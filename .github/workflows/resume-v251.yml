@@ -1,0 +1,146 @@
+name: Resume KEYNLOCK v251
+
+on:
+  push:
+    paths:
+      - .github/workflows/resume-v251.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore omitted active assets from archived v250 ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARCHIVE_COMMIT=eb24d51afc2c53b6a7bbd4dab9be66f2f0b8cda4
+          git show "$ARCHIVE_COMMIT:lockpick-puzzle-v250-split.zip" > /tmp/keynlock-v250.zip
+          for rel in \
+            assets/backgrounds/lair-overlay.jpg \
+            assets/lair/lair-background.png \
+            assets/locks/default-lock.webp
+          do
+            if [ ! -f "$rel" ]; then
+              mkdir -p "$(dirname "$rel")"
+              unzip -p /tmp/keynlock-v250.zip "lockpick-puzzle-v250-split/$rel" > "$rel"
+            fi
+            test -s "$rel"
+          done
+          rm -f /tmp/keynlock-v250.zip
+
+      - name: Transform v250 to v251
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import csv, io, re
+
+          css_path=Path('css/app.css')
+          css=css_path.read_text(encoding='utf-8')
+          js_path=Path('js/app.js')
+          js=js_path.read_text(encoding='utf-8')
+          html_path=Path('index.html')
+          html=html_path.read_text(encoding='utf-8')
+
+          # Exact contiguous CSS split. Concatenation must equal the old file byte-for-byte.
+          mode_i=css.find('.hillsfarMode')
+          candidates=[]
+          for needle in ('.inventoryDrawer','.worldMapScreen','.shopOverlay','.lairOverlay','.shopPanel'):
+              i=css.find(needle,mode_i+1)
+              if i!=-1: candidates.append(i)
+          assert mode_i>0 and candidates
+          world_i=min(candidates)
+          motion_i=css.find(':root',world_i+1)
+          assert mode_i < world_i < motion_i
+          parts=[
+            ('css/base.css',css[:mode_i]),
+            ('css/modes.css',css[mode_i:world_i]),
+            ('css/world.css',css[world_i:motion_i]),
+            ('css/motion.css',css[motion_i:]),
+          ]
+          assert ''.join(x[1] for x in parts)==css
+          for p,t in parts: Path(p).write_text(t,encoding='utf-8')
+          css_path.unlink()
+
+          # Remove unused legacy pin pool and inactive fifth plate.
+          assert js.count('LEGACY_PIN_SKINS')==1
+          s=js.index('const LEGACY_PIN_SKINS=')
+          e=js.index('];',s)+2
+          js=js[:s]+js[e:]
+          old="'assets/plates/plate_04.webp',\n'assets/plates/plate_05.webp'"
+          assert old in js and js.count('plate_05.webp')==1
+          js=js.replace(old,"'assets/plates/plate_04.webp'",1)
+          js_path.write_text(js,encoding='utf-8')
+
+          legacy=Path('assets/pins/legacy')
+          if legacy.exists():
+              for p in legacy.iterdir():
+                  if p.is_file(): p.unlink()
+              legacy.rmdir()
+          Path('assets/plates/plate_05.webp').unlink(missing_ok=True)
+
+          # Manifest: keep only physical assets and renumber.
+          manifest=Path('ASSET_MANIFEST.tsv')
+          rows=list(csv.DictReader(io.StringIO(manifest.read_text(encoding='utf-8')),delimiter='\t'))
+          rows=[r for r in rows if Path(r['path']).is_file()]
+          out=io.StringIO()
+          fields=['index','mime','path','bytes','sha256_12']
+          w=csv.DictWriter(out,fieldnames=fields,delimiter='\t',lineterminator='\n')
+          w.writeheader()
+          for i,r in enumerate(rows):
+              r['index']=str(i); w.writerow(r)
+          manifest.write_text(out.getvalue(),encoding='utf-8')
+
+          # KEYNLOCK branding and direct stylesheet order.
+          html=re.sub(r'<!DOCTYPE html>\s*<!--.*?-->\s*','<!DOCTYPE html>\n<!-- KEYNLOCK — modular browser build -->\n',html,count=1,flags=re.S)
+          html=re.sub(r'<title>.*?</title>','<title>KEYNLOCK — Lockpicking Puzzle</title>',html,count=1)
+          old_link='<link rel="stylesheet" href="css/app.css">'
+          links='\n'.join([
+            '<link rel="stylesheet" href="css/base.css">',
+            '<link rel="stylesheet" href="css/modes.css">',
+            '<link rel="stylesheet" href="css/world.css">',
+            '<link rel="stylesheet" href="css/motion.css">',
+          ])
+          assert old_link in html
+          html=html.replace(old_link,links,1)
+          html_path.write_text(html,encoding='utf-8')
+
+          Path('VERSION').write_text('251\n',encoding='utf-8')
+          Path('README.md').write_text('''# KEYNLOCK — v251\n\nBrowser puzzle game. v251 preserves v250 gameplay while cleaning dead assets and splitting CSS without changing cascade order.\n\n- `css/base.css` — foundation, HUD and classic lock\n- `css/modes.css` — puzzle modes\n- `css/world.css` — inventory, shop, map and lair UI\n- `css/motion.css` — final motion/compositor overrides\n- `css/mobile.css` — mobile overrides, loaded last\n- `js/app.js` — gameplay logic; only unused asset declarations removed in v251\n\n`v250-stable` preserves the pre-v251 checkpoint.\n''',encoding='utf-8')
+
+          Path('ARCHITECTURE_REPORT.txt').unlink(missing_ok=True)
+          Path('V251_FAILURE.log').unlink(missing_ok=True)
+
+          # Runtime asset reference check.
+          scan='\n'.join(Path(p).read_text(encoding='utf-8') for p in ['index.html','js/app.js','css/base.css','css/modes.css','css/world.css','css/motion.css','css/mobile.css'])
+          refs=sorted(set(re.findall(r'assets/[A-Za-z0-9_./-]+\.(?:png|webp|jpg|jpeg)',scan,re.I)))
+          missing=[p for p in refs if not Path(p).is_file()]
+          assert not missing,missing
+          assert 'LEGACY_PIN_SKINS' not in scan and 'plate_05.webp' not in scan
+          assert 'SINGLE-FILE BUILD' not in scan and 'LOCKPICK PUZZLE' not in scan
+          physical=sum(1 for p in Path('assets').rglob('*') if p.is_file())
+          assert physical==len(rows)==76,(physical,len(rows))
+          print('v251 verified:',physical,'assets,',len(refs),'runtime refs')
+          PY
+          node --check js/app.js
+          grep -q '^251$' VERSION
+
+      - name: Commit v251
+        shell: bash
+        run: |
+          rm -f .github/workflows/build-v251.yml .github/workflows/resume-v251.yml
+          rmdir .github/workflows 2>/dev/null || true
+          rmdir .github 2>/dev/null || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "KEYNLOCK v251: modular CSS and cleanup"
+          git push

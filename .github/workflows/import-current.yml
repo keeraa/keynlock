@@ -1,6 +1,7 @@
 name: Import current KEYNLOCK archive
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - .github/workflows/import-current.yml

@@ -1,14 +1,12 @@
-# KEYNLOCK — v251
+# KEYNLOCK — v252
 
-Browser lockpicking puzzle game. v251 preserves v250 gameplay while cleaning stale asset references and modularizing CSS without changing cascade order.
+Browser lockpicking puzzle game. v252 modularizes JavaScript and fixes asset URLs passed through CSS variables.
 
 - `index.html` — KEYNLOCK entry point
-- `css/base.css` — foundation, HUD and classic lock
-- `css/modes.css` — puzzle-mode styles
-- `css/world.css` — inventory, shop, map, lair and world UI
-- `css/motion.css` — final motion/compositor overrides
-- `css/mobile.css` — mobile overrides, loaded last
-- `js/app.js` — gameplay logic; only unused asset declarations removed in v251
+- `css/` — modular CSS
+- `js/core/` — shared runtime
+- `js/world/` — inventory, lair, map/navigation and shop
+- `js/modes/` — puzzle mechanics
 - `assets/` — active artwork
 
-`v250-stable` preserves the pre-v251 checkpoint.
+Stable checkpoints: `v250-stable`, `v251-stable`.

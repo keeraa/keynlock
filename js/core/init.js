@@ -1,0 +1,326 @@
+  requestAnimationFrame(animationLoop);
+
+  function tablerIcon(name, size=18){
+    const icons={
+      lock:'<path d="M5 11m-2 0a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"/><path d="M8 9v-4a4 4 0 0 1 8 0v4"/><path d="M12 15l0 .01"/>',
+      adjustments:'<path d="M4 6h16"/><path d="M4 18h16"/><path d="M4 12h16"/><path d="M8 4v4"/><path d="M16 10v4"/><path d="M10 16v4"/>',
+      route:'<path d="M3 17l4 4l4 -4"/><path d="M7 21v-11a3 3 0 0 1 3 -3h7"/><path d="M14 4l3 3l-3 3"/>',
+      list:'<path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="M5 6v.01"/><path d="M5 12v.01"/><path d="M5 18v.01"/>',
+      sparkles:'<path d="M12 3l1.7 4.3l4.3 1.7l-4.3 1.7l-1.7 4.3l-1.7 -4.3l-4.3 -1.7l4.3 -1.7z"/><path d="M5 17l.8 2.2l2.2 .8l-2.2 .8l-.8 2.2l-.8 -2.2l-2.2 -.8l2.2 -.8z"/>',
+      key:'<circle cx="8" cy="15" r="4"/><path d="M11 12l8 -8"/><path d="M15 8l3 3"/><path d="M17 6l3 3"/>',
+      circles:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+      arrows:'<path d="M7 7l-4 4l4 4"/><path d="M3 11h14"/><path d="M17 5l4 4l-4 4"/><path d="M21 9h-14"/>',
+      tool:'<path d="M14.7 6.3a4 4 0 0 0 -5 -5l2.2 2.2l-2.8 2.8l-2.2 -2.2a4 4 0 0 0 5 5l7.6 7.6a2 2 0 0 1 -2.8 2.8l-7.6 -7.6"/>',
+      unlock:'<rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11v-4a5 5 0 0 1 9.8 -1"/><path d="M12 16v.01"/>',
+      binary:'<path d="M8 9h8"/><path d="M8 15h8"/><circle cx="5" cy="9" r="1"/><circle cx="19" cy="15" r="1"/>',
+      bag:'<path d="M6 8h12l1 13h-14z"/><path d="M9 8v-2a3 3 0 0 1 6 0v2"/>',
+      coin:'<circle cx="12" cy="12" r="9"/><path d="M14.8 9a3 3 0 0 0 -2.8 -1.5c-1.7 0 -3 1 -3 2.3c0 3.2 6 1.7 6 5c0 1.3 -1.3 2.2 -3 2.2a3 3 0 0 1 -2.8 -1.5"/><path d="M12 5v2.5"/><path d="M12 17v2"/>',
+      x:'<path d="M18 6l-12 12"/><path d="M6 6l12 12"/>',
+      up:'<path d="M6 15l6 -6l6 6"/>',
+      down:'<path d="M6 9l6 6l6 -6"/>',
+      left:'<path d="M15 6l-6 6l6 6"/>',
+      right:'<path d="M9 6l6 6l-6 6"/>',
+      refresh:'<path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/>',
+      plus:'<path d="M12 5v14"/><path d="M5 12h14"/>',
+      diamond:'<path d="M12 3l8 6l-8 12l-8 -12z"/><path d="M4 9h16"/>',
+      tree:'<path d="M12 3l-5 7h3l-4 6h5v5h2v-5h5l-4 -6h3z"/>',
+      hammer:'<path d="M8 4l8 8"/><path d="M12 4l4 4l-3 3l-4 -4z"/><path d="M11 13l-7 7"/>',
+      briefcase:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7v-2h8v2"/><path d="M3 12h18"/>'
+    };
+    const body=icons[name]||icons.lock;
+    return `<svg class="ti-svg" data-tabler-icon="${name}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+  }
+
+  function setIconLabel(el, icon, label){
+    if(!el) return;
+    el.innerHTML=`${tablerIcon(icon,17)}<span>${label}</span>`;
+  }
+
+  function applyTablerIcons(){
+    setIconLabel($tabClassic,'lock','Классика');
+    setIconLabel($tabTarget,'adjustments','Альтернатива');
+    setIconLabel($tabLine,'route','Другая линия');
+    setIconLabel($tabAlt2,'list','Альтернатива 2');
+    setIconLabel($tabSpecial,'sparkles','Особые замки');
+    setIconLabel($tabHillsfar,'key','Hillsfar');
+    setIconLabel($tabMass,'circles','Mass Effect');
+    setIconLabel($tabG1,'arrows','Gothic 1');
+    setIconLabel($tabR2,'tool','Risen 2');
+    setIconLabel($tabSkyrim,'unlock','Skyrim');
+    setIconLabel($tabAnach,'binary','Anachronox');
+    setIconLabel($tabTension,'adjustments','Натяжение');
+    setIconLabel($tabResonance,'circles','Резонанс');
+    setIconLabel($tabDeduction,'key','Слепок ключа');
+    setIconLabel($tabComposite,'key','Составная');
+    setIconLabel($shopTab,'bag','Магазин');
+
+    const coinIcon=document.querySelector('.coinIcon');
+    if(coinIcon) coinIcon.innerHTML=tablerIcon('coin',16);
+    const headerPickIcon=document.querySelector('.headerPickIcon');
+    if(headerPickIcon) headerPickIcon.innerHTML=tablerIcon('key',18);
+    if($shopClose) $shopClose.innerHTML=tablerIcon('x',20);
+    if($toastAction) $toastAction.innerHTML=`${tablerIcon('refresh',16)}<span>Новый замок</span>`;
+
+    const woodName=$shopWood?.querySelector('.shopCardName');
+    const ironName=$shopIron?.querySelector('.shopCardName');
+    const diamondName=$shopDiamond?.querySelector('.shopCardName');
+    if(woodName) woodName.innerHTML=`${tablerIcon('tree',18)}<span>Деревянная</span>`;
+    if(ironName) ironName.innerHTML=`${tablerIcon('hammer',18)}<span>Железная</span>`;
+    if(diamondName) diamondName.innerHTML=`${tablerIcon('diamond',18)}<span>Алмазная</span>`;
+    const pouchName=document.querySelector('#pouchTitle');
+    if(pouchName) pouchName.dataset.iconReady='1';
+
+    document.querySelectorAll('.anBtn.anUp').forEach(b=>b.innerHTML=tablerIcon('up',18));
+    document.querySelectorAll('.anBtn.anDown').forEach(b=>b.innerHTML=tablerIcon('down',18));
+    document.querySelectorAll('.btn.up').forEach(b=>b.innerHTML=tablerIcon('up',20));
+    document.querySelectorAll('.btn.down').forEach(b=>b.innerHTML=tablerIcon('down',20));
+    document.querySelectorAll('.btn.left').forEach(b=>b.innerHTML=tablerIcon('left',20));
+    document.querySelectorAll('.btn.right').forEach(b=>b.innerHTML=tablerIcon('right',20));
+    const actions=document.querySelectorAll('.actions .action');
+    if(actions[0]) actions[0].innerHTML=tablerIcon('refresh',18);
+    if(actions[1]) actions[1].innerHTML=tablerIcon('plus',18);
+  }
+
+  document.addEventListener('selectstart', e=>e.preventDefault());
+  addEventListener('pointerdown',ensureAudio,{once:true});
+  addEventListener('keydown',ensureAudio,{once:true});
+  document.addEventListener('dragstart', e=>e.preventDefault());
+
+  function input(k){
+    if(shopOpen) return;
+    k=String(k).toLowerCase();
+    if(k==='a'||k==='arrowleft')move(-1);
+    else if(k==='d'||k==='arrowright')move(1);
+    else if(k==='w'||k==='arrowup')select(-1);
+    else if(k==='s'||k==='arrowdown')select(1);
+    else if(k==='r')reset();
+    else if(k==='n')newLock();
+  }
+
+  addEventListener('resize',()=>{
+    if(mode==='composite' && !$compositeMode.hidden){
+      requestAnimationFrame(()=>{
+        cpRenderPinRail($cpPins, cpNodes);
+        cpRenderPinRail($cpBuildPins, cpBuiltNodes());
+        cpRenderJoints(cpBuiltNodes());
+      });
+    }
+  },{passive:true});
+
+  const KEY_ACTIONS={
+    KeyA:'a', KeyD:'d', KeyW:'w', KeyS:'s', KeyR:'r', KeyN:'n', KeyT:'t',
+    ArrowLeft:'arrowleft', ArrowRight:'arrowright', ArrowUp:'arrowup', ArrowDown:'arrowdown'
+  };
+
+  addEventListener('keydown',e=>{
+    const action=KEY_ACTIONS[e.code];
+    if(!action) return;
+    e.preventDefault();
+    input(action);
+  });
+  document.querySelectorAll('[data-key]').forEach(b=>b.addEventListener('pointerdown',()=>input(b.dataset.key)));
+
+  addEventListener('pointermove', e=>{
+    const nx=(e.clientX / Math.max(1, innerWidth) - 0.5) * 2;
+    const ny=(e.clientY / Math.max(1, innerHeight) - 0.5) * 2;
+    bgParallaxTargetX = -nx * innerWidth * 0.025;
+    bgParallaxTargetY = -ny * innerHeight * 0.025;
+  }, {passive:true});
+  document.documentElement.addEventListener('mouseleave', ()=>{
+    bgParallaxTargetX = 0;
+    bgParallaxTargetY = 0;
+  });
+
+  $scene.addEventListener('pointermove', e=>{
+    const r=$scene.getBoundingClientRect();
+    const nx=((e.clientX-r.left)/r.width - 0.5) * 2;
+    const ny=((e.clientY-r.top)/r.height - 0.5) * 2;
+    pointerTargetX = nx * 13;
+    pointerTargetY = ny * 11;
+  });
+  $scene.addEventListener('pointerleave', ()=>{
+    pointerTargetX = 0;
+    pointerTargetY = 0;
+  });
+
+  $skBoard.addEventListener('pointerdown',e=>{
+    if(mode!=='skyrim' || e.target.closest('.skTorqueButton')) return;
+    skDragging=true;
+    $skBoard.setPointerCapture?.(e.pointerId);
+    setSkyrimAngle(skyrimAngleFromPointer(e));
+  });
+  $skBoard.addEventListener('pointermove',e=>{
+    if(mode!=='skyrim' || !skDragging) return;
+    setSkyrimAngle(skyrimAngleFromPointer(e));
+  });
+  $skBoard.addEventListener('pointerup',e=>{
+    if(mode!=='skyrim') return;
+    skDragging=false;
+    $skBoard.releasePointerCapture?.(e.pointerId);
+  });
+  $skBoard.addEventListener('pointercancel',()=>{ skDragging=false; });
+
+  $lockHitArea.addEventListener('click',handleUniversalLockClick);
+  $massCenter.addEventListener('click',tryOpenMass);
+  $kdCheck?.addEventListener('click',checkDeduction);
+  $skTorqueButton.addEventListener('click',tryTorqueSkyrim);
+  $anUnlock.addEventListener('click',e=>{ if(e.target.closest('.anBtn')) return; tryOpenAn(); });
+  $anUnlock.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&!e.target.closest('.anBtn')){ e.preventDefault(); tryOpenAn(); } });
+  document.querySelectorAll('[data-an-col]').forEach(btn=>btn.addEventListener('click',e=>{ e.stopPropagation(); adjustAn(btn.dataset.anDir==='up'?1:-1, Number(btn.dataset.anCol)); }));
+  document.querySelectorAll('.anChannel').forEach(ch=>ch.addEventListener('click',e=>{ if(e.target.closest('.anBtn')) return; anSelected=Number(ch.dataset.col); SFX.select(); renderAn(); }));
+  $tnGauge?.addEventListener('pointerdown',e=>{
+    if(mode!=='tension'||solved||tnReady) return;
+    tnDragging=true;$tnGauge.setPointerCapture?.(e.pointerId);
+    const r=$tnGauge.getBoundingClientRect();tnTension=clamp((e.clientX-r.left)/r.width*100,0,100);renderTension();
+  });
+  $tnGauge?.addEventListener('pointermove',e=>{if(!tnDragging||mode!=='tension')return;const r=$tnGauge.getBoundingClientRect();tnTension=clamp((e.clientX-r.left)/r.width*100,0,100);if($tnNeedle)$tnNeedle.style.left=`${tnTension}%`;});
+  $tnGauge?.addEventListener('pointerup',()=>{tnDragging=false;});
+  $tnGauge?.addEventListener('pointercancel',()=>{tnDragging=false;});
+  addEventListener('keydown',e=>{if(mode==='resonance'&&e.code==='Space'){e.preventDefault();hitResonance();}});
+  addEventListener('keydown',e=>{if(mode==='tension'&&e.code==='Space'){e.preventDefault();setTensionPin();}});
+  addEventListener('keydown',e=>{if(mode==='deduction'&&e.code==='Space'){e.preventDefault();checkDeduction();}});
+  document.querySelector('#shopHudButton')?.addEventListener('click',()=>{
+    if(lairOpen) closeLair();
+    if(mapOpen) closeMap();
+    openShop();
+  });
+  document.querySelector('#lairHudButton')?.addEventListener('click',openLairFromHud);
+  document.querySelector('#newPuzzleButton')?.addEventListener('click',restartCurrentRound);
+  $mapTab.onclick=openMap;
+  document.querySelector('#worldMapClose')?.addEventListener('click',closeMap);
+  $worldMapScreen?.addEventListener('pointerdown',e=>{
+    if(e.target===$worldMapScreen) closeMap();
+  });
+  $worldMapCanvas?.querySelectorAll('.mapNode').forEach(node=>{
+    node.addEventListener('click',()=>travelToMapLocation(node.dataset.location));
+  });
+  document.querySelectorAll('.lairHotspot').forEach(btn=>{
+    btn.addEventListener('click',()=>openLairModule(btn.dataset.lairOpen));
+  });
+  document.querySelector('#lairWorkbenchHotspot')?.addEventListener('click',openLairWorkbench);
+  document.querySelector('#lairWorkbenchClose')?.addEventListener('click',closeLairWorkbench);
+  document.querySelector('#lairWorkbenchModal')?.addEventListener('pointerdown',e=>{
+    if(e.target===e.currentTarget) closeLairWorkbench();
+  });
+  $lairModuleClose?.addEventListener('click',closeLairModule);
+  $lairClose?.addEventListener('click',closeLair);
+
+  if($shopTab) $shopTab.onclick=null;
+  $shopClose.onclick=closeShop;
+  $shopOverlay.addEventListener('pointerdown',e=>{ if(e.target===$shopOverlay) closeShop(); });
+  $shopWood.onclick=()=>buyOrEquipPick('wood');
+  $shopIron.onclick=()=>buyOrEquipPick('iron');
+  $shopDiamond.onclick=()=>buyOrEquipPick('diamond');
+  $pouchBuy.onclick=buyPouch;
+  addEventListener('keydown',e=>{
+    if(e.code!=='Escape') return;
+    if(shopOpen){ e.preventDefault(); closeShop(); return; }
+    const workbenchModal=document.querySelector('#lairWorkbenchModal');
+    if(lairOpen && workbenchModal && !workbenchModal.hidden){ e.preventDefault(); closeLairWorkbench(); return; }
+    if(lairOpen && $lairModuleWindow && !$lairModuleWindow.hidden){ e.preventDefault(); closeLairModule(); return; }
+    if(lairOpen){ e.preventDefault(); closeLair(); return; }
+    if(mapOpen){ e.preventDefault(); closeMap(); }
+  });
+
+  const $mobileModeMenuButton=document.querySelector('#mobileModeMenuButton');
+  const $mobileModeBackdrop=document.querySelector('#mobileModeBackdrop');
+  const $modeTabsPanel=document.querySelector('.modeTabs');
+  const mobileLayoutQuery=window.matchMedia('(max-width:760px), (max-height:560px) and (orientation:landscape)');
+
+  function setMobileModeMenu(open){
+    const enabled=mobileLayoutQuery.matches;
+    const next=Boolean(open && enabled);
+    document.body.classList.toggle('mobile-mode-menu-open',next);
+    $mobileModeMenuButton?.setAttribute('aria-expanded',next?'true':'false');
+    $mobileModeBackdrop?.setAttribute('aria-hidden',next?'false':'true');
+  }
+  function closeMobileModeMenu(){ setMobileModeMenu(false); }
+
+  $mobileModeMenuButton?.addEventListener('click',()=>setMobileModeMenu(!document.body.classList.contains('mobile-mode-menu-open')));
+  $mobileModeBackdrop?.addEventListener('click',closeMobileModeMenu);
+  $modeTabsPanel?.addEventListener('click',e=>{
+    if(e.target.closest('.tab')) closeMobileModeMenu();
+  });
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape') closeMobileModeMenu();
+  });
+  mobileLayoutQuery.addEventListener?.('change',()=>closeMobileModeMenu());
+
+  $toastAction.onclick=()=>{ newLock(); $toast.classList.remove('show','actionable'); };
+  $tabClassic.onclick=()=>switchMode('classic');
+  $tabTarget.onclick=()=>switchMode('target');
+  $tabLine.onclick=()=>switchMode('line');
+  $tabAlt2.onclick=()=>switchMode('sequence');
+  $tabSpecial.onclick=()=>switchMode('special');
+  $tabHillsfar.onclick=()=>switchMode('hillsfar');
+  $tabMass.onclick=()=>switchMode('mass');
+  $tabG1.onclick=()=>switchMode('g1');
+  $tabR2.onclick=()=>switchMode('r2');
+  $tabSkyrim.onclick=()=>switchMode('skyrim');
+  $tabAnach.onclick=()=>switchMode('anach');
+  $tabTension.onclick=()=>switchMode('tension');
+  $tabResonance.onclick=()=>switchMode('resonance');
+  $tabDeduction.onclick=()=>switchMode('deduction');
+  $tabComposite.onclick=()=>{
+    if(lairOpen) closeLair();
+    if(mapOpen) closeMap();
+    if(shopOpen) closeShop();
+    mode='composite';
+    chooseRoundPinSkin();
+    chooseRoundPlateSkin();
+    syncModePanels('composite');
+    updateModeUI();
+    startCompositeRound();
+    syncModePanels('composite');
+    $compositeMode.hidden=false;
+    $compositeMode.inert=false;
+    $compositeMode.style.setProperty('display','flex','important');
+    $compositeMode.style.setProperty('visibility','visible','important');
+    $compositeMode.style.setProperty('opacity','1','important');
+    renderComposite();
+  };
+  $tabHeatCold.onclick=()=>switchMode('heatcold');
+  $tabDrum.onclick=()=>switchMode('drum');
+  $tabScope.onclick=()=>switchMode('scope');
+  $hcInput?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();scanHeatCold();}});
+  $hcInput?.addEventListener('input',()=>{$hcInput.value=$hcInput.value.replace(/\D/g,'').slice(0,4);});
+  document.addEventListener('keydown',handleHeatColdKey);
+  $drumWheels?.addEventListener('click',e=>{const b=e.target.closest('[data-drum-i]');if(!b)return;changeDrum(Number(b.dataset.drumI),Number(b.dataset.dir));});
+  $drumCheck?.addEventListener('click',checkDrum);
+  $drumNew?.addEventListener('click',()=>newLock());
+  $drumSound?.addEventListener('click',()=>{drumSoundOn=!drumSoundOn;$drumSound.textContent='Звук: '+(drumSoundOn?'вкл':'выкл');});
+  $scopeWheels?.addEventListener('click',e=>{const b=e.target.closest('[data-scope-i]');if(!b)return;changeScope(Number(b.dataset.scopeI),Number(b.dataset.dir));});
+  $scopeCheck?.addEventListener('click',checkScope);
+  $scopeNew?.addEventListener('click',()=>newLock());
+  $hcDialRow?.addEventListener('click',e=>{
+    const btn=e.target.closest('[data-hc-step]');
+    if(btn){
+      adjustHeatColdDigit(Number(btn.dataset.hcIndex),Number(btn.dataset.hcStep));
+      return;
+    }
+    const col=e.target.closest('[data-hc-col]');
+    if(col) setHeatColdActive(Number(col.dataset.hcCol));
+  });
+  $hcDialRow?.addEventListener('focusin',e=>{
+    const col=e.target.closest('[data-hc-col]');
+    if(col && Number(col.dataset.hcCol)!==hcActiveIndex){
+      hcActiveIndex=Number(col.dataset.hcCol);
+      renderHeatColdControls();
+      focusHeatColdDigit(hcActiveIndex);
+    }
+  });
+  document.querySelectorAll('.difficultyBtn').forEach(btn=>{
+    btn.addEventListener('click',()=>setModeDifficulty(Number(btn.dataset.difficulty)));
+  });
+  addEventListener('resize',()=>renderDifficultyDock(),{passive:true});
+  applyPickSkin();
+  applyTensionSkin();
+  initPickSkinShop();
+  initTensionSkinShop();
+  initInventoryDrawer();
+  applyTablerIcons();
+  updateModeUI();
+  updateEconomyUI();
+  updatePickUI();
+  updateShopUI();
+  newLock(false);

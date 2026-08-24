@@ -1,0 +1,72 @@
+  // ===== GOTHIC 1 =====
+  function renderG1Row(container, arr, size=4){
+    container.innerHTML = '';
+    for(let i=0;i<size;i++){
+      const slot=document.createElement('div');
+      const val = arr[i];
+      slot.className = 'g1Slot ' + (val==null ? 'empty' : (val < 0 ? 'left' : 'right'));
+      container.appendChild(slot);
+    }
+  }
+
+  function renderG1(){
+    renderG1Row($g1ProgressRow, g1Input, g1Length);
+    const ready = g1Input.length === g1Length && g1Input.every((v,i)=>v===g1Sequence[i]);
+  }
+
+  function startG1Round(){
+    solved=false;
+    $lock.classList.remove('win');
+    $mechanism.classList.remove('ready','opening','opened');
+    picks=pickCapacity;
+    moves=0;
+    brokenPicks=0;
+    runReward=1000;
+    g1Length=diffStep(3,4,5,'g1');
+    g1Input=[];
+    g1Sequence = Array.from({length:g1Length}, ()=> Math.random() < .5 ? -1 : 1);
+    if(g1Sequence.every(v=>v===g1Sequence[0])) g1Sequence[rand(0,g1Length-1)] *= -1;
+    generatedDistance = g1Length;
+    updateEconomyUI();
+    renderG1();
+  }
+
+  function g1Press(dir){
+    if(shopOpen || solved) return;
+    const expected = g1Sequence[g1Input.length];
+    registerMove();
+    if(dir === expected){
+      g1Input.push(dir);
+      SFX.move();
+      renderG1();
+      if(g1Input.length === g1Length){
+        SFX.ready();
+        toast('Последовательность верна · нажми на замок');
+      }
+    }else{
+      damagePick({
+        resetProgress:()=>{ g1Input=[]; },
+        renderState:renderG1,
+        surviveText:'Неверная команда'
+      });
+    }
+  }
+
+  function tryOpenG1(auto=false){
+    if(shopOpen || solved) return;
+    const ready = g1Input.length === g1Length && g1Input.every((v,i)=>v===g1Sequence[i]);
+    if(!ready){
+      if(!auto){
+        SFX.wrongLock();
+        toast('Сначала собери правильную последовательность');
+      }
+      return;
+    }
+    solved = true;
+    $lock.classList.add('win');
+    SFX.open();
+    renderG1();
+    setTimeout(()=>celebrate(), 420);
+  }
+
+

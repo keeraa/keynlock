@@ -1,0 +1,200 @@
+name: Build KEYNLOCK v254 CSS architecture
+
+on:
+  push:
+    paths:
+      - .github/workflows/build-v254.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Split CSS without changing cascade
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          assert Path('VERSION').read_text().strip() == '253'
+
+          def split_file(source, out_dir, candidates, minimum):
+              text=Path(source).read_text(encoding='utf-8')
+              found=[]
+              for label,marker in candidates:
+                  i=text.find(marker)
+                  if i>=0: found.append((i,label,marker))
+              found.sort()
+              assert len(found)>=minimum,(source,found)
+              assert found[0][0] == 0,(source,found[0])
+              out=Path(out_dir); out.mkdir(parents=True,exist_ok=True)
+              paths=[]
+              pieces=[]
+              for n,(start,label,marker) in enumerate(found):
+                  end=found[n+1][0] if n+1<len(found) else len(text)
+                  chunk=text[start:end]
+                  path=out / f'{n+1:02d}-{label}.css'
+                  path.write_text(chunk,encoding='utf-8')
+                  paths.append(path.as_posix())
+                  pieces.append(chunk)
+              assert ''.join(pieces)==text
+              Path(source).unlink()
+              return paths,[(p,len(c.encode())) for p,c in zip(paths,pieces)]
+
+          modes,modes_meta=split_file('css/modes.css','css/modes',[
+              ('hillsfar','.hillsfarMode{'),
+              ('mass-effect','.massMode{'),
+              ('gothic1','.g1Mode{'),
+              ('risen2','.r2Mode{'),
+              ('skyrim','.skMode{'),
+              ('anachronox','.anMode{'),
+              ('tension','.tnMode{'),
+              ('resonance','.rsMode{'),
+              ('deduction','.kdMode{'),
+              ('composite','.cpMode{'),
+              ('digital','.digitalMode{'),
+          ],6)
+
+          world,world_meta=split_file('css/world.css','css/world',[
+              ('shop','.shopOverlay{'),
+              ('inventory','.inventoryDrawer{'),
+              ('map','.worldMapScreen{'),
+              ('lair','.lairOverlay{'),
+              ('lair-scene','.lairScene{'),
+          ],3)
+
+          overrides,overrides_meta=split_file('css/motion.css','css/overrides',[
+              ('motion',':root{--motion-ease'),
+              ('inventory','.inventoryDrawer'),
+              ('universal-lock','#lock.universalLockBlock'),
+              ('digital','.digitalMode'),
+              ('map','.worldMapInfo'),
+              ('lair','.lairScene'),
+              ('workbench','.lairWorkbenchHotspot'),
+          ],4)
+
+          html_path=Path('index.html')
+          html=html_path.read_text(encoding='utf-8')
+          old='\n'.join([
+              '<link rel="stylesheet" href="css/base.css">',
+              '<link rel="stylesheet" href="css/modes.css">',
+              '<link rel="stylesheet" href="css/world.css">',
+              '<link rel="stylesheet" href="css/motion.css">',
+              '<link rel="stylesheet" href="css/mobile.css">',
+          ])
+          assert old in html
+          ordered=['css/base.css',*modes,*world,*overrides,'css/mobile.css']
+          new='\n'.join(f'<link rel="stylesheet" href="{p}">' for p in ordered)
+          html=html.replace(old,new,1)
+          html_path.write_text(html,encoding='utf-8')
+
+          check_path=Path('scripts/check.mjs')
+          check=check_path.read_text(encoding='utf-8')
+          anchor="const scripts = localAttributeRefs(html, 'script', 'src');\n"
+          assert check.count(anchor)==1
+          expected=[
+            'js/core/state.js','js/core/audio.js','js/core/ui.js',
+            'js/world/inventory.js','js/world/lair.js','js/world/navigation-shop.js',
+            'js/core/digital-helpers.js','js/modes/heat-cold.js','js/modes/drum.js','js/modes/oscilloscope.js',
+            'js/core/game.js','js/modes/mass-effect.js','js/modes/anachronox.js','js/modes/composite.js',
+            'js/modes/tension.js','js/modes/resonance.js','js/modes/deduction.js','js/modes/skyrim.js',
+            'js/modes/risen2.js','js/modes/gothic1.js','js/modes/hillsfar.js','js/modes/base-locks.js',
+            'js/core/init.js','js/core/inventory-hit-testing.js'
+          ]
+          insertion=(anchor+
+            'const expectedScriptOrder = '+json.dumps(expected,separators=(',',':'))+';\n'+
+            "if (JSON.stringify(scripts) !== JSON.stringify(expectedScriptOrder)) fail('JavaScript load order changed; classic scripts share one lexical environment.');\n")
+          check=check.replace(anchor,insertion,1)
+          check_path.write_text(check,encoding='utf-8')
+
+          package=Path('package.json')
+          data=json.loads(package.read_text(encoding='utf-8'))
+          data['version']='0.254.0'
+          package.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          Path('VERSION').write_text('254\n',encoding='utf-8')
+
+          Path('css/README.md').write_text('''# KEYNLOCK CSS architecture\n\nv254 keeps the v253 cascade byte-for-byte while splitting the large CSS files into contiguous fragments. File order in `index.html` is significant.\n\n- `base.css` — foundation, HUD and classic lock base styles\n- `modes/` — imported puzzle-mode sections in original cascade order\n- `world/` — shop/inventory/map/lair sections plus shared overrides that originally occurred between them\n- `overrides/` — late-stage motion and cascade overrides, mechanically split by dominant section\n- `mobile.css` — final mobile override layer and must remain last\n\nFragments are intentionally not regrouped by selector because doing so could alter cascade behavior. Shared rules stay at their original chronological position.\n''',encoding='utf-8')
+
+          Path('README.md').write_text('''# KEYNLOCK — v254\n\nBrowser lockpicking puzzle game. v254 keeps the v253 runtime and adds cascade-safe CSS modularization plus a locked JavaScript load-order check.\n\n- `index.html` — ordered CSS and JavaScript entry point\n- `css/base.css` — foundation and classic lock base styles\n- `css/modes/` — puzzle-mode CSS fragments\n- `css/world/` — shop, inventory, map and lair CSS fragments\n- `css/overrides/` — late cascade/motion overrides\n- `css/mobile.css` — final mobile overrides\n- `js/core/`, `js/world/`, `js/modes/` — modular runtime\n- `scripts/` — local server, structural check and browser smoke\n- `vercel.json` — static deploy configuration\n\nLocal verification: `npm run check`, `npm run smoke`, `npm run dev`.\n\nStable checkpoints: `v250-stable`, `v251-stable`, `v252-stable`, `v253-stable`.\n''',encoding='utf-8')
+
+          print('modes:',modes_meta)
+          print('world:',world_meta)
+          print('overrides:',overrides_meta)
+          print('stylesheets:',len(ordered))
+          PY
+
+          npm run check
+          npm run smoke
+
+      - name: Full interactive browser smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/keynlock-pw
+          cd /tmp/keynlock-pw
+          npm init -y >/dev/null 2>&1
+          npm install --silent --no-save playwright-core@1.55.0
+          cd "$GITHUB_WORKSPACE"
+          node scripts/serve.mjs --port 8765 --quiet >/tmp/keynlock-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID 2>/dev/null || true' EXIT
+          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          test -n "$CHROME_BIN"
+          CHROME_BIN="$CHROME_BIN" NODE_PATH=/tmp/keynlock-pw/node_modules node <<'NODE'
+          const {chromium}=require('playwright-core');
+          const assert=(v,m)=>{if(!v) throw new Error(m)};
+          (async()=>{
+            const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN,args:['--no-sandbox','--disable-dev-shm-usage']});
+            const errors=[];
+            async function run(viewport,mobile){
+              const page=await browser.newPage({viewport});
+              page.on('pageerror',e=>errors.push('pageerror: '+e.message));
+              page.on('response',r=>{
+                const u=r.url();
+                if(r.status()>=400 && u.startsWith('http://127.0.0.1:8765/') && !u.endsWith('/favicon.ico')) errors.push(`HTTP ${r.status()} ${u}`);
+              });
+              const response=await page.goto('http://127.0.0.1:8765/',{waitUntil:'load',timeout:15000});
+              assert(response?.ok(),'root failed');
+              await page.waitForTimeout(350);
+              const ids=['tabClassic','tabTarget','tabLine','tabAlt2','tabSpecial','tabHillsfar','tabMass','tabG1','tabR2','tabSkyrim','tabAnach','tabTension','tabResonance','tabDeduction','tabComposite','tabHeatCold','tabDrum','tabScope'];
+              for(const id of ids){await page.locator('#'+id).evaluate(el=>el.click());await page.waitForTimeout(40);}
+              if(mobile){
+                await page.locator('#mobileModeMenuButton').click({force:true});
+                await page.waitForTimeout(70);
+                assert(await page.locator('body.mobile-mode-menu-open').count()===1,'mobile menu failed');
+                await page.locator('#tabClassic').click({force:true});
+                await page.waitForTimeout(70);
+                assert(await page.locator('body.mobile-mode-menu-open').count()===0,'mobile menu did not close');
+              } else {
+                await page.locator('#mapTab').click({force:true}); await page.waitForTimeout(70); assert(await page.locator('#worldMapScreen:not([hidden])').count()===1,'map failed'); await page.locator('#worldMapClose').click({force:true});
+                await page.locator('#lairHudButton').click({force:true}); await page.waitForTimeout(70); assert(await page.locator('#lairOverlay:not([hidden])').count()===1,'lair failed'); await page.locator('#lairClose').click({force:true}); await page.waitForTimeout(70); if(await page.locator('#worldMapScreen:not([hidden])').count()) await page.locator('#worldMapClose').click({force:true});
+                await page.locator('#shopHudButton').click({force:true}); await page.waitForTimeout(70); assert(await page.locator('#shopOverlay.open').count()===1,'shop failed'); await page.locator('#shopClose').click({force:true});
+              }
+              await page.close();
+            }
+            await run({width:1440,height:900},false);
+            await run({width:390,height:844},true);
+            await browser.close();
+            if(errors.length) throw new Error(errors.join('\n'));
+            console.log('KEYNLOCK v254 interactive smoke OK');
+          })().catch(e=>{console.error(e.stack||e);process.exit(1)});
+          NODE
+
+      - name: Commit v254
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .github
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "KEYNLOCK v254: cascade-safe CSS architecture"
+          git push

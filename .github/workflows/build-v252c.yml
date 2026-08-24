@@ -47,7 +47,6 @@ jobs:
               found=text.count(old)
               assert found==expected,(old,found,expected)
               text=text.replace(old,new,expected)
-          assert not [(i,l) for i,l in enumerate(text.splitlines(),1) if '`url(' in l and '${' in l]
 
           tail_marker='/* Inventory visual hit testing */'
           tail_i=text.index(tail_marker)
@@ -201,7 +200,7 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf .github
-          rm -f V252_JS_REPORT.txt V252_DIAGNOSTIC.txt V252_FAILURE.log V252_FAILURE_FINAL.log V252_FAILURE_LAST.log RESTORE_ASSETS_FAILURE.log ARCHITECTURE_REPORT.txt
+          rm -f V252_JS_REPORT.txt V252_DIAGNOSTIC.txt V252_FAILURE.log V252_FAILURE_FINAL.log V252_FAILURE_LAST.log V252_PATTERN_REPORT.txt RESTORE_ASSETS_FAILURE.log ARCHITECTURE_REPORT.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A

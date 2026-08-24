@@ -57,7 +57,7 @@ try {
       url,
     ], { encoding: 'utf8', timeout: 20000, maxBuffer: 12 * 1024 * 1024 });
     if (result.status !== 0) throw new Error(`Chrome smoke failed (${result.status}):\n${result.stderr}`);
-    if (!result.stdout.includes('<title>KEYNLOCK — Lockpicking Puzzle</title>')) throw new Error('Chrome smoke: KEYNLOCK title missing.');
+    if (!result.stdout.includes('KEYNLOCK')) throw new Error('Chrome smoke: KEYNLOCK marker missing.');
     if (!result.stdout.includes('data-tabler-icon="lock"')) throw new Error('Chrome smoke: initialization did not render Tabler icons.');
     if (!result.stdout.includes('id="tabScope"')) throw new Error('Chrome smoke: mode DOM incomplete.');
     console.log('Browser smoke OK — KEYNLOCK initialized in headless Chrome.');

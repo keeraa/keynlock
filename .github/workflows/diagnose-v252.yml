@@ -1,0 +1,93 @@
+name: Diagnose KEYNLOCK v252
+
+on:
+  push:
+    paths:
+      - .github/workflows/diagnose-v252.yml
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Diagnose
+        shell: bash
+        run: |
+          set +e
+          exec > >(tee /tmp/v252-diagnostic.log) 2>&1
+          echo '=== environment ==='
+          node --version
+          python3 --version
+          echo "chrome=$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          echo '=== transform ==='
+          python3 - <<'PY'
+          from pathlib import Path
+          text=Path('js/app.js').read_text(encoding='utf-8')
+          print('source bytes',len(text.encode()))
+          assert text.startswith('(() => {\n')
+          tail_i=text.index('/* Inventory visual hit testing */')
+          main=text[:tail_i]
+          close_i=main.rfind('\n})();')
+          inner=main[len('(() => {\n'):close_i]
+          tail=text[tail_i:]
+          markers=[
+          ('js/core/audio.js','  let audioCtx=null;'),('js/core/ui.js','  function shuffle'),('js/world/inventory.js','  function inventoryEls'),('js/world/lair.js','  function saveLairIntel'),('js/world/navigation-shop.js','  function renderWorldMap'),('js/core/digital-helpers.js','  // Digital puzzle helpers'),('js/modes/heat-cold.js','  // Heat / cold'),('js/modes/drum.js','  // Drum clicks'),('js/modes/oscilloscope.js','  // Oscilloscope'),('js/core/game.js','  function updateModeUI'),('js/modes/mass-effect.js','  // ===== MASS EFFECT ====='),('js/modes/anachronox.js','  // ===== ANACHRONOX ====='),('js/modes/composite.js','  // ===== COMPOSITE PICK — CONTINUOUS BUILDER ====='),('js/modes/tension.js','  // ===== TENSION CONTROL ====='),('js/modes/resonance.js','  // ===== RESONANCE ====='),('js/modes/deduction.js','  // ===== KEY DEDUCTION ====='),('js/modes/skyrim.js','  // ===== SKYRIM ====='),('js/modes/risen2.js','  // ===== RISEN 2 ====='),('js/modes/gothic1.js','  // ===== GOTHIC 1 ====='),('js/modes/hillsfar.js','  // ===== HILLSFAR ====='),('js/modes/base-locks.js','  // ===== BASE / SPECIAL LOCKS =====')]
+          cuts=[]
+          last=-1
+          for path,m in markers:
+              i=inner.find(m,last+1)
+              print(path,i)
+              assert i>last,(path,i,last)
+              cuts.append((path,i));last=i
+          tabler=inner.find('  function tablerIcon',last+1)
+          init=inner.rfind('  requestAnimationFrame(animationLoop);',0,tabler)
+          print('tabler',tabler,'init',init)
+          assert init>last
+          cuts.append(('js/core/init.js',init))
+          bounds=[('js/core/state.js',0)]+cuts
+          parts=[]
+          for n,(path,start) in enumerate(bounds):
+              end=bounds[n+1][1] if n+1<len(bounds) else len(inner)
+              Path(path).parent.mkdir(parents=True,exist_ok=True)
+              Path(path).write_text(inner[start:end],encoding='utf-8')
+              parts.append(path)
+          Path('js/core/inventory-hit-testing.js').write_text(tail,encoding='utf-8')
+          parts.append('js/core/inventory-hit-testing.js')
+          assert ''.join(Path(p).read_text(encoding='utf-8') for p in parts[:-1])==inner
+          Path('js/app.js').unlink()
+          html=Path('index.html').read_text(encoding='utf-8')
+          scripts='\n'.join(f'<script src="{p}"></script>' for p in parts)
+          html=html.replace('<script src="js/app.js"></script>',scripts,1)
+          Path('index.html').write_text(html,encoding='utf-8')
+          print('transform OK, files',len(parts))
+          PY
+          TRANSFORM_RC=$?
+          echo "transform_rc=$TRANSFORM_RC"
+          echo '=== syntax ==='
+          if [ "$TRANSFORM_RC" -eq 0 ]; then
+            for f in $(find js -type f -name '*.js' | sort); do echo "CHECK $f"; node --check "$f"; echo "rc=$?"; done
+          fi
+          echo '=== browser basic ==='
+          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ "$TRANSFORM_RC" -eq 0 ] && [ -n "$CHROME_BIN" ]; then
+            python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/keynlock-http.log 2>&1 & SERVER_PID=$!
+            sleep 1
+            "$CHROME_BIN" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=2000 --dump-dom http://127.0.0.1:8765/ >/tmp/dom.txt 2>/tmp/chrome.err
+            echo "chrome_rc=$?"
+            echo '-- chrome stderr --'; tail -80 /tmp/chrome.err
+            echo '-- title/dom markers --'; grep -E 'KEYNLOCK|id="tabClassic"|id="shopHudButton"' /tmp/dom.txt | head -10
+            kill $SERVER_PID 2>/dev/null || true
+          fi
+          cp /tmp/v252-diagnostic.log /tmp/V252_DIAGNOSTIC.txt
+          git reset --hard HEAD
+          cp /tmp/V252_DIAGNOSTIC.txt V252_DIAGNOSTIC.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add V252_DIAGNOSTIC.txt
+          git commit -m "Record v252 diagnostic"
+          git push

@@ -18,7 +18,7 @@ jobs:
       - shell: bash
         run: |
           set -euo pipefail
-          printf '\n# retry after local smoke portability fix\n' >> .github/workflows/build-v254-final.yml
+          printf '\n# retry after local smoke portability fix v2\n' >> .github/workflows/build-v254-final.yml
           rm -f .github/workflows/retrigger-v254.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

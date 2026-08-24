@@ -158,12 +158,14 @@ jobs:
               assert((await page.title()).includes('KEYNLOCK'),'wrong title');
               await page.waitForTimeout(400);
               const ids=['tabClassic','tabTarget','tabLine','tabAlt2','tabSpecial','tabHillsfar','tabMass','tabG1','tabR2','tabSkyrim','tabAnach','tabTension','tabResonance','tabDeduction','tabComposite','tabHeatCold','tabDrum','tabScope'];
-              for(const id of ids){await page.locator('#'+id).click({force:true});await page.waitForTimeout(45);}
+              for(const id of ids){await page.locator('#'+id).evaluate(el=>el.click());await page.waitForTimeout(45);}
               if(mobile){
                 await page.locator('#mobileModeMenuButton').click({force:true});
                 await page.waitForTimeout(70);
                 assert(await page.locator('body.mobile-mode-menu-open').count()===1,'mobile menu failed');
-                await page.locator('#tabMass').click({force:true});
+                await page.locator('#tabClassic').click({force:true});
+                await page.waitForTimeout(70);
+                assert(await page.locator('body.mobile-mode-menu-open').count()===0,'mobile menu did not close after mode selection');
               }else{
                 await page.locator('#mapTab').click({force:true});await page.waitForTimeout(80);assert(await page.locator('#worldMapScreen:not([hidden])').count()===1,'map failed');await page.locator('#worldMapClose').click({force:true});
                 await page.locator('#lairHudButton').click({force:true});await page.waitForTimeout(80);assert(await page.locator('#lairOverlay:not([hidden])').count()===1,'lair failed');await page.locator('#lairClose').click({force:true});await page.waitForTimeout(80);if(await page.locator('#worldMapScreen:not([hidden])').count())await page.locator('#worldMapClose').click({force:true});

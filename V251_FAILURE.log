@@ -2,11 +2,12 @@
 2/8 split CSS
 CSS boundaries 13286 43816 77923 sizes [13286, 30530, 34107, 104675]
 3/8 remove dead JS constants
-4/8 remove dead assets
+4/8 remove dead assets if present
+legacy asset directory already absent
+5/8 update manifest
+6/8 brand KEYNLOCK and load CSS fragments
+7/8 docs
+8/8 verify references
 Traceback (most recent call last):
-  File "<stdin>", line 45, in <module>
-  File "<stdin>", line 45, in <genexpr>
-  File "/usr/lib/python3.12/pathlib.py", line 1058, in iterdir
-    for name in os.listdir(self):
-                ^^^^^^^^^^^^^^^^
-FileNotFoundError: [Errno 2] No such file or directory: 'assets/pins/legacy'
+  File "<stdin>", line 98, in <module>
+AssertionError: ['assets/backgrounds/lair-overlay.jpg', 'assets/lair/lair-background.png', 'assets/locks/default-lock.webp']

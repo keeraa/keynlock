@@ -1,0 +1,1967 @@
+KEYNLOCK STRUCTURE REPORT
+CSS lines=1837 bytes=182600
+JS lines=4066 bytes=168388
+HTML lines=583 bytes=28908
+
+=== REFERENCES ===
+LEGACY_PIN_SKINS: CSS=0 JS=1 HTML=0
+plate_05: CSS=0 JS=1 HTML=0
+lockpick-puzzle: CSS=0 JS=0 HTML=0
+LOCKPICK PUZZLE: CSS=0 JS=0 HTML=1
+SINGLE-FILE BUILD: CSS=0 JS=0 HTML=1
+ACTIVE_PLATE_SKIN_COUNT: CSS=0 JS=5 HTML=0
+
+=== CSS TOP-LEVEL RULE STARTS ===
+1: :root
+1: *
+1: [hidden]
+1: .modePanel
+1: .modePanel[hidden]
+1: html
+1: body
+1: body:before
+1: .app
+1: header
+1: h1
+1: .difficulty
+1: .difficulty b
+1: .main
+1: .target
+1: .target:before
+1: .index
+1: .touch
+1: .dpad
+1: .btn
+1: .btn:active
+1: .up
+1: .down
+1: .left
+1: .right
+1: .actions
+1: .action
+1: .flash
+1: .toast
+1: .toast.show
+1: .toast.actionable
+1: .toastAction
+1: .toastText
+1: @media (max-width: 720px)
+1: .toast.actionable .toastAction
+1: .toastAction:hover
+1: .economyHud
+1: .coinIcon
+1: .rewardBox
+1: .rewardBox strong
+1: .rewardBox.drop
+1: @keyframes rewardDrop
+1: .modeTabs
+1: .tab
+1: .tab.active
+1: @media (max-width:720px)
+1: body.importedMode .main
+1: .modeTabs
+1: .economyHud
+1: @media (max-width: 1200px)
+1: @media (max-width: 900px)
+1: .topRightHud
+1: .timerCircleHud
+1: .timerCircleHud.hidden
+1: .timerCircleSvg
+1: .timerCircleBg
+1: .timerCircleTrack
+1: .timerCircleProgress
+1: .timerCircleInner
+1: .timerCircleValue
+1: .timerCircleLabel
+1: .headerPickIcon
+1: .headerPickIcon:before
+1: .headerPickIcon:after
+1: .headerPickIcon:before
+1: .headerPickIcon:after
+1: .plate .index
+1: .kdPinImg
+1: .cpMode .cpPinImg,.cpMode header .difficulty
+1: header .economyHud
+1: @media (max-width:900px)
+1: .glow
+1: #lock
+1: .mechanismZone
+1: .platesZone
+1: .lockPanel
+1: .pick
+1: .pick:before
+1: .pick:after
+1: .tension
+1: .mechanismZone.nudge .tension
+1: @keyframes toolNudgeTension
+1: .plates
+1: .plate
+1: .plate:before
+1: .plateFace
+1: .plate.selected
+1: .plate.selected:after
+1: .plate:not(.selected):hover
+1: .pin
+1: .pin::after
+1: .plate.solved .pin
+1: .plate.mode-target .target
+1: .status
+1: .status strong
+1: @keyframes shake
+1: .scene.hideBase #lock
+1: .scene.hideBase .status
+1: #lock
+1: .status
+1: @media (max-width:720px)
+1: .scene.hideBase #lock
+1: .scene.hideBase .status
+1: body.importedMode .glow
+1: .sharedModeLockArt
+1: .sharedModeLockArt .lockPanel,.sharedModeLockArt .pick,.sharedModeLockArt .tension
+1: @media (max-width: 900px)
+1: .hillsfarMode
+1: .hfLockBox
+1: .hfTryArea
+1: .hfTryArea:disabled
+1: .hfTryArea:after
+1: .hfLockCut
+1: .hfLockCut svg
+1: .hfCandidates
+1: .hfCandidate
+1: .hfCandidate.selected:after
+1: .hfCandidate.correctFlash:after
+1: .hfCandidate svg
+1: .hillsfarMode
+1: .hfCandidates
+1: .hfLockBox
+1: .hfTryArea
+1: .hfLockCut
+1: .hfLockCut svg
+1: .hfCandidates
+1: .hfCandidate
+1: .hfCandidate svg
+1: body.importedMode .hillsfarMode
+1: body.importedMode .hfLockBox
+1: body.importedMode .hfTryArea
+1: @media (max-width: 900px)
+1: body.importedMode .hillsfarMode
+1: body.importedMode .hfLockBox
+1: body.importedMode .hfTryArea
+1: body.importedMode .hfCandidates
+1: body.importedMode .hfCandidate
+1: body.importedMode .hfCandidate svg
+1: body.importedMode .hfCandidate.selected:after
+1: body.importedMode .hfCandidate.correctFlash:after
+1: @media (max-width: 1200px)
+1: @media (max-width: 900px)
+1: .hillsfarMode[hidden]
+1: body.importedMode .hillsfarMode
+1: body.mode-hillsfar header
+1: body.mode-hillsfar .economyHud
+1: body.importedMode.mode-hillsfar .hillsfarMode
+1: body.mode-hillsfar .hfLockBox
+1: body.mode-hillsfar .hfTryArea
+1: body.mode-hillsfar .hfTryArea:after
+1: body.mode-hillsfar .hfLockCut
+1: body.mode-hillsfar .hfCandidates
+1: body.mode-hillsfar .hfCandidate.selected:after
+1: body.mode-hillsfar .hfCandidate.correctFlash:after
+1: body.mode-hillsfar .hfCandidate svg
+1: @media (max-width: 1200px)
+1: @media (max-width: 900px)
+1: @media (max-width: 1100px)
+1: @media (max-width: 900px)
+1: @media (max-width: 1200px)
+1: @media (max-width: 900px)
+1: body.mode-hillsfar header
+1: body.mode-hillsfar .main
+1: body.mode-hillsfar .hillsfarMode
+1: body.mode-hillsfar .hillsfarMode>*
+1: body.mode-hillsfar .hfLockBox
+1: body.mode-hillsfar .hfTryArea
+1: body.mode-hillsfar .hfLockCut
+1: @media (max-width:1200px)
+1: @media (max-width:900px)
+1: body.mode-hillsfar .hfCandidate svg
+1: @media (max-width:900px)
+1: body.mode-hillsfar .hillsfarMode
+1: body.mode-hillsfar .hfTryArea
+1: body.mode-hillsfar .hfLockCut
+1: body.mode-hillsfar .hfLockCut svg
+1: body.mode-hillsfar .hfCandidates
+1: body.mode-hillsfar .hfCandidate.selected
+1: @media (max-width:900px)
+1: .massMode
+1: .massBoard
+1: .massPointer
+1: .massRings
+1: .massRing
+1: .massRing::before
+1: .massRing::after
+1: .massRing.selected::before
+1: .massRing.selected::after
+1: .massRing.ready::before
+1: .massRing.ready::after
+1: .massRing.ready.selected::before
+1: .massRing.ready.selected::after
+1: .massRingDisc
+1: .massRing.selected .massRingDisc
+1: .massRing.ready .massRingDisc
+1: .massRing.ready.selected .massRingDisc
+1: .massCenter
+1: .massCenter span
+1: .massCenter.ready
+1: .massMode
+1: .massBoard
+1: .massCenter
+1: .massCenter span
+1: .massMode
+1: body.importedMode .massMode
+1: body.importedMode .massBoard
+1: @media (max-width: 900px)
+1: .massMode[hidden]
+1: body.importedMode .massMode
+1: .g1Mode
+1: .g1ProgressWrap
+1: .g1ProgressTitle
+1: .g1ProgressRow
+1: .g1Slot
+1: .g1Slot.empty
+1: .g1Slot.left::before
+1: .g1Slot.right::before
+1: .g1Slot.left::before
+1: .g1Slot.right::before
+1: .g1Mode
+1: .g1ProgressWrap
+1: .g1ProgressTitle
+1: .g1ProgressRow
+1: .g1Slot
+1: .g1Slot.left::before
+1: .g1Slot.right::before
+1: .g1Mode
+1: body.importedMode .g1Mode
+1: body.importedMode .g1ProgressWrap
+1: @media (max-width: 900px)
+1: .g1Mode[hidden]
+1: body.importedMode .g1Mode
+1: .r2Mode
+1: .r2Lock
+1: .r2Frame
+1: .r2Frame:before
+1: .r2Frame:after
+1: .r2Frame:before
+1: .r2Frame:after
+1: .r2Pins
+1: .r2Pin
+1: .r2PinStem
+1: .r2PinHead
+1: .r2Pin.current .r2PinHead
+1: .r2Pin.up .r2PinStem
+1: .r2Pin.up .r2PinHead
+1: .r2Pin.wrong .r2PinHead
+1: .r2PinImg
+1: .r2Pin.current .r2PinImg
+1: .r2Pin.up .r2PinImg
+1: .tnPinImg
+1: .tnPin.active .tnPinImg
+1: .tnPin.set .tnPinImg
+1: .cpPinImg
+1: @keyframes r2Wrong
+1: .r2PickRail
+1: .r2Pick
+1: .r2PickHandle
+1: .r2PickHandle:before
+1: .r2PickShaft
+1: .r2PickTip
+1: .r2Status
+1: #r2Progress
+1: .r2StatusSep
+1: .r2Mode
+1: body.importedMode .r2Mode
+1: @media (max-width: 900px)
+1: .r2Mode[hidden]
+1: body.importedMode .r2Mode
+1: .skMode
+1: .skBoard
+1: .skOuterRing
+1: .skOuterRing:after
+1: .skCylinder
+1: .skCylinderMarks
+1: .skKeyholeShape
+1: .skKeyholeShape:before
+1: .skKeyholeShape:after
+1: .skPickArm
+1: .skPickNeedle
+1: .skPickGrip
+1: .skWrench
+1: .skWrenchBar
+1: .skWrenchHandle
+1: .skTorqueButton
+1: .skTorqueButton:after
+1: .skTorqueButton:hover:after
+1: .skMode.ready .skTorqueButton:after
+1: .skFeedback
+1: .skMode.torque-fail .skPickNeedle
+1: @keyframes skPickStrain
+1: @media (max-width:720px)
+1: .skMode
+1: body.importedMode .skMode
+1: body.importedMode .skBoard
+1: @media (max-width: 900px)
+1: .skMode[hidden]
+1: body.importedMode .skMode
+1: .anMode
+1: .anBoard
+1: .anConsole
+1: .anConsole:before
+1: .anConsole.ready
+1: .anReadout
+1: .anTracks
+1: .anChannel
+1: .anChannel.selected .anSlot
+1: .anSlot
+1: .anLevel
+1: .anLevel:after
+1: .anBtn
+1: .anBtn:hover
+1: .anBtn:active
+1: .anValue
+1: .anActionLabel
+1: @media (max-width:720px)
+1: .anMode
+1: .anBoard
+1: .anConsole
+1: .anReadout
+1: .anTracks
+1: .anChannel
+1: .anSlot
+1: .anLevel
+1: .anBtn
+1: .anValue
+1: .anActionLabel
+1: @media (max-width: 860px)
+1: body.importedMode .anMode
+1: body.importedMode .anBoard
+1: @media (max-width: 900px)
+1: .anMode[hidden]
+1: body.importedMode .anMode
+1: body.importedMode .anMode:not([hidden])
+1: body.importedMode .anBoard
+1: body.importedMode .anReadout
+1: body.importedMode .anActionLabel
+1: .shopOverlay
+1: .shopOverlay.open
+1: .shopPanel
+1: .shopHeader
+1: .shopHeader h2
+1: .shopClose
+1: .shopBalance
+1: .shopBalance strong
+1: .shopSectionTitle
+1: .shopGrid
+1: .shopCard
+1: .shopCard:hover
+1: .shopCard.equipped
+1: .shopCard.locked
+1: .shopCardName
+1: .shopCardStat
+1: .shopCardAction
+1: .shopPouch
+1: .shopPouchInfo strong
+1: .shopPouchInfo span
+1: .shopBuy
+1: .shopBuy:disabled
+1: @media (max-width:720px)
+1: body.mode-hillsfar .hfCandidates
+1: body.mode-hillsfar .hfCandidate
+1: @media (max-width:900px)
+1: body.mode-hillsfar .hfCandidates
+1: body.mode-hillsfar .hfCandidate
+1: @media (max-width: 900px)
+1: body.importedMode .hillsfarMode,body.importedMode .massMode,body.importedMode .g1Mode,body.importedMode .r2Mode,body.importedMode .skMode,body.importedMode .anMode
+1: body.mode-hillsfar .hillsfarMode
+1: body.importedMode header
+1: body.importedMode header .economyHud
+1: body.importedMode .main
+1: body.importedMode .scene
+1: body.importedMode .hillsfarMode,body.importedMode .massMode,body.importedMode .g1Mode,body.importedMode .r2Mode,body.importedMode .skMode,body.importedMode .anMode
+1: @media (max-width:900px)
+1: body.mode-hillsfar .hfCandidate:hover
+1: body.mode-hillsfar .hfCandidate.selected
+1: body.mode-hillsfar .hfCandidate.selected:after,body.mode-hillsfar .hfCandidate.correctFlash:after
+1: @media (max-width: 980px)
+1: .massPointer
+1: body.mode-hillsfar .hfCandidate svg
+1: @media (max-width: 850px)
+1: body.mode-hillsfar .hfCandidates
+1: body.mode-hillsfar .hfCandidate
+1: body.mode-hillsfar .hfCandidate svg
+1: body.mode-hillsfar .hfCandidates.has-selection .hfCandidate:not(.selected)
+1: body.mode-hillsfar .hfCandidates.has-selection .hfCandidate.selected
+1: body.mode-hillsfar .hfCandidate.selected
+1: @media (max-width: 980px)
+1: @media (max-width: 760px)
+1: body.mode-hillsfar .hfLockBox
+1: body.mode-hillsfar .hfTryArea,body.mode-hillsfar .hfLockCut
+1: body.mode-hillsfar .hfCandidate:hover
+1: body.mode-hillsfar .hfCandidates.has-selection .hfCandidate:not(.selected):hover
+1: body.mode-hillsfar .hfCandidate.selected,body.mode-hillsfar .hfCandidate.selected:hover,body.mode-hillsfar .hfCandidates.has-selection .hfCandidate.selected,body.mode-hillsfar .hfC
+1: @media (max-width: 760px)
+1: body.importedMode .g1Mode
+1: body.importedMode .g1ProgressWrap
+1: .ti-svg
+1: .tab
+1: .tab .ti-svg
+1: .tab.active .ti-svg
+1: .coinIcon
+1: .coinIcon .ti-svg
+1: .headerPickIcon
+1: .headerPickIcon:before,.headerPickIcon:after
+1: .headerPickIcon .ti-svg
+1: .shopClose
+1: .toastAction
+1: .shopCardName
+1: .anBtn,.btn
+1: body.importedMode .skBoardViewport
+1: body.importedMode .skBoardViewport .skBoard
+1: body.importedMode .skMode .sharedModeLockArt
+1: @media (max-width:900px)
+1: .anInstructions
+1: .anInstructions strong
+1: .anInstructions em
+1: body.importedMode .anMode:not([hidden])
+1: body.importedMode .anBoard
+1: body.importedMode .anConsole:before
+1: body.importedMode .anActionLabel
+1: @media (max-width:900px)
+1: body.importedMode .r2Mode
+1: body.importedMode .r2Lock
+1: body.importedMode .r2Frame
+1: body.importedMode .r2Pins
+1: body.importedMode .r2Pin
+1: body.importedMode .r2PinStem,body.importedMode .r2PinHead
+1: body.importedMode .r2PinStem
+1: body.importedMode .r2PinHead
+1: body.importedMode .r2Pin.current .r2PinHead
+1: body.importedMode .r2Pin.up .r2PinStem
+1: body.importedMode .r2Pin.up .r2PinHead
+1: body.importedMode .r2Pin.wrong
+1: body.importedMode .r2Pin.wrong .r2PinHead
+1: @keyframes r2WrongFixed
+1: body.importedMode .r2PickRail
+1: body.importedMode .r2Pick
+1: body.importedMode .r2PickHandle
+1: body.importedMode .r2PickHandle:before
+1: body.importedMode .r2PickShaft
+1: body.importedMode .r2PickTip
+1: body.importedMode .r2Status
+1: body .modePanel[hidden],body.importedMode .modePanel[hidden]
+1: body .modePanel:not([hidden])
+1: body.importedMode .tnMode,body.importedMode .rsMode,body.importedMode .kdMode
+1: .tnPanel
+1: .tnGauge
+1: .tnTicks
+1: .tnBand
+1: .tnNeedle
+1: .tnGaugeLabels
+1: .tnPins
+1: .tnPin
+1: .tnPinStem
+1: .tnPinHead
+1: .tnPin.active
+1: .tnPin.set
+1: .tnPin.set .tnPinStem
+1: .tnPin.set .tnPinHead
+1: .tnMessage,.kdFeedback
+1: .rsBoard
+1: .rsLine
+1: .rsLanes
+1: .rsLane
+1: .rsLane.active
+1: .rsLane.set
+1: .rsOrb
+1: .rsLane.set .rsOrb
+1: .kdPanel
+1: .kdKey
+1: .kdTooth
+1: .kdTooth.active
+1: .kdBar
+1: .kdNum
+1: .kdControls
+1: .kdMini,.kdCheck
+1: .kdMini
+1: .kdCheck
+1: .kdHistory
+1: .kdPanel.ready .kdBar
+1: @media (max-width:760px)
+1: body.importedMode .anMode:not([hidden])
+1: body.importedMode .anInstructions
+1: body.importedMode .anInstructions::before,body.importedMode .anInstructions::after
+1: body.importedMode .anInstructions::before
+1: body.importedMode .anInstructions::after
+1: body.importedMode .anInstructions strong
+1: body.importedMode .anInstructions span
+1: body.importedMode .anInstructions em
+1: body.importedMode .anBoard
+1: body.importedMode .anConsole
+1: body.importedMode .anConsole::before
+1: body.importedMode .anConsole.ready
+1: body.importedMode .anReadout
+1: body.importedMode .anReadout::after
+1: body.importedMode .anTracks
+1: body.importedMode .anChannel
+1: body.importedMode .anChannel::before,body.importedMode .anChannel::after
+1: body.importedMode .anChannel::before
+1: body.importedMode .anChannel.selected
+1: body.importedMode .anChannel.selected::before,body.importedMode .anChannel.selected::after
+1: body.importedMode .anSlot
+1: body.importedMode .anChannel.selected .anSlot
+1: body.importedMode .anSlot::before
+1: body.importedMode .anLevel
+1: body.importedMode .anLevel::after
+1: body.importedMode .anBtn
+1: body.importedMode .anBtn:hover
+1: body.importedMode .anBtn:active
+1: body.importedMode .anBtn .ti-svg
+1: body.importedMode .anValue
+1: body.importedMode .anActionLabel
+1: body.importedMode .anConsole.ready .anReadout
+1: body.importedMode .anConsole.ready .anChannel
+1: body.importedMode .anConsole.ready .anSlot
+1: @media (max-width:900px)
+1: .cpMode
+1: .cpBoard
+1: .cpTarget,.cpBuild
+1: .cpTarget
+1: .cpBuild
+1: .cpSectionTitle
+1: .cpProfileTray,.cpBuildCanvas
+1: .cpProfileTray
+1: .cpProfileTray::before,.cpBuildCanvas::before
+1: .cpPins
+1: .cpPinsBuild
+1: .cpPin
+1: .cpPinImg
+1: .cpTargetSvg,.cpBuildSvg
+1: .cpTargetSvg
+1: .cpBuildCanvas
+1: .cpBuildSvg
+1: .cpTargetShadow,.cpBuildShadow
+1: .cpTargetFill
+1: .cpBuildFill
+1: .cpTargetTopLine,.cpBuildTopLine,.cpTargetBevel,.cpBuildBevel,.cpTargetPath,.cpBuildPath,.cpTargetGlow,.cpBuildGlow
+1: .cpTargetTopLine,.cpBuildTopLine
+1: .cpTargetBevel,.cpBuildBevel
+1: .cpTargetGlow,.cpBuildGlow
+1: .cpTargetPath
+1: .cpBuildPath
+1: .cpBuildJoints
+1: .cpJoint
+1: .cpJoint.start
+1: .cpJoint.selected
+1: .cpParts
+1: .cpPart
+1: .cpPart.selected
+1: .cpParts.has-selection .cpPart:not(.selected)
+1: .cpPartPreview
+1: .cpPartPreview svg
+1: .cpPartLabel
+1: .cpLevelControls
+1: .cpLevelBtn
+1: .cpLevelBtn:hover
+1: .cpLevelBtn.active
+1: .cpState
+1: .cpState.ready
+1: .cpHint
+1: @media (max-width:900px)
+1: :root
+1: .skinShowcaseRow
+1: .skinShowcase
+1: .skinShowcaseTitle
+1: .skinPreviewMain
+1: .skinPreviewMain .pickSkinPreview
+1: .skinPreviewMain .pickSkinLabel
+1: .pickSkinGrid
+1: .pickSkinCard
+1: .pickSkinCard:hover
+1: .pickSkinCard.selected
+1: .pickSkinPreview
+1: .pickSkinLabel
+1: @keyframes previewSway
+1: @media (max-width:980px)
+1: @media (max-width:720px)
+1: .pick
+1: .pick:before,.pick:after
+1: .r2PickHandle,.r2PickShaft,.r2PickTip
+1: .r2Pick::before
+1: .skPickNeedle,.skPickGrip
+1: .skPickArm::before
+1: :root
+1: .sharedModeLockArt,body.importedMode .sharedModeLockArt,body.importedMode .skMode .sharedModeLockArt
+1: .r2Pick::before
+1: @media (max-width: 900px)
+1: .r2Pick::before
+1: body.importedMode .hillsfarMode,body.importedMode .massMode,body.importedMode .g1Mode,body.importedMode .r2Mode,body.importedMode .skMode,body.importedMode .anMode,body.importedMod
+1: body.importedMode .skMode
+1: body.importedMode .skBoardViewport
+1: .skPickArm,.skPickArm::before
+1: body
+1: @media (orientation: portrait)
+1: :root
+1: .pick:after
+1: .mechanismZone .pick,.sharedModeLockArt .pick,body.mode-hillsfar .mechanismZone .pick
+1: .mechanismZone .tension,.sharedModeLockArt .tension,body.mode-hillsfar .mechanismZone .tension
+1: .mechanismZone.nudge .pick,.sharedModeLockArt.nudge .pick
+1: .mechanismZone.nudge .tension,.sharedModeLockArt.nudge .tension
+1: @keyframes clockPickNudge
+1: @keyframes clockTensionNudge
+1: .plate
+1: .pin
+1: .r2PinStem,.r2PinHead,.tnPinStem,.tnPinHead
+1: .r2PinImg
+1: .tnPinImg
+1: .cpPinImg
+1: .sharedModeLockArt,.sharedModeLockArt .lockPanel
+1: .skinPreviewMain[data-kind="tension"] .pickSkinPreview
+1: .pickSkinCard[data-kind="tension"] .pickSkinPreview
+1: @media (max-width: 720px)
+1: body.importedMode .skMode .skPickArm::before
+1: body.importedMode .skMode .skWrenchBar,body.importedMode .skMode .skWrenchHandle
+1: body.importedMode .skMode .skWrench::before
+1: body.map-open header,body.map-open .main,body.map-open .topRightHud
+1: .worldMapScreen
+1: .worldMapCurrent
+1: .worldMapCurrent strong
+1: .worldMapCanvas
+1: .worldMapCanvas:before
+1: .worldMapRoads
+1: .mapDistrictShape
+1: .mapRoad
+1: .mapRoad.active
+1: .mapRoad.locked
+1: .mapWater
+1: .mapWall
+1: .mapWallA
+1: .mapWallB
+1: .mapNode
+1: .mapNodeDot
+1: .mapNode.accessible:hover .mapNodeDot
+1: .mapNode.accessible
+1: .mapNode.current .mapNodeDot
+1: .mapNode .shopDot:after
+1: .mapNode.locked
+1: .mapNodeLock
+1: .mapPlayer
+1: .mapPlayerCore
+1: .mapPlayerCore:after
+1: .worldMapInfo
+1: .worldMapInfoTitle
+1: .worldMapInfoText
+1: .worldMapAction
+1: .worldMapAction:hover
+1: body.map-open .modeTabs .tab.active:not(#mapTab)
+1: @media (max-width:900px)
+1: #shopTab[hidden]
+1: #mapLocationAction
+1: .lairOverlay
+1: .lairOverlay.open
+1: .lairOverlay[hidden]
+1: .lairClose
+1: .lairClose:hover
+1: .lairTab
+1: .lairTab.active
+1: .lairPanelHead
+1: .lairPanelTitle
+1: .lairPanelText
+1: .lairCharacters
+1: .lairCharacter
+1: .lairCharacter:hover
+1: .lairCharacter.active
+1: .lairPortrait
+1: .lairPortraitMark
+1: .lairCharacterName
+1: .lairCharacterRole
+1: .lairCharacterDesc
+1: .lairCharacterSelect
+1: .lairCharacter.active .lairCharacterSelect
+1: .lairDialogueLayout
+1: .lairDialoguePeople
+1: .lairPersonBtn
+1: .lairPersonBtn.active
+1: .lairDialogueMain
+1: .lairDialogueSpeaker
+1: .lairDialogueText
+1: .lairDialogueTopics
+1: .lairTopic
+1: .lairTopic:hover
+1: .lairIntelGrid
+1: .lairIntelCard
+1: .lairIntelCard.active
+1: .lairIntelCard.locked
+1: .lairIntelName
+1: .lairIntelLevel
+1: .lairIntelPips
+1: .lairIntelPips span
+1: .lairIntelPips span.on
+1: .lairIntelMini
+1: .lairIntelDetail
+1: .lairIntelDetailTitle
+1: .lairIntelDetailText
+1: .lairIntelRows
+1: .lairIntelRow
+1: .lairIntelRow span
+1: .lairIntelRow strong
+1: .lairAnalyze
+1: .lairAnalyze:disabled
+1: @media (max-width:860px)
+1: .lairPortrait
+1: .lairPortrait.hasArt
+1: .lairPortraitInner
+1: .lairPortraitArt
+1: .lairPersonThumb
+1: .lairPersonThumb img
+1: .lairOverlay
+1: .lairScene
+1: .lairSceneTop
+1: .lairSceneTopRight
+1: .lairSceneKicker
+1: .lairSceneTitle
+1: .lairSceneActive
+1: .lairSceneActive strong
+1: .lairSceneCharacters
+1: .lairSceneCharacter
+1: .lairSceneCharacter img
+1: .lairSceneCharacter.kai
+1: .lairSceneCharacter.sai
+1: .lairSceneCharacter.tik
+1: @keyframes lairSceneSwayKai
+1: @keyframes lairSceneSwaySai
+1: @keyframes lairSceneSwayTik
+1: .lairHotspot
+1: .lairHotspotDot
+1: .lairHotspot:hover
+1: .lairHotspot:hover .lairHotspotDot
+1: .lairHotspotDialogue
+1: .lairModuleWindow
+1: .lairModuleWindow[hidden]
+1: .lairModuleWindow.open
+1: .lairModuleHeader
+1: .lairModuleTitle
+1: .lairModuleClose
+1: .lairModuleBody
+1: .lairPanel
+1: .lairPanel.active
+1: .lairCharacter
+1: .lairPortrait
+1: @media (max-width:900px)
+1: .mapRoad.missionRoad
+1: .mapNode.mission
+1: .mapNode.mission .mapNodeDot
+1: .mapNode.mission .mapNodeDot:before
+1: .mapNodeMissionType
+1: .mapNode.mission.current .mapNodeDot
+1: #mapTab.mapCornerBtn
+1: #mapTab.mapCornerBtn:hover
+1: #mapTab.mapCornerBtn:active
+1: #mapTab .mapTabIcon
+1: #mapTab.active
+1: .mechanismZone,.sharedModeLockArt
+1: .mechanismZone::before,.sharedModeLockArt::before
+1: .mechanismZone .lockPanel,.sharedModeLockArt .lockPanel
+1: .mechanismZone .pick,.mechanismZone .tension,.sharedModeLockArt .pick,.sharedModeLockArt .tension
+1: .mechanismZone.opening .lockPanel,.sharedModeLockArt.opening .lockPanel
+1: @keyframes padlockBodyOpenSettle
+1: .sharedModeLockArt
+1: .difficultyDock
+1: .difficultyBtn
+1: .difficultyBtn:hover
+1: .difficultyBtn.active
+1: .objectiveDiff
+1: @media (max-width:1200px)
+1: @media (max-width:900px)
+1: :root
+1: #objectiveLine b
+1: .topRightHud
+1: .assetNameHud
+1: .assetNameHud>div
+1: .topRightHud .economyHud
+1: .topRightHud .hudSquareBadge,#mapTab.mapCornerBtn
+1: .topRightHud .hudSquareBadge
+1: .hudBadgeLabel
+1: .hudBadgeValue
+1: .hudBadgeValue strong,.topRightHud .hudSquareBadge strong
+1: .topRightHud .coinIcon
+1: .topRightHud .headerPickIcon
+1: #mapTab .mapTabIcon
+1: .difficultyDock
+1: .difficultyBtn
+1: .difficultyBtn:hover
+1: #lock::before,body.importedMode .modePanel:not([hidden])::before,body.mode-hillsfar .hillsfarMode::before
+1: body.importedMode .hillsfarMode,body.importedMode .massMode,body.importedMode .g1Mode,body.importedMode .r2Mode,body.importedMode .skMode,body.importedMode .anMode,body.importedMod
+1: body:not(.importedMode) #lock
+1: body:not(.importedMode) #lock>.mechanismZone
+1: body:not(.importedMode) #lock>.platesZone
+1: body.importedMode .modePanel:not([hidden]),body.mode-hillsfar .hillsfarMode
+1: body.importedMode .sharedModeLockArt
+1: .mechanismZone::before,.sharedModeLockArt::before
+1: .mechanismZone .lockPanel,.sharedModeLockArt .lockPanel
+1: .mechanismZone .pick,.sharedModeLockArt .pick,body.mode-hillsfar .mechanismZone .pick
+1: .mechanismZone .tension,.sharedModeLockArt .tension,body.mode-hillsfar .mechanismZone .tension
+1: @media (max-width:900px)
+1: :root
+1: .app
+1: .main
+1: .scene
+1: #lock.universalLockBlock,body:not(.importedMode) #lock.universalLockBlock,body.importedMode #lock.universalLockBlock,.scene.hideBase #lock.universalLockBlock
+1: #lock.universalLockBlock>.mechanismZone,body:not(.importedMode) #lock.universalLockBlock>.mechanismZone,body.importedMode #lock.universalLockBlock>.mechanismZone
+1: .sharedModeLockArt
+1: .puzzleArea
+1: body:not(.importedMode) .puzzleArea
+1: body:not(.importedMode) .puzzleArea>.platesZone
+1: .puzzleArea>.platesZone
+1: body.importedMode .puzzleArea>.platesZone,body.importedMode .puzzleArea>#status
+1: body:not(.importedMode) .puzzleArea>.platesZone
+1: body.importedMode .puzzleArea>.modePanel:not([hidden]),body.mode-hillsfar .puzzleArea>.hillsfarMode:not([hidden])
+1: body.importedMode .g1Mode,body.importedMode .r2Mode,body.importedMode .hillsfarMode,body.importedMode .massMode,body.importedMode .skMode,body.importedMode .anMode,body.importedMod
+1: body.mode-hillsfar .hfLockBox
+1: body.mode-hillsfar .hfCandidates
+1: body.importedMode .g1ProgressWrap
+1: body.importedMode .r2Lock
+1: body.importedMode .massBoard
+1: body.importedMode .skBoardViewport
+1: body.importedMode .anInstructions
+1: body.importedMode .tnPanel,body.importedMode .rsBoard,body.importedMode .kdPanel,body.importedMode .cpBoard
+1: #objectiveLine.difficulty
+1: @media (max-width:900px)
+1: body.importedMode .app
+1: body.importedMode .main,body.mode-hillsfar .main
+1: body.importedMode .scene,body.mode-hillsfar .scene
+1: .topRightHud .hudNavBtn
+1: .topRightHud .hudNavBtn:hover
+1: .topRightHud .hudNavBtn:active
+1: .topRightHud .hudNavIcon
+1: #lock.universalLockBlock
+1: #lock.universalLockBlock>.mechanismZone
+1: #lock.universalLockBlock .lockPanel,#lock.universalLockBlock .pick,#lock.universalLockBlock .tension
+1: #lock.universalLockBlock .lockHitArea
+1: #lock.universalLockBlock .lockHitArea:focus,#lock.universalLockBlock .lockHitArea:focus-visible
+1: .mechanismZone::before,.sharedModeLockArt::before
+1: .mechanismZone.shake-fail::before,.mechanismZone.shake-fail .lockPanel
+1: @keyframes lockPartsShake
+1: .mobileModeMenuButton,.mobileModeBackdrop
+1: @supports (height:100dvh)
+1: @media (max-width:760px),(max-height:560px) and (orientation:landscape)
+1: @media (max-width:760px) and (max-height:620px) and (orientation:portrait)
+1: @media (max-height:560px) and (orientation:landscape)
+1: @media (prefers-reduced-motion:reduce)
+1: .plate.selected:after
+1: .plateFace
+1: .plate.selected .plateFace
+1: .skinPreviewMain
+1: #pickSkinMain .pickSkinPreview
+1: #tensionSkinMain .pickSkinPreview
+1: #pickSkinMain .pickSkinLabel,#tensionSkinMain .pickSkinLabel
+1: .pickSkinGrid
+1: .pickSkinCard
+1: .pickSkinCard .pickSkinPreview
+1: .pickSkinLabel
+1: #pickSkinMain .pickSkinPreview
+1: #tensionSkinMain .pickSkinPreview
+1: @keyframes previewSwayPickHorizontal
+1: @keyframes previewSwayTensionHorizontal
+1: @media (max-width:720px)
+1: body.game-inactive.shop-open::after,body.game-inactive.lair-open::after,body.game-inactive.map-open::after
+1: .topRightHud
+1: .mechanismZone::before,.sharedModeLockArt::before
+1: .mechanismZone.opening::before,.sharedModeLockArt.opening::before
+1: .mechanismZone.opened::before,.sharedModeLockArt.opened::before
+1: @keyframes shackleOpenSmooth
+1: .skinPreviewMain
+1: #pickSkinMain,#tensionSkinMain
+1: #pickSkinMain
+1: #pickSkinMain .pickSkinPreview,#tensionSkinMain .pickSkinPreview
+1: #pickSkinMain .pickSkinPreview
+1: #tensionSkinMain .pickSkinPreview
+1: #pickSkinMain .pickSkinLabel,#tensionSkinMain .pickSkinLabel
+1: #pickSkinMain .pickSkinLabel
+1: @keyframes v159Glow
+1: @keyframes v159PickShowcase
+1: @keyframes v159TensionShowcase
+1: .pickSkinGrid
+1: .pickSkinCard
+1: .pickSkinCard[data-kind="tension"]
+1: .pickSkinCard[data-kind="tension"] .pickSkinPreview
+1: @media (max-width:760px),(max-height:560px) and (orientation:landscape)
+1: .inventoryDrawer
+1: .inventoryDrawer.open
+1: .inventoryDrawer:not(.open):hover
+1: .inventoryToggle
+1: .inventoryToggle::after
+1: .inventoryToggle:hover::after,.inventoryDrawer:not(.open):hover .inventoryToggle::after
+1: .inventoryToggle::after
+1: .inventoryCaseBack,.inventoryCaseFront
+1: .inventoryCaseBack
+1: .inventoryCaseFront
+1: .inventoryContents
+1: .inventoryTools
+1: .inventoryToolsPick
+1: .inventoryToolsTension
+1: .inventoryTool
+1: .inventoryTool.hidden-slot
+1: .inventoryTool.breaking-out
+1: .inventoryTool.breaking-out img
+1: .inventoryTool img
+1: .inventoryTool-pick img
+1: .inventoryTool-tension img
+1: .inventoryTool.visual-hover,.inventoryTool:hover,.inventoryTool.selected
+1: .inventoryTool.visual-hover,.inventoryTool:hover
+1: .inventoryTool.selected img
+1: .inventoryDrawer,.inventoryContents,.inventoryToggle,.inventoryTool
+1: .inventoryToggle:focus,.inventoryToggle:focus-visible,.inventoryTool:focus,.inventoryTool:focus-visible,.inventoryDrawer:focus,.inventoryDrawer:focus-visible,.inventoryContents:foc
+1: .inventoryAvatar
+1: .inventoryDrawer:not(.open) .inventoryAvatar
+1: .inventoryAvatar img
+1: .inventoryAvatar span
+1: .inventoryBalanceBadge
+1: .inventoryBalanceBadge .coinIcon
+1: .inventoryDrawer:not(.open) .inventoryBalanceBadge
+1: body:not(.inventory-open) #objectiveLine.difficulty
+1: body.inventory-open #objectiveLine.difficulty
+1: body.shop-open .inventoryDrawer,body.lair-open .inventoryDrawer,body.map-open .inventoryDrawer
+1: body.game-inactive .inventoryDrawer
+1: @media (max-width:960px)
+1: @media (max-width:760px)
+1: #lock.universalLockBlock,body:not(.importedMode) #lock.universalLockBlock,body.importedMode #lock.universalLockBlock,.scene.hideBase #lock.universalLockBlock
+1: #lock.universalLockBlock .lockPanel,#lock.universalLockBlock>.mechanismZone::before
+1: #lock.universalLockBlock:has(.lockHitArea:hover) .lockPanel,#lock.universalLockBlock:has(.lockHitArea:focus-visible) .lockPanel,#lock.universalLockBlock:has(.lockHitArea:focus) .lo
+1: #lock.universalLockBlock:has(.lockHitArea:hover)>.mechanismZone::before,#lock.universalLockBlock:has(.lockHitArea:focus-visible)>.mechanismZone::before,#lock.universalLockBlock:has
+1: body.game-inactive .scene
+1: body.game-inactive::after
+1: body.game-inactive #lock.universalLockBlock
+1: body.game-inactive #lock.universalLockBlock .lockPanel
+1: body.game-inactive #lock.universalLockBlock>.mechanismZone::before
+1: body.game-inactive #lock.universalLockBlock .pick,body.game-inactive #lock.universalLockBlock .tension
+1: body.game-inactive .modeTabs,body.game-inactive #difficultyDock,body.game-inactive #objectiveLine,body.game-inactive .topRightHud,body.game-inactive .inventoryDrawer,body.game-inac
+1: .solvedPuzzleOverlay
+1: body.game-inactive.solved-notice-visible .solvedPuzzleOverlay
+1: .solvedPuzzleCard
+1: .solvedPuzzleKicker
+1: .solvedPuzzleTitle
+1: .solvedPuzzleButton
+1: .solvedPuzzleButton:hover
+1: .solvedPuzzleButton:active
+1: @media (max-width:760px),(max-height:560px) and (orientation:landscape)
+1: .digitalMode
+1: .digitalCard
+1: .digitalHead
+1: .digitalKicker
+1: .digitalTitle
+1: .digitalSub
+1: .digitalMiniBtn,.digitalBtn,.digitalWheel button
+1: .digitalMiniBtn:hover,.digitalBtn:hover,.digitalWheel button:hover
+1: .digitalMiniBtn:active,.digitalBtn:active,.digitalWheel button:active
+1: .digitalMiniBtn
+1: .digitalBtn
+1: .digitalBtn.primary
+1: .digitalControls
+1: .digitalResult
+1: .digitalResult.success
+1: .heatColdMode .digitalCard
+1: .hcInput
+1: .hcDialRow
+1: .hcDigitCol
+1: .hcDigitCol.active .hcDigitValue,.hcDigitCol:focus-visible .hcDigitValue
+1: .hcStepBtn
+1: .hcStepBtn:hover
+1: .hcStepBtn:active
+1: .hcDigitValue
+1: .hcSlots
+1: .hcSlot
+1: .hcNum
+1: .hcWord
+1: .hcThermo
+1: .hcThermo>i
+1: .hcHistory,.hcHistoryTitle,.hcRows,.hcRow
+1: @media (max-width:900px)
+1: .drumWheels,.scopeWheels
+1: .digitalWheel
+1: .digitalWheel.hit
+1: @keyframes digitalWheelHit
+1: .digitalWheel button
+1: .digitalWheelValue
+1: .drumMeter
+1: .drumMeter>i
+1: .drumLabel
+1: .drumHint
+1: .scopeFrame
+1: #scopeCanvas
+1: .scopeLegend
+1: .scopeDot
+1: .scopeDot.ref
+1: .scopeDot.cur
+1: .scopeScore
+1: .scopeScore b
+1: .scopeBar
+1: .scopeBar>i
+1: .scopeMode .digitalWheel
+1: .scopeMode .digitalWheelValue
+1: .scopeMode .digitalWheel button
+1: @media (max-width:760px)
+1: body.importedMode .rsMode
+1: body.importedMode .rsBoard
+1: body.importedMode .rsLanes
+1: body.importedMode .rsLane
+1: body.importedMode .rsLane.active
+1: body.importedMode .anInstructions
+1: body.importedMode .anReadout::after
+1: body.importedMode .anChannel
+1: body.importedMode .anSlot
+1: body.importedMode .anSlot::before
+1: body.importedMode .anBtn
+1: body.importedMode .anBtn .ti-svg
+1: body.importedMode .anValue
+1: body.importedMode .tnPanel
+1: body.importedMode .tnPins
+1: body.importedMode .tnPin
+1: body.importedMode .tnPinImg
+1: body.importedMode .tnMessage
+1: body.importedMode .kdPanel
+1: body.importedMode .kdKey
+1: body.importedMode .kdTooth
+1: body.importedMode .kdBar
+1: body.importedMode .kdPinImg
+1: body.importedMode .kdControls
+1: body.importedMode .kdFeedback
+1: @media (max-width:900px)
+1: body.importedMode .anTracks
+1: body.importedMode .anValue
+1: body.importedMode .cpMode
+1: body.importedMode .cpTarget
+1: body.importedMode .cpBuild
+1: body.importedMode .cpPins
+1: body.importedMode .cpPinsBuild
+1: body.importedMode .cpPinImg
+1: body.importedMode .cpTargetSvg,body.importedMode .cpBuildSvg
+1: body.importedMode .cpTargetSvg
+1: body.importedMode .cpBuildCanvas
+1: body.importedMode .cpBuildSvg
+1: body.importedMode .cpParts
+1: body.importedMode .cpPart
+1: @media (max-width:900px)
+1: body.importedMode .anChannel
+1: body.importedMode .anChannel::after
+1: body.importedMode .anSlot
+1: body.importedMode .anValue
+1: body.importedMode .anBtn.anUp
+1: body.importedMode .anBtn.anDown
+1: body.importedMode .cpPinImg
+1: body.importedMode .cpPin
+1: body.importedMode .cpPins
+1: body.importedMode .cpBuildCanvas
+1: body.importedMode .kdPanel
+1: body.importedMode .kdCheck,body.importedMode .kdFeedback
+1: body.importedMode .kdKey
+1: body.importedMode .kdTooth
+1: body.importedMode .kdBar
+1: body.importedMode .kdPinImg
+1: @media (max-width:900px)
+1: body.importedMode .drumMode .digitalCard
+1: body.importedMode .drumMode .digitalHead
+1: body.importedMode .drumMode .digitalHead>div,body.importedMode .drumMode .drumHint
+1: body.importedMode .drumMode .digitalResult
+1: .worldMapInfo
+1: .worldMapCanvas
+1: .worldMapArtwork
+1: .worldMapCanvas::before
+1: .worldMapRoads,.mapWater,.mapWall
+1: .worldMapCanvas .mapNode
+1: .worldMapCanvas .mapNode.accessible
+1: .worldMapCanvas .mapNodeLock,.worldMapCanvas .mapNodeMissionType
+1: .worldMapCanvas .mapNodeDot
+1: .worldMapCanvas .mapNode.current .mapNodeDot
+1: .worldMapCanvas .mapPlayer
+1: @media (max-width:900px)
+1: .worldMapScreen
+1: .worldMapScreen[hidden]
+1: .worldMapDialog
+1: .worldMapDialog .worldMapCanvas,.worldMapDialog .worldMapInfo
+1: .worldMapDialog .worldMapCanvas
+1: body.map-open
+1: .lairScene
+1: @media (max-width:760px)
+1: .worldMapDialog
+1: .worldMapCanvas
+1: .worldMapCurrentOverlay
+1: .worldMapCurrentOverlay strong
+1: .worldMapInfoOverlay
+1: .worldMapInfoOverlay .worldMapAction
+1: .worldMapInfoOverlay .worldMapInfoTitle
+1: .worldMapInfoOverlay .worldMapInfoText
+1: @media (max-width:760px)
+1: .worldMapScreen
+1: .worldMapDialog
+1: .worldMapDialog .worldMapCanvas
+1: .worldMapArtwork
+1: .lairSceneTop
+1: .lairSceneTop > div:first-child
+1: .lairSceneCharacters
+1: .lairSceneCharacter
+1: .lairSceneCharacter img
+1: .lairSceneCharacter:hover,.lairSceneCharacter:focus-visible
+1: .lairSceneCharacter.active
+1: .lairSceneCharacter.tik
+1: @media (max-width:760px)
+1: .lairPanel[data-lair-panel="team"] .lairPanelHead
+1: .lairPersonThumb img
+1: .lairPortraitInner
+1: .lairPortraitArt
+1: .lairSceneCharacter
+1: .lairSceneCharacter.kai
+1: @media (max-width:760px)
+1: .worldMapClose
+1: .worldMapClose:hover
+1: .lairHotspotCity
+1: .lairHotspotTeam
+1: @media (max-width:760px)
+1: body.importedMode .g1ProgressWrap
+1: body.importedMode .g1ProgressRow
+1: body.importedMode .g1Slot,body.importedMode .g1Slot.empty,body.importedMode .g1Slot.left,body.importedMode .g1Slot.right
+1: body.importedMode .g1Slot.left::before,body.importedMode .g1Slot.right::before
+1: body.importedMode .anBoard
+1: body.importedMode .anConsole
+1: body.importedMode .anTracks
+1: body.importedMode .anReadout
+1: body.importedMode .anReadout::after
+1: @media (max-width:760px)
+1: .lairWorkbenchHotspot
+1: .lairWorkbenchHotspot::after
+1: .lairWorkbenchHotspot:hover::after,.lairWorkbenchHotspot:focus-visible::after
+1: .lairWorkbenchModal
+1: .lairWorkbenchModal[hidden]
+1: .lairWorkbenchDialog
+1: .lairWorkbenchImage
+1: .lairWorkbenchClose
+1: .lairWorkbenchClose:hover
+1: @media (max-width:760px)
+1: :root
+1: :where(   button,[role="button"],.tab,.difficultyBtn,.hudNavBtn,.shopCard,.pickSkinCard,   .inventoryTool,.lairCharacter,.lairPersonBtn,.lairTopic,.lairIntelCard,   .hcStepBtn,.dig
+1: :where(   .plate,.pin,.pick,.tension,.r2Pick,.r2PinImg,.r2PinStem,.r2PinHead,   .skCylinder,.skWrench,.anLevel,.tnBand,.tnNeedle,.tnPinImg,.rsOrb,   .massRing,.massRingDisc,.cpPinI
+1: :where(.plate,.pick,.tension,.r2Pick,.skCylinder,.skWrench,.rsOrb,.inventoryDrawer,.lairSceneCharacter)
+1: :where(.anLevel,.tnBand,.tnNeedle,.tnPinImg,.r2PinImg,.massRingDisc)
+1: .r2Pick,.r2PinImg,.r2PinStem,.r2PinHead
+1: .skCylinder,.skWrench
+1: .anLevel,.tnBand,.tnPinStem,.tnPinHead,.tnPinImg,.kdPinImg, .massRing,.massRingDisc,.hcThermo>i,.drumMeter>i,.scopeBar>i
+1: .inventoryDrawer,.modeTabs,.mobileModeBackdrop,.solvedPuzzleOverlay, .lairModuleWindow,.lairSceneCharacter,.worldMapDialog,.shopPanel
+1: .skinPreviewMain .pickSkinPreview, #pickSkinMain .pickSkinPreview, #tensionSkinMain .pickSkinPreview
+1: #lock,.mechanismZone,.sharedModeLockArt,.platesZone
+
+=== JS TOP-LEVEL DECLARATIONS / SECTION COMMENTS ===
+2: const GOAL=4, MIN=1, MAX=7;
+3: const STORE=(()=>{
+5: const s=window.localStorage;
+6: const k='__lockpick_probe__';
+10: const mem={};
+18: const PICK_TYPES={
+23: const SHOP_PRICES={iron:3000,diamond:10000,pouch4:4500,pouch5:9000};
+24: const PICK_SKINS=[null,
+31: let pickSkin=Math.max(1,Math.min(5,Number(STORE.getItem('lockpickSkin'))||1));
+32: let tensionSkin=Math.max(1,Math.min(5,Number(STORE.getItem('tensionSkin'))||1));
+35: function loadPickProgress(){
+37: const saved=JSON.parse(STORE.getItem('lockpickProgress')||'{}');
+41: let pickProgress=loadPickProgress();
+44: let pickType=pickProgress.equipped, pickCapacity=pickProgress.capacity, shopOpen=false;
+45: let mapOpen=false, mapMoving=false;
+46: const MAP_LOCATIONS={
+54: const MAP_CONNECTIONS={lair:['shop','mission1'],shop:['lair','mission1'],mission1:['lair','shop']};
+55: let mapLocation=MAP_LOCATIONS[STORE.getItem('lockpickMapLocation')]?STORE.getItem('lockpickMapLocation'):'lair';
+57: let lairOpen=false;
+58: const LAIR_KAI_PORTRAIT="assets/characters/kai.png";
+59: const LAIR_SAI_PORTRAIT="assets/characters/sai.png";
+60: const LAIR_TIK_PORTRAIT="assets/characters/tik.png";
+61: const LAIR_CHARACTERS={
+66: let lairCharacter=LAIR_CHARACTERS[STORE.getItem('lockpickLairCharacter')]?STORE.getItem('lockpickLairCharacter'):'kai';
+67: let lairTab='team';
+68: let lairDialoguePerson='sai';
+69: let lairIntelSelected='lair';
+70: const LAIR_DIALOGUES={
+87: const LAIR_INTEL_INFO={
+94: let lairIntel={lair:3,shop:3,old:0,upper:0,port:0};
+96: const savedIntel=JSON.parse(STORE.getItem('lockpickLairIntel')||'null');
+104: let hfTarget=[], hfOptions=[], hfSelected=-1;
+105: let meRings=[], meSelected=0, meInitialPositions=[];
+106: let g1Sequence=[], g1Input=[];
+107: let r2Sequence=[], r2ProgressCount=0, r2PickPos=0, r2PinEls=[];
+108: let skTargetAngle=0, skPickAngle=0, skCylinderAngle=0, skTorqueBusy=false, skDragging=false;
+109: let anTarget=[0,0,0], anState=[0,0,0], anInitialState=[0,0,0], anSelected=0;
+110: let tnTension=40, tnTarget=52, tnWidth=18, tnIndex=0, tnDrift=.05, tnDragging=false, tnReady=false;
+111: let rsIndex=0, rsT=0, rsSpeeds=[], rsBaseSpeeds=[], rsSpeedTargets=[], rsSpeedChangeAt=[], rsPauseUntil=[], rsOffsets=[], rsPhases=[], rsLaneEls=[], rsOrbEls=[], rsReady=false;
+112: let kdVals=[2,2,2,2,2], kdTarget=[2,2,2,2,2], kdSelected=0, kdTests=0, kdFailures=0, kdLogs=[], kdReady=false;
+113: const CP_LEVEL_NAMES=['ВЕРХ','ЦЕНТР','НИЗ'];
+114: let cpNodes=[1,1,1,1,1], cpTarget=[1,1,1,1], cpVals=[1,1,1,1], cpInitial=[1,1,1,1], cpSelected=0, cpReady=false;
+115: let hcSecret=[0,0,0,0], hcAttempts=[], hcDigits=[0,0,0,0], hcActiveIndex=0;
+116: let drumSecret=[0,0,0,0], drumState=[0,0,0,0], drumSoundOn=true, drumAudioCtx=null;
+117: let scopeSecret=[0,0,0,0], scopeState=[0,0,0,0];
+118: let n=5, selected=0, picks=pickCapacity, state=[], initial=[], links=[], targets=[], solved=false, mode='classic', goalLine=GOAL, moves=0, brokenPicks=0, runReward=1000, specialType='chain', generated
+119: let g1Length=4, r2PinCount=6, tnPinCount=5, rsPinCount=5, kdToothCount=5, skSolveTolerance=6;
+120: const $plates=document.querySelector('#plates'), $status=document.querySelector('#status'),
+149: const MODE_PANELS=Object.freeze({
+164: const IMPORTED_MODES=new Set(Object.keys(MODE_PANELS));
+165: const ALL_MODES=new Set(['classic','target','line','sequence','special',...IMPORTED_MODES]);
+167: const DIFFICULTY_STORAGE_KEY='lockpickModeDifficulty';
+168: const DEFAULT_MODE_DIFFICULTY=Object.freeze({classic:1,target:1,line:1,sequence:1,special:1,hillsfar:1,mass:1,g1:1,r2:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,heatcold:1,drum:1
+169: function loadModeDifficulty(){
+171: const saved=JSON.parse(STORE.getItem(DIFFICULTY_STORAGE_KEY)||'{}');
+172: const out={...DEFAULT_MODE_DIFFICULTY};
+177: let modeDifficultyMap=loadModeDifficulty();
+178: function saveModeDifficulty(){ STORE.setItem(DIFFICULTY_STORAGE_KEY, JSON.stringify(modeDifficultyMap)); }
+179: function getModeDifficulty(modeName=mode){ const v=Number(modeDifficultyMap?.[modeName]); return [1,2,3].includes(v)?v:1; }
+180: function diffStep(a,b,c,modeName=mode){ const level=getModeDifficulty(modeName); return level===1?a:level===2?b:c; }
+181: function renderDifficultyDock(){
+182: const dock=document.querySelector('#difficultyDock');
+188: const activeTab=document.querySelector('.modeTabs .tab.active');
+189: const hide=mapOpen || lairOpen || shopOpen || !activeTab || activeTab.hidden;
+194: const r=activeTab.getBoundingClientRect();
+195: const h=dock.offsetHeight || 34;
+200: function setModeDifficulty(level, modeName=mode, regenerate=true){
+212: function syncModePanels(activeMode=mode){
+215: const active=name===activeMode;
+226: let pointerTargetX=0, pointerTargetY=0, pointerX=0, pointerY=0;
+227: let bgParallaxTargetX=0, bgParallaxTargetY=0, bgParallaxX=0, bgParallaxY=0;
+229: function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+231: const LEGACY_PIN_SKINS=[
+243: const PLATE_SKINS=[
+250: const PIN_SKINS=[
+262: const PIN_SKIN_NAMES=['iron_pin_01.png','iron_pin_02.png','iron_pin_03.png','iron_pin_04.png','iron_pin_05.png','iron_pin_06.png','iron_pin_07.png','iron_pin_08.png','iron_pin_09.png','iron_pin_10.png
+263: const GOLD_PIN_SKINS=[
+275: const GOLD_PIN_SKIN_NAMES=['gold_pin_01.png','gold_pin_02.png','gold_pin_03.png','gold_pin_04.png','gold_pin_05.png','gold_pin_06.png','gold_pin_07.png','gold_pin_08.png','gold_pin_09.png','gold_pin_1
+276: const TENSION_SKINS=[null,
+283: const TENSION_SKIN_LABELS=[null,'Прямой','Крючок','Угловой','Волнистый','L-образный'];
+284: const ACTIVE_PLATE_SKIN_COUNT=4;
+285: const PLATE_SKIN_NAMES=['plate_01.png','plate_02.png','plate_03.png','plate_04.png'];
+286: const PLATE_HOLE_Y=[0.41711230,0.44547872,0.47406417,0.49202128,0.52032086];
+287: const PLATE_HOLE_X=[150.5,275,399.5,524.5,649,773.5,898].map(x=>x/1054);
+288: let roundPinSkin=0, roundPlateSkin=0, currentPinLevel=1;
+289: function pinSkinPoolForLevel(level=currentPinLevel){ return level===2 ? GOLD_PIN_SKINS : PIN_SKINS; }
+290: function pinNamePoolForLevel(level=currentPinLevel){ return level===2 ? GOLD_PIN_SKIN_NAMES : PIN_SKIN_NAMES; }
+291: function chooseRoundPinSkin(){
+293: const pool=pinSkinPoolForLevel(currentPinLevel);
+297: function chooseRoundPlateSkin(){ roundPlateSkin=rand(0,Math.max(0,Math.min(ACTIVE_PLATE_SKIN_COUNT,PLATE_SKINS.length)-1)); }
+298: function currentPinSkin(){ const pool=pinSkinPoolForLevel(); return pool[roundPinSkin] || pool[0] || ''; }
+299: function currentPinName(){ const pool=pinNamePoolForLevel(); return pool[roundPinSkin] || pool[0] || '—'; }
+300: function currentPlateName(){ return PLATE_SKIN_NAMES[Math.min(roundPlateSkin||0,ACTIVE_PLATE_SKIN_COUNT-1)] || 'plate_01.png'; }
+301: function currentPlateSkin(){ return PLATE_SKINS[Math.min(roundPlateSkin||0,ACTIVE_PLATE_SKIN_COUNT-1)] || PLATE_SKINS[0]; }
+302: function currentPlateHoleY(){ return PLATE_HOLE_Y[Math.min(roundPlateSkin||0,ACTIVE_PLATE_SKIN_COUNT-1)] ?? .47; }
+304: const LOCK_BODY_SKINS_BY_LEVEL={
+331: const LOCKER_SKINS_BY_LEVEL={
+353: const REMOVED_SHACKLE_NAMES = new Set([
+364: let roundLockBodySkin=0, roundLockerSkin=0;
+365: let currentMechanismLevel=1;
+366: const LAST_LOCK_BODY_KEY='lastRoundLockBodyName';
+367: const LAST_SHACKLE_KEY='lastRoundShackleName';
+368: let previousRoundLockBodyName=STORE.getItem(LAST_LOCK_BODY_KEY)||'';
+369: let previousRoundShackleName=STORE.getItem(LAST_SHACKLE_KEY)||'';
+370: function getSkinPoolByLevel(store, level=getModeDifficulty(mode)){
+371: const fallback=(store && store[1] && store[1].length)?store[1]:[];
+374: function chooseNonRepeatingSkinIndex(pool, previousName=''){
+377: const candidates=pool
+385: function chooseRoundMechanismSkin(){
+387: const bodyPool=getSkinPoolByLevel(LOCK_BODY_SKINS_BY_LEVEL,currentMechanismLevel);
+388: const shacklePool=getSkinPoolByLevel(LOCKER_SKINS_BY_LEVEL,currentMechanismLevel);
+397: function currentLockBodyEntry(){
+398: const pool=getSkinPoolByLevel(LOCK_BODY_SKINS_BY_LEVEL,currentMechanismLevel);
+401: function currentLockerEntry(){
+402: const pool=getSkinPoolByLevel(LOCKER_SKINS_BY_LEVEL,currentMechanismLevel);
+405: function currentLockBodySkin(){ return currentLockBodyEntry().data || ''; }
+406: function currentLockerSkin(){ return currentLockerEntry().data || ''; }
+407: function updateMechanismAssetHud(){
+408: const wrap=document.querySelector('#assetNameHud');
+409: const lockEl=document.querySelector('#assetNameLock');
+410: const shackleEl=document.querySelector('#assetNameShackle');
+411: const plateEl=document.querySelector('#assetNamePlate');
+412: const pinEl=document.querySelector('#assetNamePin');
+414: const lockEntry=currentLockBodyEntry();
+415: const shackleEntry=currentLockerEntry();
+421: function applyMechanismSkin(){
+422: const lockBody=`url("${currentLockBodySkin()}")`;
+423: const locker=`url("${currentLockerSkin()}")`;
+432: let audioCtx=null;
+434: function ensureAudio(){
+436: const AC=window.AudioContext||window.webkitAudioContext;
+444: function tone(freq=440,duration=.08,type='sine',gain=.035,slideTo=null){
+445: const ctx=ensureAudio();
+447: const now=ctx.currentTime;
+448: const osc=ctx.createOscillator();
+449: const vol=ctx.createGain();
+461: function noise(duration=.06,gain=.025){
+462: const ctx=ensureAudio();
+464: const length=Math.max(1,Math.floor(ctx.sampleRate*duration));
+465: const buffer=ctx.createBuffer(1,length,ctx.sampleRate);
+466: const data=buffer.getChannelData(0);
+468: const src=ctx.createBufferSource();
+469: const vol=ctx.createGain();
+477: const SFX={
+505: function shuffle(a){for(let i=a.length-1;i>0;i--){let j=rand(0,i);[a[i],a[j]]=[a[j],a[i]]}return a}
+506: function toast(t, action=false){
+519: function updateEconomyUI(){
+524: function animateRewardDrop(){
+530: let toolMotionKick = 0;
+532: function computeToolMotionProfile(){
+533: const safeMax = (typeof MAX === 'number' ? MAX : 6);
+534: const safeMin = (typeof MIN === 'number' ? MIN : 1);
+535: const span = Math.max(1, safeMax - safeMin);
+537: let rowBias = 0;
+538: let posBias = 0;
+541: const idx = Math.max(0, Math.min(state.length - 1, Number.isFinite(selected) ? selected : 0));
+544: const rawPos = typeof state[idx] === 'number' ? state[idx] : safeMin;
+551: function registerMove(){
+554: const next=Math.max(100, 1000 - moves*50);
+562: function awardRun(){
+563: const cleanBonus = brokenPicks===0 ? 250 : 0;
+564: const earned = runReward + cleanBonus;
+572: function savePickProgress(){
+577: function ownsPick(type){
+580: function setGlobalTimer(active=false, timeLeft=0, timeMax=1, label='ТАЙМЕР'){
+585: const safeMax = Math.max(.001, timeMax || 1);
+586: const pct = Math.max(0, Math.min(1, timeLeft / safeMax));
+587: const radius = 30;
+588: const circumference = 2 * Math.PI * radius;
+596: function updatePickUI(){
+600: function damagePick({resetProgress=null, renderState=null, surviveText='Ошибка'}={}){
+601: const info=PICK_TYPES[pickType];
+602: const breaks=Math.random()<info.breakChance;
+612: const previousVisiblePicks=Math.max(0, Math.min(pickCapacity, picks));
+617: const kept=Math.random()<info.saveChance;
+633: function applyPickSkin(){
+634: const uri=PICK_SKINS[pickSkin]||PICK_SKINS[1];
+638: function selectPickSkin(index){
+647: function buildSkinMain($mount, uri, label, kind){
+650: const img=document.createElement('img');
+654: const cap=document.createElement('div');
+661: function updatePickSkinShop(){
+666: const btn=document.createElement('button');
+671: const img=document.createElement('img');
+675: const label=document.createElement('span');
+684: function initPickSkinShop(){
+688: function applyTensionSkin(){
+689: const uri=TENSION_SKINS[tensionSkin]||TENSION_SKINS[1];
+693: function selectTensionSkin(index){
+702: function updateTensionSkinShop(){
+707: const btn=document.createElement('button');
+712: const img=document.createElement('img');
+716: const label=document.createElement('span');
+725: function initTensionSkinShop(){
+729: function updateShopUI(){
+733: const cards={wood:$shopWood,iron:$shopIron,diamond:$shopDiamond};
+747: function inventoryEls(){
+757: function triggerInventoryBreakAnimation(slot){
+766: function setInventoryOpen(force){
+769: const next=typeof force==='boolean' ? force : !root.classList.contains('open');
+776: function renderInventoryAvatar(){
+779: const ch=LAIR_CHARACTERS[lairCharacter] || LAIR_CHARACTERS.kai;
+785: function inventoryTool(kind,index,src,label,options={}){
+786: const btn=document.createElement('button');
+788: const active=kind==='pick' ? pickSkin===index : tensionSkin===index;
+795: const img=document.createElement('img');
+807: function renderInventoryTools(){
+813: const visiblePicks=Math.max(0, Math.min(pickCapacity, picks));
+818: const pickIndex=i;
+819: const isAvailable=i<=visiblePicks;
+820: const isBreaking=(i===inventoryBrokenSlot && i===visiblePicks+1 && i<=pickCapacity+1);
+821: const isRenderable=isAvailable || isBreaking;
+822: const btn=inventoryTool('pick',pickIndex,PICK_SKINS[pickIndex],`Отмычка ${pickIndex} · слот ${i}${isAvailable ? ` · осталось ${visiblePicks}` : ''}`,{
+837: function initInventoryDrawer(){
+848: const currentRoot=document.querySelector('#inventoryDrawer');
+857: function saveLairIntel(){
+861: function setLairTab(next){
+869: function renderLairScene(){
+873: const order=['kai','sai','tik'];
+875: const ch=LAIR_CHARACTERS[id];
+883: const selectCharacter=()=>{
+884: const id=el.dataset.lairCharacter;
+899: function openLairModule(next){
+901: const titles={team:'Выбор персонажа',dialogue:'Диалоги',city:'Анализ города'};
+908: function closeLairModule(){
+914: function openLairWorkbench(){
+915: const modal=document.querySelector('#lairWorkbenchModal');
+922: function closeLairWorkbench(){
+923: const modal=document.querySelector('#lairWorkbenchModal');
+928: function lairPortraitMarkup(ch,{small=false}={}){
+940: function renderLairTeam(){
+945: const card=document.createElement('button');
+967: function renderLairDialogue(){
+971: const btn=document.createElement('button');
+982: const ch=LAIR_CHARACTERS[lairDialoguePerson];
+983: const topics=LAIR_DIALOGUES[lairDialoguePerson]||[];
+988: const btn=document.createElement('button');
+999: function renderLairIntelDetail(){
+1001: const info=LAIR_INTEL_INFO[lairIntelSelected];
+1002: const level=lairIntel[lairIntelSelected]||0;
+1003: const revealed=level ? info.notes[Math.min(level-1,info.notes.length-1)] : 'Достоверных сведений пока нет.';
+1004: const maxed=level>=3;
+1015: const analyze=$lairIntelDetail.querySelector('#lairAnalyze');
+1024: function renderLairIntel(){
+1028: const info=LAIR_INTEL_INFO[id];
+1029: const level=lairIntel[id]||0;
+1030: const card=document.createElement('button');
+1033: const pips=[0,1,2].map(i=>`<span class="${i<level?'on':''}"></span>`).join('');
+1049: function openLair(){
+1067: function closeLair(){
+1077: function openLairFromHud(){
+1090: function renderWorldMap(){
+1092: const loc=MAP_LOCATIONS[mapLocation]||MAP_LOCATIONS.lair;
+1106: function openMap(){
+1119: function closeMap(){
+1128: function startFirstMission(){
+1148: function travelToMapLocation(next){
+1149: const target=MAP_LOCATIONS[next];
+1161: const allowed=MAP_CONNECTIONS[mapLocation]||[];
+1183: function openShop(){ closeMobileModeMenu(); setInventoryOpen(false); shopOpen=true; document.body.classList.add('shop-open'); $toast.classList.remove('show','actionable'); updateShopUI(); $shopOverlay
+1184: function closeShop(){ shopOpen=false; document.body.classList.remove('shop-open'); $shopOverlay.classList.remove('open'); updatePickUI(); }
+1185: function switchMode(nextMode){
+1200: function spend(cost){
+1208: function buyOrEquipPick(type){
+1216: const cost=SHOP_PRICES[type];
+1226: function buyPouch(){
+1228: const cost=pickCapacity===3?SHOP_PRICES.pouch4:SHOP_PRICES.pouch5;
+1238: // Digital puzzle helpers
+1239: function randomFourDigitCode(){
+1243: function randomCodeAndState(){
+1244: let secret,state;
+1252: function resetDigitalRunState(){
+1261: function setDigitalResult(element,text='',success=false){
+1267: function finishDigitalPuzzle(renderFn=null){
+1277: // Heat / cold
+1278: function hcGrade(distance){
+1287: function syncHeatColdInput(){
+1291: function renderHeatColdControls(){
+1302: function adjustHeatColdDigit(index,delta){
+1312: function setHeatColdActive(index){
+1318: function focusHeatColdDigit(index){
+1320: const col=$hcDialRow.querySelector(`[data-hc-col="${index}"]`);
+1324: function handleHeatColdKey(e){
+1326: const key=e.key;
+1337: function renderHeatColdEmpty(){
+1349: function startHeatColdRound(){
+1363: function scanHeatCold(){
+1365: const code=hcDigits.join('');
+1368: let exact=0;
+1369: const states=hcDigits.map((value,index)=>{
+1370: const distance=Math.abs(value-hcSecret[index]);
+1405: // Drum clicks
+1406: function drumCircDist(a,b){
+1407: const distance=Math.abs(a-b);
+1411: function drumStrength(distance){
+1415: function drumLabel(distance){
+1426: function drumPlayClick(distance){
+1429: const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+1432: const now=drumAudioCtx.currentTime;
+1433: const hit=(time,frequency,gainValue,duration=.035)=>{
+1434: const oscillator=drumAudioCtx.createOscillator();
+1435: const gain=drumAudioCtx.createGain();
+1445: const strength=drumStrength(distance)/100;
+1451: function renderDrum(){
+1454: const distance=drumCircDist(value,drumSecret[index]);
+1467: function startDrumRound(){
+1475: function changeDrum(index,direction){
+1479: const distance=drumCircDist(drumState[index],drumSecret[index]);
+1482: const wheel=document.querySelector(`#drumWheel${index}`);
+1488: function checkDrum(){
+1490: const exact=drumState.filter((value,index)=>value===drumSecret[index]).length;
+1500: // Oscilloscope
+1501: const scopeFreqs=[1,2,3,5];
+1502: const scopeWeights=[.22,.18,.14,.11];
+1503: const scopePhases=[.1,.7,1.3,2.1];
+1505: function scopeSignal(code){
+1506: const sampleCount=420;
+1507: const signal=[];
+1509: const x=index/(sampleCount-1)*Math.PI*2;
+1510: let y=.10*Math.sin(x*.5);
+1512: const coefficient=(code[harmonic]-4.5)/4.5;
+1520: function scopeScoreValue(reference,current){
+1521: let squaredError=0;
+1523: const delta=reference[index]-current[index];
+1526: const rms=Math.sqrt(squaredError/reference.length);
+1530: function drawScope(){
+1532: const context=$scopeCanvas.getContext('2d');
+1533: const width=$scopeCanvas.width;
+1534: const height=$scopeCanvas.height;
+1543: const y=20+row*(height-40)/6;
+1550: const x=18+column*(width-36)/9;
+1557: const plot=(signal,color,lineWidth)=>{
+1560: const x=18+index*(width-36)/(signal.length-1);
+1561: const y=height/2-value*height*.70;
+1572: const reference=scopeSignal(scopeSecret);
+1573: const current=scopeSignal(scopeState);
+1577: const score=scopeScoreValue(reference,current);
+1582: function renderScope(){
+1595: function startScopeRound(){
+1603: function changeScope(index,direction){
+1612: function checkScope(){
+1614: const exact=scopeState.every((value,index)=>value===scopeSecret[index]);
+1624: function updateModeUI(){
+1646: const isImported=IMPORTED_MODES.has(mode);
+1694: function getVisibleLockArts(){
+1696: const st=getComputedStyle(el);
+1697: const r=el.getBoundingClientRect();
+1702: function setGameInactive(flag){
+1710: function restartCurrentRound(){
+1719: function celebrate(){
+1728: // После успешного прохождения не показываем общий toast/кнопку «Новый замок».
+1732: // Во всех режимах доигрываем анимацию открытия и оставляем замок раскрытым.
+1746: function nudgeTools(){
+1747: const tools=[...document.querySelectorAll('.mechanismZone, .sharedModeLockArt')];
+1749: // force a single reflow after clearing the class so animations restart
+1752: const r=el.getBoundingClientRect();
+1757: function goalMet(){
+1762: function stateKey(s){ return s.join(''); }
+1764: function shortestDistance(start, goal, maxDepth=24){
+1765: const targetKey=stateKey(goal);
+1766: const startKey=stateKey(start);
+1769: const queue=[[start,0]];
+1770: const seen=new Set([startKey]);
+1771: let head=0;
+1780: const next=applyRaw(cur,i,dir);
+1781: const key=stateKey(next);
+1792: function randomWalkFrom(goalState, steps){
+1793: let s=[...goalState];
+1794: let last=null;
+1796: const choices=[];
+1805: const c=choices[rand(0,choices.length-1)];
+1812: function generateLinkedPuzzle(goal, minMoves=7, maxMoves=12){
+1813: const goalState=Array(n).fill(goal);
+1814: let best=null;
+1815: let bestScore=-Infinity;
+1818: const steps=rand(minMoves,maxMoves+6);
+1819: const candidate=randomWalkFrom(goalState,steps);
+1822: const distance=shortestDistance(candidate,goalState,maxMoves+8);
+1829: const score=-Math.abs(distance-(minMoves+maxMoves)/2);
+1843: function independentDistance(a,b){
+1847: function makeSmartTargetModeStart(minMoves=8,maxMoves=14){
+1849: const t=Array.from({length:n},()=>rand(MIN,MAX));
+1850: const s=Array.from({length:n},()=>rand(MIN,MAX));
+1851: const d=independentDistance(s,t);
+1864: // ===== MASS EFFECT =====
+1865: function massGradientForRing(ring){
+1866: const step = 360 / ring.count;
+1867: const goodColor = '#f0c878';
+1868: const decoyColor = '#8e6a39';
+1869: const baseColor = '#2f2418';
+1870: const darkGap = '#15100b';
+1871: const gap = Math.max(2.2, step * .11);
+1872: const parts = [];
+1874: // Все кольца используют одну и ту же дискретную угловую сетку.
+1875: // Сектор i центрирован ровно на i * step градусов.
+1877: const start = i * step;
+1878: const segStart = start + gap;
+1879: const segEnd = start + step - gap;
+1880: let color = baseColor;
+1888: // -step/2 делает центр нулевого сектора направленным ровно вверх.
+1892: function massRingSolved(ring){
+1896: function renderMassEffect(){
+1899: const btn = document.createElement('button');
+1908: const ringNames = ['Внешнее кольцо','Среднее кольцо','Внутреннее кольцо'];
+1911: const disc = document.createElement('div');
+1928: const ready = meRings.length && meRings.every(massRingSolved);
+1933: function startMassRound(){
+1941: const sectorCount = diffStep(10,12,14,'mass');
+1942: const decoyCount = diffStep(2,3,4,'mass');
+1943: const configs = [
+1949: const goodIndex = rand(0, cfg.count-1);
+1950: const targetIndex = Math.floor(cfg.count / 2);
+1951: const solution = (targetIndex - goodIndex + cfg.count) % cfg.count;
+1952: const decoys = [];
+1954: const d = rand(0, cfg.count-1);
+1957: let pos = rand(0, cfg.count-1);
+1964: const diff = Math.abs(r.pos - r.solution);
+1971: function tryOpenMass(){
+1989: function moveMass(dir){
+1991: const ring = meRings[meSelected];
+1996: const wasReady = $massCenter.classList.contains('ready');
+1998: const isReady = meRings.every(massRingSolved);
+2002: function selectMass(delta){
+2004: // W / ArrowUp passes delta=-1: outer (0) -> middle (1) -> inner (2).
+2005: // S / ArrowDown goes in the opposite direction.
+2006: const step = delta < 0 ? 1 : -1;
+2012: function clamp(v,min,max){ return Math.max(min,Math.min(max,v)); }
+2014: // ===== ANACHRONOX =====
+2015: function anReadoutValue(){
+2016: const distance=Math.abs(anState[0]-anTarget[0]) + Math.abs(anState[1]-anTarget[1]) + Math.abs(anState[2]-anTarget[2]);
+2020: function anSolved(){
+2024: function renderAn(){
+2025: const channels=[...document.querySelectorAll('.anChannel')];
+2028: const level=ch.querySelector('.anLevel');
+2029: const value=ch.querySelector('.anValue');
+2033: const score = anReadoutValue();
+2036: const ready = !solved && anSolved();
+2043: function startAnRound(){
+2051: const anMax=diffStep(6,8,9,'anach');
+2052: const minDistance=diffStep(6,10,14,'anach');
+2053: let dist=0;
+2066: function moveAn(dir){
+2068: const next = Math.max(0, Math.min(2, anSelected + dir));
+2075: function adjustAn(step, forcedCol=null){
+2077: const col = forcedCol==null ? anSelected : Math.max(0,Math.min(2,forcedCol));
+2079: const next = Math.max(0, Math.min(9, anState[col] + step));
+2088: function tryOpenAn(){
+2107: // ===== COMPOSITE PICK — CONTINUOUS BUILDER =====
+2108: const CP_XS=[0,160,320,480,640];
+2109: const CP_PIN_COUNT=5;
+2110: function cpY(level){ return [14,24,34][level] ?? 24; }
+2111: function cpSvgY(level){ return cpY(level) + 12; }
+2112: function cpMiniY(level){ return [8,13,18][level] ?? 13; }
+2114: function cpPathD(nodes){
+2118: function cpProfileD(nodes){
+2119: const bottomY=74;
+2120: let d=`M 0 ${bottomY} L 0 ${cpSvgY(nodes[0])}`;
+2126: function cpBuiltNodes(vals=cpVals){
+2130: function cpMatchesTarget(vals=cpVals){
+2134: function cpSamplePoints(nodes,count=CP_PIN_COUNT){
+2135: const pts=[];
+2136: const totalSegments=nodes.length-1;
+2138: const t = (i/(count-1))*totalSegments;
+2139: const seg = Math.min(totalSegments-1, Math.floor(t));
+2140: const local = Math.max(0, Math.min(1, t-seg));
+2141: const x1=CP_XS[seg], x2=CP_XS[seg+1];
+2142: const y1=cpY(nodes[seg]), y2=cpY(nodes[seg+1]);
+2151: function cpSetPath($el,d){
+2155: function cpApplyProfile({shadow,fill,topLine,bevel,path,glow},nodes){
+2156: const profileD=cpProfileD(nodes);
+2157: const lineD=cpPathD(nodes);
+2166: function cpPartPreviewSvg(index,level){
+2167: const leftLevel=index===0 ? cpNodes[0] : cpVals[index-1];
+2168: const y1=cpMiniY(leftLevel), y2=cpMiniY(level);
+2169: const gradId=`cpMiniMetal${index}`;
+2170: const path=`M 6 26 L 6 ${y1} L 56 ${y1} L 104 ${y2} L 110 26 Z`;
+2171: const line=`M 6 ${y1} L 56 ${y1} L 104 ${y2}`;
+2188: function cpRenderPinRail($rail,nodes){
+2190: const points=cpSamplePoints(nodes);
+2191: const pinSkin=currentPinSkin();
+2192: const frag=document.createDocumentFragment();
+2194: const pin=document.createElement('div');
+2199: const img=document.createElement('img');
+2209: function cpRenderJoints(nodes){
+2212: const svgBox=$cpBuildPath?.ownerSVGElement?.getBoundingClientRect();
+2213: const canvasBox=$cpBuildJoints.getBoundingClientRect();
+2217: const dot=document.createElement('div');
+2219: const px=(CP_XS[i]/640)*svgBox.width + (svgBox.left-canvasBox.left);
+2220: const py=(cpSvgY(level)/90)*svgBox.height + (svgBox.top-canvasBox.top);
+2227: function setCompositeLevel(i,level){
+2242: function renderComposite(){
+2255: const builtNodes=cpBuiltNodes();
+2270: const wrap=document.createElement('div');
+2275: const buttons=CP_LEVEL_NAMES.map((name,buttonLevel)=>
+2316: function startCompositeRound(){
+2325: const prev=cpNodes[i];
+2326: const options=[prev-1,prev,prev+1].filter(v=>v>=0&&v<=2);
+2331: const minDistance=diffStep(2,4,6,'composite');
+2343: function moveCompositeSelection(dir){
+2345: const next=clamp(cpSelected+dir,0,3);
+2355: function changeCompositeShape(i,delta){
+2357: const next=clamp(cpVals[i]+delta,0,2);
+2365: function tryOpenComposite(){
+2389: // ===== TENSION CONTROL =====
+2390: function tnInBand(){ return Math.abs(tnTension-tnTarget)<=tnWidth/2; }
+2391: function renderTension(){
+2396: const pinSkin=currentPinSkin();
+2397: const frag=document.createDocumentFragment();
+2399: const p=document.createElement('div');
+2409: function startTensionRound(){
+2416: function moveTension(dir){
+2421: function setTensionPin(){
+2439: function tryOpenTension(){
+2445: // ===== RESONANCE =====
+2446: function rsPos(i){ return 50+43*Math.sin((rsOffsets[i]||0)+(rsPhases[i]||0)); }
+2447: function renderResonance(){
+2450: const frag=document.createDocumentFragment();
+2453: const lane=document.createElement('div');
+2455: const orb=document.createElement('div'); orb.className='rsOrb';
+2463: function startResonanceRound(){
+2467: const speedBase=diffStep(.72,.85,1.02,'resonance');
+2468: const speedStep=diffStep(.10,.13,.16,'resonance');
+2469: const randomAmp=diffStep(.16,.22,.28,'resonance');
+2475: const now=performance.now();
+2480: function hitResonance(){
+2483: const p=rsPos(rsIndex);
+2496: function tryOpenResonance(){
+2502: // ===== KEY DEDUCTION =====
+2503: function renderDeduction(){
+2505: const pinSkin=currentPinSkin();
+2506: const frag=document.createDocumentFragment();
+2508: const t=document.createElement('div');
+2521: function startDeductionRound(){
+2524: const maxTooth=diffStep(3,4,4,'deduction');
+2530: function moveDeductionSelection(dir){
+2532: const next=clamp(kdSelected+dir,0,kdVals.length-1);
+2536: function changeDeduction(i,delta){
+2539: const next=clamp(kdVals[i]+delta,0,4);
+2543: function checkDeduction(){
+2546: let wrong=-1;
+2549: const low=kdVals[wrong]<kdTarget[wrong];
+2561: function tryOpenDeduction(){
+2567: // ===== SKYRIM =====
+2568: function skAngleDiff(){
+2572: function renderSkyrim(){
+2575: const diff=skAngleDiff();
+2576: const ready=diff<=skSolveTolerance && !solved;
+2592: function startSkyrimRound(){
+2601: const angleRange=diffStep(42,60,72,'skyrim');
+2613: function setSkyrimAngle(angle){
+2620: function moveSkyrim(dir){
+2627: function skyrimBreakPick(){
+2635: function tryTorqueSkyrim(){
+2640: const diff=skAngleDiff();
+2641: const normalized=clamp(1-diff/48,0,1);
+2642: const maxTurn=diff<=6 ? 90 : 10+62*normalized;
+2674: function skyrimAngleFromPointer(e){
+2675: const r=$skBoard.getBoundingClientRect();
+2676: const cx=r.left+r.width/2;
+2677: const cy=r.top+r.height/2;
+2678: const dx=e.clientX-cx;
+2679: const dy=e.clientY-cy;
+2680: const angle=Math.atan2(dx,-dy)*180/Math.PI;
+2684: // ===== RISEN 2 =====
+2685: function getR2Layout(){
+2686: const count = r2PinCount;
+2687: const pinGap = count >= 8 ? 12 : 18;
+2688: const pinsWidth = 540;
+2689: const pinWidth = Math.floor((pinsWidth - pinGap * (count - 1)) / count);
+2690: const pinsLeft = (780 - pinsWidth) / 2;
+2691: const pinXs = Array.from({length:count},(_,i)=>18 + i * (pinWidth + pinGap));
+2692: const pinCenters = pinXs.map(x => pinsLeft + x + pinWidth / 2);
+2693: const imported = document.body.classList.contains('importedMode');
+2694: const pickTipCenter = imported ? 308 : 276;
+2698: function startR2Round(){
+2715: function renderR2(){
+2716: const layout = getR2Layout();
+2717: const raised = new Set(r2Sequence.slice(0,r2ProgressCount));
+2718: const pinSkin=currentPinSkin();
+2719: const frag=document.createDocumentFragment();
+2723: const pin=document.createElement('div');
+2724: const isRaised = raised.has(i);
+2730: const stem=document.createElement('div');
+2732: const head=document.createElement('div');
+2734: const skin=document.createElement('img');
+2753: const targetX = layout.pinCenters[r2PickPos] - layout.pickTipCenter;
+2762: function moveR2(dir){
+2764: const next=Math.max(0,Math.min(r2PinCount-1,r2PickPos+dir));
+2771: function attemptR2Pin(){
+2774: const expected=r2Sequence[r2ProgressCount];
+2775: const pin=r2PinEls[r2PickPos];
+2789: const outcome=damagePick({
+2799: function tryOpenR2(){
+2813: // ===== GOTHIC 1 =====
+2814: function renderG1Row(container, arr, size=4){
+2817: const slot=document.createElement('div');
+2818: const val = arr[i];
+2824: function renderG1(){
+2826: const ready = g1Input.length === g1Length && g1Input.every((v,i)=>v===g1Sequence[i]);
+2829: function startG1Round(){
+2846: function g1Press(dir){
+2848: const expected = g1Sequence[g1Input.length];
+2867: function tryOpenG1(auto=false){
+2869: const ready = g1Input.length === g1Length && g1Input.every((v,i)=>v===g1Sequence[i]);
+2885: // ===== HILLSFAR =====
+2886: function clearHillsfarTimer(){
+2891: function renderHillsfarHud(){
+2895: function startHillsfarTimer(){
+2903: function failHillsfarAttempt(message){
+2907: const outcome=damagePick({
+2919: function hillsfarSegmentShape(type, x, baseY, step){
+2935: // shallow shelf + tooth
+2939: function hillsfarLockShape(type, x, baseY, step){
+2958: function hillsfarPattern(len=6){
+2959: const arr=[];
+2965: function hillsfarMutate(base){
+2966: const out=[...base];
+2967: const changes=rand(1,2);
+2969: const i=rand(0,out.length-1);
+2975: function samePattern(a,b){
+2979: function hillsfarSvg(pattern, width=189, height=64){
+2980: const baseY = height * 0.70;
+2981: const shankH = Math.max(12, Math.round(height * 0.14));
+2982: const left = 1;
+2983: const right = 1;
+2984: const usable = width - left - right;
+2985: const step = usable / pattern.length;
+2986: let d = `M ${left} ${baseY}`;
+2992: const metal = '#eadc93';
+2993: const shadow = '#8d7841';
+2994: const body = `<path d="${d}" fill="${metal}"/>`;
+2995: const spine = `<rect x="${left}" y="${height - 10 - shankH}" width="${width - left - right}" height="${shankH}" rx="2" fill="${metal}"/>`;
+2996: const tip = `<rect x="${width - 10}" y="${height - 30}" width="9" height="20" fill="${metal}"/>`;
+2997: const grooves = [0.28,0.56].map(k=>{
+2998: const y = baseY + k * (height - baseY - 16);
+3001: const bevel = `<path d="${d}" fill="none" stroke="rgba(255,247,206,.35)" stroke-width="1.6" stroke-linejoin="round"/>`;
+3005: function hillsfarLockSvg(pattern, width=760, height=64){
+3006: const baseY = 22;
+3007: const step = width / pattern.length;
+3008: let d = `M 0 ${baseY}`;
+3013: const bg = `<rect x="0" y="0" width="${width}" height="${height}" fill="url(#hfBg)"/>`;
+3014: const cut = `<path d="${d}" fill="#e8d88e"/>`;
+3015: const defs = `<defs><linearGradient id="hfBg" x1="0" x2="1"><stop offset="0" stop-color="#8f8f8f"/><stop offset="0.55" stop-color="#9b9b9b"/><stop offset="1" stop-color="#8f8f8f"/></linearGradient></d
+3016: const bevels = `<path d="M 0 ${baseY} H ${width}" stroke="rgba(255,255,255,.12)" stroke-width="1.5"/>`;
+3020: function renderHillsfar(){
+3025: const btn=document.createElement('button');
+3039: function startHillsfarRound(){
+3053: const optionCount=diffStep(6,8,9,'hillsfar');
+3054: const options=[hfTarget];
+3056: const candidate=hillsfarMutate(hfTarget);
+3067: function tryOpenHillsfar(){
+3078: const candidate=$hfCandidates.children[hfSelected];
+3089: // ===== BASE / SPECIAL LOCKS =====
+3090: function buildSpecialLinks(type){
+3105: const m=n-1-i;
+3111: // "wave": selected pin + next pin same direction + previous pin opposite.
+3119: function specialTypeName(){
+3123: function makeLinks(){
+3127: let count = n<=3 ? rand(0,1) : rand(1,Math.min(2,n-1));
+3128: let candidates=shuffle([...Array(n).keys()].filter(j=>j!==i));
+3133: function deltaFor(i,dir){return links[i].map(v=>v*dir)}
+3134: function legal(st,i,dir){
+3135: const d=deltaFor(i,dir);
+3138: function applyRaw(st,i,dir){
+3139: const d=deltaFor(i,dir); return st.map((v,j)=>v+d[j]);
+3141: let plateEls=[], pinTopPlateEls=[];
+3143: function rebuildPlates(){
+3146: const spacing = n===3 ? 106 : n===4 ? 78 : n===5 ? 78 : 74;
+3147: const pinSkin=currentPinSkin();
+3148: const plateSkin=currentPlateSkin();
+3149: const pinImage=`url("${pinSkin}")`;
+3150: const plateImage=`url("${plateSkin}")`;
+3151: const frag=document.createDocumentFragment();
+3152: const pinTopFrag=document.createDocumentFragment();
+3153: const pinTopRoot=document.querySelector('#pinTopPlates');
+3155: const p=document.createElement('div');
+3163: const x=0, y=i*spacing;
+3170: const plateH=97;
+3171: const holeY=currentPlateHoleY()*plateH;
+3173: const pin=document.createElement('div');
+3179: const pinTopPlate=document.createElement('div');
+3186: const pinTop=document.createElement('div');
+3193: const face=document.createElement('div');
+3197: const target=document.createElement('div');
+3200: const idx=document.createElement('div');
+3233: function pinXForState(pos){
+3234: const i=Math.max(0,Math.min(6,pos-1));
+3238: function targetLineFor(i){
+3244: function pinScaleFor(i, pos){
+3246: const target = targetLineFor(i);
+3250: function pinTransform(x, scale=1){
+3251: const xShift=(520*0.01);
+3252: const yShift=(scale>=0.70 ? -5 : 0);
+3256: function animatePinTo(p, nextState){
+3257: const pins=[p._pin,p._pinTop].filter(Boolean);
+3259: const row=+p.dataset.index;
+3260: const prevState=p._pinState;
+3261: const nextX=pinXForState(nextState);
+3262: const nextScale=pinScaleFor(row,nextState);
+3265: const nextTransform=pinTransform(nextX,nextScale);
+3271: const prevX=pinXForState(prevState);
+3272: const prevScale=pinScaleFor(row,prevState);
+3275: const anim=pin.animate([
+3287: function updatePlateVisual(i){
+3288: const p=plateEls[i];
+3290: const isSelected = i===selected;
+3291: const codeSolved = mode==='sequence' && goalMet();
+3292: const isSolved = (mode==='classic' || mode==='special') ? state[i]===GOAL : (mode==='target' ? state[i]===targets[i] : (mode==='line' ? state[i]===goalLine : codeSolved));
+3302: const tx = pinXForState((targets[i]||1)) - 8;
+3309: function newLock(notify=true){
+3317: const baseDifficulty = getModeDifficulty(mode);
+3354: const specialDifficulty=getModeDifficulty('special');
+3393: const msg =
+3418: function reset(){
+3438: function failMove(){
+3444: const info=PICK_TYPES[pickType];
+3445: const breaks=Math.random()<info.breakChance;
+3453: const previousVisiblePicks=Math.max(0, Math.min(pickCapacity, picks));
+3458: const keepsPosition=Math.random()<info.saveChance;
+3474: function move(dir){
+3493: const next = state[selected] + dir;
+3499: const wasReady=$mechanism.classList.contains('ready');
+3501: const isReady=goalMet();
+3506: function shakeUniversalLock(){
+3514: function handleUniversalLockClick(){
+3516: const solvedBefore = solved;
+3521: function tryOpenLock(){
+3559: function select(delta){
+3579: function render(){
+3595: // Все динамические эффекты идут через requestAnimationFrame:
+3596: // на дисплее 120 Гц браузер отрисовывает их до 120 кадров/с.
+3597: let lastFrame=performance.now();
+3598: function animationLoop(now){
+3599: const dt=Math.min(32,now-lastFrame);
+3601: const lerp = 1 - Math.pow(0.001, dt/1000);
+3608: const idleSway = Math.sin(now * 0.0016) * 0.55;
+3610: const toolProfile = computeToolMotionProfile();
+3611: const movePulse = toolMotionKick;
+3612: const pulseSin = Math.sin(now * 0.024) * movePulse;
+3614: const pickRotDrift = idleSway * 1.15 + pointerX * 0.18 - pointerY * 0.14;
+3615: const tensionRotDrift = idleSway * 0.95 + pointerX * 0.12 + pointerY * 0.12;
+3617: const pickReactX = toolProfile.rowBias * -8 + pulseSin * 2.2;
+3618: const pickReactY = toolProfile.posBias * 6 - movePulse * 2.4;
+3619: const pickReactRot = toolProfile.rowBias * 2.2 + toolProfile.posBias * 1.5 + pulseSin * 1.8;
+3621: const tensionReactX = toolProfile.rowBias * 4 + pulseSin * 1.1;
+3622: const tensionReactY = toolProfile.posBias * 3 - movePulse * 1.2;
+3623: const tensionReactRot = toolProfile.rowBias * -1.4 + toolProfile.posBias * 1.1 + pulseSin * 1.1;
+3638: const px=`${pointerX.toFixed(2)}px`;
+3639: const py=`${pointerY.toFixed(2)}px`;
+3649: const hfDt = Math.max(0, now - (hfLastTick || now)) / 1000;
+3660: const rsLevel=getModeDifficulty('resonance');
+3662: const orb=rsOrbEls[i];
+3666: const base=rsBaseSpeeds[i] || rsSpeeds[i] || 1;
+3667: const vary=rsLevel===2 ? .18 : .24;
+3692: function tablerIcon(name, size=18){
+3693: const icons={
+3719: const body=icons[name]||icons.lock;
+3723: function setIconLabel(el, icon, label){
+3728: function applyTablerIcons(){
+3746: const coinIcon=document.querySelector('.coinIcon');
+3748: const headerPickIcon=document.querySelector('.headerPickIcon');
+3753: const woodName=$shopWood?.querySelector('.shopCardName');
+3754: const ironName=$shopIron?.querySelector('.shopCardName');
+3755: const diamondName=$shopDiamond?.querySelector('.shopCardName');
+3759: const pouchName=document.querySelector('#pouchTitle');
+3768: const actions=document.querySelectorAll('.actions .action');
+3778: function input(k){
+3799: const KEY_ACTIONS={
+3805: const action=KEY_ACTIONS[e.code];
+3813: const nx=(e.clientX / Math.max(1, innerWidth) - 0.5) * 2;
+3814: const ny=(e.clientY / Math.max(1, innerHeight) - 0.5) * 2;
+3824: const r=$scene.getBoundingClientRect();
+3825: const nx=((e.clientX-r.left)/r.width - 0.5) * 2;
+3826: const ny=((e.clientY-r.top)/r.height - 0.5) * 2;
+3863: const r=$tnGauge.getBoundingClientRect();tnTension=clamp((e.clientX-r.left)/r.width*100,0,100);renderTension();
+3907: const workbenchModal=document.querySelector('#lairWorkbenchModal');
+3914: const $mobileModeMenuButton=document.querySelector('#mobileModeMenuButton');
+3915: const $mobileModeBackdrop=document.querySelector('#mobileModeBackdrop');
+3916: const $modeTabsPanel=document.querySelector('.modeTabs');
+3917: const mobileLayoutQuery=window.matchMedia('(max-width:760px), (max-height:560px) and (orientation:landscape)');
+3919: function setMobileModeMenu(open){
+3920: const enabled=mobileLayoutQuery.matches;
+3921: const next=Boolean(open && enabled);
+3926: function closeMobileModeMenu(){ setMobileModeMenu(false); }
+3985: const btn=e.target.closest('[data-hc-step]');
+3990: const col=e.target.closest('[data-hc-col]');
+3994: const col=e.target.closest('[data-hc-col]');
+4019: /* Inventory visual hit testing */
+4021: const PAD=14;
+4022: function root(){ return document.querySelector('#inventoryDrawer'); }
+4023: function candidates(x,y){
+4024: const r=root();
+4028: const img=btn.querySelector('img');
+4030: const b=img.getBoundingClientRect();
+4031: const inside=x>=b.left-PAD && x<=b.right+PAD && y>=b.top-PAD && y<=b.bottom+PAD;
+4033: const cx=(b.left+b.right)/2, cy=(b.top+b.bottom)/2;
+4034: const dx=x-cx, dy=y-cy;
+4040: function clearVisualHover(){
+4044: const r=root();
+4047: const hit=candidates(e.clientX,e.clientY)[0];
+4052: // Keep enlarged tool images clickable outside their narrow grid cells.
+4054: const r=root();
+4058: const hit=candidates(e.clientX,e.clientY)[0];
+
+=== SCRIPT/STYLE TAGS ===
+13: <title>Lockpick Puzzle — Gothic-style simulator</title>
+14: <link rel="stylesheet" href="css/app.css">
+18: <link rel="stylesheet" href="css/mobile.css">
+578: <script src="js/app.js"></script>

@@ -1,11 +1,14 @@
-# Lockpick Puzzle — v250 split
+# KEYNLOCK — v251
 
-Mechanical split of v249. No game logic or visual values were intentionally refactored.
+Browser lockpicking puzzle game. v251 preserves v250 gameplay while cleaning stale asset references and modularizing CSS without changing cascade order.
 
-- `index.html` — markup
-- `css/app.css` — main CSS, original cascade order preserved
-- `css/mobile.css` — v246 mobile overrides, loaded second
-- `js/app.js` — original JS logic
-- `assets/` — all 87 formerly embedded images
+- `index.html` — KEYNLOCK entry point
+- `css/base.css` — foundation, HUD and classic lock
+- `css/modes.css` — puzzle-mode styles
+- `css/world.css` — inventory, shop, map, lair and world UI
+- `css/motion.css` — final motion/compositor overrides
+- `css/mobile.css` — mobile overrides, loaded last
+- `js/app.js` — gameplay logic; only unused asset declarations removed in v251
+- `assets/` — active artwork
 
-Open `index.html` directly or serve the folder with any static HTTP server.
+`v250-stable` preserves the pre-v251 checkpoint.

@@ -228,24 +228,12 @@
 
   function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
 
-  const LEGACY_PIN_SKINS=[
-'assets/pins/legacy/legacy_pin_01.webp',
-'assets/pins/legacy/legacy_pin_02.webp',
-'assets/pins/legacy/legacy_pin_03.webp',
-'assets/pins/legacy/legacy_pin_04.webp',
-'assets/pins/legacy/legacy_pin_05.webp',
-'assets/pins/legacy/legacy_pin_06.webp',
-'assets/pins/legacy/legacy_pin_07.webp',
-'assets/pins/legacy/legacy_pin_08.webp',
-'assets/pins/legacy/legacy_pin_09.webp',
-'assets/pins/legacy/legacy_pin_10.webp'
-];
+  
   const PLATE_SKINS=[
 'assets/plates/plate_01.webp',
 'assets/plates/plate_02.webp',
 'assets/plates/plate_03.webp',
-'assets/plates/plate_04.webp',
-'assets/plates/plate_05.webp'
+'assets/plates/plate_04.webp'
 ];
   const PIN_SKINS=[
 'assets/pins/iron/iron_pin_01.png',

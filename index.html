@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<!--
+  LOCKPICK PUZZLE — SINGLE-FILE BUILD
+  UI, game modes, world map, lair, shop and embedded assets live in this file.
+  Assets remain embedded so the build is portable as one HTML document.
+-->
+
+
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<title>Lockpick Puzzle — Gothic-style simulator</title>
+<link rel="stylesheet" href="css/app.css">
+
+
+
+<link rel="stylesheet" href="css/mobile.css">
+
+</head>
+<body>
+<div class="app" id="app">
+<button class="mobileModeMenuButton" id="mobileModeMenuButton" type="button" aria-label="Открыть меню игр" aria-expanded="false">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+</button>
+<div class="mobileModeBackdrop" id="mobileModeBackdrop" aria-hidden="true"></div>
+<div class="modeTabs">
+<button class="tab active" id="tabClassic" type="button">Классика</button>
+<button class="tab" id="tabTarget" type="button">Альтернатива</button>
+<button class="tab" id="tabLine" type="button">Другая линия</button>
+<button class="tab" id="tabAlt2" type="button">Альтернатива 2</button>
+<button class="tab" id="tabSpecial" type="button">Особые замки</button>
+<button class="tab" id="tabHillsfar" type="button">Hillsfar</button>
+<button class="tab" id="tabMass" type="button">Mass Effect</button>
+<button class="tab" id="tabG1" type="button">Gothic 1</button><button class="tab" id="tabR2" type="button">Risen 2</button><button class="tab" id="tabSkyrim" type="button">Skyrim</button><button class="tab" id="tabAnach" type="button">Anachronox</button><button class="tab" id="tabTension" type="button">Натяжение</button><button class="tab" id="tabResonance" type="button">Резонанс</button><button class="tab" id="tabDeduction" type="button">Слепок ключа</button><button class="tab" id="tabComposite" type="button">Составная</button><button class="tab" id="tabHeatCold" type="button">Тепло — холодно</button><button class="tab" id="tabDrum" type="button">Щелчки барабана</button><button class="tab" id="tabScope" type="button">Осциллограф</button><button class="tab" id="shopTab" type="button" hidden aria-hidden="true" tabindex="-1">Магазин</button>
+</div>
+<div class="difficultyDock" id="difficultyDock" aria-label="Сложность текущего режима">
+  <button class="difficultyBtn active" data-difficulty="1" type="button" aria-label="Сложность 1">1</button>
+  <button class="difficultyBtn" data-difficulty="2" type="button" aria-label="Сложность 2">2</button>
+  <button class="difficultyBtn" data-difficulty="3" type="button" aria-label="Сложность 3">3</button>
+</div>
+<div class="topRightHud">
+  <div class="timerCircleHud hidden" id="timerCircleHud" aria-hidden="true">
+    <svg class="timerCircleSvg" viewBox="0 0 80 80" aria-hidden="true">
+      <circle class="timerCircleBg" cx="40" cy="40" r="36"></circle>
+      <circle class="timerCircleTrack" cx="40" cy="40" r="30"></circle>
+      <circle class="timerCircleProgress" id="timerCircleProgress" cx="40" cy="40" r="30"></circle>
+    </svg>
+    <div class="timerCircleInner">
+      <div class="timerCircleValue" id="timerCircleValue">--</div>
+      <div class="timerCircleLabel" id="timerCircleLabel">ТАЙМЕР</div>
+    </div>
+  </div>
+<div class="economyHud" id="economyHud">
+  <div class="rewardBox hudSquareBadge" id="rewardBox">
+    <span class="hudBadgeLabel">За замок</span>
+    <strong class="hudBadgeValue" id="runReward">1000</strong>
+  </div>
+</div>
+  <button class="mapCornerBtn hudNavBtn" id="shopHudButton" type="button" aria-label="Магазин" title="Магазин">
+    <svg class="hudNavIcon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 8h12l1 13H5L6 8z"></path>
+      <path d="M9 8V6a3 3 0 0 1 6 0v2"></path>
+    </svg>
+  </button>
+  <button class="mapCornerBtn hudNavBtn" id="lairHudButton" type="button" aria-label="Логово" title="Логово">
+    <svg class="hudNavIcon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 11l9-8 9 8"></path>
+      <path d="M5 10v10h14V10"></path>
+      <path d="M9 20v-6h6v6"></path>
+    </svg>
+  </button>
+  <button class="mapCornerBtn hudNavBtn" id="mapTab" type="button" aria-label="Карта города" title="Карта города"><svg class="mapTabIcon hudNavIcon" viewBox="0 0 24 24" aria-hidden="true">
+  <path d="M9 18l-6 3V6l6-3 6 3 6-3v15l-6 3-6-3z"></path>
+  <path d="M9 3v15"></path>
+  <path d="M15 6v15"></path>
+</svg></button>
+  <div class="assetNameHud" id="assetNameHud" aria-live="polite">
+    <div id="assetNameLock">lock: —</div>
+    <div id="assetNameShackle">shackle: —</div>
+    <div id="assetNamePlate">plate: —</div>
+    <div id="assetNamePin">pin: —</div>
+  </div>
+</div>
+
+<div class="inventoryDrawer" id="inventoryDrawer" aria-label="Инвентарь">
+  <button class="inventoryToggle" id="inventoryToggle" type="button" aria-expanded="false" aria-label="Открыть инвентарь"></button>
+  <div class="inventoryCaseBack" aria-hidden="true"></div>
+  <div class="inventoryContents">
+    <div class="inventoryTools inventoryToolsPick" id="inventoryPickRail"></div>
+    <div class="inventoryTools inventoryToolsTension" id="inventoryTensionRail"></div>
+  </div>
+  <div class="inventoryCaseFront" aria-hidden="true"></div>
+  <div class="inventoryAvatar" id="inventoryAvatar"></div>
+  <div class="inventoryBalanceBadge" id="inventoryBalanceBadge" aria-label="Баланс">
+    <span class="coinIcon">◈</span><strong id="coinBalance">0</strong>
+  </div>
+</div>
+
+<section class="worldMapScreen" id="worldMapScreen" hidden aria-label="Карта города">
+  <button class="worldMapClose" id="worldMapClose" type="button" aria-label="Закрыть карту">×</button>
+  <div class="worldMapDialog" role="dialog" aria-modal="true" aria-label="Карта города">
+  <div class="worldMapCanvas" id="worldMapCanvas">
+    <div class="worldMapCurrent worldMapCurrentOverlay">Сейчас: <strong id="mapCurrentName">Логово</strong></div>
+    <img class="worldMapArtwork" src="assets/map/city-map.jpg" alt="Карта Кийенока">
+    <svg class="worldMapRoads" viewBox="0 0 900 520" aria-hidden="true">
+      <path class="mapDistrictShape d1" d="M52 345 C112 250 187 230 267 262 C319 282 337 353 294 421 C220 481 115 457 52 345Z"></path>
+      <path class="mapDistrictShape d2" d="M293 193 C352 126 469 112 554 163 C601 193 607 271 558 315 C464 342 356 319 293 193Z"></path>
+      <path class="mapDistrictShape d3" d="M559 82 C649 42 770 64 829 145 C842 216 799 267 719 275 C637 260 588 199 559 82Z"></path>
+      <path class="mapDistrictShape d4" d="M570 323 C658 282 787 309 847 387 C817 464 734 489 632 461 C584 431 565 382 570 323Z"></path>
+
+      <path class="mapRoad active" d="M165 384 C281 338 408 283 552 224"></path>
+      <path class="mapRoad missionRoad" d="M165 384 C238 357 288 330 352 302"></path>
+      <path class="mapRoad locked" d="M552 224 C648 171 716 133 754 111"></path>
+      <path class="mapRoad locked" d="M552 224 C643 300 694 349 742 405"></path>
+      <path class="mapRoad locked" d="M165 384 C302 411 405 394 475 359"></path>
+    </svg>
+
+    <div class="mapWater"></div>
+    <div class="mapWall mapWallA"></div>
+    <div class="mapWall mapWallB"></div>
+
+    <button class="mapNode accessible current" type="button" data-location="lair" style="--mx:20%;--my:68%;">
+      <span class="mapNodeDot"></span>
+      <span class="mapNodeLabel">Логово</span>
+    </button>
+
+    <button class="mapNode accessible" type="button" data-location="shop" style="--mx:49%;--my:55%;">
+      <span class="mapNodeDot shopDot"></span>
+      <span class="mapNodeLabel">Лавка отмычек</span>
+    </button>
+
+    <button class="mapNode accessible mission" type="button" data-location="mission1" style="--mx:34%;--my:48%;">
+      <span class="mapNodeDot missionDot"></span>
+      <span class="mapNodeLabel">Миссия 1</span>
+      <span class="mapNodeMissionType">Классика</span>
+    </button>
+
+    <button class="mapNode locked" type="button" data-location="upper" style="--mx:56%;--my:18%;" aria-disabled="true">
+      <span class="mapNodeDot"></span>
+      <span class="mapNodeLabel">Верхний город</span>
+      <span class="mapNodeLock">закрыто</span>
+    </button>
+
+    <button class="mapNode locked" type="button" data-location="port" style="--mx:73%;--my:84%;" aria-disabled="true">
+      <span class="mapNodeDot"></span>
+      <span class="mapNodeLabel">Порт</span>
+      <span class="mapNodeLock">закрыто</span>
+    </button>
+
+    <button class="mapNode locked" type="button" data-location="old" style="--mx:65%;--my:48%;" aria-disabled="true">
+      <span class="mapNodeDot"></span>
+      <span class="mapNodeLabel">Старый квартал</span>
+      <span class="mapNodeLock">закрыто</span>
+    </button>
+
+    <div class="mapPlayer" id="mapPlayer" style="--mx:20%;--my:68%;" aria-hidden="true">
+      <span class="mapPlayerCore"></span>
+    </div>
+
+    <div class="worldMapInfo worldMapInfoOverlay">
+      <div>
+        <div class="worldMapInfoTitle" id="mapInfoTitle">Логово</div>
+        <div class="worldMapInfoText" id="mapInfoText">Точка старта. Здесь находится база команды.</div>
+      </div>
+      <button class="worldMapAction" id="mapLocationAction" type="button" hidden>Войти</button>
+    </div>
+  </div>
+  </div>
+</section>
+
+<section class="lairOverlay" id="lairOverlay" hidden aria-label="Логово">
+  <div class="lairScene">
+    <div class="lairSceneTop">
+      <div>
+        <div class="lairSceneKicker">БАЗА КОМАНДЫ</div>
+        <div class="lairSceneTitle">Логово</div>
+      </div>
+      <div class="lairSceneTopRight">
+        <div class="lairSceneActive">Активен: <strong id="lairActiveName">Кай</strong></div>
+        <button class="lairClose" id="lairClose" type="button">На карту</button>
+      </div>
+    </div>
+
+    <div class="lairSceneCharacters" id="lairSceneCharacters" aria-hidden="true"></div>
+
+    <button class="lairHotspot lairHotspotCity" type="button" data-lair-open="city">
+      <span class="lairHotspotDot"></span>
+      <span>Анализ города</span>
+    </button>
+
+    <button class="lairHotspot lairHotspotDialogue" type="button" data-lair-open="dialogue">
+      <span class="lairHotspotDot"></span>
+      <span>Диалоги</span>
+    </button>
+
+    <button class="lairHotspot lairHotspotTeam" type="button" data-lair-open="team">
+      <span class="lairHotspotDot"></span>
+      <span>Выбор персонажа</span>
+    </button>
+
+    <button class="lairWorkbenchHotspot" id="lairWorkbenchHotspot" type="button" aria-label="Открыть верстак"></button>
+
+    <div class="lairWorkbenchModal" id="lairWorkbenchModal" hidden aria-label="Верстак">
+      <div class="lairWorkbenchDialog" role="dialog" aria-modal="true" aria-label="Верстак и чертежи">
+        <img class="lairWorkbenchImage" src="assets/lair/workbench.jpg" alt="Верстак с чертежами замков и инструментами">
+        <button class="lairWorkbenchClose" id="lairWorkbenchClose" type="button" aria-label="Закрыть">×</button>
+      </div>
+    </div>
+
+    <div class="lairModuleWindow" id="lairModuleWindow" hidden>
+      <div class="lairModuleHeader">
+        <div class="lairModuleTitle" id="lairModuleTitle">Логово</div>
+        <button class="lairModuleClose" id="lairModuleClose" type="button" aria-label="Закрыть">×</button>
+      </div>
+
+      <div class="lairModuleBody">
+        <section class="lairPanel" data-lair-panel="team">
+          <div class="lairPanelHead">
+            <div>
+              <div class="lairPanelTitle">Выбор персонажа</div>
+              <div class="lairPanelText">Выбранный персонаж становится активным для следующих вылазок.</div>
+            </div>
+          </div>
+          <div class="lairCharacters" id="lairCharacters"></div>
+        </section>
+
+        <section class="lairPanel" data-lair-panel="dialogue">
+          <div class="lairDialogueLayout">
+            <aside class="lairDialoguePeople" id="lairDialoguePeople"></aside>
+            <div class="lairDialogueMain">
+              <div class="lairDialogueSpeaker" id="lairDialogueSpeaker">Сай</div>
+              <div class="lairDialogueText" id="lairDialogueText">Выбери тему разговора.</div>
+              <div class="lairDialogueTopics" id="lairDialogueTopics"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="lairPanel" data-lair-panel="city">
+          <div class="lairPanelHead">
+            <div>
+              <div class="lairPanelTitle">Анализ города</div>
+              <div class="lairPanelText">Собирай сведения о районах и оценивай цели до выхода в город.</div>
+            </div>
+          </div>
+          <div class="lairIntelGrid" id="lairIntelGrid"></div>
+          <div class="lairIntelDetail" id="lairIntelDetail">
+            <div class="lairIntelDetailTitle">Выбери район</div>
+            <div class="lairIntelDetailText">Здесь появятся собранные сведения.</div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="difficulty" id="objectiveLine">ЦЕЛЬ: <b>ПОДНЯТЬ ВСЕ ШТИФТЫ</b></div>
+<main class="main">
+<div class="scene">
+<div class="glow"></div>
+<div id="lock" class="universalLockBlock">
+<div class="mechanismZone">
+<div class="lockPanel"></div>
+<div class="pick"></div>
+<div class="tension"></div>
+<button aria-label="Открыть замок" class="lockHitArea" id="lockHitArea" type="button"></button>
+</div>
+</div>
+<div class="pinTopLayer" id="pinTopLayer" aria-hidden="true"><div class="pinTopPlates" id="pinTopPlates"></div></div>
+<div class="puzzleArea" id="puzzleArea">
+<div class="platesZone">
+<div class="plates" id="plates"></div>
+</div>
+<div class="status" id="status"></div>
+<!-- MODE: GOTHIC 1 -->
+<div class="modePanel g1Mode" data-mode="g1" hidden="" id="g1Mode">
+<div class="g1ProgressWrap">
+<div class="g1ProgressTitle">Введено</div>
+<div class="g1ProgressRow" id="g1ProgressRow"></div>
+</div>
+
+</div>
+<!-- MODE: RISEN 2 -->
+<div class="modePanel r2Mode" data-mode="r2" hidden="" id="r2Mode">
+<div class="r2Lock" id="r2Lock">
+<div class="r2Frame"></div>
+<div class="r2Pins" id="r2Pins"></div>
+<div class="r2PickRail"></div>
+<div class="r2Pick" id="r2Pick">
+<div class="r2PickHandle"></div>
+<div class="r2PickShaft"></div>
+<div class="r2PickTip"></div>
+</div>
+</div>
+<div class="r2Status">
+<span id="r2Progress">0 / 6</span>
+<span class="r2StatusSep">·</span>
+<span id="r2Message">A / D — двигать отмычку, W — поднять штифт</span>
+</div>
+
+</div>
+<!-- MODE: HILLSFAR -->
+<div class="modePanel hillsfarMode" data-mode="hillsfar" hidden="" id="hillsfarMode">
+<div class="hfLockBox">
+<div class="hfTryArea" id="hfTryArea">
+<div class="hfLockCut" id="hfLockCut"></div>
+</div>
+</div>
+
+<div class="hfCandidates" id="hfCandidates"></div>
+</div>
+<!-- MODE: MASS EFFECT -->
+<div class="modePanel massMode" data-mode="mass" hidden="" id="massMode">
+<div class="massBoard">
+<div class="massPointer"></div>
+<div class="massRings" id="massRings"></div>
+<button aria-label="Открыть замок" class="massCenter" id="massCenter" type="button">
+<span id="massCenterText">ОТКРЫТЬ</span>
+</button>
+</div>
+
+</div>
+<!-- MODE: SKYRIM -->
+<div class="modePanel skMode" data-mode="skyrim" hidden="" id="skMode">
+<div class="skBoardViewport">
+<div class="skBoard" id="skBoard">
+<div class="skOuterRing"></div>
+<div class="skCylinder" id="skCylinder">
+<div class="skCylinderMarks"></div>
+<div class="skKeyholeShape"></div>
+</div>
+<div class="skPickArm" id="skPickArm">
+<div class="skPickNeedle"></div>
+<div class="skPickGrip"></div>
+</div>
+<div class="skWrench" id="skWrench">
+<div class="skWrenchBar"></div>
+<div class="skWrenchHandle"></div>
+</div>
+<button aria-label="Провернуть замок" class="skTorqueButton" id="skTorqueButton" type="button">
+<span></span>
+</button>
+</div>
+</div>
+<div class="skFeedback">
+<span id="skFeedbackText">Найди правильный угол отмычки</span>
+</div>
+
+</div>
+
+<!-- MODE: ANACHRONOX -->
+<div class="modePanel anMode" data-mode="anach" hidden="" id="anMode">
+<div class="anInstructions">
+  <strong>КАК ИГРАТЬ</strong>
+  <span>A / D — выбрать канал · W / S — менять уровень · следи за числом: оно должно расти до 100.0</span>
+  <em id="anSelectedHint">Выбран канал 1 из 3</em>
+</div>
+<div class="anBoard">
+<div aria-label="Активировать панель" class="anConsole" id="anUnlock" role="button" tabindex="0">
+<div class="anReadout" id="anReadout">57.5</div>
+<div class="anTracks" id="anTracks">
+<div class="anChannel" data-col="0">
+<div class="anSlot"><div class="anLevel" id="anLevel0"></div></div>
+<button class="anBtn anUp" data-an-col="0" data-an-dir="up" type="button">▲</button>
+<div class="anValue" id="anValue0">0</div>
+<button class="anBtn anDown" data-an-col="0" data-an-dir="down" type="button">▼</button>
+</div>
+<div class="anChannel" data-col="1">
+<div class="anSlot"><div class="anLevel" id="anLevel1"></div></div>
+<button class="anBtn anUp" data-an-col="1" data-an-dir="up" type="button">▲</button>
+<div class="anValue" id="anValue1">0</div>
+<button class="anBtn anDown" data-an-col="1" data-an-dir="down" type="button">▼</button>
+</div>
+<div class="anChannel" data-col="2">
+<div class="anSlot"><div class="anLevel" id="anLevel2"></div></div>
+<button class="anBtn anUp" data-an-col="2" data-an-dir="up" type="button">▲</button>
+<div class="anValue" id="anValue2">0</div>
+<button class="anBtn anDown" data-an-col="2" data-an-dir="down" type="button">▼</button>
+</div>
+</div>
+<div class="anActionLabel" id="anActionLabel" aria-hidden="true"></div>
+</div>
+</div>
+
+</div>
+
+<!-- MODE: TENSION CONTROL -->
+<div class="modePanel tnMode" data-mode="tension" hidden id="tensionMode">
+  <div class="tnPanel">
+    <div class="tnGauge" id="tnGauge">
+      <div class="tnTicks"></div>
+      <div class="tnBand" id="tnBand"></div>
+      <div class="tnNeedle" id="tnNeedle"></div>
+    </div>
+    <div class="tnGaugeLabels"><span>0</span><span>НАТЯЖЕНИЕ</span><span>100</span></div>
+    <div class="tnPins" id="tnPins"></div>
+    <div class="tnMessage" id="tnMessage">A / D — натяжение · W / ↑ / Space — поставить штифт</div>
+  </div>
+
+</div>
+
+<!-- MODE: RESONANCE -->
+<div class="modePanel rsMode" data-mode="resonance" hidden id="resonanceMode">
+  <div class="rsBoard">
+    <div class="rsLine"></div>
+    <div class="rsLanes" id="rsLanes"></div>
+  </div>
+
+</div>
+
+<!-- MODE: KEY DEDUCTION -->
+<div class="modePanel kdMode" data-mode="deduction" hidden id="deductionMode">
+  <div class="kdPanel" id="kdPanel">
+    <div class="kdKey" id="kdKey"></div>
+    <button class="kdCheck" id="kdCheck" type="button">Проверить ключ</button>
+    <div class="kdFeedback" id="kdFeedback">A / D — выбрать зубец · W / S — изменить высоту. Проверка сообщает только о первом неправильном зубце.</div>
+    <div class="kdHistory" id="kdHistory"></div>
+  </div>
+
+</div>
+
+<!-- MODE: COMPOSITE PICK -->
+<div class="modePanel cpMode" data-mode="composite" hidden id="compositeMode">
+  <div class="cpBoard">
+    <section class="cpTarget">
+      <div class="cpSectionTitle">ЦЕЛЕВОЙ ПРОФИЛЬ</div>
+      <div class="cpProfileTray">
+        <div class="cpPins" id="cpPins"></div>
+        <svg class="cpTargetSvg" viewBox="0 0 640 90" aria-hidden="true">
+          <defs>
+            <linearGradient id="cpTargetMetal" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#f5dc9a"></stop>
+              <stop offset="0.36" stop-color="#e1bc67"></stop>
+              <stop offset="0.63" stop-color="#b8863b"></stop>
+              <stop offset="1" stop-color="#7c5221"></stop>
+            </linearGradient>
+          </defs>
+          <path class="cpTargetShadow" id="cpTargetShadow"></path>
+          <path class="cpTargetFill" id="cpTargetFill"></path>
+          <path class="cpTargetTopLine" id="cpTargetTopLine"></path>
+          <path class="cpTargetBevel" id="cpTargetBevel"></path>
+          <path class="cpTargetGlow" id="cpTargetGlow"></path>
+          <path class="cpTargetPath" id="cpTargetPath"></path>
+        </svg>
+      </div>
+    </section>
+
+    <section class="cpBuild">
+      <div class="cpSectionTitle">ТВОЯ ОТМЫЧКА</div>
+      <div class="cpBuildCanvas">
+        <div class="cpPins cpPinsBuild" id="cpBuildPins"></div>
+        <svg class="cpBuildSvg" viewBox="0 0 640 90" aria-hidden="true">
+          <defs>
+            <linearGradient id="cpBuildMetal" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ffe4a5"></stop>
+              <stop offset="0.34" stop-color="#f0c774"></stop>
+              <stop offset="0.64" stop-color="#c18c41"></stop>
+              <stop offset="1" stop-color="#805321"></stop>
+            </linearGradient>
+          </defs>
+          <path class="cpBuildShadow" id="cpBuildShadow"></path>
+          <path class="cpBuildFill" id="cpBuildFill"></path>
+          <path class="cpBuildTopLine" id="cpBuildTopLine"></path>
+          <path class="cpBuildBevel" id="cpBuildBevel"></path>
+          <path class="cpBuildGlow" id="cpBuildGlow"></path>
+          <path class="cpBuildPath" id="cpBuildPath"></path>
+        </svg>
+        <div class="cpBuildJoints" id="cpBuildJoints" aria-hidden="true"></div>
+      </div>
+      <div class="cpParts" id="cpParts"></div>
+      <div class="cpState" id="cpState">Выбери сегмент и высоту его правого конца</div>
+      <div class="cpHint">A / D — сегмент · W / S — выше / ниже</div>
+    </section>
+  </div>
+
+
+</div>
+
+
+<!-- MODE: HEAT / COLD DIGITAL LOCK -->
+<div class="modePanel digitalMode heatColdMode" data-mode="heatcold" hidden id="heatColdMode">
+  <div class="digitalCard">
+    <input class="hcInput" id="hcInput" maxlength="4" inputmode="numeric" autocomplete="off" placeholder="0000" hidden aria-hidden="true" tabindex="-1">
+    <div class="hcDialRow" id="hcDialRow"></div>
+    <div class="hcSlots" id="hcSlots"></div>
+    <div class="digitalResult" id="hcResult"></div>
+    <div class="hcHistory"><div class="hcHistoryTitle">Последние попытки</div><div class="hcRows" id="hcRows"></div></div>
+  </div>
+</div>
+
+<!-- MODE: DRUM CLICKS DIGITAL LOCK -->
+<div class="modePanel digitalMode drumMode" data-mode="drum" hidden id="drumMode">
+  <div class="digitalCard">
+    <div class="digitalHead">
+      <div><div class="digitalKicker">КОДОВЫЙ БАРАБАН</div><div class="digitalTitle">Щелчки барабана</div><div class="digitalSub">Прокручивай каждый барабан. Чем ближе цифра к правильной, тем сильнее отклик механизма. Точная цифра даёт резкий двойной щелчок.</div></div>
+      <button class="digitalMiniBtn" id="drumSound" type="button">Звук: вкл</button>
+    </div>
+    <div class="drumWheels" id="drumWheels"></div>
+    <div class="digitalControls"><button class="digitalBtn primary" id="drumCheck" type="button">Проверить код</button><button class="digitalBtn" id="drumNew" type="button">Новый замок</button></div>
+    <div class="digitalResult" id="drumResult"></div>
+    <div class="drumHint">Отклик считается по расстоянию по кругу: 9 находится рядом с 0. Ищи самый сильный резонанс каждого барабана.</div>
+  </div>
+</div>
+
+<!-- MODE: OSCILLOSCOPE DIGITAL LOCK -->
+<div class="modePanel digitalMode scopeMode" data-mode="scope" hidden id="scopeMode">
+  <div class="digitalCard">
+    <div class="digitalHead">
+      <div><div class="digitalKicker">СИГНАЛЬНЫЙ ЗАМОК</div><div class="digitalTitle">Осциллограф</div><div class="digitalSub">Совмести золотой сигнал с холодным эталоном. Каждая цифра управляет отдельной гармоникой сигнала.</div></div>
+      <button class="digitalMiniBtn" id="scopeNew" type="button">Новый код</button>
+    </div>
+    <div class="scopeFrame"><canvas id="scopeCanvas" width="860" height="250"></canvas><div class="scopeLegend"><span><i class="scopeDot ref"></i>эталон</span><span><i class="scopeDot cur"></i>текущий сигнал</span></div></div>
+    <div class="scopeWheels" id="scopeWheels"></div>
+    <div class="scopeScore">Совпадение: <b id="scopeScore">0%</b></div><div class="scopeBar"><i id="scopeBar"></i></div>
+    <div class="digitalControls"><button class="digitalBtn primary" id="scopeCheck" type="button">Проверить</button></div>
+    <div class="digitalResult" id="scopeResult"></div>
+  </div>
+</div>
+
+</div><!-- /puzzleArea -->
+<div class="solvedPuzzleOverlay" id="solvedPuzzleOverlay" aria-live="polite" aria-atomic="true">
+  <div class="solvedPuzzleCard">
+    <div class="solvedPuzzleKicker">ГОТОВО</div>
+    <div class="solvedPuzzleTitle">Замок открыт</div>
+    <button class="solvedPuzzleButton" id="newPuzzleButton" type="button">Новая головоломка</button>
+  </div>
+</div>
+</div><!-- /scene -->
+</main>
+<div class="touch">
+<div class="dpad">
+<button class="btn up" data-key="w">▲</button><button class="btn down" data-key="s">▼</button>
+<button class="btn left" data-key="a">◀</button><button class="btn right" data-key="d">▶</button>
+</div>
+<div class="actions"><button class="btn action" data-key="r">R</button><button class="btn action" data-key="n">NEW</button></div>
+</div>
+<div class="shopOverlay" id="shopOverlay">
+<div class="shopPanel">
+<div class="shopHeader"><h2>Магазин</h2><button class="shopClose" id="shopClose" type="button">×</button></div>
+<div class="shopBalance">Баланс: <strong id="shopBalance">0</strong> монет</div>
+<div class="shopSectionTitle">Материал отмычки</div>
+<div class="shopGrid">
+<button class="shopCard" id="shopWood" type="button">
+<div class="shopCardName">Деревянная</div>
+<div class="shopCardStat">Слом при ошибке: 100%<br/>После слома сохранить позицию: 0%</div>
+<div class="shopCardAction" id="woodAction">Использовать</div>
+</button>
+<button class="shopCard locked" id="shopIron" type="button">
+<div class="shopCardName">Железная</div>
+<div class="shopCardStat">Слом при ошибке: 30%<br/>После слома сохранить позицию: 30%</div>
+<div class="shopCardAction" id="ironAction">Купить · 3000</div>
+</button>
+<button class="shopCard locked" id="shopDiamond" type="button">
+<div class="shopCardName">Алмазная</div>
+<div class="shopCardStat">Слом при ошибке: 20%<br/>После слома сохранить позицию: 50%</div>
+<div class="shopCardAction" id="diamondAction">Купить · 10000</div>
+</button>
+</div>
+<div class="skinShowcaseRow">
+<div class="skinShowcase">
+<div class="skinShowcaseTitle">Внешний вид отмычки · бесплатно</div>
+<div class="skinPreviewMain" data-kind="pick" id="pickSkinMain"></div>
+<div class="pickSkinGrid" id="pickSkinGrid"></div>
+</div>
+<div class="skinShowcase">
+<div class="skinShowcaseTitle">Внешний вид натяжителя · бесплатно</div>
+<div class="skinPreviewMain" data-kind="tension" id="tensionSkinMain"></div>
+<div class="pickSkinGrid" id="tensionSkinGrid"></div>
+</div>
+</div>
+<div class="shopSectionTitle">Запас отмычек</div>
+<div class="shopPouch">
+<div class="shopPouchInfo"><strong id="pouchTitle">Чехол · 3 отмычки</strong><span>Увеличивает максимальный запас до 5.</span></div>
+<button class="shopBuy" id="pouchBuy" type="button">3 → 4 · 4500</button>
+</div>
+</div>
+</div>
+<div class="toast" id="toast"><span class="toastText" id="toastText"></span><button class="toastAction" id="toastAction" type="button">Новый замок</button></div>
+<script src="js/app.js"></script>
+
+
+</body>
+</html>

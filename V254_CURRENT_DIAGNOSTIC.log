@@ -1,0 +1,35 @@
+=== transform ===
+ordered CSS ['css/base.css', 'css/modes-01-hillsfar.css', 'css/modes-02-mass-effect.css', 'css/modes-03-gothic1.css', 'css/modes-04-risen2.css', 'css/modes-05-skyrim.css', 'css/modes-06-anachronox.css', 'css/world-01-shop-shared.css', 'css/overrides-01-tools-shared.css', 'css/overrides-02-map.css', 'css/overrides-03-lair.css', 'css/overrides-04-universal-lock.css', 'css/overrides-05-inventory.css', 'css/overrides-06-digital.css', 'css/overrides-07-workbench.css', 'css/mobile.css']
+transform_rc=0
+=== check ===
+
+> keynlock@0.253.0 check
+> node scripts/check.mjs
+
+KEYNLOCK check OK — v253
+24 JS files, 16 CSS files, 187 unique HTML ids, 76 asset references checked.
+check_rc=0
+=== smoke ===
+
+> keynlock@0.253.0 smoke
+> node scripts/smoke.mjs
+
+KEYNLOCK check OK — v253
+24 JS files, 16 CSS files, 187 unique HTML ids, 76 asset references checked.
+HTTP smoke OK — 40 entry resources loaded.
+file:///home/runner/work/keynlock/keynlock/scripts/smoke.mjs:60
+    if (!result.stdout.includes('KEYNLOCK')) throw new Error('Chrome smoke: KEYNLOCK marker missing.');
+                                                   ^
+
+Error: Chrome smoke: KEYNLOCK marker missing.
+    at file:///home/runner/work/keynlock/keynlock/scripts/smoke.mjs:60:52
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+
+Node.js v22.23.2
+smoke_rc=1
+=== full browser ===
+desktop errors []
+mobile errors []
+full browser OK
+browser_rc=0
+=== HTTP 4xx/5xx ===

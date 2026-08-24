@@ -1,0 +1,12 @@
+1/8 read sources
+2/8 split CSS
+CSS boundaries 13286 43816 77923 sizes [13286, 30530, 34107, 104675]
+3/8 remove dead JS constants
+4/8 remove dead assets
+Traceback (most recent call last):
+  File "<stdin>", line 45, in <module>
+  File "<stdin>", line 45, in <genexpr>
+  File "/usr/lib/python3.12/pathlib.py", line 1058, in iterdir
+    for name in os.listdir(self):
+                ^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'assets/pins/legacy'

@@ -1,0 +1,41 @@
+=== versions ===
+v22.23.2
+Google Chrome 151.0.7922.137 
+=== marker scan ===
+modes.css 30530 [('.hillsfarMode{', 0), ('.massMode{', 9565), ('.g1Mode{', 14031), ('.r2Mode{', 16044), ('.skMode{', 21398), ('.anMode{', 26807), ('.tnMode{', -1), ('.rsMode{', -1), ('.kdMode{', -1), ('.cpMode{', -1), ('.digitalMode{', -1)]
+world.css 34107 [('.shopOverlay{', 0), ('.inventoryDrawer{', -1), ('.worldMapScreen{', -1), ('.lairOverlay{', -1), ('.lairScene{', -1)]
+motion.css 104671 [(':root{--motion-ease', -1), ('.inventoryDrawer', 64893), ('#lock.universalLockBlock', 34533), ('.digitalMode', 76524), ('.worldMapInfo', 11831), ('.lairScene', 19477), ('.lairWorkbenchHotspot', 99872)]
+=== v253 check ===
+
+> keynlock@0.253.0 check
+> node scripts/check.mjs
+
+KEYNLOCK check OK — v253
+24 JS files, 5 CSS files, 187 unique HTML ids, 76 asset references checked.
+check_rc=0
+=== v253 smoke ===
+
+> keynlock@0.253.0 smoke
+> node scripts/smoke.mjs
+
+KEYNLOCK check OK — v253
+24 JS files, 5 CSS files, 187 unique HTML ids, 76 asset references checked.
+HTTP smoke OK — 29 entry resources loaded.
+file:///home/runner/work/keynlock/keynlock/scripts/smoke.mjs:60
+    if (!result.stdout.includes('<title>KEYNLOCK — Lockpicking Puzzle</title>')) throw new Error('Chrome smoke: KEYNLOCK title missing.');
+                                                                                       ^
+
+Error: Chrome smoke: KEYNLOCK title missing.
+    at file:///home/runner/work/keynlock/keynlock/scripts/smoke.mjs:60:88
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+
+Node.js v22.23.2
+smoke_rc=1
+=== dry split ===
+css/modes.css [(0, 'hillsfar', '.hillsfarMode{'), (9565, 'mass-effect', '.massMode{'), (14031, 'gothic1', '.g1Mode{'), (16044, 'risen2', '.r2Mode{'), (21398, 'skyrim', '.skMode{'), (26807, 'anachronox', '.anMode{')]
+css/world.css [(0, 'shop', '.shopOverlay{')]
+Traceback (most recent call last):
+  File "<stdin>", line 14, in <module>
+  File "<stdin>", line 10, in scan
+AssertionError: ('css/world.css', [(0, 'shop', '.shopOverlay{')])
+dry_split_rc=1

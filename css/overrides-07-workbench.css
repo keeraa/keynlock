@@ -1,0 +1,81 @@
+.lairWorkbenchHotspot{position:absolute !important;left:72.5% !important;top:59% !important;width:16.5% !important;height:18% !important;z-index:19 !important;border:0 !important;border-radius:14px !important;padding:0 !important;background:transparent !important;cursor:pointer !important;outline:none !important;-webkit-tap-highlight-color:transparent !important;}
+.lairWorkbenchHotspot::after{content:"";position:absolute;inset:0;border:1px solid rgba(224,180,89,0);border-radius:14px;background:rgba(224,180,89,0);box-shadow:0 0 0 rgba(224,180,89,0);transition:background .18s ease,border-color .18s ease,box-shadow .18s ease;pointer-events:none;}
+.lairWorkbenchHotspot:hover::after,.lairWorkbenchHotspot:focus-visible::after{background:rgba(224,180,89,.045);border-color:rgba(224,180,89,.26);box-shadow:0 0 22px rgba(224,180,89,.10);}
+.lairWorkbenchModal{position:absolute !important;inset:0 !important;z-index:90 !important;display:flex !important;align-items:center !important;justify-content:center !important;padding:28px !important;background:rgba(4,3,3,.72) !important;backdrop-filter:blur(5px) !important;-webkit-backdrop-filter:blur(5px) !important;}
+.lairWorkbenchModal[hidden]{display:none !important;}
+.lairWorkbenchDialog{position:relative;width:min(1420px,94vw);max-height:92vh;display:flex;align-items:center;justify-content:center;padding:12px;border:1px solid rgba(170,127,63,.72);border-radius:16px;background:rgba(20,15,11,.96);box-shadow:0 30px 90px rgba(0,0,0,.62),inset 0 0 0 1px rgba(255,227,177,.035);}
+.lairWorkbenchImage{display:block;width:100%;height:auto;max-height:calc(92vh - 24px);object-fit:contain;border-radius:10px;}
+.lairWorkbenchClose{position:absolute;top:18px;right:18px;z-index:3;width:44px;height:44px;display:grid;place-items:center;border:1px solid rgba(176,132,65,.82);border-radius:11px;background:rgba(28,21,15,.94);color:#e7c783;font:700 27px/1 Arial,sans-serif;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.36);}
+.lairWorkbenchClose:hover{filter:brightness(1.16);}
+@media (max-width:760px){
+.lairWorkbenchHotspot{left:68% !important;top:61% !important;width:23% !important;height:17% !important;}
+.lairWorkbenchModal{padding:8px !important;}
+.lairWorkbenchDialog{width:calc(100vw - 16px);max-height:calc(100dvh - 16px);padding:7px;border-radius:12px;}
+.lairWorkbenchImage{max-height:calc(100dvh - 30px);}
+.lairWorkbenchClose{top:12px;right:12px;width:40px;height:40px;border-radius:10px;}
+}
+
+
+/* v245 — unified smooth motion / high-refresh pass */
+:root{
+  --motion-ease:cubic-bezier(.22,.78,.22,1);
+  --motion-ease-soft:cubic-bezier(.16,.68,.18,1);
+}
+
+/* Use one smooth easing language across all interactive UI. */
+:where(
+  button,[role="button"],.tab,.difficultyBtn,.hudNavBtn,.shopCard,.pickSkinCard,
+  .inventoryTool,.lairCharacter,.lairPersonBtn,.lairTopic,.lairIntelCard,
+  .hcStepBtn,.digitalMiniBtn,.digitalBtn,.digitalWheel button,.anBtn,.cpPart,.cpLevelBtn
+){
+  transition-timing-function:var(--motion-ease) !important;
+}
+
+/* Moving puzzle parts: compositor-friendly and smooth on 120 Hz displays. */
+:where(
+  .plate,.pin,.pick,.tension,.r2Pick,.r2PinImg,.r2PinStem,.r2PinHead,
+  .skCylinder,.skWrench,.anLevel,.tnBand,.tnNeedle,.tnPinImg,.rsOrb,
+  .massRing,.massRingDisc,.cpPinImg,.inventoryDrawer,.inventoryTool,
+  .lairSceneCharacter,.solvedPuzzleOverlay,.timerCircleHud
+){
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+
+:where(.plate,.pick,.tension,.r2Pick,.skCylinder,.skWrench,.rsOrb,.inventoryDrawer,.lairSceneCharacter){
+  will-change:transform;
+}
+:where(.anLevel,.tnBand,.tnNeedle,.tnPinImg,.r2PinImg,.massRingDisc){
+  will-change:transform,opacity,filter;
+}
+
+/* Soften all high-frequency puzzle movement without making controls sluggish. */
+.r2Pick,.r2PinImg,.r2PinStem,.r2PinHead{
+  transition-timing-function:var(--motion-ease) !important;
+}
+.skCylinder,.skWrench{
+  transition-timing-function:var(--motion-ease-soft) !important;
+}
+.anLevel,.tnBand,.tnPinStem,.tnPinHead,.tnPinImg,.kdPinImg,
+.massRing,.massRingDisc,.hcThermo>i,.drumMeter>i,.scopeBar>i{
+  transition-timing-function:var(--motion-ease) !important;
+}
+
+/* Panels / drawers / overlays use a slightly softer curve. */
+.inventoryDrawer,.modeTabs,.mobileModeBackdrop,.solvedPuzzleOverlay,
+.lairModuleWindow,.lairSceneCharacter,.worldMapDialog,.shopPanel{
+  transition-timing-function:var(--motion-ease-soft) !important;
+}
+
+/* Keep continuous showcase movement smooth rather than stepping at endpoints. */
+.skinPreviewMain .pickSkinPreview,
+#pickSkinMain .pickSkinPreview,
+#tensionSkinMain .pickSkinPreview{
+  animation-timing-function:ease-in-out !important;
+}
+
+/* GPU/compositor hints for parallax layers. */
+#lock,.mechanismZone,.sharedModeLockArt,.platesZone{
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}

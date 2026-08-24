@@ -1,0 +1,78 @@
+name: Diagnose KEYNLOCK v254
+
+on:
+  push:
+    paths:
+      - .github/workflows/diagnose-v254.yml
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Reproduce transform and checks
+        shell: bash
+        run: |
+          set +e
+          exec > >(tee /tmp/v254-diagnostic.log) 2>&1
+          echo '=== versions ==='
+          node --version
+          google-chrome --version || true
+          echo '=== marker scan ==='
+          python3 - <<'PY'
+          from pathlib import Path
+          groups={
+            'modes.css':['.hillsfarMode{','.massMode{','.g1Mode{','.r2Mode{','.skMode{','.anMode{','.tnMode{','.rsMode{','.kdMode{','.cpMode{','.digitalMode{'],
+            'world.css':['.shopOverlay{','.inventoryDrawer{','.worldMapScreen{','.lairOverlay{','.lairScene{'],
+            'motion.css':[':root{--motion-ease','.inventoryDrawer','#lock.universalLockBlock','.digitalMode','.worldMapInfo','.lairScene','.lairWorkbenchHotspot'],
+          }
+          for file,markers in groups.items():
+              text=Path('css/'+file).read_text(encoding='utf-8')
+              print(file,len(text),[(m,text.find(m)) for m in markers])
+          PY
+          echo '=== v253 check ==='
+          npm run check
+          echo check_rc=$?
+          echo '=== v253 smoke ==='
+          npm run smoke
+          echo smoke_rc=$?
+          echo '=== dry split ==='
+          python3 - <<'PY'
+          from pathlib import Path
+          def scan(source,candidates,minimum):
+              text=Path(source).read_text(encoding='utf-8')
+              found=[]
+              for label,marker in candidates:
+                  i=text.find(marker)
+                  if i>=0: found.append((i,label,marker))
+              found.sort()
+              print(source,found)
+              assert len(found)>=minimum,(source,found)
+              assert found[0][0]==0,(source,found[0])
+          scan('css/modes.css',[
+              ('hillsfar','.hillsfarMode{'),('mass-effect','.massMode{'),('gothic1','.g1Mode{'),('risen2','.r2Mode{'),('skyrim','.skMode{'),('anachronox','.anMode{'),('tension','.tnMode{'),('resonance','.rsMode{'),('deduction','.kdMode{'),('composite','.cpMode{'),('digital','.digitalMode{')],6)
+          scan('css/world.css',[
+              ('shop','.shopOverlay{'),('inventory','.inventoryDrawer{'),('map','.worldMapScreen{'),('lair','.lairOverlay{'),('lair-scene','.lairScene{')],3)
+          scan('css/motion.css',[
+              ('motion',':root{--motion-ease'),('inventory','.inventoryDrawer'),('universal-lock','#lock.universalLockBlock'),('digital','.digitalMode'),('map','.worldMapInfo'),('lair','.lairScene'),('workbench','.lairWorkbenchHotspot')],4)
+          print('dry split OK')
+          PY
+          echo dry_split_rc=$?
+          cp /tmp/v254-diagnostic.log /tmp/V254_DIAGNOSTIC.log
+      - name: Save diagnostic
+        if: always()
+        shell: bash
+        run: |
+          git reset --hard HEAD
+          cp /tmp/V254_DIAGNOSTIC.log V254_DIAGNOSTIC.log
+          rm -f .github/workflows/diagnose-v254.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Record v254 diagnostic" || true
+          git push || true

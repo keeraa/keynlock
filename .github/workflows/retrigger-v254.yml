@@ -1,0 +1,27 @@
+name: Retrigger KEYNLOCK v254
+
+on:
+  push:
+    paths:
+      - .github/workflows/retrigger-v254.yml
+
+permissions:
+  contents: write
+
+jobs:
+  retrigger:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - shell: bash
+        run: |
+          set -euo pipefail
+          printf '\n# retry after local smoke portability fix\n' >> .github/workflows/build-v254-final.yml
+          rm -f .github/workflows/retrigger-v254.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Retrigger v254 final build"
+          git push

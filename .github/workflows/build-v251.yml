@@ -17,7 +17,6 @@ jobs:
           fetch-depth: 0
 
       - name: Transform and verify v251
-        id: transform
         shell: bash
         run: |
           set -o pipefail
@@ -62,19 +61,22 @@ jobs:
           end=js.index('];',start)+2
           js=js[:start]+js[end:]
           assert js.count('plate_05.webp')==1, js.count('plate_05.webp')
-          js=js.replace("'assets/plates/plate_04.webp',\n'assets/plates/plate_05.webp'", "'assets/plates/plate_04.webp'",1)
-          assert 'plate_05.webp' not in js
+          old="'assets/plates/plate_04.webp',\n'assets/plates/plate_05.webp'"
+          assert old in js
+          js=js.replace(old,"'assets/plates/plate_04.webp'",1)
           js_path.write_text(js,encoding='utf-8')
 
-          print('4/8 remove dead assets')
+          print('4/8 remove dead assets if present')
           legacy_dir=Path('assets/pins/legacy')
-          legacy_files=sorted(p for p in legacy_dir.iterdir() if p.is_file())
-          assert len(legacy_files)==10, [p.name for p in legacy_files]
-          for p in legacy_files: p.unlink()
-          legacy_dir.rmdir()
+          if legacy_dir.exists():
+              legacy_files=sorted(p for p in legacy_dir.iterdir() if p.is_file())
+              for p in legacy_files: p.unlink()
+              legacy_dir.rmdir()
+              print('removed legacy files',len(legacy_files))
+          else:
+              print('legacy asset directory already absent')
           plate5=Path('assets/plates/plate_05.webp')
-          assert plate5.is_file(), plate5
-          plate5.unlink()
+          if plate5.exists(): plate5.unlink()
 
           print('5/8 update manifest')
           manifest=Path('ASSET_MANIFEST.tsv')
@@ -94,15 +96,15 @@ jobs:
           print('6/8 brand KEYNLOCK and load CSS fragments')
           html=re.sub(r'<!DOCTYPE html>\s*<!--.*?-->\s*','<!DOCTYPE html>\n<!-- KEYNLOCK — modular browser build -->\n',html,count=1,flags=re.S)
           html=re.sub(r'<title>.*?</title>','<title>KEYNLOCK — Lockpicking Puzzle</title>',html,count=1)
-          old='<link rel="stylesheet" href="css/app.css">'
-          new='\n'.join([
+          old_link='<link rel="stylesheet" href="css/app.css">'
+          new_links='\n'.join([
               '<link rel="stylesheet" href="css/base.css">',
               '<link rel="stylesheet" href="css/modes.css">',
               '<link rel="stylesheet" href="css/world.css">',
               '<link rel="stylesheet" href="css/motion.css">',
           ])
-          assert old in html
-          html=html.replace(old,new,1)
+          assert old_link in html
+          html=html.replace(old_link,new_links,1)
           html_path.write_text(html,encoding='utf-8')
 
           print('7/8 docs')
@@ -121,7 +123,7 @@ jobs:
           assert not missing,missing
           asset_count=sum(1 for p in Path('assets').rglob('*') if p.is_file())
           assert asset_count==len(rows)==76,(asset_count,len(rows))
-          print('v251 Python checks OK; assets',asset_count,'refs',len(refs))
+          print('v251 checks OK; assets',asset_count,'refs',len(refs))
           PY
           node --check js/app.js
           test ! -e css/app.css

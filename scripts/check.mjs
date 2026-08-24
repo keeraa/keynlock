@@ -64,8 +64,9 @@ for (const source of sourceFiles) {
   if (/data:image|;base64,/i.test(text)) fail(`Embedded asset found in ${posix(relative(root, source))}`);
   if (/\/css\/assets\//i.test(text)) fail(`Broken /css/assets path found in ${posix(relative(root, source))}`);
   const refs = [...text.matchAll(assetPattern)].map(m => m[0]);
+  const sourceIsCss = source.endsWith('.css');
   for (const ref of refs) {
-    const resolved = resolve(dirname(source), ref);
+    const resolved = sourceIsCss ? resolve(dirname(source), ref) : resolve(root, ref.replace(/^\.\//, ''));
     if (!existsSync(resolved)) fail(`Missing asset ${ref} referenced by ${posix(relative(root, source))}`);
     checkedAssets++;
   }

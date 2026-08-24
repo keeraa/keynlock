@@ -85,16 +85,19 @@ jobs:
 
           html_path=Path('index.html')
           html=html_path.read_text(encoding='utf-8')
-          old='\n'.join([
-              '<link rel="stylesheet" href="css/base.css">',
+          anchor='<link rel="stylesheet" href="css/base.css">'
+          obsolete=[
               '<link rel="stylesheet" href="css/modes.css">',
               '<link rel="stylesheet" href="css/world.css">',
               '<link rel="stylesheet" href="css/motion.css">',
               '<link rel="stylesheet" href="css/mobile.css">',
-          ])
-          assert html.count(old)==1
+          ]
+          assert html.count(anchor)==1
+          for link in obsolete:
+              assert html.count(link)==1,(link,html.count(link))
+              html=html.replace(link,'',1)
           ordered=['css/base.css',*modes,world,*overrides,'css/mobile.css']
-          html=html.replace(old,'\n'.join(f'<link rel="stylesheet" href="{p}">' for p in ordered),1)
+          html=html.replace(anchor,'\n'.join(f'<link rel="stylesheet" href="{p}">' for p in ordered),1)
           html_path.write_text(html,encoding='utf-8')
 
           check_path=Path('scripts/check.mjs')
@@ -177,7 +180,7 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf .github
-          rm -f V254_DIAGNOSTIC.log
+          rm -f V254_DIAGNOSTIC.log V254_FINAL_DIAGNOSTIC.log
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A

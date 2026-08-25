@@ -141,8 +141,11 @@ body.importedMode .pinTopLayer{display:none!important;}
     max-width:none!important;
   }
 
+  /* Measured off the case, not off the safe area: the drawer is pinned to the
+     very bottom and ignores the inset, so adding it here opened a gap the size
+     of the home indicator between the line and the case. */
   body:not(.inventory-open) #objectiveLine.difficulty{
-    bottom:calc(var(--mobile-safe-bottom) + 72px)!important;   /* clears the case peek */
+    bottom:64px!important;
   }
 
   /* Raise the game area and enlarge plate puzzles by ~15%. */
@@ -310,4 +313,10 @@ body.importedMode .pinTopLayer{display:none!important;}
     grid-template-columns:none!important;
   }
   .topRightHud #economyHud .hudSquareBadge{width:auto!important;min-width:0!important;max-width:none!important;height:auto!important;padding:0!important;}
+}
+
+/* No per-plate parallax on a phone: the rows drifting against each other under
+   a thumb reads as wobble rather than depth. The lock and background keep theirs. */
+@media (max-width:760px),(max-height:560px) and (orientation:landscape){
+  .plate,.pinTopPlate{--parx:0!important;--pary:0!important;}
 }

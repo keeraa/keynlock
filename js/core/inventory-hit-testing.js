@@ -61,8 +61,14 @@
       if(!img) continue;
       const cell=btn.getBoundingClientRect();
       if(x<cell.left-PAD || x>cell.right+PAD) continue;
-      const art=restingBox(btn,img);
-      if(y<art.top || y>art.bottom) continue;
+      // Test the art where it is actually drawn, not where it rests: hovering
+      // lifts it by --tool-lift, and the tension rail only clears the bottom of
+      // the screen by ~18px, so that offset alone would miss the whole tool.
+      const art=img.getBoundingClientRect();
+      if(art.bottom<strip.top || art.top>window.innerHeight) continue;
+      // Any tool showing above the lip owns its whole column of the peek — the
+      // tensioners poke out a third as far as the picks do, and a sliver at the
+      // very edge of the screen is not something anyone can reliably click.
       const d=Math.abs(x-(cell.left+cell.right)/2);
       if(!best || d<best.d) best={btn,d};
     }

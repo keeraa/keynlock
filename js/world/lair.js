@@ -206,6 +206,11 @@
     $lairOverlay.classList.add('open');
     closeLairModule();
     renderLairScene();
+    // The scene only has a size once the overlay is up, so the opening view is
+    // set here rather than at load. Straight away if layout is already there,
+    // and on the next frame if it is not — waiting for a frame unconditionally
+    // let a fast first touch get overwritten.
+    if(!window.resetLairPan?.()) requestAnimationFrame(() => window.resetLairPan?.());
   }
 
   function closeLair(){
@@ -231,3 +236,88 @@
     openLair();
   }
 
+
+  // ===== DRAG TO PAN =====
+  // A phone crops both the lair room and the city map hard: the room renders
+  // about 1440px wide inside a 375px screen, so most of it is simply unreachable
+  // without a way to move the view.
+  (function bindPanning(){
+    const panQuery = window.matchMedia('(max-width:760px), (pointer:coarse)');
+    const DRAG_SLOP = 6;   // px before a press counts as a drag rather than a tap
+
+    function enablePan(surface, apply, range){
+      if(!surface) return;
+      let pan = 0, startX = 0, startPan = 0, id = null, dragging = false;
+      const clamp = () => {
+        const limit = range();
+        pan = Math.max(-limit, Math.min(limit, pan));
+      };
+      const paint = () => { clamp(); apply(pan); };
+      surface.addEventListener('pointerdown', e => {
+        if(!panQuery.matches || e.pointerType === 'mouse') return;
+        id = e.pointerId; startX = e.clientX; startPan = pan; dragging = false;
+      }, { passive:true });
+      surface.addEventListener('pointermove', e => {
+        if(id !== e.pointerId) return;
+        const dx = e.clientX - startX;
+        if(!dragging && Math.abs(dx) < DRAG_SLOP) return;
+        dragging = true;
+        pan = startPan + dx;
+        paint();
+      }, { passive:true });
+      const release = e => {
+        if(id !== e.pointerId) return;
+        id = null;
+        // Swallow the click a drag would otherwise fire on whatever is beneath.
+        if(dragging) surface.addEventListener('click', ev => {
+          ev.preventDefault(); ev.stopPropagation();
+        }, { capture:true, once:true });
+      };
+      surface.addEventListener('pointerup', release, { passive:true });
+      surface.addEventListener('pointercancel', release, { passive:true });
+      addEventListener('resize', paint, { passive:true });
+      return { set(v){ pan = v; paint(); }, paint };
+    }
+
+    // --- the lair room ---
+    const scene = document.querySelector('.lairScene');
+    if(scene){
+      const chars = document.querySelector('.lairSceneCharacters');
+      const spots = () => document.querySelectorAll('.lairHotspot');
+      // How far the cover-fitted backdrop hangs off each side.
+      const roomRange = () => {
+        const vw = scene.clientWidth, vh = scene.clientHeight;
+        if(!vw || !vh) return 0;
+        const scale = Math.max(vw / 1672, vh / 941);
+        return Math.max(0, (1672 * scale - vw) / 2);
+      };
+      const roomPan = enablePan(scene, v => {
+        // Through a custom property: the rule that places this backdrop is
+        // !important, so an inline background-position would lose to it.
+        scene.style.setProperty('--lair-pan', `${v.toFixed(0)}px`);
+        if(chars) chars.style.transform = `translateX(${v.toFixed(0)}px)`;
+        spots().forEach(s => { s.style.transform = `translateX(${v.toFixed(0)}px)`; });
+      }, roomRange);
+
+      // Open with the room shifted a fifth of a screen to the right: centred,
+      // a phone crops it onto bare wall on the right and cuts the crew off on
+      // the left.
+      window.resetLairPan = () => {
+        if(!roomPan || !scene.clientWidth) return false;
+        roomPan.set(panQuery.matches ? scene.clientWidth * 0.2 : 0);
+        return true;
+      };
+    }
+
+    // --- the city map ---
+    const canvas = document.querySelector('#worldMapCanvas');
+    if(canvas){
+      const mapRange = () => {
+        const shown = canvas.parentElement ? canvas.parentElement.clientWidth : 0;
+        return Math.max(0, (canvas.clientWidth - shown) / 2);
+      };
+      enablePan(canvas, v => {
+        canvas.style.transform = `translateX(${v.toFixed(0)}px)`;
+      }, mapRange);
+    }
+  })();

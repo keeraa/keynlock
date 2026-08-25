@@ -169,7 +169,7 @@ body.importedMode .drumMode .digitalResult{margin-top:6px!important;}
 .worldMapDialog .worldMapCanvas,.worldMapDialog .worldMapInfo{width:100% !important;max-width:none !important;}
 .worldMapDialog .worldMapCanvas{flex:0 0 auto;}
 body.map-open{overflow:hidden !important;}
-.lairScene{background-image:linear-gradient(rgba(10,7,4,.14),rgba(10,7,4,.22)),url("../assets/lair/lair-background.jpg") !important;background-size:cover !important;background-position:center center !important;background-repeat:no-repeat !important;}
+.lairScene{background-image:linear-gradient(rgba(10,7,4,.14),rgba(10,7,4,.22)),url("../assets/lair/lair-background.jpg") !important;background-size:100% 100%,cover !important;background-position:center center,calc(50% + var(--lair-pan,0px)) center !important;background-repeat:no-repeat !important;}
 @media (max-width:760px){
 .worldMapDialog{gap:10px;}
 }
@@ -240,4 +240,30 @@ body.importedMode .anBoard{width:360px !important;height:292px !important;min-he
 body.importedMode .anConsole{width:350px !important;height:282px !important;}
 body.importedMode .anTracks{width:260px !important;gap:10px !important;}
 body.importedMode .anReadout{top:232px !important;font-size:44px !important;}
+}
+
+/* ---- Lair scene pass ---- */
+/* The objective belongs to the lock, not to the base. */
+body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none !important;}
+
+/* Tik stands further back than Sai, so he reads behind her and stands higher up
+   the room rather than at her feet. */
+.lairSceneCharacter.kai{z-index:2 !important;}
+.lairSceneCharacter.sai{z-index:3 !important;}
+.lairSceneCharacter.tik{z-index:1 !important;}
+
+/* Desktop figures come down to the proportions they already had on phones —
+   they were half again as tall for the same room. */
+.lairSceneCharacter.kai{height:39.3% !important;}
+.lairSceneCharacter.sai{height:46% !important;}
+.lairSceneCharacter.tik{right:11.5% !important;bottom:12% !important;height:41% !important;}
+
+/* Hotspots sat across the faces. City moves right, team drops below the figure. */
+.lairHotspotCity{left:32% !important;top:40.5% !important;}
+.lairHotspotTeam{left:83% !important;top:68% !important;}
+
+@media (max-width:760px){
+  .lairSceneCharacter.tik{right:6% !important;bottom:10% !important;height:41% !important;}
+  .lairHotspotCity{left:26% !important;top:36% !important;}
+  .lairHotspotTeam{left:79% !important;top:74% !important;}
 }

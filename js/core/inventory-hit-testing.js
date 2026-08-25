@@ -153,16 +153,95 @@
   bindMobileSwipes();
 })();
 
-/* v257 — typed tensioners across all lock modes; typed plates only on level 1. */
+/* v257 — typed tensioners across all lock modes; typed plates only on level 1.
+   v259 — five iron tiers per type, with per-skin hole geometry. */
 (function(){
+  // v259 — iron plates in five tiers; end shape still encodes the tension type.
+  const typedPlateNames=[
+    'iron_bar_01.webp',
+    'iron_bar_02.png',
+    'iron_bar_03.png',
+    'iron_bar_04.png',
+    'iron_bar_05.png',
+    'iron_hook_01.webp',
+    'iron_hook_02.png',
+    'iron_hook_03.png',
+    'iron_hook_04.png',
+    'iron_hook_05.png',
+    'iron_kink_01.webp',
+    'iron_kink_02.png',
+    'iron_kink_03.png',
+    'iron_kink_04.png',
+    'iron_kink_05.png',
+    'iron_wave_01.webp',
+    'iron_wave_02.png',
+    'iron_wave_03.png',
+    'iron_wave_04.png',
+    'iron_wave_05.png',
+    'iron_angle_01.webp',
+    'iron_angle_02.png',
+    'iron_angle_03.png',
+    'iron_angle_04.png',
+    'iron_angle_05.png'
+  ];
   const typedPlateSkins=[
     'assets/plates/iron_bar_01.webp',
+    'assets/plates/iron_bar_02.png',
+    'assets/plates/iron_bar_03.png',
+    'assets/plates/iron_bar_04.png',
+    'assets/plates/iron_bar_05.png',
     'assets/plates/iron_hook_01.webp',
+    'assets/plates/iron_hook_02.png',
+    'assets/plates/iron_hook_03.png',
+    'assets/plates/iron_hook_04.png',
+    'assets/plates/iron_hook_05.png',
     'assets/plates/iron_kink_01.webp',
+    'assets/plates/iron_kink_02.png',
+    'assets/plates/iron_kink_03.png',
+    'assets/plates/iron_kink_04.png',
+    'assets/plates/iron_kink_05.png',
     'assets/plates/iron_wave_01.webp',
-    'assets/plates/iron_angle_01.webp'
+    'assets/plates/iron_wave_02.png',
+    'assets/plates/iron_wave_03.png',
+    'assets/plates/iron_wave_04.png',
+    'assets/plates/iron_wave_05.png',
+    'assets/plates/iron_angle_01.webp',
+    'assets/plates/iron_angle_02.png',
+    'assets/plates/iron_angle_03.png',
+    'assets/plates/iron_angle_04.png',
+    'assets/plates/iron_angle_05.png'
   ];
-  const typedPlateNames=['iron_bar_01.webp','iron_hook_01.webp','iron_kink_01.webp','iron_wave_01.webp','iron_angle_01.webp'];
+  // Hole geometry measured from each source image: `ar` is its aspect ratio,
+  // `x` the seven hole centres as a fraction of image width, `y` the row centre
+  // as a fraction of image height. Tiers differ in hole spacing, so a single
+  // shared table would leave pins sitting outside the holes.
+  const typedPlateGeom=[
+    {ar:6.76159,y:0.52899,x:[0.13519,0.25672,0.37926,0.50130,0.62344,0.74603,0.86692]},
+    {ar:6.86957,y:0.48577,x:[0.14374,0.26162,0.37981,0.49766,0.61581,0.73368,0.85070]},
+    {ar:5.95139,y:0.50235,x:[0.18448,0.29172,0.39960,0.50732,0.61556,0.72388,0.83190]},
+    {ar:4.72781,y:0.50282,x:[0.15150,0.26811,0.38417,0.49984,0.61595,0.73218,0.84817]},
+    {ar:6.00000,y:0.47966,x:[0.14996,0.26376,0.37732,0.49537,0.61516,0.73347,0.85286]},
+    {ar:7.24113,y:0.50137,x:[0.13511,0.25665,0.37914,0.50136,0.62344,0.74602,0.86678]},
+    {ar:7.11712,y:0.48521,x:[0.14462,0.26300,0.38095,0.49901,0.61689,0.73459,0.85152]},
+    {ar:5.74510,y:0.51263,x:[0.18896,0.29348,0.39834,0.50359,0.60920,0.71474,0.82020]},
+    {ar:5.22727,y:0.50192,x:[0.15287,0.26851,0.38369,0.49844,0.61371,0.72896,0.84382]},
+    {ar:6.19697,y:0.48967,x:[0.17116,0.28179,0.39395,0.50395,0.61528,0.72654,0.83579]},
+    {ar:5.90173,y:0.50152,x:[0.13514,0.25683,0.37920,0.50137,0.62337,0.74609,0.86703]},
+    {ar:7.00000,y:0.48585,x:[0.14461,0.26293,0.38079,0.49858,0.61637,0.73382,0.85070]},
+    {ar:5.77922,y:0.51465,x:[0.19765,0.30073,0.40467,0.50832,0.61248,0.71679,0.82092]},
+    {ar:5.06918,y:0.49047,x:[0.15461,0.26989,0.38491,0.49955,0.61447,0.72963,0.84482]},
+    {ar:6.66142,y:0.49485,x:[0.17736,0.28540,0.39472,0.50475,0.61328,0.72373,0.83211]},
+    {ar:6.07738,y:0.51145,x:[0.13509,0.25671,0.37916,0.50143,0.62345,0.74601,0.86683]},
+    {ar:7.05357,y:0.48797,x:[0.14452,0.26278,0.38083,0.49885,0.61699,0.73439,0.85146]},
+    {ar:5.91608,y:0.49778,x:[0.17794,0.28640,0.39576,0.50482,0.61463,0.72458,0.83394]},
+    {ar:4.85802,y:0.49458,x:[0.14615,0.26450,0.38234,0.49967,0.61759,0.73555,0.85295]},
+    {ar:5.83333,y:0.48325,x:[0.15722,0.27508,0.38983,0.50285,0.61596,0.72974,0.84270]},
+    {ar:6.76159,y:0.49795,x:[0.13507,0.25664,0.37917,0.50139,0.62354,0.74600,0.86703]},
+    {ar:7.05357,y:0.48500,x:[0.14450,0.26277,0.38104,0.49894,0.61692,0.73453,0.85149]},
+    {ar:5.82313,y:0.51238,x:[0.18156,0.28895,0.39668,0.50474,0.61275,0.72141,0.82943]},
+    {ar:4.97531,y:0.49080,x:[0.15152,0.26582,0.37991,0.49380,0.60768,0.72178,0.83608]},
+    {ar:6.05426,y:0.47559,x:[0.15110,0.26469,0.37811,0.49595,0.61562,0.73374,0.85307]}
+  ];
   const basePlateSkins=[...PLATE_SKINS];
   const basePlateNames=[...PLATE_SKIN_NAMES];
   const basePlateHoleY=[...PLATE_HOLE_Y];
@@ -196,10 +275,33 @@
     const pool=activePlateSkins();
     return pool[Math.min(roundPlateSkin||0,pool.length-1)] || pool[0] || '';
   };
+  // .plate is a fixed 520x97 box and .plateFace paints with `contain`, so a
+  // plate narrower than the box is letterboxed; hole positions have to be
+  // mapped through that fit before pins can line up with them.
+  const BOX_W=520, BOX_H=97, BOX_AR=BOX_W/BOX_H;
+  function fitBox(ar){
+    const rw = ar>=BOX_AR ? BOX_W : BOX_H*ar;
+    const rh = ar>=BOX_AR ? BOX_W/ar : BOX_H;
+    return {rw,rh,ox:(BOX_W-rw)/2,oy:(BOX_H-rh)/2};
+  }
+  function typedGeom(){
+    if(!levelUsesTypedPlates()) return null;
+    return typedPlateGeom[Math.min(roundPlateSkin||0,typedPlateGeom.length-1)] || null;
+  }
+
   currentPlateHoleY=function(){
-    if(levelUsesTypedPlates()) return .496;
+    const g=typedGeom();
+    if(g){ const f=fitBox(g.ar); return (f.oy + g.y*f.rh)/BOX_H; }
     const i=Math.min(roundPlateSkin||0,Math.max(0,basePlateHoleY.length-1));
     return basePlateHoleY[i] ?? .47;
+  };
+
+  const basePinXForState=pinXForState;
+  pinXForState=function(pos){
+    const g=typedGeom();
+    if(!g) return basePinXForState(pos);
+    const f=fitBox(g.ar);
+    return f.ox + g.x[Math.max(0,Math.min(6,pos-1))]*f.rw;
   };
 
   function extractTensionTypeFromText(value=''){

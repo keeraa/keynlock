@@ -115,3 +115,198 @@ body.importedMode .pinTopLayer{display:none!important;}
 @media (max-height:560px) and (orientation:landscape){
   .pinTopLayer{transform:translateX(-50%) scale(.44)!important;}
 }
+
+/* v255 — mobile UX pass from real-device screenshots. */
+@media (max-width:760px) and (orientation:portrait){
+  :root{
+    --template-lock-top:calc(var(--mobile-safe-top) + 78px)!important;
+    --template-puzzle-top:calc(var(--mobile-safe-top) + 220px)!important;
+    --template-puzzle-bottom:calc(var(--mobile-safe-bottom) + 190px)!important;
+  }
+
+  /* The useful middle of the case occupies about 73% of its artwork.
+     136vw makes that middle section effectively fill the phone width. */
+  .inventoryDrawer{
+    width:136vw!important;
+    max-width:none!important;
+    --inv-peek:34px!important;
+    --inv-open-y:7%!important;
+  }
+  body.shop-open .inventoryDrawer,
+  body.lair-open .inventoryDrawer,
+  body.map-open .inventoryDrawer{
+    max-width:none!important;
+  }
+
+  /* Compact mobile controls: centered, lower, and without the unclear
+     floating reset/new-round buttons on the lower-right. */
+  .dpad{
+    left:50%!important;
+    bottom:calc(var(--mobile-safe-bottom) + 52px)!important;
+    width:184px!important;
+    height:122px!important;
+    transform:translateX(-50%)!important;
+  }
+  .btn{width:58px!important;height:58px!important;font-size:27px!important;}
+  .up{left:63px!important;top:0!important;}
+  .left{left:0!important;top:64px!important;}
+  .down{left:63px!important;top:64px!important;bottom:auto!important;}
+  .right{right:0!important;top:64px!important;}
+  .actions{display:none!important;}
+  body.inventory-open .touch{opacity:0!important;pointer-events:none!important;}
+  body:not(.inventory-open) #objectiveLine.difficulty{
+    bottom:calc(var(--mobile-safe-bottom) + 190px)!important;
+  }
+
+  /* Raise the game area and enlarge plate puzzles by ~15%. */
+  .puzzleArea>.platesZone,
+  .pinTopLayer{
+    transform:translateX(-50%) scale(.64)!important;
+    transform-origin:top center!important;
+  }
+  .plate{touch-action:none!important;}
+
+  /* Risen 2: make the active pick visually match the pin assembly. */
+  body.importedMode .r2Lock{
+    margin-top:-8px!important;
+    margin-bottom:-250px!important;
+    transform:scale(.36)!important;
+    transform-origin:top center!important;
+  }
+  body.importedMode .r2Pick{top:276px!important;width:290px!important;height:90px!important;}
+  body.importedMode .r2Pick::before{
+    left:54px!important;
+    top:-204px!important;
+    width:92px!important;
+    height:530px!important;
+  }
+
+  /* Gothic 1 was sitting too close to the bottom controls. */
+  body.importedMode .g1ProgressWrap{
+    margin-top:-24px!important;
+    transform:none!important;
+  }
+
+  /* Anachronox: remove the oversized 760px transformed layout that could
+     shift outside the viewport and size the console directly for mobile. */
+  body.importedMode .anMode{padding-top:0!important;overflow-x:hidden!important;}
+  body.importedMode .anBoard{
+    width:min(390px,96vw)!important;
+    min-width:0!important;
+    height:350px!important;
+    min-height:350px!important;
+    margin:0 auto!important;
+    transform:none!important;
+    flex:0 0 350px!important;
+    justify-content:center!important;
+  }
+  body.importedMode .anConsole{
+    width:100%!important;
+    max-width:390px!important;
+    height:350px!important;
+  }
+  body.importedMode .anReadout{
+    left:50%!important;
+    top:4px!important;
+    transform:translateX(-50%)!important;
+    font-size:34px!important;
+    text-align:center!important;
+  }
+  body.importedMode .anTracks{
+    left:18px!important;
+    right:18px!important;
+    top:54px!important;
+    height:286px!important;
+    gap:10px!important;
+    justify-content:center!important;
+  }
+  body.importedMode .anChannel{
+    width:min(92px,26vw)!important;
+    height:286px!important;
+    grid-template-rows:178px 38px 24px 38px!important;
+  }
+  body.importedMode .anSlot{width:58px!important;height:174px!important;}
+  body.importedMode .anChannel::after{top:174px!important;}
+  body.importedMode .anBtn{width:38px!important;height:38px!important;}
+  body.importedMode .anValue{font-size:16px!important;}
+
+  /* Heat/cold: four feedback cards stay aligned with the four digits.
+     Arrow buttons get a larger touch target. */
+  .heatColdMode .digitalCard{
+    width:min(396px,96vw)!important;
+    padding-inline:8px!important;
+  }
+  .hcDialRow,.hcSlots{
+    width:100%!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:7px!important;
+    justify-content:center!important;
+  }
+  .hcDigitCol{gap:7px!important;}
+  .hcStepBtn{
+    min-height:46px!important;
+    padding:10px 5px!important;
+    font-size:16px!important;
+    border-radius:11px!important;
+  }
+  .hcDigitValue{padding:12px 5px!important;font-size:26px!important;}
+  .hcSlot{
+    min-width:0!important;
+    min-height:116px!important;
+    padding:10px 5px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:space-between!important;
+  }
+
+  /* Hillsfar: six candidate keys are larger and begin lower so they do not
+     visually collide with the lock-cut pattern above them. */
+  body.mode-hillsfar .hfCandidates{
+    width:min(396px,96vw)!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:14px 10px!important;
+    margin-top:28px!important;
+  }
+  body.mode-hillsfar .hfCandidate{
+    width:100%!important;
+    max-width:none!important;
+    min-height:84px!important;
+    height:84px!important;
+  }
+  body.mode-hillsfar .hfCandidate svg{
+    width:100%!important;
+    max-width:176px!important;
+    height:80px!important;
+    max-height:80px!important;
+  }
+
+  /* Gesture surfaces should receive a full pointer sequence instead of
+     browser pan gestures. Native-drag mechanics keep their own handling. */
+  .platesZone,.r2Lock,.anBoard,.massBoard,.kdPanel,.cpBoard,.rsBoard,
+  .heatColdMode .digitalCard,.drumMode .digitalCard,.scopeMode .digitalCard{
+    touch-action:none!important;
+  }
+}
+
+/* v255 — faster continuous opening motion on every layout.
+   The final JS module promotes opening -> opened on animationend, removing
+   the former multi-second visual pause. */
+.mechanismZone.opening .lockPanel,
+.sharedModeLockArt.opening .lockPanel{
+  animation:keynlockBodyOpenFast 950ms cubic-bezier(.20,.76,.18,1) forwards!important;
+}
+.mechanismZone.opening::before,
+.sharedModeLockArt.opening::before{
+  animation:keynlockShackleOpenFast 950ms cubic-bezier(.20,.76,.18,1) forwards!important;
+}
+@keyframes keynlockBodyOpenFast{
+  0%{transform:translateX(-50%) scale(1);}
+  52%{transform:translateX(-50%) scale(.992);}
+  100%{transform:translateX(-50%) scale(1);}
+}
+@keyframes keynlockShackleOpenFast{
+  0%{transform:translateX(-50%) translateY(0) rotate(0deg);}
+  55%{transform:translateX(-50%) translateY(-31%) rotate(-8deg);}
+  82%{transform:translateX(-50%) translateY(-42%) rotate(-15deg);}
+  100%{transform:translateX(-50%) translateY(-40%) rotate(-14deg);}
+}

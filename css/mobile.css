@@ -141,22 +141,6 @@ body.importedMode .pinTopLayer{display:none!important;}
     max-width:none!important;
   }
 
-  /* Compact mobile controls: centered, lower, and without the unclear
-     floating reset/new-round buttons on the lower-right. */
-  .dpad{
-    left:50%!important;
-    bottom:calc(var(--mobile-safe-bottom) + 52px)!important;
-    width:184px!important;
-    height:122px!important;
-    transform:translateX(-50%)!important;
-  }
-  .btn{width:58px!important;height:58px!important;font-size:27px!important;}
-  .up{left:63px!important;top:0!important;}
-  .left{left:0!important;top:64px!important;}
-  .down{left:63px!important;top:64px!important;bottom:auto!important;}
-  .right{right:0!important;top:64px!important;}
-  .actions{display:none!important;}
-  body.inventory-open .touch{opacity:0!important;pointer-events:none!important;}
   body:not(.inventory-open) #objectiveLine.difficulty{
     bottom:calc(var(--mobile-safe-bottom) + 190px)!important;
   }

@@ -85,7 +85,7 @@ body.mobile-mode-menu-open #difficultyDock .difficultyBtn{width:36px!important;m
 .puzzleArea{top:var(--template-puzzle-top)!important;bottom:var(--template-puzzle-bottom)!important;overflow:hidden!important;}
 .puzzleArea>.platesZone{left:50%!important;top:0!important;transform:translateX(-50%) scale(.63)!important;transform-origin:top center!important;}
 body.importedMode .puzzleArea>.modePanel:not([hidden]),body.mode-hillsfar .puzzleArea>.hillsfarMode:not([hidden]){padding:4px 8px 8px!important;overflow-x:hidden!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch;}
-#objectiveLine.difficulty{left:8px!important;right:8px!important;bottom:calc(var(--mobile-safe-bottom) + 6px)!important;width:auto!important;max-width:none!important;min-height:34px!important;padding:7px 9px!important;transform:none!important;border-radius:9px!important;font-size:9px!important;line-height:1.25!important;letter-spacing:.035em!important;}
+#objectiveLine.difficulty{left:8px!important;right:8px!important;bottom:calc(var(--mobile-safe-bottom) + 6px)!important;width:auto!important;max-width:none!important;min-height:34px!important;padding:7px 9px!important;transform:none!important;border-radius:9px!important;font-size:13.5px!important;line-height:1.25!important;letter-spacing:.035em!important;}
 #objectiveLine .objectiveDiff{white-space:nowrap;}
 body.mode-hillsfar .hfLockBox,body.mode-hillsfar .hfTryArea,body.mode-hillsfar .hfLockCut{width:min(94vw,420px)!important;}
 body.mode-hillsfar .hfTryArea,body.mode-hillsfar .hfLockCut{height:118px!important;}
@@ -166,7 +166,7 @@ body.map-open .mobileModeMenuButton,body.map-open .mobileModeBackdrop,body.map-o
 .topRightHud{width:calc(var(--mobile-hud-size) * 3 + 6px)!important;gap:3px!important;}
 .topRightHud .economyHud{gap:3px!important;}
 .puzzleArea>.platesZone{transform:translateX(-50%) scale(.55)!important;}
-#objectiveLine.difficulty{font-size:8px!important;padding:5px 7px!important;min-height:30px!important;}
+#objectiveLine.difficulty{font-size:12px!important;padding:5px 7px!important;min-height:30px!important;}
 body.importedMode .massBoard{width:230px!important;height:230px!important;}
 body.importedMode .skBoardViewport{width:250px!important;height:250px!important;flex-basis:250px!important;}
 body.importedMode .skBoardViewport .skBoard{transform:translateX(-50%) scale(.36)!important;}
@@ -185,7 +185,7 @@ body.mobile-mode-menu-open #difficultyDock .difficultyBtn{width:34px!important;m
 .timerCircleHud:not(.hidden){left:calc(var(--mobile-safe-left) + 6px)!important;top:calc(var(--mobile-safe-top) + 50px)!important;width:38px!important;height:38px!important;}
 .timerCircleHud:not(.hidden) .timerCircleSvg{width:38px!important;height:38px!important;}
 .puzzleArea>.platesZone{transform:translateX(-50%) scale(.44)!important;}
-#objectiveLine.difficulty{bottom:calc(var(--mobile-safe-bottom) + 3px)!important;min-height:26px!important;padding:4px 7px!important;font-size:7.5px!important;}
+#objectiveLine.difficulty{bottom:calc(var(--mobile-safe-bottom) + 3px)!important;min-height:26px!important;padding:4px 7px!important;font-size:11.25px!important;}
 body.importedMode .massBoard{width:min(52dvh,205px)!important;height:min(52dvh,205px)!important;}
 body.importedMode .r2Lock{margin-bottom:-294px!important;transform:scale(.30)!important;}
 body.importedMode .skBoardViewport{width:205px!important;height:205px!important;flex-basis:205px!important;}

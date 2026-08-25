@@ -177,7 +177,7 @@
 
     scene.addEventListener('pointerdown',e=>{
       if(!mobileQuery.matches || e.pointerType!=='touch') return;
-      if(e.target.closest('.touch,.topRightHud,.modeTabs,.mobileModeMenuButton,.inventoryDrawer,.worldMapScreen,.lairOverlay,.shopOverlay,.skBoard,.tnGauge')) return;
+      if(e.target.closest('.topRightHud,.modeTabs,.mobileModeMenuButton,.inventoryDrawer,.worldMapScreen,.lairOverlay,.shopOverlay,.skBoard,.tnGauge')) return;
       gesture={id:e.pointerId,x:e.clientX,y:e.clientY,target:e.target};
     },{passive:true});
 

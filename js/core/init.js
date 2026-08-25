@@ -72,13 +72,6 @@
 
     document.querySelectorAll('.anBtn.anUp').forEach(b=>b.innerHTML=tablerIcon('up',18));
     document.querySelectorAll('.anBtn.anDown').forEach(b=>b.innerHTML=tablerIcon('down',18));
-    document.querySelectorAll('.btn.up').forEach(b=>b.innerHTML=tablerIcon('up',20));
-    document.querySelectorAll('.btn.down').forEach(b=>b.innerHTML=tablerIcon('down',20));
-    document.querySelectorAll('.btn.left').forEach(b=>b.innerHTML=tablerIcon('left',20));
-    document.querySelectorAll('.btn.right').forEach(b=>b.innerHTML=tablerIcon('right',20));
-    const actions=document.querySelectorAll('.actions .action');
-    if(actions[0]) actions[0].innerHTML=tablerIcon('refresh',18);
-    if(actions[1]) actions[1].innerHTML=tablerIcon('plus',18);
   }
 
   document.addEventListener('selectstart', e=>e.preventDefault());

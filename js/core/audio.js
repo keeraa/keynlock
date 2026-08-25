@@ -43,14 +43,25 @@
     src.start();
   }
 
+  // Haptics track the sounds: a nudge for a pin, a knock for a broken pick, a
+  // roll for the lock giving. navigator.vibrate is Android-only — Safari on iOS
+  // exposes no vibration API at all, so this is silently a no-op there.
+  const canBuzz = typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function';
+  function buzz(pattern){
+    if(!canBuzz) return;
+    try{ navigator.vibrate(pattern); }catch(e){}
+  }
+
   const SFX={
     select(){ tone(520,.045,'triangle',.022,600); },
     move(){
+      buzz(12);
       tone(250,.07,'triangle',.026,330);
       setTimeout(()=>tone(620,.045,'sine',.018,700),40);
     },
     blocked(){ tone(145,.10,'sawtooth',.025,95); },
     break(){
+      buzz([28,40,28]);
       noise(.09,.036);
       tone(120,.12,'square',.022,70);
     },
@@ -64,6 +75,7 @@
       setTimeout(()=>tone(130,.08,'triangle',.018,100),70);
     },
     open(){
+      buzz([45,55,45,55,90]);
       tone(240,.09,'triangle',.025,360);
       setTimeout(()=>tone(480,.11,'sine',.025,720),80);
       setTimeout(()=>tone(760,.16,'sine',.022,980),165);

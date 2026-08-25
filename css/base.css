@@ -18,15 +18,12 @@ h1{margin:0;font-size:clamp(27.5px,3.3vw,48.4px);font-weight:500;letter-spacing:
 .target{position:absolute;top:12px;left:0;width:16px;height:10px;z-index:8;opacity:0;pointer-events:none;transform:translate3d(0,0,0);transition:opacity 198ms ease;}
 .target:before{content:"";position:absolute;left:50%;top:0;transform:translateX(-50%);width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:10px solid #5ca8ff;filter:drop-shadow(0 0 5px rgba(92,168,255,.35));}
 .index{position:absolute;right:22px;bottom:15px;color:#d5ad5e;font:13.20px/1 Georgia,serif;opacity:.72;text-shadow:0 1px 2px #000;z-index:9;}
-.touch{display:none;position:absolute;inset:0;pointer-events:none;}
-.dpad{position:absolute;left:22px;bottom:24px;width:136px;height:136px;pointer-events:auto;}
 .btn{cursor:pointer;position:absolute;width:46px;height:46px;border:1px solid #665f55;background:rgba(20,19,17,.72);color:#cabba6;display:grid;place-items:center;font:22px Arial;backdrop-filter:blur(5px);}
 .btn:active{background:rgba(98,80,58,.64);}
 .up{left:45px;top:0;}
 .down{left:45px;bottom:0;}
 .left{left:0;top:45px;}
 .right{right:0;top:45px;}
-.actions{position:absolute;right:22px;bottom:35px;display:flex;gap:12px;pointer-events:auto;}
 .action{width:54px;height:54px;border-radius:50%;font-size:13.20px;}
 .flash{animation:shake 280ms cubic-bezier(.36,.07,.19,.97);}
 .toast{position:fixed;right:18px;bottom:18px;transform:translateY(14px) scale(.98);opacity:0;width:min(420px,calc(100vw - 36px));min-height:0;padding:12px 14px;border:1px solid #806438;border-radius:12px;background:linear-gradient(180deg,rgba(31,27,25,.96),rgba(10,9,9,.96));color:#ead7b6;font:14.8px var(--ui-font);line-height:1.35;letter-spacing:.02em;pointer-events:none;transition:opacity .18s ease,transform .18s ease;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;box-shadow:0 14px 34px rgba(0,0,0,.46),0 0 18px rgba(180,132,56,.08),inset 0 0 0 1px rgba(232,190,110,.06);}
@@ -56,7 +53,6 @@ h1{margin:0;font-size:clamp(27.5px,3.3vw,48.4px);font-weight:500;letter-spacing:
 @media (max-width:720px){
 header{padding-top:14px;}
 .economyHud{top:58px;right:10px;transform:scale(.72);}
-.touch{display:block;}
 }
 body.importedMode .main{place-items:stretch;}
 .modeTabs{z-index:200!important;}

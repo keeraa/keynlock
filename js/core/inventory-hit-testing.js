@@ -152,3 +152,89 @@
 
   bindMobileSwipes();
 })();
+
+/* v256 — typed tensioners and filename-driven plate compatibility. */
+(function(){
+  const plateSkins=[
+    'assets/plates/iron_bar_01.webp',
+    'assets/plates/iron_hook_01.webp',
+    'assets/plates/iron_kink_01.webp',
+    'assets/plates/iron_wave_01.webp',
+    'assets/plates/iron_angle_01.webp'
+  ];
+  const plateNames=['iron_bar_01.webp','iron_hook_01.webp','iron_kink_01.webp','iron_wave_01.webp','iron_angle_01.webp'];
+  const tensionSkins=[null,
+    'assets/tensions/tension_bar_01.webp',
+    'assets/tensions/tension_hook_01.webp',
+    'assets/tensions/tension_kink_01.webp',
+    'assets/tensions/tension_wave_01.webp',
+    'assets/tensions/tension_angle_01.webp'
+  ];
+  const tensionLabels=[null,'Bar','Hook','Kink','Wave','Angle'];
+  const typeOrder=['bar','hook','kink','wave','angle'];
+  const typeMeta={
+    bar:{code:'Bar',label:'Bar'},
+    hook:{code:'Hook',label:'Hook'},
+    kink:{code:'Kink',label:'Kink'},
+    wave:{code:'Wave',label:'Wave'},
+    angle:{code:'Angle',label:'Angle'}
+  };
+  const typeBySkin={1:'bar',2:'hook',3:'kink',4:'wave',5:'angle'};
+
+  PLATE_SKINS.splice(0,PLATE_SKINS.length,...plateSkins);
+  PLATE_SKIN_NAMES.splice(0,PLATE_SKIN_NAMES.length,...plateNames);
+  PLATE_HOLE_Y.splice(0,PLATE_HOLE_Y.length,.496,.496,.496,.496,.496);
+  TENSION_SKINS.splice(0,TENSION_SKINS.length,...tensionSkins);
+  TENSION_SKIN_LABELS.splice(0,TENSION_SKIN_LABELS.length,...tensionLabels);
+
+  chooseRoundPlateSkin=function(){ roundPlateSkin=rand(0,4); };
+  currentPlateName=function(){ return plateNames[Math.min(roundPlateSkin||0,4)] || plateNames[0]; };
+  currentPlateSkin=function(){ return plateSkins[Math.min(roundPlateSkin||0,4)] || plateSkins[0]; };
+  currentPlateHoleY=function(){ return .496; };
+
+  function getTensionTypeLabel(type){ return typeMeta[type]?.label || '—'; }
+  function getSelectedTensionType(){ return typeBySkin[tensionSkin] || null; }
+  function extractTensionTypeFromText(value=''){
+    const low=String(value||'').toLowerCase();
+    return typeOrder.find(type=>low.includes(type)) || null;
+  }
+  function currentRequiredTensionType(){
+    const names=[currentLockBodyEntry().name,currentLockerEntry().name,currentPlateName()];
+    for(const name of names){
+      const type=extractTensionTypeFromText(name);
+      if(type) return type;
+    }
+    return null;
+  }
+  function isSelectedTensionCompatible(){
+    const required=currentRequiredTensionType();
+    if(!required) return true;
+    return getSelectedTensionType()===required;
+  }
+
+  const originalTryOpenLock=tryOpenLock;
+  tryOpenLock=function(){
+    const delegatedModes=new Set(['tension','resonance','deduction','composite','heatcold','drum','scope','anach','skyrim','r2','g1','hillsfar','mass']);
+    if(delegatedModes.has(mode) || solved || shopOpen || !goalMet()) return originalTryOpenLock();
+
+    if(!isSelectedTensionCompatible()){
+      const required=currentRequiredTensionType();
+      damagePick({surviveText:`Неверный натяжитель · нужен ${getTensionTypeLabel(required)}`});
+      $mechanism.classList.remove('ready');
+      nudgeTools();
+      SFX.wrongLock();
+      toast(`Нужен натяжитель ${getTensionTypeLabel(required)}`);
+      render();
+      return;
+    }
+    return originalTryOpenLock();
+  };
+
+  applyTensionSkin();
+  updateTensionSkinShop();
+  renderInventoryTools();
+  chooseRoundPlateSkin();
+  rebuildPlates();
+  render();
+  updateMechanismAssetHud();
+})();

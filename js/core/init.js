@@ -140,34 +140,61 @@
   // does it — and harder than the mouse does, since tilting is a deliberate
   // gesture rather than an incidental one.
   (function bindTiltParallax(){
-    const TILT_SPAN = 22;   // degrees of tilt that reach the full sweep
+    const TILT_SPAN = 22;   // degrees, for the Euler fallback
+    const SPAN = 0.34;      // fraction of g that reaches the full sweep
     const TILT_X = 38, TILT_Y = 30;
     let rest = null;
     const clamp = v => v < -1 ? -1 : v > 1 ? 1 : v;
 
+    // Read the tilt off gravity rather than off Euler angles. Held upright a
+    // phone sits at beta ~90deg, where gamma is degenerate — which is why the
+    // left/right axis reads as dead while up/down works fine. The gravity
+    // vector has no such singularity.
+    const G = 9.81;
+    function apply(nx, ny){
+      pointerTargetX = clamp(nx) * TILT_X;
+      pointerTargetY = clamp(ny) * TILT_Y;
+      bgParallaxTargetX = -clamp(nx) * innerWidth * 0.055;
+      bgParallaxTargetY = -clamp(ny) * innerHeight * 0.055;
+    }
+    // Device axes are fixed to the hardware, so undo the screen rotation.
+    function screenAngle(){
+      const a = (screen.orientation && screen.orientation.angle);
+      return ((a == null ? (window.orientation || 0) : a) * Math.PI) / 180;
+    }
+    function onMotion(e){
+      const g = e.accelerationIncludingGravity;
+      if(!g || g.x == null || g.z == null) return;
+      const a = screenAngle(), cos = Math.cos(a), sin = Math.sin(a);
+      const x = (g.x * cos + g.y * sin) / G;
+      const z = -g.z / G;
+      if(!rest) rest = { x, z };
+      apply((x - rest.x) / SPAN, (z - rest.z) / SPAN);
+    }
+    // Fallback for anything without motion events.
     function onTilt(e){
       if(e.gamma == null || e.beta == null) return;
-      // First reading is however the player happens to be holding the phone.
       if(!rest) rest = { g: e.gamma, b: e.beta };
-      const nx = clamp((e.gamma - rest.g) / TILT_SPAN);
-      const ny = clamp((e.beta - rest.b) / TILT_SPAN);
-      pointerTargetX = nx * TILT_X;
-      pointerTargetY = ny * TILT_Y;
-      bgParallaxTargetX = -nx * innerWidth * 0.055;
-      bgParallaxTargetY = -ny * innerHeight * 0.055;
+      apply((e.gamma - rest.g) / TILT_SPAN, (e.beta - rest.b) / TILT_SPAN);
     }
 
-    function listen(){ addEventListener('deviceorientation', onTilt, { passive:true }); }
+    const hasMotion = typeof DeviceMotionEvent !== 'undefined';
+    function listen(){
+      if(hasMotion) addEventListener('devicemotion', onMotion, { passive:true });
+      else addEventListener('deviceorientation', onTilt, { passive:true });
+    }
 
-    // iOS hands out orientation only after an explicit grant, and only from a
+    // iOS hands these out only after an explicit grant, and only from a
     // gesture, so ask on the first touch and never nag again.
-    const needsGrant = typeof DeviceOrientationEvent !== 'undefined'
-      && typeof DeviceOrientationEvent.requestPermission === 'function';
-    if(!needsGrant){ listen(); return; }
+    const gate = (hasMotion && typeof DeviceMotionEvent.requestPermission === 'function')
+      ? DeviceMotionEvent
+      : (typeof DeviceOrientationEvent !== 'undefined'
+         && typeof DeviceOrientationEvent.requestPermission === 'function' ? DeviceOrientationEvent : null);
+    if(!gate){ listen(); return; }
     const ask = () => {
       removeEventListener('touchend', ask);
       removeEventListener('click', ask);
-      DeviceOrientationEvent.requestPermission().then(r => { if(r === 'granted') listen(); }).catch(()=>{});
+      gate.requestPermission().then(r => { if(r === 'granted') listen(); }).catch(()=>{});
     };
     addEventListener('touchend', ask, { passive:true });
     addEventListener('click', ask);

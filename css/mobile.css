@@ -142,7 +142,7 @@ body.importedMode .pinTopLayer{display:none!important;}
   }
 
   body:not(.inventory-open) #objectiveLine.difficulty{
-    bottom:calc(var(--mobile-safe-bottom) + 190px)!important;
+    bottom:calc(var(--mobile-safe-bottom) + 72px)!important;   /* clears the case peek */
   }
 
   /* Raise the game area and enlarge plate puzzles by ~15%. */

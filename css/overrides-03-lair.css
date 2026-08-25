@@ -54,7 +54,6 @@
 .mapRoad.missionRoad{stroke:#b48643;stroke-width:5;stroke-dasharray:3 8;opacity:.9;}
 .mapNode.mission{color:#edca7e;}
 .mapNode.mission .mapNodeDot{width:26px;height:26px;border-color:#e0ae53;background:#4a2d16;box-shadow:0 0 0 6px rgba(222,169,75,.10),0 0 20px rgba(228,173,74,.28);}
-.mapNode.mission .mapNodeDot:before{content:"1";position:absolute;inset:0;display:grid;place-items:center;color:#f4d68e;font:700 11px/1 Arial,sans-serif;}
 .mapNodeMissionType{display:block;margin-top:3px;color:#947847;font:700 9px/1 Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;}
 .mapNode.mission.current .mapNodeDot{background:#936126;border-color:#ffd77c;}
 #mapTab.mapCornerBtn{width:68px;height:68px;flex:0 0 68px;display:grid;place-items:center;padding:0;border:1px solid rgba(161,121,59,.76);border-radius:14px;background:linear-gradient(180deg,rgba(43,33,23,.94),rgba(19,15,12,.96));color:#e4c37f;box-shadow:0 8px 24px rgba(0,0,0,.30),inset 0 0 0 1px rgba(255,229,176,.04);cursor:pointer;pointer-events:auto;transition:transform .16s ease,filter .16s ease,border-color .16s ease;}

@@ -107,16 +107,34 @@ body.map-open .modeTabs .tab.active:not(#mapTab){box-shadow:none;}
 .lairOverlay{--lair-bg:url("../assets/lair/lair-background.jpg");padding:0!important;background:linear-gradient(rgba(6,5,4,.12),rgba(6,5,4,.24)),
     var(--lair-bg, none) center center/cover no-repeat!important;overflow:hidden;}
 
-/* Mission nodes: one per lock game, so they have to sit tighter than the
-   hand-placed district markers and carry their own chapter progress. */
-.mapNode.missionNode{min-width:74px;padding:34px 4px 2px;font-size:11px;z-index:9;}
-.mapNode.missionNode .mapNodeDot{top:13px;width:16px;height:16px;border-width:2px;}
-.mapNode.missionNode:hover{z-index:12;}
-.mapNode.missionNode .mapNodeLabel{display:block;text-shadow:0 1px 2px rgba(20,14,8,.85),0 0 6px rgba(20,14,8,.6);}
-.mapNodeTiers{display:flex;gap:3px;justify-content:center;margin-top:3px;}
-.mapTierPip{width:5px;height:5px;border-radius:50%;background:rgba(120,102,74,.5);box-shadow:inset 0 0 0 1px rgba(0,0,0,.4);}
-.mapTierPip.done{background:#d9a74c;}
-.mapTierPip.current{box-shadow:0 0 0 2px rgba(217,167,76,.28),inset 0 0 0 1px rgba(0,0,0,.4);}
+/* Map labels sit on light parchment, so they need their own dark plate rather
+   than a text shadow. Every node gets it — the lair and the shop read the same
+   as the games. These are prefixed with the canvas id because this file loads
+   before overrides-03-lair and overrides-06-digital, which both restyle nodes. */
+#worldMapCanvas .mapNodeLabel{display:inline-block;padding:2px 7px;border:1px solid rgba(122,95,52,.55);border-radius:7px;background:rgba(22,17,12,.88);color:#e6d2a6;font:600 11px/1.25 Arial,sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.45);text-shadow:none;white-space:nowrap;}
+#worldMapCanvas .mapNode.accessible:hover .mapNodeLabel{border-color:#d6ab5e;color:#f6e3b6;}
+#worldMapCanvas .mapNode.current .mapNodeLabel{background:rgba(74,47,19,.94);border-color:#f0c86e;color:#ffe6b4;}
+#worldMapCanvas .mapNodeLock{color:#8d7c60;text-shadow:0 1px 2px rgba(20,14,8,.8);}
+/* A locked node dimmed to .45 took its label plate down with it and became
+   unreadable against the parchment. Dim the marker, keep the name legible. */
+#worldMapCanvas .mapNode.locked{opacity:1;}
+#worldMapCanvas .mapNode.locked .mapNodeDot{opacity:.5;}
+#worldMapCanvas .mapNode.locked .mapNodeLabel{background:rgba(22,17,12,.7);border-color:rgba(104,84,52,.42);color:#a8977a;}
+
+/* One node per lock game means they sit far tighter than the old district
+   markers, so the hit box hugs its own label instead of a fixed 110px. */
+#worldMapCanvas .mapNode.missionNode{min-width:0;padding:26px 2px 2px;z-index:9;}
+#worldMapCanvas .mapNode.missionNode:hover{z-index:12;}
+#worldMapCanvas .mapNode.missionNode .mapNodeDot{top:11px;width:18px;height:18px;border-width:2px;}
+#worldMapCanvas .mapNodeTiers{display:flex;gap:3px;justify-content:center;margin-top:3px;}
+#worldMapCanvas .mapTierPip{width:5px;height:5px;border-radius:50%;background:rgba(30,23,16,.75);box-shadow:inset 0 0 0 1px rgba(196,166,110,.45);}
+#worldMapCanvas .mapTierPip.done{background:#d9a74c;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35);}
+#worldMapCanvas .mapTierPip.current{outline:1px solid rgba(240,200,110,.75);outline-offset:1px;}
+
+/* Half the width it used to take, tucked into the left corner. */
+#worldMapCanvas .worldMapInfoOverlay{width:min(470px,52%)!important;padding:9px 12px!important;}
+#worldMapCanvas .worldMapInfoOverlay .worldMapInfoTitle{font:600 14px/1.2 Georgia,serif!important;}
+#worldMapCanvas .worldMapInfoOverlay .worldMapInfoText{margin-top:3px!important;font:11px/1.3 Arial,sans-serif!important;}
 
 .mapChapterPicker{position:absolute;right:14px;top:58px;z-index:14;display:flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid rgba(120,94,52,.62);border-radius:11px;background:linear-gradient(180deg,rgba(31,25,18,.94),rgba(17,13,10,.96));box-shadow:0 8px 20px rgba(0,0,0,.42);}
 .mapChapterCaption{color:#9d8d75;font:12px/1 Arial,sans-serif;letter-spacing:.04em;}

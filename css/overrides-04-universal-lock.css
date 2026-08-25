@@ -287,3 +287,26 @@ body.game-inactive.shop-open::after,body.game-inactive.lair-open::after,body.gam
 #tensionSkinMain .pickSkinPreview{width:356px!important;height:108px!important;}
 .pickSkinCard[data-kind="tension"] .pickSkinPreview{width:46px!important;height:68px!important;max-width:46px!important;max-height:68px!important;}
 }
+
+/* Desktop: the games list slides away behind the menu button, same as on
+   phones. Scoped to a min-width query so the mobile drawer rules above, which
+   size it for a phone, are left alone. */
+@media (min-width:761px){
+  .mobileModeMenuButton{display:grid;place-items:center;position:fixed;left:14px;top:14px;z-index:410;width:42px;height:42px;padding:0;border:1px solid #8b6a35;border-radius:9px;background:linear-gradient(#302534,#17151a);color:#e0c99e;cursor:pointer;}
+  .mobileModeMenuButton:hover{border-color:#d6ab5e;color:#f3ddb1;}
+  .mobileModeMenuButton svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;}
+  .modeTabs{top:66px;z-index:400;transform:translateX(calc(-100% - 20px));transition:transform .2s cubic-bezier(.22,.78,.22,1);}
+  body.mobile-mode-menu-open .modeTabs{transform:translateX(0);}
+  .mobileModeBackdrop{display:block;position:fixed;inset:0;z-index:385;background:rgba(4,3,3,.5);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .18s ease,visibility .18s ease;}
+  body.mobile-mode-menu-open .mobileModeBackdrop{opacity:1;visibility:visible;pointer-events:auto;}
+  body.map-open .mobileModeMenuButton{display:none;}
+}
+
+/* The round reward and the balance report numbers; they are not buttons, so
+   they carry no frame. They also read as a pair, so they sit on one line and
+   size to their content rather than to the square HUD tile grid. */
+.topRightHud .economyHud{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-end!important;gap:12px!important;width:auto!important;grid-template-columns:none!important;}
+.topRightHud .economyHud .hudSquareBadge{width:auto!important;min-width:0!important;max-width:none!important;height:auto!important;padding:0!important;}
+.economyHud .rewardBox,.economyHud .balanceBox{border:0!important;background:none!important;box-shadow:none!important;}
+.economyHud .balanceBox .hudBadgeValue{display:flex;align-items:center;gap:4px;}
+.economyHud .balanceBox .coinIcon{color:#d7ab5c;font-size:.9em;}

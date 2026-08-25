@@ -45,9 +45,6 @@
 .inventoryDrawer:not(.open) .inventoryAvatar{opacity:0;}
 .inventoryAvatar img{width:100%;height:238%;object-fit:contain;object-position:50% 0%;transform:translateY(6%);filter:drop-shadow(0 8px 14px rgba(0,0,0,.38));-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 76%,rgba(0,0,0,.78) 89%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 76%,rgba(0,0,0,.78) 89%,transparent 100%);}
 .inventoryAvatar span{margin-top:28px;width:94px;height:94px;border-radius:50%;display:grid;place-items:center;color:#ead6a6;background:#181515;font:700 48px/1 Georgia,serif;}
-.inventoryBalanceBadge{position:absolute;left:calc(var(--avatar-left) + 10.8%);top:calc(var(--avatar-top) + 3%);z-index:10;display:flex;align-items:center;gap:7px;min-width:64px;height:34px;padding:0 10px 0 7px;border:1px solid rgba(161,121,59,.82);border-radius:10px;background:linear-gradient(180deg,rgba(43,33,23,.96),rgba(19,15,12,.97));box-shadow:0 7px 18px rgba(0,0,0,.34),inset 0 0 0 1px rgba(255,229,176,.04);color:#f0d497;font:700 13px/1 var(--ui-font);pointer-events:none;transition:opacity .16s ease;}
-.inventoryBalanceBadge .coinIcon{margin:0;flex:0 0 auto;}
-.inventoryDrawer:not(.open) .inventoryBalanceBadge{opacity:0;}
 body:not(.inventory-open) #objectiveLine.difficulty{bottom:48px!important;}
 body.inventory-open #objectiveLine.difficulty{opacity:0!important;pointer-events:none!important;}
 body.shop-open .inventoryDrawer,body.lair-open .inventoryDrawer,body.map-open .inventoryDrawer{opacity:0;pointer-events:none;transform:translate(calc(-50% + var(--inv-shift-x)),calc(100% + 24px));}
@@ -108,7 +105,7 @@ body.game-inactive.solved-notice-visible .solvedPuzzleOverlay{opacity:1;visibili
     width:calc(100vw - 8px)!important;
     max-width:calc(100vw - 8px)!important;
   }
-  .inventoryAvatar,.inventoryBalanceBadge{display:none!important;}
+  .inventoryAvatar{display:none!important;}
   .inventoryCaseBack,.inventoryCaseFront{background-image:none!important;}
   .inventoryCaseBack::before,.inventoryCaseBack::after,
   .inventoryCaseFront::before,.inventoryCaseFront::after{

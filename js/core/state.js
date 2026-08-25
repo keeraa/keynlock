@@ -191,6 +191,13 @@
     requestAnimationFrame(()=>{
       const r=activeTab.getBoundingClientRect();
       const h=dock.offsetHeight || 34;
+      const btn=document.querySelector('.mobileModeMenuButton');
+      if(r.right < 8 && btn){
+        const b=btn.getBoundingClientRect();
+        dock.style.left=`${Math.round(b.right + 8)}px`;
+        dock.style.top=`${Math.round(b.top + (b.height-h)/2)}px`;
+        return;
+      }
       dock.style.left=`${Math.round(r.right + 7)}px`;
       dock.style.top=`${Math.round(r.top + (r.height-h)/2)}px`;
     });

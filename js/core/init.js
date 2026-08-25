@@ -227,9 +227,10 @@
   const $modeTabsPanel=document.querySelector('.modeTabs');
   const mobileLayoutQuery=window.matchMedia('(max-width:760px), (max-height:560px) and (orientation:landscape)');
 
+  // The games list hides behind the menu button at every width now, not just
+  // on phones; the class name is kept so the mobile rules keep matching.
   function setMobileModeMenu(open){
-    const enabled=mobileLayoutQuery.matches;
-    const next=Boolean(open && enabled);
+    const next=Boolean(open);
     document.body.classList.toggle('mobile-mode-menu-open',next);
     $mobileModeMenuButton?.setAttribute('aria-expanded',next?'true':'false');
     $mobileModeBackdrop?.setAttribute('aria-hidden',next?'false':'true');

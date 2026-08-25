@@ -313,3 +313,17 @@ body.importedMode .pinTopLayer{display:none!important;}
   82%{transform:translateX(-50%) translateY(-42%) rotate(-15deg);}
   100%{transform:translateX(-50%) translateY(-40%) rotate(-14deg);}
 }
+
+/* The reward and the balance are one line of readout, not two HUD tiles: the
+   grid above pinned them into a single --mobile-hud-size column, which stacked
+   them and pushed the balance off the right edge. */
+@media (max-width:760px),(max-height:560px) and (orientation:landscape){
+  .topRightHud #economyHud{
+    grid-column:1 / 4!important;grid-row:2!important;
+    display:flex!important;flex-direction:row!important;align-items:center!important;
+    justify-content:flex-end!important;gap:10px!important;
+    width:auto!important;min-width:0!important;max-width:none!important;
+    grid-template-columns:none!important;
+  }
+  .topRightHud #economyHud .hudSquareBadge{width:auto!important;min-width:0!important;max-width:none!important;height:auto!important;padding:0!important;}
+}

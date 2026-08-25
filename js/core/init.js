@@ -168,14 +168,28 @@
       const a = (screen.orientation && screen.orientation.angle);
       return ((a == null ? (window.orientation || 0) : a) * Math.PI) / 180;
     }
+    // accelerationIncludingGravity carries the hand as well as the planet, and
+    // a hand shakes. Low-pass it so only the slow part — which is gravity, i.e.
+    // how the phone is actually being held — reaches the scene.
+    const SMOOTH = 0.09;     // share of each new sample that gets through
+    const DEADZONE = 0.022;  // fraction of g around rest that counts as still
+    let held = null;
+    const stillness = v => {
+      if(v > DEADZONE) return v - DEADZONE;
+      if(v < -DEADZONE) return v + DEADZONE;
+      return 0;
+    };
     function onMotion(e){
       const g = e.accelerationIncludingGravity;
       if(!g || g.x == null || g.z == null) return;
       const a = screenAngle(), cos = Math.cos(a), sin = Math.sin(a);
       const x = (g.x * cos + g.y * sin) / G;
       const z = -g.z / G;
-      if(!rest) rest = { x, z };
-      apply((x - rest.x) / SPAN_X, (z - rest.z) / SPAN_Y);
+      if(!held) held = { x, z };
+      held.x += (x - held.x) * SMOOTH;
+      held.z += (z - held.z) * SMOOTH;
+      if(!rest) rest = { x: held.x, z: held.z };
+      apply(stillness(held.x - rest.x) / SPAN_X, stillness(held.z - rest.z) / SPAN_Y);
     }
     // Fallback for anything without motion events.
     function onTilt(e){

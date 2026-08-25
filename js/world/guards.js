@@ -191,11 +191,15 @@
     birdEl.style.setProperty('--bird-to', fromLeft ? '108vw' : '-14vw');
     birdEl.classList.remove('passing');
     birdEl.classList.add('active');
-    const plates = document.querySelector('.platesZone');
-    if(plates){
-      const r = plates.getBoundingClientRect();
-      birdShadow.style.top = `${Math.round(r.top)}px`;
-      birdShadow.style.height = `${Math.round(r.height)}px`;
+    // Measure the plate stack, not .platesZone: the zone is a fixed 455px box
+    // with dead space below the rows, and a shadow spilling onto the backdrop
+    // there is what made it read as a background effect.
+    const rows = [...document.querySelectorAll('.plate')].map(p => p.getBoundingClientRect());
+    if(rows.length){
+      const top = Math.min(...rows.map(r => r.top));
+      const bottom = Math.max(...rows.map(r => r.bottom));
+      birdShadow.style.top = `${Math.round(top)}px`;
+      birdShadow.style.height = `${Math.round(bottom - top)}px`;
     }
     birdShadow.style.setProperty('--bird-from', fromLeft ? '-30vw' : '110vw');
     birdShadow.style.setProperty('--bird-to', fromLeft ? '110vw' : '-30vw');

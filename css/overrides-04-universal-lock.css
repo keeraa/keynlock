@@ -341,8 +341,13 @@ body.game-inactive.shop-open::after,body.game-inactive.lair-open::after,body.gam
 @keyframes birdFlap{0%,100%{scale:1 1;}50%{scale:1 .62;}}
 
 /* Its shadow crosses the plates, so the warning still reads with sound off. */
-.birdShadow{position:fixed;left:0;width:34vw;z-index:24;opacity:0;pointer-events:none;
-  background:radial-gradient(60% 50% at 50% 50%,rgba(6,5,4,.42),rgba(6,5,4,0) 72%);}
+/* multiply, not a translucent overlay: laid flat it greyed everything equally
+   and vanished against the dark backdrop. Multiplying bites hard into the lit
+   metal of the plates and barely touches the scene behind them, which is what a
+   shadow actually does. */
+.birdShadow{position:fixed;left:0;width:30vw;z-index:24;opacity:0;pointer-events:none;
+  mix-blend-mode:multiply;
+  background:radial-gradient(58% 62% at 50% 50%,rgba(24,18,10,.92),rgba(60,50,36,.55) 46%,rgba(255,255,255,0) 78%);}
 .birdShadow.active{animation:birdShadowCross 3s linear forwards;}
 @keyframes birdShadowCross{
   0%{opacity:0;transform:translateX(var(--bird-from,-30vw));}

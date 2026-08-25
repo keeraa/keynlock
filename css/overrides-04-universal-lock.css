@@ -331,7 +331,9 @@ body.game-inactive.shop-open::after,body.game-inactive.lair-open::after,body.gam
 
 /* Sky bird. The silhouette is a placeholder for real artwork — swap the svg in
    guards.js and the sizing here follows. */
-.skyBird{position:fixed;top:11vh;left:0;z-index:60;width:66px;height:26px;padding:0;border:0;background:none;color:#20160e;opacity:0;pointer-events:none;transform:translateX(var(--bird-from,-14vw));}
+/* Rides the vertical parallax: looking up walks the sky down into frame, so
+   the gesture actually shows you the bird instead of only registering. */
+.skyBird{position:fixed;top:calc(11vh + var(--bg-parallax-y,0px) * 0.6);left:0;z-index:60;width:66px;height:26px;padding:0;border:0;background:none;color:#20160e;opacity:0;pointer-events:none;transform:translateX(var(--bird-from,-14vw));}
 .skyBird svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;filter:drop-shadow(0 2px 5px rgba(0,0,0,.35));}
 .skyBird.active{opacity:.92;pointer-events:auto;animation:birdCross 3s linear forwards,birdFlap 320ms ease-in-out infinite;}
 .skyBird.passing{opacity:0;transition:opacity .3s ease;}
@@ -349,5 +351,5 @@ body.game-inactive.shop-open::after,body.game-inactive.lair-open::after,body.gam
   100%{opacity:0;transform:translateX(var(--bird-to,110vw));}
 }
 @media (max-width:760px){
-  .skyBird{width:52px;height:20px;top:9vh;}
+  .skyBird{width:52px;height:20px;top:calc(9vh + var(--bg-parallax-y,0px) * 0.6);}
 }

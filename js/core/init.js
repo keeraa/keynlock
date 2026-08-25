@@ -141,8 +141,14 @@
   // gesture rather than an incidental one.
   (function bindTiltParallax(){
     const TILT_SPAN = 22;   // degrees, for the Euler fallback
-    const SPAN = 0.34;      // fraction of g that reaches the full sweep
-    const TILT_X = 38, TILT_Y = 30;
+    // Vertical gets the longer throw and the shorter span: looking up and
+    // ducking are the deliberate moves, so they should cost less tilt and show
+    // more travel than an idle sideways lean.
+    const SPAN_X = 0.34;    // fraction of g that reaches the full sweep
+    const SPAN_Y = 0.24;
+    const TILT_X = 38, TILT_Y = 58;
+    // The bird check needs to know how far up "all the way up" is.
+    window.TILT_SWEEP_Y = TILT_Y;
     let rest = null;
     const clamp = v => v < -1 ? -1 : v > 1 ? 1 : v;
 
@@ -155,7 +161,7 @@
       pointerTargetX = clamp(nx) * TILT_X;
       pointerTargetY = clamp(ny) * TILT_Y;
       bgParallaxTargetX = -clamp(nx) * innerWidth * 0.055;
-      bgParallaxTargetY = -clamp(ny) * innerHeight * 0.055;
+      bgParallaxTargetY = -clamp(ny) * innerHeight * 0.090;
     }
     // Device axes are fixed to the hardware, so undo the screen rotation.
     function screenAngle(){
@@ -169,7 +175,7 @@
       const x = (g.x * cos + g.y * sin) / G;
       const z = -g.z / G;
       if(!rest) rest = { x, z };
-      apply((x - rest.x) / SPAN, (z - rest.z) / SPAN);
+      apply((x - rest.x) / SPAN_X, (z - rest.z) / SPAN_Y);
     }
     // Fallback for anything without motion events.
     function onTilt(e){

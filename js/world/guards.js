@@ -245,7 +245,7 @@
     if(!birdTiltLayout.matches) return;
     birdLookTimer = setInterval(() => {
       if(birdState !== 'warning'){ clearInterval(birdLookTimer); return; }
-      if(pointerTargetY <= BIRD_LOOK_UP * 30) noticeBird();
+      if(pointerTargetY <= BIRD_LOOK_UP * (window.TILT_SWEEP_Y || 30)) noticeBird();
     }, 60);
   }
 

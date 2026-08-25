@@ -27,6 +27,11 @@
       .filter(Boolean)
       .sort((a,b)=>a.dist-b.dist);
   }
+  // The outside-click guard needs the same answer this module uses: tension art
+  // is 176px wide and reaches well past the case, so a press on a perfectly
+  // visible tool can land outside the drawer box and read as "outside".
+  window.inventoryToolAtPoint=(x,y)=>candidates(x,y)[0]?.btn || null;
+
   let hovered=null;
   function setHovered(btn){
     if(hovered===btn) return;

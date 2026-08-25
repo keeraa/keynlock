@@ -102,6 +102,7 @@
         const currentRoot=document.querySelector('#inventoryDrawer');
         if(!currentRoot || !currentRoot.classList.contains('open')) return;
         if(currentRoot.contains(e.target)) return;
+        if(window.inventoryToolAtPoint?.(e.clientX,e.clientY)) return;
         setInventoryOpen(false);
       },true);
       initInventoryDrawer._outsideBound = true;

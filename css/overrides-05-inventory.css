@@ -6,6 +6,11 @@
 /* While closed, every visible pixel of the case opens it — the strip grows with
    the approach lift so the hit area always matches what is actually on screen. */
 .inventoryDrawer:not(.open) .inventoryToggle{left:0;width:100%;height:calc(var(--inv-peek) + var(--inv-approach, 0px));transform:none;}
+/* Open, the strip sits between the rails instead of across them. It paints above
+   the tools, and the tension art reaches up into it, so a wider strip swallowed
+   presses aimed at four of the five tensioners and shut the case. Pick art ends
+   at 15.6% and tension art starts at 48.6%, so this band touches neither. */
+.inventoryDrawer.open .inventoryToggle{left:32%;width:30%;}
 .inventoryToggle::after{position:absolute;left:50%;top:10px;width:96px;height:5px;border-radius:99px;transform:translateX(-50%);background:rgba(221,190,123,.72);box-shadow:0 1px 0 rgba(255,238,197,.18),0 3px 8px rgba(0,0,0,.34);opacity:.72;transition:opacity .15s ease,transform .15s ease;}
 .inventoryToggle:hover::after,.inventoryDrawer:not(.open):hover .inventoryToggle::after{opacity:1;transform:translateX(-50%) translateY(-3px);}
 .inventoryToggle::after{display:none!important;content:none!important;}

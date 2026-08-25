@@ -80,11 +80,14 @@
   position:absolute;width:520px;height:97px;left:50%;top:0;
   transform-origin:50% 50%;
   transform:translate3d(calc(-50% + var(--dx) + (var(--px) * var(--parx))),calc(var(--dy) + (var(--py) * var(--pary))),0);
+  /* Must match .plate exactly: the parallax loop writes --px/--py to both layers
+     every frame, so a different transition makes the pins drift off the plates. */
+  transition:transform 363ms cubic-bezier(.18,.82,.2,1);
   pointer-events:none;
   will-change:transform;
   backface-visibility:hidden;
 }
-.pinTopPlate.selected{transform:translate3d(calc(-50% + var(--dx)),var(--dy),0) scale(1.01);}
+.pinTopPlate.selected{transform:translate3d(calc(-50% + var(--dx) + (var(--px) * var(--parx))),calc(var(--dy) + (var(--py) * var(--pary))),0) scale(1.01);}
 .pinTopPin{
   position:absolute;left:0;
   width:60.64px!important;height:113px!important;

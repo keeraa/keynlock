@@ -2,6 +2,14 @@
 (function(){
   const PAD=14;
   function root(){ return document.querySelector('#inventoryDrawer'); }
+  // The hovered/selected tool lifts its artwork by --tool-lift. Hit testing has to
+  // undo that lift, or the lifted tool slides out from under the pointer and the
+  // hover flickers on and off as it bounces back.
+  function restingBox(btn,img){
+    const b=img.getBoundingClientRect();
+    const lift=parseFloat(getComputedStyle(btn).getPropertyValue('--tool-lift'))||0;
+    return {left:b.left, right:b.right, top:b.top+lift, bottom:b.bottom+lift};
+  }
   function candidates(x,y){
     const r=root();
     if(!r) return [];
@@ -9,7 +17,7 @@
       .map(btn=>{
         const img=btn.querySelector('img');
         if(!img) return null;
-        const b=img.getBoundingClientRect();
+        const b=restingBox(btn,img);
         const inside=x>=b.left-PAD && x<=b.right+PAD && y>=b.top-PAD && y<=b.bottom+PAD;
         if(!inside) return null;
         const cx=(b.left+b.right)/2, cy=(b.top+b.bottom)/2;
@@ -19,15 +27,17 @@
       .filter(Boolean)
       .sort((a,b)=>a.dist-b.dist);
   }
-  function clearVisualHover(){
-    root()?.querySelectorAll('.inventoryTool.visual-hover').forEach(el=>el.classList.remove('visual-hover'));
+  let hovered=null;
+  function setHovered(btn){
+    if(hovered===btn) return;
+    hovered?.classList.remove('visual-hover');
+    hovered=btn||null;
+    hovered?.classList.add('visual-hover');
   }
+  function clearVisualHover(){ setHovered(null); }
   document.addEventListener('pointermove',e=>{
-    const r=root();
-    if(!r){ return; }
-    clearVisualHover();
-    const hit=candidates(e.clientX,e.clientY)[0];
-    if(hit) hit.btn.classList.add('visual-hover');
+    if(!root()) return;
+    setHovered(candidates(e.clientX,e.clientY)[0]?.btn || null);
   },{passive:true});
   document.addEventListener('pointerleave',clearVisualHover,{passive:true});
 
@@ -390,4 +400,60 @@
   rebuildPlates();
   render();
   updateMechanismAssetHud();
+})();
+
+/* v260 — pointer proximity: the inventory eases out and the lock warms up as the
+   cursor approaches, instead of snapping on a binary :hover. */
+(function(){
+  const INV_REACH=260;   // px above the drawer where the lift starts
+  const INV_LIFT=30;     // px of extra peek at full approach
+  const LOCK_REACH=300;  // px around the lock hit area where the glow starts
+
+  let px=0, py=0, queued=false, seen=false;
+
+  const clamp01=v=>v<0?0:v>1?1:v;
+  // Distance from the pointer to a rect, zero once inside it.
+  function gapTo(r){
+    const dx=Math.max(r.left-px, 0, px-r.right);
+    const dy=Math.max(r.top-py, 0, py-r.bottom);
+    return Math.hypot(dx,dy);
+  }
+  // Ease so the last stretch of the approach moves more than the first.
+  const ease=t=>t*t*(3-2*t);
+
+  function apply(){
+    queued=false;
+    const drawer=document.querySelector('#inventoryDrawer');
+    if(drawer){
+      if(drawer.classList.contains('open') || !seen){
+        drawer.style.setProperty('--inv-approach','0px');
+      } else {
+        const r=drawer.getBoundingClientRect();
+        // Measure to the resting edge, not the lifted one, so the drawer cannot
+        // chase its own movement. Spread the rect field by field — DOMRect keeps
+        // its values on the prototype, so {...rect} comes out empty.
+        const lift=parseFloat(drawer.style.getPropertyValue('--inv-approach'))||0;
+        const t=ease(clamp01(1 - gapTo({left:r.left,right:r.right,top:r.top+lift,bottom:r.bottom+lift})/INV_REACH));
+        drawer.style.setProperty('--inv-approach',`${(t*INV_LIFT).toFixed(2)}px`);
+      }
+    }
+
+    const lock=document.querySelector('#lock.universalLockBlock');
+    if(lock){
+      const hit=lock.querySelector('.lockHitArea');
+      const r=(hit||lock).getBoundingClientRect();
+      const t=seen ? ease(clamp01(1 - gapTo(r)/LOCK_REACH)) : 0;
+      lock.style.setProperty('--lock-glow',t.toFixed(3));
+    }
+  }
+  function schedule(){ if(!queued){ queued=true; requestAnimationFrame(apply); } }
+
+  document.addEventListener('pointermove',e=>{
+    if(e.pointerType==='touch') return;
+    px=e.clientX; py=e.clientY; seen=true; schedule();
+  },{passive:true});
+  document.addEventListener('pointerleave',()=>{ seen=false; schedule(); },{passive:true});
+  window.addEventListener('blur',()=>{ seen=false; schedule(); });
+  window.addEventListener('scroll',schedule,{passive:true});
+  window.addEventListener('resize',schedule,{passive:true});
 })();

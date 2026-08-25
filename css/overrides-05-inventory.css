@@ -1,6 +1,7 @@
-.inventoryDrawer{--inv-peek:38px;--inv-shift-x:10%;--inv-open-y:10%;--case-body-center-x:40.5%;--pick-rail-left:calc(3.368% - 5px - 0.414%);--pick-rail-width:21.50571264%;--tension-rail-left:53.8%;--tension-rail-width:22.902672%;--avatar-left:25.7%;--avatar-top:10.5%;--avatar-width:35.5%;--avatar-height:82.8%;position:fixed;left:50%;bottom:0;width:min(1180px,calc(100vw - 48px));max-width:calc(100vw - 48px);aspect-ratio:1436 / 344;z-index:215;overflow:visible;user-select:none;transform:translate(calc(-50% + var(--inv-shift-x)),calc(100% - var(--inv-peek)));transition:transform .34s cubic-bezier(.22,.78,.22,1),opacity .18s ease,filter .18s ease;}
+.inventoryDrawer{--inv-peek:56px;--inv-shift-x:10%;--inv-open-y:10%;--case-body-center-x:40.5%;--pick-rail-left:calc(3.368% - 5px - 0.414%);--pick-rail-width:21.50571264%;--tension-rail-left:53.8%;--tension-rail-width:22.902672%;--avatar-left:25.7%;--avatar-top:10.5%;--avatar-width:35.5%;--avatar-height:82.8%;position:fixed;left:50%;bottom:0;width:min(1180px,calc(100vw - 48px));max-width:calc(100vw - 48px);aspect-ratio:1436 / 344;z-index:215;overflow:visible;user-select:none;transform:translate(calc(-50% + var(--inv-shift-x)),calc(100% - var(--inv-peek) - var(--inv-approach, 0px)));transition:transform .34s cubic-bezier(.22,.78,.22,1),opacity .18s ease,filter .18s ease;}
+.inventoryDrawer:not(.open){transition:transform .16s cubic-bezier(.22,.78,.22,1),opacity .18s ease,filter .18s ease;}
 .inventoryDrawer.open{transform:translate(calc(-50% + var(--inv-shift-x)),var(--inv-open-y));}
-.inventoryDrawer:not(.open):hover{transform:translate(calc(-50% + var(--inv-shift-x)),calc(100% - var(--inv-peek) - 12px));filter:brightness(1.05);}
+.inventoryDrawer:not(.open):hover{filter:brightness(1.05);}
 .inventoryToggle{position:absolute;z-index:7;left:var(--case-body-center-x);top:0;width:50%;height:var(--inv-peek);padding:0;border:0;background:transparent;cursor:pointer;transform:translateX(-50%);}
 .inventoryToggle::after{position:absolute;left:50%;top:10px;width:96px;height:5px;border-radius:99px;transform:translateX(-50%);background:rgba(221,190,123,.72);box-shadow:0 1px 0 rgba(255,238,197,.18),0 3px 8px rgba(0,0,0,.34);opacity:.72;transition:opacity .15s ease,transform .15s ease;}
 .inventoryToggle:hover::after,.inventoryDrawer:not(.open):hover .inventoryToggle::after{opacity:1;transform:translateX(-50%) translateY(-3px);}
@@ -17,10 +18,18 @@
 .inventoryTool.breaking-out{opacity:0;pointer-events:none;transform:translateY(-18px) scale(.92);}
 .inventoryTool.breaking-out img{filter:drop-shadow(0 7px 8px rgba(0,0,0,.30));}
 .inventoryTool img{position:absolute;display:block;max-width:none;max-height:none;object-fit:contain;pointer-events:auto;cursor:pointer;filter:drop-shadow(0 7px 8px rgba(0,0,0,.44));}
-.inventoryTool-pick img{left:50%;bottom:35.459%;width:107.552942%;height:109.704%;transform:translateX(-50%) rotate(180deg);transform-origin:50% 50%;}
-.inventoryTool-tension img{left:50%;bottom:34%;width:294.117647%;height:100%;transform:translateX(-50%) rotate(90deg);transform-origin:50% 50%;}
-.inventoryTool.visual-hover,.inventoryTool:hover,.inventoryTool.selected{transform:translateY(-9px);z-index:8;}
-.inventoryTool.visual-hover,.inventoryTool:hover{filter:brightness(1.08);}
+.inventoryTool-pick img{left:50%;bottom:35.459%;width:107.552942%;height:109.704%;transform:translateX(-50%) translateY(calc(-1 * var(--tool-lift))) rotate(180deg);transform-origin:50% 50%;}
+.inventoryTool-tension img{left:50%;bottom:34%;width:294.117647%;height:100%;transform:translateX(-50%) translateY(calc(-1 * var(--tool-lift))) rotate(90deg);transform-origin:50% 50%;}
+/* The lift is folded into each image's own transform, never applied to the
+   button: lifting the button moved it out from under the pointer, which dropped
+   the hover, which put it back — the tools visibly juddered. The button box now
+   never moves, and --tool-lift is the single source of truth that the hit test
+   reads back to undo the lift. */
+.inventoryTool{--tool-lift:0px;}
+.inventoryTool.visual-hover,.inventoryTool.selected{--tool-lift:9px;z-index:8;}
+.inventoryToolsTension .inventoryTool.selected{--tool-lift:20px;}
+.inventoryTool img{transition:transform .17s ease,filter .17s ease;}
+.inventoryTool.visual-hover{filter:brightness(1.08);}
 .inventoryTool.selected img{filter:drop-shadow(0 8px 10px rgba(0,0,0,.46)) drop-shadow(0 0 10px rgba(226,188,101,.34));}
 .inventoryDrawer,.inventoryContents,.inventoryToggle,.inventoryTool{-webkit-tap-highlight-color:transparent;}
 .inventoryToggle:focus,.inventoryToggle:focus-visible,.inventoryTool:focus,.inventoryTool:focus-visible,.inventoryDrawer:focus,.inventoryDrawer:focus-visible,.inventoryContents:focus,.inventoryContents:focus-visible{outline:none!important;box-shadow:none!important;}
@@ -36,22 +45,23 @@ body.inventory-open #objectiveLine.difficulty{opacity:0!important;pointer-events
 body.shop-open .inventoryDrawer,body.lair-open .inventoryDrawer,body.map-open .inventoryDrawer{opacity:0;pointer-events:none;transform:translate(calc(-50% + var(--inv-shift-x)),calc(100% + 24px));}
 body.game-inactive .inventoryDrawer{filter:saturate(.6) brightness(.76);pointer-events:none;}
 @media (max-width:960px){
-.inventoryDrawer{--inv-peek:34px;width:min(92vw,calc(100vw - 28px));max-width:calc(100vw - 28px);}
+.inventoryDrawer{--inv-peek:48px;width:min(92vw,calc(100vw - 28px));max-width:calc(100vw - 28px);}
 .inventoryAvatar{height:81.6%;}
 .inventoryAvatar img{height:238%;transform:translateY(6%);}
 body:not(.inventory-open) #objectiveLine.difficulty{bottom:42px!important;}
 }
 @media (max-width:760px){
-.inventoryDrawer{--inv-peek:30px;--inv-open-y:8%;--pick-rail-left:calc(3.368% + 3px - 0.414%);width:min(96vw,calc(100vw - 16px));max-width:calc(100vw - 16px);}
+.inventoryDrawer{--inv-peek:42px;--inv-open-y:8%;--pick-rail-left:calc(3.368% + 3px - 0.414%);width:min(96vw,calc(100vw - 16px));max-width:calc(100vw - 16px);}
 .inventoryToggle::after{top:8px;width:72px;height:4px;}
 .inventoryAvatar{top:10%;height:80.4%;}
 .inventoryAvatar img{height:228%;transform:translateY(6%);}
 body:not(.inventory-open) #objectiveLine.difficulty{bottom:38px!important;}
 }
 #lock.universalLockBlock,body:not(.importedMode) #lock.universalLockBlock,body.importedMode #lock.universalLockBlock,.scene.hideBase #lock.universalLockBlock{transform:translateX(-50%) scale(var(--template-lock-scale)) translateY(12%)!important;}
-#lock.universalLockBlock .lockPanel,#lock.universalLockBlock>.mechanismZone::before{transition:filter .34s cubic-bezier(.22,.84,.22,1), opacity .34s cubic-bezier(.22,.84,.22,1)!important;}
-#lock.universalLockBlock:has(.lockHitArea:hover) .lockPanel,#lock.universalLockBlock:has(.lockHitArea:focus-visible) .lockPanel,#lock.universalLockBlock:has(.lockHitArea:focus) .lockPanel{filter:brightness(1.18) saturate(1.07) drop-shadow(0 16px 20px rgba(0,0,0,.42))!important;}
-#lock.universalLockBlock:has(.lockHitArea:hover)>.mechanismZone::before,#lock.universalLockBlock:has(.lockHitArea:focus-visible)>.mechanismZone::before,#lock.universalLockBlock:has(.lockHitArea:focus)>.mechanismZone::before{filter:brightness(1.18) saturate(1.07) drop-shadow(0 9px 12px rgba(0,0,0,.18))!important;}
+#lock.universalLockBlock{--lock-glow:0;}
+#lock.universalLockBlock .lockPanel,#lock.universalLockBlock>.mechanismZone::before{transition:filter .18s cubic-bezier(.22,.84,.22,1), opacity .34s cubic-bezier(.22,.84,.22,1)!important;}
+#lock.universalLockBlock .lockPanel{filter:brightness(calc(1 + .18 * var(--lock-glow))) saturate(calc(1 + .07 * var(--lock-glow))) drop-shadow(0 16px 20px rgba(0,0,0,.42)) drop-shadow(0 0 calc(18px * var(--lock-glow)) rgba(236,192,96,calc(.16 * var(--lock-glow))))!important;}
+#lock.universalLockBlock>.mechanismZone::before{filter:brightness(calc(1 + .18 * var(--lock-glow))) saturate(calc(1 + .07 * var(--lock-glow))) drop-shadow(0 9px 12px rgba(0,0,0,.18)) drop-shadow(0 0 calc(16px * var(--lock-glow)) rgba(236,192,96,calc(.14 * var(--lock-glow))))!important;}
 body.game-inactive .scene{filter:none!important;}
 body.game-inactive::after{content:"";position:fixed;inset:0;z-index:55!important;background:rgba(3,3,5,.58)!important;pointer-events:auto;}
 body.game-inactive #lock.universalLockBlock{z-index:65!important;}

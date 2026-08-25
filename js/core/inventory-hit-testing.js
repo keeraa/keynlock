@@ -17,10 +17,15 @@
       .map(btn=>{
         const img=btn.querySelector('img');
         if(!img) return null;
+        // Horizontally the tool owns its grid column and no more. A tensioner is
+        // drawn rotated, so its axis-aligned box runs three cells wide and used
+        // to start reacting from over by the avatar's head. Vertically the art
+        // box still rules, so tall handles stay reachable above their pocket.
+        const cell=btn.getBoundingClientRect();
+        if(x<cell.left-PAD || x>cell.right+PAD) return null;
         const b=restingBox(btn,img);
-        const inside=x>=b.left-PAD && x<=b.right+PAD && y>=b.top-PAD && y<=b.bottom+PAD;
-        if(!inside) return null;
-        const cx=(b.left+b.right)/2, cy=(b.top+b.bottom)/2;
+        if(y<b.top-PAD || y>b.bottom+PAD) return null;
+        const cx=(cell.left+cell.right)/2, cy=(b.top+b.bottom)/2;
         const dx=x-cx, dy=y-cy;
         return {btn,dist:dx*dx+dy*dy};
       })
@@ -463,6 +468,7 @@
   const INV_REACH=260;   // px above the drawer where the lift starts
   const INV_LIFT=30;     // px of extra peek at full approach
   const INV_HOLD=650;    // ms the drawer stays out after the pointer leaves
+  const INV_RETRACT_RATE=0.12; // per frame, how fast it eases back once it does
   const LOCK_REACH=300;  // px around the lock hit area where the glow starts
 
   let px=0, py=0, queued=false, seen=false;
@@ -504,24 +510,32 @@
       lock.style.setProperty('--lock-glow',t.toFixed(3));
     }
   }
-  // Coming out is immediate, going back in waits: a stray flick of the cursor
-  // should not slam the drawer shut the moment it clips the edge of the reach.
+  // Coming out is immediate; going back in waits out a grace period and then
+  // eases, so the drawer withdraws as smoothly as it came and a stray flick of
+  // the cursor cannot slam it shut.
   function setApproach(drawer, next, current){
+    const write=v=>drawer.style.setProperty('--inv-approach',`${v.toFixed(2)}px`);
     if(next>=current-0.01){
       retractAt=0;
-      drawer.style.setProperty('--inv-approach',`${next.toFixed(2)}px`);
+      write(next);
       return;
     }
     const now=performance.now();
     if(!retractAt) retractAt=now+INV_HOLD;
-    if(now>=retractAt){
-      retractAt=0;
-      drawer.style.setProperty('--inv-approach',`${next.toFixed(2)}px`);
+    if(now<retractAt){
+      // Nothing else will wake us if the pointer has come to rest.
+      clearTimeout(holdTimer);
+      holdTimer=setTimeout(schedule, retractAt-now+16);
       return;
     }
-    // Nothing else will wake us if the pointer has come to rest.
+    // Ease toward the target instead of dropping onto it: after a hold the
+    // pointer is usually already far, and a single step would snap the drawer
+    // back however gently it eased out.
+    const eased=current+(next-current)*INV_RETRACT_RATE;
+    if(Math.abs(next-eased)<0.4){ retractAt=0; write(next); return; }
+    write(eased);
     clearTimeout(holdTimer);
-    holdTimer=setTimeout(schedule, retractAt-now+16);
+    holdTimer=setTimeout(schedule, 16);
   }
   function schedule(){ if(!queued){ queued=true; requestAnimationFrame(apply); } }
 

@@ -46,18 +46,62 @@
   },{passive:true});
   document.addEventListener('pointerleave',clearVisualHover,{passive:true});
 
+  // Closed, the grab strip covers the whole peek so any press opens the case —
+  // but a press on a tool that is plainly sticking out of a pocket belongs to
+  // that tool. Claim by grid column rather than by image box: tension art is
+  // three cells wide, so its box alone would swallow most of the right half.
+  function toolInPeek(x,y){
+    const r=root();
+    if(!r) return null;
+    const strip=r.getBoundingClientRect();
+    if(y<strip.top || y>window.innerHeight) return null;
+    let best=null;
+    for(const btn of r.querySelectorAll('.inventoryTool:not(.hidden-slot):not(.breaking-out):not(:disabled)')){
+      const img=btn.querySelector('img');
+      if(!img) continue;
+      const cell=btn.getBoundingClientRect();
+      if(x<cell.left-PAD || x>cell.right+PAD) continue;
+      const art=restingBox(btn,img);
+      if(y<art.top || y>art.bottom) continue;
+      const d=Math.abs(x-(cell.left+cell.right)/2);
+      if(!best || d<best.d) best={btn,d};
+    }
+    return best?.btn || null;
+  }
+
   // Keep enlarged tool images clickable outside their narrow grid cells.
+  let peekPressAt=0;
   document.addEventListener('pointerdown',e=>{
+    peekPressAt=0;
     const r=root();
     if(!r || !r.contains(e.target)) return;
-    if(e.target.closest('.inventoryToggle')) return;
     if(e.target.closest('.inventoryTool')) return;
+    if(e.target.closest('.inventoryToggle')){
+      if(r.classList.contains('open')) return;
+      const tool=toolInPeek(e.clientX,e.clientY);
+      if(!tool) return;
+      e.preventDefault();
+      e.stopPropagation();
+      peekPressAt=e.timeStamp||performance.now();
+      tool.click();
+      return;
+    }
     const hit=candidates(e.clientX,e.clientY)[0];
     if(hit){
       e.preventDefault();
       e.stopPropagation();
       hit.btn.click();
     }
+  },true);
+  // pointerdown cannot cancel the click the toggle button still emits after it.
+  // Only the toggle's own click clears the flag: routing to a tool fires that
+  // tool's click first, and that one must not consume it.
+  document.addEventListener('click',e=>{
+    if(!peekPressAt) return;
+    if(!e.target.closest?.('.inventoryToggle')) return;
+    peekPressAt=0;
+    e.preventDefault();
+    e.stopImmediatePropagation();
   },true);
 })();
 

@@ -138,7 +138,8 @@
 
   const BIRD_GAP_MIN = 14000;    // ms between sightings, low end
   const BIRD_GAP_MAX = 26000;    // ...and high end
-  const BIRD_WARN_MS = 2600;     // how long you have to notice it
+  const BIRD_WARN_MS = 5200;     // how long it circles before it comes down
+  const BIRD_HOLD_MS = 1500;     // how long you have to keep watching it
   const BIRD_NOISE_HIT = 0.60;   // what an unnoticed bird costs
   const BIRD_LOOK_UP = -0.55;    // share of the upward sweep that counts as looking up
 
@@ -150,6 +151,7 @@
   let birdEl = null, birdShadow = null;
   let birdState = 'idle';        // idle | warning
   let birdTimer = 0, birdDeadline = 0;
+  let birdWatchedMs = 0;         // how long it has been held in view
 
   function buildBird(){
     if(birdEl) return;
@@ -162,7 +164,10 @@
     birdEl.innerHTML = '<svg viewBox="0 0 64 24" aria-hidden="true">'
       + '<path d="M2 18 C12 4 22 4 32 14 C42 4 52 4 62 18" />'
       + '</svg>';
-    birdEl.addEventListener('click', () => noticeBird('click'));
+    // On a desktop watching means keeping the cursor on it, which is the same
+    // "hold your attention there" the tilt asks for rather than a stray click.
+    birdEl.addEventListener('pointerenter', () => { birdHovered = true; });
+    birdEl.addEventListener('pointerleave', () => { birdHovered = false; });
     document.body.appendChild(birdEl);
 
     birdShadow = document.createElement('div');
@@ -179,9 +184,13 @@
     birdTimer = setTimeout(sendBird, gap);
   }
 
+  let birdHovered = false;
+
   function sendBird(){
     if(!birdsActive()){ scheduleBird(); return; }
     birdState = 'warning';
+    birdWatchedMs = 0;
+    birdHovered = false;
     birdDeadline = performance.now() + BIRD_WARN_MS;
 
     // Fly it across the sky above the lock, and drag its shadow over the plates
@@ -213,6 +222,10 @@
 
   function endBird(passed){
     birdState = 'idle';
+    birdWatchedMs = 0;
+    birdHovered = false;
+    birdEl.classList.remove('watched');
+    birdEl.style.removeProperty('--bird-watch');
     birdEl.classList.toggle('passing', passed);
     birdEl.classList.remove('active');
     birdShadow.classList.remove('active');
@@ -223,7 +236,7 @@
 
   function noticeBird(){
     if(birdState !== 'warning') return;
-    toast('Птица прошла мимо');
+    toast('Птица улетела');
     endBird(true);
   }
 
@@ -243,14 +256,30 @@
   // top of the device tips away from you, which drives pointerTargetY negative.
   // Polled on a timer rather than rAF — this has a deadline, and rAF stops
   // whenever the page is not compositing.
-  let birdLookTimer = 0;
+  // Glancing up is not enough — you have to keep looking, which is what makes
+  // it a real interruption rather than a reflex. Time spent watching is
+  // accumulated, so looking away and back still counts.
+  const BIRD_TICK = 60;
+  let birdLookTimer = 0, birdLookLast = 0;
   function watchForLookUp(){
     clearInterval(birdLookTimer);
-    if(!birdTiltLayout.matches) return;
+    birdLookLast = performance.now();
     birdLookTimer = setInterval(() => {
       if(birdState !== 'warning'){ clearInterval(birdLookTimer); return; }
-      if(pointerTargetY <= BIRD_LOOK_UP * (window.TILT_SWEEP_Y || 30)) noticeBird();
-    }, 60);
+      // Count real elapsed time, not one tick per callback: timers stretch when
+      // the page is busy, and a stretched tick would otherwise steal from the
+      // player's hold.
+      const now = performance.now();
+      const dt = Math.min(250, now - birdLookLast);
+      birdLookLast = now;
+      const lookingUp = birdTiltLayout.matches
+        && pointerTargetY <= BIRD_LOOK_UP * (window.TILT_SWEEP_Y || 30);
+      const watching = lookingUp || birdHovered;
+      if(watching) birdWatchedMs += dt;
+      birdEl.classList.toggle('watched', watching);
+      birdEl.style.setProperty('--bird-watch', Math.min(1, birdWatchedMs / BIRD_HOLD_MS).toFixed(3));
+      if(birdWatchedMs >= BIRD_HOLD_MS) noticeBird();
+    }, BIRD_TICK);
   }
 
   buildBird();

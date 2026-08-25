@@ -173,6 +173,7 @@
     // how the phone is actually being held — reaches the scene.
     const SMOOTH = 0.09;     // share of each new sample that gets through
     const DEADZONE = 0.022;  // fraction of g around rest that counts as still
+    const REST_DRIFT = 0.0015; // how fast neutral follows the way you hold it
     let held = null;
     const stillness = v => {
       if(v > DEADZONE) return v - DEADZONE;
@@ -190,6 +191,13 @@
       held.z += (z - held.z) * SMOOTH;
       if(!rest) rest = { x: held.x, z: held.z };
       apply(stillness(held.x - rest.x) / SPAN_X, stillness(held.z - rest.z) / SPAN_Y);
+      // Neutral creeps towards however the phone is being held now. Fixed once
+      // at the first sample it would be wrong for the whole session if that
+      // sample caught a movement, or if the player later sits up or lies down —
+      // the scene would hang off-centre with no way back. Slow enough that a
+      // deliberate look lasting a second or two survives it.
+      rest.x += (held.x - rest.x) * REST_DRIFT;
+      rest.z += (held.z - rest.z) * REST_DRIFT;
     }
     // Fallback for anything without motion events.
     function onTilt(e){

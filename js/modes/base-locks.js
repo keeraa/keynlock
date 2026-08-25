@@ -55,7 +55,7 @@ let plateEls=[], pinTopPlateEls=[];
   function rebuildPlates(){
     plateEls=[];
     pinTopPlateEls=[];
-    const spacing = n===3 ? 106 : n===4 ? 78 : n===5 ? 78 : 74;
+    const spacing = n===3 ? 118 : n===4 ? 88 : n===5 ? 88 : 84;
     const pinSkin=currentPinSkin();
     const plateSkin=currentPlateSkin();
     const pinImage=cssUrl(pinSkin);

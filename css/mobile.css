@@ -123,7 +123,7 @@ body.importedMode .pinTopLayer{display:none!important;}
 @media (max-width:760px) and (orientation:portrait){
   :root{
     --template-lock-top:calc(var(--mobile-safe-top) + 78px)!important;
-    --template-puzzle-top:calc(var(--mobile-safe-top) + 220px)!important;
+    --template-puzzle-top:calc(var(--mobile-safe-top) + 252px)!important;
     --template-puzzle-bottom:calc(var(--mobile-safe-bottom) + 190px)!important;
   }
 

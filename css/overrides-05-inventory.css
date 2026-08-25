@@ -85,6 +85,43 @@ body.game-inactive.solved-notice-visible .solvedPuzzleOverlay{opacity:1;visibili
 .solvedPuzzleButton{margin-top:7px;min-width:220px;min-height:44px;padding:10px 18px;border:1px solid #b98942;border-radius:10px;background:linear-gradient(180deg,#4c3820,#2a1f16);color:#f0d39c;box-shadow:inset 0 0 0 1px rgba(255,229,177,.06),0 8px 20px rgba(0,0,0,.28);font:700 13px/1 var(--ui-font);letter-spacing:.05em;cursor:pointer;transition:filter .15s ease, transform .15s ease, border-color .15s ease;pointer-events:auto;}
 .solvedPuzzleButton:hover{filter:brightness(1.18);border-color:#d2a75d;transform:translateY(-1px);}
 .solvedPuzzleButton:active{transform:translateY(0);}
+
+/* Mobile: most of the case is a plain middle panel carrying the avatar, plus a
+   decorative strap on the right — between them they left the two tool rails
+   tiny on a phone. mobile.css used to blow the whole sheet up to 136vw so the
+   useful middle filled the screen, which pushed the right rail off the edge.
+   Cut instead: keep source 0-32% and 50-82%, dropping the middle panel and the
+   strap while keeping the case body's own rounded ends. 64% of the art remains,
+   so the whole case fits on screen and every tool still gets bigger. */
+@media (max-width:760px){
+  /* mobile.css loads after this file and still carries the old 136vw blow-up,
+     so match it on priority and beat it on specificity. */
+  .inventoryDrawer.inventoryDrawer{
+    --inv-shift-x:0%;
+    --pick-rail-left:4.62%;
+    --pick-rail-width:33.60%;
+    --tension-rail-left:55.94%;
+    --tension-rail-width:35.79%;
+    --inv-peek:52px!important;
+    --inv-open-y:5%!important;
+    aspect-ratio:919 / 344;
+    width:calc(100vw - 8px)!important;
+    max-width:calc(100vw - 8px)!important;
+  }
+  .inventoryAvatar,.inventoryBalanceBadge{display:none!important;}
+  .inventoryCaseBack,.inventoryCaseFront{background-image:none!important;}
+  .inventoryCaseBack::before,.inventoryCaseBack::after,
+  .inventoryCaseFront::before,.inventoryCaseFront::after{
+    content:"";position:absolute;top:0;bottom:0;background-repeat:no-repeat;
+  }
+  .inventoryCaseBack::before{left:0;width:50.00%;background-image:url("../assets/inventory/lockpick-case-back.png");background-size:312.5% 100%;background-position:0.00% top;}
+  .inventoryCaseBack::after{right:0;width:50.00%;background-image:url("../assets/inventory/lockpick-case-back.png");background-size:312.5% 100%;background-position:73.53% top;}
+  .inventoryCaseFront::before{left:0;width:50.00%;background-image:url("../assets/inventory/lockpick-case-front.png");background-size:312.5% auto;background-position:0.00% bottom;}
+  .inventoryCaseFront::after{right:0;width:50.00%;background-image:url("../assets/inventory/lockpick-case-front.png");background-size:312.5% auto;background-position:73.53% bottom;}
+  /* Rails land at 4.6-38.2% and 55.9-91.7%, so the strip goes between them. */
+  .inventoryDrawer.open .inventoryToggle{left:39%;width:16%;transform:none;}
+}
+
 @media (max-width:760px),(max-height:560px) and (orientation:landscape){
 .topRightHud{width:calc(var(--mobile-hud-size) * 3 + 6px)!important;grid-template-columns:repeat(3,var(--mobile-hud-size))!important;}
 .topRightHud .economyHud{grid-column:1 / 4!important;grid-row:1!important;}

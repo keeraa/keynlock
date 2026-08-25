@@ -80,6 +80,19 @@
       setTimeout(()=>tone(480,.11,'sine',.025,720),80);
       setTimeout(()=>tone(760,.16,'sine',.022,980),165);
     },
-    newRound(){ tone(330,.06,'sine',.012,410); }
+    newRound(){ tone(330,.06,'sine',.012,410); },
+    // The noise meter entering its warning band: a held, uneasy note rather
+    // than a sting, so it reads as "someone is listening", not "you lost".
+    alarm(){
+      buzz([16,60,16]);
+      tone(300,.14,'triangle',.020,250);
+      setTimeout(()=>tone(240,.16,'triangle',.018,205),120);
+    },
+    guards(){
+      buzz([70,60,70,60,140]);
+      tone(190,.14,'sawtooth',.026,150);
+      setTimeout(()=>tone(150,.16,'sawtooth',.024,110),110);
+      setTimeout(()=>tone(110,.24,'square',.022,80),230);
+    }
   };
 

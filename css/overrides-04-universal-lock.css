@@ -313,3 +313,18 @@ body.game-inactive.shop-open::after,body.game-inactive.lair-open::after,body.gam
   .mobileModeMenuButton{width:var(--mobile-hud-size)!important;height:var(--mobile-hud-size)!important;border-radius:12px!important;}
   .mobileModeMenuButton svg{width:calc(var(--mobile-hud-size) * .5)!important;height:calc(var(--mobile-hud-size) * .5)!important;}
 }
+
+/* Noise meter. Positioned from JS against the objective line so it tracks that
+   element across breakpoints instead of repeating its rules. */
+.noiseMeter{position:fixed;z-index:70;display:none;align-items:center;gap:8px;padding:5px 10px;border:1px solid rgba(120,94,52,.5);border-radius:9px;background:rgba(17,13,10,.74);box-shadow:0 6px 16px rgba(0,0,0,.3);pointer-events:none;}
+.noiseMeter.visible{display:flex;}
+.noiseMeterLabel{flex:0 0 auto;color:#9d8d75;font:600 9px/1 Arial,sans-serif;letter-spacing:.12em;}
+.noiseMeterTrack{position:relative;flex:1 1 auto;height:6px;border-radius:99px;background:rgba(60,50,36,.6);overflow:hidden;}
+.noiseMeterFill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:99px;background:linear-gradient(90deg,#8a7a4e,#d9a74c);transition:width .16s linear,background .3s ease;}
+.noiseMeter.warning .noiseMeterFill{background:linear-gradient(90deg,#c07a35,#e0503a);}
+.noiseMeter.warning{border-color:rgba(206,96,60,.72);animation:noisePulse 780ms ease-in-out infinite;}
+@keyframes noisePulse{0%,100%{box-shadow:0 6px 16px rgba(0,0,0,.3);}50%{box-shadow:0 6px 16px rgba(0,0,0,.3),0 0 14px rgba(214,88,54,.34);}}
+@media (max-width:760px){
+  .noiseMeter{padding:4px 8px;gap:6px;}
+  .noiseMeterLabel{font-size:8px;}
+}

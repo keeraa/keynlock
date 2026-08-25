@@ -153,16 +153,19 @@
   bindMobileSwipes();
 })();
 
-/* v256 — typed tensioners and filename-driven plate compatibility. */
+/* v257 — typed tensioners across all lock modes; typed plates only on level 1. */
 (function(){
-  const plateSkins=[
+  const typedPlateSkins=[
     'assets/plates/iron_bar_01.webp',
     'assets/plates/iron_hook_01.webp',
     'assets/plates/iron_kink_01.webp',
     'assets/plates/iron_wave_01.webp',
     'assets/plates/iron_angle_01.webp'
   ];
-  const plateNames=['iron_bar_01.webp','iron_hook_01.webp','iron_kink_01.webp','iron_wave_01.webp','iron_angle_01.webp'];
+  const typedPlateNames=['iron_bar_01.webp','iron_hook_01.webp','iron_kink_01.webp','iron_wave_01.webp','iron_angle_01.webp'];
+  const basePlateSkins=[...PLATE_SKINS];
+  const basePlateNames=[...PLATE_SKIN_NAMES];
+  const basePlateHoleY=[...PLATE_HOLE_Y];
   const tensionSkins=[null,
     'assets/tensions/tension_bar_01.webp',
     'assets/tensions/tension_hook_01.webp',
@@ -172,28 +175,33 @@
   ];
   const tensionLabels=[null,'Bar','Hook','Kink','Wave','Angle'];
   const typeOrder=['bar','hook','kink','wave','angle'];
-  const typeMeta={
-    bar:{code:'Bar',label:'Bar'},
-    hook:{code:'Hook',label:'Hook'},
-    kink:{code:'Kink',label:'Kink'},
-    wave:{code:'Wave',label:'Wave'},
-    angle:{code:'Angle',label:'Angle'}
-  };
   const typeBySkin={1:'bar',2:'hook',3:'kink',4:'wave',5:'angle'};
 
-  PLATE_SKINS.splice(0,PLATE_SKINS.length,...plateSkins);
-  PLATE_SKIN_NAMES.splice(0,PLATE_SKIN_NAMES.length,...plateNames);
-  PLATE_HOLE_Y.splice(0,PLATE_HOLE_Y.length,.496,.496,.496,.496,.496);
   TENSION_SKINS.splice(0,TENSION_SKINS.length,...tensionSkins);
   TENSION_SKIN_LABELS.splice(0,TENSION_SKIN_LABELS.length,...tensionLabels);
 
-  chooseRoundPlateSkin=function(){ roundPlateSkin=rand(0,4); };
-  currentPlateName=function(){ return plateNames[Math.min(roundPlateSkin||0,4)] || plateNames[0]; };
-  currentPlateSkin=function(){ return plateSkins[Math.min(roundPlateSkin||0,4)] || plateSkins[0]; };
-  currentPlateHoleY=function(){ return .496; };
+  function levelUsesTypedPlates(){ return getModeDifficulty(mode)===1; }
+  function activePlateSkins(){ return levelUsesTypedPlates()?typedPlateSkins:basePlateSkins; }
+  function activePlateNames(){ return levelUsesTypedPlates()?typedPlateNames:basePlateNames; }
 
-  function getTensionTypeLabel(type){ return typeMeta[type]?.label || '—'; }
-  function getSelectedTensionType(){ return typeBySkin[tensionSkin] || null; }
+  chooseRoundPlateSkin=function(){
+    const pool=activePlateSkins();
+    roundPlateSkin=rand(0,Math.max(0,pool.length-1));
+  };
+  currentPlateName=function(){
+    const pool=activePlateNames();
+    return pool[Math.min(roundPlateSkin||0,pool.length-1)] || pool[0] || '—';
+  };
+  currentPlateSkin=function(){
+    const pool=activePlateSkins();
+    return pool[Math.min(roundPlateSkin||0,pool.length-1)] || pool[0] || '';
+  };
+  currentPlateHoleY=function(){
+    if(levelUsesTypedPlates()) return .496;
+    const i=Math.min(roundPlateSkin||0,Math.max(0,basePlateHoleY.length-1));
+    return basePlateHoleY[i] ?? .47;
+  };
+
   function extractTensionTypeFromText(value=''){
     const low=String(value||'').toLowerCase();
     return typeOrder.find(type=>low.includes(type)) || null;
@@ -206,29 +214,72 @@
     }
     return null;
   }
-  function isSelectedTensionCompatible(){
+  function selectedTensionType(){ return typeBySkin[tensionSkin] || null; }
+  function tensionCompatible(){
     const required=currentRequiredTensionType();
-    if(!required) return true;
-    return getSelectedTensionType()===required;
+    return !required || selectedTensionType()===required;
+  }
+  function tensionTypeLabel(type){
+    return type ? type[0].toUpperCase()+type.slice(1) : '—';
   }
 
-  const originalTryOpenLock=tryOpenLock;
-  tryOpenLock=function(){
-    const delegatedModes=new Set(['tension','resonance','deduction','composite','heatcold','drum','scope','anach','skyrim','r2','g1','hillsfar','mass']);
-    if(delegatedModes.has(mode) || solved || shopOpen || !goalMet()) return originalTryOpenLock();
+  function forceWrongTensionBreak(){
+    const required=currentRequiredTensionType();
+    if(!required || tensionCompatible()) return false;
 
-    if(!isSelectedTensionCompatible()){
-      const required=currentRequiredTensionType();
-      damagePick({surviveText:`Неверный натяжитель · нужен ${getTensionTypeLabel(required)}`});
-      $mechanism.classList.remove('ready');
-      nudgeTools();
-      SFX.wrongLock();
-      toast(`Нужен натяжитель ${getTensionTypeLabel(required)}`);
-      render();
-      return;
+    const previousVisiblePicks=Math.max(0,Math.min(pickCapacity,picks));
+    picks=Math.max(0,picks-1);
+    if(previousVisiblePicks>0) triggerInventoryBreakAnimation(previousVisiblePicks);
+    brokenPicks++;
+    SFX.break();
+    updatePickUI();
+    $mechanism?.classList.remove('ready');
+    nudgeTools();
+    SFX.wrongLock();
+
+    if(picks<=0){
+      solved=true;
+      toast('Отмычки закончились · проигрыш');
+      setTimeout(()=>newLock(false),1320);
+      return true;
     }
-    return originalTryOpenLock();
-  };
+
+    toast(`Неверный натяжитель · нужен ${tensionTypeLabel(required)}`);
+    return true;
+  }
+
+  function guardOpen(fn){
+    return function(...args){
+      if(shopOpen || solved) return fn.apply(this,args);
+      if(forceWrongTensionBreak()) return;
+      return fn.apply(this,args);
+    };
+  }
+
+  tryOpenLock=guardOpen(tryOpenLock);
+  tryOpenTension=guardOpen(tryOpenTension);
+  tryOpenResonance=guardOpen(tryOpenResonance);
+  tryOpenDeduction=guardOpen(tryOpenDeduction);
+  tryOpenComposite=guardOpen(tryOpenComposite);
+  scanHeatCold=guardOpen(scanHeatCold);
+  checkDrum=guardOpen(checkDrum);
+  checkScope=guardOpen(checkScope);
+  tryOpenAn=guardOpen(tryOpenAn);
+  tryTorqueSkyrim=guardOpen(tryTorqueSkyrim);
+  tryOpenR2=guardOpen(tryOpenR2);
+  tryOpenG1=guardOpen(tryOpenG1);
+  tryOpenHillsfar=guardOpen(tryOpenHillsfar);
+  tryOpenMass=guardOpen(tryOpenMass);
+
+  // init.js bound these two handlers by function reference before this patch runs.
+  // Capture them so the same guard still applies to their dedicated controls.
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('#massCenter,#skTorqueButton')) return;
+    if(shopOpen || solved || tensionCompatible()) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    forceWrongTensionBreak();
+  },true);
 
   applyTensionSkin();
   updateTensionSkinShop();

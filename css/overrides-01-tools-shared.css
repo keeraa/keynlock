@@ -69,7 +69,7 @@ body{background-size:100% 100%, auto 105%!important;}
 35%{transform: translate(var(--tension-react-x), var(--tension-react-y)) rotate(calc(19.5deg + var(--tension-rot-drift) + var(--tension-react-rot)));}
 70%{transform: translate(var(--tension-react-x), var(--tension-react-y)) rotate(calc(7.5deg + var(--tension-rot-drift) + var(--tension-react-rot)));}
 }
-.plate{background-size:100% 100%!important;background-position:center!important;background-repeat:no-repeat!important;border-radius:0!important;}
+.plate,.plateFace{background-size:contain!important;background-position:center!important;background-repeat:no-repeat!important;border-radius:0!important;}
 .pin{width:60.64px!important;height:113px!important;z-index:14!important;background-size:contain!important;background-repeat:no-repeat!important;background-position:center bottom!important;transform-origin:50% 88%!important;}
 .r2PinStem,.r2PinHead,.tnPinStem,.tnPinHead{opacity:0!important;}
 .r2PinImg{width:58px!important;max-height:188px!important;object-fit:contain!important;}

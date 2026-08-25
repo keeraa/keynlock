@@ -83,7 +83,7 @@ body.mobile-mode-menu-open #difficultyDock .difficultyBtn{width:36px!important;m
 .timerCircleHud:not(.hidden) .timerCircleLabel{display:none!important;}
 #lock.universalLockBlock,body.importedMode #lock.universalLockBlock{top:var(--template-lock-top)!important;transform:translateX(-50%) scale(var(--template-lock-scale))!important;}
 .puzzleArea{top:var(--template-puzzle-top)!important;bottom:var(--template-puzzle-bottom)!important;overflow:hidden!important;}
-.puzzleArea>.platesZone{left:50%!important;top:0!important;transform:translateX(-50%) scale(.56)!important;transform-origin:top center!important;}
+.puzzleArea>.platesZone{left:50%!important;top:0!important;transform:translateX(-50%) scale(.63)!important;transform-origin:top center!important;}
 body.importedMode .puzzleArea>.modePanel:not([hidden]),body.mode-hillsfar .puzzleArea>.hillsfarMode:not([hidden]){padding:4px 8px 8px!important;overflow-x:hidden!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch;}
 #objectiveLine.difficulty{left:8px!important;right:8px!important;bottom:calc(var(--mobile-safe-bottom) + 6px)!important;width:auto!important;max-width:none!important;min-height:34px!important;padding:7px 9px!important;transform:none!important;border-radius:9px!important;font-size:9px!important;line-height:1.25!important;letter-spacing:.035em!important;}
 #objectiveLine .objectiveDiff{white-space:nowrap;}
@@ -162,10 +162,10 @@ body.map-open .mobileModeMenuButton,body.map-open .mobileModeBackdrop,body.map-o
 }
 @media (max-width:760px) and (max-height:620px) and (orientation:portrait){
 :root{--template-lock-top:calc(var(--mobile-safe-top) + 86px);--template-lock-scale:.50;--template-puzzle-top:calc(var(--mobile-safe-top) + 268px);--template-puzzle-bottom:calc(var(--mobile-safe-bottom) + 43px);--mobile-hud-size:37px;}
-.mobileModeMenuButton{width:42px;height:42px;}
+
 .topRightHud{width:calc(var(--mobile-hud-size) * 3 + 6px)!important;gap:3px!important;}
 .topRightHud .economyHud{gap:3px!important;}
-.puzzleArea>.platesZone{transform:translateX(-50%) scale(.49)!important;}
+.puzzleArea>.platesZone{transform:translateX(-50%) scale(.55)!important;}
 #objectiveLine.difficulty{font-size:8px!important;padding:5px 7px!important;min-height:30px!important;}
 body.importedMode .massBoard{width:230px!important;height:230px!important;}
 body.importedMode .skBoardViewport{width:250px!important;height:250px!important;flex-basis:250px!important;}
@@ -173,7 +173,7 @@ body.importedMode .skBoardViewport .skBoard{transform:translateX(-50%) scale(.36
 }
 @media (max-height:560px) and (orientation:landscape){
 :root{--mobile-hud-size:34px;--template-lock-top:calc(var(--mobile-safe-top) + 10px);--template-lock-scale:.42;--template-puzzle-top:calc(var(--mobile-safe-top) + 148px);--template-puzzle-bottom:calc(var(--mobile-safe-bottom) + 34px);}
-.mobileModeMenuButton{width:38px;height:38px;top:calc(var(--mobile-safe-top) + 6px);left:calc(var(--mobile-safe-left) + 6px);}
+.mobileModeMenuButton{top:calc(var(--mobile-safe-top) + 6px);left:calc(var(--mobile-safe-left) + 6px);}
 .mobileModeMenuButton svg{width:21px;height:21px;}
 .modeTabs{width:min(270px,48vw)!important;padding-top:calc(var(--mobile-safe-top) + 54px)!important;}
 body.mobile-mode-menu-open #difficultyDock{left:calc(var(--mobile-safe-left) + 54px)!important;top:calc(var(--mobile-safe-top) + 7px)!important;height:34px!important;}
@@ -205,15 +205,9 @@ body.mode-hillsfar .hfCandidate{min-height:56px!important;}
 }
 .plate.selected:after{content:none!important;display:none!important;}
 .plateFace{transition:filter 180ms ease;}
-.plate.selected .plateFace{filter:drop-shadow( 2px  0    0 rgba(241,191,91,.72))
-    drop-shadow(-2px  0    0 rgba(241,191,91,.72))
-    drop-shadow( 0     2px 0 rgba(241,191,91,.72))
-    drop-shadow( 0    -2px 0 rgba(241,191,91,.72))
-    drop-shadow( 1.4px  1.4px 0 rgba(241,191,91,.58))
-    drop-shadow(-1.4px  1.4px 0 rgba(241,191,91,.58))
-    drop-shadow( 1.4px -1.4px 0 rgba(241,191,91,.58))
-    drop-shadow(-1.4px -1.4px 0 rgba(241,191,91,.58))
-    drop-shadow(0 0 8px rgba(241,191,91,.30));}
+/* Was eight opaque gold shadows ringing the plate plus a glow — a neon outline.
+   A single soft halo is enough to say "selected". */
+.plate.selected .plateFace{filter:drop-shadow(0 0 2px rgba(241,191,91,.30)) drop-shadow(0 0 7px rgba(241,191,91,.16));}
 .skinPreviewMain{padding:10px 10px 8px!important;}
 #pickSkinMain .pickSkinPreview{transform:rotate(90deg) scale(1.40)!important;transform-origin:50% 50%!important;}
 #tensionSkinMain .pickSkinPreview{transform:none!important;transform-origin:50% 50%!important;}
@@ -292,7 +286,7 @@ body.game-inactive.shop-open::after,body.game-inactive.lair-open::after,body.gam
    phones. Scoped to a min-width query so the mobile drawer rules above, which
    size it for a phone, are left alone. */
 @media (min-width:761px){
-  .mobileModeMenuButton{display:grid;place-items:center;position:fixed;left:14px;top:14px;z-index:410;width:42px;height:42px;padding:0;border:1px solid #8b6a35;border-radius:9px;background:linear-gradient(#302534,#17151a);color:#e0c99e;cursor:pointer;}
+  .mobileModeMenuButton{display:grid;place-items:center;position:fixed;left:14px;top:14px;z-index:410;width:var(--top-hud-size,68px);height:var(--top-hud-size,68px);padding:0;border:1px solid #8b6a35;border-radius:9px;background:linear-gradient(#302534,#17151a);color:#e0c99e;cursor:pointer;}
   .mobileModeMenuButton:hover{border-color:#d6ab5e;color:#f3ddb1;}
   .mobileModeMenuButton svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;}
   .modeTabs{top:66px;z-index:400;transform:translateX(calc(-100% - 20px));transition:transform .2s cubic-bezier(.22,.78,.22,1);}
@@ -310,3 +304,12 @@ body.game-inactive.shop-open::after,body.game-inactive.lair-open::after,body.gam
 .economyHud .rewardBox,.economyHud .balanceBox{border:0!important;background:none!important;box-shadow:none!important;}
 .economyHud .balanceBox .hudBadgeValue{display:flex;align-items:center;gap:4px;}
 .economyHud .balanceBox .coinIcon{color:#d7ab5c;font-size:.9em;}
+
+/* The menu button is a HUD button like the three on the right, so it takes the
+   same box. mobile.css and the narrow breakpoints used to pin it to 38-42px
+   while the right-hand buttons followed --mobile-hud-size. */
+.mobileModeMenuButton{width:var(--top-hud-size,68px)!important;height:var(--top-hud-size,68px)!important;}
+@media (max-width:760px),(max-height:560px) and (orientation:landscape){
+  .mobileModeMenuButton{width:var(--mobile-hud-size)!important;height:var(--mobile-hud-size)!important;border-radius:12px!important;}
+  .mobileModeMenuButton svg{width:calc(var(--mobile-hud-size) * .5)!important;height:calc(var(--mobile-hud-size) * .5)!important;}
+}

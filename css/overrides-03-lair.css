@@ -113,7 +113,7 @@ body.importedMode .sharedModeLockArt{position:absolute!important;left:50%!import
 .mechanismZone::before,.sharedModeLockArt::before{left:50%!important;width:214px!important;height:214px!important;transform:translateX(-50%) translateY(0);box-shadow:none!important;filter:none!important;}
 .mechanismZone .lockPanel,.sharedModeLockArt .lockPanel{left:50%!important;top:66px!important;width:254px!important;height:206px!important;transform:translateX(-50%)!important;}
 .mechanismZone .pick,.sharedModeLockArt .pick,body.mode-hillsfar .mechanismZone .pick{left:var(--pick-left)!important;top:var(--pick-top)!important;width:72px!important;height:360px!important;translate:0 0!important;}
-.mechanismZone .tension,.sharedModeLockArt .tension,body.mode-hillsfar .mechanismZone .tension{left:var(--tension-left)!important;top:var(--tension-top)!important;width:199px!important;height:49px!important;translate:0 0!important;}
+.mechanismZone .tension,.sharedModeLockArt .tension,body.mode-hillsfar .mechanismZone .tension{left:var(--tension-left)!important;top:var(--tension-top)!important;width:239px!important;height:59px!important;translate:0 0!important;}
 @media (max-width:900px){
 :root{--top-hud-size:58px;--lock-scale:.68;--lock-visual-w:367px;--lock-visual-h:181px;--lock-top:30px;--objective-bottom:10px;}
 .topRightHud{top:10px!important;right:10px!important;gap:6px!important;}

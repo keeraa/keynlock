@@ -504,6 +504,8 @@ let plateEls=[], pinTopPlateEls=[];
     $status.innerHTML = '';
   }
 
+  const toolShakeQuery = window.matchMedia('(max-width:760px), (max-height:560px) and (orientation:landscape), (pointer:coarse)');
+
   // Все динамические эффекты идут через requestAnimationFrame:
   // на дисплее 120 Гц браузер отрисовывает их до 120 кадров/с.
   let lastFrame=performance.now();
@@ -520,8 +522,12 @@ let plateEls=[], pinTopPlateEls=[];
     const idleSway = Math.sin(now * 0.0016) * 0.55;
     toolMotionKick += (0 - toolMotionKick) * (1 - Math.pow(0.001, dt / 420));
     const toolProfile = computeToolMotionProfile();
-    const movePulse = toolMotionKick;
-    const pulseSin = Math.sin(now * 0.024) * movePulse;
+    // Math.sin(now * 0.024) is about 3.8Hz. At 120Hz that reads as a flick; at
+    // the 60Hz a phone actually runs it lands as a judder, so slow it and take
+    // most of the amplitude out there.
+    const touchLayout = toolShakeQuery.matches;
+    const movePulse = toolMotionKick * (touchLayout ? 0.4 : 1);
+    const pulseSin = Math.sin(now * (touchLayout ? 0.011 : 0.024)) * movePulse;
 
     const pickRotDrift = idleSway * 1.15 + pointerX * 0.18 - pointerY * 0.14;
     const tensionRotDrift = idleSway * 0.95 + pointerX * 0.12 + pointerY * 0.12;

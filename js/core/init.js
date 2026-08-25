@@ -143,6 +143,43 @@
     pointerTargetY = 0;
   });
 
+  // Tilt parallax. A phone has no cursor to drive the scene, so the gyroscope
+  // does it — and harder than the mouse does, since tilting is a deliberate
+  // gesture rather than an incidental one.
+  (function bindTiltParallax(){
+    const TILT_SPAN = 22;   // degrees of tilt that reach the full sweep
+    const TILT_X = 38, TILT_Y = 30;
+    let rest = null;
+    const clamp = v => v < -1 ? -1 : v > 1 ? 1 : v;
+
+    function onTilt(e){
+      if(e.gamma == null || e.beta == null) return;
+      // First reading is however the player happens to be holding the phone.
+      if(!rest) rest = { g: e.gamma, b: e.beta };
+      const nx = clamp((e.gamma - rest.g) / TILT_SPAN);
+      const ny = clamp((e.beta - rest.b) / TILT_SPAN);
+      pointerTargetX = nx * TILT_X;
+      pointerTargetY = ny * TILT_Y;
+      bgParallaxTargetX = -nx * innerWidth * 0.055;
+      bgParallaxTargetY = -ny * innerHeight * 0.055;
+    }
+
+    function listen(){ addEventListener('deviceorientation', onTilt, { passive:true }); }
+
+    // iOS hands out orientation only after an explicit grant, and only from a
+    // gesture, so ask on the first touch and never nag again.
+    const needsGrant = typeof DeviceOrientationEvent !== 'undefined'
+      && typeof DeviceOrientationEvent.requestPermission === 'function';
+    if(!needsGrant){ listen(); return; }
+    const ask = () => {
+      removeEventListener('touchend', ask);
+      removeEventListener('click', ask);
+      DeviceOrientationEvent.requestPermission().then(r => { if(r === 'granted') listen(); }).catch(()=>{});
+    };
+    addEventListener('touchend', ask, { passive:true });
+    addEventListener('click', ask);
+  })();
+
   $skBoard.addEventListener('pointerdown',e=>{
     if(mode!=='skyrim' || e.target.closest('.skTorqueButton')) return;
     skDragging=true;

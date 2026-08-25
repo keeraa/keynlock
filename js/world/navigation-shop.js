@@ -7,7 +7,7 @@
     $mapInfoTitle.textContent=loc.name;
     $mapInfoText.textContent=loc.text
       + (mapLocation==='lair'?` Активный персонаж: ${LAIR_CHARACTERS[lairCharacter].name}.`:'')
-      + (mapLocation==='mission1'?' Нажми на точку ещё раз, чтобы начать.':'');
+      + (loc.action==='mission'?' Нажми на точку ещё раз, чтобы начать.':'');
     document.querySelectorAll('.mapNode').forEach(node=>{
       node.classList.toggle('current',node.dataset.location===mapLocation);
     });
@@ -36,24 +36,13 @@
     updateModeUI();
   }
 
-  function startFirstMission(){
-    if(lairOpen) closeLair();
-    if(shopOpen) closeShop();
-
-    if(mapOpen){
-      mapOpen=false;
-      document.body.classList.remove('map-open');
-      $worldMapScreen.hidden=true;
-    }
-
-    mode='classic';
-    syncModePanels(mode);
-    updateModeUI();
-
-    requestAnimationFrame(()=>{
-      newLock(false);
-      toast('Миссия 1 · Классика');
-    });
+  // Locations say what they are; the map no longer needs to know their names.
+  function arriveAtLocation(id){
+    const loc=MAP_LOCATIONS[id];
+    if(!loc) return;
+    if(loc.action==='shop') openShop();
+    else if(loc.action==='lair') openLair();
+    else if(loc.action==='mission') window.startMapMission?.(id);
   }
 
   function travelToMapLocation(next){
@@ -64,9 +53,7 @@
     }
     if(next===mapLocation){
       renderWorldMap();
-      if(next==='shop') openShop();
-      if(next==='lair') openLair();
-      if(next==='mission1') startFirstMission();
+      arriveAtLocation(next);
       return;
     }
     const allowed=MAP_CONNECTIONS[mapLocation]||[];
@@ -85,9 +72,7 @@
       STORE.setItem('lockpickMapLocation',mapLocation);
       mapMoving=false;
       renderWorldMap();
-      if(next==='shop') openShop();
-      if(next==='lair') openLair();
-      if(next==='mission1') startFirstMission();
+      arriveAtLocation(next);
     },1180);
   }
 

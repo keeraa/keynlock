@@ -43,14 +43,13 @@
   let pickType=pickProgress.equipped, pickCapacity=pickProgress.capacity, shopOpen=false;
   let mapOpen=false, mapMoving=false;
   const MAP_LOCATIONS={
-    lair:{name:'Логово',x:20,y:68,text:'Точка старта. Здесь находится база команды.',action:null},
+    lair:{name:'Логово',x:20,y:68,text:'Точка старта. Здесь находится база команды.',action:'lair'},
     shop:{name:'Лавка отмычек',x:49,y:55,text:'Здесь можно покупать материалы, внешний вид и увеличивать запас отмычек.',action:'shop'},
-    mission1:{name:'Миссия 1',x:34,y:48,text:'Первый рабочий замок. Механика: Классика.',action:'mission-classic'},
     upper:{name:'Верхний город',x:56,y:18,text:'Район пока закрыт.',locked:true},
     port:{name:'Порт',x:73,y:84,text:'Район пока закрыт.',locked:true},
     old:{name:'Старый квартал',x:65,y:48,text:'Район пока закрыт.',locked:true}
   };
-  const MAP_CONNECTIONS={lair:['shop','mission1'],shop:['lair','mission1'],mission1:['lair','shop']};
+  const MAP_CONNECTIONS={lair:['shop'],shop:['lair']};
   let mapLocation=MAP_LOCATIONS[STORE.getItem('lockpickMapLocation')]?STORE.getItem('lockpickMapLocation'):'lair';
   if(MAP_LOCATIONS[mapLocation]?.locked) mapLocation='lair';
   let lairOpen=false;

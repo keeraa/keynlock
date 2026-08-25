@@ -106,3 +106,21 @@ body.map-open .modeTabs .tab.active:not(#mapTab){box-shadow:none;}
 .lairPersonThumb img{position:absolute;left:50%;bottom:-3px;width:auto;height:120%;transform:translateX(-50%);object-fit:contain;}
 .lairOverlay{--lair-bg:url("../assets/lair/lair-background.jpg");padding:0!important;background:linear-gradient(rgba(6,5,4,.12),rgba(6,5,4,.24)),
     var(--lair-bg, none) center center/cover no-repeat!important;overflow:hidden;}
+
+/* Mission nodes: one per lock game, so they have to sit tighter than the
+   hand-placed district markers and carry their own chapter progress. */
+.mapNode.missionNode{min-width:74px;padding:34px 4px 2px;font-size:11px;z-index:9;}
+.mapNode.missionNode .mapNodeDot{top:13px;width:16px;height:16px;border-width:2px;}
+.mapNode.missionNode:hover{z-index:12;}
+.mapNode.missionNode .mapNodeLabel{display:block;text-shadow:0 1px 2px rgba(20,14,8,.85),0 0 6px rgba(20,14,8,.6);}
+.mapNodeTiers{display:flex;gap:3px;justify-content:center;margin-top:3px;}
+.mapTierPip{width:5px;height:5px;border-radius:50%;background:rgba(120,102,74,.5);box-shadow:inset 0 0 0 1px rgba(0,0,0,.4);}
+.mapTierPip.done{background:#d9a74c;}
+.mapTierPip.current{box-shadow:0 0 0 2px rgba(217,167,76,.28),inset 0 0 0 1px rgba(0,0,0,.4);}
+
+.mapChapterPicker{position:absolute;right:14px;top:58px;z-index:14;display:flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid rgba(120,94,52,.62);border-radius:11px;background:linear-gradient(180deg,rgba(31,25,18,.94),rgba(17,13,10,.96));box-shadow:0 8px 20px rgba(0,0,0,.42);}
+.mapChapterCaption{color:#9d8d75;font:12px/1 Arial,sans-serif;letter-spacing:.04em;}
+.mapChapterBtn{width:26px;height:26px;padding:0;border:1px solid rgba(120,94,52,.7);border-radius:8px;background:rgba(24,19,14,.9);color:#c9b98c;font:600 13px/1 Arial,sans-serif;cursor:pointer;transition:background .16s ease,color .16s ease,border-color .16s ease;}
+.mapChapterBtn:hover{border-color:#d6ab5e;color:#f0d497;}
+.mapChapterBtn.active{background:#a9772f;border-color:#f0c86e;color:#1a130c;}
+.mapChapterBtn.locked{opacity:.42;cursor:not-allowed;}

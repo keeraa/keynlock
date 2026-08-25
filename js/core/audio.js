@@ -88,6 +88,18 @@
       tone(300,.14,'triangle',.020,250);
       setTimeout(()=>tone(240,.16,'triangle',.018,205),120);
     },
+    // A bird overhead: two harsh calls, meant to be heard without looking.
+    bird(){
+      buzz([14,90,14]);
+      tone(1180,.07,'sawtooth',.020,900);
+      setTimeout(()=>tone(980,.09,'sawtooth',.018,720),150);
+    },
+    birdHit(){
+      buzz([60,40,90]);
+      noise(.13,.040);
+      tone(820,.10,'square',.024,320);
+      setTimeout(()=>tone(300,.16,'sawtooth',.022,150),90);
+    },
     guards(){
       buzz([70,60,70,60,140]);
       tone(190,.14,'sawtooth',.026,150);

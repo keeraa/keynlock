@@ -407,9 +407,11 @@
 (function(){
   const INV_REACH=260;   // px above the drawer where the lift starts
   const INV_LIFT=30;     // px of extra peek at full approach
+  const INV_HOLD=650;    // ms the drawer stays out after the pointer leaves
   const LOCK_REACH=300;  // px around the lock hit area where the glow starts
 
   let px=0, py=0, queued=false, seen=false;
+  let retractAt=0, holdTimer=0;
 
   const clamp01=v=>v<0?0:v>1?1:v;
   // Distance from the pointer to a rect, zero once inside it.
@@ -425,16 +427,17 @@
     queued=false;
     const drawer=document.querySelector('#inventoryDrawer');
     if(drawer){
-      if(drawer.classList.contains('open') || !seen){
+      if(drawer.classList.contains('open')){
         drawer.style.setProperty('--inv-approach','0px');
+        retractAt=0;
       } else {
         const r=drawer.getBoundingClientRect();
         // Measure to the resting edge, not the lifted one, so the drawer cannot
         // chase its own movement. Spread the rect field by field — DOMRect keeps
         // its values on the prototype, so {...rect} comes out empty.
         const lift=parseFloat(drawer.style.getPropertyValue('--inv-approach'))||0;
-        const t=ease(clamp01(1 - gapTo({left:r.left,right:r.right,top:r.top+lift,bottom:r.bottom+lift})/INV_REACH));
-        drawer.style.setProperty('--inv-approach',`${(t*INV_LIFT).toFixed(2)}px`);
+        const t=seen ? ease(clamp01(1 - gapTo({left:r.left,right:r.right,top:r.top+lift,bottom:r.bottom+lift})/INV_REACH)) : 0;
+        setApproach(drawer, t*INV_LIFT, lift);
       }
     }
 
@@ -445,6 +448,25 @@
       const t=seen ? ease(clamp01(1 - gapTo(r)/LOCK_REACH)) : 0;
       lock.style.setProperty('--lock-glow',t.toFixed(3));
     }
+  }
+  // Coming out is immediate, going back in waits: a stray flick of the cursor
+  // should not slam the drawer shut the moment it clips the edge of the reach.
+  function setApproach(drawer, next, current){
+    if(next>=current-0.01){
+      retractAt=0;
+      drawer.style.setProperty('--inv-approach',`${next.toFixed(2)}px`);
+      return;
+    }
+    const now=performance.now();
+    if(!retractAt) retractAt=now+INV_HOLD;
+    if(now>=retractAt){
+      retractAt=0;
+      drawer.style.setProperty('--inv-approach',`${next.toFixed(2)}px`);
+      return;
+    }
+    // Nothing else will wake us if the pointer has come to rest.
+    clearTimeout(holdTimer);
+    holdTimer=setTimeout(schedule, retractAt-now+16);
   }
   function schedule(){ if(!queued){ queued=true; requestAnimationFrame(apply); } }
 

@@ -618,7 +618,12 @@
       const mute=Math.min(.22,bd*.65);return best.rgb.map(v=>Math.round(v*(1-mute)+150*mute));
     }
     function randomSimpleColor(excludeName=''){const pool=SIMPLE_COLORS.filter(c=>c.name!==excludeName);return pool[Math.floor(Math.random()*pool.length)]}
-    function makeBottleCard(name,color,getCount,addFn,subFn){const card=document.createElement('div');card.className='color-card';card.innerHTML=`<div class="mini-swatch tube-sm" style="--tube-fill:${color}"><div class="mini-liquid-layer"></div><div class="mini-frame-layer"></div><span class="tube-count">${getCount()}</span></div><strong>${name}</strong><div class="drops">${getCount()}</div><div class="ctrl-row"><button class="small-btn">−</button><button class="small-btn">＋</button></div>`;const [minus,plus]=card.querySelectorAll('button');minus.onclick=subFn;plus.onclick=addFn;return card}
+    function makeBottleCard(name,color,getCount,addFn,subFn){const card=document.createElement('div');card.className='color-card';card.innerHTML=`<div class="mini-swatch tube-sm" style="--tube-fill:${color}"><div class="mini-liquid-layer"></div><div class="mini-frame-layer"></div><span class="tube-count">${getCount()}</span></div><strong>${name}</strong><div class="drops">${getCount()}</div><div class="ctrl-row"><button class="small-btn">−</button><button class="small-btn">＋</button></div>`;const [minus,plus]=card.querySelectorAll('button');minus.onclick=subFn;plus.onclick=addFn;
+      // The tube is the obvious thing to hit; the small + underneath is a
+      // second-guess target, especially on a phone.
+      const swatch=card.querySelector('.mini-swatch');
+      if(swatch){ swatch.classList.add('tappable'); swatch.onclick=addFn; }
+      return card}
 
 
 
@@ -630,6 +635,8 @@
       card.className='color-card';
       card.innerHTML=`<div class="mini-swatch tube-sm" style="--tube-fill:${color}"><div class="mini-liquid-layer"></div><div class="mini-frame-layer"></div><span class="tube-count">${count}</span></div><strong>${name}</strong><div class="drops">${count}</div><div class="ctrl-row"><button class="small-btn">${buttonText}</button></div>`;
       card.querySelector('button').onclick=actionFn;
+      const swatchOne=card.querySelector('.mini-swatch');
+      if(swatchOne){ swatchOne.classList.add('tappable'); swatchOne.onclick=actionFn; }
       return card;
     }
     function renderDualActionCardsV98(containerId,items,counts,onAdd,onSub){
@@ -1070,6 +1077,39 @@
     tabs.forEach((t, n) => t.classList.toggle('active', n === i));
     scenes().forEach((s, n) => s.classList.toggle('active', n === i));
   }
+  // The prototype was a catalogue: every station carried its own heading and
+  // status line because they scrolled past one another. Here the window is the
+  // frame, so the heading is dropped, the verdict is moved down beside the
+  // actions where it can be pinned, and the reagents are lifted out of the
+  // cluster that squared them around the flask.
+  function reframe(scene){
+    if(scene.dataset.reframed) return;
+    scene.dataset.reframed = '1';
+    scene.querySelector('.scene-head h2')?.closest('div')?.remove();
+    const lab = scene.querySelector('.lab');
+    const actions = scene.querySelector('.big-actions');
+    const status = scene.querySelector('.status');
+    const controls = scene.querySelector('.color-controls');
+    const pair = scene.querySelector('.tube-pair');
+    // Reagents come out of the lab entirely. Inside it they sat in an absolute
+    // grid of named corners around the flask, and no amount of overriding kept
+    // them from painting over everything below. Out here they are a plain band
+    // that always sits between the glassware and the verdict.
+    if(lab && actions && status){
+      const foot = document.createElement('div');
+      foot.className = 'alchemyFoot';
+      foot.append(status, actions);
+      if(controls){
+        const band = document.createElement('div');
+        band.className = 'alchemyReagents';
+        band.append(controls);
+        scene.append(band);
+      }
+      scene.append(foot);
+    }
+  }
+
   tabs.forEach((t, i) => t.addEventListener('click', () => show(i)));
+  scenes().forEach(reframe);
   show(0);
 })();

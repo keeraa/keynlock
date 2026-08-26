@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v303)
+## Where this stands (v304)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -67,14 +67,36 @@ with its own `hidden` attribute (`js/world/lair.js`
 directly (v303): the peek rises as the cursor approaches rather than
 waiting for a click — `js/core/inventory-hit-testing.js`'s pointer-
 proximity easing (`v260`), generalized from one drawer to a
-`makeApproach(selector, cssVar)` factory so `#inventoryDrawer` and
+`makeApproach(selector, cssVar, maxLift)` factory so `#inventoryDrawer` and
 `#alchemyRackDrawer` approach and retract independently through the same
-`pointermove` listener rather than needing two — and `--rack-open-y` is
-`20%` (was `2%`, picked without checking against `.inventoryDrawer`'s own
-`--inv-open-y`), so the bottom fifth of the rack stays tucked below the
-screen edge at full open, same as the lockpick case. The status line
-under the rack ("Выбери элемент…") is gone too — the selected glow on the
+`pointermove` listener rather than needing two — and `--rack-open-y` (was
+`2%`, picked without checking against `.inventoryDrawer`'s own
+`--inv-open-y`) matches that at `20%`, so the bottom fifth of the rack
+stays tucked below the screen edge at full open. The status line under
+the rack ("Выбери элемент…") is gone too — the selected glow on the
 bottle itself already says which one is picked.
+
+v304 pushed both further and fixed a real bug the approach lift
+introduced. The bug: `.alchemyRackDrawerToggle` covered the entire peek
+strip at `z-index:5`, above the bottles (`z-index:2`) — so a bottle that
+had risen into view via the approach lift, but hadn't been clicked open
+yet, still routed its click to the toggle. The click opened the drawer
+instead of selecting the bottle it landed on, which read as "I hovered
+over it and it just didn't pick." Fixed by dropping the *peeking* toggle
+to `z-index:0` (below the bottles — the open-state pull-tab stays at `5`,
+since closing has to win there even over a bottle underneath) and by
+having a bottle's own click handler call `setOpen(true)` itself, so
+clicking a bottle always both selects it and brings the drawer fully open
+regardless of what state it started in. The rack's own approach lift also
+grew — `maxLift` for the rack is `30 + rect.height*0.15` instead of the
+flat `30` everyone else gets, so at full approach substantially more of
+the shelf clears the peek line, not just a few extra px of cork. The
+selected bottle rises further still on its own (`translateY(-22px)`,
+`-27px` on hover) — its medallion is the only thing that names it, no
+text label prints the name anymore, and at the same height as its
+neighbours it could still be sitting below the peek line even when
+"selected." And `--rack-open-y` moved again, to `30%` (10 points past
+where it matches the lockpick case), on request.
 
 Seven bottles by element — Stannum, Plumbum, Aurum, Sulfur, Hydrargyrum,
 Argentum, Ferrum, in that order — from a shelf image

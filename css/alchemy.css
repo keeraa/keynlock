@@ -353,10 +353,10 @@
    ============================================================ */
 
 .alchemyRackDrawer{
-  /* --rack-open-y:20%, matching --inv-open-y on .inventoryDrawer exactly:
-     the bottom fifth of the drawer's own box stays tucked below the screen
-     edge even at full open, same as the lockpick case. */
-  --rack-peek:72px;--rack-open-y:20%;
+  /* --inv-open-y on .inventoryDrawer is 20%; this sits a further 10 points
+     below that on request, so more of the rack's own bottom trim tucks
+     under the screen edge at full open than the lockpick case leaves. */
+  --rack-peek:72px;--rack-open-y:30%;
   position:fixed;left:50%;bottom:0;z-index:214;
   width:min(760px,calc(100vw - 48px));max-width:calc(100vw - 48px);
   display:flex;flex-direction:column;align-items:center;
@@ -380,11 +380,19 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
   transform:translate(-50%,var(--rack-open-y));
 }
 
-.alchemyRackDrawerToggle{position:absolute;inset:0;z-index:5;padding:0;border:0;background:transparent;cursor:pointer;}
+/* z-index:0 while peeking — *below* .alchemyRackDrawerBottles (z-index:2) —
+   so a bottle poking up into the peek strip takes the click over the
+   toggle wherever the two overlap; the toggle only catches clicks in the
+   gaps between bottles. It used to sit above everything, which meant
+   clicking a bottle that was only partly revealed by the approach lift
+   opened the drawer instead of selecting it — the bottle was there to see
+   but not to click. The open-state pull-tab goes back to z-index:5, since
+   closing has to win even where it overlaps a bottle underneath. */
+.alchemyRackDrawerToggle{position:absolute;inset:0;z-index:0;padding:0;border:0;background:transparent;cursor:pointer;}
 /* Matches the approach lift so the hit area always covers what is actually
    on screen (css/overrides-05-inventory.css .inventoryToggle does the same). */
 .alchemyRackDrawer:not(.open) .alchemyRackDrawerToggle{height:calc(var(--rack-peek) + var(--rack-approach,0px));}
-.alchemyRackDrawer.open .alchemyRackDrawerToggle{inset:auto;left:38%;right:38%;top:0;height:var(--rack-peek);}
+.alchemyRackDrawer.open .alchemyRackDrawerToggle{inset:auto;left:38%;right:38%;top:0;height:var(--rack-peek);z-index:5;}
 
 .alchemyRackDrawerRack{
   position:relative;width:100%;
@@ -422,7 +430,16 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
 }
 .alchemyRackDrawerBottle img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;}
 .alchemyRackDrawerBottle:hover{transform:translateX(-50%) translateY(-5px);}
-.alchemyRackDrawerBottle.selected{filter:drop-shadow(0 0 10px var(--gold,#d9a74c)) drop-shadow(0 8px 10px rgba(0,0,0,.4));}
+/* Raised well above the others, not just glowing in place: the medallion —
+   the only thing that says *which* element this is, since the shelf carries
+   no printed names — sits partway down the bottle, inside the ring. At the
+   same height as its neighbours it can still be sitting below the peek
+   line while merely lifted by approach. Selected always clears that. */
+.alchemyRackDrawerBottle.selected{
+  transform:translateX(-50%) translateY(-22px);
+  filter:drop-shadow(0 0 10px var(--gold,#d9a74c)) drop-shadow(0 8px 10px rgba(0,0,0,.4));
+}
+.alchemyRackDrawerBottle.selected:hover{transform:translateX(-50%) translateY(-27px);}
 /* Ring centres, measured from rack-back.png at 1614px width. Three earlier
    passes: v296 eyeballed a gridline overlay (200, 412, 623, 835, 1047,
    1258, 1470 — a guessed 212px step that compounded, ring 1 close and ring

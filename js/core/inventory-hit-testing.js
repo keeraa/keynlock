@@ -506,7 +506,12 @@
 
   // One of these per drawer: each carries its own hold/retract timer state,
   // written as a CSS custom property the drawer's own transform reads.
-  function makeApproach(selector, cssVar){
+  // maxLift is either a flat px number or, for a drawer that wants a bigger
+  // rise, a function of the drawer's own rect (the rack's is 15% of its own
+  // height taller than the flat LIFT everyone else gets, on request — more
+  // of the shelf clears the peek line at full approach, not just a few
+  // extra px of cork).
+  function makeApproach(selector, cssVar, maxLift=LIFT){
     let retractAt=0, holdTimer=0;
     // Coming out is immediate; going back in waits out a grace period and then
     // eases, so the drawer withdraws as smoothly as it came and a stray flick of
@@ -549,11 +554,12 @@
       // its values on the prototype, so {...rect} comes out empty.
       const lift=parseFloat(drawer.style.getPropertyValue(cssVar))||0;
       const t=seen ? ease(clamp01(1 - gapTo({left:r.left,right:r.right,top:r.top+lift,bottom:r.bottom+lift})/REACH)) : 0;
-      setApproach(drawer, t*LIFT, lift);
+      const peak=typeof maxLift==='function' ? maxLift(r) : maxLift;
+      setApproach(drawer, t*peak, lift);
     };
   }
   const applyInventoryApproach=makeApproach('#inventoryDrawer','--inv-approach');
-  const applyRackApproach=makeApproach('#alchemyRackDrawer','--rack-approach');
+  const applyRackApproach=makeApproach('#alchemyRackDrawer','--rack-approach', r=>LIFT+r.height*0.15);
 
   function apply(){
     queued=false;

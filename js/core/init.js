@@ -125,6 +125,11 @@
     bgParallaxTargetY = 0;
   });
 
+  // How far a mouse at the edge of the scene pushes it. The bird measures
+  // "looking up" against whichever sweep is in play.
+  const POINTER_SWEEP_X = 13, POINTER_SWEEP_Y = 11;
+  window.POINTER_SWEEP_Y = POINTER_SWEEP_Y;
+
   $scene.addEventListener('pointermove', e=>{
     // Only a mouse aims the scene. A finger tapping a plate used to slam the
     // parallax target across to wherever it landed, which jolted the view and
@@ -133,8 +138,8 @@
     const r=$scene.getBoundingClientRect();
     const nx=((e.clientX-r.left)/r.width - 0.5) * 2;
     const ny=((e.clientY-r.top)/r.height - 0.5) * 2;
-    pointerTargetX = nx * 13;
-    pointerTargetY = ny * 11;
+    pointerTargetX = nx * POINTER_SWEEP_X;
+    pointerTargetY = ny * POINTER_SWEEP_Y;
   });
   $scene.addEventListener('pointerleave', e=>{
     if(e.pointerType !== 'mouse') return;

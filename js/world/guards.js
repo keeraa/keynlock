@@ -172,10 +172,13 @@
   const BIRD_NOISE_HIT = 0.60;   // what an unnoticed bird costs
   const BIRD_LOOK_UP = -0.55;    // share of the upward sweep that counts as looking up
 
-  // Tilt only decides this where there is a device to tilt. On a desktop the
-  // cursor drifts to the top of the scene all the time, which would dodge birds
-  // by accident — there you click the thing instead.
+  // "Looking up" is raising your gaze on either device: tipping the phone, or
+  // moving the cursor to the top of the scene. Both already drive pointerTargetY
+  // — only the size of the sweep differs.
   const birdTiltLayout = window.matchMedia('(pointer:coarse)');
+  const birdSweep = () => (birdTiltLayout.matches
+    ? (window.TILT_SWEEP_Y || 58)
+    : (window.POINTER_SWEEP_Y || 11));
 
   let birdEl = null, birdShadow = null;
   let birdState = 'idle';        // idle | warning
@@ -227,6 +230,10 @@
     const fromLeft = Math.random() < 0.5;
     birdEl.style.setProperty('--bird-from', fromLeft ? '-14vw' : '108vw');
     birdEl.style.setProperty('--bird-to', fromLeft ? '108vw' : '-14vw');
+    // Flight and deadline come from the same number: they drifted apart once
+    // and left the bird off-screen for two seconds before the blow landed.
+    birdEl.style.setProperty('--bird-flight', `${BIRD_WARN_MS}ms`);
+    birdShadow.style.setProperty('--bird-flight', `${BIRD_WARN_MS}ms`);
     birdEl.classList.remove('passing');
     birdEl.classList.add('active');
     // Measure the plate stack, not .platesZone: the zone is a fixed 455px box
@@ -315,8 +322,7 @@
       const now = performance.now();
       const dt = Math.min(250, now - birdLookLast);
       birdLookLast = now;
-      const lookingUp = birdTiltLayout.matches
-        && pointerTargetY <= BIRD_LOOK_UP * (window.TILT_SWEEP_Y || 30);
+      const lookingUp = pointerTargetY <= BIRD_LOOK_UP * birdSweep();
       const watching = lookingUp || birdHovered;
       if(watching) birdWatchedMs += dt;
       birdEl.classList.toggle('watched', watching);

@@ -1133,9 +1133,11 @@
   show(0);
 })();
 
-/* Ingredient rack: pick one of seven bottles by its Latin name. Just a
-   selection for now — remembers which element is chosen and shows its
-   name back, the way the mixing stations show a verdict. What the
+/* Ingredient rack: pick one of seven bottles by its Latin name (the name
+   itself isn't shown on the shelf — the bottle's medallion carries its
+   alchemical symbol instead, and the verdict line names it on selection).
+   Just a selection for now — remembers which element is chosen and shows
+   its name back, the way the mixing stations show a verdict. What the
    choice unlocks (which elixir recipes it gates) is the planned next
    step, mirrored on the tension-tool type match in
    js/core/inventory-hit-testing.js: a lock only opens for the matching
@@ -1144,18 +1146,12 @@
   const root = document.querySelector('#alchemyRoot');
   if(!root) return;
   const bottles = [...root.querySelectorAll('.alchemyRackBottle')];
-  const labels = [...root.querySelectorAll('.alchemyRackLabel')];
   const statusEl = root.querySelector('#alchemyRackStatus');
   if(!bottles.length || !statusEl) return;
-  // Labels live in their own layer above the front board (see the CSS
-  // comment on .alchemyRackLabels), not inside the bottle button, so
-  // selection is matched by data-element rather than DOM nesting.
   function select(el){
     const element = el.dataset.element;
     bottles.forEach(b => b.classList.toggle('selected', b === el));
-    const label = labels.find(l => l.dataset.element === element);
-    labels.forEach(l => l.classList.toggle('selected', l === label));
-    const name = label?.textContent || element;
+    const name = element.charAt(0).toUpperCase() + element.slice(1);
     statusEl.innerHTML = `<strong>${name}</strong>элемент выбран для варки`;
   }
   bottles.forEach(b => b.addEventListener('click', () => select(b)));

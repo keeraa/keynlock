@@ -501,7 +501,12 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
   .alchemyRoot .scene[data-name="Смешение"] .test-tube.tube-lg,
   .alchemyRoot .scene[data-name="Концентрации"] .test-tube.tube-lg,
   .alchemyRoot .scene[data-name="Разделение"] .test-tube.tube-lg{height:clamp(130px,24vh,220px)!important;}
-  .alchemyRoot .tube-pair{gap:16px;}
+  /* The leftmost (target) bottle was sitting past the table photo's own
+     tapered left edge, off the wood — translateX on the whole pair (not
+     just the target tube) moves both bottles and their цель/текущая
+     смесь labels together as one block, same idea as .color-controls
+     above. */
+  .alchemyRoot .tube-pair{gap:16px;transform:translateX(52px);}
   /* Four reagents two-by-two at full height stood 530px against 328px of
      glassware and became the tallest thing in the window. Shorter here. */
   .alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch{height:clamp(40px,7vh,68px)!important;width:34px!important;margin:0 auto 6px!important;}
@@ -525,23 +530,23 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      are tuned by eye against the photo so all three groups' feet land on
      the same line. */
   .alchemyRoot .scene.active .lab.color-game-lab .test-tube.tube-lg{
-    transform:translateY(-55px) scale(.6);
+    transform:translateY(-118px) scale(.6);
     transform-origin:bottom center;
   }
   .alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch{
-    transform:translateY(-105px) scale(1.3);
+    transform:translateY(-168px) scale(1.3);
     transform-origin:bottom center;
   }
   .alchemyRoot .alchemyReagents .color-card strong{display:none;}
   .alchemyRoot .scene.active .alchemyElementCell{
-    transform:translateX(-30px) translateY(-20px) scale(1.1);
+    transform:translateX(-30px) translateY(-83px) scale(1.1);
     transform-origin:bottom center;
   }
   .alchemyRoot .scene.active .alchemyElementCell.filled{border:none;}
   /* The whole desk (and everything standing on it) sits lower than the
      row's own box — the station tabs above are a sibling, not a child,
      so they hold their position regardless of this. */
-  .alchemyRoot .scene.active{margin-top:36%;}
+  .alchemyRoot .scene.active{margin-top:41%;}
   /* Проверить/Сброс move beside the bottle instead of stacking under it —
      row instead of column, now that the verdict text (below) no longer
      lives in this flow to need the extra vertical room. */
@@ -590,13 +595,13 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      box, not its visibly-higher one (transforms don't move flow) — same
      gap problem as the buttons-above fix, just the other direction.
      Pulled up to actually sit under the swatch instead of ~110px below it. */
-  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:last-child{order:-1;transform:translateY(-120px);}
+  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:last-child{order:-1;transform:translateY(-183px);}
   /* :not(:last-child) excludes Separation's single "Фильтр" button — it
      matches both :first-child and :last-child at once, and without this
      the two rules' conflicting translateY values (this one's -107px vs
      the other's -120px) fought each other, landing it 13px short of
      clearing the swatch. */
-  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:first-child:not(:last-child){transform:translateY(-107px);}
+  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:first-child:not(:last-child){transform:translateY(-170px);}
   /* цель/текущая смесь sat where the bench bottles used to be before this
      file's "stand on the table" pass — .swatch-label's own position is
      unmoved (still top:100% of the *original*, untransformed tube-box),
@@ -604,7 +609,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      the gap between bottle and label grew by roughly that much. Pull the
      label back up to close it — retune alongside the bottle's own
      translateY above if that changes. */
-  .alchemyRoot .swatch-label{transform:translateX(-50%) translateY(-75px);}
+  .alchemyRoot .swatch-label{transform:translateX(-50%) translateY(-138px);}
   /* white-space:normal + width:100% (of the tube-box, its positioned
      ancestor — same fix as the mobile breakpoint above), not nowrap: the
      longest element name (HYDRARGYRUM) centered under the *leftmost*
@@ -612,7 +617,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      the window clips (overflow:hidden), so the name's leading letter was
      getting cut off there, not just looking tight. Wrapping to two lines
      keeps it inside the tube's own column regardless of name length. */
-  .alchemyRoot .target-element-hint{transform:translateX(-50%) translateY(-75px);
+  .alchemyRoot .target-element-hint{transform:translateX(-50%) translateY(-138px);
     white-space:normal;width:100%;overflow-wrap:break-word;}
   /* "Образец и текущая смесь" / "Цель и результат" / "Цель и грязная
      смесь" — the per-station .lab h3 — dropped per feedback; the bottles
@@ -653,6 +658,25 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      transform: translateY approach as the bottles/swatches above, so
      there's nothing left here for the cell to override.) */
   .alchemyRoot .scene.active{margin-top:8%;}
+  /* The desk push-down above is scaled way back for a short window, but the
+     glassware/label/button raise amounts a few rules up are tuned for the
+     wide default's much larger margin-top — left at full strength here they
+     lift everything clear off the (barely pushed-down) desk instead of onto
+     it. Scaled back to match, same values this file used before that
+     margin-top grew from 36% to 41% and the raises grew alongside it. */
+  .alchemyRoot .scene.active .lab.color-game-lab .test-tube.tube-lg{
+    transform:translateY(-55px) scale(.6);
+  }
+  .alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch{
+    transform:translateY(-105px) scale(1.3);
+  }
+  .alchemyRoot .scene.active .alchemyElementCell{
+    transform:translateX(-30px) translateY(-20px) scale(1.1);
+  }
+  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:last-child{transform:translateY(-120px);}
+  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:first-child:not(:last-child){transform:translateY(-107px);}
+  .alchemyRoot .swatch-label{transform:translateX(-50%) translateY(-75px);}
+  .alchemyRoot .target-element-hint{transform:translateX(-50%) translateY(-75px);}
 }
 
 /* ============================================================

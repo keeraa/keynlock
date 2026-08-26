@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v320)
+## Where this stands (v321)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -599,6 +599,54 @@ one element matching two selectors that disagree.
 wide screens only.** The bottles' own цель/текущая смесь labels already
 say what's being compared; mobile keeps the heading since it wasn't
 asked to change and the stacked layout there has more use for it.
+
+**v321 pushed the desk lower and the glassware higher again, and moved the
+left (target) bottle onto the wood — each a small ask that touched a lot
+of tuned pixel values.** Wide-screen desk `margin-top` went 36% → 41% (a
+further 5% on top of v320's 10%); every element standing on that desk —
+bench bottles, reagent swatches, the element cell, their labels, the
+reagent ±buttons — got its own `translateY` bumped by the same ~63px so
+feet stay on the (now lower) table edge instead of floating above it,
+same "retune the whole dependent chain together" pattern as v311's
+original "stand on the table" pass. The left bottle wasn't the fix
+target's fault — `background-size:contain` on the desk photo (v308)
+letterboxes it inside `.scene.active`'s box, so the *painted* table
+doesn't reach the box's own left edge, and the target bottle's un-nudged
+position landed past that edge, off the wood. `transform:translateX(52px)`
+on `.tube-pair` (not on the two tube-boxes individually) moves both
+bottles and their absolutely-positioned цель/текущая смесь labels
+together as one rigid block — no per-element X compensation needed, since
+they share one parent, unlike the Y-axis raise where label/button
+transforms live on separate siblings and each needed tuning by hand.
+
+**The direction was "right," not "left," and getting it backwards broke
+the layout badly enough to be its own lesson.** "Сместить левее" read
+literally as *move left*; a `translateX(-52px)` pushed the target bottle
+further off the table's own left edge (worse, not better) and crushed the
+element cell down to a thin sliver — both fell out once corrected to
+`+52px` per the follow-up ("имел в виду правее"). A first pass also
+carried the same `translateX(52px)` onto `.color-controls` (the reagent
+band), reading "и всё остальное на столе подвинуть тоже" as *everything*
+rather than *everything the bottle shift affects* — that shoved
+Separation's fourth "Фильтр" button 36px past `.alchemyReagents`'s own
+`overflow:auto` edge, clipping it. Reverted: only `.tube-pair` needed the
+shift, since the reagents were never reported broken and nothing about
+raising the bottles or lowering the desk moves them horizontally at all.
+
+**The short-screen query (`max-height:760px`) silently drifted out of
+sync with the raise amounts above it, same failure mode v311 already
+named once.** That block only ever scaled `margin-top` back (8%, unrelated
+to the wide default's now-41%) — it never touched the `translateY` raises
+on the bottles/swatches/cell/buttons/labels a few rules up, which are
+tuned *against* that 41%. Left at full strength on a short window, they
+lifted every element clear off a desk that had barely been pushed down at
+all — bottles floating mid-air, "цель"/"текущая смесь" overlapping the
+target name instead of sitting under the bottle. Fixed by giving the
+short-screen block its own copy of every one of those `translateY`
+values, set back to what they were before this round grew them (the same
+numbers v320 shipped) — this is exactly the pairing v311's own note above
+warned about needing "their own, smaller push-down," just for a wider set
+of properties than margin-top alone this time.
 
 ## Two things that cost hours — do not rediscover them
 

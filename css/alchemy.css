@@ -541,7 +541,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
   /* The whole desk (and everything standing on it) sits lower than the
      row's own box — the station tabs above are a sibling, not a child,
      so they hold their position regardless of this. */
-  .alchemyRoot .scene.active{margin-top:26%;}
+  .alchemyRoot .scene.active{margin-top:36%;}
   /* Проверить/Сброс move beside the bottle instead of stacking under it —
      row instead of column, now that the verdict text (below) no longer
      lives in this flow to need the extra vertical room. */
@@ -584,7 +584,19 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      doesn't know about that shift), so the two ended up overlapping.
      Pushed up by roughly the same amount to actually clear it — retune
      this alongside the swatch's own translateY above if that changes. */
-  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn{order:-1;transform:translateY(-120px);}
+  /* Only "+" (last-child) moves above the swatch — "-" stays below it in
+     normal flow, per feedback that both above was one too many. But
+     "below it in flow" means below the swatch's *untransformed* layout
+     box, not its visibly-higher one (transforms don't move flow) — same
+     gap problem as the buttons-above fix, just the other direction.
+     Pulled up to actually sit under the swatch instead of ~110px below it. */
+  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:last-child{order:-1;transform:translateY(-120px);}
+  /* :not(:last-child) excludes Separation's single "Фильтр" button — it
+     matches both :first-child and :last-child at once, and without this
+     the two rules' conflicting translateY values (this one's -107px vs
+     the other's -120px) fought each other, landing it 13px short of
+     clearing the swatch. */
+  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:first-child:not(:last-child){transform:translateY(-107px);}
   /* цель/текущая смесь sat where the bench bottles used to be before this
      file's "stand on the table" pass — .swatch-label's own position is
      unmoved (still top:100% of the *original*, untransformed tube-box),
@@ -602,6 +614,10 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      keeps it inside the tube's own column regardless of name length. */
   .alchemyRoot .target-element-hint{transform:translateX(-50%) translateY(-75px);
     white-space:normal;width:100%;overflow-wrap:break-word;}
+  /* "Образец и текущая смесь" / "Цель и результат" / "Цель и грязная
+     смесь" — the per-station .lab h3 — dropped per feedback; the bottles
+     and their own цель/текущая смесь labels already say what's what. */
+  .alchemyRoot .lab h3{display:none;}
 }
 
 /* The window is cut to the station rather than the station spread over the

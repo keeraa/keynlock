@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v319)
+## Where this stands (v320)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -579,6 +579,26 @@ differing between the two (`var(--ui-font,Arial,sans-serif)` vs
 its `font-family` — but the first block was 100% dead weight, silently
 copy-pasted at some earlier point rather than reused. Deleted the first
 occurrence, scoped the surviving one.
+
+**"−" moved back below the tube (only "+" stays above), and the same
+flow-vs-transform gap that "+" hit in v317 showed up again on the way
+back down.** Reverting "−" to normal flow order put it below the
+swatch's *untransformed* layout box, ~110px under the swatch's actual
+(transformed-higher) visual position — the same mismatch as always,
+just discovered from the opposite direction this time. A second
+`translateY`, tuned separately from "+"'s, closes it.
+
+**That second `translateY` needed `:not(:last-child)` or Separation's
+single "Фильтр" button (`:first-child` and `:last-child` at once) got
+both rules' conflicting values and cascade order picked the wrong one.**
+Same shape of bug as v317's HYDRARGYRUM crop, different mechanism:
+there it was two elements' positions drifting out of sync, here it's
+one element matching two selectors that disagree.
+
+**`.lab h3` ("Образец и текущая смесь" etc.) dropped per feedback —
+wide screens only.** The bottles' own цель/текущая смесь labels already
+say what's being compared; mobile keeps the heading since it wasn't
+asked to change and the stacked layout there has more use for it.
 
 ## Two things that cost hours — do not rediscover them
 

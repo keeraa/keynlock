@@ -334,3 +334,96 @@
   .alchemyRoot .alchemyReagents .color-card strong{min-height:2.2em;font-size:10px;}
   .alchemyRoot .small-btn,.alchemyRoot .color-card button{padding:3px 8px;font-size:11px;}
 }
+
+/* ============================================================
+   Ingredient rack — a fourth station, seven bottles labelled by
+   element. Picking one is meant to gate which elixirs are buildable,
+   the way a tension tool's type gates which lock it opens
+   (js/core/inventory-hit-testing.js) — not built yet, this only
+   remembers the selection. Layered like the inventory case
+   (css/overrides-05-inventory.css .inventoryCaseBack/-Front): a back
+   board, the bottles, then a front board whose lower half repeats
+   the same cubby art so the bottles read as sitting *in* it rather
+   than pasted over it.
+   ============================================================ */
+
+/* Same override technique as the width guard above: higher
+   specificity beats the wide-screen two-column grid without needing
+   to sit inside its own media query. */
+.alchemyRoot .scene.active.alchemyRackScene{
+  display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:0;
+}
+
+.alchemyRoot .alchemyRack{
+  position:relative;width:100%;max-width:640px;margin:0 auto;
+  /* Matches rack-back.png's own canvas (1614x690) so the two boards
+     and the bottle slots below stay in proportion at any width. */
+  aspect-ratio:1614/690;
+}
+.alchemyRoot .alchemyRackBack,.alchemyRoot .alchemyRackFront{
+  position:absolute;left:0;right:0;background-repeat:no-repeat;background-size:100% 100%;pointer-events:none;
+}
+.alchemyRoot .alchemyRackBack{top:0;bottom:0;background-image:url("../assets/alchemy/rack-back.png");z-index:1;}
+/* rack-front.png is rack-back.png's own bottom 439 of 690px, bottom-
+   aligned — measured, not guessed. Its middle band is punched
+   transparent so a bottle's body shows through; only the shelf lip
+   and the cubby dividers around it are solid, in front of the glass. */
+.alchemyRoot .alchemyRackFront{bottom:0;height:63.62%;background-image:url("../assets/alchemy/rack-front.png");z-index:3;}
+
+.alchemyRoot .alchemyRackBottles{position:absolute;inset:0;z-index:2;}
+.alchemyRoot .alchemyRackBottle{
+  position:absolute;top:7%;height:72%;width:auto;aspect-ratio:150/409;
+  transform:translateX(-50%);
+  background:none;border:0;padding:0;margin:0;cursor:pointer;
+  filter:drop-shadow(0 10px 10px rgba(0,0,0,.4));
+  transition:transform .16s ease,filter .16s ease;
+}
+.alchemyRoot .alchemyRackBottle img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;}
+.alchemyRoot .alchemyRackBottle:hover{transform:translateX(-50%) translateY(-5px);}
+.alchemyRoot .alchemyRackBottle.selected{filter:drop-shadow(0 0 10px var(--gold)) drop-shadow(0 8px 10px rgba(0,0,0,.4));}
+/* Ring centres, measured from rack-back.png at 1614px width: 200,
+   412, 623, 835, 1047, 1258, 1470 → percent of that width. */
+.alchemyRoot .alchemyRackBottle:nth-child(1){left:12.39%;}
+.alchemyRoot .alchemyRackBottle:nth-child(2){left:25.53%;}
+.alchemyRoot .alchemyRackBottle:nth-child(3){left:38.60%;}
+.alchemyRoot .alchemyRackBottle:nth-child(4){left:51.73%;}
+.alchemyRoot .alchemyRackBottle:nth-child(5){left:64.87%;}
+.alchemyRoot .alchemyRackBottle:nth-child(6){left:77.94%;}
+.alchemyRoot .alchemyRackBottle:nth-child(7){left:91.08%;}
+
+/* A separate top layer, not a child of the bottle: the bottle sits in the
+   z-index:2 layer, under the z-index:3 front board, and a label nested
+   inside it would be hidden behind the board's own wood exactly like the
+   bottle's lower half is meant to be. This layer sits above the front
+   board instead, landing the name on the divider panel between slots
+   like a shelf plaque. */
+.alchemyRoot .alchemyRackLabels{position:absolute;inset:0;z-index:4;pointer-events:none;}
+.alchemyRoot .alchemyRackLabel{
+  position:absolute;top:83%;transform:translate(-50%,-50%);
+  /* Pitch between slots is ~13% of the rack's own width, and "Hydrargyrum"
+     next to "Argentum" only clears that at a fairly small size.
+     Longhand, not the `font:` shorthand: `font:600 9px/1 inherit` is invalid
+     CSS (inherit can't sit in the family slot next to explicit weight/size)
+     and silently drops to the browser default — the same bug already sits
+     on .ctl, .status and a few others in this file; out of scope to fix
+     here, but not one to repeat. */
+  font-weight:600;font-size:9px;line-height:1;
+  color:#c9b98c;white-space:nowrap;letter-spacing:0;
+  text-shadow:0 1px 3px rgba(0,0,0,.8);
+}
+.alchemyRoot .alchemyRackLabel:nth-of-type(1){left:12.39%;}
+.alchemyRoot .alchemyRackLabel:nth-of-type(2){left:25.53%;}
+.alchemyRoot .alchemyRackLabel:nth-of-type(3){left:38.60%;}
+.alchemyRoot .alchemyRackLabel:nth-of-type(4){left:51.73%;}
+.alchemyRoot .alchemyRackLabel:nth-of-type(5){left:64.87%;}
+.alchemyRoot .alchemyRackLabel:nth-of-type(6){left:77.94%;}
+.alchemyRoot .alchemyRackLabel:nth-of-type(7){left:91.08%;}
+.alchemyRoot .alchemyRackLabel.selected{color:var(--gold);}
+
+.alchemyRoot .alchemyRackStatus{margin-top:30px;text-align:center;color:#897d6c;font-size:12px;line-height:1.3;}
+.alchemyRoot .alchemyRackStatus strong{display:block;color:#e2c487;font:600 14px/1.2 Georgia,serif;margin-bottom:2px;}
+
+@media (max-width:760px){
+  .alchemyRoot .alchemyRackLabel{font-size:7px;}
+  .alchemyRoot .alchemyRackStatus{margin-top:22px;}
+}

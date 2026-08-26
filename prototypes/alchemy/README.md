@@ -34,13 +34,39 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v295)
+## Where this stands (v296)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
-reached from a lair hotspot. Three stations run — mixing, concentrations,
-separation. The whole prototype script came over at once, so the remaining
-seven need only their markup; missing elements get a stand-in rather than
-throwing, and every query the ported code makes is confined to `#alchemyRoot`.
+reached from a lair hotspot. Three color-game stations run — mixing,
+concentrations, separation — plus a fourth, non-puzzle station: an
+ingredient rack. The whole prototype script came over at once, so the
+remaining seven color-game stations need only their markup; missing
+elements get a stand-in rather than throwing, and every query the ported
+code makes is confined to `#alchemyRoot`.
+
+**The rack** (`Стойка` tab) shows seven bottles, each labelled with its
+element's Latin name — Stannum, Plumbum, Aurum, Sulfur, Hydrargyrum,
+Argentum, Ferrum — picked from a shelf image (`assets/alchemy/rack-back.png`
++ `rack-front.png`) built for exactly seven slots. Clicking one selects it;
+nothing branches on the selection yet. The plan is to gate which elixir
+recipes are buildable by the chosen element, mirrored on the tension tool's
+lock-type match in `js/core/inventory-hit-testing.js`
+(`typeBySkin`/`selectedTensionType`/`currentRequiredTensionType`/
+`tensionCompatible`) — a lock only opens for the matching tool; an elixir
+should only brew from the matching element. Not built.
+
+The rack is layered like the inventory case
+(`css/overrides-05-inventory.css` `.inventoryCaseBack`/`.inventoryCaseFront`,
+`js/world/inventory.js`): a back board with the bottles' slot holes, the
+bottles positioned over them, then a front board on top whose lower half
+repeats the same cubby art with its middle band cut transparent — so the
+front board's dividers sit in front of each bottle's base while the bottle's
+own body still shows through the gap, rather than getting fully hidden or
+fully exposed. `rack-front.png` is `rack-back.png`'s own bottom 439 of
+690px, bottom-aligned; that split and the seven ring-centre x-positions
+(200, 412, 623, 835, 1047, 1258, 1470 of a 1614px-wide source) were measured
+from the source art, not eyeballed — see the CSS comments on
+`.alchemyRackFront`/`.alchemyRackBottle` if the art ever changes.
 
 The three stations were tuned for the lair window rather than the demo's
 scrolling page: the window went from 1280px down to 780px, the glassware
@@ -118,6 +144,19 @@ setting the column's width. That takes the label out of flow, so `.tube-pair`
 carries an explicit `padding-bottom` to keep the space it needs inside the
 scrollable `.lab` — drop that and the label clips a few px short.
 
+**`font:600 12px/1 inherit` is invalid CSS, and it's all over this file.**
+`inherit` can't sit in the font shorthand's family slot next to an explicit
+weight and size — only a bare `font:inherit` is valid — so browsers drop the
+whole declaration and the element falls back to the 16px default instead of
+the size the rule names. Confirmed on `.ctl` (`#mixCheck`'s computed
+font-size is 16px, not the 12px the rule asks for); a `grep -n
+"font:.*inherit" css/alchemy.css` turns up several more from before this
+session. The rack's own new rules use longhand
+(`font-weight`/`font-size`/`line-height`) instead, deliberately, after
+running into this while sizing `.alchemyRackLabel`. The rest are unfixed —
+flagged as a separate task rather than folded into this one, since it
+touches sizes across every station and wants its own look before-and-after.
+
 ## Still to do
 
 The other seven stations — markup only, no JS work. A bench texture under the
@@ -132,3 +171,6 @@ glass. Easy to mistake for the mask-bleed bug since it's the same tube art;
 it isn't one — confirmed by dropping the clip-path, which fills clean. Not
 fixed: needs a decision on what "empty" should look like, not just a value
 tweak.
+
+The rack picks an element but nothing reads the pick yet. Next step is
+wiring it to gate elixir recipes, per the tension-tool analogy above.

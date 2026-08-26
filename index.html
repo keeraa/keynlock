@@ -255,6 +255,7 @@
               <button class="alchemyStationTab active" type="button" data-station="0">Смешение</button>
               <button class="alchemyStationTab" type="button" data-station="1">Концентрации</button>
               <button class="alchemyStationTab" type="button" data-station="2">Разделение</button>
+              <button class="alchemyStationTab" type="button" data-station="3">Стойка</button>
             </div>
           <section class="scene" data-name="Смешение">
             <div class="scene-head"><div><h2>Смешение цвета</h2></div><div class="status" id="mixStatus"><strong>Подбери оттенок</strong>и проверь смесь</div></div>
@@ -267,6 +268,31 @@
           <section class="scene" data-name="Разделение">
             <div class="scene-head"><div><h2>Разделение смеси</h2></div><div class="status" id="sepStatus"><strong>Очисти смесь</strong>до образца</div></div>
             <div class="lab color-game-lab"><div class="color-sample-panel"><h3>Цель и грязная смесь</h3><div class="tube-pair"><div class="tube-box"><div class="test-tube tube-lg"><div class="tube-liquid" id="sepTarget" style="--liquid-color:#5370c9;background-color:#5370c9"></div></div><div class="swatch-label">цель</div></div><div class="current-cluster"><div class="tube-box current-main-box"><div class="test-tube tube-lg"><div class="tube-liquid" id="sepCurrent" style="--liquid-color:#8a647f;background-color:#8a647f"></div></div><div class="swatch-label">грязная смесь</div></div><div class="color-controls side-color-controls" id="sepControls"></div></div></div><div class="big-actions centered-actions"><button class="ctl" id="sepCheck">Проверить</button><button class="ctl" id="sepReset">Новая смесь</button></div><div class="keyhint">Клавиатура: 1/2/3/4 — убрать примесь · Enter — проверить · R — сброс</div></div></div>
+          </section>
+          <section class="scene alchemyRackScene" data-name="Стойка">
+            <div class="alchemyRack" id="alchemyRack">
+              <div class="alchemyRackBack" aria-hidden="true"></div>
+              <div class="alchemyRackBottles" id="alchemyRackBottles">
+                <button class="alchemyRackBottle" type="button" data-element="stannum" style="--slot:0"><img src="assets/alchemy/bottle-stannum.png" alt="Stannum"></button>
+                <button class="alchemyRackBottle" type="button" data-element="plumbum" style="--slot:1"><img src="assets/alchemy/bottle-plumbum.png" alt="Plumbum"></button>
+                <button class="alchemyRackBottle" type="button" data-element="aurum" style="--slot:2"><img src="assets/alchemy/bottle-aurum.png" alt="Aurum"></button>
+                <button class="alchemyRackBottle" type="button" data-element="sulfur" style="--slot:3"><img src="assets/alchemy/bottle-sulfur.png" alt="Sulfur"></button>
+                <button class="alchemyRackBottle" type="button" data-element="hydrargyrum" style="--slot:4"><img src="assets/alchemy/bottle-hydrargyrum.png" alt="Hydrargyrum"></button>
+                <button class="alchemyRackBottle" type="button" data-element="argentum" style="--slot:5"><img src="assets/alchemy/bottle-argentum.png" alt="Argentum"></button>
+                <button class="alchemyRackBottle" type="button" data-element="ferrum" style="--slot:6"><img src="assets/alchemy/bottle-ferrum.png" alt="Ferrum"></button>
+              </div>
+              <div class="alchemyRackFront" aria-hidden="true"></div>
+              <div class="alchemyRackLabels" aria-hidden="true">
+                <span class="alchemyRackLabel" data-element="stannum">Stannum</span>
+                <span class="alchemyRackLabel" data-element="plumbum">Plumbum</span>
+                <span class="alchemyRackLabel" data-element="aurum">Aurum</span>
+                <span class="alchemyRackLabel" data-element="sulfur">Sulfur</span>
+                <span class="alchemyRackLabel" data-element="hydrargyrum">Hydrargyrum</span>
+                <span class="alchemyRackLabel" data-element="argentum">Argentum</span>
+                <span class="alchemyRackLabel" data-element="ferrum">Ferrum</span>
+              </div>
+            </div>
+            <div class="alchemyRackStatus" id="alchemyRackStatus"><strong>Выбери элемент</strong>он определит доступные эликсиры</div>
           </section>
           </div>
         </section>

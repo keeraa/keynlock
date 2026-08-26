@@ -683,6 +683,13 @@
     // past that, more clicks did nothing but invite the player to find out
     // what 99 looked like.
     const MAX_DROPS_PER_REAGENT=6;
+
+    // Named under the target bottle, one per round — cosmetic for now, the
+    // way the element slot itself (see the two IIFEs near the end of this
+    // file) only checks that *some* element is placed, not this one.
+    const ALCHEMY_ELEMENT_NAMES=['Stannum','Plumbum','Aurum','Sulfur','Hydrargyrum','Argentum','Ferrum'];
+    function randomElementName(){return ALCHEMY_ELEMENT_NAMES[Math.floor(Math.random()*ALCHEMY_ELEMENT_NAMES.length)]}
+    function setTargetElementHint(id){const el=doc.getElementById(id);if(el)el.textContent=randomElementName();}
     let mixGoal=randomSimpleColor(),mixAmts=[0,0,0,0];
     function mixLevelTopV88(){return amountTopV88(sumAmountsV98(mixAmts),{empty:84,full:24,steps:6})}
     function drawMix(){
@@ -698,6 +705,7 @@
       mixGoal=randomSimpleColor(mixGoal?.name);
       mixAmts=[0,0,0,0];
       drawMix();
+      setTargetElementHint('mixTargetElement');
       animateSceneLiquidV98('mixCurrent',mixLevelTopV88(),{animate:true,duration:560,intensity:.7});
       setStatusHtmlV98('mixStatus','<strong>Новый цвет</strong>смешай его по образцу');
     }
@@ -706,7 +714,7 @@
       setStatusHtmlV98('mixStatus',ok?`<strong>Совпало: ${mixGoal.name}</strong>цвет получен`:'<strong>Мимо</strong>цвет отличается от образца');
       if(!ok)breakFlask('Неверное смешение');
     };
-    doc.getElementById('mixReset').onclick=newMixRound;drawMix();animateSceneLiquidV98('mixCurrent',mixLevelTopV88(),{animate:false});
+    doc.getElementById('mixReset').onclick=newMixRound;drawMix();setTargetElementHint('mixTargetElement');animateSceneLiquidV98('mixCurrent',mixLevelTopV88(),{animate:false});
 
     let unkStrength=[1,1,1,1],unkGoal=randomSimpleColor(),unkAmts=[0,0,0,0];
     function unknownLevelTopV88(){return amountTopV88(sumAmountsV98(unkAmts),{empty:84,full:24,steps:6})}
@@ -726,6 +734,7 @@
       unkGoal=randomSimpleColor(unkGoal?.name);
       unkAmts=[0,0,0,0];
       drawUnknown();
+      setTargetElementHint('unknownTargetElement');
       animateSceneLiquidV98('unknownCurrent',unknownLevelTopV88(),{animate:true,duration:560,intensity:.7});
       setStatusHtmlV98('unknownStatus','<strong>Новая партия</strong>силы реагентов снова скрыты');
     }
@@ -755,6 +764,7 @@
       sepImp=[Math.floor(Math.random()*3),Math.floor(Math.random()*3),Math.floor(Math.random()*3),Math.floor(Math.random()*3)];
       if(sumAmountsV98(sepImp)<2)sepImp=[1,1,1,1];
       drawSep();
+      setTargetElementHint('sepTargetElement');
       animateSceneLiquidV98('sepCurrent',separationLevelTopV88(),{animate:true,duration:560,intensity:.7});
       setStatusHtmlV98('sepStatus',`<strong>Новая цель: ${sepGoal.name}</strong>убери лишние примеси`);
     }
@@ -1109,22 +1119,25 @@
     const actions = scene.querySelector('.big-actions');
     const status = scene.querySelector('.status');
     const controls = scene.querySelector('.color-controls');
-    const pair = scene.querySelector('.tube-pair');
+    const elementCell = scene.querySelector('.alchemyElementCell');
     // Reagents come out of the lab entirely. Inside it they sat in an absolute
     // grid of named corners around the flask, and no amount of overriding kept
     // them from painting over everything below. Out here they are a plain band
-    // that always sits between the glassware and the verdict.
+    // that always sits between the glassware and the verdict — and, alongside
+    // it, a third column: the element slot, the verdict, then the buttons,
+    // stacked in the order you actually use them.
     if(lab && actions && status){
-      const foot = document.createElement('div');
-      foot.className = 'alchemyFoot';
-      foot.append(status, actions);
+      const column = document.createElement('div');
+      column.className = 'alchemyElementColumn';
+      if(elementCell) column.append(elementCell);
+      column.append(status, actions);
       if(controls){
         const band = document.createElement('div');
         band.className = 'alchemyReagents';
         band.append(controls);
         scene.append(band);
       }
-      scene.append(foot);
+      scene.append(column);
     }
   }
 
@@ -1178,6 +1191,51 @@
     bottles.forEach(b => b.classList.toggle('selected', b === el));
     window.Alchemy = window.Alchemy || {};
     window.Alchemy.selectedElement = el.dataset.element;
+    window.Alchemy.applySelection?.(el.dataset.element);
   }
   bottles.forEach(b => b.addEventListener('click', () => select(b)));
+
+  // The station element slots (js/world/alchemy.js, further down) open the
+  // rack the same way the drawer's own peek does, rather than duplicating
+  // the open logic.
+  window.Alchemy = window.Alchemy || {};
+  window.Alchemy.openRackDrawer = () => setOpen(true);
+})();
+
+/* Element slots: each color-game station carries one empty cell (see
+   reframe() above — it lands in .alchemyElementColumn alongside the verdict
+   and the check button) that has to hold one of the rack's seven elements
+   before its Check button will do anything. Clicking an empty cell opens
+   the rack the same way clicking the drawer's own peek does; picking a
+   bottle there (see the IIFE above) fills every station's cell at once —
+   the choice isn't per-station, so there's one selection to keep in sync,
+   not three. */
+(function(){
+  const cells = [...document.querySelectorAll('.alchemyElementCell')];
+  const checks = [document.querySelector('#mixCheck'), document.querySelector('#unknownCheck'), document.querySelector('#sepCheck')].filter(Boolean);
+  if(!cells.length) return;
+
+  function applySelection(element){
+    cells.forEach(cell => {
+      if(element){
+        cell.classList.add('filled');
+        // Root-relative, not "assets/...": a relative url() written into a
+        // custom property resolves against the stylesheet that *uses* the
+        // var() (css/alchemy.css, one level down from the project root),
+        // not the page — the relative form landed inside css/ itself, a 404.
+        cell.style.setProperty('--element-bottle-img', `url("/assets/alchemy/bottle-${element}.png")`);
+        cell.setAttribute('aria-label', `Элемент: ${element.charAt(0).toUpperCase()+element.slice(1)} · сменить`);
+      } else {
+        cell.classList.remove('filled');
+        cell.style.removeProperty('--element-bottle-img');
+        cell.setAttribute('aria-label', 'Добавить элемент из стойки');
+      }
+    });
+    checks.forEach(btn => { btn.disabled = !element; });
+  }
+  window.Alchemy = window.Alchemy || {};
+  window.Alchemy.applySelection = applySelection;
+  applySelection(window.Alchemy.selectedElement);
+
+  cells.forEach(cell => cell.addEventListener('click', () => window.Alchemy.openRackDrawer?.()));
 })();

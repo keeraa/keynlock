@@ -103,10 +103,6 @@
 /* The lab scrolls, the verdict and its buttons never do: a result you cannot
    see while you act is not a result. */
 .alchemyRoot .scene.active > .lab{flex:1 1 auto!important;min-height:0!important;overflow:auto!important;}
-.alchemyFoot{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;
-  margin-top:12px;padding-top:12px;border-top:1px solid rgba(120,94,52,.32);}
-.alchemyFoot .status{margin:0;text-align:left;}
-.alchemyFoot .big-actions{margin:0;display:flex;gap:10px;}
 
 /* The tube itself is the target now. */
 .alchemyRoot .mini-swatch.tappable{cursor:pointer;transition:transform .14s ease,filter .14s ease;}
@@ -184,9 +180,11 @@
    turned that into the two flasks visibly sitting closer together on one tab
    than another. Width still gets a say — narrower panels pull them in. */
 .alchemyRoot .tube-pair{display:flex;justify-content:center;align-items:flex-end;gap:32px;
-  /* The label's own height no longer sits in flow (see .swatch-label below),
-     so without this the scrollable .lab clips it a few px short. */
-  padding-bottom:20px;}
+  /* Neither label's own height sits in flow (see .swatch-label and
+     .target-element-hint below), so without this the scrollable .lab clips
+     them a few px short. Taller than the single-label days now that the
+     target stacks a second line under "цель". */
+  padding-bottom:36px;}
 .alchemyRoot .tube-box,.alchemyRoot .current-cluster{display:flex;flex-direction:column;
   align-items:center;gap:6px;}
 /* Taken out of flow and centered by its own transform, not by its parent's
@@ -202,18 +200,29 @@
 .alchemyRoot .swatch-label{color:#9d8d75;font:11px/1 inherit;letter-spacing:.02em;
   position:absolute;top:100%;left:50%;transform:translateX(-50%);
   margin-top:6px;white-space:nowrap;}
+/* The element a round is built around, named under the target's own "цель" —
+   stacked below it the same way, just further down (see the taller
+   .tube-pair padding above). Cosmetic for now: nothing checks the placed
+   element against this name yet, the way nothing checks reagent amounts
+   against anything but the target colour. */
+.alchemyRoot .target-element-hint{color:var(--gold);font:600 10px/1 inherit;letter-spacing:.05em;
+  text-transform:uppercase;position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  margin-top:22px;white-space:nowrap;}
 
 /* The glassware is sized from the window, not pinned in pixels. At a fixed
    96x224 the two flasks were a small island in a bench that stretched to
    whatever the column gave it — 244px of content inside 854px. Height leads
    and the frame PNG keeps its own ratio, so the flasks grow with the window
-   instead of the bench growing around them. */
+   instead of the bench growing around them.
+   Smaller across the board now that the bench shares the row with a third
+   column (the element slot, below) as well as the reagents — the same
+   window budget has to fit three things side by side instead of two. */
 .alchemyRoot .scene[data-name="Смешение"] .test-tube.tube-lg,
 .alchemyRoot .scene[data-name="Концентрации"] .test-tube.tube-lg,
 .alchemyRoot .scene[data-name="Разделение"] .test-tube.tube-lg{
-  height:clamp(140px,20vh,300px)!important;width:auto!important;aspect-ratio:96/224;}
+  height:clamp(110px,16vh,220px)!important;width:auto!important;aspect-ratio:96/224;}
 /* Reagent tubes follow the window too, or four of them out-measure the bench. */
-.alchemyRoot .color-controls .color-card .mini-swatch{height:clamp(60px,10vh,110px)!important;}
+.alchemyRoot .color-controls .color-card .mini-swatch{height:clamp(48px,8vh,88px)!important;}
 
 /* --- reagents: one row, the tube is the target --- */
 .alchemyReagents{flex:0 0 auto;}
@@ -239,22 +248,85 @@
 .alchemyRoot .mini-swatch.atMax:hover{transform:none;filter:none;}
 .alchemyRoot .mini-swatch:active{transform:translateY(-1px) scale(.97);}
 
-/* --- verdict and actions, pinned --- */
-.alchemyFoot{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
-  gap:16px;padding-top:10px;border-top:1px solid rgba(120,94,52,.32);}
-.alchemyRoot .status{display:flex;flex-direction:column;gap:2px;color:#897d6c;font:12px/1.3 inherit;}
+/* --- the element slot, the verdict, and the buttons: one column --- */
+/* Third column, not a footer any more: the slot on top, the verdict below
+   it, the buttons below that — the order you actually use them in, and the
+   same narrow-column treatment the reagents already got. Checking a mix
+   used to need only reagents; now it needs an element in this slot too,
+   so the slot sits closest to the buttons that need it filled. */
+.alchemyElementColumn{flex:0 0 auto;display:flex;flex-direction:column;
+  align-items:center;gap:12px;padding-top:10px;border-top:1px solid rgba(120,94,52,.32);}
+/* width:100%, not the default shrink-to-fit a column-direction flex item
+   gets: without it the verdict sat at its own unwrapped text width, which
+   is wider than the element column and was running the line straight out
+   past the modal's own edge instead of wrapping inside it. */
+.alchemyRoot .status{display:flex;flex-direction:column;gap:2px;color:#897d6c;font:12px/1.3 inherit;text-align:center;width:100%;min-width:0;}
 .alchemyRoot .status strong{color:#e2c487;font:600 14px/1.2 Georgia,serif;}
 .alchemyRoot .big-actions{display:flex;gap:10px;}
+/* Side by side needs more width than the narrow element column has to give —
+   Проверить and Сброс were clipping. Stacked instead, each full width. */
+.alchemyElementColumn .big-actions{flex-direction:column;width:100%;gap:8px;}
+.alchemyElementColumn .ctl{width:100%;}
 .alchemyRoot .ctl{padding:9px 16px;border:1px solid #a97f3e;border-radius:9px;
   background:linear-gradient(#432f1b,#20170f);color:#e8c67d;font:600 12px/1 inherit;cursor:pointer;}
 .alchemyRoot .ctl:hover{filter:brightness(1.14);}
+.alchemyRoot .ctl:disabled{opacity:.4;cursor:not-allowed;filter:none;}
 .alchemyRoot .keyhint{display:none;}
+
+/* Empty until an element from the rack drawer (assets/alchemy/bottle-*.png,
+   js/world/alchemy.js window.Alchemy.applySelection) fills it — a dashed
+   silhouette inviting the click that opens the drawer, same aspect ratio as
+   the bottles there so the art doesn't stretch once it's set. */
+.alchemyElementCell{
+  --element-bottle-img:none;
+  width:clamp(46px,7vh,72px);aspect-ratio:150/409;
+  border:2px dashed rgba(138,100,52,.55);border-radius:8px 8px 22px 22px;
+  background:rgba(24,19,14,.5) var(--element-bottle-img) center/contain no-repeat;
+  padding:0;cursor:pointer;
+  transition:border-color .16s ease,background-color .16s ease,transform .16s ease;
+}
+.alchemyElementCell:hover{border-color:#d6ab5e;transform:translateY(-3px);}
+.alchemyElementCellHint{font-size:1.6em;line-height:1;color:rgba(217,167,76,.55);}
+.alchemyElementCell.filled{border-style:solid;border-color:rgba(217,167,76,.6);background-color:transparent;}
+.alchemyElementCell.filled .alchemyElementCellHint{display:none;}
 
 @media (max-width:760px){
   .alchemyRoot .tube-pair{gap:24px;}
   .alchemyRoot .color-controls{gap:8px;}
   .alchemyRoot .color-card{width:66px;}
-  .alchemyFoot{flex-direction:column;align-items:stretch;gap:8px;}
+  /* The element cell's tall bottle aspect-ratio (150/409) makes it the
+     biggest single item in a stacked mobile layout — at the base 7vh width
+     it was taller than the two lab bottles combined, squeezing .lab's own
+     flex-1 box short enough to scroll the target-element-hint out of view. */
+  .alchemyRoot .alchemyElementCell{width:clamp(28px,3.6vh,40px);}
+  .alchemyRoot .alchemyElementColumn{gap:6px;padding-top:4px;}
+  .alchemyRoot .alchemyElementColumn .status{min-height:0;}
+  .alchemyRoot .alchemyElementColumn .big-actions{gap:6px;}
+  .alchemyRoot .alchemyElementColumn .ctl{padding:7px 14px;}
+  /* Separation's "Убрать красную примесь" labels are much longer than
+     Mixing's "Красный" — left uncapped they ballooned .alchemyReagents to
+     ~200px on this station alone (vs ~150px elsewhere), squeezing .lab's
+     flex-1 share down enough to clip the target-element-hint again, this
+     time invisibly (elementFromPoint landed on bare .scene, past .lab's
+     own painted area). Two lines, then ellipsis, keeps every station's
+     reagent band the same height so the fixed padding-bottom budget above
+     actually holds. */
+  .alchemyRoot .color-card strong{display:-webkit-box;-webkit-line-clamp:2;
+    -webkit-box-orient:vertical;overflow:hidden;min-height:0;}
+  .alchemyRoot .tube-pair{padding-bottom:52px;}
+  /* Stays absolute (like desktop) instead of joining flow — .tube-box's
+     flex height also drives the current-side bottle via align-items:flex-end,
+     so growing it here would drag the bottles out of alignment. Width:100%
+     pins it to the tube's own ~58px column (its positioned ancestor) rather
+     than a guessed px value, so a long name like HYDRARGYRUM wraps within
+     that column instead of bleeding into the "текущая смесь" label 24px
+     away. */
+  /* .swatch-label ("цель") is also position:absolute;top:100% off the
+     same .tube-box, so without matching clearance here the two stack on
+     top of each other instead of one below the other. */
+  .alchemyRoot .target-element-hint{white-space:normal;width:100%;
+    font-size:9px;letter-spacing:.02em;line-height:1.15;margin-top:24px;
+    overflow-wrap:break-word;}
 }
 
 /* --- wide: glassware left, reagents right --- */
@@ -265,14 +337,14 @@
   .alchemyRoot .scene.active{
     display:grid;
     /* minmax(0,1fr), not 1fr: a 1fr track will not shrink below its own
-       min-content, and the bench was pushing the whole grid past the window. */
-    grid-template-columns:minmax(0,1fr) minmax(200px,230px);
-    /* The bench takes the room that is left and the verdict is sized to its
-       own content, so the foot cannot be pushed out of the window — which is
-       what happened on a 600px-tall screen, where the reagent column stood
-       378px against a 332px bench. */
-    grid-template-rows:minmax(0,1fr) auto;
-    grid-template-areas:"bench reagents" "foot foot";
+       min-content, and the bench was pushing the whole grid past the window.
+       Three columns now — bench, reagents, element — all in one row: the
+       element slot sits right where the old "foot" row used to span, since
+       its own column already carries the verdict and the buttons stacked
+       inside it (see .alchemyElementColumn above). */
+    grid-template-columns:minmax(0,1fr) minmax(150px,180px) minmax(120px,150px);
+    grid-template-rows:minmax(0,1fr);
+    grid-template-areas:"bench reagents element";
     gap:14px;
     /* An explicit width, because stretch alone will not pull a flex item below
        the min-content of its own grid tracks — the bench kept the scene 1180px
@@ -290,7 +362,10 @@
   .alchemyRoot .scene.active > .alchemyReagents{grid-area:reagents;min-width:0;min-height:0;align-self:stretch;overflow:auto;display:flex;align-items:center;
     padding:16px;border:1px solid rgba(120,94,52,.34);border-radius:14px;
     background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.16));}
-  .alchemyRoot .scene.active > .alchemyFoot{grid-area:foot;min-width:0;align-self:end;}
+  .alchemyRoot .scene.active > .alchemyElementColumn{grid-area:element;min-width:0;min-height:0;
+    align-self:stretch;justify-content:center;overflow:auto;
+    padding:16px;border-top:0;border:1px solid rgba(120,94,52,.34);border-radius:14px;
+    background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.16));}
   .alchemyRoot .scene.active > .scene-head{display:none;}
   /* four reagents read better as a block of two than as a tall column */
   .alchemyRoot .color-controls{display:grid;grid-template-columns:repeat(2,1fr);
@@ -299,15 +374,19 @@
      from the inside, this time on the long filter labels. */
   .alchemyRoot .color-card{width:auto;min-width:0;}
   .alchemyRoot .lab{display:flex;flex-direction:column;justify-content:center;}
-  /* Side by side the bench has a full column of height to spend on the flasks. */
+  /* Side by side the bench has a full column of height to spend on the
+     flasks — still shorter than before (v292-301 had these at 170-300px):
+     the bench is one of three columns competing for the same width now,
+     not one of two. */
   .alchemyRoot .scene[data-name="Смешение"] .test-tube.tube-lg,
   .alchemyRoot .scene[data-name="Концентрации"] .test-tube.tube-lg,
-  .alchemyRoot .scene[data-name="Разделение"] .test-tube.tube-lg{height:clamp(170px,32vh,300px)!important;}
-  .alchemyRoot .tube-pair{gap:40px;}
+  .alchemyRoot .scene[data-name="Разделение"] .test-tube.tube-lg{height:clamp(130px,24vh,220px)!important;}
+  .alchemyRoot .tube-pair{gap:28px;}
   /* Four reagents two-by-two at full height stood 530px against 328px of
      glassware and became the tallest thing in the window. Shorter here. */
-  .alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch{height:clamp(52px,10vh,96px)!important;width:40px!important;margin:0 auto 6px!important;}
+  .alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch{height:clamp(40px,7vh,68px)!important;width:34px!important;margin:0 auto 6px!important;}
   .alchemyRoot .alchemyReagents .color-card strong{min-height:2.4em;font-size:10.5px;}
+  .alchemyElementCell{width:clamp(40px,6vh,60px);}
 }
 
 /* The window is cut to the station rather than the station spread over the
@@ -329,7 +408,8 @@
 @media (min-width:900px) and (max-height:760px){
   .alchemyRoot .lab{padding:12px;}
   .alchemyRoot .lab h3{margin:0 0 8px;font-size:13px;}
-  .alchemyRoot .scene.active > .alchemyReagents{padding:12px;}
+  .alchemyRoot .scene.active > .alchemyReagents,
+  .alchemyRoot .scene.active > .alchemyElementColumn{padding:12px;}
   .alchemyRoot .color-controls{gap:10px;}
   .alchemyRoot .alchemyReagents .color-card strong{min-height:2.2em;font-size:10px;}
   .alchemyRoot .small-btn,.alchemyRoot .color-card button{padding:3px 8px;font-size:11px;}

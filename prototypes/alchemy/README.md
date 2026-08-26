@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v304)
+## Where this stands (v305)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -152,6 +152,43 @@ part worth keeping.
 Success is only a verdict for now. Nothing is banked; potions that carry into
 the next lock are the agreed next step, not built.
 
+**Each of the three color-game stations is now three columns: bench,
+reagents, element slot.** The two glassware bottles and four reagent flasks
+shrank to make room for a third cell — a dashed bottle-silhouette button
+(`.alchemyElementCell`) with the Проверить/Сброс pair moved underneath it.
+Clicking the cell opens the rack drawer; picking any of the seven rack
+bottles fills the cell (with that bottle's own art, via
+`--element-bottle-img`) and enables all three stations' Check buttons at
+once — one selection, shared across the whole module, same as the rack's
+`window.Alchemy.selectedElement` was already shared. The target bottle also
+grows a second label under "цель" naming one of the seven elements
+(`ALCHEMY_ELEMENT_NAMES`, rerolled alongside the round itself). Nothing
+checks the placed element *against* that name yet — the gameplay ask was
+just "some element must be present to check," not "the right one," so the
+name is a hint for future work, not a gate today.
+
+**A long element name needs the same absolute-label handling mobile-side
+that "текущая смесь" already got.** `.target-element-hint` sits
+`position:absolute;top:100%` under the target tube, same trick as
+`.swatch-label` above it (see "A wide label..." below) — kept out of flow
+so it can't widen `.tube-box` and drag the whole row off-centre. At the
+mobile breakpoint the tube column is only ~58px wide, and Cyrillic-style
+`white-space:nowrap` let "HYDRARGYRUM" run 130px past its box into
+"текущая смесь" 24px away. Fixed with `width:100%` (not a guessed
+max-width — 100% of the tube-box, its own positioned ancestor, so it
+literally cannot exceed the column) plus `overflow-wrap:break-word` (a bare
+`white-space:normal` does not break an unbroken word — it only wraps at
+existing spaces, and this is one word) and a matching `margin-top` to clear
+`.swatch-label`, which sits at that same `top:100%` and would otherwise
+print on the same line. `.lab`'s own scroll region ended up the tightest
+budget in the stack: its flex-1 share is whatever's left after the reagent
+band and the new element column, both flex-0, so the reagent labels also
+needed a 2-line clamp (`-webkit-line-clamp:2`) — Separation's "Убрать
+красную примесь" alone was ~50px taller than Mixing's "Красный" and that
+difference was enough to push the target-element-hint below `.lab`'s
+visible area on that station only, even after the tube-pair budget was
+tuned against Mixing.
+
 ## Two things that cost hours — do not rediscover them
 
 **The class names leak both ways.** Eleven are shared with the game. Scoping
@@ -266,6 +303,15 @@ subtree, and relies on `body:has(...)` rather than nesting to know when to
 show itself. Nothing about "it's a lair-only element" required it to
 physically live inside the lair markup.
 
+**A relative `url()` written into a custom property resolves against the
+stylesheet, not the page.** Filling `.alchemyElementCell`'s
+`--element-bottle-img` from JS with
+`url("assets/alchemy/bottle-${element}.png")` 404'd — the property is only
+*read* by `css/alchemy.css`, one directory below the project root, and a
+relative `url()` resolves against wherever the declaration using it lives,
+not the document that set the property or the document itself. It landed as
+`/css/assets/alchemy/...`. Root-relative (`/assets/alchemy/...`) fixed it.
+
 ## Still to do
 
 The other seven stations — markup only, no JS work. A bench texture under the
@@ -281,5 +327,7 @@ it isn't one — confirmed by dropping the clip-path, which fills clean. Not
 fixed: needs a decision on what "empty" should look like, not just a value
 tweak.
 
-The rack picks an element but nothing reads the pick yet. Next step is
-wiring it to gate elixir recipes, per the tension-tool analogy above.
+The rack's pick now gates the three Check buttons (any element unlocks all
+three — see v305 above) but nothing checks *which* element was placed
+against the target-element-hint's name yet. Next step is wiring that
+comparison in, per the tension-tool analogy above.

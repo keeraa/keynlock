@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v316)
+## Where this stands (v317)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -505,6 +505,26 @@ read as "the table moved."** Rather than fight that budget again,
 pushed the *contents* (bottle groups' own transforms) further down
 instead of the row itself. Visually similar outcome, achieved by moving
 what actually had room to move.
+
+**"колба с металлом обрезается слева" wasn't the rack bottle at all — it
+was HYDRARGYRUM's own leading letter, clipped by the window's edge.**
+`.target-element-hint` centers itself under the *leftmost* item in the
+bench column via `left:50%;transform:translateX(-50%)`, `white-space:
+nowrap`. For an 11-letter name that math put the text's left edge outside
+`#lairModuleWindow`'s own left edge — measured, 193px against the
+window's 210px — and the window clips (`overflow:hidden`, plain, not
+`!important`, but still enough). Same fix as the mobile breakpoint
+already uses: `white-space:normal;width:100%` (of the tube-box, its
+positioned ancestor) so it wraps to two lines within its own column
+instead of overflowing sideways into a hard edge.
+
+**Raising the bench bottles 10% (v317) meant every position tuned
+against their *old* line needed the same push, not just the bottles
+themselves** — the reagent ± buttons (positioned above the swatch via a
+matching `translateY`, v316) and цель/текущая смесь's own labels (already
+pulled up once in v315 to track the bottles) both needed the identical
+delta reapplied, or they'd drift back out of alignment with bottles that
+had just moved without them.
 
 ## Two things that cost hours — do not rediscover them
 

@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v296)
+## Where this stands (v297)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -44,16 +44,25 @@ remaining seven color-game stations need only their markup; missing
 elements get a stand-in rather than throwing, and every query the ported
 code makes is confined to `#alchemyRoot`.
 
-**The rack** (`Стойка` tab) shows seven bottles, each labelled with its
-element's Latin name — Stannum, Plumbum, Aurum, Sulfur, Hydrargyrum,
-Argentum, Ferrum — picked from a shelf image (`assets/alchemy/rack-back.png`
-+ `rack-front.png`) built for exactly seven slots. Clicking one selects it;
-nothing branches on the selection yet. The plan is to gate which elixir
-recipes are buildable by the chosen element, mirrored on the tension tool's
-lock-type match in `js/core/inventory-hit-testing.js`
+**The rack** (`Стойка` tab) shows seven bottles by element — Stannum,
+Plumbum, Aurum, Sulfur, Hydrargyrum, Argentum, Ferrum, in that order —
+picked from a shelf image (`assets/alchemy/rack-back.png` + `rack-front.png`)
+built for exactly seven slots. No name is printed on the shelf; each bottle
+carries its own alchemical symbol on a medallion instead, and the verdict
+line below names the element once picked. Clicking one selects it; nothing
+branches on the selection yet. The plan is to gate which elixir recipes are
+buildable by the chosen element, mirrored on the tension tool's lock-type
+match in `js/core/inventory-hit-testing.js`
 (`typeBySkin`/`selectedTensionType`/`currentRequiredTensionType`/
 `tensionCompatible`) — a lock only opens for the matching tool; an elixir
 should only brew from the matching element. Not built.
+
+Unlike the other three stations, the rack gets its own, wider module window
+(1040px, not 780px) — `#lairModuleWindow:has(.lairPanel[data-lair-panel=
+"alchemy"] .alchemyRackScene.active)`, scoped to just that scene so the
+color-game stations keep the narrower window they were sized for. A 1614:690
+shelf with seven items across needs the room; at 780px the bottles read as
+cramped rather than sitting cleanly in their rings.
 
 The rack is layered like the inventory case
 (`css/overrides-05-inventory.css` `.inventoryCaseBack`/`.inventoryCaseFront`,

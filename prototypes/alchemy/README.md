@@ -34,13 +34,23 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v290)
+## Where this stands (v293)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three stations run — mixing, concentrations,
 separation. The whole prototype script came over at once, so the remaining
 seven need only their markup; missing elements get a stand-in rather than
 throwing, and every query the ported code makes is confined to `#alchemyRoot`.
+
+The three stations were tuned for the lair window rather than the demo's
+scrolling page: the window went from 1280px down to 780px, the glassware
+scales with the window instead of sitting at a fixed 96×224, and a short
+screen (max-height:760px) trims chrome instead of pushing the verdict off the
+bottom. Pour/drain animates faster (820/680ms, was 1350/1100), the color
+transition itself is slower (.6s, was .22s) so a swap doesn't flash, and each
+reagent caps at 6 drops — past that the tube was already at its visual
+maximum, so more clicks did nothing but invite the player to find out what 99
+looked like.
 
 Styles the seven cannot reach yet are parked in `stations-pending.css`. Move a
 block back when its station's markup lands.
@@ -71,6 +81,25 @@ look there first.
 growing as a flex item — a used height, not a specified one — so `height:100%`
 below it resolves to auto. The chain is flex and grid throughout for that
 reason.
+
+**The mask PNG has empty margin baked in, and stretching it evenly moves both
+edges.** Its silhouette runs 14.6%–96.2% of the image, not edge to edge, so a
+plain 100%/100% mask left the liquid's floor short of the glass's own rounded
+bottom. The first fix stretched the mask symmetrically to close that gap —
+and moved the top edge with it, bleeding liquid color out past the neck where
+the frame art doesn't cover it. The working version only pulls the bottom in;
+the scale and offset are solved so the top lands back on exactly 14.6%, where
+the untouched mask already put it. Touch `mask-size`/`mask-position` on
+`.test-tube>.tube-liquid` and re-check both ends, not just the one you're
+fixing.
+
+**`.tube-pair`'s gap was in `vh`, and the module window's height isn't fixed.**
+Each station's footer text wraps to a different height, so the window — sized
+to its content, capped at 82vh — is a few px taller or shorter station to
+station. A `clamp(24px,4vh,48px)` gap read that difference back as the two
+flasks sitting visibly closer together on one tab than another. Fixed px
+values now (32px / 40px by breakpoint) — width may still resize it, height
+must not.
 
 ## Still to do
 

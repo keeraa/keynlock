@@ -25,6 +25,12 @@
 .inventoryTool.hidden-slot{opacity:0;pointer-events:none;filter:none;}
 .inventoryTool.breaking-out{opacity:0;pointer-events:none;transform:translateY(-18px) scale(.92);}
 .inventoryTool.breaking-out img{filter:drop-shadow(0 7px 8px rgba(0,0,0,.30));}
+.pickBreakBurst{position:fixed;z-index:520;width:1px;height:1px;pointer-events:none;}
+.pickBreakBurst i{--break-x:0px;--break-y:40px;--break-r:0deg;--break-delay:0ms;position:absolute;left:-4px;top:-14px;width:8px;height:28px;border-radius:3px 3px 1px 1px;background:linear-gradient(90deg,#6f4a21,#d59a48 42%,#f0bd67 56%,#51351c);box-shadow:0 2px 4px rgba(0,0,0,.42);opacity:0;animation:pickFragmentScatter 690ms cubic-bezier(.18,.62,.3,1) var(--break-delay) forwards;}
+body.pick-breaking .mechanismZone .pick,body.pick-breaking .sharedModeLockArt .pick,body.pick-breaking .r2Pick::before,body.pick-breaking .skPickArm::before,body.pick-breaking .inventoryTool-pick.selected img{opacity:0!important;transition:opacity 80ms linear!important;}
+body.pick-reforming .mechanismZone .pick,body.pick-reforming .sharedModeLockArt .pick,body.pick-reforming .r2Pick::before,body.pick-reforming .skPickArm::before,body.pick-reforming .inventoryTool-pick.selected img{animation:pickReform 340ms cubic-bezier(.18,.74,.22,1) both!important;}
+@keyframes pickFragmentScatter{0%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1);}68%{opacity:.9;}100%{opacity:0;transform:translate(var(--break-x),var(--break-y)) rotate(var(--break-r)) scale(.55);}}
+@keyframes pickReform{0%{opacity:0;filter:brightness(1.8) drop-shadow(0 0 12px rgba(232,189,104,.7));}55%{opacity:.72;}100%{opacity:1;}}
 .inventoryTool img{position:absolute;display:block;max-width:none;max-height:none;object-fit:contain;pointer-events:auto;cursor:pointer;filter:drop-shadow(0 7px 8px rgba(0,0,0,.44));}
 .inventoryTool-pick img{left:50%;bottom:35.459%;width:107.552942%;height:109.704%;transform:translateX(-50%) translateY(calc(-1 * var(--tool-lift))) rotate(180deg);transform-origin:50% 50%;}
 .inventoryTool-tension img{left:50%;bottom:34%;width:294.117647%;height:100%;transform:translateX(-50%) translateY(calc(-1 * var(--tool-lift))) rotate(90deg);transform-origin:50% 50%;}

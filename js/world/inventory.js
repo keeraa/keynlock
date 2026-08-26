@@ -9,12 +9,54 @@
   }
 
   function triggerInventoryBreakAnimation(slot){
+    triggerPickBreakVisual();
     inventoryBrokenSlot = Math.max(0, Math.min(5, Number(slot)||0));
     if(inventoryBreakTimer) clearTimeout(inventoryBreakTimer);
     inventoryBreakTimer = setTimeout(()=>{
       inventoryBrokenSlot = 0;
       renderInventoryTools();
-    }, 280);
+    }, 720);
+  }
+
+  function triggerPickBreakVisual(){
+    const body=document.body;
+    body.classList.remove('pick-breaking','pick-reforming');
+    void body.offsetWidth;
+    body.classList.add('pick-breaking');
+
+    const sources=[...document.querySelectorAll(
+      '.mechanismZone .pick,.sharedModeLockArt .pick,.r2Pick,.skPickArm,.inventoryTool-pick.selected img'
+    )].filter(el=>{
+      const style=getComputedStyle(el);
+      const r=el.getBoundingClientRect();
+      return style.display!=='none' && style.visibility!=='hidden' && r.right>=0 && r.left<=innerWidth && r.bottom>=0 && r.top<=innerHeight;
+    });
+
+    sources.forEach((source,sourceIndex)=>{
+      const r=source.getBoundingClientRect();
+      const burst=document.createElement('div');
+      burst.className='pickBreakBurst';
+      burst.style.left=`${r.left+r.width/2}px`;
+      burst.style.top=`${r.top+r.height/2}px`;
+      for(let i=0;i<9;i++){
+        const fragment=document.createElement('i');
+        const angle=(Math.PI*2*i/9)+(sourceIndex*.31);
+        const distance=28+(i%3)*16;
+        fragment.style.setProperty('--break-x',`${Math.cos(angle)*distance}px`);
+        fragment.style.setProperty('--break-y',`${Math.sin(angle)*distance+28}px`);
+        fragment.style.setProperty('--break-r',`${(i-4)*37}deg`);
+        fragment.style.setProperty('--break-delay',`${i*12}ms`);
+        burst.appendChild(fragment);
+      }
+      document.body.appendChild(burst);
+      setTimeout(()=>burst.remove(),760);
+    });
+
+    setTimeout(()=>{
+      body.classList.remove('pick-breaking');
+      body.classList.add('pick-reforming');
+    },390);
+    setTimeout(()=>body.classList.remove('pick-reforming'),760);
   }
 
   function setInventoryOpen(force){
@@ -108,4 +150,3 @@
       initInventoryDrawer._outsideBound = true;
     }
   }
-

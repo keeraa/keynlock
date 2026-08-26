@@ -5,7 +5,8 @@
 
   function renderSkyrimTensionPattern(type){
     const marks=document.querySelector('#skTensionPatternMarks');
-    if(!marks || marks.dataset.type===type) return;
+    const outerMarks=document.querySelector('#skTensionPatternOuterMarks');
+    if(!marks || !outerMarks || marks.dataset.type===type) return;
     const symbols={
       bar:'M0 -7V7',
       kink:'M-7 -6H-1Q6 -6 6 1V7',
@@ -19,6 +20,10 @@
       const angle=(360/28)*i;
       return `<g transform="rotate(${angle} 280 280) translate(280 105)"><path d="${path}"/></g>`;
     }).join('');
+    outerMarks.innerHTML=Array.from({length:36},(_,i)=>{
+      const angle=(360/36)*i;
+      return `<g transform="rotate(${angle} 280 280) translate(280 48) scale(.82)"><path d="${path}"/></g>`;
+    }).join('');
   }
 
   function renderSkyrim(){
@@ -27,9 +32,7 @@
     const diff=skAngleDiff();
     const ready=diff<=skSolveTolerance && !solved;
     $skMode.classList.toggle('ready',ready);
-    const tensionHint=document.querySelector('#skTensionHint');
     const requiredTension=window.getKeynlockTensionRequirement?.();
-    if(tensionHint) tensionHint.textContent=`Нужен натяжитель: ${requiredTension?.label || '—'}`;
     renderSkyrimTensionPattern(requiredTension?.type);
 
     if(solved){
@@ -71,7 +74,7 @@
     if(solved || skTorqueBusy) return;
     const desired=clamp(angle,-80,80);
     const distance=Math.abs(desired-skTargetAngle);
-    const response=distance<=skSolveTolerance*2 ? .78 : distance<=skSolveTolerance*5 ? .54 : .34;
+    const response=distance<=skSolveTolerance*2 ? .64 : distance<=skSolveTolerance*5 ? .36 : .18;
     skPickAngle=clamp(skPickAngle+(desired-skPickAngle)*response,-80,80);
     SFX.select();
     renderSkyrim();
@@ -80,7 +83,7 @@
   function moveSkyrim(dir){
     if(solved || skTorqueBusy) return;
     const distance=skAngleDiff();
-    const step=distance<=skSolveTolerance*2 ? 4 : distance<=skSolveTolerance*5 ? 3 : 2;
+    const step=distance<=skSolveTolerance*2 ? 3 : distance<=skSolveTolerance*5 ? 2 : 1;
     skPickAngle=clamp(skPickAngle+dir*step,-80,80);
     SFX.select();
     renderSkyrim();

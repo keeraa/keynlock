@@ -6,6 +6,20 @@
   function renderSkyrimTensionPattern(type){
     const marks=document.querySelector('#skTensionPatternMarks');
     const outerMarks=document.querySelector('#skTensionPatternOuterMarks');
+    const outerRing=document.querySelector('.skOuterRing');
+    const circleArt={
+      bar:'/assets/skyrim/iron_circle_bar_06.png',
+      hook:'/assets/skyrim/iron_circle_hook_03.png',
+      kink:'/assets/skyrim/iron_circle_kink_01.png',
+      wave:'/assets/skyrim/iron_circle_wave_04.png',
+      angle:'/assets/skyrim/iron_circle_angle_05.png'
+    };
+    const art=currentMechanismLevel===1 ? circleArt[type] : '';
+    outerRing?.classList.toggle('has-circle-art',Boolean(art));
+    if(outerRing){
+      if(art) outerRing.style.setProperty('--sk-circle-image',`url("${art}")`);
+      else outerRing.style.removeProperty('--sk-circle-image');
+    }
     if(!marks || !outerMarks || marks.dataset.type===type) return;
     const symbols={
       bar:'M0 -7V7',

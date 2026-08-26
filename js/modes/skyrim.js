@@ -9,6 +9,9 @@
     const diff=skAngleDiff();
     const ready=diff<=skSolveTolerance && !solved;
     $skMode.classList.toggle('ready',ready);
+    const tensionHint=document.querySelector('#skTensionHint');
+    const requiredTension=window.getKeynlockTensionRequirement?.();
+    if(tensionHint) tensionHint.textContent=`Нужен натяжитель: ${requiredTension?.label || '—'}`;
 
     if(solved){
       $skFeedbackText.textContent='Замок открыт';
@@ -114,4 +117,3 @@
     const angle=Math.atan2(dx,-dy)*180/Math.PI;
     return clamp(angle,-80,80);
   }
-

@@ -24,6 +24,7 @@
     $scene.classList.toggle('hideBase',isImported);
     document.body.classList.toggle('importedMode',isImported);
     document.body.classList.toggle('mode-hillsfar', mode==='hillsfar');
+    document.body.classList.toggle('mode-skyrim', mode==='skyrim');
     renderDifficultyDock();
     if(mode!=='hillsfar') clearHillsfarTimer();
     if(mode==='hillsfar') setGlobalTimer(true, hfTimeLeft || hfTimeMax, hfTimeMax || 1, 'ТАЙМЕР');

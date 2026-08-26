@@ -394,6 +394,10 @@
   function tensionTypeLabel(type){
     return type ? type[0].toUpperCase()+type.slice(1) : '—';
   }
+  window.getKeynlockTensionRequirement=()=>{
+    const type=currentRequiredTensionType();
+    return {type,label:type?tensionTypeLabel(type):'Любой'};
+  };
 
   function forceWrongTensionBreak(){
     const required=currentRequiredTensionType();

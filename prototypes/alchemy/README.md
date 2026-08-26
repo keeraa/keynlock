@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v299)
+## Where this stands (v300)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -88,12 +88,11 @@ front board's dividers sit in front of each bottle's base while the bottle's
 own body still shows through the gap, rather than getting fully hidden or
 fully exposed. `rack-front.png` is `rack-back.png`'s own bottom 439 of
 690px, bottom-aligned — that split was measured, not eyeballed. The seven
-ring-centre x-positions were *supposed* to be too (see the v298 entry below
-for how that went); the real, `cv2.matchTemplate`-measured values are 212,
-412, 611, 810, 1011, 1210, 1405 of a 1614px-wide source — see the CSS
-comments on `.alchemyRackFront`/`.alchemyRackBottle` if the art ever
-changes, and measure with a tool next time, not a gridline overlay judged
-by eye.
+ring-centre x-positions took three tries to actually get right (see the
+"Two things" section below) — the value that stuck is an ellipse fit to
+each ring's own edge contour: 204.5, 405.0, 604.1, 803.0, 1003.3, 1201.6,
+1401.9 of a 1614px-wide source. See the CSS comments on
+`.alchemyRackFront`/`.alchemyRackBottle` if the art ever changes.
 
 The three stations were tuned for the lair window rather than the demo's
 scrolling page: the window went from 1280px down to 780px, the glassware
@@ -199,6 +198,23 @@ image, correlation peaks found across the row) and cross-checked against
 the rim's own left/right edges by hand. Eyeballing a single instance is
 fine; eyeballing a *spacing* that repeats seven times is not — eyeball
 error is per-ring, but position error is per-ring-times-how-many-rings-away.
+
+**The `matchTemplate` fix (v299) traded a compounding error for a
+constant one — still wrong, just wrong the same amount everywhere.** The
+template was a crop centred on a guessed x for ring 2; correlation finds
+where the template's *own* pixel pattern recurs, not where the ring
+geometrically centres, so whatever offset was baked into that guess (~7px)
+came back on six of the seven matches. Six bottles reading uniformly
+crooked while the seventh (whose crop happened to be closer to centred)
+read fine is a harder pattern to catch by skimming a screenshot than the
+one-directional drift before it — it took being told plainly that only one
+bottle looked right to go looking again. Fixed by not comparing rings to
+each other at all: Canny edges (`cv2.Canny`) plus `cv2.findContours` and
+`cv2.fitEllipse` on each ring's own boundary, independently, cross-checked
+by two separate contours (inner hole, outer rim) landing within ~1px of
+each other per ring. Two rings agreeing with a template is still just the
+template being self-consistent; two independent fits on the *same* ring
+agreeing with each other is the actual signal.
 
 ## Still to do
 

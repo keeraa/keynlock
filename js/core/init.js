@@ -90,7 +90,7 @@
     else if(k==='d'||k==='arrowright')move(1);
     else if(k==='w'||k==='arrowup')select(-1);
     else if(k==='s'||k==='arrowdown')select(1);
-    else if(k==='r')reset();
+    else if(k==='r')newLock();
     else if(k==='n')newLock();
   }
 
@@ -111,6 +111,7 @@
 
   addEventListener('keydown',e=>{
     if(e.target?.closest?.('input,textarea,select,[contenteditable="true"]')) return;
+    if(e.metaKey||e.ctrlKey||e.altKey) return;
     const action=KEY_ACTIONS[e.code];
     if(!action) return;
     e.preventDefault();

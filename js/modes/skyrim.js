@@ -30,6 +30,7 @@
     solved=false;
     $lock.classList.remove('win');
     $mechanism.classList.remove('ready','opening','opened');
+    document.querySelector('.skCenterLock')?.classList.remove('opening','opened');
     picks=pickCapacity;
     moves=0;
     brokenPicks=0;
@@ -49,14 +50,19 @@
 
   function setSkyrimAngle(angle){
     if(solved || skTorqueBusy) return;
-    skPickAngle=clamp(angle,-80,80);
+    const desired=clamp(angle,-80,80);
+    const distance=Math.abs(desired-skTargetAngle);
+    const response=distance<=skSolveTolerance*2 ? .78 : distance<=skSolveTolerance*5 ? .54 : .34;
+    skPickAngle=clamp(skPickAngle+(desired-skPickAngle)*response,-80,80);
     SFX.select();
     renderSkyrim();
   }
 
   function moveSkyrim(dir){
     if(solved || skTorqueBusy) return;
-    skPickAngle=clamp(skPickAngle+dir*4,-80,80);
+    const distance=skAngleDiff();
+    const step=distance<=skSolveTolerance*2 ? 4 : distance<=skSolveTolerance*5 ? 3 : 2;
+    skPickAngle=clamp(skPickAngle+dir*step,-80,80);
     SFX.select();
     renderSkyrim();
   }
@@ -75,23 +81,28 @@
     registerMove();
 
     const diff=skAngleDiff();
-    const normalized=clamp(1-diff/48,0,1);
-    const maxTurn=diff<=6 ? 90 : 10+62*normalized;
-    skCylinderAngle=maxTurn;
-    SFX.move();
-    renderSkyrim();
-
     if(diff<=skSolveTolerance){
       solved=true;
+      skCylinderAngle=0;
       $lock.classList.add('win');
+      const centerLock=document.querySelector('.skCenterLock');
+      centerLock?.classList.add('opening');
       SFX.open();
+      renderSkyrim();
       setTimeout(()=>{
+        centerLock?.classList.remove('opening');
+        centerLock?.classList.add('opened');
         renderSkyrim();
         celebrate();
         skTorqueBusy=false;
-      },430);
+      },980);
       return;
     }
+
+    const normalized=clamp(1-diff/48,0,1);
+    skCylinderAngle=10+62*normalized;
+    SFX.move();
+    renderSkyrim();
 
     $skMode.classList.remove('torque-fail');
     void $skMode.offsetWidth;
@@ -105,7 +116,7 @@
         renderSkyrim();
       }
       skTorqueBusy=false;
-    },390);
+    },680);
   }
 
   function skyrimAngleFromPointer(e){

@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v312)
+## Where this stands (v313)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -380,6 +380,30 @@ than a tabletop sitting under three columns of glassware. `max-height:
 sizing (still auto height, still capped at 82vh) — the window just ends
 up with a bit of slack above/below the row on a very tall screen instead
 of stretching the photo to fill it.
+
+**Two of v312's three follow-up complaints were the same underlying
+regression, seen once by eye and once by name.** "Стол растянут" and
+"коричневая обводка" both pointed at the `background-color:#7a4e31` fill
+under the desk photo (added in v309 to hide its own transparent corners
+against the panel's old near-black background). Once the row also had a
+hard `max-height` (v312) its box became visibly rectangular, and that
+flat brown fill in the corners read as its own box drawn around the
+organic table shape — "stretched" and "outlined" are two ways of
+describing the same rectangle-vs-trapezoid mismatch becoming visible.
+Removed the fill outright rather than re-tuning it: v309's fix predates
+the full-screen blur from later in v312, and blurred room in those
+corners (instead of a flat color, instead of the old near-black) is a
+strictly better background than anything this file was trying to paint
+there itself.
+
+**Z-index numbers copied from one comment to justify a value elsewhere
+in the same file need to be re-checked against the actual CSS, not
+assumed.** v312's blur used z-index:1, reasoning (never actually
+verified) that anything from the room would be even lower. Сай's own
+portrait sits at z-index:3 (`css/overrides-06-digital.css`,
+`.lairSceneCharacter.sai`), inside `#lairSceneCharacters` at z-index:8 —
+both comfortably above 1, so she kept painting on top of the blur meant
+to cover her. Fixed at z-index:9, one past that container.
 
 ## Two things that cost hours — do not rediscover them
 

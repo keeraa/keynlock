@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Алхимические прототипы — полный набор</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="alchemy.css">
+</head>
+<body>
+<div class="app">
+  <div class="tabs" id="tabs"></div>
+  <div class="flask-hud"><span class="flask-title">Флаконы</span><div class="flasks" id="flasks"></div><span class="flask-note" id="flaskNote">3 попытки</span><button class="refill" id="refillFlasks" aria-label="Пополнить флаконы" title="Пополнить флаконы"><i class="ti ti-refresh"></i></button></div>
+  <main class="stage">
+
+    <section class="scene" data-name="Смешение">
+  <div class="scene-head"><div><h2>Смешение цвета</h2></div><div class="status" id="mixStatus"><strong>Подбери оттенок</strong>и проверь смесь</div></div>
+  <div class="lab color-game-lab"><div class="color-sample-panel"><h3>Образец и текущая смесь</h3><div class="tube-pair"><div class="tube-box"><div class="test-tube tube-lg"><div class="tube-liquid" id="mixTarget" style="--liquid-color:#dc8342;background-color:#dc8342"></div></div><div class="swatch-label">цель</div></div><div class="current-cluster"><div class="tube-box current-main-box"><div class="test-tube tube-lg"><div class="tube-liquid" id="mixCurrent" style="--liquid-color:#c6beac;background-color:#c6beac"></div></div><div class="swatch-label">текущая смесь</div></div><div class="color-controls side-color-controls" id="mixControls"></div></div></div><div class="big-actions centered-actions"><button class="ctl" id="mixCheck">Проверить</button><button class="ctl" id="mixReset">Сброс</button></div><div class="keyhint">Клавиатура: 1/2/3/4 — добавить реагент · Enter — проверить · R — сброс</div></div></div>
+</section>
+
+    <section class="scene" data-name="Концентрации">
+  <div class="scene-head"><div><h2>Неизвестные концентрации</h2></div><div class="status" id="unknownStatus"><strong>Скрытые силы</strong>наблюдай за цветом</div></div>
+  <div class="lab color-game-lab"><div class="color-sample-panel"><h3>Цель и результат</h3><div class="tube-pair"><div class="tube-box"><div class="test-tube tube-lg"><div class="tube-liquid" id="unknownTarget" style="--liquid-color:#5b9d62;background-color:#5b9d62"></div></div><div class="swatch-label">цель</div></div><div class="current-cluster"><div class="tube-box current-main-box"><div class="test-tube tube-lg"><div class="tube-liquid" id="unknownCurrent" style="--liquid-color:#c6beac;background-color:#c6beac"></div></div><div class="swatch-label">получилось</div></div><div class="color-controls side-color-controls" id="unknownControls"></div></div></div><div class="big-actions centered-actions"><button class="ctl" id="unknownCheck">Проверить</button><button class="ctl" id="unknownReset">Новая партия</button></div><div class="keyhint">Клавиатура: 1/2/3/4 — добавить реагент · Enter — проверить · R — новая партия</div></div></div>
+</section>
+
+    <section class="scene" data-name="Разделение">
+  <div class="scene-head"><div><h2>Разделение смеси</h2></div><div class="status" id="sepStatus"><strong>Очисти смесь</strong>до образца</div></div>
+  <div class="lab color-game-lab"><div class="color-sample-panel"><h3>Цель и грязная смесь</h3><div class="tube-pair"><div class="tube-box"><div class="test-tube tube-lg"><div class="tube-liquid" id="sepTarget" style="--liquid-color:#5370c9;background-color:#5370c9"></div></div><div class="swatch-label">цель</div></div><div class="current-cluster"><div class="tube-box current-main-box"><div class="test-tube tube-lg"><div class="tube-liquid" id="sepCurrent" style="--liquid-color:#8a647f;background-color:#8a647f"></div></div><div class="swatch-label">грязная смесь</div></div><div class="color-controls side-color-controls" id="sepControls"></div></div></div><div class="big-actions centered-actions"><button class="ctl" id="sepCheck">Проверить</button><button class="ctl" id="sepReset">Новая смесь</button></div><div class="keyhint">Клавиатура: 1/2/3/4 — убрать примесь · Enter — проверить · R — сброс</div></div></div>
+</section>
+<section class="scene" data-name="Порядок">
+  <div class="scene-head">
+    <div><h2>Последовательность реагентов</h2></div>
+    <div class="status" id="seqStatus"><strong>0 / 4</strong>этапов</div>
+  </div>
+  <div class="lab">
+    <div class="sequence-layout-v8">
+      <div class="sequence-tube-card">
+        <div class="kicker"><i class="ti ti-test-pipe"></i> Текущая реакция</div>
+        <div class="test-tube tube-lg sequence-game-tube-v21"><div class="sequence-liquid-stack" id="seqTubeLayers"></div></div>
+        <div class="seq-dots" id="seqDots"></div>
+      </div>
+      <div class="sequence-elements-card">
+        <div class="kicker"><i class="ti ti-atom"></i> Реагенты</div>
+        <div class="sigils sigils-v8" id="sigils"></div>
+        <div class="keyhint">Клавиатура: 1–4 — добавить реагент · R — новый рецепт</div>
+        <button class="ctl" id="seqReset"><i class="ti ti-refresh"></i> Новый рецепт</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <section class="scene" data-name="Перегонка">
+      <div class="scene-head"><div><h2>Фракционная перегонка</h2><div class="desc">Уровни пяти фракций движутся вверх и вниз, а сама жидкость непрерывно меняет цвет. Для каждой колбы есть свой целевой цвет: зафиксируй её только тогда, когда поверхность жидкости находится в золотой зоне и оттенок совпадает с целью.</div></div><div class="status" id="distillStatus"><strong>0 / 5</strong>цветов зафиксировано</div></div>
+      <div class="lab"><div class="columns columns-v14" id="columns"></div><div class="rulebox"><b>Управление:</b> под каждой пробиркой включай <b>огонёк</b>, чтобы прогревать цвет. Зафиксируй пробирку кликом по колонне или клавишами 1–5 только тогда, когда уровень попал в золотую зону и текущий оттенок совпал с целью.</div></div>
+    </section>
+
+    <section class="scene" data-name="Формула">
+  <div class="scene-head">
+    <div><h2>Сбор формулы по свойствам</h2><div class="desc">Слева — рецепт из четырёх требований. Справа — пробирка, в которую по порядку попадают выбранные вещества. Ниже каждый раз выдаются 12 случайных компонентов из общей библиотеки.</div></div>
+    <div class="status" id="recipeStatus"><strong>0 / 4</strong>компонентов добавлено</div>
+  </div>
+  <div class="lab formula-lab-v8">
+    <div class="formula-top-v8">
+      <div class="recipe-sheet-v8">
+        <div class="kicker"><i class="ti ti-notes"></i> Рецепт</div>
+        <div id="recipeClues" class="recipe-plain-list"></div>
+        <div class="big-actions"><button class="ctl" id="recipeReset"><i class="ti ti-refresh"></i> Новый рецепт</button></div>
+      </div>
+      <div class="formula-tube-panel-v8">
+        <div class="kicker"><i class="ti ti-test-pipe"></i> Смесь</div>
+        <div class="test-tube tube-lg formula-game-tube-v21"><div class="formula-tube-stack-v8" id="recipeTubeStack"></div></div>
+        <div class="formula-progress-v8" id="recipeProgress">пусто</div><button class="ctl formula-tube-check-v11" id="recipeCheck"><i class="ti ti-check"></i> Проверить</button>
+      </div>
+    </div>
+    <div class="formula-parts-v8" id="recipeParts"></div>
+    <div class="keyhint">Клавиатура: 1–9, Q/W/E — 12 компонентов · Enter — проверить · R — новый рецепт</div>
+  </div>
+</section>
+<section class="scene" data-name="Давление + осаждение">
+  <div class="scene-head">
+    <div><h2>Стабилизация и осаждение</h2>
+    </div>
+    <div class="status" id="compoundStatus"><strong>Собрано 0 / 3</strong></div>
+  </div>
+
+  <div class="lab">
+    <div class="compound-layout-v12">
+      <div class="compound-dial-v12" id="compoundDial">
+        <svg class="compound-zone-svg-v12" id="compoundZoneSvg" viewBox="0 0 100 100" aria-hidden="true"></svg>
+        <div class="compound-pulse-v12" id="compoundPulseHand"></div>
+        <div class="compound-core-v12"><i class="ti ti-flask"></i></div>
+      </div>
+
+      <div class="compound-tube-card-v12">
+        <div class="kicker"><i class="ti ti-test-pipe"></i> Собранный осадок</div>
+        <div class="test-tube tube-lg compound-game-tube-v21 compound-test-tube-v12">
+          <div class="compound-tube-stack-v12" id="compoundTubeStack"></div>
+<div class="compound-tube-targets-v15" id="compoundTubeTargets" aria-hidden="true"></div>
+        </div>
+        <div class="compound-tube-label-v12" id="compoundTubeLabel">пробирка пуста</div>
+      </div>
+
+      <div class="compound-card-v12 compound-card-minimal-v19">
+        <div class="kicker"><i class="ti ti-flame"></i> Нагрев</div>
+        <button class="hold compound-hold-v12" id="compoundHeat"><i class="ti ti-flame"></i> Удерживать нагрев · Space</button>
+        <div class="compound-hint-v12" id="compoundHint">Удерживай Space, пока стрелка проходит активную цветную дугу.</div><div class="compound-impurity-v41" id="compoundImpurity"></div>
+        <div class="keyhint">Space — удерживать нагрев · R — новая игра</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="scene" data-name="Баланс эссенций">
+  <div class="scene-head"><div><h2>Соотношение эссенций</h2><div class="desc">Выбери ровно три ингредиента. Их эссенции складываются в котле; итоговые три шкалы должны совпасть с заданным составом.</div></div><div class="status" id="essenceStatus"><strong>0 / 3</strong>ингредиента выбрано</div></div>
+  <div class="lab"><div class="balance-proto-layout">
+    <div class="essence-summary">
+      <div class="essence-half"><div class="kicker">Цель</div><div id="essenceTargetBars"></div></div>
+      <div class="essence-half"><div class="kicker">В котле</div><div id="essenceCurrentBars"></div></div>
+    </div>
+    <div class="essence-cards" id="essenceCards"></div>
+    <div class="proto-actions essence-actions"><button class="ctl" id="essenceCheck"><i class="ti ti-check"></i> Сварить</button><button class="ctl" id="essenceReset"><i class="ti ti-refresh"></i> Новый состав</button></div>
+    <div class="proto-note">1–6 — выбрать ингредиент · Enter — проверить · R — новый состав</div>
+  </div></div>
+</section>
+
+<section class="scene" data-name="Реакции слоёв">
+  <div class="scene-head"><div><h2>Реакции между слоями</h2><div class="desc">Новый реагент касается только верхнего слоя жидкости. Удаляй и превращай слои последовательно, пока в пробирке не останется нужный кристаллический осадок.</div></div><div class="status" id="layerStatus"><strong>Цель: кристалл</strong>реагируй с верхним слоем</div></div>
+  <div class="lab"><div class="layer-react-layout">
+    <div class="proto-card" style="text-align:center"><div class="kicker">Реактор</div><div class="layer-react-tube"><div class="layer-react-stack" id="layerReactStack"></div></div><div class="proto-sub" id="layerTopLabel">верхний слой</div></div>
+    <div><div class="layer-reagent-grid" id="layerReagents"></div><div class="proto-actions"><button class="ctl" id="layerReset"><i class="ti ti-refresh"></i> Новая пробирка</button></div><div class="proto-note">1–4 — применить реагент к верхнему слою · R — новая пробирка</div></div>
+  </div></div>
+</section>
+
+<section class="scene" data-name="Ветвящийся рецепт">
+  <div class="scene-head"><div><h2>Три стадии настоя</h2><div class="desc">Один и тот же реагент работает по-разному на разных стадиях. Сначала выбери основу, затем эффект, затем способ стабилизации — так получится нужная ветка эликсира.</div></div><div class="status" id="branchStatus"><strong>Шаг 1 / 3</strong>выбери основу</div></div>
+  <div class="lab"><div class="branch-layout">
+    <div class="branch-top-row">
+      <div class="branch-target"><div class="kicker">Целевой эликсир</div><div class="branch-target-name" id="branchTargetName">—</div><div class="branch-tags" id="branchTargetTags"></div></div>
+      <div class="branch-current"><div class="kicker">Текущий настой</div><div class="test-tube tube-lg" style="margin:14px auto 8px"><div class="tube-liquid" id="branchLiquid"></div></div><div class="proto-title" id="branchCurrentName">Базовый настой</div><div class="branch-steps" id="branchSteps"></div></div>
+    </div>
+    <div class="branch-bottom"><div class="branch-reagents" id="branchReagents"></div><div class="proto-actions"><button class="ctl" id="branchReset"><i class="ti ti-refresh"></i> Новая цель</button></div><div class="proto-note">1–9 — добавить реагент · R — новая цель</div></div>
+  </div></div>
+</section>
+
+</main>
+</div>
+
+  <script src="alchemy.js"></script>
+</body>
+</html>

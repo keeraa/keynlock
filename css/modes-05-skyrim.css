@@ -34,7 +34,7 @@
 .skTorqueButton:after{content:"";position:absolute;inset:8px;border-radius:50%;opacity:0;box-shadow:0 0 22px rgba(226,183,101,.25);transition:opacity 180ms ease;}
 .skTorqueButton:hover:after{opacity:.6;}
 .skMode.ready .skTorqueButton:after{opacity:1;box-shadow:0 0 28px rgba(246,211,139,.42),0 0 56px rgba(226,176,87,.24);}
-.skFeedback{position:absolute;left:50%;top:-38px;z-index:12;min-width:420px;display:flex;flex-direction:column;align-items:center;gap:5px;transform:translateX(-50%);text-align:center;font:14px/1.3 Arial,sans-serif;color:#bea986;letter-spacing:.04em;}
+.skFeedback{position:absolute;left:50%;top:12px;z-index:12;min-width:420px;display:flex;flex-direction:column;align-items:center;gap:5px;transform:translateX(-50%);text-align:center;font:14px/1.3 Arial,sans-serif;color:#bea986;letter-spacing:.04em;}
 .skTensionHint{padding:5px 10px;border:1px solid rgba(190,153,88,.42);border-radius:999px;background:rgba(22,16,11,.72);color:#e2c47e;font:700 11px/1 Arial,sans-serif;letter-spacing:.06em;}
 .skMode.torque-fail .skPickNeedle{animation:skPickStrain 280ms ease;}
 @keyframes skPickStrain{
@@ -56,7 +56,8 @@ body.importedMode .skMode .sharedModeLockArt{transform:translateX(-50%) scale(.3
 .skMode[hidden]{display:none!important;pointer-events:none!important;}
 body.importedMode .skMode{inset:0!important;width:100%!important;height:100%!important;min-height:0!important;max-width:none!important;z-index:20!important;}
 body.mode-skyrim #lock.universalLockBlock{display:none!important;}
+body.mode-skyrim,body.mode-skyrim .app{overflow:hidden!important;}
 @media (max-width:720px){
 .skCenterLock{transform:translate(-50%,-50%) scale(1.15);}
-.skFeedback{top:-28px;min-width:0;width:min(92vw,420px);}
+.skFeedback{top:8px;min-width:0;width:min(92vw,420px);}
 }

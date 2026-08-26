@@ -9,6 +9,7 @@ body:not(.importedMode) .puzzleArea>.platesZone{z-index:58!important;}
 body.importedMode .puzzleArea>.platesZone,body.importedMode .puzzleArea>#status{display:none!important;}
 body:not(.importedMode) .puzzleArea>.platesZone{display:block!important;}
 body.importedMode .puzzleArea>.modePanel:not([hidden]),body.mode-hillsfar .puzzleArea>.hillsfarMode:not([hidden]){position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;max-width:none!important;margin:0!important;padding:8px 20px 12px!important;display:flex!important;visibility:visible!important;opacity:1!important;align-items:center!important;justify-content:flex-start!important;flex-direction:column!important;overflow:auto!important;background:transparent!important;background-image:none!important;box-shadow:none!important;filter:none!important;z-index:5!important;}
+body.importedMode .puzzleArea>.skMode:not([hidden]){overflow:hidden!important;}
 body.importedMode .g1Mode,body.importedMode .r2Mode,body.importedMode .hillsfarMode,body.importedMode .massMode,body.importedMode .skMode,body.importedMode .anMode,body.importedMode .tnMode,body.importedMode .rsMode,body.importedMode .kdMode,body.importedMode .cpMode{top:0!important;right:0!important;bottom:0!important;left:0!important;inset:0!important;}
 body.mode-hillsfar .hfLockBox{margin-top:0!important;}
 body.mode-hillsfar .hfCandidates{margin-top:18px!important;}

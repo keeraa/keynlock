@@ -22,6 +22,15 @@ twice already (`noise` against the audio generator, `gate` against the motion
 permission). Wrapped, it contributes nothing to the global scope. Expose
 through `window.Alchemy` when wiring it in.
 
+**The stylesheet is scoped under `.alchemyRoot`.** Eleven class names collide
+with the game, and several are load-bearing there: `.tab` styles the 19 mode
+tabs, `.locked` eight map nodes, `.scene` is the game's main stage, plus
+`.app`, `.active`, `.status`. Dropped in raw, the prototype would restyle half
+the game. `alchemy.scoped.css` is generated from `alchemy.css` by prefixing
+every selector; keyframes are left alone. Verified both ways — the prototype
+renders the same under the root class, and loading the scoped sheet into the
+running game changes nothing.
+
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 

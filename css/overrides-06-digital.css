@@ -267,3 +267,9 @@ body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none !important
   .lairHotspotCity{left:26% !important;top:36% !important;}
   .lairHotspotTeam{left:79% !important;top:74% !important;}
 }
+
+/* Alchemy hotspot: left of the crew, on the wall the camera opens onto. */
+.lairHotspotAlchemy{left:52% !important;top:38% !important;}
+@media (max-width:760px){
+  .lairHotspotAlchemy{left:56% !important;top:30% !important;}
+}

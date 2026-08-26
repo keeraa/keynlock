@@ -34,16 +34,19 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Before this goes in the game
+## Ported (v285)
 
-**Lazy start.** 17 `requestAnimationFrame` loops and nine autostarts fire on
-load. Fine for a demo page where everything is on screen; inside the game they
-would run forever on top of the parallax, the noise decay and the bird watcher.
-Each mechanic needs to start when opened and stop when closed.
+`js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`. Reached from a new
+lair hotspot; three stations are wired up — mixing, concentrations, separation.
 
-**A home.** The lair already has a module system — a hotspot opens a window
-with a panel, as with Dialogues and City analysis. Alchemy fits there as
-another hotspot. The workbench beside it is still a static image with no logic.
+The whole script came over at once, so the remaining seven need only their
+markup. Missing elements get a stand-in instead of throwing, and every query
+the ported code makes is confined to `#alchemyRoot`.
+
+## Still to do
+
+**The other seven stations** — markup only, no JS work.
 
 **A purpose.** Decided: potions that carry into the next lock — less noise per
-move, sturdier picks, guards arriving later.
+move, sturdier picks, guards arriving later. Nothing is banked yet; finishing a
+station only reports its verdict.

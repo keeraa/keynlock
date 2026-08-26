@@ -8,6 +8,8 @@
     if(next==='team') renderLairTeam();
     if(next==='dialogue') renderLairDialogue();
     if(next==='city') renderLairIntel();
+    // The stations boot on first open and park their loops when they close.
+    if(next==='alchemy') window.Alchemy?.start(); else window.Alchemy?.stop();
   }
 
   function renderLairScene(){
@@ -42,7 +44,7 @@
 
   function openLairModule(next){
     if(!$lairModuleWindow) return;
-    const titles={team:'Выбор персонажа',dialogue:'Диалоги',city:'Анализ города'};
+    const titles={team:'Выбор персонажа',dialogue:'Диалоги',city:'Анализ города',alchemy:'Алхимия'};
     setLairTab(next);
     $lairModuleTitle.textContent=titles[next]||'Логово';
     $lairModuleWindow.hidden=false;
@@ -50,6 +52,7 @@
   }
 
   function closeLairModule(){
+    window.Alchemy?.stop();
     if(!$lairModuleWindow) return;
     $lairModuleWindow.classList.remove('open');
     $lairModuleWindow.hidden=true;

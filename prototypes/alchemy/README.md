@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v310)
+## Where this stands (v311)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -300,6 +300,55 @@ opaque without reading as a UI card: no border, no shadow, no rounded
 corners, just more of the same desk color the detailed photo already
 sits on, so title/tabs/tubes all look like they belong to one continuous
 wooden surface instead of a window with a table drawn inside it.
+
+**v310's flat wood-tone window fill was itself unwanted — swapped for a
+blur.** Per feedback, any solid color reads as "a UI panel" no matter how
+well it's sampled from the desk photo; `backdrop-filter:blur(20px)` plus a
+neutral `rgba(10,8,6,.28)` (not brown) keeps the lair room behind
+illegible without introducing a color of its own. Still scoped to
+`#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active)`
+only, so other lair panels are untouched.
+
+**Bottles now stand on the desk's own surface (wide screens) instead of
+sinking into its front edge/legs — `transform`, not repositioned layout,
+and each group needed a different fix once buttons started colliding.**
+The big bench bottles (`translateY` + `scale(.5)`, `transform-origin:bottom
+center`) were straightforward — nothing sits below them, so a pure visual
+transform was enough. The reagent flasks weren't: they live in
+`.color-card` (swatch → hidden label → hidden drops → ±/Filter button),
+and a `translateY` on just `.mini-swatch` moved the swatch without moving
+the button after it — since transforms never affect layout, the flasks
+visually slid right down into their own controls once the labels were
+hidden and the natural gap disappeared with them. Chasing that with a
+matching margin on the button didn't work either: `.alchemyReagents` was
+`align-items:center` on its row, and — surprisingly — center/flex-end
+alignment cares about each flex item's *content height*, not its bottom
+position, so padding the item didn't relocate its bottom edge at all.
+The actual fix was structural: switching `.alchemyReagents` to
+`align-items:flex-end` (matching how `.tube-pair` already anchors the
+bench) put the reagents' natural baseline near the table's front edge on
+its own, so the swatches only needed a small `translateY`, not one big
+enough to reach past their own buttons. The element-slot cell hit the
+same problem one layer up — a `translateY` shift and the verdict
+text/Check button below it (a *sibling* in a plain flex column, not
+row-aligned at all) started overlapping — solved with `margin-top`
+instead of `translateY` there specifically, since that column has no
+flex-end trick to lean on and margin is the one transform-like property
+that *does* push later siblings down with it.
+
+**All three groups' target position was found empirically, the same way
+the ring centers and mask bounds earlier in this file were** — read each
+group's `getBoundingClientRect().bottom` via the console, nudge the
+transform, repeat until bench/reagents/element all report the same
+number (663–664px at a representative 1200×900 window in this pass).
+These are unapologetically pixel values, not percentages — like the
+`.tube-pair` gap fix above, this file keeps choosing fixed px over a
+formula when the underlying image itself is a fixed-aspect object, not
+something that reflows cleanly at every size. Short screens
+(`@media (min-width:900px) and (max-height:760px)`) needed their own,
+smaller push-down and cell margin — the full-size ones were tuned against
+a normal window height and ate into the already-tight short-screen budget
+enough to clip Проверить/Новая партия at the window's own bottom edge.
 
 ## Two things that cost hours — do not rediscover them
 

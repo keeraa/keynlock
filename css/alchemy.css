@@ -384,8 +384,18 @@
 .alchemyRoot .alchemyRackFront{bottom:0;height:63.62%;background-image:url("../assets/alchemy/rack-front.png");z-index:3;}
 
 .alchemyRoot .alchemyRackBottles{position:absolute;inset:0;z-index:2;}
+/* Shorter than the bottle art's own proportions would give at top:7% —
+   deliberately: the ring hole sits at ~32% down the rack, which used to land
+   on each bottle at roughly its neck-to-shoulder line (~35% into the bottle
+   image), right where the pendant's chain hangs — length that varies a
+   little bottle to bottle since these are seven separate illustrations, not
+   one template. At height:62% the same ring lands past that at ~55-60% into
+   the bottle, inside the wide jar body every one of the seven fills solidly
+   (98-100% of its own width from that point down, measured across all
+   seven) — clear of the one part of the art that wasn't guaranteed to line
+   up the same way twice. */
 .alchemyRoot .alchemyRackBottle{
-  position:absolute;top:7%;height:72%;width:auto;aspect-ratio:150/409;
+  position:absolute;top:7%;height:62%;width:auto;aspect-ratio:150/409;
   transform:translateX(-50%);
   background:none;border:0;padding:0;margin:0;cursor:pointer;
   filter:drop-shadow(0 10px 10px rgba(0,0,0,.4));

@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v297)
+## Where this stands (v298)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -63,6 +63,21 @@ Unlike the other three stations, the rack gets its own, wider module window
 color-game stations keep the narrower window they were sized for. A 1614:690
 shelf with seven items across needs the room; at 780px the bottles read as
 cramped rather than sitting cleanly in their rings.
+
+Each bottle is shorter than its own art would give at a naive `top:7%`
+(`.alchemyRackBottle` is `height:62%`, not the ~72% the ring position alone
+would suggest): the ring sits at ~32% down the rack, and at 72% that lands on
+each bottle at roughly its neck-to-shoulder line — where a pendant hangs from
+a chain whose length isn't identical across the seven separate illustrations.
+Shrinking the bottle pushes that same absolute ring position deeper into the
+image (~55-60% into the bottle instead of ~35%), into the wide jar body that
+every one of the seven fills solidly full-width from that point down. Chased
+by eye against a screenshot that looked like two rings had nothing in
+them — never reproduced directly (measured identical `getBoundingClientRect`
+for all seven bottles, and a from-scratch canvas recomposite of the same two
+layers came out clean) — but the fix stands on its own regardless: it trades
+a part of the art that wasn't guaranteed to line up the same way twice for
+one that is.
 
 The rack is layered like the inventory case
 (`css/overrides-05-inventory.css` `.inventoryCaseBack`/`.inventoryCaseFront`,

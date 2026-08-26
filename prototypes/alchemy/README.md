@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v314)
+## Where this stands (v315)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -434,6 +434,48 @@ uses (`.lairSceneTop`'s 25 is the highest) rather than bumping past just
 the one culprit found this time — the room's stacking layers aren't
 documented anywhere else, so picking a number with headroom beats another
 round of "found one more thing poking through."
+
+**A wide-screen layout pass, in one go: Проверить/Сброс beside the element
+bottle, the verdict text moved to a strip under the tabs, ±/Filter
+flanking each reagent tube instead of sitting together, цель/текущая
+смесь pulled back up to the (now higher) bottles, the desk pushed lower
+still.** Each piece had its own gotcha:
+
+**`position:static!important` from an early "protect alchemy from the
+game's leaking styles" rule (v284-era, `.alchemyRoot
+.scene,.alchemyRoot .status,.alchemyRoot .tab{position:static!important;
+...}`) beat a normal-weight `position:absolute` no matter how specific
+the selector.** Needed to move the verdict text out of the element
+column and up under the tabs; wrote a plain `.alchemyRoot .scene.active
+.status{position:absolute;top:46px;...}`, checked it in the browser, and
+it measured `position: static` anyway. `!important` always wins against
+normal-weight rules regardless of specificity or source order — the
+fix was giving the new rule `!important` too, not writing it more
+specifically. `.status` never moved in the DOM; `.alchemyRoot` being the
+nearest *positioned* ancestor already made this legal — each station's
+own `#mixStatus`/`#unknownStatus`/`#sepStatus` still only shows when its
+own `.scene` is `.active`, same as before, just painted somewhere else.
+
+**Flex-shrink crushed the element cell down to a 20px sliver once
+Проверить/Сброс moved into the same row as it.** The "element" grid
+column was only 120–150px — barely enough for the bottle alone, let alone
+beside a button stack with its own 100px+ floor. Neither the cell nor the
+buttons had `flex-shrink:0`, so the row absorbed the deficit by crushing
+whichever item had no floor to fall back on — the bottle, not the
+buttons (which did have `min-width`). Widened the column to 210–260px
+*and* added `flex-shrink:0` to both; the width fix alone wasn't enough
+because the row was still tight enough to shrink something.
+
+**Percentage `margin-top` resolves against the containing block's
+*width*, not its height — a different quirk than `.tube-pair`'s `vh` gap
+below, but the same family of "the unit didn't mean what it looked like
+it meant".** Pushing the desk row lower (`margin-top` on `.scene.active`,
+a percentage) moved it by a fraction of the row's own *width* (~740px),
+not a fraction of the window's height. A modest-looking `35%` request
+(meant as "a bit more than the existing 20%") worked out to ~260px,
+enough to squeeze the row well below its own `max-height` since there
+wasn't that much room left in the window's own height budget. Backed off
+to a value that fits instead of chasing the literal percentage.
 
 ## Two things that cost hours — do not rediscover them
 

@@ -417,7 +417,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
        element slot sits right where the old "foot" row used to span, since
        its own column already carries the verdict and the buttons stacked
        inside it (see .alchemyElementColumn above). */
-    grid-template-columns:minmax(0,1fr) minmax(220px,280px) minmax(120px,150px);
+    grid-template-columns:minmax(0,1fr) minmax(220px,280px) minmax(210px,260px);
     grid-template-rows:minmax(0,1fr);
     grid-template-areas:"bench reagents element";
     gap:14px;
@@ -520,21 +520,59 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
   }
   .alchemyRoot .alchemyReagents .color-card strong{display:none;}
   .alchemyRoot .scene.active .alchemyElementCell{
-    /* margin-top, not translateY, for the vertical shift specifically:
-       this cell sits above .status/.big-actions in a flex column, and a
-       transform doesn't move layout siblings — translateY alone dropped
-       the (visually lower) bottle right on top of the verdict text and
-       buttons below it. margin-top shifts the real box, so everything
-       after it in the column follows. */
-    transform:translateX(-30px) scale(1.1);
+    transform:translateX(-30px) translateY(-25px) scale(1.1);
     transform-origin:bottom center;
-    margin-top:93px;
   }
   .alchemyRoot .scene.active .alchemyElementCell.filled{border:none;}
-  /* The whole desk (and everything standing on it) sits 20% lower than
-     the row's own box — the station tabs above are a sibling, not a
-     child, so they hold their position. */
-  .alchemyRoot .scene.active{margin-top:20%;}
+  /* The whole desk (and everything standing on it) sits lower than the
+     row's own box — the station tabs above are a sibling, not a child,
+     so they hold their position regardless of this. */
+  .alchemyRoot .scene.active{margin-top:26%;}
+  /* Проверить/Сброс move beside the bottle instead of stacking under it —
+     row instead of column, now that the verdict text (below) no longer
+     lives in this flow to need the extra vertical room. */
+  .alchemyRoot .scene.active > .alchemyElementColumn{
+    flex-direction:row;align-items:center;justify-content:center;gap:14px;
+  }
+  /* flex-shrink:0 on both: the "element" grid column only has ~210-260px
+     to give (widened above from 120-150px, but still tight for a bottle
+     graphic *and* two full-width buttons side by side) — without this the
+     cell had no min-width floor to fall back on and flex-shrink crushed it
+     down to ~20px, a sliver next to the buttons instead of a bottle. */
+  .alchemyRoot .scene.active > .alchemyElementColumn .alchemyElementCell{flex-shrink:0;}
+  .alchemyRoot .scene.active > .alchemyElementColumn .big-actions{width:auto;min-width:100px;flex-shrink:0;}
+  /* The verdict/status text ("Подбери оттенок…", "Мимо" etc.) moves to a
+     strip directly under the station tabs instead of living in the
+     element column. `.alchemyRoot` is the nearest positioned ancestor for
+     every station's own #mixStatus/#unknownStatus/#sepStatus either way
+     (position:relative below), so this is pure repositioning — each stays
+     exactly as tied to its own scene's .active visibility as before, it
+     just paints somewhere else. */
+  .alchemyRoot{position:relative;}
+  .alchemyRoot .scene.active .status{
+    /* !important to win against the earlier "neutralise the game's leaking
+       styles" rule above (.alchemyRoot .scene,.alchemyRoot .status,
+       .alchemyRoot .tab{position:static!important;...}) — that rule exists
+       specifically so nothing normal-weight can reposition .status, which
+       is exactly what this needs to do. */
+    position:absolute!important;top:46px!important;left:0!important;right:0!important;
+    bottom:auto!important;z-index:2;
+    padding:0 16px;
+  }
+  /* Reagent -/+ flank the tube instead of sitting together under it —
+     `display:contents` lets the two buttons (previously grouped inside
+     .ctrl-row) join .color-card's own flex flow directly, so `order` can
+     place one on each side of the swatch between them. */
+  .alchemyRoot .alchemyReagents .color-card .ctrl-row{display:contents;}
+  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:last-child{order:-1;}
+  /* цель/текущая смесь sat where the bench bottles used to be before this
+     file's "stand on the table" pass — .swatch-label's own position is
+     unmoved (still top:100% of the *original*, untransformed tube-box),
+     but the bottle itself now renders translateY(-60px) higher, so the
+     gap between bottle and label grew by roughly that much. Pull the
+     label back up to close it. */
+  .alchemyRoot .swatch-label{transform:translateX(-50%) translateY(-40px);}
+  .alchemyRoot .target-element-hint{transform:translateX(-50%) translateY(-40px);}
 }
 
 /* The window is cut to the station rather than the station spread over the

@@ -299,12 +299,12 @@
         spots().forEach(s => { s.style.transform = `translateX(${v.toFixed(0)}px)`; });
       }, roomRange);
 
-      // Open with the room shifted a fifth of a screen to the right: centred,
-      // a phone crops it onto bare wall on the right and cuts the crew off on
-      // the left.
+      // Open with the room shifted a fifth of a screen to the left, which walks
+      // the camera right — that half of the room is where the tables and the
+      // board are going, and it is off-screen on a phone when centred.
       window.resetLairPan = () => {
         if(!roomPan || !scene.clientWidth) return false;
-        roomPan.set(panQuery.matches ? scene.clientWidth * 0.2 : 0);
+        roomPan.set(panQuery.matches ? -scene.clientWidth * 0.2 : 0);
         return true;
       };
     }

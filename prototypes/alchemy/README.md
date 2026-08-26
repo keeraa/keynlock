@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v302)
+## Where this stands (v303)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -63,12 +63,25 @@ with its own `hidden` attribute (`js/world/lair.js`
 `openLairModule`/`closeLairModule`) and only the active tab's panel carries
 `.active`. JS only runs the open/closed toggle and the bottle click.
 
+"Same mechanics" turned out to mean two more things once asked for
+directly (v303): the peek rises as the cursor approaches rather than
+waiting for a click — `js/core/inventory-hit-testing.js`'s pointer-
+proximity easing (`v260`), generalized from one drawer to a
+`makeApproach(selector, cssVar)` factory so `#inventoryDrawer` and
+`#alchemyRackDrawer` approach and retract independently through the same
+`pointermove` listener rather than needing two — and `--rack-open-y` is
+`20%` (was `2%`, picked without checking against `.inventoryDrawer`'s own
+`--inv-open-y`), so the bottom fifth of the rack stays tucked below the
+screen edge at full open, same as the lockpick case. The status line
+under the rack ("Выбери элемент…") is gone too — the selected glow on the
+bottle itself already says which one is picked.
+
 Seven bottles by element — Stannum, Plumbum, Aurum, Sulfur, Hydrargyrum,
 Argentum, Ferrum, in that order — from a shelf image
 (`assets/alchemy/rack-back.png` + `rack-front.png`) built for exactly seven
 slots. No name is printed on the shelf; each bottle carries its own
-alchemical symbol on a medallion instead, and the verdict line below names
-the element once picked. Clicking one selects it; nothing branches on the
+alchemical symbol on a medallion instead. Clicking one selects it (the
+choice lands in `window.Alchemy.selectedElement`); nothing branches on the
 selection yet. The plan is to gate which elixir recipes are buildable by
 the chosen element, mirrored on the tension tool's lock-type match in
 `js/core/inventory-hit-testing.js`

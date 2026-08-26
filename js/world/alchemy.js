@@ -1144,17 +1144,16 @@
 
    Picking a bottle by its Latin name (the name itself isn't printed on the
    shelf — the medallion carries its alchemical symbol instead, and the
-   verdict line names it on selection) just remembers the choice for now.
-   What it unlocks (which elixir recipes it gates) is the planned next
-   step, mirrored on the tension-tool type match in
-   js/core/inventory-hit-testing.js: a lock only opens for the matching
-   tool, an elixir will only brew from the matching element. */
+   selected glow is the only feedback) just remembers the choice for now,
+   in window.Alchemy.selectedElement. What it unlocks (which elixir recipes
+   it gates) is the planned next step, mirrored on the tension-tool type
+   match in js/core/inventory-hit-testing.js: a lock only opens for the
+   matching tool, an elixir will only brew from the matching element. */
 (function(){
   const drawer = document.querySelector('#alchemyRackDrawer');
   const toggle = document.querySelector('#alchemyRackDrawerToggle');
   const bottles = [...document.querySelectorAll('.alchemyRackDrawerBottle')];
-  const statusEl = document.querySelector('#alchemyRackDrawerStatus');
-  if(!drawer || !toggle || !bottles.length || !statusEl) return;
+  if(!drawer || !toggle || !bottles.length) return;
 
   function setOpen(force){
     const next = typeof force === 'boolean' ? force : !drawer.classList.contains('open');
@@ -1171,10 +1170,9 @@
   }, true);
 
   function select(el){
-    const element = el.dataset.element;
     bottles.forEach(b => b.classList.toggle('selected', b === el));
-    const name = element.charAt(0).toUpperCase() + element.slice(1);
-    statusEl.innerHTML = `<strong>${name}</strong>элемент выбран для варки`;
+    window.Alchemy = window.Alchemy || {};
+    window.Alchemy.selectedElement = el.dataset.element;
   }
   bottles.forEach(b => b.addEventListener('click', () => select(b)));
 })();

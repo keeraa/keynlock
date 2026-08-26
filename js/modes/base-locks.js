@@ -219,7 +219,7 @@ let plateEls=[], pinTopPlateEls=[];
   }
 
   function newLock(notify=true){
-    setGameInactive(false);
+    beginRoundState();
     $toast.classList.remove('show','actionable');
     chooseRoundPinSkin();
     chooseRoundPlateSkin();
@@ -328,7 +328,7 @@ let plateEls=[], pinTopPlateEls=[];
   }
 
   function reset(){
-    setGameInactive(false);
+    beginRoundState();
     if(mode==='hillsfar'){ startHillsfarRound(); toast('Набор ключей обновлён'); return; }
     if(mode==='mass'){ startMassRound(); toast('Круговой замок обновлён'); return; }
     if(mode==='g1'){ startG1Round(); toast('Последовательность обновлена'); return; }
@@ -461,7 +461,9 @@ let plateEls=[], pinTopPlateEls=[];
     $lock.classList.add('win');
     render();
 
+    const openingRoundId=activeRoundId;
     setTimeout(()=>{
+      if(openingRoundId!==activeRoundId || !solved) return;
       $mechanism.classList.remove('opening');
       $mechanism.classList.add('opened');
       celebrate();

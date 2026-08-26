@@ -84,20 +84,31 @@ if(mode==='classic'){
     }
   }
 
+  let activeRoundId=0;
+  function beginRoundState(){
+    activeRoundId++;
+    setGameInactive(false);
+    document.querySelectorAll('.mechanismZone, .sharedModeLockArt').forEach(el=>{
+      el.classList.remove('opening','opened');
+    });
+  }
+
   function restartCurrentRound(){
     if(shopOpen) closeShop();
     if(lairOpen) closeLair();
     if(mapOpen) closeMap();
-    setGameInactive(false);
     newLock(false);
     SFX.newRound?.();
   }
 
   function celebrate(){
+    if(!solved) return;
+    const completedRoundId=activeRoundId;
     awardRun();
     setGameInactive(true);
     document.body.classList.remove('solved-notice-visible');
     setTimeout(()=>{
+      if(completedRoundId!==activeRoundId) return;
       if(solved && document.body.classList.contains('game-inactive')){
         document.body.classList.add('solved-notice-visible');
       }
@@ -113,6 +124,7 @@ if(mode==='classic'){
       if(!el.classList.contains('opening')){
         el.classList.add('opening');
         setTimeout(()=>{
+          if(completedRoundId!==activeRoundId) return;
           el.classList.remove('opening');
           el.classList.add('opened');
         },4300);
@@ -237,4 +249,3 @@ function stateKey(s){ return s.join(''); }
     state=[6,5,4,3,2];
     generatedDistance=12;
   }
-

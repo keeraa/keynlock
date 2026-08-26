@@ -363,7 +363,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    js/world/alchemy.js window.Alchemy.applySelection) fills it — a dashed
    silhouette inviting the click that opens the drawer, same aspect ratio as
    the bottles there so the art doesn't stretch once it's set. */
-.alchemyElementCell{
+.alchemyRoot .alchemyElementCell{
   --element-bottle-img:none;
   width:clamp(46px,7vh,72px);aspect-ratio:150/409;
   border:2px dashed rgba(138,100,52,.55);border-radius:8px 8px 22px 22px;
@@ -371,10 +371,10 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
   padding:0;cursor:pointer;
   transition:border-color .16s ease,background-color .16s ease,transform .16s ease;
 }
-.alchemyElementCell:hover{border-color:#d6ab5e;transform:translateY(-3px);}
-.alchemyElementCellHint{font-size:1.6em;line-height:1;color:rgba(217,167,76,.55);}
-.alchemyElementCell.filled{border-style:solid;border-color:rgba(217,167,76,.6);background-color:transparent;}
-.alchemyElementCell.filled .alchemyElementCellHint{display:none;}
+.alchemyRoot .alchemyElementCell:hover{border-color:#d6ab5e;transform:translateY(-3px);}
+.alchemyRoot .alchemyElementCellHint{font-size:1.6em;line-height:1;color:rgba(217,167,76,.55);}
+.alchemyRoot .alchemyElementCell.filled{border-style:solid;border-color:rgba(217,167,76,.6);background-color:transparent;}
+.alchemyRoot .alchemyElementCell.filled .alchemyElementCellHint{display:none;}
 
 @media (max-width:760px){
   .alchemyRoot .tube-pair{gap:24px;}
@@ -512,7 +512,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      glassware and became the tallest thing in the window. Shorter here. */
   .alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch{height:clamp(40px,7vh,68px)!important;width:34px!important;margin:0 auto 6px!important;}
   .alchemyRoot .alchemyReagents .color-card strong{min-height:2.4em;font-size:10.5px;}
-  .alchemyElementCell{width:clamp(40px,6vh,60px);}
+  .alchemyRoot .alchemyElementCell{width:clamp(40px,6vh,60px);}
   /* .lab's own overflow:auto (line ~105, !important — it's there so a
      long verdict on a short window scrolls instead of blowing out the
      modal) started showing a permanent scrollbar once the bench bottles
@@ -585,17 +585,19 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      place one on each side of the swatch between them. */
   .alchemyRoot .alchemyReagents .color-card .ctrl-row{display:contents;}
   /* order:-1 alone put both buttons directly above the swatch's own
-     *layout* position — but the swatch itself renders 70px higher than
-     that via transform (transforms don't move flow, so reordering before
-     it doesn't know about that shift), so the two ended up overlapping.
-     Pushed up by roughly the same amount to actually clear it. */
+     *layout* position — but the swatch itself renders well above that via
+     transform (transforms don't move flow, so reordering before it
+     doesn't know about that shift), so the two ended up overlapping.
+     Pushed up by roughly the same amount to actually clear it — retune
+     this alongside the swatch's own translateY above if that changes. */
   .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn{order:-1;transform:translateY(-120px);}
   /* цель/текущая смесь sat where the bench bottles used to be before this
      file's "stand on the table" pass — .swatch-label's own position is
      unmoved (still top:100% of the *original*, untransformed tube-box),
-     but the bottle itself now renders translateY(-60px) higher, so the
-     gap between bottle and label grew by roughly that much. Pull the
-     label back up to close it. */
+     but the bottle itself now renders well above that via transform, so
+     the gap between bottle and label grew by roughly that much. Pull the
+     label back up to close it — retune alongside the bottle's own
+     translateY above if that changes. */
   .alchemyRoot .swatch-label{transform:translateX(-50%) translateY(-75px);}
   /* white-space:normal + width:100% (of the tube-box, its positioned
      ancestor — same fix as the mobile breakpoint above), not nowrap: the
@@ -632,13 +634,15 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
   .alchemyRoot .color-controls{gap:10px;}
   .alchemyRoot .alchemyReagents .color-card strong{min-height:2.2em;font-size:10px;}
   .alchemyRoot .small-btn,.alchemyRoot .color-card button{padding:3px 8px;font-size:11px;}
-  /* The v311 "stand on the table" repositioning (20% desk push-down +
-     the element cell's own margin-top to reach the same line) eats into
-     a short window's already-tight budget — Новая партия/Проверить were
-     clipping at the window's own bottom edge before this. Scale both
-     back here rather than fighting the window's max-height. */
+  /* The v311 "stand on the table" desk push-down eats into a short
+     window's already-tight budget — Новая партия/Проверить were clipping
+     at the window's own bottom edge before this. Scaled back here rather
+     than fighting the window's max-height. (v315 also scaled the element
+     cell's own margin-top down here, back when the cell used margin-top
+     for its vertical placement — v316 switched that to the same
+     transform: translateY approach as the bottles/swatches above, so
+     there's nothing left here for the cell to override.) */
   .alchemyRoot .scene.active{margin-top:8%;}
-  .alchemyRoot .scene.active .alchemyElementCell{margin-top:90px;}
 }
 
 /* ============================================================

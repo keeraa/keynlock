@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v317)
+## Where this stands (v318)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -525,6 +525,35 @@ matching `translateY`, v316) and цель/текущая смесь's own labels
 pulled up once in v315 to track the bottles) both needed the identical
 delta reapplied, or they'd drift back out of alignment with bottles that
 had just moved without them.
+
+**A cleanup pass, prompted by "the code definitely has problems" rather
+than a specific symptom.** Read back through the v311-v317 additions
+specifically (the ones from this feature's most recent, fastest-moving
+stretch) looking for exactly the kind of thing rapid iteration leaves
+behind — dead code, stale comments, broken scoping — rather than
+re-verifying things already re-checked each version. Found two real ones:
+
+**`.alchemyElementCell` (and its `.filled`/hover/`Hint` variants) were
+never wrapped in `.alchemyRoot`, unlike every other selector in this
+file.** The comment right above the game/alchemy scoping rules (v284-era)
+spells out exactly why that prefix exists — "scoping protects the game
+from this stylesheet; [the neutralise rule] protects the stations from
+the game's" — and this class, added later when the element slot was
+built, never got it. No actual collision today (checked: nothing outside
+`#alchemyRoot` uses the name), but it's exactly the gap that convention
+exists to close. Prefixed all six rules.
+
+**A genuinely stale override:
+`.alchemyRoot .scene.active .alchemyElementCell{margin-top:90px;}` in
+the short-screen media query, left over from v315 when the cell used
+`margin-top` for its vertical placement.** v316 switched the cell to the
+same `transform:translateY(...)` approach the bottles and swatches
+already used, and the base rule's own `margin-top` came out — but this
+short-screen copy of it didn't, so on any short wide-screen window the
+cell was still getting an *extra* 90px pushed onto it on top of the
+transform, a real (if narrow-window-only) misplacement that nothing
+since v316 had re-tested. Removed; the cell's normal transform already
+carries over into short screens fine on its own.
 
 ## Two things that cost hours — do not rediscover them
 

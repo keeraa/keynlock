@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v300)
+## Where this stands (v301)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -65,8 +65,10 @@ shelf with seven items across needs the room; at 780px the bottles read as
 cramped rather than sitting cleanly in their rings.
 
 Each bottle is shorter than its own art would give at a naive `top:7%`
-(`.alchemyRackBottle` is `height:62%`, not the ~72% the ring position alone
-would suggest): the ring sits at ~32% down the rack, and at 72% that lands on
+(`.alchemyRackBottle` is `height:61%` — 62% (v298), then nudged one point
+smaller by eye once the ring positions themselves stopped being the
+question — not the ~72% the ring position alone would suggest): the ring
+sits at ~32% down the rack, and at 72% that lands on
 each bottle at roughly its neck-to-shoulder line — where a pendant hangs from
 a chain whose length isn't identical across the seven separate illustrations.
 Shrinking the bottle pushes that same absolute ring position deeper into the

@@ -114,6 +114,7 @@
   document.querySelectorAll('[data-key]').forEach(b=>b.addEventListener('pointerdown',()=>input(b.dataset.key)));
 
   addEventListener('pointermove', e=>{
+    if(e.pointerType !== 'mouse') return;
     const nx=(e.clientX / Math.max(1, innerWidth) - 0.5) * 2;
     const ny=(e.clientY / Math.max(1, innerHeight) - 0.5) * 2;
     bgParallaxTargetX = -nx * innerWidth * 0.025;
@@ -125,13 +126,18 @@
   });
 
   $scene.addEventListener('pointermove', e=>{
+    // Only a mouse aims the scene. A finger tapping a plate used to slam the
+    // parallax target across to wherever it landed, which jolted the view and
+    // whipped the pick and tensioner round with it.
+    if(e.pointerType !== 'mouse') return;
     const r=$scene.getBoundingClientRect();
     const nx=((e.clientX-r.left)/r.width - 0.5) * 2;
     const ny=((e.clientY-r.top)/r.height - 0.5) * 2;
     pointerTargetX = nx * 13;
     pointerTargetY = ny * 11;
   });
-  $scene.addEventListener('pointerleave', ()=>{
+  $scene.addEventListener('pointerleave', e=>{
+    if(e.pointerType !== 'mouse') return;
     pointerTargetX = 0;
     pointerTargetY = 0;
   });

@@ -26,6 +26,31 @@
     return NOISE_MODES.includes(mode) && !shopOpen && !lairOpen && !mapOpen;
   }
 
+  let guardFace = null;
+  function buildGuardFace(){
+    if(guardFace) return;
+    guardFace = document.createElement('div');
+    guardFace.className = 'guardWatch';
+    guardFace.id = 'guardWatch';
+    guardFace.setAttribute('aria-hidden', 'true');
+    const img = document.createElement('img');
+    img.src = 'assets/guards/guard_01_face.png';
+    img.alt = '';
+    guardFace.appendChild(img);
+    document.body.appendChild(guardFace);
+  }
+
+  // Leans further in the louder it gets, so the guard is a warning before he is
+  // a verdict.
+  function renderGuardFace(){
+    if(!guardFace) return;
+    const alert = noiseActive() && !solved
+      ? Math.max(0, (noiseLevel - NOISE_WARN) / (1 - NOISE_WARN))
+      : 0;
+    guardFace.style.setProperty('--guard-alert', Math.min(1, alert).toFixed(3));
+    guardFace.classList.toggle('watching', alert > 0);
+  }
+
   function buildNoiseMeter(){
     if(noiseBar) return;
     noiseBar = document.createElement('div');
@@ -61,9 +86,10 @@
     if(!noiseBar) return;
     const on = noiseActive() && !solved;
     noiseBar.classList.toggle('visible', on);
-    if(!on) return;
+    if(!on){ renderGuardFace(); return; }
     noiseFill.style.width = `${Math.min(100, noiseLevel * 100).toFixed(1)}%`;
     noiseBar.classList.toggle('warning', noiseLevel >= NOISE_WARN);
+    renderGuardFace();
     placeNoiseMeter();
   }
 
@@ -79,6 +105,7 @@
   }
 
   function resetNoise(){
+    guardFace?.classList.remove('caught');
     noiseLevel = 0;
     noiseWarned = false;
     guardsCalled = false;
@@ -89,6 +116,7 @@
     if(guardsCalled) return;
     guardsCalled = true;
     solved = true;
+    guardFace?.classList.add('caught');
     SFX.guards();
     if(typeof render === 'function') render();
     toast('Стража услышала · проигрыш');
@@ -127,6 +155,7 @@
     requestAnimationFrame(noiseTick);
   }
 
+  buildGuardFace();
   buildNoiseMeter();
   renderNoise();
   addEventListener('resize', placeNoiseMeter, { passive:true });
@@ -240,10 +269,24 @@
     endBird(true);
   }
 
+  let hitMark = null;
+  function flashHitFromAbove(){
+    if(!hitMark){
+      hitMark = document.createElement('div');
+      hitMark.className = 'hitMark';
+      hitMark.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(hitMark);
+    }
+    hitMark.classList.remove('show');
+    void hitMark.offsetWidth;
+    hitMark.classList.add('show');
+  }
+
   function birdStrike(){
     if(birdState !== 'warning') return;
     endBird(false);
     if(!birdsActive()) return;
+    flashHitFromAbove();
     SFX.birdHit();
     document.body.classList.remove('flash');
     void document.body.offsetWidth;

@@ -365,3 +365,33 @@ body.game-inactive.shop-open::after,body.game-inactive.lair-open::after,body.gam
      it into frame — the call and the shadow are what tell you it is there. */
   .skyBird{width:52px;height:20px;top:calc(-3vh + var(--bg-parallax-y,0px) * 0.95);}
 }
+
+/* Hit from above: the shooter-style wedge at the edge the blow came from. The
+   bird always dives, so it is always the top. */
+.hitMark{position:fixed;left:0;right:0;top:0;height:26vh;z-index:300;opacity:0;pointer-events:none;
+  background:radial-gradient(120% 100% at 50% 0%,rgba(196,44,28,.62),rgba(150,30,18,.26) 46%,rgba(0,0,0,0) 74%);}
+.hitMark.show{animation:hitFromAbove 620ms cubic-bezier(.2,.7,.3,1) forwards;}
+@keyframes hitFromAbove{
+  0%{opacity:0;transform:translateY(-14px);}
+  14%{opacity:1;transform:translateY(0);}
+  100%{opacity:0;transform:translateY(-6px);}
+}
+
+/* The guard leans in from the edge as the meter fills, and steps fully into
+   frame when it tops out — a warning before a verdict. */
+.guardWatch{position:fixed;right:0;top:34%;z-index:150;width:104px;height:104px;
+  opacity:0;pointer-events:none;
+  transform:translateX(calc(58% - 58% * var(--guard-alert,0)));
+  transition:opacity .28s ease,transform .28s cubic-bezier(.22,.78,.22,1),filter .28s ease;
+  filter:drop-shadow(-6px 6px 12px rgba(0,0,0,.5)) grayscale(calc(1 - var(--guard-alert,0)));}
+.guardWatch img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%;
+  border:2px solid rgba(150,110,58,.7);background:rgba(14,11,8,.9);}
+.guardWatch.watching{opacity:calc(.30 + .7 * var(--guard-alert,0));}
+.guardWatch.caught{opacity:1;transform:translateX(0) scale(1.22);
+  filter:drop-shadow(-8px 8px 18px rgba(0,0,0,.6)) grayscale(0);
+  animation:guardArrives 420ms cubic-bezier(.2,.8,.2,1);}
+.guardWatch.caught img{border-color:#d9613c;}
+@keyframes guardArrives{0%{transform:translateX(40%) scale(.9);}100%{transform:translateX(0) scale(1.22);}}
+@media (max-width:760px){
+  .guardWatch{width:78px;height:78px;top:30%;}
+}

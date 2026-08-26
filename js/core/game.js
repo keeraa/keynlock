@@ -85,12 +85,20 @@ if(mode==='classic'){
   }
 
   let activeRoundId=0;
+  function scheduleRoundAction(action,delay){
+    const roundId=activeRoundId;
+    return setTimeout(()=>{
+      if(roundId!==activeRoundId) return;
+      action();
+    },delay);
+  }
   function beginRoundState(){
     activeRoundId++;
     setGameInactive(false);
     document.querySelectorAll('.mechanismZone, .sharedModeLockArt').forEach(el=>{
       el.classList.remove('opening','opened');
     });
+    window.onKeynlockRoundStarted?.(activeRoundId);
   }
 
   function restartCurrentRound(){

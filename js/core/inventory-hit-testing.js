@@ -412,7 +412,7 @@
     if(picks<=0){
       solved=true;
       toast('Отмычки закончились · проигрыш');
-      setTimeout(()=>newLock(false),1320);
+      scheduleRoundAction(()=>newLock(false),1320);
       return true;
     }
 

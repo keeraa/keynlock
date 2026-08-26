@@ -120,7 +120,7 @@
     SFX.guards();
     if(typeof render === 'function') render();
     toast('Стража услышала · проигрыш');
-    setTimeout(() => { resetNoise(); newLock(); }, 1600);
+    scheduleRoundAction(() => { resetNoise(); newLock(); }, 1600);
   }
 
   // Wrapping the sounds catches every game at once: anything that makes a noiseLevel

@@ -79,8 +79,12 @@
   addEventListener('keydown',ensureAudio,{once:true});
   document.addEventListener('dragstart', e=>e.preventDefault());
 
+  function gameplayInputBlocked(){
+    return shopOpen || mapOpen || lairOpen || document.body.classList.contains('game-inactive');
+  }
+
   function input(k){
-    if(shopOpen) return;
+    if(gameplayInputBlocked()) return;
     k=String(k).toLowerCase();
     if(k==='a'||k==='arrowleft')move(-1);
     else if(k==='d'||k==='arrowright')move(1);
@@ -106,6 +110,7 @@
   };
 
   addEventListener('keydown',e=>{
+    if(e.target?.closest?.('input,textarea,select,[contenteditable="true"]')) return;
     const action=KEY_ACTIONS[e.code];
     if(!action) return;
     e.preventDefault();
@@ -272,9 +277,9 @@
   $tnGauge?.addEventListener('pointermove',e=>{if(!tnDragging||mode!=='tension')return;const r=$tnGauge.getBoundingClientRect();tnTension=clamp((e.clientX-r.left)/r.width*100,0,100);if($tnNeedle)$tnNeedle.style.left=`${tnTension}%`;});
   $tnGauge?.addEventListener('pointerup',()=>{tnDragging=false;});
   $tnGauge?.addEventListener('pointercancel',()=>{tnDragging=false;});
-  addEventListener('keydown',e=>{if(mode==='resonance'&&e.code==='Space'){e.preventDefault();hitResonance();}});
-  addEventListener('keydown',e=>{if(mode==='tension'&&e.code==='Space'){e.preventDefault();setTensionPin();}});
-  addEventListener('keydown',e=>{if(mode==='deduction'&&e.code==='Space'){e.preventDefault();checkDeduction();}});
+  addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='resonance'&&e.code==='Space'){e.preventDefault();hitResonance();}});
+  addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='tension'&&e.code==='Space'){e.preventDefault();setTensionPin();}});
+  addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='deduction'&&e.code==='Space'){e.preventDefault();checkDeduction();}});
   document.querySelector('#shopHudButton')?.addEventListener('click',()=>{
     if(lairOpen) closeLair();
     if(mapOpen) closeMap();
@@ -358,28 +363,11 @@
   $tabTension.onclick=()=>switchMode('tension');
   $tabResonance.onclick=()=>switchMode('resonance');
   $tabDeduction.onclick=()=>switchMode('deduction');
-  $tabComposite.onclick=()=>{
-    if(lairOpen) closeLair();
-    if(mapOpen) closeMap();
-    if(shopOpen) closeShop();
-    mode='composite';
-    chooseRoundPinSkin();
-    chooseRoundPlateSkin();
-    syncModePanels('composite');
-    updateModeUI();
-    startCompositeRound();
-    syncModePanels('composite');
-    $compositeMode.hidden=false;
-    $compositeMode.inert=false;
-    $compositeMode.style.setProperty('display','flex','important');
-    $compositeMode.style.setProperty('visibility','visible','important');
-    $compositeMode.style.setProperty('opacity','1','important');
-    renderComposite();
-  };
+  $tabComposite.onclick=()=>switchMode('composite');
   $tabHeatCold.onclick=()=>switchMode('heatcold');
   $tabDrum.onclick=()=>switchMode('drum');
   $tabScope.onclick=()=>switchMode('scope');
-  $hcInput?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();scanHeatCold();}});
+  $hcInput?.addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&e.key==='Enter'){e.preventDefault();scanHeatCold();}});
   $hcInput?.addEventListener('input',()=>{$hcInput.value=$hcInput.value.replace(/\D/g,'').slice(0,4);});
   document.addEventListener('keydown',handleHeatColdKey);
   $drumWheels?.addEventListener('click',e=>{const b=e.target.closest('[data-drum-i]');if(!b)return;changeDrum(Number(b.dataset.drumI),Number(b.dataset.dir));});

@@ -118,7 +118,7 @@ renderInventoryTools();
     if(picks<=0){
       solved=true;
       toast('Отмычки закончились · проигрыш');
-      setTimeout(()=>newLock(false),1320);
+      scheduleRoundAction(()=>newLock(false),1320);
       return {broke:true, kept, depleted:true};
     }
 
@@ -239,4 +239,3 @@ renderInventoryTools();
     else if(pickCapacity===4){ $pouchBuy.textContent='4 → 5 · 9000'; $pouchBuy.disabled=false; }
     else { $pouchBuy.textContent='Максимум · 5'; $pouchBuy.disabled=true; }
   }
-

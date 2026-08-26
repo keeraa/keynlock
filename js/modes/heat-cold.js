@@ -46,7 +46,7 @@
   }
 
   function handleHeatColdKey(e){
-    if(mode!=='heatcold' || solved) return;
+    if(mode!=='heatcold' || solved || gameplayInputBlocked()) return;
     const key=e.key;
     if(key==='ArrowLeft'){e.preventDefault();setHeatColdActive(hcActiveIndex-1);return;}
     if(key==='ArrowRight'){e.preventDefault();setHeatColdActive(hcActiveIndex+1);return;}
@@ -125,4 +125,3 @@
       setDigitalResult($hcResult);
     }
   }
-

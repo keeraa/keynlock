@@ -108,11 +108,15 @@
       $worldMapScreen.hidden = true;
     }
 
-    // Set the difficulty without regenerating: the tab click below builds the
-    // round, and some games (composite) need their own tab handler to do it.
+    // Build the mission round directly. Clicking the active tab is intentionally
+    // a no-op during play, so it cannot be used as a reliable round launcher.
     setModeDifficulty(mapChapter, loc.mode, false);
-    activeMissionRun = { id: missionRunId(loc.mode, mapChapter), mode: loc.mode, tier: mapChapter };
-    document.querySelector(`#${loc.tab}`)?.click();
+    mode=loc.mode;
+    syncModePanels(mode);
+    updateModeUI();
+    newLock(false);
+    if(mode==='r2') requestAnimationFrame(renderR2);
+    activeMissionRun = { id: missionRunId(loc.mode, mapChapter), mode: loc.mode, tier: mapChapter, roundId: activeRoundId };
     toast(`${loc.name} · глава ${mapChapter}`);
   }
   window.startMapMission = startMapMission;
@@ -125,7 +129,7 @@
   function markMissionCleared() {
     const run = activeMissionRun;
     if (!run) return;
-    if (mode !== run.mode || getModeDifficulty(run.mode) !== run.tier) { activeMissionRun = null; return; }
+    if (!solved || run.roundId !== activeRoundId || mode !== run.mode || getModeDifficulty(run.mode) !== run.tier) { activeMissionRun = null; return; }
     activeMissionRun = null;
     if (missionsDone[run.id]) return;
     missionsDone[run.id] = true;
@@ -133,6 +137,9 @@
     renderMissionNodes();
   }
   window.markMissionCleared = markMissionCleared;
+  window.onKeynlockRoundStarted = roundId => {
+    if(activeMissionRun && activeMissionRun.roundId !== roundId) activeMissionRun=null;
+  };
 
   function renderMissionNodes() {
     const canvas = document.querySelector('#worldMapCanvas');
@@ -147,7 +154,8 @@
       node.type = 'button';
       node.className = 'mapNode missionNode mission ' + (open ? 'accessible' : 'locked');
       node.dataset.location = id;
-      if (!open) node.setAttribute('aria-disabled', 'true');
+      node.disabled=!open;
+      node.setAttribute('aria-disabled', open?'false':'true');
       node.style.setProperty('--mx', `${place.x}%`);
       node.style.setProperty('--my', `${place.y}%`);
 
@@ -220,8 +228,9 @@
   // Banking a mission happens on the solve, which every game funnels through.
   const baseCelebrateForMissions = celebrate;
   celebrate = function () {
-    markMissionCleared();
-    return baseCelebrateForMissions();
+    const result=baseCelebrateForMissions();
+    if(solved && document.body.classList.contains('game-inactive')) markMissionCleared();
+    return result;
   };
 
   // state.js validated the saved location before these places existed, so a

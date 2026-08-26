@@ -374,7 +374,7 @@ let plateEls=[], pinTopPlateEls=[];
       solved=true;
       render();
       toast('Отмычки закончились · проигрыш');
-      setTimeout(()=>newLock(),1320);
+      scheduleRoundAction(()=>newLock(),1320);
       return;
     }
 

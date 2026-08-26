@@ -27,8 +27,11 @@
     renderWorldMap();
   }
 
+  let mapTravelId=0;
   function closeMap(){
     if(!mapOpen) return;
+    mapTravelId++;
+    mapMoving=false;
     if(lairOpen) closeLair();
     mapOpen=false;
     document.body.classList.remove('map-open');
@@ -62,12 +65,14 @@
       return;
     }
     mapMoving=true;
+    const travelId=++mapTravelId;
     $mapInfoTitle.textContent='В пути';
     $mapInfoText.textContent=`Идём: ${target.name}`;
     if($mapLocationAction) $mapLocationAction.hidden=true;
     $mapPlayer.style.setProperty('--mx',`${target.x}%`);
     $mapPlayer.style.setProperty('--my',`${target.y}%`);
     setTimeout(()=>{
+      if(travelId!==mapTravelId || !mapOpen) return;
       mapLocation=next;
       STORE.setItem('lockpickMapLocation',mapLocation);
       mapMoving=false;
@@ -76,18 +81,23 @@
     },1180);
   }
 
-  function openShop(){ closeMobileModeMenu(); setInventoryOpen(false); shopOpen=true; document.body.classList.add('shop-open'); $toast.classList.remove('show','actionable'); updateShopUI(); $shopOverlay.classList.add('open'); }
+  function openShop(){ closeMobileModeMenu(); setInventoryOpen(false); if(mapOpen) closeMap(); shopOpen=true; document.body.classList.add('shop-open'); $toast.classList.remove('show','actionable'); updateShopUI(); $shopOverlay.classList.add('open'); }
   function closeShop(){ shopOpen=false; document.body.classList.remove('shop-open'); $shopOverlay.classList.remove('open'); updatePickUI(); }
+  let modeSwitchFrame=0;
   function switchMode(nextMode){
-    setGameInactive(false);
+    if(!ALL_MODES.has(nextMode)) return;
     if(lairOpen) closeLair();
     if(mapOpen) closeMap();
     if(shopOpen) closeShop();
-    if(!ALL_MODES.has(nextMode) || mode===nextMode) return;
+    if(mode===nextMode && !solved && !document.body.classList.contains('game-inactive')) return;
     mode=nextMode;
     syncModePanels(mode);
     updateModeUI();
-    requestAnimationFrame(()=>{
+    if(modeSwitchFrame) cancelAnimationFrame(modeSwitchFrame);
+    const requestedMode=nextMode;
+    modeSwitchFrame=requestAnimationFrame(()=>{
+      modeSwitchFrame=0;
+      if(mode!==requestedMode) return;
       newLock(false);
       if(mode==='r2') requestAnimationFrame(renderR2);
     });
@@ -130,4 +140,3 @@
     updateShopUI();
     toast(`Запас увеличен до ${pickCapacity}`);
   }
-

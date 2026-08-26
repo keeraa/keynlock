@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v307)
+## Where this stands (v308)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -232,6 +232,31 @@ that breakpoint (`css/overrides-05-inventory.css`, `min(96vw,calc(100vw -
 case's own mobile width step; since every bottle and the rack art itself
 are sized off `.alchemyRackDrawer`'s width via percentages and
 `aspect-ratio`, widening the one property scales all of it together.
+
+**v307's wide desk still left a band of the (near-black) `.alchemyRoot`
+background above the tabletop's own back edge**, per a follow-up
+screenshot — "фон вокруг всего". `auto 100%` keeps the source table
+undistorted, but undistorted isn't the same as "fills the box": the wide
+row's own aspect ratio is wider relative to its height than the table
+source is, so the caps-and-mid layers, each individually sized to the
+row's height, simply didn't reach as high as the row — same underlying
+image, rendered smaller than the box that was supposed to be full of it.
+Switched to one full, unsliced image (`desk-full.png`, the whole
+`table.png` trimmed to its bbox) stretched `100% 100%` — no gap possible
+by construction, at the cost of accepting some perspective distortion at
+extreme row aspect ratios. The mid-tile/cap-slicing trick stays for
+mobile, where each stacked block's own height already roughly matches its
+content, so there's no gap to stretch away in the first place.
+
+**The wide reagent band was a 2×2 grid; feedback wanted one row of four,
+same as mobile.** That grid was itself deliberate (v292-ish, "four
+reagents read better as a block of two than as a tall column" — see the
+comment history) for the *narrow* reagents column that existed back then.
+The column's since widened for the single-desk backdrop above
+(`minmax(150px,180px)` → `minmax(220px,280px)`, still much narrower than
+the bench), so reverting `.color-controls` to the same `flex-row` the base
+layout already uses (rather than inventing a new wide-only rule) fits
+without the old cramping.
 
 ## Two things that cost hours — do not rediscover them
 

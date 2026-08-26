@@ -367,7 +367,7 @@
        element slot sits right where the old "foot" row used to span, since
        its own column already carries the verdict and the buttons stacked
        inside it (see .alchemyElementColumn above). */
-    grid-template-columns:minmax(0,1fr) minmax(150px,180px) minmax(120px,150px);
+    grid-template-columns:minmax(0,1fr) minmax(220px,280px) minmax(120px,150px);
     grid-template-rows:minmax(0,1fr);
     grid-template-areas:"bench reagents element";
     gap:14px;
@@ -394,25 +394,30 @@
      separate tabletops with a gap of bare panel between them — the grid
      gap still separates the columns, but the desk paints straight through
      it since it's one background on the grid container, not per-column.
-     Caps come back here (mobile drops them, see the mid-tile-only rule
-     above) because a row this wide has the room for them without
-     overlapping into a mess. */
+     The 3-slice cap+mid version left a strip of the (near-black)
+     .alchemyRoot background showing above the tabletop's own back edge —
+     `auto 100%` keeps the source image undistorted, but the row is wider
+     relative to its height than the source table is, so undistorted
+     wasn't the same as "fills the box". Stretching the single full image
+     to `100% 100%` fills the row exactly, table included edge to edge —
+     some perspective distortion at extreme row aspect ratios, but no gap
+     and nothing cropped. */
   .alchemyRoot .scene.active:has(> .lab.color-game-lab){
-    background-image:url("../assets/alchemy/desk-cap-left.png"),
-      url("../assets/alchemy/desk-cap-right.png"),
-      url("../assets/alchemy/desk-mid.png");
-    background-position:left top,right top,left top;
-    background-repeat:no-repeat,no-repeat,repeat-x;
-    background-size:auto 100%,auto 100%,auto 100%;
+    background-image:url("../assets/alchemy/desk-full.png");
+    background-position:center;
+    background-repeat:no-repeat;
+    background-size:100% 100%;
   }
   .alchemyRoot .scene.active > .lab.color-game-lab,
   .alchemyRoot .scene.active > .alchemyReagents,
   .alchemyRoot .scene.active > .alchemyElementColumn{
     background:none;
   }
-  /* four reagents read better as a block of two than as a tall column */
-  .alchemyRoot .color-controls{display:grid;grid-template-columns:repeat(2,1fr);
-    gap:18px 12px;width:100%;}
+  /* One row of four, same as the base layout — not the 2x2 grid this used
+     to be, per feedback that the reagents should "stand in a row" on
+     desktop too. */
+  .alchemyRoot .color-controls{display:flex;flex-direction:row;flex-wrap:nowrap;
+    justify-content:center;align-items:flex-end;gap:8px;width:100%;}
   /* min-width:0 again: as grid items the cards were distending their column
      from the inside, this time on the long filter labels. */
   .alchemyRoot .color-card{width:auto;min-width:0;}

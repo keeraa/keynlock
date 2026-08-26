@@ -176,8 +176,12 @@
 .alchemyRoot .lab h3{margin:0 0 14px;text-align:center;color:#e6d2a6;
   font:600 15px/1.2 Georgia,serif;}
 
-/* Target beside current, always side by side — they are meant to be compared. */
-.alchemyRoot .tube-pair{display:flex;justify-content:center;align-items:flex-end;gap:52px;}
+/* Target beside current, always side by side — they are meant to be compared.
+   Fixed gaps, not vh-based ones: the module window's height already differs a
+   little station to station (footer text wraps differently), and a vh clamp
+   turned that into the two flasks visibly sitting closer together on one tab
+   than another. Width still gets a say — narrower panels pull them in. */
+.alchemyRoot .tube-pair{display:flex;justify-content:center;align-items:flex-end;gap:32px;}
 .alchemyRoot .tube-box,.alchemyRoot .current-cluster{display:flex;flex-direction:column;
   align-items:center;gap:6px;}
 .alchemyRoot .swatch-label{color:#9d8d75;font:11px/1 inherit;letter-spacing:.02em;}
@@ -282,7 +286,7 @@
   .alchemyRoot .scene[data-name="Смешение"] .test-tube.tube-lg,
   .alchemyRoot .scene[data-name="Концентрации"] .test-tube.tube-lg,
   .alchemyRoot .scene[data-name="Разделение"] .test-tube.tube-lg{height:clamp(170px,32vh,300px)!important;}
-  .alchemyRoot .tube-pair{gap:clamp(24px,4vh,48px);}
+  .alchemyRoot .tube-pair{gap:40px;}
   /* Four reagents two-by-two at full height stood 530px against 328px of
      glassware and became the tallest thing in the window. Shorter here. */
   .alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch{height:clamp(52px,10vh,96px)!important;width:40px!important;margin:0 auto 6px!important;}

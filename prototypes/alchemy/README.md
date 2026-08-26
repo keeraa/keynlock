@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v292)
+## Where this stands (v293)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three stations run — mixing, concentrations,
@@ -92,6 +92,14 @@ the scale and offset are solved so the top lands back on exactly 14.6%, where
 the untouched mask already put it. Touch `mask-size`/`mask-position` on
 `.test-tube>.tube-liquid` and re-check both ends, not just the one you're
 fixing.
+
+**`.tube-pair`'s gap was in `vh`, and the module window's height isn't fixed.**
+Each station's footer text wraps to a different height, so the window — sized
+to its content, capped at 82vh — is a few px taller or shorter station to
+station. A `clamp(24px,4vh,48px)` gap read that difference back as the two
+flasks sitting visibly closer together on one tab than another. Fixed px
+values now (32px / 40px by breakpoint) — width may still resize it, height
+must not.
 
 ## Still to do
 

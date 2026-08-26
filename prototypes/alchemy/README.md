@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v306)
+## Where this stands (v307)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -208,6 +208,30 @@ extra assets — stacked on mobile it reads as three separate desks (the
 wide 3-column grid it reads as close to one continuous bench. Bottles and
 the Проверить/Сброс buttons keep their own opaque backgrounds, so nothing
 needed to change there — only the panel chrome around them did.
+
+**v306's three separate desks were wrong on both ends, per feedback off a
+screenshot.** Wide screens got three tabletops with a strip of bare panel
+between them where the user wanted one continuous desk; narrow screens got
+each block's two 250px leg caps overlapping (blocks run ~340px there) into
+a doubled top edge where the user wanted a plain stretch of grain with no
+leg art at all. Split the one shared rule in two: the always-on base rule
+(mobile) now draws only `desk-mid.png`, repeated, no caps; a new wide-only
+rule moves the full three-layer (caps + mid) background onto
+`.scene.active` itself — one background behind the whole grid row, so the
+14px column gap still separates bench/reagents/element but the desk paints
+straight through it — and clears `background` back to `none` on the three
+child panels so they don't double-draw under it. Same two source images
+either way, just applied at a different level of the DOM depending on
+whether there's room for the caps.
+
+**The rack drawer was still sized off its 760px desktop cap on mobile.**
+Its own `max-width:760px` breakpoint only touched `--rack-peek` (the peek
+height), never `width` — so next to the lockpick case, which does widen at
+that breakpoint (`css/overrides-05-inventory.css`, `min(96vw,calc(100vw -
+16px))`), the rack visibly stayed the smaller of the two. Matched the
+case's own mobile width step; since every bottle and the rack art itself
+are sized off `.alchemyRackDrawer`'s width via percentages and
+`aspect-ratio`, widening the one property scales all of it together.
 
 ## Two things that cost hours — do not rediscover them
 

@@ -181,16 +181,20 @@
    legs. Stacked on mobile or sitting side by side on the wide grid, each
    of the three gets a complete desk this way — no separate mobile/desktop
    asset needed. */
+/* Mobile: each stacked block is narrower than the two leg caps combined
+   (250px apiece), so drawing both caps overlapped them into a messy double
+   edge at the top instead of a clean tabletop. Flat tabletop only here —
+   no leg art — repeating the same grain-only tile the wide layout also
+   uses for its own stretch. The wide layout below replaces this with a
+   single continuous desk (caps included) behind the whole row instead. */
 .alchemyRoot .lab.color-game-lab,
 .alchemyRoot .alchemyReagents,
 .alchemyRoot .alchemyElementColumn{
   border:none;border-radius:0;background-color:transparent;
-  background-image:url("../assets/alchemy/desk-cap-left.png"),
-    url("../assets/alchemy/desk-cap-right.png"),
-    url("../assets/alchemy/desk-mid.png");
-  background-position:left top,right top,left top;
-  background-repeat:no-repeat,no-repeat,repeat-x;
-  background-size:auto 100%,auto 100%,auto 100%;
+  background-image:url("../assets/alchemy/desk-mid.png");
+  background-position:left top;
+  background-repeat:repeat-x;
+  background-size:auto 100%;
 }
 .alchemyRoot .lab h3{margin:0 0 14px;text-align:center;color:#e6d2a6;
   font:600 15px/1.2 Georgia,serif;}
@@ -386,6 +390,26 @@
     align-self:stretch;justify-content:center;overflow:auto;
     padding:16px;border-top:0;}
   .alchemyRoot .scene.active > .scene-head{display:none;}
+  /* Wide: one continuous desk behind the whole row instead of three
+     separate tabletops with a gap of bare panel between them — the grid
+     gap still separates the columns, but the desk paints straight through
+     it since it's one background on the grid container, not per-column.
+     Caps come back here (mobile drops them, see the mid-tile-only rule
+     above) because a row this wide has the room for them without
+     overlapping into a mess. */
+  .alchemyRoot .scene.active:has(> .lab.color-game-lab){
+    background-image:url("../assets/alchemy/desk-cap-left.png"),
+      url("../assets/alchemy/desk-cap-right.png"),
+      url("../assets/alchemy/desk-mid.png");
+    background-position:left top,right top,left top;
+    background-repeat:no-repeat,no-repeat,repeat-x;
+    background-size:auto 100%,auto 100%,auto 100%;
+  }
+  .alchemyRoot .scene.active > .lab.color-game-lab,
+  .alchemyRoot .scene.active > .alchemyReagents,
+  .alchemyRoot .scene.active > .alchemyElementColumn{
+    background:none;
+  }
   /* four reagents read better as a block of two than as a tall column */
   .alchemyRoot .color-controls{display:grid;grid-template-columns:repeat(2,1fr);
     gap:18px 12px;width:100%;}
@@ -559,5 +583,11 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
 .alchemyRackDrawerBottle:nth-child(7){left:86.86%;}
 
 @media (max-width:760px){
-  .alchemyRackDrawer{--rack-peek:56px;}
+  /* Matches the lockpick case's own mobile width step
+     (css/overrides-05-inventory.css) — the rack was still sized off the
+     760px desktop cap here, noticeably smaller than the case despite
+     sitting right next to it. Bottles and rack art both scale off this
+     width (percentage/aspect-ratio throughout), so widening it alone
+     grows everything in proportion. */
+  .alchemyRackDrawer{--rack-peek:56px;width:min(96vw,calc(100vw - 16px));max-width:calc(100vw - 16px);}
 }

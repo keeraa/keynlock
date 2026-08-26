@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v318)
+## Where this stands (v319)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -554,6 +554,31 @@ cell was still getting an *extra* 90px pushed onto it on top of the
 transform, a real (if narrow-window-only) misplacement that nothing
 since v316 had re-tested. Removed; the cell's normal transform already
 carries over into short screens fine on its own.
+
+**A second, more thorough cleanup pass, this time reading the whole file
+line by line rather than spot-checking the recent additions.** Wrote a
+small script to list every selector using a custom `.alchemy*` class
+without an `.alchemyRoot` ancestor — the same category of gap v318 fixed
+for `.alchemyElementCell` — and cross-checked each hit against the
+markup/JS before touching anything, since `.alchemyRackDrawer*` and
+`.alchemyFullBlur` are *correctly* unscoped (both live outside
+`#alchemyRoot` entirely, by design). Found four more genuine misses:
+`.alchemyReagents`, `.alchemyElementColumn` (plus its `.big-actions`/`.ctl`
+children), and — while checking those — `.alchemyStations`/
+`.alchemyStationTab` too, unscoped since before this whole feature. None
+had an actual collision (checked each name against the rest of the
+codebase), same as v318's find; still worth closing for the same reason
+the convention exists.
+
+**Also found an exact duplicate: `.alchemyStations`/`.alchemyStationTab`
+were defined twice, ~120 lines apart, with the tab rule's `font` shorthand
+differing between the two (`var(--ui-font,Arial,sans-serif)` vs
+`inherit`).** Not a visible bug — cascade order made the second,
+`inherit` version win outright, and `inherit` resolves to the same
+`var(--ui-font,...)` value anyway since `.alchemyRoot` itself sets that as
+its `font-family` — but the first block was 100% dead weight, silently
+copy-pasted at some earlier point rather than reused. Deleted the first
+occurrence, scoped the surviving one.
 
 ## Two things that cost hours — do not rediscover them
 

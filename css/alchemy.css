@@ -92,12 +92,6 @@
 /* The prototype showed one scene at a time through its own chrome; here the
    lair window is the frame, so only the chosen station is in the flow. */
 .alchemyRoot{display:flex;flex-direction:column;gap:12px;height:100%;min-height:0;}
-.alchemyStations{display:flex;gap:8px;flex:0 0 auto;flex-wrap:wrap;}
-.alchemyStationTab{padding:8px 14px;border:1px solid rgba(138,100,52,.5);border-radius:9px;
-  background:rgba(22,17,12,.7);color:#c9b98c;font:600 12px/1 var(--ui-font,Arial,sans-serif);
-  cursor:pointer;transition:background .16s ease,color .16s ease,border-color .16s ease;}
-.alchemyStationTab:hover{border-color:#d6ab5e;color:#f0d497;}
-.alchemyStationTab.active{background:#a9772f;border-color:#f0c86e;color:#1a130c;}
 
 
 /* The lab scrolls, the verdict and its buttons never do: a result you cannot
@@ -216,12 +210,12 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
   color:#e2c487;font-family:var(--ui-font,Arial,sans-serif);}
 
 /* --- station picker --- */
-.alchemyStations{display:flex;gap:8px;flex:0 0 auto;flex-wrap:wrap;}
-.alchemyStationTab{padding:8px 14px;border:1px solid rgba(138,100,52,.5);border-radius:9px;
+.alchemyRoot .alchemyStations{display:flex;gap:8px;flex:0 0 auto;flex-wrap:wrap;}
+.alchemyRoot .alchemyStationTab{padding:8px 14px;border:1px solid rgba(138,100,52,.5);border-radius:9px;
   background:rgba(22,17,12,.7);color:#c9b98c;font:600 12px/1 inherit;cursor:pointer;
   transition:background .16s ease,color .16s ease,border-color .16s ease;}
-.alchemyStationTab:hover{border-color:#d6ab5e;color:#f0d497;}
-.alchemyStationTab.active{background:#a9772f;border-color:#f0c86e;color:#1a130c;}
+.alchemyRoot .alchemyStationTab:hover{border-color:#d6ab5e;color:#f0d497;}
+.alchemyRoot .alchemyStationTab.active{background:#a9772f;border-color:#f0c86e;color:#1a130c;}
 
 /* --- one station --- */
 .alchemyRoot .scene{display:none;}
@@ -311,7 +305,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
 .alchemyRoot .color-controls .color-card .mini-swatch{height:clamp(48px,8vh,88px)!important;}
 
 /* --- reagents: one row, the tube is the target --- */
-.alchemyReagents{flex:0 0 auto;padding:14px;}
+.alchemyRoot .alchemyReagents{flex:0 0 auto;padding:14px;}
 .alchemyRoot .color-controls{display:flex;flex-direction:row;flex-wrap:nowrap;
   justify-content:center;align-items:flex-end;gap:16px;}
 .alchemyRoot .color-card{display:flex;flex-direction:column;align-items:center;gap:4px;
@@ -340,7 +334,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    same narrow-column treatment the reagents already got. Checking a mix
    used to need only reagents; now it needs an element in this slot too,
    so the slot sits closest to the buttons that need it filled. */
-.alchemyElementColumn{flex:0 0 auto;display:flex;flex-direction:column;
+.alchemyRoot .alchemyElementColumn{flex:0 0 auto;display:flex;flex-direction:column;
   align-items:center;gap:12px;padding:14px 12px 12px;}
 /* width:100%, not the default shrink-to-fit a column-direction flex item
    gets: without it the verdict sat at its own unwrapped text width, which
@@ -351,8 +345,8 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
 .alchemyRoot .big-actions{display:flex;gap:10px;}
 /* Side by side needs more width than the narrow element column has to give —
    Проверить and Сброс were clipping. Stacked instead, each full width. */
-.alchemyElementColumn .big-actions{flex-direction:column;width:100%;gap:8px;}
-.alchemyElementColumn .ctl{width:100%;}
+.alchemyRoot .alchemyElementColumn .big-actions{flex-direction:column;width:100%;gap:8px;}
+.alchemyRoot .alchemyElementColumn .ctl{width:100%;}
 .alchemyRoot .ctl{padding:9px 16px;border:1px solid #a97f3e;border-radius:9px;
   background:linear-gradient(#432f1b,#20170f);color:#e8c67d;font:600 12px/1 inherit;cursor:pointer;}
 .alchemyRoot .ctl:hover{filter:brightness(1.14);}

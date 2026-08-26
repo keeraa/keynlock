@@ -183,10 +183,25 @@
    little station to station (footer text wraps differently), and a vh clamp
    turned that into the two flasks visibly sitting closer together on one tab
    than another. Width still gets a say — narrower panels pull them in. */
-.alchemyRoot .tube-pair{display:flex;justify-content:center;align-items:flex-end;gap:32px;}
+.alchemyRoot .tube-pair{display:flex;justify-content:center;align-items:flex-end;gap:32px;
+  /* The label's own height no longer sits in flow (see .swatch-label below),
+     so without this the scrollable .lab clips it a few px short. */
+  padding-bottom:20px;}
 .alchemyRoot .tube-box,.alchemyRoot .current-cluster{display:flex;flex-direction:column;
   align-items:center;gap:6px;}
-.alchemyRoot .swatch-label{color:#9d8d75;font:11px/1 inherit;letter-spacing:.02em;}
+/* Taken out of flow and centered by its own transform, not by its parent's
+   flex sizing. In flow, a long label ("текущая смесь", "грязная смесь") is
+   wider than the 70-something px tube and forces .tube-box to that width —
+   the target tube's box stays narrow (its label is just "цель"), so the two
+   columns end up different widths and .tube-pair's justify-content:center
+   centers the whole *row* on that mismatch, not on the tubes. The result was
+   the left flask sitting at a different x on every station, tracking
+   whatever the right-hand label happened to say. Absolute removes the label
+   from that math entirely — both boxes are exactly tube-width, every time. */
+.alchemyRoot .tube-box{position:relative;}
+.alchemyRoot .swatch-label{color:#9d8d75;font:11px/1 inherit;letter-spacing:.02em;
+  position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  margin-top:6px;white-space:nowrap;}
 
 /* The glassware is sized from the window, not pinned in pixels. At a fixed
    96x224 the two flasks were a small island in a bench that stretched to

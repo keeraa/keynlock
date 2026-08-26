@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v294)
+## Where this stands (v295)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three stations run — mixing, concentrations,
@@ -104,8 +104,31 @@ flasks sitting visibly closer together on one tab than another. Fixed px
 values now (32px / 40px by breakpoint) — width may still resize it, height
 must not.
 
+**A wide label under the current tube used to widen its whole column.** The
+target's label is always "цель" — short, narrower than the tube. The current
+tube's label is per-station ("текущая смесь", "получилось", "грязная смесь")
+and on a narrow layout every one of those is wider than the ~70px tube itself,
+so `.tube-box`/`.current-cluster` — a flex column, sized to its widest child —
+took the *label's* width, not the tube's. `.tube-pair`'s `justify-content:
+center` then centered the row on two mismatched columns, and the target tube
+visibly landed at a different x per station, tracking whatever the other
+label's length was. Fix: the label is `position:absolute` under the tube now,
+centered by its own transform, so it can be wider than its column without
+setting the column's width. That takes the label out of flow, so `.tube-pair`
+carries an explicit `padding-bottom` to keep the space it needs inside the
+scrollable `.lab` — drop that and the label clips a few px short.
+
 ## Still to do
 
 The other seven stations — markup only, no JS work. A bench texture under the
 glassware and recipe cards were proposed and not built; both need a decision
 first.
+
+A near-empty tube (freshly reset, nothing poured) reads as a solid black
+bottle rather than empty glass — `.test-tube` carries no fill of its own
+(`background:none!important`, deliberate, from the port), so wherever
+`clip-path` hides the liquid, the dark lair panel just shows through the
+glass. Easy to mistake for the mask-bleed bug since it's the same tube art;
+it isn't one — confirmed by dropping the clip-path, which fills clean. Not
+fixed: needs a decision on what "empty" should look like, not just a value
+tweak.

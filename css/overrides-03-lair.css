@@ -65,14 +65,7 @@
 .mechanismZone::before,.sharedModeLockArt::before{content:"";position:absolute;background:var(--locker-image) center/contain no-repeat;z-index:0;pointer-events:none;transition:transform .25s ease;will-change:transform;}
 .mechanismZone .lockPanel,.sharedModeLockArt .lockPanel{inset:auto!important;background:var(--lock-body-image) center/contain no-repeat!important;filter:drop-shadow(0 16px 20px rgba(0,0,0,.42));z-index:1!important;pointer-events:none;}
 .mechanismZone .pick,.mechanismZone .tension,.sharedModeLockArt .pick,.sharedModeLockArt .tension{z-index:3!important;}
-.mechanismZone.opening .lockPanel,.sharedModeLockArt.opening .lockPanel{animation:padlockBodyOpenSettle 4300ms cubic-bezier(.16,.68,.18,1);}
-@keyframes padlockBodyOpenSettle{
-0%{transform:translateX(-50%) scale(1);}
-18%{transform:translateX(-50%) scale(.997);}
-45%{transform:translateX(-50%) scale(.989);}
-72%{transform:translateX(-50%) scale(.995);}
-100%{transform:translateX(-50%) scale(1);}
-}
+.mechanismZone.opening .lockPanel,.sharedModeLockArt.opening .lockPanel{animation:keynlockBodyOpenFast 950ms cubic-bezier(.20,.76,.18,1);}
 .sharedModeLockArt{position:relative;}
 .difficultyDock{top:14px;left:180px;}
 .difficultyBtn{border:1px solid #8b6a35;background:linear-gradient(#302534,#17151a);color:#d8be90;cursor:pointer;font:700 14px var(--ui-font);letter-spacing:.04em;transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease;}

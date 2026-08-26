@@ -121,7 +121,7 @@ if(mode==='classic'){
       if(solved && document.body.classList.contains('game-inactive')){
         document.body.classList.add('solved-notice-visible');
       }
-    },4200);
+    },1100);
     // После успешного прохождения не показываем общий toast/кнопку «Новый замок».
     $toast.classList.remove('show','actionable');
     $toastText.textContent='';
@@ -136,7 +136,7 @@ if(mode==='classic'){
           if(completedRoundId!==activeRoundId) return;
           el.classList.remove('opening');
           el.classList.add('opened');
-        },4300);
+        },1000);
       }
     });
   }

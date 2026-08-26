@@ -239,16 +239,8 @@ body.mode-hillsfar .hfCandidate{min-height:56px!important;}
 body.game-inactive.shop-open::after,body.game-inactive.lair-open::after,body.game-inactive.map-open::after{display:none;}
 .topRightHud{z-index:360!important;}
 .mechanismZone::before,.sharedModeLockArt::before{top:-28px!important;}
-.mechanismZone.opening::before,.sharedModeLockArt.opening::before{animation:shackleOpenSmooth 4300ms cubic-bezier(.16,.68,.18,1) forwards!important;}
+.mechanismZone.opening::before,.sharedModeLockArt.opening::before{animation:keynlockShackleOpenFast 950ms cubic-bezier(.20,.76,.18,1) forwards!important;}
 .mechanismZone.opened::before,.sharedModeLockArt.opened::before{transform:translateX(-50%) translateY(-40%) rotate(-14deg)!important;}
-@keyframes shackleOpenSmooth{
-0%{transform:translateX(-50%) translateY(0) rotate(0deg);}
-12%{transform:translateX(-50%) translateY(-6%) rotate(-1.5deg);}
-36%{transform:translateX(-50%) translateY(-23%) rotate(-5deg);}
-64%{transform:translateX(-50%) translateY(-36%) rotate(-11deg);}
-84%{transform:translateX(-50%) translateY(-41%) rotate(-14.5deg);}
-100%{transform:translateX(-50%) translateY(-40%) rotate(-14deg);}
-}
 .skinPreviewMain{min-height:172px!important;height:172px!important;justify-content:center!important;gap:8px!important;overflow:hidden!important;}
 #pickSkinMain,#tensionSkinMain{min-height:172px!important;height:172px!important;}
 #pickSkinMain{position:relative!important;width:50%!important;max-width:320px!important;margin-inline:auto!important;}

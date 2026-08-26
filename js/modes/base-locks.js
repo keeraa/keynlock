@@ -467,7 +467,7 @@ let plateEls=[], pinTopPlateEls=[];
       $mechanism.classList.remove('opening');
       $mechanism.classList.add('opened');
       celebrate();
-    },4300);
+    },1000);
   }
 
   function select(delta){

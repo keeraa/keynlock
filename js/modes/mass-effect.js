@@ -71,6 +71,7 @@
     solved = false;
     $lock.classList.remove('win');
     $mechanism.classList.remove('ready','opening','opened');
+    document.querySelector('.massCenterLock')?.classList.remove('opening','opened');
     picks = pickCapacity;
     moves = 0;
     brokenPicks = 0;
@@ -118,6 +119,7 @@
     }
     solved = true;
     $lock.classList.add('win');
+    document.querySelector('.massCenterLock')?.classList.add('opening');
     SFX.open();
     renderMassEffect();
     setTimeout(() => celebrate(), 420);
@@ -147,4 +149,3 @@
   }
 
   function clamp(v,min,max){ return Math.max(min,Math.min(max,v)); }
-

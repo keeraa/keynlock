@@ -24,6 +24,7 @@
     $scene.classList.toggle('hideBase',isImported);
     document.body.classList.toggle('importedMode',isImported);
     document.body.classList.toggle('mode-hillsfar', mode==='hillsfar');
+    document.body.classList.toggle('mode-mass', mode==='mass');
     document.body.classList.toggle('mode-skyrim', mode==='skyrim');
     renderDifficultyDock();
     if(mode!=='hillsfar') clearHillsfarTimer();
@@ -66,7 +67,6 @@ if(mode==='classic'){
     }else if(mode==='scope'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>СОВМЕСТИТЬ ТЕКУЩИЙ СИГНАЛ С ЭТАЛОНОМ</b>';
     }
-    $objectiveLine.innerHTML += ` <span class="objectiveDiff">· Ур. ${getModeDifficulty(mode)}</span>`;
   }
 
   function getVisibleLockArts(){

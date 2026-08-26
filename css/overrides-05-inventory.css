@@ -1,7 +1,7 @@
 .inventoryDrawer{--inv-peek:56px;--inv-shift-x:10%;--inv-open-y:20%;--case-body-center-x:40.5%;--pick-rail-left:calc(3.368% - 5px - 0.414%);--pick-rail-width:21.50571264%;--tension-rail-left:53.8%;--tension-rail-width:22.902672%;--avatar-left:25.7%;--avatar-top:10.5%;--avatar-width:35.5%;--avatar-height:82.8%;position:fixed;left:50%;bottom:0;width:min(1180px,calc(100vw - 48px));max-width:calc(100vw - 48px);aspect-ratio:1436 / 344;z-index:215;overflow:visible;user-select:none;transform:translate(calc(-50% + var(--inv-shift-x)),calc(100% - var(--inv-peek) - var(--inv-approach, 0px)));transition:transform .34s cubic-bezier(.22,.78,.22,1),opacity .18s ease,filter .18s ease;}
 .inventoryDrawer:not(.open){transition:transform .16s cubic-bezier(.22,.78,.22,1),opacity .18s ease,filter .18s ease;}
 .inventoryDrawer.open{transform:translate(calc(-50% + var(--inv-shift-x)),var(--inv-open-y));}
-body.inventory-open #objectiveLine{z-index:205!important;}
+body.inventory-open #objectiveLine{visibility:hidden!important;opacity:0!important;pointer-events:none!important;}
 .inventoryDrawer:not(.open):hover{filter:brightness(1.05);}
 .inventoryToggle{position:absolute;z-index:7;left:var(--case-body-center-x);top:0;width:50%;height:var(--inv-peek);padding:0;border:0;background:transparent;cursor:pointer;transform:translateX(-50%);}
 /* While closed, every visible pixel of the case opens it — the strip grows with

@@ -204,7 +204,7 @@
 
   document.addEventListener('animationend',e=>{
     if(e.animationName!=='keynlockShackleOpenFast') return;
-    const lockArt=e.target?.closest?.('.mechanismZone,.sharedModeLockArt,.skCenterLock') || e.target;
+    const lockArt=e.target?.closest?.('.mechanismZone,.sharedModeLockArt,.skCenterLock,.massCenterLock') || e.target;
     if(!lockArt?.classList?.contains('opening')) return;
 
     lockArt.classList.remove('opening');

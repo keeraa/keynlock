@@ -416,7 +416,7 @@ function updateMechanismAssetHud(){
 function applyMechanismSkin(){
   const lockBody=cssUrl(currentLockBodySkin());
   const locker=cssUrl(currentLockerSkin());
-  document.querySelectorAll('.mechanismZone, .sharedModeLockArt, #skBoard').forEach(el=>{
+  document.querySelectorAll('.mechanismZone, .sharedModeLockArt, #skBoard, .massBoard').forEach(el=>{
     el.style.setProperty('--lock-body-image', lockBody);
     el.style.setProperty('--locker-image', locker);
   });

@@ -1,4 +1,5 @@
 .massMode{position:absolute;z-index:7;display:flex;flex-direction:column;align-items:center;}
+.massBoardViewport{position:relative;width:620px;height:620px;flex:0 0 620px;overflow:visible;}
 .massBoard{position:relative;display:grid;place-items:center;}
 .massPointer{position:absolute;left:50%;transform:translateX(-50%);width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:18px solid #d9b56c;filter:drop-shadow(0 0 12px rgba(241,199,104,.62)) drop-shadow(0 0 20px rgba(241,199,104,.18));z-index:6;}
 .massRings{position:absolute;inset:0;display:grid;place-items:center;}
@@ -23,23 +24,30 @@
 .massRing.selected .massRingDisc{opacity:1;filter:brightness(1.14) saturate(1.06) drop-shadow(0 10px 24px rgba(0,0,0,.24));}
 .massRing.ready .massRingDisc{opacity:.22;filter:brightness(.62) saturate(.72) drop-shadow(0 4px 10px rgba(0,0,0,.12));}
 .massRing.ready.selected .massRingDisc{opacity:.72;filter:brightness(.92) saturate(.96) drop-shadow(0 8px 18px rgba(0,0,0,.18));}
-.massCenter{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;border:0;background:radial-gradient(circle at 35% 30%, #6a5030, #2d2318 58%, #15110c 100%);box-shadow:inset 0 0 0 2px rgba(236,202,132,.34),
-      0 0 0 14px rgba(77,58,31,.35),
-      0 0 38px rgba(0,0,0,.32);color:#e8d2a6;cursor:pointer;z-index:5;}
+.massCenter{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;border:0;background:transparent;box-shadow:none;color:#e8d2a6;cursor:pointer;z-index:5;}
 .massCenter span{font:700 20px/1 Arial,sans-serif;letter-spacing:.18em;}
-.massCenter.ready{box-shadow:inset 0 0 0 2px rgba(255,230,157,.65),
-      0 0 0 14px rgba(77,58,31,.35),
-      0 0 46px rgba(219,180,95,.24);}
+.massCenter.ready{filter:drop-shadow(0 0 16px rgba(219,180,95,.42));}
+.massCenterLock{position:absolute;left:50%;top:50%;width:136px;height:142px;transform:translate(-50%,-50%);z-index:2;pointer-events:none;filter:drop-shadow(0 7px 10px rgba(0,0,0,.48));}
+.massCenterShackle{position:absolute;left:50%;top:-28px;width:112px;height:112px;transform:translateX(-50%);background:var(--locker-image) center/contain no-repeat;}
+.massCenterBody{position:absolute;left:50%;top:30px;width:136px;height:110px;transform:translateX(-50%);background:var(--lock-body-image) center/contain no-repeat;}
+.massCenterPick{position:absolute;left:50%;top:50%;width:1px;height:1px;z-index:4;transform:rotate(-66deg);transform-origin:center;}
+.massCenterPick::before{content:"";position:absolute;left:-11px;bottom:-38px;width:22px;height:158px;background:var(--pick-skin-image) center bottom/contain no-repeat;transform:scaleY(-1);filter:drop-shadow(0 2px 4px rgba(0,0,0,.48));}
+.massCenterTension{position:absolute;left:50%;top:50%;width:1px;height:1px;z-index:3;}
+.massCenterTension::before{content:"";position:absolute;left:-5px;top:-12px;width:104px;height:26px;background:var(--tension-skin-image) center/contain no-repeat;transform-origin:6% 50%;transform:rotate(13.5deg);filter:drop-shadow(0 2px 4px rgba(0,0,0,.48));}
+.massCenterLock.opening .massCenterShackle{animation:keynlockShackleOpenFast 950ms cubic-bezier(.20,.76,.18,1) forwards!important;}
+.massCenterLock.opened .massCenterShackle{transform:translateX(-50%) translateY(-40%) rotate(-14deg);}
 .massMode{gap:8px;padding:10px 20px 6px;justify-content:flex-start;overflow:auto;backdrop-filter:none;}
-.massBoard{width:310px;height:310px;}
-.massCenter{width:90px;height:90px;}
+.massBoard{position:absolute;left:50%;top:50%;width:310px;height:310px;transform:translate(-50%,-50%) scale(2);transform-origin:center;}
+.massCenter{width:150px;height:150px;}
 .massCenter span{font-size:10px;}
 .massMode{inset:0;background:rgba(16,12,9,.985);}
 body.importedMode .massMode{border-radius:0;padding:10px 24px 8px;justify-content:center;align-items:center;gap:4px;background:#0d0a07;overflow:auto;}
 body.importedMode .massBoard{width:310px!important;height:310px!important;max-width:310px!important;max-height:310px!important;}
 @media (max-width: 900px){
 body.importedMode .massMode{inset:0;padding:10px 14px 10px;}
-body.importedMode .massBoard{width:260px!important;height:260px!important;max-width:260px!important;max-height:260px!important;}
+.massBoardViewport{width:520px;height:520px;flex-basis:520px;}
+body.importedMode .massBoard{width:310px!important;height:310px!important;max-width:310px!important;max-height:310px!important;transform:translate(-50%,-50%) scale(1.677);}
 }
 .massMode[hidden]{display:none!important;pointer-events:none!important;}
 body.importedMode .massMode{inset:0!important;width:100%!important;height:100%!important;min-height:0!important;max-width:none!important;z-index:20!important;}
+body.mode-mass #lock.universalLockBlock{display:none!important;}

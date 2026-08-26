@@ -357,12 +357,20 @@
 </div>
 <!-- MODE: MASS EFFECT -->
 <div class="modePanel massMode" data-mode="mass" hidden="" id="massMode">
+<div class="massBoardViewport">
 <div class="massBoard">
 <div class="massPointer"></div>
 <div class="massRings" id="massRings"></div>
 <button aria-label="Открыть замок" class="massCenter" id="massCenter" type="button">
-<span id="massCenterText">ОТКРЫТЬ</span>
+<span class="massCenterLock" aria-hidden="true">
+<span class="massCenterShackle"></span>
+<span class="massCenterBody"></span>
+<span class="massCenterPick"></span>
+<span class="massCenterTension"></span>
+</span>
+<span id="massCenterText" hidden>ОТКРЫТЬ</span>
 </button>
+</div>
 </div>
 
 </div>

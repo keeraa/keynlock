@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v311)
+## Where this stands (v312)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -349,6 +349,37 @@ something that reflows cleanly at every size. Short screens
 smaller push-down and cell margin — the full-size ones were tuned against
 a normal window height and ate into the already-tight short-screen budget
 enough to clip Проверить/Новая партия at the window's own bottom edge.
+
+**A `backdrop-filter` on the window only ever blurs what's directly
+behind its own box — that's not "the whole screen" once the window is
+narrower than the viewport.** v311's blur sat on `#lairModuleWindow`
+itself, capped at 780px wide; everything past its edges (the room, the
+character portraits either side) stayed sharp, visible on a wide-enough
+browser window. Moved the blur to its own full-viewport layer instead
+(`#alchemyFullBlur`, a sibling of `#lairModuleWindow` inside
+`#lairOverlay`) — `position:absolute;inset:0` is enough to cover the
+whole screen here because `#lairOverlay` is itself `position:fixed`,
+sidestepping the transform-on-ancestor containing-block trap
+`#lairModuleWindow`'s own `transform` sets for any `position:fixed`
+descendant (the same reason the rack drawer had to move out of the lair
+DOM subtree, `v302` above). Ordering in the markup is what keeps the top
+HUD and rack drawer sharp: the blur layer sits right before
+`#lairModuleWindow`, after all the room/hotspot/character markup, so
+`backdrop-filter` picks up everything already painted behind it and
+nothing painted after — the HUD and rack drawer live outside
+`#lairOverlay` entirely regardless, at z-index 360 and 214 against its
+160, so they were never in reach either way.
+
+**`minmax(0,1fr)` on the bench row means "fill whatever height the
+window has," and the window's own height budget (`max-height:82vh`) can
+be a lot more than a photographed tabletop wants.** On a tall browser
+window the row — and the desk image stretched `100% 100%` across it —
+grew well past a sensible table height, reading as a wall of wood rather
+than a tabletop sitting under three columns of glassware. `max-height:
+420px` on `.scene.active` caps the row without touching the window's own
+sizing (still auto height, still capped at 82vh) — the window just ends
+up with a bit of slack above/below the row on a very tall screen instead
+of stretching the photo to fill it.
 
 ## Two things that cost hours — do not rediscover them
 

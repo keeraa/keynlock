@@ -157,16 +157,31 @@
    own card exactly as before, since this selector only matches when
    alchemy's own .lairPanel is .active. */
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active){
-  border:none;border-radius:0;box-shadow:none;
-  /* Not fully transparent: on mobile this window is nearly full-screen, so
-     "no background" meant the lair room itself — with its own clickable
-     hotspots — showed through behind the tabs and tubes. Per feedback the
-     flat wood-tone fill read as its own colored panel — blur instead:
-     the room behind stays visible but illegible/inert, and no new color
-     is introduced anywhere. */
-  background:rgba(10,8,6,.28);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
+  border:none;border-radius:0;box-shadow:none;background:none;
+}
+/* Full-screen blur, not just behind the window: a backdrop-filter on the
+   window itself only ever blurs what's directly behind *its own box* —
+   at the window's capped width that left the room sharp everywhere
+   outside it (visible past the window's edges on a wide screen). This is
+   a dedicated layer instead, `position:absolute;inset:0` inside
+   `#lairOverlay` (itself `position:fixed`, so inset:0 already spans the
+   full viewport without needing position:fixed here too — sidesteps the
+   containing-block trap `.lairModuleWindow`'s own transform sets for any
+   position:fixed descendant, same lesson as the rack drawer). Sits right
+   before `#lairModuleWindow` in the DOM, after the room/hotspot markup —
+   backdrop-filter only picks up what's already painted behind it, so
+   this order is what makes the room blur and the window itself, its
+   tabs, and its buttons stay sharp. The rack drawer and the top HUD live
+   outside `#lairOverlay` entirely (z-index 214 and 360 against
+   `#lairOverlay`'s 160), so they're unaffected without any extra rule. */
+.alchemyFullBlur{
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  opacity:0;background:rgba(10,8,6,.28);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  transition:opacity .18s ease;
+}
+body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .alchemyFullBlur{
+  opacity:1;
 }
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleHeader{
   border-bottom:none;
@@ -406,6 +421,13 @@
     /* a flex item will not shrink below its content unless told to, and the
        grid was pushing the reagent column out past the window */
     min-width:0;
+    /* Capped, not left to `minmax(0,1fr)` fill whatever height the window
+       has to spare: on a tall enough browser window the row — and with it
+       the desk photo stretched 100%/100% across it — grew well past a
+       sensible table height, reading as a wall of wood rather than a
+       tabletop. The window itself still sizes to content above/below
+       this row as usual; only the row stops growing past this point. */
+    max-height:420px;
   }
   /* Grid items carry min-width:auto too: the bench was distending its own
      track from the inside, which is what kept the scene wider than the panel. */
@@ -469,7 +491,7 @@
   .alchemyRoot .scene[data-name="Смешение"] .test-tube.tube-lg,
   .alchemyRoot .scene[data-name="Концентрации"] .test-tube.tube-lg,
   .alchemyRoot .scene[data-name="Разделение"] .test-tube.tube-lg{height:clamp(130px,24vh,220px)!important;}
-  .alchemyRoot .tube-pair{gap:28px;}
+  .alchemyRoot .tube-pair{gap:16px;}
   /* Four reagents two-by-two at full height stood 530px against 328px of
      glassware and became the tallest thing in the window. Shorter here. */
   .alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch{height:clamp(40px,7vh,68px)!important;width:34px!important;margin:0 auto 6px!important;}
@@ -484,11 +506,11 @@
      are tuned by eye against the photo so all three groups' feet land on
      the same line. */
   .alchemyRoot .scene.active .lab.color-game-lab .test-tube.tube-lg{
-    transform:translateY(-12px) scale(.5);
+    transform:translateY(-12px) scale(.6);
     transform-origin:bottom center;
   }
   .alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch{
-    transform:translateY(-78px) scale(1.3);
+    transform:translateY(-67px) scale(1.3);
     transform-origin:bottom center;
   }
   .alchemyRoot .alchemyReagents .color-card strong{display:none;}
@@ -501,7 +523,7 @@
        after it in the column follows. */
     transform:translateX(-30px) scale(1.1);
     transform-origin:bottom center;
-    margin-top:149px;
+    margin-top:144px;
   }
   .alchemyRoot .scene.active .alchemyElementCell.filled{border:none;}
   /* The whole desk (and everything standing on it) sits 20% lower than

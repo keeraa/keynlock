@@ -34,67 +34,66 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v301)
+## Where this stands (v302)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
-concentrations, separation — plus a fourth, non-puzzle station: an
-ingredient rack. The whole prototype script came over at once, so the
-remaining seven color-game stations need only their markup; missing
-elements get a stand-in rather than throwing, and every query the ported
-code makes is confined to `#alchemyRoot`.
+concentrations, separation. The whole prototype script came over at once,
+so the remaining seven need only their markup; missing elements get a
+stand-in rather than throwing, and every query the ported code makes is
+confined to `#alchemyRoot`.
 
-**The rack** (`Стойка` tab) shows seven bottles by element — Stannum,
-Plumbum, Aurum, Sulfur, Hydrargyrum, Argentum, Ferrum, in that order —
-picked from a shelf image (`assets/alchemy/rack-back.png` + `rack-front.png`)
-built for exactly seven slots. No name is printed on the shelf; each bottle
-carries its own alchemical symbol on a medallion instead, and the verdict
-line below names the element once picked. Clicking one selects it; nothing
-branches on the selection yet. The plan is to gate which elixir recipes are
-buildable by the chosen element, mirrored on the tension tool's lock-type
-match in `js/core/inventory-hit-testing.js`
+**The ingredient rack lives outside the modal now, as a bottom drawer**
+(`#alchemyRackDrawer`) — it was a fourth "Стойка" tab through v296-301, but
+that made it just another color-game station when it isn't a puzzle at all,
+and boxed it into the modal's own width/height budget when a 1614:690 shelf
+with seven items across wants room the modal doesn't have to spare. Moved
+out to match the lockpick case instead
+(`css/overrides-05-inventory.css` `.inventoryDrawer`,
+`js/world/inventory.js`): fixed to the bottom of the screen, peeking above
+the edge, sliding open on click, closing on an outside click — same
+mechanics, same construction (a back board, the bottles, a front board
+whose lower half repeats the cubby art with its middle band cut
+transparent, so the dividers sit in front of each bottle's base while the
+body still shows through the gap). No JS drives *visibility* — showing the
+drawer exactly while the alchemy module is the open one is one selector,
+`body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"]
+.active)`, because `#lairModuleWindow` only ever carries `.open` in sync
+with its own `hidden` attribute (`js/world/lair.js`
+`openLairModule`/`closeLairModule`) and only the active tab's panel carries
+`.active`. JS only runs the open/closed toggle and the bottle click.
+
+Seven bottles by element — Stannum, Plumbum, Aurum, Sulfur, Hydrargyrum,
+Argentum, Ferrum, in that order — from a shelf image
+(`assets/alchemy/rack-back.png` + `rack-front.png`) built for exactly seven
+slots. No name is printed on the shelf; each bottle carries its own
+alchemical symbol on a medallion instead, and the verdict line below names
+the element once picked. Clicking one selects it; nothing branches on the
+selection yet. The plan is to gate which elixir recipes are buildable by
+the chosen element, mirrored on the tension tool's lock-type match in
+`js/core/inventory-hit-testing.js`
 (`typeBySkin`/`selectedTensionType`/`currentRequiredTensionType`/
 `tensionCompatible`) — a lock only opens for the matching tool; an elixir
 should only brew from the matching element. Not built.
 
-Unlike the other three stations, the rack gets its own, wider module window
-(1040px, not 780px) — `#lairModuleWindow:has(.lairPanel[data-lair-panel=
-"alchemy"] .alchemyRackScene.active)`, scoped to just that scene so the
-color-game stations keep the narrower window they were sized for. A 1614:690
-shelf with seven items across needs the room; at 780px the bottles read as
-cramped rather than sitting cleanly in their rings.
-
 Each bottle is shorter than its own art would give at a naive `top:7%`
-(`.alchemyRackBottle` is `height:61%` — 62% (v298), then nudged one point
-smaller by eye once the ring positions themselves stopped being the
-question — not the ~72% the ring position alone would suggest): the ring
-sits at ~32% down the rack, and at 72% that lands on
-each bottle at roughly its neck-to-shoulder line — where a pendant hangs from
-a chain whose length isn't identical across the seven separate illustrations.
-Shrinking the bottle pushes that same absolute ring position deeper into the
-image (~55-60% into the bottle instead of ~35%), into the wide jar body that
-every one of the seven fills solidly full-width from that point down. Chased
-by eye against a screenshot that looked like two rings had nothing in
-them — never reproduced directly (measured identical `getBoundingClientRect`
-for all seven bottles, and a from-scratch canvas recomposite of the same two
-layers came out clean) — but the fix stands on its own regardless: it trades
-a part of the art that wasn't guaranteed to line up the same way twice for
-one that is.
+(`.alchemyRackDrawerBottle` is `height:61%` — not the ~72% the ring
+position alone would suggest): the ring sits at ~32% down the rack, and at
+72% that lands on each bottle at roughly its neck-to-shoulder line — where
+a pendant hangs from a chain whose length isn't identical across the seven
+separate illustrations. Shrinking the bottle pushes that same absolute
+ring position deeper into the image (~55-60% into the bottle instead of
+~35%), into the wide jar body that every one of the seven fills solidly
+full-width from that point down.
 
-The rack is layered like the inventory case
-(`css/overrides-05-inventory.css` `.inventoryCaseBack`/`.inventoryCaseFront`,
-`js/world/inventory.js`): a back board with the bottles' slot holes, the
-bottles positioned over them, then a front board on top whose lower half
-repeats the same cubby art with its middle band cut transparent — so the
-front board's dividers sit in front of each bottle's base while the bottle's
-own body still shows through the gap, rather than getting fully hidden or
-fully exposed. `rack-front.png` is `rack-back.png`'s own bottom 439 of
-690px, bottom-aligned — that split was measured, not eyeballed. The seven
-ring-centre x-positions took three tries to actually get right (see the
-"Two things" section below) — the value that stuck is an ellipse fit to
-each ring's own edge contour: 204.5, 405.0, 604.1, 803.0, 1003.3, 1201.6,
-1401.9 of a 1614px-wide source. See the CSS comments on
-`.alchemyRackFront`/`.alchemyRackBottle` if the art ever changes.
+`rack-front.png` is `rack-back.png`'s own bottom 439 of 690px, bottom-
+aligned — that split was measured, not eyeballed. The seven ring-centre
+x-positions took three tries to actually get right (see the "Two things"
+section below) — the value that stuck is an ellipse fit to each ring's own
+edge contour: 204.5, 405.0, 604.1, 803.0, 1003.3, 1201.6, 1401.9 of a
+1614px-wide source. See the CSS comments on
+`.alchemyRackDrawerFront`/`.alchemyRackDrawerBottle` if the art ever
+changes.
 
 The three stations were tuned for the lair window rather than the demo's
 scrolling page: the window went from 1280px down to 780px, the glassware
@@ -217,6 +216,20 @@ by two separate contours (inner hole, outer rim) landing within ~1px of
 each other per ring. Two rings agreeing with a template is still just the
 template being self-consistent; two independent fits on the *same* ring
 agreeing with each other is the actual signal.
+
+**A `position:fixed` descendant only escapes to the viewport if nothing
+between it and the root sets a transform.** `.lairModuleWindow` animates
+open with `transform:translate(-50%,-50%) scale(1)` — any `position:fixed`
+element nested inside it would be fixed *to that box*, not the screen,
+because a transformed ancestor becomes the containing block for its fixed
+descendants (same rule that makes `position:absolute` respect a
+`position:relative` ancestor). The rack drawer has to be pinned to the
+literal bottom of the screen regardless of where the modal is sized or
+positioned, so it isn't inside `#lairOverlay` at all — it sits as a
+top-level sibling of `#inventoryDrawer`, outside the whole lair DOM
+subtree, and relies on `body:has(...)` rather than nesting to know when to
+show itself. Nothing about "it's a lair-only element" required it to
+physically live inside the lair markup.
 
 ## Still to do
 

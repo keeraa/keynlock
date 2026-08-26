@@ -1133,21 +1133,43 @@
   show(0);
 })();
 
-/* Ingredient rack: pick one of seven bottles by its Latin name (the name
-   itself isn't shown on the shelf — the bottle's medallion carries its
-   alchemical symbol instead, and the verdict line names it on selection).
-   Just a selection for now — remembers which element is chosen and shows
-   its name back, the way the mixing stations show a verdict. What the
-   choice unlocks (which elixir recipes it gates) is the planned next
+/* Ingredient rack drawer: lives outside #alchemyRoot entirely now (see
+   css/alchemy.css for why — it's a bottom drawer over the whole lair
+   scene, not a station inside the modal, so a container transform on the
+   modal would break position:fixed if it were nested inside). Built and
+   wired the same way as the lockpick case in js/world/inventory.js:
+   peek/open toggle, closes on an outside click. Visibility itself needs no
+   JS — the CSS gate on body:has(...) shows it exactly while the alchemy
+   module is the open one.
+
+   Picking a bottle by its Latin name (the name itself isn't printed on the
+   shelf — the medallion carries its alchemical symbol instead, and the
+   verdict line names it on selection) just remembers the choice for now.
+   What it unlocks (which elixir recipes it gates) is the planned next
    step, mirrored on the tension-tool type match in
    js/core/inventory-hit-testing.js: a lock only opens for the matching
    tool, an elixir will only brew from the matching element. */
 (function(){
-  const root = document.querySelector('#alchemyRoot');
-  if(!root) return;
-  const bottles = [...root.querySelectorAll('.alchemyRackBottle')];
-  const statusEl = root.querySelector('#alchemyRackStatus');
-  if(!bottles.length || !statusEl) return;
+  const drawer = document.querySelector('#alchemyRackDrawer');
+  const toggle = document.querySelector('#alchemyRackDrawerToggle');
+  const bottles = [...document.querySelectorAll('.alchemyRackDrawerBottle')];
+  const statusEl = document.querySelector('#alchemyRackDrawerStatus');
+  if(!drawer || !toggle || !bottles.length || !statusEl) return;
+
+  function setOpen(force){
+    const next = typeof force === 'boolean' ? force : !drawer.classList.contains('open');
+    drawer.classList.toggle('open', next);
+    toggle.setAttribute('aria-expanded', next ? 'true' : 'false');
+    toggle.setAttribute('aria-label', next ? 'Закрыть стойку ингредиентов' : 'Открыть стойку ингредиентов');
+  }
+  toggle.addEventListener('click', () => setOpen());
+
+  document.addEventListener('pointerdown', e => {
+    if(!drawer.classList.contains('open')) return;
+    if(drawer.contains(e.target)) return;
+    setOpen(false);
+  }, true);
+
   function select(el){
     const element = el.dataset.element;
     bottles.forEach(b => b.classList.toggle('selected', b === el));

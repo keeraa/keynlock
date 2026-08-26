@@ -3,6 +3,24 @@
     return Math.abs(skPickAngle-skTargetAngle);
   }
 
+  function renderSkyrimTensionPattern(type){
+    const marks=document.querySelector('#skTensionPatternMarks');
+    if(!marks || marks.dataset.type===type) return;
+    const symbols={
+      bar:'M0 -7V7',
+      kink:'M-7 -6H-1Q6 -6 6 1V7',
+      wave:'M0 -8C-5 -5 5 -2 0 1S5 7 0 9',
+      hook:'M-3 8V0C-3 -7 7 -7 7 0V3',
+      angle:'M6 -8L-2 0L6 8'
+    };
+    const path=symbols[type]||symbols.bar;
+    marks.dataset.type=type||'bar';
+    marks.innerHTML=Array.from({length:28},(_,i)=>{
+      const angle=(360/28)*i;
+      return `<g transform="rotate(${angle} 280 280) translate(280 105)"><path d="${path}"/></g>`;
+    }).join('');
+  }
+
   function renderSkyrim(){
     $skBoard.style.setProperty('--pick-angle',`${skPickAngle.toFixed(1)}deg`);
     $skBoard.style.setProperty('--cylinder-angle',`${skCylinderAngle.toFixed(1)}deg`);
@@ -12,6 +30,7 @@
     const tensionHint=document.querySelector('#skTensionHint');
     const requiredTension=window.getKeynlockTensionRequirement?.();
     if(tensionHint) tensionHint.textContent=`Нужен натяжитель: ${requiredTension?.label || '—'}`;
+    renderSkyrimTensionPattern(requiredTension?.type);
 
     if(solved){
       $skFeedbackText.textContent='Замок открыт';

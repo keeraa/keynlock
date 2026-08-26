@@ -3,7 +3,7 @@
 .skOuterRing{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:560px;height:560px;border-radius:50%;background:radial-gradient(circle,
         transparent 0 57%,
         rgba(82,59,34,.65) 57.5% 61%,
-        rgba(218,175,104,.85) 61.5% 63%,
+        rgba(82,59,34,.65) 61.5% 63%,
         #3b2d20 63.5% 70%,
         #19130e 70.5% 100%);box-shadow:inset 0 0 0 3px rgba(231,194,126,.18),
       inset 0 0 52px rgba(0,0,0,.56),
@@ -13,6 +13,8 @@
         rgba(225,184,110,.25) 0 1deg,
         transparent 1deg 14deg
       );opacity:.48;-webkit-mask:radial-gradient(circle,transparent 0 67%,#000 68% 72%,transparent 73%);mask:radial-gradient(circle,transparent 0 67%,#000 68% 72%,transparent 73%);}
+.skTensionPattern{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:1;pointer-events:none;filter:drop-shadow(0 0 3px rgba(218,175,104,.38));}
+.skTensionPattern path{fill:none;stroke:#d9ae67;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;opacity:.92;}
 .skCylinder{position:absolute;left:50%;top:50%;width:330px;height:330px;border-radius:50%;transform:translate(-50%,-50%) rotate(var(--cylinder-angle));transition:transform 620ms cubic-bezier(.18,.64,.22,1);background:radial-gradient(circle at 35% 30%, #6b5234 0 12%, #3e3022 38%, #221a13 68%, #110d09 100%);box-shadow:inset 0 0 0 3px rgba(226,185,111,.32),
       inset 0 0 28px rgba(0,0,0,.58),
       0 0 0 16px rgba(80,59,34,.36),

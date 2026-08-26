@@ -34,19 +34,46 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Ported (v285)
+## Where this stands (v290)
 
-`js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`. Reached from a new
-lair hotspot; three stations are wired up — mixing, concentrations, separation.
+In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
+reached from a lair hotspot. Three stations run — mixing, concentrations,
+separation. The whole prototype script came over at once, so the remaining
+seven need only their markup; missing elements get a stand-in rather than
+throwing, and every query the ported code makes is confined to `#alchemyRoot`.
 
-The whole script came over at once, so the remaining seven need only their
-markup. Missing elements get a stand-in instead of throwing, and every query
-the ported code makes is confined to `#alchemyRoot`.
+Styles the seven cannot reach yet are parked in `stations-pending.css`. Move a
+block back when its station's markup lands.
+
+Stylesheet went 87 KB -> 44 KB: the demo's own page chrome, the rules bound to
+unported stations, and the prototype's layout, which was written for a
+scrolling catalogue and replaced with about 4 KB written for the lair window.
+The glassware and the 81 lines of game logic were never touched — that is the
+part worth keeping.
+
+Success is only a verdict for now. Nothing is banked; potions that carry into
+the next lock are the agreed next step, not built.
+
+## Two things that cost hours — do not rediscover them
+
+**The class names leak both ways.** Eleven are shared with the game. Scoping
+this stylesheet under `.alchemyRoot` keeps alchemy out of the game, and that
+much was done in v284 — but nothing kept the game out of alchemy. Its `.status`
+is positioned absolutely, so the verdict drew over the reagent labels; its
+`.scene` is `width:100vw !important` **and** `width:min(1180px,100vw)
+!important`, which pinned the station at 1180px inside an 888px panel. Nothing
+outranks `!important`: not `minmax(0,1fr)`, not `min-width:0` on every grid
+item, not an inline width. The guard at the top of the layout section resets
+these with `!important`. If a station ever measures wider than its panel again,
+look there first.
+
+**Percentages will not size this chain.** The module body's height comes from
+growing as a flex item — a used height, not a specified one — so `height:100%`
+below it resolves to auto. The chain is flex and grid throughout for that
+reason.
 
 ## Still to do
 
-**The other seven stations** — markup only, no JS work.
-
-**A purpose.** Decided: potions that carry into the next lock — less noise per
-move, sturdier picks, guards arriving later. Nothing is banked yet; finishing a
-station only reports its verdict.
+The other seven stations — markup only, no JS work. A bench texture under the
+glassware and recipe cards were proposed and not built; both need a decision
+first.

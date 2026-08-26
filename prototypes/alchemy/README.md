@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v293)
+## Where this stands (v294)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three stations run — mixing, concentrations,
@@ -87,11 +87,14 @@ edges.** Its silhouette runs 14.6%–96.2% of the image, not edge to edge, so a
 plain 100%/100% mask left the liquid's floor short of the glass's own rounded
 bottom. The first fix stretched the mask symmetrically to close that gap —
 and moved the top edge with it, bleeding liquid color out past the neck where
-the frame art doesn't cover it. The working version only pulls the bottom in;
-the scale and offset are solved so the top lands back on exactly 14.6%, where
-the untouched mask already put it. Touch `mask-size`/`mask-position` on
-`.test-tube>.tube-liquid` and re-check both ends, not just the one you're
-fixing.
+the frame art doesn't cover it. The second fix anchored the top back on
+14.6% and only pulled the bottom in, but overshot it: it targeted 99.5%,
+past where the *frame* PNG's own silhouette ends (98.955%), so the liquid
+still poked out below the drawn glass — just at the bottom now instead of
+the top. The bottom target is 98.3%, a margin inside the frame's own edge,
+not 100% or even the frame's exact number. Touch `mask-size`/`mask-position`
+on `.test-tube>.tube-liquid` and check both the mask's bounds *and* the
+frame's, not just one image.
 
 **`.tube-pair`'s gap was in `vh`, and the module window's height isn't fixed.**
 Each station's footer text wraps to a different height, so the window — sized

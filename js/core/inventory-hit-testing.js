@@ -481,16 +481,18 @@
 })();
 
 /* v260 — pointer proximity: the inventory eases out and the lock warms up as the
-   cursor approaches, instead of snapping on a binary :hover. */
+   cursor approaches, instead of snapping on a binary :hover. Extended (v303) to
+   the alchemy rack drawer the same way — same reach/lift/hold/retract, its own
+   independent hold-and-retract timer so the two drawers approach and withdraw
+   without interfering with each other. */
 (function(){
-  const INV_REACH=260;   // px above the drawer where the lift starts
-  const INV_LIFT=30;     // px of extra peek at full approach
-  const INV_HOLD=650;    // ms the drawer stays out after the pointer leaves
-  const INV_RETRACT_RATE=0.12; // per frame, how fast it eases back once it does
+  const REACH=260;   // px above the drawer where the lift starts
+  const LIFT=30;      // px of extra peek at full approach
+  const HOLD=650;    // ms the drawer stays out after the pointer leaves
+  const RETRACT_RATE=0.12; // per frame, how fast it eases back once it does
   const LOCK_REACH=300;  // px around the lock hit area where the glow starts
 
   let px=0, py=0, queued=false, seen=false;
-  let retractAt=0, holdTimer=0;
 
   const clamp01=v=>v<0?0:v>1?1:v;
   // Distance from the pointer to a rect, zero once inside it.
@@ -502,23 +504,61 @@
   // Ease so the last stretch of the approach moves more than the first.
   const ease=t=>t*t*(3-2*t);
 
+  // One of these per drawer: each carries its own hold/retract timer state,
+  // written as a CSS custom property the drawer's own transform reads.
+  function makeApproach(selector, cssVar){
+    let retractAt=0, holdTimer=0;
+    // Coming out is immediate; going back in waits out a grace period and then
+    // eases, so the drawer withdraws as smoothly as it came and a stray flick of
+    // the cursor cannot slam it shut.
+    function setApproach(drawer, next, current){
+      const write=v=>drawer.style.setProperty(cssVar,`${v.toFixed(2)}px`);
+      if(next>=current-0.01){
+        retractAt=0;
+        write(next);
+        return;
+      }
+      const now=performance.now();
+      if(!retractAt) retractAt=now+HOLD;
+      if(now<retractAt){
+        // Nothing else will wake us if the pointer has come to rest.
+        clearTimeout(holdTimer);
+        holdTimer=setTimeout(schedule, retractAt-now+16);
+        return;
+      }
+      // Ease toward the target instead of dropping onto it: after a hold the
+      // pointer is usually already far, and a single step would snap the drawer
+      // back however gently it eased out.
+      const eased=current+(next-current)*RETRACT_RATE;
+      if(Math.abs(next-eased)<0.4){ retractAt=0; write(next); return; }
+      write(eased);
+      clearTimeout(holdTimer);
+      holdTimer=setTimeout(schedule, 16);
+    }
+    return function apply(){
+      const drawer=document.querySelector(selector);
+      if(!drawer) return;
+      if(drawer.classList.contains('open')){
+        drawer.style.setProperty(cssVar,'0px');
+        retractAt=0;
+        return;
+      }
+      const r=drawer.getBoundingClientRect();
+      // Measure to the resting edge, not the lifted one, so the drawer cannot
+      // chase its own movement. Spread the rect field by field — DOMRect keeps
+      // its values on the prototype, so {...rect} comes out empty.
+      const lift=parseFloat(drawer.style.getPropertyValue(cssVar))||0;
+      const t=seen ? ease(clamp01(1 - gapTo({left:r.left,right:r.right,top:r.top+lift,bottom:r.bottom+lift})/REACH)) : 0;
+      setApproach(drawer, t*LIFT, lift);
+    };
+  }
+  const applyInventoryApproach=makeApproach('#inventoryDrawer','--inv-approach');
+  const applyRackApproach=makeApproach('#alchemyRackDrawer','--rack-approach');
+
   function apply(){
     queued=false;
-    const drawer=document.querySelector('#inventoryDrawer');
-    if(drawer){
-      if(drawer.classList.contains('open')){
-        drawer.style.setProperty('--inv-approach','0px');
-        retractAt=0;
-      } else {
-        const r=drawer.getBoundingClientRect();
-        // Measure to the resting edge, not the lifted one, so the drawer cannot
-        // chase its own movement. Spread the rect field by field — DOMRect keeps
-        // its values on the prototype, so {...rect} comes out empty.
-        const lift=parseFloat(drawer.style.getPropertyValue('--inv-approach'))||0;
-        const t=seen ? ease(clamp01(1 - gapTo({left:r.left,right:r.right,top:r.top+lift,bottom:r.bottom+lift})/INV_REACH)) : 0;
-        setApproach(drawer, t*INV_LIFT, lift);
-      }
-    }
+    applyInventoryApproach();
+    applyRackApproach();
 
     const lock=document.querySelector('#lock.universalLockBlock');
     if(lock){
@@ -527,33 +567,6 @@
       const t=seen ? ease(clamp01(1 - gapTo(r)/LOCK_REACH)) : 0;
       lock.style.setProperty('--lock-glow',t.toFixed(3));
     }
-  }
-  // Coming out is immediate; going back in waits out a grace period and then
-  // eases, so the drawer withdraws as smoothly as it came and a stray flick of
-  // the cursor cannot slam it shut.
-  function setApproach(drawer, next, current){
-    const write=v=>drawer.style.setProperty('--inv-approach',`${v.toFixed(2)}px`);
-    if(next>=current-0.01){
-      retractAt=0;
-      write(next);
-      return;
-    }
-    const now=performance.now();
-    if(!retractAt) retractAt=now+INV_HOLD;
-    if(now<retractAt){
-      // Nothing else will wake us if the pointer has come to rest.
-      clearTimeout(holdTimer);
-      holdTimer=setTimeout(schedule, retractAt-now+16);
-      return;
-    }
-    // Ease toward the target instead of dropping onto it: after a hold the
-    // pointer is usually already far, and a single step would snap the drawer
-    // back however gently it eased out.
-    const eased=current+(next-current)*INV_RETRACT_RATE;
-    if(Math.abs(next-eased)<0.4){ retractAt=0; write(next); return; }
-    write(eased);
-    clearTimeout(holdTimer);
-    holdTimer=setTimeout(schedule, 16);
   }
   function schedule(){ if(!queued){ queued=true; requestAnimationFrame(apply); } }
 

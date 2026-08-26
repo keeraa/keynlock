@@ -1,7 +1,7 @@
 {
   "name": "keynlock",
   "private": true,
-  "version": "0.302.0",
+  "version": "0.303.0",
   "type": "module",
   "scripts": {
     "dev": "node scripts/serve.mjs",

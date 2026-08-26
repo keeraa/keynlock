@@ -404,23 +404,28 @@
 .alchemyRoot .alchemyRackBottle img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;}
 .alchemyRoot .alchemyRackBottle:hover{transform:translateX(-50%) translateY(-5px);}
 .alchemyRoot .alchemyRackBottle.selected{filter:drop-shadow(0 0 10px var(--gold)) drop-shadow(0 8px 10px rgba(0,0,0,.4));}
-/* Ring centres, measured from rack-back.png at 1614px width. The first
-   pass at these (200, 412, 623, 835, 1047, 1258, 1470 — a 212px step) was
-   eyeballed off a gridline overlay and wrong by a step that compounds:
-   ring 1 landed close, ring 7 landed ~65px off, and every bottle in between
-   drifted further right of its ring the further right it sat — exactly
-   what showed up as bottles reading fine on the left and increasingly
-   crooked toward the right. Redone with cv2.matchTemplate against a
-   cropped ring, cross-checked by hand against the rim's own left/right
-   edges: the true step is ~199px, not 212. 212, 412, 611, 810, 1011,
-   1210, 1405 → percent of 1614. */
-.alchemyRoot .alchemyRackBottle:nth-child(1){left:13.13%;}
-.alchemyRoot .alchemyRackBottle:nth-child(2){left:25.45%;}
-.alchemyRoot .alchemyRackBottle:nth-child(3){left:37.78%;}
-.alchemyRoot .alchemyRackBottle:nth-child(4){left:50.09%;}
-.alchemyRoot .alchemyRackBottle:nth-child(5){left:62.41%;}
-.alchemyRoot .alchemyRackBottle:nth-child(6){left:74.73%;}
-.alchemyRoot .alchemyRackBottle:nth-child(7){left:87.05%;}
+/* Ring centres, measured from rack-back.png at 1614px width. Two earlier
+   passes both missed: v296 eyeballed a gridline overlay (200, 412, 623,
+   835, 1047, 1258, 1470 — a guessed 212px step that compounded, ring 1
+   close and ring 7 ~65px off); v299's cv2.matchTemplate pass (212, 412,
+   611, 810, 1011, 1210, 1405) fixed the compounding but carried its own
+   ~7px rightward bias on six of the seven, inherited from a template crop
+   that wasn't quite centered on the ring it was cut from — matching finds
+   where the template's own pattern recurs, not the ring's true centre, so
+   an off-centre template stays off-centre everywhere it matches.
+   This pass fits an ellipse to each ring's own edge contour instead
+   (Canny edges, cv2.findContours, cv2.fitEllipse — two independent
+   contours per ring, inner and outer, agreeing to ~1px) rather than
+   comparing rings to each other: 204.5, 405.0, 604.1, 803.0, 1003.3,
+   1201.6, 1401.9 → percent of 1614. Checked at 3x zoom against all seven
+   rims individually, not just the ends this time. */
+.alchemyRoot .alchemyRackBottle:nth-child(1){left:12.67%;}
+.alchemyRoot .alchemyRackBottle:nth-child(2){left:25.09%;}
+.alchemyRoot .alchemyRackBottle:nth-child(3){left:37.43%;}
+.alchemyRoot .alchemyRackBottle:nth-child(4){left:49.75%;}
+.alchemyRoot .alchemyRackBottle:nth-child(5){left:62.16%;}
+.alchemyRoot .alchemyRackBottle:nth-child(6){left:74.45%;}
+.alchemyRoot .alchemyRackBottle:nth-child(7){left:86.86%;}
 
 .alchemyRoot .alchemyRackStatus{margin-top:30px;text-align:center;color:#897d6c;font-size:12px;line-height:1.3;}
 .alchemyRoot .alchemyRackStatus strong{display:block;color:#e2c487;font:600 14px/1.2 Georgia,serif;margin-bottom:2px;}

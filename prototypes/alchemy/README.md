@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v313)
+## Where this stands (v314)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -404,6 +404,36 @@ portrait sits at z-index:3 (`css/overrides-06-digital.css`,
 `.lairSceneCharacter.sai`), inside `#lairSceneCharacters` at z-index:8 —
 both comfortably above 1, so she kept painting on top of the blur meant
 to cover her. Fixed at z-index:9, one past that container.
+
+**`100% 100%` and `max-height` together is how you get exactly double the
+distortion you were trying to fix.** v312 capped the row at 420px to stop
+it stretching the desk photo *taller* on a tall window; measured live,
+that capped row is 740×420 (≈1.76:1) against the source photo's own
+1086×266 (≈4.08:1) — stretching to fill it exactly meant scaling the
+image roughly 2.3x more on the vertical axis than the horizontal, which
+is "stretched vertically, definitely by double" from testing, read
+correctly. The cap didn't cause the distortion (`100% 100%` always
+distorts whenever box and image proportions don't match) but it did make
+the mismatch worse by holding height fixed while width could still vary
+with the window. `background-size:contain` fixes the actual cause instead
+of the symptom — the photo scales uniformly by whichever axis is more
+constraining, undistorted at any row size, with blur (v312) filling the
+letterboxed space above/below rather than a stretched or a flat-filled
+one. That also moved every bottle's target line: the photo no longer
+fills the row's full height, so the "same level" transforms tuned in
+v311-312 against a full-bleed image needed re-measuring against the
+now-centered, smaller one (~45-50px higher up in this pass).
+
+**A blurred, non-interactive room can still have live buttons poking
+through it if their own z-index outranks the blur layer's** — same
+lesson as Сай's portrait in v313, one level up. `.lairHotspot`
+("Диалоги", "Выбор персонажа", etc., `css/overrides-03-lair.css`) sits at
+z-index:18, clean past the blur's z-index:9 from that same fix. Raised to
+z-index:30, past every z-index this file's own room content actually
+uses (`.lairSceneTop`'s 25 is the highest) rather than bumping past just
+the one culprit found this time — the room's stacking layers aren't
+documented anywhere else, so picking a number with headroom beats another
+round of "found one more thing poking through."
 
 ## Two things that cost hours — do not rediscover them
 

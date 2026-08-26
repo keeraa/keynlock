@@ -245,6 +245,9 @@
       }
       return `polygon(${pts.join(',')},100% 100%,0 100%)`;
     }
+    // Call sites pass their own duration — pour and drain run quicker than the
+    // prototype had them (820/680ms rather than 1350/1100), so the level
+    // settles before the player's next keypress instead of trailing behind it.
     function setSingleLiquidLevelV88(target,topPct,{animate=true,duration=680,intensity=1}={}){
       const el=resolveLiquidHost(target);if(!el)return;
       el.classList.add('liquid-level-v88');
@@ -276,6 +279,10 @@
       };
       singleLiquidAnimationsV88.set(el,requestAnimationFrame(tick));
     }
+    // `full` is how close the surface gets to the top at max fill — the
+    // callers used to push it to 18/20, which read as brim-full against the
+    // shoulder where the glass narrows. Backed off a few points so a maxed-out
+    // mix still shows a visible gap under the neck, matching the sample tubes.
     function amountTopV88(total,{empty=84,full=18,steps=6}={}){
       const t=Math.max(0,Math.min(1,total/steps));return empty+(full-empty)*t;
     }
@@ -618,11 +625,16 @@
       const mute=Math.min(.22,bd*.65);return best.rgb.map(v=>Math.round(v*(1-mute)+150*mute));
     }
     function randomSimpleColor(excludeName=''){const pool=SIMPLE_COLORS.filter(c=>c.name!==excludeName);return pool[Math.floor(Math.random()*pool.length)]}
-    function makeBottleCard(name,color,getCount,addFn,subFn){const card=document.createElement('div');card.className='color-card';card.innerHTML=`<div class="mini-swatch tube-sm" style="--tube-fill:${color}"><div class="mini-liquid-layer"></div><div class="mini-frame-layer"></div><span class="tube-count">${getCount()}</span></div><strong>${name}</strong><div class="drops">${getCount()}</div><div class="ctrl-row"><button class="small-btn">−</button><button class="small-btn">＋</button></div>`;const [minus,plus]=card.querySelectorAll('button');minus.onclick=subFn;plus.onclick=addFn;
+    function makeBottleCard(name,color,getCount,addFn,subFn,atMax=false){const card=document.createElement('div');card.className='color-card';card.innerHTML=`<div class="mini-swatch tube-sm" style="--tube-fill:${color}"><div class="mini-liquid-layer"></div><div class="mini-frame-layer"></div><span class="tube-count">${getCount()}</span></div><strong>${name}</strong><div class="drops">${getCount()}</div><div class="ctrl-row"><button class="small-btn">−</button><button class="small-btn">＋</button></div>`;const [minus,plus]=card.querySelectorAll('button');minus.onclick=subFn;plus.onclick=addFn;
       // The tube is the obvious thing to hit; the small + underneath is a
       // second-guess target, especially on a phone.
       const swatch=card.querySelector('.mini-swatch');
       if(swatch){ swatch.classList.add('tappable'); swatch.onclick=addFn; }
+      // Every reagent used to take clicks past 99 for no visual return — the
+      // tube was already at its fullest look well before that. Capped at the
+      // source (chooseDrop below) and reflected here so the button stops
+      // inviting more clicks once they'd do nothing.
+      if(atMax){ plus.disabled=true; swatch.classList.add('atMax'); }
       return card}
 
 
@@ -639,9 +651,9 @@
       if(swatchOne){ swatchOne.classList.add('tappable'); swatchOne.onclick=actionFn; }
       return card;
     }
-    function renderDualActionCardsV98(containerId,items,counts,onAdd,onSub){
+    function renderDualActionCardsV98(containerId,items,counts,onAdd,onSub,max=Infinity){
       const box=doc.getElementById(containerId);if(!box)return;box.innerHTML='';
-      items.forEach(({name,color,index})=>box.appendChild(makeBottleCard(name,color,()=>counts[index],()=>onAdd(index),()=>onSub(index))));
+      items.forEach(({name,color,index})=>box.appendChild(makeBottleCard(name,color,()=>counts[index],()=>onAdd(index),()=>onSub(index),counts[index]>=max)));
     }
     function renderSingleActionCardsV98(containerId,items,counts,buttonText,onAction){
       const box=doc.getElementById(containerId);if(!box)return;box.innerHTML='';
@@ -666,21 +678,27 @@
       {name:'Убрать белую примесь',color:'#ded8c9',index:3}
     ];
 
+    // Six of any one reagent is already past what any recipe calls for (the
+    // widest ratio is a 2), and the tube's fill maxes out at the same total —
+    // past that, more clicks did nothing but invite the player to find out
+    // what 99 looked like.
+    const MAX_DROPS_PER_REAGENT=6;
     let mixGoal=randomSimpleColor(),mixAmts=[0,0,0,0];
-    function mixLevelTopV88(){return amountTopV88(sumAmountsV98(mixAmts),{empty:84,full:18,steps:6})}
+    function mixLevelTopV88(){return amountTopV88(sumAmountsV98(mixAmts),{empty:84,full:24,steps:6})}
     function drawMix(){
       setBg('mixTarget',mixGoal.rgb);
       setBg('mixCurrent',simpleMixColor(mixAmts));
       renderDualActionCardsV98('mixControls',COLOR_ITEMS_V98,mixAmts,
-        i=>{mixAmts[i]++;drawMix();animateSceneLiquidV98('mixCurrent',mixLevelTopV88(),{duration:1350,intensity:1})},
-        i=>{mixAmts[i]=Math.max(0,mixAmts[i]-1);drawMix();animateSceneLiquidV98('mixCurrent',mixLevelTopV88(),{duration:1100,intensity:.7})}
+        i=>{if(mixAmts[i]>=MAX_DROPS_PER_REAGENT)return;mixAmts[i]++;drawMix();animateSceneLiquidV98('mixCurrent',mixLevelTopV88(),{duration:820,intensity:1})},
+        i=>{mixAmts[i]=Math.max(0,mixAmts[i]-1);drawMix();animateSceneLiquidV98('mixCurrent',mixLevelTopV88(),{duration:680,intensity:.7})},
+        MAX_DROPS_PER_REAGENT
       );
     }
     function newMixRound(){
       mixGoal=randomSimpleColor(mixGoal?.name);
       mixAmts=[0,0,0,0];
       drawMix();
-      animateSceneLiquidV98('mixCurrent',mixLevelTopV88(),{animate:true,duration:900,intensity:.7});
+      animateSceneLiquidV98('mixCurrent',mixLevelTopV88(),{animate:true,duration:560,intensity:.7});
       setStatusHtmlV98('mixStatus','<strong>Новый цвет</strong>смешай его по образцу');
     }
     doc.getElementById('mixCheck').onclick=()=>{
@@ -691,14 +709,15 @@
     doc.getElementById('mixReset').onclick=newMixRound;drawMix();animateSceneLiquidV98('mixCurrent',mixLevelTopV88(),{animate:false});
 
     let unkStrength=[1,1,1,1],unkGoal=randomSimpleColor(),unkAmts=[0,0,0,0];
-    function unknownLevelTopV88(){return amountTopV88(sumAmountsV98(unkAmts),{empty:84,full:18,steps:6})}
+    function unknownLevelTopV88(){return amountTopV88(sumAmountsV98(unkAmts),{empty:84,full:24,steps:6})}
     function unkEffective(){return unkAmts.map((v,i)=>v*unkStrength[i])}
     function drawUnknown(){
       setBg('unknownTarget',unkGoal.rgb);
       setBg('unknownCurrent',simpleMixColor(unkEffective()));
       renderDualActionCardsV98('unknownControls',UNKNOWN_ITEMS_V98,unkAmts,
-        i=>{unkAmts[i]++;drawUnknown();animateSceneLiquidV98('unknownCurrent',unknownLevelTopV88(),{duration:1350,intensity:1})},
-        i=>{unkAmts[i]=Math.max(0,unkAmts[i]-1);drawUnknown();animateSceneLiquidV98('unknownCurrent',unknownLevelTopV88(),{duration:1100,intensity:.7})}
+        i=>{if(unkAmts[i]>=MAX_DROPS_PER_REAGENT)return;unkAmts[i]++;drawUnknown();animateSceneLiquidV98('unknownCurrent',unknownLevelTopV88(),{duration:820,intensity:1})},
+        i=>{unkAmts[i]=Math.max(0,unkAmts[i]-1);drawUnknown();animateSceneLiquidV98('unknownCurrent',unknownLevelTopV88(),{duration:680,intensity:.7})},
+        MAX_DROPS_PER_REAGENT
       );
     }
     function rerollUnknown(){
@@ -707,7 +726,7 @@
       unkGoal=randomSimpleColor(unkGoal?.name);
       unkAmts=[0,0,0,0];
       drawUnknown();
-      animateSceneLiquidV98('unknownCurrent',unknownLevelTopV88(),{animate:true,duration:900,intensity:.7});
+      animateSceneLiquidV98('unknownCurrent',unknownLevelTopV88(),{animate:true,duration:560,intensity:.7});
       setStatusHtmlV98('unknownStatus','<strong>Новая партия</strong>силы реагентов снова скрыты');
     }
     doc.getElementById('unknownCheck').onclick=()=>{
@@ -720,7 +739,7 @@
     let sepGoal=randomSimpleColor(),sepImp=[1,1,1,1];
     function sepBaseRecipe(){return [...sepGoal.recipe]}
     function sepCurrentRecipe(){const base=sepBaseRecipe();return base.map((v,i)=>v+sepImp[i])}
-    function separationLevelTopV88(){return amountTopV88(sumAmountsV98(sepCurrentRecipe()),{empty:82,full:20,steps:9})}
+    function separationLevelTopV88(){return amountTopV88(sumAmountsV98(sepCurrentRecipe()),{empty:82,full:26,steps:9})}
     function branchLevelTopV88(){return [78,60,42,24][Math.min(3,branchPath.length)]}
     function drawSep(){
       setBg('sepTarget',sepGoal.rgb);
@@ -728,7 +747,7 @@
       renderSingleActionCardsV98('sepControls',SEPARATION_ITEMS_V98,sepImp,'Фильтр',i=>{
         if(sepImp[i]>0)sepImp[i]--;else breakFlask('Перефильтрация');
         drawSep();
-        animateSceneLiquidV98('sepCurrent',separationLevelTopV88(),{duration:1150,intensity:.65});
+        animateSceneLiquidV98('sepCurrent',separationLevelTopV88(),{duration:720,intensity:.65});
       });
     }
     function resetSeparation(){
@@ -736,7 +755,7 @@
       sepImp=[Math.floor(Math.random()*3),Math.floor(Math.random()*3),Math.floor(Math.random()*3),Math.floor(Math.random()*3)];
       if(sumAmountsV98(sepImp)<2)sepImp=[1,1,1,1];
       drawSep();
-      animateSceneLiquidV98('sepCurrent',separationLevelTopV88(),{animate:true,duration:900,intensity:.7});
+      animateSceneLiquidV98('sepCurrent',separationLevelTopV88(),{animate:true,duration:560,intensity:.7});
       setStatusHtmlV98('sepStatus',`<strong>Новая цель: ${sepGoal.name}</strong>убери лишние примеси`);
     }
     doc.getElementById('sepCheck').onclick=()=>{
@@ -1042,7 +1061,7 @@
     doc.getElementById('branchReset').onclick=newBranchTarget;newBranchTarget();
 
     function activeGameName(){const s=doc.querySelector('.scene.active');return s?s.dataset.name:''}
-    document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;const tag=(e.target&&e.target.tagName||'').toLowerCase();if(tag==='input'||tag==='textarea'||tag==='select')return;const game=activeGameName();let handled=true;if(game==='Порядок'){if(['1','2','3','4'].includes(e.key))chooseSequence(Number(e.key)-1);else if(e.code==='KeyR')randomizeSequence();else handled=false}else if(game==='Перегонка'){if(['1','2','3','4','5'].includes(e.key))captureDistill(Number(e.key)-1);else handled=false}else if(game==='Формула'){const map={'1':0,'2':1,'3':2,'4':3,'5':4,'6':5,'7':6,'8':7,'9':8,'q':9,'w':10,'e':11},k=e.key.toLowerCase();if(k in map)chooseIngredientByIndex(map[k]);else if(e.key==='Enter')checkRecipe();else if(e.code==='KeyR')resetRecipe();else handled=false}else if(game==='Смешение'){if(e.key==='1'){mixAmts[0]++;drawMix();setSingleLiquidLevelV88('mixCurrent',mixLevelTopV88(),{duration:1350,intensity:1})}else if(e.key==='2'){mixAmts[1]++;drawMix();setSingleLiquidLevelV88('mixCurrent',mixLevelTopV88(),{duration:1350,intensity:1})}else if(e.key==='3'){mixAmts[2]++;drawMix();setSingleLiquidLevelV88('mixCurrent',mixLevelTopV88(),{duration:1350,intensity:1})}else if(e.key==='4'){mixAmts[3]++;drawMix();setSingleLiquidLevelV88('mixCurrent',mixLevelTopV88(),{duration:1350,intensity:1})}else if(e.key==='Enter')doc.getElementById('mixCheck').click();else if(e.code==='KeyR')doc.getElementById('mixReset').click();else handled=false}else if(game==='Концентрации'){if(e.key==='1'){unkAmts[0]++;drawUnknown();setSingleLiquidLevelV88('unknownCurrent',unknownLevelTopV88(),{duration:1350,intensity:1})}else if(e.key==='2'){unkAmts[1]++;drawUnknown();setSingleLiquidLevelV88('unknownCurrent',unknownLevelTopV88(),{duration:1350,intensity:1})}else if(e.key==='3'){unkAmts[2]++;drawUnknown();setSingleLiquidLevelV88('unknownCurrent',unknownLevelTopV88(),{duration:1350,intensity:1})}else if(e.key==='4'){unkAmts[3]++;drawUnknown();setSingleLiquidLevelV88('unknownCurrent',unknownLevelTopV88(),{duration:1350,intensity:1})}else if(e.key==='Enter')doc.getElementById('unknownCheck').click();else if(e.code==='KeyR')doc.getElementById('unknownReset').click();else handled=false}else if(game==='Разделение'){if(['1','2','3','4'].includes(e.key)){const b=doc.querySelectorAll('#sepControls .small-btn')[Number(e.key)-1];if(b)b.click()}else if(e.key==='Enter')doc.getElementById('sepCheck').click();else if(e.code==='KeyR')doc.getElementById('sepReset').click();else handled=false}else if(game==='Давление + осаждение'){if(e.code==='Space'){setCompoundHeat(true)}else if(e.code==='KeyR')resetCompound();else handled=false}else if(game==='Баланс эссенций'){if(['1','2','3','4','5','6'].includes(e.key))toggleEssence(Number(e.key)-1);else if(e.key==='Enter')checkEssence();else if(e.code==='KeyR')newEssenceRound();else handled=false}else if(game==='Реакции слоёв'){if(['1','2','3','4'].includes(e.key))applyLayerReagent(layerReagentDefs[Number(e.key)-1].key);else if(e.code==='KeyR')resetLayerGame();else handled=false}else if(game==='Ветвящийся рецепт'){if(['1','2','3','4','5','6','7','8','9'].includes(e.key))chooseBranchReagent(branchReagentDefs[Number(e.key)-1].key);else if(e.code==='KeyR')newBranchTarget();else handled=false}else handled=false;if(handled)e.preventDefault()});
+    document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;const tag=(e.target&&e.target.tagName||'').toLowerCase();if(tag==='input'||tag==='textarea'||tag==='select')return;const game=activeGameName();let handled=true;if(game==='Порядок'){if(['1','2','3','4'].includes(e.key))chooseSequence(Number(e.key)-1);else if(e.code==='KeyR')randomizeSequence();else handled=false}else if(game==='Перегонка'){if(['1','2','3','4','5'].includes(e.key))captureDistill(Number(e.key)-1);else handled=false}else if(game==='Формула'){const map={'1':0,'2':1,'3':2,'4':3,'5':4,'6':5,'7':6,'8':7,'9':8,'q':9,'w':10,'e':11},k=e.key.toLowerCase();if(k in map)chooseIngredientByIndex(map[k]);else if(e.key==='Enter')checkRecipe();else if(e.code==='KeyR')resetRecipe();else handled=false}else if(game==='Смешение'){if(e.key==='1'){if(mixAmts[0]<MAX_DROPS_PER_REAGENT)mixAmts[0]++;drawMix();setSingleLiquidLevelV88('mixCurrent',mixLevelTopV88(),{duration:820,intensity:1})}else if(e.key==='2'){if(mixAmts[1]<MAX_DROPS_PER_REAGENT)mixAmts[1]++;drawMix();setSingleLiquidLevelV88('mixCurrent',mixLevelTopV88(),{duration:820,intensity:1})}else if(e.key==='3'){if(mixAmts[2]<MAX_DROPS_PER_REAGENT)mixAmts[2]++;drawMix();setSingleLiquidLevelV88('mixCurrent',mixLevelTopV88(),{duration:820,intensity:1})}else if(e.key==='4'){if(mixAmts[3]<MAX_DROPS_PER_REAGENT)mixAmts[3]++;drawMix();setSingleLiquidLevelV88('mixCurrent',mixLevelTopV88(),{duration:820,intensity:1})}else if(e.key==='Enter')doc.getElementById('mixCheck').click();else if(e.code==='KeyR')doc.getElementById('mixReset').click();else handled=false}else if(game==='Концентрации'){if(e.key==='1'){if(unkAmts[0]<MAX_DROPS_PER_REAGENT)unkAmts[0]++;drawUnknown();setSingleLiquidLevelV88('unknownCurrent',unknownLevelTopV88(),{duration:820,intensity:1})}else if(e.key==='2'){if(unkAmts[1]<MAX_DROPS_PER_REAGENT)unkAmts[1]++;drawUnknown();setSingleLiquidLevelV88('unknownCurrent',unknownLevelTopV88(),{duration:820,intensity:1})}else if(e.key==='3'){if(unkAmts[2]<MAX_DROPS_PER_REAGENT)unkAmts[2]++;drawUnknown();setSingleLiquidLevelV88('unknownCurrent',unknownLevelTopV88(),{duration:820,intensity:1})}else if(e.key==='4'){if(unkAmts[3]<MAX_DROPS_PER_REAGENT)unkAmts[3]++;drawUnknown();setSingleLiquidLevelV88('unknownCurrent',unknownLevelTopV88(),{duration:820,intensity:1})}else if(e.key==='Enter')doc.getElementById('unknownCheck').click();else if(e.code==='KeyR')doc.getElementById('unknownReset').click();else handled=false}else if(game==='Разделение'){if(['1','2','3','4'].includes(e.key)){const b=doc.querySelectorAll('#sepControls .small-btn')[Number(e.key)-1];if(b)b.click()}else if(e.key==='Enter')doc.getElementById('sepCheck').click();else if(e.code==='KeyR')doc.getElementById('sepReset').click();else handled=false}else if(game==='Давление + осаждение'){if(e.code==='Space'){setCompoundHeat(true)}else if(e.code==='KeyR')resetCompound();else handled=false}else if(game==='Баланс эссенций'){if(['1','2','3','4','5','6'].includes(e.key))toggleEssence(Number(e.key)-1);else if(e.key==='Enter')checkEssence();else if(e.code==='KeyR')newEssenceRound();else handled=false}else if(game==='Реакции слоёв'){if(['1','2','3','4'].includes(e.key))applyLayerReagent(layerReagentDefs[Number(e.key)-1].key);else if(e.code==='KeyR')resetLayerGame();else handled=false}else if(game==='Ветвящийся рецепт'){if(['1','2','3','4','5','6','7','8','9'].includes(e.key))chooseBranchReagent(branchReagentDefs[Number(e.key)-1].key);else if(e.code==='KeyR')newBranchTarget();else handled=false}else handled=false;if(handled)e.preventDefault()});
     document.addEventListener('keyup',e=>{if(activeGameName()==='Давление + осаждение'&&e.code==='Space'){e.preventDefault();setCompoundHeat(false)}});
 
     document.addEventListener('pointerdown',e=>{

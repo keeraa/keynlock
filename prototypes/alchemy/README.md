@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v315)
+## Where this stands (v316)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -476,6 +476,35 @@ not a fraction of the window's height. A modest-looking `35%` request
 enough to squeeze the row well below its own `max-height` since there
 wasn't that much room left in the window's own height budget. Backed off
 to a value that fits instead of chasing the literal percentage.
+
+**Another "transforms don't move layout" collision, this time between two
+elements that both needed one.** v315 put the reagent tube's ± controls
+above it in the layout via flex `order:-1` and left the swatch's own
+`translateY(-70px)` alone; that lined the buttons up with the swatch's
+*old, untransformed* position, and since the swatch renders 70px higher
+than that via transform, the two ended up overlapping instead of stacked.
+Gave the buttons their own `translateY` too, tuned separately, rather
+than trying to make `order` alone account for a shift it has no way to
+know about — `order` only ever reasons about layout, and the thing it
+needed to clear moves entirely outside layout's view.
+
+**`overflow:auto!important` from the same "protect alchemy from the
+game's leaking styles" rule as v315's `position:static!important`
+started showing a real scrollbar once the bench bottles render
+translateY'd above their own box.** Transforms don't grow the box they're
+applied to — `.lab`'s layout height is still whatever the untransformed
+bottle needed, so the auto-scroll region "saw" overflow at the top the
+moment the bottle rendered outside it. Nothing here is meant to scroll at
+this width; `overflow:visible!important` on `.lab.color-game-lab`
+specifically (scoped past the generic rule's `.lab`, so it doesn't touch
+whatever markup-only stations end up using that class later) fixed it.
+
+**Percentage `margin-top` (v315's desk push-down) hit its own ceiling —
+the window's own height budget — before it could push far enough to
+read as "the table moved."** Rather than fight that budget again,
+pushed the *contents* (bottle groups' own transforms) further down
+instead of the row itself. Visually similar outcome, achieved by moving
+what actually had room to move.
 
 ## Two things that cost hours — do not rediscover them
 

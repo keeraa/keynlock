@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v308)
+## Where this stands (v309)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -257,6 +257,23 @@ The column's since widened for the single-desk backdrop above
 the bench), so reverting `.color-controls` to the same `flex-row` the base
 layout already uses (rather than inventing a new wide-only rule) fits
 without the old cramping.
+
+**`background-size:100% 100%` fills the box; it does not fill the image.**
+v308's stretch fix closed the gap along the row's own edges, but the
+source table is a photo of an *object* — drawn at an angle on a
+transparent canvas, legs and all, not a rectangular texture — so its own
+top corners (above the tabletop's receding back edge) are transparent
+pixels baked into the file itself. Stretching moves those pixels around
+with the rest of the image; it can't paint over them, because alpha
+scales right along with color. The near-black `.alchemyRoot` panel
+underneath kept showing through at exactly those corners — smaller than
+the v307 gap, easy to mistake for "basically fixed" in a quick look, but
+still the same underlying complaint. The actual fix is a
+`background-color` under the image (sampled as the average of
+`desk-mid.png`'s opaque pixels, `#7a4e31`) so the object's own transparent
+margin reads as "more desk" instead of a hole. Any background built from a
+non-rectangular source image needs this same pairing — the image alone
+only ever paints where it has content.
 
 ## Two things that cost hours — do not rediscover them
 

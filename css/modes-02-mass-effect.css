@@ -1,5 +1,5 @@
 .massMode{position:absolute;z-index:7;display:flex;flex-direction:column;align-items:center;}
-.massBoardViewport{position:relative;width:620px;height:620px;flex:0 0 620px;overflow:visible;}
+.massBoardViewport{position:relative;top:-22vh;width:620px;height:620px;flex:0 0 620px;overflow:visible;}
 .massBoard{position:relative;display:grid;place-items:center;}
 .massPointer{position:absolute;left:50%;transform:translateX(-50%);width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:18px solid #d9b56c;filter:drop-shadow(0 0 12px rgba(241,199,104,.62)) drop-shadow(0 0 20px rgba(241,199,104,.18));z-index:6;}
 .massRings{position:absolute;inset:0;display:grid;place-items:center;}
@@ -27,7 +27,7 @@
 .massCenter{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;border:0;background:transparent;box-shadow:none;color:#e8d2a6;cursor:pointer;z-index:5;}
 .massCenter span{font:700 20px/1 Arial,sans-serif;letter-spacing:.18em;}
 .massCenter.ready{filter:drop-shadow(0 0 16px rgba(219,180,95,.42));}
-.massCenterLock{position:absolute;left:50%;top:50%;width:136px;height:142px;transform:translate(-50%,-50%);z-index:2;pointer-events:none;filter:drop-shadow(0 7px 10px rgba(0,0,0,.48));}
+.massCenterLock{position:absolute;left:50%;top:50%;width:136px;height:142px;transform:translate(-50%,-50%) scale(.65);transform-origin:center;z-index:2;pointer-events:none;filter:drop-shadow(0 7px 10px rgba(0,0,0,.48));}
 .massCenterShackle{position:absolute;left:50%;top:-28px;width:112px;height:112px;transform:translateX(-50%);background:var(--locker-image) center/contain no-repeat;}
 .massCenterBody{position:absolute;left:50%;top:30px;width:136px;height:110px;transform:translateX(-50%);background:var(--lock-body-image) center/contain no-repeat;}
 .massCenterPick{position:absolute;left:50%;top:50%;width:1px;height:1px;z-index:4;transform:rotate(-66deg);transform-origin:center;}
@@ -45,7 +45,7 @@ body.importedMode .massMode{border-radius:0;padding:10px 24px 8px;justify-conten
 body.importedMode .massBoard{width:310px!important;height:310px!important;max-width:310px!important;max-height:310px!important;}
 @media (max-width: 900px){
 body.importedMode .massMode{inset:0;padding:10px 14px 10px;}
-.massBoardViewport{width:520px;height:520px;flex-basis:520px;}
+.massBoardViewport{top:-12vh;width:520px;height:520px;flex-basis:520px;}
 body.importedMode .massBoard{width:310px!important;height:310px!important;max-width:310px!important;max-height:310px!important;transform:translate(-50%,-50%) scale(1.677);}
 }
 .massMode[hidden]{display:none!important;pointer-events:none!important;}

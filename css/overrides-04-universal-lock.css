@@ -406,14 +406,14 @@ body.mode-mass .massBoard{width:310px!important;height:310px!important;max-width
   body.mode-mass .massBoard{transform:translate(-50%,-50%) scale(1.677)!important;}
 }
 @media (max-width:760px){
-  body.mode-mass .massBoardViewport{width:min(94vw,400px)!important;height:min(94vw,400px)!important;flex-basis:min(94vw,400px)!important;}
+  body.mode-mass .massBoardViewport{top:-8vh!important;width:min(94vw,400px)!important;height:min(94vw,400px)!important;flex-basis:min(94vw,400px)!important;}
   body.mode-mass .massBoard{transform:translate(-50%,-50%) scale(1.1)!important;}
 }
 @media (max-width:760px) and (max-height:620px) and (orientation:portrait){
-  body.mode-mass .massBoardViewport{width:300px!important;height:300px!important;flex-basis:300px!important;}
+  body.mode-mass .massBoardViewport{top:-5vh!important;width:300px!important;height:300px!important;flex-basis:300px!important;}
   body.mode-mass .massBoard{transform:translate(-50%,-50%) scale(.92)!important;}
 }
 @media (max-height:560px) and (orientation:landscape){
-  body.mode-mass .massBoardViewport{width:246px!important;height:246px!important;flex-basis:246px!important;}
+  body.mode-mass .massBoardViewport{top:-4vh!important;width:246px!important;height:246px!important;flex-basis:246px!important;}
   body.mode-mass .massBoard{transform:translate(-50%,-50%) scale(.75)!important;}
 }

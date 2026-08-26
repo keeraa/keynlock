@@ -150,6 +150,31 @@
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active){display:flex;flex-direction:column;}
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleBody{
   display:flex;flex-direction:column;flex:1 1 auto;min-height:0;overflow:hidden;}
+/* No card behind the tabs/title either — the desk is what the player
+   should see, not a window that happens to contain one. Strips the shared
+   dark window chrome (css/overrides-03-lair.css) only while alchemy is
+   the open panel; every other lair panel (dialogue, map, team) keeps its
+   own card exactly as before, since this selector only matches when
+   alchemy's own .lairPanel is .active. */
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active){
+  border:none;border-radius:0;box-shadow:none;
+  /* Not fully transparent: on mobile this window is nearly full-screen, so
+     "no background" meant the lair room itself — with its own clickable
+     hotspots — showed through behind the tabs and tubes. A flat fill in
+     the desk's own sampled wood tone reads as "more of the same table"
+     rather than a UI card, without that clutter. */
+  background:#7a4e31;
+}
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleHeader{
+  border-bottom:none;
+}
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleTitle,
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleClose{
+  text-shadow:0 1px 4px rgba(0,0,0,.7);
+}
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleClose{
+  background:#17120e;box-shadow:0 2px 8px rgba(0,0,0,.5);
+}
 .lairPanel[data-lair-panel="alchemy"].active{display:flex!important;flex:1 1 auto;min-height:0;min-width:0;}
 .alchemyRoot{display:flex;flex-direction:column;flex:1 1 auto;gap:12px;min-height:0;min-width:0;
   color:#e2c487;font-family:var(--ui-font,Arial,sans-serif);}

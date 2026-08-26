@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v309)
+## Where this stands (v310)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -275,6 +275,32 @@ margin reads as "more desk" instead of a hole. Any background built from a
 non-rectangular source image needs this same pairing — the image alone
 only ever paints where it has content.
 
+**All of v306-v309 was aimed at the wrong target.** Every fix up to that
+point made the *desk sit inside the modal window* look better — filling
+its box, no black corners — but the actual ask, once it was spelled out
+plainly, was that there shouldn't be a modal window at all: "не чтобы
+окно открывалось, в котором стол, а чтобы просто открывалась картинка
+стола". Removed `#lairModuleWindow`'s border/border-radius/box-shadow
+specifically while the alchemy panel is active (same `:has()` scoping as
+everything else here, so Dialogue/Map/Team keep their own card exactly as
+before) — tabs and title now sit directly over whatever's behind them,
+no card implied.
+
+**"Whatever's behind them" turned out to be the lair room itself,
+hotspots and all — dropping the background outright wasn't the fix
+either.** On mobile the window is nearly full-screen
+(`overrides-04-universal-lock.css`), so a fully transparent window meant
+the reagent tubes rendered directly over the standing character
+illustrations, with the room's own "Алхимия"/"Анализ города" hotspot
+buttons (still very much alive underneath, `.topRightHud` sits at
+z-index:360, well above the window's 40) visible and clickable right
+through the gaps. A flat `background:#7a4e31` — the same wood tone
+sampled for the transparent-corner fix above — keeps the window
+opaque without reading as a UI card: no border, no shadow, no rounded
+corners, just more of the same desk color the detailed photo already
+sits on, so title/tabs/tubes all look like they belong to one continuous
+wooden surface instead of a window with a table drawn inside it.
+
 ## Two things that cost hours — do not rediscover them
 
 **The class names leak both ways.** Eleven are shared with the game. Scoping
@@ -428,3 +454,11 @@ The rack's pick now gates the three Check buttons (any element unlocks all
 three — see v305 above) but nothing checks *which* element was placed
 against the target-element-hint's name yet. Next step is wiring that
 comparison in, per the tension-tool analogy above.
+
+`#lairModuleClose`'s hit area overlaps the game's persistent top-right HUD
+(`.topRightHud`, z-index:360) on mobile — found while chasing the v310
+window-chrome removal, but pre-existing and not caused by it (neither the
+window's position nor the HUD's z-index changed this session). Tapping
+that exact corner activates the map icon instead of closing the panel.
+Not fixed here — same top bar covers every lair module, not just alchemy,
+so it wants its own pass rather than a scoped `:has()` patch.

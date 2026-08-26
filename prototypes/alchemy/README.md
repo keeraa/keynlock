@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v305)
+## Where this stands (v306)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -189,6 +189,26 @@ difference was enough to push the target-element-hint below `.lab`'s
 visible area on that station only, even after the tube-pair budget was
 tuned against Mixing.
 
+**The three color-game panels sit on an actual wooden desk now** instead of
+the dark bordered card. One supplied table image
+(`table.png`, drawn at a slight angle with two front legs) became three
+files — `desk-cap-left.png`/`desk-cap-right.png` (each keeping a full leg,
+250px wide) and `desk-mid.png` (a 120px flat-grain strip with no leg,
+cropped from the one x-range, 250–836px of the 1086px source, where the
+table's own top/bottom edges measured pixel-identical across nine sample
+columns — proof the artist drew that stretch without perspective
+convergence, so it repeats cleanly). `.lab.color-game-lab`,
+`.alchemyReagents` and `.alchemyElementColumn` each get the same three-layer
+background (`background-size:auto 100%` on every layer, so a shorter box —
+the reagent band — gets proportionally narrower caps instead of an
+oversized leg): left cap, right cap, and the middle tiled `repeat-x`
+between them. That single rule is what makes both layouts work with zero
+extra assets — stacked on mobile it reads as three separate desks (the
+"cut the table, combine left+right per block" ask), side by side in the
+wide 3-column grid it reads as close to one continuous bench. Bottles and
+the Проверить/Сброс buttons keep their own opaque backgrounds, so nothing
+needed to change there — only the panel chrome around them did.
+
 ## Two things that cost hours — do not rediscover them
 
 **The class names leak both ways.** Eleven are shared with the game. Scoping
@@ -311,6 +331,17 @@ stylesheet, not the page.** Filling `.alchemyElementCell`'s
 relative `url()` resolves against wherever the declaration using it lives,
 not the document that set the property or the document itself. It landed as
 `/css/assets/alchemy/...`. Root-relative (`/assets/alchemy/...`) fixed it.
+
+**That fix doesn't transfer to a plain `url()` written directly in the
+stylesheet — those two cases resolve opposite ways.** Reached for
+`/assets/alchemy/desk-cap-left.png` again for the v306 desk backgrounds,
+by pattern-matching the fix above, and `check.mjs` caught it immediately:
+a literal `url()` in `alchemy.css` *is* relative to the stylesheet already
+(that's the normal, correct case CSS relative paths are built for) — only
+a JS-set custom property is the odd one out, because the browser resolves
+*that* relative to wherever the `var()` is consumed, not where the JS ran.
+`../assets/...` (one level up from `css/`) is what the file's other rules
+already use (`--tube-big-frame` etc.) and is what actually works here.
 
 ## Still to do
 

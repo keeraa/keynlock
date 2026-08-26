@@ -171,6 +171,27 @@
 .alchemyRoot .lab{flex:0 1 auto;min-height:0;overflow:auto;padding:18px;
   border:1px solid rgba(120,94,52,.34);border-radius:14px;
   background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.16));}
+/* Wood desk backdrop for the three built color-game stations: bench,
+   reagent band and element slot each read as their own little tabletop.
+   Left/right cap images (each still carrying a table leg) plus a repeating
+   flat-grain middle tile — a 3-slice background, same idea as the rack
+   front board's repeating cubby band. `auto 100%` scales every layer to
+   the element's own height (not a fixed px), so a shorter box (the
+   reagent band) gets proportionally narrower caps instead of oversized
+   legs. Stacked on mobile or sitting side by side on the wide grid, each
+   of the three gets a complete desk this way — no separate mobile/desktop
+   asset needed. */
+.alchemyRoot .lab.color-game-lab,
+.alchemyRoot .alchemyReagents,
+.alchemyRoot .alchemyElementColumn{
+  border:none;border-radius:0;background-color:transparent;
+  background-image:url("../assets/alchemy/desk-cap-left.png"),
+    url("../assets/alchemy/desk-cap-right.png"),
+    url("../assets/alchemy/desk-mid.png");
+  background-position:left top,right top,left top;
+  background-repeat:no-repeat,no-repeat,repeat-x;
+  background-size:auto 100%,auto 100%,auto 100%;
+}
 .alchemyRoot .lab h3{margin:0 0 14px;text-align:center;color:#e6d2a6;
   font:600 15px/1.2 Georgia,serif;}
 
@@ -225,7 +246,7 @@
 .alchemyRoot .color-controls .color-card .mini-swatch{height:clamp(48px,8vh,88px)!important;}
 
 /* --- reagents: one row, the tube is the target --- */
-.alchemyReagents{flex:0 0 auto;}
+.alchemyReagents{flex:0 0 auto;padding:14px;}
 .alchemyRoot .color-controls{display:flex;flex-direction:row;flex-wrap:nowrap;
   justify-content:center;align-items:flex-end;gap:16px;}
 .alchemyRoot .color-card{display:flex;flex-direction:column;align-items:center;gap:4px;
@@ -255,7 +276,7 @@
    used to need only reagents; now it needs an element in this slot too,
    so the slot sits closest to the buttons that need it filled. */
 .alchemyElementColumn{flex:0 0 auto;display:flex;flex-direction:column;
-  align-items:center;gap:12px;padding-top:10px;border-top:1px solid rgba(120,94,52,.32);}
+  align-items:center;gap:12px;padding:14px 12px 12px;}
 /* width:100%, not the default shrink-to-fit a column-direction flex item
    gets: without it the verdict sat at its own unwrapped text width, which
    is wider than the element column and was running the line straight out
@@ -360,12 +381,10 @@
   /* Both columns end at the same line and scroll inside themselves rather than
      growing past it: whichever is taller no longer sets the height. */
   .alchemyRoot .scene.active > .alchemyReagents{grid-area:reagents;min-width:0;min-height:0;align-self:stretch;overflow:auto;display:flex;align-items:center;
-    padding:16px;border:1px solid rgba(120,94,52,.34);border-radius:14px;
-    background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.16));}
+    padding:16px;}
   .alchemyRoot .scene.active > .alchemyElementColumn{grid-area:element;min-width:0;min-height:0;
     align-self:stretch;justify-content:center;overflow:auto;
-    padding:16px;border-top:0;border:1px solid rgba(120,94,52,.34);border-radius:14px;
-    background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.16));}
+    padding:16px;border-top:0;}
   .alchemyRoot .scene.active > .scene-head{display:none;}
   /* four reagents read better as a block of two than as a tall column */
   .alchemyRoot .color-controls{display:grid;grid-template-columns:repeat(2,1fr);

@@ -40,8 +40,6 @@ body.map-open .modeTabs .tab.active:not(#mapTab){box-shadow:none;}
 .lairOverlay{position:fixed;inset:0;z-index:160;display:none;}
 .lairOverlay.open{display:block;}
 .lairOverlay[hidden]{display:none!important;}
-.lairClose{min-width:108px;height:38px;border:1px solid #70552f;border-radius:8px;background:linear-gradient(#2e2115,#17110c);color:#d6b679;font:600 11px/1 Arial,sans-serif;cursor:pointer;}
-.lairClose:hover{filter:brightness(1.14);}
 .lairTab{height:34px;padding:0 16px;border:1px solid transparent;border-radius:8px;background:transparent;color:#847765;font:600 11px/1 Arial,sans-serif;cursor:pointer;}
 .lairTab.active{border-color:#7b5d32;background:linear-gradient(#302317,#1a130d);color:#e2c27e;}
 .lairPanelHead{margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start;}

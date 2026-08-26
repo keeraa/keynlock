@@ -305,7 +305,6 @@
     if(e.target===e.currentTarget) closeLairWorkbench();
   });
   $lairModuleClose?.addEventListener('click',closeLairModule);
-  $lairClose?.addEventListener('click',closeLair);
 
   if($shopTab) $shopTab.onclick=null;
   $shopClose.onclick=closeShop;
@@ -410,3 +409,4 @@
   updatePickUI();
   updateShopUI();
   newLock(false);
+  openLairFromHud();

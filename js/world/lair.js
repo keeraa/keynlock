@@ -14,7 +14,6 @@
 
   function renderLairScene(){
     if(!$lairSceneCharacters) return;
-    $lairActiveName.textContent=LAIR_CHARACTERS[lairCharacter].name;
     renderInventoryAvatar();
     const order=['kai','sai','tik'];
     $lairSceneCharacters.innerHTML=order.map((id,index)=>{
@@ -86,7 +85,6 @@
 
   function renderLairTeam(){
     if(!$lairCharacters) return;
-    $lairActiveName.textContent=LAIR_CHARACTERS[lairCharacter].name;
     $lairCharacters.innerHTML='';
     Object.entries(LAIR_CHARACTERS).forEach(([id,ch])=>{
       const card=document.createElement('button');

@@ -6,7 +6,6 @@
     $mapCurrentName.textContent=loc.name;
     $mapInfoTitle.textContent=loc.name;
     $mapInfoText.textContent=loc.text
-      + (mapLocation==='lair'?` Активный персонаж: ${LAIR_CHARACTERS[lairCharacter].name}.`:'')
       + (loc.action==='mission'?' Нажми на точку ещё раз, чтобы начать.':'');
     document.querySelectorAll('.mapNode').forEach(node=>{
       node.classList.toggle('current',node.dataset.location===mapLocation);

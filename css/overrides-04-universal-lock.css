@@ -137,7 +137,6 @@ body.map-open .mobileModeMenuButton,body.map-open .mobileModeBackdrop,body.map-o
 .lairSceneKicker{font-size:8px!important;}
 .lairSceneTitle{font-size:22px!important;}
 .lairSceneActive{display:none!important;}
-.lairClose{min-height:42px!important;padding:8px 11px!important;}
 .lairSceneCharacter.kai{left:-2%!important;height:42%!important;}
 .lairSceneCharacter.sai{left:29%!important;height:46%!important;}
 .lairSceneCharacter.tik{right:-1%!important;height:41%!important;}

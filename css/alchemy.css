@@ -123,8 +123,15 @@
    Scoping protects the game from this stylesheet; this protects the stations
    from the game's. Neutralise what leaks before laying anything out. */
 .alchemyRoot .scene,.alchemyRoot .status,.alchemyRoot .tab{
-  position:static;inset:auto;left:auto;right:auto;top:auto;bottom:auto;
-  width:auto;height:auto;max-width:none;transform:none;}
+  position:static!important;inset:auto!important;left:auto!important;right:auto!important;
+  top:auto!important;bottom:auto!important;height:auto!important;max-width:none!important;
+  min-height:0!important;transform:none!important;}
+/* width needs the hammer of its own: the game sets .scene to 100vw and to
+   min(1180px,100vw), both !important, and those were reaching in here. That is
+   what held the station at 1180px inside an 888px panel however it was asked to
+   shrink — an inline width could not beat it either. */
+.alchemyRoot .scene{width:auto!important;}
+.alchemyRoot .scene.active{width:100%!important;}
 
 /* --- the window is the frame --- */
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active){display:flex;flex-direction:column;}
@@ -144,11 +151,11 @@
 
 /* --- one station --- */
 .alchemyRoot .scene{display:none;}
-.alchemyRoot .scene.active{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;min-width:0;gap:10px;}
+.alchemyRoot .scene.active{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;min-width:0;gap:10px;justify-content:flex-start;}
 .alchemyRoot .scene h2,.alchemyRoot .scene .kicker{display:none;}
 
 /* The bench holds the glassware and is the only part that may scroll. */
-.alchemyRoot .lab{flex:1 1 auto;min-height:0;overflow:auto;padding:18px;
+.alchemyRoot .lab{flex:0 1 auto;min-height:0;overflow:auto;padding:18px;
   border:1px solid rgba(120,94,52,.34);border-radius:14px;
   background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.16));}
 .alchemyRoot .lab h3{margin:0 0 14px;text-align:center;color:#e6d2a6;
@@ -165,7 +172,7 @@
 .alchemyRoot .color-controls{display:flex;flex-direction:row;flex-wrap:nowrap;
   justify-content:center;align-items:flex-end;gap:16px;}
 .alchemyRoot .color-card{display:flex;flex-direction:column;align-items:center;gap:4px;
-  width:84px;text-align:center;}
+  width:84px;min-width:0;text-align:center;}
 .alchemyRoot .color-card strong{color:#c9b98c;font:600 11px/1.15 inherit;min-height:2.2em;
   display:flex;align-items:flex-end;justify-content:center;width:100%;
   overflow-wrap:anywhere;hyphens:auto;}
@@ -207,7 +214,9 @@
     /* minmax(0,1fr), not 1fr: a 1fr track will not shrink below its own
        min-content, and the bench was pushing the whole grid past the window. */
     grid-template-columns:minmax(0,1fr) minmax(220px,290px);
-    grid-template-rows:1fr auto;
+    /* content-sized, not 1fr: stretched, the bench was 537px around 290px of
+       glassware and dominated the window. */
+    grid-template-rows:auto 1fr;
     grid-template-areas:"bench reagents" "foot foot";
     gap:14px;
     /* An explicit width, because stretch alone will not pull a flex item below
@@ -220,17 +229,23 @@
   }
   /* Grid items carry min-width:auto too: the bench was distending its own
      track from the inside, which is what kept the scene wider than the panel. */
-  .alchemyRoot .scene.active > .lab{grid-area:bench;min-width:0;}
-  .alchemyRoot .scene.active > .alchemyReagents{grid-area:reagents;min-width:0;display:flex;align-items:center;
+  .alchemyRoot .scene.active > .lab{grid-area:bench;min-width:0;align-self:start;}
+  .alchemyRoot .scene.active > .alchemyReagents{grid-area:reagents;min-width:0;align-self:start;display:flex;align-items:center;
     padding:16px;border:1px solid rgba(120,94,52,.34);border-radius:14px;
     background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.16));}
-  .alchemyRoot .scene.active > .alchemyFoot{grid-area:foot;min-width:0;}
+  .alchemyRoot .scene.active > .alchemyFoot{grid-area:foot;min-width:0;align-self:end;}
   .alchemyRoot .scene.active > .scene-head{display:none;}
   /* four reagents read better as a block of two than as a tall column */
   .alchemyRoot .color-controls{display:grid;grid-template-columns:repeat(2,1fr);
     gap:18px 12px;width:100%;}
-  .alchemyRoot .color-card{width:auto;}
+  /* min-width:0 again: as grid items the cards were distending their column
+     from the inside, this time on the long filter labels. */
+  .alchemyRoot .color-card{width:auto;min-width:0;}
   .alchemyRoot .lab{display:flex;flex-direction:column;justify-content:center;}
+  /* Four reagents two-by-two at full height stood 530px against 328px of
+     glassware and became the tallest thing in the window. Shorter here. */
+  .alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch{height:96px!important;width:40px!important;margin:0 auto 6px!important;}
+  .alchemyRoot .alchemyReagents .color-card strong{min-height:2.4em;font-size:10.5px;}
 }
 
 /* A two-column station wants more room than the 930px module window gives it.

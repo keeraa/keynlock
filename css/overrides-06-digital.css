@@ -268,6 +268,14 @@ body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none !important
   .lairHotspotTeam{left:79% !important;top:74% !important;}
 }
 
+/* Keep the full crew inside a phone viewport: 85% of the current figure sizes,
+   shifted toward the open right side of the room. */
+@media (max-width:760px), (max-height:560px) and (orientation:landscape) and (pointer:coarse){
+  .lairSceneCharacter.kai{left:30% !important;height:33.4% !important;}
+  .lairSceneCharacter.sai{left:47% !important;bottom:2% !important;height:39.1% !important;}
+  .lairSceneCharacter.tik{right:-13% !important;height:34.9% !important;}
+}
+
 /* Alchemy hotspot: left of the crew, on the wall the camera opens onto. */
 .lairHotspotAlchemy{left:52% !important;top:38% !important;}
 @media (max-width:760px){

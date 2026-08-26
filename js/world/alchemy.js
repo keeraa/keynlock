@@ -1170,6 +1170,11 @@
   }, true);
 
   function select(el){
+    // Also opens: a bottle poking into the peek strip is clickable now (see
+    // the z-index note on .alchemyRackDrawerToggle) even before the drawer
+    // is officially "open", and picking one from there without the drawer
+    // catching up read as the click having done nothing.
+    setOpen(true);
     bottles.forEach(b => b.classList.toggle('selected', b === el));
     window.Alchemy = window.Alchemy || {};
     window.Alchemy.selectedElement = el.dataset.element;

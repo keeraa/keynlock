@@ -1,0 +1,105 @@
+/* Styles for alchemy stations that are not in the game yet.
+   Parked here rather than shipped: nothing in the build can reach them. Move a
+   block back into css/alchemy.css when its station's markup is ported. */
+
+.alchemyRoot .kicker{font-size:12px;color:var(--gold);letter-spacing:.16em;text-transform:uppercase;}
+.alchemyRoot .desc{max-width:760px;color:var(--muted);line-height:1.5;font-size:14px;}
+.alchemyRoot .sigils{display:flex;gap:18px;justify-content:center;align-items:center;min-height:320px;flex-wrap:wrap;padding-top:20px;}
+.alchemyRoot .seq-dots{display:flex;justify-content:center;gap:8px;}
+.alchemyRoot .columns{display:flex;gap:16px;align-items:flex-end;justify-content:center;min-height:360px;padding-top:28px;}
+.alchemyRoot .hold{width:100%;padding:14px;border-radius:14px;border:1px solid #665f48;background:#2a281f;color:var(--ink);cursor:pointer;}
+.alchemyRoot .rulebox{max-width:780px;margin:14px auto 0;padding:12px 14px;border:1px solid #393f32;border-radius:14px;background:#1b1f18;color:#9e9985;font-size:13px;line-height:1.45;}
+.alchemyRoot .rulebox b{color:#e5d7b6;font-weight:600;}
+.alchemyRoot .sequence-tube-card, .alchemyRoot .sequence-elements-card, .alchemyRoot .recipe-sheet-v8, .alchemyRoot .formula-tube-panel-v8{border:1px solid #3d4335;border-radius:20px;background:#1a1e17;padding:20px;}
+.alchemyRoot .sequence-tube-card{text-align:center;}
+.alchemyRoot .sequence-liquid-stack{position:absolute;left:5px;right:5px;top:12px;bottom:5px;display:flex;flex-direction:column-reverse;align-items:stretch;justify-content:flex-start;overflow:hidden;border-radius:3px 3px 22px 22px;}
+.alchemyRoot .sigils-v8{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));min-height:0;padding:18px 0 14px;gap:16px;justify-content:stretch;align-items:start;}
+.alchemyRoot .formula-lab-v8{padding:24px;}
+.alchemyRoot .formula-top-v8{display:grid;grid-template-columns:1fr 280px;gap:24px;align-items:stretch;margin-bottom:22px;}
+.alchemyRoot .recipe-sheet-v8{min-height:330px;}
+.alchemyRoot .recipe-plain-list{margin-top:18px;display:grid;gap:14px;}
+.alchemyRoot .formula-tube-panel-v8{text-align:center;}
+.alchemyRoot .formula-tube-stack-v8{position:absolute;inset:12px 6px 5px;display:flex;flex-direction:column-reverse;}
+.alchemyRoot .formula-progress-v8{color:#8d8876;font-size:12px;}
+.alchemyRoot .formula-parts-v8{display:grid;}
+.alchemyRoot .formula-tube-stack-v8{top:15px;left:0;right:0;bottom:0;overflow:hidden;border-radius:0 0 54px 54px;padding:0;}
+.alchemyRoot .formula-tube-check-v11{display:block;width:100%;margin-top:16px;}
+.alchemyRoot .sequence-liquid-stack, .alchemyRoot .formula-tube-stack-v8{padding:0!important;}
+.alchemyRoot .compound-layout-v12{display:flex;flex-direction:column;align-items:center;gap:20px;min-height:0;}
+.alchemyRoot .compound-dial-v12{width:410px;height:410px;max-width:100%;aspect-ratio:1;border:2px solid #555d48;border-radius:50%;position:relative;background:radial-gradient(circle,#24291e 0 18%,#151913 19% 65%,#0f120e 66%);box-shadow:inset 0 0 50px rgba(0,0,0,.22);overflow:hidden;}
+.alchemyRoot .compound-zone-svg-v12{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;}
+.alchemyRoot .compound-pulse-v12{position:absolute;width:3px;height:43%;left:calc(50% - 1px);bottom:50%;background:#efe3c3;transform-origin:50% 100%;z-index:5;border-radius:99px;box-shadow:0 0 10px rgba(239,227,195,.28);}
+.alchemyRoot .compound-pulse-v12:after{content:"";position:absolute;top:-7px;left:-5px;width:13px;height:13px;border-radius:50%;background:#efe3c3;}
+.alchemyRoot .compound-core-v12{position:absolute;width:74px;height:74px;border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%);display:grid;place-items:center;background:#252a20;border:1px solid #3c4235;color:var(--gold);z-index:6;}
+.alchemyRoot .compound-card-v12, .alchemyRoot .compound-tube-card-v12{width:min(520px,100%);border:1px solid #3d4335;border-radius:20px;background:#1a1e17;padding:20px;}
+.alchemyRoot .compound-card-v12{text-align:center;}
+.alchemyRoot .compound-hold-v12{width:100%;margin:6px 0 12px;user-select:none;}
+.alchemyRoot .compound-hint-v12{color:#9a947f;font-size:13px;line-height:1.45;min-height:42px;}
+.alchemyRoot .compound-tube-card-v12{text-align:center;}
+.alchemyRoot .compound-test-tube-v12{border-top:0;}
+.alchemyRoot .compound-tube-stack-v12{transform-origin:50% 100%;}
+.alchemyRoot .compound-tube-label-v12{color:#8f8a77;font-size:12px;}
+.alchemyRoot .sequence-liquid-stack{left:0!important;right:0!important;bottom:0!important;top:14px!important;padding:0!important;border-radius:0 0 39px 39px!important;overflow:hidden;}
+.alchemyRoot .columns.columns-v14{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;align-items:end;width:min(490px,100%);margin:0 auto;min-height:350px;padding:24px 4px 0;}
+.alchemyRoot .sequence-liquid-stack, .alchemyRoot .formula-tube-stack-v8, .alchemyRoot .compound-tube-stack-v12{position:absolute!important;will-change:transform,opacity;backface-visibility:hidden;}
+.alchemyRoot .compound-card-minimal-v19{display:flex;flex-direction:column;align-items:center;gap:12px;}
+.alchemyRoot .compound-card-minimal-v19 .compound-hold-v12{margin:2px 0 0;}
+.alchemyRoot .formula-parts-v8{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important;width:100%;}
+.alchemyRoot .compound-tube-stack-v12{position:absolute!important;left:0!important;right:0!important;top:15px!important;bottom:0!important;display:flex!important;flex-direction:column-reverse!important;align-items:stretch!important;justify-content:flex-start!important;overflow:hidden!important;}
+.alchemyRoot .compound-tube-label-v12{min-height:16px;}
+.alchemyRoot .sequence-game-tube-v21 .sequence-liquid-stack{position:absolute!important;left:5px!important;right:5px!important;top:9px!important;bottom:5px!important;border-radius:5px 5px 46px 46px!important;overflow:hidden!important;padding:0!important;}
+.alchemyRoot .sequence-liquid-stack{display:flex!important;flex-direction:column-reverse!important;align-items:stretch!important;justify-content:flex-start!important;}
+.alchemyRoot .sequence-game-tube-v21 .sequence-liquid-stack{top:30%!important;bottom:9%!important;left:5px!important;right:5px!important;border-radius:8px 8px 34px 34px!important;}
+.alchemyRoot .formula-game-tube-v21{width:150px!important;height:350px!important;margin:22px auto 14px!important;border:3px solid #777b67!important;border-top-width:2px!important;border-radius:10px 10px 56px 56px!important;background:linear-gradient(90deg,rgba(255,255,255,.05),transparent 38%,rgba(255,255,255,.02))!important;}
+.alchemyRoot .formula-game-tube-v21:before{left:-9px!important;right:-9px!important;top:-6px!important;height:12px!important;border-color:#777b67!important;background:#171a14!important;}
+.alchemyRoot .formula-game-tube-v21 .formula-tube-stack-v8{position:absolute!important;left:4px!important;right:4px!important;top:8px!important;bottom:4px!important;border-radius:4px 4px 52px 52px!important;overflow:hidden!important;padding:0!important;}
+.alchemyRoot .compound-test-tube-v12{width:72px;height:168px;margin:12px auto 8px;border:3px solid #777b67;border-top-width:2px;border-radius:8px 8px 28px 28px;position:relative;overflow:hidden;background:linear-gradient(90deg,rgba(255,255,255,.05),transparent 38%,rgba(255,255,255,.02));box-shadow:inset 9px 0 13px rgba(255,255,255,.025);}
+.alchemyRoot .compound-test-tube-v12:before{content:"";position:absolute;left:-6px;right:-6px;top:-5px;height:9px;border:2px solid #777b67;border-radius:50%;background:#171a14;z-index:14;}
+.alchemyRoot .compound-tube-stack-v12{position:absolute;left:5px;right:5px;bottom:5px;top:auto;display:flex;flex-direction:column-reverse;justify-content:flex-start;overflow:hidden;border-radius:3px 3px 22px 22px;transform:none;}
+.alchemyRoot .compound-tube-targets-v15{position:absolute;left:5px;right:5px;top:5px;bottom:5px;z-index:12;pointer-events:none;border-radius:3px 3px 22px 22px;overflow:hidden;}
+.alchemyRoot .formula-parts-v8, .alchemyRoot .compound-card-v12, .alchemyRoot .compound-tube-card-v12{box-shadow:none!important;}
+.alchemyRoot .proto-card{border:1px solid #3c4235;border-radius:16px;background:#1b1f18;padding:14px;min-width:0}
+.alchemyRoot .proto-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.alchemyRoot .proto-note{color:#8f8a77;font-size:12px;line-height:1.45;text-align:center;margin-top:12px}
+.alchemyRoot .balance-proto-layout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:20px;align-items:start}
+.alchemyRoot .essence-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.alchemyRoot .layer-react-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:22px;align-items:center}
+.alchemyRoot .layer-react-tube{width:94px;height:270px;margin:12px auto;border:3px solid #777b67;border-top-width:2px;border-radius:8px 8px 38px 38px;position:relative;overflow:hidden;background:#11150f}
+.alchemyRoot .layer-react-tube:before{content:"";position:absolute;left:-7px;right:-7px;top:-5px;height:11px;border:2px solid #777b67;border-radius:50%;background:#171a14;z-index:5}
+.alchemyRoot .layer-react-stack{position:absolute;left:5px;right:5px;bottom:5px;top:8px;display:flex;flex-direction:column;justify-content:flex-end;border-radius:3px 3px 32px 32px;overflow:hidden}
+.alchemyRoot .layer-reagent-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.alchemyRoot .branch-layout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:20px;align-items:start}
+.alchemyRoot .branch-target{border:1px solid #3d4335;border-radius:18px;background:#1a1e17;padding:16px;text-align:center}
+.alchemyRoot .branch-target-name{font:600 22px Georgia,serif;margin:10px 0;color:#efe3c6}
+.alchemyRoot .branch-tags{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.alchemyRoot .branch-current{text-align:center}
+.alchemyRoot .branch-steps{display:flex;justify-content:center;gap:8px;margin:12px 0}
+.alchemyRoot .branch-reagents{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:12px}
+.alchemyRoot .compound-test-tube-v12{position:relative!important;overflow:hidden!important}
+.alchemyRoot .compound-tube-stack-v12{position:absolute!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;width:100%!important;margin:0!important;padding:0!important;display:flex!important;flex-direction:column-reverse!important;justify-content:flex-start!important;overflow:hidden!important;border-radius:0 0 25px 25px!important;}
+.alchemyRoot .compound-tube-targets-v15{position:absolute!important;left:0!important;right:0!important;top:0!important;bottom:0!important;width:100%!important;margin:0!important;border-radius:0 0 25px 25px!important;overflow:hidden!important;}
+.alchemyRoot .balance-proto-layout{display:flex!important;flex-direction:column!important;gap:16px!important}
+.alchemyRoot .essence-summary{border:1px solid #3d4335;border-radius:18px;background:#1a1e17;display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
+.alchemyRoot .essence-half{padding:16px 18px}
+.alchemyRoot .essence-half+ .essence-half{border-left:1px solid #343a30}
+.alchemyRoot .essence-cards{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.alchemyRoot .essence-actions{margin-top:2px!important}
+.alchemyRoot .compound-impurity-v41{margin-top:2px;padding:10px 12px;border:1px solid #3c4337;border-radius:14px;background:#1b1f18;color:#b6af9a;font-size:13px;line-height:1.45;width:100%}
+.alchemyRoot .compound-impurity-v41 b{color:#efe1bc}
+.alchemyRoot .desc:empty{display:none!important}
+.alchemyRoot .sequence-layout-v8{display:grid;grid-template-columns:360px 1fr;gap:34px;align-items:center;min-height:390px;}
+.alchemyRoot .sequence-elements-card{display:flex;flex-direction:column;justify-content:flex-start;min-height:540px;}
+.alchemyRoot .sequence-game-tube-v21{width:138px!important;height:345px!important;margin:22px auto 16px!important;border:3px solid #777b67!important;border-top-width:2px!important;border-radius:12px 12px 52px 52px!important;background:linear-gradient(90deg,rgba(255,255,255,.05),transparent 38%,rgba(255,255,255,.02))!important;}
+.alchemyRoot .sequence-game-tube-v21:before{left:-9px!important;right:-9px!important;top:-6px!important;height:12px!important;border-color:#777b67!important;background:#171a14!important;}
+.alchemyRoot .sequence-game-tube-v21 .sequence-liquid-stack, .alchemyRoot .formula-game-tube-v21 .formula-tube-stack-v8{
+  position:absolute!important;
+  left:5px!important;
+  right:5px!important;
+  top:30%!important;
+  bottom:4.8%!important;
+  border-radius:8px 8px 34px 34px!important;
+  overflow:hidden!important;
+  padding:0!important;
+  will-change:clip-path,-webkit-clip-path,transform,opacity!important;
+  backface-visibility:hidden!important;
+}

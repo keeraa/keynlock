@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v298)
+## Where this stands (v299)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -87,10 +87,13 @@ repeats the same cubby art with its middle band cut transparent — so the
 front board's dividers sit in front of each bottle's base while the bottle's
 own body still shows through the gap, rather than getting fully hidden or
 fully exposed. `rack-front.png` is `rack-back.png`'s own bottom 439 of
-690px, bottom-aligned; that split and the seven ring-centre x-positions
-(200, 412, 623, 835, 1047, 1258, 1470 of a 1614px-wide source) were measured
-from the source art, not eyeballed — see the CSS comments on
-`.alchemyRackFront`/`.alchemyRackBottle` if the art ever changes.
+690px, bottom-aligned — that split was measured, not eyeballed. The seven
+ring-centre x-positions were *supposed* to be too (see the v298 entry below
+for how that went); the real, `cv2.matchTemplate`-measured values are 212,
+412, 611, 810, 1011, 1210, 1405 of a 1614px-wide source — see the CSS
+comments on `.alchemyRackFront`/`.alchemyRackBottle` if the art ever
+changes, and measure with a tool next time, not a gridline overlay judged
+by eye.
 
 The three stations were tuned for the lair window rather than the demo's
 scrolling page: the window went from 1280px down to 780px, the glassware
@@ -180,6 +183,22 @@ session. The rack's own new rules use longhand
 running into this while sizing `.alchemyRackLabel`. The rest are unfixed —
 flagged as a separate task rather than folded into this one, since it
 touches sizes across every station and wants its own look before-and-after.
+
+**A gridline overlay judged by eye compounds error across seven repeats.**
+The rack's first ring-centre measurement (v296) drew vertical lines over
+`rack-back.png` at guessed x-positions and nudged them until they looked
+centered — close enough on ring 1, but the guessed *step* between rings was
+212px against a true ~199px, and that 13px-per-ring error stacks: ring 7
+landed 65px off from a 13px mistake at ring 1. It read exactly like the
+bottles were "drifting" further wrong toward the right, because they were —
+just not for a reason that lived in the CSS. `.alchemyRackBottle`'s
+height:62% (v298) was a real improvement in its own right, but didn't
+touch this; it was shipped on a hunch before the actual measurement was
+redone with `cv2.matchTemplate` (a cropped ring matched against the full
+image, correlation peaks found across the row) and cross-checked against
+the rim's own left/right edges by hand. Eyeballing a single instance is
+fine; eyeballing a *spacing* that repeats seven times is not — eyeball
+error is per-ring, but position error is per-ring-times-how-many-rings-away.
 
 ## Still to do
 

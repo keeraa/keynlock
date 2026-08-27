@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v334)
+## Where this stands (v335)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -1157,6 +1157,51 @@ touching anything" approach as v329 — this file has enough layered
 `!important` overrides by now that several `width`/`height` declarations
 for `.mini-swatch` can be present in the cascade at once, only one of
 them actually rendering.
+
+Every round of visual tweaking through v334 kept hitting the same wall:
+the "stand on the table" positioning (bottle raise, reagent raise,
+element-cell raise, ± button offsets, label offset, desk push-down) was a
+full `transform: translateY(...) scale(...)` shorthand string, redeclared
+whole at each of mobile/wide/short-screen plus a couple of single-button-
+card variants. Moving something 5px meant finding which candidate rule
+actually won the cascade, rewriting the whole string without dropping
+`scale()`/`transform-origin`, and repeating per breakpoint. Converted to
+CSS custom properties instead: each positioned element now carries one
+rule declaring `translate`/`scale` (the individual CSS properties, not
+the shorthand) off tokens like `--bench-raise`/`--bench-scale`, and each
+breakpoint block only reassigns 2-3 numbers on `.alchemyRoot`. `translate`
+and `scale` as separate properties compose in the same order as the
+`translateY() scale()` shorthand did (translate always resolves in the
+un-scaled parent coordinate system either way), confirmed with a live
+`getBoundingClientRect()` comparison before converting the rest. This
+also fixes the recurring "can't add a transform here without clobbering
+the existing raise" bug (hit twice this session, on the drag-over
+highlight and the swatch-label offset) — a future one-off `rotate` or
+`transform` addition can now layer on top of a token-driven `translate`/
+`scale` instead of replacing it outright.
+
+Also, contrary to the "Nothing was removed... all 169 classes are
+referenced" note from the original split (above): they were referenced
+from *source*, but `js/world/alchemy.js`'s `doc.getElementById` is a shim
+(line 44) that returns a detached, `display:none` spare `<div>` for any
+id missing from the page, specifically so one unbuilt station's render
+function doesn't throw and kill the rest of `boot()`. That meant every
+render function for the seven still-unwired stations *does* run at boot
+and writes real DOM into that spare div — so their classes were "used" by
+the script without ever reaching the visible page. Confirmed class by
+class, both statically (`document.querySelectorAll('.<class>').length`
+in the running game) and dynamically (grepped every `classList.add/
+remove/toggle` and template-string `className=` in the JS for a path
+reachable from the three built stations, since a couple of classes —
+`.liquid-burst-v13`/`.liquid-bubble-v13`, `.liquid-surface-pulse-v83` —
+are toggled at runtime and would otherwise have looked dead in an idle
+snapshot). Roughly 100 selectors for the seven unbuilt stations (sequence,
+formula, compound, essence, branch, distillation, layer-react) came out;
+everything the three live stations actually touch — `.tube-liquid`,
+`.mini-swatch`, `.test-tube`, `.passive-bubble-v44`/`.passive-bubbles-
+v44`, `.liquid-burst-v13`/`.liquid-bubble-v13`, `.liquid-surface-pulse-
+v83`, `.tab`, `.ctl` — and their keyframes stayed. The 138+ live station-
+layout section and the rack drawer were untouched.
 
 ## Two things that cost hours — do not rediscover them
 

@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v328)
+## Where this stands (v329)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -975,6 +975,41 @@ rather than floating inside the liquid. `setTargetElementHint()`
 (root-relative `url()`, same reasoning as `applySelection`'s bottle art —
 a JS-set custom property resolves against wherever the `var()` is
 *consumed*, not where the JS ran) instead of `textContent`.
+
+**v329: the v328 glass swap looked right at a glance and was still
+leaking liquid past the reagent tube's own walls — the small tube's
+`.mini-liquid-layer` insets were never actually re-tuned for the new
+art.** Its `left:17%;right:17%` (plus an even-card-only `22%/13%`
+variant, a leftover from when `--tube-sm1-frame`/`--tube-sm2-frame` were
+two *different* images) were measured against the old frame's own,
+notably wider-drawn glass — the new `lab_test_small.png` draws a much
+narrower tube with a heavier decorative outline eating more of the
+canvas. Fixed by sampling the new PNG's own alpha channel directly
+(where it's actually transparent = real glass interior) rather than
+eyeballing against a screenshot: consistently ~44%/38% left/right and
+~18%/9% top/bottom across the tube's straight-sided body. The even-card
+override came out too — both frame variables point at the same image
+since v328, so there's no longer a second shape to correct for.
+
+Three more adjustments landed alongside it, all straightforward
+find-the-winning-rule-and-scale jobs once the exact winning declaration
+was confirmed against `document.styleSheets` (this cascade has enough
+`!important` layered on `!important` by now that guessing from source
+order alone isn't reliable — check the actual winner before touching
+anything):
+
+- The planet label doubled to 60% of the tube's own width (was 30%).
+- `.tube-count` (the drop-count digit inside each reagent swatch) down
+  to 15px from 25px — the winning rule turned out to be
+  `.side-color-controls .tube-count`, not the plainer base `.tube-count`
+  its own weaker specificity always loses to.
+- The reagent swatches themselves 30% taller: the two `clamp()` height
+  rules that actually apply (`.color-controls .color-card .mini-swatch`
+  as the base/mobile fallback, `.alchemyReagents .color-controls
+  .color-card .mini-swatch` overriding it on wide/short-screen) both
+  scaled by 1.3x across all three clamp arguments, so the vh-based
+  middle argument keeps tracking window height the same way it always
+  did, just to a taller target.
 
 ## Two things that cost hours — do not rediscover them
 

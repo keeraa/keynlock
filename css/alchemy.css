@@ -116,6 +116,15 @@
    makes an X/Y mismatch there more noticeable than lower in the body).
    The mask already carves the exact silhouette including the rounded
    bottom, so there's no border-radius left to reintroduce either. */
+/* Still a sliver of colour past the drawn glass on the right/bottom after
+   the fix above — tube-big-mask.png's own flood fill (v328) reads a few
+   anti-aliased edge pixels of the frame art as "inside," landing the
+   mask's silhouette a hair outside the crisp visible line rather than a
+   coordinate mismatch this time. A transform on the liquid layer nudges
+   it (and its mask, riding along in the same transform) back inside the
+   line instead of regenerating the mask over it — percentages here are
+   of .tube-liquid's own box, per feedback against a screenshot. */
+.alchemyRoot .test-tube.tube-lg > .tube-liquid{transform:translate(-2%,-3%);}
 
 /* The prototype showed one scene at a time through its own chrome; here the
    lair window is the frame, so only the chosen station is in the flow. */

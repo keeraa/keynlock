@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v331)
+## Where this stands (v332)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -1089,6 +1089,22 @@ position/size, this one fixes what box that position/size is even
 measured against. Removed the override outright — no border-radius
 needed either, since the mask already carves the exact silhouette
 (rounded bottom included) straight from the art.
+
+**v332: still a sliver of colour past the drawn glass after v331 — this
+time it's the mask itself, not a coordinate mismatch.** Both real bugs
+(v330's mask-position, v331's resized liquid box) were fixed, and the
+mask does share `.test-tube`'s exact coordinate system by construction
+— but `tube-big-mask.png`'s own flood fill (v328) reads a few
+anti-aliased edge pixels of the frame art as "inside," so the mask's own
+silhouette lands a hair outside the frame's crisp visible line, most
+noticeably on the right/bottom where a highlight streak's soft edge
+gives the flood fill the most room to overreach. Not worth regenerating
+the mask over a few px — a `transform:translate(-2%,-3%)` on
+`.tube-lg > .tube-liquid` nudges the liquid (mask riding along, same
+element) back inside the line instead. Percentages are of the liquid
+layer's own box, tuned against a screenshot; scoped to `.tube-lg`
+specifically so it doesn't touch whatever other minigames' plain
+`.test-tube` instances share the same mask/frame variables.
 
 ## Two things that cost hours — do not rediscover them
 

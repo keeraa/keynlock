@@ -753,7 +753,7 @@
     function drawSep(){
       setBg('sepTarget',sepGoal.rgb);
       setBg('sepCurrent',simpleMixColor(sepCurrentRecipe()));
-      renderSingleActionCardsV98('sepControls',SEPARATION_ITEMS_V98,sepImp,'Фильтр',i=>{
+      renderSingleActionCardsV98('sepControls',SEPARATION_ITEMS_V98,sepImp,'−',i=>{
         if(sepImp[i]>0)sepImp[i]--;else breakFlask('Перефильтрация');
         drawSep();
         animateSceneLiquidV98('sepCurrent',separationLevelTopV88(),{duration:720,intensity:.65});

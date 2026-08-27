@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v322)
+## Where this stands (v323)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -724,6 +724,58 @@ lands on the same line the two big bottles' feet already do
 to line the three groups up in the first place) — both retuned by the
 same "measure, nudge, repeat" process as everything else pixel-tuned in
 this file.
+
+**v323 found a real positioning bug in the hover bubble burst, and traded
+three text buttons for icons/symbols per feedback.** The bug: hovering a
+reagent swatch spawned its liquid-burst bubbles ~150px below the tube
+instead of inside it — `liquidBurst()` (`js/world/alchemy.js`) computes
+the burst's inline `top`/`left` from `getBoundingClientRect()` diffs
+between the swatch and its vessel (`.color-card`, since a reagent swatch
+isn't nested inside a `.test-tube` the way the big bottles' liquid layer
+is), which is transform-safe math — but a CSS rule reset the whole `inset`
+shorthand to `auto !important` to fix an unrelated sizing conflict, and
+`auto` on all four offsets while `position:absolute` beats even the
+inline `top`/`left` (a stylesheet `!important` outranks a non-`!important`
+inline style regardless of specificity). With every offset auto, the
+burst rendered at its plain flow position instead — dead last among
+swatch/label/drops/buttons in `.color-card`'s own column, i.e. well under
+the tube. Never surfaced for the big bottles because their burst host and
+vessel are nearly the same box, so the auto fallback happened to land
+close enough by coincidence. Fixed by narrowing that rule to only reset
+`right`/`bottom` (the actual sizing conflict this was for), leaving
+`top`/`left` free for the inline values to win as originally intended.
+
+The three-button swap: Проверить keeps its label, but Сброс/Новая
+партия/Новая смесь are now a bare reset icon (`.ctl-icon`, inline SVG —
+reused the same `refresh` glyph path `js/core/init.js`'s own
+`tablerIcon()` helper already draws elsewhere in the game, rather than
+the `<i class="ti ti-*">` webfont classes alchemy.js uses for its other
+icons, since no such font is actually loaded anywhere in this project —
+those render as blank glyphs today, a pre-existing gap out of scope
+here). Separation's single-button "Убрать примесь" control lost its
+"Фильтр" label for a bare "−", matching the ±-button look Mixing and
+Concentrations already use — it already had all the CSS a two-button pair
+gets (`:last-child{order:-1}` lifts it above the swatch the same way),
+just carried different text.
+
+**Проверить/Сброс now sit centered against the element cell's own
+*rendered* height, not its pre-transform layout height.** `align-items:
+center` on the row already centers `.big-actions` against the cell — but
+the cell also carries its own `translateY` raise (to stand on the table
+like the bottles do), which moves it up visually without moving its
+layout box, so plain centering was still centering against where the
+cell *would* sit un-raised. A matching `translateY` on `.big-actions`
+(tuned by eye against `getBoundingClientRect()`, same measure-nudge-repeat
+process as every other raise in this file) re-centers it against the
+cell's actual on-screen position instead.
+
+**The reagent row shifted right within its own column, same idea as the
+bench bottles' own rightward nudge a few versions back — a plain
+`translateX`, no compensation needed.** Unlike the bench (where labels
+live on separate sibling elements needing their own matching shift), the
+reagent swatches, their buttons, and their (hidden, wide-only) labels are
+all descendants of `.color-controls` itself, so one transform on that
+single container carries all of them together.
 
 ## Two things that cost hours — do not rediscover them
 

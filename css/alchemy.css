@@ -326,9 +326,11 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
   justify-content:center;align-items:flex-end;gap:16px;}
 .alchemyRoot .color-card{display:flex;flex-direction:column;align-items:center;gap:4px;
   width:84px;min-width:0;text-align:center;}
-.alchemyRoot .color-card strong{color:#c9b98c;font:600 11px/1.15 inherit;min-height:2.2em;
-  display:flex;align-items:flex-end;justify-content:center;width:100%;
-  overflow-wrap:anywhere;hyphens:auto;}
+/* Reagent names ("Красный", "Убрать красную примесь"...) dropped
+   everywhere per feedback — the swatch's own colour and the target hint
+   already say what's needed. display:none, not the wide-only hide this
+   used to be: every screen size gets it now. */
+.alchemyRoot .color-card strong{display:none;}
 .alchemyRoot .color-card .drops{display:none;}
 .alchemyRoot .ctrl-row{display:flex;gap:6px;}
 .alchemyRoot .small-btn,.alchemyRoot .color-card button{padding:4px 10px;
@@ -410,23 +412,11 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
   .alchemyRoot .alchemyElementColumn .status{min-height:0;}
   .alchemyRoot .alchemyElementColumn .big-actions{gap:6px;}
   .alchemyRoot .alchemyElementColumn .ctl{padding:7px 14px;}
-  /* Separation's "Убрать красную примесь" labels are much longer than
-     Mixing's "Красный" — left uncapped they ballooned .alchemyReagents to
-     ~200px on this station alone (vs ~150px elsewhere), squeezing .lab's
-     flex-1 share down enough to clip the target-element-hint again, this
-     time invisibly (elementFromPoint landed on bare .scene, past .lab's
-     own painted area). Two lines, then ellipsis, keeps every station's
-     reagent band the same height so the fixed padding-bottom budget above
-     actually holds. */
-  /* min-height reserves the full 2-line clamp height regardless of how many
-     lines a given label actually needs — without it (was min-height:0),
-     .color-controls' own align-items:flex-end aligns each card's *bottom*
-     edge, so a 1-line label ("Синий") sits its whole card, swatch included,
-     lower than a 2-line one ("Крас-\nный") right next to it. Same
-     mechanism as the .tube-pair width fix above, just triggered by text
-     length instead of translated labels. */
-  .alchemyRoot .color-card strong{display:-webkit-box;-webkit-line-clamp:2;
-    -webkit-box-orient:vertical;overflow:hidden;min-height:2.2em;}
+  /* The old line-clamp-plus-min-height override that used to live here
+     (Separation's "Убрать красную примесь" ballooning the reagent band,
+     and the card-height mismatch that caused) is moot now that the
+     labels are display:none everywhere (base rule above) — a hidden
+     element can't balloon anything or leave a mismatched flow height. */
   .alchemyRoot .tube-pair{padding-bottom:52px;}
   /* Stays absolute (like desktop) instead of joining flow — .tube-box's
      flex height also drives the current-side bottle via align-items:flex-end,
@@ -452,6 +442,14 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      position:absolute off .tube-box, whose own layout box a transform on
      the tube inside it does not move) can be pulled up to match. */
   .alchemyRoot .tube-pair{margin-top:47px;}
+  /* Same fix as the wide layout's own .lab overflow:visible!important
+     (a few hundred lines down): raising the bottles above their
+     un-transformed layout box (next rule) makes .lab's base overflow:auto
+     (it's there for a long verdict to scroll instead of blowing out the
+     modal) see overflow at the *top* and grow a permanent scrollbar next
+     to the target/current bottles — nothing here actually needs to
+     scroll at this width. */
+  .alchemyRoot .scene.active > .lab.color-game-lab{overflow:visible!important;}
   .alchemyRoot .lab.color-game-lab .test-tube.tube-lg{transform:translateY(-27px);}
   .alchemyRoot .swatch-label{transform:translateX(-50%) translateY(-27px);}
   /* Reagent tubes raised the same way, off their own table level. */
@@ -576,7 +574,6 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
   /* Four reagents two-by-two at full height stood 530px against 328px of
      glassware and became the tallest thing in the window. Shorter here. */
   .alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch{height:clamp(40px,7vh,68px)!important;width:34px!important;margin:0 auto 6px!important;}
-  .alchemyRoot .alchemyReagents .color-card strong{min-height:2.4em;font-size:10.5px;}
   .alchemyRoot .alchemyElementCell{width:clamp(40px,6vh,60px);}
   /* .lab's own overflow:auto (line ~105, !important — it's there so a
      long verdict on a short window scrolls instead of blowing out the
@@ -627,7 +624,6 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
     transform:translateY(-160px) scale(1.3);
     transform-origin:bottom center;
   }
-  .alchemyRoot .alchemyReagents .color-card strong{display:none;}
   .alchemyRoot .scene.active .alchemyElementCell{
     transform:translateX(-30px) translateY(-107px) scale(1.1);
     transform-origin:bottom center;
@@ -757,7 +753,6 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
   .alchemyRoot .scene.active > .alchemyReagents,
   .alchemyRoot .scene.active > .alchemyElementColumn{padding:12px;}
   .alchemyRoot .color-controls{gap:10px;}
-  .alchemyRoot .alchemyReagents .color-card strong{min-height:2.2em;font-size:10px;}
   .alchemyRoot .small-btn,.alchemyRoot .color-card button{padding:3px 8px;font-size:11px;}
   /* The v311 "stand on the table" desk push-down eats into a short
      window's already-tight budget — Новая партия/Проверить were clipping

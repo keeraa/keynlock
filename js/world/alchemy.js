@@ -687,7 +687,7 @@
     // Named under the target bottle, one per round — cosmetic for now, the
     // way the element slot itself (see the two IIFEs near the end of this
     // file) only checks that *some* element is placed, not this one.
-    const ALCHEMY_ELEMENT_NAMES=['Stannum','Plumbum','Aurum','Sulfur','Hydrargyrum','Argentum','Ferrum'];
+    const ALCHEMY_ELEMENT_NAMES=['Stannum','Plumbum','Aurum','Cuprum','Hydrargyrum','Argentum','Ferrum'];
     function randomElementName(){return ALCHEMY_ELEMENT_NAMES[Math.floor(Math.random()*ALCHEMY_ELEMENT_NAMES.length)]}
     function setTargetElementHint(id){const el=doc.getElementById(id);if(el)el.textContent=randomElementName();}
     let mixGoal=randomSimpleColor(),mixAmts=[0,0,0,0];

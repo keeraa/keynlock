@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v325)
+## Where this stands (v326)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -851,6 +851,44 @@ compensation — shifted down by that same 40px (34px at the short-screen
 scale) so the swatch's bottom, not the button's, lands on the shared
 line. The buttons drop below the table edge as a result, which reads
 fine since they're controls, not glassware standing on the wood.
+
+**v326: v325's sulfur→cuprum art swap was only half done — kept the old
+filename and `data-element`, which is exactly backwards from how this
+system is wired.** The element cell's own bottle art, once one is picked
+from the rack, is built directly from that string —
+`--element-bottle-img: url("/assets/alchemy/bottle-${element}.png")` — and
+its aria-label capitalizes the same string (`js/world/alchemy.js`
+`applySelection`). Leaving `data-element="sulfur"` under the new copper
+art meant the accessible name would still say "Sulfur" no matter what the
+bottle showed. Renamed everything the identifier touches together: the
+file (`bottle-sulfur.png` → `bottle-cuprum.png`, `git mv` so the history
+follows it), the rack button's `data-element`/`img src`/`alt`, and its
+entry in `ALCHEMY_ELEMENT_NAMES` (the array `randomElementName()` draws
+the target-element-hint from) — the *string* is the whole identity here,
+not the picture next to it.
+
+**The mobile bottle panel grew a scrollbar nothing in it needed — same
+bug as v321's wide-layout one, just never patched for the stacked
+layout.** `.lab`'s base `overflow:auto` exists so a long verdict can
+scroll instead of blowing out the modal; v321 already found that raising
+the bench bottles past their own un-transformed box triggers it as a false
+positive on wide screens and added a scoped `overflow:visible!important`
+there. The identical mobile-only bottle raise (`.lab.color-game-lab
+.test-tube.tube-lg{transform:translateY(-27px)}`, same v321 round)
+triggers the exact same false positive on the stacked layout, just never
+got the matching fix — added it alongside the raise.
+
+**Reagent names ("Красный", "Убрать красную примесь"...) are gone
+everywhere now, not conditionally.** They'd already been wide-only-hidden
+since early on, and mobile's own copy carried a fair amount of
+since-superseded scaffolding around it — a two-line clamp plus a
+`min-height:2.2em` reservation, both there specifically to stop cards
+with differently-long labels from throwing off `align-items:flex-end`
+(see v322's misalignment bug above). A `display:none` label can't
+balloon a card or leave a mismatched flow height either way, so all of
+that — plus three now-pointless leftover `min-height`/`font-size`
+tweaks on an invisible element, one wide, one short-screen, one already
+dead — came out with it.
 
 ## Two things that cost hours — do not rediscover them
 

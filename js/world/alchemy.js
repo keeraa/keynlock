@@ -1257,6 +1257,19 @@
   // the browser from stealing the gesture as a page scroll once a touch
   // starts moving.
   let suppressClick = false;
+  // Twice as wide as the cell's own art — a bottle is a narrow ~40-70px
+  // column, an unforgiving target to hit exactly on a phone. Only the
+  // horizontal catch area grows (padded by half the cell's own width on
+  // each side); the cell's visible size and vertical bounds are untouched.
+  function findDropCell(x, y){
+    for(const cell of document.querySelectorAll('.alchemyElementCell')){
+      const r = cell.getBoundingClientRect();
+      if(!r.width || !r.height) continue;
+      const padX = r.width / 2;
+      if(x >= r.left - padX && x <= r.right + padX && y >= r.top && y <= r.bottom) return cell;
+    }
+    return null;
+  }
   bottles.forEach(b => {
     b.addEventListener('click', () => {
       if(suppressClick){ suppressClick = false; return; }
@@ -1287,7 +1300,7 @@
         ev.preventDefault();
         ghost.style.left = ev.clientX + 'px';
         ghost.style.top = ev.clientY + 'px';
-        const cell = document.elementFromPoint(ev.clientX, ev.clientY)?.closest('.alchemyElementCell');
+        const cell = findDropCell(ev.clientX, ev.clientY);
         clearDragOver();
         if(cell) cell.classList.add('dragOver');
       };
@@ -1296,7 +1309,7 @@
         document.removeEventListener('pointerup', onUp);
         if(!dragging) return;
         suppressClick = true;
-        const cell = document.elementFromPoint(ev.clientX, ev.clientY)?.closest('.alchemyElementCell');
+        const cell = findDropCell(ev.clientX, ev.clientY);
         clearDragOver();
         if(cell){
           // Flies from wherever the pointer let go to the cell it landed
@@ -1413,11 +1426,63 @@
   window.Alchemy = window.Alchemy || {};
   window.Alchemy.applySelection = applySelection;
 
+  // Dragging a filled cell's own bottle back down onto the rack returns it
+  // — the mirror of picking one out. A plain click still opens the rack
+  // either way (to swap for a different element without returning first);
+  // suppressClick is the same pattern the rack's own bottles use to keep
+  // a completed drag from also firing as a click afterward.
+  function wireReturn(cell){
+    let suppressClick = false;
+    cell.addEventListener('click', () => {
+      if(suppressClick){ suppressClick = false; return; }
+      window.Alchemy.openRackDrawer?.();
+    });
+    cell.addEventListener('pointerdown', e => {
+      if(!cell.classList.contains('filled')) return;
+      const startX = e.clientX, startY = e.clientY;
+      let dragging = false, ghost = null;
+      const onMove = ev => {
+        if(!dragging && Math.hypot(ev.clientX - startX, ev.clientY - startY) > 8){
+          dragging = true;
+          ghost = document.createElement('div');
+          ghost.className = 'alchemyRackDrawerBottleDragGhost';
+          ghost.style.width = cell.offsetWidth + 'px';
+          ghost.style.height = cell.offsetHeight + 'px';
+          ghost.style.backgroundImage = cell.style.getPropertyValue('--element-bottle-img');
+          document.body.appendChild(ghost);
+        }
+        if(!dragging) return;
+        ev.preventDefault();
+        ghost.style.left = ev.clientX + 'px';
+        ghost.style.top = ev.clientY + 'px';
+      };
+      const onUp = ev => {
+        document.removeEventListener('pointermove', onMove);
+        document.removeEventListener('pointerup', onUp);
+        if(!dragging) return;
+        suppressClick = true;
+        const overRack = document.elementFromPoint(ev.clientX, ev.clientY)?.closest('#alchemyRackDrawer');
+        if(overRack){
+          ghost.style.transition = 'opacity .18s ease,transform .18s ease';
+          // Overrides the class's own translate(-50%,-50%) (inline always
+          // wins), so the scale has to be folded back in explicitly here.
+          ghost.style.transform = 'translate(-50%,-50%) scale(.6)';
+          ghost.style.opacity = '0';
+          setTimeout(() => { ghost.remove(); window.Alchemy.clearSelection?.(); }, 180);
+        } else {
+          ghost.remove();
+        }
+      };
+      document.addEventListener('pointermove', onMove);
+      document.addEventListener('pointerup', onUp);
+    });
+  }
+
   // Each station starts from its own stored selection (all empty at
   // boot), independently of the others.
   scenes.forEach(scene => {
     const {cell, checkBtn} = stationParts(scene);
     paint(cell, checkBtn, window.Alchemy.selections?.[scene.dataset.name] || null);
-    cell?.addEventListener('click', () => window.Alchemy.openRackDrawer?.());
+    if(cell) wireReturn(cell);
   });
 })();

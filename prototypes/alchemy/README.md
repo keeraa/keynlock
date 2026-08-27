@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v336)
+## Where this stands (v337)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -1245,6 +1245,35 @@ the `scale` custom property directly rather than `transform`, so it
 doesn't fight the cell's own token-driven `translate`/`scale` (the
 positioning tokens from v335) the way an animated `transform:` shorthand
 would.
+
+**v337 — rack polish, in one round:** the drag ghost was semi-transparent
+(`opacity:.85`) throughout the drag, which read as a broken/half-rendered
+bottle rather than an intentional "carrying" state — full opacity now,
+same class, only the drop-fade at the very end still fades it out. The
+drop target (`.alchemyElementCell`) is a narrow ~40-70px column, an
+unforgiving hit on a phone — `findDropCell()` replaces the exact
+`elementFromPoint().closest()` test with one padded by half the cell's
+own width on each side (so it catches a drop up to roughly its own width
+away horizontally), used for both the live `dragOver` highlight and the
+actual drop so what lights up is what actually catches. You can put a
+bottle back now too: dragging a *filled* cell's own bottle down onto the
+rack (`#alchemyRackDrawer` — its always-visible peek strip counts, not
+just fully open) clears that station's selection, with the same shrink-
+and-fade the placement drop uses in reverse; a plain click on a filled
+cell still opens the rack to swap for a different element directly,
+exactly as before. Reagent tube liquid insets (`.mini-liquid-layer`)
+tightened from 19%/14% top/bottom to 9%/6% — the averaged v333 insets
+left visibly more empty glass than liquid at a glance. `.small-btn`
+(every ±) got `opacity:.6` at rest, `1` on hover — quieter chrome, per
+feedback the plus/minus controls read as too heavy against the reagent
+tubes. `--btn-plus-raise` and `--element-raise` were both retuned at the
+wide and short-screen breakpoints: measured live, the "+" button's own
+box was overlapping the reagent tube's neck by several px instead of
+sitting clear above it, and the element cell's bottle was sitting several
+px off the reagent tubes' shared bottom line — both confirmed against
+`getBoundingClientRect()` before and after, not eyeballed. `.target-
+element-hint` (the planet label on the target bottle) moved from
+`top:65%` to `top:55%`.
 
 ## Two things that cost hours — do not rediscover them
 

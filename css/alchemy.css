@@ -46,7 +46,7 @@
    left, ~37-47% right, ~15-27% top, ~12-17% bottom across the four —
    the neck rim height is what varies most between them, so top is the
    least precise of the four numbers on any single tube. */
-.alchemyRoot .side-color-controls .mini-liquid-layer{position:absolute!important;left:36%!important;right:42%!important;top:19%!important;bottom:14%!important;z-index:1!important;border-radius:5px 5px 15px 15px!important;background:linear-gradient(90deg,rgba(255,255,255,.16),transparent 35%,rgba(255,255,255,.04)),var(--tube-fill,#c6beac)!important;box-shadow:inset 5px 0 9px rgba(255,255,255,.08),inset 0 -8px 12px rgba(0,0,0,.10)!important;}.alchemyRoot .side-color-controls .mini-frame-layer{position:absolute!important;inset:0!important;z-index:4!important;background:var(--mini-frame) center/100% 100% no-repeat!important;filter:drop-shadow(0 0 1px rgba(255,255,255,.22)) drop-shadow(0 2px 3px rgba(0,0,0,.35));pointer-events:none!important;}.alchemyRoot .side-color-controls .tube-count{position:absolute!important;inset:0!important;display:grid!important;place-items:center!important;z-index:6!important;font-size:10.5px!important;font-weight:700!important;color:#f5e9c8!important;text-shadow:0 2px 8px rgba(0,0,0,.65)!important;}.alchemyRoot .scene[data-name="Смешение"] .test-tube.tube-lg, .alchemyRoot .scene[data-name="Концентрации"] .test-tube.tube-lg, .alchemyRoot .scene[data-name="Разделение"] .test-tube.tube-lg{width:96px!important;height:224px!important;margin-top:0!important;margin-bottom:10px!important;}
+.alchemyRoot .side-color-controls .mini-liquid-layer{position:absolute!important;left:36%!important;right:42%!important;top:9%!important;bottom:6%!important;z-index:1!important;border-radius:5px 5px 15px 15px!important;background:linear-gradient(90deg,rgba(255,255,255,.16),transparent 35%,rgba(255,255,255,.04)),var(--tube-fill,#c6beac)!important;box-shadow:inset 5px 0 9px rgba(255,255,255,.08),inset 0 -8px 12px rgba(0,0,0,.10)!important;}.alchemyRoot .side-color-controls .mini-frame-layer{position:absolute!important;inset:0!important;z-index:4!important;background:var(--mini-frame) center/100% 100% no-repeat!important;filter:drop-shadow(0 0 1px rgba(255,255,255,.22)) drop-shadow(0 2px 3px rgba(0,0,0,.35));pointer-events:none!important;}.alchemyRoot .side-color-controls .tube-count{position:absolute!important;inset:0!important;display:grid!important;place-items:center!important;z-index:6!important;font-size:10.5px!important;font-weight:700!important;color:#f5e9c8!important;text-shadow:0 2px 8px rgba(0,0,0,.65)!important;}.alchemyRoot .scene[data-name="Смешение"] .test-tube.tube-lg, .alchemyRoot .scene[data-name="Концентрации"] .test-tube.tube-lg, .alchemyRoot .scene[data-name="Разделение"] .test-tube.tube-lg{width:96px!important;height:224px!important;margin-top:0!important;margin-bottom:10px!important;}
 /* Colour settles slower than the pour: the mix is still moving toward its
    final level when it snaps to the wrong hue, and a quick fade read as a
    glitch rather than blending. */
@@ -317,7 +317,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    to a guessed height. z-index above the glass frame (30, test-tube:after)
    so the label reads as stuck to the *outside* of the glass. */
 .alchemyRoot .target-element-hint{
-  position:absolute;top:65%;left:50%;
+  position:absolute;top:55%;left:50%;
   transform:translate(-50%,-50%);
   width:60%;aspect-ratio:208/330;
   background:var(--element-label-img,none) center/contain no-repeat;
@@ -388,8 +388,8 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
 .alchemyRoot .ctrl-row{display:flex;gap:6px;}
 .alchemyRoot .small-btn,.alchemyRoot .color-card button{padding:4px 10px;
   border:1px solid rgba(138,100,52,.55);border-radius:7px;background:rgba(24,19,14,.9);
-  color:#c9b98c;font:600 12px/1 inherit;cursor:pointer;}
-.alchemyRoot .small-btn:hover,.alchemyRoot .color-card button:hover{border-color:#d6ab5e;color:#f0d497;}
+  color:#c9b98c;font:600 12px/1 inherit;cursor:pointer;opacity:.6;transition:opacity .14s ease;}
+.alchemyRoot .small-btn:hover,.alchemyRoot .color-card button:hover{border-color:#d6ab5e;color:#f0d497;opacity:1;}
 .alchemyRoot .small-btn:disabled,.alchemyRoot .color-card button:disabled{opacity:.4;cursor:not-allowed;}
 .alchemyRoot .small-btn:disabled:hover,.alchemyRoot .color-card button:disabled:hover{border-color:rgba(138,100,52,.55);color:#c9b98c;}
 .alchemyRoot .mini-swatch{cursor:pointer;transition:transform .14s ease,filter .14s ease;}
@@ -701,7 +701,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
   .alchemyRoot .alchemyReagents .color-card:has(.ctrl-row .small-btn:only-child) .mini-swatch{
     --reagent-raise:var(--reagent-solo-raise);
   }
-  .alchemyRoot{--element-x:-30px;--element-raise:-107px;--element-scale:1.1;}
+  .alchemyRoot{--element-x:-30px;--element-raise:-96px;--element-scale:1.1;}
   .alchemyRoot .scene.active .alchemyElementCell.filled{border:none;}
   /* The whole desk (and everything standing on it) sits lower than the
      row's own box — the station tabs above are a sibling, not a child,
@@ -771,7 +771,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      the two rules' conflicting translateY values (this one's -107px vs
      the other's -120px) fought each other, landing it 13px short of
      clearing the swatch. */
-  .alchemyRoot{--btn-plus-raise:-143px;--btn-minus-raise:-130px;--btn-solo-raise:-55px;--label-raise:-138px;}
+  .alchemyRoot{--btn-plus-raise:-163px;--btn-minus-raise:-130px;--btn-solo-raise:-55px;--label-raise:-138px;}
   /* Separation's single button matches :last-child too (it's the only
      child), so without this it inherits the rule above wholesale — same
      order:-1 flip AND the same big upward translateY the "+" button uses,
@@ -828,8 +828,8 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
     --desk-margin:8%;
     --bench-raise:-55px;--bench-scale:.6;
     --reagent-raise:-71px;--reagent-scale:1.3;--reagent-solo-raise:-98px;
-    --element-x:-30px;--element-raise:-20px;--element-scale:1.1;
-    --btn-plus-raise:-86px;--btn-minus-raise:-73px;--btn-solo-raise:-11px;
+    --element-x:-30px;--element-raise:-39px;--element-scale:1.1;
+    --btn-plus-raise:-98px;--btn-minus-raise:-73px;--btn-solo-raise:-11px;
     --label-raise:-75px;
   }
 }
@@ -950,8 +950,9 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
 .alchemyRackDrawerBottleDragGhost{
   position:fixed;left:0;top:0;z-index:400;
   transform:translate(-50%,-50%);
-  pointer-events:none;opacity:.85;
+  pointer-events:none;opacity:1;
   filter:drop-shadow(0 10px 14px rgba(0,0,0,.5));
+  background-repeat:no-repeat;background-size:contain;background-position:center;
 }
 /* Ring centres, measured from rack-back.png at 1614px width. Three earlier
    passes: v296 eyeballed a gridline overlay (200, 412, 623, 835, 1047,

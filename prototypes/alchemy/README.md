@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v323)
+## Where this stands (v324)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -776,6 +776,58 @@ live on separate sibling elements needing their own matching shift), the
 reagent swatches, their buttons, and their (hidden, wide-only) labels are
 all descendants of `.color-controls` itself, so one transform on that
 single container carries all of them together.
+
+**v324 fixed Separation's single "−" button landing above its tube like a
+"+" instead of below — and along the way found why a single-button
+reagent card can't just skip the reorder.** Separation's control matches
+both `:first-child` and `:last-child` at once (it's the only child), so
+it inherited the `:last-child{order:-1;...}` rule wholesale — the same
+"reordered above the swatch" treatment "+" gets in the two-button
+stations. Feedback: minus signs belong under the tube everywhere,
+matching Mixing/Concentrations' own "−".
+
+The obvious fix — drop `order:-1` for the single-button case so it stays
+in its natural (post-swatch) position — broke the *tube* line across
+stations instead. `.alchemyReagents`/`.color-controls` both anchor their
+row's bottom edge (`align-items:flex-end`), so every card in it starts
+its flow from that shared bottom regardless of how tall the card's own
+content is. A two-button card (Mixing/Concentrations) has one more flow
+item than a one-button card (Separation) — same swatch, same hidden
+label/drops, but a second button's worth of extra height. Shorter flow
+height, same bottom anchor, means the *top* of a one-button card starts
+lower than a two-button one's — and since the swatch's raise transform is
+one shared, fixed pixel value across all three stations, starting from a
+lower flow position landed Separation's tube visibly lower than Mixing's
+after the same lift, breaking the "line of all tubes on the table" the
+feedback specifically called out.
+
+Fixed both at once, working *with* that mechanism instead of around it:
+`order:-1` stays on the single button (so its card keeps the same flow
+height as a two-button one — the reordered button still occupies the
+leading flow slot, it just doesn't have to visually render there) and
+only its `transform` changes, aimed down at the "−" position instead of
+up at the "+" one. The swatch itself still needed its own extra lift on
+top of that (`:has(.ctrl-row .small-btn:only-child)`, a card with the
+button reordered-but-redirected is *still* one real button short of two,
+so the flow deficit is only half addressed by keeping order:-1 — the
+missing button's height must be compensated somewhere, and the swatch's
+own transform was the one already built to absorb exactly this kind of
+per-station tuning).
+
+**The wide fix's own `:has()` selector leaked into the short-screen query
+nested inside the same `min-width:900px`, silently overpowering that
+block's smaller, separately-tuned numbers.** `:has(.ctrl-row .small-btn
+:only-child)` is more specific than the short-screen block's plain
+descendant-selector override of the same property, so once both matched
+(short screens are still `min-width:900px`, just also `max-height:760px`)
+the *wide* compensation value won even in the short-screen context it was
+never tuned for — swatch position 71px off, this time in the opposite
+direction (too high, not too low) once the wide value's much larger lift
+got applied against the short screen's much smaller base raise. Needed
+its own `:has()` override, at equal-or-higher specificity, inside the
+short-screen block itself — matching that block's own established
+pattern of shadowing the wide numbers wholesale rather than layering on
+top of them.
 
 ## Two things that cost hours — do not rediscover them
 

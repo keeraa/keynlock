@@ -102,13 +102,20 @@
   bottom:-1px!important;
   height:auto!important;
   border-radius:5px 5px 28px 28px!important;
-}.alchemyRoot .test-tube.tube-lg > .tube-liquid{
-  left:3px!important;
-  right:3px!important;
-  top:8px!important;
-  bottom:-1px!important;
-  border-radius:6px 6px 32px 32px!important;
 }
+/* The v109 pixel nudge that used to live here (left:3px/right:3px/top:8px/
+   bottom:-1px, border-radius:6px 6px 32px 32px) shrank and shifted
+   .tube-liquid's own box away from .test-tube's — harmless against the
+   old mask, which was hand-tuned to compensate for exactly that box, but
+   v328's replacement mask/frame pair (tube-big-mask.png, generated
+   directly from tube-big-frame.png's own alpha) assumes the liquid box
+   matches .test-tube's *exactly*, since that's what mask-position:0 0;
+   mask-size:100% 100% (a few hundred lines up) lines it up against.
+   Left in place, the liquid rectangle no longer matched the frame's own
+   silhouette — visibly off left and up (the bottle's neck/shoulder taper
+   makes an X/Y mismatch there more noticeable than lower in the body).
+   The mask already carves the exact silhouette including the rounded
+   bottom, so there's no border-radius left to reintroduce either. */
 
 /* The prototype showed one scene at a time through its own chrome; here the
    lair window is the frame, so only the chosen station is in the flow. */

@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v330)
+## Where this stands (v331)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -1071,6 +1071,24 @@ another 30% (15px → 10.5px, on top of v329's own 25px → 15px cut), both
 big-bottle height clamps up 15% across all three clamp arguments, and
 the planet label's own anchor moved from dead center (`top:50%`) to
 `top:65%`.
+
+**v331: v330's mask-position fix wasn't the whole story — a second,
+older rule was still shifting the liquid off the frame's silhouette.**
+A leftover v109 override, `.test-tube.tube-lg > .tube-liquid{left:3px;
+right:3px;top:8px;bottom:-1px;border-radius:6px 6px 32px 32px}`, was
+never touched during the v328 art swap or the v330 mask fix — it resizes
+`.tube-liquid`'s *own box* away from `.test-tube`'s (shrunk, and shifted
+down since top's pushed in 8px against bottom's -1px). `mask-size:100%
+100%` sizes the mask against whatever box it's actually applied to, so
+once that box stopped matching `.test-tube` 1:1, the mask — generated
+pixel-for-pixel against `.test-tube`'s own frame image — silently
+stopped lining up with it too, despite v330's `mask-position:0 0` fix
+being individually correct. Both bugs had to go for the liquid to
+actually sit inside the drawn glass: v330 fixed the mask's own
+position/size, this one fixes what box that position/size is even
+measured against. Removed the override outright — no border-radius
+needed either, since the mask already carves the exact silhouette
+(rounded bottom included) straight from the art.
 
 ## Two things that cost hours — do not rediscover them
 

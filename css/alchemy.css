@@ -2,7 +2,28 @@
    Every selector is scoped under .alchemyRoot: eleven class names collide with
    the game and several are load-bearing there — .tab dresses the mode tabs,
    .scene is the main stage, .locked the map nodes. Regenerate with the same
-   prefixing if the prototype changes; keyframes stay unscoped. */
+   prefixing if the prototype changes; keyframes stay unscoped.
+
+   Map of this file, in source order:
+   - Legacy prototype block (from here down to the "prototype showed one
+     scene at a time" banner below) — ported wholesale from the 10-station
+     prototype. Most of it belongs to the 7 stations with no markup yet and
+     was pruned in v335's dead-code audit; what's left is either still load-
+     bearing for the 3 built stations (see the list at that banner) or is
+     the tube-liquid mask/frame system these stations depend on directly.
+   - "=== Station layout ===" banner — the live layout for the 3 built
+     stations (Смешение/Концентрации/Разделение): scene/tab scoping, the
+     desk backdrop, tube-pair, the reagent row, the element slot, the
+     success-shake/landing-pop keyframes.
+   - Positioning tokens (--bench-raise, --reagent-scale, etc., v335) — the
+     base rules reading them sit right after the station-layout banner;
+     each breakpoint below (mobile default, `@media (min-width:900px)`,
+     `@media (min-width:900px) and (max-height:760px)`) sets its own values
+     in one `.alchemyRoot{...}` block per breakpoint (v340 merge — these
+     used to be scattered one-token-at-a-time through each block).
+   - "Ingredient rack drawer" banner — the bottom-drawer picker, outside
+     `#alchemyRoot` entirely (documented there: a `position:fixed`
+     containing-block reason). */
 .alchemyRoot{--line:rgba(120,94,52,.34);--ink:#e2c487;--muted:#9d8d75;--gold:#d9a74c;--bad:#c0603c;--shadow:0 14px 40px rgba(0,0,0,.42);}.alchemyRoot *{box-sizing:border-box;}.alchemyRoot, .alchemyRoot{margin:0;background:none;color:#e2c487;}.alchemyRoot button, .alchemyRoot input{font:inherit;}.alchemyRoot button:focus-visible, .alchemyRoot input:focus-visible, .alchemyRoot [tabindex="0"]:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}.alchemyRoot h1{font:600 clamp(28px,4vw,46px)/1.04 Georgia,serif;margin:0;letter-spacing:-.03em;}.alchemyRoot .tabs.dragging{cursor:grabbing;user-select:none;}.alchemyRoot .tabs.dragging .tab{pointer-events:none;}.alchemyRoot .tab{flex:0 0 58px;min-width:58px;height:58px;display:flex;align-items:center;justify-content:center;white-space:nowrap;border:1px solid var(--line);background:#161913;color:#9f9a86;padding:0;border-radius:18px;cursor:pointer;transition:.16s;scroll-snap-align:start;}.alchemyRoot .tab.active{background:#2b3025;border-color:#6c715c;color:#fff;}.alchemyRoot .scene.active{display:flex;flex-direction:column;min-height:0;height:100%;}.alchemyRoot h2{font:500 clamp(24px,3vw,34px)/1.04 Georgia,serif;margin:4px 0 8px;}.alchemyRoot .mini-swatch{width:52px;height:122px;border:2px solid #7a7e69;border-top-width:2px;border-radius:8px 8px 24px 24px;margin:0 auto 10px;position:relative;overflow:hidden;box-shadow:inset 7px 0 12px rgba(255,255,255,.06);background:linear-gradient(90deg,rgba(255,255,255,.06),transparent 38%,rgba(255,255,255,.02)),var(--tube-fill,transparent);}.alchemyRoot .mini-swatch::before{content:"";position:absolute;left:-5px;right:-5px;top:-5px;height:8px;border:2px solid #7a7e69;border-radius:50%;background:#171a14;z-index:3;}.alchemyRoot .tube-count{position:absolute;inset:0;display:grid;place-items:center;font-size:32px;font-weight:700;color:#f0e4c5;text-shadow:0 1px 8px rgba(0,0,0,.4);z-index:2;pointer-events:none;}.alchemyRoot .test-tube{width:64px;height:150px;margin:0 auto 10px;border:3px solid #777b67;border-top-width:2px;border-radius:8px 8px 28px 28px;position:relative;background:linear-gradient(90deg,rgba(255,255,255,.05),transparent 38%,rgba(255,255,255,.02));box-shadow:inset 9px 0 13px rgba(255,255,255,.025);}.alchemyRoot .test-tube:before{content:"";position:absolute;left:-6px;right:-6px;top:-5px;height:9px;border:2px solid #777b67;border-radius:50%;background:#171a14;z-index:3;}.alchemyRoot .tube-liquid{position:absolute;left:5px;right:5px;bottom:5px;height:78%;border-radius:3px 3px 22px 22px;transition:background .24s ease,filter .24s ease;box-shadow:inset 7px 0 12px rgba(255,255,255,.07);overflow:hidden;}@media (max-width:700px){.alchemyRoot .test-tube{width:56px;height:132px;}}.alchemyRoot .ctl .ti, .alchemyRoot .hold .ti, .alchemyRoot .small-btn .ti{font-size:1.05em;vertical-align:-.08em;margin-right:6px;}.alchemyRoot .tube-liquid{transform-origin:50% 100%;will-change:transform;}.alchemyRoot .tube-liquid:after{content:"";position:absolute;left:-8%;right:-8%;top:-5px;height:10px;border-radius:50%;background:rgba(255,255,255,.12);opacity:.38;pointer-events:none;}.alchemyRoot .tube-liquid, .alchemyRoot .tube-liquid::before{content:"";position:absolute;z-index:3;left:-18%;width:136%;height:12px;top:-5px;border-radius:48% 52% 45% 55%;background:radial-gradient(ellipse at 50% 72%,rgba(255,255,255,.17) 0 20%,rgba(255,255,255,.07) 21% 47%,transparent 49%);opacity:.46;pointer-events:none;transform-origin:50% 50%;animation:liquidIdleSurfaceV13 3.8s ease-in-out infinite alternate;}.alchemyRoot .tube-liquid{background-repeat:no-repeat;animation:liquidIdleBubblesV13 8s linear infinite;}@keyframes liquidIdleSurfaceV13{0%{transform:translateX(-2.5%) scaleX(1.015) rotate(-.65deg);}35%{transform:translateX(1.5%) scaleX(.985) rotate(.35deg);}70%{transform:translateX(-.5%) scaleX(1.025) rotate(.7deg);}100%{transform:translateX(2.5%) scaleX(.99) rotate(-.2deg);}}@keyframes liquidIdleBubblesV13{0%{background-position:0 20px,0 30px;}50%{background-position:4px -36px,-3px -28px;}100%{background-position:-2px -82px,4px -74px;}}.alchemyRoot .liquid-burst-v13{position:absolute;inset:0;overflow:visible;pointer-events:none;z-index:20;border-radius:inherit;}.alchemyRoot .liquid-bubble-v13{--bubble-size:8px;--bubble-x:50%;--bubble-drift:0px;--bubble-delay:0ms;--bubble-life:900ms;position:absolute;left:var(--bubble-x);bottom:8px;width:var(--bubble-size);height:var(--bubble-size);margin-left:calc(var(--bubble-size) * -.5);border:1.5px solid rgba(255,255,255,.7);background:rgba(255,255,255,.12);box-shadow:inset 0 0 4px rgba(255,255,255,.30),0 0 5px rgba(255,255,255,.08);border-radius:50%;opacity:0;animation:liquidBubbleBurstV13 var(--bubble-life) cubic-bezier(.18,.7,.25,1) var(--bubble-delay) forwards;}@media (prefers-reduced-motion:reduce){.alchemyRoot .tube-liquid, .alchemyRoot .tube-liquid::before{animation:none!important;}.alchemyRoot .liquid-burst-v13{display:none!important;}}.alchemyRoot .tube-liquid{background-color:var(--liquid-color)!important;}.alchemyRoot .tube-liquid{--liquid-color:#c6beac;background:var(--liquid-color)!important;background-image:none!important;opacity:1!important;filter:none!important;isolation:isolate;}.alchemyRoot .tube-liquid::before{content:"";position:absolute;left:-18%;width:136%;height:12px;top:-5px;z-index:4;border-radius:48% 52% 45% 55%;background:radial-gradient(ellipse at 50% 72%,rgba(255,255,255,.20) 0 20%,rgba(255,255,255,.08) 21% 47%,transparent 49%);opacity:.5;pointer-events:none;animation:liquidIdleSurfaceV13 3.8s ease-in-out infinite alternate;}.alchemyRoot .tube-liquid::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(circle at 23% 82%,rgba(255,255,255,.22) 0 2px,transparent 2.8px),radial-gradient(circle at 71% 71%,rgba(255,255,255,.16) 0 1.5px,transparent 2.3px),linear-gradient(90deg,rgba(255,255,255,.10),transparent 30%,rgba(0,0,0,.07) 84%,rgba(255,255,255,.04));background-repeat:no-repeat;animation:liquidIdleBubblesV16 8s linear infinite;}@keyframes liquidIdleBubblesV16{0%{background-position:0 22px,0 32px,0 0;}50%{background-position:4px -34px,-3px -26px,0 0;}100%{background-position:-2px -80px,4px -72px,0 0;}}.alchemyRoot .test-tube>.tube-liquid{position:absolute!important;left:0!important;right:0!important;top:7px!important;bottom:0!important;height:auto!important;display:block!important;background:var(--liquid-color)!important;} .alchemyRoot .tube-liquid{will-change:transform,clip-path,opacity;backface-visibility:hidden;}.alchemyRoot .tab{width:48px!important;height:48px!important;min-width:48px!important;padding:0!important;border-radius:14px!important;display:grid!important;place-items:center!important;font-size:0!important;}.alchemyRoot .tab .ti{font-size:23px!important;line-height:1!important;color:currentColor;}.alchemyRoot .tab.active .ti{color:#fff;}.alchemyRoot .tabs .ti{font-size:24px;line-height:1;}@media (max-width:700px){.alchemyRoot .tab{flex:0 0 calc(25% - 6px);min-width:56px;}}.alchemyRoot .side-color-controls .mini-swatch{width:38px;height:88px;border-radius:8px 8px 20px 20px;margin:0 auto 0;border:2px solid #777b67;background-clip:padding-box;position:relative;box-shadow:inset 8px 0 12px rgba(255,255,255,.06);}.alchemyRoot .tube-lg{box-sizing:border-box;position:relative;overflow:hidden;--tube-stroke:#777b67;}.alchemyRoot .tube-sm{box-sizing:border-box;position:relative;overflow:hidden;--tube-stroke:#777b67;}.alchemyRoot .side-color-controls .mini-swatch.tube-sm{width:40px!important;height:92px!important;margin:0 auto!important;border:2px solid var(--tube-stroke)!important;border-radius:8px 8px 20px 20px!important;position:relative!important;box-shadow:inset 8px 0 12px rgba(255,255,255,.06)!important;background-clip:padding-box!important;}.alchemyRoot .side-color-controls .mini-swatch.tube-sm:before{content:"";position:absolute;left:-5px;right:-5px;top:-4px;height:8px;border:2px solid var(--tube-stroke);border-radius:50%;background:#171a14;z-index:4;}.alchemyRoot .side-color-controls .mini-swatch.tube-sm:after{content:"";position:absolute;left:-12%;width:124%;height:10px;top:-2px;border-radius:48% 52% 45% 55%;background:radial-gradient(ellipse at 50% 72%,rgba(255,255,255,.18) 0 20%,rgba(255,255,255,.08) 21% 47%,transparent 49%);opacity:.55;animation:liquidIdleSurfaceV13 3.8s ease-in-out infinite alternate;}.alchemyRoot .color-sample-panel .tube-lg.test-tube{width:68px;height:158px;}.alchemyRoot .color-sample-panel .current-main-box .tube-lg.test-tube{margin-top:0;}.alchemyRoot .color-sample-panel .tube-pair>.tube-box:first-child .tube-lg.test-tube{margin-top:0;}.alchemyRoot .tab svg.tab-svg-icon{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block}.alchemyRoot .tab i.ti{font-size:22px;line-height:1;display:block}@keyframes liquidBubbleBurstV13{0%{transform:translate(0,0) scale(.45);opacity:0}12%{opacity:.9}50%{transform:translate(calc(var(--bubble-drift) * .5),-168px) scale(.92);opacity:.75}80%{transform:translate(var(--bubble-drift),-308px) scale(1.05);opacity:.46}100%{transform:translate(calc(var(--bubble-drift) * 1.15),-420px) scale(.45);opacity:0}}/* right/bottom only, never top/left: the base rule above sets inset:0
    (non-!important), which JS's own inline top/left (liquidBurst() in
    js/world/alchemy.js) is meant to override — inline beats a non-!important
@@ -105,6 +126,18 @@
    line instead of regenerating the mask over it — percentages here are
    of .tube-liquid's own box, per feedback against a screenshot. */
 .alchemyRoot .test-tube.tube-lg > .tube-liquid{transform:translate(-2%,-2%);}
+
+/* === Station layout === Everything above this line is the legacy
+   prototype block; everything below is written for the lair window (see
+   the file map at the top). Classes from above that are still load-
+   bearing for the 3 built stations today, confirmed against live DOM and
+   JS reachability in v335's dead-code audit — do not remove without
+   re-running that check: `.tube-liquid`, `.mini-swatch`, `.test-tube` (+
+   its mask/frame system), `.passive-bubble-v44`/`.passive-bubbles-v44`,
+   `.liquid-burst-v13`/`.liquid-bubble-v13`, `.liquid-surface-pulse-v83`,
+   `.tab`, `.ctl`, `.side-color-controls`, and their keyframes. Everything
+   else above belonged to the 7 stations with no markup yet and was
+   already removed. */
 
 /* The prototype showed one scene at a time through its own chrome; here the
    lair window is the frame, so only the chosen station is in the flow. */
@@ -525,6 +558,21 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
   .alchemyRoot .scene.active > .lab.color-game-lab,
   .alchemyRoot .scene.active > .alchemyReagents,
   .alchemyRoot .scene.active > .alchemyElementColumn{margin-left:-12px;margin-right:-12px;}
+  /* The -12px above only cancels .lairModuleBody's own padding — the
+     window itself still sat inset from the true screen edge by another
+     8px a side (css/overrides-04-universal-lock.css's shared mobile
+     #lairModuleWindow{width:calc(100vw - 16px)}, meant to keep *other*
+     lair panels' visible card border off the bezel). Alchemy already
+     strips that window chrome entirely (border/shadow/background, see
+     the :has() rule below), so there's no border left for the 8px to
+     protect here — just the wood shelves stopping short of the edge with
+     a strip of unrelated blurred room behind them showing through. An ID
+     beats the shared rule's plain class regardless of !important vs.
+     !important, so this doesn't need to fight specificity, only exist. */
+  #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active){
+    width:100vw!important;
+    border-radius:0!important;
+  }
   .alchemyRoot .tube-pair{gap:24px;}
   .alchemyRoot .color-controls{gap:8px;}
   .alchemyRoot .color-card{width:66px;}
@@ -561,7 +609,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      to the target/current bottles — nothing here actually needs to
      scroll at this width. */
   .alchemyRoot .scene.active > .lab.color-game-lab{overflow:visible!important;}
-  .alchemyRoot{--bench-raise:-27px;--label-raise:-27px;--reagent-raise:-20px;}
+  .alchemyRoot{--bench-raise:-32px;--label-raise:-32px;--reagent-raise:-24px;}
   /* Bigger, and no dashed placeholder ring around it — the bottle art
      (once filled) already says "something is here," per feedback. */
   .alchemyRoot .alchemyElementCell{width:clamp(42px,5.4vh,60px);border:none;}
@@ -583,6 +631,40 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    window has, so the flasks were cut off. Side by side each gets its own
    column and the bench keeps the full height. */
 @media (min-width:900px){
+  /* Positioning tokens for this breakpoint, one place instead of six
+     separate .alchemyRoot rules scattered through this block (merged
+     v340 — later rounds had each added their own token declaration next
+     to whatever rule they were tuning at the time, instead of here).
+     Each token's own "why this number" reasoning stays as a comment on
+     it; the rules that consume them, below, keep their own comments
+     about layout/ordering instead. */
+  .alchemyRoot{
+    /* Per feedback the two bottles should stand closer together (roughly
+       half the gap they had) on top of .tube-pair's own translateX —
+       opposite signs on .tube-pair > .tube-box / .current-cluster pull
+       them toward the row's own center. */
+    --bench-pull:15px;
+    /* Bottles were sitting in the panel-card layout's old baseline, which
+       put their feet at/under the desk's own front edge instead of on
+       its surface — raise amounts tuned by eye against the photo so all
+       three groups' feet land on the same line. */
+    --bench-raise:-123px;--bench-scale:.6;
+    --reagent-raise:-128px;--reagent-scale:1.3;
+    /* A card with only one control button (Separation's "−") has one
+       less flow item than a two-button card, so its swatch's resting
+       position starts lower — extra lift (empirically the gap between
+       the two, not a formula) brings it back level; see the :has() rule
+       below that applies it. */
+    --reagent-solo-raise:-160px;
+    --element-x:-30px;--element-raise:-96px;--element-scale:1.1;
+    /* The whole desk (and everything standing on it) sits lower than the
+       row's own box. */
+    --desk-margin:41%;
+    --btn-plus-raise:-163px;--btn-minus-raise:-130px;--btn-solo-raise:-55px;--label-raise:-138px;
+    /* Nearest positioned ancestor for .status's own absolute reposition,
+       below. */
+    position:relative;
+  }
   .alchemyRoot .scene.active{
     display:grid;
     /* minmax(0,1fr), not 1fr: a 1fr track will not shrink below its own
@@ -677,14 +759,10 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      смесь labels together as one block, same idea as .color-controls
      above. */
   .alchemyRoot .tube-pair{gap:16px;transform:translateX(82px);}
-  /* Pulled toward each other on top of the row's own translateX above —
-     per feedback the two bottles should stand closer together (roughly
-     half the gap they had), not just moved as a pair. Opposite signs on
-     the two flex children pull them toward the row's own center; .tube-box
-     carries the target bottle's swatch-label with it since both move as
-     one flex item, same as everywhere else transforms are used on a
-     bottle+label pairing in this file. */
-  .alchemyRoot{--bench-pull:15px;}
+  /* .tube-box carries the target bottle's swatch-label with it since both
+     move as one flex item, same as everywhere else transforms are used on
+     a bottle+label pairing in this file. --bench-pull itself is declared
+     with this breakpoint's other tokens, above. */
   .alchemyRoot .tube-pair > .tube-box{translate:var(--bench-pull);}
   .alchemyRoot .current-cluster{translate:calc(var(--bench-pull) * -1);}
   /* Four reagents two-by-two at full height stood 530px against 328px of
@@ -709,35 +787,24 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      instead of scrolling. */
   .alchemyRoot .scene.active > .alchemyReagents,
   .alchemyRoot .scene.active > .alchemyElementColumn{overflow:visible!important;}
-  /* Bottles were sitting in the panel-card layout's old baseline, which
-     put their feet at/under the desk's own front edge instead of on its
-     surface — transform (not a height/position rewrite) so it layers on
-     top of the sizing above rather than fighting it. transform-origin:
-     bottom keeps each one's own footprint anchored while it scales, so
-     "raise" and "resize" don't fight each other; the raise amounts below
-     are tuned by eye against the photo so all three groups' feet land on
-     the same line. */
-  .alchemyRoot{--bench-raise:-123px;--bench-scale:.6;--reagent-raise:-128px;--reagent-scale:1.3;--reagent-solo-raise:-160px;}
-  /* A card with only one control button (Separation's "−") has one less
-     flow item than a two-button card (Mixing/Concentrations' "−"+"+") —
-     order alone (see the ctrl-row rules below) repositions that single
-     button but can't manufacture a second one's worth of flow height, so
-     this card is shorter overall. Every card in a row shares the same
-     bottom edge (.alchemyReagents/.color-controls both
-     align-items:flex-end), so a shorter card's un-transformed top — and
-     with it this swatch's own resting position — starts lower than a
+  /* transform (not a height/position rewrite) so the raise layers on top
+     of the sizing above rather than fighting it; transform-origin:bottom
+     keeps each one's own footprint anchored while it scales, so "raise"
+     and "resize" don't fight each other. Token values themselves are
+     declared with this breakpoint's other tokens, above. */
+  /* Every card in a row shares the same bottom edge
+     (.alchemyReagents/.color-controls both align-items:flex-end), so a
+     shorter card's (Separation's single-button one) un-transformed top —
+     and with it its swatch's own resting position — starts lower than a
      two-button station's, breaking the tube line across stations despite
-     an identical translateY above. Extra lift here (empirically the gap
-     between the two, not a formula) brings it back level. */
+     an identical raise. --reagent-solo-raise (declared above) corrects
+     just this card. */
   .alchemyRoot .alchemyReagents .color-card:has(.ctrl-row .small-btn:only-child) .mini-swatch{
     --reagent-raise:var(--reagent-solo-raise);
   }
-  .alchemyRoot{--element-x:-30px;--element-raise:-96px;--element-scale:1.1;}
   .alchemyRoot .scene.active .alchemyElementCell.filled{border:none;}
-  /* The whole desk (and everything standing on it) sits lower than the
-     row's own box — the station tabs above are a sibling, not a child,
-     so they hold their position regardless of this. */
-  .alchemyRoot{--desk-margin:41%;}
+  /* The station tabs above are a sibling, not a child, so they hold their
+     position regardless of the desk-margin push-down below. */
   .alchemyRoot .scene.active{margin-top:var(--desk-margin);}
   /* Проверить/Сброс move beside the bottle instead of stacking under it —
      row instead of column, now that the verdict text (below) no longer
@@ -765,10 +832,10 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      strip directly under the station tabs instead of living in the
      element column. `.alchemyRoot` is the nearest positioned ancestor for
      every station's own #mixStatus/#unknownStatus/#sepStatus either way
-     (position:relative below), so this is pure repositioning — each stays
-     exactly as tied to its own scene's .active visibility as before, it
-     just paints somewhere else. */
-  .alchemyRoot{position:relative;}
+     (its own position:relative is declared with this breakpoint's other
+     tokens, above), so this is pure repositioning — each stays exactly as
+     tied to its own scene's .active visibility as before, it just paints
+     somewhere else. */
   .alchemyRoot .scene.active .status{
     /* !important to win against the earlier "neutralise the game's leaking
        styles" rule above (.alchemyRoot .scene,.alchemyRoot .status,
@@ -799,10 +866,9 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
   .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:last-child{order:-1;}
   /* :not(:last-child) excludes Separation's single "Фильтр" button — it
      matches both :first-child and :last-child at once, and without this
-     the two rules' conflicting translateY values (this one's -107px vs
-     the other's -120px) fought each other, landing it 13px short of
-     clearing the swatch. */
-  .alchemyRoot{--btn-plus-raise:-163px;--btn-minus-raise:-130px;--btn-solo-raise:-55px;--label-raise:-138px;}
+     the two rules' conflicting raises (this one's vs. the other's) fought
+     each other, landing it short of clearing the swatch. Token values
+     themselves are declared with this breakpoint's other tokens, above. */
   /* Separation's single button matches :last-child too (it's the only
      child), so without this it inherits the rule above wholesale — same
      order:-1 flip AND the same big upward translateY the "+" button uses,

@@ -252,7 +252,12 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
   background-size:auto 100%;
 }
 .alchemyRoot .lab h3{margin:0 0 14px;text-align:center;color:#e6d2a6;
-  font:600 15px/1.2 Georgia,serif;}
+  font:600 15px/1.2 Georgia,serif;
+  /* "Образец и текущая смесь" / "Цель и результат" / "Цель и грязная
+     смесь" — dropped everywhere now, not just wide (see the wide-only
+     rule this used to be, below): the bottles and their own цель/текущая
+     смесь labels already say what's what. */
+  display:none;}
 
 /* Target beside current, always side by side — they are meant to be compared.
    Fixed gaps, not vh-based ones: the module window's height already differs a
@@ -391,8 +396,15 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      own painted area). Two lines, then ellipsis, keeps every station's
      reagent band the same height so the fixed padding-bottom budget above
      actually holds. */
+  /* min-height reserves the full 2-line clamp height regardless of how many
+     lines a given label actually needs — without it (was min-height:0),
+     .color-controls' own align-items:flex-end aligns each card's *bottom*
+     edge, so a 1-line label ("Синий") sits its whole card, swatch included,
+     lower than a 2-line one ("Крас-\nный") right next to it. Same
+     mechanism as the .tube-pair width fix above, just triggered by text
+     length instead of translated labels. */
   .alchemyRoot .color-card strong{display:-webkit-box;-webkit-line-clamp:2;
-    -webkit-box-orient:vertical;overflow:hidden;min-height:0;}
+    -webkit-box-orient:vertical;overflow:hidden;min-height:2.2em;}
   .alchemyRoot .tube-pair{padding-bottom:52px;}
   /* Stays absolute (like desktop) instead of joining flow — .tube-box's
      flex height also drives the current-side bottle via align-items:flex-end,
@@ -406,7 +418,38 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      top of each other instead of one below the other. */
   .alchemyRoot .target-element-hint{white-space:normal;width:100%;
     font-size:9px;letter-spacing:.02em;line-height:1.15;margin-top:24px;
-    overflow-wrap:break-word;}
+    overflow-wrap:break-word;
+    transform:translateX(-50%) translateY(-27px);}
+  /* The two bench bottles stand higher above the panel's own table level,
+     same "push the surface down, raise what stands on it" pass the wide
+     layout already got (see the wide media query below) — just tuned for
+     the stacked mobile panel instead of the grid row. margin-top on
+     .tube-pair (not a transform) opens the extra headroom above the
+     bottles since nothing needs to track that shift; the bottles
+     themselves use transform so .swatch-label/.target-element-hint (both
+     position:absolute off .tube-box, whose own layout box a transform on
+     the tube inside it does not move) can be pulled up to match. */
+  .alchemyRoot .tube-pair{margin-top:47px;}
+  .alchemyRoot .lab.color-game-lab .test-tube.tube-lg{transform:translateY(-27px);}
+  .alchemyRoot .swatch-label{transform:translateX(-50%) translateY(-27px);}
+  /* Reagent tubes raised the same way, off their own table level. */
+  .alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch{
+    transform:translateY(-20px);
+  }
+  /* Bigger, and no dashed placeholder ring around it — the bottle art
+     (once filled) already says "something is here," per feedback. */
+  .alchemyRoot .alchemyElementCell{width:clamp(42px,5.4vh,60px);border:none;}
+  .alchemyRoot .alchemyElementCell.filled{border:none;}
+  /* Проверить/Сброс side by side instead of stacked, same as the wide
+     layout — the stacked pair was original only because this column used
+     to be the narrowest thing in a 3-column grid; stacked full-width here
+     it has the whole panel to itself. */
+  .alchemyRoot .alchemyElementColumn .big-actions{flex-direction:row;}
+  /* .ctl's own width:100% (base rule, meant for the stacked column layout)
+     would otherwise still claim the full row width per button and stack
+     them anyway despite the row above allowing side-by-side. flex:1 splits
+     the row's width evenly between the two instead. */
+  .alchemyRoot .alchemyElementColumn .ctl{width:auto;flex:1 1 0;}
 }
 
 /* --- wide: glassware left, reagents right --- */
@@ -506,7 +549,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      just the target tube) moves both bottles and their цель/текущая
      смесь labels together as one block, same idea as .color-controls
      above. */
-  .alchemyRoot .tube-pair{gap:16px;transform:translateX(52px);}
+  .alchemyRoot .tube-pair{gap:16px;transform:translateX(82px);}
   /* Four reagents two-by-two at full height stood 530px against 328px of
      glassware and became the tallest thing in the window. Shorter here. */
   .alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch{height:clamp(40px,7vh,68px)!important;width:34px!important;margin:0 auto 6px!important;}
@@ -521,6 +564,15 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      top. Nothing in here actually needs to scroll at this width — visible
      instead, !important to beat that earlier !important. */
   .alchemyRoot .scene.active > .lab.color-game-lab{overflow:visible!important;}
+  /* Same fix as the bench above, for the other two columns: raising the
+     reagent swatches and the element cell (below) off their own table
+     level moves them past their column's own top edge the same way the
+     bench bottles moved past .lab's — .alchemyReagents/.alchemyElementColumn
+     both kept the base grid rule's overflow:auto (set for scrolling long
+     content, not for this), which clipped a few px off the top of both
+     instead of scrolling. */
+  .alchemyRoot .scene.active > .alchemyReagents,
+  .alchemyRoot .scene.active > .alchemyElementColumn{overflow:visible!important;}
   /* Bottles were sitting in the panel-card layout's old baseline, which
      put their feet at/under the desk's own front edge instead of on its
      surface — transform (not a height/position rewrite) so it layers on
@@ -539,7 +591,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
   }
   .alchemyRoot .alchemyReagents .color-card strong{display:none;}
   .alchemyRoot .scene.active .alchemyElementCell{
-    transform:translateX(-30px) translateY(-83px) scale(1.1);
+    transform:translateX(-30px) translateY(-107px) scale(1.1);
     transform-origin:bottom center;
   }
   .alchemyRoot .scene.active .alchemyElementCell.filled{border:none;}
@@ -619,10 +671,6 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      keeps it inside the tube's own column regardless of name length. */
   .alchemyRoot .target-element-hint{transform:translateX(-50%) translateY(-138px);
     white-space:normal;width:100%;overflow-wrap:break-word;}
-  /* "Образец и текущая смесь" / "Цель и результат" / "Цель и грязная
-     смесь" — the per-station .lab h3 — dropped per feedback; the bottles
-     and their own цель/текущая смесь labels already say what's what. */
-  .alchemyRoot .lab h3{display:none;}
 }
 
 /* The window is cut to the station rather than the station spread over the

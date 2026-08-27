@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v321)
+## Where this stands (v322)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -647,6 +647,83 @@ values, set back to what they were before this round grew them (the same
 numbers v320 shipped) — this is exactly the pairing v311's own note above
 warned about needing "their own, smaller push-down," just for a wider set
 of properties than margin-top alone this time.
+
+**v322 turned out to be mostly mobile — the stacked layout had never gotten
+the "stand on the table" pass the wide grid got back in v311.** The
+mobile `.lab`/`.alchemyReagents`/`.alchemyElementColumn` stack always had
+its own transform-free layout (no `margin-top`, no per-element
+`translateY`), which is why the mobile panels still read as flat and
+close-packed while the wide row already had headroom and raised
+glassware. Added the same two-part move — push the panel's own table
+level down (`margin-top` on `.tube-pair`, since nothing needs to track a
+plain layout shift the way a transform's flow-position mismatch would),
+raise what stands on it (`translateY` on the two bench bottles, the four
+reagent swatches) — tuned in px against the stacked panel's own height
+rather than reusing the wide numbers, which were tuned against a
+completely different box.
+
+**"Образец и текущая смесь" is gone everywhere now, not just wide.** The
+per-station `.lab h3` used to hide only inside the `min-width:900px`
+query (v320); moved the `display:none` onto the base rule instead and
+dropped the now-redundant wide-only copy. Same reasoning as v320 already
+gave for wide — the bottles' own цель/текущая смесь labels say what's
+being compared — just extended to the panel that was still carrying it.
+
+**Reagents 3 and 4 sat 18px lower than 1 and 2, and it wasn't a
+translateY at all — it was `min-height:0`.** `.color-controls` has always
+been `align-items:flex-end` (v311, to anchor the row's baseline near the
+table's front edge), which lines up each card's *bottom* edge, not its
+swatch's top. A 2-line label ("Крас-\nный") makes its card taller than a
+1-line one ("Синий") sitting right next to it — bottom-aligned, the
+taller card's swatch sits higher, the shorter card's lower. The mobile
+line-clamp rule (v317, added to stop Separation's long labels from
+ballooning the panel) set `min-height:0` on the label specifically to let
+short labels take only the room they need — which is exactly what broke
+the alignment for any station where labels happen to differ in line
+count within the same row. Restored `min-height:2.2em` (the same
+reservation the non-clamped base rule already used) alongside the clamp,
+so every label reserves full 2-line height regardless of how many lines
+its own text needs — cards end up the same total height again, and
+`flex-end` lines up their swatches instead of their labels.
+
+**The element cell's dashed border is mobile-only gone — width also grew
+50%, aspect-ratio kept it proportional.** Both are cosmetic-only changes
+scoped inside `@media (max-width:760px)`; the wide layout's own element
+cell sizing and (border-less already, see v321's `.filled{border:none}`)
+styling are untouched.
+
+**Проверить/Сброс moved to one row on mobile — its own `.ctl{width:100%}`
+still had to be overridden alongside the row's `flex-direction`.** Base
+`.alchemyElementColumn .ctl{width:100%}` was written for the *column*
+layout (v305) where each full-width button stacks under the next; simply
+flipping `.big-actions` to `flex-direction:row` left both buttons still
+individually claiming 100% of the row's width, so they'd still stack (now
+overlapping) instead of sitting side by side. `flex:1 1 0` on `.ctl`
+(mobile-scoped, same media block) splits the row evenly between them —
+the wide layout was never touched, so its own separate stacked
+Проверить/Сброс (`width:auto;min-width:100px`, v305) still reads that
+way; only mobile asked to change here.
+
+**Two real desktop bugs surfaced once this round's asks pushed the
+raise/shift numbers further: reagent swatches and the element cell were
+losing a few px off their own top edge, and the target bottle needed
+more clearance than the row's own width implied.** The clipping:
+`.alchemyReagents`/`.alchemyElementColumn` both still carried the base
+grid rule's `overflow:auto` (meant for scrolling long verdict text, not
+for this) — v321 already fixed the identical bug for `.lab` when the
+bench bottles' raise first pushed them past their own box's top edge, but
+never extended the same `overflow:visible!important` to the other two
+columns, which is exactly what a further raise on the reagents/element
+cell this round needed and didn't have. Same fix, same reasoning, applied
+to both remaining columns. The shift: `.tube-pair`'s `translateX` went
+52px → 82px (an added ~4% of the row's own 740px width, on top of v321's
+value) to clear the desk photo's own tapered left edge by a wider margin,
+and the element cell's own raise grew from -83px to -107px so its foot
+lands on the same line the two big bottles' feet already do
+(`getBoundingClientRect().bottom`, same measurement technique v311 used
+to line the three groups up in the first place) — both retuned by the
+same "measure, nudge, repeat" process as everything else pixel-tuned in
+this file.
 
 ## Two things that cost hours — do not rediscover them
 

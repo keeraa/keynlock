@@ -694,6 +694,12 @@
       const name=randomElementName();
       el.style.setProperty('--element-label-img',`url("/assets/alchemy/label-${name.toLowerCase()}.png")`);
       el.setAttribute('aria-label',`Цель: ${name}`);
+      // The planet label on the target bottle isn't cosmetic any more —
+      // Check now also needs the rack-picked element (window.Alchemy.
+      // selectedElement) to match this, not just the colour. Stashed on
+      // the hint element itself so each station's Check handler can read
+      // it without its own separate variable to keep in sync.
+      el.dataset.targetElement=name.toLowerCase();
     }
     let mixGoal=randomSimpleColor(),mixAmts=[0,0,0,0];
     function mixLevelTopV88(){return amountTopV88(sumAmountsV98(mixAmts),{empty:84,full:24,steps:6})}
@@ -710,13 +716,19 @@
       mixGoal=randomSimpleColor(mixGoal?.name);
       mixAmts=[0,0,0,0];
       drawMix();
+      window.Alchemy?.clearSelection?.();
       setTargetElementHint('mixTargetElement');
       animateSceneLiquidV98('mixCurrent',mixLevelTopV88(),{animate:true,duration:560,intensity:.7});
       setStatusHtmlV98('mixStatus','<strong>Новый цвет</strong>смешай его по образцу');
     }
     doc.getElementById('mixCheck').onclick=()=>{
-      const d=colorDistance(simpleMixColor(mixAmts),mixGoal.rgb),ok=d<38;
-      setStatusHtmlV98('mixStatus',ok?`<strong>Совпало: ${mixGoal.name}</strong>цвет получен`:'<strong>Мимо</strong>цвет отличается от образца');
+      const d=colorDistance(simpleMixColor(mixAmts),mixGoal.rgb),colorOk=d<38;
+      const required=doc.getElementById('mixTargetElement').dataset.targetElement;
+      const elementOk=window.Alchemy?.selectedElement===required;
+      const ok=colorOk&&elementOk;
+      setStatusHtmlV98('mixStatus',ok?`<strong>Совпало: ${mixGoal.name}</strong>цвет получен`:
+        !colorOk?'<strong>Мимо</strong>цвет отличается от образца':
+        '<strong>Не тот металл</strong>цвет верный, но элемент не совпадает с целью');
       if(!ok)breakFlask('Неверное смешение');
     };
     doc.getElementById('mixReset').onclick=newMixRound;drawMix();setTargetElementHint('mixTargetElement');animateSceneLiquidV98('mixCurrent',mixLevelTopV88(),{animate:false});
@@ -739,13 +751,19 @@
       unkGoal=randomSimpleColor(unkGoal?.name);
       unkAmts=[0,0,0,0];
       drawUnknown();
+      window.Alchemy?.clearSelection?.();
       setTargetElementHint('unknownTargetElement');
       animateSceneLiquidV98('unknownCurrent',unknownLevelTopV88(),{animate:true,duration:560,intensity:.7});
       setStatusHtmlV98('unknownStatus','<strong>Новая партия</strong>силы реагентов снова скрыты');
     }
     doc.getElementById('unknownCheck').onclick=()=>{
-      const d=colorDistance(simpleMixColor(unkEffective()),unkGoal.rgb),ok=d<40;
-      setStatusHtmlV98('unknownStatus',ok?`<strong>Получен ${unkGoal.name}</strong>концентрации разгаданы`:'<strong>Неточно</strong>нужно скорректировать капли');
+      const d=colorDistance(simpleMixColor(unkEffective()),unkGoal.rgb),colorOk=d<40;
+      const required=doc.getElementById('unknownTargetElement').dataset.targetElement;
+      const elementOk=window.Alchemy?.selectedElement===required;
+      const ok=colorOk&&elementOk;
+      setStatusHtmlV98('unknownStatus',ok?`<strong>Получен ${unkGoal.name}</strong>концентрации разгаданы`:
+        !colorOk?'<strong>Неточно</strong>нужно скорректировать капли':
+        '<strong>Не тот металл</strong>концентрации верны, но элемент не совпадает с целью');
       if(!ok)breakFlask('Партия испорчена');
     };
     doc.getElementById('unknownReset').onclick=rerollUnknown;rerollUnknown();
@@ -769,13 +787,19 @@
       sepImp=[Math.floor(Math.random()*3),Math.floor(Math.random()*3),Math.floor(Math.random()*3),Math.floor(Math.random()*3)];
       if(sumAmountsV98(sepImp)<2)sepImp=[1,1,1,1];
       drawSep();
+      window.Alchemy?.clearSelection?.();
       setTargetElementHint('sepTargetElement');
       animateSceneLiquidV98('sepCurrent',separationLevelTopV88(),{animate:true,duration:560,intensity:.7});
       setStatusHtmlV98('sepStatus',`<strong>Новая цель: ${sepGoal.name}</strong>убери лишние примеси`);
     }
     doc.getElementById('sepCheck').onclick=()=>{
-      const ok=sepImp.every(v=>v===0);
-      setStatusHtmlV98('sepStatus',ok?`<strong>Очищено до ${sepGoal.name}</strong>примеси удалены`:'<strong>Ещё есть примеси</strong>продолжай фильтрацию');
+      const cleanOk=sepImp.every(v=>v===0);
+      const required=doc.getElementById('sepTargetElement').dataset.targetElement;
+      const elementOk=window.Alchemy?.selectedElement===required;
+      const ok=cleanOk&&elementOk;
+      setStatusHtmlV98('sepStatus',ok?`<strong>Очищено до ${sepGoal.name}</strong>примеси удалены`:
+        !cleanOk?'<strong>Ещё есть примеси</strong>продолжай фильтрацию':
+        '<strong>Не тот металл</strong>примеси убраны, но элемент не совпадает с целью');
       if(!ok)breakFlask('Смесь очищена неверно');
     };
     doc.getElementById('sepReset').onclick=resetSeparation;resetSeparation();
@@ -1187,24 +1211,86 @@
     setOpen(false);
   }, true);
 
+  function applyElement(el){
+    bottles.forEach(b => b.classList.toggle('selected', b === el));
+    window.Alchemy = window.Alchemy || {};
+    window.Alchemy.selectedElement = el.dataset.element;
+    window.Alchemy.applySelection?.(el.dataset.element);
+  }
   function select(el){
     // Also opens: a bottle poking into the peek strip is clickable now (see
     // the z-index note on .alchemyRackDrawerToggle) even before the drawer
     // is officially "open", and picking one from there without the drawer
     // catching up read as the click having done nothing.
     setOpen(true);
-    bottles.forEach(b => b.classList.toggle('selected', b === el));
-    window.Alchemy = window.Alchemy || {};
-    window.Alchemy.selectedElement = el.dataset.element;
-    window.Alchemy.applySelection?.(el.dataset.element);
+    applyElement(el);
   }
-  bottles.forEach(b => b.addEventListener('click', () => select(b)));
+  // Dragging a bottle out and dropping it directly on a station's element
+  // cell selects it the same way a click does — a click is still the way
+  // in for anyone who doesn't drag. Pointer events, not the HTML5 drag-
+  // and-drop API: that API has no real touch support, and this rack is
+  // used from a phone as often as a mouse. touch-action:none (CSS) keeps
+  // the browser from stealing the gesture as a page scroll once a touch
+  // starts moving.
+  let suppressClick = false;
+  bottles.forEach(b => {
+    b.addEventListener('click', () => {
+      if(suppressClick){ suppressClick = false; return; }
+      select(b);
+    });
+    b.addEventListener('pointerdown', e => {
+      if(b.classList.contains('selected')) return;
+      const startX = e.clientX, startY = e.clientY;
+      let dragging = false, ghost = null;
+      const clearDragOver = () => document.querySelectorAll('.alchemyElementCell.dragOver')
+        .forEach(c => c.classList.remove('dragOver'));
+      const onMove = ev => {
+        if(!dragging && Math.hypot(ev.clientX - startX, ev.clientY - startY) > 8){
+          dragging = true;
+          ghost = b.cloneNode(true);
+          ghost.className = 'alchemyRackDrawerBottleDragGhost';
+          ghost.style.width = b.offsetWidth + 'px';
+          ghost.style.height = b.offsetHeight + 'px';
+          document.body.appendChild(ghost);
+        }
+        if(!dragging) return;
+        ev.preventDefault();
+        ghost.style.left = ev.clientX + 'px';
+        ghost.style.top = ev.clientY + 'px';
+        const cell = document.elementFromPoint(ev.clientX, ev.clientY)?.closest('.alchemyElementCell');
+        clearDragOver();
+        if(cell) cell.classList.add('dragOver');
+      };
+      const onUp = ev => {
+        document.removeEventListener('pointermove', onMove);
+        document.removeEventListener('pointerup', onUp);
+        if(!dragging) return;
+        suppressClick = true;
+        const cell = document.elementFromPoint(ev.clientX, ev.clientY)?.closest('.alchemyElementCell');
+        clearDragOver();
+        ghost.remove();
+        if(cell) select(b);
+      };
+      document.addEventListener('pointermove', onMove);
+      document.addEventListener('pointerup', onUp);
+    });
+  });
 
   // The station element slots (js/world/alchemy.js, further down) open the
   // rack the same way the drawer's own peek does, rather than duplicating
   // the open logic.
   window.Alchemy = window.Alchemy || {};
   window.Alchemy.openRackDrawer = () => setOpen(true);
+  // Reset/Новая партия/Новая смесь put the bottle back on the shelf —
+  // standing on the table was tied to *this* round, and a fresh round
+  // hasn't picked one yet. Shared across all three stations (the
+  // selection always was, see the comment above the next IIFE), so
+  // resetting any one station clears it for all of them.
+  window.Alchemy.clearSelection = () => {
+    bottles.forEach(b => b.classList.remove('selected'));
+    window.Alchemy.selectedElement = null;
+    window.Alchemy.applySelection?.(null);
+  };
 })();
 
 /* Element slots: each color-game station carries one empty cell (see

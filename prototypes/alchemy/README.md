@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v329)
+## Where this stands (v330)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -1010,6 +1010,67 @@ anything):
   scaled by 1.3x across all three clamp arguments, so the vh-based
   middle argument keeps tracking window height the same way it always
   did, just to a taller target.
+
+**v330 found the real bug behind the big bottle's liquid sliding off to
+one side, added an element-match requirement to Check, and let a bottle
+be dragged onto the table instead of only clicked.**
+
+The slide: `mask-position:50% 14.6%;mask-size:100% 102.6%` on
+`.test-tube>.tube-liquid` was tuned (v109, long before this round)
+against the *old* mask+frame pair's own baked-in margins — that mask's
+silhouette ran 14.6%–96.2% of its canvas, not edge to edge, so the
+position/size compensated for empty space that doesn't exist in
+`tube-big-mask.png` (v328's replacement, generated *from*
+`tube-big-frame.png`'s own alpha via flood fill, so the two already
+share one coordinate system with zero margin). Applying the old
+compensation to a mask that needs none is exactly what pushed the
+liquid off-center. `mask-position:0 0;mask-size:100% 100%` — a plain,
+untransformed fit — is now correct by construction: regenerate the mask
+from whatever frame replaces this one, and identity mapping keeps
+working without new tuning.
+
+The element match: picking an element from the rack always filled every
+station's slot (`window.Alchemy.selectedElement`), but nothing checked
+*which* one against the target's own planet label — any element unlocked
+Check, matching only on colour. `setTargetElementHint()` now stashes the
+rolled element's id on the hint node itself
+(`el.dataset.targetElement`), and all three Check handlers compare that
+against `window.Alchemy.selectedElement` alongside their existing colour/
+cleanliness test — a status message distinguishes "wrong colour" from
+"right colour, wrong metal" so a near-miss doesn't read as a total
+whiff. Reset (`newMixRound`/`rerollUnknown`/`resetSeparation`) now also
+calls a new `window.Alchemy.clearSelection()` (defined alongside
+`select()` in the rack-bottle IIFE, since that's where the `bottles`
+array already lives) — the bottle currently standing on the table goes
+back on the shelf (`.selected` removed, `opacity` fades back to 1) and
+every station's cell empties, since the selection was always shared
+across all three, not per-station.
+
+Drag-to-drop: pointer events, not the HTML5 Drag and Drop API — that API
+has no real touch backing, and this rack sees as much phone use as
+mouse. `pointerdown` on a bottle arms a listener pair on `document`;
+past an 8px move threshold it spawns a fixed-position ghost clone that
+tracks the pointer, and `pointerup` checks `elementFromPoint` for a
+`.alchemyElementCell` underneath to complete the same `select()` a click
+would have triggered. A plain tap (no threshold crossed) leaves `click`
+to fire normally — `suppressClick` only swallows the synthetic click
+that follows a *completed* drag, so tap-to-select still works exactly as
+before. `touch-action:none` on the bottles stops the browser from
+claiming a moving touch as a page scroll before the drag logic gets a
+look at it. One thing worth remembering if this needs debugging later:
+a drag toward the element cell can fail to find it if the rack drawer is
+already fully open when the drag starts — the open drawer's own covered
+region can overlap the cell on short viewports, same as it would block
+a click there too. Not fixed (matches existing click behavior, and the
+peeking, not-fully-open state most drags actually start from doesn't
+have this problem).
+
+Also, per feedback once the new glassware and label were live: swatch-
+label font halved (11px → 5.5px), the reagent-tube drop-count digit down
+another 30% (15px → 10.5px, on top of v329's own 25px → 15px cut), both
+big-bottle height clamps up 15% across all three clamp arguments, and
+the planet label's own anchor moved from dead center (`top:50%`) to
+`top:65%`.
 
 ## Two things that cost hours — do not rediscover them
 

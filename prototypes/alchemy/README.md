@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v332)
+## Where this stands (v333)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -1105,6 +1105,24 @@ element) back inside the line instead. Percentages are of the liquid
 layer's own box, tuned against a screenshot; scoped to `.tube-lg`
 specifically so it doesn't touch whatever other minigames' plain
 `.test-tube` instances share the same mask/frame variables.
+
+**v333 gave each of the four reagent tubes its own drawing instead of
+one image reused across all four.** Four supplied source PNGs
+(`tube-small-1..4.png`) replace the single `tube-small-frame.png` v328
+introduced; `--tube-sm1-frame` through `--tube-sm4-frame` now each point
+at a different file, and `.side-color-controls .color-card:nth-child(1..4)
+.mini-swatch{--mini-frame:...}` assigns one per card position (the old
+mechanism only ever had two slots, alternating by `:nth-child(even)`,
+left over from when there were only two source images).
+
+Per feedback, `.mini-liquid-layer`'s inset wasn't re-measured per tube —
+one shared value averaged across all four instead. Sampled each source
+PNG's own transparent interior at several rows and a full column
+(same technique as v329's single-tube measurement) and meaned the four:
+left settled around 36%, right 42%, top 19%, bottom 14%. The four
+tubes' neck-rim heights vary more than their body widths do, so top is
+the least precise of the four numbers on any *individual* tube — an
+accepted tradeoff for one inset instead of four, per the ask.
 
 ## Two things that cost hours — do not rediscover them
 

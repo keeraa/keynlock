@@ -2041,12 +2041,11 @@ html.embedded .app{width:100%;height:100%;padding:0}
 html.embedded .tabs{display:none}
 html.embedded .stage{width:100%;height:100%;border:0;border-radius:0;background:transparent;overflow:auto;scrollbar-width:none}
 html.embedded .stage::-webkit-scrollbar{display:none}
-html.embedded .scene{min-height:100%;padding:84px 22px 150px}
-html.embedded .scene-head{max-width:760px;margin:0 auto 14px;padding:10px 16px;border:1px solid rgba(185,139,70,.46);border-radius:14px;background:linear-gradient(180deg,rgba(51,37,24,.88),rgba(23,17,12,.84));box-shadow:0 10px 30px rgba(0,0,0,.28)}
-html.embedded .scene-head h2{color:#f0d49d;font-family:Georgia,serif}
+html.embedded .scene{min-height:100%;padding:76px 22px 150px}
+html.embedded .scene-head{display:none}
 html.embedded .head-picks,html.embedded .status{color:#c5ad80}
 html.embedded .head-picks{border-color:rgba(190,145,71,.5);background:rgba(28,20,13,.78)}
-html.embedded .lab{max-width:1040px;min-height:calc(100vh - 270px);margin:auto;border-color:rgba(181,134,65,.45);background:radial-gradient(circle at 50% 35%,rgba(93,64,34,.38),rgba(20,14,10,.60) 68%);box-shadow:inset 0 0 70px rgba(0,0,0,.34),0 14px 38px rgba(0,0,0,.24)}
+html.embedded .lab{max-width:1040px;min-height:calc(100vh - 226px);margin:auto;border:0;background:transparent;box-shadow:none}
 html.embedded .btn{border-color:rgba(187,141,70,.7);background:linear-gradient(#4a341d,#24180f);color:#efd095}
 html.embedded .status strong{color:#f0d49d}
 html.embedded .scene[data-name="Kingdom Come"] .kcd-lock{border-color:#8b6638;background:radial-gradient(circle at 50% 50%,transparent 0 11%,rgba(0,0,0,.28) 11.5% 13%,transparent 13.5%),repeating-conic-gradient(from 3deg,rgba(224,181,105,.055) 0 2deg,transparent 2deg 15deg),radial-gradient(circle at 46% 42%,#594125 0 16%,#342417 17% 48%,#21160f 49% 72%,#120d09 73% 100%);box-shadow:inset 0 0 0 10px #24170e,inset 0 0 0 12px #8a6536,inset 0 0 50px rgba(0,0,0,.65),0 18px 40px rgba(0,0,0,.32)}
@@ -2057,7 +2056,7 @@ html.embedded .prototype-classic-lock .classic-shackle{position:absolute;left:50
 html.embedded .prototype-classic-lock .classic-body{position:absolute;left:50%;top:52px;width:144px;height:120px;transform:translateX(-50%);object-fit:contain}
 html.embedded .prototype-classic-lock .classic-pick{position:absolute;left:7px;top:66px;width:178px;height:70px;object-fit:contain;transform:rotate(-8deg);transform-origin:75% 50%}
 html.embedded .prototype-classic-lock .classic-tension{position:absolute;left:142px;top:84px;width:145px;height:48px;object-fit:contain;transform:rotate(8deg);transform-origin:0 50%}
-@media(max-width:760px){html.embedded .scene{padding:64px 10px 118px}html.embedded .scene-head{margin-inline:46px;padding:8px 10px}html.embedded .scene-head h2{font-size:18px}html.embedded .lab{min-height:calc(100vh - 220px);padding:10px}html.embedded .scene.has-classic-lock .lab{padding-top:150px}html.embedded .prototype-classic-lock{top:4px;transform:translateX(-50%) scale(.76);transform-origin:50% 0}}
+@media(max-width:760px){html.embedded .scene{padding:58px 10px 118px}html.embedded .lab{min-height:calc(100vh - 176px);padding:10px}html.embedded .scene.has-classic-lock .lab{padding-top:150px}html.embedded .prototype-classic-lock{top:4px;transform:translateX(-50%) scale(.76);transform-origin:50% 0}}
 </style>
 </head>
 <body>
@@ -2220,22 +2219,32 @@ const LOCK_SYMBOLS=[
 ];
 
 // Shared move-based scoring. A game opts in by calling scoreReset/scoreAction.
+const EMBEDDED_PARAMS=new URLSearchParams(location.search);
+const EMBEDDED_GAME=EMBEDDED_PARAMS.get('game')||'';
+const EMBEDDED_PICK_VALUE=Number(EMBEDDED_PARAMS.get('picks'));
+const PLAYER_PICK_COUNT=Math.max(0,Math.min(99,Math.round(Number.isFinite(EMBEDDED_PICK_VALUE)?EMBEDDED_PICK_VALUE:3)));
 const SCORE_BASE=1000,SCORE_STEP=50,scoreState={};
 function scoreScene(game){return GameHub.scene(game)}
 function scoreReset(game,ideal){ideal=Math.max(1,Math.round(ideal||1));scoreState[game]={moves:0,ideal};scoreRender(game)}
 function scoreAction(game,n=1){const s=scoreState[game];if(!s)return;s.moves+=n;scoreRender(game)}
 function scoreValue(game){const s=scoreState[game];if(!s)return SCORE_BASE;return Math.max(0,SCORE_BASE-Math.max(0,s.moves-s.ideal)*SCORE_STEP)}
-function scoreRender(game){const s=scoreState[game],scene=scoreScene(game);if(!s||!scene)return;const status=scene.querySelector('.status');if(status)status.dataset.score=`Очки ${scoreValue(game)} · ходы ${s.moves} · норма ${s.ideal}`}
+function embeddedGoal(game){const status=scoreScene(game)?.querySelector(':scope > .scene-head .status');if(!status)return 'Выполнить взлом';return [...status.childNodes].filter(node=>!(node.nodeType===1&&node.matches?.('strong'))).map(node=>node.textContent||'').join(' ').replace(/\s+/g,' ').trim()||status.querySelector('strong')?.textContent||'Выполнить взлом'}
+function emitEmbeddedState(game){if(game!==EMBEDDED_GAME)return;const s=scoreState[game];window.parent?.postMessage({type:'keynlock-mechanic-state',game,goal:embeddedGoal(game),moves:s?.moves,ideal:s?.ideal,reward:scoreValue(game)},location.origin)}
+function scoreRender(game){const s=scoreState[game],scene=scoreScene(game);if(!s||!scene)return;const status=scene.querySelector('.status');if(status)status.dataset.score=`Очки ${scoreValue(game)} · ходы ${s.moves} · норма ${s.ideal}`;emitEmbeddedState(game)}
 
 // Shared runtime used by every lock module. Keep game modules portable: they only
 // own their puzzle state; lockpick stock and final open transition live here.
 const LockRuntime=(()=>{
-  const DEFAULT_PICKS=3;
+  const DEFAULT_PICKS=PLAYER_PICK_COUNT;
+  const lastPicks={};
   function scene(game){return GameHub.scene(game)}
   function counter(game){return scene(game)?.querySelector('[data-head-picks]')||null}
   function syncPicks(game,picks=DEFAULT_PICKS){
     const value=Math.max(0,Math.round(Number.isFinite(+picks)?+picks:DEFAULT_PICKS));
-    const el=counter(game);if(el)el.textContent=String(value);return value
+    const previous=lastPicks[game];lastPicks[game]=value;
+    const el=counter(game);if(el)el.textContent=String(value);
+    if(game===EMBEDDED_GAME&&Number.isFinite(previous)&&value<previous)window.parent?.postMessage({type:'keynlock-mechanic-picks',game,remaining:value,spent:previous-value},location.origin);
+    return value
   }
   function resetPicks(game,state,count=DEFAULT_PICKS){if(state)state.picks=count;return syncPicks(game,count)}
   function breakPick(game,state,{count=1,messageEl=null,message='',emptyMessage='Отмычки закончились.',onEmpty=null}={}){
@@ -2266,9 +2275,9 @@ const LockRuntime=(()=>{
 // Kingdom Come-inspired
 const kcdLock=document.getElementById('kcdLock'),kcdStatus=document.getElementById('kcdStatus'),kcdTurnBtn=document.getElementById('kcdTurn');
 const kcdProgressBar=document.getElementById('kcdProgressBar'),kcdStressBar=document.getElementById('kcdStressBar'),kcdProgressText=document.getElementById('kcdProgressText'),kcdStressText=document.getElementById('kcdStressText');
-const KCD_TARGET=220;let kcd={sweetR:.28,sweetA:0,rot:0,stress:0,turning:false,solved:false,failed:false,picks:3,notice:false,pointerX:.5,pointerY:.5,last:performance.now()};
+const KCD_TARGET=220;let kcd={sweetR:.28,sweetA:0,rot:0,stress:0,turning:false,solved:false,failed:false,picks:LockRuntime.DEFAULT_PICKS,notice:false,pointerX:.5,pointerY:.5,last:performance.now()};
 function kcdRandomPointer(){const a=Math.random()*Math.PI*2,r=.11+Math.random()*.14;kcd.pointerX=.5+Math.cos(a)*r;kcd.pointerY=.5+Math.sin(a)*r}
-function kcdReset(){LockRuntime.resetOpen('Kingdom Come');kcd.sweetR=.18+Math.random()*.18;kcd.sweetA=Math.random()*Math.PI*2;kcd.rot=0;kcd.stress=0;kcd.turning=false;kcd.solved=false;kcd.failed=false;kcd.picks=3;kcd.notice=false;kcdRandomPointer();kcdLock.classList.remove('shaking','solved');renderKcd()}
+function kcdReset(){LockRuntime.resetOpen('Kingdom Come');kcd.sweetR=.18+Math.random()*.18;kcd.sweetA=Math.random()*Math.PI*2;kcd.rot=0;kcd.stress=0;kcd.turning=false;kcd.solved=false;kcd.failed=false;kcd.picks=LockRuntime.DEFAULT_PICKS;kcd.notice=false;kcdRandomPointer();kcdLock.classList.remove('shaking','solved');renderKcd()}
 function kcdSweet(){const a=kcd.sweetA+kcd.rot*Math.PI/180;return{x:.5+Math.cos(a)*kcd.sweetR,y:.5+Math.sin(a)*kcd.sweetR}}
 function kcdDist(){const s=kcdSweet();return Math.hypot(kcd.pointerX-s.x,kcd.pointerY-s.y)}
 function kcdClose(){return Math.max(0,Math.min(1,1-kcdDist()/(.082*3.4)))}
@@ -2288,7 +2297,7 @@ GameHub.register('Kingdom Come',{reset:kcdReset,tick:kcdLoop,leave:()=>kcdTurn(f
 // BioShock 2-inspired
 // Difficulty is visible in the bar itself: more/wider red segments and narrower green segments.
 const bioTrack=document.getElementById('bioTrack'),bioNeedle=document.getElementById('bioNeedle'),bioResult=document.getElementById('bioResult'),bioStatus=document.getElementById('bioStatus'),bioBot=document.getElementById('bioBot');
-const BIO_STAGES=5,BIO_MAX_PICKS=3;
+const BIO_STAGES=5,BIO_MAX_PICKS=LockRuntime.DEFAULT_PICKS;
 const BIO_STAGE_CFG=[
   {redCount:2,redW:6.5, greenCount:2,greenW:14.0},
   {redCount:3,redW:7.5, greenCount:2,greenW:11.5},
@@ -2374,8 +2383,8 @@ GameHub.register('BioShock 2',{reset:bioReset,tick:bioLoop,keydown:e=>{const d=d
 // Oblivion-inspired
 const obLock=document.getElementById('obLock'),obStatus=document.getElementById('obStatus');
 const OB_READY_MIN=76,OB_READY_MAX=112;
-let ob={pins:[],picks:3,last:performance.now(),failed:false};let obKb=0;
-function obReset(){LockRuntime.resetOpen('Oblivion');scoreReset('Oblivion',10);obKb=0;ob.picks=3;ob.failed=false;const tiers=[420,520,640,780,930].map(v=>v*(.94+Math.random()*.12));for(let i=tiers.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[tiers[i],tiers[j]]=[tiers[j],tiers[i]]}ob.pins=Array.from({length:5},(_,i)=>({rise:0,state:'idle',phase:0,speed:0,pause:0,set:false,baseSpeed:tiers[i],pinH:108+Math.random()*52,apex:145}));obLock.querySelectorAll('.tumbler-slot').forEach(n=>n.remove());ob.pins.forEach((p,i)=>{const s=document.createElement('div');s.className='tumbler-slot';s.dataset.i=i;s.innerHTML='<div class="pin"></div>';s.onclick=()=>obClick(i);obLock.appendChild(s);s.querySelector('.pin').style.setProperty('--ob-pin-h',p.pinH.toFixed(1)+'px')});renderOb()}
+let ob={pins:[],picks:LockRuntime.DEFAULT_PICKS,last:performance.now(),failed:false};let obKb=0;
+function obReset(){LockRuntime.resetOpen('Oblivion');scoreReset('Oblivion',10);obKb=0;ob.picks=LockRuntime.DEFAULT_PICKS;ob.failed=false;const tiers=[420,520,640,780,930].map(v=>v*(.94+Math.random()*.12));for(let i=tiers.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[tiers[i],tiers[j]]=[tiers[j],tiers[i]]}ob.pins=Array.from({length:5},(_,i)=>({rise:0,state:'idle',phase:0,speed:0,pause:0,set:false,baseSpeed:tiers[i],pinH:108+Math.random()*52,apex:145}));obLock.querySelectorAll('.tumbler-slot').forEach(n=>n.remove());ob.pins.forEach((p,i)=>{const s=document.createElement('div');s.className='tumbler-slot';s.dataset.i=i;s.innerHTML='<div class="pin"></div>';s.onclick=()=>obClick(i);obLock.appendChild(s);s.querySelector('.pin').style.setProperty('--ob-pin-h',p.pinH.toFixed(1)+'px')});renderOb()}
 function obApex(i){const s=obLock.querySelector('.tumbler-slot[data-i="'+i+'"]'),pin=s?.querySelector('.pin');if(!s||!pin||!s.clientHeight)return 145;return Math.max(72,s.clientHeight-24-pin.offsetHeight-12)}
 function obDropOneSet(){const setPins=ob.pins.map((p,i)=>[p,i]).filter(([p])=>p.set);if(!setPins.length)return false;const [,idx]=setPins[Math.floor(Math.random()*setPins.length)];const drop=ob.pins[idx];drop.set=false;drop.state='down';drop.rise=Math.max(56,drop.rise||drop.apex||145);drop.phase=0;return true}
 function obStartPin(p,i){p.apex=obApex(i);p.state='up';p.speed=p.baseSpeed*(.98+Math.random()*.04);p.pause=OB_READY_MIN+Math.random()*(OB_READY_MAX-OB_READY_MIN)}
@@ -2395,7 +2404,7 @@ GameHub.register('Oblivion',{reset:obReset,tick:obLoop,keydown:e=>{const d=direc
 const r2Lock=document.getElementById('r2Lock'),r2Status=document.getElementById('r2Status');
 let r2={bars:6,pos:0,seq:[],step:0,wrong:-1,wrongTimer:0,stress:0,picks:3,failed:false};
 function r2MakeSequence(n){const seq=[];let pos=Math.floor(Math.random()*n);seq.push(pos);while(seq.length<n){const options=[];for(let i=0;i<n;i++)if(!seq.includes(i))options.push(i);options.sort((a,b)=>Math.abs(a-pos)-Math.abs(b-pos));const pool=options.slice(0,Math.min(3,options.length));pos=pool[Math.floor(Math.random()*pool.length)];seq.push(pos)}return seq}
-function r2Reset(){LockRuntime.resetOpen('Risen 2');r2.pos=0;r2.step=0;r2.wrong=-1;r2.stress=0;r2.picks=3;r2.failed=false;clearTimeout(r2.wrongTimer);r2.seq=r2MakeSequence(r2.bars);scoreReset('Risen 2',r2.bars);r2Lock.querySelectorAll('.r2-bar').forEach(n=>n.remove());for(let i=0;i<r2.bars;i++){const b=document.createElement('div');b.className='r2-bar';b.dataset.i=i;b.style.setProperty('--bar-h',(48+Math.random()*43)+'%');b.onclick=()=>{r2.pos=i;r2Try();renderR2()};r2Lock.appendChild(b)}renderR2()}
+function r2Reset(){LockRuntime.resetOpen('Risen 2');r2.pos=0;r2.step=0;r2.wrong=-1;r2.stress=0;r2.picks=LockRuntime.DEFAULT_PICKS;r2.failed=false;clearTimeout(r2.wrongTimer);r2.seq=r2MakeSequence(r2.bars);scoreReset('Risen 2',r2.bars);r2Lock.querySelectorAll('.r2-bar').forEach(n=>n.remove());for(let i=0;i<r2.bars;i++){const b=document.createElement('div');b.className='r2-bar';b.dataset.i=i;b.style.setProperty('--bar-h',(48+Math.random()*43)+'%');b.onclick=()=>{r2.pos=i;r2Try();renderR2()};r2Lock.appendChild(b)}renderR2()}
 function r2Move(d){if(r2.failed)return;r2.pos=Math.max(0,Math.min(r2.bars-1,r2.pos+d));renderR2()}
 function r2WrongPulse(i){clearTimeout(r2.wrongTimer);r2.wrong=i;renderR2();r2.wrongTimer=setTimeout(()=>{r2.wrong=-1;renderR2()},170)}
 function r2BreakPick(){r2.picks--;r2.stress=0;if(r2.picks<=0){r2.picks=0;r2.failed=true;r2Status.innerHTML='<strong>Отмычки закончились</strong>нажми «Новый замок»'}else r2Status.innerHTML=`<strong>Отмычка сломалась</strong>осталось ${r2.picks}`}
@@ -2427,7 +2436,7 @@ GameHub.register('Risen 2',{reset:r2Reset,keydown:e=>{const d=directionFromCode(
 // Portable game module: watchmen
 // Watchmen-inspired
 const wmLock=document.getElementById('wmLock'),wmStatus=document.getElementById('wmStatus'),wmHelp=document.getElementById('wmHelp');
-const WM_SCALE=2.05,WM_LOCK_TOL=3.8,WM_TIME=16,WM_MAX_PICKS=3,WM_MIN=0,WM_MAX=96,WM_ROUGH_MISS=18;let wm={pins:[],sel:0,time:WM_TIME,last:performance.now(),failed:false,picks:WM_MAX_PICKS};
+const WM_SCALE=2.05,WM_LOCK_TOL=3.8,WM_TIME=16,WM_MAX_PICKS=LockRuntime.DEFAULT_PICKS,WM_MIN=0,WM_MAX=96,WM_ROUGH_MISS=18;let wm={pins:[],sel:0,time:WM_TIME,last:performance.now(),failed:false,picks:WM_MAX_PICKS};
 function wmReset(){LockRuntime.resetOpen('Watchmen');
   wm.sel=0;wm.time=WM_TIME;wm.failed=false;wm.last=performance.now();wm.picks=WM_MAX_PICKS;
   const invertCount=Math.random()<.5?1:2,order=[0,1,2,3,4];
@@ -2630,7 +2639,7 @@ function bs1Reset(){
   const tiles=bs1BuildBoard();
   scoreReset('Трубопровод',bs1IdealMoves(tiles));
   const revealed=new Set();
-  bs1={tiles,selected:-1,cursor:bs1Index(BS1_START.r,BS1_START.c),revealed,moves:0,state:'prep',startAt:performance.now()+BS1_PREP_MS,lastStep:0,pos:null,inDir:'W',visited:new Set(),fast:false,picks:3};LockRuntime.resetOpen('Трубопровод');LockRuntime.resetPicks('Трубопровод',bs1);
+  bs1={tiles,selected:-1,cursor:bs1Index(BS1_START.r,BS1_START.c),revealed,moves:0,state:'prep',startAt:performance.now()+BS1_PREP_MS,lastStep:0,pos:null,inDir:'W',visited:new Set(),fast:false,picks:LockRuntime.DEFAULT_PICKS};LockRuntime.resetOpen('Трубопровод');LockRuntime.resetPicks('Трубопровод',bs1);
   bs1Msg.textContent='Новый уровень сгенерирован. Доступны минимум два пути, а лишние трубы и аварийные клетки создают ложные маршруты.';
   document.getElementById('bs1Boost').classList.remove('active');
   renderBs1()
@@ -2727,7 +2736,7 @@ GameHub.register('Трубопровод',{reset:bs1Reset,tick:bs1Loop,enter:()=
 // Portable game module: thief-1-2
 // Thief 1/2
 const th12Door=document.getElementById('th12Door'),th12Stages=document.getElementById('th12Stages'),th12Status=document.getElementById('th12Status'),th12Msg=document.getElementById('th12Msg'),th12TimerBar=document.getElementById('th12Timer');
-const TH12_TYPES=['p1','p2','p3','p4','p5'],TH12_TIME=22,TH12_MAX_PICKS=3;
+const TH12_TYPES=['p1','p2','p3','p4','p5'],TH12_TIME=22,TH12_MAX_PICKS=LockRuntime.DEFAULT_PICKS;
 let th12={seq:[],near:[],step:0,hold:null,timer:null,time:TH12_TIME,last:performance.now(),failed:false,picks:TH12_MAX_PICKS,tried:new Set()};
 let th12Audio=null;
 function th12AudioCtx(){
@@ -2809,7 +2818,7 @@ GameHub.register('Thief 1/2',{reset:th12Reset,tick:th12Loop,leave:()=>{if(th12Ke
 // Portable game module: thief-deadly-shadows
 // Thief Deadly Shadows
 const tdsLock=document.getElementById('tdsLock'),tdsProbe=document.getElementById('tdsProbe'),tdsTip=document.getElementById('tdsTip'),tdsStatus=document.getElementById('tdsStatus'),tdsMsg=document.getElementById('tdsMsg'),tdsTimer=document.getElementById('tdsTimer'),tdsSequence=document.getElementById('tdsSequence'),tdsPattern=document.getElementById('tdsPattern');
-const TDS_TIME=22,TDS_MAX_PICKS=3,TDS_PATTERN_MARKS=28;
+const TDS_TIME=22,TDS_MAX_PICKS=LockRuntime.DEFAULT_PICKS,TDS_PATTERN_MARKS=28;
 let tds={selectedRing:0,ang:0,targets:[],hot:false,time:TDS_TIME,last:performance.now(),failed:false,done:new Set(),ringSymbols:[],order:[],step:0,picks:TDS_MAX_PICKS,patternSymbol:0,down:null};
 function tdsReset(){LockRuntime.resetOpen('Thief: Deadly Shadows');
   const ringSymbols=shuffled([0,1,2,3,4]).slice(0,3);
@@ -2913,7 +2922,7 @@ function renderSfSymbolRing(){
   }
 }
 function sfReset(){LockRuntime.resetOpen('Fallout');
-  sf={secret:-150+Math.random()*120,angle:-90,turn:0,wear:0,torqueDir:0,openDir:Math.random()<.5?-1:1,last:performance.now(),solved:false,failed:false,picks:3,symbol:Math.floor(Math.random()*5),stall:0};
+  sf={secret:-150+Math.random()*120,angle:-90,turn:0,wear:0,torqueDir:0,openDir:Math.random()<.5?-1:1,last:performance.now(),solved:false,failed:false,picks:LockRuntime.DEFAULT_PICKS,symbol:Math.floor(Math.random()*5),stall:0};
   renderSfSymbolRing();
   sfLock.querySelector('.sf-cylinder')?.classList.remove('strain');
   sfLeftBtn.classList.remove('active');sfRightBtn.classList.remove('active');
@@ -3030,7 +3039,7 @@ function anBreakPick(reason){
   }
   renderAn();
 }
-function anReset(){LockRuntime.resetOpen('Anachronox');an={secret:[0,1,2].map(()=>Math.floor(Math.random()*10)),vals:[0,0,0],meters:[0,0,0],slot:0,time:30,last:performance.now(),won:false,picks:3,checked:[new Set(),new Set(),new Set()],failed:false};const ideal=(an.secret.reduce((s,v)=>s+Math.min(v,10-v),0)+4)*2;scoreReset('Anachronox',ideal);renderAn();anMsg.textContent='Выбери тумблер, выставь цифру и проверь расстояние.'}
+function anReset(){LockRuntime.resetOpen('Anachronox');an={secret:[0,1,2].map(()=>Math.floor(Math.random()*10)),vals:[0,0,0],meters:[0,0,0],slot:0,time:30,last:performance.now(),won:false,picks:LockRuntime.DEFAULT_PICKS,checked:[new Set(),new Set(),new Set()],failed:false};const ideal=(an.secret.reduce((s,v)=>s+Math.min(v,10-v),0)+4)*2;scoreReset('Anachronox',ideal);renderAn();anMsg.textContent='Выбери тумблер, выставь цифру и проверь расстояние.'}
 function anMove(d){if(an.won||an.failed)return;scoreAction('Anachronox');an.vals[an.slot]=(an.vals[an.slot]+d+10)%10;renderAn()}
 function anTest(){
   if(an.won||an.failed)return;
@@ -3090,7 +3099,7 @@ GameHub.register('Anachronox',{reset:anReset,tick:anLoop,keydown:e=>{const d=dir
 const hillLock=document.getElementById('hillLock'),hillPicks=document.getElementById('hillPicks'),hillStatus=document.getElementById('hillStatus'),hillMsg=document.getElementById('hillMsg'),hillTimer=document.getElementById('hillTimer');
 const HSH=['△','◇','○','⌒','⊥','≋','∩','▽','◁','▷','◊','◌','⌣','◠','☉','☽','☿','♀','♂','♃','♄'];
 let hill={seq:[],jam:[],cover:[],step:0,time:28,last:performance.now(),won:false,failed:false,picks:3};let hillKb=0;
-function hillReset(){hillKb=0;const seq=Array.from({length:6},()=>Math.floor(Math.random()*HSH.length)),cover=Array(6).fill(null),indices=[0,1,2,3,4,5];for(let i=indices.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[indices[i],indices[j]]=[indices[j],indices[i]]}const coverCount=2+Math.floor(Math.random()*2);indices.slice(0,coverCount).forEach(i=>{seq[i]=Math.floor(Math.random()*7);cover[i]=Math.random()<.5?'left':'right'});hill={seq,jam:Array.from({length:6},()=>Math.random()<.25?2:1),cover,step:0,time:28,last:performance.now(),won:false,failed:false,picks:3};LockRuntime.resetOpen('Hillsfar');LockRuntime.resetPicks('Hillsfar',hill);scoreReset('Hillsfar',hill.jam.reduce((a,b)=>a+b,0));renderHill();hillMsg.textContent='Часть профилей закрыта по диагонали. В набор добавлены планетарные алхимические символы.'}
+function hillReset(){hillKb=0;const seq=Array.from({length:6},()=>Math.floor(Math.random()*HSH.length)),cover=Array(6).fill(null),indices=[0,1,2,3,4,5];for(let i=indices.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[indices[i],indices[j]]=[indices[j],indices[i]]}const coverCount=2+Math.floor(Math.random()*2);indices.slice(0,coverCount).forEach(i=>{seq[i]=Math.floor(Math.random()*7);cover[i]=Math.random()<.5?'left':'right'});hill={seq,jam:Array.from({length:6},()=>Math.random()<.25?2:1),cover,step:0,time:28,last:performance.now(),won:false,failed:false,picks:LockRuntime.DEFAULT_PICKS};LockRuntime.resetOpen('Hillsfar');LockRuntime.resetPicks('Hillsfar',hill);scoreReset('Hillsfar',hill.jam.reduce((a,b)=>a+b,0));renderHill();hillMsg.textContent='Часть профилей закрыта по диагонали. В набор добавлены планетарные алхимические символы.'}
 function hillPick(i){if(hill.won||hill.failed||hill.time<=0)return;scoreAction('Hillsfar');if(i!==hill.seq[hill.step]){hill.time=Math.max(0,hill.time-2.2);LockRuntime.breakPick('Hillsfar',hill,{messageEl:hillMsg,message:'Форма не подходит — отмычка сломалась.',onEmpty:()=>{hill.failed=true;hillStatus.innerHTML='<strong>Отмычки закончились</strong>перезапусти замок'}});renderHill();return}hill.jam[hill.step]--;if(hill.jam[hill.step]>0){hillMsg.textContent='Профиль подходит, но тумблер заклинил. Повтори.';renderHill();return}hill.step++;if(hill.step>=hill.seq.length){hill.won=true;LockRuntime.open('Hillsfar',{statusEl:hillStatus,statusHtml:'<strong>Замок открыт</strong>все профили подобраны',messageEl:hillMsg,message:'Все тумблеры пройдены.'})}else hillMsg.textContent='Следующий тумблер.';renderHill()}
 function renderHill(){LockRuntime.syncPicks('Hillsfar',hill.picks);hillLock.innerHTML='';for(let i=0;i<6;i++){const side=hill.cover[i],d=document.createElement('div');d.className='hill-tumb'+(i===hill.step?' current':'')+(i<hill.step?' done':'')+(i>=hill.step&&side?' covered-'+side:'');if(i<hill.step)d.textContent='✓';else{const symbol=HSH[hill.seq[i]],occ=side?`<span class="hill-occlusion ${side}"></span>`:'';d.innerHTML=`<span class="hill-symbol-wrap"><span class="hill-target-symbol">${symbol}</span></span>${occ}`}hillLock.appendChild(d)}hillPicks.innerHTML='';HSH.forEach((s,i)=>{const b=document.createElement('button');b.className='btn hill-pick'+(i===hillKb?' kb-focus':'');b.innerHTML=`<span class="hill-pick-symbol" data-glyph="${s.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}">${s}</span>`;b.onclick=()=>hillPick(i);hillPicks.appendChild(b)});if(!hill.won&&!hill.failed)hillStatus.innerHTML=`<strong>Тумблер ${Math.min(6,hill.step+1)} / 6</strong>${hill.jam[hill.step]>1?'заклинивший профиль':'подбери форму'}`;hillTimer.style.width=Math.max(0,hill.time/28*100)+'%'}
 function hillLoop(now){const dt=Math.min(.05,(now-hill.last)/1000);hill.last=now;if(activeName()==='Hillsfar'&&!hill.won&&!hill.failed&&hill.time>0){hill.time=Math.max(0,hill.time-dt);hillTimer.style.width=Math.max(0,hill.time/28*100)+'%';if(hill.time<=0){hill.time=0;hill.failed=true;hillStatus.innerHTML='<strong>Время вышло</strong>охрана уже рядом';hillMsg.textContent='Попытка провалена.'}}}document.getElementById('hillReset').onclick=hillReset;
@@ -3176,7 +3185,7 @@ function apEnsureCalibrated(){
 }
 function apReset(){
   const order=shuffled([0,1,2,3,4]);
-  ap={pins:Array.from({length:5},apMakePin),sel:0,time:AP_TIME,last:performance.now(),won:false,failed:false,picks:3,order,orderStep:0,calibrated:false};LockRuntime.resetOpen('Alpha Protocol');LockRuntime.resetPicks('Alpha Protocol',ap);
+  ap={pins:Array.from({length:5},apMakePin),sel:0,time:AP_TIME,last:performance.now(),won:false,failed:false,picks:LockRuntime.DEFAULT_PICKS,order,orderStep:0,calibrated:false};LockRuntime.resetOpen('Alpha Protocol');LockRuntime.resetPicks('Alpha Protocol',ap);
   renderAp(false);
   apMsg.textContent='Выставляй пины в порядке символов под замком.';
   if(activeName()==='Alpha Protocol'&&!apFinishCalibration())apEnsureCalibrated()
@@ -3250,7 +3259,7 @@ function me1RenderShell(){
     d.style.transform=`translate(-50%,-50%) rotate(${a+90}deg)`;d.innerHTML=LOCK_SYMBOLS[me1.symbol];me1ShellSymbols.appendChild(d)
   }
 }
-function me1Reset(){LockRuntime.resetOpen('Mass Effect');const startAng=Math.random()*360,ringPlan=[1,2,3,4,5,3,5],baseSpeeds=[24,28,32,36,40,30,38];me1={ring:5,ang:startAng,blocks:ringPlan.map((ring,i)=>({ring,a:(Math.random()*360+i*43)%360,s:(baseSpeeds[i]+(Math.random()*10-5))*(Math.random()<.5?-1:1)})),last:performance.now(),won:false,failed:false,picks:3,hitUntil:0,symbol:Math.floor(Math.random()*5),collapse:false,collapseStart:0};me1Arena.querySelectorAll('.me1-ring,.me1-block').forEach(n=>n.remove());for(let r=1;r<=5;r++){const guide=document.createElement('div');guide.className='me1-ring';guide.dataset.ring=r;me1Arena.insertBefore(guide,me1Core)}me1.blocks.forEach((b,i)=>{const e=document.createElement('div');e.className='me1-block';e.dataset.i=i;me1Arena.appendChild(e)});me1Player.classList.remove('hit');me1Core.classList.remove('ready');me1RenderShell();renderMe1();me1Msg.textContent='Пять равномерных колец. Доберись до ядра и подтверди его тапом или кликом.'}
+function me1Reset(){LockRuntime.resetOpen('Mass Effect');const startAng=Math.random()*360,ringPlan=[1,2,3,4,5,3,5],baseSpeeds=[24,28,32,36,40,30,38];me1={ring:5,ang:startAng,blocks:ringPlan.map((ring,i)=>({ring,a:(Math.random()*360+i*43)%360,s:(baseSpeeds[i]+(Math.random()*10-5))*(Math.random()<.5?-1:1)})),last:performance.now(),won:false,failed:false,picks:LockRuntime.DEFAULT_PICKS,hitUntil:0,symbol:Math.floor(Math.random()*5),collapse:false,collapseStart:0};me1Arena.querySelectorAll('.me1-ring,.me1-block').forEach(n=>n.remove());for(let r=1;r<=5;r++){const guide=document.createElement('div');guide.className='me1-ring';guide.dataset.ring=r;me1Arena.insertBefore(guide,me1Core)}me1.blocks.forEach((b,i)=>{const e=document.createElement('div');e.className='me1-block';e.dataset.i=i;me1Arena.appendChild(e)});me1Player.classList.remove('hit');me1Core.classList.remove('ready');me1RenderShell();renderMe1();me1Msg.textContent='Пять равномерных колец. Доберись до ядра и подтверди его тапом или кликом.'}
 function me1Move(d){if(me1.won||me1.failed||me1.ring===0)return;me1.ang=(me1.ang+d+360)%360;renderMe1()}
 function me1Out(){if(me1.won||me1.failed||me1.ring===0)return;me1.ring=Math.min(5,me1.ring+1);renderMe1()}
 function me1In(){if(me1.won||me1.failed||me1.ring===0)return;if(me1Collides()){me1Hit(performance.now());return}me1.ring--;if(me1.ring===0){me1.collapse=true;me1.collapseStart=performance.now()}renderMe1()}
@@ -3291,7 +3300,7 @@ window.addEventListener('resize',()=>{if(activeName()==='Mass Effect'){me1Render
 const me2Board=document.getElementById('me2Board'),me2Status=document.getElementById('me2Status'),me2Timer=document.getElementById('me2Timer'),me2Msg=document.getElementById('me2Msg');
 const ME2SY=['◈','⌁','Ψ','⊙','✦','⌬','☿','♀'],ME2_TIME=40,ME2_HOLD=900;
 let me2={nodes:[],sel:-1,matched:new Set(),time:ME2_TIME,last:performance.now(),won:false,failed:false,picks:3,lock:false,unlockTimer:0};let me2Kb=0;
-function me2Reset(){clearTimeout(me2.unlockTimer);scoreReset('Mass Effect 2',16);me2Kb=0;me2={nodes:shuffled([...ME2SY,...ME2SY]),sel:-1,matched:new Set(),time:ME2_TIME,last:performance.now(),won:false,failed:false,picks:3,lock:false,unlockTimer:0};LockRuntime.resetOpen('Mass Effect 2');LockRuntime.resetPicks('Mass Effect 2',me2);renderMe2();me2Msg.textContent='Мышь: наведи и подожди. Телефон: удерживай узел до проявления символа.'}
+function me2Reset(){clearTimeout(me2.unlockTimer);scoreReset('Mass Effect 2',16);me2Kb=0;me2={nodes:shuffled([...ME2SY,...ME2SY]),sel:-1,matched:new Set(),time:ME2_TIME,last:performance.now(),won:false,failed:false,picks:LockRuntime.DEFAULT_PICKS,lock:false,unlockTimer:0};LockRuntime.resetOpen('Mass Effect 2');LockRuntime.resetPicks('Mass Effect 2',me2);renderMe2();me2Msg.textContent='Мышь: наведи и подожди. Телефон: удерживай узел до проявления символа.'}
 function me2Click(i){if(me2.won||me2.failed||me2.lock||me2.matched.has(i)||me2.time<=0)return;scoreAction('Mass Effect 2');if(me2.sel<0){me2.sel=i;renderMe2();return}if(i===me2.sel){me2.sel=-1;renderMe2();return}if(me2.nodes[i]===me2.nodes[me2.sel]){me2.matched.add(i);me2.matched.add(me2.sel);me2.sel=-1;me2Msg.textContent='Пара соединена.';if(me2.matched.size===me2.nodes.length){me2.won=true;LockRuntime.open('Mass Effect 2',{statusEl:me2Status,statusHtml:'<strong>Схема открыта</strong>все пары найдены',messageEl:me2Msg,message:'Все пары соединены.'})}}else{me2.lock=true;LockRuntime.breakPick('Mass Effect 2',me2,{messageEl:me2Msg,message:'Не совпало — отмычка сломалась.',onEmpty:()=>{me2.failed=true;me2Status.innerHTML='<strong>Отмычки закончились</strong>перезапусти схему'}});if(!me2.failed){clearTimeout(me2.unlockTimer);me2.unlockTimer=setTimeout(()=>{me2.unlockTimer=0;me2.sel=-1;me2.lock=false;renderMe2()},650)}}renderMe2()}
 function renderMe2(){
   LockRuntime.syncPicks('Mass Effect 2',me2.picks);
@@ -3324,7 +3333,7 @@ GameHub.register('Mass Effect 2',{reset:me2Reset,tick:me2Loop,keydown:e=>{const 
 // Pathologic 2
 // v7 audit: slightly wider human timing window
 const pathL=document.getElementById('pathL'),pathR=document.getElementById('pathR'),pathStatus=document.getElementById('pathStatus'),pathDur=document.getElementById('pathDur'),pathMsg=document.getElementById('pathMsg');let path={y:[.08,.08],v:[0,0],target:[.37,.51],dur:1.35,last:performance.now(),won:false,failed:false,picks:3};
-function pathReset(){LockRuntime.resetOpen('Pathologic 2');path={y:[.06+.06*Math.random(),.06+.06*Math.random()],v:[0,0],target:[.24+Math.random()*.18,.24+Math.random()*.18],dur:1.35,last:performance.now(),won:false,failed:false,picks:3};renderPath();pathMsg.textContent='Добейся одновременного совпадения красных зон с центральной линией.'}
+function pathReset(){LockRuntime.resetOpen('Pathologic 2');path={y:[.06+.06*Math.random(),.06+.06*Math.random()],v:[0,0],target:[.24+Math.random()*.18,.24+Math.random()*.18],dur:1.35,last:performance.now(),won:false,failed:false,picks:LockRuntime.DEFAULT_PICKS};renderPath();pathMsg.textContent='Добейся одновременного совпадения красных зон с центральной линией.'}
 function pathReplacePick(reason='Отмычка сломалась.'){path.picks--;if(path.picks<=0){path.picks=0;path.failed=true;path.dur=0;path.v=[0,0];pathStatus.innerHTML='<strong>Отмычки закончились</strong>нажми «Новый замок»';pathMsg.textContent=reason}else{path.dur=1.35;path.y=[.06+.06*Math.random(),.06+.06*Math.random()];path.v=[0,0];pathStatus.innerHTML=`<strong>Новая отмычка</strong>осталось ${path.picks}`;pathMsg.textContent=reason}renderPath()}
 function pathHit(i){if(path.won||path.failed)return;path.v[i]+=1.18;path.dur=Math.max(0,path.dur-.032);if(path.dur<=0){pathReplacePick('Отмычка не выдержала ударов.');return}renderPath()}
 function pathGood(i){const toothH=.38,targetRel=path.target[i],bandH=.32;const bandBottom=path.y[i]+targetRel*toothH,bandTop=bandBottom+bandH*toothH;return bandBottom<=.52&&bandTop>=.48}
@@ -3337,7 +3346,7 @@ GameHub.register('Pathologic 2',{reset:pathReset,tick:pathLoop,keydown:e=>{if(e.
 
 })();
 GameHub.boot();
-const embeddedGame=new URLSearchParams(location.search).get('game');
+const embeddedGame=EMBEDDED_GAME;
 if(embeddedGame){
   document.documentElement.classList.add('embedded');
   const embeddedIndex=GameHub.scenes.findIndex(scene=>scene.dataset.name===embeddedGame);
@@ -3358,11 +3367,13 @@ if(embeddedGame){
     }
     const activeStatus=activeScene.querySelector(':scope > .scene-head .status');
     const lossObserver=new MutationObserver(()=>{
+      emitEmbeddedState(embeddedGame);
       if(/отмычки закончились/i.test(activeStatus?.textContent||'')){
         window.parent?.postMessage({type:'keynlock-mechanic-loss',game:embeddedGame},location.origin);
       }
     });
     if(activeStatus)lossObserver.observe(activeStatus,{subtree:true,childList:true,characterData:true});
+    emitEmbeddedState(embeddedGame);
   }
 }
 </script>

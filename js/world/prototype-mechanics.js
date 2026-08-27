@@ -19,11 +19,10 @@
 
   const $prototypeMechanicOverlay=document.querySelector('#prototypeMechanicOverlay');
   const $prototypeMechanicFrame=document.querySelector('#prototypeMechanicFrame');
-  const $prototypeMechanicTitle=document.querySelector('#prototypeMechanicTitle');
   const $prototypeMechanicLoss=document.querySelector('#prototypeMechanicLoss');
 
   function prototypeLocationId(place){return `prototype-${place.id}`;}
-  function prototypeMechanicUrl(place){return `prototypes/lockpicking-mechanics-v63.html?game=${encodeURIComponent(place.game)}&run=${Date.now()}`;}
+  function prototypeMechanicUrl(place){return `prototypes/lockpicking-mechanics-v63.html?game=${encodeURIComponent(place.game)}&picks=${Math.max(0,picks)}&run=${Date.now()}`;}
 
   PROTOTYPE_MECHANIC_PLACES.forEach(place=>{
     MAP_LOCATIONS[prototypeLocationId(place)]={name:place.name,x:place.x,y:place.y,text:`Новая механика: ${place.game}.`,action:'prototype-mechanic',prototypeId:place.id,game:place.game};
@@ -57,9 +56,11 @@
     activePrototypeMechanic=place;
     document.body.classList.add('prototype-mechanic-open');
     setGameInactive(true);
-    $prototypeMechanicTitle.textContent=place.name;
-    $prototypeMechanicLoss.hidden=true;
+    $prototypeMechanicLoss.hidden=picks>0;
     $prototypeMechanicOverlay.hidden=false;
+    $objectiveLine.innerHTML='ЦЕЛЬ: <b>ПОДГОТОВКА МЕХАНИКИ</b>';
+    runReward=1000;
+    updateEconomyUI();
     $prototypeMechanicFrame.src=prototypeMechanicUrl(place);
   }
 
@@ -71,6 +72,7 @@
     if($prototypeMechanicFrame)$prototypeMechanicFrame.src='about:blank';
     document.body.classList.remove('prototype-mechanic-open');
     setGameInactive(false);
+    render();
     openMap();
   }
 
@@ -82,10 +84,14 @@
     if($prototypeMechanicFrame)$prototypeMechanicFrame.src='about:blank';
     document.body.classList.remove('prototype-mechanic-open');
     setGameInactive(false);
+    render();
   }
 
   function replayPrototypeMechanic(){
     if(!activePrototypeMechanic||!$prototypeMechanicFrame)return;
+    picks=pickCapacity;
+    brokenPicks=0;
+    renderInventoryTools();
     $prototypeMechanicLoss.hidden=true;
     $prototypeMechanicFrame.src=prototypeMechanicUrl(activePrototypeMechanic);
   }
@@ -109,6 +115,25 @@
   window.addEventListener('message',event=>{
     if(event.origin!==location.origin||event.source!==$prototypeMechanicFrame?.contentWindow||!activePrototypeMechanic)return;
     if(event.data?.game!==activePrototypeMechanic.game)return;
+    if(event.data.type==='keynlock-mechanic-state'){
+      const goal=String(event.data.goal||'Выполнить взлом').trim().toUpperCase();
+      const moveInfo=Number.isFinite(+event.data.moves)&&Number.isFinite(+event.data.ideal)
+        ? ` · ${Math.max(0,+event.data.moves)} ходов · норма ${Math.max(1,+event.data.ideal)}`:'';
+      $objectiveLine.innerHTML=`ЦЕЛЬ: <b>${goal}</b>${moveInfo}`;
+      runReward=Math.max(0,Number(event.data.reward)||0);
+      updateEconomyUI();
+      return;
+    }
+    if(event.data.type==='keynlock-mechanic-picks'){
+      const remaining=Math.max(0,Math.min(pickCapacity,Number(event.data.remaining)||0));
+      if(remaining<picks){
+        brokenPicks+=picks-remaining;
+        triggerInventoryBreakAnimation(remaining+1);
+      }
+      picks=remaining;
+      renderInventoryTools();
+      return;
+    }
     if(event.data.type==='keynlock-mechanic-loss'){
       $prototypeMechanicLoss.hidden=false;
       return;

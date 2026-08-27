@@ -29,7 +29,7 @@
    The gradient stop below is the static fill shown when nothing drives
    --liquid-top-v88 (the sample/target tubes never pour, so they never get
    one) — 88% read as brim-full against the shoulder; 78% leaves it room. */
-.alchemyRoot .test-tube>.tube-liquid{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;border-radius:0!important;overflow:visible!important;z-index:2!important;box-shadow:none!important;background:linear-gradient(to top,var(--liquid-color,#c6beac) 0 78%,transparent 78% 100%)!important;-webkit-mask-image:var(--tube-big-mask)!important;-webkit-mask-repeat:no-repeat!important;-webkit-mask-position:0 0!important;-webkit-mask-size:100% 100%!important;mask-image:var(--tube-big-mask)!important;mask-repeat:no-repeat!important;mask-position:0 0!important;mask-size:100% 100%!important}.alchemyRoot .test-tube>.tube-liquid:before{z-index:4!important}.alchemyRoot .test-tube>.tube-liquid>.passive-bubbles-v44{z-index:12!important;left:7%!important;right:7%!important;top:18%!important;bottom:9%!important;height:auto!important;mix-blend-mode:screen}.alchemyRoot .test-tube>.tube-liquid>.liquid-burst-v13{z-index:14!important;overflow:visible!important}.alchemyRoot .test-tube>.sequence-liquid-stack, .alchemyRoot .test-tube>.formula-tube-stack-v8, .alchemyRoot .test-tube>.essence-stack{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;border-radius:0!important;overflow:hidden!important;z-index:2!important;-webkit-mask-image:var(--tube-big-mask)!important;-webkit-mask-repeat:no-repeat!important;-webkit-mask-position:center!important;-webkit-mask-size:100% 100%!important;mask-image:var(--tube-big-mask)!important;mask-repeat:no-repeat!important;mask-position:center!important;mask-size:100% 100%!important}.alchemyRoot .side-color-controls .mini-swatch, .alchemyRoot .color-controls.side-color-controls .mini-swatch{width:42px!important;height:160px!important;margin:0 auto 7px!important;position:relative!important;display:block!important;overflow:visible!important;border:0!important;border-radius:0!important;background:none!important;background-color:transparent!important;box-shadow:none!important;isolation:isolate!important;--mini-frame:var(--tube-sm1-frame);}.alchemyRoot .side-color-controls .color-card:nth-child(2) .mini-swatch{--mini-frame:var(--tube-sm2-frame)!important}.alchemyRoot .side-color-controls .color-card:nth-child(3) .mini-swatch{--mini-frame:var(--tube-sm3-frame)!important}.alchemyRoot .side-color-controls .color-card:nth-child(4) .mini-swatch{--mini-frame:var(--tube-sm4-frame)!important}.alchemyRoot .side-color-controls .mini-swatch::before, .alchemyRoot .side-color-controls .mini-swatch::after, .alchemyRoot .color-controls.side-color-controls .mini-swatch::before, .alchemyRoot .color-controls.side-color-controls .mini-swatch::after{display:none!important;content:none!important;}/* Insets measured against the new tube art (lab_test_small.png, v328) —
+.alchemyRoot .test-tube>.tube-liquid{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;border-radius:0!important;overflow:visible!important;z-index:2!important;box-shadow:none!important;background:linear-gradient(to top,var(--liquid-color,#c6beac) 0 78%,transparent 78% 100%)!important;-webkit-mask-image:var(--tube-big-mask)!important;-webkit-mask-repeat:no-repeat!important;-webkit-mask-position:0 0!important;-webkit-mask-size:100% 100%!important;mask-image:var(--tube-big-mask)!important;mask-repeat:no-repeat!important;mask-position:0 0!important;mask-size:100% 100%!important}.alchemyRoot .test-tube>.tube-liquid:before{z-index:4!important}.alchemyRoot .test-tube>.tube-liquid>.passive-bubbles-v44{z-index:12!important;left:7%!important;right:7%!important;top:18%!important;bottom:9%!important;height:auto!important;mix-blend-mode:screen}.alchemyRoot .test-tube>.tube-liquid>.liquid-burst-v13{z-index:14!important;overflow:visible!important}.alchemyRoot .test-tube>.sequence-liquid-stack, .alchemyRoot .test-tube>.formula-tube-stack-v8, .alchemyRoot .test-tube>.essence-stack{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;border-radius:0!important;overflow:hidden!important;z-index:2!important;-webkit-mask-image:var(--tube-big-mask)!important;-webkit-mask-repeat:no-repeat!important;-webkit-mask-position:center!important;-webkit-mask-size:100% 100%!important;mask-image:var(--tube-big-mask)!important;mask-repeat:no-repeat!important;mask-position:center!important;mask-size:100% 100%!important}.alchemyRoot .side-color-controls .mini-swatch, .alchemyRoot .color-controls.side-color-controls .mini-swatch{width:34px!important;height:160px!important;margin:0 auto 7px!important;position:relative!important;display:block!important;overflow:visible!important;border:0!important;border-radius:0!important;background:none!important;background-color:transparent!important;box-shadow:none!important;isolation:isolate!important;--mini-frame:var(--tube-sm1-frame);}.alchemyRoot .side-color-controls .color-card:nth-child(2) .mini-swatch{--mini-frame:var(--tube-sm2-frame)!important}.alchemyRoot .side-color-controls .color-card:nth-child(3) .mini-swatch{--mini-frame:var(--tube-sm3-frame)!important}.alchemyRoot .side-color-controls .color-card:nth-child(4) .mini-swatch{--mini-frame:var(--tube-sm4-frame)!important}.alchemyRoot .side-color-controls .mini-swatch::before, .alchemyRoot .side-color-controls .mini-swatch::after, .alchemyRoot .color-controls.side-color-controls .mini-swatch::before, .alchemyRoot .color-controls.side-color-controls .mini-swatch::after{display:none!important;content:none!important;}/* Insets measured against the new tube art (lab_test_small.png, v328) —
    its glass reads much narrower and its neck ring much taller than the
    old frame's did, so the old 17%/17%/9%/7% (tuned for that art) sat the
    liquid rectangle half outside the new glass walls. Sampled the source
@@ -366,7 +366,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
 .alchemyRoot .scene[data-name="Разделение"] .test-tube.tube-lg{
   height:clamp(127px,18.4vh,253px)!important;width:auto!important;aspect-ratio:96/224;}
 /* Reagent tubes follow the window too, or four of them out-measure the bench. */
-.alchemyRoot .color-controls .color-card .mini-swatch{height:clamp(62px,10.4vh,114px)!important;}
+.alchemyRoot .color-controls .color-card .mini-swatch{height:clamp(87px,14.6vh,160px)!important;}
 
 /* --- reagents: one row, the tube is the target --- */
 .alchemyRoot .alchemyReagents{flex:0 0 auto;padding:14px;}
@@ -637,9 +637,18 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      смесь labels together as one block, same idea as .color-controls
      above. */
   .alchemyRoot .tube-pair{gap:16px;transform:translateX(82px);}
+  /* Pulled toward each other on top of the row's own translateX above —
+     per feedback the two bottles should stand closer together (roughly
+     half the gap they had), not just moved as a pair. Opposite signs on
+     the two flex children pull them toward the row's own center; .tube-box
+     carries the target bottle's swatch-label with it since both move as
+     one flex item, same as everywhere else transforms are used on a
+     bottle+label pairing in this file. */
+  .alchemyRoot .tube-pair > .tube-box{transform:translateX(15px);}
+  .alchemyRoot .current-cluster{transform:translateX(-15px);}
   /* Four reagents two-by-two at full height stood 530px against 328px of
      glassware and became the tallest thing in the window. Shorter here. */
-  .alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch{height:clamp(52px,9.1vh,88px)!important;width:34px!important;margin:0 auto 6px!important;}
+  .alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch{height:clamp(73px,12.7vh,123px)!important;width:27px!important;margin:0 auto 6px!important;}
   .alchemyRoot .alchemyElementCell{width:clamp(40px,6vh,60px);}
   /* .lab's own overflow:auto (line ~105, !important — it's there so a
      long verdict on a short window scrolls instead of blowing out the
@@ -668,7 +677,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      are tuned by eye against the photo so all three groups' feet land on
      the same line. */
   .alchemyRoot .scene.active .lab.color-game-lab .test-tube.tube-lg{
-    transform:translateY(-118px) scale(.6);
+    transform:translateY(-123px) scale(.6);
     transform-origin:bottom center;
   }
   .alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch{

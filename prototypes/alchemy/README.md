@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v333)
+## Where this stands (v334)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -1123,6 +1123,40 @@ left settled around 36%, right 42%, top 19%, bottom 14%. The four
 tubes' neck-rim heights vary more than their body widths do, so top is
 the least precise of the four numbers on any *individual* tube — an
 accepted tradeoff for one inset instead of four, per the ask.
+
+**v334, wide layout: the two bench bottles stand closer together, and
+their feet land exactly on the reagent tubes' own line.** The gap
+between them looked wider than the shared 16px `gap` on `.tube-pair`
+because each bottle also carries its own `scale(.6)` (the "stand on the
+table" raise) — scaling shrinks a box toward its own center, pulling
+both edges inward, so the *rendered* gap is the CSS gap plus however much
+each bottle's edges retreated from their unscaled position (measured:
+58px total against a nominal 16px). Closing that further isn't as simple
+as shrinking `gap` — the scale-driven inward pull is fixed regardless of
+gap, and pushing gap toward 0 only gets partway to "half." Added opposite
+`translateX` pulls on the row's two flex children instead
+(`.tube-pair > .tube-box` and `.current-cluster`, ±15px) — cheaper than
+re-deriving the gap math, and it stacks cleanly on top of `.tube-pair`'s
+own existing `translateX(82px)` row-shift since transforms compose. The
+target bottle's label rides along for free (it's a child of `.test-tube`
+now, per v330). Landed at 28.6px rendered gap against a 58px starting
+point — close enough to "half" to call it done. The raise: `.test-tube.
+tube-lg`'s own `translateY` went from -118px to -123px, closing what was
+still a 5px gap between the bottles' feet and the reagent tubes' shared
+bottom line (see v325's original "stand on the table" alignment) — a
+plain unscaled-pixel nudge, since `translateY` in a `translateY(...)
+scale(...)` list moves in the *parent's* coordinate system regardless of
+the element's own scale, not the shrunk one.
+
+**Small reagent tubes: 40% taller, 20% narrower — both `clamp()` height
+rules (base/mobile and the wide/short-screen override) scaled by 1.4x
+across all three arguments each, and every width declaration that
+actually wins in some context (mobile's plain 42px, wide/short-screen's
+34px) scaled by 0.8x.** Same "confirm the actual winning rule before
+touching anything" approach as v329 — this file has enough layered
+`!important` overrides by now that several `width`/`height` declarations
+for `.mini-swatch` can be present in the cascade at once, only one of
+them actually rendering.
 
 ## Two things that cost hours — do not rediscover them
 

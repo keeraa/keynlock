@@ -2,13 +2,17 @@
   const PROTOTYPE_MECHANIC_PLACES=[
     {id:'pipeline',name:'Трубопровод',game:'Трубопровод',x:14,y:40},
     {id:'bioshock2',name:'Охранный дрон',game:'BioShock 2',x:17,y:23},
+    {id:'risen-2',name:'Верфь Risen 2',game:'Risen 2',x:11,y:61},
     {id:'alpha-protocol',name:'Архив пазов',game:'Alpha Protocol',x:31,y:17},
+    {id:'hillsfar',name:'Музей Hillsfar',game:'Hillsfar',x:25,y:82},
     {id:'thief-ds',name:'Теневой квартал',game:'Thief: Deadly Shadows',x:48,y:15},
     {id:'kingdom-come',name:'Дом бронника',game:'Kingdom Come',x:64,y:16},
     {id:'oblivion',name:'Башня штифтов',game:'Oblivion',x:79,y:20},
     {id:'watchmen',name:'Часовая мастерская',game:'Watchmen',x:86,y:34},
     {id:'thief-12',name:'Гильдия воров',game:'Thief 1/2',x:88,y:49},
     {id:'fallout',name:'Старый бункер',game:'Fallout',x:88,y:70},
+    {id:'anachronox',name:'Лаборатория Anachronox',game:'Anachronox',x:57,y:86},
+    {id:'mass-effect',name:'Узел Mass Effect',game:'Mass Effect',x:96,y:59},
     {id:'mass-effect-2',name:'Парные узлы',game:'Mass Effect 2',x:76,y:82},
     {id:'pathologic-2',name:'Дом механика',game:'Pathologic 2',x:40,y:82}
   ];

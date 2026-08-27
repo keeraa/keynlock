@@ -84,6 +84,16 @@ const modeTabs = [
 ];
 for (const id of modeTabs) if (!ids.includes(id)) fail(`Missing mode tab: ${id}`);
 
+const prototypeHtml = readFileSync(resolve(root, 'prototypes/lockpicking-mechanics-v63.html'), 'utf8');
+const prototypeScenes = new Set([...prototypeHtml.matchAll(/<section\b[^>]*\bdata-name=["']([^"']+)["']/gi)].map(match => match[1]));
+const prototypeWorld = readFileSync(resolve(root, 'js/world/prototype-mechanics.js'), 'utf8');
+const placesSource = prototypeWorld.match(/const PROTOTYPE_MECHANIC_PLACES=\[([\s\S]*?)\n\s*\];/)?.[1] || '';
+const mappedPrototypeGames = new Set([...placesSource.matchAll(/\bgame:'([^']+)'/g)].map(match => match[1]));
+const missingPrototypeGames = [...prototypeScenes].filter(game => !mappedPrototypeGames.has(game));
+const unknownPrototypeGames = [...mappedPrototypeGames].filter(game => !prototypeScenes.has(game));
+if (missingPrototypeGames.length) fail(`Prototype games missing from map: ${missingPrototypeGames.join(', ')}`);
+if (unknownPrototypeGames.length) fail(`Map references unknown prototype games: ${unknownPrototypeGames.join(', ')}`);
+
 const version = readFileSync(resolve(root, 'VERSION'), 'utf8').trim();
 console.log(`KEYNLOCK check OK — v${version}`);
-console.log(`${jsFiles.length} JS files, ${cssFiles.length} CSS files, ${ids.length} unique HTML ids, ${checkedAssets} asset references checked.`);
+console.log(`${jsFiles.length} JS files, ${cssFiles.length} CSS files, ${ids.length} unique HTML ids, ${checkedAssets} asset references, ${prototypeScenes.size} mapped prototype games checked.`);

@@ -14,7 +14,7 @@
    reagent swatch's own burst, "auto" top/left falls back to the burst
    element's flow position inside its .color-card vessel: dead last among
    swatch/label/drops/buttons, well under the tube instead of inside it. */
-.alchemyRoot .liquid-burst-v13{overflow:visible!important;right:auto!important;bottom:auto!important}.alchemyRoot .distill-target-chip{width:36px;height:12px;border-radius:999px;border:1px solid rgba(255,255,255,.22);box-shadow:0 0 0 1px rgba(0,0,0,.18) inset,0 0 10px rgba(255,255,255,.05)}.alchemyRoot .distill-target-name{font-size:12px;color:#9a947f;line-height:1.2;text-align:center;min-height:28px}.alchemyRoot .distill-ok{color:#78cb82}@media (max-width:780px){}.alchemyRoot .refill .ti{font-size:22px;line-height:1}@media (max-width:820px){}.alchemyRoot .liquid-bubble-v13{bottom:4px!important}@media (max-width:780px){}@media (max-width:760px){}.alchemyRoot .liquid-burst-v13{position:absolute;pointer-events:none;overflow:visible;z-index:12}.alchemyRoot .liquid-bubble-v13{position:absolute;left:var(--bubble-x);bottom:0;width:var(--bubble-size);height:var(--bubble-size);border-radius:50%;background:rgba(255,255,255,.46);border:1px solid rgba(255,255,255,.38);box-shadow:0 0 8px rgba(255,255,255,.22)}@keyframes bubbleRiseV13{0%{transform:translate(-50%,0) scale(.72);opacity:0}12%{opacity:.95}100%{transform:translate(calc(-50% + var(--bubble-drift)),calc(-1 * var(--bubble-rise,70px))) scale(1.08);opacity:0}}.alchemyRoot .compound-zone-arc-v12.extra{opacity:.22;stroke-width:5;filter:none!important}.alchemyRoot .compound-zone-arc-v12.impurity-hit{opacity:.72;filter:drop-shadow(0 0 4px currentColor)}.alchemyRoot .tube-liquid, .alchemyRoot .sequence-layer, .alchemyRoot .formula-tube-layer-v8, .alchemyRoot .compound-tube-layer-v12, .alchemyRoot .layer-react-layer{position:relative;overflow:hidden}.alchemyRoot .distill-controls{display:grid;justify-items:center;gap:8px;margin-top:8px}.alchemyRoot .distill-ctrl-btn{min-width:48px;padding:8px 0;border-radius:12px;border:1px solid #4d513f;background:#24291f;color:var(--ink);cursor:pointer;transition:.15s}.alchemyRoot .distill-ctrl-btn .ti{font-size:18px;margin:0}.alchemyRoot .distill-heat-btn.active{border-color:#d8ba71;background:#342c1d;box-shadow:0 0 0 1px rgba(214,179,111,.18) inset,0 0 14px rgba(214,179,111,.14)}.alchemyRoot .distill-fix-btn.locked{border-color:#78cb82;background:#223025;color:#dff0d8;box-shadow:0 0 0 1px rgba(120,203,130,.18) inset,0 0 14px rgba(120,203,130,.15)}.alchemyRoot .passive-bubbles-v44{position:absolute;inset:0;overflow:hidden;border-radius:inherit;pointer-events:none;z-index:6;display:block}.alchemyRoot .tube-liquid>.passive-bubbles-v44, .alchemyRoot .vapor>.passive-bubbles-v44{z-index:5}.alchemyRoot .sequence-liquid-stack>.passive-bubbles-v44, .alchemyRoot .formula-tube-stack-v8>.passive-bubbles-v44, .alchemyRoot .compound-tube-stack-v12>.passive-bubbles-v44, .alchemyRoot .layer-react-stack>.passive-bubbles-v44{z-index:8}.alchemyRoot .ingredient-icon-v8{width:70px;height:70px;margin:0 auto 12px;border:1px solid #4b5140;border-radius:16px;display:grid;place-items:center;background:linear-gradient(180deg,#22271e,#1a1e17)}.alchemyRoot .ingredient-icon-v8 .ti{font-size:34px;line-height:1}.alchemyRoot .essence-beaker-card{border:1px solid #3d4335;border-radius:18px;background:#1a1e17;padding:16px 14px 14px;text-align:center;min-height:240px}.alchemyRoot .essence-test-tube{width:76px!important;height:178px!important;margin:10px auto 0!important}.alchemyRoot .essence-stack{position:absolute;left:5px;right:5px;bottom:5px;top:16px;display:flex;flex-direction:column-reverse;justify-content:flex-start;overflow:hidden;border-radius:3px 3px 22px 22px}.alchemyRoot .essence-layer{flex:0 0 auto;position:relative;box-shadow:inset 7px 0 12px rgba(255,255,255,.07)}.alchemyRoot .essence-stack.empty::after{content:"пусто";position:absolute;left:0;right:0;bottom:12px;text-align:center;color:#8f8a77;font-size:11px}.alchemyRoot .essence-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:12px}.alchemyRoot .essence-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid #42483a;border-radius:999px;padding:4px 8px;font-size:11px;color:#cfc5aa;background:#20241b}.alchemyRoot .essence-chip i{display:inline-block;width:9px;height:9px;border-radius:50%}@media (max-width:620px){}.alchemyRoot{--tube-big-frame:url("../assets/alchemy/alchemy_01_d0869176.png");--tube-big-mask:url("../assets/alchemy/alchemy_02_81cf2941.png");--tube-sm1-frame:url("../assets/alchemy/alchemy_03_677eb87f.png");--tube-sm2-frame:url("../assets/alchemy/alchemy_04_e4889c44.png");}.alchemyRoot .test-tube{position:relative!important;border:0!important;background:none!important;box-shadow:none!important;overflow:visible!important;isolation:isolate}.alchemyRoot .test-tube:before{display:none!important;content:none!important}.alchemyRoot .test-tube:after{content:""!important;display:block!important;position:absolute!important;inset:0!important;background:var(--tube-big-frame) center/100% 100% no-repeat!important;z-index:30!important;pointer-events:none!important}/* The mask PNG has empty margin baked in — its silhouette runs from 14.6% to
+.alchemyRoot .liquid-burst-v13{overflow:visible!important;right:auto!important;bottom:auto!important}.alchemyRoot .distill-target-chip{width:36px;height:12px;border-radius:999px;border:1px solid rgba(255,255,255,.22);box-shadow:0 0 0 1px rgba(0,0,0,.18) inset,0 0 10px rgba(255,255,255,.05)}.alchemyRoot .distill-target-name{font-size:12px;color:#9a947f;line-height:1.2;text-align:center;min-height:28px}.alchemyRoot .distill-ok{color:#78cb82}@media (max-width:780px){}.alchemyRoot .refill .ti{font-size:22px;line-height:1}@media (max-width:820px){}.alchemyRoot .liquid-bubble-v13{bottom:4px!important}@media (max-width:780px){}@media (max-width:760px){}.alchemyRoot .liquid-burst-v13{position:absolute;pointer-events:none;overflow:visible;z-index:12}.alchemyRoot .liquid-bubble-v13{position:absolute;left:var(--bubble-x);bottom:0;width:var(--bubble-size);height:var(--bubble-size);border-radius:50%;background:rgba(255,255,255,.46);border:1px solid rgba(255,255,255,.38);box-shadow:0 0 8px rgba(255,255,255,.22)}@keyframes bubbleRiseV13{0%{transform:translate(-50%,0) scale(.72);opacity:0}12%{opacity:.95}100%{transform:translate(calc(-50% + var(--bubble-drift)),calc(-1 * var(--bubble-rise,70px))) scale(1.08);opacity:0}}.alchemyRoot .compound-zone-arc-v12.extra{opacity:.22;stroke-width:5;filter:none!important}.alchemyRoot .compound-zone-arc-v12.impurity-hit{opacity:.72;filter:drop-shadow(0 0 4px currentColor)}.alchemyRoot .tube-liquid, .alchemyRoot .sequence-layer, .alchemyRoot .formula-tube-layer-v8, .alchemyRoot .compound-tube-layer-v12, .alchemyRoot .layer-react-layer{position:relative;overflow:hidden}.alchemyRoot .distill-controls{display:grid;justify-items:center;gap:8px;margin-top:8px}.alchemyRoot .distill-ctrl-btn{min-width:48px;padding:8px 0;border-radius:12px;border:1px solid #4d513f;background:#24291f;color:var(--ink);cursor:pointer;transition:.15s}.alchemyRoot .distill-ctrl-btn .ti{font-size:18px;margin:0}.alchemyRoot .distill-heat-btn.active{border-color:#d8ba71;background:#342c1d;box-shadow:0 0 0 1px rgba(214,179,111,.18) inset,0 0 14px rgba(214,179,111,.14)}.alchemyRoot .distill-fix-btn.locked{border-color:#78cb82;background:#223025;color:#dff0d8;box-shadow:0 0 0 1px rgba(120,203,130,.18) inset,0 0 14px rgba(120,203,130,.15)}.alchemyRoot .passive-bubbles-v44{position:absolute;inset:0;overflow:hidden;border-radius:inherit;pointer-events:none;z-index:6;display:block}.alchemyRoot .tube-liquid>.passive-bubbles-v44, .alchemyRoot .vapor>.passive-bubbles-v44{z-index:5}.alchemyRoot .sequence-liquid-stack>.passive-bubbles-v44, .alchemyRoot .formula-tube-stack-v8>.passive-bubbles-v44, .alchemyRoot .compound-tube-stack-v12>.passive-bubbles-v44, .alchemyRoot .layer-react-stack>.passive-bubbles-v44{z-index:8}.alchemyRoot .ingredient-icon-v8{width:70px;height:70px;margin:0 auto 12px;border:1px solid #4b5140;border-radius:16px;display:grid;place-items:center;background:linear-gradient(180deg,#22271e,#1a1e17)}.alchemyRoot .ingredient-icon-v8 .ti{font-size:34px;line-height:1}.alchemyRoot .essence-beaker-card{border:1px solid #3d4335;border-radius:18px;background:#1a1e17;padding:16px 14px 14px;text-align:center;min-height:240px}.alchemyRoot .essence-test-tube{width:76px!important;height:178px!important;margin:10px auto 0!important}.alchemyRoot .essence-stack{position:absolute;left:5px;right:5px;bottom:5px;top:16px;display:flex;flex-direction:column-reverse;justify-content:flex-start;overflow:hidden;border-radius:3px 3px 22px 22px}.alchemyRoot .essence-layer{flex:0 0 auto;position:relative;box-shadow:inset 7px 0 12px rgba(255,255,255,.07)}.alchemyRoot .essence-stack.empty::after{content:"пусто";position:absolute;left:0;right:0;bottom:12px;text-align:center;color:#8f8a77;font-size:11px}.alchemyRoot .essence-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:12px}.alchemyRoot .essence-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid #42483a;border-radius:999px;padding:4px 8px;font-size:11px;color:#cfc5aa;background:#20241b}.alchemyRoot .essence-chip i{display:inline-block;width:9px;height:9px;border-radius:50%}@media (max-width:620px){}.alchemyRoot{--tube-big-frame:url("../assets/alchemy/tube-big-frame.png");--tube-big-mask:url("../assets/alchemy/tube-big-mask.png");--tube-sm1-frame:url("../assets/alchemy/tube-small-frame.png");--tube-sm2-frame:url("../assets/alchemy/tube-small-frame.png");}.alchemyRoot .test-tube{position:relative!important;border:0!important;background:none!important;box-shadow:none!important;overflow:visible!important;isolation:isolate}.alchemyRoot .test-tube:before{display:none!important;content:none!important}.alchemyRoot .test-tube:after{content:""!important;display:block!important;position:absolute!important;inset:0!important;background:var(--tube-big-frame) center/100% 100% no-repeat!important;z-index:30!important;pointer-events:none!important}/* The mask PNG has empty margin baked in — its silhouette runs from 14.6% to
    96.2% of the image, not edge to edge — so a plain 100%/100% mask left the
    liquid's floor short of the glass's own rounded bottom by a few percent,
    showing the panel through the gap at low fill. Stretching evenly to close
@@ -296,14 +296,27 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
 .alchemyRoot .swatch-label{color:#9d8d75;font:11px/1 inherit;letter-spacing:.02em;
   position:absolute;top:100%;left:50%;transform:translateX(-50%);
   margin-top:6px;white-space:nowrap;}
-/* The element a round is built around, named under the target's own "цель" —
-   stacked below it the same way, just further down (see the taller
-   .tube-pair padding above). Cosmetic for now: nothing checks the placed
-   element against this name yet, the way nothing checks reagent amounts
-   against anything but the target colour. */
-.alchemyRoot .target-element-hint{color:var(--gold);font:600 10px/1 inherit;letter-spacing:.05em;
-  text-transform:uppercase;position:absolute;top:100%;left:50%;transform:translateX(-50%);
-  margin-top:22px;white-space:nowrap;}
+/* The element a round is built around — a planet-sigil label stuck on the
+   target bottle itself now (a parchment card per element, assets/alchemy/
+   label-*.png, JS sets --element-label-img), not a name printed below it.
+   A child of .test-tube rather than a sibling in .tube-box: the tube
+   itself is raised off the table with its own transform at every
+   breakpoint (see the "stand on the table" rules throughout this file),
+   and transforms carry their whole subtree — riding along inside .test-tube
+   means this needs no matching per-breakpoint offset of its own, unlike
+   .swatch-label ("цель"), which stays outside and did need one back when
+   this hung below it too. 30% of the tube's own width, per feedback
+   ("не должна полностью перекрывать бутылку") — aspect-ratio keeps the
+   card's own proportions (208/330, its source art) rather than stretching
+   to a guessed height. z-index above the glass frame (30, test-tube:after)
+   so the label reads as stuck to the *outside* of the glass. */
+.alchemyRoot .target-element-hint{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:30%;aspect-ratio:208/330;
+  background:var(--element-label-img,none) center/contain no-repeat;
+  pointer-events:none;z-index:31;
+}
 
 /* The glassware is sized from the window, not pinned in pixels. At a fixed
    96x224 the two flasks were a small island in a bench that stretched to
@@ -440,21 +453,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      and the card-height mismatch that caused) is moot now that the
      labels are display:none everywhere (base rule above) — a hidden
      element can't balloon anything or leave a mismatched flow height. */
-  .alchemyRoot .tube-pair{padding-bottom:52px;}
-  /* Stays absolute (like desktop) instead of joining flow — .tube-box's
-     flex height also drives the current-side bottle via align-items:flex-end,
-     so growing it here would drag the bottles out of alignment. Width:100%
-     pins it to the tube's own ~58px column (its positioned ancestor) rather
-     than a guessed px value, so a long name like HYDRARGYRUM wraps within
-     that column instead of bleeding into the "текущая смесь" label 24px
-     away. */
-  /* .swatch-label ("цель") is also position:absolute;top:100% off the
-     same .tube-box, so without matching clearance here the two stack on
-     top of each other instead of one below the other. */
-  .alchemyRoot .target-element-hint{white-space:normal;width:100%;
-    font-size:9px;letter-spacing:.02em;line-height:1.15;margin-top:24px;
-    overflow-wrap:break-word;
-    transform:translateX(-50%) translateY(-27px);}
+  .alchemyRoot .tube-pair{padding-bottom:36px;}
   /* The two bench bottles stand higher above the panel's own table level,
      same "push the surface down, raise what stands on it" pass the wide
      layout already got (see the wide media query below) — just tuned for
@@ -743,15 +742,6 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      label back up to close it — retune alongside the bottle's own
      translateY above if that changes. */
   .alchemyRoot .swatch-label{transform:translateX(-50%) translateY(-138px);}
-  /* white-space:normal + width:100% (of the tube-box, its positioned
-     ancestor — same fix as the mobile breakpoint above), not nowrap: the
-     longest element name (HYDRARGYRUM) centered under the *leftmost*
-     bottle in the bench column ran past the window's own left edge —
-     the window clips (overflow:hidden), so the name's leading letter was
-     getting cut off there, not just looking tight. Wrapping to two lines
-     keeps it inside the tube's own column regardless of name length. */
-  .alchemyRoot .target-element-hint{transform:translateX(-50%) translateY(-138px);
-    white-space:normal;width:100%;overflow-wrap:break-word;}
 }
 
 /* The window is cut to the station rather than the station spread over the
@@ -818,7 +808,6 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      the short-screen raise amounts. */
   .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:only-child{transform:translateY(-11px);}
   .alchemyRoot .swatch-label{transform:translateX(-50%) translateY(-75px);}
-  .alchemyRoot .target-element-hint{transform:translateX(-50%) translateY(-75px);}
 }
 
 /* ============================================================

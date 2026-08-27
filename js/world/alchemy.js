@@ -689,7 +689,12 @@
     // file) only checks that *some* element is placed, not this one.
     const ALCHEMY_ELEMENT_NAMES=['Stannum','Plumbum','Aurum','Cuprum','Hydrargyrum','Argentum','Ferrum'];
     function randomElementName(){return ALCHEMY_ELEMENT_NAMES[Math.floor(Math.random()*ALCHEMY_ELEMENT_NAMES.length)]}
-    function setTargetElementHint(id){const el=doc.getElementById(id);if(el)el.textContent=randomElementName();}
+    function setTargetElementHint(id){
+      const el=doc.getElementById(id);if(!el)return;
+      const name=randomElementName();
+      el.style.setProperty('--element-label-img',`url("/assets/alchemy/label-${name.toLowerCase()}.png")`);
+      el.setAttribute('aria-label',`Цель: ${name}`);
+    }
     let mixGoal=randomSimpleColor(),mixAmts=[0,0,0,0];
     function mixLevelTopV88(){return amountTopV88(sumAmountsV98(mixAmts),{empty:84,full:24,steps:6})}
     function drawMix(){

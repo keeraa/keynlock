@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v327)
+## Where this stands (v328)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -926,6 +926,55 @@ of floating in from both sides. Each panel's own inner `padding` (`.lab`,
 `.alchemyReagents`, `.alchemyElementColumn`) is untouched, so the actual
 content — bottles, reagent tubes, buttons — keeps the same clearance from
 the wood's own edge as before; only the wood itself got wider.
+
+**v328 replaced both glass assets and swapped the target's name-under-
+the-bottle for a planet-sigil label stuck on the glass itself.**
+
+New bottle art (`lab_test_big.png`/`lab_test_small.png`, supplied files)
+drops straight into the existing frame+mask system with zero structural
+change, because it happens to already be built the same way the old art
+was: fully transparent in the glass's own interior (alpha=0 at every
+sampled point, checked directly against the pixels), opaque only along
+the outline/highlights. That's exactly the "outline drawn on top at
+z-index 30, liquid shows through the transparent middle" contract
+`.test-tube:after` already assumes — a plain drop-in for `--tube-big-frame`
+and `--tube-sm1/2-frame` (one image standing in for both small-tube
+variants now, since only one was supplied). The one thing that *wasn't*
+supplied — a filled silhouette mask to clip the liquid layer to the new
+big bottle's shape (`--tube-big-mask`) — got built from the frame image
+itself: threshold its alpha to a binary outline, flood-fill inward from
+all four image edges to find the true "outside," and everything the
+flood fill *didn't* reach (the outline plus whatever it encloses)
+becomes the mask's opaque region. No mask was needed for the small tube
+— that one was never mask-clipped to begin with, just a plain
+`.mini-liquid-layer` positioned by percentage, unaffected by a frame-only
+swap. The four now-unreferenced original glass PNGs came out with the
+CSS variables that pointed at them.
+
+The label: `.target-element-hint` used to be `.tube-box`'s sibling,
+holding capitalized element text (STANNUM, AURUM…) positioned below the
+bottle with its own `translateY` retuned at every breakpoint to chase
+the bottle's own raise — three separate copies of that chase, one per
+screen size (`css/alchemy.css`, base/mobile/wide/short-screen). Per
+feedback, the element name is a parchment card image now
+(`assets/alchemy/label-<element>.png`, one per planet correspondence:
+sun→aurum, moon→argentum, mercury→hydrargyrum, venus→cuprum, mars→ferrum,
+jupiter→stannum, saturn→plumbum — classical alchemy's own planet-metal
+pairing, matching the supplied filenames), and it moved from being a
+sibling of `.test-tube` to a *child* of it. That one move deleted all
+three of the old per-breakpoint overrides outright: a transform on
+`.test-tube` carries its whole subtree along, so a label riding inside
+it tracks the bottle's raise automatically at every screen size — the
+exact chase the old sibling positioning needed hand-tuned copies of
+because it *wasn't* inside the transformed box. Sized to 30% of the
+tube's own width via `aspect-ratio` (not a stretched guess), centered
+with `top:50%;left:50%;transform:translate(-50%,-50%)`, at a z-index one
+above the glass frame so it reads as stuck to the outside of the bottle
+rather than floating inside the liquid. `setTargetElementHint()`
+(`js/world/alchemy.js`) now sets a `--element-label-img` custom property
+(root-relative `url()`, same reasoning as `applySelection`'s bottle art —
+a JS-set custom property resolves against wherever the `var()` is
+*consumed*, not where the JS ran) instead of `textContent`.
 
 ## Two things that cost hours — do not rediscover them
 

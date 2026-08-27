@@ -2035,13 +2035,29 @@ button {
   cursor:default;
   box-shadow:none
 }
-html.embedded,html.embedded body{width:100%;height:100%;overflow:hidden;background:transparent}
+html.embedded{--bg:#17100a;--panel:#261a10;--panel2:#352516;--line:#71512b;--line2:#a6783d;--ink:#eee0c0;--muted:#b7a17c;--gold:#d8b871;--good:#c69b52;--blue:#b98443}
+html.embedded,html.embedded body{width:100%;height:100%;overflow:hidden;background:transparent;color:#ead7ad}
 html.embedded .app{width:100%;height:100%;padding:0}
 html.embedded .tabs{display:none}
-html.embedded .stage{width:100%;height:100%;border:0;border-radius:0;background:rgba(13,16,13,.94);overflow:auto}
-html.embedded .scene{min-height:100%;padding:16px 22px 120px}
-html.embedded .scene-head{max-width:760px;margin-inline:auto}
-@media(max-width:760px){html.embedded .scene{padding:12px 10px 104px}}
+html.embedded .stage{width:100%;height:100%;border:0;border-radius:0;background:transparent;overflow:auto;scrollbar-width:none}
+html.embedded .stage::-webkit-scrollbar{display:none}
+html.embedded .scene{min-height:100%;padding:84px 22px 150px}
+html.embedded .scene-head{max-width:760px;margin:0 auto 14px;padding:10px 16px;border:1px solid rgba(185,139,70,.46);border-radius:14px;background:linear-gradient(180deg,rgba(51,37,24,.88),rgba(23,17,12,.84));box-shadow:0 10px 30px rgba(0,0,0,.28)}
+html.embedded .scene-head h2{color:#f0d49d;font-family:Georgia,serif}
+html.embedded .head-picks,html.embedded .status{color:#c5ad80}
+html.embedded .head-picks{border-color:rgba(190,145,71,.5);background:rgba(28,20,13,.78)}
+html.embedded .lab{max-width:1040px;min-height:calc(100vh - 270px);margin:auto;border-color:rgba(181,134,65,.45);background:radial-gradient(circle at 50% 35%,rgba(93,64,34,.38),rgba(20,14,10,.60) 68%);box-shadow:inset 0 0 70px rgba(0,0,0,.34),0 14px 38px rgba(0,0,0,.24)}
+html.embedded .btn{border-color:rgba(187,141,70,.7);background:linear-gradient(#4a341d,#24180f);color:#efd095}
+html.embedded .status strong{color:#f0d49d}
+html.embedded .scene[data-name="Kingdom Come"] .kcd-lock{border-color:#8b6638;background:radial-gradient(circle at 50% 50%,transparent 0 11%,rgba(0,0,0,.28) 11.5% 13%,transparent 13.5%),repeating-conic-gradient(from 3deg,rgba(224,181,105,.055) 0 2deg,transparent 2deg 15deg),radial-gradient(circle at 46% 42%,#594125 0 16%,#342417 17% 48%,#21160f 49% 72%,#120d09 73% 100%);box-shadow:inset 0 0 0 10px #24170e,inset 0 0 0 12px #8a6536,inset 0 0 50px rgba(0,0,0,.65),0 18px 40px rgba(0,0,0,.32)}
+html.embedded .scene[data-name="Kingdom Come"] .kcd-rotor{border-color:#8c693b;background:repeating-conic-gradient(from 0deg,#4b351f 0 19deg,#2d1f14 19deg 39deg)}
+html.embedded .scene.has-classic-lock .lab{position:relative;padding-top:194px}
+html.embedded .prototype-classic-lock{position:absolute;z-index:3;left:50%;top:8px;width:290px;height:178px;transform:translateX(-50%);pointer-events:none;filter:drop-shadow(0 12px 18px rgba(0,0,0,.5))}
+html.embedded .prototype-classic-lock .classic-shackle{position:absolute;left:50%;top:0;width:116px;height:105px;transform:translateX(-50%);object-fit:contain}
+html.embedded .prototype-classic-lock .classic-body{position:absolute;left:50%;top:52px;width:144px;height:120px;transform:translateX(-50%);object-fit:contain}
+html.embedded .prototype-classic-lock .classic-pick{position:absolute;left:7px;top:66px;width:178px;height:70px;object-fit:contain;transform:rotate(-8deg);transform-origin:75% 50%}
+html.embedded .prototype-classic-lock .classic-tension{position:absolute;left:142px;top:84px;width:145px;height:48px;object-fit:contain;transform:rotate(8deg);transform-origin:0 50%}
+@media(max-width:760px){html.embedded .scene{padding:64px 10px 118px}html.embedded .scene-head{margin-inline:46px;padding:8px 10px}html.embedded .scene-head h2{font-size:18px}html.embedded .lab{min-height:calc(100vh - 220px);padding:10px}html.embedded .scene.has-classic-lock .lab{padding-top:150px}html.embedded .prototype-classic-lock{top:4px;transform:translateX(-50%) scale(.76);transform-origin:50% 0}}
 </style>
 </head>
 <body>
@@ -3328,6 +3344,18 @@ if(embeddedGame){
   if(embeddedIndex>=0) GameHub.show(embeddedIndex);
   const activeScene=GameHub.scene(embeddedGame);
   if(activeScene){
+    const classicLockGames=new Set(['Thief: Deadly Shadows','Kingdom Come','Oblivion','Watchmen','Thief 1/2','Fallout']);
+    if(classicLockGames.has(embeddedGame)){
+      activeScene.classList.add('has-classic-lock');
+      const lab=activeScene.querySelector(':scope > .lab');
+      if(lab){
+        const art=document.createElement('div');
+        art.className='prototype-classic-lock';
+        art.setAttribute('aria-hidden','true');
+        art.innerHTML='<img class="classic-shackle" src="../assets/shackles/level1/iron_locker_05.png" alt=""><img class="classic-body" src="../assets/locks/level1/iron_lock_09.png" alt=""><img class="classic-pick" src="../assets/picks/pick_01.webp" alt=""><img class="classic-tension" src="../assets/tensions/tension_01.webp" alt="">';
+        lab.prepend(art);
+      }
+    }
     const activeStatus=activeScene.querySelector(':scope > .scene-head .status');
     const lossObserver=new MutationObserver(()=>{
       if(/отмычки закончились/i.test(activeStatus?.textContent||'')){

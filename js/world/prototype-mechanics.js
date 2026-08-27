@@ -74,6 +74,16 @@
     openMap();
   }
 
+  function leavePrototypeMechanic(){
+    if(!activePrototypeMechanic||!$prototypeMechanicOverlay)return;
+    activePrototypeMechanic=null;
+    $prototypeMechanicOverlay.hidden=true;
+    $prototypeMechanicLoss.hidden=true;
+    if($prototypeMechanicFrame)$prototypeMechanicFrame.src='about:blank';
+    document.body.classList.remove('prototype-mechanic-open');
+    setGameInactive(false);
+  }
+
   function replayPrototypeMechanic(){
     if(!activePrototypeMechanic||!$prototypeMechanicFrame)return;
     $prototypeMechanicLoss.hidden=true;
@@ -91,8 +101,10 @@
     const node=event.target.closest?.('.prototypeMechanicNode');
     if(node)travelToMapLocation(node.dataset.location);
   });
-  document.querySelector('#prototypeMechanicClose')?.addEventListener('click',closePrototypeMechanic);
   document.querySelector('#prototypeMechanicReplay')?.addEventListener('click',replayPrototypeMechanic);
+  ['#shopHudButton','#lairHudButton','#mapTab'].forEach(selector=>{
+    document.querySelector(selector)?.addEventListener('click',()=>leavePrototypeMechanic(),{capture:true});
+  });
 
   window.addEventListener('message',event=>{
     if(event.origin!==location.origin||event.source!==$prototypeMechanicFrame?.contentWindow||!activePrototypeMechanic)return;

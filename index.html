@@ -633,7 +633,7 @@
 </div>
 </div>
 </div>
-<div class="toast" id="toast"><span class="toastText" id="toastText"></span><button class="toastAction" id="toastAction" type="button">Новый замок</button></div>
+<div class="toast" id="toast"><span class="toastText" id="toastText"></span><button class="toastAction" id="toastAction" type="button" onclick="restartCurrentRound();document.querySelector('#toast')?.classList.remove('show','actionable')">Новый замок</button></div>
 <script src="js/core/state.js"></script>
 <script src="js/core/audio.js"></script>
 <script src="js/core/ui.js"></script>

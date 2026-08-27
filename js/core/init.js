@@ -348,7 +348,6 @@
   });
   mobileLayoutQuery.addEventListener?.('change',()=>closeMobileModeMenu());
 
-  $toastAction.onclick=()=>{ newLock(); $toast.classList.remove('show','actionable'); };
   $tabClassic.onclick=()=>switchMode('classic');
   $tabTarget.onclick=()=>switchMode('target');
   $tabLine.onclick=()=>switchMode('line');

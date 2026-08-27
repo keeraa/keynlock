@@ -12,6 +12,21 @@
     }
   }
 
+  function setToastActionLabel(label='Новый замок'){
+    if(!$toastAction) return;
+    $toastAction.innerHTML=typeof tablerIcon==='function'
+      ? `${tablerIcon('refresh',16)}<span>${label}</span>`
+      : `<span>${label}</span>`;
+  }
+
+  function showPickDepletedLoss(){
+    solved=true;
+    setGameInactive(true);
+    setGlobalTimer(false);
+    setToastActionLabel('Пройти заново');
+    toast('Отмычки закончились · вы проиграли',true);
+  }
+
   function updateEconomyUI(){
     $coinBalance.textContent=balance;
     $runReward.textContent=runReward;
@@ -116,9 +131,7 @@ renderInventoryTools();
     if(renderState) renderState();
 
     if(picks<=0){
-      solved=true;
-      toast('Отмычки закончились · проигрыш');
-      scheduleRoundAction(()=>newLock(false),1320);
+      showPickDepletedLoss();
       return {broke:true, kept, depleted:true};
     }
 

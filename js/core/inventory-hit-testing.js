@@ -379,12 +379,15 @@
     return typeOrder.find(type=>low.includes(type)) || null;
   }
   function currentRequiredTensionType(){
+    // Gothic's square frame is itself the tension clue on every tier. Keep
+    // that clue rotating even when higher-tier asset names carry no type.
+    if(mode==='g1') return roundTensionPatternType||'bar';
     const names=[currentLockBodyEntry().name,currentLockerEntry().name,currentPlateName()];
     for(const name of names){
       const type=extractTensionTypeFromText(name);
       if(type) return type;
     }
-    return null;
+    return roundTensionPatternType||null;
   }
   function selectedTensionType(){ return typeBySkin[tensionSkin] || null; }
   function tensionCompatible(){
@@ -428,9 +431,7 @@
     }
 
     if(picks<=0){
-      solved=true;
-      toast('Отмычки закончились · проигрыш');
-      scheduleRoundAction(()=>newLock(false),1320);
+      showPickDepletedLoss();
       return true;
     }
 

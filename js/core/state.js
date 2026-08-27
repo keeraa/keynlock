@@ -358,6 +358,8 @@ Object.keys(LOCKER_SKINS_BY_LEVEL).forEach(level=>{
 
 let roundLockBodySkin=0, roundLockerSkin=0;
 let currentMechanismLevel=1;
+const TENSION_PATTERN_TYPES=['bar','hook','kink','wave','angle'];
+let roundTensionPatternType='bar';
 const LAST_LOCK_BODY_KEY='lastRoundLockBodyName';
 const LAST_SHACKLE_KEY='lastRoundShackleName';
 let previousRoundLockBodyName=STORE.getItem(LAST_LOCK_BODY_KEY)||'';
@@ -383,6 +385,8 @@ function chooseRoundMechanismSkin(){
   const shacklePool=getSkinPoolByLevel(LOCKER_SKINS_BY_LEVEL,currentMechanismLevel);
   roundLockBodySkin=chooseNonRepeatingSkinIndex(bodyPool,previousRoundLockBodyName);
   roundLockerSkin=chooseNonRepeatingSkinIndex(shacklePool,previousRoundShackleName);
+  const tensionCandidates=TENSION_PATTERN_TYPES.filter(type=>type!==roundTensionPatternType);
+  roundTensionPatternType=tensionCandidates[rand(0,tensionCandidates.length-1)]||'bar';
   previousRoundLockBodyName=(bodyPool[roundLockBodySkin] && bodyPool[roundLockBodySkin].name) || '';
   previousRoundShackleName=(shacklePool[roundLockerSkin] && shacklePool[roundLockerSkin].name) || '';
   STORE.setItem(LAST_LOCK_BODY_KEY,previousRoundLockBodyName);

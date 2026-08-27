@@ -96,6 +96,7 @@ if(mode==='classic'){
   function beginRoundState(){
     activeRoundId++;
     setGameInactive(false);
+    setToastActionLabel('Новый замок');
     document.querySelectorAll('.mechanismZone, .sharedModeLockArt').forEach(el=>{
       el.classList.remove('opening','opened');
     });

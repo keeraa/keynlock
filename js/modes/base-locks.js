@@ -371,10 +371,8 @@ let plateEls=[], pinTopPlateEls=[];
     if(!keepsPosition) state=[...initial];
 
     if(picks<=0){
-      solved=true;
       render();
-      toast('Отмычки закончились · проигрыш');
-      scheduleRoundAction(()=>newLock(),1320);
+      showPickDepletedLoss();
       return;
     }
 

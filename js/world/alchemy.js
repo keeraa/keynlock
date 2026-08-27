@@ -641,6 +641,17 @@
 
     function sumAmountsV98(arr){return arr.reduce((a,b)=>a+b,0)}
     function setStatusHtmlV98(id,html){const el=doc.getElementById(id);if(el)el.innerHTML=html}
+    // A correct Check gets a shake-and-flash on the *current* bottle (the
+    // liquid id passed in is what setBg/setSingleLiquidLevelV88 already
+    // target, so this reuses the same id rather than needing its own).
+    // Retriggered by forcing a reflow between removing and re-adding the
+    // class, same trick as the element cell's own landing pop.
+    function triggerSuccessPulseV1(liquidId){
+      const tube=doc.getElementById(liquidId)?.closest('.test-tube');
+      if(!tube)return;
+      tube.classList.remove('successPulse');void tube.offsetWidth;tube.classList.add('successPulse');
+      setTimeout(()=>tube.classList.remove('successPulse'),650);
+    }
     function animateSceneLiquidV98(id,top,{animate=true,duration=900,intensity=.7}={}){setSingleLiquidLevelV88(id,top,{animate,duration,intensity})}
     function makeSingleActionBottleCardV98(name,color,count,buttonText,actionFn){
       const card=document.createElement('div');
@@ -719,7 +730,7 @@
       window.Alchemy?.clearSelection?.();
       setTargetElementHint('mixTargetElement');
       animateSceneLiquidV98('mixCurrent',mixLevelTopV88(),{animate:true,duration:560,intensity:.7});
-      setStatusHtmlV98('mixStatus','<strong>Новый цвет</strong>смешай его по образцу');
+      setStatusHtmlV98('mixStatus','');
     }
     doc.getElementById('mixCheck').onclick=()=>{
       const d=colorDistance(simpleMixColor(mixAmts),mixGoal.rgb),colorOk=d<38;
@@ -729,7 +740,7 @@
       setStatusHtmlV98('mixStatus',ok?`<strong>Совпало: ${mixGoal.name}</strong>цвет получен`:
         !colorOk?'<strong>Мимо</strong>цвет отличается от образца':
         '<strong>Не тот металл</strong>цвет верный, но элемент не совпадает с целью');
-      if(!ok)breakFlask('Неверное смешение');
+      if(ok)triggerSuccessPulseV1('mixCurrent');else breakFlask('Неверное смешение');
     };
     doc.getElementById('mixReset').onclick=newMixRound;drawMix();setTargetElementHint('mixTargetElement');animateSceneLiquidV98('mixCurrent',mixLevelTopV88(),{animate:false});
 
@@ -754,7 +765,7 @@
       window.Alchemy?.clearSelection?.();
       setTargetElementHint('unknownTargetElement');
       animateSceneLiquidV98('unknownCurrent',unknownLevelTopV88(),{animate:true,duration:560,intensity:.7});
-      setStatusHtmlV98('unknownStatus','<strong>Новая партия</strong>силы реагентов снова скрыты');
+      setStatusHtmlV98('unknownStatus','');
     }
     doc.getElementById('unknownCheck').onclick=()=>{
       const d=colorDistance(simpleMixColor(unkEffective()),unkGoal.rgb),colorOk=d<40;
@@ -764,7 +775,7 @@
       setStatusHtmlV98('unknownStatus',ok?`<strong>Получен ${unkGoal.name}</strong>концентрации разгаданы`:
         !colorOk?'<strong>Неточно</strong>нужно скорректировать капли':
         '<strong>Не тот металл</strong>концентрации верны, но элемент не совпадает с целью');
-      if(!ok)breakFlask('Партия испорчена');
+      if(ok)triggerSuccessPulseV1('unknownCurrent');else breakFlask('Партия испорчена');
     };
     doc.getElementById('unknownReset').onclick=rerollUnknown;rerollUnknown();
 
@@ -790,7 +801,7 @@
       window.Alchemy?.clearSelection?.();
       setTargetElementHint('sepTargetElement');
       animateSceneLiquidV98('sepCurrent',separationLevelTopV88(),{animate:true,duration:560,intensity:.7});
-      setStatusHtmlV98('sepStatus',`<strong>Новая цель: ${sepGoal.name}</strong>убери лишние примеси`);
+      setStatusHtmlV98('sepStatus','');
     }
     doc.getElementById('sepCheck').onclick=()=>{
       const cleanOk=sepImp.every(v=>v===0);
@@ -800,7 +811,7 @@
       setStatusHtmlV98('sepStatus',ok?`<strong>Очищено до ${sepGoal.name}</strong>примеси удалены`:
         !cleanOk?'<strong>Ещё есть примеси</strong>продолжай фильтрацию':
         '<strong>Не тот металл</strong>примеси убраны, но элемент не совпадает с целью');
-      if(!ok)breakFlask('Смесь очищена неверно');
+      if(ok)triggerSuccessPulseV1('sepCurrent');else breakFlask('Смесь очищена неверно');
     };
     doc.getElementById('sepReset').onclick=resetSeparation;resetSeparation();
 

@@ -46,7 +46,7 @@
    left, ~37-47% right, ~15-27% top, ~12-17% bottom across the four —
    the neck rim height is what varies most between them, so top is the
    least precise of the four numbers on any single tube. */
-.alchemyRoot .side-color-controls .mini-liquid-layer{position:absolute!important;left:36%!important;right:42%!important;top:9%!important;bottom:6%!important;z-index:1!important;border-radius:5px 5px 15px 15px!important;background:linear-gradient(90deg,rgba(255,255,255,.16),transparent 35%,rgba(255,255,255,.04)),var(--tube-fill,#c6beac)!important;box-shadow:inset 5px 0 9px rgba(255,255,255,.08),inset 0 -8px 12px rgba(0,0,0,.10)!important;}.alchemyRoot .side-color-controls .mini-frame-layer{position:absolute!important;inset:0!important;z-index:4!important;background:var(--mini-frame) center/100% 100% no-repeat!important;filter:drop-shadow(0 0 1px rgba(255,255,255,.22)) drop-shadow(0 2px 3px rgba(0,0,0,.35));pointer-events:none!important;}.alchemyRoot .side-color-controls .tube-count{position:absolute!important;inset:0!important;display:grid!important;place-items:center!important;z-index:6!important;font-size:10.5px!important;font-weight:700!important;color:#f5e9c8!important;text-shadow:0 2px 8px rgba(0,0,0,.65)!important;}.alchemyRoot .scene[data-name="Смешение"] .test-tube.tube-lg, .alchemyRoot .scene[data-name="Концентрации"] .test-tube.tube-lg, .alchemyRoot .scene[data-name="Разделение"] .test-tube.tube-lg{width:96px!important;height:224px!important;margin-top:0!important;margin-bottom:10px!important;}
+.alchemyRoot .side-color-controls .mini-liquid-layer{position:absolute!important;left:25%!important;right:31%!important;top:9%!important;bottom:6%!important;z-index:1!important;border-radius:5px 5px 15px 15px!important;background:linear-gradient(90deg,rgba(255,255,255,.16),transparent 35%,rgba(255,255,255,.04)),var(--tube-fill,#c6beac)!important;box-shadow:inset 5px 0 9px rgba(255,255,255,.08),inset 0 -8px 12px rgba(0,0,0,.10)!important;}.alchemyRoot .side-color-controls .mini-frame-layer{position:absolute!important;inset:0!important;z-index:4!important;background:var(--mini-frame) center/100% 100% no-repeat!important;filter:drop-shadow(0 0 1px rgba(255,255,255,.22)) drop-shadow(0 2px 3px rgba(0,0,0,.35));pointer-events:none!important;}.alchemyRoot .side-color-controls .tube-count{position:absolute!important;inset:0!important;display:grid!important;place-items:center!important;z-index:6!important;font-size:10.5px!important;font-weight:700!important;color:#f5e9c8!important;text-shadow:0 2px 8px rgba(0,0,0,.65)!important;}.alchemyRoot .scene[data-name="Смешение"] .test-tube.tube-lg, .alchemyRoot .scene[data-name="Концентрации"] .test-tube.tube-lg, .alchemyRoot .scene[data-name="Разделение"] .test-tube.tube-lg{width:96px!important;height:224px!important;margin-top:0!important;margin-bottom:10px!important;}
 /* Colour settles slower than the pour: the mix is still moving toward its
    final level when it snaps to the wrong hue, and a quick fade read as a
    glitch rather than blending. */
@@ -104,7 +104,7 @@
    it (and its mask, riding along in the same transform) back inside the
    line instead of regenerating the mask over it — percentages here are
    of .tube-liquid's own box, per feedback against a screenshot. */
-.alchemyRoot .test-tube.tube-lg > .tube-liquid{transform:translate(-2%,-3%);}
+.alchemyRoot .test-tube.tube-lg > .tube-liquid{transform:translate(-2%,-2%);}
 
 /* The prototype showed one scene at a time through its own chrome; here the
    lair window is the frame, so only the chosen station is in the flow. */
@@ -299,7 +299,14 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    whatever the right-hand label happened to say. Absolute removes the label
    from that math entirely — both boxes are exactly tube-width, every time. */
 .alchemyRoot .tube-box{position:relative;}
-.alchemyRoot .swatch-label{color:#9d8d75;font:5.5px/1 inherit;letter-spacing:.02em;
+/* "цель"/"текущая смесь"/"получилось"/"грязная смесь" — dropped per
+   feedback, same reasoning as the reagent names and .lab h3 above: the
+   bottles' own position (left=target, right=current) and the verdict
+   text already say what's what. display:none rather than deleting the
+   rule: the --label-raise token above still exists for a future revival,
+   and nothing else depends on this element occupying space (it was
+   already taken out of flow, see the comment below). */
+.alchemyRoot .swatch-label{display:none;color:#9d8d75;font:5.5px/1 inherit;letter-spacing:.02em;
   position:absolute;top:100%;left:50%;translate:-50% var(--label-raise,0);
   margin-top:6px;white-space:nowrap;}
 /* The element a round is built around — a planet-sigil label stuck on the
@@ -469,6 +476,30 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    rule takes back over on its own. */
 @keyframes elementCellLandV1{0%{scale:.6}55%{scale:1.12}100%{scale:1}}
 .alchemyRoot .alchemyElementCell.landing{animation:elementCellLandV1 .32s cubic-bezier(.34,1.56,.64,1);}
+
+/* A correct Check shakes and flashes the *current* bottle (js/world/
+   alchemy.js triggerSuccessPulseV1). Shakes via `translate` alone, each
+   keyframe re-reading var(--bench-raise) so the bottle's own "stand on
+   the table" raise (positioning tokens, above) isn't lost mid-shake — an
+   animated `transform:` shorthand would replace the static translate/
+   scale individual properties wholesale for its duration instead of
+   composing with them. `scale` itself is left alone (not listed in any
+   keyframe), so the bottle's normal size holds throughout. */
+@keyframes alchemySuccessShakeV1{
+  0%,100%{translate:0 var(--bench-raise,0);}
+  15%{translate:-4px var(--bench-raise,0);}
+  30%{translate:4px var(--bench-raise,0);}
+  45%{translate:-3px var(--bench-raise,0);}
+  60%{translate:3px var(--bench-raise,0);}
+  80%{translate:-1px var(--bench-raise,0);}
+}
+@keyframes alchemySuccessFlashV1{
+  0%,100%{filter:brightness(1) drop-shadow(0 0 0 rgba(255,224,140,0));}
+  40%{filter:brightness(1.55) drop-shadow(0 0 16px rgba(255,224,140,.9));}
+}
+.alchemyRoot .test-tube.successPulse{
+  animation:alchemySuccessShakeV1 .6s ease,alchemySuccessFlashV1 .6s ease;
+}
 
 @media (max-width:760px){
   /* The top shelf (target/current bottles) sits lower, off the station

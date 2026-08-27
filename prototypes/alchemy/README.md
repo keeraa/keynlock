@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v337)
+## Where this stands (v338)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -1274,6 +1274,31 @@ px off the reagent tubes' shared bottom line — both confirmed against
 `getBoundingClientRect()` before and after, not eyeballed. `.target-
 element-hint` (the planet label on the target bottle) moved from
 `top:65%` to `top:55%`.
+
+**v338 — a success beat, and the last of the printed labels.** A correct
+Check now shakes and flashes the *current* bottle
+(`triggerSuccessPulseV1`, keyed off the same liquid id `setBg`/
+`setSingleLiquidLevelV88` already use, so it needs no new id of its own).
+The shake keyframes read `var(--bench-raise)` at every step instead of
+animating the bare `transform` shorthand — same reasoning as the element
+cell's own landing pop (v337): the bottle's "stand on the table" raise
+lives in the individual `translate`/`scale` properties now (v335), and an
+animated `transform:` would replace them wholesale for the animation's
+duration instead of composing with them. `scale` isn't touched by any
+keyframe, so the bottle doesn't change size mid-shake either. `.swatch-
+label` ("цель"/"текущая смесь"/"получилось"/"грязная смесь") is
+`display:none` now, matching every other per-bottle caption dropped
+earlier (reagent names, `.lab h3`) — the bottle's own position already
+says target vs. current. The three stations' status lines started with
+their own static heading in `index.html` (`<strong>Подбери оттенок</strong>
+и проверь смесь` etc.) *and* a second, JS-set one on every reset
+(`<strong>Новый цвет</strong>...`) — both emptied out now, so the strip
+stays blank until a real Check outcome ("Совпало"/"Мимо"/"Не тот металл"
+etc., untouched) has something to say. `.test-tube.tube-lg > .tube-
+liquid`'s translate compensation (v332's flood-fill fix) nudged from
+`-3%` to `-2%` on the Y axis. `.mini-liquid-layer`'s left/right insets
+(36%/42%, the v333 average across four tube drawings) tightened to
+25%/31%, doubling the visible liquid column's width.
 
 ## Two things that cost hours — do not rediscover them
 

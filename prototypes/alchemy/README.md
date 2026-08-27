@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v326)
+## Where this stands (v327)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -889,6 +889,43 @@ balloon a card or leave a mismatched flow height either way, so all of
 that — plus three now-pointless leftover `min-height`/`font-size`
 tweaks on an invisible element, one wide, one short-screen, one already
 dead — came out with it.
+
+**v327: a picked bottle now leaves the shelf instead of just glowing on
+it.** Once an element is on the table (in the station's own slot), it
+reads oddly to still see it standing in the rack too — `.selected` used
+to raise it and add a gold glow in place; now it's `opacity:0;
+pointer-events:none` instead, an empty gap where it stood. Picking a
+*different* bottle still works exactly as before (`select()` toggles
+`.selected` across all seven, so the old pick's opacity comes back the
+moment a new one takes over) — the only thing that changed is what
+"selected" looks like, not the one-at-a-time selection logic itself.
+
+**Mobile's three shelves get the same two moves this file has made for
+the wide layout a dozen times now: pushed down, and let loose sideways.**
+The top shelf (target/current bottles) drops further from the station
+tabs — `margin-top` on the *panel*, not on `.tube-pair` inside it (that's
+a separate, already-existing knob that only moves the bottles within the
+shelf) — and immediately uncovered a second bug: `.scene.active > .lab`
+carries the base rule's `flex:1 1 auto!important` (written for the wide
+grid, where `.lab` is one capped-height column that legitimately needs
+to shrink+scroll), and on mobile nothing actually constrains `.scene`'s
+height enough to make that shrink meaningful — except now it did,
+compressing `.lab`'s own box shorter than its (pushed-down, raised)
+content actually needed and letting the *next* shelf's opening edge
+land on top of the still-visible target-element-hint text. `flex-shrink:
+0!important` locks it to its natural content height instead — needed
+`!important` to beat the base rule's own, an equal-specificity fight
+where only source order would otherwise decide and the base rule sits
+later in the file.
+
+All three shelves also lose the `margin-left`/`margin-right` that used
+to stop at `.lairModuleBody`'s own 12px padding (`css/overrides-04-
+universal-lock.css`, shared with every lair panel) — a matching negative
+margin cancels it, so the wood runs edge-to-edge with the window instead
+of floating in from both sides. Each panel's own inner `padding` (`.lab`,
+`.alchemyReagents`, `.alchemyElementColumn`) is untouched, so the actual
+content — bottles, reagent tubes, buttons — keeps the same clearance from
+the wood's own edge as before; only the wood itself got wider.
 
 ## Two things that cost hours — do not rediscover them
 

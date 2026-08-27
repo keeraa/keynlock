@@ -400,6 +400,29 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
 .alchemyRoot .alchemyElementCell.filled .alchemyElementCellHint{display:none;}
 
 @media (max-width:760px){
+  /* The top shelf (target/current bottles) sits lower, off the station
+     tabs, per feedback — margin-top on the panel itself, not the bottles
+     inside it (that's .tube-pair's own margin-top below), so it moves the
+     whole block including its background wood. */
+  /* flex-shrink:0: the base rule's .scene.active > .lab{flex:1 1 auto} is
+     meant for the wide layout, where .lab is one column in a height-capped
+     grid row and legitimately needs to shrink+scroll. Stacked on mobile
+     nothing caps .scene's height (the whole modal body scrolls instead),
+     but the shrink behavior still applied — .lab's own box could compress
+     shorter than its raised bottles actually need, and the *next* panel
+     (positioned right after .lab's own, now-too-short, box in normal
+     flow) started overlapping the target-element-hint text still hanging
+     below it. Locked to its natural content height instead. */
+  .alchemyRoot .scene.active > .lab.color-game-lab{margin-top:20%;flex-shrink:0!important;}
+  /* Full width instead of stopping at .lairModuleBody's own 12px padding
+     (css/overrides-04-universal-lock.css, shared with every lair panel) —
+     per feedback the three shelves shouldn't be boxed in left/right.
+     Negative margin cancels exactly that padding; the panels' own inner
+     padding (.lab/.alchemyReagents/.alchemyElementColumn) keeps their
+     actual content off the wood's own edge same as before. */
+  .alchemyRoot .scene.active > .lab.color-game-lab,
+  .alchemyRoot .scene.active > .alchemyReagents,
+  .alchemyRoot .scene.active > .alchemyElementColumn{margin-left:-12px;margin-right:-12px;}
   .alchemyRoot .tube-pair{gap:24px;}
   .alchemyRoot .color-controls{gap:8px;}
   .alchemyRoot .color-card{width:66px;}
@@ -889,20 +912,20 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
   transform:translateX(-50%);
   background:none;border:0;padding:0;margin:0;cursor:pointer;
   filter:drop-shadow(0 10px 10px rgba(0,0,0,.4));
-  transition:transform .16s ease,filter .16s ease;
+  transition:transform .16s ease,filter .16s ease,opacity .16s ease;
 }
 .alchemyRackDrawerBottle img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;}
 .alchemyRackDrawerBottle:hover{transform:translateX(-50%) translateY(-5px);}
-/* Raised well above the others, not just glowing in place: the medallion —
-   the only thing that says *which* element this is, since the shelf carries
-   no printed names — sits partway down the bottle, inside the ring. At the
-   same height as its neighbours it can still be sitting below the peek
-   line while merely lifted by approach. Selected always clears that. */
+/* Once picked, the bottle is standing on the table (the element cell), not
+   sitting on this shelf any more — hidden instead of just glowing in place,
+   per feedback. pointer-events:none so the empty slot it leaves behind
+   isn't a dead click target; picking a *different* bottle still works
+   (select() below un-hides this one and hides the new pick instead), the
+   only way back is choosing another element. */
 .alchemyRackDrawerBottle.selected{
-  transform:translateX(-50%) translateY(-22px);
-  filter:drop-shadow(0 0 10px var(--gold,#d9a74c)) drop-shadow(0 8px 10px rgba(0,0,0,.4));
+  opacity:0;
+  pointer-events:none;
 }
-.alchemyRackDrawerBottle.selected:hover{transform:translateX(-50%) translateY(-27px);}
 /* Ring centres, measured from rack-back.png at 1614px width. Three earlier
    passes: v296 eyeballed a gridline overlay (200, 412, 623, 835, 1047,
    1258, 1470 — a guessed 212px step that compounded, ring 1 close and ring

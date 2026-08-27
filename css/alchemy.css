@@ -460,6 +460,15 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
 .alchemyRoot .alchemyElementCellHint{font-size:1.6em;line-height:1;color:rgba(217,167,76,.55);}
 .alchemyRoot .alchemyElementCell.filled{border-style:solid;border-color:rgba(217,167,76,.6);background-color:transparent;}
 .alchemyRoot .alchemyElementCell.filled .alchemyElementCellHint{display:none;}
+/* A bottle landing in the cell (js/world/alchemy.js, drag-drop or a plain
+   click-select both trigger this) pops in rather than just appearing —
+   animates the `scale` custom property directly, not `transform`, so it
+   doesn't fight the cell's own token-driven translate/scale (the "stand
+   on the table" raise, above) the way a `transform:` keyframe would; once
+   the animation ends (no fill-mode) the static scale:var(--element-scale)
+   rule takes back over on its own. */
+@keyframes elementCellLandV1{0%{scale:.6}55%{scale:1.12}100%{scale:1}}
+.alchemyRoot .alchemyElementCell.landing{animation:elementCellLandV1 .32s cubic-bezier(.34,1.56,.64,1);}
 
 @media (max-width:760px){
   /* The top shelf (target/current bottles) sits lower, off the station

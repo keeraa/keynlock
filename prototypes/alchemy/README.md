@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v335)
+## Where this stands (v336)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -1202,6 +1202,49 @@ everything the three live stations actually touch — `.tube-liquid`,
 v44`, `.liquid-burst-v13`/`.liquid-bubble-v13`, `.liquid-surface-pulse-
 v83`, `.tab`, `.ctl` — and their keyframes stayed. The 138+ live station-
 layout section and the rack drawer were untouched.
+
+**The rack's pick is per-station now, not shared** (v336) — picking a
+bottle in Mixing no longer also fills Concentrations' and Separation's
+element cells. `window.Alchemy.selectedElement` used to be one value read
+by all three Check handlers and painted onto every `.alchemyElementCell`
+at once; it's a `get`/`set` accessor now over `window.Alchemy.selections`,
+a plain object keyed by the active scene's `dataset.name` — every existing
+read/write site (`applyElement`, `clearSelection`, the three Check
+handlers) kept working unchanged since the name didn't move, only what it
+resolves against. `applySelection()` paints only the currently-active
+scene's own cell and Check button; each scene starts from its own stored
+entry (all empty at boot) rather than one shared flag, and switching
+station tabs re-syncs the rack's single highlighted bottle to match
+whichever station just became active (`window.Alchemy.syncRackSelection`,
+called from the tab-switcher's own `show(i)`).
+
+**Fixed the drag ghost rendering huge with a blank patch where the bottle
+should be.** `ghost.className = 'alchemyRackDrawerBottleDragGhost'` wasn't
+adding a class to the clone, it was *replacing* every class already on
+it — including `.alchemyRackDrawerBottle`, which is what
+`.alchemyRackDrawerBottle img{width:100%;height:100%;object-fit:contain}`
+needs to match to keep the `<img>` inside scaled to its box. Losing it
+left the image at its own intrinsic pixel size with nothing constraining
+it — hundreds of px of source art, mostly transparent glass, reading as
+an oversized pale rectangle. `classList.add()` instead of `className=`
+keeps the original classes and layers the ghost-specific ones (fixed
+position, extra shadow, no pointer-events) on top, same as any other
+class-stacking in this file.
+
+**Dropping a bottle on a cell now flies there instead of just appearing.**
+On drop, the ghost transitions its own `left`/`top`/`transform`/`opacity`
+from the pointer's last position to the target cell's center over ~240ms
+(scaled down to the cell's own rendered height along the way, `getBoundingClientRect()`
+on both ends so it also matches a scaled cell, e.g. the wide layout's
+`scale(1.1)`), then the real selection is painted once it lands —
+`setTimeout` matches the transition's own duration rather than firing
+immediately, so the ghost and the landed art don't overlap mid-flight. A
+short `@keyframes elementCellLandV1` pop plays on the cell the moment it
+actually fills (drag or a plain click-select both trigger it) — animates
+the `scale` custom property directly rather than `transform`, so it
+doesn't fight the cell's own token-driven `translate`/`scale` (the
+positioning tokens from v335) the way an animated `transform:` shorthand
+would.
 
 ## Two things that cost hours — do not rediscover them
 

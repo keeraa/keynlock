@@ -1124,6 +1124,26 @@
   };
   })();
 
+/* One bottle per station, not one bottle for all three: each of the color-
+   game scenes carries its own element cell (reframe(), below), so the
+   choice should stick to whichever station is showing when it's made.
+   window.Alchemy.selectedElement stays the read/write name every Check
+   handler already uses — it's now an accessor over a per-station map
+   instead of one shared value, so picking (or resetting) in Mixing can no
+   longer plant — or clear — a bottle in Separation. */
+(function(){
+  window.Alchemy = window.Alchemy || {};
+  window.Alchemy.selections = window.Alchemy.selections || {};
+  function activeStationKey(){
+    return document.querySelector('#alchemyRoot .scene.active')?.dataset.name || '';
+  }
+  Object.defineProperty(window.Alchemy, 'selectedElement', {
+    configurable:true,
+    get(){ return window.Alchemy.selections[activeStationKey()] || null; },
+    set(v){ window.Alchemy.selections[activeStationKey()] = v || null; }
+  });
+})();
+
 /* Station switching inside the lair panel. Only three of the ten are wired up,
    so this drives them by index over whatever scenes are present. */
 (function(){
@@ -1134,6 +1154,10 @@
   function show(i){
     tabs.forEach((t, n) => t.classList.toggle('active', n === i));
     scenes().forEach((s, n) => s.classList.toggle('active', n === i));
+    // The rack itself is one shared strip of UI — its highlighted bottle
+    // has to catch up to whichever station just became active, since the
+    // selection underneath is per-station now (see the accessor above).
+    window.Alchemy?.syncRackSelection?.();
   }
   // The prototype was a catalogue: every station carried its own heading and
   // status line because they scrolled past one another. Here the window is the
@@ -1248,7 +1272,13 @@
         if(!dragging && Math.hypot(ev.clientX - startX, ev.clientY - startY) > 8){
           dragging = true;
           ghost = b.cloneNode(true);
-          ghost.className = 'alchemyRackDrawerBottleDragGhost';
+          // Adding the ghost class rather than replacing className outright:
+          // .alchemyRackDrawerBottle img{width:100%;height:100%;object-fit:
+          // contain} only matches while the clone still carries that class
+          // too. Dropped, the <img> fell back to its own intrinsic pixel
+          // size — hundreds of px of source art with no containing box to
+          // scale it, which is the "huge bottle with a white square" bug.
+          ghost.classList.add('alchemyRackDrawerBottleDragGhost');
           ghost.style.width = b.offsetWidth + 'px';
           ghost.style.height = b.offsetHeight + 'px';
           document.body.appendChild(ghost);
@@ -1268,8 +1298,26 @@
         suppressClick = true;
         const cell = document.elementFromPoint(ev.clientX, ev.clientY)?.closest('.alchemyElementCell');
         clearDragOver();
-        ghost.remove();
-        if(cell) select(b);
+        if(cell){
+          // Flies from wherever the pointer let go to the cell it landed
+          // on and shrinks to match it, instead of the bottle just
+          // vanishing and the cell art popping in cold. select() (which
+          // paints the cell) waits for the flight to land so the two
+          // don't visually overlap mid-transit.
+          const cellRect = cell.getBoundingClientRect();
+          const scale = Math.min(1, cellRect.height / b.offsetHeight);
+          ghost.style.transition = 'left .24s cubic-bezier(.3,.6,.28,1),top .24s cubic-bezier(.3,.6,.28,1),transform .24s cubic-bezier(.3,.6,.28,1),opacity .24s ease .06s';
+          void ghost.offsetWidth; // force the start position to commit before animating
+          ghost.style.left = (cellRect.left + cellRect.width / 2) + 'px';
+          ghost.style.top = (cellRect.top + cellRect.height / 2) + 'px';
+          ghost.style.transform = `translate(-50%,-50%) scale(${scale})`;
+          ghost.style.opacity = '0';
+          setTimeout(() => { ghost.remove(); select(b); }, 240);
+        } else {
+          ghost.style.transition = 'opacity .16s ease';
+          ghost.style.opacity = '0';
+          setTimeout(() => ghost.remove(), 160);
+        }
       };
       document.addEventListener('pointermove', onMove);
       document.addEventListener('pointerup', onUp);
@@ -1281,15 +1329,24 @@
   // the open logic.
   window.Alchemy = window.Alchemy || {};
   window.Alchemy.openRackDrawer = () => setOpen(true);
-  // Reset/Новая партия/Новая смесь put the bottle back on the shelf —
-  // standing on the table was tied to *this* round, and a fresh round
-  // hasn't picked one yet. Shared across all three stations (the
-  // selection always was, see the comment above the next IIFE), so
-  // resetting any one station clears it for all of them.
+  // Reset/Новая партия/Новая смесь put the bottle back on the shelf — a
+  // fresh round hasn't picked one yet. Only the resetting station's own
+  // selection clears (the accessor above resolves selectedElement=null
+  // against whichever station is active, i.e. this one), so the rack's
+  // single highlighted bottle — which only ever reflects the active
+  // station's own pick — is what needs un-highlighting here too.
   window.Alchemy.clearSelection = () => {
     bottles.forEach(b => b.classList.remove('selected'));
     window.Alchemy.selectedElement = null;
     window.Alchemy.applySelection?.(null);
+  };
+  // Switching stations doesn't touch any selection, but the rack is one
+  // shared strip of UI shown regardless of which station is active — its
+  // highlighted bottle has to catch up to whatever *that* station last
+  // picked (or didn't).
+  window.Alchemy.syncRackSelection = () => {
+    const el = window.Alchemy.selectedElement;
+    bottles.forEach(b => b.classList.toggle('selected', !!el && b.dataset.element === el));
   };
 })();
 
@@ -1298,16 +1355,27 @@
    and the check button) that has to hold one of the rack's seven elements
    before its Check button will do anything. Clicking an empty cell opens
    the rack the same way clicking the drawer's own peek does; picking a
-   bottle there (see the IIFE above) fills every station's cell at once —
-   the choice isn't per-station, so there's one selection to keep in sync,
-   not three. */
+   bottle there (see the accessor IIFE above) now fills only the station
+   that was showing when it was picked — each scene's own cell and Check
+   button are painted from that scene's own stored selection, not a shared
+   one. */
 (function(){
-  const cells = [...document.querySelectorAll('.alchemyElementCell')];
-  const checks = [document.querySelector('#mixCheck'), document.querySelector('#unknownCheck'), document.querySelector('#sepCheck')].filter(Boolean);
-  if(!cells.length) return;
+  const scenes = [...document.querySelectorAll('#alchemyRoot .scene')];
+  if(!scenes.length) return;
 
-  function applySelection(element){
-    cells.forEach(cell => {
+  // .big-actions holds exactly two buttons per station — Проверить (plain
+  // .ctl) and the reset icon (.ctl.ctl-icon) — so :not(.ctl-icon) finds
+  // this scene's own Check button without hardcoding its id.
+  function stationParts(scene){
+    return {
+      cell: scene.querySelector('.alchemyElementCell'),
+      checkBtn: scene.querySelector('.big-actions .ctl:not(.ctl-icon)')
+    };
+  }
+
+  function paint(cell, checkBtn, element){
+    if(cell){
+      const wasFilled = cell.classList.contains('filled');
       if(element){
         cell.classList.add('filled');
         // Root-relative, not "assets/...": a relative url() written into a
@@ -1316,17 +1384,40 @@
         // not the page — the relative form landed inside css/ itself, a 404.
         cell.style.setProperty('--element-bottle-img', `url("/assets/alchemy/bottle-${element}.png")`);
         cell.setAttribute('aria-label', `Элемент: ${element.charAt(0).toUpperCase()+element.slice(1)} · сменить`);
+        // A brief landing pop, same trigger whether the bottle arrived by
+        // drag or by a plain click-select — retriggered by forcing a
+        // reflow between removing and re-adding the class, since re-adding
+        // an already-present class doesn't restart a CSS animation.
+        if(!wasFilled){
+          cell.classList.remove('landing'); void cell.offsetWidth; cell.classList.add('landing');
+          setTimeout(() => cell.classList.remove('landing'), 340);
+        }
       } else {
         cell.classList.remove('filled');
         cell.style.removeProperty('--element-bottle-img');
         cell.setAttribute('aria-label', 'Добавить элемент из стойки');
       }
-    });
-    checks.forEach(btn => { btn.disabled = !element; });
+    }
+    if(checkBtn) checkBtn.disabled = !element;
+  }
+
+  function applySelection(element){
+    // Only the active scene reacts: picking/clearing always targets
+    // whichever station is showing (window.Alchemy.selectedElement's
+    // setter already resolved `element` against that same station).
+    const scene = document.querySelector('#alchemyRoot .scene.active');
+    if(!scene) return;
+    const {cell, checkBtn} = stationParts(scene);
+    paint(cell, checkBtn, element);
   }
   window.Alchemy = window.Alchemy || {};
   window.Alchemy.applySelection = applySelection;
-  applySelection(window.Alchemy.selectedElement);
 
-  cells.forEach(cell => cell.addEventListener('click', () => window.Alchemy.openRackDrawer?.()));
+  // Each station starts from its own stored selection (all empty at
+  // boot), independently of the others.
+  scenes.forEach(scene => {
+    const {cell, checkBtn} = stationParts(scene);
+    paint(cell, checkBtn, window.Alchemy.selections?.[scene.dataset.name] || null);
+    cell?.addEventListener('click', () => window.Alchemy.openRackDrawer?.());
+  });
 })();

@@ -525,6 +525,21 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
   .alchemyRoot .scene.active > .lab.color-game-lab,
   .alchemyRoot .scene.active > .alchemyReagents,
   .alchemyRoot .scene.active > .alchemyElementColumn{margin-left:-12px;margin-right:-12px;}
+  /* The -12px above only cancels .lairModuleBody's own padding — the
+     window itself still sat inset from the true screen edge by another
+     8px a side (css/overrides-04-universal-lock.css's shared mobile
+     #lairModuleWindow{width:calc(100vw - 16px)}, meant to keep *other*
+     lair panels' visible card border off the bezel). Alchemy already
+     strips that window chrome entirely (border/shadow/background, see
+     the :has() rule below), so there's no border left for the 8px to
+     protect here — just the wood shelves stopping short of the edge with
+     a strip of unrelated blurred room behind them showing through. An ID
+     beats the shared rule's plain class regardless of !important vs.
+     !important, so this doesn't need to fight specificity, only exist. */
+  #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active){
+    width:100vw!important;
+    border-radius:0!important;
+  }
   .alchemyRoot .tube-pair{gap:24px;}
   .alchemyRoot .color-controls{gap:8px;}
   .alchemyRoot .color-card{width:66px;}
@@ -561,7 +576,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      to the target/current bottles — nothing here actually needs to
      scroll at this width. */
   .alchemyRoot .scene.active > .lab.color-game-lab{overflow:visible!important;}
-  .alchemyRoot{--bench-raise:-27px;--label-raise:-27px;--reagent-raise:-20px;}
+  .alchemyRoot{--bench-raise:-32px;--label-raise:-32px;--reagent-raise:-24px;}
   /* Bigger, and no dashed placeholder ring around it — the bottle art
      (once filled) already says "something is here," per feedback. */
   .alchemyRoot .alchemyElementCell{width:clamp(42px,5.4vh,60px);border:none;}

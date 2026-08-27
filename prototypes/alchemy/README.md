@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v338)
+## Where this stands (v339)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -1299,6 +1299,26 @@ liquid`'s translate compensation (v332's flood-fill fix) nudged from
 `-3%` to `-2%` on the Y axis. `.mini-liquid-layer`'s left/right insets
 (36%/42%, the v333 average across four tube drawings) tightened to
 25%/31%, doubling the visible liquid column's width.
+
+**v339 — mobile: bottles raised, shelves to the true edge.** The bench/
+reagent/label raise tokens on mobile went up 20% (-27px/-27px/-20px →
+-32px/-32px/-24px). The bigger find: the wood shelves' own negative
+margin (`-12px`, cancelling `.lairModuleBody`'s padding) only reached the
+*window's* own edge — `#lairModuleWindow` itself still sat inset from the
+true screen edge by another 8px a side, a shared mobile rule in
+`css/overrides-04-universal-lock.css` (`width:calc(100vw - 16px)`) meant
+to keep *other* lair panels' visible card border off the bezel. Alchemy
+already strips that window's border/shadow/background entirely once its
+panel is active (`:has()` rule further down this file), so there was no
+border left for the 8px to protect — just a strip of the blurred room
+behind the window showing through past the wood texture's own edge.
+Added an alchemy-scoped `#lairModuleWindow:has(...){width:100vw}` in the
+same mobile media query; an ID beats the shared rule's plain class
+regardless of `!important` on both sides, and it's gated to the same
+`:has(.lairPanel[data-lair-panel="alchemy"].active)` every other window-
+chrome override in this file already uses, so every other lair panel
+(dialogue, map, team) keeps its normal inset card — confirmed live,
+unaffected.
 
 ## Two things that cost hours — do not rediscover them
 

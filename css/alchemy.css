@@ -609,7 +609,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      to the target/current bottles — nothing here actually needs to
      scroll at this width. */
   .alchemyRoot .scene.active > .lab.color-game-lab{overflow:visible!important;}
-  .alchemyRoot{--bench-raise:-32px;--label-raise:-32px;--reagent-raise:-24px;}
+  .alchemyRoot{--bench-raise:-70px;--label-raise:-70px;--reagent-raise:-55px;--element-raise:-40px;}
   /* Bigger, and no dashed placeholder ring around it — the bottle art
      (once filled) already says "something is here," per feedback. */
   .alchemyRoot .alchemyElementCell{width:clamp(42px,5.4vh,60px);border:none;}

@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v340)
+## Where this stands (v341)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -1339,7 +1339,17 @@ banner at the legacy/live boundary listing which pre-boundary classes are
 still load-bearing — both promised back in v335's plan and never actually
 written, since that round got pulled into the dead-code audit instead.
 
-## Two things that cost hours — do not rediscover them
+**v341 — mobile bottles raised again.** v339's +20% mobile raise
+(`--bench-raise`/`--label-raise`/`--reagent-raise`: -27px/-27px/-20px →
+-32px/-32px/-24px) still left each shelf panel with 80-100px of empty
+wood below the bottle that was standing on it (measured live via
+`getBoundingClientRect()` against each panel's own box). Raised further
+— -70px/-70px/-55px — and gave the element cell a mobile raise for the
+first time (`--element-raise:-40px`; it had none before, standing at its
+un-raised table level while the other two shelves lifted). Confirmed the
+bench bottle doesn't clip against the panel's own top edge even though it
+now pokes slightly above it (`.scene.active > .lab.color-game-lab{
+overflow:visible!important}`, already in place for exactly this).
 
 **The class names leak both ways.** Eleven are shared with the game. Scoping
 this stylesheet under `.alchemyRoot` keeps alchemy out of the game, and that

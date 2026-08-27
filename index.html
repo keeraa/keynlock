@@ -21,6 +21,7 @@
 <link rel="stylesheet" href="css/overrides-06-digital.css">
 <link rel="stylesheet" href="css/overrides-07-workbench.css">
 <link rel="stylesheet" href="css/alchemy.css">
+<link rel="stylesheet" href="css/prototype-mechanics.css">
 <link rel="stylesheet" href="css/mobile.css">
 
 
@@ -191,6 +192,24 @@
       <button class="worldMapAction" id="mapLocationAction" type="button" hidden>Войти</button>
     </div>
   </div>
+  </div>
+</section>
+
+<section class="prototypeMechanicOverlay" id="prototypeMechanicOverlay" hidden aria-label="Новая механика">
+  <div class="prototypeMechanicTopbar">
+    <div>
+      <div class="prototypeMechanicKicker">ГОРОДСКАЯ ЛОКАЦИЯ</div>
+      <div class="prototypeMechanicTitle" id="prototypeMechanicTitle">Механика</div>
+    </div>
+    <button class="prototypeMechanicClose" id="prototypeMechanicClose" type="button" aria-label="Вернуться на карту">×</button>
+  </div>
+  <iframe class="prototypeMechanicFrame" id="prototypeMechanicFrame" title="Игровая механика" scrolling="no"></iframe>
+  <div class="prototypeMechanicLoss" id="prototypeMechanicLoss" hidden>
+    <div class="prototypeMechanicLossCard">
+      <strong>Отмычки закончились</strong>
+      <span>Попытка провалена. Начать эту механику заново?</span>
+      <button id="prototypeMechanicReplay" type="button">Пройти заново</button>
+    </div>
   </div>
 </section>
 
@@ -659,6 +678,7 @@
 <script src="js/world/alchemy.js"></script>
 <script src="js/world/guards.js"></script>
 <script src="js/world/missions.js"></script>
+<script src="js/world/prototype-mechanics.js"></script>
 <script src="js/core/init.js"></script>
 <script src="js/core/inventory-hit-testing.js"></script>
 

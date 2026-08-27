@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>KEYNLOCK — Lockpicking Mechanics v22</title>
+<title>KEYNLOCK — Lockpicking Mechanics v23</title>
 <style>html,body{margin:0;min-height:100%;background:#0d100d;color:#eee4ca;font:16px system-ui,sans-serif}body{display:grid;place-items:center}.loading{padding:24px;text-align:center;color:#aaa38e}.error{max-width:560px;line-height:1.5;color:#d9a09a}</style>
 </head>
 <body>
@@ -12,11 +12,11 @@
 (async()=>{
   try{
     const files=[
-      'prototype-v22/chunk-00.txt',
-      'prototype-v22/chunk-01.txt',
-      'prototype-v22/chunk-23.txt',
-      'prototype-v22/chunk-45.txt',
-      'prototype-v22/chunk-67.txt'
+      'prototype-v23/chunk-00.txt',
+      'prototype-v23/chunk-01.txt',
+      'prototype-v23/chunk-23.txt',
+      'prototype-v23/chunk-45.txt',
+      'prototype-v23/chunk-67.txt'
     ];
     const parts=await Promise.all(files.map(async file=>{
       const res=await fetch(file,{cache:'no-store'});

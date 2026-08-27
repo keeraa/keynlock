@@ -112,6 +112,13 @@
     if(node)travelToMapLocation(node.dataset.location);
   });
   document.querySelector('#prototypeMechanicReplay')?.addEventListener('click',replayPrototypeMechanic);
+  $prototypeMechanicFrame?.addEventListener('load',()=>{
+    if(!activePrototypeMechanic||$prototypeMechanicFrame.src==='about:blank')return;
+    requestAnimationFrame(()=>{
+      $prototypeMechanicFrame.focus({preventScroll:true});
+      $prototypeMechanicFrame.contentWindow?.focus();
+    });
+  });
   ['#shopHudButton','#lairHudButton','#mapTab'].forEach(selector=>{
     document.querySelector(selector)?.addEventListener('click',()=>leavePrototypeMechanic(),{capture:true});
   });

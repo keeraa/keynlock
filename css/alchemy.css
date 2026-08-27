@@ -609,7 +609,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
     transform-origin:bottom center;
   }
   .alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch{
-    transform:translateY(-168px) scale(1.3);
+    transform:translateY(-128px) scale(1.3);
     transform-origin:bottom center;
   }
   /* A card with only one control button (Separation's "−") has one less
@@ -624,7 +624,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      an identical translateY above. Extra lift here (empirically the gap
      between the two, not a formula) brings it back level. */
   .alchemyRoot .alchemyReagents .color-card:has(.ctrl-row .small-btn:only-child) .mini-swatch{
-    transform:translateY(-200px) scale(1.3);
+    transform:translateY(-160px) scale(1.3);
     transform-origin:bottom center;
   }
   .alchemyRoot .alchemyReagents .color-card strong{display:none;}
@@ -694,13 +694,13 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      box, not its visibly-higher one (transforms don't move flow) — same
      gap problem as the buttons-above fix, just the other direction.
      Pulled up to actually sit under the swatch instead of ~110px below it. */
-  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:last-child{order:-1;transform:translateY(-183px);}
+  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:last-child{order:-1;transform:translateY(-143px);}
   /* :not(:last-child) excludes Separation's single "Фильтр" button — it
      matches both :first-child and :last-child at once, and without this
      the two rules' conflicting translateY values (this one's -107px vs
      the other's -120px) fought each other, landing it 13px short of
      clearing the swatch. */
-  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:first-child:not(:last-child){transform:translateY(-170px);}
+  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:first-child:not(:last-child){transform:translateY(-130px);}
   /* Separation's single button matches :last-child too (it's the only
      child), so without this it inherits the rule above wholesale — same
      order:-1 flip AND the same big upward translateY the "+" button uses,
@@ -715,7 +715,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      down and breaking the tube line across stations. Keeping order:-1
      preserves the leading flow slot (same flow height as "+"'s station),
      just aimed at a different landing spot via transform. */
-  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:only-child{transform:translateY(-95px);}
+  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:only-child{transform:translateY(-55px);}
   /* цель/текущая смесь sat where the bench bottles used to be before this
      file's "stand on the table" pass — .swatch-label's own position is
      unmoved (still top:100% of the *original*, untransformed tube-box),
@@ -778,7 +778,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
     transform:translateY(-55px) scale(.6);
   }
   .alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch{
-    transform:translateY(-105px) scale(1.3);
+    transform:translateY(-71px) scale(1.3);
   }
   /* The wide rule's own :has() compensation (a few hundred lines up) is
      scoped to plain min-width:900px, which this short-screen query is
@@ -789,16 +789,16 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      this block's smaller raise, same card-height-deficit reasoning as
      the wide comment. */
   .alchemyRoot .alchemyReagents .color-card:has(.ctrl-row .small-btn:only-child) .mini-swatch{
-    transform:translateY(-132px) scale(1.3);
+    transform:translateY(-98px) scale(1.3);
   }
   .alchemyRoot .scene.active .alchemyElementCell{
     transform:translateX(-30px) translateY(-20px) scale(1.1);
   }
-  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:last-child{transform:translateY(-120px);}
-  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:first-child:not(:last-child){transform:translateY(-107px);}
+  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:last-child{transform:translateY(-86px);}
+  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:first-child:not(:last-child){transform:translateY(-73px);}
   /* Same "below, not above" fix as the wide rule above, scaled down for
      the short-screen raise amounts. */
-  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:only-child{transform:translateY(-45px);}
+  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:only-child{transform:translateY(-11px);}
   .alchemyRoot .swatch-label{transform:translateX(-50%) translateY(-75px);}
   .alchemyRoot .target-element-hint{transform:translateX(-50%) translateY(-75px);}
 }

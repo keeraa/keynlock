@@ -34,7 +34,7 @@ running game changes nothing.
 Nothing was removed: checked for dead CSS and there is none. All 169 classes
 are referenced, several only from template strings in the script.
 
-## Where this stands (v324)
+## Where this stands (v325)
 
 In the game: `js/world/alchemy.js`, `css/alchemy.css`, `assets/alchemy/`,
 reached from a lair hotspot. Three color-game stations run — mixing,
@@ -828,6 +828,29 @@ its own `:has()` override, at equal-or-higher specificity, inside the
 short-screen block itself — matching that block's own established
 pattern of shadowing the wide numbers wholesale rather than layering on
 top of them.
+
+**v325 swapped the sulfur rack bottle's art** (`assets/alchemy/bottle-sulfur.png`,
+still that filename — only the pixels changed, `data-element="sulfur"`
+and the DOM/markup are untouched) for a supplied `cuprum_bottle_04.png`
+(150×411, close enough to the original 150×408 that nothing needed
+retuning).
+
+**And fixed what "the tube line" actually meant — it was the reagent
+swatch's own *bottom edge* the whole time, not wherever its "−" button
+happened to land.** Every earlier "stand on the table" pass (v311
+onward) tuned the swatch and its buttons together as one unit, always by
+eye against a screenshot — close enough each time to look right, but the
+actual anchor was never verified against the *big* bottles' own bottom
+edge until asked directly. Measured: the reagent swatch's rendered bottom
+sat 40px above the big bottles' (matched only by the "−" button
+underneath it, which is why it read as "the tubes are already on the
+table" at a glance — something was there, just the wrong something).
+Every `translateY` in the reagent group — the swatch, both button
+positions, the single-button compensation, and its own swatch
+compensation — shifted down by that same 40px (34px at the short-screen
+scale) so the swatch's bottom, not the button's, lands on the shared
+line. The buttons drop below the table edge as a result, which reads
+fine since they're controls, not glassware standing on the wood.
 
 ## Two things that cost hours — do not rediscover them
 

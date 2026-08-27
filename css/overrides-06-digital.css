@@ -223,7 +223,7 @@ body.map-open{overflow:hidden !important;}
 .lairHotspotCity{left:17% !important;top:36% !important;}
 .lairHotspotTeam{left:79% !important;top:62% !important;}
 }
-body.importedMode .g1ProgressWrap{position:absolute !important;left:50% !important;top:auto !important;bottom:5% !important;width:auto !important;margin:0 !important;transform:translateX(-50%) !important;z-index:30 !important;}
+body.importedMode .g1ProgressWrap{position:absolute !important;left:50% !important;top:48% !important;bottom:auto !important;width:auto !important;margin:0 !important;transform:translateX(-50%) !important;z-index:30 !important;}
 body.importedMode .g1ProgressRow{display:flex !important;flex-wrap:nowrap !important;align-items:center !important;justify-content:center !important;gap:12px !important;min-height:74px !important;}
 body.importedMode .g1Slot,body.importedMode .g1Slot.empty,body.importedMode .g1Slot.left,body.importedMode .g1Slot.right{flex:0 0 74px !important;width:74px !important;height:74px !important;margin:0 !important;top:auto !important;bottom:auto !important;transform:none !important;position:relative !important;}
 body.importedMode .g1Slot.left::before,body.importedMode .g1Slot.right::before{top:50% !important;transform:translate(-50%,-50%) !important;}
@@ -233,7 +233,7 @@ body.importedMode .anTracks{position:absolute !important;left:50% !important;rig
 body.importedMode .anReadout{position:absolute !important;left:50% !important;top:246px !important;width:220px !important;transform:translateX(-50%) !important;text-align:center !important;font:500 54px/.95 Georgia,"Times New Roman",serif !important;}
 body.importedMode .anReadout::after{margin-left:auto !important;margin-right:auto !important;}
 @media (max-width:760px){
-body.importedMode .g1ProgressWrap{bottom:3% !important;}
+body.importedMode .g1ProgressWrap{top:38% !important;bottom:auto !important;}
 body.importedMode .g1ProgressRow{gap:8px !important;min-height:60px !important;}
 body.importedMode .g1Slot,body.importedMode .g1Slot.empty,body.importedMode .g1Slot.left,body.importedMode .g1Slot.right{flex-basis:60px !important;width:60px !important;height:60px !important;}
 body.importedMode .anBoard{width:360px !important;height:292px !important;min-height:292px !important;}

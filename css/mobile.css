@@ -174,7 +174,19 @@ body.importedMode .pinTopLayer{display:none!important;}
   /* Gothic 1 was sitting too close to the bottom controls. */
   body.importedMode .g1ProgressWrap{
     margin-top:-24px!important;
+    top:38%!important;
+    left:0!important;
+    right:0!important;
+    width:100%!important;
     transform:none!important;
+  }
+  body.importedMode .g1ProgressRow{
+    display:grid!important;
+    grid-template-columns:repeat(4,52px)!important;
+    width:max-content!important;
+    max-width:100%!important;
+    margin-inline:auto!important;
+    justify-content:center!important;
   }
 
   /* Anachronox: remove the oversized 760px transformed layout that could

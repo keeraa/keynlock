@@ -1,10 +1,35 @@
   // ===== GOTHIC 1 =====
+  const G1_SYMBOL_PATHS={
+    bar:'M0 -7V7',
+    kink:'M-7 -6H-1Q6 -6 6 1V7',
+    wave:'M0 -8C-5 -5 5 -2 0 1S5 7 0 9',
+    hook:'M-3 8V0C-3 -7 7 -7 7 0V3',
+    angle:'M6 -8L-2 0L6 8'
+  };
+
+  function g1SymbolFrame(type){
+    const path=G1_SYMBOL_PATHS[type]||G1_SYMBOL_PATHS.bar;
+    const marks=[];
+    [18,38,58,78].forEach(x=>{
+      marks.push(`<path transform="translate(${x} 8)" d="${path}"/>`);
+      marks.push(`<path transform="translate(${x} 92) rotate(180)" d="${path}"/>`);
+    });
+    [28,50,72].forEach(y=>{
+      marks.push(`<path transform="translate(8 ${y}) rotate(-90)" d="${path}"/>`);
+      marks.push(`<path transform="translate(92 ${y}) rotate(90)" d="${path}"/>`);
+    });
+    return `<svg class="g1SymbolFrame" viewBox="0 0 100 100" aria-hidden="true">${marks.join('')}</svg>`;
+  }
+
   function renderG1Row(container, arr, size=4){
     container.innerHTML = '';
+    const symbolType=window.getKeynlockTensionRequirement?.()?.type||'bar';
+    container.dataset.symbol=symbolType;
     for(let i=0;i<size;i++){
       const slot=document.createElement('div');
       const val = arr[i];
       slot.className = 'g1Slot ' + (val==null ? 'empty' : (val < 0 ? 'left' : 'right'));
+      slot.insertAdjacentHTML('beforeend',g1SymbolFrame(symbolType));
       container.appendChild(slot);
     }
   }
@@ -22,7 +47,7 @@
     moves=0;
     brokenPicks=0;
     runReward=1000;
-    g1Length=diffStep(3,4,5,'g1');
+    g1Length=diffStep(4,6,8,'g1');
     g1Input=[];
     g1Sequence = Array.from({length:g1Length}, ()=> Math.random() < .5 ? -1 : 1);
     if(g1Sequence.every(v=>v===g1Sequence[0])) g1Sequence[rand(0,g1Length-1)] *= -1;
@@ -68,5 +93,4 @@
     renderG1();
     setTimeout(()=>celebrate(), 420);
   }
-
 

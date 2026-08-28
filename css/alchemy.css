@@ -1811,15 +1811,25 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
     left: 50%;
     top: 3%;
     width: clamp(310px, 39vw, 610px);
-    /* The replacement board has a taller source canvas than the original.
-       Keep the established wide stage geometry so it does not lengthen the
-       entire composition and slide below the table. */
-    aspect-ratio: 1296 / 734;
-    transform: translateX(-50%);
+    /* Use the replacement's real 1407x1096 proportions. Its height at this
+       width is 27.35% greater than the old board's relative to the new height,
+       so lift it by that amount: the feet keep the established table baseline
+       while the frame itself is no longer vertically squashed. */
+    aspect-ratio: 1407 / 1096;
+    transform: translate(-50%, -27.35%);
   }
   .alchemyRoot .scene.active .alchemyMixReferenceBoard {
     width: 100%;
     height: 100%;
+  }
+  /* The taller asset's cork panel occupies a different fraction of its canvas
+     than the old board. Keep the Mixing guide inside the actual cork inset,
+     above the long supporting legs. */
+  .alchemyRoot .scene.active .alchemyMixReferenceGuide {
+    left: 10%;
+    top: 5%;
+    width: 80%;
+    height: 56%;
   }
   /* The reference board is scenery. Every interactive object must stand in
      front of it in every station, not only in Mixing. */

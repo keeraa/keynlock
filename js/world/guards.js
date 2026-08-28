@@ -73,17 +73,12 @@
     document.body.appendChild(noiseBar);
   }
 
-  // Sit just above the objective line, wherever that has ended up: it moves
-  // between breakpoints and this way the meter follows without its own copy of
-  // every rule.
+  // Keep a stable viewport position and clear coordinates left by older builds.
   function placeNoiseMeter(){
     if(!noiseBar) return;
-    const line = document.querySelector('#objectiveLine');
-    if(!line) return;
-    const r = line.getBoundingClientRect();
-    noiseBar.style.left = `${Math.round(r.left)}px`;
-    noiseBar.style.width = `${Math.round(r.width)}px`;
-    noiseBar.style.top = `${Math.round(r.top - noiseBar.offsetHeight - 6)}px`;
+    noiseBar.style.removeProperty('left');
+    noiseBar.style.removeProperty('width');
+    noiseBar.style.removeProperty('top');
   }
 
   function renderNoise(){
@@ -91,7 +86,7 @@
     const on = noiseSensorActive() && !solved;
     noiseBar.classList.toggle('visible', on);
     if(!on){ renderGuardFace(); return; }
-    noiseFill.style.width = `${Math.min(100, noiseLevel * 100).toFixed(1)}%`;
+    noiseFill.style.height = `${Math.min(100, noiseLevel * 100).toFixed(1)}%`;
     noiseBar.classList.toggle('warning', noiseLevel >= NOISE_WARN);
     renderGuardFace();
     placeNoiseMeter();

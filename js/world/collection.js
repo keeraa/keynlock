@@ -217,53 +217,23 @@
     let pinchStartDist = 0;
     let pinchStartZoom = state.zoom;
 
-    // Angle is measured from whichever point is actually the CSS
-    // transform-origin right now, not always the stage's center — a
-    // transform-origin off-center (grabbing the handle) but an angle
-    // still measured from stage-center produced a huge mismatch between
-    // the pointer's real motion and the origin the rotation was actually
-    // pivoting around, which read as the tool flailing wildly.
-    let pivot = { x: 0, y: 0 };
-    function angleFromPivot(clientX, clientY){
-      const dx = clientX - pivot.x, dy = clientY - pivot.y;
+    // Rotation always pivots on the stage's own center. An earlier
+    // attempt pivoted on whichever end (shaft/handle) the grab landed
+    // closer to, using the CSS transform-origin actually set — that was
+    // mathematically correct (the origin point does stay fixed on
+    // screen), but rotation angle near a close pivot is extremely
+    // sensitive: a tiny pointer move produces a huge angle swing, so the
+    // far end whipped across the screen. Not a bug to fix, a property of
+    // near-pivot rotation — reverted per explicit call after seeing it
+    // live.
+    function angleFromCenter(clientX, clientY){
+      const rect = $stage.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+      const dx = clientX - cx, dy = clientY - cy;
       return Math.atan2(dx, -dy) * 180 / Math.PI;
     }
-    // transform-origin percentages resolve against the element's own
-    // untransformed box, not its current (rotated/scaled) rendered one —
-    // $stageInner is always centered in $stage by flex layout regardless
-    // of its transform, so that untransformed box's screen position can
-    // be recovered from $stage's own (untransformed) rect.
-    function pivotPoint(fracX, fracY){
-      const rect = $stage.getBoundingClientRect();
-      const left = rect.left + rect.width / 2 - STAGE_W / 2;
-      const top = rect.top + rect.height / 2 - STAGE_H / 2;
-      return { x: left + fracX * STAGE_W, y: top + fracY * STAGE_H };
-    }
     function dist(a, b){ return Math.hypot(a.x - b.x, a.y - b.y); }
-    function stopRotate(){
-      rotating = false;
-      $stage.classList.remove('dragging');
-      // Resting pivot is always the box's own center — ease back to it
-      // now that the grab (which may have pivoted around the handle
-      // instead) has ended.
-      $stageInner.classList.add('easing');
-      $stageInner.style.transformOrigin = '50% 50%';
-    }
-    function elementCenter(el){
-      const r = el.getBoundingClientRect();
-      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-    }
-    // Whichever layer's on-screen center the grab landed closer to (this
-    // uses the actual rendered/rotated bounding boxes, so it stays right
-    // at any zoom or rotation) decides the pivot fraction for this drag —
-    // grab the shaft and it spins around the shaft, grab the handle and
-    // it turns around the handle, same as physically holding either end.
-    function grabOriginFraction(clientX, clientY){
-      const handleC = elementCenter($imgHandle), shaftC = elementCenter($imgShaft);
-      const dHandle = Math.hypot(clientX - handleC.x, clientY - handleC.y);
-      const dShaft = Math.hypot(clientX - shaftC.x, clientY - shaftC.y);
-      return dHandle <= dShaft ? { x: 0.5, y: 0.76 } : { x: 0.5, y: 0.5 };
-    }
+    function stopRotate(){ rotating = false; $stage.classList.remove('dragging'); }
 
     $stage.addEventListener('pointerdown', e => {
       $stage.setPointerCapture(e.pointerId);
@@ -275,10 +245,7 @@
         // into it once so it doesn't visually snap, then drop the
         // transition so live tracking stays 1:1 with the pointer.
         $stageInner.classList.add('easing');
-        const frac = grabOriginFraction(e.clientX, e.clientY);
-        $stageInner.style.transformOrigin = `${frac.x * 100}% ${frac.y * 100}%`;
-        pivot = pivotPoint(frac.x, frac.y);
-        state.rotate = Math.max(-180, Math.min(180, Math.round(angleFromPivot(e.clientX, e.clientY))));
+        state.rotate = Math.max(-180, Math.min(180, Math.round(angleFromCenter(e.clientX, e.clientY))));
         renderStage();
       }else if(pointers.size === 2){
         stopRotate();
@@ -299,7 +266,7 @@
         }
       }else if(rotating){
         $stageInner.classList.remove('easing');
-        state.rotate = Math.max(-180, Math.min(180, Math.round(angleFromPivot(e.clientX, e.clientY))));
+        state.rotate = Math.max(-180, Math.min(180, Math.round(angleFromCenter(e.clientX, e.clientY))));
         renderStage();
       }
     });

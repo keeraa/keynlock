@@ -236,10 +236,11 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   position:relative;
   width:300px;
   height:912px;
-  /* Default/resting pivot is the box's own center — matches the
-     preview's original look. js/world/collection.js swaps this to a
-     point near the grip for the duration of a drag that started on the
-     handle, then eases back to center on release (see .easing below). */
+  /* Rotation always pivots on the box's own center — pivoting on the
+     grip instead was tried and reverted: rotation angle near a
+     close/off-center pivot is extremely sensitive to small pointer
+     moves, so the far end (the shaft) whipped wildly across the screen
+     on any real drag. See js/world/collection.js for the fuller note. */
   transform-origin:50% 50%;
 }
 /* Applied only for the initial press-to-angle jump, then dropped for the

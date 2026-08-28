@@ -2051,13 +2051,7 @@ html.embedded .btn{border-color:rgba(187,141,70,.7);background:linear-gradient(#
 html.embedded .status strong{color:#f0d49d}
 html.embedded .scene[data-name="Kingdom Come"] .kcd-lock{border-color:#8b6638;background:radial-gradient(circle at 50% 50%,transparent 0 11%,rgba(0,0,0,.28) 11.5% 13%,transparent 13.5%),repeating-conic-gradient(from 3deg,rgba(224,181,105,.055) 0 2deg,transparent 2deg 15deg),radial-gradient(circle at 46% 42%,#594125 0 16%,#342417 17% 48%,#21160f 49% 72%,#120d09 73% 100%);box-shadow:inset 0 0 0 10px #24170e,inset 0 0 0 12px #8a6536,inset 0 0 50px rgba(0,0,0,.65),0 18px 40px rgba(0,0,0,.32)}
 html.embedded .scene[data-name="Kingdom Come"] .kcd-rotor{border-color:#8c693b;background:repeating-conic-gradient(from 0deg,#4b351f 0 19deg,#2d1f14 19deg 39deg)}
-html.embedded .scene.has-classic-lock .lab{position:relative;padding-top:194px}
-html.embedded .prototype-classic-lock{position:absolute;z-index:3;left:50%;top:8px;width:290px;height:178px;transform:translateX(-50%);pointer-events:none;filter:drop-shadow(0 12px 18px rgba(0,0,0,.5))}
-html.embedded .prototype-classic-lock .classic-shackle{position:absolute;left:50%;top:0;width:116px;height:105px;transform:translateX(-50%);object-fit:contain}
-html.embedded .prototype-classic-lock .classic-body{position:absolute;left:50%;top:52px;width:144px;height:120px;transform:translateX(-50%);object-fit:contain}
-html.embedded .prototype-classic-lock .classic-pick{position:absolute;left:7px;top:66px;width:178px;height:70px;object-fit:contain;transform:rotate(-8deg);transform-origin:75% 50%}
-html.embedded .prototype-classic-lock .classic-tension{position:absolute;left:142px;top:84px;width:145px;height:48px;object-fit:contain;transform:rotate(8deg);transform-origin:0 50%}
-@media(max-width:760px){html.embedded .scene{padding:58px 10px 118px}html.embedded .lab{min-height:calc(100vh - 176px);padding:10px}html.embedded .scene.has-classic-lock .lab{padding-top:150px}html.embedded .prototype-classic-lock{top:4px;transform:translateX(-50%) scale(.76);transform-origin:50% 0}}
+@media(max-width:760px){html.embedded .scene{padding:58px 10px 118px}html.embedded .lab{min-height:calc(100vh - 176px);padding:10px}}
 </style>
 </head>
 <body>
@@ -2223,7 +2217,9 @@ const LOCK_SYMBOLS=[
 const EMBEDDED_PARAMS=new URLSearchParams(location.search);
 const EMBEDDED_GAME=EMBEDDED_PARAMS.get('game')||'';
 const EMBEDDED_PICK_VALUE=Number(EMBEDDED_PARAMS.get('picks'));
+const EMBEDDED_TENSION_VALUE=Number(EMBEDDED_PARAMS.get('tension'));
 const PLAYER_PICK_COUNT=Math.max(0,Math.min(99,Math.round(Number.isFinite(EMBEDDED_PICK_VALUE)?EMBEDDED_PICK_VALUE:3)));
+let playerTensionSkin=Math.max(1,Math.min(5,Math.round(Number.isFinite(EMBEDDED_TENSION_VALUE)?EMBEDDED_TENSION_VALUE:1)));
 const SCORE_BASE=1000,SCORE_STEP=50,scoreState={};
 function scoreScene(game){return GameHub.scene(game)}
 function scoreReset(game,ideal){ideal=Math.max(1,Math.round(ideal||1));scoreState[game]={moves:0,ideal};scoreRender(game)}
@@ -2238,6 +2234,7 @@ function scoreRender(game){const s=scoreState[game],scene=scoreScene(game);if(!s
 const LockRuntime=(()=>{
   const DEFAULT_PICKS=PLAYER_PICK_COUNT;
   const lastPicks={};
+  const requiredTensions={};
   function scene(game){return GameHub.scene(game)}
   function counter(game){return scene(game)?.querySelector('[data-head-picks]')||null}
   function syncPicks(game,picks=DEFAULT_PICKS){
@@ -2256,6 +2253,20 @@ const LockRuntime=(()=>{
     else if(messageEl&&message)messageEl.textContent=message;
     return state.picks
   }
+  function setRequiredTension(game,symbolIndex){
+    const required=Math.max(1,Math.min(5,Number(symbolIndex)+1));
+    requiredTensions[game]=required;
+    if(game===EMBEDDED_GAME)window.parent?.postMessage({type:'keynlock-mechanic-tension',game,required},location.origin);
+    return required
+  }
+  function tensionReady(game,{statusEl=null,messageEl=null}={}){
+    const required=requiredTensions[game];
+    if(!required||required===playerTensionSkin)return true;
+    if(statusEl)statusEl.innerHTML='<strong>Неверный натяжитель</strong>сопоставь инструмент с символом узора';
+    if(messageEl)messageEl.textContent='Замок сопротивляется: выбран другой тип натяжителя.';
+    window.parent?.postMessage({type:'keynlock-mechanic-wrong-tension',game,required,selected:playerTensionSkin},location.origin);
+    return false
+  }
   function open(game,{statusEl=null,statusHtml='<strong>Замок открыт</strong>',messageEl=null,message='',onOpen=null}={}){
     const s=scene(game);if(s?.dataset.lockOpened==='true')return false;
     if(s)s.dataset.lockOpened='true';
@@ -2268,7 +2279,7 @@ const LockRuntime=(()=>{
   function resetOpen(game){const s=scene(game);if(s)delete s.dataset.lockOpened}
   function isOpen(game){return scene(game)?.dataset.lockOpened==='true'}
   function initAll(){GameHub.scenes.forEach(s=>{if(!s.querySelector('[data-head-picks]'))return;const el=s.querySelector('[data-head-picks]');if(!el.textContent.trim())el.textContent=String(DEFAULT_PICKS)})}
-  return{DEFAULT_PICKS,syncPicks,resetPicks,breakPick,open,resetOpen,isOpen,initAll};
+  return{DEFAULT_PICKS,syncPicks,resetPicks,breakPick,setRequiredTension,tensionReady,open,resetOpen,isOpen,initAll};
 })();
 (()=>{
 'use strict';
@@ -2826,6 +2837,7 @@ function tdsReset(){LockRuntime.resetOpen('Thief: Deadly Shadows');
   let order=shuffled([0,1,2]);
   while(order.join(',')==='0,1,2')order=shuffled([0,1,2]);
   tds={selectedRing:2,ang:0,targets:[0,1,2].map(()=>Math.random()*360),hot:false,time:TDS_TIME,last:performance.now(),failed:false,done:new Set(),ringSymbols,order,step:0,picks:TDS_MAX_PICKS,patternSymbol:Math.floor(Math.random()*5),down:null};
+  LockRuntime.setRequiredTension('Thief: Deadly Shadows',tds.patternSymbol);
   scoreReset('Thief: Deadly Shadows',3);
   renderTds();
   tdsMsg.textContent='Выбери кольцо, найди сладкую точку и соблюдай порядок символов.'
@@ -2891,6 +2903,7 @@ function tdsSet(){
   const expected=tds.order[tds.step];
   if(tds.selectedRing!==expected){tdsBreakPick();return}
   if(!tds.hot){tdsBreakPick('Промах мимо сладкой точки — отмычка сломалась.');return}
+  if(tds.step===2&&!LockRuntime.tensionReady('Thief: Deadly Shadows',{statusEl:tdsStatus,messageEl:tdsMsg})){tds.down=null;return}
   tds.done.add(tds.selectedRing);
   tds.step++;
   tds.hot=false;
@@ -2924,6 +2937,7 @@ function renderSfSymbolRing(){
 }
 function sfReset(){LockRuntime.resetOpen('Fallout');
   sf={secret:-150+Math.random()*120,angle:-90,turn:0,wear:0,torqueDir:0,openDir:Math.random()<.5?-1:1,last:performance.now(),solved:false,failed:false,picks:LockRuntime.DEFAULT_PICKS,symbol:Math.floor(Math.random()*5),stall:0};
+  LockRuntime.setRequiredTension('Fallout',sf.symbol);
   renderSfSymbolRing();
   sfLock.querySelector('.sf-cylinder')?.classList.remove('strain');
   sfLeftBtn.classList.remove('active');sfRightBtn.classList.remove('active');
@@ -2990,7 +3004,8 @@ function sfLoop(now){
         if(sf.stall>=1){sfBreakPick();return}
         if(sf.wear>=1)sfBreakPick();
         else if(Math.abs(sf.turn)>=87&&d<=SF_SUCCESS){
-          sf.solved=true;sf.turn=sf.openDir*SF_MAX_TURN;sfRelease();if(cyl)cyl.classList.remove('strain');LockRuntime.open('Fallout',{statusEl:sfStatus,statusHtml:'<strong>Замок открыт</strong>угол и направление найдены'})
+          if(!LockRuntime.tensionReady('Fallout',{statusEl:sfStatus})){sfRelease();sf.turn=0;sf.stall=0;if(cyl)cyl.classList.remove('strain')}
+          else{sf.solved=true;sf.turn=sf.openDir*SF_MAX_TURN;sfRelease();if(cyl)cyl.classList.remove('strain');LockRuntime.open('Fallout',{statusEl:sfStatus,statusHtml:'<strong>Замок открыт</strong>угол и направление найдены'})}
         }else sfStatus.innerHTML=d<=SF_SUCCESS?'<strong>Есть полный ход</strong>держи вращение':d<32?'<strong>Есть ход</strong>подкорректируй отмычку':'<strong>Сильное сопротивление</strong>измени угол отмычки'
       }
     }else{
@@ -3187,6 +3202,7 @@ function apEnsureCalibrated(){
 function apReset(){
   const order=shuffled([0,1,2,3,4]);
   ap={pins:Array.from({length:5},apMakePin),sel:0,time:AP_TIME,last:performance.now(),won:false,failed:false,picks:LockRuntime.DEFAULT_PICKS,order,orderStep:0,calibrated:false};LockRuntime.resetOpen('Alpha Protocol');LockRuntime.resetPicks('Alpha Protocol',ap);
+  LockRuntime.setRequiredTension('Alpha Protocol',order[order.length-1]);
   renderAp(false);
   apMsg.textContent='Выставляй пины в порядке символов под замком.';
   if(activeName()==='Alpha Protocol'&&!apFinishCalibration())apEnsureCalibrated()
@@ -3209,6 +3225,7 @@ function apSet(){
   const expected=ap.order[ap.orderStep];
   if(ap.sel!==expected){ap.time=Math.max(0,ap.time-1);LockRuntime.breakPick('Alpha Protocol',ap,{messageEl:apMsg,message:'Неверный символ — отмычка сломалась.',onEmpty:()=>{ap.failed=true;apStatus.innerHTML='<strong>Отмычки закончились</strong>перезапусти замок'}});renderAp();return}
   if(apReadyIndex(ap.sel)){
+    if(ap.orderStep===ap.order.length-1&&!LockRuntime.tensionReady('Alpha Protocol',{statusEl:apStatus,messageEl:apMsg}))return;
     p.set=true;ap.orderStep++;
     if(ap.orderStep>=ap.order.length){ap.won=true;LockRuntime.open('Alpha Protocol',{statusEl:apStatus,statusHtml:'<strong>Замок открыт</strong>последовательность выполнена',messageEl:apMsg,message:'Все пины выставлены в правильном порядке.'})}
     else{apMsg.textContent='Верно. Найди следующий символ сам.'}
@@ -3260,7 +3277,7 @@ function me1RenderShell(){
     d.style.transform=`translate(-50%,-50%) rotate(${a+90}deg)`;d.innerHTML=LOCK_SYMBOLS[me1.symbol];me1ShellSymbols.appendChild(d)
   }
 }
-function me1Reset(){LockRuntime.resetOpen('Mass Effect');const startAng=Math.random()*360,ringPlan=[1,2,3,4,5,3,5],baseSpeeds=[24,28,32,36,40,30,38];me1={ring:5,ang:startAng,blocks:ringPlan.map((ring,i)=>({ring,a:(Math.random()*360+i*43)%360,s:(baseSpeeds[i]+(Math.random()*10-5))*(Math.random()<.5?-1:1)})),last:performance.now(),won:false,failed:false,picks:LockRuntime.DEFAULT_PICKS,hitUntil:0,symbol:Math.floor(Math.random()*5),collapse:false,collapseStart:0};me1Arena.querySelectorAll('.me1-ring,.me1-block').forEach(n=>n.remove());for(let r=1;r<=5;r++){const guide=document.createElement('div');guide.className='me1-ring';guide.dataset.ring=r;me1Arena.insertBefore(guide,me1Core)}me1.blocks.forEach((b,i)=>{const e=document.createElement('div');e.className='me1-block';e.dataset.i=i;me1Arena.appendChild(e)});me1Player.classList.remove('hit');me1Core.classList.remove('ready');me1RenderShell();renderMe1();me1Msg.textContent='Пять равномерных колец. Доберись до ядра и подтверди его тапом или кликом.'}
+function me1Reset(){LockRuntime.resetOpen('Mass Effect');const startAng=Math.random()*360,ringPlan=[1,2,3,4,5,3,5],baseSpeeds=[24,28,32,36,40,30,38];me1={ring:5,ang:startAng,blocks:ringPlan.map((ring,i)=>({ring,a:(Math.random()*360+i*43)%360,s:(baseSpeeds[i]+(Math.random()*10-5))*(Math.random()<.5?-1:1)})),last:performance.now(),won:false,failed:false,picks:LockRuntime.DEFAULT_PICKS,hitUntil:0,symbol:Math.floor(Math.random()*5),collapse:false,collapseStart:0};LockRuntime.setRequiredTension('Mass Effect',me1.symbol);me1Arena.querySelectorAll('.me1-ring,.me1-block').forEach(n=>n.remove());for(let r=1;r<=5;r++){const guide=document.createElement('div');guide.className='me1-ring';guide.dataset.ring=r;me1Arena.insertBefore(guide,me1Core)}me1.blocks.forEach((b,i)=>{const e=document.createElement('div');e.className='me1-block';e.dataset.i=i;me1Arena.appendChild(e)});me1Player.classList.remove('hit');me1Core.classList.remove('ready');me1RenderShell();renderMe1();me1Msg.textContent='Пять равномерных колец. Доберись до ядра и подтверди его тапом или кликом.'}
 function me1Move(d){if(me1.won||me1.failed||me1.ring===0)return;me1.ang=(me1.ang+d+360)%360;renderMe1()}
 function me1Out(){if(me1.won||me1.failed||me1.ring===0)return;me1.ring=Math.min(5,me1.ring+1);renderMe1()}
 function me1In(){if(me1.won||me1.failed||me1.ring===0)return;if(me1Collides()){me1Hit(performance.now());return}me1.ring--;if(me1.ring===0){me1.collapse=true;me1.collapseStart=performance.now()}renderMe1()}
@@ -3268,7 +3285,7 @@ function me1HitTolerance(r){return 9+Math.max(0,5-r)*1.6}
 function me1Collides(){if(me1.ring<=0)return false;const tol=me1HitTolerance(me1.ring);return me1.blocks.some(b=>b.ring===me1.ring&&angleDiff(me1.ang,b.a)<=tol)}
 function me1SafeOuterAngle(){let best=me1.ang,bestGap=-1;const outer=me1.blocks.filter(b=>b.ring===5);for(let a=0;a<360;a+=6){const gaps=outer.length?outer.map(b=>angleDiff(a,b.a)):[180],gap=Math.min(...gaps);if(gap>bestGap){bestGap=gap;best=a}}return best}
 function me1Hit(now=performance.now()){if(me1.won||me1.failed||now<me1.hitUntil)return;me1.hitUntil=now+650;me1.collapse=false;me1.collapseStart=0;me1.picks--;me1Player.classList.remove('hit');void me1Player.offsetWidth;me1Player.classList.add('hit');if(me1.picks<=0){me1.picks=0;me1.failed=true;me1Status.innerHTML='<strong>Отмычки закончились</strong>перезапусти игру';me1Msg.textContent='Красный блок сломал последнюю отмычку.'}else{me1.ring=5;me1.ang=me1SafeOuterAngle();me1Status.innerHTML=`<strong>Отмычка сломалась</strong>осталось ${me1.picks}`;me1Msg.textContent='Красный блок отбросил тебя на внешнее кольцо.'}renderMe1()}
-function me1Confirm(){if(me1.failed||me1.won||me1.ring!==0)return;me1.won=true;me1Core.classList.remove('ready');LockRuntime.open('Mass Effect',{statusEl:me1Status,statusHtml:'<strong>ACCESS GRANTED</strong>ядро подтверждено',messageEl:me1Msg,message:'Защита обойдена.'});renderMe1()}
+function me1Confirm(){if(me1.failed||me1.won||me1.ring!==0)return;if(!LockRuntime.tensionReady('Mass Effect',{statusEl:me1Status,messageEl:me1Msg}))return;me1.won=true;me1Core.classList.remove('ready');LockRuntime.open('Mass Effect',{statusEl:me1Status,statusHtml:'<strong>ACCESS GRANTED</strong>ядро подтверждено',messageEl:me1Msg,message:'Защита обойдена.'});renderMe1()}
 function me1CollapseRadius(b,now,m){
   const base=me1RadiusPx(b.ring,m.s);
   if(!me1.collapse||!me1.collapseStart)return base;
@@ -3355,18 +3372,6 @@ if(embeddedGame){
   if(embeddedIndex>=0) GameHub.show(embeddedIndex);
   const activeScene=GameHub.scene(embeddedGame);
   if(activeScene){
-    const classicLockGames=new Set(['Thief: Deadly Shadows','Kingdom Come','Oblivion','Watchmen','Thief 1/2','Fallout']);
-    if(classicLockGames.has(embeddedGame)){
-      activeScene.classList.add('has-classic-lock');
-      const lab=activeScene.querySelector(':scope > .lab');
-      if(lab){
-        const art=document.createElement('div');
-        art.className='prototype-classic-lock';
-        art.setAttribute('aria-hidden','true');
-        art.innerHTML='<img class="classic-shackle" src="../assets/shackles/level1/iron_locker_05.png" alt=""><img class="classic-body" src="../assets/locks/level1/iron_lock_09.png" alt=""><img class="classic-pick" src="../assets/picks/pick_01.webp" alt=""><img class="classic-tension" src="../assets/tensions/tension_01.webp" alt="">';
-        lab.prepend(art);
-      }
-    }
     const activeStatus=activeScene.querySelector(':scope > .scene-head .status');
     const lossObserver=new MutationObserver(()=>{
       emitEmbeddedState(embeddedGame);
@@ -3379,6 +3384,10 @@ if(embeddedGame){
     requestAnimationFrame(()=>{window.focus();document.body.focus({preventScroll:true})});
   }
 }
+window.addEventListener('message',event=>{
+  if(event.origin!==location.origin||event.source!==window.parent||event.data?.type!=='keynlock-player-tools')return;
+  playerTensionSkin=Math.max(1,Math.min(5,Math.round(Number(event.data.tensionSkin)||1)));
+});
 </script>
 </body>
 </html>

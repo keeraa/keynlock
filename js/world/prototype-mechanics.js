@@ -17,6 +17,7 @@
     {id:'pathologic-2',name:'Дом механика',game:'Pathologic 2',x:40,y:82}
   ];
   const PROTOTYPE_MECHANIC_DONE_KEY='keynlockPrototypeMechanicsDone';
+  const PROTOTYPE_CLASSIC_LOCK_GAMES=new Set(['Thief: Deadly Shadows','Kingdom Come','Oblivion','Watchmen','Thief 1/2','Fallout']);
   let prototypeMechanicsDone={};
   try{prototypeMechanicsDone=JSON.parse(STORE.getItem(PROTOTYPE_MECHANIC_DONE_KEY)||'{}')||{};}catch(_){prototypeMechanicsDone={};}
   let activePrototypeMechanic=null;
@@ -26,7 +27,11 @@
   const $prototypeMechanicLoss=document.querySelector('#prototypeMechanicLoss');
 
   function prototypeLocationId(place){return `prototype-${place.id}`;}
-  function prototypeMechanicUrl(place){return `prototypes/lockpicking-mechanics-v63.html?game=${encodeURIComponent(place.game)}&picks=${Math.max(0,picks)}&run=${Date.now()}`;}
+  function prototypeMechanicUrl(place){return `prototypes/lockpicking-mechanics-v63.html?game=${encodeURIComponent(place.game)}&picks=${Math.max(0,picks)}&tension=${Math.max(1,Math.min(5,tensionSkin||1))}&run=${Date.now()}`;}
+  function syncPrototypeTools(){
+    if(!activePrototypeMechanic||!$prototypeMechanicFrame?.contentWindow)return;
+    $prototypeMechanicFrame.contentWindow.postMessage({type:'keynlock-player-tools',tensionSkin:Math.max(1,Math.min(5,tensionSkin||1))},location.origin);
+  }
 
   PROTOTYPE_MECHANIC_PLACES.forEach(place=>{
     MAP_LOCATIONS[prototypeLocationId(place)]={name:place.name,x:place.x,y:place.y,text:`Новая механика: ${place.game}.`,action:'prototype-mechanic',prototypeId:place.id,game:place.game};
@@ -59,6 +64,7 @@
     if(mapOpen){mapOpen=false;document.body.classList.remove('map-open');$worldMapScreen.hidden=true;}
     activePrototypeMechanic=place;
     document.body.classList.add('prototype-mechanic-open');
+    document.body.classList.toggle('prototype-has-classic-lock',PROTOTYPE_CLASSIC_LOCK_GAMES.has(place.game));
     setGameInactive(true);
     $prototypeMechanicLoss.hidden=picks>0;
     $prototypeMechanicOverlay.hidden=false;
@@ -74,7 +80,7 @@
     $prototypeMechanicOverlay.hidden=true;
     $prototypeMechanicLoss.hidden=true;
     if($prototypeMechanicFrame)$prototypeMechanicFrame.src='about:blank';
-    document.body.classList.remove('prototype-mechanic-open');
+    document.body.classList.remove('prototype-mechanic-open','prototype-has-classic-lock');
     setGameInactive(false);
     render();
     openMap();
@@ -86,7 +92,7 @@
     $prototypeMechanicOverlay.hidden=true;
     $prototypeMechanicLoss.hidden=true;
     if($prototypeMechanicFrame)$prototypeMechanicFrame.src='about:blank';
-    document.body.classList.remove('prototype-mechanic-open');
+    document.body.classList.remove('prototype-mechanic-open','prototype-has-classic-lock');
     setGameInactive(false);
     render();
   }
@@ -115,10 +121,12 @@
   $prototypeMechanicFrame?.addEventListener('load',()=>{
     if(!activePrototypeMechanic||$prototypeMechanicFrame.src==='about:blank')return;
     requestAnimationFrame(()=>{
+      syncPrototypeTools();
       $prototypeMechanicFrame.focus({preventScroll:true});
       $prototypeMechanicFrame.contentWindow?.focus();
     });
   });
+  document.querySelector('#inventoryTensionRail')?.addEventListener('click',()=>requestAnimationFrame(syncPrototypeTools));
   ['#shopHudButton','#lairHudButton','#mapTab'].forEach(selector=>{
     document.querySelector(selector)?.addEventListener('click',()=>leavePrototypeMechanic(),{capture:true});
   });
@@ -147,6 +155,19 @@
     }
     if(event.data.type==='keynlock-mechanic-loss'){
       $prototypeMechanicLoss.hidden=false;
+      return;
+    }
+    if(event.data.type==='keynlock-mechanic-tension'){
+      $prototypeMechanicOverlay.dataset.requiredTension=String(Math.max(1,Math.min(5,Number(event.data.required)||1)));
+      return;
+    }
+    if(event.data.type==='keynlock-mechanic-wrong-tension'){
+      const lock=document.querySelector('#lock.universalLockBlock');
+      lock?.classList.remove('prototype-wrong-tension');
+      void lock?.offsetWidth;
+      lock?.classList.add('prototype-wrong-tension');
+      setTimeout(()=>lock?.classList.remove('prototype-wrong-tension'),420);
+      toast('Неверный натяжитель · ориентируйся по символу');
       return;
     }
     if(event.data.type!=='keynlock-mechanic-open')return;

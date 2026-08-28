@@ -73,6 +73,7 @@
     $prototypeMechanicLoss.hidden=picks>0;
     $prototypeMechanicOverlay.hidden=false;
     $objectiveLine.innerHTML='ЦЕЛЬ: <b>ПОДГОТОВКА МЕХАНИКИ</b>';
+    setGlobalTimer(false);
     runReward=1000;
     updateEconomyUI();
     updateMechanismAssetHud();
@@ -93,6 +94,7 @@
     $prototypeMechanicOverlay.hidden=true;
     $prototypeMechanicLoss.hidden=true;
     window.KeynlockImportedGames?.close();
+    setGlobalTimer(false);
     document.body.classList.remove('prototype-mechanic-open','prototype-has-classic-lock','prototype-lock-ready');
     setGameInactive(false);
     updateMechanismAssetHud();
@@ -108,6 +110,7 @@
     $prototypeMechanicOverlay.hidden=true;
     $prototypeMechanicLoss.hidden=true;
     window.KeynlockImportedGames?.close();
+    setGlobalTimer(false);
     document.body.classList.remove('prototype-mechanic-open','prototype-has-classic-lock','prototype-lock-ready');
     setGameInactive(false);
     updateMechanismAssetHud();
@@ -158,6 +161,10 @@
   window.addEventListener('message',event=>{
     if(event.origin!==location.origin||event.source!==window||!activePrototypeMechanic)return;
     if(event.data?.game!==activePrototypeMechanic.game)return;
+    if(event.data.type==='keynlock-mechanic-timer'){
+      setGlobalTimer(!!event.data.active,Number(event.data.timeLeft)||0,Number(event.data.timeMax)||1,event.data.label||'Время');
+      return;
+    }
     if(event.data.type==='keynlock-mechanic-state'){
       const goal=String(event.data.goal||'Выполнить взлом').trim().toUpperCase();
       const moveInfo=Number.isFinite(+event.data.moves)&&Number.isFinite(+event.data.ideal)

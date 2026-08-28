@@ -21,7 +21,17 @@
     const style=document.createElement('style');
     style.textContent=sourceStyle.textContent
       .replace(':root {',':host {')
-      .replaceAll('html.embedded',':host(.embedded)');
+      .replaceAll('html.embedded',':host(.embedded)')+`
+        /* Timers are rendered only by the application's shared challenge HUD. */
+        .lockpick-prototype .ap-time,
+        .lockpick-prototype .hill-timer,
+        .lockpick-prototype .tds-time,
+        .lockpick-prototype .wm-time,
+        .lockpick-prototype .th12-time,
+        .lockpick-prototype .an-time,
+        .lockpick-prototype .me2-time,
+        .lockpick-prototype .bs1-meter,
+        .lockpick-prototype .bs1-head #bs1Time{display:none!important}`;
     shadow.append(style,prototypeRoot.cloneNode(true));
     host.classList.add('embedded');
 
@@ -44,8 +54,46 @@
         "  function setDefaultPicks(count){DEFAULT_PICKS=Math.max(0,Math.min(99,Math.round(Number(count)||0)))}\n  return{get DEFAULT_PICKS(){return DEFAULT_PICKS},setDefaultPicks,$1};")
       .replace(/const embeddedGame=EMBEDDED_GAME;[\s\S]*?window\.addEventListener\('message',[\s\S]*?\n\}\);\s*$/,'');
 
-    code+=`\nlet integratedLossObserver=null;
+    code+=`\nlet integratedLossObserver=null,integratedTimerObserver=null;
       let integratedManualOpen=false,integratedPendingOpen=null,integratedPendingTension=null;
+      const integratedTimerConfigs={
+        'Трубопровод':{bar:'#bs1TimerBar',duration:17,invert:true,gate:'#bs1Time'},
+        'Watchmen':{bar:'#wmTimer',duration:16},
+        'Thief 1/2':{bar:'#th12Timer',duration:22},
+        'Thief: Deadly Shadows':{bar:'#tdsTimer',duration:22},
+        'Anachronox':{bar:'#anTimer',duration:30},
+        'Hillsfar':{bar:'#hillTimer',duration:28},
+        'Alpha Protocol':{bar:'#apTimer',duration:26},
+        'Mass Effect 2':{bar:'#me2Timer',duration:40}
+      };
+      let integratedTimerLastSent=0;
+      function emitIntegratedTimer(game,force=false){
+        const config=integratedTimerConfigs[game];
+        if(!config){window.postMessage({type:'keynlock-mechanic-timer',game,active:false},location.origin);return;}
+        const now=performance.now();
+        if(!force&&now-integratedTimerLastSent<80)return;
+        integratedTimerLastSent=now;
+        const bar=document.querySelector(config.bar);
+        let percent=Math.max(0,Math.min(100,parseFloat(bar?.style.width)||0));
+        let active=true;
+        if(config.gate){
+          const text=document.querySelector(config.gate)?.textContent||'';
+          active=/Поток через/i.test(text);
+        }
+        if(config.invert)percent=100-percent;
+        window.postMessage({type:'keynlock-mechanic-timer',game,active,timeLeft:config.duration*percent/100,timeMax:config.duration,label:'Время'},location.origin);
+      }
+      function observeIntegratedTimer(game){
+        integratedTimerObserver?.disconnect();
+        const config=integratedTimerConfigs[game];
+        if(!config){emitIntegratedTimer(game,true);return;}
+        const bar=document.querySelector(config.bar);
+        const gate=config.gate?document.querySelector(config.gate):null;
+        integratedTimerObserver=new MutationObserver(()=>emitIntegratedTimer(game));
+        if(bar)integratedTimerObserver.observe(bar,{attributes:true,attributeFilter:['style']});
+        if(gate)integratedTimerObserver.observe(gate,{subtree:true,childList:true,characterData:true});
+        emitIntegratedTimer(game,true);
+      }
       const integratedOriginalOpen=LockRuntime.open;
       const integratedOriginalResetOpen=LockRuntime.resetOpen;
       const integratedOriginalTensionReady=LockRuntime.tensionReady;
@@ -93,12 +141,15 @@
           GameHub.show(index);
           GameHub.get(game)?.reset?.();
           observeIntegratedGame(game);
+          observeIntegratedTimer(game);
           emitEmbeddedState(game);
           host.hidden=false;
           host.focus({preventScroll:true});
         },
         close(){
           integratedLossObserver?.disconnect();
+          integratedTimerObserver?.disconnect();
+          if(EMBEDDED_GAME)window.postMessage({type:'keynlock-mechanic-timer',game:EMBEDDED_GAME,active:false},location.origin);
           GameHub.get(EMBEDDED_GAME)?.leave?.();
           integratedManualOpen=false;
           integratedPendingOpen=null;
@@ -106,7 +157,7 @@
           EMBEDDED_GAME='';
           host.hidden=true;
         },
-        replay(){if(EMBEDDED_GAME)GameHub.get(EMBEDDED_GAME)?.reset?.()},
+        replay(){if(EMBEDDED_GAME){GameHub.get(EMBEDDED_GAME)?.reset?.();observeIntegratedTimer(EMBEDDED_GAME)}},
         attemptOpen(){
           if(integratedPendingOpen){
             if(integratedPendingTension&&!integratedOriginalTensionReady(integratedPendingTension.game,integratedPendingTension.options))return false;

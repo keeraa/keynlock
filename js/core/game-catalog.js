@@ -76,7 +76,9 @@ const GameCatalog=(()=>{
       readiness:Number.isFinite(+saved.readiness)
         ? Math.max(1,Math.min(5,+saved.readiness>5?Math.round(+saved.readiness/20):+saved.readiness))
         : base.readiness,
-      rating:saved.rating===null||saved.rating===''||!Number.isFinite(+saved.rating)?base.rating:Math.max(1,Math.min(10,+saved.rating)),
+      rating:saved.rating===null||saved.rating===''||!Number.isFinite(+saved.rating)
+        ? base.rating
+        : Math.max(1,Math.min(5,+saved.rating>5?Math.round(+saved.rating/2):+saved.rating)),
       lock:{...base.lock,...saved.lock},
       world:{...base.world,...saved.world}
     };
@@ -97,7 +99,7 @@ const GameCatalog=(()=>{
     target[parts.at(-1)]=path==='readiness'
       ? Math.max(1,Math.min(5,Number(value)||1))
       : path==='rating'
-        ? (value===''||value===null?null:Math.max(1,Math.min(10,Number(value)||1)))
+        ? (value===''||value===null?null:Math.max(1,Math.min(5,Number(value)||1)))
         : !!value;
     persist();
     emitChange(id,path);

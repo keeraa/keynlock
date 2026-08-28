@@ -16,18 +16,21 @@
 .gameSettingsTable thead{position:sticky;top:0;z-index:2;}
 .gameSettingsTable th,.gameSettingsTable td{padding:7px 9px;border-bottom:1px solid rgba(164,124,64,.17);text-align:center;vertical-align:middle;}
 .gameSettingsTable thead th{padding:0;background:#21180f;color:#bfa878;white-space:normal;}
-.gameSettingsTable thead button{width:100%;min-height:44px;border:0;background:transparent;color:inherit;padding:6px 8px;font:700 10px/1.2 var(--ui-font);text-transform:uppercase;letter-spacing:.05em;cursor:pointer;}
+.gameSettingsTable thead button{position:relative;width:100%;min-height:44px;border:0;background:transparent;color:inherit;padding:6px 8px;font:700 10px/1.2 var(--ui-font);text-transform:uppercase;letter-spacing:.05em;cursor:pointer;}
 .gameSettingsTable thead button:hover,.gameSettingsTable thead button.active{color:#f0cf88;background:rgba(190,139,61,.08);}
 .gameSettingsTable thead button span{display:block;min-height:11px;margin-top:3px;color:#c99744;font-size:9px;letter-spacing:0;}
+.gameSettingsTable thead button[data-tip]:hover:after,.gameSettingsTable thead button[data-tip]:focus-visible:after{content:attr(data-tip);position:absolute;z-index:8;top:calc(100% + 7px);left:50%;width:220px;max-width:calc(100vw - 30px);transform:translateX(-50%);padding:10px 12px;border:1px solid rgba(198,148,70,.58);border-radius:9px;background:rgba(20,15,10,.98);box-shadow:0 12px 30px rgba(0,0,0,.5);color:#e8d0a0;font:500 11px/1.4 var(--ui-font);text-align:left;text-transform:none;letter-spacing:0;white-space:normal;pointer-events:none;}
 .gameSettingsTable tbody tr:hover{background:rgba(185,137,66,.065);}
 .gameSettingsTable tbody th{min-width:225px;text-align:left;}
-.gameSettingName{display:inline-block;vertical-align:middle;max-width:170px;}
+.gameSettingName{display:inline-flex;align-items:center;gap:10px;vertical-align:middle;max-width:185px;}
+.gameNameText{display:block;min-width:92px;max-width:118px;}
 .gameSettingName strong{display:block;color:#ead19a;font:700 14px/1.15 Georgia,serif;}
 .gameSettingName small{display:block;margin-top:2px;color:#75674f;font:500 9px/1.15 ui-monospace,SFMono-Regular,Menlo,monospace;}
-.gameDifficulty{display:inline-flex;gap:3px;margin-top:4px;}
+.gameDifficulty{display:inline-flex;flex:0 0 auto;gap:3px;}
 .gameDifficulty button{display:grid;place-items:center;width:21px;height:19px;padding:0;border:1px solid rgba(145,108,54,.48);border-radius:5px;background:#15110d;color:#927a50;font:700 9px/1 var(--ui-font);cursor:pointer;}
 .gameDifficulty button:hover{border-color:#bd8b3d;color:#e2bd75;}
 .gameDifficulty button.active{border-color:#d2a24d;background:#8a5c1f;color:#fff0bd;box-shadow:0 0 10px rgba(199,145,57,.18);}
+.gameDifficulty button:disabled{border-color:rgba(110,94,70,.25);background:#11100e;color:#4f493f;box-shadow:none;cursor:not-allowed;filter:none;}
 .gameReadyMark{display:inline-grid;place-items:center;width:17px;height:17px;margin-left:7px;border-radius:50%;background:#8a611f;color:#fff0bd;font:700 11px/1 var(--ui-font);vertical-align:1px;}
 .gameLaunchButton{display:inline-grid;place-items:center;width:30px;height:30px;margin-right:9px;border:1px solid rgba(181,135,62,.58);border-radius:8px;background:#18120d;color:#d7ae64;vertical-align:middle;cursor:pointer;}
 .gameLaunchButton:hover{border-color:#d2a24d;color:#ffe3a5;filter:brightness(1.15);}
@@ -39,12 +42,8 @@
 .gameSettingToggle input:checked+span{border-color:#d3a44f;background:linear-gradient(180deg,#b37a25,#7e501a);box-shadow:0 0 16px rgba(212,161,72,.22);}
 .gameSettingToggle input:checked+span:after{border-color:#fff0bd;}
 .gameSettingToggle input:focus-visible+span{outline:2px solid #e1b65e;outline-offset:2px;}
-.gameReadiness{display:grid;grid-template-columns:minmax(76px,1fr) 30px;align-items:center;gap:6px;min-width:120px;}
-.gameReadiness input{accent-color:#c8953f;width:100%;}
-.gameReadiness output{color:#e8ca89;font:700 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;}
-.gameRatingInput{width:48px;height:30px;box-sizing:border-box;border:1px solid rgba(166,124,58,.52);border-radius:7px;background:#14110d;color:#efd18e;text-align:center;font:700 13px/1 var(--ui-font);appearance:textfield;}
-.gameRatingInput::-webkit-inner-spin-button,.gameRatingInput::-webkit-outer-spin-button{appearance:none;margin:0;}
-.gameRatingInput:focus{outline:2px solid #d2a24d;outline-offset:1px;border-color:#d2a24d;}
+.gameNumberSelect{width:52px;height:30px;box-sizing:border-box;border:1px solid rgba(166,124,58,.52);border-radius:7px;background:#14110d;color:#efd18e;padding:0 6px;text-align:center;font:700 13px/1 var(--ui-font);cursor:pointer;}
+.gameNumberSelect:focus{outline:2px solid #d2a24d;outline-offset:1px;border-color:#d2a24d;}
 .gameSettingsEmpty{padding:60px;text-align:center;color:#9d8967;}
 body.game-settings-open .globalTopHud,body.game-settings-open .inventoryDrawer,body.game-settings-open .alchemyRackDrawer{visibility:hidden!important;pointer-events:none!important;}
 @media(max-width:760px),(max-height:560px) and (orientation:landscape){

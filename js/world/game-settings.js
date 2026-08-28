@@ -33,38 +33,24 @@
     }
 
     function readinessControl(gameId,value){
-      const control=document.createElement('div');
-      control.className='gameReadiness';
-      const input=document.createElement('input');
-      input.type='range';
-      input.min='1';
-      input.max='5';
-      input.step='1';
-      input.value=String(value);
-      input.dataset.gameId=gameId;
-      input.dataset.feature='readiness';
-      input.setAttribute('aria-label','Готовность');
-      const output=document.createElement('output');
-      output.value=`${value}/5`;
-      output.textContent=`${value}/5`;
-      control.append(input,output);
-      return control;
+      const select=document.createElement('select');
+      select.className='gameNumberSelect';
+      select.dataset.gameId=gameId;
+      select.dataset.feature='readiness';
+      select.setAttribute('aria-label',`Готовность: ${gameId}`);
+      for(let number=1;number<=5;number++)select.add(new Option(String(number),String(number),false,number===value));
+      return select;
     }
 
     function ratingControl(gameId,value){
-      const input=document.createElement('input');
-      input.className='gameRatingInput';
-      input.type='number';
-      input.min='1';
-      input.max='10';
-      input.step='1';
-      input.inputMode='numeric';
-      input.placeholder='—';
-      input.value=value??'';
-      input.dataset.gameId=gameId;
-      input.dataset.feature='rating';
-      input.setAttribute('aria-label',`Рейтинг: ${gameId}`);
-      return input;
+      const select=document.createElement('select');
+      select.className='gameNumberSelect';
+      select.dataset.gameId=gameId;
+      select.dataset.feature='rating';
+      select.setAttribute('aria-label',`Рейтинг: ${gameId}`);
+      select.add(new Option('—','',false,value===null));
+      for(let number=1;number<=5;number++)select.add(new Option(String(number),String(number),false,number===value));
+      return select;
     }
 
     function sortValue(id,path){
@@ -107,7 +93,7 @@
         tr.dataset.gameId=id;
         const name=document.createElement('th');
         name.scope='row';
-        name.innerHTML=`<button class="gameLaunchButton" type="button" aria-label="Перейти в игру"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg></button><span class="gameSettingName"><strong></strong><small></small></span>`;
+        name.innerHTML=`<button class="gameLaunchButton" type="button" aria-label="Перейти в игру"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg></button><span class="gameSettingName"><span class="gameNameText"><strong></strong><small></small></span></span>`;
         name.querySelector('button').dataset.launchGame=id;
         name.querySelector('strong').textContent=game.title;
         name.querySelector('small').textContent=id;
@@ -118,22 +104,23 @@
           ready.title='Готово';
           name.querySelector('strong').appendChild(ready);
         }
-        if(game.difficulty.levels.length){
-          const difficulty=document.createElement('span');
-          difficulty.className='gameDifficulty';
-          difficulty.setAttribute('aria-label','Сложность');
-          game.difficulty.levels.forEach(level=>{
-            const button=document.createElement('button');
-            button.type='button';
-            button.dataset.gameDifficulty=id;
-            button.dataset.level=String(level);
-            button.textContent=String(level);
-            button.classList.toggle('active',getModeDifficulty(id)===level);
-            button.setAttribute('aria-label',`${game.title}: сложность ${level}`);
-            difficulty.appendChild(button);
-          });
-          name.querySelector('.gameSettingName').appendChild(difficulty);
-        }
+        const difficulty=document.createElement('span');
+        difficulty.className='gameDifficulty';
+        difficulty.setAttribute('aria-label','Сложность');
+        const supportedLevels=game.difficulty.levels.length?game.difficulty.levels:[1];
+        [1,2,3].forEach(level=>{
+          const supported=supportedLevels.includes(level);
+          const button=document.createElement('button');
+          button.type='button';
+          button.dataset.gameDifficulty=id;
+          button.dataset.level=String(level);
+          button.textContent=String(level);
+          button.disabled=!supported;
+          button.classList.toggle('active',supported&&(game.difficulty.levels.length?getModeDifficulty(id)===level:level===1));
+          button.setAttribute('aria-label',`${game.title}: сложность ${level}${supported?'':' недоступна'}`);
+          difficulty.appendChild(button);
+        });
+        name.querySelector('.gameSettingName').appendChild(difficulty);
         tr.appendChild(name);
         featureColumns.forEach(([path,label])=>{
           const td=document.createElement('td');
@@ -199,9 +186,7 @@
       if(!input)return;
       const value=input.type==='checkbox'?input.checked:input.dataset.feature==='rating'?input.value:Number(input.value);
       GameCatalog.setFeature(input.dataset.gameId,input.dataset.feature,value);
-      if(input.type==='range'){
-        const output=input.parentElement?.querySelector('output');
-        if(output){output.value=`${input.value}/5`;output.textContent=`${input.value}/5`;}
+      if(input.dataset.feature==='readiness'){
         const title=input.closest('tr')?.querySelector('.gameSettingName strong');
         const mark=title?.querySelector('.gameReadyMark');
         if(input.value==='5'&&!mark){
@@ -212,8 +197,9 @@
     rows?.addEventListener('click',event=>{
       const difficulty=event.target.closest?.('[data-game-difficulty]');
       if(difficulty){
-        setModeDifficulty(Number(difficulty.dataset.level),difficulty.dataset.gameDifficulty,false);
-        difficulty.parentElement?.querySelectorAll('button').forEach(button=>button.classList.toggle('active',button===difficulty));
+        const gameId=difficulty.dataset.gameDifficulty;
+        if(GameCatalog.get(gameId)?.difficulty.levels.length)setModeDifficulty(Number(difficulty.dataset.level),gameId,false);
+        launchGame(gameId);
         return;
       }
       const button=event.target.closest?.('[data-launch-game]');

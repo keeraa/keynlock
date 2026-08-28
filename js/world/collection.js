@@ -8,36 +8,34 @@
 // js/world/lair.js's setLairTab toggling `.lairPanel[data-lair-panel]`).
 //
 // Scope, on purpose: this screen only *browses* handles inside one
-// collection at a time (shaft stays fixed to DEFAULT_SHAFT) — not a free
-// shaft+handle mixer. The data shape below doesn't hard-code collection =
+// collection at a time (each handle carries its own paired shaft) — not a
+// free shaft+handle mixer. The data shape below doesn't hard-code collection =
 // one fixed pair, though, so a future "build your own set" screen can
 // reuse PICK_COLLECTIONS without a rewrite. Economy (buying/unlocking) is
 // not built here either — `unlocked` is just a flag other code can flip
 // later; this screen only renders it (grayscale when false).
 (function(){
+  // Every handle gets its own numbered shaft (sting_01..08, matched to the
+  // handle's position within its collection) rather than all sharing one
+  // fixed shaft — building that list inline per collection would repeat the
+  // same eight paths four times over, so it's generated once here instead.
+  function shaftFor(index){ return `assets/picks/shafts/sting_0${index + 1}.png`; }
+  function buildHandles(idPrefix, folder, filePrefix, unlockedFlags){
+    return unlockedFlags.map((unlocked, i) => {
+      const n = String(i + 1).padStart(2, '0');
+      return { id: `${idPrefix}-${n}`, image: `assets/picks/handles/${folder}/${filePrefix}_${n}.png`, shaft: shaftFor(i), unlocked };
+    });
+  }
   const PICK_COLLECTIONS = [
-    { id:'japan', name:'Japan', handles:[
-      { id:'japan-01', image:'assets/picks/handles/japan/japan_big_art_01.png', unlocked:true },
-      { id:'japan-02', image:'assets/picks/handles/japan/japan_big_art_02.png', unlocked:true },
-      { id:'japan-03', image:'assets/picks/handles/japan/japan_big_art_03.png', unlocked:true },
-      { id:'japan-04', image:'assets/picks/handles/japan/japan_big_art_04.png', unlocked:true },
-      { id:'japan-05', image:'assets/picks/handles/japan/japan_big_art_05.png', unlocked:true },
-      { id:'japan-06', image:'assets/picks/handles/japan/japan_big_art_06.png', unlocked:true },
-      { id:'japan-07', image:'assets/picks/handles/japan/japan_big_art_07.png', unlocked:true },
-      { id:'japan-08', image:'assets/picks/handles/japan/japan_big_art_08.png', unlocked:false }
-    ]},
-    { id:'decodance', name:'Decodance Black', handles:[
-      { id:'decodance-01', image:'assets/picks/handles/decodance/decodance_black_01.png', unlocked:true },
-      { id:'decodance-02', image:'assets/picks/handles/decodance/decodance_black_02.png', unlocked:true },
-      { id:'decodance-03', image:'assets/picks/handles/decodance/decodance_black_03.png', unlocked:true },
-      { id:'decodance-04', image:'assets/picks/handles/decodance/decodance_black_04.png', unlocked:true },
-      { id:'decodance-05', image:'assets/picks/handles/decodance/decodance_black_05.png', unlocked:false },
-      { id:'decodance-06', image:'assets/picks/handles/decodance/decodance_black_06.png', unlocked:true },
-      { id:'decodance-07', image:'assets/picks/handles/decodance/decodance_black_07.png', unlocked:true },
-      { id:'decodance-08', image:'assets/picks/handles/decodance/decodance_black_08.png', unlocked:true }
-    ]}
+    { id:'japan', name:'Japan', handles: buildHandles('japan', 'japan', 'japan_big_art',
+      [true, true, true, true, true, true, true, false]) },
+    { id:'decodance', name:'Decodance Black', handles: buildHandles('decodance', 'decodance', 'decodance_black',
+      [true, true, true, true, false, true, true, true]) },
+    { id:'japan-classic-white', name:'Japan Classic White', handles: buildHandles('japan-classic-white', 'japan-classic-white', 'japan_classic_white',
+      [true, true, true, true, true, true, true, true]) },
+    { id:'japan-classic-black', name:'Japan Classic Black', handles: buildHandles('japan-classic-black', 'japan-classic-black', 'japan_classic_black',
+      [true, true, true, true, true, true, true, true]) }
   ];
-  const DEFAULT_SHAFT = 'assets/picks/shafts/sting_01.png';
 
   // Unlock overrides live in storage separately from the hard-coded
   // defaults above, so a future economy pass can flip individual ids
@@ -81,7 +79,6 @@
   let state = {
     collectionId: PICK_COLLECTIONS[0].id,
     handle: PICK_COLLECTIONS[0].handles[0],
-    shaft: DEFAULT_SHAFT,
     // 100% = the source PNGs' own pixel size (matches the prototype's
     // default, unscaled view) — the stage box clips anything past its own
     // edges rather than shrinking content to fit, same as a normal image
@@ -135,13 +132,20 @@
       }else{
         card.disabled = true;
         card.setAttribute('aria-label', 'Ещё не открыто');
+        // The grain overlay (css/collection.css) is masked to this exact
+        // handle's own art so it only covers the pick's actual silhouette,
+        // not the whole square button box around it. A url() inside a
+        // custom property resolves against the stylesheet that reads it
+        // (css/collection.css), not this script or the page — so the path
+        // needs a leading slash, or "assets/..." resolves to "css/assets/...".
+        card.style.setProperty('--handle-mask', `url("/${handle.image}")`);
       }
       $handleStrip.appendChild(card);
     });
   }
 
   function renderStage(){
-    $imgShaft.src = state.shaft;
+    $imgShaft.src = state.handle.shaft;
     $imgHandle.src = state.handle.image;
     $imgShaft.style.transform = 'translateX(-50%)';
     $imgHandle.style.transform = 'translateX(-50%)';

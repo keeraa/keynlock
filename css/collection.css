@@ -283,8 +283,11 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   opacity:.55;
   cursor:not-allowed;
 }
-/* Grainy static over the locked art, on top of the grayscale+blur —
-   an inline SVG turbulence noise, not an image asset. */
+/* Grainy static over the locked art, on top of the grayscale+blur — an
+   SVG turbulence noise. Masked to the handle's own image (JS sets
+   --handle-mask per card) so the grain follows the pick's actual
+   silhouette instead of covering the whole square button box with a
+   visible block around the artwork. */
 .collectionHandleCard.locked::after{
   content:"";
   position:absolute;
@@ -294,4 +297,12 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   mix-blend-mode:overlay;
   opacity:.45;
   pointer-events:none;
+  -webkit-mask-image:var(--handle-mask);
+  -webkit-mask-size:contain;
+  -webkit-mask-repeat:no-repeat;
+  -webkit-mask-position:center;
+  mask-image:var(--handle-mask);
+  mask-size:contain;
+  mask-repeat:no-repeat;
+  mask-position:center;
 }

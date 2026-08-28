@@ -509,9 +509,21 @@ let plateEls=[], pinTopPlateEls=[];
   // Все динамические эффекты идут через requestAnimationFrame:
   // на дисплее 120 Гц браузер отрисовывает их до 120 кадров/с.
   let lastFrame=performance.now();
+  const ACTIVE_FRAME_MS=24;
+  const IDLE_FRAME_MS=160;
+  function scheduleAnimationLoop(delay=ACTIVE_FRAME_MS){
+    setTimeout(()=>requestAnimationFrame(animationLoop),delay);
+  }
   function animationLoop(now){
-    const dt=Math.min(32,now-lastFrame);
+    const dt=Math.min(50,now-lastFrame);
     lastFrame=now;
+    const uiPaused=document.hidden || document.body.classList.contains('lair-open') ||
+      document.body.classList.contains('shop-open') || document.body.classList.contains('map-open') ||
+      document.body.classList.contains('prototype-mechanic-open');
+    if(uiPaused){
+      scheduleAnimationLoop(document.hidden ? 500 : IDLE_FRAME_MS);
+      return;
+    }
     const lerp = 1 - Math.pow(0.001, dt/1000);
     pointerX += (pointerTargetX - pointerX) * lerp;
     pointerY += (pointerTargetY - pointerY) * lerp;
@@ -603,5 +615,5 @@ let plateEls=[], pinTopPlateEls=[];
       if(tnTension>98){tnTension=98;tnDrift=-Math.abs(tnDrift);}
       if($tnNeedle) $tnNeedle.style.left=`${tnTension}%`;
     }
-    requestAnimationFrame(animationLoop);
+    scheduleAnimationLoop(solved ? IDLE_FRAME_MS : ACTIVE_FRAME_MS);
   }

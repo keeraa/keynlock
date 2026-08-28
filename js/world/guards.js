@@ -152,7 +152,7 @@
     }
     const showing = noiseActive() && !solved;
     if(showing !== noiseWasShowing){ noiseWasShowing = showing; renderNoise(); }
-    requestAnimationFrame(noiseTick);
+    setTimeout(()=>requestAnimationFrame(noiseTick),document.hidden ? 500 : 100);
   }
 
   buildGuardFace();

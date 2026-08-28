@@ -62,7 +62,7 @@
 #mapTab .mapTabIcon{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
 #mapTab.active{border-color:#d5a64e;color:#ffe0a0;}
 .mechanismZone,.sharedModeLockArt{overflow:visible!important;--lock-body-image:none;--locker-image:none;}
-.mechanismZone::before,.sharedModeLockArt::before{content:"";position:absolute;background:var(--locker-image) center/contain no-repeat;z-index:0;pointer-events:none;transition:transform .25s ease;will-change:transform;}
+.mechanismZone::before,.sharedModeLockArt::before{content:"";position:absolute;background:var(--locker-image) center/contain no-repeat;z-index:0;pointer-events:none;transition:transform .25s ease;}
 .mechanismZone .lockPanel,.sharedModeLockArt .lockPanel{inset:auto!important;background:var(--lock-body-image) center/contain no-repeat!important;filter:drop-shadow(0 16px 20px rgba(0,0,0,.42));z-index:1!important;pointer-events:none;}
 .mechanismZone .pick,.mechanismZone .tension,.sharedModeLockArt .pick,.sharedModeLockArt .tension{z-index:3!important;}
 .mechanismZone.opening .lockPanel,.sharedModeLockArt.opening .lockPanel{animation:keynlockBodyOpenFast 950ms cubic-bezier(.20,.76,.18,1);}

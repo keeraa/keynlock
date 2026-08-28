@@ -375,7 +375,9 @@
       let layer=host.querySelector(':scope > .passive-bubbles-v44');
       if(!layer){
         layer=document.createElement('div');layer.className='passive-bubbles-v44';
-        const total=12;
+        // Six layers keep the liquid visibly alive without compositing twelve
+        // independently animated nodes for every flask and reagent tube.
+        const total=6;
         for(let i=0;i<total;i++){
           const b=document.createElement('span');b.className='passive-bubble-v44';
           const dur=5.4+Math.random()*4.2;

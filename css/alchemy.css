@@ -984,8 +984,8 @@
   pointer-events: none;
   opacity: 0;
   background: rgba(10, 8, 6, 0.28);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   transition: opacity 0.18s ease;
 }
 body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)

@@ -29,7 +29,8 @@
     { mode: 'composite', x: 72, y: 52 },
     { mode: 'heatcold',  x: 80, y: 60 },
     { mode: 'drum',      x: 64, y: 72 },
-    { mode: 'scope',     x: 56, y: 80 }
+    { mode: 'scope',     x: 56, y: 80 },
+    { mode: 'oblivion',  x: 79, y: 20 }
   ];
 
   const MISSION_STORAGE_KEY = 'lockpickMissions';

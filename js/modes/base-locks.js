@@ -296,6 +296,8 @@ let plateEls=[], pinTopPlateEls=[];
       startDrumRound();
     }else if(mode==='scope'){
       startScopeRound();
+    }else if(mode==='oblivion'){
+      startOblivionRound();
     }
 
     updateModeUI();
@@ -320,6 +322,7 @@ let plateEls=[], pinTopPlateEls=[];
       mode==='composite' ? 'Новая составная отмычка' :
       mode==='heatcold' ? 'Новый цифровой код' :
       mode==='drum' ? 'Новый барабанный замок' :
+      mode==='oblivion' ? 'Новый штифтовый замок' :
       'Новый сигнал осциллографа';
     if(notify){
       toast(msg);
@@ -342,6 +345,7 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='heatcold'){ startHeatColdRound(); toast('Цифровой код обновлён'); return; }
     if(mode==='drum'){ startDrumRound(); toast('Барабанный замок обновлён'); return; }
     if(mode==='scope'){ startScopeRound(); toast('Сигнал обновлён'); return; }
+    if(mode==='oblivion'){ startOblivionRound(); toast('Штифтовый замок обновлён'); return; }
     state=[...initial]; solved=false; $lock.classList.remove('win');
     $mechanism.classList.remove('ready','opening','opened');
     render(); toast('Механизм сброшен');
@@ -389,6 +393,7 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='anach') return moveAn(dir);
     if(mode==='skyrim') return moveSkyrim(dir);
     if(mode==='r2') return moveR2(dir);
+    if(mode==='oblivion') return obMove(dir);
     if(mode==='g1') return g1Press(dir);
     if(mode==='mass') return moveMass(dir);
     if(mode==='hillsfar') return;
@@ -481,7 +486,8 @@ let plateEls=[], pinTopPlateEls=[];
     r2:()=>tryOpenR2(),
     g1:()=>tryOpenG1(),
     hillsfar:()=>tryOpenHillsfar(),
-    mass:()=>tryOpenMass()
+    mass:()=>tryOpenMass(),
+    oblivion:()=>tryOpenOblivion()
   });
 
   function select(delta){
@@ -493,6 +499,10 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='skyrim'){ if(delta<0) GameActions.attemptOpen({modeId:'skyrim',source:'keyboard'}); return; }
     if(mode==='r2'){
       if(delta<0) return attemptR2Pin();
+      return;
+    }
+    if(mode==='oblivion'){
+      if(delta<0) obClick(obSelected);
       return;
     }
     if(mode==='g1') return;
@@ -513,6 +523,7 @@ let plateEls=[], pinTopPlateEls=[];
     else if(mode==='anach'){ $mechanism.classList.remove('ready'); }
     else if(mode==='skyrim'){ $mechanism.classList.remove('ready'); }
     else if(mode==='r2'){ $mechanism.classList.remove('ready'); }
+    else if(mode==='oblivion'){ $mechanism.classList.remove('ready'); }
     else if(mode==='g1'){ $mechanism.classList.remove('ready'); }
     else if(mode==='mass'){ $mechanism.classList.remove('ready'); }
     else if(mode!=='hillsfar') $mechanism.classList.toggle('ready',!solved && goalMet());
@@ -625,6 +636,9 @@ let plateEls=[], pinTopPlateEls=[];
       if(tnTension<2){tnTension=2;tnDrift=Math.abs(tnDrift);}
       if(tnTension>98){tnTension=98;tnDrift=-Math.abs(tnDrift);}
       if($tnNeedle) $tnNeedle.style.left=`${tnTension}%`;
+    }
+    if(mode==='oblivion' && !solved){
+      obTick(Math.min(.035,dt/1000));
     }
     scheduleAnimationLoop(solved ? 160 : ACTIVE_FRAME_MS);
   }

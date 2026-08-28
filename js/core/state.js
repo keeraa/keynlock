@@ -125,6 +125,12 @@
   let tnTension=40, tnTarget=52, tnWidth=18, tnIndex=0, tnDrift=.05, tnDragging=false, tnReady=false;
   let rsIndex=0, rsT=0, rsSpeeds=[], rsBaseSpeeds=[], rsSpeedTargets=[], rsSpeedChangeAt=[], rsPauseUntil=[], rsOffsets=[], rsPhases=[], rsLaneEls=[], rsOrbEls=[], rsReady=false;
   let kdVals=[2,2,2,2,2], kdTarget=[2,2,2,2,2], kdSelected=0, kdTests=0, kdFailures=0, kdLogs=[], kdReady=false;
+  // Штифтовый замок (Oblivion): each pin springs up on its own timer, pauses
+  // briefly at its own apex height, then falls — click/select during that
+  // pause to set it. obPins holds one record per pin: {rise,state('idle'|
+  // 'up'|'pause'|'down'),phase,speed,baseSpeed,pinH,apex,set}.
+  let obPins=[], obSelected=0, obPinEls=[];
+  const OB_READY_MIN=76, OB_READY_MAX=112;
   const CP_LEVEL_NAMES=['ВЕРХ','ЦЕНТР','НИЗ'];
   let cpNodes=[1,1,1,1,1], cpTarget=[1,1,1,1], cpVals=[1,1,1,1], cpInitial=[1,1,1,1], cpSelected=0, cpReady=false;
   let hcSecret=[0,0,0,0], hcAttempts=[], hcDigits=[0,0,0,0], hcActiveIndex=0;
@@ -158,7 +164,8 @@
         $compositeMode=document.querySelector('#compositeMode'), $cpPins=document.querySelector('#cpPins'), $cpBuildPins=document.querySelector('#cpBuildPins'), $cpTargetShadow=document.querySelector('#cpTargetShadow'), $cpTargetFill=document.querySelector('#cpTargetFill'), $cpTargetTopLine=document.querySelector('#cpTargetTopLine'), $cpTargetBevel=document.querySelector('#cpTargetBevel'), $cpTargetPath=document.querySelector('#cpTargetPath'), $cpTargetGlow=document.querySelector('#cpTargetGlow'), $cpBuildShadow=document.querySelector('#cpBuildShadow'), $cpBuildFill=document.querySelector('#cpBuildFill'), $cpBuildTopLine=document.querySelector('#cpBuildTopLine'), $cpBuildBevel=document.querySelector('#cpBuildBevel'), $cpBuildPath=document.querySelector('#cpBuildPath'), $cpBuildGlow=document.querySelector('#cpBuildGlow'), $cpBuildJoints=document.querySelector('#cpBuildJoints'), $cpParts=document.querySelector('#cpParts'), $cpState=document.querySelector('#cpState'),
         $heatColdMode=document.querySelector('#heatColdMode'), $hcInput=document.querySelector('#hcInput'), $hcDialRow=document.querySelector('#hcDialRow'), $hcSlots=document.querySelector('#hcSlots'), $hcResult=document.querySelector('#hcResult'), $hcRows=document.querySelector('#hcRows'),
         $drumMode=document.querySelector('#drumMode'), $drumWheels=document.querySelector('#drumWheels'), $drumCheck=document.querySelector('#drumCheck'), $drumResult=document.querySelector('#drumResult'), $drumSound=document.querySelector('#drumSound'), $drumNew=document.querySelector('#drumNew'),
-        $scopeMode=document.querySelector('#scopeMode'), $scopeCanvas=document.querySelector('#scopeCanvas'), $scopeWheels=document.querySelector('#scopeWheels'), $scopeScore=document.querySelector('#scopeScore'), $scopeBar=document.querySelector('#scopeBar'), $scopeCheck=document.querySelector('#scopeCheck'), $scopeResult=document.querySelector('#scopeResult'), $scopeNew=document.querySelector('#scopeNew');
+        $scopeMode=document.querySelector('#scopeMode'), $scopeCanvas=document.querySelector('#scopeCanvas'), $scopeWheels=document.querySelector('#scopeWheels'), $scopeScore=document.querySelector('#scopeScore'), $scopeBar=document.querySelector('#scopeBar'), $scopeCheck=document.querySelector('#scopeCheck'), $scopeResult=document.querySelector('#scopeResult'), $scopeNew=document.querySelector('#scopeNew'),
+        $obMode=document.querySelector('#obMode'), $obLock=document.querySelector('#obLock'), $obMessage=document.querySelector('#obMessage');
 
   const MODE_PANELS=Object.freeze({
     hillsfar:$hillsfarMode,
@@ -173,13 +180,14 @@
     composite:$compositeMode,
     heatcold:$heatColdMode,
     drum:$drumMode,
-    scope:$scopeMode
+    scope:$scopeMode,
+    oblivion:$obMode
   });
   const IMPORTED_MODES=new Set(Object.keys(MODE_PANELS));
   const ALL_MODES=new Set(GameCatalog.nativeIds);
 
   const DIFFICULTY_STORAGE_KEY='lockpickModeDifficulty';
-  const DEFAULT_MODE_DIFFICULTY=Object.freeze({classic:1,target:1,line:1,sequence:1,special:1,hillsfar:1,mass:1,g1:1,r2:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,heatcold:1,drum:1,scope:1});
+  const DEFAULT_MODE_DIFFICULTY=Object.freeze({classic:1,target:1,line:1,sequence:1,special:1,hillsfar:1,mass:1,g1:1,r2:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,heatcold:1,drum:1,scope:1,oblivion:1});
   function loadModeDifficulty(){
     try{
       const saved=JSON.parse(STORE.getItem(DIFFICULTY_STORAGE_KEY)||'{}');

@@ -51,6 +51,8 @@ if(mode==='classic'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ВЫСТАВИТЬ 4 БАРАБАНА ПО СИЛЕ ЩЕЛЧКА</b>';
     }else if(mode==='scope'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>СОВМЕСТИТЬ ТЕКУЩИЙ СИГНАЛ С ЭТАЛОНОМ</b>';
+    }else if(mode==='oblivion'){
+      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ПОДНЯТЬ И ЗАФИКСИРОВАТЬ ВСЕ ШТИФТЫ</b>';
     }
   }
 

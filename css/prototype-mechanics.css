@@ -4,7 +4,8 @@ body.game-inactive.prototype-has-classic-lock #lock.universalLockBlock .lockHitA
 .prototype-has-classic-lock #lock.universalLockBlock.prototype-wrong-tension{animation:prototypeWrongTension .38s ease both;}
 @keyframes prototypeWrongTension{0%,100%{margin-left:0}20%{margin-left:-13px}40%{margin-left:11px}60%{margin-left:-8px}80%{margin-left:5px}}
 .prototypeMechanicOverlay[hidden]{display:none!important;}
-.prototypeMechanicFrame{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;}
+.prototypeMechanicHost{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;outline:0;}
+.prototypeMechanicHost[hidden]{display:none!important;}
 .prototypeMechanicLoss{position:absolute;inset:0;z-index:5;display:grid;place-items:center;padding:20px;background:rgba(2,2,3,.68);backdrop-filter:blur(4px);}
 .prototypeMechanicLoss[hidden]{display:none!important;}
 .prototypeMechanicLossCard{width:min(430px,92vw);padding:26px;display:flex;flex-direction:column;align-items:center;gap:12px;border:1px solid rgba(190,145,71,.7);border-radius:18px;background:linear-gradient(180deg,#2e2318,#14100c);color:#d7c3a0;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.58);}

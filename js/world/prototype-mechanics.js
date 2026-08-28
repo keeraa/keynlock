@@ -22,14 +22,12 @@
   let activePrototypeMechanic=null;
 
   const $prototypeMechanicOverlay=document.querySelector('#prototypeMechanicOverlay');
-  const $prototypeMechanicFrame=document.querySelector('#prototypeMechanicFrame');
   const $prototypeMechanicLoss=document.querySelector('#prototypeMechanicLoss');
 
   function prototypeLocationId(place){return `prototype-${place.id}`;}
-  function prototypeMechanicUrl(place){return `prototypes/lockpicking-mechanics-v63.html?game=${encodeURIComponent(place.game)}&picks=${Math.max(0,picks)}&tension=${Math.max(1,Math.min(5,tensionSkin||1))}&run=${Date.now()}`;}
   function syncPrototypeTools(){
-    if(!activePrototypeMechanic||!$prototypeMechanicFrame?.contentWindow)return;
-    $prototypeMechanicFrame.contentWindow.postMessage({type:'keynlock-player-tools',tensionSkin:Math.max(1,Math.min(5,tensionSkin||1))},location.origin);
+    if(!activePrototypeMechanic)return;
+    window.KeynlockImportedGames?.setTools({tension:Math.max(1,Math.min(5,tensionSkin||1))});
   }
 
   PROTOTYPE_MECHANIC_PLACES.forEach(place=>{
@@ -60,7 +58,7 @@
 
   function openPrototypeMechanic(location){
     const place=PROTOTYPE_MECHANIC_PLACES.find(item=>item.id===location.prototypeId);
-    if(!place||!$prototypeMechanicOverlay||!$prototypeMechanicFrame)return;
+    if(!place||!$prototypeMechanicOverlay)return;
     if(mapOpen){mapOpen=false;document.body.classList.remove('map-open');$worldMapScreen.hidden=true;}
     activePrototypeMechanic=place;
     document.body.dataset.prototypeGameId=`prototype:${place.id}`;
@@ -73,7 +71,9 @@
     runReward=1000;
     updateEconomyUI();
     updateMechanismAssetHud();
-    $prototypeMechanicFrame.src=prototypeMechanicUrl(place);
+    window.KeynlockImportedInitialPicks=Math.max(0,picks);
+    window.KeynlockImportedGames?.open(place.game,{picks,tension:Math.max(1,Math.min(5,tensionSkin||1))})
+      .catch(error=>{console.error('[prototype-mechanic]',error);toast('Не удалось открыть механику');});
   }
 
   function closePrototypeMechanic(){
@@ -82,7 +82,7 @@
     delete document.body.dataset.prototypeGameId;
     $prototypeMechanicOverlay.hidden=true;
     $prototypeMechanicLoss.hidden=true;
-    if($prototypeMechanicFrame)$prototypeMechanicFrame.src='about:blank';
+    window.KeynlockImportedGames?.close();
     document.body.classList.remove('prototype-mechanic-open','prototype-has-classic-lock');
     setGameInactive(false);
     updateMechanismAssetHud();
@@ -96,7 +96,7 @@
     delete document.body.dataset.prototypeGameId;
     $prototypeMechanicOverlay.hidden=true;
     $prototypeMechanicLoss.hidden=true;
-    if($prototypeMechanicFrame)$prototypeMechanicFrame.src='about:blank';
+    window.KeynlockImportedGames?.close();
     document.body.classList.remove('prototype-mechanic-open','prototype-has-classic-lock');
     setGameInactive(false);
     updateMechanismAssetHud();
@@ -104,12 +104,12 @@
   }
 
   function replayPrototypeMechanic(){
-    if(!activePrototypeMechanic||!$prototypeMechanicFrame)return;
+    if(!activePrototypeMechanic)return;
     picks=pickCapacity;
     brokenPicks=0;
     renderInventoryTools();
     $prototypeMechanicLoss.hidden=true;
-    $prototypeMechanicFrame.src=prototypeMechanicUrl(activePrototypeMechanic);
+    window.KeynlockImportedGames?.replay();
   }
 
   const baseArriveAtLocationForPrototype=arriveAtLocation;
@@ -124,21 +124,13 @@
     if(node)travelToMapLocation(node.dataset.location);
   });
   document.querySelector('#prototypeMechanicReplay')?.addEventListener('click',replayPrototypeMechanic);
-  $prototypeMechanicFrame?.addEventListener('load',()=>{
-    if(!activePrototypeMechanic||$prototypeMechanicFrame.src==='about:blank')return;
-    requestAnimationFrame(()=>{
-      syncPrototypeTools();
-      $prototypeMechanicFrame.focus({preventScroll:true});
-      $prototypeMechanicFrame.contentWindow?.focus();
-    });
-  });
   document.querySelector('#inventoryTensionRail')?.addEventListener('click',()=>requestAnimationFrame(syncPrototypeTools));
   ['#shopHudButton','#lairHudButton','#mapTab'].forEach(selector=>{
     document.querySelector(selector)?.addEventListener('click',()=>leavePrototypeMechanic(),{capture:true});
   });
 
   window.addEventListener('message',event=>{
-    if(event.origin!==location.origin||event.source!==$prototypeMechanicFrame?.contentWindow||!activePrototypeMechanic)return;
+    if(event.origin!==location.origin||event.source!==window||!activePrototypeMechanic)return;
     if(event.data?.game!==activePrototypeMechanic.game)return;
     if(event.data.type==='keynlock-mechanic-state'){
       const goal=String(event.data.goal||'Выполнить взлом').trim().toUpperCase();

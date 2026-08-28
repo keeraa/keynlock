@@ -26,6 +26,7 @@
 <link rel="stylesheet" href="css/mobile.css">
 <link rel="stylesheet" href="css/global-top-hud.css">
 <link rel="stylesheet" href="css/game-settings.css">
+<link rel="stylesheet" href="css/challenge-hud.css">
 
 
 
@@ -39,22 +40,7 @@
 <div class="app" id="app">
 <header class="globalTopHud" id="globalTopHud" aria-label="Верхнее меню игры">
 <div class="topRightHud">
-  <div class="timerCircleHud hidden" id="timerCircleHud" aria-hidden="true">
-    <svg class="timerCircleSvg" viewBox="0 0 80 80" aria-hidden="true">
-      <circle class="timerCircleBg" cx="40" cy="40" r="36"></circle>
-      <circle class="timerCircleTrack" cx="40" cy="40" r="30"></circle>
-      <circle class="timerCircleProgress" id="timerCircleProgress" cx="40" cy="40" r="30"></circle>
-    </svg>
-    <div class="timerCircleInner">
-      <div class="timerCircleValue" id="timerCircleValue">--</div>
-      <div class="timerCircleLabel" id="timerCircleLabel">ТАЙМЕР</div>
-    </div>
-  </div>
 <div class="economyHud" id="economyHud">
-  <div class="rewardBox hudSquareBadge" id="rewardBox">
-    <span class="hudBadgeLabel">За замок</span>
-    <strong class="hudBadgeValue" id="runReward">1000</strong>
-  </div>
   <div class="balanceBox hudSquareBadge" id="balanceBox" aria-label="Деньги">
     <span class="hudBadgeLabel">Деньги</span>
     <strong class="hudBadgeValue"><span class="coinIcon">◈</span><span id="coinBalance">0</span></strong>
@@ -380,7 +366,21 @@
     </div>
   </div>
 </section>
-<div class="difficulty" id="objectiveLine">ЦЕЛЬ: <b>ПОДНЯТЬ ВСЕ ШТИФТЫ</b></div>
+<section class="challengeHud" id="challengeHud" aria-label="Условия текущей головоломки">
+  <div class="challengeObjective difficulty" id="objectiveLine">ЦЕЛЬ: <b>ПОДНЯТЬ ВСЕ ШТИФТЫ</b></div>
+  <div class="challengeStatus" id="challengeStatus">
+    <div class="rewardBox challengeMetric challengeReward" id="rewardBox">
+      <span class="challengeMetricLabel">За замок</span>
+      <strong class="challengeMetricValue" id="runReward">1000</strong>
+    </div>
+    <div class="challengeDivider" aria-hidden="true"></div>
+    <div class="challengeMetric challengeTimer hidden" id="challengeTimer" aria-hidden="true">
+      <span class="challengeMetricLabel" id="challengeTimerLabel">Время</span>
+      <strong class="challengeMetricValue" id="challengeTimerValue">00:00</strong>
+      <span class="challengeTimerTrack" aria-hidden="true"><span id="challengeTimerProgress"></span></span>
+    </div>
+  </div>
+</section>
 <main class="main">
 <div class="scene">
 <div class="glow"></div>
@@ -713,6 +713,7 @@
 </div>
 <div class="toast" id="toast"><span class="toastText" id="toastText"></span><button class="toastAction" id="toastAction" type="button" onclick="restartCurrentRound();document.querySelector('#toast')?.classList.remove('show','actionable')">Новый замок</button></div>
 <script src="js/core/game-catalog.js"></script>
+<script src="js/core/challenge-hud.js"></script>
 <script src="js/core/state.js"></script>
 <script src="js/core/audio.js"></script>
 <script src="js/core/ui.js"></script>

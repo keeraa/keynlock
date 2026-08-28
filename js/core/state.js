@@ -134,7 +134,7 @@
   let g1Length=4, r2PinCount=6, tnPinCount=5, rsPinCount=5, kdToothCount=5, skSolveTolerance=6;
   const $plates=document.querySelector('#plates'), $status=document.querySelector('#status'),
         $lock=document.querySelector('#lock'),
-        $timerCircleHud=document.querySelector('#timerCircleHud'), $timerCircleProgress=document.querySelector('#timerCircleProgress'), $timerCircleValue=document.querySelector('#timerCircleValue'), $timerCircleLabel=document.querySelector('#timerCircleLabel'),
+        challengeHud=new GameChallengeHud(document.querySelector('#challengeHud')),
         $toast=document.querySelector('#toast'), $toastText=document.querySelector('#toastText'), $toastAction=document.querySelector('#toastAction'), $scene=document.querySelector('.scene'), $mechanism=document.querySelector('.mechanismZone'), $lockHitArea=document.querySelector('#lockHitArea'),
         $objectiveLine=document.querySelector('#objectiveLine'),
         $mapTab=document.querySelector('#mapTab'),

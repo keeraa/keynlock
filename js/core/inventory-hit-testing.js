@@ -509,12 +509,13 @@
   // height taller than the flat LIFT everyone else gets, on request — more
   // of the shelf clears the peek line at full approach, not just a few
   // extra px of cork).
-  function makeApproach(selector, cssVar, maxLift=LIFT){
+  function makeApproach(selector, cssVar, maxLift=LIFT,onLift=null){
     return function apply(){
       const drawer=document.querySelector(selector);
       if(!drawer) return;
       if(drawer.classList.contains('open')){
         drawer.style.setProperty(cssVar,'0px');
+        if(onLift) onLift(0);
         return;
       }
       const r=drawer.getBoundingClientRect();
@@ -532,10 +533,14 @@
       const reach=Math.max(1,TRIGGER_DEPTH-peek);
       const t=seen ? ease(clamp01(1 - gapTo(restingRect)/reach)) : 0;
       const peak=typeof maxLift==='function' ? maxLift(r) : maxLift;
-      drawer.style.setProperty(cssVar,`${(t*peak).toFixed(2)}px`);
+      const amount=t*peak;
+      drawer.style.setProperty(cssVar,`${amount.toFixed(2)}px`);
+      if(onLift) onLift(amount);
     };
   }
-  const applyInventoryApproach=makeApproach('#inventoryDrawer','--inv-approach');
+  const applyInventoryApproach=makeApproach('#inventoryDrawer','--inv-approach',LIFT,amount=>{
+    document.querySelector('#challengeHud')?.style.setProperty('--challenge-inventory-lift',`${amount.toFixed(2)}px`);
+  });
   const applyRackApproach=makeApproach('#alchemyRackDrawer','--rack-approach', r=>LIFT+r.height*0.15);
 
   function apply(){

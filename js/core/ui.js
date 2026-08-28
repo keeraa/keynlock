@@ -29,13 +29,11 @@
 
   function updateEconomyUI(){
     $coinBalance.textContent=balance;
-    $runReward.textContent=runReward;
+    challengeHud.setReward(runReward);
 }
 
   function animateRewardDrop(){
-    $rewardBox.classList.remove('drop');
-    void $rewardBox.offsetWidth;
-    $rewardBox.classList.add('drop');
+    challengeHud.pulseReward();
   }
 
   let toolMotionKick = 0;
@@ -89,19 +87,7 @@
     return type==='wood' || (type==='iron'&&pickProgress.iron) || (type==='diamond'&&pickProgress.diamond);
   }
 function setGlobalTimer(active=false, timeLeft=0, timeMax=1, label='ТАЙМЕР'){
-    if(!$timerCircleHud || !$timerCircleProgress || !$timerCircleValue || !$timerCircleLabel) return;
-    $timerCircleHud.classList.toggle('hidden', !active);
-    $timerCircleHud.setAttribute('aria-hidden', active ? 'false' : 'true');
-    if(!active) return;
-    const safeMax = Math.max(.001, timeMax || 1);
-    const pct = Math.max(0, Math.min(1, timeLeft / safeMax));
-    const radius = 30;
-    const circumference = 2 * Math.PI * radius;
-    $timerCircleProgress.style.strokeDasharray = `${circumference}`;
-    $timerCircleProgress.style.strokeDashoffset = `${circumference * (1 - pct)}`;
-    $timerCircleProgress.style.stroke = pct > .45 ? '#d9f184' : (pct > .2 ? '#e8c77e' : '#e58468');
-    $timerCircleValue.textContent = `${timeLeft.toFixed(1)}с`;
-    $timerCircleLabel.textContent = label;
+    challengeHud.setTimer({active,timeLeft,timeMax,label});
   }
 
   function updatePickUI(){

@@ -48,6 +48,7 @@ function freezeGameDefinitions(definitions){
     // catalogue schema complete for every consumer.
     if(entry.world.noiseSensor===undefined)entry.world.noiseSensor=false;
     if(entry.readiness===undefined)entry.readiness=entry.kind==='native'?4:3;
+    if(entry.rating===undefined)entry.rating=null;
     Object.freeze(entry.lock);
     Object.freeze(entry.world);
     Object.freeze(entry);
@@ -58,7 +59,7 @@ function freezeGameDefinitions(definitions){
 const GameCatalog=(()=>{
   const definitions=freezeGameDefinitions(GAME_DEFINITIONS);
   const storageKey='keynlockGameCatalogOverrides';
-  const editablePaths=Object.freeze(['lock.present','lock.manualOpen','world.noise','world.noiseSensor','world.guards','world.birds','readiness']);
+  const editablePaths=Object.freeze(['lock.present','lock.manualOpen','world.noise','world.noiseSensor','world.guards','world.birds','readiness','rating']);
   let overrides={};
   try{overrides=JSON.parse(localStorage.getItem(storageKey)||'{}')||{};}catch(_){overrides={};}
   const nativeIds=Object.freeze(Object.keys(definitions).filter(id=>definitions[id].kind==='native'));
@@ -72,6 +73,7 @@ const GameCatalog=(()=>{
       readiness:Number.isFinite(+saved.readiness)
         ? Math.max(1,Math.min(5,+saved.readiness>5?Math.round(+saved.readiness/20):+saved.readiness))
         : base.readiness,
+      rating:saved.rating===null||saved.rating===''||!Number.isFinite(+saved.rating)?base.rating:Math.max(1,Math.min(10,+saved.rating)),
       lock:{...base.lock,...saved.lock},
       world:{...base.world,...saved.world}
     };
@@ -89,7 +91,11 @@ const GameCatalog=(()=>{
     const entry=overrides[id]||(overrides[id]={});
     let target=entry;
     for(const part of parts.slice(0,-1))target=target[part]||(target[part]={});
-    target[parts.at(-1)]=path==='readiness'?Math.max(1,Math.min(5,Number(value)||1)):!!value;
+    target[parts.at(-1)]=path==='readiness'
+      ? Math.max(1,Math.min(5,Number(value)||1))
+      : path==='rating'
+        ? (value===''||value===null?null:Math.max(1,Math.min(10,Number(value)||1)))
+        : !!value;
     persist();
     emitChange(id,path);
     return get(id);

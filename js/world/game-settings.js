@@ -51,6 +51,22 @@
       return control;
     }
 
+    function ratingControl(gameId,value){
+      const input=document.createElement('input');
+      input.className='gameRatingInput';
+      input.type='number';
+      input.min='1';
+      input.max='10';
+      input.step='1';
+      input.inputMode='numeric';
+      input.placeholder='—';
+      input.value=value??'';
+      input.dataset.gameId=gameId;
+      input.dataset.feature='rating';
+      input.setAttribute('aria-label',`Рейтинг: ${gameId}`);
+      return input;
+    }
+
     function sortValue(id,path){
       const game=GameCatalog.get(id);
       return path==='title'?game.title:GameCatalog.feature(id,path);
@@ -59,6 +75,9 @@
     function compareGames(a,b){
       const left=sortValue(a,sortPath);
       const right=sortValue(b,sortPath);
+      if(left===null&&right===null)return 0;
+      if(left===null)return 1;
+      if(right===null)return -1;
       if(typeof left==='string')return left.localeCompare(right,'ru',{sensitivity:'base'})*sortDirection;
       return ((Number(left)||0)-(Number(right)||0))*sortDirection;
     }
@@ -108,6 +127,9 @@
         const readiness=document.createElement('td');
         readiness.appendChild(readinessControl(id,game.readiness));
         tr.appendChild(readiness);
+        const rating=document.createElement('td');
+        rating.appendChild(ratingControl(id,game.rating));
+        tr.appendChild(rating);
         rows.appendChild(tr);
       });
       if(empty)empty.hidden=visible.length>0;
@@ -159,7 +181,7 @@
     rows?.addEventListener('input',event=>{
       const input=event.target.closest?.('[data-game-id][data-feature]');
       if(!input)return;
-      const value=input.type==='checkbox'?input.checked:Number(input.value);
+      const value=input.type==='checkbox'?input.checked:input.dataset.feature==='rating'?input.value:Number(input.value);
       GameCatalog.setFeature(input.dataset.gameId,input.dataset.feature,value);
       if(input.type==='range'){
         const output=input.parentElement?.querySelector('output');

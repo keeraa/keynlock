@@ -116,7 +116,7 @@
           button.dataset.level=String(level);
           button.textContent=String(level);
           button.disabled=!supported;
-          button.classList.toggle('active',supported&&(game.difficulty.levels.length?getModeDifficulty(id)===level:level===1));
+          button.classList.toggle('active',supported&&game.kind==='native'&&id===mode&&getModeDifficulty(id)===level);
           button.setAttribute('aria-label',`${game.title}: сложность ${level}${supported?'':' недоступна'}`);
           difficulty.appendChild(button);
         });

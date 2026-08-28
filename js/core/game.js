@@ -73,6 +73,10 @@ if(mode==='classic'){
     }
   }
 
+  window.addEventListener('keynlock-game-catalog-change',event=>{
+    if(!event.detail?.id || event.detail.id===mode)updateModeUI();
+  });
+
   function getVisibleLockArts(){
     return [...document.querySelectorAll('.mechanismZone, .sharedModeLockArt')].filter(el=>{
       const st=getComputedStyle(el);

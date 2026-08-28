@@ -24,6 +24,7 @@
 <link rel="stylesheet" href="css/prototype-mechanics.css">
 <link rel="stylesheet" href="css/mobile.css">
 <link rel="stylesheet" href="css/global-top-hud.css">
+<link rel="stylesheet" href="css/game-settings.css">
 
 
 
@@ -95,6 +96,12 @@
   <path d="M9 3v15"></path>
   <path d="M15 6v15"></path>
 </svg></button>
+  <button class="mapCornerBtn hudNavBtn" id="gameSettingsButton" type="button" aria-label="Настройки игр" title="Настройки игр">
+    <svg class="hudNavIcon" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="3"></circle>
+      <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.86 2.86-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.55v-.09A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.86-2.86.06-.06A1.7 1.7 0 0 0 4.2 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H2.4V9.55h.1A1.7 1.7 0 0 0 4.2 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06L6.66 3.8l.06.06A1.7 1.7 0 0 0 8.6 4.2a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V2.4h4.05v.1a1.7 1.7 0 0 0 .95 1.7 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.86 2.86-.06.06A1.7 1.7 0 0 0 19.4 8.6a1.7 1.7 0 0 0 .6 1 1.7 1.7 0 0 0 1.1.4h.1v4.05h-.1a1.7 1.7 0 0 0-1.7.95Z"></path>
+    </svg>
+  </button>
   <div class="assetNameHud" id="assetNameHud" aria-live="polite">
     <div id="assetNameLock">lock: —</div>
     <div id="assetNameShackle">shackle: —</div>
@@ -141,6 +148,31 @@
     <div class="alchemyRackDrawerFront" aria-hidden="true"></div>
   </div>
 </div>
+
+<section class="gameSettingsScreen" id="gameSettingsScreen" hidden aria-label="Настройки игр">
+  <div class="gameSettingsDialog" role="dialog" aria-modal="true" aria-labelledby="gameSettingsTitle">
+    <div class="gameSettingsHeader">
+      <div>
+        <span class="gameSettingsKicker">ВНУТРЕННИЙ КАТАЛОГ</span>
+        <h1 id="gameSettingsTitle">Настройки игр</h1>
+        <p>Общие возможности механик. Изменения применяются сразу и сохраняются в этом браузере.</p>
+      </div>
+      <button class="gameSettingsClose" id="gameSettingsClose" type="button" aria-label="Закрыть настройки">×</button>
+    </div>
+    <div class="gameSettingsToolbar">
+      <label class="gameSettingsSearch"><span>Поиск</span><input id="gameSettingsSearch" type="search" placeholder="Название игры"></label>
+      <label class="gameSettingsFilter"><span>Тип</span><select id="gameSettingsKind"><option value="all">Все игры</option><option value="native">Встроенные</option><option value="prototype">Перенесённые</option></select></label>
+      <button class="gameSettingsResetAll" id="gameSettingsResetAll" type="button">Сбросить изменения</button>
+    </div>
+    <div class="gameSettingsTableWrap">
+      <table class="gameSettingsTable">
+        <thead><tr><th>Игра</th><th>Тип</th><th>Физический замок</th><th>Отдельное открытие</th><th>Шум</th><th>Датчик шума</th><th>Стражники</th><th>Птицы</th><th>Готовность</th><th></th></tr></thead>
+        <tbody id="gameSettingsRows"></tbody>
+      </table>
+    </div>
+    <div class="gameSettingsEmpty" id="gameSettingsEmpty" hidden>Игры не найдены</div>
+  </div>
+</section>
 
 <section class="worldMapScreen" id="worldMapScreen" hidden aria-label="Карта города">
   <button class="worldMapClose" id="worldMapClose" type="button" aria-label="Закрыть карту">×</button>
@@ -698,6 +730,7 @@
 <script src="js/world/guards.js"></script>
 <script src="js/world/missions.js"></script>
 <script src="js/world/prototype-mechanics.js"></script>
+<script src="js/world/game-settings.js"></script>
 <script src="js/core/init.js"></script>
 <script src="js/core/inventory-hit-testing.js"></script>
 

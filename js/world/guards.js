@@ -172,6 +172,9 @@
   buildGuardFace();
   buildNoiseMeter();
   renderNoise();
+  window.addEventListener('keynlock-game-catalog-change',event=>{
+    if(!event.detail?.id || event.detail.id===mode)renderNoise();
+  });
   addEventListener('resize', placeNoiseMeter, { passive:true });
   requestAnimationFrame(noiseTick);
 

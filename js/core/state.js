@@ -1,5 +1,5 @@
   const GOAL=4, MIN=1, MAX=7;
-  const WORLD_PAUSE_CLASSES=['lair-open','shop-open','map-open','prototype-mechanic-open'];
+  const WORLD_PAUSE_CLASSES=['lair-open','shop-open','map-open','prototype-mechanic-open','game-settings-open'];
   let worldPauseState=null;
   function isWorldPaused(){
     return document.hidden || WORLD_PAUSE_CLASSES.some(name=>document.body.classList.contains(name));

@@ -47,6 +47,7 @@ function freezeGameDefinitions(definitions){
     // Quiet locations omit the flag for readability; normalization keeps the
     // catalogue schema complete for every consumer.
     if(entry.world.noiseSensor===undefined)entry.world.noiseSensor=false;
+    if(entry.readiness===undefined)entry.readiness=entry.kind==='native'?90:70;
     Object.freeze(entry.lock);
     Object.freeze(entry.world);
     Object.freeze(entry);
@@ -56,16 +57,53 @@ function freezeGameDefinitions(definitions){
 
 const GameCatalog=(()=>{
   const definitions=freezeGameDefinitions(GAME_DEFINITIONS);
+  const storageKey='keynlockGameCatalogOverrides';
+  const editablePaths=Object.freeze(['lock.present','lock.manualOpen','world.noise','world.noiseSensor','world.guards','world.birds','readiness']);
+  let overrides={};
+  try{overrides=JSON.parse(localStorage.getItem(storageKey)||'{}')||{};}catch(_){overrides={};}
   const nativeIds=Object.freeze(Object.keys(definitions).filter(id=>definitions[id].kind==='native'));
   const prototypeIds=Object.freeze(Object.keys(definitions).filter(id=>definitions[id].kind==='prototype'));
-  function get(id){return definitions[id]||null;}
+  function get(id){
+    const base=definitions[id];
+    if(!base)return null;
+    const saved=overrides[id]||{};
+    return {
+      ...base,
+      readiness:Number.isFinite(+saved.readiness)?Math.max(0,Math.min(100,+saved.readiness)):base.readiness,
+      lock:{...base.lock,...saved.lock},
+      world:{...base.world,...saved.world}
+    };
+  }
   function feature(id,path){
     const parts=String(path).split('.');
     let value=get(id);
     for(const part of parts)value=value?.[part];
     return value;
   }
-  return Object.freeze({definitions,nativeIds,prototypeIds,get,feature,has:id=>!!get(id)});
+  function setFeature(id,path,value){
+    if(!definitions[id])throw new Error(`Unknown game: ${id}`);
+    if(!editablePaths.includes(path))throw new Error(`Game feature is not editable: ${path}`);
+    const parts=path.split('.');
+    const entry=overrides[id]||(overrides[id]={});
+    let target=entry;
+    for(const part of parts.slice(0,-1))target=target[part]||(target[part]={});
+    target[parts.at(-1)]=path==='readiness'?Math.max(0,Math.min(100,Number(value)||0)):!!value;
+    persist();
+    emitChange(id,path);
+    return get(id);
+  }
+  function reset(id){
+    if(id){delete overrides[id];}else{overrides={};}
+    persist();
+    emitChange(id||null,'reset');
+  }
+  function persist(){
+    try{localStorage.setItem(storageKey,JSON.stringify(overrides));}catch(_){}
+  }
+  function emitChange(id,path){
+    window.dispatchEvent(new CustomEvent('keynlock-game-catalog-change',{detail:{id,path,game:id?get(id):null}}));
+  }
+  return Object.freeze({definitions,nativeIds,prototypeIds,editablePaths,get,feature,setFeature,reset,has:id=>!!get(id)});
 })();
 
 const GameActions=(()=>{

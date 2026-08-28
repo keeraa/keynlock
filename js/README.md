@@ -7,6 +7,7 @@ v252 splits the former `app.js` into ordered classic scripts. Script order in `i
 - `core/audio.js` — audio and SFX
 - `core/ui.js` — economy, skins and common UI
 - `world/` — inventory, lair, map/navigation and shop
+- `world/game-settings.js` — in-game editor for catalogue capabilities and readiness, persisted as local overrides
 - `core/digital-helpers.js` — shared digital-puzzle helpers
 - `modes/` — individual mechanics; `base-locks.js` serves Classic, Target, Another Line, Alternative 2 and Special locks
 - `core/game.js` — shared solve flow and puzzle generation

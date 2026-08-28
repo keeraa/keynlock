@@ -26,6 +26,9 @@
     document.body.classList.toggle('mode-hillsfar', mode==='hillsfar');
     document.body.classList.toggle('mode-mass', mode==='mass');
     document.body.classList.toggle('mode-skyrim', mode==='skyrim');
+    document.body.classList.toggle('game-has-lock', !!GameCatalog.feature(mode,'lock.present'));
+    document.body.classList.toggle('game-manual-open', !!GameCatalog.feature(mode,'lock.manualOpen'));
+    document.body.dataset.gameMode=mode;
     renderDifficultyDock();
     if(mode!=='hillsfar') clearHillsfarTimer();
     if(mode==='hillsfar') setGlobalTimer(true, hfTimeLeft || hfTimeMax, hfTimeMax || 1, 'ТАЙМЕР');

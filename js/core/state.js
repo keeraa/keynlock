@@ -177,7 +177,7 @@
     scope:$scopeMode
   });
   const IMPORTED_MODES=new Set(Object.keys(MODE_PANELS));
-  const ALL_MODES=new Set(['classic','target','line','sequence','special',...IMPORTED_MODES]);
+  const ALL_MODES=new Set(GameCatalog.nativeIds);
 
   const DIFFICULTY_STORAGE_KEY='lockpickModeDifficulty';
   const DEFAULT_MODE_DIFFICULTY=Object.freeze({classic:1,target:1,line:1,sequence:1,special:1,hillsfar:1,mass:1,g1:1,r2:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,heatcold:1,drum:1,scope:1});

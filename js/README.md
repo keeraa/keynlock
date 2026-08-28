@@ -2,13 +2,15 @@
 
 v252 splits the former `app.js` into ordered classic scripts. Script order in `index.html` is significant.
 
-- `core/state.js` — state, DOM references, mode registry and visual assets
+- `core/game-catalog.js` — canonical game capabilities and the shared action dispatcher
+- `core/state.js` — runtime state, DOM references and visual assets
 - `core/audio.js` — audio and SFX
 - `core/ui.js` — economy, skins and common UI
 - `world/` — inventory, lair, map/navigation and shop
 - `core/digital-helpers.js` — shared digital-puzzle helpers
 - `modes/` — individual mechanics; `base-locks.js` serves Classic, Target, Another Line, Alternative 2 and Special locks
 - `core/game.js` — shared solve flow and puzzle generation
+- `modes/base-locks.js` registers every native puzzle's open handler with `GameActions`; UI controls call `GameActions.attemptOpen()` instead of mode-specific functions
 - `core/init.js` — animation startup, input bindings and initialization
 - `core/inventory-hit-testing.js` — expanded inventory hit testing
 

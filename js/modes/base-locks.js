@@ -424,24 +424,15 @@ let plateEls=[], pinTopPlateEls=[];
   function handleUniversalLockClick(){
     if(shopOpen || solved) return;
     const solvedBefore = solved;
-    tryOpenLock();
+    GameActions.attemptOpen({modeId:mode,source:'universal-lock'});
     if(!solved && !solvedBefore) shakeUniversalLock();
   }
 
   function tryOpenLock(){
-    if(mode==='tension') return tryOpenTension();
-    if(mode==='resonance') return tryOpenResonance();
-    if(mode==='deduction') return tryOpenDeduction();
-    if(mode==='composite') return tryOpenComposite();
-    if(mode==='heatcold') return scanHeatCold();
-    if(mode==='drum') return checkDrum();
-    if(mode==='scope') return checkScope();
-    if(mode==='anach') return tryOpenAn();
-    if(mode==='skyrim') return tryTorqueSkyrim();
-    if(mode==='r2') return tryOpenR2();
-    if(mode==='g1') return tryOpenG1();
-    if(mode==='hillsfar') return tryOpenHillsfar();
-    if(mode==='mass') return tryOpenMass();
+    return GameActions.attemptOpen({modeId:mode,source:'legacy'});
+  }
+
+  function tryOpenBaseLock(){
     if(solved || shopOpen) return;
 
     if(!goalMet()){
@@ -468,13 +459,38 @@ let plateEls=[], pinTopPlateEls=[];
     },1000);
   }
 
+  /* Mode files keep ownership of their puzzle-specific validation, but every
+     UI surface enters through GameActions.attemptOpen. Lambdas intentionally
+     resolve the function variables at call time: the inventory/tension layer
+     may wrap those functions later without leaving stale registrations. */
+  GameActions.registerOpeners({
+    classic:()=>tryOpenBaseLock(),
+    target:()=>tryOpenBaseLock(),
+    line:()=>tryOpenBaseLock(),
+    sequence:()=>tryOpenBaseLock(),
+    special:()=>tryOpenBaseLock(),
+    tension:()=>tryOpenTension(),
+    resonance:()=>tryOpenResonance(),
+    deduction:()=>tryOpenDeduction(),
+    composite:()=>tryOpenComposite(),
+    heatcold:()=>scanHeatCold(),
+    drum:()=>checkDrum(),
+    scope:()=>checkScope(),
+    anach:()=>tryOpenAn(),
+    skyrim:()=>tryTorqueSkyrim(),
+    r2:()=>tryOpenR2(),
+    g1:()=>tryOpenG1(),
+    hillsfar:()=>tryOpenHillsfar(),
+    mass:()=>tryOpenMass()
+  });
+
   function select(delta){
     if(mode==='tension'){ if(delta<0) setTensionPin(); return; }
     if(mode==='resonance'){ if(delta<0) hitResonance(); return; }
     if(mode==='deduction') return changeDeduction(kdSelected,delta<0?1:-1);
     if(mode==='composite') return changeCompositeShape(cpSelected,delta);
     if(mode==='anach') return adjustAn(delta<0?1:-1);
-    if(mode==='skyrim'){ if(delta<0) tryTorqueSkyrim(); return; }
+    if(mode==='skyrim'){ if(delta<0) GameActions.attemptOpen({modeId:'skyrim',source:'keyboard'}); return; }
     if(mode==='r2'){
       if(delta<0) return attemptR2Pin();
       return;

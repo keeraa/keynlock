@@ -17,7 +17,6 @@
     {id:'pathologic-2',name:'Дом механика',game:'Pathologic 2',x:40,y:82}
   ];
   const PROTOTYPE_MECHANIC_DONE_KEY='keynlockPrototypeMechanicsDone';
-  const PROTOTYPE_CLASSIC_LOCK_GAMES=new Set(['Thief: Deadly Shadows','Kingdom Come','Oblivion','Watchmen','Thief 1/2','Fallout']);
   let prototypeMechanicsDone={};
   try{prototypeMechanicsDone=JSON.parse(STORE.getItem(PROTOTYPE_MECHANIC_DONE_KEY)||'{}')||{};}catch(_){prototypeMechanicsDone={};}
   let activePrototypeMechanic=null;
@@ -34,6 +33,7 @@
   }
 
   PROTOTYPE_MECHANIC_PLACES.forEach(place=>{
+    if(!GameCatalog.has(`prototype:${place.id}`))throw new Error(`Missing game catalogue entry: prototype:${place.id}`);
     MAP_LOCATIONS[prototypeLocationId(place)]={name:place.name,x:place.x,y:place.y,text:`Новая механика: ${place.game}.`,action:'prototype-mechanic',prototypeId:place.id,game:place.game};
   });
   const prototypeAllLocationIds=Object.keys(MAP_LOCATIONS).filter(id=>!MAP_LOCATIONS[id].locked);
@@ -64,7 +64,7 @@
     if(mapOpen){mapOpen=false;document.body.classList.remove('map-open');$worldMapScreen.hidden=true;}
     activePrototypeMechanic=place;
     document.body.classList.add('prototype-mechanic-open');
-    document.body.classList.toggle('prototype-has-classic-lock',PROTOTYPE_CLASSIC_LOCK_GAMES.has(place.game));
+    document.body.classList.toggle('prototype-has-classic-lock',!!GameCatalog.feature(`prototype:${place.id}`,'lock.present'));
     setGameInactive(true);
     $prototypeMechanicLoss.hidden=picks>0;
     $prototypeMechanicOverlay.hidden=false;

@@ -11,10 +11,6 @@
   const NOISE_DECAY = 0.075;      // per second, back towards silence
   const NOISE_WARN = 0.68;        // where the meter starts warning
 
-  // Only the mechanical locks listen for now. Add a mode here once it has an
-  // answer for what counts as noise in it.
-  const NOISE_MODES = ['classic', 'target', 'line', 'sequence', 'special'];
-
   // `noise` itself is taken: audio.js has a noise generator, and classic
   // scripts share one scope.
   let noiseLevel = 0;
@@ -23,7 +19,11 @@
   let noiseBar = null, noiseFill = null;
 
   function noiseActive(){
-    return NOISE_MODES.includes(mode) && !shopOpen && !lairOpen && !mapOpen;
+    return !!GameCatalog.feature(mode,'world.noise') && !shopOpen && !lairOpen && !mapOpen;
+  }
+
+  function guardsActive(){
+    return !!GameCatalog.feature(mode,'world.guards') && noiseActive();
   }
 
   let guardFace = null;
@@ -44,7 +44,7 @@
   // a verdict.
   function renderGuardFace(){
     if(!guardFace) return;
-    const alert = noiseActive() && !solved
+    const alert = guardsActive() && !solved
       ? Math.max(0, (noiseLevel - NOISE_WARN) / (1 - NOISE_WARN))
       : 0;
     guardFace.style.setProperty('--guard-alert', Math.min(1, alert).toFixed(3));
@@ -100,7 +100,7 @@
       noiseWarned = true;
       SFX.alarm();
     }
-    if(noiseLevel >= 1) guardsArrive();
+    if(noiseLevel >= 1 && guardsActive()) guardsArrive();
     renderNoise();
   }
 
@@ -113,7 +113,7 @@
   }
 
   function guardsArrive(){
-    if(guardsCalled) return;
+    if(guardsCalled || !guardsActive()) return;
     guardsCalled = true;
     solved = true;
     guardFace?.classList.add('caught');
@@ -218,7 +218,9 @@
     document.body.appendChild(birdShadow);
   }
 
-  function birdsActive(){ return noiseActive() && !solved && !guardsCalled; }
+  function birdsActive(){
+    return !!GameCatalog.feature(mode,'world.birds') && noiseActive() && !solved && !guardsCalled;
+  }
 
   function scheduleBird(){
     clearTimeout(birdTimer);

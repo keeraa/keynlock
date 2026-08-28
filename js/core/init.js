@@ -263,11 +263,11 @@
   $skBoard.addEventListener('pointercancel',()=>{ skDragging=false; });
 
   $lockHitArea.addEventListener('click',handleUniversalLockClick);
-  $massCenter.addEventListener('click',tryOpenMass);
+  $massCenter.addEventListener('click',()=>GameActions.attemptOpen({modeId:'mass',source:'puzzle-control'}));
   $kdCheck?.addEventListener('click',checkDeduction);
-  $skTorqueButton.addEventListener('click',tryTorqueSkyrim);
-  $anUnlock.addEventListener('click',e=>{ if(e.target.closest('.anBtn')) return; tryOpenAn(); });
-  $anUnlock.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&!e.target.closest('.anBtn')){ e.preventDefault(); tryOpenAn(); } });
+  $skTorqueButton.addEventListener('click',()=>GameActions.attemptOpen({modeId:'skyrim',source:'puzzle-control'}));
+  $anUnlock.addEventListener('click',e=>{ if(e.target.closest('.anBtn')) return; GameActions.attemptOpen({modeId:'anach',source:'puzzle-control'}); });
+  $anUnlock.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&!e.target.closest('.anBtn')){ e.preventDefault(); GameActions.attemptOpen({modeId:'anach',source:'keyboard'}); } });
   document.querySelectorAll('[data-an-col]').forEach(btn=>btn.addEventListener('click',e=>{ e.stopPropagation(); adjustAn(btn.dataset.anDir==='up'?1:-1, Number(btn.dataset.anCol)); }));
   document.querySelectorAll('.anChannel').forEach(ch=>ch.addEventListener('click',e=>{ if(e.target.closest('.anBtn')) return; anSelected=Number(ch.dataset.col); SFX.select(); renderAn(); }));
   $tnGauge?.addEventListener('pointerdown',e=>{
@@ -367,15 +367,15 @@
   $tabHeatCold.onclick=()=>switchMode('heatcold');
   $tabDrum.onclick=()=>switchMode('drum');
   $tabScope.onclick=()=>switchMode('scope');
-  $hcInput?.addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&e.key==='Enter'){e.preventDefault();scanHeatCold();}});
+  $hcInput?.addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&e.key==='Enter'){e.preventDefault();GameActions.attemptOpen({modeId:'heatcold',source:'keyboard'});}});
   $hcInput?.addEventListener('input',()=>{$hcInput.value=$hcInput.value.replace(/\D/g,'').slice(0,4);});
   document.addEventListener('keydown',handleHeatColdKey);
   $drumWheels?.addEventListener('click',e=>{const b=e.target.closest('[data-drum-i]');if(!b)return;changeDrum(Number(b.dataset.drumI),Number(b.dataset.dir));});
-  $drumCheck?.addEventListener('click',checkDrum);
+  $drumCheck?.addEventListener('click',()=>GameActions.attemptOpen({modeId:'drum',source:'puzzle-control'}));
   $drumNew?.addEventListener('click',()=>newLock());
   $drumSound?.addEventListener('click',()=>{drumSoundOn=!drumSoundOn;$drumSound.textContent='Звук: '+(drumSoundOn?'вкл':'выкл');});
   $scopeWheels?.addEventListener('click',e=>{const b=e.target.closest('[data-scope-i]');if(!b)return;changeScope(Number(b.dataset.scopeI),Number(b.dataset.dir));});
-  $scopeCheck?.addEventListener('click',checkScope);
+  $scopeCheck?.addEventListener('click',()=>GameActions.attemptOpen({modeId:'scope',source:'puzzle-control'}));
   $scopeNew?.addEventListener('click',()=>newLock());
   $hcDialRow?.addEventListener('click',e=>{
     const btn=e.target.closest('[data-hc-step]');

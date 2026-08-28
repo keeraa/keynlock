@@ -32,7 +32,7 @@ function localAttributeRefs(html, tag, attr) {
 const htmlPath = resolve(root, 'index.html');
 const html = readFileSync(htmlPath, 'utf8');
 const scripts = localAttributeRefs(html, 'script', 'src');
-const expectedScriptOrder = ["js/core/state.js","js/core/audio.js","js/core/ui.js","js/world/inventory.js","js/world/lair.js","js/world/navigation-shop.js","js/core/digital-helpers.js","js/modes/heat-cold.js","js/modes/drum.js","js/modes/oscilloscope.js","js/core/game.js","js/modes/mass-effect.js","js/modes/anachronox.js","js/modes/composite.js","js/modes/tension.js","js/modes/resonance.js","js/modes/deduction.js","js/modes/skyrim.js","js/modes/risen2.js","js/modes/gothic1.js","js/modes/hillsfar.js","js/modes/base-locks.js","js/world/alchemy.js","js/world/guards.js","js/world/missions.js","js/world/prototype-mechanics.js","js/core/init.js","js/core/inventory-hit-testing.js"];
+const expectedScriptOrder = ["js/core/game-catalog.js","js/core/state.js","js/core/audio.js","js/core/ui.js","js/world/inventory.js","js/world/lair.js","js/world/navigation-shop.js","js/core/digital-helpers.js","js/modes/heat-cold.js","js/modes/drum.js","js/modes/oscilloscope.js","js/core/game.js","js/modes/mass-effect.js","js/modes/anachronox.js","js/modes/composite.js","js/modes/tension.js","js/modes/resonance.js","js/modes/deduction.js","js/modes/skyrim.js","js/modes/risen2.js","js/modes/gothic1.js","js/modes/hillsfar.js","js/modes/base-locks.js","js/world/alchemy.js","js/world/guards.js","js/world/missions.js","js/world/prototype-mechanics.js","js/core/init.js","js/core/inventory-hit-testing.js"];
 if (JSON.stringify(scripts) !== JSON.stringify(expectedScriptOrder)) fail('JavaScript load order changed; classic scripts share one lexical environment.');
 const links = localAttributeRefs(html, 'link', 'href').filter(x => x.endsWith('.css'));
 
@@ -84,6 +84,16 @@ const modeTabs = [
 ];
 for (const id of modeTabs) if (!ids.includes(id)) fail(`Missing mode tab: ${id}`);
 
+const catalogueSource = readFileSync(resolve(root, 'js/core/game-catalog.js'), 'utf8');
+const catalogueEntries = [...catalogueSource.matchAll(/^\s*(?:'([^']+)'|([a-z][\w-]*)):\{title:[^\n]+kind:'(native|prototype)'/gm)]
+  .map(match => ({ id: match[1] || match[2], kind: match[3] }));
+const nativeGames = catalogueEntries.filter(entry => entry.kind === 'native').map(entry => entry.id);
+const prototypeCatalogueIds = catalogueEntries.filter(entry => entry.kind === 'prototype').map(entry => entry.id.replace(/^prototype:/, ''));
+const openerSource = readFileSync(resolve(root, 'js/modes/base-locks.js'), 'utf8').match(/GameActions\.registerOpeners\(\{([\s\S]*?)\n\s*\}\);/)?.[1] || '';
+const registeredOpeners = new Set([...openerSource.matchAll(/^\s*([a-z][\w-]*):/gm)].map(match => match[1]));
+const missingOpeners = nativeGames.filter(id => !registeredOpeners.has(id));
+if (missingOpeners.length) fail(`Native games missing a shared open action: ${missingOpeners.join(', ')}`);
+
 const prototypeHtml = readFileSync(resolve(root, 'prototypes/lockpicking-mechanics-v63.html'), 'utf8');
 const prototypeScenes = new Set([...prototypeHtml.matchAll(/<section\b[^>]*\bdata-name=["']([^"']+)["']/gi)].map(match => match[1]));
 const prototypeWorld = readFileSync(resolve(root, 'js/world/prototype-mechanics.js'), 'utf8');
@@ -93,6 +103,11 @@ const missingPrototypeGames = [...prototypeScenes].filter(game => !mappedPrototy
 const unknownPrototypeGames = [...mappedPrototypeGames].filter(game => !prototypeScenes.has(game));
 if (missingPrototypeGames.length) fail(`Prototype games missing from map: ${missingPrototypeGames.join(', ')}`);
 if (unknownPrototypeGames.length) fail(`Map references unknown prototype games: ${unknownPrototypeGames.join(', ')}`);
+const mappedPrototypeIds = new Set([...placesSource.matchAll(/\bid:'([^']+)'/g)].map(match => match[1]));
+const missingPrototypeCatalogue = [...mappedPrototypeIds].filter(id => !prototypeCatalogueIds.includes(id));
+const orphanPrototypeCatalogue = prototypeCatalogueIds.filter(id => !mappedPrototypeIds.has(id));
+if (missingPrototypeCatalogue.length) fail(`Prototype locations missing from game catalogue: ${missingPrototypeCatalogue.join(', ')}`);
+if (orphanPrototypeCatalogue.length) fail(`Game catalogue has unmapped prototypes: ${orphanPrototypeCatalogue.join(', ')}`);
 
 const version = readFileSync(resolve(root, 'VERSION'), 'utf8').trim();
 console.log(`KEYNLOCK check OK — v${version}`);

@@ -55,7 +55,7 @@
     if(key==='Home'){e.preventDefault();setHeatColdActive(0);return;}
     if(key==='End'){e.preventDefault();setHeatColdActive(3);return;}
     if(/^[0-9]$/.test(key)){e.preventDefault();hcDigits[hcActiveIndex]=Number(key);syncHeatColdInput();renderHeatColdControls();focusHeatColdDigit(hcActiveIndex);setDigitalResult($hcResult);return;}
-    if(key==='Enter' || key===' '){e.preventDefault();scanHeatCold();return;}
+    if(key==='Enter' || key===' '){e.preventDefault();GameActions.attemptOpen({modeId:'heatcold',source:'keyboard'});return;}
   }
 
   function renderHeatColdEmpty(){

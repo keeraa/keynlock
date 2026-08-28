@@ -55,14 +55,19 @@
 .collectionRow.active{background:#5a4322;}
 /* Each collection button shows every handle it owns in one row, at their
    own tall aspect ratio (no square crop, no per-thumb cell background —
-   just the art), with the collection's name underneath. */
+   just the art), with the collection's name underneath. Equal-width
+   grid columns (not a flex row) keep the gaps between handles even —
+   a flex row let narrower/taller art sit closer together than wider art,
+   which read as uneven crowding. */
 .collectionRowThumbs{
-  display:flex;
-  justify-content:center;
+  display:grid;
+  grid-auto-flow:column;
+  grid-auto-columns:1fr;
+  align-items:end;
   gap:4px;
 }
 .collectionRowThumbs img{
-  width:auto;
+  width:100%;
   height:112px;
   object-fit:contain;
 }
@@ -101,6 +106,23 @@
   flex:0 0 auto;
 }
 .collectionStage.dragging{cursor:grabbing;}
+/* Soft drifting mist behind the tool — purely decorative, sits under both
+   layers (painted first, so it's behind them without needing z-index). */
+.collectionStageSmoke{
+  position:absolute;
+  inset:-20%;
+  background:
+    radial-gradient(circle at 30% 60%,rgba(255,255,255,.06),transparent 55%),
+    radial-gradient(circle at 68% 32%,rgba(255,255,255,.045),transparent 50%);
+  filter:blur(18px);
+  opacity:.8;
+  pointer-events:none;
+  animation:collectionSmokeDrift 16s ease-in-out infinite alternate;
+}
+@keyframes collectionSmokeDrift{
+  0%{transform:translate(-2%,-1%) scale(1);}
+  100%{transform:translate(2%,2%) scale(1.08);}
+}
 .collectionStageInner{
   position:relative;
   width:300px;
@@ -115,42 +137,32 @@
 .collectionLayerShaft{top:0;z-index:1;}
 .collectionLayerHandle{bottom:0;z-index:2;}
 
-.collectionZoomRow{
-  width:var(--preview-w);
-  display:grid;
-  grid-template-columns:auto 1fr auto;
-  align-items:center;
-  gap:8px;
-  font-size:12px;
-  color:#c9b98c;
-}
-.collectionZoomRow input[type="range"]{width:100%;}
-
+/* One row spanning the preview's own width, no card chrome — just the
+   pick art, ~10% smaller than the earlier boxed cards (52px -> 47px) so
+   all 8 fit without wrapping. */
 .collectionHandleStrip{
   width:var(--preview-w);
   display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:8px;
+  flex-wrap:nowrap;
+  justify-content:space-between;
+  align-items:center;
   padding-top:4px;
 }
 .collectionHandleCard{
-  width:52px;height:52px;
-  padding:4px;
-  border:2px solid rgba(138,100,52,.5);
-  border-radius:8px;
-  background:rgba(22,17,12,.7);
+  width:47px;height:47px;
+  padding:0;
+  border:0;
+  background:transparent;
   cursor:pointer;
   display:grid;
   place-items:center;
-  transition:transform .14s ease,background .16s ease;
+  transition:transform .14s ease,filter .14s ease;
 }
 .collectionHandleCard img{max-width:100%;max-height:100%;object-fit:contain;}
-/* Hover reads as a lift, not a border — matches the alchemy inventory's
-   hover feel instead of introducing a second highlight color next to the
-   active gold border. */
+/* Hover reads as a lift, matching the alchemy inventory's hover feel;
+   the active pick gets a soft glow instead of a border/background box. */
 .collectionHandleCard:hover:not(:disabled){transform:scale(1.12);z-index:1;}
-.collectionHandleCard.active{background:#5a4322;}
+.collectionHandleCard.active{filter:drop-shadow(0 0 7px rgba(240,200,120,.65));}
 .collectionHandleCard.locked{
   filter:grayscale(1);
   opacity:.55;

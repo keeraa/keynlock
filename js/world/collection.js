@@ -58,8 +58,6 @@
   const $stageInner = $root.querySelector('#collectionStageInner');
   const $imgShaft = $root.querySelector('#collectionImgShaft');
   const $imgHandle = $root.querySelector('#collectionImgHandle');
-  const $zoom = $root.querySelector('#collectionZoom');
-  const $zoomOut = $root.querySelector('#collectionZoomOut');
 
   // The stage's own coordinate system matches the prototype's: every shaft
   // and handle PNG is native-pixel-sized inside a much taller box, shaft
@@ -75,8 +73,8 @@
     // 100% = the source PNGs' own pixel size (matches the prototype's
     // default, unscaled view) — the stage box clips anything past its own
     // edges rather than shrinking content to fit, same as a normal image
-    // zoom control. 39% is both the default AND the slider's floor — any
-    // lower reads as illegibly small, so zooming out further isn't offered.
+    // zoom control. 39% is both the default AND the floor — any lower
+    // reads as illegibly small, so zooming out further isn't offered.
     zoom: 39,
     rotate: 0
   };
@@ -135,45 +133,79 @@
     $imgHandle.style.transform = 'translateX(-50%)';
     const scale = state.zoom / 100;
     $stageInner.style.transform = `scale(${scale}) rotate(${state.rotate}deg)`;
-    $zoom.value = state.zoom;
-    $zoomOut.textContent = `${state.zoom}%`;
   }
 
-  $zoom.addEventListener('input', e => {
-    state.zoom = Number(e.target.value);
-    renderStage();
-  });
+  function clampZoom(z){ return Math.max(39, Math.min(100, z)); }
 
-  // Grab-to-rotate, same technique as the prototype: angle from the
-  // stage's own center to the pointer, updated on drag.
+  // One-finger drag rotates (angle from the stage's own center to the
+  // pointer); two fingers pinch to zoom, same gesture as a normal photo
+  // viewer. Desktop covers the same ground with a trackpad pinch or plain
+  // wheel, both delivered as `wheel` events.
   (function(){
-    let dragging = false;
+    const pointers = new Map();
+    let rotating = false;
+    let pinchStartDist = 0;
+    let pinchStartZoom = state.zoom;
+
     function angleFromCenter(clientX, clientY){
       const rect = $stage.getBoundingClientRect();
       const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
       const dx = clientX - cx, dy = clientY - cy;
       return Math.atan2(dx, -dy) * 180 / Math.PI;
     }
+    function dist(a, b){ return Math.hypot(a.x - b.x, a.y - b.y); }
+    function stopRotate(){ rotating = false; $stage.classList.remove('dragging'); }
+
     $stage.addEventListener('pointerdown', e => {
-      dragging = true;
-      $stage.classList.add('dragging');
-      // The initial press can land far from the current angle — ease into
-      // it once so it doesn't visually snap, then drop the transition for
-      // the rest of the drag so live tracking stays 1:1 with the pointer.
-      $stageInner.classList.add('easing');
       $stage.setPointerCapture(e.pointerId);
-      state.rotate = Math.max(-180, Math.min(180, Math.round(angleFromCenter(e.clientX, e.clientY))));
-      renderStage();
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if(pointers.size === 1){
+        rotating = true;
+        $stage.classList.add('dragging');
+        // The initial press can land far from the current angle — ease
+        // into it once so it doesn't visually snap, then drop the
+        // transition so live tracking stays 1:1 with the pointer.
+        $stageInner.classList.add('easing');
+        state.rotate = Math.max(-180, Math.min(180, Math.round(angleFromCenter(e.clientX, e.clientY))));
+        renderStage();
+      }else if(pointers.size === 2){
+        stopRotate();
+        const [a, b] = [...pointers.values()];
+        pinchStartDist = dist(a, b);
+        pinchStartZoom = state.zoom;
+      }
     });
     $stage.addEventListener('pointermove', e => {
-      if(!dragging) return;
-      $stageInner.classList.remove('easing');
-      state.rotate = Math.max(-180, Math.min(180, Math.round(angleFromCenter(e.clientX, e.clientY))));
-      renderStage();
+      if(!pointers.has(e.pointerId)) return;
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if(pointers.size >= 2){
+        const [a, b] = [...pointers.values()];
+        const d = dist(a, b);
+        if(pinchStartDist > 0){
+          state.zoom = clampZoom(Math.round(pinchStartZoom * (d / pinchStartDist)));
+          renderStage();
+        }
+      }else if(rotating){
+        $stageInner.classList.remove('easing');
+        state.rotate = Math.max(-180, Math.min(180, Math.round(angleFromCenter(e.clientX, e.clientY))));
+        renderStage();
+      }
     });
-    function stop(){ dragging = false; $stage.classList.remove('dragging'); }
-    $stage.addEventListener('pointerup', stop);
-    $stage.addEventListener('pointercancel', stop);
+    function releasePointer(e){
+      pointers.delete(e.pointerId);
+      if(pointers.size < 2) pinchStartDist = 0;
+      if(pointers.size === 0) stopRotate();
+    }
+    $stage.addEventListener('pointerup', releasePointer);
+    $stage.addEventListener('pointercancel', releasePointer);
+
+    // Trackpad pinch arrives as `wheel` with ctrlKey set; a plain wheel
+    // scroll zooms too, for a mouse.
+    $stage.addEventListener('wheel', e => {
+      e.preventDefault();
+      state.zoom = clampZoom(Math.round(state.zoom - e.deltaY * 0.15));
+      renderStage();
+    }, { passive: false });
   })();
 
   window.addEventListener('resize', renderStage);

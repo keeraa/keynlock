@@ -4,7 +4,8 @@
   "version": "0.341.0",
   "type": "module",
   "scripts": {
-    "dev": "node scripts/serve.mjs",
+    "dev": "node scripts/write-build-info.mjs && node scripts/serve.mjs",
+    "build": "node scripts/write-build-info.mjs",
     "check": "node scripts/check.mjs",
     "smoke": "node scripts/smoke.mjs"
   }

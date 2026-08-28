@@ -45,6 +45,31 @@
       .replace(/const embeddedGame=EMBEDDED_GAME;[\s\S]*?window\.addEventListener\('message',[\s\S]*?\n\}\);\s*$/,'');
 
     code+=`\nlet integratedLossObserver=null;
+      let integratedManualOpen=false,integratedPendingOpen=null,integratedPendingTension=null;
+      const integratedOriginalOpen=LockRuntime.open;
+      const integratedOriginalResetOpen=LockRuntime.resetOpen;
+      const integratedOriginalTensionReady=LockRuntime.tensionReady;
+      LockRuntime.open=function(game,options={}){
+        if(integratedManualOpen&&game===EMBEDDED_GAME){
+          integratedPendingOpen={game,options};
+          if(options.statusEl)options.statusEl.innerHTML='<strong>Механизм выставлен</strong>нажми на замок наверху';
+          window.postMessage({type:'keynlock-mechanic-ready',game,ready:true},location.origin);
+          return false;
+        }
+        return integratedOriginalOpen(game,options);
+      };
+      LockRuntime.resetOpen=function(game){
+        if(game===EMBEDDED_GAME){
+          integratedPendingOpen=null;
+          integratedPendingTension=null;
+          window.postMessage({type:'keynlock-mechanic-ready',game,ready:false},location.origin);
+        }
+        return integratedOriginalResetOpen(game);
+      };
+      LockRuntime.tensionReady=function(game,options={}){
+        if(integratedManualOpen&&game===EMBEDDED_GAME){integratedPendingTension={game,options};return true;}
+        return integratedOriginalTensionReady(game,options);
+      };
       function observeIntegratedGame(game){
         integratedLossObserver?.disconnect();
         const scene=GameHub.scene(game);
@@ -58,6 +83,9 @@
       window.__KeynlockImportedRuntime={
         open(game,options={}){
           EMBEDDED_GAME=game;
+          integratedManualOpen=!!options.manualOpen;
+          integratedPendingOpen=null;
+          integratedPendingTension=null;
           playerTensionSkin=Math.max(1,Math.min(5,Math.round(Number(options.tension)||1)));
           LockRuntime.setDefaultPicks(options.picks);
           const index=GameHub.scenes.findIndex(scene=>scene.dataset.name===game);
@@ -72,11 +100,24 @@
         close(){
           integratedLossObserver?.disconnect();
           GameHub.get(EMBEDDED_GAME)?.leave?.();
+          integratedManualOpen=false;
+          integratedPendingOpen=null;
+          integratedPendingTension=null;
           EMBEDDED_GAME='';
           host.hidden=true;
         },
         replay(){if(EMBEDDED_GAME)GameHub.get(EMBEDDED_GAME)?.reset?.()},
-        attemptOpen(){return GameHub.get(EMBEDDED_GAME)?.open?.()},
+        attemptOpen(){
+          if(integratedPendingOpen){
+            if(integratedPendingTension&&!integratedOriginalTensionReady(integratedPendingTension.game,integratedPendingTension.options))return false;
+            const pending=integratedPendingOpen;
+            integratedPendingOpen=null;
+            integratedPendingTension=null;
+            window.postMessage({type:'keynlock-mechanic-ready',game:pending.game,ready:false},location.origin);
+            return integratedOriginalOpen(pending.game,pending.options);
+          }
+          return GameHub.get(EMBEDDED_GAME)?.open?.();
+        },
         setTools(options={}){playerTensionSkin=Math.max(1,Math.min(5,Math.round(Number(options.tension)||1)))},
         active(){return EMBEDDED_GAME}
       };`;

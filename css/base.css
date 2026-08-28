@@ -28,13 +28,13 @@ h1{margin:0;font-size:clamp(27.5px,3.3vw,48.4px);font-weight:500;letter-spacing:
 .right{right:0;top:45px;}
 .action{width:54px;height:54px;border-radius:50%;font-size:13.20px;}
 .flash{animation:shake 280ms cubic-bezier(.36,.07,.19,.97);}
-.toast{position:fixed;right:18px;bottom:18px;transform:translateY(14px) scale(.98);opacity:0;width:min(420px,calc(100vw - 36px));min-height:0;padding:12px 14px;border:1px solid #806438;border-radius:12px;background:linear-gradient(180deg,rgba(31,27,25,.96),rgba(10,9,9,.96));color:#ead7b6;font:14.8px var(--ui-font);line-height:1.35;letter-spacing:.02em;pointer-events:none;transition:opacity .18s ease,transform .18s ease;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;box-shadow:0 14px 34px rgba(0,0,0,.46),0 0 18px rgba(180,132,56,.08),inset 0 0 0 1px rgba(232,190,110,.06);}
+.toast{position:fixed;right:18px;bottom:92px;transform:translateY(14px) scale(.98);opacity:0;width:min(420px,calc(100vw - 36px));min-height:0;padding:12px 14px;border:1px solid #806438;border-radius:12px;background:linear-gradient(180deg,rgba(31,27,25,.96),rgba(10,9,9,.96));color:#ead7b6;font:14.8px var(--ui-font);line-height:1.35;letter-spacing:.02em;pointer-events:none;transition:opacity .18s ease,transform .18s ease;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;box-shadow:0 14px 34px rgba(0,0,0,.46),0 0 18px rgba(180,132,56,.08),inset 0 0 0 1px rgba(232,190,110,.06);}
 .toast.show{opacity:1;transform:translateY(0) scale(1);}
 .toast.actionable{pointer-events:auto;z-index:360;}
-.toastAction{flex:0 0 auto;border:1px solid #9b7942;border-radius:7px;background:linear-gradient(#2c2318,#17130f);color:#efd093;padding:8px 12px;cursor:pointer;white-space:nowrap;font:13.8px var(--ui-font);}
+.toastAction{display:none;flex:0 0 auto;border:1px solid #9b7942;border-radius:7px;background:linear-gradient(#2c2318,#17130f);color:#efd093;padding:8px 12px;cursor:pointer;white-space:nowrap;font:13.8px var(--ui-font);}
 .toastText{flex:1 1 auto;min-width:0;}
 @media (max-width: 720px){
-.toast{left:12px;right:12px;bottom:12px;width:auto;padding:10px 12px;font-size:13.2px;gap:10px;}
+.toast{left:12px;right:12px;bottom:64px;width:auto;padding:10px 12px;font-size:13.2px;gap:10px;}
 .toastAction{padding:7px 10px;font-size:12.8px;}
 }
 .toast.actionable .toastAction{display:inline-block;}

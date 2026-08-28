@@ -66,7 +66,6 @@
       renderG1();
       if(g1Input.length === g1Length){
         SFX.ready();
-        toast('Последовательность верна · нажми на замок');
       }
     }else{
       damagePick({
@@ -93,4 +92,3 @@
     renderG1();
     setTimeout(()=>celebrate(), 420);
   }
-

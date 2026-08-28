@@ -77,7 +77,11 @@
     updateEconomyUI();
     updateMechanismAssetHud();
     window.KeynlockImportedInitialPicks=Math.max(0,picks);
-    window.KeynlockImportedGames?.open(place.game,{picks,tension:Math.max(1,Math.min(5,tensionSkin||1))})
+    window.KeynlockImportedGames?.open(place.game,{
+      picks,
+      tension:Math.max(1,Math.min(5,tensionSkin||1)),
+      manualOpen:!!GameCatalog.feature(`prototype:${place.id}`,'lock.present')&&!!GameCatalog.feature(`prototype:${place.id}`,'lock.manualOpen')
+    })
       .catch(error=>{console.error('[prototype-mechanic]',error);toast('Не удалось открыть механику');});
   }
 

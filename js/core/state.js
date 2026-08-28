@@ -392,6 +392,25 @@ function currentLockerEntry(){
 }
 function currentLockBodySkin(){ return currentLockBodyEntry().data || ''; }
 function currentLockerSkin(){ return currentLockerEntry().data || ''; }
+let buildInfoPromise=null;
+function updateBuildInfoHud(){
+  const buildEl=document.querySelector('#assetNameBuild');
+  if(!buildEl) return;
+  if(!buildInfoPromise){
+    buildInfoPromise=fetch('./build-info.json',{cache:'no-store'})
+      .then(response=>response.ok ? response.json() : Promise.reject(new Error(`HTTP ${response.status}`)))
+      .catch(()=>null);
+  }
+  buildInfoPromise.then(info=>{
+    if(!info?.commit) return;
+    const date=new Date(info.committedAt);
+    const time=Number.isNaN(date.getTime())
+      ? ''
+      : ` · ${new Intl.DateTimeFormat('ru-RU',{dateStyle:'short',timeStyle:'short'}).format(date)}`;
+    buildEl.textContent=`Коммит: ${String(info.commit).slice(0,7)}${time}`;
+    buildEl.title=`${info.commit}${info.committedAt ? ` · ${info.committedAt}` : ''}`;
+  });
+}
 function updateMechanismAssetHud(){
   const wrap=document.querySelector('#assetNameHud');
   const gameEl=document.querySelector('#assetNameGame');
@@ -402,6 +421,7 @@ function updateMechanismAssetHud(){
   if(!wrap || !lockEl || !shackleEl) return;
   const gameId=document.body.dataset.prototypeGameId || mode;
   if(gameEl) gameEl.textContent=`Игра: ${GameCatalog.get(gameId)?.title || gameId}`;
+  updateBuildInfoHud();
   const lockEntry=currentLockBodyEntry();
   const shackleEntry=currentLockerEntry();
   lockEl.textContent=`lock: ${lockEntry.name || '—'}`;

@@ -6,11 +6,11 @@
  * systems run there, and whether opening is an explicit player action.
  */
 const GAME_DEFINITIONS={
-  classic:{title:'Классика',kind:'native',lock:{present:true,manualOpen:true},world:{noise:true,guards:true,birds:true}},
-  target:{title:'Альтернатива',kind:'native',lock:{present:true,manualOpen:true},world:{noise:true,guards:true,birds:true}},
-  line:{title:'Другая линия',kind:'native',lock:{present:true,manualOpen:true},world:{noise:true,guards:true,birds:true}},
-  sequence:{title:'Альтернатива 2',kind:'native',lock:{present:true,manualOpen:true},world:{noise:true,guards:true,birds:true}},
-  special:{title:'Особые замки',kind:'native',lock:{present:true,manualOpen:true},world:{noise:true,guards:true,birds:true}},
+  classic:{title:'Классика',kind:'native',lock:{present:true,manualOpen:true},world:{noise:true,noiseSensor:true,guards:true,birds:true}},
+  target:{title:'Альтернатива',kind:'native',lock:{present:true,manualOpen:true},world:{noise:true,noiseSensor:true,guards:true,birds:true}},
+  line:{title:'Другая линия',kind:'native',lock:{present:true,manualOpen:true},world:{noise:true,noiseSensor:true,guards:true,birds:true}},
+  sequence:{title:'Альтернатива 2',kind:'native',lock:{present:true,manualOpen:true},world:{noise:true,noiseSensor:true,guards:true,birds:true}},
+  special:{title:'Особые замки',kind:'native',lock:{present:true,manualOpen:true},world:{noise:true,noiseSensor:true,guards:true,birds:true}},
   hillsfar:{title:'Hillsfar',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   mass:{title:'Mass Effect',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   g1:{title:'Gothic 1',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
@@ -44,6 +44,9 @@ const GAME_DEFINITIONS={
 
 function freezeGameDefinitions(definitions){
   Object.values(definitions).forEach(entry=>{
+    // Quiet locations omit the flag for readability; normalization keeps the
+    // catalogue schema complete for every consumer.
+    if(entry.world.noiseSensor===undefined)entry.world.noiseSensor=false;
     Object.freeze(entry.lock);
     Object.freeze(entry.world);
     Object.freeze(entry);

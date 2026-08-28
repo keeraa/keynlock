@@ -28,6 +28,7 @@
     document.body.classList.toggle('mode-skyrim', mode==='skyrim');
     document.body.classList.toggle('game-has-lock', !!GameCatalog.feature(mode,'lock.present'));
     document.body.classList.toggle('game-manual-open', !!GameCatalog.feature(mode,'lock.manualOpen'));
+    document.body.classList.toggle('game-noise-sensor', !!GameCatalog.feature(mode,'world.noiseSensor'));
     document.body.dataset.gameMode=mode;
     renderDifficultyDock();
     if(mode!=='hillsfar') clearHillsfarTimer();

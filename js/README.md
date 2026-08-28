@@ -2,7 +2,7 @@
 
 v252 splits the former `app.js` into ordered classic scripts. Script order in `index.html` is significant.
 
-- `core/game-catalog.js` — canonical game capabilities and the shared action dispatcher
+- `core/game-catalog.js` — canonical game capabilities (including lock, noise sensor, guards and birds) and the shared action dispatcher
 - `core/state.js` — runtime state, DOM references and visual assets
 - `core/audio.js` — audio and SFX
 - `core/ui.js` — economy, skins and common UI

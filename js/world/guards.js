@@ -26,6 +26,10 @@
     return !!GameCatalog.feature(mode,'world.guards') && noiseActive();
   }
 
+  function noiseSensorActive(){
+    return !!GameCatalog.feature(mode,'world.noiseSensor') && noiseActive();
+  }
+
   let guardFace = null;
   function buildGuardFace(){
     if(guardFace) return;
@@ -84,7 +88,7 @@
 
   function renderNoise(){
     if(!noiseBar) return;
-    const on = noiseActive() && !solved;
+    const on = noiseSensorActive() && !solved;
     noiseBar.classList.toggle('visible', on);
     if(!on){ renderGuardFace(); return; }
     noiseFill.style.width = `${Math.min(100, noiseLevel * 100).toFixed(1)}%`;
@@ -153,7 +157,7 @@
       if(noiseLevel < NOISE_WARN) noiseWarned = false;
       if(before !== noiseLevel) renderNoise();
     }
-    const showing = noiseActive() && !solved;
+    const showing = noiseSensorActive() && !solved;
     if(showing !== noiseWasShowing){ noiseWasShowing = showing; renderNoise(); }
     setTimeout(()=>requestAnimationFrame(noiseTick),100);
   }

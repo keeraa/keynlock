@@ -28,6 +28,7 @@
 .lairHotspot:hover{background:rgba(19,15,11,.34);}
 .lairHotspot:hover .lairHotspotDot{transform:translateX(-50%) scale(1.16);background:#a7772f;box-shadow:0 0 0 6px rgba(213,165,76,.12),0 0 18px rgba(225,178,80,.38);}
 .lairHotspotDialogue{left:43.5%;top:75%;}
+.lairHotspotCollection{left:10%;top:24%;}
 .lairModuleWindow{position:absolute;z-index:40;left:50%;top:50%;width:min(930px,88vw);max-height:82%;transform:translate(-50%,-50%) scale(.97);overflow:hidden;border:1px solid rgba(162,119,58,.66);border-radius:16px;background:radial-gradient(circle at 18% 8%,rgba(109,76,37,.16),transparent 28%),
     linear-gradient(145deg,rgba(29,22,16,.96),rgba(10,8,7,.96));box-shadow:0 28px 90px rgba(0,0,0,.62),inset 0 0 80px rgba(0,0,0,.15);opacity:0;transition:opacity .16s ease,transform .16s ease;}
 .lairModuleWindow[hidden]{display:none!important;}
@@ -50,6 +51,7 @@
 .lairHotspotCity{left:22%;top:44%;}
 .lairHotspotDialogue{left:38%;top:72%;}
 .lairHotspotTeam{left:69%;top:49%;}
+.lairHotspotCollection{left:8%;top:22%;}
 }
 .mapRoad.missionRoad{stroke:#b48643;stroke-width:5;stroke-dasharray:3 8;opacity:.9;}
 .mapNode.mission{color:#edca7e;}

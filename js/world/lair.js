@@ -43,7 +43,7 @@
 
   function openLairModule(next){
     if(!$lairModuleWindow) return;
-    const titles={team:'Выбор персонажа',dialogue:'Диалоги',city:'Анализ города',alchemy:'Алхимия'};
+    const titles={team:'Выбор персонажа',dialogue:'Диалоги',city:'Анализ города',alchemy:'Алхимия',collection:'Коллекция'};
     setLairTab(next);
     $lairModuleTitle.textContent=titles[next]||'Логово';
     $lairModuleWindow.hidden=false;

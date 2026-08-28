@@ -281,3 +281,11 @@ body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none !important
 @media (max-width:760px){
   .lairHotspotAlchemy{left:56% !important;top:30% !important;}
 }
+
+/* Collection hotspot: empty wall above Kai, clear of the city hotspot at
+   32%/40.5% and Kai's own sprite (left:13%, height:39.3% up from the
+   bottom — his head clears well below this). */
+.lairHotspotCollection{left:10% !important;top:24% !important;}
+@media (max-width:760px){
+  .lairHotspotCollection{left:8% !important;top:18% !important;}
+}

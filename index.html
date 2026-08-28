@@ -22,6 +22,7 @@
 <link rel="stylesheet" href="css/overrides-07-workbench.css">
 <link rel="stylesheet" href="css/alchemy.css">
 <link rel="stylesheet" href="css/prototype-mechanics.css">
+<link rel="stylesheet" href="css/collection.css">
 <link rel="stylesheet" href="css/mobile.css">
 <link rel="stylesheet" href="css/global-top-hud.css">
 <link rel="stylesheet" href="css/game-settings.css">
@@ -267,6 +268,11 @@
       <span>Выбор персонажа</span>
     </button>
 
+    <button class="lairHotspot lairHotspotCollection" type="button" data-lair-open="collection">
+      <span class="lairHotspotDot"></span>
+      <span>Коллекция</span>
+    </button>
+
     <button class="lairWorkbenchHotspot" id="lairWorkbenchHotspot" type="button" aria-label="Открыть верстак"></button>
 
     <div class="lairWorkbenchModal" id="lairWorkbenchModal" hidden aria-label="Верстак">
@@ -337,6 +343,27 @@
             <div class="scene-head"><div><h2>Разделение смеси</h2></div><div class="status" id="sepStatus"></div></div>
             <div class="lab color-game-lab"><div class="color-sample-panel"><h3>Цель и грязная смесь</h3><div class="tube-pair"><div class="tube-box"><div class="test-tube tube-lg"><div class="tube-liquid" id="sepTarget" style="--liquid-color:#5370c9;background-color:#5370c9"></div><div class="target-element-hint" id="sepTargetElement"></div></div><div class="swatch-label">цель</div></div><div class="current-cluster"><div class="tube-box current-main-box"><div class="test-tube tube-lg"><div class="tube-liquid" id="sepCurrent" style="--liquid-color:#8a647f;background-color:#8a647f"></div></div><div class="swatch-label">грязная смесь</div></div><div class="color-controls side-color-controls" id="sepControls"></div></div></div><button type="button" class="alchemyElementCell" id="sepElementCell" aria-label="Добавить элемент из стойки"><span class="alchemyElementCellHint">+</span></button><div class="big-actions centered-actions"><button class="ctl" id="sepCheck" disabled>Проверить</button><button class="ctl ctl-icon" id="sepReset" aria-label="Новая смесь"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg></button></div><div class="keyhint">Клавиатура: 1/2/3/4 — убрать примесь · Enter — проверить · R — сброс</div></div></div>
           </section>
+          </div>
+        </section>
+        <section class="lairPanel" data-lair-panel="collection">
+          <div id="collectionRoot">
+            <div class="collectionLayout">
+              <div class="collectionListCol" id="collectionList"></div>
+              <div class="collectionPreviewCol">
+                <div class="collectionStage" id="collectionStage">
+                  <div class="collectionStageInner" id="collectionStageInner">
+                    <div class="collectionLayer collectionLayerShaft"><img id="collectionImgShaft" alt="шило"></div>
+                    <div class="collectionLayer collectionLayerHandle"><img id="collectionImgHandle" alt="рукоять"></div>
+                  </div>
+                </div>
+                <div class="collectionZoomRow">
+                  <label>Зум</label>
+                  <input type="range" id="collectionZoom" min="10" max="100" value="35">
+                  <output id="collectionZoomOut">35%</output>
+                </div>
+                <div class="collectionHandleStrip" id="collectionHandleStrip"></div>
+              </div>
+            </div>
           </div>
         </section>
         <section class="lairPanel" data-lair-panel="city">
@@ -717,6 +744,7 @@
 <script src="js/modes/imported-games.js"></script>
 <script src="js/world/prototype-mechanics.js"></script>
 <script src="js/world/game-settings.js"></script>
+<script src="js/world/collection.js"></script>
 <script src="js/core/init.js"></script>
 <script src="js/core/inventory-hit-testing.js"></script>
 

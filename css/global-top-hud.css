@@ -1,0 +1,104 @@
+/*
+ * Global top HUD
+ *
+ * Every screen now uses one layout owner for the menu, difficulty selector,
+ * contextual title/tabs and the economy/navigation controls.  The contextual
+ * block is intentionally empty outside modes (such as Alchemy) that need it.
+ */
+.globalTopHud{
+  position:fixed;
+  z-index:360;
+  top:14px;
+  left:14px;
+  right:14px;
+  height:68px;
+  display:grid;
+  grid-template-columns:68px auto minmax(0,1fr) auto;
+  grid-template-rows:68px;
+  grid-template-areas:"menu difficulty context actions";
+  align-items:center;
+  gap:10px;
+  pointer-events:none;
+  box-sizing:border-box;
+  padding:0!important;
+  margin:0!important;
+  transform:none!important;
+  transform-origin:initial!important;
+  text-align:initial;
+  visibility:visible!important;
+  opacity:1!important;
+  min-height:68px!important;
+}
+.globalTopHud > *{pointer-events:auto;}
+
+.globalTopHud .mobileModeMenuButton{
+  grid-area:menu;
+  position:static!important;
+  inset:auto!important;
+  width:68px!important;
+  height:68px!important;
+  margin:0!important;
+}
+.globalTopHud #difficultyDock{
+  grid-area:difficulty;
+  position:static!important;
+  inset:auto!important;
+  align-self:center!important;
+  margin:0!important;
+}
+.globalTopHud .topRightHud{
+  grid-area:actions;
+  position:static!important;
+  inset:auto!important;
+  align-self:start!important;
+  margin:0!important;
+  transform:none!important;
+}
+.globalTopHud .alchemyTopHud{
+  grid-area:context;
+  position:relative!important;
+  inset:auto!important;
+  width:100%;
+  min-width:0;
+  height:68px;
+  margin:0!important;
+}
+
+/* The drawer and its scrim belong to the header semantically, but not to its
+   grid geometry. */
+.globalTopHud .mobileModeBackdrop{position:fixed!important;}
+.globalTopHud .modeTabs{position:fixed!important;}
+
+body.lair-open .globalTopHud .mobileModeMenuButton{display:grid!important;}
+body.lair-open .globalTopHud #difficultyDock,
+body.shop-open .globalTopHud #difficultyDock,
+body.map-open .globalTopHud #difficultyDock{display:none!important;}
+
+@media (max-width:1100px){
+  .globalTopHud{
+    grid-template-columns:68px minmax(0,1fr) auto;
+    grid-template-areas:"menu context actions";
+    gap:8px;
+  }
+  .globalTopHud #difficultyDock{display:none!important;}
+}
+
+@media (max-width:760px),(max-height:560px) and (orientation:landscape){
+  .globalTopHud{
+    top:calc(var(--mobile-safe-top,0px) + 7px);
+    left:calc(var(--mobile-safe-left,0px) + 7px);
+    right:calc(var(--mobile-safe-right,0px) + 7px);
+    height:54px;
+    grid-template-columns:var(--mobile-hud-size,42px) minmax(0,1fr) auto;
+    grid-template-rows:54px;
+    gap:6px;
+    min-height:54px!important;
+  }
+  .globalTopHud .mobileModeMenuButton{
+    width:var(--mobile-hud-size,42px)!important;
+    height:var(--mobile-hud-size,42px)!important;
+    align-self:start;
+  }
+  .globalTopHud .alchemyTopHud{height:54px;}
+  .globalTopHud .topRightHud{max-width:min(58vw,260px)!important;}
+}

@@ -118,6 +118,22 @@
           ready.title='Готово';
           name.querySelector('strong').appendChild(ready);
         }
+        if(game.difficulty.levels.length){
+          const difficulty=document.createElement('span');
+          difficulty.className='gameDifficulty';
+          difficulty.setAttribute('aria-label','Сложность');
+          game.difficulty.levels.forEach(level=>{
+            const button=document.createElement('button');
+            button.type='button';
+            button.dataset.gameDifficulty=id;
+            button.dataset.level=String(level);
+            button.textContent=String(level);
+            button.classList.toggle('active',getModeDifficulty(id)===level);
+            button.setAttribute('aria-label',`${game.title}: сложность ${level}`);
+            difficulty.appendChild(button);
+          });
+          name.querySelector('.gameSettingName').appendChild(difficulty);
+        }
         tr.appendChild(name);
         featureColumns.forEach(([path,label])=>{
           const td=document.createElement('td');
@@ -194,6 +210,12 @@
       }
     });
     rows?.addEventListener('click',event=>{
+      const difficulty=event.target.closest?.('[data-game-difficulty]');
+      if(difficulty){
+        setModeDifficulty(Number(difficulty.dataset.level),difficulty.dataset.gameDifficulty,false);
+        difficulty.parentElement?.querySelectorAll('button').forEach(button=>button.classList.toggle('active',button===difficulty));
+        return;
+      }
       const button=event.target.closest?.('[data-launch-game]');
       if(!button)return;
       launchGame(button.dataset.launchGame);

@@ -49,8 +49,11 @@ function freezeGameDefinitions(definitions){
     if(entry.world.noiseSensor===undefined)entry.world.noiseSensor=false;
     if(entry.readiness===undefined)entry.readiness=entry.kind==='native'?4:3;
     if(entry.rating===undefined)entry.rating=null;
+    if(entry.difficulty===undefined)entry.difficulty={levels:entry.kind==='native'?[1,2,3]:[]};
     Object.freeze(entry.lock);
     Object.freeze(entry.world);
+    Object.freeze(entry.difficulty.levels);
+    Object.freeze(entry.difficulty);
     Object.freeze(entry);
   });
   return Object.freeze(definitions);

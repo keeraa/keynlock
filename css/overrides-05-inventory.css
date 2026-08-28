@@ -34,7 +34,14 @@ body.pick-reforming .mechanismZone .pick,body.pick-reforming .sharedModeLockArt 
 @keyframes pickFragmentScatter{0%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1);}68%{opacity:.9;}100%{opacity:0;transform:translate(var(--break-x),var(--break-y)) rotate(var(--break-r)) scale(.55);}}
 @keyframes pickReform{0%{opacity:0;filter:brightness(1.8) drop-shadow(0 0 12px rgba(232,189,104,.7));}55%{opacity:.72;}100%{opacity:1;}}
 .inventoryTool img{position:absolute;display:block;max-width:none;max-height:none;object-fit:contain;pointer-events:auto;cursor:pointer;filter:drop-shadow(0 7px 8px rgba(0,0,0,.44));}
-.inventoryTool-pick img{left:50%;bottom:35.459%;width:123.685883%;height:126.1596%;transform:translateX(-50%) translateY(calc(-1 * var(--tool-lift))) rotate(180deg);transform-origin:50% 50%;}
+/* width grows from `left` and re-centers for free — translateX(-50%) is a
+   percentage of the element's OWN width, so it re-follows any width
+   automatically. height has no such counterpart: it grows upward from
+   the fixed `bottom` anchor with nothing to re-center it, so the last
+   15% size bump visibly shifted the art upward instead of growing it in
+   place. `bottom` is offset here by half the height increase to keep the
+   original vertical center (35.459% + 109.704%/2 = 90.311%) fixed. */
+.inventoryTool-pick img{left:50%;bottom:27.2312%;width:123.685883%;height:126.1596%;transform:translateX(-50%) translateY(calc(-1 * var(--tool-lift))) rotate(180deg);transform-origin:50% 50%;}
 .inventoryTool-tension img{left:50%;bottom:34%;width:294.117647%;height:100%;transform:translateX(-50%) translateY(calc(-1 * var(--tool-lift))) rotate(90deg);transform-origin:50% 50%;}
 /* The lift is folded into each image's own transform, never applied to the
    button: lifting the button moved it out from under the pointer, which dropped

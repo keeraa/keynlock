@@ -261,10 +261,10 @@
 
     <div class="alchemyFullBlur" id="alchemyFullBlur" aria-hidden="true"></div>
     <div class="alchemyGuideViewer" id="alchemyGuideViewer" hidden role="dialog" aria-modal="true" aria-label="Инструкция по смешению">
-      <button class="alchemyGuideViewerBackdrop" type="button" aria-label="Закрыть просмотр"></button>
+      <button class="alchemyGuideViewerBackdrop" type="button" aria-label="Закрыть просмотр" onclick="this.closest('.alchemyGuideViewer').hidden=true"></button>
       <div class="alchemyGuideViewerDialog">
         <img src="assets/alchemy/mixing-guide.jpg" alt="Инструкция по смешению реагентов">
-        <button class="alchemyGuideViewerClose" type="button" aria-label="Закрыть просмотр">×</button>
+        <button class="alchemyGuideViewerClose" type="button" aria-label="Закрыть просмотр" onclick="this.closest('.alchemyGuideViewer').hidden=true">×</button>
       </div>
     </div>
 
@@ -299,7 +299,7 @@
         <section class="lairPanel" data-lair-panel="alchemy">
           <div class="alchemyRoot" id="alchemyRoot">
           <section class="scene" data-name="Смешение">
-            <button class="alchemyMixReference" type="button" aria-label="Открыть памятку по смешению" onclick="document.getElementById('alchemyGuideViewer').hidden=false">
+            <button class="alchemyMixReference" type="button" aria-label="Открыть памятку по смешению">
               <img class="alchemyMixReferenceBoard" src="assets/alchemy/mixing-board.png" alt="">
               <img class="alchemyMixReferenceGuide" src="assets/alchemy/mixing-guide.jpg" alt="Инструкция по смешению реагентов">
             </button>

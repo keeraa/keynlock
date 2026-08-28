@@ -1164,8 +1164,26 @@
   if(!root) return;
   const guideViewer = document.querySelector('#alchemyGuideViewer');
   const closeGuideViewer = () => { if(guideViewer) guideViewer.hidden = true; };
-  guideViewer?.querySelector('.alchemyGuideViewerBackdrop')?.addEventListener('click', closeGuideViewer);
-  guideViewer?.querySelector('.alchemyGuideViewerClose')?.addEventListener('click', closeGuideViewer);
+  // Capture before the room's broad click/drag surfaces. The board itself is
+  // deliberately behind the table layer, so delegating from document also
+  // remains reliable when an image inside the button is the actual target.
+  document.addEventListener('pointerdown', event => {
+    const reference = event.target.closest?.('.alchemyMixReference:not(.alchemyBlankReference)');
+    if(!reference || !root.contains(reference)) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    if(guideViewer) guideViewer.hidden = false;
+  }, true);
+  // Handle close controls at the viewer boundary in capture phase. This keeps
+  // the close action reliable even when other lair click handlers are mounted
+  // above the station and prevents the click reaching the board beneath after
+  // the viewer becomes hidden.
+  guideViewer?.addEventListener('pointerdown', event => {
+    if(!event.target.closest('.alchemyGuideViewerClose,.alchemyGuideViewerBackdrop')) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    closeGuideViewer();
+  }, true);
   document.addEventListener('keydown', event => { if(event.key === 'Escape' && guideViewer && !guideViewer.hidden){ event.preventDefault(); event.stopImmediatePropagation(); closeGuideViewer(); } });
   const tabs = [...document.querySelectorAll('#alchemyTopHud .alchemyStationTab')];
   const scenes = () => [...root.querySelectorAll('.scene')];

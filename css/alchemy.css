@@ -992,6 +992,13 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   .alchemyFullBlur {
   opacity: 1;
 }
+/* The room remains visible as the backdrop, but it must not remain an input
+   surface behind the alchemy station. In particular the invisible workbench
+   hit area used to receive clicks through transparent parts of the module. */
+body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
+  :is(.lairHotspot, .lairWorkbenchHotspot) {
+  pointer-events: none !important;
+}
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active)
   .lairModuleHeader {
   border-bottom: none;
@@ -1816,7 +1823,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
        so lift it by that amount: the feet keep the established table baseline
        while the frame itself is no longer vertically squashed. */
     aspect-ratio: 1407 / 1096;
-    transform: translate(-50%, -27.35%);
+    transform: translate(-50%, calc(-27.35% - 12vh));
   }
   .alchemyRoot .scene.active .alchemyMixReferenceBoard {
     width: 100%;
@@ -1895,10 +1902,19 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
      showing in the letterboxed space above/below rather than the table
      photo being warped to fill it. */
   .alchemyRoot .scene.active:has(> .lab.color-game-lab) {
-    background-image: url("../assets/alchemy/desk-full.png");
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
+    isolation: isolate;
+    background: none;
+  }
+  /* Paint the tabletop as its own layer above the reference board (z-index:1)
+     and below all bottles and controls (z-index:4). A parent background is
+     always below every child, so it could never cover the board correctly. */
+  .alchemyRoot .scene.active:has(> .lab.color-game-lab)::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: url("../assets/alchemy/desk-full.png") center / contain no-repeat;
   }
   .alchemyRoot .scene.active > .lab.color-game-lab,
   .alchemyRoot .scene.active > .alchemyReagents,
@@ -2219,6 +2235,13 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   display: grid;
   place-items: center;
   padding: clamp(14px, 4vw, 54px);
+}
+/* #alchemyGuideViewer lives inside #lairOverlay. A child's z-index cannot
+   escape that parent's stacking context, while the universal top HUD sits
+   above the normal lair layer. Raise the parent only for the guide viewer so
+   its visible close button is also the element that receives the click. */
+body:has(#alchemyGuideViewer:not([hidden])) #lairOverlay {
+  z-index: 600 !important;
 }
 .alchemyGuideViewer[hidden] {
   display: none !important;

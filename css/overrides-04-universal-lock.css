@@ -48,7 +48,6 @@ body.importedMode .scene,body.mode-hillsfar .scene{position:relative!important;w
 54%{translate: -4px 0;}
 72%{translate: 4px 0;}
 }
-.mobileModeMenuButton,.mobileModeBackdrop{display:none;}
 @supports (height:100dvh){
 html,body,.app{height:100dvh;}
 }
@@ -59,16 +58,6 @@ body{background-attachment:scroll!important;}
 .app,.main,.scene{width:100%!important;height:100dvh!important;min-height:0!important;}
 .scene{max-width:none!important;overflow:hidden!important;}
 button,.tab{touch-action:manipulation;}
-.mobileModeMenuButton{position:fixed;display:grid;place-items:center;left:calc(var(--mobile-safe-left) + 8px);top:calc(var(--mobile-safe-top) + 8px);z-index:410;width:46px;height:46px;padding:0;border:1px solid rgba(161,121,59,.82);border-radius:12px;background:linear-gradient(180deg,rgba(43,33,23,.97),rgba(19,15,12,.98));color:#e4c37f;box-shadow:0 8px 22px rgba(0,0,0,.34);cursor:pointer;}
-.mobileModeMenuButton svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;}
-.mobileModeBackdrop{display:block;position:fixed;inset:0;z-index:385;background:rgba(4,3,3,.58);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .18s ease,visibility .18s ease;}
-body.mobile-mode-menu-open .mobileModeBackdrop{opacity:1;visibility:visible;pointer-events:auto;}
-.modeTabs{position:fixed!important;z-index:400!important;top:0!important;bottom:0!important;left:0!important;width:min(286px,82vw)!important;height:100dvh!important;max-height:none!important;padding:calc(var(--mobile-safe-top) + 66px) 12px calc(var(--mobile-safe-bottom) + 14px)!important;gap:6px!important;overflow-x:hidden!important;overflow-y:auto!important;background:linear-gradient(180deg,rgba(24,19,17,.995),rgba(10,8,8,.995));border-right:1px solid rgba(139,106,53,.58);box-shadow:18px 0 48px rgba(0,0,0,.46);transform:translateX(-105%);transition:transform .2s cubic-bezier(.2,.8,.2,1);scrollbar-width:thin;}
-body.mobile-mode-menu-open .modeTabs{transform:translateX(0);}
-.modeTabs .tab{min-height:44px!important;padding:10px 12px!important;font-size:13px!important;border-radius:9px!important;}
-#difficultyDock{display:none!important;}
-body.mobile-mode-menu-open #difficultyDock{display:flex!important;position:fixed!important;z-index:405!important;left:calc(var(--mobile-safe-left) + 66px)!important;top:calc(var(--mobile-safe-top) + 14px)!important;width:auto!important;height:36px!important;flex-direction:row!important;align-items:center!important;gap:5px!important;padding:0!important;}
-body.mobile-mode-menu-open #difficultyDock .difficultyBtn{width:36px!important;min-width:36px!important;max-width:36px!important;height:36px!important;min-height:36px!important;padding:0!important;font-size:13px!important;}
 .topRightHud{position:fixed!important;top:calc(var(--mobile-safe-top) + 8px)!important;right:calc(var(--mobile-safe-right) + 8px)!important;display:grid!important;grid-auto-rows:var(--mobile-hud-size)!important;gap:4px!important;align-items:stretch!important;justify-content:end!important;z-index:360!important;}
 .topRightHud .economyHud{position:static!important;display:grid!important;gap:4px!important;width:auto!important;height:var(--mobile-hud-size)!important;margin:0!important;padding:0!important;}
 .topRightHud .hudSquareBadge,.topRightHud #shopHudButton,.topRightHud #lairHudButton,.topRightHud #mapTab{width:var(--mobile-hud-size)!important;min-width:var(--mobile-hud-size)!important;max-width:var(--mobile-hud-size)!important;height:var(--mobile-hud-size)!important;min-height:var(--mobile-hud-size)!important;max-height:var(--mobile-hud-size)!important;padding:0!important;border-radius:10px!important;box-shadow:0 5px 14px rgba(0,0,0,.28),inset 0 0 0 1px rgba(255,229,176,.03)!important;}
@@ -124,7 +113,7 @@ body.importedMode .cpTarget,body.importedMode .cpBuild{padding-inline:6px!import
 body.importedMode .cpBuildCanvas{width:96%!important;}
 body.importedMode .cpParts{justify-content:flex-start!important;overflow-x:auto!important;overflow-y:hidden!important;gap:5px!important;padding-bottom:5px!important;-webkit-overflow-scrolling:touch;}
 body.importedMode .cpPart{min-width:82px!important;}
-body.map-open .mobileModeMenuButton,body.map-open .mobileModeBackdrop,body.map-open .modeTabs,body.map-open #difficultyDock,body.lair-open .mobileModeMenuButton,body.lair-open .mobileModeBackdrop,body.shop-open .mobileModeMenuButton,body.shop-open .mobileModeBackdrop,body.shop-open .modeTabs,body.shop-open #difficultyDock,body.shop-open .topRightHud{display:none!important;}
+body.shop-open .topRightHud{display:none!important;}
 .worldMapScreen{padding:calc(var(--mobile-safe-top) + 14px) 10px calc(var(--mobile-safe-bottom) + 14px)!important;gap:10px!important;}
 .worldMapCurrent{font-size:10px!important;text-align:right!important;}
 .worldMapCanvas{min-height:min(56dvh,420px)!important;border-radius:12px!important;}
@@ -174,11 +163,6 @@ body.importedMode .skBoardViewport .skBoard{transform:translateX(-50%) scale(.43
 }
 @media (max-height:560px) and (orientation:landscape){
 :root{--mobile-hud-size:34px;--template-lock-top:calc(var(--mobile-safe-top) + 10px);--template-lock-scale:.42;--template-puzzle-top:calc(var(--mobile-safe-top) + 148px);--template-puzzle-bottom:calc(var(--mobile-safe-bottom) + 34px);}
-.mobileModeMenuButton{top:calc(var(--mobile-safe-top) + 6px);left:calc(var(--mobile-safe-left) + 6px);}
-.mobileModeMenuButton svg{width:21px;height:21px;}
-.modeTabs{width:min(270px,48vw)!important;padding-top:calc(var(--mobile-safe-top) + 54px)!important;}
-body.mobile-mode-menu-open #difficultyDock{left:calc(var(--mobile-safe-left) + 54px)!important;top:calc(var(--mobile-safe-top) + 7px)!important;height:34px!important;}
-body.mobile-mode-menu-open #difficultyDock .difficultyBtn{width:34px!important;min-width:34px!important;max-width:34px!important;height:34px!important;min-height:34px!important;}
 .topRightHud{top:calc(var(--mobile-safe-top) + 6px)!important;right:calc(var(--mobile-safe-right) + 6px)!important;width:calc(var(--mobile-hud-size) * 3 + 6px)!important;gap:3px!important;}
 .topRightHud .economyHud{gap:3px!important;}
 .topRightHud .hudNavIcon,.topRightHud #mapTab .mapTabIcon{width:19px!important;height:19px!important;}
@@ -202,7 +186,6 @@ body.mode-hillsfar .hfCandidate{min-height:56px!important;}
 .lairHotspotDialogue{top:62%!important;}
 }
 @media (prefers-reduced-motion:reduce){
-.modeTabs,.mobileModeBackdrop,.mobileModeMenuButton{transition:none!important;}
 }
 .plate.selected:after{content:none!important;display:none!important;}
 .plateFace{transition:filter 180ms ease;}
@@ -275,20 +258,6 @@ body.game-inactive.shop-open::after,body.game-inactive.lair-open::after,body.gam
 .pickSkinCard[data-kind="tension"] .pickSkinPreview{width:46px!important;height:68px!important;max-width:46px!important;max-height:68px!important;}
 }
 
-/* Desktop: the games list slides away behind the menu button, same as on
-   phones. Scoped to a min-width query so the mobile drawer rules above, which
-   size it for a phone, are left alone. */
-@media (min-width:761px){
-  .mobileModeMenuButton{display:grid;place-items:center;position:fixed;left:14px;top:14px;z-index:410;width:var(--top-hud-size,68px);height:var(--top-hud-size,68px);padding:0;border:1px solid #8b6a35;border-radius:9px;background:linear-gradient(#302534,#17151a);color:#e0c99e;cursor:pointer;}
-  .mobileModeMenuButton:hover{border-color:#d6ab5e;color:#f3ddb1;}
-  .mobileModeMenuButton svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;}
-  .modeTabs{top:66px;z-index:400;transform:translateX(calc(-100% - 20px));transition:transform .2s cubic-bezier(.22,.78,.22,1);}
-  body.mobile-mode-menu-open .modeTabs{transform:translateX(0);}
-  .mobileModeBackdrop{display:block;position:fixed;inset:0;z-index:385;background:rgba(4,3,3,.5);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .18s ease,visibility .18s ease;}
-  body.mobile-mode-menu-open .mobileModeBackdrop{opacity:1;visibility:visible;pointer-events:auto;}
-  body.map-open .mobileModeMenuButton{display:none;}
-}
-
 /* The round reward and the balance report numbers; they are not buttons, so
    they carry no frame. They also read as a pair, so they sit on one line and
    size to their content rather than to the square HUD tile grid. */
@@ -297,15 +266,6 @@ body.game-inactive.shop-open::after,body.game-inactive.lair-open::after,body.gam
 .economyHud .rewardBox,.economyHud .balanceBox{border:0!important;background:none!important;box-shadow:none!important;}
 .economyHud .balanceBox .hudBadgeValue{display:flex;align-items:center;gap:4px;}
 .economyHud .balanceBox .coinIcon{color:#d7ab5c;font-size:.9em;}
-
-/* The menu button is a HUD button like the three on the right, so it takes the
-   same box. mobile.css and the narrow breakpoints used to pin it to 38-42px
-   while the right-hand buttons followed --mobile-hud-size. */
-.mobileModeMenuButton{width:var(--top-hud-size,68px)!important;height:var(--top-hud-size,68px)!important;}
-@media (max-width:760px),(max-height:560px) and (orientation:landscape){
-  .mobileModeMenuButton{width:var(--mobile-hud-size)!important;height:var(--mobile-hud-size)!important;border-radius:12px!important;}
-  .mobileModeMenuButton svg{width:calc(var(--mobile-hud-size) * .5)!important;height:calc(var(--mobile-hud-size) * .5)!important;}
-}
 
 /* Noise meter. Positioned from JS against the objective line so it tracks that
    element across breakpoints instead of repeating its rules. */

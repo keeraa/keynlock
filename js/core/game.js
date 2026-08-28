@@ -1,22 +1,4 @@
   function updateModeUI(){
-    $tabClassic.classList.toggle('active', mode==='classic');
-    $tabTarget.classList.toggle('active', mode==='target');
-    $tabLine.classList.toggle('active', mode==='line');
-    $tabAlt2.classList.toggle('active', mode==='sequence');
-    $tabSpecial.classList.toggle('active', mode==='special');
-    $tabHillsfar.classList.toggle('active', mode==='hillsfar');
-    $tabMass.classList.toggle('active', mode==='mass');
-    $tabG1.classList.toggle('active', mode==='g1');
-    $tabR2.classList.toggle('active', mode==='r2');
-    $tabSkyrim.classList.toggle('active', mode==='skyrim');
-    $tabAnach.classList.toggle('active', mode==='anach');
-    $tabTension.classList.toggle('active', mode==='tension');
-    $tabResonance.classList.toggle('active', mode==='resonance');
-    $tabDeduction.classList.toggle('active', mode==='deduction');
-    $tabComposite.classList.toggle('active', mode==='composite');
-    $tabHeatCold.classList.toggle('active', mode==='heatcold');
-    $tabDrum.classList.toggle('active', mode==='drum');
-    $tabScope.classList.toggle('active', mode==='scope');
     if($mapTab) $mapTab.classList.toggle('active',mapOpen);
 
     syncModePanels(mode);
@@ -30,7 +12,6 @@
     document.body.classList.toggle('game-manual-open', !!GameCatalog.feature(mode,'lock.manualOpen'));
     document.body.classList.toggle('game-noise-sensor', !!GameCatalog.feature(mode,'world.noiseSensor'));
     document.body.dataset.gameMode=mode;
-    renderDifficultyDock();
     if(mode!=='hillsfar') clearHillsfarTimer();
     if(mode==='hillsfar') setGlobalTimer(true, hfTimeLeft || hfTimeMax, hfTimeMax || 1, 'ТАЙМЕР');
     else setGlobalTimer(false);
@@ -88,7 +69,6 @@ if(mode==='classic'){
   function setGameInactive(flag){
     document.body.classList.toggle('game-inactive', !!flag);
     if(!flag){
-      document.body.classList.remove('mobile-mode-menu-open');
       document.body.classList.remove('solved-notice-visible');
     }
   }

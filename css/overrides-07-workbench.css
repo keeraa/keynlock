@@ -24,7 +24,7 @@
 
 /* Use one smooth easing language across all interactive UI. */
 :where(
-  button,[role="button"],.tab,.difficultyBtn,.hudNavBtn,.shopCard,.pickSkinCard,
+  button,[role="button"],.tab,.hudNavBtn,.shopCard,.pickSkinCard,
   .inventoryTool,.lairCharacter,.lairPersonBtn,.lairTopic,.lairIntelCard,
   .hcStepBtn,.digitalMiniBtn,.digitalBtn,.digitalWheel button,.anBtn,.cpPart,.cpLevelBtn
 ){
@@ -62,7 +62,7 @@
 }
 
 /* Panels / drawers / overlays use a slightly softer curve. */
-.inventoryDrawer,.modeTabs,.mobileModeBackdrop,.solvedPuzzleOverlay,
+.inventoryDrawer,.solvedPuzzleOverlay,
 .lairModuleWindow,.lairSceneCharacter,.worldMapDialog,.shopPanel{
   transition-timing-function:var(--motion-ease-soft) !important;
 }

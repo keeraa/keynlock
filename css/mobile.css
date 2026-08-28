@@ -42,8 +42,6 @@
 }
 @media (max-width:340px) and (orientation:portrait){
   :root{--mobile-hud-size:35px;}
-  .mobileModeMenuButton{left:calc(var(--mobile-safe-left) + 5px)!important;top:calc(var(--mobile-safe-top) + 5px)!important;}
-  .mobileModeMenuButton svg{width:22px!important;height:22px!important;}
   .topRightHud{right:calc(var(--mobile-safe-right) + 5px)!important;top:calc(var(--mobile-safe-top) + 5px)!important;}
 }
 @media (max-height:560px) and (orientation:landscape){

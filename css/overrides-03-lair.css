@@ -67,16 +67,10 @@
 .mechanismZone .pick,.mechanismZone .tension,.sharedModeLockArt .pick,.sharedModeLockArt .tension{z-index:3!important;}
 .mechanismZone.opening .lockPanel,.sharedModeLockArt.opening .lockPanel{animation:keynlockBodyOpenFast 950ms cubic-bezier(.20,.76,.18,1);}
 .sharedModeLockArt{position:relative;}
-.difficultyDock{top:14px;left:180px;}
-.difficultyBtn{border:1px solid #8b6a35;background:linear-gradient(#302534,#17151a);color:#d8be90;cursor:pointer;font:700 14px var(--ui-font);letter-spacing:.04em;transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease;}
-.difficultyBtn:hover{border-color:#c49a51;}
-.difficultyBtn.active{border-color:#d8aa58;color:#fff0c6;background:linear-gradient(#5a315b,#2f2036);box-shadow:inset 0 0 0 1px rgba(236,193,105,.32),0 0 14px rgba(138,80,150,.18);}
 .objectiveDiff{display:inline-block;margin-left:6px;color:#e8c77e;}
 @media (max-width:1200px){
-.difficultyDock{left:160px;width:48px;}
 }
 @media (max-width:900px){
-.difficultyDock{left:144px;width:44px;}
 }
 :root{--top-hud-size:68px;--lock-src-w:540px;--lock-src-h:266px;--lock-scale:.80;--lock-visual-w:432px;--lock-visual-h:213px;--lock-top:36px;--pick-left:222px;--pick-top:146px;--tension-left:272px;--tension-top:137px;--objective-bottom:18px;}
 #objectiveLine b{color:#dcc9aa;}
@@ -92,9 +86,6 @@
 .topRightHud .coinIcon{font-size:13px;}
 .topRightHud .headerPickIcon{width:14px!important;height:14px!important;transform:scale(.8);}
 #mapTab .mapTabIcon{width:36px!important;height:36px!important;}
-.difficultyDock{position:fixed!important;z-index:205!important;width:auto!important;display:flex!important;flex-direction:row!important;align-items:center!important;gap:4px!important;padding:0!important;pointer-events:auto;transition:top .14s ease,left .14s ease;}
-.difficultyBtn{width:34px!important;min-width:34px!important;max-width:34px!important;height:34px!important;min-height:34px!important;padding:0!important;display:grid!important;place-items:center!important;border-radius:7px!important;font-size:13px!important;}
-.difficultyBtn:hover{transform:translateY(-1px)!important;}
 #lock::before,body.importedMode .modePanel:not([hidden])::before,body.mode-hillsfar .hillsfarMode::before{content:none!important;display:none!important;background:none!important;border:0!important;box-shadow:none!important;}
 body.importedMode .hillsfarMode,body.importedMode .massMode,body.importedMode .g1Mode,body.importedMode .r2Mode,body.importedMode .skMode,body.importedMode .anMode,body.importedMode .tnMode,body.importedMode .rsMode,body.importedMode .kdMode,body.importedMode .cpMode,body.importedMode .modePanel:not([hidden]),body.mode-hillsfar .hillsfarMode{background:transparent!important;background-image:none!important;box-shadow:none!important;filter:none!important;}
 body:not(.importedMode) #lock{left:50%!important;top:0!important;width:900px!important;height:880px!important;transform:translateX(-50%) scale(.80)!important;transform-origin:top center!important;}
@@ -113,8 +104,6 @@ body.importedMode .sharedModeLockArt{position:absolute!important;left:50%!import
 .topRightHud .economyHud{gap:6px!important;}
 .hudBadgeLabel{font-size:8px;}
 .hudBadgeValue,.hudBadgeValue strong,.topRightHud .hudSquareBadge strong{font-size:12px!important;}
-.difficultyDock{gap:3px!important;}
-.difficultyBtn{width:30px!important;min-width:30px!important;max-width:30px!important;height:30px!important;min-height:30px!important;font-size:12px!important;}
 #objectiveLine.difficulty{max-width:calc(100vw - 24px)!important;padding:8px 12px!important;font-size:10px!important;}
 body:not(.importedMode) #lock{transform:translateX(-50%) scale(.68)!important;height:900px!important;}
 body:not(.importedMode) #lock>.platesZone{top:379px!important;}

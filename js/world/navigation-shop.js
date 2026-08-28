@@ -14,14 +14,12 @@
   }
 
   function openMap(){
-    closeMobileModeMenu();
     setInventoryOpen(false);
     if(shopOpen) closeShop();
     if(lairOpen) closeLair();
     mapOpen=true;
     document.body.classList.add('map-open');
     $worldMapScreen.hidden=false;
-    document.querySelectorAll('.modeTabs .tab').forEach(tab=>tab.classList.remove('active'));
     $mapTab.classList.add('active');
     renderWorldMap();
   }
@@ -80,7 +78,7 @@
     },1180);
   }
 
-  function openShop(){ closeMobileModeMenu(); setInventoryOpen(false); if(mapOpen) closeMap(); shopOpen=true; document.body.classList.add('shop-open'); $toast.classList.remove('show','actionable'); updateShopUI(); $shopOverlay.classList.add('open'); }
+  function openShop(){ setInventoryOpen(false); if(mapOpen) closeMap(); shopOpen=true; document.body.classList.add('shop-open'); $toast.classList.remove('show','actionable'); updateShopUI(); $shopOverlay.classList.add('open'); }
   function closeShop(){ shopOpen=false; document.body.classList.remove('shop-open'); $shopOverlay.classList.remove('open'); updatePickUI(); }
   let modeSwitchFrame=0;
   function switchMode(nextMode){

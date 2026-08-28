@@ -2137,12 +2137,6 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
      just aimed at a different landing spot via transform. */
 }
 
-body.lair-open #difficultyDock,
-body.shop-open #difficultyDock,
-body.map-open #difficultyDock {
-  display: none !important;
-}
-
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) {
   overflow: visible !important;
 }

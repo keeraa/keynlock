@@ -1,8 +1,8 @@
 /*
  * Global top HUD
  *
- * Every screen now uses one layout owner for the menu, difficulty selector,
- * contextual title/tabs and the economy/navigation controls.  The contextual
+ * Every screen uses one layout owner for contextual title/tabs and the
+ * economy/navigation controls. The contextual
  * block is intentionally empty outside modes (such as Alchemy) that need it.
  */
 .globalTopHud{
@@ -13,9 +13,9 @@
   right:14px;
   height:68px;
   display:grid;
-  grid-template-columns:68px auto minmax(0,1fr) auto;
+  grid-template-columns:minmax(0,1fr) auto;
   grid-template-rows:68px;
-  grid-template-areas:"menu difficulty context actions";
+  grid-template-areas:"context actions";
   align-items:center;
   gap:10px;
   pointer-events:none;
@@ -32,7 +32,6 @@
 .globalTopHud > *{pointer-events:auto;}
 
 /* All icon controls in the shared HUD use the same material and ink. */
-.globalTopHud .mobileModeMenuButton,
 .globalTopHud .hudNavBtn,
 .globalTopHud .alchemyTopHudClose{
   border-color:rgba(161,121,59,.82)!important;
@@ -42,7 +41,6 @@
   box-shadow:0 8px 24px rgba(0,0,0,.30),inset 0 0 0 1px rgba(255,229,176,.04)!important;
   transition:transform .16s ease,filter .16s ease,border-color .16s ease,color .16s ease!important;
 }
-.globalTopHud .mobileModeMenuButton svg,
 .globalTopHud .hudNavIcon{
   fill:none!important;
   stroke:currentColor!important;
@@ -50,14 +48,12 @@
   stroke-linecap:round!important;
   stroke-linejoin:round!important;
 }
-.globalTopHud .mobileModeMenuButton:hover,
 .globalTopHud .hudNavBtn:hover,
 .globalTopHud .alchemyTopHudClose:hover{
   border-color:#c79648!important;
   color:#f0d497!important;
   filter:brightness(1.12);
 }
-.globalTopHud .mobileModeMenuButton:focus-visible,
 .globalTopHud .hudNavBtn:focus-visible,
 .globalTopHud .alchemyTopHudClose:focus-visible{
   outline:2px solid #d9a74c!important;
@@ -68,21 +64,6 @@
   outline-offset:2px!important;
 }
 
-.globalTopHud .mobileModeMenuButton{
-  grid-area:menu;
-  position:static!important;
-  inset:auto!important;
-  width:68px!important;
-  height:68px!important;
-  margin:0!important;
-}
-.globalTopHud #difficultyDock{
-  grid-area:difficulty;
-  position:static!important;
-  inset:auto!important;
-  align-self:center!important;
-  margin:0!important;
-}
 .globalTopHud .topRightHud{
   grid-area:actions;
   position:static!important;
@@ -117,24 +98,14 @@
   }
 }
 
-/* The drawer and its scrim belong to the header semantically, but not to its
-   grid geometry. */
-.globalTopHud .mobileModeBackdrop{position:fixed!important;}
-.globalTopHud .modeTabs{position:fixed!important;}
-
-body.lair-open .globalTopHud .mobileModeMenuButton{display:grid!important;}
 body.lair-open .globalTopHud #rewardBox{display:none!important;}
-body.lair-open .globalTopHud #difficultyDock,
-body.shop-open .globalTopHud #difficultyDock,
-body.map-open .globalTopHud #difficultyDock{display:none!important;}
 
 @media (max-width:1100px){
   .globalTopHud{
-    grid-template-columns:68px minmax(0,1fr) auto;
-    grid-template-areas:"menu context actions";
+    grid-template-columns:minmax(0,1fr) auto;
+    grid-template-areas:"context actions";
     gap:8px;
   }
-  .globalTopHud #difficultyDock{display:none!important;}
 }
 
 @media (max-width:760px),(max-height:560px) and (orientation:landscape){
@@ -143,15 +114,10 @@ body.map-open .globalTopHud #difficultyDock{display:none!important;}
     left:calc(var(--mobile-safe-left,0px) + 7px);
     right:calc(var(--mobile-safe-right,0px) + 7px);
     height:54px;
-    grid-template-columns:var(--mobile-hud-size,42px) minmax(0,1fr) auto;
+    grid-template-columns:minmax(0,1fr) auto;
     grid-template-rows:54px;
     gap:6px;
     min-height:54px!important;
-  }
-  .globalTopHud .mobileModeMenuButton{
-    width:var(--mobile-hud-size,42px)!important;
-    height:var(--mobile-hud-size,42px)!important;
-    align-self:start;
   }
   .globalTopHud .alchemyTopHud{height:54px;}
   .globalTopHud .topRightHud{max-width:min(58vw,260px)!important;}

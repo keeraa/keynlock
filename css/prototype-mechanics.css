@@ -15,8 +15,6 @@ body.prototype-mechanic-open .alchemyRackDrawer,
 body.prototype-mechanic-open.game-inactive::after{display:none!important;}
 body.prototype-mechanic-open.game-inactive .topRightHud,
 body.prototype-mechanic-open.game-inactive .inventoryDrawer,
-body.prototype-mechanic-open.game-inactive .modeTabs,
-body.prototype-mechanic-open.game-inactive #difficultyDock,
 body.prototype-mechanic-open.game-inactive #objectiveLine{filter:none!important;pointer-events:auto!important;}
 body.prototype-mechanic-open .topRightHud{z-index:360!important;}
 body.prototype-mechanic-open .inventoryDrawer{z-index:215!important;}

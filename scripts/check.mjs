@@ -78,12 +78,6 @@ const ids = [...html.matchAll(/\bid=["']([^"']+)["']/gi)].map(m => m[1]);
 const duplicates = [...new Set(ids.filter((id, i) => ids.indexOf(id) !== i))];
 if (duplicates.length) fail(`Duplicate HTML ids: ${duplicates.join(', ')}`);
 
-const modeTabs = [
-  'tabClassic','tabTarget','tabLine','tabAlt2','tabSpecial','tabHillsfar','tabMass','tabG1','tabR2',
-  'tabSkyrim','tabAnach','tabTension','tabResonance','tabDeduction','tabComposite','tabHeatCold','tabDrum','tabScope'
-];
-for (const id of modeTabs) if (!ids.includes(id)) fail(`Missing mode tab: ${id}`);
-
 const catalogueSource = readFileSync(resolve(root, 'js/core/game-catalog.js'), 'utf8');
 const catalogueEntries = [...catalogueSource.matchAll(/^\s*(?:'([^']+)'|([a-z][\w-]*)):\{title:[^\n]+kind:'(native|prototype)'/gm)]
   .map(match => ({ id: match[1] || match[2], kind: match[3] }));

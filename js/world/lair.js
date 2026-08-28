@@ -192,7 +192,6 @@
   }
 
   function openLair(){
-    closeMobileModeMenu();
     setInventoryOpen(false);
     if(mapLocation!=='lair' || !$lairOverlay) return;
     if(shopOpen) closeShop();

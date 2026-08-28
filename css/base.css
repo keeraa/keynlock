@@ -49,7 +49,6 @@ h1{margin:0;font-size:clamp(27.5px,3.3vw,48.4px);font-weight:500;letter-spacing:
 35%{transform: translateY(2px);filter: brightness(1.35);}
 100%{transform: translateY(0);filter: brightness(1);}
 }
-.modeTabs{position:fixed;top:14px;left:14px;display:flex;flex-direction:column;gap:8px;width:158px;max-height:calc(100vh - 28px);overflow-y:auto;overflow-x:hidden;padding-right:4px;scrollbar-width:thin;scrollbar-color:#70572f transparent;font:13.20px var(--ui-font);}
 .tab{width:100%;text-align:left;border:1px solid #8b6a35;background:linear-gradient(#302534,#17151a);color:#e0c99e;padding:8px 12px;cursor:pointer;border-radius:7px;letter-spacing:.04em;}
 .tab.active{border-color:#c49a51;color:#ffe7b8;background:linear-gradient(#5a315b,#2f2036);box-shadow:inset 0 0 0 1px rgba(236,193,105,.32), 0 0 14px rgba(138,80,150,.18);}
 @media (max-width:720px){
@@ -57,13 +56,8 @@ header{padding-top:14px;}
 .economyHud{top:58px;right:10px;transform:scale(.72);}
 }
 body.importedMode .main{place-items:stretch;}
-.modeTabs{z-index:200!important;}
 .economyHud{z-index:190!important;}
-@media (max-width: 1200px){
-.modeTabs{width:138px;}
-}
 @media (max-width: 900px){
-.modeTabs{width:122px;gap:6px;}
 .tab{padding:7px 10px;font-size:12px;}
 }
 .topRightHud{position:fixed;display:flex;pointer-events:none;}

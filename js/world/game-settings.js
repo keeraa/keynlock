@@ -149,7 +149,6 @@
 
     function openGameSettings(){
       if(!screen)return;
-      closeMobileModeMenu?.();
       if(shopOpen)closeShop();
       if(lairOpen)closeLair();
       if(mapOpen)closeMap();
@@ -167,7 +166,6 @@
       document.body.classList.remove('game-settings-open');
       setGameInactive(false);
       render();
-      document.querySelector('#mobileModeMenuButton')?.focus({preventScroll:true});
     }
 
     document.querySelector('#gameSettingsButton')?.addEventListener('click',openGameSettings);

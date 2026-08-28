@@ -37,23 +37,6 @@
   }
 
   function applyTablerIcons(){
-    setIconLabel($tabClassic,'lock','Классика');
-    setIconLabel($tabTarget,'adjustments','Альтернатива');
-    setIconLabel($tabLine,'route','Другая линия');
-    setIconLabel($tabAlt2,'list','Альтернатива 2');
-    setIconLabel($tabSpecial,'sparkles','Особые замки');
-    setIconLabel($tabHillsfar,'key','Hillsfar');
-    setIconLabel($tabMass,'circles','Mass Effect');
-    setIconLabel($tabG1,'arrows','Gothic 1');
-    setIconLabel($tabR2,'tool','Risen 2');
-    setIconLabel($tabSkyrim,'unlock','Skyrim');
-    setIconLabel($tabAnach,'binary','Anachronox');
-    setIconLabel($tabTension,'adjustments','Натяжение');
-    setIconLabel($tabResonance,'circles','Резонанс');
-    setIconLabel($tabDeduction,'key','Слепок ключа');
-    setIconLabel($tabComposite,'key','Составная');
-    setIconLabel($shopTab,'bag','Магазин');
-
     const coinIcon=document.querySelector('.coinIcon');
     if(coinIcon) coinIcon.innerHTML=tablerIcon('coin',16);
     const headerPickIcon=document.querySelector('.headerPickIcon');
@@ -324,49 +307,6 @@
     if(mapOpen){ e.preventDefault(); closeMap(); }
   });
 
-  const $mobileModeMenuButton=document.querySelector('#mobileModeMenuButton');
-  const $mobileModeBackdrop=document.querySelector('#mobileModeBackdrop');
-  const $modeTabsPanel=document.querySelector('.modeTabs');
-  const mobileLayoutQuery=window.matchMedia('(max-width:760px), (max-height:560px) and (orientation:landscape)');
-
-  // The games list hides behind the menu button at every width now, not just
-  // on phones; the class name is kept so the mobile rules keep matching.
-  function setMobileModeMenu(open){
-    const next=Boolean(open);
-    document.body.classList.toggle('mobile-mode-menu-open',next);
-    $mobileModeMenuButton?.setAttribute('aria-expanded',next?'true':'false');
-    $mobileModeBackdrop?.setAttribute('aria-hidden',next?'false':'true');
-  }
-  function closeMobileModeMenu(){ setMobileModeMenu(false); }
-
-  $mobileModeMenuButton?.addEventListener('click',()=>setMobileModeMenu(!document.body.classList.contains('mobile-mode-menu-open')));
-  $mobileModeBackdrop?.addEventListener('click',closeMobileModeMenu);
-  $modeTabsPanel?.addEventListener('click',e=>{
-    if(e.target.closest('.tab')) closeMobileModeMenu();
-  });
-  document.addEventListener('keydown',e=>{
-    if(e.key==='Escape') closeMobileModeMenu();
-  });
-  mobileLayoutQuery.addEventListener?.('change',()=>closeMobileModeMenu());
-
-  $tabClassic.onclick=()=>switchMode('classic');
-  $tabTarget.onclick=()=>switchMode('target');
-  $tabLine.onclick=()=>switchMode('line');
-  $tabAlt2.onclick=()=>switchMode('sequence');
-  $tabSpecial.onclick=()=>switchMode('special');
-  $tabHillsfar.onclick=()=>switchMode('hillsfar');
-  $tabMass.onclick=()=>switchMode('mass');
-  $tabG1.onclick=()=>switchMode('g1');
-  $tabR2.onclick=()=>switchMode('r2');
-  $tabSkyrim.onclick=()=>switchMode('skyrim');
-  $tabAnach.onclick=()=>switchMode('anach');
-  $tabTension.onclick=()=>switchMode('tension');
-  $tabResonance.onclick=()=>switchMode('resonance');
-  $tabDeduction.onclick=()=>switchMode('deduction');
-  $tabComposite.onclick=()=>switchMode('composite');
-  $tabHeatCold.onclick=()=>switchMode('heatcold');
-  $tabDrum.onclick=()=>switchMode('drum');
-  $tabScope.onclick=()=>switchMode('scope');
   $hcInput?.addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&e.key==='Enter'){e.preventDefault();GameActions.attemptOpen({modeId:'heatcold',source:'keyboard'});}});
   $hcInput?.addEventListener('input',()=>{$hcInput.value=$hcInput.value.replace(/\D/g,'').slice(0,4);});
   document.addEventListener('keydown',handleHeatColdKey);
@@ -394,10 +334,6 @@
       focusHeatColdDigit(hcActiveIndex);
     }
   });
-  document.querySelectorAll('.difficultyBtn').forEach(btn=>{
-    btn.addEventListener('click',()=>setModeDifficulty(Number(btn.dataset.difficulty)));
-  });
-  addEventListener('resize',()=>renderDifficultyDock(),{passive:true});
   applyPickSkin();
   applyTensionSkin();
   initPickSkinShop();

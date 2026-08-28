@@ -137,7 +137,7 @@
         $timerCircleHud=document.querySelector('#timerCircleHud'), $timerCircleProgress=document.querySelector('#timerCircleProgress'), $timerCircleValue=document.querySelector('#timerCircleValue'), $timerCircleLabel=document.querySelector('#timerCircleLabel'),
         $toast=document.querySelector('#toast'), $toastText=document.querySelector('#toastText'), $toastAction=document.querySelector('#toastAction'), $scene=document.querySelector('.scene'), $mechanism=document.querySelector('.mechanismZone'), $lockHitArea=document.querySelector('#lockHitArea'),
         $objectiveLine=document.querySelector('#objectiveLine'),
-        $tabClassic=document.querySelector('#tabClassic'), $tabTarget=document.querySelector('#tabTarget'), $tabLine=document.querySelector('#tabLine'), $tabAlt2=document.querySelector('#tabAlt2'), $tabSpecial=document.querySelector('#tabSpecial'), $tabHillsfar=document.querySelector('#tabHillsfar'), $tabMass=document.querySelector('#tabMass'), $tabG1=document.querySelector('#tabG1'), $tabR2=document.querySelector('#tabR2'), $tabSkyrim=document.querySelector('#tabSkyrim'), $tabAnach=document.querySelector('#tabAnach'), $tabTension=document.querySelector('#tabTension'), $tabResonance=document.querySelector('#tabResonance'), $tabDeduction=document.querySelector('#tabDeduction'), $tabComposite=document.querySelector('#tabComposite'), $mapTab=document.querySelector('#mapTab'),
+        $mapTab=document.querySelector('#mapTab'),
         $coinBalance=document.querySelector('#coinBalance'), $runReward=document.querySelector('#runReward'), $rewardBox=document.querySelector('#rewardBox'),
         $shopTab=document.querySelector('#shopTab'), $shopOverlay=document.querySelector('#shopOverlay'), $shopClose=document.querySelector('#shopClose'), $shopBalance=document.querySelector('#shopBalance'),
         $worldMapScreen=document.querySelector('#worldMapScreen'), $worldMapCanvas=document.querySelector('#worldMapCanvas'), $mapPlayer=document.querySelector('#mapPlayer'), $mapCurrentName=document.querySelector('#mapCurrentName'), $mapInfoTitle=document.querySelector('#mapInfoTitle'), $mapInfoText=document.querySelector('#mapInfoText'), $mapLocationAction=document.querySelector('#mapLocationAction'),
@@ -156,7 +156,6 @@
         $resonanceMode=document.querySelector('#resonanceMode'), $rsLanes=document.querySelector('#rsLanes'),
         $deductionMode=document.querySelector('#deductionMode'), $kdPanel=document.querySelector('#kdPanel'), $kdKey=document.querySelector('#kdKey'), $kdCheck=document.querySelector('#kdCheck'), $kdFeedback=document.querySelector('#kdFeedback'), $kdHistory=document.querySelector('#kdHistory'),
         $compositeMode=document.querySelector('#compositeMode'), $cpPins=document.querySelector('#cpPins'), $cpBuildPins=document.querySelector('#cpBuildPins'), $cpTargetShadow=document.querySelector('#cpTargetShadow'), $cpTargetFill=document.querySelector('#cpTargetFill'), $cpTargetTopLine=document.querySelector('#cpTargetTopLine'), $cpTargetBevel=document.querySelector('#cpTargetBevel'), $cpTargetPath=document.querySelector('#cpTargetPath'), $cpTargetGlow=document.querySelector('#cpTargetGlow'), $cpBuildShadow=document.querySelector('#cpBuildShadow'), $cpBuildFill=document.querySelector('#cpBuildFill'), $cpBuildTopLine=document.querySelector('#cpBuildTopLine'), $cpBuildBevel=document.querySelector('#cpBuildBevel'), $cpBuildPath=document.querySelector('#cpBuildPath'), $cpBuildGlow=document.querySelector('#cpBuildGlow'), $cpBuildJoints=document.querySelector('#cpBuildJoints'), $cpParts=document.querySelector('#cpParts'), $cpState=document.querySelector('#cpState'),
-        $tabHeatCold=document.querySelector('#tabHeatCold'), $tabDrum=document.querySelector('#tabDrum'), $tabScope=document.querySelector('#tabScope'),
         $heatColdMode=document.querySelector('#heatColdMode'), $hcInput=document.querySelector('#hcInput'), $hcDialRow=document.querySelector('#hcDialRow'), $hcSlots=document.querySelector('#hcSlots'), $hcResult=document.querySelector('#hcResult'), $hcRows=document.querySelector('#hcRows'),
         $drumMode=document.querySelector('#drumMode'), $drumWheels=document.querySelector('#drumWheels'), $drumCheck=document.querySelector('#drumCheck'), $drumResult=document.querySelector('#drumResult'), $drumSound=document.querySelector('#drumSound'), $drumNew=document.querySelector('#drumNew'),
         $scopeMode=document.querySelector('#scopeMode'), $scopeCanvas=document.querySelector('#scopeCanvas'), $scopeWheels=document.querySelector('#scopeWheels'), $scopeScore=document.querySelector('#scopeScore'), $scopeBar=document.querySelector('#scopeBar'), $scopeCheck=document.querySelector('#scopeCheck'), $scopeResult=document.querySelector('#scopeResult'), $scopeNew=document.querySelector('#scopeNew');
@@ -193,37 +192,10 @@
   function saveModeDifficulty(){ STORE.setItem(DIFFICULTY_STORAGE_KEY, JSON.stringify(modeDifficultyMap)); }
   function getModeDifficulty(modeName=mode){ const v=Number(modeDifficultyMap?.[modeName]); return [1,2,3].includes(v)?v:1; }
   function diffStep(a,b,c,modeName=mode){ const level=getModeDifficulty(modeName); return level===1?a:level===2?b:c; }
-  function renderDifficultyDock(){
-    const dock=document.querySelector('#difficultyDock');
-    document.querySelectorAll('.difficultyBtn').forEach(btn=>{
-      btn.classList.toggle('active', Number(btn.dataset.difficulty)===getModeDifficulty(mode));
-    });
-    if(!dock) return;
-
-    const activeTab=document.querySelector('.modeTabs .tab.active');
-    const hide=mapOpen || lairOpen || shopOpen || !activeTab || activeTab.hidden;
-    dock.style.display=hide?'none':'flex';
-    if(hide) return;
-
-    requestAnimationFrame(()=>{
-      const r=activeTab.getBoundingClientRect();
-      const h=dock.offsetHeight || 34;
-      const btn=document.querySelector('.mobileModeMenuButton');
-      if(r.right < 8 && btn){
-        const b=btn.getBoundingClientRect();
-        dock.style.left=`${Math.round(b.right + 8)}px`;
-        dock.style.top=`${Math.round(b.top + (b.height-h)/2)}px`;
-        return;
-      }
-      dock.style.left=`${Math.round(r.right + 7)}px`;
-      dock.style.top=`${Math.round(r.top + (r.height-h)/2)}px`;
-    });
-  }
   function setModeDifficulty(level, modeName=mode, regenerate=true){
     level=Math.max(1,Math.min(3,Number(level)||1));
     modeDifficultyMap[modeName]=level;
     saveModeDifficulty();
-    renderDifficultyDock();
     if(modeName!==mode || !regenerate) return;
     if(lairOpen) closeLair();
     if(mapOpen) closeMap();

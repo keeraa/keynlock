@@ -29,7 +29,6 @@
 .worldMapInfoText{margin-top:4px;color:#897d6c;font:12px/1.35 Arial,sans-serif;}
 .worldMapAction{min-width:132px;height:42px;border:1px solid #a97f3e;border-radius:9px;background:linear-gradient(#432f1b,#20170f);color:#e8c67d;font:600 12px/1 Arial,sans-serif;cursor:pointer;}
 .worldMapAction:hover{filter:brightness(1.14);}
-body.map-open .modeTabs .tab.active:not(#mapTab){box-shadow:none;}
 @media (max-width:900px){
 .worldMapScreen{padding:18px 14px 22px 142px;}
 .worldMapCanvas{min-height:330px;}

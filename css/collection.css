@@ -2,13 +2,19 @@
    of the lair (.lairHotspot, .lairCharacter), self-contained rather than
    reaching into the shared .lairPanelHead/.lairPanelTitle classes (those
    vary per game-mode theme file; this screen doesn't need to). */
+/* The left list now shows every handle of a collection in one row per
+   button, which needs real vertical room — let the window grow taller for
+   this panel specifically rather than cramping the strips. */
+#lairModuleWindow:has(.lairPanel[data-lair-panel="collection"].active){max-height:90vh;}
+#lairModuleWindow:has(.lairPanel[data-lair-panel="collection"].active) .lairModuleBody{max-height:calc(90vh - 54px);}
+
 .alchemyRoot ~ #collectionRoot,
 #collectionRoot{
   display:flex;
   flex-direction:column;
   gap:14px;
   height:100%;
-  min-height:0;
+  min-height:640px;
   color:#e2c487;
   font-family:var(--ui-font,Arial,sans-serif);
 }
@@ -21,42 +27,46 @@
 
 /* --- left: the list of collections --- */
 .collectionListCol{
-  flex:0 0 200px;
+  flex:0 0 auto;
   min-width:0;
   overflow-y:auto;
   display:flex;
   flex-direction:column;
-  gap:8px;
+  gap:10px;
   padding-right:4px;
 }
 .collectionRow{
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:6px;
   padding:8px;
   border:1px solid rgba(138,100,52,.5);
   border-radius:10px;
   background:rgba(22,17,12,.7);
-  color:#c9b98c;
   cursor:pointer;
   text-align:left;
   transition:border-color .16s ease,background .16s ease;
 }
-.collectionRow:hover{border-color:#d6ab5e;color:#f0d497;}
-.collectionRow.active{background:#a9772f;border-color:#f0c86e;color:#1a130c;}
-.collectionRowThumb{
-  flex:0 0 auto;
-  width:34px;height:34px;
+.collectionRow:hover{border-color:#d6ab5e;}
+.collectionRow.active{background:#a9772f;border-color:#f0c86e;}
+/* Each collection button shows every handle it owns in one row — no name
+   label, the thumbnails ARE the identity. Sized ~30% up from the old
+   single 34px thumbnail (34 * 1.3 ≈ 44px). */
+.collectionRowThumbs{
+  display:flex;
+  gap:5px;
+}
+.collectionRowThumbs img{
+  width:44px;height:44px;
   border-radius:6px;
   overflow:hidden;
   background:rgba(0,0,0,.35);
-  display:grid;place-items:center;
+  object-fit:contain;
 }
-.collectionRowThumb img{max-width:100%;max-height:100%;object-fit:contain;}
-.collectionRowName{font:600 12px/1.2 inherit;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
 /* --- right: preview stage + zoom + handle strip --- */
 .collectionPreviewCol{
+  --preview-w:min(460px,100%);
   flex:1 1 auto;
   min-width:0;
   display:flex;
@@ -67,7 +77,7 @@
 }
 .collectionStage{
   position:relative;
-  width:min(320px,80%);
+  width:var(--preview-w);
   aspect-ratio:1;
   background:
     repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 1px,transparent 1px 40px),
@@ -90,13 +100,16 @@
   height:912px;
   transform-origin:50% 50%;
 }
+/* Applied only for the initial press-to-angle jump, then dropped for the
+   rest of the drag so live tracking stays 1:1 with the pointer. */
+.collectionStageInner.easing{transition:transform .18s ease;}
 .collectionStageInner .collectionLayer{position:absolute;left:50%;pointer-events:none;}
 .collectionStageInner .collectionLayer img{display:block;}
 .collectionLayerShaft{top:0;z-index:1;}
 .collectionLayerHandle{bottom:0;z-index:2;}
 
 .collectionZoomRow{
-  width:min(320px,80%);
+  width:var(--preview-w);
   display:grid;
   grid-template-columns:auto 1fr auto;
   align-items:center;
@@ -107,7 +120,7 @@
 .collectionZoomRow input[type="range"]{width:100%;}
 
 .collectionHandleStrip{
-  width:100%;
+  width:var(--preview-w);
   display:flex;
   flex-wrap:wrap;
   justify-content:center;
@@ -123,10 +136,13 @@
   cursor:pointer;
   display:grid;
   place-items:center;
-  transition:border-color .16s ease,background .16s ease;
+  transition:transform .14s ease,background .16s ease;
 }
 .collectionHandleCard img{max-width:100%;max-height:100%;object-fit:contain;}
-.collectionHandleCard:hover:not(:disabled){border-color:#d6ab5e;}
+/* Hover reads as a lift, not a border — matches the alchemy inventory's
+   hover feel instead of introducing a second highlight color next to the
+   active gold border. */
+.collectionHandleCard:hover:not(:disabled){transform:scale(1.12);z-index:1;}
 .collectionHandleCard.active{border-color:#f0c86e;background:#3a331f;}
 .collectionHandleCard.locked{
   filter:grayscale(1);

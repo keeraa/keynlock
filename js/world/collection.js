@@ -75,9 +75,10 @@
     // 100% = the source PNGs' own pixel size (matches the prototype's
     // default, unscaled view) — the stage box clips anything past its own
     // edges rather than shrinking content to fit, same as a normal image
-    // zoom control. Starts low enough to show the whole 300x912 stage
-    // inside the box by default.
-    zoom: 35,
+    // zoom control. 39 is small enough to show the whole 300x912 stage
+    // inside the box, while staying above the range where the pick reads
+    // as too tiny to see (confirmed with the user against the 10% floor).
+    zoom: 39,
     rotate: 0
   };
 
@@ -89,9 +90,10 @@
       const row = document.createElement('button');
       row.type = 'button';
       row.className = 'collectionRow' + (col.id === state.collectionId ? ' active' : '');
+      row.title = col.name;
+      row.setAttribute('aria-label', col.name);
       row.innerHTML = `
-        <span class="collectionRowThumb"><img src="${col.handles[0].image}" alt=""></span>
-        <span class="collectionRowName">${col.name}</span>
+        <span class="collectionRowThumbs">${col.handles.map(h => `<img src="${h.image}" alt="">`).join('')}</span>
       `;
       row.addEventListener('click', () => {
         state.collectionId = col.id;
@@ -157,12 +159,17 @@
     $stage.addEventListener('pointerdown', e => {
       dragging = true;
       $stage.classList.add('dragging');
+      // The initial press can land far from the current angle — ease into
+      // it once so it doesn't visually snap, then drop the transition for
+      // the rest of the drag so live tracking stays 1:1 with the pointer.
+      $stageInner.classList.add('easing');
       $stage.setPointerCapture(e.pointerId);
       state.rotate = Math.max(-180, Math.min(180, Math.round(angleFromCenter(e.clientX, e.clientY))));
       renderStage();
     });
     $stage.addEventListener('pointermove', e => {
       if(!dragging) return;
+      $stageInner.classList.remove('easing');
       state.rotate = Math.max(-180, Math.min(180, Math.round(angleFromCenter(e.clientX, e.clientY))));
       renderStage();
     });

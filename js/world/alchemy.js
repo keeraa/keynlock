@@ -1165,7 +1165,7 @@
   guideViewer?.querySelector('.alchemyGuideViewerBackdrop')?.addEventListener('click', closeGuideViewer);
   guideViewer?.querySelector('.alchemyGuideViewerClose')?.addEventListener('click', closeGuideViewer);
   document.addEventListener('keydown', event => { if(event.key === 'Escape' && guideViewer && !guideViewer.hidden){ event.preventDefault(); event.stopImmediatePropagation(); closeGuideViewer(); } });
-  const tabs = [...root.querySelectorAll('.alchemyStationTab')];
+  const tabs = [...document.querySelectorAll('#alchemyTopHud .alchemyStationTab')];
   const scenes = () => [...root.querySelectorAll('.scene')];
   function show(i){
     tabs.forEach((t, n) => t.classList.toggle('active', n === i));

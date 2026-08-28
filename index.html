@@ -101,9 +101,14 @@
   </div>
 </div>
 
-<div class="alchemyTopHud" id="alchemyTopHud" aria-hidden="true">
+<div class="alchemyTopHud" id="alchemyTopHud">
   <div class="alchemyTopHudTitle">Алхимия</div>
   <button class="alchemyTopHudClose" id="alchemyTopHudClose" type="button" aria-label="Закрыть алхимию">×</button>
+  <div class="alchemyStations" id="alchemyStations" role="tablist" aria-label="Станции">
+    <button class="alchemyStationTab active" type="button" data-station="0">Смешение</button>
+    <button class="alchemyStationTab" type="button" data-station="1">Концентрации</button>
+    <button class="alchemyStationTab" type="button" data-station="2">Разделение</button>
+  </div>
 </div>
 
 <div class="inventoryDrawer" id="inventoryDrawer" aria-label="Инвентарь">
@@ -290,11 +295,6 @@
 
         <section class="lairPanel" data-lair-panel="alchemy">
           <div class="alchemyRoot" id="alchemyRoot">
-            <div class="alchemyStations" id="alchemyStations" role="tablist" aria-label="Станции">
-              <button class="alchemyStationTab active" type="button" data-station="0">Смешение</button>
-              <button class="alchemyStationTab" type="button" data-station="1">Концентрации</button>
-              <button class="alchemyStationTab" type="button" data-station="2">Разделение</button>
-          </div>
           <section class="scene" data-name="Смешение">
             <button class="alchemyMixReference" type="button" aria-label="Открыть памятку по смешению" onclick="document.getElementById('alchemyGuideViewer').hidden=false">
               <img class="alchemyMixReferenceBoard" src="assets/alchemy/mixing-board.png" alt="">

@@ -904,10 +904,9 @@ body.lair-open #difficultyDock,body.shop-open #difficultyDock,body.map-open #dif
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active){overflow:visible!important;}
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleHeader{display:none!important;}
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleBody{overflow:visible!important;}
-#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .alchemyStations{position:relative;z-index:21;transform:translateY(-68px);}
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .scene.active{transform:translateY(5vh);}
 
-.alchemyTopHud{display:none;position:fixed;z-index:361;left:124px;right:270px;top:14px;height:68px;
+.alchemyTopHud{display:none;position:fixed;z-index:361;left:clamp(124px,8vw,180px);right:clamp(340px,25vw,520px);top:14px;height:68px;
   align-items:center;justify-content:center;border:1px solid rgba(152,110,54,.38);border-radius:12px;
   background:linear-gradient(90deg,rgba(22,15,10,.28),rgba(40,25,15,.82),rgba(22,15,10,.28));
   backdrop-filter:blur(8px);box-shadow:0 8px 24px rgba(0,0,0,.22);}
@@ -915,6 +914,12 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
 .alchemyTopHudTitle{color:#e4c788;font:600 20px/1 Georgia,serif;text-shadow:0 1px 4px rgba(0,0,0,.7);}
 .alchemyTopHudClose{position:absolute;right:10px;width:44px;height:44px;border:1px solid #664d2c;border-radius:9px;
   background:#17120e;color:#c6a66f;font:25px/1 Arial,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.5);}
+.alchemyTopHud .alchemyStations{position:absolute;left:50%;top:76px;display:flex;gap:8px;transform:translateX(-50%);white-space:nowrap;}
+.alchemyTopHud .alchemyStationTab{padding:8px 14px;border:1px solid rgba(138,100,52,.5);border-radius:9px;
+  background:rgba(22,17,12,.88);color:#c9b98c;font:600 12px/1 var(--ui-font,Arial,sans-serif);cursor:pointer;
+  transition:background .16s ease,color .16s ease,border-color .16s ease;}
+.alchemyTopHud .alchemyStationTab:hover{border-color:#d6ab5e;color:#f0d497;}
+.alchemyTopHud .alchemyStationTab.active{background:#a9772f;border-color:#f0c86e;color:#1a130c;}
 
 .alchemyGuideViewer{position:fixed;inset:0;z-index:520;display:grid;place-items:center;padding:clamp(14px,4vw,54px);}
 .alchemyGuideViewer[hidden]{display:none!important;}
@@ -927,7 +932,8 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
   .alchemyTopHud{left:calc(var(--mobile-safe-left,0px) + 58px);right:calc(var(--mobile-safe-right,0px) + 8px);top:calc(var(--mobile-safe-top,0px) + 7px);height:54px;}
   .alchemyTopHudTitle{font-size:17px;}
   .alchemyTopHudClose{right:7px;width:38px;height:38px;}
-  #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .alchemyStations{transform:translateY(-46px);}
+  .alchemyTopHud .alchemyStations{top:60px;gap:5px;}
+  .alchemyTopHud .alchemyStationTab{padding:7px 9px;font-size:11px;}
   .alchemyRoot .scene.active .alchemyMixReference{
     order:-1;flex:0 0 auto;width:min(94vw,620px);margin:8px auto -10%;
   }

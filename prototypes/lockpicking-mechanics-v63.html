@@ -2022,7 +2022,7 @@ html.embedded .scene[data-name="Risen 2"] .lab{align-items:flex-start}
           <div class="lab"><div class="r2-wrap"><div class="r2-lock" id="r2Lock"><div class="r2-pick"></div></div></div></div>
         </section>
     <section class="scene" data-name="Alpha Protocol" data-tab-check="true">
-          <div class="scene-head"><div><div class="scene-title-row"><h2>Выравнивание пазов</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="apStatus"><strong>Пин 1 / 5</strong>совмести паз с линией</div></div>
+          <div class="scene-head"><div><div class="scene-title-row"><h2>Выравнивание пазов</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="apStatus"><strong>0 / 5</strong>Выставляй пины в порядке символов под замком</div></div>
           <div class="lab"><div class="museum-wrap"><div class="museum-panel"><div class="ap-time"><span id="apTimer"></span></div><div class="ap-lock" id="apLock"><div class="ap-beam"><span class="ap-beam-fill" id="apBeamFill"></span></div><div class="ap-line"></div></div><div class="ap-sequence" id="apSequence" aria-label="Порядок символов"></div></div><div class="museum-actions"><button class="btn" id="apSet">Фиксировать · Space</button><button class="btn" id="apReset"><span aria-hidden="true">↻</span></button></div><div class="museum-msg" id="apMsg"></div></div></div>
 
         </section>
@@ -3164,7 +3164,6 @@ function apReset(){
   ap={pins:Array.from({length:5},apMakePin),sel:0,time:AP_TIME,last:performance.now(),won:false,failed:false,picks:LockRuntime.DEFAULT_PICKS,order,orderStep:0,calibrated:false};LockRuntime.resetOpen('Alpha Protocol');LockRuntime.resetPicks('Alpha Protocol',ap);
   LockRuntime.setRequiredTension('Alpha Protocol',order[order.length-1]);
   renderAp(false);
-  apMsg.textContent='Выставляй пины в порядке символов под замком.';
   if(activeName()==='Alpha Protocol'&&!apFinishCalibration())apEnsureCalibrated()
 }
 function apMove(d){
@@ -3210,9 +3209,9 @@ function renderAp(markReady=true){LockRuntime.syncPicks('Alpha Protocol',ap.pick
   if(beam)beam.style.width=(markReady?apBeamProgress():0)+'%';
   renderApSequence();
   apTimer.style.width=Math.max(0,ap.time/AP_TIME*100)+'%';
-  if(!ap.won&&!ap.failed){const n=apCountSet(),expected=ap.order[ap.orderStep];apStatus.innerHTML=`<strong>${n} / 5</strong>${ap.sel===expected?'правильный символ выбран':'выбери следующий символ'}`}
+  if(!ap.won&&!ap.failed){const n=apCountSet();apStatus.innerHTML=`<strong>${n} / 5</strong>Выставляй пины в порядке символов под замком`}
 }
-function apLoop(now){const dt=Math.min(.05,(now-ap.last)/1000);ap.last=now;if(activeName()==='Alpha Protocol'&&ap.calibrated&&!ap.won&&!ap.failed&&ap.time>0){ap.time=Math.max(0,ap.time-dt);apTimer.style.width=Math.max(0,ap.time/AP_TIME*100)+'%';if(ap.time<=0){ap.time=0;ap.failed=true;apStatus.innerHTML='<strong>Время вышло</strong>сработала тревога';apMsg.textContent='Новая попытка потребуется.'}}}document.getElementById('apSet').onclick=apSet;document.getElementById('apReset').onclick=apReset;
+function apLoop(now){const dt=Math.min(.05,(now-ap.last)/1000);ap.last=now;if(activeName()==='Alpha Protocol'&&ap.calibrated&&!ap.won&&!ap.failed&&ap.time>0){ap.time=Math.max(0,ap.time-dt);apTimer.style.width=Math.max(0,ap.time/AP_TIME*100)+'%';if(ap.time<=0){ap.time=0;ap.failed=true;apStatus.innerHTML='<strong>Время вышло</strong>сработала тревога';apMsg.textContent='Новая попытка потребуется.';window.parent?.postMessage({type:'keynlock-mechanic-loss',game:'Alpha Protocol'},location.origin)}}}document.getElementById('apSet').onclick=apSet;document.getElementById('apReset').onclick=apReset;
 
 GameHub.register('Alpha Protocol',{reset:apReset,tick:apLoop,enter:apEnsureCalibrated,keydown:e=>{const d=directionFromCode(e.code);if(e.code==='KeyR'){apReset();return true}if(e.code==='Space'){apSet();return true}if(d==='left'){apSelect(-1);return true}if(d==='right'){apSelect(1);return true}if(d==='up'){apMove(-AP_STEP);return true}if(d==='down'){apMove(AP_STEP);return true}return false}});
 

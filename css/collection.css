@@ -30,7 +30,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   background:none;
   overflow:visible!important;
   max-height:90vh;
-  width:min(760px,88vw);
+  width:min(800px,88vw);
 }
 #lairModuleWindow:has(.lairPanel[data-lair-panel="collection"].active) .lairModuleHeader{
   display:none!important;
@@ -164,19 +164,32 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
 
 /* --- right: preview stage + zoom + handle strip --- */
 .collectionPreviewCol{
-  --preview-w:min(414px,100%);
+  /* The stage is 10% wider than it is tall — a square clipped the glow
+     of the outermost handles once the strip below it grew to the same
+     width. --preview-h stays the old square size; --preview-w (used by
+     both the stage and the handle strip, so they keep lining up) is
+     10% wider. overflow-y:auto here would force overflow-x to 'auto'
+     too (CSS's visible/non-visible pairing rule) and clip that same
+     glow sideways, so this column doesn't scroll — nothing in it
+     outgrows the window's own max-height. */
+  /* Fixed px, not min(…,100%): that percentage resolved against this
+     very column's own auto-sized width, which is itself driven by the
+     stage/strip below reading --preview-w — a circular reference that
+     silently clamped the stage down to whatever flex leftover space
+     happened to exist instead of the intended size. */
+  --preview-h:414px;
+  --preview-w:455px;
   flex:0 1 auto;
   min-width:0;
   display:flex;
   flex-direction:column;
   align-items:center;
   gap:10px;
-  overflow-y:auto;
 }
 .collectionStage{
   position:relative;
   width:var(--preview-w);
-  aspect-ratio:1;
+  height:var(--preview-h);
   background:
     repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 1px,transparent 1px 40px),
     repeating-linear-gradient(90deg,rgba(255,255,255,.03) 0 1px,transparent 1px 40px),
@@ -214,12 +227,12 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
    transform back to the drift animation above), scaling outward from
    center and fading rather than just continuing to drift in place. */
 .collectionStageSmoke.burst{
-  animation:collectionSmokeBurst 900ms ease-out;
+  animation:collectionSmokeBurst 1500ms ease-out;
 }
 @keyframes collectionSmokeBurst{
-  0%{transform:scale(.4);opacity:1;filter:blur(10px);}
-  60%{opacity:.85;}
-  100%{transform:scale(1.6);opacity:0;filter:blur(22px);}
+  0%{transform:scale(.35);opacity:1;filter:blur(8px);}
+  45%{opacity:1;filter:blur(16px);}
+  100%{transform:scale(1.9);opacity:0;filter:blur(26px);}
 }
 .collectionStageInner{
   position:relative;
@@ -254,15 +267,31 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   cursor:pointer;
   display:grid;
   place-items:center;
+  transform-origin:50% 100%;
   transition:transform .14s ease,filter .14s ease;
 }
 .collectionHandleCard img{max-width:100%;max-height:100%;object-fit:contain;}
 /* Hover reads as a lift, matching the alchemy inventory's hover feel;
-   the active pick gets a soft glow instead of a border/background box. */
+   grows upward off the bottom edge (transform-origin above) rather than
+   from the center, so it doesn't dip into the row below it. The active
+   pick gets a soft glow instead of a border/background box. */
 .collectionHandleCard:hover:not(:disabled){transform:scale(1.12);z-index:1;}
 .collectionHandleCard.active{filter:drop-shadow(0 0 7px rgba(240,200,120,.65));}
 .collectionHandleCard.locked{
-  filter:grayscale(1);
+  position:relative;
+  filter:grayscale(1) blur(1.1px);
   opacity:.55;
   cursor:not-allowed;
+}
+/* Grainy static over the locked art, on top of the grayscale+blur —
+   an inline SVG turbulence noise, not an image asset. */
+.collectionHandleCard.locked::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image:url("../assets/picks/noise.svg");
+  background-size:60px 60px;
+  mix-blend-mode:overlay;
+  opacity:.45;
+  pointer-events:none;
 }

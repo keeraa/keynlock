@@ -270,11 +270,9 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
 /* --- one station --- */
 .alchemyRoot .scene{display:none;}
 .alchemyRoot .scene.active{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;min-width:0;gap:10px;justify-content:flex-start;}
-.alchemyRoot .alchemyMixReference{display:none;position:relative;isolation:isolate;padding:0;border:0;background:none;cursor:zoom-in;filter:drop-shadow(0 12px 14px rgba(0,0,0,.48));transition:filter .16s ease,transform .16s ease;}
+.alchemyRoot .alchemyMixReference{display:none;position:relative;isolation:isolate;padding:0;border:0;background:none;cursor:zoom-in;filter:drop-shadow(0 12px 14px rgba(0,0,0,.48));}
 .alchemyRoot .scene.active .alchemyMixReference{display:block;}
-.alchemyRoot .alchemyMixReference:hover{filter:brightness(1.06) drop-shadow(0 15px 18px rgba(0,0,0,.55));}
 .alchemyRoot .alchemyBlankReference{cursor:default;}
-.alchemyRoot .alchemyBlankReference:hover{filter:drop-shadow(0 12px 14px rgba(0,0,0,.48));}
 .alchemyRoot .alchemyMixReferenceBoard{display:block;width:100%;height:auto;position:relative;z-index:1;}
 .alchemyRoot .alchemyMixReferenceGuide{position:absolute;z-index:2;left:12.9%;top:9.2%;width:74.3%;height:72.6%;object-fit:cover;transform:perspective(900px) rotateX(.4deg);transform-origin:center;filter:sepia(.08) saturate(.9) brightness(.96);}
 .alchemyRoot .scene h2,.alchemyRoot .scene .kicker{display:none;}
@@ -701,7 +699,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
     position:relative;
   }
   .alchemyRoot .scene.active .alchemyMixReference{
-    position:absolute;z-index:3;left:50%;top:18%;width:clamp(310px,39vw,610px);
+    position:absolute;z-index:1;left:50%;top:3%;width:clamp(310px,39vw,610px);
     transform:translateX(-50%);
   }
   .alchemyRoot .scene[data-name="Смешение"].active > .lab,
@@ -903,7 +901,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
 body.lair-open #difficultyDock,body.shop-open #difficultyDock,body.map-open #difficultyDock{display:none!important;}
 
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleHeader{
-  position:absolute;z-index:20;left:0;right:0;top:-104px;height:58px;padding:0;
+  position:absolute;z-index:20;left:0;right:0;top:-104px;height:68px;padding:0;
   display:flex;align-items:center;justify-content:center;pointer-events:none;
   border:1px solid rgba(152,110,54,.38);border-radius:12px;
   background:linear-gradient(90deg,rgba(22,15,10,.28),rgba(40,25,15,.82),rgba(22,15,10,.28));
@@ -911,7 +909,8 @@ body.lair-open #difficultyDock,body.shop-open #difficultyDock,body.map-open #dif
 }
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active){overflow:visible!important;}
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleTitle{font-size:20px;pointer-events:auto;}
-#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleClose{position:absolute;right:0;pointer-events:auto;}
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleClose{position:absolute;right:10px;pointer-events:auto;}
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .alchemyStations{position:relative;z-index:21;transform:translateY(-26px);}
 
 .alchemyGuideViewer{position:fixed;inset:0;z-index:520;display:grid;place-items:center;padding:clamp(14px,4vw,54px);}
 .alchemyGuideViewer[hidden]{display:none!important;}

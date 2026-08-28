@@ -24,7 +24,519 @@
    - "Ingredient rack drawer" banner — the bottom-drawer picker, outside
      `#alchemyRoot` entirely (documented there: a `position:fixed`
      containing-block reason). */
-.alchemyRoot{--line:rgba(120,94,52,.34);--ink:#e2c487;--muted:#9d8d75;--gold:#d9a74c;--bad:#c0603c;--shadow:0 14px 40px rgba(0,0,0,.42);}.alchemyRoot *{box-sizing:border-box;}.alchemyRoot, .alchemyRoot{margin:0;background:none;color:#e2c487;}.alchemyRoot button, .alchemyRoot input{font:inherit;}.alchemyRoot button:focus-visible, .alchemyRoot input:focus-visible, .alchemyRoot [tabindex="0"]:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}.alchemyRoot h1{font:600 clamp(28px,4vw,46px)/1.04 Georgia,serif;margin:0;letter-spacing:-.03em;}.alchemyRoot .tabs.dragging{cursor:grabbing;user-select:none;}.alchemyRoot .tabs.dragging .tab{pointer-events:none;}.alchemyRoot .tab{flex:0 0 58px;min-width:58px;height:58px;display:flex;align-items:center;justify-content:center;white-space:nowrap;border:1px solid var(--line);background:#161913;color:#9f9a86;padding:0;border-radius:18px;cursor:pointer;transition:.16s;scroll-snap-align:start;}.alchemyRoot .tab.active{background:#2b3025;border-color:#6c715c;color:#fff;}.alchemyRoot .scene.active{display:flex;flex-direction:column;min-height:0;height:100%;}.alchemyRoot h2{font:500 clamp(24px,3vw,34px)/1.04 Georgia,serif;margin:4px 0 8px;}.alchemyRoot .mini-swatch{width:52px;height:122px;border:2px solid #7a7e69;border-top-width:2px;border-radius:8px 8px 24px 24px;margin:0 auto 10px;position:relative;overflow:hidden;box-shadow:inset 7px 0 12px rgba(255,255,255,.06);background:linear-gradient(90deg,rgba(255,255,255,.06),transparent 38%,rgba(255,255,255,.02)),var(--tube-fill,transparent);}.alchemyRoot .mini-swatch::before{content:"";position:absolute;left:-5px;right:-5px;top:-5px;height:8px;border:2px solid #7a7e69;border-radius:50%;background:#171a14;z-index:3;}.alchemyRoot .tube-count{position:absolute;inset:0;display:grid;place-items:center;font-size:32px;font-weight:700;color:#f0e4c5;text-shadow:0 1px 8px rgba(0,0,0,.4);z-index:2;pointer-events:none;}.alchemyRoot .test-tube{width:64px;height:150px;margin:0 auto 10px;border:3px solid #777b67;border-top-width:2px;border-radius:8px 8px 28px 28px;position:relative;background:linear-gradient(90deg,rgba(255,255,255,.05),transparent 38%,rgba(255,255,255,.02));box-shadow:inset 9px 0 13px rgba(255,255,255,.025);}.alchemyRoot .test-tube:before{content:"";position:absolute;left:-6px;right:-6px;top:-5px;height:9px;border:2px solid #777b67;border-radius:50%;background:#171a14;z-index:3;}.alchemyRoot .tube-liquid{position:absolute;left:5px;right:5px;bottom:5px;height:78%;border-radius:3px 3px 22px 22px;transition:background .24s ease,filter .24s ease;box-shadow:inset 7px 0 12px rgba(255,255,255,.07);overflow:hidden;}@media (max-width:700px){.alchemyRoot .test-tube{width:56px;height:132px;}}.alchemyRoot .ctl .ti, .alchemyRoot .hold .ti, .alchemyRoot .small-btn .ti{font-size:1.05em;vertical-align:-.08em;margin-right:6px;}.alchemyRoot .tube-liquid{transform-origin:50% 100%;will-change:transform;}.alchemyRoot .tube-liquid:after{content:"";position:absolute;left:-8%;right:-8%;top:-5px;height:10px;border-radius:50%;background:rgba(255,255,255,.12);opacity:.38;pointer-events:none;}.alchemyRoot .tube-liquid, .alchemyRoot .tube-liquid::before{content:"";position:absolute;z-index:3;left:-18%;width:136%;height:12px;top:-5px;border-radius:48% 52% 45% 55%;background:radial-gradient(ellipse at 50% 72%,rgba(255,255,255,.17) 0 20%,rgba(255,255,255,.07) 21% 47%,transparent 49%);opacity:.46;pointer-events:none;transform-origin:50% 50%;animation:liquidIdleSurfaceV13 3.8s ease-in-out infinite alternate;}.alchemyRoot .tube-liquid{background-repeat:no-repeat;animation:liquidIdleBubblesV13 8s linear infinite;}@keyframes liquidIdleSurfaceV13{0%{transform:translateX(-2.5%) scaleX(1.015) rotate(-.65deg);}35%{transform:translateX(1.5%) scaleX(.985) rotate(.35deg);}70%{transform:translateX(-.5%) scaleX(1.025) rotate(.7deg);}100%{transform:translateX(2.5%) scaleX(.99) rotate(-.2deg);}}@keyframes liquidIdleBubblesV13{0%{background-position:0 20px,0 30px;}50%{background-position:4px -36px,-3px -28px;}100%{background-position:-2px -82px,4px -74px;}}.alchemyRoot .liquid-burst-v13{position:absolute;inset:0;overflow:visible;pointer-events:none;z-index:20;border-radius:inherit;}.alchemyRoot .liquid-bubble-v13{--bubble-size:8px;--bubble-x:50%;--bubble-drift:0px;--bubble-delay:0ms;--bubble-life:900ms;position:absolute;left:var(--bubble-x);bottom:8px;width:var(--bubble-size);height:var(--bubble-size);margin-left:calc(var(--bubble-size) * -.5);border:1.5px solid rgba(255,255,255,.7);background:rgba(255,255,255,.12);box-shadow:inset 0 0 4px rgba(255,255,255,.30),0 0 5px rgba(255,255,255,.08);border-radius:50%;opacity:0;animation:liquidBubbleBurstV13 var(--bubble-life) cubic-bezier(.18,.7,.25,1) var(--bubble-delay) forwards;}@media (prefers-reduced-motion:reduce){.alchemyRoot .tube-liquid, .alchemyRoot .tube-liquid::before{animation:none!important;}.alchemyRoot .liquid-burst-v13{display:none!important;}}.alchemyRoot .tube-liquid{background-color:var(--liquid-color)!important;}.alchemyRoot .tube-liquid{--liquid-color:#c6beac;background:var(--liquid-color)!important;background-image:none!important;opacity:1!important;filter:none!important;isolation:isolate;}.alchemyRoot .tube-liquid::before{content:"";position:absolute;left:-18%;width:136%;height:12px;top:-5px;z-index:4;border-radius:48% 52% 45% 55%;background:radial-gradient(ellipse at 50% 72%,rgba(255,255,255,.20) 0 20%,rgba(255,255,255,.08) 21% 47%,transparent 49%);opacity:.5;pointer-events:none;animation:liquidIdleSurfaceV13 3.8s ease-in-out infinite alternate;}.alchemyRoot .tube-liquid::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(circle at 23% 82%,rgba(255,255,255,.22) 0 2px,transparent 2.8px),radial-gradient(circle at 71% 71%,rgba(255,255,255,.16) 0 1.5px,transparent 2.3px),linear-gradient(90deg,rgba(255,255,255,.10),transparent 30%,rgba(0,0,0,.07) 84%,rgba(255,255,255,.04));background-repeat:no-repeat;animation:liquidIdleBubblesV16 8s linear infinite;}@keyframes liquidIdleBubblesV16{0%{background-position:0 22px,0 32px,0 0;}50%{background-position:4px -34px,-3px -26px,0 0;}100%{background-position:-2px -80px,4px -72px,0 0;}}.alchemyRoot .test-tube>.tube-liquid{position:absolute!important;left:0!important;right:0!important;top:7px!important;bottom:0!important;height:auto!important;display:block!important;background:var(--liquid-color)!important;} .alchemyRoot .tube-liquid{will-change:transform,clip-path,opacity;backface-visibility:hidden;}.alchemyRoot .tab{width:48px!important;height:48px!important;min-width:48px!important;padding:0!important;border-radius:14px!important;display:grid!important;place-items:center!important;font-size:0!important;}.alchemyRoot .tab .ti{font-size:23px!important;line-height:1!important;color:currentColor;}.alchemyRoot .tab.active .ti{color:#fff;}.alchemyRoot .tabs .ti{font-size:24px;line-height:1;}@media (max-width:700px){.alchemyRoot .tab{flex:0 0 calc(25% - 6px);min-width:56px;}}.alchemyRoot .side-color-controls .mini-swatch{width:38px;height:88px;border-radius:8px 8px 20px 20px;margin:0 auto 0;border:2px solid #777b67;background-clip:padding-box;position:relative;box-shadow:inset 8px 0 12px rgba(255,255,255,.06);}.alchemyRoot .tube-lg{box-sizing:border-box;position:relative;overflow:hidden;--tube-stroke:#777b67;}.alchemyRoot .tube-sm{box-sizing:border-box;position:relative;overflow:hidden;--tube-stroke:#777b67;}.alchemyRoot .side-color-controls .mini-swatch.tube-sm{width:40px!important;height:92px!important;margin:0 auto!important;border:2px solid var(--tube-stroke)!important;border-radius:8px 8px 20px 20px!important;position:relative!important;box-shadow:inset 8px 0 12px rgba(255,255,255,.06)!important;background-clip:padding-box!important;}.alchemyRoot .side-color-controls .mini-swatch.tube-sm:before{content:"";position:absolute;left:-5px;right:-5px;top:-4px;height:8px;border:2px solid var(--tube-stroke);border-radius:50%;background:#171a14;z-index:4;}.alchemyRoot .side-color-controls .mini-swatch.tube-sm:after{content:"";position:absolute;left:-12%;width:124%;height:10px;top:-2px;border-radius:48% 52% 45% 55%;background:radial-gradient(ellipse at 50% 72%,rgba(255,255,255,.18) 0 20%,rgba(255,255,255,.08) 21% 47%,transparent 49%);opacity:.55;animation:liquidIdleSurfaceV13 3.8s ease-in-out infinite alternate;}.alchemyRoot .color-sample-panel .tube-lg.test-tube{width:68px;height:158px;}.alchemyRoot .color-sample-panel .current-main-box .tube-lg.test-tube{margin-top:0;}.alchemyRoot .color-sample-panel .tube-pair>.tube-box:first-child .tube-lg.test-tube{margin-top:0;}.alchemyRoot .tab svg.tab-svg-icon{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block}.alchemyRoot .tab i.ti{font-size:22px;line-height:1;display:block}@keyframes liquidBubbleBurstV13{0%{transform:translate(0,0) scale(.45);opacity:0}12%{opacity:.9}50%{transform:translate(calc(var(--bubble-drift) * .5),-168px) scale(.92);opacity:.75}80%{transform:translate(var(--bubble-drift),-308px) scale(1.05);opacity:.46}100%{transform:translate(calc(var(--bubble-drift) * 1.15),-420px) scale(.45);opacity:0}}/* right/bottom only, never top/left: the base rule above sets inset:0
+.alchemyRoot {
+  --line: rgba(120, 94, 52, 0.34);
+  --ink: #e2c487;
+  --muted: #9d8d75;
+  --gold: #d9a74c;
+  --bad: #c0603c;
+  --shadow: 0 14px 40px rgba(0, 0, 0, 0.42);
+  --tube-big-frame: url("../assets/alchemy/tube-big-frame.png");
+  --tube-big-mask: url("../assets/alchemy/tube-big-mask.png");
+  --tube-sm1-frame: url("../assets/alchemy/tube-small-1.png");
+  --tube-sm2-frame: url("../assets/alchemy/tube-small-2.png");
+  --tube-sm3-frame: url("../assets/alchemy/tube-small-3.png");
+  --tube-sm4-frame: url("../assets/alchemy/tube-small-4.png");
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  margin: 0;
+  background: none;
+  color: var(--ink);
+  font-family: var(--ui-font, Arial, sans-serif);
+}
+.alchemyRoot * {
+  box-sizing: border-box;
+}
+.alchemyRoot button,
+.alchemyRoot input {
+  font: inherit;
+}
+.alchemyRoot button:focus-visible,
+.alchemyRoot input:focus-visible,
+.alchemyRoot [tabindex="0"]:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+.alchemyRoot h1 {
+  font:
+    600 clamp(28px, 4vw, 46px) / 1.04 Georgia,
+    serif;
+  margin: 0;
+  letter-spacing: -0.03em;
+}
+.alchemyRoot .tabs.dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+.alchemyRoot .tabs.dragging .tab {
+  pointer-events: none;
+}
+.alchemyRoot .tab {
+  flex: 0 0 58px;
+  width: 48px !important;
+  min-width: 48px !important;
+  height: 48px !important;
+  display: grid !important;
+  place-items: center !important;
+  white-space: nowrap;
+  border: 1px solid var(--line);
+  background: #161913;
+  color: #9f9a86;
+  padding: 0 !important;
+  border-radius: 14px !important;
+  font-size: 0 !important;
+  cursor: pointer;
+  transition: 0.16s;
+  scroll-snap-align: start;
+}
+.alchemyRoot .tab.active {
+  background: #2b3025;
+  border-color: #6c715c;
+  color: #fff;
+}
+.alchemyRoot h2 {
+  font:
+    500 clamp(24px, 3vw, 34px) / 1.04 Georgia,
+    serif;
+  margin: 4px 0 8px;
+}
+.alchemyRoot .mini-swatch {
+  width: 52px;
+  height: 122px;
+  border: 2px solid #7a7e69;
+  border-top-width: 2px;
+  border-radius: 8px 8px 24px 24px;
+  margin: 0 auto 10px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    transform 0.14s ease,
+    filter 0.14s ease;
+  box-shadow: inset 7px 0 12px rgba(255, 255, 255, 0.06);
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.06),
+      transparent 38%,
+      rgba(255, 255, 255, 0.02)
+    ),
+    var(--tube-fill, transparent);
+}
+.alchemyRoot .mini-swatch::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  right: -5px;
+  top: -5px;
+  height: 8px;
+  border: 2px solid #7a7e69;
+  border-radius: 50%;
+  background: #171a14;
+  z-index: 3;
+}
+.alchemyRoot .tube-count {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 32px;
+  font-weight: 700;
+  color: #f0e4c5;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+  z-index: 2;
+  pointer-events: none;
+}
+.alchemyRoot .test-tube {
+  width: 64px;
+  height: 150px;
+  margin: 0 auto 10px;
+  border: 3px solid #777b67;
+  border-top-width: 2px;
+  border-radius: 8px 8px 28px 28px;
+  position: relative;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05),
+    transparent 38%,
+    rgba(255, 255, 255, 0.02)
+  );
+  box-shadow: inset 9px 0 13px rgba(255, 255, 255, 0.025);
+}
+.alchemyRoot .test-tube:before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  right: -6px;
+  top: -5px;
+  height: 9px;
+  border: 2px solid #777b67;
+  border-radius: 50%;
+  background: #171a14;
+  z-index: 3;
+}
+.alchemyRoot .tube-liquid {
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  height: 78%;
+  border-radius: 3px 3px 22px 22px;
+  transition:
+    background 0.24s ease,
+    filter 0.24s ease;
+  box-shadow: inset 7px 0 12px rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+}
+@media (max-width: 700px) {
+  .alchemyRoot .test-tube {
+    width: 56px;
+    height: 132px;
+  }
+}
+.alchemyRoot .ctl .ti,
+.alchemyRoot .hold .ti,
+.alchemyRoot .small-btn .ti {
+  font-size: 1.05em;
+  vertical-align: -0.08em;
+  margin-right: 6px;
+}
+.alchemyRoot .tube-liquid {
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+.alchemyRoot .tube-liquid:after {
+  content: "";
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  top: -5px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  opacity: 0.38;
+  pointer-events: none;
+}
+.alchemyRoot .tube-liquid,
+.alchemyRoot .tube-liquid::before {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  left: -18%;
+  width: 136%;
+  height: 12px;
+  top: -5px;
+  border-radius: 48% 52% 45% 55%;
+  background: radial-gradient(
+    ellipse at 50% 72%,
+    rgba(255, 255, 255, 0.17) 0 20%,
+    rgba(255, 255, 255, 0.07) 21% 47%,
+    transparent 49%
+  );
+  opacity: 0.46;
+  pointer-events: none;
+  transform-origin: 50% 50%;
+  animation: liquidIdleSurfaceV13 3.8s ease-in-out infinite alternate;
+}
+.alchemyRoot .tube-liquid {
+  background-repeat: no-repeat;
+  animation: liquidIdleBubblesV13 8s linear infinite;
+}
+@keyframes liquidIdleSurfaceV13 {
+  0% {
+    transform: translateX(-2.5%) scaleX(1.015) rotate(-0.65deg);
+  }
+  35% {
+    transform: translateX(1.5%) scaleX(0.985) rotate(0.35deg);
+  }
+  70% {
+    transform: translateX(-0.5%) scaleX(1.025) rotate(0.7deg);
+  }
+  100% {
+    transform: translateX(2.5%) scaleX(0.99) rotate(-0.2deg);
+  }
+}
+@keyframes liquidIdleBubblesV13 {
+  0% {
+    background-position:
+      0 20px,
+      0 30px;
+  }
+  50% {
+    background-position:
+      4px -36px,
+      -3px -28px;
+  }
+  100% {
+    background-position:
+      -2px -82px,
+      4px -74px;
+  }
+}
+.alchemyRoot .liquid-burst-v13 {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 20;
+  border-radius: inherit;
+}
+.alchemyRoot .liquid-bubble-v13 {
+  --bubble-size: 8px;
+  --bubble-x: 50%;
+  --bubble-drift: 0px;
+  --bubble-delay: 0ms;
+  --bubble-life: 900ms;
+  position: absolute;
+  left: var(--bubble-x);
+  bottom: 8px;
+  width: var(--bubble-size);
+  height: var(--bubble-size);
+  margin-left: calc(var(--bubble-size) * -0.5);
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 0 4px rgba(255, 255, 255, 0.3),
+    0 0 5px rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  opacity: 0;
+  animation: liquidBubbleBurstV13 var(--bubble-life)
+    cubic-bezier(0.18, 0.7, 0.25, 1) var(--bubble-delay) forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .alchemyRoot .tube-liquid,
+  .alchemyRoot .tube-liquid::before {
+    animation: none !important;
+  }
+  .alchemyRoot .liquid-burst-v13 {
+    display: none !important;
+  }
+}
+.alchemyRoot .tube-liquid {
+  background-color: var(--liquid-color) !important;
+}
+.alchemyRoot .tube-liquid {
+  --liquid-color: #c6beac;
+  background: var(--liquid-color) !important;
+  background-image: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+  isolation: isolate;
+}
+.alchemyRoot .tube-liquid::before {
+  content: "";
+  position: absolute;
+  left: -18%;
+  width: 136%;
+  height: 12px;
+  top: -5px;
+  z-index: 4;
+  border-radius: 48% 52% 45% 55%;
+  background: radial-gradient(
+    ellipse at 50% 72%,
+    rgba(255, 255, 255, 0.2) 0 20%,
+    rgba(255, 255, 255, 0.08) 21% 47%,
+    transparent 49%
+  );
+  opacity: 0.5;
+  pointer-events: none;
+  animation: liquidIdleSurfaceV13 3.8s ease-in-out infinite alternate;
+}
+.alchemyRoot .tube-liquid::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at 23% 82%,
+      rgba(255, 255, 255, 0.22) 0 2px,
+      transparent 2.8px
+    ),
+    radial-gradient(
+      circle at 71% 71%,
+      rgba(255, 255, 255, 0.16) 0 1.5px,
+      transparent 2.3px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.1),
+      transparent 30%,
+      rgba(0, 0, 0, 0.07) 84%,
+      rgba(255, 255, 255, 0.04)
+    );
+  background-repeat: no-repeat;
+  animation: liquidIdleBubblesV16 8s linear infinite;
+}
+@keyframes liquidIdleBubblesV16 {
+  0% {
+    background-position:
+      0 22px,
+      0 32px,
+      0 0;
+  }
+  50% {
+    background-position:
+      4px -34px,
+      -3px -26px,
+      0 0;
+  }
+  100% {
+    background-position:
+      -2px -80px,
+      4px -72px,
+      0 0;
+  }
+}
+.alchemyRoot .test-tube > .tube-liquid {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: 7px !important;
+  bottom: 0 !important;
+  height: auto !important;
+  display: block !important;
+  background: var(--liquid-color) !important;
+}
+.alchemyRoot .tube-liquid {
+  will-change: transform, clip-path, opacity;
+  backface-visibility: hidden;
+}
+.alchemyRoot .tab .ti {
+  font-size: 23px !important;
+  line-height: 1 !important;
+  color: currentColor;
+}
+.alchemyRoot .tab.active .ti {
+  color: #fff;
+}
+.alchemyRoot .tabs .ti {
+  font-size: 24px;
+  line-height: 1;
+}
+@media (max-width: 700px) {
+  .alchemyRoot .tab {
+    flex: 0 0 calc(25% - 6px);
+    min-width: 56px;
+  }
+}
+.alchemyRoot .side-color-controls .mini-swatch {
+  width: 38px;
+  height: 88px;
+  border-radius: 8px 8px 20px 20px;
+  margin: 0 auto 0;
+  border: 2px solid #777b67;
+  background-clip: padding-box;
+  position: relative;
+  box-shadow: inset 8px 0 12px rgba(255, 255, 255, 0.06);
+}
+.alchemyRoot .tube-lg {
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  --tube-stroke: #777b67;
+}
+.alchemyRoot .tube-sm {
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  --tube-stroke: #777b67;
+}
+.alchemyRoot .side-color-controls .mini-swatch.tube-sm {
+  width: 40px !important;
+  height: 92px !important;
+  margin: 0 auto !important;
+  border: 2px solid var(--tube-stroke) !important;
+  border-radius: 8px 8px 20px 20px !important;
+  position: relative !important;
+  box-shadow: inset 8px 0 12px rgba(255, 255, 255, 0.06) !important;
+  background-clip: padding-box !important;
+}
+.alchemyRoot .side-color-controls .mini-swatch.tube-sm:before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  right: -5px;
+  top: -4px;
+  height: 8px;
+  border: 2px solid var(--tube-stroke);
+  border-radius: 50%;
+  background: #171a14;
+  z-index: 4;
+}
+.alchemyRoot .side-color-controls .mini-swatch.tube-sm:after {
+  content: "";
+  position: absolute;
+  left: -12%;
+  width: 124%;
+  height: 10px;
+  top: -2px;
+  border-radius: 48% 52% 45% 55%;
+  background: radial-gradient(
+    ellipse at 50% 72%,
+    rgba(255, 255, 255, 0.18) 0 20%,
+    rgba(255, 255, 255, 0.08) 21% 47%,
+    transparent 49%
+  );
+  opacity: 0.55;
+  animation: liquidIdleSurfaceV13 3.8s ease-in-out infinite alternate;
+}
+.alchemyRoot .color-sample-panel .tube-lg.test-tube {
+  width: 68px;
+  height: 158px;
+}
+.alchemyRoot .color-sample-panel .current-main-box .tube-lg.test-tube {
+  margin-top: 0;
+}
+.alchemyRoot
+  .color-sample-panel
+  .tube-pair
+  > .tube-box:first-child
+  .tube-lg.test-tube {
+  margin-top: 0;
+}
+.alchemyRoot .tab svg.tab-svg-icon {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  display: block;
+}
+.alchemyRoot .tab i.ti {
+  font-size: 22px;
+  line-height: 1;
+  display: block;
+}
+@keyframes liquidBubbleBurstV13 {
+  0% {
+    transform: translate(0, 0) scale(0.45);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate(calc(var(--bubble-drift) * 0.5), -168px) scale(0.92);
+    opacity: 0.75;
+  }
+  80% {
+    transform: translate(var(--bubble-drift), -308px) scale(1.05);
+    opacity: 0.46;
+  }
+  100% {
+    transform: translate(calc(var(--bubble-drift) * 1.15), -420px) scale(0.45);
+    opacity: 0;
+  }
+} /* right/bottom only, never top/left: the base rule above sets inset:0
    (non-!important), which JS's own inline top/left (liquidBurst() in
    js/world/alchemy.js) is meant to override — inline beats a non-!important
    stylesheet rule regardless of specificity. An earlier version of this
@@ -35,7 +547,85 @@
    reagent swatch's own burst, "auto" top/left falls back to the burst
    element's flow position inside its .color-card vessel: dead last among
    swatch/label/drops/buttons, well under the tube instead of inside it. */
-.alchemyRoot .liquid-burst-v13{overflow:visible!important;right:auto!important;bottom:auto!important}.alchemyRoot .liquid-bubble-v13{bottom:4px!important}.alchemyRoot .liquid-burst-v13{position:absolute;pointer-events:none;overflow:visible;z-index:12}.alchemyRoot .liquid-bubble-v13{position:absolute;left:var(--bubble-x);bottom:0;width:var(--bubble-size);height:var(--bubble-size);border-radius:50%;background:rgba(255,255,255,.46);border:1px solid rgba(255,255,255,.38);box-shadow:0 0 8px rgba(255,255,255,.22)}@keyframes bubbleRiseV13{0%{transform:translate(-50%,0) scale(.72);opacity:0}12%{opacity:.95}100%{transform:translate(calc(-50% + var(--bubble-drift)),calc(-1 * var(--bubble-rise,70px))) scale(1.08);opacity:0}}.alchemyRoot .tube-liquid{position:relative;overflow:hidden}.alchemyRoot .passive-bubbles-v44{position:absolute;inset:0;overflow:hidden;border-radius:inherit;pointer-events:none;z-index:6;display:block}.alchemyRoot .tube-liquid>.passive-bubbles-v44{z-index:5}.alchemyRoot{--tube-big-frame:url("../assets/alchemy/tube-big-frame.png");--tube-big-mask:url("../assets/alchemy/tube-big-mask.png");--tube-sm1-frame:url("../assets/alchemy/tube-small-1.png");--tube-sm2-frame:url("../assets/alchemy/tube-small-2.png");--tube-sm3-frame:url("../assets/alchemy/tube-small-3.png");--tube-sm4-frame:url("../assets/alchemy/tube-small-4.png");}.alchemyRoot .test-tube{position:relative!important;border:0!important;background:none!important;box-shadow:none!important;overflow:visible!important;isolation:isolate}.alchemyRoot .test-tube:before{display:none!important;content:none!important}.alchemyRoot .test-tube:after{content:""!important;display:block!important;position:absolute!important;inset:0!important;background:var(--tube-big-frame) center/100% 100% no-repeat!important;z-index:30!important;pointer-events:none!important}/* mask-position:0 0 / mask-size:100% 100% — a plain, untransformed fit.
+.alchemyRoot .liquid-burst-v13 {
+  overflow: visible !important;
+  right: auto !important;
+  bottom: auto !important;
+}
+.alchemyRoot .liquid-bubble-v13 {
+  bottom: 4px !important;
+}
+.alchemyRoot .liquid-burst-v13 {
+  position: absolute;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 12;
+}
+.alchemyRoot .liquid-bubble-v13 {
+  position: absolute;
+  left: var(--bubble-x);
+  bottom: 0;
+  width: var(--bubble-size);
+  height: var(--bubble-size);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.46);
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.22);
+}
+@keyframes bubbleRiseV13 {
+  0% {
+    transform: translate(-50%, 0) scale(0.72);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(
+        calc(-50% + var(--bubble-drift)),
+        calc(-1 * var(--bubble-rise, 70px))
+      )
+      scale(1.08);
+    opacity: 0;
+  }
+}
+.alchemyRoot .tube-liquid {
+  position: relative;
+  overflow: hidden;
+}
+.alchemyRoot .passive-bubbles-v44 {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 6;
+  display: block;
+}
+.alchemyRoot .tube-liquid > .passive-bubbles-v44 {
+  z-index: 5;
+}
+.alchemyRoot .test-tube {
+  position: relative !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+  isolation: isolate;
+}
+.alchemyRoot .test-tube:before {
+  display: none !important;
+  content: none !important;
+}
+.alchemyRoot .test-tube:after {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: var(--tube-big-frame) center/100% 100% no-repeat !important;
+  z-index: 30 !important;
+  pointer-events: none !important;
+} /* mask-position:0 0 / mask-size:100% 100% — a plain, untransformed fit.
    tube-big-mask.png (v328) is generated *from* tube-big-frame.png itself
    (threshold its alpha to a binary outline, flood-fill inward from the
    four image edges to find the true "outside," everything the fill
@@ -50,7 +640,77 @@
    The gradient stop below is the static fill shown when nothing drives
    --liquid-top-v88 (the sample/target tubes never pour, so they never get
    one) — 88% read as brim-full against the shoulder; 78% leaves it room. */
-.alchemyRoot .test-tube>.tube-liquid{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;border-radius:0!important;overflow:visible!important;z-index:2!important;box-shadow:none!important;background:linear-gradient(to top,var(--liquid-color,#c6beac) 0 78%,transparent 78% 100%)!important;-webkit-mask-image:var(--tube-big-mask)!important;-webkit-mask-repeat:no-repeat!important;-webkit-mask-position:0 0!important;-webkit-mask-size:100% 100%!important;mask-image:var(--tube-big-mask)!important;mask-repeat:no-repeat!important;mask-position:0 0!important;mask-size:100% 100%!important}.alchemyRoot .test-tube>.tube-liquid:before{z-index:4!important}.alchemyRoot .test-tube>.tube-liquid>.passive-bubbles-v44{z-index:12!important;left:7%!important;right:7%!important;top:18%!important;bottom:9%!important;height:auto!important;mix-blend-mode:screen}.alchemyRoot .test-tube>.tube-liquid>.liquid-burst-v13{z-index:14!important;overflow:visible!important}.alchemyRoot .side-color-controls .mini-swatch, .alchemyRoot .color-controls.side-color-controls .mini-swatch{width:34px!important;height:160px!important;margin:0 auto 7px!important;position:relative!important;display:block!important;overflow:visible!important;border:0!important;border-radius:0!important;background:none!important;background-color:transparent!important;box-shadow:none!important;isolation:isolate!important;--mini-frame:var(--tube-sm1-frame);}.alchemyRoot .side-color-controls .color-card:nth-child(2) .mini-swatch{--mini-frame:var(--tube-sm2-frame)!important}.alchemyRoot .side-color-controls .color-card:nth-child(3) .mini-swatch{--mini-frame:var(--tube-sm3-frame)!important}.alchemyRoot .side-color-controls .color-card:nth-child(4) .mini-swatch{--mini-frame:var(--tube-sm4-frame)!important}.alchemyRoot .side-color-controls .mini-swatch::before, .alchemyRoot .side-color-controls .mini-swatch::after, .alchemyRoot .color-controls.side-color-controls .mini-swatch::before, .alchemyRoot .color-controls.side-color-controls .mini-swatch::after{display:none!important;content:none!important;}/* Insets measured against the new tube art (lab_test_small.png, v328) —
+.alchemyRoot .test-tube > .tube-liquid {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+  z-index: 2 !important;
+  box-shadow: none !important;
+  background: linear-gradient(
+    to top,
+    var(--liquid-color, #c6beac) 0 78%,
+    transparent 78% 100%
+  ) !important;
+  -webkit-mask-image: var(--tube-big-mask) !important;
+  -webkit-mask-repeat: no-repeat !important;
+  -webkit-mask-position: 0 0 !important;
+  -webkit-mask-size: 100% 100% !important;
+  mask-image: var(--tube-big-mask) !important;
+  mask-repeat: no-repeat !important;
+  mask-position: 0 0 !important;
+  mask-size: 100% 100% !important;
+}
+.alchemyRoot .test-tube > .tube-liquid:before {
+  z-index: 4 !important;
+}
+.alchemyRoot .test-tube > .tube-liquid > .passive-bubbles-v44 {
+  z-index: 12 !important;
+  left: 7% !important;
+  right: 7% !important;
+  top: 18% !important;
+  bottom: 9% !important;
+  height: auto !important;
+  mix-blend-mode: screen;
+}
+.alchemyRoot .test-tube > .tube-liquid > .liquid-burst-v13 {
+  z-index: 14 !important;
+  overflow: visible !important;
+}
+.alchemyRoot .side-color-controls .mini-swatch,
+.alchemyRoot .color-controls.side-color-controls .mini-swatch {
+  width: 34px !important;
+  height: 160px !important;
+  margin: 0 auto 7px !important;
+  position: relative !important;
+  display: block !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  isolation: isolate !important;
+  --mini-frame: var(--tube-sm1-frame);
+}
+.alchemyRoot .side-color-controls .color-card:nth-child(2) .mini-swatch {
+  --mini-frame: var(--tube-sm2-frame) !important;
+}
+.alchemyRoot .side-color-controls .color-card:nth-child(3) .mini-swatch {
+  --mini-frame: var(--tube-sm3-frame) !important;
+}
+.alchemyRoot .side-color-controls .color-card:nth-child(4) .mini-swatch {
+  --mini-frame: var(--tube-sm4-frame) !important;
+}
+.alchemyRoot .side-color-controls .mini-swatch::before,
+.alchemyRoot .side-color-controls .mini-swatch::after,
+.alchemyRoot .color-controls.side-color-controls .mini-swatch::before,
+.alchemyRoot .color-controls.side-color-controls .mini-swatch::after {
+  display: none !important;
+  content: none !important;
+} /* Insets measured against the new tube art (lab_test_small.png, v328) —
    its glass reads much narrower and its neck ring much taller than the
    old frame's did, so the old 17%/17%/9%/7% (tuned for that art) sat the
    liquid rectangle half outside the new glass walls. Sampled the source
@@ -67,42 +727,128 @@
    left, ~37-47% right, ~15-27% top, ~12-17% bottom across the four —
    the neck rim height is what varies most between them, so top is the
    least precise of the four numbers on any single tube. */
-.alchemyRoot .side-color-controls .mini-liquid-layer{position:absolute!important;left:25%!important;right:31%!important;top:9%!important;bottom:6%!important;z-index:1!important;border-radius:5px 5px 15px 15px!important;background:linear-gradient(90deg,rgba(255,255,255,.16),transparent 35%,rgba(255,255,255,.04)),var(--tube-fill,#c6beac)!important;box-shadow:inset 5px 0 9px rgba(255,255,255,.08),inset 0 -8px 12px rgba(0,0,0,.10)!important;}.alchemyRoot .side-color-controls .mini-frame-layer{position:absolute!important;inset:0!important;z-index:4!important;background:var(--mini-frame) center/100% 100% no-repeat!important;filter:drop-shadow(0 0 1px rgba(255,255,255,.22)) drop-shadow(0 2px 3px rgba(0,0,0,.35));pointer-events:none!important;}.alchemyRoot .side-color-controls .tube-count{position:absolute!important;inset:0!important;display:grid!important;place-items:center!important;z-index:6!important;font-size:10.5px!important;font-weight:700!important;color:#f5e9c8!important;text-shadow:0 2px 8px rgba(0,0,0,.65)!important;}.alchemyRoot .scene[data-name="Смешение"] .test-tube.tube-lg, .alchemyRoot .scene[data-name="Концентрации"] .test-tube.tube-lg, .alchemyRoot .scene[data-name="Разделение"] .test-tube.tube-lg{width:96px!important;height:224px!important;margin-top:0!important;margin-bottom:10px!important;}
+.alchemyRoot .side-color-controls .mini-liquid-layer {
+  position: absolute !important;
+  left: 25% !important;
+  right: 31% !important;
+  top: 9% !important;
+  bottom: 6% !important;
+  z-index: 1 !important;
+  border-radius: 5px 5px 15px 15px !important;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.16),
+      transparent 35%,
+      rgba(255, 255, 255, 0.04)
+    ),
+    var(--tube-fill, #c6beac) !important;
+  box-shadow:
+    inset 5px 0 9px rgba(255, 255, 255, 0.08),
+    inset 0 -8px 12px rgba(0, 0, 0, 0.1) !important;
+}
+.alchemyRoot .side-color-controls .mini-frame-layer {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 4 !important;
+  background: var(--mini-frame) center/100% 100% no-repeat !important;
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.22))
+    drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+  pointer-events: none !important;
+}
+.alchemyRoot .side-color-controls .tube-count {
+  position: absolute !important;
+  inset: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  z-index: 6 !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  color: #f5e9c8 !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.65) !important;
+}
+.alchemyRoot .scene[data-name="Смешение"] .test-tube.tube-lg,
+.alchemyRoot .scene[data-name="Концентрации"] .test-tube.tube-lg,
+.alchemyRoot .scene[data-name="Разделение"] .test-tube.tube-lg {
+  width: 96px !important;
+  height: 224px !important;
+  margin-top: 0 !important;
+  margin-bottom: 10px !important;
+}
 /* Colour settles slower than the pour: the mix is still moving toward its
    final level when it snaps to the wrong hue, and a quick fade read as a
    glitch rather than blending. */
-.alchemyRoot .test-tube>.tube-liquid:not(.distill-liquid-v76){
-  background:var(--liquid-color,#c6beac)!important;
-  transition:background .6s ease-out!important;
-  box-shadow:inset 7px 0 12px rgba(255,255,255,.07)!important;
-  will-change:clip-path,-webkit-clip-path,background,height!important;
-  overflow:hidden!important;
-}.alchemyRoot .passive-bubble-v44{
-  position:absolute!important;
-  left:var(--x,50%)!important;
-  bottom:6px!important;
-  width:var(--s,3px)!important;
-  height:var(--s,3px)!important;
-  margin-left:calc(var(--s,3px) * -0.5)!important;
-  border-radius:50%!important;
-  background:rgba(255,255,255,.16)!important;
-  border:1px solid rgba(255,255,255,.42)!important;
-  box-shadow:inset 0 0 2px rgba(255,255,255,.20)!important;
-  opacity:0!important;
-  transform:translate3d(0,0,0)!important;
-  animation:passiveBubbleRiseV97 var(--dur,6s) linear var(--delay,0s) infinite!important;
+.alchemyRoot .test-tube > .tube-liquid:not(.distill-liquid-v76) {
+  background: var(--liquid-color, #c6beac) !important;
+  transition: background 0.6s ease-out !important;
+  box-shadow: inset 7px 0 12px rgba(255, 255, 255, 0.07) !important;
+  will-change:
+    clip-path,
+    -webkit-clip-path,
+    background,
+    height !important;
+  overflow: hidden !important;
 }
-@keyframes passiveBubbleRiseV97{.alchemyRoot 0%{transform:translate3d(0,0,0);opacity:0;}.alchemyRoot 10%{opacity:.55;}.alchemyRoot 78%{opacity:.36;}.alchemyRoot 100%{transform:translate3d(var(--drift,0px),calc(-1 * var(--rise-px,74px)),0);opacity:0;}
-}.alchemyRoot .liquid-surface-pulse-v83{animation:liquidSurfacePulseV83 .72s cubic-bezier(.2,.68,.2,1)!important;transform-origin:50% 100%!important;}
-@keyframes liquidSurfacePulseV83{.alchemyRoot 0%, .alchemyRoot 100%{transform:translateZ(0) scaleY(1)}.alchemyRoot 28%{transform:translateY(-.6px) scaleY(1.02)}.alchemyRoot 64%{transform:translateY(.4px) scaleY(.992)}
-}.alchemyRoot /* v109 — cover flask bottom better and add hover bubble-ready geometry */
-.test-tube > .tube-liquid{
-  left:2px!important;
-  right:2px!important;
-  top:6px!important;
-  bottom:-1px!important;
-  height:auto!important;
-  border-radius:5px 5px 28px 28px!important;
+.alchemyRoot .passive-bubble-v44 {
+  position: absolute !important;
+  left: var(--x, 50%) !important;
+  bottom: 6px !important;
+  width: var(--s, 3px) !important;
+  height: var(--s, 3px) !important;
+  margin-left: calc(var(--s, 3px) * -0.5) !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.42) !important;
+  box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.2) !important;
+  opacity: 0 !important;
+  transform: translate3d(0, 0, 0) !important;
+  animation: passiveBubbleRiseV97 var(--dur, 6s) linear var(--delay, 0s)
+    infinite !important;
+}
+@keyframes passiveBubbleRiseV97 {
+  .alchemyRoot 0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  .alchemyRoot 10% {
+    opacity: 0.55;
+  }
+  .alchemyRoot 78% {
+    opacity: 0.36;
+  }
+  .alchemyRoot 100% {
+    transform: translate3d(
+      var(--drift, 0px),
+      calc(-1 * var(--rise-px, 74px)),
+      0
+    );
+    opacity: 0;
+  }
+}
+.alchemyRoot .liquid-surface-pulse-v83 {
+  animation: liquidSurfacePulseV83 0.72s cubic-bezier(0.2, 0.68, 0.2, 1) !important;
+  transform-origin: 50% 100% !important;
+}
+@keyframes liquidSurfacePulseV83 {
+  .alchemyRoot 0%,
+  .alchemyRoot 100% {
+    transform: translateZ(0) scaleY(1);
+  }
+  .alchemyRoot 28% {
+    transform: translateY(-0.6px) scaleY(1.02);
+  }
+  .alchemyRoot 64% {
+    transform: translateY(0.4px) scaleY(0.992);
+  }
+}
+.alchemyRoot /* v109 — cover flask bottom better and add hover bubble-ready geometry */
+.test-tube > .tube-liquid {
+  left: 2px !important;
+  right: 2px !important;
+  top: 6px !important;
+  bottom: -1px !important;
+  height: auto !important;
+  border-radius: 5px 5px 28px 28px !important;
 }
 /* The v109 pixel nudge that used to live here (left:3px/right:3px/top:8px/
    bottom:-1px, border-radius:6px 6px 32px 32px) shrank and shifted
@@ -125,7 +871,9 @@
    it (and its mask, riding along in the same transform) back inside the
    line instead of regenerating the mask over it — percentages here are
    of .tube-liquid's own box, per feedback against a screenshot. */
-.alchemyRoot .test-tube.tube-lg > .tube-liquid{transform:translate(-2%,-2%);}
+.alchemyRoot .test-tube.tube-lg > .tube-liquid {
+  transform: translate(-2%, -2%);
+}
 
 /* === Station layout === Everything above this line is the legacy
    prototype block; everything below is written for the lair window (see
@@ -139,34 +887,23 @@
    else above belonged to the 7 stations with no markup yet and was
    already removed. */
 
-/* The prototype showed one scene at a time through its own chrome; here the
-   lair window is the frame, so only the chosen station is in the flow. */
-.alchemyRoot{display:flex;flex-direction:column;gap:12px;height:100%;min-height:0;}
-
-
 /* The lab scrolls, the verdict and its buttons never do: a result you cannot
    see while you act is not a result. */
-.alchemyRoot .scene.active > .lab{flex:1 1 auto!important;min-height:0!important;overflow:auto!important;}
-
-/* The tube itself is the target now. */
-.alchemyRoot .mini-swatch.tappable{cursor:pointer;transition:transform .14s ease,filter .14s ease;}
-.alchemyRoot .mini-swatch.tappable:hover{transform:translateY(-3px);filter:brightness(1.12);}
-.alchemyRoot .mini-swatch.tappable:active{transform:translateY(-1px) scale(.97);}
-
-/* Keyboard hints are noise on a touch screen. */
-@media (max-width:760px),(pointer:coarse){
+.alchemyRoot .scene.active > .lab {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: auto !important;
 }
-
-
 
 /* Flex the whole chain rather than chasing percentages: the body's height comes
    from growing as a flex item, which is a used height, not a specified one, so
    height:100% below it resolved to auto — even inline. */
-.lairPanel[data-lair-panel="alchemy"].active{display:flex!important;flex:1 1 auto;min-height:0;min-width:0;}
-#alchemyRoot{flex:1 1 auto;min-height:0;height:auto;}
-.alchemyRoot .scene.active{flex:1 1 auto;height:auto;}
-
-
+.lairPanel[data-lair-panel="alchemy"].active {
+  display: flex !important;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+}
 /* ============================================================
    Station layout — written for the lair window.
    Replaces the prototype's own, which was built for a scrolling
@@ -179,29 +916,44 @@
    reach in here — the mirror of the scoping that keeps alchemy out of the game.
    Scoping protects the game from this stylesheet; this protects the stations
    from the game's. Neutralise what leaks before laying anything out. */
-.alchemyRoot .scene,.alchemyRoot .status,.alchemyRoot .tab{
-  position:static!important;inset:auto!important;left:auto!important;right:auto!important;
-  top:auto!important;bottom:auto!important;height:auto!important;max-width:none!important;
-  min-height:0!important;transform:none!important;}
-/* width needs the hammer of its own: the game sets .scene to 100vw and to
-   min(1180px,100vw), both !important, and those were reaching in here. That is
-   what held the station at 1180px inside an 888px panel however it was asked to
-   shrink — an inline width could not beat it either. */
-.alchemyRoot .scene{width:auto!important;}
-.alchemyRoot .scene.active{width:100%!important;}
-
+.alchemyRoot .scene,
+.alchemyRoot .status,
+.alchemyRoot .tab {
+  position: static !important;
+  inset: auto !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+  height: auto !important;
+  max-width: none !important;
+  min-height: 0 !important;
+  transform: none !important;
+}
 /* --- the window is the frame --- */
-#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active){display:flex;flex-direction:column;}
-#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleBody{
-  display:flex;flex-direction:column;flex:1 1 auto;min-height:0;overflow:hidden;}
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) {
+  display: flex;
+  flex-direction: column;
+}
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active)
+  .lairModuleBody {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
 /* No card behind the tabs/title either — the desk is what the player
    should see, not a window that happens to contain one. Strips the shared
    dark window chrome (css/overrides-03-lair.css) only while alchemy is
    the open panel; every other lair panel (dialogue, map, team) keeps its
    own card exactly as before, since this selector only matches when
    alchemy's own .lairPanel is .active. */
-#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active){
-  border:none;border-radius:0;box-shadow:none;background:none;
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: none;
 }
 /* Full-screen blur, not just behind the window: a backdrop-filter on the
    window itself only ever blurs what's directly behind *its own box* —
@@ -225,63 +977,154 @@
    sharp on top of the blur meant to cover them too. 30 clears every
    z-index this file's room content actually uses (highest is
    `.lairSceneTop`'s 25) while staying well under the window's own 40. */
-.alchemyFullBlur{
-  position:absolute;inset:0;z-index:30;pointer-events:none;
-  opacity:0;background:rgba(10,8,6,.28);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  transition:opacity .18s ease;
+.alchemyFullBlur {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  opacity: 0;
+  background: rgba(10, 8, 6, 0.28);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: opacity 0.18s ease;
 }
-body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .alchemyFullBlur{
-  opacity:1;
+body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
+  .alchemyFullBlur {
+  opacity: 1;
 }
-#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleHeader{
-  border-bottom:none;
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active)
+  .lairModuleHeader {
+  border-bottom: none;
 }
 /* The gap from "Алхимия" down to the station tabs was ~39px (the shared
    header's own line-height slack below the title text, plus
    .lairModuleBody's 20px top padding) — down to about a third of that.
    Scoped to alchemy specifically (this is #lairModuleBody, shared by
    every lair panel) rather than editing the shared padding directly. */
-#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleBody{
-  padding-top:6px;
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active)
+  .lairModuleBody {
+  padding-top: 6px;
 }
-#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .alchemyRoot{
-  margin-top:-13px;
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active)
+  .alchemyRoot {
+  margin-top: -13px;
 }
-#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleTitle,
-#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleClose{
-  text-shadow:0 1px 4px rgba(0,0,0,.7);
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active)
+  .lairModuleTitle,
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active)
+  .lairModuleClose {
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
 }
-#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleClose{
-  background:#17120e;box-shadow:0 2px 8px rgba(0,0,0,.5);
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active)
+  .lairModuleClose {
+  background: #17120e;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
-.lairPanel[data-lair-panel="alchemy"].active{display:flex!important;flex:1 1 auto;min-height:0;min-width:0;}
-.alchemyRoot{display:flex;flex-direction:column;flex:1 1 auto;gap:12px;min-height:0;min-width:0;
-  color:#e2c487;font-family:var(--ui-font,Arial,sans-serif);}
-
 /* --- station picker --- */
-.alchemyRoot .alchemyStations{display:flex;gap:8px;flex:0 0 auto;flex-wrap:wrap;}
-.alchemyRoot .alchemyStationTab{padding:8px 14px;border:1px solid rgba(138,100,52,.5);border-radius:9px;
-  background:rgba(22,17,12,.7);color:#c9b98c;font:600 12px/1 inherit;cursor:pointer;
-  transition:background .16s ease,color .16s ease,border-color .16s ease;}
-.alchemyRoot .alchemyStationTab:hover{border-color:#d6ab5e;color:#f0d497;}
-.alchemyRoot .alchemyStationTab.active{background:#a9772f;border-color:#f0c86e;color:#1a130c;}
+.alchemyRoot .alchemyStations {
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+}
+.alchemyRoot .alchemyStationTab {
+  padding: 8px 14px;
+  border: 1px solid rgba(138, 100, 52, 0.5);
+  border-radius: 9px;
+  background: rgba(22, 17, 12, 0.7);
+  color: #c9b98c;
+  font: 600 12px/1 inherit;
+  cursor: pointer;
+  transition:
+    background 0.16s ease,
+    color 0.16s ease,
+    border-color 0.16s ease;
+}
+.alchemyRoot .alchemyStationTab:hover {
+  border-color: #d6ab5e;
+  color: #f0d497;
+}
+.alchemyRoot .alchemyStationTab.active {
+  background: #a9772f;
+  border-color: #f0c86e;
+  color: #1a130c;
+}
 
 /* --- one station --- */
-.alchemyRoot .scene{display:none;}
-.alchemyRoot .scene.active{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;min-width:0;gap:10px;justify-content:flex-start;}
-.alchemyRoot .alchemyMixReference{display:none;position:relative;isolation:isolate;padding:0;border:0;background:none;cursor:zoom-in;filter:drop-shadow(0 12px 14px rgba(0,0,0,.48));}
-.alchemyRoot .scene.active .alchemyMixReference{display:block;}
-.alchemyRoot .alchemyMixReference:focus,.alchemyRoot .alchemyMixReference:focus-visible{outline:none!important;}
-.alchemyRoot .alchemyBlankReference{cursor:default;}
-.alchemyRoot .alchemyMixReferenceBoard{display:block;width:100%;height:auto;position:relative;z-index:1;}
-.alchemyRoot .alchemyMixReferenceGuide{position:absolute;z-index:2;left:12.9%;top:9.2%;width:74.3%;height:72.6%;object-fit:cover;transform:perspective(900px) rotateX(.4deg);transform-origin:center;filter:sepia(.08) saturate(.9) brightness(.96);}
-.alchemyRoot .scene h2,.alchemyRoot .scene .kicker{display:none;}
+.alchemyRoot .scene {
+  display: none;
+  /* The game sets .scene to 100vw/min(1180px,100vw) with !important. */
+  width: auto !important;
+}
+.alchemyRoot .scene.active {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 0;
+  min-width: 0;
+  width: 100% !important;
+  gap: 10px;
+  justify-content: flex-start;
+}
+.alchemyRoot .alchemyMixReference {
+  display: none;
+  position: relative;
+  isolation: isolate;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+  filter: drop-shadow(0 12px 14px rgba(0, 0, 0, 0.48));
+}
+.alchemyRoot .scene.active .alchemyMixReference {
+  display: block;
+}
+.alchemyRoot .alchemyMixReference:focus,
+.alchemyRoot .alchemyMixReference:focus-visible {
+  outline: none !important;
+}
+.alchemyRoot .alchemyBlankReference {
+  cursor: default;
+}
+.alchemyRoot .alchemyMixReferenceBoard {
+  display: block;
+  width: 100%;
+  height: auto;
+  position: relative;
+  z-index: 1;
+}
+.alchemyRoot .alchemyMixReferenceGuide {
+  position: absolute;
+  z-index: 2;
+  left: 12.9%;
+  top: 9.2%;
+  width: 74.3%;
+  height: 72.6%;
+  object-fit: cover;
+  transform: perspective(900px) rotateX(0.4deg);
+  transform-origin: center;
+  filter: sepia(0.08) saturate(0.9) brightness(0.96);
+}
+.alchemyRoot .scene h2,
+.alchemyRoot .scene .kicker {
+  display: none;
+}
 
 /* The bench holds the glassware and is the only part that may scroll. */
-.alchemyRoot .lab{flex:0 1 auto;min-height:0;overflow:auto;padding:18px;
-  border:1px solid rgba(120,94,52,.34);border-radius:14px;
-  background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.16));}
+.alchemyRoot .lab {
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 18px;
+  border: 1px solid rgba(120, 94, 52, 0.34);
+  border-radius: 14px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(0, 0, 0, 0.16)
+  );
+}
 /* Wood desk backdrop for the three built color-game stations: bench,
    reagent band and element slot each read as their own little tabletop.
    Left/right cap images (each still carrying a table leg) plus a repeating
@@ -300,34 +1143,52 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    single continuous desk (caps included) behind the whole row instead. */
 .alchemyRoot .lab.color-game-lab,
 .alchemyRoot .alchemyReagents,
-.alchemyRoot .alchemyElementColumn{
-  border:none;border-radius:0;background-color:transparent;
-  background-image:url("../assets/alchemy/desk-mid.png");
-  background-position:left top;
-  background-repeat:repeat-x;
-  background-size:auto 100%;
+.alchemyRoot .alchemyElementColumn {
+  border: none;
+  border-radius: 0;
+  background-color: transparent;
+  background-image: url("../assets/alchemy/desk-mid.png");
+  background-position: left top;
+  background-repeat: repeat-x;
+  background-size: auto 100%;
 }
-.alchemyRoot .lab h3{margin:0 0 14px;text-align:center;color:#e6d2a6;
-  font:600 15px/1.2 Georgia,serif;
+.alchemyRoot .lab h3 {
+  margin: 0 0 14px;
+  text-align: center;
+  color: #e6d2a6;
+  font:
+    600 15px/1.2 Georgia,
+    serif;
   /* "Образец и текущая смесь" / "Цель и результат" / "Цель и грязная
      смесь" — dropped everywhere now, not just wide (see the wide-only
      rule this used to be, below): the bottles and their own цель/текущая
      смесь labels already say what's what. */
-  display:none;}
+  display: none;
+}
 
 /* Target beside current, always side by side — they are meant to be compared.
    Fixed gaps, not vh-based ones: the module window's height already differs a
    little station to station (footer text wraps differently), and a vh clamp
    turned that into the two flasks visibly sitting closer together on one tab
    than another. Width still gets a say — narrower panels pull them in. */
-.alchemyRoot .tube-pair{display:flex;justify-content:center;align-items:flex-end;gap:32px;
+.alchemyRoot .tube-pair {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 32px;
   /* Neither label's own height sits in flow (see .swatch-label and
      .target-element-hint below), so without this the scrollable .lab clips
      them a few px short. Taller than the single-label days now that the
      target stacks a second line under "цель". */
-  padding-bottom:36px;}
-.alchemyRoot .tube-box,.alchemyRoot .current-cluster{display:flex;flex-direction:column;
-  align-items:center;gap:6px;}
+  padding-bottom: 36px;
+}
+.alchemyRoot .tube-box,
+.alchemyRoot .current-cluster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
 /* Taken out of flow and centered by its own transform, not by its parent's
    flex sizing. In flow, a long label ("текущая смесь", "грязная смесь") is
    wider than the 70-something px tube and forces .tube-box to that width —
@@ -337,7 +1198,9 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    the left flask sitting at a different x on every station, tracking
    whatever the right-hand label happened to say. Absolute removes the label
    from that math entirely — both boxes are exactly tube-width, every time. */
-.alchemyRoot .tube-box{position:relative;}
+.alchemyRoot .tube-box {
+  position: relative;
+}
 /* "цель"/"текущая смесь"/"получилось"/"грязная смесь" — dropped per
    feedback, same reasoning as the reagent names and .lab h3 above: the
    bottles' own position (left=target, right=current) and the verdict
@@ -345,9 +1208,18 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    rule: the --label-raise token above still exists for a future revival,
    and nothing else depends on this element occupying space (it was
    already taken out of flow, see the comment below). */
-.alchemyRoot .swatch-label{display:none;color:#9d8d75;font:5.5px/1 inherit;letter-spacing:.02em;
-  position:absolute;top:100%;left:50%;translate:-50% var(--label-raise,0);
-  margin-top:6px;white-space:nowrap;}
+.alchemyRoot .swatch-label {
+  display: none;
+  color: #9d8d75;
+  font: 5.5px/1 inherit;
+  letter-spacing: 0.02em;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  translate: -50% var(--label-raise, 0);
+  margin-top: 6px;
+  white-space: nowrap;
+}
 /* The element a round is built around — a planet-sigil label stuck on the
    target bottle itself now (a parchment card per element, assets/alchemy/
    label-*.png, JS sets --element-label-img), not a name printed below it.
@@ -362,12 +1234,16 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    card's own proportions (208/330, its source art) rather than stretching
    to a guessed height. z-index above the glass frame (30, test-tube:after)
    so the label reads as stuck to the *outside* of the glass. */
-.alchemyRoot .target-element-hint{
-  position:absolute;top:55%;left:50%;
-  transform:translate(-50%,-50%);
-  width:60%;aspect-ratio:208/330;
-  background:var(--element-label-img,none) center/contain no-repeat;
-  pointer-events:none;z-index:31;
+.alchemyRoot .target-element-hint {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%;
+  aspect-ratio: 208/330;
+  background: var(--element-label-img, none) center/contain no-repeat;
+  pointer-events: none;
+  z-index: 31;
 }
 
 /* The glassware is sized from the window, not pinned in pixels. At a fixed
@@ -380,8 +1256,11 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    window budget has to fit three things side by side instead of two. */
 .alchemyRoot .scene[data-name="Смешение"] .test-tube.tube-lg,
 .alchemyRoot .scene[data-name="Концентрации"] .test-tube.tube-lg,
-.alchemyRoot .scene[data-name="Разделение"] .test-tube.tube-lg{
-  height:clamp(127px,18.4vh,253px)!important;width:auto!important;aspect-ratio:96/224;}
+.alchemyRoot .scene[data-name="Разделение"] .test-tube.tube-lg {
+  height: clamp(127px, 18.4vh, 253px) !important;
+  width: auto !important;
+  aspect-ratio: 96/224;
+}
 
 /* Positioning tokens: "stand on the table" raise/scale/offset values that
    used to be full `transform:` shorthand strings, redeclared whole at every
@@ -398,52 +1277,118 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    `rotate`/`transform` addition can layer on top instead of clobbering it
    (hit twice before this: the drag-over highlight and the swatch-label
    offset both had to route around a monolithic `transform:`). */
-.alchemyRoot .scene.active .lab.color-game-lab .test-tube.tube-lg{
-  translate:0 var(--bench-raise,0);
-  scale:var(--bench-scale,1);
-  transform-origin:bottom center;
+.alchemyRoot .scene.active .lab.color-game-lab .test-tube.tube-lg {
+  translate: 0 var(--bench-raise, 0);
+  scale: var(--bench-scale, 1);
+  transform-origin: bottom center;
 }
-.alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch{
-  translate:0 var(--reagent-raise,0);
-  scale:var(--reagent-scale,1);
-  transform-origin:bottom center;
+.alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch {
+  translate: 0 var(--reagent-raise, 0);
+  scale: var(--reagent-scale, 1);
+  transform-origin: bottom center;
 }
-.alchemyRoot .scene.active .alchemyElementCell{
-  translate:var(--element-x,0) var(--element-raise,0);
-  scale:var(--element-scale,1);
-  transform-origin:bottom center;
+.alchemyRoot .scene.active .alchemyElementCell {
+  translate: var(--element-x, 0) var(--element-raise, 0);
+  scale: var(--element-scale, 1);
+  transform-origin: bottom center;
 }
-.alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:last-child{translate:0 var(--btn-plus-raise,0);}
-.alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:first-child:not(:last-child){translate:0 var(--btn-minus-raise,0);}
-.alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:only-child{translate:0 var(--btn-solo-raise,0);}
+.alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:last-child {
+  translate: 0 var(--btn-plus-raise, 0);
+}
+.alchemyRoot
+  .alchemyReagents
+  .color-card
+  .ctrl-row
+  .small-btn:first-child:not(:last-child) {
+  translate: 0 var(--btn-minus-raise, 0);
+}
+.alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:only-child {
+  translate: 0 var(--btn-solo-raise, 0);
+}
 /* Reagent tubes follow the window too, or four of them out-measure the bench. */
-.alchemyRoot .color-controls .color-card .mini-swatch{height:clamp(87px,14.6vh,160px)!important;}
+.alchemyRoot .color-controls .color-card .mini-swatch {
+  height: clamp(87px, 14.6vh, 160px) !important;
+}
 
 /* --- reagents: one row, the tube is the target --- */
-.alchemyRoot .alchemyReagents{flex:0 0 auto;padding:14px;}
-.alchemyRoot .color-controls{display:flex;flex-direction:row;flex-wrap:nowrap;
-  justify-content:center;align-items:flex-end;gap:16px;}
-.alchemyRoot .color-card{display:flex;flex-direction:column;align-items:center;gap:4px;
-  width:84px;min-width:0;text-align:center;}
+.alchemyRoot .alchemyReagents {
+  flex: 0 0 auto;
+  padding: 14px;
+}
+.alchemyRoot .color-controls {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 16px;
+}
+.alchemyRoot .color-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 84px;
+  min-width: 0;
+  text-align: center;
+}
 /* Reagent names ("Красный", "Убрать красную примесь"...) dropped
    everywhere per feedback — the swatch's own colour and the target hint
    already say what's needed. display:none, not the wide-only hide this
    used to be: every screen size gets it now. */
-.alchemyRoot .color-card strong{display:none;}
-.alchemyRoot .color-card .drops{display:none;}
-.alchemyRoot .ctrl-row{display:flex;gap:6px;}
-.alchemyRoot .small-btn,.alchemyRoot .color-card button{padding:4px 10px;
-  border:1px solid rgba(138,100,52,.55);border-radius:7px;background:rgba(24,19,14,.9);
-  color:#c9b98c;font:600 12px/1 inherit;cursor:pointer;opacity:.6;transition:opacity .14s ease;}
-.alchemyRoot .small-btn:hover,.alchemyRoot .color-card button:hover{border-color:#d6ab5e;color:#f0d497;opacity:1;}
-.alchemyRoot .small-btn:disabled,.alchemyRoot .color-card button:disabled{opacity:.4;cursor:not-allowed;}
-.alchemyRoot .small-btn:disabled:hover,.alchemyRoot .color-card button:disabled:hover{border-color:rgba(138,100,52,.55);color:#c9b98c;}
-.alchemyRoot .mini-swatch{cursor:pointer;transition:transform .14s ease,filter .14s ease;}
-.alchemyRoot .mini-swatch:hover{transform:translateY(-3px);filter:brightness(1.12);}
+.alchemyRoot .color-card strong {
+  display: none;
+}
+.alchemyRoot .color-card .drops {
+  display: none;
+}
+.alchemyRoot .ctrl-row {
+  display: flex;
+  gap: 6px;
+}
+.alchemyRoot .small-btn,
+.alchemyRoot .color-card button {
+  padding: 4px 10px;
+  border: 1px solid rgba(138, 100, 52, 0.55);
+  border-radius: 7px;
+  background: rgba(24, 19, 14, 0.9);
+  color: #c9b98c;
+  font: 600 12px/1 inherit;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.14s ease;
+}
+.alchemyRoot .small-btn:hover,
+.alchemyRoot .color-card button:hover {
+  border-color: #d6ab5e;
+  color: #f0d497;
+  opacity: 1;
+}
+.alchemyRoot .small-btn:disabled,
+.alchemyRoot .color-card button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.alchemyRoot .small-btn:disabled:hover,
+.alchemyRoot .color-card button:disabled:hover {
+  border-color: rgba(138, 100, 52, 0.55);
+  color: #c9b98c;
+}
+.alchemyRoot .mini-swatch:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.12);
+}
 /* Reagent capped at MAX_DROPS_PER_REAGENT: the tube stops inviting more clicks. */
-.alchemyRoot .mini-swatch.atMax{cursor:default;}
-.alchemyRoot .mini-swatch.atMax:hover{transform:none;filter:none;}
-.alchemyRoot .mini-swatch:active{transform:translateY(-1px) scale(.97);}
+.alchemyRoot .mini-swatch.atMax {
+  cursor: default;
+}
+.alchemyRoot .mini-swatch.atMax:hover {
+  transform: none;
+  filter: none;
+}
+.alchemyRoot .mini-swatch:active {
+  transform: translateY(-1px) scale(0.97);
+}
 
 /* --- the element slot, the verdict, and the buttons: one column --- */
 /* Third column, not a footer any more: the slot on top, the verdict below
@@ -451,23 +1396,65 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    same narrow-column treatment the reagents already got. Checking a mix
    used to need only reagents; now it needs an element in this slot too,
    so the slot sits closest to the buttons that need it filled. */
-.alchemyRoot .alchemyElementColumn{flex:0 0 auto;display:flex;flex-direction:column;
-  align-items:center;gap:12px;padding:14px 12px 12px;}
+.alchemyRoot .alchemyElementColumn {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 12px 12px;
+}
 /* width:100%, not the default shrink-to-fit a column-direction flex item
    gets: without it the verdict sat at its own unwrapped text width, which
    is wider than the element column and was running the line straight out
    past the modal's own edge instead of wrapping inside it. */
-.alchemyRoot .status{display:flex;flex-direction:column;gap:2px;color:#897d6c;font:12px/1.3 inherit;text-align:center;width:100%;min-width:0;}
-.alchemyRoot .status strong{color:#e2c487;font:600 14px/1.2 Georgia,serif;}
-.alchemyRoot .big-actions{display:flex;gap:10px;}
+.alchemyRoot .status {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: #897d6c;
+  font: 12px/1.3 inherit;
+  text-align: center;
+  width: 100%;
+  min-width: 0;
+}
+.alchemyRoot .status strong {
+  color: #e2c487;
+  font:
+    600 14px/1.2 Georgia,
+    serif;
+}
+.alchemyRoot .big-actions {
+  display: flex;
+  gap: 10px;
+}
 /* Side by side needs more width than the narrow element column has to give —
    Проверить and Сброс were clipping. Stacked instead, each full width. */
-.alchemyRoot .alchemyElementColumn .big-actions{flex-direction:column;width:100%;gap:8px;}
-.alchemyRoot .alchemyElementColumn .ctl{width:100%;}
-.alchemyRoot .ctl{padding:9px 16px;border:1px solid #a97f3e;border-radius:9px;
-  background:linear-gradient(#432f1b,#20170f);color:#e8c67d;font:600 12px/1 inherit;cursor:pointer;}
-.alchemyRoot .ctl:hover{filter:brightness(1.14);}
-.alchemyRoot .ctl:disabled{opacity:.4;cursor:not-allowed;filter:none;}
+.alchemyRoot .alchemyElementColumn .big-actions {
+  flex-direction: column;
+  width: 100%;
+  gap: 8px;
+}
+.alchemyRoot .alchemyElementColumn .ctl {
+  width: 100%;
+}
+.alchemyRoot .ctl {
+  padding: 9px 16px;
+  border: 1px solid #a97f3e;
+  border-radius: 9px;
+  background: linear-gradient(#432f1b, #20170f);
+  color: #e8c67d;
+  font: 600 12px/1 inherit;
+  cursor: pointer;
+}
+.alchemyRoot .ctl:hover {
+  filter: brightness(1.14);
+}
+.alchemyRoot .ctl:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: none;
+}
 /* Сброс/Новая партия/Новая смесь — a reset icon, not a text button, per
    feedback ("просто сделай иконкой сброса"). Fixed square instead of
    `.ctl`'s own text-driven padding, so the icon centers regardless of how
@@ -476,36 +1463,69 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    for the stacked/row text-button layouts) outranks a bare `.ctl-icon` on
    specificity alone — this is a deliberate "always render as a fixed
    icon square" override, not a fight worth winning on specificity. */
-.alchemyRoot .ctl-icon{width:38px!important;height:38px!important;padding:0!important;
-  flex:0 0 auto!important;display:grid;place-items:center;}
-.alchemyRoot .ctl-icon svg{display:block;}
-.alchemyRoot .keyhint{display:none;}
+.alchemyRoot .ctl-icon {
+  width: 38px !important;
+  height: 38px !important;
+  padding: 0 !important;
+  flex: 0 0 auto !important;
+  display: grid;
+  place-items: center;
+}
+.alchemyRoot .ctl-icon svg {
+  display: block;
+}
+.alchemyRoot .keyhint {
+  display: none;
+}
 
 /* Empty until an element from the rack drawer (assets/alchemy/bottle-*.png,
    js/world/alchemy.js window.Alchemy.applySelection) fills it — a dashed
    silhouette inviting the click that opens the drawer, same aspect ratio as
    the bottles there so the art doesn't stretch once it's set. */
-.alchemyRoot .alchemyElementCell{
-  --element-bottle-img:none;
-  width:clamp(46px,7vh,72px);aspect-ratio:150/409;
-  border:2px dashed rgba(138,100,52,.55);border-radius:8px 8px 22px 22px;
-  background:rgba(24,19,14,.5) var(--element-bottle-img) center/contain no-repeat;
-  padding:0;cursor:pointer;
-  transition:border-color .16s ease,background-color .16s ease,transform .16s ease;
+.alchemyRoot .alchemyElementCell {
+  --element-bottle-img: none;
+  width: clamp(46px, 7vh, 72px);
+  aspect-ratio: 150/409;
+  border: 2px dashed rgba(138, 100, 52, 0.55);
+  border-radius: 8px 8px 22px 22px;
+  background: rgba(24, 19, 14, 0.5) var(--element-bottle-img) center/contain
+    no-repeat;
+  padding: 0;
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background-color 0.16s ease,
+    transform 0.16s ease;
 }
-.alchemyRoot .alchemyElementCell:hover{border-color:#d6ab5e;transform:translateY(-3px);}
+.alchemyRoot .alchemyElementCell:hover {
+  border-color: #d6ab5e;
+  transform: translateY(-3px);
+}
 /* A bottle being pointer-dragged (js/world/alchemy.js) is over this cell
    right now — border/glow only, no transform: the cell already carries
    its own raise transform at some breakpoints (the "stand on the table"
    rules further down), and transform is a single property — adding one
    here would replace that positioning instead of layering on top of it. */
-.alchemyRoot .alchemyElementCell.dragOver{
-  border-color:var(--gold);border-style:solid;
-  box-shadow:0 0 0 1px rgba(217,167,76,.3),0 0 16px rgba(217,167,76,.25);
+.alchemyRoot .alchemyElementCell.dragOver {
+  border-color: var(--gold);
+  border-style: solid;
+  box-shadow:
+    0 0 0 1px rgba(217, 167, 76, 0.3),
+    0 0 16px rgba(217, 167, 76, 0.25);
 }
-.alchemyRoot .alchemyElementCellHint{font-size:1.6em;line-height:1;color:rgba(217,167,76,.55);}
-.alchemyRoot .alchemyElementCell.filled{border-style:solid;border-color:rgba(217,167,76,.6);background-color:transparent;}
-.alchemyRoot .alchemyElementCell.filled .alchemyElementCellHint{display:none;}
+.alchemyRoot .alchemyElementCellHint {
+  font-size: 1.6em;
+  line-height: 1;
+  color: rgba(217, 167, 76, 0.55);
+}
+.alchemyRoot .alchemyElementCell.filled {
+  border-style: solid;
+  border-color: rgba(217, 167, 76, 0.6);
+  background-color: transparent;
+}
+.alchemyRoot .alchemyElementCell.filled .alchemyElementCellHint {
+  display: none;
+}
 /* A bottle landing in the cell (js/world/alchemy.js, drag-drop or a plain
    click-select both trigger this) pops in rather than just appearing —
    animates the `scale` custom property directly, not `transform`, so it
@@ -513,8 +1533,20 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    on the table" raise, above) the way a `transform:` keyframe would; once
    the animation ends (no fill-mode) the static scale:var(--element-scale)
    rule takes back over on its own. */
-@keyframes elementCellLandV1{0%{scale:.6}55%{scale:1.12}100%{scale:1}}
-.alchemyRoot .alchemyElementCell.landing{animation:elementCellLandV1 .32s cubic-bezier(.34,1.56,.64,1);}
+@keyframes elementCellLandV1 {
+  0% {
+    scale: 0.6;
+  }
+  55% {
+    scale: 1.12;
+  }
+  100% {
+    scale: 1;
+  }
+}
+.alchemyRoot .alchemyElementCell.landing {
+  animation: elementCellLandV1 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 
 /* A correct Check shakes and flashes the *current* bottle (js/world/
    alchemy.js triggerSuccessPulseV1). Shakes via `translate` alone, each
@@ -524,23 +1556,43 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    scale individual properties wholesale for its duration instead of
    composing with them. `scale` itself is left alone (not listed in any
    keyframe), so the bottle's normal size holds throughout. */
-@keyframes alchemySuccessShakeV1{
-  0%,100%{translate:0 var(--bench-raise,0);}
-  15%{translate:-4px var(--bench-raise,0);}
-  30%{translate:4px var(--bench-raise,0);}
-  45%{translate:-3px var(--bench-raise,0);}
-  60%{translate:3px var(--bench-raise,0);}
-  80%{translate:-1px var(--bench-raise,0);}
+@keyframes alchemySuccessShakeV1 {
+  0%,
+  100% {
+    translate: 0 var(--bench-raise, 0);
+  }
+  15% {
+    translate: -4px var(--bench-raise, 0);
+  }
+  30% {
+    translate: 4px var(--bench-raise, 0);
+  }
+  45% {
+    translate: -3px var(--bench-raise, 0);
+  }
+  60% {
+    translate: 3px var(--bench-raise, 0);
+  }
+  80% {
+    translate: -1px var(--bench-raise, 0);
+  }
 }
-@keyframes alchemySuccessFlashV1{
-  0%,100%{filter:brightness(1) drop-shadow(0 0 0 rgba(255,224,140,0));}
-  40%{filter:brightness(1.55) drop-shadow(0 0 16px rgba(255,224,140,.9));}
+@keyframes alchemySuccessFlashV1 {
+  0%,
+  100% {
+    filter: brightness(1) drop-shadow(0 0 0 rgba(255, 224, 140, 0));
+  }
+  40% {
+    filter: brightness(1.55) drop-shadow(0 0 16px rgba(255, 224, 140, 0.9));
+  }
 }
-.alchemyRoot .test-tube.successPulse{
-  animation:alchemySuccessShakeV1 .6s ease,alchemySuccessFlashV1 .6s ease;
+.alchemyRoot .test-tube.successPulse {
+  animation:
+    alchemySuccessShakeV1 0.6s ease,
+    alchemySuccessFlashV1 0.6s ease;
 }
 
-@media (max-width:760px){
+@media (max-width: 760px) {
   /* The top shelf (target/current bottles) sits lower, off the station
      tabs, per feedback — margin-top on the panel itself, not the bottles
      inside it (that's .tube-pair's own margin-top below), so it moves the
@@ -554,7 +1606,10 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      (positioned right after .lab's own, now-too-short, box in normal
      flow) started overlapping the target-element-hint text still hanging
      below it. Locked to its natural content height instead. */
-  .alchemyRoot .scene.active > .lab.color-game-lab{margin-top:20%;flex-shrink:0!important;}
+  .alchemyRoot .scene.active > .lab.color-game-lab {
+    margin-top: 20%;
+    flex-shrink: 0 !important;
+  }
   /* Full width instead of stopping at .lairModuleBody's own 12px padding
      (css/overrides-04-universal-lock.css, shared with every lair panel) —
      per feedback the three shelves shouldn't be boxed in left/right.
@@ -563,7 +1618,10 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      actual content off the wood's own edge same as before. */
   .alchemyRoot .scene.active > .lab.color-game-lab,
   .alchemyRoot .scene.active > .alchemyReagents,
-  .alchemyRoot .scene.active > .alchemyElementColumn{margin-left:-12px;margin-right:-12px;}
+  .alchemyRoot .scene.active > .alchemyElementColumn {
+    margin-left: -12px;
+    margin-right: -12px;
+  }
   /* The -12px above only cancels .lairModuleBody's own padding — the
      window itself still sat inset from the true screen edge by another
      8px a side (css/overrides-04-universal-lock.css's shared mobile
@@ -575,28 +1633,47 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      a strip of unrelated blurred room behind them showing through. An ID
      beats the shared rule's plain class regardless of !important vs.
      !important, so this doesn't need to fight specificity, only exist. */
-  #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active){
-    width:100vw!important;
-    border-radius:0!important;
+  #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) {
+    width: 100vw !important;
+    border-radius: 0 !important;
   }
-  .alchemyRoot .tube-pair{gap:24px;}
-  .alchemyRoot .color-controls{gap:8px;}
-  .alchemyRoot .color-card{width:66px;}
+  .alchemyRoot .tube-pair {
+    gap: 24px;
+  }
+  .alchemyRoot .color-controls {
+    gap: 8px;
+  }
+  .alchemyRoot .color-card {
+    width: 66px;
+  }
   /* The element cell's tall bottle aspect-ratio (150/409) makes it the
      biggest single item in a stacked mobile layout — at the base 7vh width
      it was taller than the two lab bottles combined, squeezing .lab's own
      flex-1 box short enough to scroll the target-element-hint out of view. */
-  .alchemyRoot .alchemyElementCell{width:clamp(28px,3.6vh,40px);}
-  .alchemyRoot .alchemyElementColumn{gap:6px;padding-top:4px;}
-  .alchemyRoot .alchemyElementColumn .status{min-height:0;}
-  .alchemyRoot .alchemyElementColumn .big-actions{gap:6px;}
-  .alchemyRoot .alchemyElementColumn .ctl{padding:7px 14px;}
+  .alchemyRoot .alchemyElementCell {
+    width: clamp(28px, 3.6vh, 40px);
+  }
+  .alchemyRoot .alchemyElementColumn {
+    gap: 6px;
+    padding-top: 4px;
+  }
+  .alchemyRoot .alchemyElementColumn .status {
+    min-height: 0;
+  }
+  .alchemyRoot .alchemyElementColumn .big-actions {
+    gap: 6px;
+  }
+  .alchemyRoot .alchemyElementColumn .ctl {
+    padding: 7px 14px;
+  }
   /* The old line-clamp-plus-min-height override that used to live here
      (Separation's "Убрать красную примесь" ballooning the reagent band,
      and the card-height mismatch that caused) is moot now that the
      labels are display:none everywhere (base rule above) — a hidden
      element can't balloon anything or leave a mismatched flow height. */
-  .alchemyRoot .tube-pair{padding-bottom:36px;}
+  .alchemyRoot .tube-pair {
+    padding-bottom: 36px;
+  }
   /* The two bench bottles stand higher above the panel's own table level,
      same "push the surface down, raise what stands on it" pass the wide
      layout already got (see the wide media query below) — just tuned for
@@ -606,7 +1683,9 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      themselves use transform so .swatch-label/.target-element-hint (both
      position:absolute off .tube-box, whose own layout box a transform on
      the tube inside it does not move) can be pulled up to match. */
-  .alchemyRoot .tube-pair{margin-top:47px;}
+  .alchemyRoot .tube-pair {
+    margin-top: 47px;
+  }
   /* Same fix as the wide layout's own .lab overflow:visible!important
      (a few hundred lines down): raising the bottles above their
      un-transformed layout box (next rule) makes .lab's base overflow:auto
@@ -614,29 +1693,46 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      modal) see overflow at the *top* and grow a permanent scrollbar next
      to the target/current bottles — nothing here actually needs to
      scroll at this width. */
-  .alchemyRoot .scene.active > .lab.color-game-lab{overflow:visible!important;}
-  .alchemyRoot{--bench-raise:-70px;--label-raise:-70px;--reagent-raise:-55px;--element-raise:-40px;}
+  .alchemyRoot .scene.active > .lab.color-game-lab {
+    overflow: visible !important;
+  }
+  .alchemyRoot {
+    --bench-raise: -70px;
+    --label-raise: -70px;
+    --reagent-raise: -55px;
+    --element-raise: -40px;
+  }
   /* Bigger, and no dashed placeholder ring around it — the bottle art
      (once filled) already says "something is here," per feedback. */
-  .alchemyRoot .alchemyElementCell{width:clamp(42px,5.4vh,60px);border:none;}
-  .alchemyRoot .alchemyElementCell.filled{border:none;}
+  .alchemyRoot .alchemyElementCell {
+    width: clamp(42px, 5.4vh, 60px);
+    border: none;
+  }
+  .alchemyRoot .alchemyElementCell.filled {
+    border: none;
+  }
   /* Проверить/Сброс side by side instead of stacked, same as the wide
      layout — the stacked pair was original only because this column used
      to be the narrowest thing in a 3-column grid; stacked full-width here
      it has the whole panel to itself. */
-  .alchemyRoot .alchemyElementColumn .big-actions{flex-direction:row;}
+  .alchemyRoot .alchemyElementColumn .big-actions {
+    flex-direction: row;
+  }
   /* .ctl's own width:100% (base rule, meant for the stacked column layout)
      would otherwise still claim the full row width per button and stack
      them anyway despite the row above allowing side-by-side. flex:1 splits
      the row's width evenly between the two instead. */
-  .alchemyRoot .alchemyElementColumn .ctl{width:auto;flex:1 1 0;}
+  .alchemyRoot .alchemyElementColumn .ctl {
+    width: auto;
+    flex: 1 1 0;
+  }
 }
 
 /* --- wide: glassware left, reagents right --- */
 /* Stacked, the bench and the reagent row together want more height than the
    window has, so the flasks were cut off. Side by side each gets its own
    column and the bench keeps the full height. */
-@media (min-width:900px){
+@media (min-width: 900px) {
   /* Positioning tokens for this breakpoint, one place instead of six
      separate .alchemyRoot rules scattered through this block (merged
      v340 — later rounds had each added their own token declaration next
@@ -644,73 +1740,95 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      Each token's own "why this number" reasoning stays as a comment on
      it; the rules that consume them, below, keep their own comments
      about layout/ordering instead. */
-  .alchemyRoot{
+  .alchemyRoot {
     /* Per feedback the two bottles should stand closer together (roughly
        half the gap they had) on top of .tube-pair's own translateX —
        opposite signs on .tube-pair > .tube-box / .current-cluster pull
        them toward the row's own center. */
-    --bench-pull:15px;
+    --bench-pull: 15px;
     /* Bottles were sitting in the panel-card layout's old baseline, which
        put their feet at/under the desk's own front edge instead of on
        its surface — raise amounts tuned by eye against the photo so all
        three groups' feet land on the same line. */
-    --bench-raise:-123px;--bench-scale:.6;
-    --reagent-raise:-128px;--reagent-scale:1.3;
+    --bench-raise: -123px;
+    --bench-scale: 0.6;
+    --reagent-raise: -128px;
+    --reagent-scale: 1.3;
     /* A card with only one control button (Separation's "−") has one
        less flow item than a two-button card, so its swatch's resting
        position starts lower — extra lift (empirically the gap between
        the two, not a formula) brings it back level; see the :has() rule
        below that applies it. */
-    --reagent-solo-raise:-160px;
-    --element-x:-30px;--element-raise:-96px;--element-scale:1.1;
+    --reagent-solo-raise: -160px;
+    --element-x: -30px;
+    --element-raise: -96px;
+    --element-scale: 1.1;
     /* The whole desk (and everything standing on it) sits lower than the
        row's own box. */
-    --desk-margin:41%;
-    --btn-plus-raise:-163px;--btn-minus-raise:-130px;--btn-solo-raise:-55px;--label-raise:-138px;
+    --desk-margin: 41%;
+    --btn-plus-raise: -163px;
+    --btn-minus-raise: -130px;
+    --btn-solo-raise: -55px;
+    --label-raise: -138px;
     /* Nearest positioned ancestor for .status's own absolute reposition,
        below. */
-    position:relative;
+    position: relative;
   }
-  .alchemyRoot .scene.active{
-    display:grid;
+  .alchemyRoot .scene.active {
+    display: grid;
     /* minmax(0,1fr), not 1fr: a 1fr track will not shrink below its own
        min-content, and the bench was pushing the whole grid past the window.
        Three columns now — bench, reagents, element — all in one row: the
        element slot sits right where the old "foot" row used to span, since
        its own column already carries the verdict and the buttons stacked
        inside it (see .alchemyElementColumn above). */
-    grid-template-columns:minmax(0,1fr) minmax(220px,280px) minmax(210px,260px);
-    grid-template-rows:minmax(0,1fr);
-    grid-template-areas:"bench reagents element";
-    gap:14px;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 280px) minmax(
+        210px,
+        260px
+      );
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-areas: "bench reagents element";
+    gap: 14px;
     /* An explicit width, because stretch alone will not pull a flex item below
        the min-content of its own grid tracks — the bench kept the scene 1180px
        wide inside an 888px panel. */
-    width:100%;
+    width: 100%;
     /* a flex item will not shrink below its content unless told to, and the
        grid was pushing the reagent column out past the window */
-    min-width:0;
+    min-width: 0;
     /* Capped, not left to `minmax(0,1fr)` fill whatever height the window
        has to spare: on a tall enough browser window the row — and with it
        the desk photo stretched 100%/100% across it — grew well past a
        sensible table height, reading as a wall of wood rather than a
        tabletop. The window itself still sizes to content above/below
        this row as usual; only the row stops growing past this point. */
-    max-height:420px;
-    position:relative;
+    max-height: 420px;
+    position: relative;
   }
-  .alchemyRoot .scene.active .alchemyMixReference{
-    position:absolute;z-index:1;left:50%;top:3%;width:clamp(310px,39vw,610px);
-    transform:translateX(-50%);
+  .alchemyRoot .scene.active .alchemyMixReference {
+    position: absolute;
+    z-index: 1;
+    left: 50%;
+    top: 3%;
+    width: clamp(310px, 39vw, 610px);
+    transform: translateX(-50%);
   }
   /* The reference board is scenery. Every interactive object must stand in
      front of it in every station, not only in Mixing. */
   .alchemyRoot .scene.active > .lab,
   .alchemyRoot .scene.active > .alchemyReagents,
-  .alchemyRoot .scene.active > .alchemyElementColumn{position:relative;z-index:4;}
+  .alchemyRoot .scene.active > .alchemyElementColumn {
+    position: relative;
+    z-index: 4;
+  }
   /* Grid items carry min-width:auto too: the bench was distending its own
      track from the inside, which is what kept the scene wider than the panel. */
-  .alchemyRoot .scene.active > .lab{grid-area:bench;min-width:0;min-height:0;align-self:stretch;}
+  .alchemyRoot .scene.active > .lab {
+    grid-area: bench;
+    min-width: 0;
+    min-height: 0;
+    align-self: stretch;
+  }
   /* Both columns end at the same line and scroll inside themselves rather than
      growing past it: whichever is taller no longer sets the height. */
   /* align-items:flex-end, not center: centered in the full band height put
@@ -721,12 +1839,29 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      to the band's bottom (same idea as .tube-pair for the big bottles)
      means the swatches only need a small nudge, not one that swallows
      their own controls. */
-  .alchemyRoot .scene.active > .alchemyReagents{grid-area:reagents;min-width:0;min-height:0;align-self:stretch;overflow:auto;display:flex;align-items:flex-end;
-    padding:16px;}
-  .alchemyRoot .scene.active > .alchemyElementColumn{grid-area:element;min-width:0;min-height:0;
-    align-self:stretch;justify-content:center;overflow:auto;
-    padding:16px;border-top:0;}
-  .alchemyRoot .scene.active > .scene-head{display:none;}
+  .alchemyRoot .scene.active > .alchemyReagents {
+    grid-area: reagents;
+    min-width: 0;
+    min-height: 0;
+    align-self: stretch;
+    overflow: auto;
+    display: flex;
+    align-items: flex-end;
+    padding: 16px;
+  }
+  .alchemyRoot .scene.active > .alchemyElementColumn {
+    grid-area: element;
+    min-width: 0;
+    min-height: 0;
+    align-self: stretch;
+    justify-content: center;
+    overflow: auto;
+    padding: 16px;
+    border-top: 0;
+  }
+  .alchemyRoot .scene.active > .scene-head {
+    display: none;
+  }
   /* Wide: one continuous desk behind the whole row instead of three
      separate tabletops with a gap of bare panel between them — the grid
      gap still separates the columns, but the desk paints straight through
@@ -741,50 +1876,79 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      width) — undistorted at any row size, centered, with blur (v312)
      showing in the letterboxed space above/below rather than the table
      photo being warped to fill it. */
-  .alchemyRoot .scene.active:has(> .lab.color-game-lab){
-    background-image:url("../assets/alchemy/desk-full.png");
-    background-position:center;
-    background-repeat:no-repeat;
-    background-size:contain;
+  .alchemyRoot .scene.active:has(> .lab.color-game-lab) {
+    background-image: url("../assets/alchemy/desk-full.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
   }
   .alchemyRoot .scene.active > .lab.color-game-lab,
   .alchemyRoot .scene.active > .alchemyReagents,
-  .alchemyRoot .scene.active > .alchemyElementColumn{
-    background:none;
+  .alchemyRoot .scene.active > .alchemyElementColumn {
+    background: none;
   }
   /* One row of four, same as the base layout — not the 2x2 grid this used
      to be, per feedback that the reagents should "stand in a row" on
      desktop too. */
-  .alchemyRoot .color-controls{display:flex;flex-direction:row;flex-wrap:nowrap;
-    justify-content:center;align-items:flex-end;gap:8px;width:100%;
-    transform:translateX(28px);}
+  .alchemyRoot .color-controls {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 8px;
+    width: 100%;
+    transform: translateX(28px);
+  }
   /* min-width:0 again: as grid items the cards were distending their column
      from the inside, this time on the long filter labels. */
-  .alchemyRoot .color-card{width:auto;min-width:0;}
-  .alchemyRoot .lab{display:flex;flex-direction:column;justify-content:center;}
+  .alchemyRoot .color-card {
+    width: auto;
+    min-width: 0;
+  }
+  .alchemyRoot .lab {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
   /* Side by side the bench has a full column of height to spend on the
      flasks — still shorter than before (v292-301 had these at 170-300px):
      the bench is one of three columns competing for the same width now,
      not one of two. */
   .alchemyRoot .scene[data-name="Смешение"] .test-tube.tube-lg,
   .alchemyRoot .scene[data-name="Концентрации"] .test-tube.tube-lg,
-  .alchemyRoot .scene[data-name="Разделение"] .test-tube.tube-lg{height:clamp(150px,27.6vh,253px)!important;}
+  .alchemyRoot .scene[data-name="Разделение"] .test-tube.tube-lg {
+    height: clamp(150px, 27.6vh, 253px) !important;
+  }
   /* The leftmost (target) bottle was sitting past the table photo's own
      tapered left edge, off the wood — translateX on the whole pair (not
      just the target tube) moves both bottles and their цель/текущая
      смесь labels together as one block, same idea as .color-controls
      above. */
-  .alchemyRoot .tube-pair{gap:16px;transform:translateX(82px);}
+  .alchemyRoot .tube-pair {
+    gap: 16px;
+    transform: translateX(82px);
+  }
   /* .tube-box carries the target bottle's swatch-label with it since both
      move as one flex item, same as everywhere else transforms are used on
      a bottle+label pairing in this file. --bench-pull itself is declared
      with this breakpoint's other tokens, above. */
-  .alchemyRoot .tube-pair > .tube-box{translate:var(--bench-pull);}
-  .alchemyRoot .current-cluster{translate:calc(var(--bench-pull) * -1);}
+  .alchemyRoot .tube-pair > .tube-box {
+    translate: var(--bench-pull);
+  }
+  .alchemyRoot .current-cluster {
+    translate: calc(var(--bench-pull) * -1);
+  }
   /* Four reagents two-by-two at full height stood 530px against 328px of
      glassware and became the tallest thing in the window. Shorter here. */
-  .alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch{height:clamp(73px,12.7vh,123px)!important;width:27px!important;margin:0 auto 6px!important;}
-  .alchemyRoot .alchemyElementCell{width:clamp(40px,6vh,60px);}
+  .alchemyRoot .alchemyReagents .color-controls .color-card .mini-swatch {
+    height: clamp(73px, 12.7vh, 123px) !important;
+    width: 27px !important;
+    margin: 0 auto 6px !important;
+  }
+  .alchemyRoot .alchemyElementCell {
+    width: clamp(40px, 6vh, 60px);
+  }
   /* .lab's own overflow:auto (line ~105, !important — it's there so a
      long verdict on a short window scrolls instead of blowing out the
      modal) started showing a permanent scrollbar once the bench bottles
@@ -793,7 +1957,9 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      never affect layout), so the auto-scroll region "saw" overflow at the
      top. Nothing in here actually needs to scroll at this width — visible
      instead, !important to beat that earlier !important. */
-  .alchemyRoot .scene.active > .lab.color-game-lab{overflow:visible!important;}
+  .alchemyRoot .scene.active > .lab.color-game-lab {
+    overflow: visible !important;
+  }
   /* Same fix as the bench above, for the other two columns: raising the
      reagent swatches and the element cell (below) off their own table
      level moves them past their column's own top edge the same way the
@@ -802,7 +1968,9 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      content, not for this), which clipped a few px off the top of both
      instead of scrolling. */
   .alchemyRoot .scene.active > .alchemyReagents,
-  .alchemyRoot .scene.active > .alchemyElementColumn{overflow:visible!important;}
+  .alchemyRoot .scene.active > .alchemyElementColumn {
+    overflow: visible !important;
+  }
   /* transform (not a height/position rewrite) so the raise layers on top
      of the sizing above rather than fighting it; transform-origin:bottom
      keeps each one's own footprint anchored while it scales, so "raise"
@@ -815,25 +1983,37 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      two-button station's, breaking the tube line across stations despite
      an identical raise. --reagent-solo-raise (declared above) corrects
      just this card. */
-  .alchemyRoot .alchemyReagents .color-card:has(.ctrl-row .small-btn:only-child) .mini-swatch{
-    --reagent-raise:var(--reagent-solo-raise);
+  .alchemyRoot
+    .alchemyReagents
+    .color-card:has(.ctrl-row .small-btn:only-child)
+    .mini-swatch {
+    --reagent-raise: var(--reagent-solo-raise);
   }
-  .alchemyRoot .scene.active .alchemyElementCell.filled{border:none;}
+  .alchemyRoot .scene.active .alchemyElementCell.filled {
+    border: none;
+  }
   /* The station tabs above are a sibling, not a child, so they hold their
      position regardless of the desk-margin push-down below. */
-  .alchemyRoot .scene.active{margin-top:var(--desk-margin);}
+  .alchemyRoot .scene.active {
+    margin-top: var(--desk-margin);
+  }
   /* Проверить/Сброс move beside the bottle instead of stacking under it —
      row instead of column, now that the verdict text (below) no longer
      lives in this flow to need the extra vertical room. */
-  .alchemyRoot .scene.active > .alchemyElementColumn{
-    flex-direction:row;align-items:center;justify-content:center;gap:14px;
+  .alchemyRoot .scene.active > .alchemyElementColumn {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
   }
   /* flex-shrink:0 on both: the "element" grid column only has ~210-260px
      to give (widened above from 120-150px, but still tight for a bottle
      graphic *and* two full-width buttons side by side) — without this the
      cell had no min-width floor to fall back on and flex-shrink crushed it
      down to ~20px, a sliver next to the buttons instead of a bottle. */
-  .alchemyRoot .scene.active > .alchemyElementColumn .alchemyElementCell{flex-shrink:0;}
+  .alchemyRoot .scene.active > .alchemyElementColumn .alchemyElementCell {
+    flex-shrink: 0;
+  }
   /* align-items:center on the row (above) centers big-actions against the
      element cell's own *layout* box — but the cell also carries its own
      translateY raise (below, to stand on the table like the bottles), which
@@ -842,8 +2022,12 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      *would* be un-raised. Matching translateY here re-centers it against
      the cell's actual rendered height instead — tuned by eye, retune
      alongside the cell's own raise if that changes. */
-  .alchemyRoot .scene.active > .alchemyElementColumn .big-actions{width:auto;min-width:100px;flex-shrink:0;
-    transform:translateY(-114px);}
+  .alchemyRoot .scene.active > .alchemyElementColumn .big-actions {
+    width: auto;
+    min-width: 100px;
+    flex-shrink: 0;
+    transform: translateY(-114px);
+  }
   /* The verdict/status text ("Подбери оттенок…", "Мимо" etc.) moves to a
      strip directly under the station tabs instead of living in the
      element column. `.alchemyRoot` is the nearest positioned ancestor for
@@ -852,21 +2036,27 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      tokens, above), so this is pure repositioning — each stays exactly as
      tied to its own scene's .active visibility as before, it just paints
      somewhere else. */
-  .alchemyRoot .scene.active .status{
+  .alchemyRoot .scene.active .status {
     /* !important to win against the earlier "neutralise the game's leaking
        styles" rule above (.alchemyRoot .scene,.alchemyRoot .status,
        .alchemyRoot .tab{position:static!important;...}) — that rule exists
        specifically so nothing normal-weight can reposition .status, which
        is exactly what this needs to do. */
-    position:absolute!important;top:46px!important;left:0!important;right:0!important;
-    bottom:auto!important;z-index:2;
-    padding:0 16px;
+    position: absolute !important;
+    top: 46px !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: auto !important;
+    z-index: 2;
+    padding: 0 16px;
   }
   /* Reagent -/+ flank the tube instead of sitting together under it —
      `display:contents` lets the two buttons (previously grouped inside
      .ctrl-row) join .color-card's own flex flow directly, so `order` can
      place one on each side of the swatch between them. */
-  .alchemyRoot .alchemyReagents .color-card .ctrl-row{display:contents;}
+  .alchemyRoot .alchemyReagents .color-card .ctrl-row {
+    display: contents;
+  }
   /* order:-1 alone put both buttons directly above the swatch's own
      *layout* position — but the swatch itself renders well above that via
      transform (transforms don't move flow, so reordering before it
@@ -879,7 +2069,9 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      box, not its visibly-higher one (transforms don't move flow) — same
      gap problem as the buttons-above fix, just the other direction.
      Pulled up to actually sit under the swatch instead of ~110px below it. */
-  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:last-child{order:-1;}
+  .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:last-child {
+    order: -1;
+  }
   /* :not(:last-child) excludes Separation's single "Фильтр" button — it
      matches both :first-child and :last-child at once, and without this
      the two rules' conflicting raises (this one's vs. the other's) fought
@@ -901,43 +2093,189 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      just aimed at a different landing spot via transform. */
 }
 
-body.lair-open #difficultyDock,body.shop-open #difficultyDock,body.map-open #difficultyDock{display:none!important;}
+body.lair-open #difficultyDock,
+body.shop-open #difficultyDock,
+body.map-open #difficultyDock {
+  display: none !important;
+}
 
-#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active){overflow:visible!important;}
-#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleHeader{display:none!important;}
-#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleBody{overflow:visible!important;}
-#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .scene.active{transform:translateY(5vh);}
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) {
+  overflow: visible !important;
+}
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active)
+  .lairModuleHeader {
+  display: none !important;
+}
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active)
+  .lairModuleBody {
+  overflow: visible !important;
+}
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active)
+  .scene.active {
+  transform: translateY(5vh);
+}
 
-.alchemyTopHud{display:none;position:fixed;z-index:361;left:clamp(124px,8vw,180px);right:clamp(340px,25vw,520px);top:14px;height:68px;
-  align-items:center;justify-content:center;border:1px solid rgba(152,110,54,.38);border-radius:12px;
-  background:linear-gradient(90deg,rgba(22,15,10,.28),rgba(40,25,15,.82),rgba(22,15,10,.28));
-  backdrop-filter:blur(8px);box-shadow:0 8px 24px rgba(0,0,0,.22);}
-body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .alchemyTopHud{display:flex;}
-.alchemyTopHudTitle{color:#e4c788;font:600 20px/1 Georgia,serif;text-shadow:0 1px 4px rgba(0,0,0,.7);}
-.alchemyTopHudClose{position:absolute;right:10px;width:44px;height:44px;border:1px solid #664d2c;border-radius:9px;
-  background:#17120e;color:#c6a66f;font:25px/1 Arial,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.5);}
-.alchemyTopHud .alchemyStations{position:absolute;left:50%;top:76px;display:flex;gap:8px;transform:translateX(-50%);white-space:nowrap;}
-.alchemyTopHud .alchemyStationTab{padding:8px 14px;border:1px solid rgba(138,100,52,.5);border-radius:9px;
-  background:rgba(22,17,12,.88);color:#c9b98c;font:600 12px/1 var(--ui-font,Arial,sans-serif);cursor:pointer;
-  transition:background .16s ease,color .16s ease,border-color .16s ease;}
-.alchemyTopHud .alchemyStationTab:hover{border-color:#d6ab5e;color:#f0d497;}
-.alchemyTopHud .alchemyStationTab.active{background:#a9772f;border-color:#f0c86e;color:#1a130c;}
+.alchemyTopHud {
+  display: none;
+  position: fixed;
+  z-index: 361;
+  left: clamp(124px, 8vw, 180px);
+  right: clamp(340px, 25vw, 520px);
+  top: 14px;
+  height: 68px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(152, 110, 54, 0.38);
+  border-radius: 12px;
+  background: linear-gradient(
+    90deg,
+    rgba(22, 15, 10, 0.28),
+    rgba(40, 25, 15, 0.82),
+    rgba(22, 15, 10, 0.28)
+  );
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
+body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
+  .alchemyTopHud {
+  display: flex;
+}
+.alchemyTopHudTitle {
+  color: #e4c788;
+  font:
+    600 20px/1 Georgia,
+    serif;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+}
+.alchemyTopHudClose {
+  position: absolute;
+  right: 10px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #664d2c;
+  border-radius: 9px;
+  background: #17120e;
+  color: #c6a66f;
+  font:
+    25px/1 Arial,
+    sans-serif;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+.alchemyTopHud .alchemyStations {
+  position: absolute;
+  left: 50%;
+  top: 76px;
+  display: flex;
+  gap: 8px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.alchemyTopHud .alchemyStationTab {
+  padding: 8px 14px;
+  border: 1px solid rgba(138, 100, 52, 0.5);
+  border-radius: 9px;
+  background: rgba(22, 17, 12, 0.88);
+  color: #c9b98c;
+  font: 600 12px/1 var(--ui-font, Arial, sans-serif);
+  cursor: pointer;
+  transition:
+    background 0.16s ease,
+    color 0.16s ease,
+    border-color 0.16s ease;
+}
+.alchemyTopHud .alchemyStationTab:hover {
+  border-color: #d6ab5e;
+  color: #f0d497;
+}
+.alchemyTopHud .alchemyStationTab.active {
+  background: #a9772f;
+  border-color: #f0c86e;
+  color: #1a130c;
+}
 
-.alchemyGuideViewer{position:fixed;inset:0;z-index:520;display:grid;place-items:center;padding:clamp(14px,4vw,54px);}
-.alchemyGuideViewer[hidden]{display:none!important;}
-.alchemyGuideViewerBackdrop{position:absolute;inset:0;width:100%;height:100%;border:0;background:rgba(4,3,2,.84);backdrop-filter:blur(10px);cursor:zoom-out;}
-.alchemyGuideViewerDialog{position:relative;z-index:1;max-width:min(1100px,92vw);max-height:90dvh;filter:drop-shadow(0 24px 48px rgba(0,0,0,.72));}
-.alchemyGuideViewerDialog img{display:block;max-width:100%;max-height:90dvh;width:auto;height:auto;border:2px solid #9b7137;border-radius:8px;}
-.alchemyGuideViewerClose{position:absolute;right:-14px;top:-14px;width:42px;height:42px;border:1px solid #b68a48;border-radius:10px;background:#17120e;color:#e8c985;font:26px/1 Arial,sans-serif;cursor:pointer;box-shadow:0 5px 16px rgba(0,0,0,.55);}
+.alchemyGuideViewer {
+  position: fixed;
+  inset: 0;
+  z-index: 520;
+  display: grid;
+  place-items: center;
+  padding: clamp(14px, 4vw, 54px);
+}
+.alchemyGuideViewer[hidden] {
+  display: none !important;
+}
+.alchemyGuideViewerBackdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: rgba(4, 3, 2, 0.84);
+  backdrop-filter: blur(10px);
+  cursor: zoom-out;
+}
+.alchemyGuideViewerDialog {
+  position: relative;
+  z-index: 1;
+  max-width: min(1100px, 92vw);
+  max-height: 90dvh;
+  filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.72));
+}
+.alchemyGuideViewerDialog img {
+  display: block;
+  max-width: 100%;
+  max-height: 90dvh;
+  width: auto;
+  height: auto;
+  border: 2px solid #9b7137;
+  border-radius: 8px;
+}
+.alchemyGuideViewerClose {
+  position: absolute;
+  right: -14px;
+  top: -14px;
+  width: 42px;
+  height: 42px;
+  border: 1px solid #b68a48;
+  border-radius: 10px;
+  background: #17120e;
+  color: #e8c985;
+  font:
+    26px/1 Arial,
+    sans-serif;
+  cursor: pointer;
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.55);
+}
 
-@media (max-width:899px){
-  .alchemyTopHud{left:calc(var(--mobile-safe-left,0px) + 58px);right:calc(var(--mobile-safe-right,0px) + 8px);top:calc(var(--mobile-safe-top,0px) + 7px);height:54px;}
-  .alchemyTopHudTitle{font-size:17px;}
-  .alchemyTopHudClose{right:7px;width:38px;height:38px;}
-  .alchemyTopHud .alchemyStations{top:60px;gap:5px;}
-  .alchemyTopHud .alchemyStationTab{padding:7px 9px;font-size:11px;}
-  .alchemyRoot .scene.active .alchemyMixReference{
-    order:-1;flex:0 0 auto;width:min(94vw,620px);margin:8px auto -10%;
+@media (max-width: 899px) {
+  .alchemyTopHud {
+    left: calc(var(--mobile-safe-left, 0px) + 58px);
+    right: calc(var(--mobile-safe-right, 0px) + 8px);
+    top: calc(var(--mobile-safe-top, 0px) + 7px);
+    height: 54px;
+  }
+  .alchemyTopHudTitle {
+    font-size: 17px;
+  }
+  .alchemyTopHudClose {
+    right: 7px;
+    width: 38px;
+    height: 38px;
+  }
+  .alchemyTopHud .alchemyStations {
+    top: 60px;
+    gap: 5px;
+  }
+  .alchemyTopHud .alchemyStationTab {
+    padding: 7px 9px;
+    font-size: 11px;
+  }
+  .alchemyRoot .scene.active .alchemyMixReference {
+    order: -1;
+    flex: 0 0 auto;
+    width: min(94vw, 620px);
+    margin: 8px auto -10%;
   }
 }
 
@@ -948,22 +2286,35 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    about 700px; the window is that, a little under the 930px the other lair
    modules use.
    Raise this when a station lands that genuinely needs more. */
-@media (min-width:900px){
-  #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active){
-    width:min(780px,calc(100vw - 80px))!important;
-    max-width:calc(100vw - 80px)!important;
+@media (min-width: 900px) {
+  #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) {
+    width: min(780px, calc(100vw - 80px)) !important;
+    max-width: calc(100vw - 80px) !important;
   }
 }
 
 /* Short screens: the window keeps its proportions but the chrome gives way,
    so nothing has to scroll to reach the verdict. */
-@media (min-width:900px) and (max-height:760px){
-  .alchemyRoot .lab{padding:12px;}
-  .alchemyRoot .lab h3{margin:0 0 8px;font-size:13px;}
+@media (min-width: 900px) and (max-height: 760px) {
+  .alchemyRoot .lab {
+    padding: 12px;
+  }
+  .alchemyRoot .lab h3 {
+    margin: 0 0 8px;
+    font-size: 13px;
+  }
   .alchemyRoot .scene.active > .alchemyReagents,
-  .alchemyRoot .scene.active > .alchemyElementColumn{padding:12px;}
-  .alchemyRoot .color-controls{gap:10px;}
-  .alchemyRoot .small-btn,.alchemyRoot .color-card button{padding:3px 8px;font-size:11px;}
+  .alchemyRoot .scene.active > .alchemyElementColumn {
+    padding: 12px;
+  }
+  .alchemyRoot .color-controls {
+    gap: 10px;
+  }
+  .alchemyRoot .small-btn,
+  .alchemyRoot .color-card button {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
   /* The v311 "stand on the table" desk push-down eats into a short
      window's already-tight budget — Новая партия/Проверить were clipping
      at the window's own bottom edge before this. Scaled back here rather
@@ -977,13 +2328,20 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      window's own bottom edge without this, and the glassware/label/button
      raise tokens are scaled back to match (full wide strength would lift
      everything clear off this barely-pushed-down desk instead of onto it). */
-  .alchemyRoot{
-    --desk-margin:8%;
-    --bench-raise:-55px;--bench-scale:.6;
-    --reagent-raise:-71px;--reagent-scale:1.3;--reagent-solo-raise:-98px;
-    --element-x:-30px;--element-raise:-39px;--element-scale:1.1;
-    --btn-plus-raise:-98px;--btn-minus-raise:-73px;--btn-solo-raise:-11px;
-    --label-raise:-75px;
+  .alchemyRoot {
+    --desk-margin: 8%;
+    --bench-raise: -55px;
+    --bench-scale: 0.6;
+    --reagent-raise: -71px;
+    --reagent-scale: 1.3;
+    --reagent-solo-raise: -98px;
+    --element-x: -30px;
+    --element-raise: -39px;
+    --element-scale: 1.1;
+    --btn-plus-raise: -98px;
+    --btn-minus-raise: -73px;
+    --btn-solo-raise: -11px;
+    --label-raise: -75px;
   }
 }
 
@@ -1004,32 +2362,48 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    remembers the selection.
    ============================================================ */
 
-.alchemyRackDrawer{
+.alchemyRackDrawer {
   /* --inv-open-y on .inventoryDrawer is 20%; this sits a further 10 points
      below that on request, so more of the rack's own bottom trim tucks
      under the screen edge at full open than the lockpick case leaves. */
-  --rack-peek:72px;--rack-open-y:30%;
-  position:fixed;left:50%;bottom:0;z-index:214;
-  width:min(760px,calc(100vw - 48px));max-width:calc(100vw - 48px);
-  display:flex;flex-direction:column;align-items:center;
-  pointer-events:none;opacity:0;
-  transform:translate(-50%,calc(100% + 24px));
-  transition:transform .3s cubic-bezier(.22,.78,.22,1),opacity .2s ease;
+  --rack-peek: 72px;
+  --rack-open-y: 30%;
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 214;
+  width: min(760px, calc(100vw - 48px));
+  max-width: calc(100vw - 48px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, calc(100% + 24px));
+  transition:
+    transform 0.3s cubic-bezier(0.22, 0.78, 0.22, 1),
+    opacity 0.2s ease;
 }
 /* The gate: only #lairModuleWindow carries .open in sync with its own
    hidden attribute (js/world/lair.js openLairModule/closeLairModule), and
    only the active .lairPanel is "alchemy" while that station is showing —
    so this alone stands in for "the alchemy module is open right now"
    without any extra class to keep in sync from JS. */
-body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .alchemyRackDrawer{
-  pointer-events:auto;opacity:1;
+body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
+  .alchemyRackDrawer {
+  pointer-events: auto;
+  opacity: 1;
   /* --rack-approach is written from JS (js/core/inventory-hit-testing.js,
      the same pointer-proximity easing that already drives --inv-approach)
      so the drawer rises a little as the cursor nears it, before any click. */
-  transform:translate(-50%,calc(100% - var(--rack-peek) - var(--rack-approach,0px)));
+  transform: translate(
+    -50%,
+    calc(100% - var(--rack-peek) - var(--rack-approach, 0px))
+  );
 }
-body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .alchemyRackDrawer.open{
-  transform:translate(-50%,var(--rack-open-y));
+body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
+  .alchemyRackDrawer.open {
+  transform: translate(-50%, var(--rack-open-y));
 }
 
 /* z-index:0 while peeking — *below* .alchemyRackDrawerBottles (z-index:2) —
@@ -1040,30 +2414,68 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    opened the drawer instead of selecting it — the bottle was there to see
    but not to click. The open-state pull-tab goes back to z-index:5, since
    closing has to win even where it overlaps a bottle underneath. */
-.alchemyRackDrawerToggle{position:absolute;inset:0;z-index:0;padding:0;border:0;background:transparent;cursor:pointer;}
+.alchemyRackDrawerToggle {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
 /* Matches the approach lift so the hit area always covers what is actually
    on screen (css/overrides-05-inventory.css .inventoryToggle does the same). */
-.alchemyRackDrawer:not(.open) .alchemyRackDrawerToggle{height:calc(var(--rack-peek) + var(--rack-approach,0px));}
-.alchemyRackDrawer.open .alchemyRackDrawerToggle{inset:auto;left:38%;right:38%;top:0;height:var(--rack-peek);z-index:5;}
+.alchemyRackDrawer:not(.open) .alchemyRackDrawerToggle {
+  height: calc(var(--rack-peek) + var(--rack-approach, 0px));
+}
+.alchemyRackDrawer.open .alchemyRackDrawerToggle {
+  inset: auto;
+  left: 38%;
+  right: 38%;
+  top: 0;
+  height: var(--rack-peek);
+  z-index: 5;
+}
 
-.alchemyRackDrawerRack{
-  position:relative;width:100%;
+.alchemyRackDrawerRack {
+  position: relative;
+  width: 100%;
   /* Matches rack-back.png's own canvas (1614x690) so the two boards
      and the bottle slots below stay in proportion at any width. */
-  aspect-ratio:1614/690;
-  filter:drop-shadow(0 -8px 18px rgba(0,0,0,.32));
+  aspect-ratio: 1614/690;
+  filter: drop-shadow(0 -8px 18px rgba(0, 0, 0, 0.32));
 }
-.alchemyRackDrawerBack,.alchemyRackDrawerFront{
-  position:absolute;left:0;right:0;background-repeat:no-repeat;background-size:100% 100%;pointer-events:none;
+.alchemyRackDrawerBack,
+.alchemyRackDrawerFront {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  pointer-events: none;
 }
-.alchemyRackDrawerBack{top:0;bottom:0;background-image:url("../assets/alchemy/rack-back.png");z-index:1;}
+.alchemyRackDrawerBack {
+  top: 0;
+  bottom: 0;
+  background-image: url("../assets/alchemy/rack-back.png");
+  z-index: 1;
+}
 /* rack-front.png is rack-back.png's own bottom 439 of 690px, bottom-
    aligned — measured, not guessed. Its middle band is punched
    transparent so a bottle's body shows through; only the shelf lip
    and the cubby dividers around it are solid, in front of the glass. */
-.alchemyRackDrawerFront{bottom:0;height:63.62%;background-image:url("../assets/alchemy/rack-front.png");z-index:3;}
+.alchemyRackDrawerFront {
+  bottom: 0;
+  height: 63.62%;
+  background-image: url("../assets/alchemy/rack-front.png");
+  z-index: 3;
+}
 
-.alchemyRackDrawerBottles{position:absolute;inset:0;z-index:2;}
+.alchemyRackDrawerBottles {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
 /* Shorter than the bottle art's own proportions would give at top:7% —
    deliberately: the ring hole sits at ~32% down the rack, which used to land
    on each bottle at roughly its neck-to-shoulder line (~35% into the bottle
@@ -1073,39 +2485,64 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    wide jar body every one of the seven fills solidly (98-100% of its own
    width from that point down, measured across all seven) — clear of the one
    part of the art that wasn't guaranteed to line up the same way twice. */
-.alchemyRackDrawerBottle{
-  position:absolute;top:7%;height:61%;width:auto;aspect-ratio:150/409;
-  transform:translateX(-50%);
-  background:none;border:0;padding:0;margin:0;cursor:pointer;
-  filter:drop-shadow(0 10px 10px rgba(0,0,0,.4));
-  transition:transform .16s ease,filter .16s ease,opacity .16s ease;
+.alchemyRackDrawerBottle {
+  position: absolute;
+  top: 7%;
+  height: 61%;
+  width: auto;
+  aspect-ratio: 150/409;
+  transform: translateX(-50%);
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.4));
+  transition:
+    transform 0.16s ease,
+    filter 0.16s ease,
+    opacity 0.16s ease;
   /* Without this a touch-drag toward an element cell reads as a page
      scroll to the browser before the pointermove handler (js/world/
      alchemy.js) ever gets to call it a drag. */
-  touch-action:none;
+  touch-action: none;
 }
-.alchemyRackDrawerBottle img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;}
-.alchemyRackDrawerBottle:hover{transform:translateX(-50%) translateY(-5px);}
+.alchemyRackDrawerBottle img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+.alchemyRackDrawerBottle:hover {
+  transform: translateX(-50%) translateY(-5px);
+}
 /* Once picked, the bottle is standing on the table (the element cell), not
    sitting on this shelf any more — hidden instead of just glowing in place,
    per feedback. pointer-events:none so the empty slot it leaves behind
    isn't a dead click target; picking a *different* bottle still works
    (select() below un-hides this one and hides the new pick instead), the
    only way back is choosing another element. */
-.alchemyRackDrawerBottle.selected{
-  opacity:0;
-  pointer-events:none;
+.alchemyRackDrawerBottle.selected {
+  opacity: 0;
+  pointer-events: none;
 }
 /* The dragged bottle's own stand-in while a pointer-drag (js/world/
    alchemy.js) is in flight — a clone positioned at the pointer, the
    original stays put in the rack (still visible, not yet .selected)
    until the drop actually lands. */
-.alchemyRackDrawerBottleDragGhost{
-  position:fixed;left:0;top:0;z-index:400;
-  transform:translate(-50%,-50%);
-  pointer-events:none;opacity:1;
-  filter:drop-shadow(0 10px 14px rgba(0,0,0,.5));
-  background-repeat:no-repeat;background-size:contain;background-position:center;
+.alchemyRackDrawerBottleDragGhost {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 400;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 1;
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.5));
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
 }
 /* Ring centres, measured from rack-back.png at 1614px width. Three earlier
    passes: v296 eyeballed a gridline overlay (200, 412, 623, 835, 1047,
@@ -1118,20 +2555,38 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
    two independent contours per ring, inner and outer, agreeing to ~1px)
    rather than comparing rings to each other: 204.5, 405.0, 604.1, 803.0,
    1003.3, 1201.6, 1401.9 → percent of 1614. */
-.alchemyRackDrawerBottle:nth-child(1){left:12.67%;}
-.alchemyRackDrawerBottle:nth-child(2){left:25.09%;}
-.alchemyRackDrawerBottle:nth-child(3){left:37.43%;}
-.alchemyRackDrawerBottle:nth-child(4){left:49.75%;}
-.alchemyRackDrawerBottle:nth-child(5){left:62.16%;}
-.alchemyRackDrawerBottle:nth-child(6){left:74.45%;}
-.alchemyRackDrawerBottle:nth-child(7){left:86.86%;}
+.alchemyRackDrawerBottle:nth-child(1) {
+  left: 12.67%;
+}
+.alchemyRackDrawerBottle:nth-child(2) {
+  left: 25.09%;
+}
+.alchemyRackDrawerBottle:nth-child(3) {
+  left: 37.43%;
+}
+.alchemyRackDrawerBottle:nth-child(4) {
+  left: 49.75%;
+}
+.alchemyRackDrawerBottle:nth-child(5) {
+  left: 62.16%;
+}
+.alchemyRackDrawerBottle:nth-child(6) {
+  left: 74.45%;
+}
+.alchemyRackDrawerBottle:nth-child(7) {
+  left: 86.86%;
+}
 
-@media (max-width:760px){
+@media (max-width: 760px) {
   /* Matches the lockpick case's own mobile width step
      (css/overrides-05-inventory.css) — the rack was still sized off the
      760px desktop cap here, noticeably smaller than the case despite
      sitting right next to it. Bottles and rack art both scale off this
      width (percentage/aspect-ratio throughout), so widening it alone
      grows everything in proportion. */
-  .alchemyRackDrawer{--rack-peek:56px;width:min(96vw,calc(100vw - 16px));max-width:calc(100vw - 16px);}
+  .alchemyRackDrawer {
+    --rack-peek: 56px;
+    width: min(96vw, calc(100vw - 16px));
+    max-width: calc(100vw - 16px);
+  }
 }

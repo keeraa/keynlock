@@ -83,6 +83,7 @@
   let modeSwitchFrame=0;
   function switchMode(nextMode){
     if(!ALL_MODES.has(nextMode)) return;
+    window.dispatchEvent(new CustomEvent('keynlock-game-opened',{detail:{id:nextMode}}));
     if(lairOpen) closeLair();
     if(mapOpen) closeMap();
     if(shopOpen) closeShop();

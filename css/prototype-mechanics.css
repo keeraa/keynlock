@@ -1,6 +1,8 @@
 .prototypeMechanicOverlay{position:fixed;inset:0;z-index:180;overflow:hidden;background:linear-gradient(rgba(12,10,8,.42),rgba(12,10,8,.62)),url("../assets/backgrounds/main-background.jpg") center/cover no-repeat;}
 body.game-inactive.prototype-has-classic-lock #lock.universalLockBlock{display:block!important;visibility:visible!important;z-index:205!important;pointer-events:none!important;}
-body.game-inactive.prototype-has-classic-lock #lock.universalLockBlock .lockHitArea{pointer-events:none!important;}
+body.game-inactive.prototype-has-classic-lock #lock.universalLockBlock{top:110px!important;}
+body.game-inactive.prototype-has-classic-lock #lock.universalLockBlock .lockHitArea{pointer-events:auto!important;}
+body.game-inactive.prototype-has-classic-lock.prototype-lock-ready #lock.universalLockBlock{--lock-glow:1;}
 .prototype-has-classic-lock #lock.universalLockBlock.prototype-wrong-tension{animation:prototypeWrongTension .38s ease both;}
 @keyframes prototypeWrongTension{0%,100%{margin-left:0}20%{margin-left:-13px}40%{margin-left:11px}60%{margin-left:-8px}80%{margin-left:5px}}
 .prototypeMechanicOverlay[hidden]{display:none!important;}

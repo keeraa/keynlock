@@ -40,8 +40,8 @@
       .replace("const EMBEDDED_PARAMS=new URLSearchParams(location.search);\nconst EMBEDDED_GAME=EMBEDDED_PARAMS.get('game')||'';\nconst EMBEDDED_PICK_VALUE=Number(EMBEDDED_PARAMS.get('picks'));\nconst EMBEDDED_TENSION_VALUE=Number(EMBEDDED_PARAMS.get('tension'));\nconst PLAYER_PICK_COUNT=Math.max(0,Math.min(99,Math.round(Number.isFinite(EMBEDDED_PICK_VALUE)?EMBEDDED_PICK_VALUE:3)));\nlet playerTensionSkin=Math.max(1,Math.min(5,Math.round(Number.isFinite(EMBEDDED_TENSION_VALUE)?EMBEDDED_TENSION_VALUE:1)));",
         "let EMBEDDED_GAME='';\nlet PLAYER_PICK_COUNT=Math.max(0,Math.min(99,Math.round(Number(window.KeynlockImportedInitialPicks)||3)));\nlet playerTensionSkin=1;")
       .replace('  const DEFAULT_PICKS=PLAYER_PICK_COUNT;','  let DEFAULT_PICKS=PLAYER_PICK_COUNT;')
-      .replace('  return{DEFAULT_PICKS,syncPicks,resetPicks,breakPick,setRequiredTension,tensionReady,open,resetOpen,isOpen,initAll};',
-        "  function setDefaultPicks(count){DEFAULT_PICKS=Math.max(0,Math.min(99,Math.round(Number(count)||0)))}\n  return{get DEFAULT_PICKS(){return DEFAULT_PICKS},setDefaultPicks,syncPicks,resetPicks,breakPick,setRequiredTension,tensionReady,open,resetOpen,isOpen,initAll};")
+      .replace(/  return\{DEFAULT_PICKS,([^}]+)\};/,
+        "  function setDefaultPicks(count){DEFAULT_PICKS=Math.max(0,Math.min(99,Math.round(Number(count)||0)))}\n  return{get DEFAULT_PICKS(){return DEFAULT_PICKS},setDefaultPicks,$1};")
       .replace(/const embeddedGame=EMBEDDED_GAME;[\s\S]*?window\.addEventListener\('message',[\s\S]*?\n\}\);\s*$/,'');
 
     code+=`\nlet integratedLossObserver=null;
@@ -76,6 +76,7 @@
           host.hidden=true;
         },
         replay(){if(EMBEDDED_GAME)GameHub.get(EMBEDDED_GAME)?.reset?.()},
+        attemptOpen(){return GameHub.get(EMBEDDED_GAME)?.open?.()},
         setTools(options={}){playerTensionSkin=Math.max(1,Math.min(5,Math.round(Number(options.tension)||1)))},
         active(){return EMBEDDED_GAME}
       };`;
@@ -92,6 +93,7 @@
     open:(game,options)=>ready.then(api=>api.open(game,options)),
     close:()=>runtime?.close(),
     replay:()=>runtime?.replay(),
+    attemptOpen:()=>runtime?.attemptOpen(),
     setTools:options=>runtime?.setTools(options),
     active:()=>runtime?.active()||''
   };

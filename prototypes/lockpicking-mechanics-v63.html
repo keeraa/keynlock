@@ -719,69 +719,18 @@ button {
 }
 .lockpick-prototype .scene[data-name="Risen 2"] .r2-pick {
   position:absolute;
-  left:var(--r2-x,calc(50% - 60px));
-  bottom:23px;
-  width:120px;
-  height:4px;
-  background:linear-gradient(90deg,#5d4a34 0 13%,#9b8e72 14%,#ddd1ad 68%,#f0e7ca 100%);
+  left:var(--r2-x,calc(50% - 36px));
+  bottom:-130px;
+  width:72px;
+  height:360px;
+  background:var(--pick-skin-image) center/contain no-repeat;
   pointer-events:none;
-  box-shadow:0 1px 2px #000;
+  filter:drop-shadow(0 5px 8px rgba(0,0,0,.45));
+  transform:rotate(90deg);
+  transform-origin:50% 50%;
   transition:left .12s ease
 }
-.lockpick-prototype .scene[data-name="Risen 2"] .r2-pick:before {
-  content:"";
-  position:absolute;
-  left:-2px;
-  top:-7px;
-  width:44px;
-  height:18px;
-  border-radius:8px;
-  background:linear-gradient(180deg,#6d5639,#3c3022);
-  border:1px solid #8a7350;
-  transform:translateX(-36px)
-}
-.lockpick-prototype .scene[data-name="Risen 2"] .r2-pick:after {
-  content:"";
-  position:absolute;
-  right:-7px;
-  top:-8px;
-  width:13px;
-  height:10px;
-  border-top:4px solid #f0e7ca;
-  border-right:4px solid #f0e7ca;
-  border-radius:0 6px 0 0;
-  transform:rotate(-18deg);
-  transform-origin:right bottom
-}
-.lockpick-prototype .scene[data-name="Risen 2"] .r2-meta {
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
-  width:100%
-}
-.lockpick-prototype .scene[data-name="Risen 2"] .r2-card {
-  border:1px solid #353c30;
-  background:#151913;
-  border-radius:12px;
-  padding:11px;
-  text-align:center;
-  color:#99927e;
-  font-size:11px
-}
-.lockpick-prototype .scene[data-name="Risen 2"] .r2-card strong {
-  display:block;
-  color:#f0e6cc;
-  font-size:15px
-}
-.lockpick-prototype .scene[data-name="Risen 2"] .r2-actions {
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  flex-wrap:wrap
-}@media(max-width:650px) {
-  .lockpick-prototype .scene[data-name="Risen 2"] .r2-meta {
-    grid-template-columns:repeat(2,1fr)
-  }
+@media(max-width:650px) {
   .lockpick-prototype .scene[data-name="Risen 2"] .r2-lock {
     padding-inline:18px;
     gap:5px
@@ -2051,6 +2000,8 @@ html.embedded .btn{border-color:rgba(187,141,70,.7);background:linear-gradient(#
 html.embedded .status strong{color:#f0d49d}
 html.embedded .scene[data-name="Kingdom Come"] .kcd-lock{border-color:#8b6638;background:radial-gradient(circle at 50% 50%,transparent 0 11%,rgba(0,0,0,.28) 11.5% 13%,transparent 13.5%),repeating-conic-gradient(from 3deg,rgba(224,181,105,.055) 0 2deg,transparent 2deg 15deg),radial-gradient(circle at 46% 42%,#594125 0 16%,#342417 17% 48%,#21160f 49% 72%,#120d09 73% 100%);box-shadow:inset 0 0 0 10px #24170e,inset 0 0 0 12px #8a6536,inset 0 0 50px rgba(0,0,0,.65),0 18px 40px rgba(0,0,0,.32)}
 html.embedded .scene[data-name="Kingdom Come"] .kcd-rotor{border-color:#8c693b;background:repeating-conic-gradient(from 0deg,#4b351f 0 19deg,#2d1f14 19deg 39deg)}
+html.embedded .scene[data-name="Risen 2"]{padding-top:340px}
+html.embedded .scene[data-name="Risen 2"] .lab{align-items:flex-start}
 @media(max-width:760px){html.embedded .scene{padding:58px 10px 118px}html.embedded .lab{min-height:calc(100vh - 176px);padding:10px}}
 </style>
 </head>
@@ -2068,7 +2019,7 @@ html.embedded .scene[data-name="Kingdom Come"] .kcd-rotor{border-color:#8c693b;b
         </section>
     <section class="scene" data-name="Risen 2" data-tab-check="true">
           <div class="scene-head"><div><div class="scene-title-row"><h2>Последовательность задвижек</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="r2Status"><strong>0 / 6</strong>задвижек открыто</div></div>
-          <div class="lab"><div class="r2-wrap"><div class="r2-lock" id="r2Lock"><div class="r2-pick"></div></div><div class="r2-meta"><div class="r2-card"><strong id="r2OpenText">0 / 6</strong>открыто</div><div class="r2-card"><strong id="r2PosText">1</strong>позиция</div><div class="r2-card"><strong id="r2StressText">0 / 2</strong>напряжение</div></div><div class="r2-actions"><button class="btn" id="r2Left">← Влево</button><button class="btn" id="r2Try">Поднять · Space</button><button class="btn" id="r2Right">Вправо →</button><button class="btn" id="r2Reset">Новый замок</button></div></div></div>
+          <div class="lab"><div class="r2-wrap"><div class="r2-lock" id="r2Lock"><div class="r2-pick"></div></div></div></div>
         </section>
     <section class="scene" data-name="Alpha Protocol" data-tab-check="true">
           <div class="scene-head"><div><div class="scene-title-row"><h2>Выравнивание пазов</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="apStatus"><strong>Пин 1 / 5</strong>совмести паз с линией</div></div>
@@ -2259,6 +2210,13 @@ const LockRuntime=(()=>{
     if(game===EMBEDDED_GAME)window.parent?.postMessage({type:'keynlock-mechanic-tension',game,required},location.origin);
     return required
   }
+  function markTensionHint(element,symbolIndex){
+    if(!element)return element;
+    const tension=Math.max(1,Math.min(5,Number(symbolIndex)+1));
+    element.classList.add('tension-hint-symbol');
+    element.dataset.tension=String(tension);
+    return element
+  }
   function tensionReady(game,{statusEl=null,messageEl=null}={}){
     const required=requiredTensions[game];
     if(!required||required===playerTensionSkin)return true;
@@ -2279,7 +2237,7 @@ const LockRuntime=(()=>{
   function resetOpen(game){const s=scene(game);if(s)delete s.dataset.lockOpened}
   function isOpen(game){return scene(game)?.dataset.lockOpened==='true'}
   function initAll(){GameHub.scenes.forEach(s=>{if(!s.querySelector('[data-head-picks]'))return;const el=s.querySelector('[data-head-picks]');if(!el.textContent.trim())el.textContent=String(DEFAULT_PICKS)})}
-  return{DEFAULT_PICKS,syncPicks,resetPicks,breakPick,setRequiredTension,tensionReady,open,resetOpen,isOpen,initAll};
+  return{DEFAULT_PICKS,syncPicks,resetPicks,breakPick,setRequiredTension,markTensionHint,tensionReady,open,resetOpen,isOpen,initAll};
 })();
 (()=>{
 'use strict';
@@ -2416,7 +2374,8 @@ GameHub.register('Oblivion',{reset:obReset,tick:obLoop,keydown:e=>{const d=direc
 const r2Lock=document.getElementById('r2Lock'),r2Status=document.getElementById('r2Status');
 let r2={bars:6,pos:0,seq:[],step:0,wrong:-1,wrongTimer:0,stress:0,picks:3,failed:false};
 function r2MakeSequence(n){const seq=[];let pos=Math.floor(Math.random()*n);seq.push(pos);while(seq.length<n){const options=[];for(let i=0;i<n;i++)if(!seq.includes(i))options.push(i);options.sort((a,b)=>Math.abs(a-pos)-Math.abs(b-pos));const pool=options.slice(0,Math.min(3,options.length));pos=pool[Math.floor(Math.random()*pool.length)];seq.push(pos)}return seq}
-function r2Reset(){LockRuntime.resetOpen('Risen 2');r2.pos=0;r2.step=0;r2.wrong=-1;r2.stress=0;r2.picks=LockRuntime.DEFAULT_PICKS;r2.failed=false;clearTimeout(r2.wrongTimer);r2.seq=r2MakeSequence(r2.bars);scoreReset('Risen 2',r2.bars);r2Lock.querySelectorAll('.r2-bar').forEach(n=>n.remove());for(let i=0;i<r2.bars;i++){const b=document.createElement('div');b.className='r2-bar';b.dataset.i=i;b.style.setProperty('--bar-h',(48+Math.random()*43)+'%');b.onclick=()=>{r2.pos=i;r2Try();renderR2()};r2Lock.appendChild(b)}renderR2()}
+function r2Ready(ready){if(EMBEDDED_GAME==='Risen 2')window.parent?.postMessage({type:'keynlock-mechanic-ready',game:'Risen 2',ready:!!ready},location.origin)}
+function r2Reset(){LockRuntime.resetOpen('Risen 2');r2Ready(false);r2.pos=0;r2.step=0;r2.wrong=-1;r2.stress=0;r2.picks=LockRuntime.DEFAULT_PICKS;r2.failed=false;clearTimeout(r2.wrongTimer);r2.seq=r2MakeSequence(r2.bars);scoreReset('Risen 2',r2.bars);r2Lock.querySelectorAll('.r2-bar').forEach(n=>n.remove());for(let i=0;i<r2.bars;i++){const b=document.createElement('div');b.className='r2-bar';b.dataset.i=i;b.style.setProperty('--bar-h',(48+Math.random()*43)+'%');b.onclick=()=>{r2.pos=i;r2Try();renderR2()};r2Lock.appendChild(b)}renderR2()}
 function r2Move(d){if(r2.failed)return;r2.pos=Math.max(0,Math.min(r2.bars-1,r2.pos+d));renderR2()}
 function r2WrongPulse(i){clearTimeout(r2.wrongTimer);r2.wrong=i;renderR2();r2.wrongTimer=setTimeout(()=>{r2.wrong=-1;renderR2()},170)}
 function r2BreakPick(){r2.picks--;r2.stress=0;if(r2.picks<=0){r2.picks=0;r2.failed=true;r2Status.innerHTML='<strong>Отмычки закончились</strong>нажми «Новый замок»'}else r2Status.innerHTML=`<strong>Отмычка сломалась</strong>осталось ${r2.picks}`}
@@ -2429,7 +2388,7 @@ function r2Try(){
     r2.step++;
     r2.stress=Math.max(0,r2.stress-1);
     r2.wrong=-1;
-    if(r2.step===r2.bars)LockRuntime.open('Risen 2',{statusEl:r2Status,statusHtml:'<strong>Замок открыт</strong>все задвижки пройдены'});
+    if(r2.step===r2.bars){r2Ready(true);r2Status.innerHTML='<strong>Задвижки выставлены</strong>нажми на замок наверху'}
   }else{
     r2WrongPulse(r2.pos);
     r2.step=0;
@@ -2438,10 +2397,10 @@ function r2Try(){
   }
   renderR2()
 }
-function renderR2(){LockRuntime.syncPicks('Risen 2',r2.picks);const bars=[...r2Lock.querySelectorAll('.r2-bar')];bars.forEach((b,i)=>{b.classList.toggle('current',i===r2.pos);b.classList.toggle('open',r2.seq.slice(0,r2.step).includes(i));b.classList.toggle('wrong',i===r2.wrong)});r2Lock.style.setProperty('--r2-x',`calc(${((r2.pos+.5)/r2.bars)*100}% - 60px)`);document.getElementById('r2OpenText').textContent=r2.step+' / '+r2.bars;document.getElementById('r2PosText').textContent=r2.pos+1;document.getElementById('r2StressText').textContent=r2.stress+' / 2';if(r2.failed)r2Status.innerHTML='<strong>Отмычки закончились</strong>нажми «Новый замок»';else if(r2.step<r2.bars&&r2.wrong<0)r2Status.innerHTML='<strong>'+r2.step+' / '+r2.bars+'</strong>задвижек открыто'}
-document.getElementById('r2Left').onclick=()=>r2Move(-1);document.getElementById('r2Right').onclick=()=>r2Move(1);document.getElementById('r2Try').onclick=r2Try;document.getElementById('r2Reset').onclick=r2Reset;
+function r2Open(){if(r2.failed||r2.step<r2.bars){r2Status.innerHTML='<strong>Замок не готов</strong>сначала выставь все задвижки';return false}return LockRuntime.open('Risen 2',{statusEl:r2Status,statusHtml:'<strong>Замок открыт</strong>все задвижки пройдены'})}
+function renderR2(){LockRuntime.syncPicks('Risen 2',r2.picks);const bars=[...r2Lock.querySelectorAll('.r2-bar')];bars.forEach((b,i)=>{b.classList.toggle('current',i===r2.pos);b.classList.toggle('open',r2.seq.slice(0,r2.step).includes(i));b.classList.toggle('wrong',i===r2.wrong)});r2Lock.style.setProperty('--r2-x',`calc(${((r2.pos+.5)/r2.bars)*100}% - 36px)`);if(r2.failed)r2Status.innerHTML='<strong>Отмычки закончились</strong>перезапусти замок';else if(r2.step<r2.bars&&r2.wrong<0)r2Status.innerHTML='<strong>'+r2.step+' / '+r2.bars+'</strong>задвижек открыто'}
 
-GameHub.register('Risen 2',{reset:r2Reset,keydown:e=>{const d=directionFromCode(e.code);if(e.code==='KeyR'){r2Reset();return true}if(e.code==='Space'||d==='up'){r2Try();return true}if(d==='left'){r2Move(-1);return true}if(d==='right'){r2Move(1);return true}return false}});
+GameHub.register('Risen 2',{reset:r2Reset,open:r2Open,keydown:e=>{const d=directionFromCode(e.code);if(e.code==='KeyR'){r2Reset();return true}if(e.code==='Space'||d==='up'){r2Try();return true}if(d==='left'){r2Move(-1);return true}if(d==='right'){r2Move(1);return true}return false}});
 })();
 (()=>{
 'use strict';
@@ -2879,6 +2838,7 @@ function renderTdsPattern(){
   for(let i=0;i<TDS_PATTERN_MARKS;i++){
     const a=(i/TDS_PATTERN_MARKS)*Math.PI*2,mark=document.createElement('span');
     mark.className='tds-pattern-mark';
+    LockRuntime.markTensionHint(mark,tds.patternSymbol);
     mark.style.left=(50+Math.cos(a)*47.5)+'%';
     mark.style.top=(50+Math.sin(a)*47.5)+'%';
     mark.style.transform=`translate(-50%,-50%) rotate(${i/TDS_PATTERN_MARKS*360+90}deg)`;
@@ -2931,7 +2891,7 @@ function renderSfSymbolRing(){
   const w=sfLock.clientWidth,h=sfLock.clientHeight,cx=w/2,cy=h/2,R=Math.max(10,Math.min(w,h)/2-24);
   for(let i=0;i<10;i++){
     const a=i*36-90,rad=a*Math.PI/180,d=document.createElement('span');
-    d.className='sf-ring-symbol';d.style.left=(cx+Math.cos(rad)*R)+'px';d.style.top=(cy+Math.sin(rad)*R)+'px';
+    d.className='sf-ring-symbol';LockRuntime.markTensionHint(d,sf.symbol);d.style.left=(cx+Math.cos(rad)*R)+'px';d.style.top=(cy+Math.sin(rad)*R)+'px';
     d.style.transform=`translate(-50%,-50%) rotate(${a+90}deg)`;d.innerHTML=LOCK_SYMBOLS[sf.symbol];sfSymbolRing.appendChild(d)
   }
 }
@@ -3233,7 +3193,7 @@ function apSet(){
   }
   ap.time=Math.max(0,ap.time-1.25);LockRuntime.breakPick('Alpha Protocol',ap,{messageEl:apMsg,message:'Щель не совпала — отмычка сломалась.',onEmpty:()=>{ap.failed=true;apStatus.innerHTML='<strong>Отмычки закончились</strong>перезапусти замок'}});renderAp()
 }
-function renderApSequence(){const box=document.getElementById('apSequence');if(!box)return;box.innerHTML='';ap.order.forEach((pinIndex,step)=>{const d=document.createElement('div');d.className='ap-seq-item'+(step<ap.orderStep?' done':step===ap.orderStep&&!ap.won?' current':'');d.innerHTML=LOCK_SYMBOLS[pinIndex];box.appendChild(d)})}
+function renderApSequence(){const box=document.getElementById('apSequence');if(!box)return;box.innerHTML='';ap.order.forEach((pinIndex,step)=>{const d=document.createElement('div');d.className='ap-seq-item'+(step<ap.orderStep?' done':step===ap.orderStep&&!ap.won?' current':'');if(step===ap.order.length-1)LockRuntime.markTensionHint(d,pinIndex);d.innerHTML=LOCK_SYMBOLS[pinIndex];box.appendChild(d)})}
 function apSymbolTop(p){return p.groove>50?18:82}
 function renderAp(markReady=true){LockRuntime.syncPicks('Alpha Protocol',ap.picks);
   apLock.querySelectorAll('.ap-pin').forEach(n=>n.remove());
@@ -3273,7 +3233,7 @@ function me1RenderShell(){
   const m=me1ArenaMetrics(),R=Math.max(10,m.s/2-13),count=20;
   for(let i=0;i<count;i++){
     const a=i*(360/count)-90,rad=a*Math.PI/180,d=document.createElement('span');
-    d.className='me1-shell-symbol';d.style.left=(m.cx+Math.cos(rad)*R)+'px';d.style.top=(m.cy+Math.sin(rad)*R)+'px';
+    d.className='me1-shell-symbol';LockRuntime.markTensionHint(d,me1.symbol);d.style.left=(m.cx+Math.cos(rad)*R)+'px';d.style.top=(m.cy+Math.sin(rad)*R)+'px';
     d.style.transform=`translate(-50%,-50%) rotate(${a+90}deg)`;d.innerHTML=LOCK_SYMBOLS[me1.symbol];me1ShellSymbols.appendChild(d)
   }
 }

@@ -5,16 +5,47 @@
     const empty=document.querySelector('#gameSettingsEmpty');
     const search=document.querySelector('#gameSettingsSearch');
     const table=document.querySelector('.gameSettingsTable');
+    const recentList=document.querySelector('#gameSettingsRecentList');
+    const recentStorageKey='keynlockRecentlyOpenedGames';
+    let recentGames=[];
+    try{recentGames=JSON.parse(STORE.getItem(recentStorageKey)||'[]').filter(id=>GameCatalog.has(id)).slice(0,3);}catch(_){recentGames=[];}
     let sortPath='title';
     let sortDirection=1;
     const featureColumns=[
       ['lock.present','Физический замок'],
       ['lock.manualOpen','Отдельное открытие'],
+      ['lock.specialTool','Особый натяжитель'],
       ['world.noise','Шум'],
       ['world.noiseSensor','Датчик шума'],
       ['world.guards','Стражники'],
       ['world.birds','Птицы']
     ];
+
+    function recordRecentGame(id){
+      if(!GameCatalog.has(id))return;
+      recentGames=[id,...recentGames.filter(saved=>saved!==id)].slice(0,3);
+      try{STORE.setItem(recentStorageKey,JSON.stringify(recentGames));}catch(_){}
+      if(!screen?.hidden)renderRecentGames();
+    }
+
+    function renderRecentGames(){
+      if(!recentList)return;
+      recentList.replaceChildren();
+      recentGames.forEach((id,index)=>{
+        const game=GameCatalog.get(id);
+        if(!game)return;
+        const button=document.createElement('button');
+        button.type='button';
+        button.className='gameSettingsRecentItem';
+        button.dataset.recentGame=id;
+        button.innerHTML='<span class="gameSettingsRecentOrder"></span><span class="gameSettingsRecentName"></span><span class="gameSettingsRecentPlay" aria-hidden="true">▶</span>';
+        button.querySelector('.gameSettingsRecentOrder').textContent=String(index+1);
+        button.querySelector('.gameSettingsRecentName').textContent=game.title;
+        button.setAttribute('aria-label',`Открыть ${game.title}, первый уровень`);
+        recentList.appendChild(button);
+      });
+      recentList.closest('.gameSettingsRecent')?.classList.toggle('empty',recentGames.length===0);
+    }
 
     function checkbox(gameId,path,label,checked){
       const control=document.createElement('label');
@@ -93,8 +124,11 @@
         tr.dataset.gameId=id;
         const name=document.createElement('th');
         name.scope='row';
-        name.innerHTML=`<button class="gameLaunchButton" type="button" aria-label="Перейти в игру"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg></button><span class="gameSettingName"><span class="gameNameText"><strong></strong><small></small></span></span>`;
+        name.innerHTML=`<button class="gameLaunchButton" type="button" aria-label="Перейти в игру"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg></button><span class="gameSettingName"><button class="gameNameText" type="button"></button></span>`;
         name.querySelector('button').dataset.launchGame=id;
+        name.querySelector('.gameNameText').dataset.launchGame=id;
+        name.querySelector('.gameNameText').setAttribute('aria-label',`Открыть ${game.title}, первый уровень`);
+        name.querySelector('.gameNameText').innerHTML='<strong></strong><small></small>';
         name.querySelector('strong').textContent=game.title;
         name.querySelector('small').textContent=id;
         if(game.readiness===5){
@@ -139,10 +173,14 @@
       renderSortIndicators();
     }
 
-    function launchGame(id){
+    function launchGame(id,level=1){
       closeGameSettings();
       const game=GameCatalog.get(id);
-      if(game?.kind==='native'){switchMode(id);return;}
+      if(game?.kind==='native'){
+        setModeDifficulty(level,id,false);
+        switchMode(id);
+        return;
+      }
       const location=MAP_LOCATIONS[`prototype-${id.replace(/^prototype:/,'')}`];
       if(location)openPrototypeMechanic(location);
     }
@@ -156,6 +194,7 @@
       document.body.classList.add('game-settings-open');
       setGameInactive(true);
       screen.hidden=false;
+      renderRecentGames();
       renderGameSettings();
       requestAnimationFrame(()=>search?.focus({preventScroll:true}));
     }
@@ -196,14 +235,19 @@
       const difficulty=event.target.closest?.('[data-game-difficulty]');
       if(difficulty){
         const gameId=difficulty.dataset.gameDifficulty;
-        if(GameCatalog.get(gameId)?.difficulty.levels.length)setModeDifficulty(Number(difficulty.dataset.level),gameId,false);
-        launchGame(gameId);
+        const level=Number(difficulty.dataset.level)||1;
+        launchGame(gameId,level);
         return;
       }
       const button=event.target.closest?.('[data-launch-game]');
       if(!button)return;
       launchGame(button.dataset.launchGame);
     });
+    recentList?.addEventListener('click',event=>{
+      const button=event.target.closest?.('[data-recent-game]');
+      if(button)launchGame(button.dataset.recentGame,1);
+    });
+    addEventListener('keynlock-game-opened',event=>recordRecentGame(event.detail?.id));
     addEventListener('keydown',event=>{
       if(event.code!=='Escape'||!document.body.classList.contains('game-settings-open'))return;
       event.preventDefault();

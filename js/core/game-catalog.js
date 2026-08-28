@@ -27,17 +27,17 @@ const GAME_DEFINITIONS={
 
   'prototype:pipeline':{title:'Трубопровод',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
   'prototype:bioshock2':{title:'BioShock 2',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
-  'prototype:risen-2':{title:'Risen 2 — верфь',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
-  'prototype:alpha-protocol':{title:'Alpha Protocol',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
+  'prototype:risen-2':{title:'Risen 2 — верфь',kind:'prototype',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
+  'prototype:alpha-protocol':{title:'Alpha Protocol',kind:'prototype',lock:{present:false,manualOpen:false,specialTool:true},world:{noise:false,guards:false,birds:false}},
   'prototype:hillsfar':{title:'Hillsfar — музей',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
-  'prototype:thief-ds':{title:'Thief: Deadly Shadows',kind:'prototype',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
+  'prototype:thief-ds':{title:'Thief: Deadly Shadows',kind:'prototype',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:false,guards:false,birds:false}},
   'prototype:kingdom-come':{title:'Kingdom Come',kind:'prototype',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   'prototype:oblivion':{title:'Oblivion',kind:'prototype',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   'prototype:watchmen':{title:'Watchmen',kind:'prototype',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   'prototype:thief-12':{title:'Thief 1/2',kind:'prototype',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
-  'prototype:fallout':{title:'Fallout',kind:'prototype',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
+  'prototype:fallout':{title:'Fallout',kind:'prototype',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:false,guards:false,birds:false}},
   'prototype:anachronox':{title:'Anachronox — лаборатория',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
-  'prototype:mass-effect':{title:'Mass Effect — узел',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
+  'prototype:mass-effect':{title:'Mass Effect — узел',kind:'prototype',lock:{present:false,manualOpen:false,specialTool:true},world:{noise:false,guards:false,birds:false}},
   'prototype:mass-effect-2':{title:'Mass Effect 2',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
   'prototype:pathologic-2':{title:'Pathologic 2',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}}
 };
@@ -47,6 +47,7 @@ function freezeGameDefinitions(definitions){
     // Quiet locations omit the flag for readability; normalization keeps the
     // catalogue schema complete for every consumer.
     if(entry.world.noiseSensor===undefined)entry.world.noiseSensor=false;
+    if(entry.lock.specialTool===undefined)entry.lock.specialTool=false;
     if(entry.readiness===undefined)entry.readiness=entry.kind==='native'?4:3;
     if(entry.rating===undefined)entry.rating=null;
     if(entry.difficulty===undefined)entry.difficulty={levels:entry.kind==='native'?[1,2,3]:[]};
@@ -62,7 +63,7 @@ function freezeGameDefinitions(definitions){
 const GameCatalog=(()=>{
   const definitions=freezeGameDefinitions(GAME_DEFINITIONS);
   const storageKey='keynlockGameCatalogOverrides';
-  const editablePaths=Object.freeze(['lock.present','lock.manualOpen','world.noise','world.noiseSensor','world.guards','world.birds','readiness','rating']);
+  const editablePaths=Object.freeze(['lock.present','lock.manualOpen','lock.specialTool','world.noise','world.noiseSensor','world.guards','world.birds','readiness','rating']);
   let overrides={};
   try{overrides=JSON.parse(localStorage.getItem(storageKey)||'{}')||{};}catch(_){overrides={};}
   const nativeIds=Object.freeze(Object.keys(definitions).filter(id=>definitions[id].kind==='native'));

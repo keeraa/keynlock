@@ -90,6 +90,58 @@
 
   function collectionById(id){ return PICK_COLLECTIONS.find(c => c.id === id) || PICK_COLLECTIONS[0]; }
 
+  // ===== Equipping the browsed handle into actual gameplay =====
+  // The lock minigame, inventory case, and every imported-mode skin all
+  // already read one shared CSS var (--pick-skin-image, set by
+  // js/core/ui.js's applyPickSkin() for the older single-image pick-skin
+  // shop) as a single flat background-image — see css/overrides-01-tools-shared.css,
+  // css/overrides-05-inventory.css, css/modes-02-mass-effect.css. Rather
+  // than teach five different already-tuned rendering contexts to layer
+  // two separate shaft/handle backgrounds each with their own sizing math,
+  // this composites the pair once onto an offscreen canvas (same layering
+  // as the live preview stage: shaft top-aligned, handle bottom-aligned,
+  // handle painted last so it sits over the shaft) and hands that single
+  // flattened image to the exact same var — every one of those five spots
+  // picks it up for free, no changes needed there.
+  const EQUIPPED_KEY = 'keynlockEquippedPick';
+  function loadImage(src){
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+  async function applyEquippedSkin(handle){
+    try{
+      const [shaftImg, handleImg] = await Promise.all([loadImage(handle.shaft), loadImage(handle.image)]);
+      const canvas = document.createElement('canvas');
+      canvas.width = STAGE_W;
+      canvas.height = STAGE_H;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(shaftImg, (STAGE_W - shaftImg.width) / 2, 0);
+      ctx.drawImage(handleImg, (STAGE_W - handleImg.width) / 2, STAGE_H - handleImg.height);
+      document.documentElement.style.setProperty('--pick-skin-image', `url("${canvas.toDataURL('image/png')}")`);
+    }catch(_){ /* an asset failed to load — leave whatever skin was already applied */ }
+  }
+  function equipHandle(handle){
+    state.handle = handle;
+    try{ STORE.setItem(EQUIPPED_KEY, JSON.stringify({ collectionId: state.collectionId, handleId: handle.id })); }catch(_){}
+    applyEquippedSkin(handle);
+  }
+  function restoreEquipped(){
+    let saved = null;
+    try{ saved = JSON.parse(STORE.getItem(EQUIPPED_KEY) || 'null'); }catch(_){ saved = null; }
+    if(!saved) return;
+    const col = PICK_COLLECTIONS.find(c => c.id === saved.collectionId);
+    const handle = col?.handles.find(h => h.id === saved.handleId);
+    if(handle && isUnlocked(handle)){
+      state.collectionId = col.id;
+      state.handle = handle;
+      applyEquippedSkin(handle);
+    }
+  }
+
   function renderCollectionList(){
     $collectionList.innerHTML = '';
     PICK_COLLECTIONS.forEach(col => {
@@ -104,7 +156,7 @@
         if(col.id === state.collectionId) return;
         state.collectionId = col.id;
         const firstUnlocked = col.handles.find(isUnlocked) || col.handles[0];
-        state.handle = firstUnlocked;
+        equipHandle(firstUnlocked);
         renderCollectionList();
         renderHandleStrip();
         renderStage();
@@ -125,7 +177,7 @@
       card.innerHTML = `<img src="${handle.image}" alt="" loading="lazy">`;
       if(unlocked){
         card.addEventListener('click', () => {
-          state.handle = handle;
+          equipHandle(handle);
           renderHandleStrip();
           renderStage();
         });
@@ -224,10 +276,23 @@
       state.zoom = clampZoom(Math.round(state.zoom - e.deltaY * 0.15));
       renderStage();
     }, { passive: false });
+
+    // A very slow ambient spin while nobody's actually turning the tool —
+    // stops the instant a finger/pointer touches the stage (pointers.size
+    // check) and only does work while this panel is the one on screen.
+    const $panel = $root.closest('.lairPanel');
+    (function idleSpin(){
+      if(pointers.size === 0 && $panel?.classList.contains('active')){
+        state.rotate = (state.rotate + 0.025) % 360;
+        renderStage();
+      }
+      requestAnimationFrame(idleSpin);
+    })();
   })();
 
   window.addEventListener('resize', renderStage);
 
+  restoreEquipped();
   renderCollectionList();
   renderHandleStrip();
   renderStage();

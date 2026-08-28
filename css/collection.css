@@ -81,18 +81,6 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   cursor:pointer;
   box-shadow:0 2px 8px rgba(0,0,0,.5);
 }
-@media (max-width:899px){
-  .collectionTopHud{
-    left:calc(var(--mobile-safe-left,0px) + 58px);
-    right:calc(var(--mobile-safe-right,0px) + 8px);
-    top:calc(var(--mobile-safe-top,0px) + 7px);
-    height:54px;
-  }
-  .collectionTopHudTitle{font-size:17px;}
-  .collectionTopHudClose{right:7px;width:38px;height:38px;}
-  #lairModuleWindow:has(.lairPanel[data-lair-panel="collection"].active) .lairModuleBody{padding-top:60px;}
-}
-
 .alchemyRoot ~ #collectionRoot,
 #collectionRoot{
   display:flex;
@@ -127,13 +115,19 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   flex-direction:column;
   align-items:stretch;
   gap:8px;
-  padding:10px;
+  padding:20px 10px 10px;
   border:1px solid rgba(138,100,52,.5);
   border-radius:10px;
   background:rgba(22,17,12,.7);
   cursor:pointer;
   text-align:center;
   transition:background .16s ease;
+  /* Without this, the row's flex-basis (50% on mobile) gets overridden
+     by its content's min-content width — each grid-track image below
+     has an intrinsic aspect-ratio-driven "auto" min-width that's wider
+     than a shrunk column, so the row silently grew back to full width
+     instead of actually sitting two-up. */
+  min-width:0;
 }
 .collectionRow:hover{background:rgba(58,45,26,.75);}
 /* Fill, not a border, marks the active collection — a gold outline reads
@@ -155,6 +149,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
 }
 .collectionRowThumbs img{
   width:100%;
+  min-width:0;
   height:101px;
   object-fit:contain;
 }
@@ -241,7 +236,11 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   position:relative;
   width:300px;
   height:912px;
-  transform-origin:50% 50%;
+  /* Pivots near the grip, not the stage box's geometric center — that
+     center fell inside the shaft (the handle is the shorter piece,
+     pinned to the bottom), so rotating read as spinning the blade
+     instead of turning the tool in a hand holding the handle. */
+  transform-origin:50% 76%;
 }
 /* Applied only for the initial press-to-angle jump, then dropped for the
    rest of the drag so live tracking stays 1:1 with the pointer. */
@@ -308,4 +307,67 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   mask-size:contain;
   mask-repeat:no-repeat;
   mask-position:center;
+}
+
+/* Media queries live at the end of the file on purpose: a media block
+   earlier than the base rule it overrides loses even while its
+   condition matches, since @media adds no specificity — source order
+   alone decides between two otherwise-equal rules. (Cost a real bug
+   once already: this file used to open with the 899px block, so its
+   #collectionRoot padding always lost to the later plain rule below.) */
+@media (max-width:899px){
+  .collectionTopHud{
+    left:calc(var(--mobile-safe-left,0px) + 58px);
+    right:calc(var(--mobile-safe-right,0px) + 8px);
+    top:calc(var(--mobile-safe-top,0px) + 7px);
+    height:54px;
+  }
+  .collectionTopHudTitle{font-size:17px;}
+  .collectionTopHudClose{right:7px;width:38px;height:38px;}
+  #lairModuleWindow:has(.lairPanel[data-lair-panel="collection"].active) .lairModuleBody{padding-top:60px;}
+  /* Below the phone breakpoint there isn't room for a list column next
+     to a preview column side by side — stack them, and let the
+     collections become a wrapping row of cards instead of a tall rail
+     (which would otherwise push the preview off the bottom of the
+     screen). Sizes below are vw-scaled rather than the desktop's fixed
+     px so they keep shrinking gracefully down to small phones. */
+  #lairModuleWindow:has(.lairPanel[data-lair-panel="collection"].active){
+    width:96vw;
+    max-height:94vh;
+  }
+  .alchemyRoot ~ #collectionRoot,
+  #collectionRoot{
+    padding:0 10px;
+    min-height:0;
+    gap:10px;
+  }
+  .collectionLayout{
+    flex-direction:column;
+    align-items:center;
+    gap:18px;
+    overflow-y:auto;
+  }
+  .collectionListCol{
+    flex-direction:row;
+    flex-wrap:wrap;
+    justify-content:center;
+    width:100%;
+    overflow-y:visible;
+    padding-right:0;
+  }
+  .collectionRow{
+    flex:1 1 calc(50% - 8px);
+    min-width:150px;
+    padding:16px 8px 8px;
+  }
+  .collectionRowThumbs img{height:min(16vw,80px);}
+  .collectionRowLabel{font-size:13px;}
+  .collectionPreviewCol{
+    --preview-h:min(78vw,380px);
+    --preview-w:min(86vw,418px);
+  }
+  .collectionHandleCard{width:min(9vw,38px);height:min(9vw,38px);}
+}
+@media (max-width:480px){
+  .collectionRow{flex:1 1 100%;}
 }

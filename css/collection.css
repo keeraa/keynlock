@@ -28,7 +28,12 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   border-radius:0;
   box-shadow:none;
   background:none;
-  overflow:visible!important;
+  /* Not visible: alchemy uses visible because nothing inside it needs to
+     scroll. This screen's own collections column does (six collections
+     no longer fit in 90vh) — overflow:visible here left it nothing to
+     scroll WITHIN, so .collectionListCol's own overflow-y:auto had nowhere
+     bounded to apply and the list just grew past the window instead. */
+  overflow:hidden;
   max-height:90vh;
   width:min(860px,90vw);
 }
@@ -40,7 +45,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   flex-direction:column;
   flex:1 1 auto;
   min-height:0;
-  overflow:visible!important;
+  overflow:hidden;
   max-height:90vh;
   /* Clears the fixed top HUD bar (68px tall, 14px from the top) that
      replaces the hidden shared header. */
@@ -85,9 +90,18 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
 #collectionRoot{
   display:flex;
   flex-direction:column;
+  flex:1 1 auto;
   gap:14px;
-  height:100%;
-  min-height:640px;
+  /* Not height:100% — percentage heights on a flex item that's itself
+     sized by a parent flex-grow (.lairPanel[…].active, a row-direction
+     flex container) turned out not to resolve reliably here (stayed at
+     the content's own natural height instead of the ~689px actually
+     available). flex:1 1 auto + min-height:0 gets the same "fill the
+     available cross size" result through the ordinary stretch/grow
+     mechanism instead of percentage resolution, which is what actually
+     let .collectionListCol's overflow-y:auto have a bounded box to
+     scroll within. */
+  min-height:0;
   padding:0 28px;
   color:#e2c487;
   font-family:var(--ui-font,Arial,sans-serif);

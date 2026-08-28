@@ -27,10 +27,14 @@
     });
   }
   const PICK_COLLECTIONS = [
+    { id:'japan-wood', name:'Japan Wood', handles: buildHandles('japan-wood', 'japan-wood', 'japan_wood',
+      [true, true, true, true, true, true, true, true]) },
     { id:'japan', name:'Japan', handles: buildHandles('japan', 'japan', 'japan_big_art',
       [true, true, true, true, true, true, true, false]) },
     { id:'decodance', name:'Decodance Black', handles: buildHandles('decodance', 'decodance', 'decodance_black',
       [true, true, true, true, false, true, true, true]) },
+    { id:'decodance-white', name:'Decodance White', handles: buildHandles('decodance-white', 'decodance-white', 'decodance_white',
+      [true, true, true, true, true, true, true, true]) },
     { id:'japan-classic-white', name:'Japan Classic White', handles: buildHandles('japan-classic-white', 'japan-classic-white', 'japan_classic_white',
       [true, true, true, true, true, true, true, true]) },
     { id:'japan-classic-black', name:'Japan Classic Black', handles: buildHandles('japan-classic-black', 'japan-classic-black', 'japan_classic_black',

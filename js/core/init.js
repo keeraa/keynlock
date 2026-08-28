@@ -305,6 +305,7 @@
     if(e.target===e.currentTarget) closeLairWorkbench();
   });
   $lairModuleClose?.addEventListener('click',closeLairModule);
+  document.querySelector('#alchemyTopHudClose')?.addEventListener('click',closeLairModule);
 
   if($shopTab) $shopTab.onclick=null;
   $shopClose.onclick=closeShop;

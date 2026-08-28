@@ -224,7 +224,30 @@
       return Math.atan2(dx, -dy) * 180 / Math.PI;
     }
     function dist(a, b){ return Math.hypot(a.x - b.x, a.y - b.y); }
-    function stopRotate(){ rotating = false; $stage.classList.remove('dragging'); }
+    function stopRotate(){
+      rotating = false;
+      $stage.classList.remove('dragging');
+      // Resting pivot is always the box's own center — ease back to it
+      // now that the grab (which may have pivoted around the handle
+      // instead) has ended.
+      $stageInner.classList.add('easing');
+      $stageInner.style.transformOrigin = '50% 50%';
+    }
+    function elementCenter(el){
+      const r = el.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+    // Whichever layer's on-screen center the grab landed closer to (this
+    // uses the actual rendered/rotated bounding boxes, so it stays right
+    // at any zoom or rotation) becomes the pivot for this drag — grab the
+    // shaft and it spins around the shaft, grab the handle and it turns
+    // around the handle, same as physically holding either end.
+    function grabOrigin(clientX, clientY){
+      const handleC = elementCenter($imgHandle), shaftC = elementCenter($imgShaft);
+      const dHandle = Math.hypot(clientX - handleC.x, clientY - handleC.y);
+      const dShaft = Math.hypot(clientX - shaftC.x, clientY - shaftC.y);
+      return dHandle <= dShaft ? '50% 76%' : '50% 50%';
+    }
 
     $stage.addEventListener('pointerdown', e => {
       $stage.setPointerCapture(e.pointerId);
@@ -236,6 +259,7 @@
         // into it once so it doesn't visually snap, then drop the
         // transition so live tracking stays 1:1 with the pointer.
         $stageInner.classList.add('easing');
+        $stageInner.style.transformOrigin = grabOrigin(e.clientX, e.clientY);
         state.rotate = Math.max(-180, Math.min(180, Math.round(angleFromCenter(e.clientX, e.clientY))));
         renderStage();
       }else if(pointers.size === 2){

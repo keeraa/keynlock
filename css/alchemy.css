@@ -271,8 +271,10 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
 .alchemyRoot .scene{display:none;}
 .alchemyRoot .scene.active{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;min-width:0;gap:10px;justify-content:flex-start;}
 .alchemyRoot .alchemyMixReference{display:none;position:relative;isolation:isolate;padding:0;border:0;background:none;cursor:zoom-in;filter:drop-shadow(0 12px 14px rgba(0,0,0,.48));transition:filter .16s ease,transform .16s ease;}
-.alchemyRoot .scene[data-name="Смешение"].active .alchemyMixReference{display:block;}
+.alchemyRoot .scene.active .alchemyMixReference{display:block;}
 .alchemyRoot .alchemyMixReference:hover{filter:brightness(1.06) drop-shadow(0 15px 18px rgba(0,0,0,.55));}
+.alchemyRoot .alchemyBlankReference{cursor:default;}
+.alchemyRoot .alchemyBlankReference:hover{filter:drop-shadow(0 12px 14px rgba(0,0,0,.48));}
 .alchemyRoot .alchemyMixReferenceBoard{display:block;width:100%;height:auto;position:relative;z-index:1;}
 .alchemyRoot .alchemyMixReferenceGuide{position:absolute;z-index:2;left:12.9%;top:9.2%;width:74.3%;height:72.6%;object-fit:cover;transform:perspective(900px) rotateX(.4deg);transform-origin:center;filter:sepia(.08) saturate(.9) brightness(.96);}
 .alchemyRoot .scene h2,.alchemyRoot .scene .kicker{display:none;}
@@ -698,7 +700,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
     max-height:420px;
     position:relative;
   }
-  .alchemyRoot .scene[data-name="Смешение"].active .alchemyMixReference{
+  .alchemyRoot .scene.active .alchemyMixReference{
     position:absolute;z-index:3;left:50%;top:18%;width:clamp(310px,39vw,610px);
     transform:translateX(-50%);
   }
@@ -907,6 +909,7 @@ body.lair-open #difficultyDock,body.shop-open #difficultyDock,body.map-open #dif
   background:linear-gradient(90deg,rgba(22,15,10,.28),rgba(40,25,15,.82),rgba(22,15,10,.28));
   backdrop-filter:blur(8px);box-shadow:0 8px 24px rgba(0,0,0,.22);
 }
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active){overflow:visible!important;}
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleTitle{font-size:20px;pointer-events:auto;}
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleClose{position:absolute;right:0;pointer-events:auto;}
 
@@ -918,7 +921,7 @@ body.lair-open #difficultyDock,body.shop-open #difficultyDock,body.map-open #dif
 .alchemyGuideViewerClose{position:absolute;right:-14px;top:-14px;width:42px;height:42px;border:1px solid #b68a48;border-radius:10px;background:#17120e;color:#e8c985;font:26px/1 Arial,sans-serif;cursor:pointer;box-shadow:0 5px 16px rgba(0,0,0,.55);}
 
 @media (max-width:899px){
-  .alchemyRoot .scene[data-name="Смешение"].active .alchemyMixReference{
+  .alchemyRoot .scene.active .alchemyMixReference{
     order:-1;flex:0 0 auto;width:min(94vw,620px);margin:8px auto -10%;
   }
 }

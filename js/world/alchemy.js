@@ -1160,6 +1160,11 @@
 (function(){
   const root = document.querySelector('#alchemyRoot');
   if(!root) return;
+  const guideViewer = document.querySelector('#alchemyGuideViewer');
+  const closeGuideViewer = () => { if(guideViewer) guideViewer.hidden = true; };
+  guideViewer?.querySelector('.alchemyGuideViewerBackdrop')?.addEventListener('click', closeGuideViewer);
+  guideViewer?.querySelector('.alchemyGuideViewerClose')?.addEventListener('click', closeGuideViewer);
+  document.addEventListener('keydown', event => { if(event.key === 'Escape' && guideViewer && !guideViewer.hidden){ event.preventDefault(); closeGuideViewer(); } });
   const tabs = [...root.querySelectorAll('.alchemyStationTab')];
   const scenes = () => [...root.querySelectorAll('.scene')];
   function show(i){

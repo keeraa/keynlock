@@ -270,8 +270,9 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
 /* --- one station --- */
 .alchemyRoot .scene{display:none;}
 .alchemyRoot .scene.active{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;min-width:0;gap:10px;justify-content:flex-start;}
-.alchemyRoot .alchemyMixReference{display:none;position:relative;isolation:isolate;pointer-events:none;filter:drop-shadow(0 12px 14px rgba(0,0,0,.48));}
+.alchemyRoot .alchemyMixReference{display:none;position:relative;isolation:isolate;padding:0;border:0;background:none;cursor:zoom-in;filter:drop-shadow(0 12px 14px rgba(0,0,0,.48));transition:filter .16s ease,transform .16s ease;}
 .alchemyRoot .scene[data-name="Смешение"].active .alchemyMixReference{display:block;}
+.alchemyRoot .alchemyMixReference:hover{filter:brightness(1.06) drop-shadow(0 15px 18px rgba(0,0,0,.55));}
 .alchemyRoot .alchemyMixReferenceBoard{display:block;width:100%;height:auto;position:relative;z-index:1;}
 .alchemyRoot .alchemyMixReferenceGuide{position:absolute;z-index:2;left:12.9%;top:9.2%;width:74.3%;height:72.6%;object-fit:cover;transform:perspective(900px) rotateX(.4deg);transform-origin:center;filter:sepia(.08) saturate(.9) brightness(.96);}
 .alchemyRoot .scene h2,.alchemyRoot .scene .kicker{display:none;}
@@ -698,12 +699,12 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
     position:relative;
   }
   .alchemyRoot .scene[data-name="Смешение"].active .alchemyMixReference{
-    position:absolute;z-index:1;left:50%;top:-5%;width:clamp(310px,39vw,610px);
+    position:absolute;z-index:3;left:50%;top:18%;width:clamp(310px,39vw,610px);
     transform:translateX(-50%);
   }
   .alchemyRoot .scene[data-name="Смешение"].active > .lab,
   .alchemyRoot .scene[data-name="Смешение"].active > .alchemyReagents,
-  .alchemyRoot .scene[data-name="Смешение"].active > .alchemyElementColumn{position:relative;z-index:2;}
+  .alchemyRoot .scene[data-name="Смешение"].active > .alchemyElementColumn{position:relative;z-index:4;}
   /* Grid items carry min-width:auto too: the bench was distending its own
      track from the inside, which is what kept the scene wider than the panel. */
   .alchemyRoot .scene.active > .lab{grid-area:bench;min-width:0;min-height:0;align-self:stretch;}
@@ -896,6 +897,25 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      preserves the leading flow slot (same flow height as "+"'s station),
      just aimed at a different landing spot via transform. */
 }
+
+body.lair-open #difficultyDock,body.shop-open #difficultyDock,body.map-open #difficultyDock{display:none!important;}
+
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleHeader{
+  position:absolute;z-index:20;left:0;right:0;top:-104px;height:58px;padding:0;
+  display:flex;align-items:center;justify-content:center;pointer-events:none;
+  border:1px solid rgba(152,110,54,.38);border-radius:12px;
+  background:linear-gradient(90deg,rgba(22,15,10,.28),rgba(40,25,15,.82),rgba(22,15,10,.28));
+  backdrop-filter:blur(8px);box-shadow:0 8px 24px rgba(0,0,0,.22);
+}
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleTitle{font-size:20px;pointer-events:auto;}
+#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) .lairModuleClose{position:absolute;right:0;pointer-events:auto;}
+
+.alchemyGuideViewer{position:fixed;inset:0;z-index:520;display:grid;place-items:center;padding:clamp(14px,4vw,54px);}
+.alchemyGuideViewer[hidden]{display:none!important;}
+.alchemyGuideViewerBackdrop{position:absolute;inset:0;width:100%;height:100%;border:0;background:rgba(4,3,2,.84);backdrop-filter:blur(10px);cursor:zoom-out;}
+.alchemyGuideViewerDialog{position:relative;z-index:1;max-width:min(1100px,92vw);max-height:90dvh;filter:drop-shadow(0 24px 48px rgba(0,0,0,.72));}
+.alchemyGuideViewerDialog img{display:block;max-width:100%;max-height:90dvh;width:auto;height:auto;border:2px solid #9b7137;border-radius:8px;}
+.alchemyGuideViewerClose{position:absolute;right:-14px;top:-14px;width:42px;height:42px;border:1px solid #b68a48;border-radius:10px;background:#17120e;color:#e8c985;font:26px/1 Arial,sans-serif;cursor:pointer;box-shadow:0 5px 16px rgba(0,0,0,.55);}
 
 @media (max-width:899px){
   .alchemyRoot .scene[data-name="Смешение"].active .alchemyMixReference{

@@ -31,6 +31,16 @@
 }
 .globalTopHud > *{pointer-events:auto;}
 
+/* Legacy game styles used to scale their own header. The shared HUD is now
+   the only header owner and must always retain viewport geometry. */
+body.importedMode .globalTopHud,
+body.mode-hillsfar .globalTopHud{
+  padding:0!important;
+  margin:0!important;
+  transform:none!important;
+  transform-origin:initial!important;
+}
+
 /* All icon controls in the shared HUD use the same material and ink. */
 .globalTopHud .hudNavBtn,
 .globalTopHud .alchemyTopHudClose{

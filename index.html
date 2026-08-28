@@ -282,8 +282,12 @@
               <button class="alchemyStationTab active" type="button" data-station="0">Смешение</button>
               <button class="alchemyStationTab" type="button" data-station="1">Концентрации</button>
               <button class="alchemyStationTab" type="button" data-station="2">Разделение</button>
-            </div>
+          </div>
           <section class="scene" data-name="Смешение">
+            <div class="alchemyMixReference" aria-label="Памятка по смешению">
+              <img class="alchemyMixReferenceBoard" src="assets/alchemy/mixing-board.png" alt="">
+              <img class="alchemyMixReferenceGuide" src="assets/alchemy/mixing-guide.jpg" alt="Инструкция по смешению реагентов">
+            </div>
             <div class="scene-head"><div><h2>Смешение цвета</h2></div><div class="status" id="mixStatus"></div></div>
             <div class="lab color-game-lab"><div class="color-sample-panel"><h3>Образец и текущая смесь</h3><div class="tube-pair"><div class="tube-box"><div class="test-tube tube-lg"><div class="tube-liquid" id="mixTarget" style="--liquid-color:#dc8342;background-color:#dc8342"></div><div class="target-element-hint" id="mixTargetElement"></div></div><div class="swatch-label">цель</div></div><div class="current-cluster"><div class="tube-box current-main-box"><div class="test-tube tube-lg"><div class="tube-liquid" id="mixCurrent" style="--liquid-color:#c6beac;background-color:#c6beac"></div></div><div class="swatch-label">текущая смесь</div></div><div class="color-controls side-color-controls" id="mixControls"></div></div></div><button type="button" class="alchemyElementCell" id="mixElementCell" aria-label="Добавить элемент из стойки"><span class="alchemyElementCellHint">+</span></button><div class="big-actions centered-actions"><button class="ctl" id="mixCheck" disabled>Проверить</button><button class="ctl ctl-icon" id="mixReset" aria-label="Сброс"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg></button></div><div class="keyhint">Клавиатура: 1/2/3/4 — добавить реагент · Enter — проверить · R — сброс</div></div></div>
           </section>

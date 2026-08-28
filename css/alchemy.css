@@ -270,6 +270,10 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
 /* --- one station --- */
 .alchemyRoot .scene{display:none;}
 .alchemyRoot .scene.active{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;min-width:0;gap:10px;justify-content:flex-start;}
+.alchemyRoot .alchemyMixReference{display:none;position:relative;isolation:isolate;pointer-events:none;filter:drop-shadow(0 12px 14px rgba(0,0,0,.48));}
+.alchemyRoot .scene[data-name="Смешение"].active .alchemyMixReference{display:block;}
+.alchemyRoot .alchemyMixReferenceBoard{display:block;width:100%;height:auto;position:relative;z-index:1;}
+.alchemyRoot .alchemyMixReferenceGuide{position:absolute;z-index:2;left:12.9%;top:9.2%;width:74.3%;height:72.6%;object-fit:cover;transform:perspective(900px) rotateX(.4deg);transform-origin:center;filter:sepia(.08) saturate(.9) brightness(.96);}
 .alchemyRoot .scene h2,.alchemyRoot .scene .kicker{display:none;}
 
 /* The bench holds the glassware and is the only part that may scroll. */
@@ -691,7 +695,15 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
        tabletop. The window itself still sizes to content above/below
        this row as usual; only the row stops growing past this point. */
     max-height:420px;
+    position:relative;
   }
+  .alchemyRoot .scene[data-name="Смешение"].active .alchemyMixReference{
+    position:absolute;z-index:1;left:50%;top:-5%;width:clamp(310px,39vw,610px);
+    transform:translateX(-50%);
+  }
+  .alchemyRoot .scene[data-name="Смешение"].active > .lab,
+  .alchemyRoot .scene[data-name="Смешение"].active > .alchemyReagents,
+  .alchemyRoot .scene[data-name="Смешение"].active > .alchemyElementColumn{position:relative;z-index:2;}
   /* Grid items carry min-width:auto too: the bench was distending its own
      track from the inside, which is what kept the scene wider than the panel. */
   .alchemyRoot .scene.active > .lab{grid-area:bench;min-width:0;min-height:0;align-self:stretch;}
@@ -883,6 +895,12 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
      down and breaking the tube line across stations. Keeping order:-1
      preserves the leading flow slot (same flow height as "+"'s station),
      just aimed at a different landing spot via transform. */
+}
+
+@media (max-width:899px){
+  .alchemyRoot .scene[data-name="Смешение"].active .alchemyMixReference{
+    order:-1;flex:0 0 auto;width:min(94vw,620px);margin:8px auto -10%;
+  }
 }
 
 /* The window is cut to the station rather than the station spread over the

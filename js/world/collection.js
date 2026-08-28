@@ -112,8 +112,37 @@
       img.src = src;
     });
   }
-  async function applyEquippedSkin(handle){
-    try{
+  // Finds the smallest box that actually holds non-transparent pixels.
+  // The shaft/handle pair is drawn centered in a 300px-wide canvas, but
+  // the art itself (a thin pick) is nowhere near that wide — every
+  // gameplay context that reads this composite sizes it with
+  // background:contain against boxes shaped for a thin tall pick (e.g.
+  // the lock minigame's 72x360 box), so the wide transparent margins
+  // were shrinking the whole rendered pick down to fit, and leaving it
+  // vertically centered/short of the box's top edge instead of reaching
+  // it (where the keyhole/pivot expects the tip to be).
+  function opaqueBoundingBox(ctx, w, h){
+    const data = ctx.getImageData(0, 0, w, h).data;
+    let minX = w, minY = h, maxX = -1, maxY = -1;
+    for(let y = 0; y < h; y++){
+      for(let x = 0; x < w; x++){
+        if(data[(y * w + x) * 4 + 3] > 8){
+          if(x < minX) minX = x;
+          if(x > maxX) maxX = x;
+          if(y < minY) minY = y;
+          if(y > maxY) maxY = y;
+        }
+      }
+    }
+    return maxX >= minX ? { minX, minY, maxX, maxY } : { minX: 0, minY: 0, maxX: w - 1, maxY: h - 1 };
+  }
+  // handle.id -> composited, cropped data URL. Compositing needs two
+  // image loads plus a pixel scan, so results are cached rather than
+  // redone every time a rail or the equipped skin needs the same handle.
+  const compositeCache = new Map();
+  async function compositeHandle(handle){
+    if(compositeCache.has(handle.id)) return compositeCache.get(handle.id);
+    const promise = (async () => {
       const [shaftImg, handleImg] = await Promise.all([loadImage(handle.shaft), loadImage(handle.image)]);
       const canvas = document.createElement('canvas');
       canvas.width = STAGE_W;
@@ -121,13 +150,34 @@
       const ctx = canvas.getContext('2d');
       ctx.drawImage(shaftImg, (STAGE_W - shaftImg.width) / 2, 0);
       ctx.drawImage(handleImg, (STAGE_W - handleImg.width) / 2, STAGE_H - handleImg.height);
-      document.documentElement.style.setProperty('--pick-skin-image', `url("${canvas.toDataURL('image/png')}")`);
+      const box = opaqueBoundingBox(ctx, STAGE_W, STAGE_H);
+      const cropW = box.maxX - box.minX + 1, cropH = box.maxY - box.minY + 1;
+      const cropped = document.createElement('canvas');
+      cropped.width = cropW;
+      cropped.height = cropH;
+      cropped.getContext('2d').drawImage(canvas, box.minX, box.minY, cropW, cropH, 0, 0, cropW, cropH);
+      return cropped.toDataURL('image/png');
+    })();
+    compositeCache.set(handle.id, promise);
+    // Replace the pending promise with its resolved string once ready —
+    // cachedImage()/getInventoryRail() need a synchronous string to hand
+    // to an <img src>, and a Map entry that's still a Promise reads as
+    // "not ready yet" there forever otherwise.
+    const url = await promise;
+    compositeCache.set(handle.id, url);
+    return url;
+  }
+  async function applyEquippedSkin(handle){
+    try{
+      const url = await compositeHandle(handle);
+      document.documentElement.style.setProperty('--pick-skin-image', `url("${url}")`);
     }catch(_){ /* an asset failed to load — leave whatever skin was already applied */ }
   }
   function equipHandle(handle){
     state.handle = handle;
     try{ STORE.setItem(EQUIPPED_KEY, JSON.stringify({ collectionId: state.collectionId, handleId: handle.id })); }catch(_){}
     applyEquippedSkin(handle);
+    refreshInventoryRail();
   }
   function restoreEquipped(){
     let saved = null;
@@ -141,6 +191,49 @@
       applyEquippedSkin(handle);
     }
   }
+
+  // ===== Feeding the inventory case's own pick rail =====
+  // js/world/inventory.js (loaded earlier, but classic scripts share one
+  // lexical environment so its functions are still callable from here)
+  // used to show 5 fixed preset skins from PICK_SKINS as pickable
+  // options. It now asks this file for the current collection's handles
+  // instead, through the small API exposed below — the rail shows the
+  // equipped handle's own collection (first 5, matching the rail's slot
+  // count) so it stays consistent with whatever the player last chose in
+  // the Коллекция screen, defaulting to the first collection otherwise.
+  function railCollection(){
+    return collectionById(state.collectionId);
+  }
+  function getInventoryRail(count){
+    return railCollection().handles.filter(isUnlocked).slice(0, count);
+  }
+  function refreshInventoryRail(){
+    // Composites for the rail's handles may not be cached yet — kick
+    // them off, then re-render once ready so the rail doesn't sit on
+    // stale/missing thumbnails while they load.
+    const handles = getInventoryRail(5);
+    Promise.all(handles.map(compositeHandle)).then(() => {
+      if(typeof renderInventoryTools === 'function') renderInventoryTools();
+    }).catch(() => {});
+  }
+  function cachedImage(handleId){
+    const cached = compositeCache.get(handleId);
+    // Only a resolved string is usable synchronously as an <img src>; a
+    // still-pending promise means the composite isn't ready yet — the
+    // caller falls back to something else until refreshInventoryRail's
+    // re-render lands.
+    return typeof cached === 'string' ? cached : null;
+  }
+  window.KeynlockCollection = {
+    getInventoryRail(count){
+      return getInventoryRail(count).map(h => ({ id: h.id, image: cachedImage(h.id) }));
+    },
+    getEquippedHandleId(){ return state.handle.id; },
+    equipHandleById(handleId){
+      const handle = railCollection().handles.find(h => h.id === handleId);
+      if(handle && isUnlocked(handle)) equipHandle(handle);
+    }
+  };
 
   function renderCollectionList(){
     $collectionList.innerHTML = '';
@@ -319,4 +412,5 @@
   renderCollectionList();
   renderHandleStrip();
   renderStage();
+  refreshInventoryRail();
 })();

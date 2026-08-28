@@ -81,7 +81,7 @@
   function inventoryTool(kind,index,src,label,options={}){
     const btn=document.createElement('button');
     btn.type='button';
-    const active=kind==='pick' ? pickSkin===index : tensionSkin===index;
+    const active=options.active!==undefined ? options.active : (kind==='pick' ? pickSkin===index : tensionSkin===index);
     btn.className=`inventoryTool inventoryTool-${kind}${active?' selected':''}`;
     if(options.hidden) btn.classList.add('hidden-slot');
     if(options.breaking) btn.classList.add('breaking-out');
@@ -94,7 +94,8 @@
     btn.appendChild(img);
     if(!(options.hidden || options.breaking)) btn.addEventListener('click',e=>{
       e.stopPropagation();
-      if(kind==='pick') selectPickSkin(index);
+      if(options.onClick) options.onClick();
+      else if(kind==='pick') selectPickSkin(index);
       else selectTensionSkin(index);
     });
     return btn;
@@ -110,14 +111,26 @@
     pickRail.style.gridTemplateColumns = 'repeat(5,1fr)';
     pickRail.style.opacity = pickCapacity > 0 ? '1' : '.45';
 
+    // The rail shows the player's own Коллекция picks when that screen
+    // (js/world/collection.js) has set itself up — its own currently
+    // equipped collection's handles, first-come first-slot — falling
+    // back to the older fixed PICK_SKINS set if that API isn't present
+    // or a given slot's composite hasn't finished rendering yet.
+    const rail = window.KeynlockCollection?.getInventoryRail(5) || [];
+    const equippedHandleId = window.KeynlockCollection?.getEquippedHandleId();
+
     for(let i=1;i<=5;i++){
       const pickIndex=i;
       const isAvailable=i<=visiblePicks;
       const isBreaking=(i===inventoryBrokenSlot && i===visiblePicks+1 && i<=pickCapacity+1);
       const isRenderable=isAvailable || isBreaking;
-      const btn=inventoryTool('pick',pickIndex,PICK_SKINS[pickIndex],`Отмычка ${pickIndex} · слот ${i}${isAvailable ? ` · осталось ${visiblePicks}` : ''}`,{
+      const railEntry=rail[i-1];
+      const src=railEntry?.image || PICK_SKINS[pickIndex];
+      const btn=inventoryTool('pick',pickIndex,src,`Отмычка ${pickIndex} · слот ${i}${isAvailable ? ` · осталось ${visiblePicks}` : ''}`,{
         hidden: !isRenderable,
-        breaking: isBreaking
+        breaking: isBreaking,
+        active: railEntry ? railEntry.id===equippedHandleId : undefined,
+        onClick: railEntry ? (()=>window.KeynlockCollection.equipHandleById(railEntry.id)) : undefined
       });
       btn.dataset.pickIndex=String(pickIndex);
       btn.dataset.slot=String(i);

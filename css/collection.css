@@ -30,7 +30,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   background:none;
   overflow:visible!important;
   max-height:90vh;
-  width:min(800px,88vw);
+  width:min(860px,90vw);
 }
 #lairModuleWindow:has(.lairPanel[data-lair-panel="collection"].active) .lairModuleHeader{
   display:none!important;
@@ -100,13 +100,14 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   gap:14px;
   height:100%;
   min-height:640px;
+  padding:0 28px;
   color:#e2c487;
   font-family:var(--ui-font,Arial,sans-serif);
 }
 .collectionLayout{
   display:flex;
   justify-content:center;
-  gap:14px;
+  gap:40px;
   flex:1 1 auto;
   min-height:0;
 }
@@ -157,9 +158,11 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   height:101px;
   object-fit:contain;
 }
+/* Same face as the top HUD's "Коллекция" title (.collectionTopHudTitle) —
+   Georgia serif, not the UI sans-serif everything else in this row uses. */
 .collectionRowLabel{
-  font:600 13px/1.2 inherit;
-  color:#e2c487;
+  font:600 15px/1.2 Georgia,serif;
+  color:#e4c788;
 }
 
 /* --- right: preview stage + zoom + handle strip --- */

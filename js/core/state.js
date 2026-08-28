@@ -394,11 +394,14 @@ function currentLockBodySkin(){ return currentLockBodyEntry().data || ''; }
 function currentLockerSkin(){ return currentLockerEntry().data || ''; }
 function updateMechanismAssetHud(){
   const wrap=document.querySelector('#assetNameHud');
+  const gameEl=document.querySelector('#assetNameGame');
   const lockEl=document.querySelector('#assetNameLock');
   const shackleEl=document.querySelector('#assetNameShackle');
   const plateEl=document.querySelector('#assetNamePlate');
   const pinEl=document.querySelector('#assetNamePin');
   if(!wrap || !lockEl || !shackleEl) return;
+  const gameId=document.body.dataset.prototypeGameId || mode;
+  if(gameEl) gameEl.textContent=`Игра: ${GameCatalog.get(gameId)?.title || gameId}`;
   const lockEntry=currentLockBodyEntry();
   const shackleEntry=currentLockerEntry();
   lockEl.textContent=`lock: ${lockEntry.name || '—'}`;

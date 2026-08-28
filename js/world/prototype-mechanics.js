@@ -63,6 +63,7 @@
     if(!place||!$prototypeMechanicOverlay||!$prototypeMechanicFrame)return;
     if(mapOpen){mapOpen=false;document.body.classList.remove('map-open');$worldMapScreen.hidden=true;}
     activePrototypeMechanic=place;
+    document.body.dataset.prototypeGameId=`prototype:${place.id}`;
     document.body.classList.add('prototype-mechanic-open');
     document.body.classList.toggle('prototype-has-classic-lock',!!GameCatalog.feature(`prototype:${place.id}`,'lock.present'));
     setGameInactive(true);
@@ -71,17 +72,20 @@
     $objectiveLine.innerHTML='ЦЕЛЬ: <b>ПОДГОТОВКА МЕХАНИКИ</b>';
     runReward=1000;
     updateEconomyUI();
+    updateMechanismAssetHud();
     $prototypeMechanicFrame.src=prototypeMechanicUrl(place);
   }
 
   function closePrototypeMechanic(){
     if(!$prototypeMechanicOverlay)return;
     activePrototypeMechanic=null;
+    delete document.body.dataset.prototypeGameId;
     $prototypeMechanicOverlay.hidden=true;
     $prototypeMechanicLoss.hidden=true;
     if($prototypeMechanicFrame)$prototypeMechanicFrame.src='about:blank';
     document.body.classList.remove('prototype-mechanic-open','prototype-has-classic-lock');
     setGameInactive(false);
+    updateMechanismAssetHud();
     render();
     openMap();
   }
@@ -89,11 +93,13 @@
   function leavePrototypeMechanic(){
     if(!activePrototypeMechanic||!$prototypeMechanicOverlay)return;
     activePrototypeMechanic=null;
+    delete document.body.dataset.prototypeGameId;
     $prototypeMechanicOverlay.hidden=true;
     $prototypeMechanicLoss.hidden=true;
     if($prototypeMechanicFrame)$prototypeMechanicFrame.src='about:blank';
     document.body.classList.remove('prototype-mechanic-open','prototype-has-classic-lock');
     setGameInactive(false);
+    updateMechanismAssetHud();
     render();
   }
 

@@ -47,7 +47,7 @@ function freezeGameDefinitions(definitions){
     // Quiet locations omit the flag for readability; normalization keeps the
     // catalogue schema complete for every consumer.
     if(entry.world.noiseSensor===undefined)entry.world.noiseSensor=false;
-    if(entry.readiness===undefined)entry.readiness=entry.kind==='native'?90:70;
+    if(entry.readiness===undefined)entry.readiness=entry.kind==='native'?4:3;
     Object.freeze(entry.lock);
     Object.freeze(entry.world);
     Object.freeze(entry);
@@ -69,7 +69,9 @@ const GameCatalog=(()=>{
     const saved=overrides[id]||{};
     return {
       ...base,
-      readiness:Number.isFinite(+saved.readiness)?Math.max(0,Math.min(100,+saved.readiness)):base.readiness,
+      readiness:Number.isFinite(+saved.readiness)
+        ? Math.max(1,Math.min(5,+saved.readiness>5?Math.round(+saved.readiness/20):+saved.readiness))
+        : base.readiness,
       lock:{...base.lock,...saved.lock},
       world:{...base.world,...saved.world}
     };
@@ -87,7 +89,7 @@ const GameCatalog=(()=>{
     const entry=overrides[id]||(overrides[id]={});
     let target=entry;
     for(const part of parts.slice(0,-1))target=target[part]||(target[part]={});
-    target[parts.at(-1)]=path==='readiness'?Math.max(0,Math.min(100,Number(value)||0)):!!value;
+    target[parts.at(-1)]=path==='readiness'?Math.max(1,Math.min(5,Number(value)||1)):!!value;
     persist();
     emitChange(id,path);
     return get(id);

@@ -6,35 +6,38 @@
 .gameSettingsHeader h1{margin:0;color:#f1d38e;font:700 clamp(26px,3vw,42px)/1.05 Georgia,serif;}
 .gameSettingsHeader p{margin:8px 0 0;color:#bba986;font-size:14px;}
 .gameSettingsClose{flex:0 0 52px;width:52px;height:52px;border:1px solid #88652e;border-radius:12px;background:#17120d;color:#e5c37b;font:700 30px/1 var(--ui-font);cursor:pointer;}
-.gameSettingsClose:hover,.gameSettingsResetAll:hover,.gameSettingReset:hover{filter:brightness(1.18);}
+.gameSettingsClose:hover{filter:brightness(1.18);}
 .gameSettingsToolbar{display:flex;align-items:end;gap:14px;padding:18px 30px;border-bottom:1px solid rgba(178,132,65,.24);}
 .gameSettingsToolbar label{display:grid;gap:6px;color:#ad9872;font-size:11px;text-transform:uppercase;letter-spacing:.1em;}
 .gameSettingsSearch{flex:1;max-width:420px;}
-.gameSettingsToolbar input[type="search"],.gameSettingsToolbar select{height:42px;border:1px solid rgba(166,124,58,.5);border-radius:9px;background:#15110d;color:#ead6ad;padding:0 13px;font:600 14px/1 var(--ui-font);}
-.gameSettingsResetAll,.gameSettingReset{height:42px;border:1px solid rgba(166,124,58,.54);border-radius:9px;background:#21180f;color:#d9bb7d;padding:0 15px;font:700 12px/1 var(--ui-font);cursor:pointer;}
-.gameSettingsResetAll{margin-left:auto;}
+.gameSettingsToolbar input[type="search"]{height:38px;border:1px solid rgba(166,124,58,.5);border-radius:9px;background:#15110d;color:#ead6ad;padding:0 13px;font:600 14px/1 var(--ui-font);}
 .gameSettingsTableWrap{overflow:auto;max-height:calc(100vh - 245px);}
-.gameSettingsTable{width:100%;min-width:1240px;border-collapse:separate;border-spacing:0;}
+.gameSettingsTable{width:100%;min-width:1080px;border-collapse:separate;border-spacing:0;}
 .gameSettingsTable thead{position:sticky;top:0;z-index:2;}
-.gameSettingsTable th,.gameSettingsTable td{padding:13px 12px;border-bottom:1px solid rgba(164,124,64,.17);text-align:center;vertical-align:middle;}
-.gameSettingsTable thead th{background:#21180f;color:#bfa878;font-size:11px;line-height:1.25;text-transform:uppercase;letter-spacing:.06em;white-space:normal;}
+.gameSettingsTable th,.gameSettingsTable td{padding:7px 9px;border-bottom:1px solid rgba(164,124,64,.17);text-align:center;vertical-align:middle;}
+.gameSettingsTable thead th{padding:0;background:#21180f;color:#bfa878;white-space:normal;}
+.gameSettingsTable thead button{width:100%;min-height:44px;border:0;background:transparent;color:inherit;padding:6px 8px;font:700 10px/1.2 var(--ui-font);text-transform:uppercase;letter-spacing:.05em;cursor:pointer;}
+.gameSettingsTable thead button:hover,.gameSettingsTable thead button.active{color:#f0cf88;background:rgba(190,139,61,.08);}
+.gameSettingsTable thead button span{display:block;min-height:11px;margin-top:3px;color:#c99744;font-size:9px;letter-spacing:0;}
 .gameSettingsTable tbody tr:hover{background:rgba(185,137,66,.065);}
-.gameSettingsTable tbody th{text-align:left;min-width:190px;}
-.gameSettingsTable tbody th strong{display:block;color:#ead19a;font:700 16px/1.2 Georgia,serif;}
-.gameSettingsTable tbody th small{display:block;margin-top:4px;color:#75674f;font:500 10px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;}
-.gameKindBadge{display:inline-flex;border:1px solid rgba(168,126,61,.42);border-radius:999px;padding:5px 8px;color:#c8ae77;background:rgba(70,47,27,.48);font-size:10px;white-space:nowrap;}
-.gameKindBadge.prototype{border-color:rgba(103,139,124,.5);color:#b6d1c3;background:rgba(31,58,48,.42);}
+.gameSettingsTable tbody th{min-width:225px;text-align:left;}
+.gameSettingName{display:inline-block;vertical-align:middle;max-width:170px;}
+.gameSettingName strong{display:block;color:#ead19a;font:700 14px/1.15 Georgia,serif;}
+.gameSettingName small{display:block;margin-top:2px;color:#75674f;font:500 9px/1.15 ui-monospace,SFMono-Regular,Menlo,monospace;}
+.gameReadyMark{display:inline-grid;place-items:center;width:17px;height:17px;margin-left:7px;border-radius:50%;background:#8a611f;color:#fff0bd;font:700 11px/1 var(--ui-font);vertical-align:1px;}
+.gameLaunchButton{display:inline-grid;place-items:center;width:30px;height:30px;margin-right:9px;border:1px solid rgba(181,135,62,.58);border-radius:8px;background:#18120d;color:#d7ae64;vertical-align:middle;cursor:pointer;}
+.gameLaunchButton:hover{border-color:#d2a24d;color:#ffe3a5;filter:brightness(1.15);}
+.gameLaunchButton svg{width:15px;height:15px;fill:currentColor;stroke:none;}
 .gameSettingToggle{display:inline-grid;place-items:center;cursor:pointer;}
 .gameSettingToggle input{position:absolute;opacity:0;pointer-events:none;}
-.gameSettingToggle span{display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(152,118,67,.55);border-radius:8px;background:#14110d;transition:.15s ease;}
+.gameSettingToggle span{display:grid;place-items:center;width:25px;height:25px;border:1px solid rgba(152,118,67,.55);border-radius:7px;background:#14110d;transition:.15s ease;}
 .gameSettingToggle span:after{content:"";width:11px;height:6px;border-left:2px solid transparent;border-bottom:2px solid transparent;transform:rotate(-45deg) translateY(-1px);}
 .gameSettingToggle input:checked+span{border-color:#d3a44f;background:linear-gradient(180deg,#b37a25,#7e501a);box-shadow:0 0 16px rgba(212,161,72,.22);}
 .gameSettingToggle input:checked+span:after{border-color:#fff0bd;}
 .gameSettingToggle input:focus-visible+span{outline:2px solid #e1b65e;outline-offset:2px;}
-.gameReadiness{display:grid;grid-template-columns:minmax(90px,1fr) 42px;align-items:center;gap:8px;min-width:155px;}
+.gameReadiness{display:grid;grid-template-columns:minmax(76px,1fr) 30px;align-items:center;gap:6px;min-width:120px;}
 .gameReadiness input{accent-color:#c8953f;width:100%;}
 .gameReadiness output{color:#e8ca89;font:700 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;text-align:right;}
-.gameSettingReset{height:32px;padding:0 10px;color:#9e8965;font-size:10px;}
 .gameSettingsEmpty{padding:60px;text-align:center;color:#9d8967;}
 body.game-settings-open .globalTopHud,body.game-settings-open .inventoryDrawer,body.game-settings-open .alchemyRackDrawer{visibility:hidden!important;pointer-events:none!important;}
 @media(max-width:760px),(max-height:560px) and (orientation:landscape){
@@ -49,6 +52,5 @@ body.game-settings-open .globalTopHud,body.game-settings-open .inventoryDrawer,b
   .gameSettingsClose{width:44px;height:44px;flex-basis:44px;}
   .gameSettingsToolbar{padding:12px 16px;flex-wrap:wrap;}
   .gameSettingsSearch{min-width:100%;max-width:none;}
-  .gameSettingsResetAll{margin-left:0;}
   .gameSettingsTableWrap{max-height:calc(100vh - 225px);}
 }

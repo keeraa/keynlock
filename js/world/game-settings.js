@@ -4,7 +4,9 @@
     const rows=document.querySelector('#gameSettingsRows');
     const empty=document.querySelector('#gameSettingsEmpty');
     const search=document.querySelector('#gameSettingsSearch');
-    const kind=document.querySelector('#gameSettingsKind');
+    const table=document.querySelector('.gameSettingsTable');
+    let sortPath='title';
+    let sortDirection=1;
     const featureColumns=[
       ['lock.present','Физический замок'],
       ['lock.manualOpen','Отдельное открытие'],
@@ -35,29 +37,50 @@
       control.className='gameReadiness';
       const input=document.createElement('input');
       input.type='range';
-      input.min='0';
-      input.max='100';
-      input.step='5';
+      input.min='1';
+      input.max='5';
+      input.step='1';
       input.value=String(value);
       input.dataset.gameId=gameId;
       input.dataset.feature='readiness';
       input.setAttribute('aria-label','Готовность');
       const output=document.createElement('output');
-      output.value=`${value}%`;
-      output.textContent=`${value}%`;
+      output.value=`${value}/5`;
+      output.textContent=`${value}/5`;
       control.append(input,output);
       return control;
+    }
+
+    function sortValue(id,path){
+      const game=GameCatalog.get(id);
+      return path==='title'?game.title:GameCatalog.feature(id,path);
+    }
+
+    function compareGames(a,b){
+      const left=sortValue(a,sortPath);
+      const right=sortValue(b,sortPath);
+      if(typeof left==='string')return left.localeCompare(right,'ru',{sensitivity:'base'})*sortDirection;
+      return ((Number(left)||0)-(Number(right)||0))*sortDirection;
+    }
+
+    function renderSortIndicators(){
+      table?.querySelectorAll('[data-sort]').forEach(button=>{
+        const active=button.dataset.sort===sortPath;
+        button.classList.toggle('active',active);
+        button.setAttribute('aria-sort',active?(sortDirection>0?'ascending':'descending'):'none');
+        const indicator=button.querySelector('span');
+        if(indicator)indicator.textContent=active?(sortDirection>0?'А→Я':'Я→А'):'';
+      });
     }
 
     function renderGameSettings(){
       if(!rows)return;
       const query=(search?.value||'').trim().toLocaleLowerCase('ru');
-      const filter=kind?.value||'all';
       const ids=[...GameCatalog.nativeIds,...GameCatalog.prototypeIds];
       const visible=ids.filter(id=>{
         const game=GameCatalog.get(id);
-        return (filter==='all'||game.kind===filter) && (!query||game.title.toLocaleLowerCase('ru').includes(query)||id.includes(query));
-      });
+        return !query||game.title.toLocaleLowerCase('ru').includes(query)||id.includes(query);
+      }).sort(compareGames);
       rows.replaceChildren();
       visible.forEach(id=>{
         const game=GameCatalog.get(id);
@@ -65,16 +88,18 @@
         tr.dataset.gameId=id;
         const name=document.createElement('th');
         name.scope='row';
-        name.innerHTML=`<strong></strong><small></small>`;
+        name.innerHTML=`<button class="gameLaunchButton" type="button" aria-label="Перейти в игру"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg></button><span class="gameSettingName"><strong></strong><small></small></span>`;
+        name.querySelector('button').dataset.launchGame=id;
         name.querySelector('strong').textContent=game.title;
         name.querySelector('small').textContent=id;
+        if(game.readiness===5){
+          const ready=document.createElement('span');
+          ready.className='gameReadyMark';
+          ready.textContent='✓';
+          ready.title='Готово';
+          name.querySelector('strong').appendChild(ready);
+        }
         tr.appendChild(name);
-        const type=document.createElement('td');
-        const badge=document.createElement('span');
-        badge.className=`gameKindBadge ${game.kind}`;
-        badge.textContent=game.kind==='native'?'Встроенная':'Перенесённая';
-        type.appendChild(badge);
-        tr.appendChild(type);
         featureColumns.forEach(([path,label])=>{
           const td=document.createElement('td');
           td.appendChild(checkbox(id,path,label,GameCatalog.feature(id,path)));
@@ -83,17 +108,18 @@
         const readiness=document.createElement('td');
         readiness.appendChild(readinessControl(id,game.readiness));
         tr.appendChild(readiness);
-        const actions=document.createElement('td');
-        const reset=document.createElement('button');
-        reset.type='button';
-        reset.className='gameSettingReset';
-        reset.dataset.resetGame=id;
-        reset.textContent='Сбросить';
-        actions.appendChild(reset);
-        tr.appendChild(actions);
         rows.appendChild(tr);
       });
       if(empty)empty.hidden=visible.length>0;
+      renderSortIndicators();
+    }
+
+    function launchGame(id){
+      closeGameSettings();
+      const game=GameCatalog.get(id);
+      if(game?.kind==='native'){switchMode(id);return;}
+      const location=MAP_LOCATIONS[`prototype-${id.replace(/^prototype:/,'')}`];
+      if(location)openPrototypeMechanic(location);
     }
 
     function openGameSettings(){
@@ -123,7 +149,13 @@
     document.querySelector('#gameSettingsClose')?.addEventListener('click',closeGameSettings);
     screen?.addEventListener('pointerdown',event=>{if(event.target===screen)closeGameSettings();});
     search?.addEventListener('input',renderGameSettings);
-    kind?.addEventListener('change',renderGameSettings);
+    table?.querySelector('thead')?.addEventListener('click',event=>{
+      const button=event.target.closest?.('[data-sort]');
+      if(!button)return;
+      if(sortPath===button.dataset.sort)sortDirection*=-1;
+      else{sortPath=button.dataset.sort;sortDirection=1;}
+      renderGameSettings();
+    });
     rows?.addEventListener('input',event=>{
       const input=event.target.closest?.('[data-game-id][data-feature]');
       if(!input)return;
@@ -131,18 +163,18 @@
       GameCatalog.setFeature(input.dataset.gameId,input.dataset.feature,value);
       if(input.type==='range'){
         const output=input.parentElement?.querySelector('output');
-        if(output){output.value=`${input.value}%`;output.textContent=`${input.value}%`;}
+        if(output){output.value=`${input.value}/5`;output.textContent=`${input.value}/5`;}
+        const title=input.closest('tr')?.querySelector('.gameSettingName strong');
+        const mark=title?.querySelector('.gameReadyMark');
+        if(input.value==='5'&&!mark){
+          const ready=document.createElement('span');ready.className='gameReadyMark';ready.textContent='✓';ready.title='Готово';title?.appendChild(ready);
+        }else if(input.value!=='5')mark?.remove();
       }
     });
     rows?.addEventListener('click',event=>{
-      const button=event.target.closest?.('[data-reset-game]');
+      const button=event.target.closest?.('[data-launch-game]');
       if(!button)return;
-      GameCatalog.reset(button.dataset.resetGame);
-      renderGameSettings();
-    });
-    document.querySelector('#gameSettingsResetAll')?.addEventListener('click',()=>{
-      GameCatalog.reset();
-      renderGameSettings();
+      launchGame(button.dataset.launchGame);
     });
     addEventListener('keydown',event=>{
       if(event.code!=='Escape'||!document.body.classList.contains('game-settings-open'))return;

@@ -161,12 +161,10 @@
     </div>
     <div class="gameSettingsToolbar">
       <label class="gameSettingsSearch"><span>Поиск</span><input id="gameSettingsSearch" type="search" placeholder="Название игры"></label>
-      <label class="gameSettingsFilter"><span>Тип</span><select id="gameSettingsKind"><option value="all">Все игры</option><option value="native">Встроенные</option><option value="prototype">Перенесённые</option></select></label>
-      <button class="gameSettingsResetAll" id="gameSettingsResetAll" type="button">Сбросить изменения</button>
     </div>
     <div class="gameSettingsTableWrap">
       <table class="gameSettingsTable">
-        <thead><tr><th>Игра</th><th>Тип</th><th>Физический замок</th><th>Отдельное открытие</th><th>Шум</th><th>Датчик шума</th><th>Стражники</th><th>Птицы</th><th>Готовность</th><th></th></tr></thead>
+        <thead><tr><th><button type="button" data-sort="title">Игра <span></span></button></th><th><button type="button" data-sort="lock.present">Физический замок <span></span></button></th><th><button type="button" data-sort="lock.manualOpen">Отдельное открытие <span></span></button></th><th><button type="button" data-sort="world.noise">Шум <span></span></button></th><th><button type="button" data-sort="world.noiseSensor">Датчик шума <span></span></button></th><th><button type="button" data-sort="world.guards">Стражники <span></span></button></th><th><button type="button" data-sort="world.birds">Птицы <span></span></button></th><th><button type="button" data-sort="readiness">Готовность <span></span></button></th></tr></thead>
         <tbody id="gameSettingsRows"></tbody>
       </table>
     </div>

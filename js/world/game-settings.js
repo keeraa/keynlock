@@ -5,7 +5,6 @@
     const empty=document.querySelector('#gameSettingsEmpty');
     const search=document.querySelector('#gameSettingsSearch');
     const table=document.querySelector('.gameSettingsTable');
-    const recentList=document.querySelector('#gameSettingsRecentList');
     const recentStorageKey='keynlockRecentlyOpenedGames';
     let recentGames=[];
     try{recentGames=JSON.parse(STORE.getItem(recentStorageKey)||'[]').filter(id=>GameCatalog.has(id)).slice(0,3);}catch(_){recentGames=[];}
@@ -25,26 +24,7 @@
       if(!GameCatalog.has(id))return;
       recentGames=[id,...recentGames.filter(saved=>saved!==id)].slice(0,3);
       try{STORE.setItem(recentStorageKey,JSON.stringify(recentGames));}catch(_){}
-      if(!screen?.hidden)renderRecentGames();
-    }
-
-    function renderRecentGames(){
-      if(!recentList)return;
-      recentList.replaceChildren();
-      recentGames.forEach((id,index)=>{
-        const game=GameCatalog.get(id);
-        if(!game)return;
-        const button=document.createElement('button');
-        button.type='button';
-        button.className='gameSettingsRecentItem';
-        button.dataset.recentGame=id;
-        button.innerHTML='<span class="gameSettingsRecentOrder"></span><span class="gameSettingsRecentName"></span><span class="gameSettingsRecentPlay" aria-hidden="true">▶</span>';
-        button.querySelector('.gameSettingsRecentOrder').textContent=String(index+1);
-        button.querySelector('.gameSettingsRecentName').textContent=game.title;
-        button.setAttribute('aria-label',`Открыть ${game.title}, первый уровень`);
-        recentList.appendChild(button);
-      });
-      recentList.closest('.gameSettingsRecent')?.classList.toggle('empty',recentGames.length===0);
+      if(!screen?.hidden)renderGameSettings();
     }
 
     function checkbox(gameId,path,label,checked){
@@ -116,7 +96,16 @@
       const visible=ids.filter(id=>{
         const game=GameCatalog.get(id);
         return !query||game.title.toLocaleLowerCase('ru').includes(query)||id.includes(query);
-      }).sort(compareGames);
+      }).sort((a,b)=>{
+        const recentA=recentGames.indexOf(a);
+        const recentB=recentGames.indexOf(b);
+        if(recentA!==-1||recentB!==-1){
+          if(recentA===-1)return 1;
+          if(recentB===-1)return -1;
+          return recentA-recentB;
+        }
+        return compareGames(a,b);
+      });
       rows.replaceChildren();
       visible.forEach(id=>{
         const game=GameCatalog.get(id);
@@ -178,7 +167,7 @@
       const game=GameCatalog.get(id);
       if(game?.kind==='native'){
         setModeDifficulty(level,id,false);
-        switchMode(id);
+        switchMode(id,true);
         return;
       }
       const location=MAP_LOCATIONS[`prototype-${id.replace(/^prototype:/,'')}`];
@@ -194,7 +183,6 @@
       document.body.classList.add('game-settings-open');
       setGameInactive(true);
       screen.hidden=false;
-      renderRecentGames();
       renderGameSettings();
       requestAnimationFrame(()=>search?.focus({preventScroll:true}));
     }
@@ -242,10 +230,6 @@
       const button=event.target.closest?.('[data-launch-game]');
       if(!button)return;
       launchGame(button.dataset.launchGame);
-    });
-    recentList?.addEventListener('click',event=>{
-      const button=event.target.closest?.('[data-recent-game]');
-      if(button)launchGame(button.dataset.recentGame,1);
     });
     addEventListener('keynlock-game-opened',event=>recordRecentGame(event.detail?.id));
     addEventListener('keydown',event=>{

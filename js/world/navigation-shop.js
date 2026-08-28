@@ -81,13 +81,13 @@
   function openShop(){ setInventoryOpen(false); if(mapOpen) closeMap(); shopOpen=true; document.body.classList.add('shop-open'); $toast.classList.remove('show','actionable'); updateShopUI(); $shopOverlay.classList.add('open'); }
   function closeShop(){ shopOpen=false; document.body.classList.remove('shop-open'); $shopOverlay.classList.remove('open'); updatePickUI(); }
   let modeSwitchFrame=0;
-  function switchMode(nextMode){
+  function switchMode(nextMode,forceRestart=false){
     if(!ALL_MODES.has(nextMode)) return;
     window.dispatchEvent(new CustomEvent('keynlock-game-opened',{detail:{id:nextMode}}));
     if(lairOpen) closeLair();
     if(mapOpen) closeMap();
     if(shopOpen) closeShop();
-    if(mode===nextMode && !solved && !document.body.classList.contains('game-inactive')) return;
+    if(!forceRestart && mode===nextMode && !solved && !document.body.classList.contains('game-inactive')) return;
     mode=nextMode;
     syncModePanels(mode);
     updateModeUI();

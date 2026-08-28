@@ -7,16 +7,6 @@
 .gameSettingsHeader p{margin:8px 0 0;color:#bba986;font-size:14px;}
 .gameSettingsClose{flex:0 0 52px;width:52px;height:52px;border:1px solid #88652e;border-radius:12px;background:#17120d;color:#e5c37b;font:700 30px/1 var(--ui-font);cursor:pointer;}
 .gameSettingsClose:hover{filter:brightness(1.18);}
-.gameSettingsRecent{padding:14px 30px 16px;border-bottom:1px solid rgba(178,132,65,.24);background:rgba(16,12,9,.3);}
-.gameSettingsRecent.empty{display:none;}
-.gameSettingsRecentTitle{margin-bottom:9px;color:#bd8e49;font:700 10px/1.2 var(--ui-font);letter-spacing:.14em;text-transform:uppercase;}
-.gameSettingsRecentList{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;}
-.gameSettingsRecentItem{min-width:0;height:38px;display:grid;grid-template-columns:22px minmax(0,1fr) 18px;align-items:center;gap:7px;padding:0 10px;border:1px solid rgba(166,124,58,.42);border-radius:9px;background:linear-gradient(180deg,#2a1e14,#17110d);color:#dfc18a;text-align:left;cursor:pointer;}
-.gameSettingsRecentItem:first-child{border-color:#c18d3d;background:linear-gradient(180deg,#3d2917,#20160e);color:#f1d18e;}
-.gameSettingsRecentItem:hover{filter:brightness(1.15);border-color:#d2a24d;}
-.gameSettingsRecentOrder{display:grid;place-items:center;width:20px;height:20px;border-radius:6px;background:rgba(202,151,70,.13);color:#ba8c49;font:700 10px/1 var(--ui-font);}
-.gameSettingsRecentName{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:700 12px/1.2 Georgia,serif;}
-.gameSettingsRecentPlay{color:#b98a45;font-size:9px;text-align:right;}
 .gameSettingsToolbar{display:flex;align-items:end;gap:14px;padding:18px 30px;border-bottom:1px solid rgba(178,132,65,.24);}
 .gameSettingsToolbar label{display:grid;gap:6px;color:#ad9872;font-size:11px;text-transform:uppercase;letter-spacing:.1em;}
 .gameSettingsSearch{flex:1;max-width:420px;}
@@ -68,8 +58,6 @@ body.game-settings-open .globalTopHud,body.game-settings-open .inventoryDrawer,b
   .gameSettingsHeader p{font-size:12px;}
   .gameSettingsClose{width:44px;height:44px;flex-basis:44px;}
   .gameSettingsToolbar{padding:12px 16px;flex-wrap:wrap;}
-  .gameSettingsRecent{padding:11px 16px 12px;}
-  .gameSettingsRecentList{grid-template-columns:1fr;}
   .gameSettingsSearch{min-width:100%;max-width:none;}
   .gameSettingsTableWrap{max-height:calc(100vh - 300px);}
 }

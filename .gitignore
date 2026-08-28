@@ -1,1 +1,3 @@
 build-info.json
+.vercel
+.env*

@@ -58,6 +58,18 @@
   const $stageInner = $root.querySelector('#collectionStageInner');
   const $imgShaft = $root.querySelector('#collectionImgShaft');
   const $imgHandle = $root.querySelector('#collectionImgHandle');
+  const $smoke = $root.querySelector('#collectionStageSmoke');
+
+  // Re-triggers the CSS burst animation (a class can't replay its own
+  // animation just by staying applied — remove it, force a reflow, then
+  // add it back) whenever the collection changes.
+  function burstSmoke(){
+    if(!$smoke) return;
+    $smoke.classList.remove('burst');
+    void $smoke.offsetWidth;
+    $smoke.classList.add('burst');
+    $smoke.addEventListener('animationend', () => $smoke.classList.remove('burst'), { once: true });
+  }
 
   // The stage's own coordinate system matches the prototype's: every shaft
   // and handle PNG is native-pixel-sized inside a much taller box, shaft
@@ -92,12 +104,14 @@
         <span class="collectionRowLabel">${col.name}</span>
       `;
       row.addEventListener('click', () => {
+        if(col.id === state.collectionId) return;
         state.collectionId = col.id;
         const firstUnlocked = col.handles.find(isUnlocked) || col.handles[0];
         state.handle = firstUnlocked;
         renderCollectionList();
         renderHandleStrip();
         renderStage();
+        burstSmoke();
       });
       $collectionList.appendChild(row);
     });

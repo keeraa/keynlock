@@ -289,6 +289,7 @@
   });
   $lairModuleClose?.addEventListener('click',closeLairModule);
   document.querySelector('#alchemyTopHudClose')?.addEventListener('click',closeLairModule);
+  document.querySelector('#collectionTopHudClose')?.addEventListener('click',closeLairModule);
 
   if($shopTab) $shopTab.onclick=null;
   $shopClose.onclick=closeShop;

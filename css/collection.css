@@ -2,11 +2,96 @@
    of the lair (.lairHotspot, .lairCharacter), self-contained rather than
    reaching into the shared .lairPanelHead/.lairPanelTitle classes (those
    vary per game-mode theme file; this screen doesn't need to). */
-/* The left list now shows every handle of a collection in one row per
-   button, which needs real vertical room — let the window grow taller for
-   this panel specifically rather than cramping the strips. */
-#lairModuleWindow:has(.lairPanel[data-lair-panel="collection"].active){max-height:90vh;}
-#lairModuleWindow:has(.lairPanel[data-lair-panel="collection"].active) .lairModuleBody{max-height:calc(90vh - 54px);}
+
+/* ============================================================
+   Full-screen takeover, same pattern as alchemy (css/alchemy.css):
+   strip the shared modal's chrome (border/background/header) and show
+   a fixed top HUD bar instead, so this reads as its own screen rather
+   than a dialog box floating over the lair. Reuses alchemy's own blur
+   layer and hotspot-lockout rules (same #alchemyFullBlur element,
+   same .lairHotspot/.lairWorkbenchHotspot selector) rather than
+   duplicating them for a second element.
+   ============================================================ */
+body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active) #alchemyFullBlur{opacity:1;}
+body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active) :is(.lairHotspot,.lairWorkbenchHotspot){pointer-events:none!important;}
+
+.lairPanel[data-lair-panel="collection"].active{
+  display:flex!important;
+  flex:1 1 auto;
+  min-height:0;
+  min-width:0;
+}
+#lairModuleWindow:has(.lairPanel[data-lair-panel="collection"].active){
+  display:flex;
+  flex-direction:column;
+  border:none;
+  border-radius:0;
+  box-shadow:none;
+  background:none;
+  overflow:visible!important;
+  max-height:90vh;
+  width:min(760px,88vw);
+}
+#lairModuleWindow:has(.lairPanel[data-lair-panel="collection"].active) .lairModuleHeader{
+  display:none!important;
+}
+#lairModuleWindow:has(.lairPanel[data-lair-panel="collection"].active) .lairModuleBody{
+  display:flex;
+  flex-direction:column;
+  flex:1 1 auto;
+  min-height:0;
+  overflow:visible!important;
+  max-height:90vh;
+  /* Clears the fixed top HUD bar (68px tall, 14px from the top) that
+     replaces the hidden shared header. */
+  padding-top:74px;
+}
+
+.collectionTopHud{
+  display:none;
+  position:fixed;
+  z-index:361;
+  left:clamp(124px,8vw,180px);
+  right:clamp(340px,25vw,520px);
+  top:14px;
+  height:68px;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(152,110,54,.38);
+  border-radius:12px;
+  background:linear-gradient(90deg,rgba(22,15,10,.28),rgba(40,25,15,.82),rgba(22,15,10,.28));
+  backdrop-filter:blur(8px);
+  box-shadow:0 8px 24px rgba(0,0,0,.22);
+}
+body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active) .collectionTopHud{display:flex;}
+.collectionTopHudTitle{
+  color:#e4c788;
+  font:600 20px/1 Georgia,serif;
+  text-shadow:0 1px 4px rgba(0,0,0,.7);
+}
+.collectionTopHudClose{
+  position:absolute;
+  right:10px;
+  width:44px;height:44px;
+  border:1px solid #664d2c;
+  border-radius:9px;
+  background:#17120e;
+  color:#c6a66f;
+  font:25px/1 Arial,sans-serif;
+  cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,.5);
+}
+@media (max-width:899px){
+  .collectionTopHud{
+    left:calc(var(--mobile-safe-left,0px) + 58px);
+    right:calc(var(--mobile-safe-right,0px) + 8px);
+    top:calc(var(--mobile-safe-top,0px) + 7px);
+    height:54px;
+  }
+  .collectionTopHudTitle{font-size:17px;}
+  .collectionTopHudClose{right:7px;width:38px;height:38px;}
+  #lairModuleWindow:has(.lairPanel[data-lair-panel="collection"].active) .lairModuleBody{padding-top:60px;}
+}
 
 .alchemyRoot ~ #collectionRoot,
 #collectionRoot{
@@ -20,6 +105,7 @@
 }
 .collectionLayout{
   display:flex;
+  justify-content:center;
   gap:14px;
   flex:1 1 auto;
   min-height:0;
@@ -68,7 +154,7 @@
 }
 .collectionRowThumbs img{
   width:100%;
-  height:112px;
+  height:101px;
   object-fit:contain;
 }
 .collectionRowLabel{
@@ -78,8 +164,8 @@
 
 /* --- right: preview stage + zoom + handle strip --- */
 .collectionPreviewCol{
-  --preview-w:min(460px,100%);
-  flex:1 1 auto;
+  --preview-w:min(414px,100%);
+  flex:0 1 auto;
   min-width:0;
   display:flex;
   flex-direction:column;
@@ -123,6 +209,18 @@
   0%{transform:translate(-2%,-1%) scale(1);}
   100%{transform:translate(2%,2%) scale(1.08);}
 }
+/* One-shot puff on collection change: takes over from the ambient drift
+   for its duration (JS removes the class on animationend, handing the
+   transform back to the drift animation above), scaling outward from
+   center and fading rather than just continuing to drift in place. */
+.collectionStageSmoke.burst{
+  animation:collectionSmokeBurst 900ms ease-out;
+}
+@keyframes collectionSmokeBurst{
+  0%{transform:scale(.4);opacity:1;filter:blur(10px);}
+  60%{opacity:.85;}
+  100%{transform:scale(1.6);opacity:0;filter:blur(22px);}
+}
 .collectionStageInner{
   position:relative;
   width:300px;
@@ -138,8 +236,8 @@
 .collectionLayerHandle{bottom:0;z-index:2;}
 
 /* One row spanning the preview's own width, no card chrome — just the
-   pick art, ~10% smaller than the earlier boxed cards (52px -> 47px) so
-   all 8 fit without wrapping. */
+   pick art, sized down alongside the preview stage (52px original ->
+   47px -> 42px, a further 10% pass) so all 8 fit without wrapping. */
 .collectionHandleStrip{
   width:var(--preview-w);
   display:flex;
@@ -149,7 +247,7 @@
   padding-top:4px;
 }
 .collectionHandleCard{
-  width:47px;height:47px;
+  width:42px;height:42px;
   padding:0;
   border:0;
   background:transparent;

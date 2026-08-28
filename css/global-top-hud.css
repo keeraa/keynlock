@@ -107,6 +107,7 @@
 .globalTopHud .modeTabs{position:fixed!important;}
 
 body.lair-open .globalTopHud .mobileModeMenuButton{display:grid!important;}
+body.lair-open .globalTopHud #rewardBox{display:none!important;}
 body.lair-open .globalTopHud #difficultyDock,
 body.shop-open .globalTopHud #difficultyDock,
 body.map-open .globalTopHud #difficultyDock{display:none!important;}

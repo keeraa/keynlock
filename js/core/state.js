@@ -1,4 +1,21 @@
   const GOAL=4, MIN=1, MAX=7;
+  const WORLD_PAUSE_CLASSES=['lair-open','shop-open','map-open','prototype-mechanic-open'];
+  let worldPauseState=null;
+  function isWorldPaused(){
+    return document.hidden || WORLD_PAUSE_CLASSES.some(name=>document.body.classList.contains(name));
+  }
+  function syncWorldPauseState(){
+    const paused=isWorldPaused();
+    if(document.body.classList.contains('world-paused')!==paused){
+      document.body.classList.toggle('world-paused',paused);
+    }
+    if(paused===worldPauseState)return;
+    worldPauseState=paused;
+    window.dispatchEvent(new CustomEvent('keynlock-world-pausechange',{detail:{paused}}));
+  }
+  new MutationObserver(syncWorldPauseState).observe(document.body,{attributes:true,attributeFilter:['class']});
+  document.addEventListener('visibilitychange',syncWorldPauseState);
+  queueMicrotask(syncWorldPauseState);
   const STORE=(()=>{
     try{
       const s=window.localStorage;

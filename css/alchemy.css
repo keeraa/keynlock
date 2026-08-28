@@ -2112,7 +2112,7 @@ body.map-open #difficultyDock {
 }
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active)
   .scene.active {
-  transform: translateY(5vh);
+  transform: translateY(10vh) !important;
 }
 
 .alchemyTopHud {

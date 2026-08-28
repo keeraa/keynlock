@@ -141,7 +141,10 @@
 
   let noiseLast = performance.now();
   let noiseWasShowing = null;
+  let noiseLoopParked = false;
   function noiseTick(now){
+    if(isWorldPaused()){ noiseLoopParked=true; return; }
+    noiseLoopParked=false;
     const dt = Math.min(200, now - noiseLast);
     noiseLast = now;
     if(noiseLevel > 0 && !guardsCalled){
@@ -152,8 +155,15 @@
     }
     const showing = noiseActive() && !solved;
     if(showing !== noiseWasShowing){ noiseWasShowing = showing; renderNoise(); }
-    setTimeout(()=>requestAnimationFrame(noiseTick),document.hidden ? 500 : 100);
+    setTimeout(()=>requestAnimationFrame(noiseTick),100);
   }
+  window.addEventListener('keynlock-world-pausechange',event=>{
+    if(!event.detail?.paused && noiseLoopParked){
+      noiseLoopParked=false;
+      noiseLast=performance.now();
+      requestAnimationFrame(noiseTick);
+    }
+  });
 
   buildGuardFace();
   buildNoiseMeter();
@@ -212,6 +222,7 @@
 
   function scheduleBird(){
     clearTimeout(birdTimer);
+    if(isWorldPaused()){ birdTimer=0; return; }
     const gap = BIRD_GAP_MIN + Math.random() * (BIRD_GAP_MAX - BIRD_GAP_MIN);
     birdTimer = setTimeout(sendBird, gap);
   }
@@ -219,6 +230,7 @@
   let birdHovered = false;
 
   function sendBird(){
+    if(isWorldPaused()){ scheduleBird(); return; }
     if(!birdsActive()){ scheduleBird(); return; }
     birdState = 'warning';
     birdWatchedMs = 0;
@@ -330,6 +342,21 @@
       if(birdWatchedMs >= BIRD_HOLD_MS) noticeBird();
     }, BIRD_TICK);
   }
+
+  window.addEventListener('keynlock-world-pausechange',event=>{
+    if(event.detail?.paused){
+      clearTimeout(birdTimer);
+      clearInterval(birdLookTimer);
+      birdTimer=0;
+      birdState='idle';
+      birdWatchedMs=0;
+      birdHovered=false;
+      birdEl?.classList.remove('active','passing','watched');
+      birdShadow?.classList.remove('active');
+      return;
+    }
+    scheduleBird();
+  });
 
   buildBird();
   scheduleBird();

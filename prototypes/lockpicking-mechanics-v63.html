@@ -527,11 +527,26 @@ button {
 }
 /* Oblivion */
 .lockpick-prototype .scene[data-name="Oblivion"] .ob-wrap {
-  width:min(640px,100%);
+  /* Wider than the shared 640px museum-column width other prototype
+     scenes use — on a normal desktop-width screen that left ~320px of
+     dead space on each side, which read as "too much space left/right"
+     next to Classic mode's much wider layout. */
+  width:min(980px,92%);
   display:flex;
   flex-direction:column;
   align-items:center;
   gap:18px
+}
+/* .lab (base rule, shared by every prototype scene) is
+   min-height:560px + align-items:center — Oblivion's own content
+   (~380px) is well under that, so centering added ~90px of dead space
+   above AND below it on top of the padding-top below, which is most of
+   why the scene ended up taller than the viewport and scrolled. Oblivion
+   doesn't need the generic min-height or the vertical centering since
+   its own scene padding already places it precisely. */
+.lockpick-prototype .scene[data-name="Oblivion"] .lab {
+  min-height:0;
+  align-items:flex-start;
 }
 .lockpick-prototype .scene[data-name="Oblivion"] .ob-lock {
   width:100%;
@@ -641,7 +656,7 @@ button {
    which only sees classes on the shadow HOST itself
    (.prototypeMechanicHost), not classes on the outer page's <body>. */
 html.embedded .lockpick-prototype .scene[data-name="Oblivion"] {
-  padding-top:300px;
+  padding-top:345px;
 }
 @media(max-width:650px) {
   .lockpick-prototype .scene[data-name="Oblivion"] .ob-lock {

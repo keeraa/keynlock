@@ -486,7 +486,7 @@
    the alchemy rack drawer the same way. Both drawers use the same distance field
    in both directions, so moving away reverses the approach just as smoothly. */
 (function(){
-  const REACH=180;   // px around the drawer where the lift starts
+  const TRIGGER_DEPTH=180; // total px from the viewport bottom, including the visible peek
   const LIFT=30;      // px of extra peek at full approach
   const LOCK_REACH=300;  // px around the lock hit area where the glow starts
 
@@ -522,7 +522,15 @@
       // chase its own movement. Spread the rect field by field — DOMRect keeps
       // its values on the prototype, so {...rect} comes out empty.
       const lift=parseFloat(drawer.style.getPropertyValue(cssVar))||0;
-      const t=seen ? ease(clamp01(1 - gapTo({left:r.left,right:r.right,top:r.top+lift,bottom:r.bottom+lift})/REACH)) : 0;
+      const restingRect={left:r.left,right:r.right,top:r.top+lift,bottom:r.bottom+lift};
+      // The old radius started above the already-visible peek, so a requested
+      // 180px zone was really 180px + 56/72px. Subtract that peek here: the
+      // first movement now begins exactly 180px from the viewport bottom for
+      // both the lockpick case and the alchemy rack.
+      const peekName=cssVar==='--rack-approach' ? '--rack-peek' : '--inv-peek';
+      const peek=parseFloat(getComputedStyle(drawer).getPropertyValue(peekName))||0;
+      const reach=Math.max(1,TRIGGER_DEPTH-peek);
+      const t=seen ? ease(clamp01(1 - gapTo(restingRect)/reach)) : 0;
       const peak=typeof maxLift==='function' ? maxLift(r) : maxLift;
       drawer.style.setProperty(cssVar,`${(t*peak).toFixed(2)}px`);
     };

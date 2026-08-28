@@ -31,7 +31,11 @@
         .lockpick-prototype .an-time,
         .lockpick-prototype .me2-time,
         .lockpick-prototype .bs1-meter,
-        .lockpick-prototype .bs1-head #bs1Time{display:none!important}`;
+        .lockpick-prototype .bs1-head #bs1Time{display:none!important}
+        .lockpick-prototype{font-family:var(--ui-font,"Golos Text",Arial,sans-serif)!important}
+        .lockpick-prototype button{font-family:inherit!important}
+        .lockpick-prototype .scene-head h2{font-family:var(--title-font,"Cormorant Garamond",Georgia,serif)!important}
+        .lockpick-prototype .status,.lockpick-prototype .museum-msg{font-family:var(--accent-font,"Forum",Georgia,serif)!important}`;
     shadow.append(style,prototypeRoot.cloneNode(true));
     host.classList.add('embedded');
 

@@ -1,12 +1,12 @@
 /* Refactored stylesheet: stale legacy selectors removed; cascade-preserving declarations retained. */
-:root{--paper:#d7c8b5;--ui-font:Georgia, "Times New Roman", serif;}
+:root{--paper:#d7c8b5;--title-font:"Cormorant Garamond",Georgia,"Times New Roman",serif;--ui-font:"Golos Text",Arial,sans-serif;--accent-font:"Forum",Georgia,serif;}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 [hidden]{display:none!important;}
 .modePanel{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:auto;}
 .modePanel[hidden]{display:none!important;}
 html{height:100%;}
 body{height:100%;margin:0;overflow:hidden;background:linear-gradient(rgba(10,8,6,.62), rgba(10,8,6,.72)),
-      url("../assets/backgrounds/main-background.jpg") center center / cover no-repeat fixed;color:var(--paper);font-family:Georgia,"Times New Roman",serif;user-select:none;-webkit-user-select:none;}
+      url("../assets/backgrounds/main-background.jpg") center center / cover no-repeat fixed;color:var(--paper);font-family:var(--ui-font);user-select:none;-webkit-user-select:none;}
 body.world-paused .main{visibility:hidden!important;}
 body.world-paused .main *,body.world-paused .main *::before,body.world-paused .main *::after,body.world-paused .skyBird,body.world-paused .birdShadow{animation-play-state:paused!important;}
 body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.14;background-image:repeating-linear-gradient(7deg, transparent 0 19px, rgba(255,255,255,.018) 20px 21px),

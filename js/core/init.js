@@ -264,6 +264,7 @@
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='resonance'&&e.code==='Space'){e.preventDefault();hitResonance();}});
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='tension'&&e.code==='Space'){e.preventDefault();setTensionPin();}});
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='deduction'&&e.code==='Space'){e.preventDefault();checkDeduction();}});
+  addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='oblivion'&&e.code==='Space'){e.preventDefault();obClick(obSelected);}});
   document.querySelector('#shopHudButton')?.addEventListener('click',()=>{
     if(lairOpen) closeLair();
     if(mapOpen) closeMap();

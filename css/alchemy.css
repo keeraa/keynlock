@@ -1823,7 +1823,10 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
        so lift it by that amount: the feet keep the established table baseline
        while the frame itself is no longer vertically squashed. */
     aspect-ratio: 1407 / 1096;
-    transform: translate(-50%, calc(-27.35% - 12vh));
+    /* A further 20% of the board's own rendered height above the previous
+       placement, without changing its native proportions or table baseline
+       calculations for the other scene objects. */
+    transform: translate(-50%, calc(-47.35% - 12vh));
   }
   .alchemyRoot .scene.active .alchemyMixReferenceBoard {
     width: 100%;
@@ -1837,6 +1840,13 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
     top: 5%;
     width: 80%;
     height: 56%;
+  }
+  @media (max-height: 760px) {
+    /* Keep the reference clear of the unified header in short landscape
+       windows; taller screens receive the full additional 20% lift above. */
+    .alchemyRoot .scene.active .alchemyMixReference {
+      transform: translate(-50%, calc(-27.35% - 12vh));
+    }
   }
   /* The reference board is scenery. Every interactive object must stand in
      front of it in every station, not only in Mixing. */

@@ -243,9 +243,6 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
      on any real drag. See js/world/collection.js for the fuller note. */
   transform-origin:50% 50%;
 }
-/* Applied only for the initial press-to-angle jump, then dropped for the
-   rest of the drag so live tracking stays 1:1 with the pointer. */
-.collectionStageInner.easing{transition:transform .18s ease;}
 .collectionStageInner .collectionLayer{position:absolute;left:50%;pointer-events:none;}
 .collectionStageInner .collectionLayer img{display:block;}
 .collectionLayerShaft{top:0;z-index:1;}

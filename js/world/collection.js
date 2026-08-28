@@ -232,8 +232,26 @@
       const dx = clientX - cx, dy = clientY - cy;
       return Math.atan2(dx, -dy) * 180 / Math.PI;
     }
+    // Wraps a raw angle difference into (-180, 180] — atan2 only ever
+    // returns -180..180, so a drag that crosses that seam (e.g. pointer
+    // angle going from 179° to -179°, an actual 2° move) would otherwise
+    // read as a 358° jump.
+    function normalizeAngleDelta(delta){
+      return ((delta + 180) % 360 + 360) % 360 - 180;
+    }
     function dist(a, b){ return Math.hypot(a.x - b.x, a.y - b.y); }
     function stopRotate(){ rotating = false; $stage.classList.remove('dragging'); }
+
+    // Relative dragging, not absolute angle-snapping: grabbing the object
+    // used to immediately set its rotation to match the click point's own
+    // angle from center, so a click on the lower half (where the handle
+    // sits at rest, near 180° from center) snapped the whole tool to face
+    // that way before any actual drag motion happened. Now the press only
+    // records a starting reference; only pointer MOVEMENT after that
+    // changes the rotation, by the same amount the pointer's own angle
+    // changed — so touching down anywhere never itself moves the tool.
+    let dragStartPointerAngle = 0;
+    let dragStartRotate = 0;
 
     $stage.addEventListener('pointerdown', e => {
       $stage.setPointerCapture(e.pointerId);
@@ -241,12 +259,8 @@
       if(pointers.size === 1){
         rotating = true;
         $stage.classList.add('dragging');
-        // The initial press can land far from the current angle — ease
-        // into it once so it doesn't visually snap, then drop the
-        // transition so live tracking stays 1:1 with the pointer.
-        $stageInner.classList.add('easing');
-        state.rotate = Math.max(-180, Math.min(180, Math.round(angleFromCenter(e.clientX, e.clientY))));
-        renderStage();
+        dragStartPointerAngle = angleFromCenter(e.clientX, e.clientY);
+        dragStartRotate = state.rotate;
       }else if(pointers.size === 2){
         stopRotate();
         const [a, b] = [...pointers.values()];
@@ -265,8 +279,8 @@
           renderStage();
         }
       }else if(rotating){
-        $stageInner.classList.remove('easing');
-        state.rotate = Math.max(-180, Math.min(180, Math.round(angleFromCenter(e.clientX, e.clientY))));
+        const delta = normalizeAngleDelta(angleFromCenter(e.clientX, e.clientY) - dragStartPointerAngle);
+        state.rotate = Math.round(dragStartRotate + delta);
         renderStage();
       }
     });

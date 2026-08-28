@@ -85,6 +85,7 @@ if(mode==='classic'){
   }
   function beginRoundState(){
     activeRoundId++;
+    gameDefeat.reset();
     setGameInactive(false);
     setToastActionLabel('Новый замок');
     document.querySelectorAll('.mechanismZone, .sharedModeLockArt').forEach(el=>{
@@ -102,7 +103,7 @@ if(mode==='classic'){
   }
 
   function celebrate(){
-    if(!solved) return;
+    if(!solved||gameDefeat.isActive()) return;
     const completedRoundId=activeRoundId;
     awardRun();
     setGameInactive(true);

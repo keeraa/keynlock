@@ -22,7 +22,6 @@
   let prototypeMechanicReady=false;
 
   const $prototypeMechanicOverlay=document.querySelector('#prototypeMechanicOverlay');
-  const $prototypeMechanicLoss=document.querySelector('#prototypeMechanicLoss');
 
   function prototypeLocationId(place){return `prototype-${place.id}`;}
   function syncPrototypeTools(){
@@ -63,13 +62,14 @@
     if(mapOpen){mapOpen=false;document.body.classList.remove('map-open');$worldMapScreen.hidden=true;}
     activePrototypeMechanic=place;
     prototypeMechanicReady=false;
+    solved=false;
     $mechanism?.classList.remove('opening','opened','shake-fail');
     document.body.dataset.prototypeGameId=`prototype:${place.id}`;
     document.body.classList.add('prototype-mechanic-open');
     document.body.classList.remove('prototype-lock-ready');
     document.body.classList.toggle('prototype-has-classic-lock',!!GameCatalog.feature(`prototype:${place.id}`,'lock.present'));
     setGameInactive(true);
-    $prototypeMechanicLoss.hidden=picks>0;
+    gameDefeat.reset();
     $prototypeMechanicOverlay.hidden=false;
     $objectiveLine.innerHTML='ЦЕЛЬ: <b>ПОДГОТОВКА МЕХАНИКИ</b>';
     setGlobalTimer(false);
@@ -91,7 +91,7 @@
     prototypeMechanicReady=false;
     delete document.body.dataset.prototypeGameId;
     $prototypeMechanicOverlay.hidden=true;
-    $prototypeMechanicLoss.hidden=true;
+    gameDefeat.reset();
     window.KeynlockImportedGames?.close();
     setGlobalTimer(false);
     document.body.classList.remove('prototype-mechanic-open','prototype-has-classic-lock','prototype-lock-ready');
@@ -107,7 +107,7 @@
     prototypeMechanicReady=false;
     delete document.body.dataset.prototypeGameId;
     $prototypeMechanicOverlay.hidden=true;
-    $prototypeMechanicLoss.hidden=true;
+    gameDefeat.reset();
     window.KeynlockImportedGames?.close();
     setGlobalTimer(false);
     document.body.classList.remove('prototype-mechanic-open','prototype-has-classic-lock','prototype-lock-ready');
@@ -118,10 +118,11 @@
 
   function replayPrototypeMechanic(){
     if(!activePrototypeMechanic)return;
+    solved=false;
     picks=pickCapacity;
     brokenPicks=0;
     renderInventoryTools();
-    $prototypeMechanicLoss.hidden=true;
+    gameDefeat.reset();
     window.KeynlockImportedGames?.replay();
   }
 
@@ -136,7 +137,6 @@
     const node=event.target.closest?.('.prototypeMechanicNode');
     if(node)travelToMapLocation(node.dataset.location);
   });
-  document.querySelector('#prototypeMechanicReplay')?.addEventListener('click',replayPrototypeMechanic);
   document.querySelector('#lockHitArea')?.addEventListener('click',event=>{
     if(!activePrototypeMechanic||!GameCatalog.feature(`prototype:${activePrototypeMechanic.id}`,'lock.manualOpen'))return;
     event.preventDefault();
@@ -184,7 +184,8 @@
       return;
     }
     if(event.data.type==='keynlock-mechanic-loss'){
-      $prototypeMechanicLoss.hidden=false;
+      const reason=event.data.reason==='time'||activePrototypeMechanic.game==='Alpha Protocol'?'time':'picks';
+      showGameDefeat(reason);
       return;
     }
     if(event.data.type==='keynlock-mechanic-tension'){

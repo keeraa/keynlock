@@ -18,12 +18,6 @@ body.prototype-has-classic-lock #lock.universalLockBlock .pick{transition:transf
 .prototypeMechanicOverlay[hidden]{display:none!important;}
 .prototypeMechanicHost{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;outline:0;}
 .prototypeMechanicHost[hidden]{display:none!important;}
-.prototypeMechanicLoss{position:absolute;inset:0;z-index:5;display:grid;place-items:center;padding:20px;background:rgba(2,2,3,.68);backdrop-filter:blur(4px);}
-.prototypeMechanicLoss[hidden]{display:none!important;}
-.prototypeMechanicLossCard{width:min(430px,92vw);padding:26px;display:flex;flex-direction:column;align-items:center;gap:12px;border:1px solid rgba(190,145,71,.7);border-radius:18px;background:linear-gradient(180deg,#2e2318,#14100c);color:#d7c3a0;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.58);}
-.prototypeMechanicLossCard strong{color:#f0d49d;font:600 25px/1.15 Georgia,serif;}
-.prototypeMechanicLossCard span{font:14px/1.45 Arial,sans-serif;}
-.prototypeMechanicLossCard button{min-height:44px;padding:0 20px;border:1px solid #b78b46;border-radius:10px;background:linear-gradient(#49341e,#251a11);color:#f0ce8c;font:700 13px/1 Arial,sans-serif;cursor:pointer;}
 body.prototype-mechanic-open .alchemyRackDrawer,
 body.prototype-mechanic-open.game-inactive::after{display:none!important;}
 body.prototype-mechanic-open.game-inactive .topRightHud,

@@ -1,5 +1,5 @@
   const GOAL=4, MIN=1, MAX=7;
-  const WORLD_PAUSE_CLASSES=['lair-open','shop-open','map-open','prototype-mechanic-open','game-settings-open'];
+  const WORLD_PAUSE_CLASSES=['lair-open','shop-open','map-open','prototype-mechanic-open','game-settings-open','game-defeat'];
   let worldPauseState=null;
   function isWorldPaused(){
     return document.hidden || WORLD_PAUSE_CLASSES.some(name=>document.body.classList.contains(name));
@@ -141,6 +141,10 @@
   const $plates=document.querySelector('#plates'), $status=document.querySelector('#status'),
         $lock=document.querySelector('#lock'),
         challengeHud=new GameChallengeHud(document.querySelector('#challengeHud')),
+        gameDefeat=new GameDefeat(document.querySelector('#gameDefeatOverlay'),{onRestart:()=>{
+          if(activePrototypeMechanic)replayPrototypeMechanic();
+          else restartCurrentRound();
+        }}),
         $toast=document.querySelector('#toast'), $toastText=document.querySelector('#toastText'), $toastAction=document.querySelector('#toastAction'), $scene=document.querySelector('.scene'), $mechanism=document.querySelector('.mechanismZone'), $lockHitArea=document.querySelector('#lockHitArea'),
         $objectiveLine=document.querySelector('#objectiveLine'),
         $mapTab=document.querySelector('#mapTab'),

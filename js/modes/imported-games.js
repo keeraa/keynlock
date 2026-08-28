@@ -61,7 +61,7 @@
     code+=`\nlet integratedLossObserver=null,integratedTimerObserver=null;
       let integratedManualOpen=false,integratedPendingOpen=null,integratedPendingTension=null;
       const integratedTimerConfigs={
-        'Трубопровод':{bar:'#bs1TimerBar',duration:17,invert:true,gate:'#bs1Time'},
+        'Трубопровод':{bar:'#bs1TimerBar',duration:17,invert:true,gate:'#bs1Time',defeatOnZero:false},
         'Watchmen':{bar:'#wmTimer',duration:16},
         'Thief 1/2':{bar:'#th12Timer',duration:22},
         'Thief: Deadly Shadows':{bar:'#tdsTimer',duration:22},
@@ -71,6 +71,7 @@
         'Mass Effect 2':{bar:'#me2Timer',duration:40}
       };
       let integratedTimerLastSent=0;
+      let integratedTimerDefeated=false;
       function emitIntegratedTimer(game,force=false){
         const config=integratedTimerConfigs[game];
         if(!config){window.postMessage({type:'keynlock-mechanic-timer',game,active:false},location.origin);return;}
@@ -86,6 +87,10 @@
         }
         if(config.invert)percent=100-percent;
         window.postMessage({type:'keynlock-mechanic-timer',game,active,timeLeft:config.duration*percent/100,timeMax:config.duration,label:'Время'},location.origin);
+        if(active&&config.defeatOnZero!==false&&percent<=.01&&!integratedTimerDefeated){
+          integratedTimerDefeated=true;
+          window.postMessage({type:'keynlock-mechanic-loss',game,reason:'time'},location.origin);
+        }
       }
       function observeIntegratedTimer(game){
         integratedTimerObserver?.disconnect();
@@ -114,6 +119,7 @@
         if(game===EMBEDDED_GAME){
           integratedPendingOpen=null;
           integratedPendingTension=null;
+          integratedTimerDefeated=false;
           window.postMessage({type:'keynlock-mechanic-ready',game,ready:false},location.origin);
         }
         return integratedOriginalResetOpen(game);
@@ -128,7 +134,7 @@
         const status=scene?.querySelector(':scope > .scene-head .status');
         integratedLossObserver=new MutationObserver(()=>{
           emitEmbeddedState(game);
-          if(/отмычки закончились/i.test(status?.textContent||''))window.postMessage({type:'keynlock-mechanic-loss',game},location.origin);
+          if(/отмычки закончились/i.test(status?.textContent||''))window.postMessage({type:'keynlock-mechanic-loss',game,reason:'picks'},location.origin);
         });
         if(status)integratedLossObserver.observe(status,{subtree:true,childList:true,characterData:true});
       }
@@ -138,6 +144,7 @@
           integratedManualOpen=!!options.manualOpen;
           integratedPendingOpen=null;
           integratedPendingTension=null;
+          integratedTimerDefeated=false;
           playerTensionSkin=Math.max(1,Math.min(5,Math.round(Number(options.tension)||1)));
           LockRuntime.setDefaultPicks(options.picks);
           const index=GameHub.scenes.findIndex(scene=>scene.dataset.name===game);
@@ -161,7 +168,7 @@
           EMBEDDED_GAME='';
           host.hidden=true;
         },
-        replay(){if(EMBEDDED_GAME){GameHub.get(EMBEDDED_GAME)?.reset?.();observeIntegratedTimer(EMBEDDED_GAME)}},
+        replay(){if(EMBEDDED_GAME){integratedTimerDefeated=false;GameHub.get(EMBEDDED_GAME)?.reset?.();observeIntegratedTimer(EMBEDDED_GAME)}},
         attemptOpen(){
           if(integratedPendingOpen){
             if(integratedPendingTension&&!integratedOriginalTensionReady(integratedPendingTension.game,integratedPendingTension.options))return false;

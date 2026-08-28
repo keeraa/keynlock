@@ -29,6 +29,7 @@
 <link rel="stylesheet" href="css/game-settings.css">
 <link rel="stylesheet" href="css/challenge-hud.css">
 <link rel="stylesheet" href="css/typography.css">
+<link rel="stylesheet" href="css/game-defeat.css">
 
 
 
@@ -217,13 +218,6 @@
 
 <section class="prototypeMechanicOverlay" id="prototypeMechanicOverlay" hidden aria-label="Новая механика">
   <div class="prototypeMechanicHost" id="prototypeMechanicHost" tabindex="-1" hidden></div>
-  <div class="prototypeMechanicLoss" id="prototypeMechanicLoss" hidden>
-    <div class="prototypeMechanicLossCard">
-      <strong>Отмычки закончились</strong>
-      <span>Попытка провалена. Начать эту механику заново?</span>
-      <button id="prototypeMechanicReplay" type="button">Пройти заново</button>
-    </div>
-  </div>
 </section>
 
 <section class="lairOverlay" id="lairOverlay" hidden aria-label="Логово">
@@ -381,6 +375,14 @@
       <strong class="challengeMetricValue" id="challengeTimerValue">00:00</strong>
       <span class="challengeTimerTrack" aria-hidden="true"><span id="challengeTimerProgress"></span></span>
     </div>
+  </div>
+</section>
+<section class="gameDefeatOverlay" id="gameDefeatOverlay" hidden aria-labelledby="gameDefeatTitle" aria-describedby="gameDefeatText">
+  <div class="gameDefeatCard" role="alertdialog" aria-modal="true">
+    <div class="gameDefeatKicker">ПОРАЖЕНИЕ</div>
+    <h2 class="gameDefeatTitle" id="gameDefeatTitle">Попытка провалена</h2>
+    <p class="gameDefeatText" id="gameDefeatText"></p>
+    <button class="gameDefeatRestart" id="gameDefeatRestart" type="button">Пройти заново</button>
   </div>
 </section>
 <main class="main">
@@ -721,6 +723,7 @@
 <div class="toast" id="toast"><span class="toastText" id="toastText"></span><button class="toastAction" id="toastAction" type="button" onclick="restartCurrentRound();document.querySelector('#toast')?.classList.remove('show','actionable')">Новый замок</button></div>
 <script src="js/core/game-catalog.js"></script>
 <script src="js/core/challenge-hud.js"></script>
+<script src="js/core/game-defeat.js"></script>
 <script src="js/core/state.js"></script>
 <script src="js/core/audio.js"></script>
 <script src="js/core/ui.js"></script>

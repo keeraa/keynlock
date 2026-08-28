@@ -119,12 +119,10 @@
   function guardsArrive(){
     if(guardsCalled || !guardsActive()) return;
     guardsCalled = true;
-    solved = true;
     guardFace?.classList.add('caught');
     SFX.guards();
     if(typeof render === 'function') render();
-    toast('Стража услышала · проигрыш');
-    scheduleRoundAction(() => { resetNoise(); newLock(); }, 1600);
+    showGameDefeat('noise');
   }
 
   // Wrapping the sounds catches every game at once: anything that makes a noiseLevel

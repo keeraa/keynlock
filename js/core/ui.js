@@ -20,11 +20,17 @@
   }
 
   function showPickDepletedLoss(){
+    showGameDefeat('picks');
+  }
+
+  function showGameDefeat(reason='generic',options={}){
+    if(gameDefeat.isActive())return false;
     solved=true;
     setGameInactive(true);
     setGlobalTimer(false);
-    setToastActionLabel('Пройти заново');
-    toast('Отмычки закончились · вы проиграли',true);
+    $toast.classList.remove('show','actionable');
+    $toastText.textContent='';
+    return gameDefeat.show(reason,options);
   }
 
   function updateEconomyUI(){
@@ -110,16 +116,14 @@ renderInventoryTools();
     picks=Math.max(0,picks-1);
     if(previousVisiblePicks>0) triggerInventoryBreakAnimation(previousVisiblePicks);
     brokenPicks++;
+    if(picks<=0)showPickDepletedLoss();
     SFX.break();
     const kept=Math.random()<info.saveChance;
     if(!kept && resetProgress) resetProgress();
     updatePickUI();
     if(renderState) renderState();
 
-    if(picks<=0){
-      showPickDepletedLoss();
-      return {broke:true, kept, depleted:true};
-    }
+    if(picks<=0)return {broke:true, kept, depleted:true};
 
     toast(kept?'Отмычка сломалась · прогресс сохранён':'Отмычка сломалась · прогресс сброшен');
     return {broke:true, kept, depleted:false};

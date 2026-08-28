@@ -604,7 +604,7 @@ let plateEls=[], pinTopPlateEls=[];
       renderHillsfarHud();
       if(hfTimeLeft <= 0){
         clearHillsfarTimer();
-        failHillsfarAttempt('Время вышло');
+        showGameDefeat('time');
       }
     }
     if(mode==='resonance' && !solved && !rsReady && rsLaneEls.length){

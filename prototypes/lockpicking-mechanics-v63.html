@@ -620,9 +620,28 @@ button {
   flex-wrap:wrap;
   justify-content:center
 }
+/* Same gold glow as Classic's .plate.selected (css/base.css) — Classic's
+   own markup/class isn't reachable from this standalone prototype
+   document, so the exact rgba values are copied instead of the class
+   name, to read as the same "this one's selected" treatment. */
 .lockpick-prototype .scene[data-name="Oblivion"] .tumbler-slot.kb-focus {
   border-color:var(--gold)!important;
-  box-shadow:0 0 0 2px rgba(214,179,111,.22),inset 0 0 18px rgba(214,179,111,.08)!important
+  box-shadow:0 0 0 2px rgba(241,191,91,.14),0 0 18px rgba(241,191,91,.24),0 0 38px rgba(241,191,91,.12),inset 0 0 14px rgba(255,224,152,.04)!important
+}
+/* Embedded scenes get 76px of top padding (html.embedded .scene, above).
+   Oblivion always shows with the shared classic-lock overlay too (its
+   catalog entry sets lock.present:true unconditionally — js/core/game-catalog.js),
+   which sits at a fixed top:110px/height~213px (css/prototype-mechanics.css)
+   overlapping the top two rows of pin columns, so it needs extra
+   clearance beyond the generic 76px. This can't be conditioned on
+   body's .prototype-has-classic-lock class the way the JS comment above
+   describes for other rules: this file gets its own <style> injected
+   into the host element's shadow root at runtime, and every
+   `html.embedded` selector is rewritten there to `:host(.embedded)` —
+   which only sees classes on the shadow HOST itself
+   (.prototypeMechanicHost), not classes on the outer page's <body>. */
+html.embedded .lockpick-prototype .scene[data-name="Oblivion"] {
+  padding-top:300px;
 }
 @media(max-width:650px) {
   .lockpick-prototype .scene[data-name="Oblivion"] .ob-lock {
@@ -2042,7 +2061,7 @@ html.embedded .scene[data-name="Risen 2"] .lab{align-items:flex-start}
         </section>
     <section class="scene" data-name="Oblivion" data-tab-check="true">
           <div class="scene-head"><div><div class="scene-title-row"><h2>Штифтовый замок</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="obStatus"><strong>0 / 5</strong>штифтов зафиксировано</div></div>
-          <div class="lab"><div class="ob-wrap"><div class="ob-lock" id="obLock"></div><div class="ob-info"><div class="ob-card"><strong id="obSetText">0 / 5</strong>зафиксировано</div></div><div class="ob-actions"><button class="btn" id="obReset">Новый замок · R</button></div></div></div>
+          <div class="lab"><div class="ob-wrap"><div class="ob-lock" id="obLock"></div></div></div>
         </section>
     <section class="scene" data-name="Watchmen">
           <div class="scene-head"><div><div class="scene-title-row"><h2>Подпружиненные тумблеры</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="wmStatus"><strong>0 / 5</strong>тумблеров зафиксировано</div></div>
@@ -2359,9 +2378,31 @@ function obApex(i){const s=obLock.querySelector('.tumbler-slot[data-i="'+i+'"]')
 function obDropOneSet(){const setPins=ob.pins.map((p,i)=>[p,i]).filter(([p])=>p.set);if(!setPins.length)return false;const [,idx]=setPins[Math.floor(Math.random()*setPins.length)];const drop=ob.pins[idx];drop.set=false;drop.state='down';drop.rise=Math.max(56,drop.rise||drop.apex||145);drop.phase=0;return true}
 function obStartPin(p,i){p.apex=obApex(i);p.state='up';p.speed=p.baseSpeed*(.98+Math.random()*.04);p.pause=OB_READY_MIN+Math.random()*(OB_READY_MAX-OB_READY_MIN)}
 function obClick(i){if(ob.failed)return;obKb=i;const p=ob.pins[i];if(p.set)return;scoreAction('Oblivion');if(p.state==='idle'){obStartPin(p,i);renderOb();return}if(p.state==='pause'&&Math.abs(p.rise-p.apex)<.5){p.set=true;p.state='set';p.rise=p.apex;if(ob.pins.every(q=>q.set))LockRuntime.open('Oblivion',{statusEl:obStatus,statusHtml:'<strong>Замок открыт</strong>все штифты выставлены'});renderOb();return}ob.picks--;p.state='down';if(obDropOneSet())obStatus.innerHTML='<strong>Промах</strong>один уже выставленный штифт сорвался';else obStatus.innerHTML='<strong>Промах</strong>момент фиксации пропущен';if(ob.picks<=0){ob.picks=0;ob.failed=true;ob.pins.forEach(q=>{q.set=false;q.state='idle';q.rise=0;q.phase=0});obStatus.innerHTML='<strong>Отмычки закончились</strong>нажми «Новый замок»'}renderOb()}
-function renderOb(){LockRuntime.syncPicks('Oblivion',ob.picks);let selectedReady=false;ob.pins.forEach((p,i)=>{const s=obLock.querySelector('.tumbler-slot[data-i="'+i+'"]');if(!s)return;const ready=!p.set&&!ob.failed&&p.state==='pause'&&Math.abs(p.rise-p.apex)<.5;s.classList.toggle('set',p.set);s.classList.toggle('ready',ready);s.classList.toggle('kb-focus',i===obKb);if(i===obKb)selectedReady=ready;s.querySelector('.pin').style.setProperty('--rise',p.rise.toFixed(1))});const n=ob.pins.filter(p=>p.set).length;document.getElementById('obSetText').textContent=n+' / 5';if(ob.failed)obStatus.innerHTML='<strong>Отмычки закончились</strong>нажми «Новый замок»';else if(n===5)obStatus.innerHTML='<strong>Замок открыт</strong>все штифты выставлены';else if(selectedReady)obStatus.innerHTML='<strong>Совпадение</strong>шляпка на уровне прорези';else obStatus.innerHTML='<strong>'+n+' / 5</strong>лови точное совпадение с верхней прорезью'}
+function obSyncPickMotion(){
+  // Same custom properties the shared classic-lock pick reads
+  // (css/overrides-01-tools-shared.css's .mechanismZone .pick rule) —
+  // reusing them means the pick slides toward the selected column with
+  // no extra CSS, using whatever transition that rule already carries
+  // for the prototype-lock context. rowBias mirrors js/core/ui.js's
+  // computeToolMotionProfile() (same -0.5..0.5 span across slots, same
+  // *-8/*2.2 scale) rather than driving Classic's own animation loop,
+  // which reads Classic-only globals (`state`/`selected`) that Oblivion
+  // has no business touching.
+  const n=ob.pins.length||1;
+  const rowBias=n>1 ? (obKb/(n-1)-0.5) : 0;
+  // This module's own `document`/`window` are shadowed locals scoped to
+  // this game's own sandbox (confirmed live: `document !== window.top.document`
+  // here, with no real <iframe> involved — some sandboxing wrapper
+  // reassigns these as local variables around each "portable game
+  // module" IIFE). #lock.universalLockBlock .pick — the actual element
+  // these vars need to reach — lives in the real top document, outside
+  // that sandbox entirely, so it has to go through window.top explicitly.
+  const topDocEl=window.top.document.documentElement;
+  topDocEl.style.setProperty('--pick-react-x',(rowBias*-8).toFixed(2)+'px');
+  topDocEl.style.setProperty('--pick-react-rot',(rowBias*2.2).toFixed(2)+'deg');
+}
+function renderOb(){LockRuntime.syncPicks('Oblivion',ob.picks);let selectedReady=false;ob.pins.forEach((p,i)=>{const s=obLock.querySelector('.tumbler-slot[data-i="'+i+'"]');if(!s)return;const ready=!p.set&&!ob.failed&&p.state==='pause'&&Math.abs(p.rise-p.apex)<.5;s.classList.toggle('set',p.set);s.classList.toggle('ready',ready);s.classList.toggle('kb-focus',i===obKb);if(i===obKb)selectedReady=ready;s.querySelector('.pin').style.setProperty('--rise',p.rise.toFixed(1))});obSyncPickMotion();const n=ob.pins.filter(p=>p.set).length;if(ob.failed)obStatus.innerHTML='<strong>Отмычки закончились</strong>нажми «Новый замок»';else if(n===5)obStatus.innerHTML='<strong>Замок открыт</strong>все штифты выставлены';else if(selectedReady)obStatus.innerHTML='<strong>Совпадение</strong>шляпка на уровне прорези';else obStatus.innerHTML='<strong>'+n+' / 5</strong>лови точное совпадение с верхней прорезью'}
 function obLoop(now){const dt=Math.min(.035,(now-ob.last)/1000);ob.last=now;if(activeName()==='Oblivion'&&!ob.failed){ob.pins.forEach(p=>{if(p.set)return;if(p.state==='up'){p.rise+=p.speed*dt;if(p.rise>=p.apex){p.rise=p.apex;p.state='pause';p.phase=p.pause}}else if(p.state==='pause'){p.phase-=dt*1000;if(p.phase<=0)p.state='down'}else if(p.state==='down'){p.rise-=p.speed*1.14*dt;if(p.rise<=0){p.rise=0;p.state='idle'}}});renderOb()}}
-document.getElementById('obReset').onclick=obReset;
 
 function obKeyMove(dir){if(dir==='left')obKb=(obKb+ob.pins.length-1)%ob.pins.length;else if(dir==='right')obKb=(obKb+1)%ob.pins.length;renderOb()}
 GameHub.register('Oblivion',{reset:obReset,tick:obLoop,keydown:e=>{const d=directionFromCode(e.code);if(e.code==='KeyR'){obReset();return true}if(d==='left'||d==='right'){obKeyMove(d);return true}if(d==='up'||e.code==='Space'||e.code==='Enter'){obClick(obKb);return true}return false}});

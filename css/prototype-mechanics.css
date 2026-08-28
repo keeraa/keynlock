@@ -4,6 +4,16 @@ body.game-inactive.prototype-has-classic-lock #lock.universalLockBlock{top:110px
 body.game-inactive.prototype-has-classic-lock #lock.universalLockBlock .lockHitArea{pointer-events:auto!important;}
 body.game-inactive.prototype-has-classic-lock.prototype-lock-ready #lock.universalLockBlock{--lock-glow:1;}
 .prototype-has-classic-lock #lock.universalLockBlock.prototype-wrong-tension{animation:prototypeWrongTension .38s ease both;}
+/* Classic mode slides the pick toward the selected plate via a
+   continuous rAF loop re-reading these same --pick-react-* vars every
+   frame (js/modes/base-locks.js's animationLoop) — that loop is
+   Classic-only (reads Classic's own `state`/`selected` globals) and
+   doesn't run for prototype mechanics, so a game like Oblivion instead
+   sets these vars once per selection change. Without an explicit
+   transition that reads as an instant snap; this animates it instead,
+   as close as a single before/after change gets to the loop's
+   continuous interpolation. */
+body.prototype-has-classic-lock #lock.universalLockBlock .pick{transition:transform .22s ease;}
 @keyframes prototypeWrongTension{0%,100%{margin-left:0}20%{margin-left:-13px}40%{margin-left:11px}60%{margin-left:-8px}80%{margin-left:5px}}
 .prototypeMechanicOverlay[hidden]{display:none!important;}
 .prototypeMechanicHost{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;outline:0;}
@@ -19,6 +29,16 @@ body.prototype-mechanic-open.game-inactive::after{display:none!important;}
 body.prototype-mechanic-open.game-inactive .topRightHud,
 body.prototype-mechanic-open.game-inactive .inventoryDrawer,
 body.prototype-mechanic-open.game-inactive #objectiveLine{filter:none!important;pointer-events:auto!important;}
+/* game-inactive stays true for the whole time a prototype mechanic is
+   open (js/world/prototype-mechanics.js's openPrototypeMechanic only
+   clears it on close, not once play starts) — it means "the prototype
+   content is driving, not classic mode" here, not genuinely paused. The
+   scrim and HUD dimming above already account for that; the shared
+   classic-lock pick/tension dim filter (css/overrides-05-inventory.css)
+   didn't, so the pick+tension shown crossed into the keyhole read as
+   inert the entire time you're actually playing. */
+body.prototype-mechanic-open.game-inactive #lock.universalLockBlock .pick,
+body.prototype-mechanic-open.game-inactive #lock.universalLockBlock .tension{filter:none!important;}
 body.prototype-mechanic-open .topRightHud{z-index:360!important;}
 body.prototype-mechanic-open .inventoryDrawer{z-index:215!important;}
 #worldMapCanvas .mapNode.prototypeMechanicNode{z-index:10;padding-top:22px;}

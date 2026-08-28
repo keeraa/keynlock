@@ -31,6 +31,43 @@
 }
 .globalTopHud > *{pointer-events:auto;}
 
+/* All icon controls in the shared HUD use the same material and ink. */
+.globalTopHud .mobileModeMenuButton,
+.globalTopHud .hudNavBtn,
+.globalTopHud .alchemyTopHudClose{
+  border-color:rgba(161,121,59,.82)!important;
+  border-radius:12px!important;
+  background:linear-gradient(180deg,rgba(43,33,23,.97),rgba(19,15,12,.98))!important;
+  color:#e4c37f!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.30),inset 0 0 0 1px rgba(255,229,176,.04)!important;
+  transition:transform .16s ease,filter .16s ease,border-color .16s ease,color .16s ease!important;
+}
+.globalTopHud .mobileModeMenuButton svg,
+.globalTopHud .hudNavIcon{
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:1.7!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
+.globalTopHud .mobileModeMenuButton:hover,
+.globalTopHud .hudNavBtn:hover,
+.globalTopHud .alchemyTopHudClose:hover{
+  border-color:#c79648!important;
+  color:#f0d497!important;
+  filter:brightness(1.12);
+}
+.globalTopHud .mobileModeMenuButton:focus-visible,
+.globalTopHud .hudNavBtn:focus-visible,
+.globalTopHud .alchemyTopHudClose:focus-visible{
+  outline:2px solid #d9a74c!important;
+  outline-offset:2px!important;
+}
+.globalTopHud .alchemyStationTab:focus-visible{
+  outline:2px solid #d9a74c!important;
+  outline-offset:2px!important;
+}
+
 .globalTopHud .mobileModeMenuButton{
   grid-area:menu;
   position:static!important;

@@ -703,9 +703,11 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active) .a
     position:absolute;z-index:1;left:50%;top:3%;width:clamp(310px,39vw,610px);
     transform:translateX(-50%);
   }
-  .alchemyRoot .scene[data-name="Смешение"].active > .lab,
-  .alchemyRoot .scene[data-name="Смешение"].active > .alchemyReagents,
-  .alchemyRoot .scene[data-name="Смешение"].active > .alchemyElementColumn{position:relative;z-index:4;}
+  /* The reference board is scenery. Every interactive object must stand in
+     front of it in every station, not only in Mixing. */
+  .alchemyRoot .scene.active > .lab,
+  .alchemyRoot .scene.active > .alchemyReagents,
+  .alchemyRoot .scene.active > .alchemyElementColumn{position:relative;z-index:4;}
   /* Grid items carry min-width:auto too: the bench was distending its own
      track from the inside, which is what kept the scene wider than the panel. */
   .alchemyRoot .scene.active > .lab{grid-area:bench;min-width:0;min-height:0;align-self:stretch;}

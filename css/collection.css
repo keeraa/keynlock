@@ -37,31 +37,38 @@
 }
 .collectionRow{
   display:flex;
-  align-items:center;
-  gap:6px;
-  padding:8px;
+  flex-direction:column;
+  align-items:stretch;
+  gap:8px;
+  padding:10px;
   border:1px solid rgba(138,100,52,.5);
   border-radius:10px;
   background:rgba(22,17,12,.7);
   cursor:pointer;
-  text-align:left;
-  transition:border-color .16s ease,background .16s ease;
+  text-align:center;
+  transition:background .16s ease;
 }
-.collectionRow:hover{border-color:#d6ab5e;}
-.collectionRow.active{background:#a9772f;border-color:#f0c86e;}
-/* Each collection button shows every handle it owns in one row — no name
-   label, the thumbnails ARE the identity. Sized ~30% up from the old
-   single 34px thumbnail (34 * 1.3 ≈ 44px). */
+.collectionRow:hover{background:rgba(58,45,26,.75);}
+/* Fill, not a border, marks the active collection — a gold outline reads
+   too close to the handle-card selection state and the user asked for
+   plain blocks here. */
+.collectionRow.active{background:#5a4322;}
+/* Each collection button shows every handle it owns in one row, at their
+   own tall aspect ratio (no square crop, no per-thumb cell background —
+   just the art), with the collection's name underneath. */
 .collectionRowThumbs{
   display:flex;
-  gap:5px;
+  justify-content:center;
+  gap:4px;
 }
 .collectionRowThumbs img{
-  width:44px;height:44px;
-  border-radius:6px;
-  overflow:hidden;
-  background:rgba(0,0,0,.35);
+  width:auto;
+  height:112px;
   object-fit:contain;
+}
+.collectionRowLabel{
+  font:600 13px/1.2 inherit;
+  color:#e2c487;
 }
 
 /* --- right: preview stage + zoom + handle strip --- */
@@ -143,7 +150,7 @@
    hover feel instead of introducing a second highlight color next to the
    active gold border. */
 .collectionHandleCard:hover:not(:disabled){transform:scale(1.12);z-index:1;}
-.collectionHandleCard.active{border-color:#f0c86e;background:#3a331f;}
+.collectionHandleCard.active{background:#5a4322;}
 .collectionHandleCard.locked{
   filter:grayscale(1);
   opacity:.55;

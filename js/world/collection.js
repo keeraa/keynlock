@@ -75,9 +75,8 @@
     // 100% = the source PNGs' own pixel size (matches the prototype's
     // default, unscaled view) — the stage box clips anything past its own
     // edges rather than shrinking content to fit, same as a normal image
-    // zoom control. 39 is small enough to show the whole 300x912 stage
-    // inside the box, while staying above the range where the pick reads
-    // as too tiny to see (confirmed with the user against the 10% floor).
+    // zoom control. 39% is both the default AND the slider's floor — any
+    // lower reads as illegibly small, so zooming out further isn't offered.
     zoom: 39,
     rotate: 0
   };
@@ -90,10 +89,9 @@
       const row = document.createElement('button');
       row.type = 'button';
       row.className = 'collectionRow' + (col.id === state.collectionId ? ' active' : '');
-      row.title = col.name;
-      row.setAttribute('aria-label', col.name);
       row.innerHTML = `
         <span class="collectionRowThumbs">${col.handles.map(h => `<img src="${h.image}" alt="">`).join('')}</span>
+        <span class="collectionRowLabel">${col.name}</span>
       `;
       row.addEventListener('click', () => {
         state.collectionId = col.id;

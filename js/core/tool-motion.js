@@ -2,8 +2,11 @@
     constructor(root=document.documentElement,options={}){
       this.root=root;
       this.response=Math.max(120,Number(options.response)||620);
+      this.parallaxResponse=Math.max(120,Number(options.parallaxResponse)||360);
       this.row=0;
       this.depth=0;
+      this.parallaxX=0;
+      this.parallaxY=0;
       this.targetRow=0;
       this.targetDepth=0;
       this.kick=0;
@@ -28,21 +31,25 @@
 
     update(dt,{pointerX=0,pointerY=0,now=performance.now(),touch=false}={}){
       const follow=1-Math.exp(-Math.max(0,dt)/this.response);
+      const parallaxFollow=1-Math.exp(-Math.max(0,dt)/this.parallaxResponse);
       this.row+=(this.targetRow-this.row)*follow;
       this.depth+=(this.targetDepth-this.depth)*follow;
+      this.parallaxX+=((touch?0:pointerX)-this.parallaxX)*parallaxFollow;
+      this.parallaxY+=((touch?0:pointerY)-this.parallaxY)*parallaxFollow;
       this.kick*=Math.exp(-Math.max(0,dt)/680);
       const pulse=this.kick*(touch ? .32 : 1);
       const pulseSin=Math.sin(now*(touch ? .008 : .013))*pulse;
       const idle=Math.sin(now*.0016)*.55;
+      const px=this.parallaxX,py=this.parallaxY;
       const values={
-        '--pick-rot-drift':`${(idle*1.15+pointerX*.18-pointerY*.14).toFixed(2)}deg`,
-        '--tension-rot-drift':`${(idle*.95+pointerX*.12+pointerY*.12).toFixed(2)}deg`,
-        '--pick-react-x':`${(this.row*-18+pulseSin*2.8).toFixed(2)}px`,
-        '--pick-react-y':`${(this.depth*13-pulse*3).toFixed(2)}px`,
-        '--pick-react-rot':`${(this.row*4.8+this.depth*3.2+pulseSin*2).toFixed(2)}deg`,
-        '--tension-react-x':`${(this.row*9+pulseSin*1.5).toFixed(2)}px`,
-        '--tension-react-y':`${(this.depth*7-pulse*1.5).toFixed(2)}px`,
-        '--tension-react-rot':`${(this.row*-3+this.depth*2.3+pulseSin*1.25).toFixed(2)}deg`
+        '--pick-rot-drift':`${(idle*1.15+px*.08-py*.05).toFixed(2)}deg`,
+        '--tension-rot-drift':`${(idle*.95+px*.06+py*.05).toFixed(2)}deg`,
+        '--pick-react-x':`${(this.row*-18+pulseSin*2.8+px*.18).toFixed(2)}px`,
+        '--pick-react-y':`${(this.depth*13-pulse*3+py*.35).toFixed(2)}px`,
+        '--pick-react-rot':`${(this.row*4.8+this.depth*3.2+pulseSin*2-px*.04-py*.12).toFixed(2)}deg`,
+        '--tension-react-x':`${(this.row*9+pulseSin*1.5+px*.10).toFixed(2)}px`,
+        '--tension-react-y':`${(this.depth*7-pulse*1.5+py*.18).toFixed(2)}px`,
+        '--tension-react-rot':`${(this.row*-3+this.depth*2.3+pulseSin*1.25+px*.03+py*.07).toFixed(2)}deg`
       };
       for(const [name,value] of Object.entries(values))this.root.style.setProperty(name,value);
       return values;

@@ -271,8 +271,8 @@ body.game-inactive.shop-open::after,body.game-inactive.lair-open::after,body.gam
 /* Noise meter: a fixed vertical instrument at the right-hand screen edge. */
 .noiseMeter{position:fixed;z-index:70;right:max(22px,env(safe-area-inset-right));top:50%;display:none;width:42px;height:218px;transform:translateY(-50%);flex-direction:column;align-items:center;gap:9px;padding:11px 9px;border:1px solid rgba(120,94,52,.5);border-radius:14px;background:rgba(17,13,10,.78);box-shadow:0 10px 28px rgba(0,0,0,.36);pointer-events:none;}
 .noiseMeter.visible{display:flex;}
-.noiseMeterLabel{flex:0 0 auto;color:#9d8d75;font:600 9px/1 var(--ui-font);letter-spacing:.12em;writing-mode:vertical-rl;transform:rotate(180deg);}
-.noiseMeterTrack{position:relative;flex:1 1 auto;width:9px;min-height:0;border:1px solid rgba(132,105,62,.32);border-radius:99px;background:rgba(60,50,36,.68);overflow:hidden;}
+.noiseMeterLabel{order:2;flex:0 0 auto;color:#9d8d75;font:600 9px/1 var(--ui-font);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;}
+.noiseMeterTrack{order:1;position:relative;flex:1 1 auto;width:9px;min-height:0;border:1px solid rgba(132,105,62,.32);border-radius:99px;background:rgba(60,50,36,.68);overflow:hidden;}
 .noiseMeterFill{position:absolute;left:0;right:0;bottom:0;height:0;border-radius:99px;background:linear-gradient(0deg,#8a7a4e,#d9a74c);transition:height .16s linear,background .3s ease;}
 .noiseMeter.warning .noiseMeterFill{background:linear-gradient(0deg,#c07a35,#e0503a);}
 .noiseMeter.warning{border-color:rgba(206,96,60,.72);animation:noisePulse 780ms ease-in-out infinite;}
@@ -281,6 +281,10 @@ body.game-inactive.shop-open::after,body.game-inactive.lair-open::after,body.gam
   .noiseMeter{right:max(8px,env(safe-area-inset-right));width:34px;height:166px;padding:9px 7px;gap:7px;}
   .noiseMeterLabel{font-size:8px;}
 }
+
+/* Development metadata lives away from the navigation controls. */
+.topRightHud .assetNameHud{position:fixed!important;left:18px!important;right:auto!important;top:auto!important;bottom:18px!important;z-index:360!important;display:flex!important;width:min(320px,calc(100vw - 36px))!important;max-width:none!important;align-items:flex-start!important;justify-content:flex-end!important;padding:0!important;margin:0!important;text-align:left!important;}
+.topRightHud .assetNameHud>div{max-width:100%!important;text-align:left!important;}
 
 /* Sky bird. The silhouette is a placeholder for real artwork — swap the svg in
    guards.js and the sizing here follows. */
@@ -333,7 +337,7 @@ body.game-inactive.shop-open::after,body.game-inactive.lair-open::after,body.gam
 
 /* The guard leans in from the edge as the meter fills, and steps fully into
    frame when it tops out — a warning before a verdict. */
-.guardWatch{position:fixed;right:0;top:34%;z-index:150;width:104px;height:104px;
+.guardWatch{position:fixed;right:0;top:calc(50% - 220px);z-index:150;width:104px;height:104px;
   opacity:0;pointer-events:none;
   transform:translateX(calc(58% - 58% * var(--guard-alert,0)));
   transition:opacity .28s ease,transform .28s cubic-bezier(.22,.78,.22,1),filter .28s ease;
@@ -347,7 +351,7 @@ body.game-inactive.shop-open::after,body.game-inactive.lair-open::after,body.gam
 .guardWatch.caught img{border-color:#d9613c;}
 @keyframes guardArrives{0%{transform:translateX(40%) scale(.9);}100%{transform:translateX(0) scale(1.22);}}
 @media (max-width:760px){
-  .guardWatch{width:78px;height:78px;top:30%;}
+  .guardWatch{width:78px;height:78px;top:calc(50% - 170px);}
 }
 
 /* Skyrim deliberately lifts the enlarged dial above the panel's content box. */

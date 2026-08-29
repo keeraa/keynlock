@@ -457,15 +457,14 @@
   tryOpenResonance=guardOpen(tryOpenResonance);
   tryOpenDeduction=guardOpen(tryOpenDeduction);
   tryOpenComposite=guardOpen(tryOpenComposite);
-  scanHeatCold=guardOpen(scanHeatCold);
-  checkDrum=guardOpen(checkDrum);
-  checkScope=guardOpen(checkScope);
   tryOpenAn=guardOpen(tryOpenAn);
   tryTorqueSkyrim=guardOpen(tryTorqueSkyrim);
   tryOpenR2=guardOpen(tryOpenR2);
   tryOpenG1=guardOpen(tryOpenG1);
   tryOpenHillsfar=guardOpen(tryOpenHillsfar);
   tryOpenMass=guardOpen(tryOpenMass);
+  tryOpenOblivion=guardOpen(tryOpenOblivion);
+  tryOpenWatchmen=guardOpen(tryOpenWatchmen);
 
   // init.js bound these two handlers by function reference before this patch runs.
   // Capture them so the same guard still applies to their dedicated controls.

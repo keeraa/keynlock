@@ -91,6 +91,19 @@ const tensionGuardSource = readFileSync(resolve(root, 'js/core/inventory-hit-tes
 if (!tensionGuardSource.includes('tryOpenBaseLock=guardOpen(tryOpenBaseLock)')) {
   fail('Classic base-lock opener must enforce the typed tensioner guard.');
 }
+const physicalNativeGames = catalogueEntries
+  .filter(entry => entry.kind === 'native')
+  .filter(entry => new RegExp(`^\\s*${entry.id}:\\{[^\\n]+lock:\\{present:true,manualOpen:true,specialTool:true\\}`,'m').test(catalogueSource))
+  .map(entry => entry.id);
+const expectedTypedTensionGames = ['classic','target','line','sequence','special','hillsfar','mass','g1','r2','skyrim','anach','tension','resonance','deduction','composite','oblivion','watchmen'];
+if (JSON.stringify(physicalNativeGames) !== JSON.stringify(expectedTypedTensionGames)) {
+  fail('Physical native games and typed-tension catalogue flags are out of sync.');
+}
+for (const opener of ['tryOpenOblivion','tryOpenWatchmen']) {
+  if (!tensionGuardSource.includes(`${opener}=guardOpen(${opener})`)) {
+    fail(`${opener} must enforce the typed tensioner guard.`);
+  }
+}
 
 const prototypeHtml = readFileSync(resolve(root, 'prototypes/lockpicking-mechanics-v63.html'), 'utf8');
 const prototypeScenes = new Set([...prototypeHtml.matchAll(/<section\b[^>]*\bdata-name=["']([^"']+)["']/gi)].map(match => match[1]));

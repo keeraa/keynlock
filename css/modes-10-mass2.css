@@ -1,0 +1,57 @@
+/* Mass Effect 2 (Парные узлы) — 16-node memory match, symbols hidden until
+   hovered/held. Markup/CSS ported from the old prototype scene
+   (prototypes/lockpicking-mechanics-v63.html, .me2-*) with classes renamed
+   to .m2Board/.m2Node/etc so they don't collide with the same-named
+   classes still used by other prototype scenes. */
+.m2Mode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:16px;padding-bottom:calc(var(--template-puzzle-bottom,56px) + 16px);background:rgba(17,13,9,.985);overflow:auto;}
+.m2Mode[hidden]{display:none!important;pointer-events:none!important;}
+
+.m2Board{
+  display:grid;
+  grid-template-columns:repeat(4,77px);
+  grid-auto-rows:77px;
+  gap:12px;
+  justify-content:center;
+  align-items:center;
+}
+.m2Node{
+  width:77px;
+  height:77px;
+  aspect-ratio:1;
+  justify-self:center;
+  border:1px solid #3a6577;
+  border-radius:50%;
+  background:#102632;
+  color:rgba(188,234,250,0);
+  cursor:pointer;
+  font-size:27px;
+  display:grid;
+  place-items:center;
+  transition:color 1.3s ease,background 1.3s ease,border-color .25s ease,box-shadow .25s ease;
+  touch-action:none;
+  -webkit-user-select:none;
+  user-select:none;
+}
+.m2Node:hover,.m2Node.reveal,.m2Node.matched{
+  color:rgba(188,234,250,1);
+  background:#173848;
+}
+.m2Node.selected{outline:2px solid #d8b871;}
+.m2Node.matched{
+  border-color:#71b67d;
+  box-shadow:0 0 12px rgba(113,182,125,.28);
+}
+.m2Node.kbFocus{outline:2px solid #d8b871!important;outline-offset:2px!important;}
+
+.m2Help{
+  color:#bcb39a;
+  text-align:center;
+  font:14px/1.35 Arial,sans-serif;
+  max-width:560px;
+}
+.m2Help:empty{display:none;}
+
+@media (max-width:650px){
+  .m2Board{grid-template-columns:repeat(4,62px);grid-auto-rows:62px;gap:8px;}
+  .m2Node{width:62px;height:62px;}
+}

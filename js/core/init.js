@@ -281,6 +281,12 @@
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='watchmen'&&e.code==='Space'){e.preventDefault();wmTryLock();}});
   $wmOpenBtn?.addEventListener('click',()=>GameActions.attemptOpen({modeId:'watchmen',source:'puzzle-control'}));
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='museum'&&e.code==='Space'){e.preventDefault();hmPick(hmKb);}});
+  addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='mass2'&&e.code==='Space'){e.preventDefault();m2Click(m2Kb);}});
+  document.querySelector('#shopHudButton')?.addEventListener('click',()=>{
+    if(lairOpen) closeLair();
+    if(mapOpen) closeMap(false);
+    openShop();
+  });
   document.querySelector('#lairHudButton')?.addEventListener('click',openLairFromHud);
   document.querySelector('#newPuzzleButton')?.addEventListener('click',restartCurrentRound);
   $mapTab.onclick=openMap;

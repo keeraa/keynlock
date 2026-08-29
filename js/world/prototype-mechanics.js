@@ -10,7 +10,6 @@
     {id:'fallout',name:'Старый бункер',game:'Fallout',x:88,y:70},
     {id:'anachronox',name:'Лаборатория Anachronox',game:'Anachronox',x:57,y:86},
     {id:'mass-effect',name:'Узел Mass Effect',game:'Mass Effect',x:96,y:59},
-    {id:'mass-effect-2',name:'Парные узлы',game:'Mass Effect 2',x:76,y:82},
     {id:'pathologic-2',name:'Дом механика',game:'Pathologic 2',x:40,y:82}
   ];
   const PROTOTYPE_MECHANIC_DONE_KEY='keynlockPrototypeMechanicsDone';

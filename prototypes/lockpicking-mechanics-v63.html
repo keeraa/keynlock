@@ -212,7 +212,7 @@ button {
 /* Mobile controls */ .sf-lock,.me1-arena {
   touch-action:none
 }
-.btn,.tab,.bs1-tile,.tumbler-slot,.me2-node,.pick-type {
+.btn,.tab,.bs1-tile,.tumbler-slot,.pick-type {
   -webkit-tap-highlight-color:transparent
 }
 @media(max-width:650px) {
@@ -239,12 +239,6 @@ button {
   }
   .museum-actions .btn,.bio-actions .btn,.r2-actions .btn,.bs1-actions .btn {
     flex:1 1 112px
-  }
-  .me2-node {
-    min-height:0;
-    height:auto;
-    aspect-ratio:1;
-    touch-action:manipulation
   }
   .th12-profiles .btn {
     min-height:72px;
@@ -1393,79 +1387,6 @@ button {
   box-shadow:0 0 8px rgba(212,100,92,.35);
   will-change:left,top,transform;pointer-events:none
 }
-/* Mass Effect 2 */
-.lockpick-prototype .scene[data-name="Mass Effect 2"] .me2-board {
-  display:grid;
-  grid-template-columns:repeat(4,77px);
-  grid-auto-rows:77px;
-  gap:12px;
-  justify-content:center;
-  align-items:center
-}
-.lockpick-prototype .scene[data-name="Mass Effect 2"] .museum-panel {
-  border:0;
-  background:transparent;
-  box-shadow:none;
-  padding:0
-}
-.lockpick-prototype .scene[data-name="Mass Effect 2"] .me2-time {
-  width:100%;
-  height:8px;
-  background:#0b0e0b;
-  border:1px solid #33392f;
-  border-radius:99px;
-  overflow:hidden
-}
-.lockpick-prototype .scene[data-name="Mass Effect 2"] .me2-time span {
-  display:block;
-  width:100%;
-  height:100%;
-  background:#9e8253
-}
-.lockpick-prototype .scene[data-name="Mass Effect 2"] .me2-node {
-  width:77px;
-  height:77px;
-  aspect-ratio:1;
-  justify-self:center;
-  border:1px solid #3a6577;
-  border-radius:50%;
-  background:#102632;
-  color:rgba(188,234,250,0);
-  cursor:pointer;
-  font-size:27px;
-  display:grid;
-  place-items:center;
-  transition:color 1.3s ease,background 1.3s ease,border-color .25s ease,box-shadow .25s ease;
-  touch-action:none;
-  -webkit-user-select:none;
-  user-select:none
-}
-.lockpick-prototype .scene[data-name="Mass Effect 2"] .me2-node:hover, .lockpick-prototype .scene[data-name="Mass Effect 2"] .me2-node.reveal, .lockpick-prototype .scene[data-name="Mass Effect 2"] .me2-node.matched {
-  color:rgba(188,234,250,1);
-  background:#173848
-}
-.lockpick-prototype .scene[data-name="Mass Effect 2"] .me2-node.selected {
-  outline:2px solid var(--gold)
-}
-.lockpick-prototype .scene[data-name="Mass Effect 2"] .me2-node.matched {
-  border-color:#71b67d;
-  box-shadow:0 0 12px rgba(113,182,125,.28)
-}
-.lockpick-prototype .scene[data-name="Mass Effect 2"] .me2-node.kb-focus {
-  outline:2px solid var(--gold)!important;
-  outline-offset:2px!important
-}
-@media(max-width:650px) {
-  .lockpick-prototype .scene[data-name="Mass Effect 2"] .me2-board {
-    grid-template-columns:repeat(4,62px);
-    grid-auto-rows:62px;
-    gap:8px
-  }
-  .lockpick-prototype .scene[data-name="Mass Effect 2"] .me2-node {
-    width:62px;
-    height:62px
-  }
-}
 /* Pathologic 2 */
 .lockpick-prototype .scene[data-name="Pathologic 2"] .path-lock {
   width:min(440px,100%);
@@ -1655,11 +1576,6 @@ html.embedded .scene[data-name="Risen 2"] .lab{align-items:flex-start}
     <section class="scene" data-name="Mass Effect" data-tab-check="true">
           <div class="scene-head"><div><div class="scene-title-row"><h2>Круговой обход защиты</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="me1Status"><strong>Внешнее кольцо</strong>доберись до ядра</div></div>
           <div class="lab"><div class="museum-wrap"><div class="me1-arena" id="me1Arena"><div class="me1-shell-symbols" id="me1ShellSymbols"></div><button class="me1-core" id="me1Core" type="button" aria-label="Подтвердить ядро"></button><div class="me1-player" id="me1Player"></div></div><div class="museum-actions"><button class="btn" id="me1Reset">Новый обход</button></div><div class="museum-msg" id="me1Msg">Красные блоки вращаются независимо на каждом кольце и опасны при любом касании.</div></div></div>
-
-        </section>
-    <section class="scene" data-name="Mass Effect 2" data-tab-label="Mass Effect 2 · Алхимия" data-tab-check="true">
-          <div class="scene-head"><div><div class="scene-title-row"><h2>Парные узлы <span class="scene-badge">Алхимия</span></h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="me2Status"><strong>0 / 8 пар</strong>найди совпадающие узлы</div></div>
-          <div class="lab"><div class="museum-wrap"><div class="museum-panel"><div class="me2-time"><span id="me2Timer"></span></div><div style="height:12px"></div><div class="me2-board" id="me2Board"></div></div><div class="museum-msg" id="me2Msg">На телефоне удерживай узел, чтобы постепенно проявить символ.</div><button class="btn" id="me2Reset">Новая схема</button></div></div>
 
         </section>
     <section class="scene" data-name="Pathologic 2" data-tab-check="true">
@@ -2731,40 +2647,6 @@ me1Arena.addEventListener('pointerup',e=>{if(!me1Swipe||e.target===me1Core){me1S
 me1Arena.addEventListener('pointercancel',()=>{me1Swipe=null});
 GameHub.register('Mass Effect',{reset:me1Reset,tick:me1Loop,enter:()=>requestAnimationFrame(()=>{me1RenderShell();renderMe1()}),keydown:e=>{const d=directionFromCode(e.code);if(e.code==='KeyR'){me1Reset();return true}if((e.code==='Space'||e.code==='Enter')&&me1.ring===0){me1Confirm();return true}if(d==='left'){me1Move(12);return true}if(d==='right'){me1Move(-12);return true}if(d==='up'){me1In();return true}if(d==='down'){me1Out();return true}return false}});
 window.addEventListener('resize',()=>{if(activeName()==='Mass Effect'){me1RenderShell();renderMe1()}});
-
-})();
-(()=>{
-'use strict';
-// Portable game module: mass-effect-2
-// Mass Effect 2
-const me2Board=document.getElementById('me2Board'),me2Status=document.getElementById('me2Status'),me2Timer=document.getElementById('me2Timer'),me2Msg=document.getElementById('me2Msg');
-const ME2SY=['◈','⌁','Ψ','⊙','✦','⌬','☿','♀'],ME2_TIME=40,ME2_HOLD=900;
-let me2={nodes:[],sel:-1,matched:new Set(),time:ME2_TIME,last:performance.now(),won:false,failed:false,picks:3,lock:false,unlockTimer:0};let me2Kb=0;
-function me2Reset(){clearTimeout(me2.unlockTimer);scoreReset('Mass Effect 2',16);me2Kb=0;me2={nodes:shuffled([...ME2SY,...ME2SY]),sel:-1,matched:new Set(),time:ME2_TIME,last:performance.now(),won:false,failed:false,picks:LockRuntime.DEFAULT_PICKS,lock:false,unlockTimer:0};LockRuntime.resetOpen('Mass Effect 2');LockRuntime.resetPicks('Mass Effect 2',me2);renderMe2();me2Msg.textContent='Мышь: наведи и подожди. Телефон: удерживай узел до проявления символа.'}
-function me2Click(i){if(me2.won||me2.failed||me2.lock||me2.matched.has(i)||me2.time<=0)return;scoreAction('Mass Effect 2');if(me2.sel<0){me2.sel=i;renderMe2();return}if(i===me2.sel){me2.sel=-1;renderMe2();return}if(me2.nodes[i]===me2.nodes[me2.sel]){me2.matched.add(i);me2.matched.add(me2.sel);me2.sel=-1;me2Msg.textContent='Пара соединена.';if(me2.matched.size===me2.nodes.length){me2.won=true;LockRuntime.open('Mass Effect 2',{statusEl:me2Status,statusHtml:'<strong>Схема открыта</strong>все пары найдены',messageEl:me2Msg,message:'Все пары соединены.'})}}else{me2.lock=true;LockRuntime.breakPick('Mass Effect 2',me2,{messageEl:me2Msg,message:'Не совпало — отмычка сломалась.',onEmpty:()=>{me2.failed=true;me2Status.innerHTML='<strong>Отмычки закончились</strong>перезапусти схему'}});if(!me2.failed){clearTimeout(me2.unlockTimer);me2.unlockTimer=setTimeout(()=>{me2.unlockTimer=0;me2.sel=-1;me2.lock=false;renderMe2()},650)}}renderMe2()}
-function renderMe2(){
-  LockRuntime.syncPicks('Mass Effect 2',me2.picks);
-  me2Board.innerHTML='';
-  me2.nodes.forEach((s,i)=>{
-    const b=document.createElement('button');
-    b.className='me2-node'+(i===me2.sel?' selected reveal':'')+(me2.matched.has(i)?' matched':'')+(i===me2Kb?' kb-focus':'');
-    b.textContent=s;
-    b.onmouseenter=()=>{if(!me2.matched.has(i)&&me2.time>0)b.classList.add('reveal')};
-    b.onmouseleave=()=>{if(i!==me2.sel&&!me2.matched.has(i))b.classList.remove('reveal')};
-    let touchStart=0,touchActive=false,suppressClick=false;
-    b.onpointerdown=e=>{if(e.pointerType!=='touch'||me2.time<=0)return;e.preventDefault();touchStart=performance.now();touchActive=true;suppressClick=true;b.classList.add('reveal');try{b.setPointerCapture(e.pointerId)}catch(_){}};
-    b.onpointerup=e=>{if(e.pointerType!=='touch'||!touchActive)return;e.preventDefault();const held=performance.now()-touchStart;touchActive=false;if(held>=ME2_HOLD)me2Click(i);else if(i!==me2.sel&&!me2.matched.has(i))b.classList.remove('reveal');setTimeout(()=>{suppressClick=false},0)};
-    b.onpointercancel=e=>{if(e.pointerType==='touch'){touchActive=false;if(i!==me2.sel&&!me2.matched.has(i))b.classList.remove('reveal')}};
-    b.onclick=e=>{if(suppressClick||e.pointerType==='touch')return;me2Click(i)};
-    me2Board.appendChild(b)
-  });
-  me2Timer.style.width=Math.max(0,me2.time/ME2_TIME*100)+'%';
-  if(!me2.won&&!me2.failed)me2Status.innerHTML=`<strong>${me2.matched.size/2} / ${ME2SY.length} пар</strong>запоминай символы`
-}
-function me2Loop(now){const dt=Math.min(.05,(now-me2.last)/1000);me2.last=now;if(activeName()==='Mass Effect 2'&&!me2.won&&!me2.failed&&me2.time>0){me2.time=Math.max(0,me2.time-dt);me2Timer.style.width=Math.max(0,me2.time/ME2_TIME*100)+'%';if(me2.time<=0){me2.time=0;me2.failed=true;me2Status.innerHTML='<strong>Время вышло</strong>обход не завершён';me2Msg.textContent='Схема закрылась.'}}}
-document.getElementById('me2Reset').onclick=me2Reset;
-function me2KeyMove(dir){const cols=4,n=me2.nodes.length;if(!n)return;let r=Math.floor(me2Kb/cols),c=me2Kb%cols;if(dir==='left')c=Math.max(0,c-1);else if(dir==='right')c=Math.min(cols-1,c+1);else if(dir==='up')r=Math.max(0,r-1);else if(dir==='down')r=Math.min(Math.ceil(n/cols)-1,r+1);me2Kb=Math.min(n-1,r*cols+c);renderMe2()}
-GameHub.register('Mass Effect 2',{reset:me2Reset,tick:me2Loop,keydown:e=>{const d=directionFromCode(e.code);if(e.code==='KeyR'){me2Reset();return true}if(e.code==='Space'||e.code==='Enter'){me2Click(me2Kb);return true}if(d){me2KeyMove(d);return true}return false}});
 
 })();
 (()=>{

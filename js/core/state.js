@@ -144,6 +144,11 @@
   // (prototypes/lockpicking-mechanics-v63.html, "// Hillsfar").
   const HM_SYMBOLS=['△','◇','○','⌒','⊥','≋','∩','▽','◁','▷','◊','◌','⌣','◠','☉','☽','☿','♀','♂','♃','♄'];
   let hmSeq=[], hmJam=[], hmCover=[], hmStep=0, hmKb=0, hmTimeLeft=28, hmTimeMax=28, hmTumbEls=[], hmPickEls=[];
+  // Mass Effect 2 (Парные узлы): memory-match — 16 nodes (8 symbols × 2),
+  // hidden until hovered (mouse) or held (touch), find all 8 pairs against
+  // a countdown.
+  const M2_SYMBOLS=['◈','⌁','Ψ','⊙','✦','⌬','☿','♀'], M2_HOLD_MS=900;
+  let m2Nodes=[], m2Sel=-1, m2Matched=new Set(), m2Kb=0, m2Lock=false, m2UnlockTimer=0, m2TimeLeft=40, m2TimeMax=40, m2NodeEls=[];
   const CP_LEVEL_NAMES=['ВЕРХ','ЦЕНТР','НИЗ'];
   let cpNodes=[1,1,1,1,1], cpTarget=[1,1,1,1], cpVals=[1,1,1,1], cpInitial=[1,1,1,1], cpSelected=0, cpReady=false;
   let hcSecret=[0,0,0,0], hcAttempts=[], hcDigits=[0,0,0,0], hcActiveIndex=0;
@@ -185,7 +190,8 @@
         $scopeMode=document.querySelector('#scopeMode'), $scopeCanvas=document.querySelector('#scopeCanvas'), $scopeWheels=document.querySelector('#scopeWheels'), $scopeScore=document.querySelector('#scopeScore'), $scopeBar=document.querySelector('#scopeBar'), $scopeCheck=document.querySelector('#scopeCheck'), $scopeResult=document.querySelector('#scopeResult'), $scopeNew=document.querySelector('#scopeNew'),
         $obMode=document.querySelector('#obMode'), $obLock=document.querySelector('#obLock'), $obMessage=document.querySelector('#obMessage'),
         $wmMode=document.querySelector('#wmMode'), $wmLock=document.querySelector('#wmLock'), $wmHelp=document.querySelector('#wmHelp'), $wmTimerBar=document.querySelector('#wmTimerBar'), $wmOpenBtn=document.querySelector('#wmOpenBtn'),
-        $museumMode=document.querySelector('#museumMode'), $hmLock=document.querySelector('#hmLock'), $hmPicks=document.querySelector('#hmPicks'), $hmHelp=document.querySelector('#hmHelp');
+        $museumMode=document.querySelector('#museumMode'), $hmLock=document.querySelector('#hmLock'), $hmPicks=document.querySelector('#hmPicks'), $hmHelp=document.querySelector('#hmHelp'),
+        $mass2Mode=document.querySelector('#mass2Mode'), $m2Board=document.querySelector('#m2Board'), $m2Help=document.querySelector('#m2Help');
 
   const MODE_PANELS=Object.freeze({
     hillsfar:$hillsfarMode,
@@ -203,13 +209,14 @@
     scope:$scopeMode,
     oblivion:$obMode,
     watchmen:$wmMode,
-    museum:$museumMode
+    museum:$museumMode,
+    mass2:$mass2Mode
   });
   const IMPORTED_MODES=new Set(Object.keys(MODE_PANELS));
   const ALL_MODES=new Set(GameCatalog.nativeIds);
 
   const DIFFICULTY_STORAGE_KEY='lockpickModeDifficulty';
-  const DEFAULT_MODE_DIFFICULTY=Object.freeze({classic:1,target:1,line:1,sequence:1,special:1,hillsfar:1,mass:1,g1:1,r2:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,heatcold:1,drum:1,scope:1,oblivion:1,watchmen:1,museum:1});
+  const DEFAULT_MODE_DIFFICULTY=Object.freeze({classic:1,target:1,line:1,sequence:1,special:1,hillsfar:1,mass:1,g1:1,r2:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,heatcold:1,drum:1,scope:1,oblivion:1,watchmen:1,museum:1,mass2:1});
   function loadModeDifficulty(){
     try{
       const saved=JSON.parse(STORE.getItem(DIFFICULTY_STORAGE_KEY)||'{}');

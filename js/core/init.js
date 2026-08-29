@@ -62,6 +62,15 @@
   addEventListener('keydown',ensureAudio,{once:true});
   document.addEventListener('dragstart', e=>e.preventDefault());
 
+  // The game owns many single-key shortcuts, but browser refresh must always
+  // remain available in the desktop shell and in a regular browser.
+  addEventListener('keydown',e=>{
+    if(e.code!=='KeyR'||(!e.metaKey&&!e.ctrlKey)||e.altKey) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    location.reload();
+  },true);
+
   function gameplayInputBlocked(){
     return shopOpen || mapOpen || lairOpen || document.body.classList.contains('game-inactive');
   }
@@ -272,11 +281,6 @@
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='watchmen'&&e.code==='Space'){e.preventDefault();wmTryLock();}});
   $wmOpenBtn?.addEventListener('click',()=>GameActions.attemptOpen({modeId:'watchmen',source:'puzzle-control'}));
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='museum'&&e.code==='Space'){e.preventDefault();hmPick(hmKb);}});
-  document.querySelector('#shopHudButton')?.addEventListener('click',()=>{
-    if(lairOpen) closeLair();
-    if(mapOpen) closeMap();
-    openShop();
-  });
   document.querySelector('#lairHudButton')?.addEventListener('click',openLairFromHud);
   document.querySelector('#newPuzzleButton')?.addEventListener('click',restartCurrentRound);
   $mapTab.onclick=openMap;

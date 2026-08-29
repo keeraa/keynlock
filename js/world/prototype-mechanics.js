@@ -151,7 +151,7 @@
     window.KeynlockImportedGames?.attemptOpen();
   },{capture:true});
   document.querySelector('#inventoryTensionRail')?.addEventListener('click',()=>requestAnimationFrame(syncPrototypeTools));
-  ['#shopHudButton','#lairHudButton','#mapTab'].forEach(selector=>{
+  ['#lairHudButton','#mapTab','#gameSettingsButton'].forEach(selector=>{
     document.querySelector(selector)?.addEventListener('click',()=>leavePrototypeMechanic(),{capture:true});
   });
 

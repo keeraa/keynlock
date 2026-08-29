@@ -48,8 +48,7 @@
 .gameSettingsEmpty{padding:60px;text-align:center;color:#9d8967;}
 body.game-settings-open .globalTopHud,body.game-settings-open .inventoryDrawer,body.game-settings-open .alchemyRackDrawer{visibility:hidden!important;pointer-events:none!important;}
 @media(max-width:760px),(max-height:560px) and (orientation:landscape){
-  .topRightHud{width:calc(var(--mobile-hud-size) * 4 + 9px)!important;grid-template-columns:repeat(4,var(--mobile-hud-size))!important;}
-  .topRightHud #gameSettingsButton{grid-column:4!important;grid-row:1!important;}
+  .topRightHud #gameSettingsButton{grid-column:3!important;grid-row:1!important;}
 }
 @media(max-width:760px){
   .gameSettingsScreen{padding:0;}

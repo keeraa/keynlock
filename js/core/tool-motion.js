@@ -73,15 +73,17 @@
       const pulseSin=Math.sin(now*(touch ? .008 : .013))*pulse;
       const idle=Math.sin(now*.0016)*.55;
       const px=this.parallaxX,py=this.parallaxY;
+      const cursorX=Math.max(-1,Math.min(1,px/13));
+      const cursorY=Math.max(-1,Math.min(1,py/11));
       const values={
         '--pick-rot-drift':`${(idle*1.15).toFixed(2)}deg`,
         '--tension-rot-drift':`${(idle*.95).toFixed(2)}deg`,
-        '--pick-react-x':`${(this.row*-18+pulseSin*2.8+px*.30).toFixed(2)}px`,
-        '--pick-react-y':`${(this.depth*13-pulse*3+py*.50).toFixed(2)}px`,
-        '--pick-react-rot':`${(this.row*4.8+this.depth*3.2+pulseSin*2-px*.32-py*.24).toFixed(2)}deg`,
-        '--tension-react-x':`${(this.row*9+pulseSin*1.5+px*.28).toFixed(2)}px`,
-        '--tension-react-y':`${(this.depth*7-pulse*1.5+py*.28).toFixed(2)}px`,
-        '--tension-react-rot':`${(this.row*-3+this.depth*2.3+pulseSin*1.25+px*.30+py*.16).toFixed(2)}deg`
+        '--pick-react-x':`${(this.row*-18+pulseSin*2.8+cursorX*7).toFixed(2)}px`,
+        '--pick-react-y':`${(this.depth*13-pulse*3+cursorY*8).toFixed(2)}px`,
+        '--pick-react-rot':`${(this.row*4.8+this.depth*3.2+pulseSin*2-cursorX*12-cursorY*7).toFixed(2)}deg`,
+        '--tension-react-x':`${(this.row*9+pulseSin*1.5+cursorX*8).toFixed(2)}px`,
+        '--tension-react-y':`${(this.depth*7-pulse*1.5+cursorY*5).toFixed(2)}px`,
+        '--tension-react-rot':`${(this.row*-3+this.depth*2.3+pulseSin*1.25+cursorX*10+cursorY*5).toFixed(2)}deg`
       };
       for(const [name,value] of Object.entries(values))this.root.style.setProperty(name,value);
       return values;

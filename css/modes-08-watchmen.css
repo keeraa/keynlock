@@ -129,3 +129,14 @@
 @media (max-width:650px){
   .wmLock{height:min(46vh,300px);padding-inline:16px;gap:6px;}
 }
+/* Short viewports (e.g. iPhone SE/6/7/8 in portrait): the shared puzzle
+   area only leaves a narrow band here, so scale the whole lock down as a
+   unit rather than trying to fit it — the pin-rise/target math (WM_SCALE
+   in js/modes/watchmen.js) stays valid since it operates on the
+   pre-transform layout size, only the final paint shrinks. A negative
+   margin below reclaims the visual space the scale-down frees up. */
+@media (max-height:900px){
+  .wmMode{gap:10px;padding:10px;}
+  .wmLock{height:300px;min-height:0;transform:scale(.57);transform-origin:top center;margin-bottom:-129px;}
+  .wmHelp{font-size:12px;}
+}

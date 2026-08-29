@@ -80,3 +80,18 @@
   .obLock{height:min(46vh,360px);padding-inline:20px;gap:8px;}
   .obSlot{max-width:64px;}
 }
+/* Short viewports (e.g. iPhone SE/6/7/8 in portrait): the shared puzzle
+   area only leaves a narrow band here, so scale the whole lock down as a
+   unit rather than trying to fit it — a negative margin below reclaims
+   the visual space the scale-down frees up, matching how Skyrim/
+   Anachronox already handle this same constraint. */
+@media (max-height:900px){
+  .obMode{gap:10px;padding:10px;}
+  .obLock{height:320px;min-height:0;transform:scale(.56);transform-origin:top center;margin-bottom:-141px;}
+  .obStatus{font-size:12px;}
+}
+@media (max-height:600px){
+  .obMode{gap:4px;padding:6px;}
+  .obLock{transform:scale(.44);margin-bottom:-179px;}
+  .obStatus{font-size:11px;}
+}

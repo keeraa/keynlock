@@ -4,7 +4,7 @@
    (prototypes/lockpicking-mechanics-v63.html, .bs1-*) with classes renamed
    to .plTile/.plGrid/etc so they don't collide with the same-named classes
    still used by other prototype scenes. */
-.plMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:16px;padding-bottom:calc(var(--template-puzzle-bottom,56px) + 16px);background:rgba(17,13,9,.985);overflow:auto;}
+.plMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:16px;background:rgba(17,13,9,.985);overflow:auto;}
 .plMode[hidden]{display:none!important;pointer-events:none!important;}
 
 .plGridWrap{
@@ -120,4 +120,29 @@
   .plSeg.N,.plSeg.S{width:21px;margin-left:-10.5px;}
   .plSeg.E,.plSeg.W{height:21px;margin-top:-10.5px;}
   .plHub{width:26px;height:26px;}
+}
+/* Short viewports (e.g. iPhone SE/6/7/8 in portrait): the shared puzzle
+   area only leaves a narrow band here. The grid's own size already
+   follows its width (aspect-ratio:1, fr columns), so just constrain that
+   width tighter — no physics tied to fixed pixel sizes in this mode. */
+@media (max-height:900px){
+  .plMode{gap:6px;padding:8px;}
+  .plGridWrap{width:min(190px,58vw);padding:0 18px;}
+  .plPort{width:18px;height:16px;}
+  .plTile.hidden:before{font-size:13px;}
+  .plTile.hazard:after{font-size:16px;}
+  .plSeg.N,.plSeg.S{width:12px;margin-left:-6px;}
+  .plSeg.E,.plSeg.W{height:12px;margin-top:-6px;}
+  .plHub{width:15px;height:15px;}
+  .plHelp{font-size:11px;}
+}
+@media (max-height:600px){
+  .plMode{gap:2px;padding:3px;}
+  .plGridWrap{width:min(95px,46vw);padding:0 10px;}
+  .plPort{width:11px;height:10px;}
+  .plTile.hidden:before{font-size:8px;}
+  .plTile.hazard:after{font-size:9px;}
+  .plSeg.N,.plSeg.S{width:7px;margin-left:-3.5px;}
+  .plSeg.E,.plSeg.W{height:7px;margin-top:-3.5px;}
+  .plHub{width:9px;height:9px;}
 }

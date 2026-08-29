@@ -5,7 +5,7 @@
    (prototypes/lockpicking-mechanics-v63.html, .hill-*) with classes renamed
    to .hmTumb/.hmPick/etc so they don't collide with the same-named classes
    still used by other prototype scenes. */
-.hmMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px;padding-bottom:calc(var(--template-puzzle-bottom,56px) + 16px);background:rgba(17,13,9,.985);overflow:auto;}
+.hmMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px;background:rgba(17,13,9,.985);overflow:auto;}
 .hmMode[hidden]{display:none!important;pointer-events:none!important;}
 
 .hmLock{
@@ -101,4 +101,33 @@
 @media (max-width:650px){
   .hmLock{grid-template-columns:repeat(3,1fr);}
   .hmPicks{grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;}
+}
+/* Short viewports (e.g. iPhone SE/6/7/8 in portrait): the shared puzzle
+   area only leaves a narrow band here — no pin/rise physics tied to fixed
+   pixel sizes in this mode, so just shrink the cells directly rather than
+   scaling the whole board as a unit. */
+@media (max-height:900px){
+  .hmMode{gap:6px;padding:8px;}
+  .hmLock{gap:4px;}
+  .hmTumb{height:38px;font-size:16px;}
+  .hmSymbolWrap{width:30px;height:30px;}
+  .hmTargetSymbol{font-size:17px;}
+  .hmPicks{gap:4px;}
+  .hmPick{height:32px;}
+  .hmPickSymbol{width:22px;height:22px;font-size:16px;}
+  .hmPick:nth-child(-n+7) .hmPickSymbol{width:26px;height:26px;font-size:18px;}
+  .hmPick:nth-child(n+8) .hmPickSymbol{width:20px;height:20px;font-size:14px;}
+  .hmHelp{font-size:11px;}
+}
+@media (max-height:600px){
+  .hmMode{gap:3px;padding:4px;}
+  .hmLock{gap:2px;}
+  .hmTumb{height:22px;font-size:11px;}
+  .hmSymbolWrap{width:18px;height:18px;}
+  .hmTargetSymbol{font-size:11px;}
+  .hmPicks{gap:2px;}
+  .hmPick{height:19px;}
+  .hmPickSymbol{width:14px;height:14px;font-size:10px;}
+  .hmPick:nth-child(-n+7) .hmPickSymbol{width:16px;height:16px;font-size:11px;}
+  .hmPick:nth-child(n+8) .hmPickSymbol{width:13px;height:13px;font-size:9px;}
 }

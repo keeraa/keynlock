@@ -300,6 +300,8 @@ let plateEls=[], pinTopPlateEls=[];
       startOblivionRound();
     }else if(mode==='watchmen'){
       startWatchmenRound();
+    }else if(mode==='museum'){
+      startMuseumRound();
     }
 
     updateModeUI();
@@ -326,6 +328,7 @@ let plateEls=[], pinTopPlateEls=[];
       mode==='drum' ? 'Новый барабанный замок' :
       mode==='oblivion' ? 'Новый штифтовый замок' :
       mode==='watchmen' ? 'Новые тумблеры' :
+      mode==='museum' ? 'Новый набор профилей' :
       'Новый сигнал осциллографа';
     if(notify){
       toast(msg);
@@ -350,6 +353,7 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='scope'){ startScopeRound(); toast('Сигнал обновлён'); return; }
     if(mode==='oblivion'){ startOblivionRound(); toast('Штифтовый замок обновлён'); return; }
     if(mode==='watchmen'){ startWatchmenRound(); toast('Тумблеры обновлены'); return; }
+    if(mode==='museum'){ startMuseumRound(); toast('Профили обновлены'); return; }
     state=[...initial]; solved=false; $lock.classList.remove('win');
     $mechanism.classList.remove('ready','opening','opened');
     render(); toast('Механизм сброшен');
@@ -399,6 +403,7 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='r2') return moveR2(dir);
     if(mode==='oblivion') return obMove(dir);
     if(mode==='watchmen') return wmMove(dir);
+    if(mode==='museum') return hmMoveKb(dir<0?'left':'right');
     if(mode==='g1') return g1Press(dir);
     if(mode==='mass') return moveMass(dir);
     if(mode==='hillsfar') return;
@@ -493,7 +498,8 @@ let plateEls=[], pinTopPlateEls=[];
     hillsfar:()=>tryOpenHillsfar(),
     mass:()=>tryOpenMass(),
     oblivion:()=>tryOpenOblivion(),
-    watchmen:()=>tryOpenWatchmen()
+    watchmen:()=>tryOpenWatchmen(),
+    museum:()=>tryOpenMuseum()
   });
 
   function select(delta){
@@ -513,6 +519,10 @@ let plateEls=[], pinTopPlateEls=[];
     }
     if(mode==='watchmen'){
       if(delta<0) wmRaise(); else wmLower();
+      return;
+    }
+    if(mode==='museum'){
+      hmMoveKb(delta<0?'up':'down');
       return;
     }
     if(mode==='g1') return;
@@ -535,6 +545,7 @@ let plateEls=[], pinTopPlateEls=[];
     else if(mode==='r2'){ $mechanism.classList.remove('ready'); }
     else if(mode==='oblivion'){ $mechanism.classList.remove('ready'); }
     else if(mode==='watchmen'){ $mechanism.classList.remove('ready'); }
+    else if(mode==='museum'){ $mechanism.classList.remove('ready'); }
     else if(mode==='g1'){ $mechanism.classList.remove('ready'); }
     else if(mode==='mass'){ $mechanism.classList.remove('ready'); }
     else if(mode!=='hillsfar') $mechanism.classList.toggle('ready',!solved && goalMet());
@@ -623,6 +634,9 @@ let plateEls=[], pinTopPlateEls=[];
     }
     if(mode==='watchmen' && !solved){
       wmTick(Math.min(.04,dt/1000));
+    }
+    if(mode==='museum' && !solved){
+      hmTick(Math.min(.05,dt/1000));
     }
     scheduleAnimationLoop(solved ? 160 : ACTIVE_FRAME_MS);
   }

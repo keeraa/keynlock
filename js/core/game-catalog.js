@@ -26,12 +26,12 @@ const GAME_DEFINITIONS={
   scope:{title:'Осциллограф',kind:'native',lock:{present:false,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   oblivion:{title:'Штифтовый замок',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   watchmen:{title:'Подпружиненные тумблеры',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
+  museum:{title:'Подбор формы отмычки',kind:'native',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
 
   'prototype:pipeline':{title:'Трубопровод',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
   'prototype:bioshock2':{title:'BioShock 2',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
   'prototype:risen-2':{title:'Risen 2 — верфь',kind:'prototype',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   'prototype:alpha-protocol':{title:'Alpha Protocol',kind:'prototype',lock:{present:false,manualOpen:false,specialTool:true},world:{noise:false,guards:false,birds:false}},
-  'prototype:hillsfar':{title:'Hillsfar — музей',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
   'prototype:thief-ds':{title:'Thief: Deadly Shadows',kind:'prototype',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:false,guards:false,birds:false}},
   'prototype:kingdom-come':{title:'Kingdom Come',kind:'prototype',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   'prototype:thief-12':{title:'Thief 1/2',kind:'prototype',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},

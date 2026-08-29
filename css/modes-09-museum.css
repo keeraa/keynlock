@@ -1,0 +1,115 @@
+/* Hillsfar — музей (подбор формы отмычки) — six tumblers, each hiding a
+   target pick-shape symbol chosen from a 21-symbol grid; some tumblers are
+   half occluded, some need the right symbol clicked twice. Markup/CSS
+   ported from the old prototype scene
+   (prototypes/lockpicking-mechanics-v63.html, .hill-*) with classes renamed
+   to .hmTumb/.hmPick/etc so they don't collide with the same-named classes
+   still used by other prototype scenes. */
+.hmMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;background:rgba(17,13,9,.985);overflow:auto;}
+.hmMode[hidden]{display:none!important;pointer-events:none!important;}
+
+.hmLock{
+  width:min(650px,92vw);
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:8px;
+  flex:none;
+}
+.hmTumb{
+  position:relative;
+  overflow:hidden;
+  height:88px;
+  border:1px solid #4c5142;
+  border-radius:12px;
+  background:#171b15;
+  display:grid;
+  place-items:center;
+  font-size:28px;
+  font-family:"Segoe UI Symbol","Noto Sans Symbols 2","Arial Unicode MS",sans-serif;
+  color:#cfd6c6;
+}
+.hmTumb.current{
+  border-color:#d8b871;
+  box-shadow:0 0 12px rgba(216,184,113,.16);
+}
+.hmTumb.current .hmTargetSymbol{transform:scale(1.06);}
+.hmTumb.done{background:#20301e;color:#a9c69a;}
+.hmSymbolWrap{
+  position:relative;
+  z-index:1;
+  isolation:isolate;
+  width:58px;
+  height:58px;
+  display:grid;
+  place-items:center;
+}
+.hmTargetSymbol{position:relative;z-index:1;font-size:30px;line-height:1;}
+.hmOcclusion{position:absolute;inset:0;z-index:20;pointer-events:none;background:#0b0e0b;}
+.hmOcclusion.left{clip-path:polygon(0 0,0 100%,100% 100%);}
+.hmOcclusion.right{clip-path:polygon(0 0,100% 0,100% 100%);}
+
+.hmTimeBar{
+  width:min(650px,92vw);
+  height:8px;
+  border:1px solid #343b31;
+  border-radius:99px;
+  overflow:hidden;
+  background:#0b0e0b;
+  flex:none;
+}
+.hmTimeBar span{display:block;height:100%;width:100%;background:#a38d58;transition:width .08s linear;}
+
+.hmPicks{
+  width:min(650px,92vw);
+  display:grid;
+  grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:8px;
+}
+.hmPick{
+  height:64px;
+  min-width:0;
+  padding:0;
+  display:grid;
+  place-items:center;
+  line-height:1;
+  overflow:hidden;
+  cursor:pointer;
+  border:1px solid #4c5142;
+  background:rgba(20,19,17,.72);
+  border-radius:8px;
+  color:#cabba6;
+  backdrop-filter:blur(5px);
+}
+.hmPick:active{background:rgba(98,80,58,.64);}
+.hmPick.kbFocus{outline:2px solid #d8b871!important;outline-offset:2px!important;}
+.hmPickSymbol{
+  width:38px;
+  height:38px;
+  display:grid;
+  place-items:center;
+  font-family:"Segoe UI Symbol","Noto Sans Symbols 2","Arial Unicode MS",sans-serif;
+  font-size:28px;
+  line-height:1;
+  transform:translateY(var(--hm-shift,0)) scale(var(--hm-scale,1));
+  transform-origin:center;
+}
+.hmPick:nth-child(-n+7) .hmPickSymbol{width:46px;height:46px;font-size:33px;}
+.hmPick:nth-child(n+8) .hmPickSymbol{width:34px;height:34px;font-size:25px;}
+.hmPickSymbol[data-glyph="○"]{--hm-scale:1.12;--hm-shift:-1px;}
+.hmPickSymbol[data-glyph="⌒"]{--hm-scale:1.10;--hm-shift:-1px;}
+.hmPickSymbol[data-glyph="∩"]{--hm-scale:1.09;--hm-shift:-1px;}
+.hmPickSymbol[data-glyph="☉"]{--hm-scale:1.08;}
+.hmPickSymbol[data-glyph="☽"]{--hm-scale:1.08;--hm-shift:-1px;}
+
+.hmHelp{
+  min-height:20px;
+  color:#bcb39a;
+  text-align:center;
+  font:14px/1.35 Arial,sans-serif;
+  max-width:560px;
+}
+
+@media (max-width:650px){
+  .hmLock{grid-template-columns:repeat(3,1fr);}
+  .hmPicks{grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;}
+}

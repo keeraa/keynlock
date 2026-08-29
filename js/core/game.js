@@ -55,6 +55,8 @@ if(mode==='classic'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ПОДНЯТЬ И ЗАФИКСИРОВАТЬ ВСЕ ШТИФТЫ</b>';
     }else if(mode==='watchmen'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ВЫСТАВИТЬ И ЗАФИКСИРОВАТЬ ВСЕ ТУМБЛЕРЫ ДО ИСТЕЧЕНИЯ ВРЕМЕНИ</b>';
+    }else if(mode==='museum'){
+      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ПОДОБРАТЬ ПРОФИЛЬ ОТМЫЧКИ ДЛЯ КАЖДОГО ТУМБЛЕРА</b>';
     }
   }
 

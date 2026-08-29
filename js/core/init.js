@@ -271,6 +271,7 @@
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='oblivion'&&e.code==='Space'){e.preventDefault();obClick(obSelected);}});
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='watchmen'&&e.code==='Space'){e.preventDefault();wmTryLock();}});
   $wmOpenBtn?.addEventListener('click',()=>GameActions.attemptOpen({modeId:'watchmen',source:'puzzle-control'}));
+  addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='museum'&&e.code==='Space'){e.preventDefault();hmPick(hmKb);}});
   document.querySelector('#shopHudButton')?.addEventListener('click',()=>{
     if(lairOpen) closeLair();
     if(mapOpen) closeMap();

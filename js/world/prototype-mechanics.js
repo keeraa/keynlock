@@ -4,7 +4,6 @@
     {id:'bioshock2',name:'Охранный дрон',game:'BioShock 2',x:17,y:23},
     {id:'risen-2',name:'Верфь Risen 2',game:'Risen 2',x:11,y:61},
     {id:'alpha-protocol',name:'Архив пазов',game:'Alpha Protocol',x:31,y:17},
-    {id:'hillsfar',name:'Музей Hillsfar',game:'Hillsfar',x:25,y:82},
     {id:'thief-ds',name:'Теневой квартал',game:'Thief: Deadly Shadows',x:48,y:15},
     {id:'kingdom-come',name:'Дом бронника',game:'Kingdom Come',x:64,y:16},
     {id:'thief-12',name:'Гильдия воров',game:'Thief 1/2',x:88,y:49},

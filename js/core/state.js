@@ -228,7 +228,7 @@
     saveModeDifficulty();
     if(modeName!==mode || !regenerate) return;
     if(lairOpen) closeLair();
-    if(mapOpen) closeMap();
+    if(mapOpen) closeMap(false);
     if(shopOpen) closeShop();
     requestAnimationFrame(()=>{ newLock(false); if(mode==='r2') requestAnimationFrame(renderR2); });
   }

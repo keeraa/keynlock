@@ -13,9 +13,12 @@
     if($mapLocationAction) $mapLocationAction.hidden=true;
   }
 
+  let mapReturnToLair=false;
+
   function openMap(){
     setInventoryOpen(false);
     if(shopOpen) closeShop();
+    mapReturnToLair=lairOpen;
     if(lairOpen) closeLair();
     mapOpen=true;
     document.body.classList.add('map-open');
@@ -25,8 +28,10 @@
   }
 
   let mapTravelId=0;
-  function closeMap(){
+  function closeMap(restorePrevious=false){
     if(!mapOpen) return;
+    const restoreLair=restorePrevious&&mapReturnToLair&&mapLocation==='lair';
+    mapReturnToLair=false;
     mapTravelId++;
     mapMoving=false;
     if(lairOpen) closeLair();
@@ -34,6 +39,7 @@
     document.body.classList.remove('map-open');
     $worldMapScreen.hidden=true;
     updateModeUI();
+    if(restoreLair) openLair();
   }
 
   // Locations say what they are; the map no longer needs to know their names.
@@ -78,14 +84,14 @@
     },1180);
   }
 
-  function openShop(){ setInventoryOpen(false); if(mapOpen) closeMap(); shopOpen=true; document.body.classList.add('shop-open'); $toast.classList.remove('show','actionable'); updateShopUI(); $shopOverlay.classList.add('open'); }
+  function openShop(){ setInventoryOpen(false); if(mapOpen) closeMap(false); shopOpen=true; document.body.classList.add('shop-open'); $toast.classList.remove('show','actionable'); updateShopUI(); $shopOverlay.classList.add('open'); }
   function closeShop(){ shopOpen=false; document.body.classList.remove('shop-open'); $shopOverlay.classList.remove('open'); updatePickUI(); }
   let modeSwitchFrame=0;
   function switchMode(nextMode,forceRestart=false){
     if(!ALL_MODES.has(nextMode)) return;
     window.dispatchEvent(new CustomEvent('keynlock-game-opened',{detail:{id:nextMode}}));
     if(lairOpen) closeLair();
-    if(mapOpen) closeMap();
+    if(mapOpen) closeMap(false);
     if(shopOpen) closeShop();
     if(!forceRestart && mode===nextMode && !solved && !document.body.classList.contains('game-inactive')) return;
     mode=nextMode;

@@ -102,7 +102,7 @@ if(mode==='classic'){
   function restartCurrentRound(){
     if(shopOpen) closeShop();
     if(lairOpen) closeLair();
-    if(mapOpen) closeMap();
+    if(mapOpen) closeMap(false);
     newLock(false);
     SFX.newRound?.();
   }

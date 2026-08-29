@@ -284,9 +284,9 @@
   document.querySelector('#lairHudButton')?.addEventListener('click',openLairFromHud);
   document.querySelector('#newPuzzleButton')?.addEventListener('click',restartCurrentRound);
   $mapTab.onclick=openMap;
-  document.querySelector('#worldMapClose')?.addEventListener('click',closeMap);
+  document.querySelector('#worldMapClose')?.addEventListener('click',()=>closeMap(true));
   $worldMapScreen?.addEventListener('pointerdown',e=>{
-    if(e.target===$worldMapScreen) closeMap();
+    if(e.target===$worldMapScreen) closeMap(true);
   });
   $worldMapCanvas?.querySelectorAll('.mapNode').forEach(node=>{
     node.addEventListener('click',()=>travelToMapLocation(node.dataset.location));
@@ -317,7 +317,7 @@
     if(lairOpen && workbenchModal && !workbenchModal.hidden){ e.preventDefault(); closeLairWorkbench(); return; }
     if(lairOpen && $lairModuleWindow && !$lairModuleWindow.hidden){ e.preventDefault(); closeLairModule(); return; }
     if(lairOpen){ e.preventDefault(); closeLair(); return; }
-    if(mapOpen){ e.preventDefault(); closeMap(); }
+    if(mapOpen){ e.preventDefault(); closeMap(true); }
   });
 
   $hcInput?.addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&e.key==='Enter'){e.preventDefault();GameActions.attemptOpen({modeId:'heatcold',source:'keyboard'});}});

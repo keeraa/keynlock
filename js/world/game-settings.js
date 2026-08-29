@@ -178,7 +178,7 @@
       if(!screen)return;
       if(shopOpen)closeShop();
       if(lairOpen)closeLair();
-      if(mapOpen)closeMap();
+      if(mapOpen)closeMap(false);
       leavePrototypeMechanic?.();
       document.body.classList.add('game-settings-open');
       setGameInactive(true);

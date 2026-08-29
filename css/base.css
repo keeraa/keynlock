@@ -101,7 +101,6 @@ header .economyHud{position:static!important;top:auto!important;right:auto!impor
 }
 .plates{position:absolute;inset:0;transform:translateY(1px);pointer-events:auto;}
 .plate{--px:0px;--py:0px;--parx:1;--pary:1;position:absolute;width:520px;height:97px;left:50%;top:0;transform-origin:50% 50%;transform:translate3d(calc(-50% + var(--dx) + (var(--px) * var(--parx))), calc(var(--dy) + (var(--py) * var(--pary))), 0);border:0;cursor:pointer;outline:none;-webkit-user-select:none;user-select:none;backface-visibility:hidden;background:none;box-shadow:none;filter:drop-shadow(0 10px 9px rgba(0,0,0,.34));transition:filter 242ms cubic-bezier(.2,.8,.2,1), transform 363ms cubic-bezier(.18,.82,.2,1);}
-.plate.mouseSteer{cursor:ew-resize;}
 .plate:before{content:none;}
 .plateFace{position:absolute;inset:0;z-index:4;background:center/contain no-repeat;pointer-events:none;}
 .plate.selected{filter:brightness(1.05) saturate(1.02) drop-shadow(0 0 12px rgba(232,187,86,.12)) drop-shadow(0 12px 10px rgba(0,0,0,.36));transform:translate3d(calc(-50% + var(--dx) + (var(--px) * var(--parx))), calc(var(--dy) + (var(--py) * var(--pary))), 0) scale(1.01);}

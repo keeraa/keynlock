@@ -51,6 +51,9 @@
     const d=deltaFor(i,dir); return st.map((v,j)=>v+d[j]);
   }
 let plateEls=[], pinTopPlateEls=[];
+  function plateMouseSteeringActive(){
+    return mode==='classic'||mode==='target'||mode==='line'||mode==='sequence'||mode==='special';
+  }
 
   function rebuildPlates(){
     plateEls=[];
@@ -67,11 +70,10 @@ let plateEls=[], pinTopPlateEls=[];
       const p=document.createElement('div');
       p.className='plate';
       if(mode==='target') p.classList.add('mode-target');
-      if(mode==='classic') p.classList.add('mouseSteer');
       p.dataset.index=i;
       p.setAttribute('role','button');
       p.setAttribute('tabindex','0');
-      p.setAttribute('aria-label',mode==='classic'
+      p.setAttribute('aria-label',plateMouseSteeringActive()
         ? `Пластина ${i+1}: левая половина двигает штифт влево, правая — вправо`
         : `Выбрать пластину ${i+1}`);
 
@@ -126,7 +128,7 @@ let plateEls=[], pinTopPlateEls=[];
       p.addEventListener('mousedown',e=>e.preventDefault());
       p.addEventListener('click',event=>{
         if(solved) return;
-        if(mode==='classic'){
+        if(plateMouseSteeringActive()){
           const rect=p.getBoundingClientRect();
           const dir=event.clientX<rect.left+rect.width/2?-1:1;
           if(selected!==i)SFX.select();

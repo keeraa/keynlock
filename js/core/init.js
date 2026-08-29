@@ -114,24 +114,25 @@
     bgParallaxTargetY = 0;
   });
 
-  // How far a mouse at the edge of the scene pushes it. The bird measures
+  // How far a mouse at the viewport edge, relative to the lock, pushes it. The bird measures
   // "looking up" against whichever sweep is in play.
   const POINTER_SWEEP_X = 13, POINTER_SWEEP_Y = 11;
   window.POINTER_SWEEP_Y = POINTER_SWEEP_Y;
 
-  $scene.addEventListener('pointermove', e=>{
+  addEventListener('pointermove', e=>{
     // Only a mouse aims the scene. A finger tapping a plate used to slam the
     // parallax target across to wherever it landed, which jolted the view and
     // whipped the pick and tensioner round with it.
     if(e.pointerType !== 'mouse') return;
-    const r=$scene.getBoundingClientRect();
-    const nx=((e.clientX-r.left)/r.width - 0.5) * 2;
-    const ny=((e.clientY-r.top)/r.height - 0.5) * 2;
+    const r=$lock.getBoundingClientRect();
+    const centerX=r.left+r.width/2,centerY=r.top+r.height/2;
+    const dx=e.clientX-centerX,dy=e.clientY-centerY;
+    const nx=Math.max(-1,Math.min(1,dx/Math.max(1,dx<0?centerX:innerWidth-centerX)));
+    const ny=Math.max(-1,Math.min(1,dy/Math.max(1,dy<0?centerY:innerHeight-centerY)));
     pointerTargetX = nx * POINTER_SWEEP_X;
     pointerTargetY = ny * POINTER_SWEEP_Y;
-  });
-  $scene.addEventListener('pointerleave', e=>{
-    if(e.pointerType !== 'mouse') return;
+  },{passive:true});
+  document.documentElement.addEventListener('mouseleave', ()=>{
     pointerTargetX = 0;
     pointerTargetY = 0;
   });

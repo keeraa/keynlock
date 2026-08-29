@@ -553,35 +553,8 @@ let plateEls=[], pinTopPlateEls=[];
     bgParallaxY += (bgParallaxTargetY - bgParallaxY) * lerp;
     document.body.style.setProperty('--bg-parallax-x', `${bgParallaxX.toFixed(2)}px`);
     document.body.style.setProperty('--bg-parallax-y', `${bgParallaxY.toFixed(2)}px`);
-    const idleSway = Math.sin(now * 0.0016) * 0.55;
-    toolMotionKick += (0 - toolMotionKick) * (1 - Math.pow(0.001, dt / 420));
-    const toolProfile = computeToolMotionProfile();
-    // Math.sin(now * 0.024) is about 3.8Hz. At 120Hz that reads as a flick; at
-    // the 60Hz a phone actually runs it lands as a judder, so slow it and take
-    // most of the amplitude out there.
-    const touchLayout = toolShakeQuery.matches;
-    const movePulse = toolMotionKick * (touchLayout ? 0.4 : 1);
-    const pulseSin = Math.sin(now * (touchLayout ? 0.011 : 0.024)) * movePulse;
-
-    const pickRotDrift = idleSway * 1.15 + pointerX * 0.18 - pointerY * 0.14;
-    const tensionRotDrift = idleSway * 0.95 + pointerX * 0.12 + pointerY * 0.12;
-
-    const pickReactX = toolProfile.rowBias * -8 + pulseSin * 2.2;
-    const pickReactY = toolProfile.posBias * 6 - movePulse * 2.4;
-    const pickReactRot = toolProfile.rowBias * 2.2 + toolProfile.posBias * 1.5 + pulseSin * 1.8;
-
-    const tensionReactX = toolProfile.rowBias * 4 + pulseSin * 1.1;
-    const tensionReactY = toolProfile.posBias * 3 - movePulse * 1.2;
-    const tensionReactRot = toolProfile.rowBias * -1.4 + toolProfile.posBias * 1.1 + pulseSin * 1.1;
-
-    document.documentElement.style.setProperty('--pick-rot-drift', `${pickRotDrift.toFixed(2)}deg`);
-    document.documentElement.style.setProperty('--tension-rot-drift', `${tensionRotDrift.toFixed(2)}deg`);
-    document.documentElement.style.setProperty('--pick-react-x', `${pickReactX.toFixed(2)}px`);
-    document.documentElement.style.setProperty('--pick-react-y', `${pickReactY.toFixed(2)}px`);
-    document.documentElement.style.setProperty('--pick-react-rot', `${pickReactRot.toFixed(2)}deg`);
-    document.documentElement.style.setProperty('--tension-react-x', `${tensionReactX.toFixed(2)}px`);
-    document.documentElement.style.setProperty('--tension-react-y', `${tensionReactY.toFixed(2)}px`);
-    document.documentElement.style.setProperty('--tension-react-rot', `${tensionReactRot.toFixed(2)}deg`);
+    toolMotionController.setTarget(toolMotionController.targetFromLinear(state,selected,{min:MIN,max:MAX}));
+    toolMotionController.update(dt,{pointerX,pointerY,now,touch:toolShakeQuery.matches});
 
     $lock.style.setProperty('--px', `${pointerX.toFixed(2)}px`);
     $lock.style.setProperty('--py', `${pointerY.toFixed(2)}px`);

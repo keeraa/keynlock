@@ -147,7 +147,7 @@
     if(speed<NOISE_MOUSE_SPEED||now-noisePointerBurstAt<NOISE_MOUSE_COOLDOWN)return;
     noisePointerBurstAt=now;
     const strength=Math.min(1,(speed-NOISE_MOUSE_SPEED)/2.5);
-    addNoise(.008+strength*.025);
+    addNoise(.016+strength*.050);
   }
   window.addEventListener('pointermove',trackPointerNoise,{passive:true});
 

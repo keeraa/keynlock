@@ -4,12 +4,10 @@ body.game-inactive.prototype-has-classic-lock #lock.universalLockBlock{top:110px
 body.game-inactive.prototype-has-classic-lock #lock.universalLockBlock .lockHitArea{pointer-events:auto!important;}
 body.game-inactive.prototype-has-classic-lock.prototype-lock-ready #lock.universalLockBlock{--lock-glow:1;}
 .prototype-has-classic-lock #lock.universalLockBlock.prototype-wrong-tension{animation:prototypeWrongTension .38s ease both;}
-/* Classic mode slides the pick toward the selected plate via a
-   continuous rAF loop re-reading these same --pick-react-* vars every
-   frame (js/modes/base-locks.js's animationLoop) — that loop is
-   Classic-only (reads Classic's own `state`/`selected` globals) and
-   doesn't run for prototype mechanics, so a game like Oblivion instead
-   sets these vars once per selection change. Without an explicit
+/* Native modes slide the tools with the reusable ToolMotionController.
+   Imported mechanics may create the same controller through
+   window.KeynlockToolMotionController; games that draw their own tools
+   can still set these vars once per selection change. Without an explicit
    transition that reads as an instant snap; this animates it instead,
    as close as a single before/after change gets to the loop's
    continuous interpolation. */

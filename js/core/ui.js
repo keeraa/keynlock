@@ -42,29 +42,8 @@
     challengeHud.pulseReward();
   }
 
-  let toolMotionKick = 0;
-
-  function computeToolMotionProfile(){
-    const safeMax = (typeof MAX === 'number' ? MAX : 6);
-    const safeMin = (typeof MIN === 'number' ? MIN : 1);
-    const span = Math.max(1, safeMax - safeMin);
-
-    let rowBias = 0;
-    let posBias = 0;
-
-    if(Array.isArray(state) && state.length){
-      const idx = Math.max(0, Math.min(state.length - 1, Number.isFinite(selected) ? selected : 0));
-      rowBias = state.length > 1 ? (idx / (state.length - 1) - 0.5) : 0;
-
-      const rawPos = typeof state[idx] === 'number' ? state[idx] : safeMin;
-      posBias = ((rawPos - safeMin) / span) - 0.5;
-    }
-
-    return { rowBias, posBias };
-  }
-
   function registerMove(){
-    toolMotionKick = Math.min(1, toolMotionKick + 1);
+    toolMotionController.impulse();
     moves++;
     const next=Math.max(100, 1000 - moves*50);
     if(next!==runReward){

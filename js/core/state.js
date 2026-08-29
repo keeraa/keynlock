@@ -141,6 +141,7 @@
   const $plates=document.querySelector('#plates'), $status=document.querySelector('#status'),
         $lock=document.querySelector('#lock'),
         challengeHud=new GameChallengeHud(document.querySelector('#challengeHud')),
+        toolMotionController=new ToolMotionController(document.documentElement),
         gameDefeat=new GameDefeat(document.querySelector('#gameDefeatOverlay'),{onRestart:()=>{
           if(activePrototypeMechanic)replayPrototypeMechanic();
           else restartCurrentRound();

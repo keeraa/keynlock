@@ -8,6 +8,8 @@
   const NOISE_PER_BLOCKED = 0.150; // a move the lock refuses
   const NOISE_PER_BREAK = 0.210;  // a pick snapping
   const NOISE_PER_WRONG = 0.190;  // wrong tensioner
+  const NOISE_MOUSE_SPEED = 1.35; // px/ms before a mouse sweep becomes noisy
+  const NOISE_MOUSE_COOLDOWN = 180; // keep dense pointer events from stacking
   const NOISE_DECAY = 0.075;      // per second, back towards silence
   const NOISE_WARN = 0.68;        // where the meter starts warning
 
@@ -128,6 +130,26 @@
   SFX.blocked = function(){ addNoise(NOISE_PER_BLOCKED); return baseBlocked.apply(this, arguments); };
   SFX.break = function(){ addNoise(NOISE_PER_BREAK); return baseBreak.apply(this, arguments); };
   SFX.wrongLock = function(){ addNoise(NOISE_PER_WRONG); return baseWrong.apply(this, arguments); };
+
+  // A deliberate slow movement is silent. Only fast mouse sweeps add a small
+  // impulse, capped and rate-limited so normal aiming never rivals an error.
+  let noisePointerX=0, noisePointerY=0, noisePointerAt=0, noisePointerBurstAt=0;
+  function trackPointerNoise(event){
+    const now=performance.now();
+    const isMouse=!event.pointerType||event.pointerType==='mouse';
+    const dt=now-noisePointerAt;
+    const dx=event.clientX-noisePointerX, dy=event.clientY-noisePointerY;
+    noisePointerX=event.clientX;
+    noisePointerY=event.clientY;
+    noisePointerAt=now;
+    if(!isMouse||!noiseActive()||solved||guardsCalled||dt<8||dt>140)return;
+    const speed=Math.hypot(dx,dy)/dt;
+    if(speed<NOISE_MOUSE_SPEED||now-noisePointerBurstAt<NOISE_MOUSE_COOLDOWN)return;
+    noisePointerBurstAt=now;
+    const strength=Math.min(1,(speed-NOISE_MOUSE_SPEED)/2.5);
+    addNoise(.008+strength*.025);
+  }
+  window.addEventListener('pointermove',trackPointerNoise,{passive:true});
 
   const baseNewLockForNoise = newLock;
   newLock = function(){

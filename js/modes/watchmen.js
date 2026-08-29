@@ -14,6 +14,28 @@
     return !!p && !p.locked && Math.abs(p.h-p.target)<=WM_LOCK_TOL;
   }
 
+  // The pin's own height, its resting offset off the slot floor, and the
+  // rise-per-unit scale (--wm-scale, also read by .wmTarget's CSS formula
+  // so the target line always lines up with the pin) are all derived from
+  // wmLock's actual rendered height rather than fixed pixels — wmLock has
+  // no min-height (css/modes-08-watchmen.css), so this keeps the physics
+  // correct whether the shared puzzle area gives it 150px or 400px+.
+  function wmApplyGeometry(){
+    if(!$wmLock) return WM_SCALE;
+    const cs=getComputedStyle($wmLock);
+    const h=$wmLock.clientHeight-(parseFloat(cs.paddingTop)||0)-(parseFloat(cs.paddingBottom)||0);
+    if(!h || h<0) return WM_SCALE;
+    const pinBottom=Math.max(8,Math.min(22,h*.07));
+    const pinH=Math.max(36,Math.min(112,h*.36));
+    const topClearance=Math.max(8,h*.09);
+    const availableRise=Math.max(24,h-pinBottom-pinH-topClearance);
+    const scale=availableRise/WM_MAX;
+    $wmLock.style.setProperty('--wm-pin-bottom',pinBottom.toFixed(1)+'px');
+    $wmLock.style.setProperty('--wm-pin-h',pinH.toFixed(1)+'px');
+    $wmLock.style.setProperty('--wm-scale',scale.toFixed(3));
+    return scale;
+  }
+
   // Regenerates just the puzzle state (pins + timer) without touching the
   // shared economy fields (picks/moves/brokenPicks/runReward) — used both
   // for a fresh round and as damagePick's resetProgress on a timeout, where
@@ -72,6 +94,7 @@
       });
       $wmLock.replaceChildren(frag);
     }
+    const scale=wmApplyGeometry();
     wmPins.forEach((p,i)=>{
       const s=wmPinEls[i];
       if(!s) return;
@@ -79,7 +102,7 @@
       s.classList.toggle('selected',i===wmSelected);
       s.classList.toggle('locked',p.locked);
       s.classList.toggle('lockable',!solved && wmCanLock(i));
-      s.querySelector('.wmPin').style.setProperty('--wm-rise',(p.h*WM_SCALE).toFixed(1));
+      s.querySelector('.wmPin').style.setProperty('--wm-rise',(p.h*scale).toFixed(1));
     });
     if($wmTimerBar) $wmTimerBar.style.width=Math.max(0,wmTimeLeft/wmTimeMax*100)+'%';
     const n=wmPins.filter(p=>p.locked).length;

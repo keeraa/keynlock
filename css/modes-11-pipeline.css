@@ -4,25 +4,44 @@
    (prototypes/lockpicking-mechanics-v63.html, .bs1-*) with classes renamed
    to .plTile/.plGrid/etc so they don't collide with the same-named classes
    still used by other prototype scenes. */
-.plMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:16px;background:rgba(17,13,9,.985);overflow:auto;}
+.plMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:10px;background:rgba(17,13,9,.985);overflow:auto;}
 .plMode[hidden]{display:none!important;pointer-events:none!important;}
 
+/* plGridWrap fills whatever height is actually left (flex:1/min-height:0)
+   and centers plGrid within it; plGrid is fit to whichever of width/height
+   is tighter via height:100%+aspect-ratio+max-width — a wide-but-short
+   desktop window sizes the board off its real height instead of assuming
+   "short == phone == tiny". Port/pipe-segment/hub sizes are cqw-relative
+   to their nearest container-type ancestor so they scale with the board
+   instead of staying a fixed px size that would look oversized on a
+   shrunk grid; js/modes/pipeline.js's plAlignPorts() still measures real
+   tile rects each render, so the ports track the grid at any size. */
 .plGridWrap{
   position:relative;
-  width:min(420px,84vw);
-  padding:0 28px;
+  flex:1 1 auto;
+  min-height:0;
+  width:100%;
+  padding:0 min(28px,7%);
+  container-type:inline-size;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 .plGrid{
+  height:100%;
+  width:auto;
+  max-width:min(420px,100%);
+  aspect-ratio:1;
+  container-type:inline-size;
   display:grid;
   grid-template-columns:repeat(6,1fr);
   gap:1px;
-  aspect-ratio:1;
 }
 .plPort{
   position:absolute;
   top:0;
-  width:31px;
-  height:22px;
+  width:min(9cqw,31px);
+  height:min(6.4cqw,22px);
   background:#34483f;
   border:1px solid #6b8172;
   z-index:3;
@@ -53,7 +72,7 @@
   display:grid;
   place-items:center;
   color:#59685e;
-  font:700 22px/1 Georgia,serif;
+  font:700 min(5.2cqw,22px)/1 Georgia,serif;
   background:repeating-linear-gradient(45deg,#111a15 0 8px,#152019 8px 16px);
 }
 .plTile.flow{
@@ -70,22 +89,22 @@
   place-items:center;
   color:#d98a78;
   font-weight:800;
-  font-size:24px;
+  font-size:min(5.7cqw,24px);
 }
 .plTile.kbFocus{outline:2px solid #d8b871!important;outline-offset:1px!important;}
 
 .plPipe{position:absolute;inset:0;}
 .plSeg{position:absolute;background:linear-gradient(#89a98e,#536d59);box-shadow:0 0 0 2px #273a2e inset;}
-.plSeg.N,.plSeg.S{width:24px;left:50%;margin-left:-12px;height:54%;}
+.plSeg.N,.plSeg.S{width:min(5.7cqw,24px);left:50%;margin-left:min(-2.85cqw,-12px);height:54%;}
 .plSeg.N{top:0;}
 .plSeg.S{bottom:0;}
-.plSeg.E,.plSeg.W{height:24px;top:50%;margin-top:-12px;width:54%;}
+.plSeg.E,.plSeg.W{height:min(5.7cqw,24px);top:50%;margin-top:min(-2.85cqw,-12px);width:54%;}
 .plSeg.E{right:0;}
 .plSeg.W{left:0;}
 .plHub{
   position:absolute;
-  width:30px;
-  height:30px;
+  width:min(7.1cqw,30px);
+  height:min(7.1cqw,30px);
   left:50%;
   top:50%;
   transform:translate(-50%,-50%);
@@ -99,6 +118,7 @@
 }
 
 .plHelp{
+  flex:none;
   color:#bcb39a;
   text-align:center;
   font:14px/1.35 Arial,sans-serif;
@@ -110,39 +130,4 @@
   background:linear-gradient(180deg,#3c6f52,#1b2c1d);
   border-color:#5fa87d;
   color:#d7f1e0;
-}
-
-@media (max-width:650px){
-  .plGridWrap{padding:0 20px;}
-  .plGrid{gap:0;}
-  .plPort{width:23px;}
-  .plTile.hidden:before{font-size:17px;}
-  .plSeg.N,.plSeg.S{width:21px;margin-left:-10.5px;}
-  .plSeg.E,.plSeg.W{height:21px;margin-top:-10.5px;}
-  .plHub{width:26px;height:26px;}
-}
-/* Short viewports (e.g. iPhone SE/6/7/8 in portrait): the shared puzzle
-   area only leaves a narrow band here. The grid's own size already
-   follows its width (aspect-ratio:1, fr columns), so just constrain that
-   width tighter — no physics tied to fixed pixel sizes in this mode. */
-@media (max-height:900px){
-  .plMode{gap:6px;padding:8px;}
-  .plGridWrap{width:min(190px,58vw);padding:0 18px;}
-  .plPort{width:18px;height:16px;}
-  .plTile.hidden:before{font-size:13px;}
-  .plTile.hazard:after{font-size:16px;}
-  .plSeg.N,.plSeg.S{width:12px;margin-left:-6px;}
-  .plSeg.E,.plSeg.W{height:12px;margin-top:-6px;}
-  .plHub{width:15px;height:15px;}
-  .plHelp{font-size:11px;}
-}
-@media (max-height:600px){
-  .plMode{gap:2px;padding:3px;}
-  .plGridWrap{width:min(95px,46vw);padding:0 10px;}
-  .plPort{width:11px;height:10px;}
-  .plTile.hidden:before{font-size:8px;}
-  .plTile.hazard:after{font-size:9px;}
-  .plSeg.N,.plSeg.S{width:7px;margin-left:-3.5px;}
-  .plSeg.E,.plSeg.W{height:7px;margin-top:-3.5px;}
-  .plHub{width:9px;height:9px;}
 }

@@ -5,26 +5,41 @@
    (prototypes/lockpicking-mechanics-v63.html, .hill-*) with classes renamed
    to .hmTumb/.hmPick/etc so they don't collide with the same-named classes
    still used by other prototype scenes. */
-.hmMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px;background:rgba(17,13,9,.985);overflow:auto;}
+.hmMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:10px;background:rgba(17,13,9,.985);overflow:auto;}
 .hmMode[hidden]{display:none!important;pointer-events:none!important;}
 
+/* Two grids share whatever height is actually available (flex-grow ratio
+   ~2:5, roughly matching their natural row counts) — each is fit to
+   whichever of width/height is tighter via height:100%+aspect-ratio+
+   max-width, so a wide-but-short desktop window sizes off its real height
+   instead of assuming "short == phone == tiny", same as the other panels. */
+.hmLockWrap{
+  flex:2 1 0;
+  min-height:0;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 .hmLock{
-  width:min(650px,92vw);
+  height:100%;
+  width:auto;
+  max-width:min(650px,100%);
+  aspect-ratio:6/1.15;
+  container-type:inline-size;
   display:grid;
   grid-template-columns:repeat(6,1fr);
-  gap:8px;
-  flex:none;
+  gap:3%;
 }
 .hmTumb{
   position:relative;
   overflow:hidden;
-  height:88px;
   border:1px solid #4c5142;
-  border-radius:12px;
+  border-radius:12%;
   background:#171b15;
   display:grid;
   place-items:center;
-  font-size:28px;
+  font-size:min(14cqw,28px);
   font-family:"Segoe UI Symbol","Noto Sans Symbols 2","Arial Unicode MS",sans-serif;
   color:#cfd6c6;
 }
@@ -38,24 +53,36 @@
   position:relative;
   z-index:1;
   isolation:isolate;
-  width:58px;
-  height:58px;
+  width:70%;
+  height:70%;
   display:grid;
   place-items:center;
 }
-.hmTargetSymbol{position:relative;z-index:1;font-size:30px;line-height:1;}
+.hmTargetSymbol{position:relative;z-index:1;font-size:min(15cqw,30px);line-height:1;}
 .hmOcclusion{position:absolute;inset:0;z-index:20;pointer-events:none;background:#0b0e0b;}
 .hmOcclusion.left{clip-path:polygon(0 0,0 100%,100% 100%);}
 .hmOcclusion.right{clip-path:polygon(0 0,100% 0,100% 100%);}
 
+.hmPicksWrap{
+  flex:5 1 0;
+  min-height:0;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 .hmPicks{
-  width:min(650px,92vw);
+  height:100%;
+  width:auto;
+  max-width:min(650px,100%);
+  aspect-ratio:7/3;
+  container-type:inline-size;
   display:grid;
-  grid-template-columns:repeat(7,minmax(0,1fr));
-  gap:8px;
+  grid-template-columns:repeat(7,1fr);
+  grid-template-rows:repeat(3,1fr);
+  gap:2.5%;
 }
 .hmPick{
-  height:64px;
   min-width:0;
   padding:0;
   display:grid;
@@ -65,25 +92,25 @@
   cursor:pointer;
   border:1px solid #4c5142;
   background:rgba(20,19,17,.72);
-  border-radius:8px;
+  border-radius:14%;
   color:#cabba6;
   backdrop-filter:blur(5px);
 }
 .hmPick:active{background:rgba(98,80,58,.64);}
 .hmPick.kbFocus{outline:2px solid #d8b871!important;outline-offset:2px!important;}
 .hmPickSymbol{
-  width:38px;
-  height:38px;
+  width:60%;
+  height:60%;
   display:grid;
   place-items:center;
   font-family:"Segoe UI Symbol","Noto Sans Symbols 2","Arial Unicode MS",sans-serif;
-  font-size:28px;
+  font-size:min(11cqw,28px);
   line-height:1;
   transform:translateY(var(--hm-shift,0)) scale(var(--hm-scale,1));
   transform-origin:center;
 }
-.hmPick:nth-child(-n+7) .hmPickSymbol{width:46px;height:46px;font-size:33px;}
-.hmPick:nth-child(n+8) .hmPickSymbol{width:34px;height:34px;font-size:25px;}
+.hmPick:nth-child(-n+7) .hmPickSymbol{width:66%;height:66%;font-size:min(13cqw,33px);}
+.hmPick:nth-child(n+8) .hmPickSymbol{width:54%;height:54%;font-size:min(10cqw,25px);}
 .hmPickSymbol[data-glyph="○"]{--hm-scale:1.12;--hm-shift:-1px;}
 .hmPickSymbol[data-glyph="⌒"]{--hm-scale:1.10;--hm-shift:-1px;}
 .hmPickSymbol[data-glyph="∩"]{--hm-scale:1.09;--hm-shift:-1px;}
@@ -91,6 +118,7 @@
 .hmPickSymbol[data-glyph="☽"]{--hm-scale:1.08;--hm-shift:-1px;}
 
 .hmHelp{
+  flex:none;
   color:#bcb39a;
   text-align:center;
   font:14px/1.35 Arial,sans-serif;
@@ -99,35 +127,5 @@
 .hmHelp:empty{display:none;}
 
 @media (max-width:650px){
-  .hmLock{grid-template-columns:repeat(3,1fr);}
-  .hmPicks{grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;}
-}
-/* Short viewports (e.g. iPhone SE/6/7/8 in portrait): the shared puzzle
-   area only leaves a narrow band here — no pin/rise physics tied to fixed
-   pixel sizes in this mode, so just shrink the cells directly rather than
-   scaling the whole board as a unit. */
-@media (max-height:900px){
-  .hmMode{gap:6px;padding:8px;}
-  .hmLock{gap:4px;}
-  .hmTumb{height:38px;font-size:16px;}
-  .hmSymbolWrap{width:30px;height:30px;}
-  .hmTargetSymbol{font-size:17px;}
-  .hmPicks{gap:4px;}
-  .hmPick{height:32px;}
-  .hmPickSymbol{width:22px;height:22px;font-size:16px;}
-  .hmPick:nth-child(-n+7) .hmPickSymbol{width:26px;height:26px;font-size:18px;}
-  .hmPick:nth-child(n+8) .hmPickSymbol{width:20px;height:20px;font-size:14px;}
-  .hmHelp{font-size:11px;}
-}
-@media (max-height:600px){
-  .hmMode{gap:3px;padding:4px;}
-  .hmLock{gap:2px;}
-  .hmTumb{height:22px;font-size:11px;}
-  .hmSymbolWrap{width:18px;height:18px;}
-  .hmTargetSymbol{font-size:11px;}
-  .hmPicks{gap:2px;}
-  .hmPick{height:19px;}
-  .hmPickSymbol{width:14px;height:14px;font-size:10px;}
-  .hmPick:nth-child(-n+7) .hmPickSymbol{width:16px;height:16px;font-size:11px;}
-  .hmPick:nth-child(n+8) .hmPickSymbol{width:13px;height:13px;font-size:9px;}
+  .hmLock{grid-template-columns:repeat(3,1fr);aspect-ratio:3/2.3;}
 }

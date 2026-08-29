@@ -4,21 +4,29 @@
    (prototypes/lockpicking-mechanics-v63.html, .wm-*) with classes renamed
    to .wmSlot/.wmSpring/.wmPin/etc so they don't collide with the same-named
    classes still used by other prototype scenes. */
-.wmMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;background:rgba(17,13,9,.985);overflow:auto;}
+.wmMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px;background:rgba(17,13,9,.985);overflow:auto;}
 .wmMode[hidden]{display:none!important;pointer-events:none!important;}
 
 .wmTimeBar{width:min(650px,92vw);height:9px;background:#0b0e0b;border:1px solid #33392f;border-radius:99px;overflow:hidden;flex:none;}
 .wmTimeBar span{display:block;height:100%;width:100%;background:#9e8253;transition:width .08s linear;}
 
+/* No fixed/min height here on purpose: wmLock is a flex item that fills
+   whatever room is actually available (from ~150px on a short phone up to
+   350px+ on a tall screen). js/modes/watchmen.js recomputes --wm-scale
+   from the slot's real rendered height on every render, and both the
+   pin-rise transform and the .wmTarget marker below read that same
+   variable — so the target line and the pin's resting height always agree,
+   at any viewport size, instead of assuming a fixed pixel scale. */
 .wmLock{
   width:min(650px,92vw);
-  height:min(50vh,350px);
-  min-height:280px;
+  flex:1 1 auto;
+  min-height:0;
+  max-height:350px;
   border:2px solid #4d5050;
   border-radius:18px;
   background:linear-gradient(180deg,#323737 0 16%,#121616 16% 100%);
   box-shadow:inset 0 0 38px #000,0 15px 30px rgba(0,0,0,.28);
-  padding:34px 18px 26px;
+  padding:10px 18px 8px;
   display:grid;
   grid-template-columns:repeat(5,minmax(0,1fr));
   align-items:stretch;
@@ -48,8 +56,8 @@
   position:absolute;
   left:20%;
   right:20%;
-  bottom:22px;
-  height:112px;
+  bottom:var(--wm-pin-bottom,22px);
+  height:var(--wm-pin-h,112px);
   transform:translateY(calc(-1px * var(--wm-rise,0)));
   transition:transform .08s linear;
   background:linear-gradient(90deg,#7d6b4d 0 42%,#c2c5bf 42% 100%);
@@ -83,7 +91,7 @@
   position:absolute;
   left:10%;
   right:10%;
-  bottom:calc(34px + var(--wm-target,70) * 2.05px);
+  bottom:calc(var(--wm-pin-bottom,22px) + 12px + var(--wm-target,70) * var(--wm-scale,2.05) * 1px);
   height:20px;
   transform:translateY(50%);
   border-top:2px solid rgba(214,184,113,.72);
@@ -108,17 +116,18 @@
 }
 
 .wmHelp{
-  min-height:20px;
+  flex:none;
   color:#bcb39a;
   text-align:center;
   font:14px/1.35 Arial,sans-serif;
   max-width:560px;
 }
+.wmHelp:empty{display:none;}
 
 .wmOpenBtn{
+  flex:none;
   width:min(260px,100%);
   align-self:center;
-  flex:none;
 }
 .wmOpenBtn:disabled{
   opacity:.38;
@@ -127,16 +136,5 @@
 }
 
 @media (max-width:650px){
-  .wmLock{height:min(46vh,300px);padding-inline:16px;gap:6px;}
-}
-/* Short viewports (e.g. iPhone SE/6/7/8 in portrait): the shared puzzle
-   area only leaves a narrow band here, so scale the whole lock down as a
-   unit rather than trying to fit it — the pin-rise/target math (WM_SCALE
-   in js/modes/watchmen.js) stays valid since it operates on the
-   pre-transform layout size, only the final paint shrinks. A negative
-   margin below reclaims the visual space the scale-down frees up. */
-@media (max-height:900px){
-  .wmMode{gap:10px;padding:10px;}
-  .wmLock{height:300px;min-height:0;transform:scale(.57);transform-origin:top center;margin-bottom:-129px;}
-  .wmHelp{font-size:12px;}
+  .wmLock{padding-inline:16px;gap:6px;}
 }

@@ -1,0 +1,56 @@
+/* Full-screen boot loader: shows the game logo while every image asset
+   preloads, and blurs the (already-rendered but not-yet-usable) app
+   underneath so nothing half-loaded is visible or clickable. */
+.bootLoader{
+  position:fixed;
+  inset:0;
+  z-index:100000;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:22px;
+  background:#0c0908;
+  transition:opacity .45s ease;
+}
+.bootLoader[hidden]{display:none!important;}
+.bootLoader.bootLoaderHidden{opacity:0;pointer-events:none;}
+
+.bootLoaderLogo{
+  width:min(220px,52vw);
+  height:auto;
+  filter:drop-shadow(0 14px 32px rgba(0,0,0,.55));
+  animation:bootLoaderPulse 2.4s ease-in-out infinite;
+}
+@keyframes bootLoaderPulse{
+  0%,100%{transform:scale(1);}
+  50%{transform:scale(1.035);}
+}
+
+.bootLoaderCaption{
+  color:#a99574;
+  font:600 13px/1.3 var(--ui-font,Arial,sans-serif);
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+.bootLoaderBar{
+  width:min(220px,52vw);
+  height:4px;
+  border-radius:99px;
+  background:rgba(255,255,255,.08);
+  overflow:hidden;
+}
+.bootLoaderBar span{
+  display:block;
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#8a5a2a,#d8b871);
+  transition:width .25s ease;
+}
+
+body.assets-loading .app{
+  filter:blur(20px) saturate(.7) brightness(.7);
+  pointer-events:none;
+  user-select:none;
+}

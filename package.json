@@ -1,11 +1,11 @@
 {
   "name": "keynlock",
   "private": true,
-  "version": "0.347.0",
+  "version": "0.348.0",
   "type": "module",
   "scripts": {
-    "dev": "node scripts/write-build-info.mjs && node scripts/serve.mjs",
-    "build": "node scripts/write-build-info.mjs",
+    "dev": "node scripts/write-build-info.mjs && node scripts/write-asset-manifest.mjs && node scripts/serve.mjs",
+    "build": "node scripts/write-build-info.mjs && node scripts/write-asset-manifest.mjs",
     "check": "node scripts/check.mjs",
     "smoke": "node scripts/smoke.mjs"
   }

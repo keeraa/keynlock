@@ -5,6 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <title>KEYNLOCK — Lockpicking Puzzle</title>
+<link rel="stylesheet" href="css/boot-loader.css">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/modes-01-hillsfar.css">
 <link rel="stylesheet" href="css/modes-02-mass-effect.css">
@@ -41,7 +42,12 @@
 
 
 </head>
-<body>
+<body class="assets-loading">
+<div class="bootLoader" id="bootLoader" aria-label="Загрузка KEYNLOCK">
+<img class="bootLoaderLogo" src="assets/branding/logo.png" alt="KEYNLOCK">
+<div class="bootLoaderCaption">Загрузка…</div>
+<div class="bootLoaderBar"><span id="bootLoaderProgress"></span></div>
+</div>
 <div class="app" id="app">
 <header class="globalTopHud" id="globalTopHud" aria-label="Верхнее меню игры">
 <div class="topRightHud">
@@ -736,6 +742,7 @@
 </div>
 </div>
 <div class="toast" id="toast"><span class="toastText" id="toastText"></span><button class="toastAction" id="toastAction" type="button" onclick="restartCurrentRound();document.querySelector('#toast')?.classList.remove('show','actionable')">Новый замок</button></div>
+<script src="js/core/asset-preload.js"></script>
 <script src="js/core/game-catalog.js"></script>
 <script src="js/core/challenge-hud.js"></script>
 <script src="js/core/tool-motion.js"></script>

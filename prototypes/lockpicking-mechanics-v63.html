@@ -634,92 +634,6 @@ button {
     font-size:9px
   }
 }
-/* Thief: Deadly Shadows */
-.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-lock {
-  width:min(370px,82vw);
-  aspect-ratio:1;
-  border-radius:50%;
-  position:relative;
-  background:radial-gradient(circle,#11150f 0 13%,#272b21 14% 68%,#11140f 69%);
-  border:2px solid #5b604d;
-  box-shadow:inset 0 0 45px #000;
-  touch-action:none;
-  cursor:crosshair
-}
-.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-ring {
-  position:absolute;
-  border-radius:50%;
-  border:3px solid #606552;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%)
-}
-.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-ring.r1 {
-  width:78%;
-  height:78%
-}
-.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-ring.r2 {
-  width:58%;
-  height:58%
-}
-.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-ring.r3 {
-  width:38%;
-  height:38%
-}
-.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-ring.active {
-  border-color:#947f53
-}
-.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-ring.set {
-  border-color:#769066
-}
-.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-probe {
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:42%;
-  height:3px;
-  background:linear-gradient(90deg,#bdb398,#eee1bd);
-  transform-origin:0 50%;
-  z-index:5
-}
-.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-tip {
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:18px;
-  height:18px;
-  margin:-9px;
-  border-radius:50%;
-  border:1px solid rgba(214,184,113,.35);
-  pointer-events:none
-}
-.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-lock.hot .tds-tip {
-  box-shadow:0 0 18px rgba(214,184,113,.7);
-  border-color:var(--gold)
-}
-.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-time {
-  width:min(370px,82vw);
-  height:8px;
-  background:#0b0e0b;
-  border:1px solid #343b31;
-  border-radius:999px;
-  overflow:hidden
-}
-.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-time span {
-  display:block;
-  height:100%;
-  width:100%;
-  background:#a88c58;
-  transition:width .05s linear
-}
-
-.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-sequence{display:grid;grid-template-columns:repeat(3,46px);justify-content:center;gap:10px}
-.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-seq-item{width:46px;height:46px;display:grid;place-items:center;border:1px solid #4d5344;border-radius:11px;color:#bbb49d;background:#11150f}
-.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-seq-item svg{width:28px;height:28px}.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-seq-item path,.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-ring-symbol path,.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-pattern-mark path{fill:none;stroke:currentColor;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
-.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-seq-item.current{border-color:var(--gold);color:#efd38b}.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-seq-item.done{border-color:#769066;color:#91af7b;background:#172016}
-.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-ring.selected{border-color:#c2a765;box-shadow:0 0 0 2px rgba(194,167,101,.13)}
-.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-ring-symbol{position:absolute;left:50%;top:-17px;transform:translateX(-50%);width:28px;height:28px;display:grid;place-items:center;color:#d5c695;background:#171a13;border:1px solid #555b4a;border-radius:50%;z-index:4;pointer-events:none}.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-ring-symbol svg{width:17px;height:17px}
-.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-pattern{position:absolute;inset:0;pointer-events:none;z-index:2}.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-pattern-mark{position:absolute;width:18px;height:18px;display:grid;place-items:center;color:rgba(183,171,129,.44)}.lockpick-prototype .scene[data-name="Thief: Deadly Shadows"] .tds-pattern-mark svg{width:15px;height:15px}
 /* Fallout */
 .lockpick-prototype .scene[data-name="Fallout"] .sf-lock {
   width:min(380px,82vw);
@@ -1242,12 +1156,7 @@ html.embedded .scene[data-name="Alpha Protocol"] .lab{align-items:flex-start}
           <div class="lab"><div class="museum-wrap"><div class="museum-panel"><div class="ap-time"><span id="apTimer"></span></div><div class="ap-lock" id="apLock"><div class="ap-beam"><span class="ap-beam-fill" id="apBeamFill"></span></div><div class="ap-line"></div></div><div class="ap-sequence" id="apSequence" aria-label="Порядок символов"></div></div><div class="museum-msg" id="apMsg"></div></div></div>
 
         </section>
-    <section class="scene" data-name="Thief: Deadly Shadows" data-tab-check="true">
-          <div class="scene-head"><div><div class="scene-title-row"><h2>Кольца и сладкие точки</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="tdsStatus"><strong>Кольцо 1 / 3</strong>ищи рабочую точку</div></div>
-          <div class="lab"><div class="museum-wrap"><div class="tds-time"><span id="tdsTimer"></span></div><div class="tds-sequence" id="tdsSequence"></div><div class="tds-lock" id="tdsLock"><div class="tds-pattern" id="tdsPattern"></div><div class="tds-ring r1" data-ring="0"></div><div class="tds-ring r2" data-ring="1"></div><div class="tds-ring r3" data-ring="2"></div><div class="tds-probe" id="tdsProbe"></div><div class="tds-tip" id="tdsTip"></div></div><div class="museum-actions"><button class="btn" id="tdsSet">Зафиксировать · Space</button><button class="btn" id="tdsReset">Новый замок</button></div><div class="museum-msg" id="tdsMsg">Выбери кольцо и следуй последовательности символов.</div></div></div>
-
-        </section>
-    <section class="scene" data-name="Kingdom Come" data-tab-check="true">
+<section class="scene" data-name="Kingdom Come" data-tab-check="true">
           <div class="scene-head"><div><div class="scene-title-row"><h2>Вращающийся замок</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="kcdStatus"><strong>Ищи рабочую точку</strong>двигай отмычку внутри замка</div></div>
           <div class="lab"><div class="kcd-board"><div class="kcd-lock" id="kcdLock"><div class="kcd-rotor"></div><div class="keyway"></div><div class="feedback"></div><div class="pick"></div></div><div class="meters"><div><div class="meter-head"><span>Поворот</span><span id="kcdProgressText">0%</span></div><div class="bar"><span id="kcdProgressBar"></span></div></div><div><div class="meter-head"><span>Напряжение</span><span id="kcdStressText">0%</span></div><div class="bar"><span id="kcdStressBar"></span></div></div></div><button class="btn" id="kcdTurn">Удерживать вращение · Space</button><button class="btn" id="kcdReset">Новый замок</button></div></div>
         </section>
@@ -1625,100 +1534,6 @@ let th12KeyType=null;
 const th12KeyMap={Digit1:'p1',Digit2:'p2',Digit3:'p3',Digit4:'p4',Digit5:'p5',Numpad1:'p1',Numpad2:'p2',Numpad3:'p3',Numpad4:'p4',Numpad5:'p5'};
 function th12Loop(now){const dt=Math.min(.05,(now-th12.last)/1000);th12.last=now;if(activeName()==='Thief 1/2'&&!th12.failed&&th12.step<5&&th12.time>0){th12.time=Math.max(0,th12.time-dt);if(th12.time<=0){th12.failed=true;clearInterval(th12.timer);th12.timer=null;th12.hold=null;th12Door.classList.remove('working');document.querySelectorAll('.pick-type').forEach(b=>b.classList.remove('active'));th12Msg.textContent='Время вышло.'}renderTh12()}}
 GameHub.register('Thief 1/2',{reset:th12Reset,tick:th12Loop,leave:()=>{if(th12KeyType){th12Use(th12KeyType,false);th12KeyType=null}},keydown:e=>{if(e.code==='KeyR'){th12Reset();return true}const type=th12KeyMap[e.code];if(type){if(!e.repeat||th12KeyType!==type){if(th12KeyType&&th12KeyType!==type)th12Use(th12KeyType,false);th12KeyType=type;th12Use(type,true)}return true}return false},keyup:e=>{const type=th12KeyMap[e.code];if(type&&th12KeyType===type){th12Use(type,false);th12KeyType=null;return true}return false}});
-
-})();
-(()=>{
-'use strict';
-// Portable game module: thief-deadly-shadows
-// Thief Deadly Shadows
-const tdsLock=document.getElementById('tdsLock'),tdsProbe=document.getElementById('tdsProbe'),tdsTip=document.getElementById('tdsTip'),tdsStatus=document.getElementById('tdsStatus'),tdsMsg=document.getElementById('tdsMsg'),tdsTimer=document.getElementById('tdsTimer'),tdsSequence=document.getElementById('tdsSequence'),tdsPattern=document.getElementById('tdsPattern');
-const TDS_TIME=22,TDS_MAX_PICKS=LockRuntime.DEFAULT_PICKS,TDS_PATTERN_MARKS=28;
-let tds={selectedRing:0,ang:0,targets:[],hot:false,time:TDS_TIME,last:performance.now(),failed:false,done:new Set(),ringSymbols:[],order:[],step:0,picks:TDS_MAX_PICKS,patternSymbol:0,down:null};
-function tdsReset(){LockRuntime.resetOpen('Thief: Deadly Shadows');
-  const ringSymbols=shuffled([0,1,2,3,4]).slice(0,3);
-  let order=shuffled([0,1,2]);
-  while(order.join(',')==='0,1,2')order=shuffled([0,1,2]);
-  tds={selectedRing:2,ang:0,targets:[0,1,2].map(()=>Math.random()*360),hot:false,time:TDS_TIME,last:performance.now(),failed:false,done:new Set(),ringSymbols,order,step:0,picks:TDS_MAX_PICKS,patternSymbol:Math.floor(Math.random()*5),down:null};
-  LockRuntime.setRequiredTension('Thief: Deadly Shadows',tds.patternSymbol);
-  scoreReset('Thief: Deadly Shadows',3);
-  renderTds();
-  tdsMsg.textContent='Выбери кольцо, найди сладкую точку и соблюдай порядок символов.'
-}
-function tdsUpdateHot(){tds.hot=!tds.failed&&!tds.done.has(tds.selectedRing)&&angleDiff(tds.ang,tds.targets[tds.selectedRing])<=14}
-function tdsSelectRing(i){if(tds.failed||tds.step>=3)return;tds.selectedRing=Math.max(0,Math.min(2,i));tdsUpdateHot();renderTds()}
-function tdsSelectDelta(d){tdsSelectRing(tds.selectedRing+d)}
-function tdsPointerAngle(e){if(tds.failed||tds.step>=3)return;const r=tdsLock.getBoundingClientRect(),x=e.clientX-(r.left+r.width/2),y=e.clientY-(r.top+r.height/2);tds.ang=Math.atan2(y,x)*180/Math.PI;tdsUpdateHot();renderTds()}
-function tdsPointerRing(e){
-  const r=tdsLock.getBoundingClientRect(),x=e.clientX-(r.left+r.width/2),y=e.clientY-(r.top+r.height/2),dist=Math.hypot(x,y)/Math.min(r.width,r.height),radii=[.39,.29,.19];
-  let best=-1,bestD=Infinity;radii.forEach((v,i)=>{const d=Math.abs(dist-v);if(d<bestD){bestD=d;best=i}});
-  return bestD<=.035?best:-1
-}
-function tdsPointerDown(e){
-  e.preventDefault();
-  const beforeHot=tds.hot,ring=tdsPointerRing(e);
-  // Desktop aiming never changes ring. On touch, a deliberate tap directly on another ring selects it.
-  if(e.pointerType==='touch'&&!beforeHot&&ring>=0&&ring!==tds.selectedRing){tdsSelectRing(ring);tds.down={x:e.clientX,y:e.clientY,ring:tds.selectedRing,selectOnly:true};return}
-  tdsPointerAngle(e);tds.down={x:e.clientX,y:e.clientY,ring:tds.selectedRing,selectOnly:false};
-  try{tdsLock.setPointerCapture(e.pointerId)}catch(_){}
-}
-function tdsPointerUp(e){
-  if(!tds.down)return;
-  const info=tds.down;
-  tds.down=null;
-  if(info.selectOnly)return;
-  const dx=e.clientX-info.x,dy=e.clientY-info.y,dist=Math.hypot(dx,dy),expected=tds.order[tds.step],sameRing=tds.selectedRing===info.ring;
-  if(dist<=14&&sameRing){
-    if(tds.hot&&tds.selectedRing===expected)tdsSet();
-    else tdsBreakPick('Промах мимо сладкой точки — отмычка сломалась.');
-  }
-}
-function renderTdsSequence(){const key=tds.order.map(i=>tds.ringSymbols[i]).join(',');if(tdsSequence.dataset.key!==key||tdsSequence.children.length!==tds.order.length){tdsSequence.dataset.key=key;tdsSequence.innerHTML='';tds.order.forEach(ringIndex=>{const d=document.createElement('div');d.className='tds-seq-item';d.innerHTML=LOCK_SYMBOLS[tds.ringSymbols[ringIndex]];tdsSequence.appendChild(d)})}[...tdsSequence.children].forEach((d,step)=>{d.classList.toggle('done',step<tds.step);d.classList.toggle('current',step===tds.step&&!tds.failed)})}
-function renderTdsPattern(){
-  const key=String(tds.patternSymbol);
-  if(tdsPattern.dataset.symbol===key&&tdsPattern.children.length===TDS_PATTERN_MARKS)return;
-  tdsPattern.dataset.symbol=key;
-  tdsPattern.innerHTML='';
-  for(let i=0;i<TDS_PATTERN_MARKS;i++){
-    const a=(i/TDS_PATTERN_MARKS)*Math.PI*2,mark=document.createElement('span');
-    mark.className='tds-pattern-mark';
-    LockRuntime.markTensionHint(mark,tds.patternSymbol);
-    mark.style.left=(50+Math.cos(a)*47.5)+'%';
-    mark.style.top=(50+Math.sin(a)*47.5)+'%';
-    mark.style.transform=`translate(-50%,-50%) rotate(${i/TDS_PATTERN_MARKS*360+90}deg)`;
-    mark.innerHTML=LOCK_SYMBOLS[tds.patternSymbol];
-    tdsPattern.appendChild(mark)
-  }
-}
-function renderTds(){LockRuntime.syncPicks('Thief: Deadly Shadows',tds.picks);tdsProbe.style.transform=`rotate(${tds.ang}deg)`;tdsLock.classList.toggle('hot',tds.hot&&!tds.failed);[...tdsLock.querySelectorAll('.tds-ring')].forEach((r,i)=>{r.classList.toggle('selected',!tds.failed&&i===tds.selectedRing);r.classList.toggle('set',tds.done.has(i));const symbol=String(tds.ringSymbols[i]);if(r.dataset.symbol!==symbol){r.dataset.symbol=symbol;r.innerHTML=`<span class="tds-ring-symbol">${LOCK_SYMBOLS[tds.ringSymbols[i]]}</span>`}});renderTdsSequence();renderTdsPattern();if(tdsTimer)tdsTimer.style.width=Math.max(0,tds.time/TDS_TIME*100)+'%';if(tds.failed)tdsStatus.innerHTML='<strong>Попытка провалена</strong>начни новый замок';else if(tds.step>=3)tdsStatus.innerHTML='<strong>Замок открыт</strong>последовательность выполнена';else tdsStatus.innerHTML=`<strong>${tds.step} / 3</strong>${tds.hot?'сладкая точка найдена':'ищи точку на выбранном кольце'}`}
-function tdsBreakPick(msg='Неверный порядок — отмычка сломалась.'){
-  tds.picks--;
-  tds.hot=false;
-  if(tds.picks<=0){
-    tds.picks=0;
-    tds.failed=true;
-    tdsMsg.textContent='Отмычки закончились.'
-  }else tdsMsg.textContent=`${msg} Осталось ${tds.picks}.`;
-  renderTds()
-}
-function tdsSet(){
-  if(tds.failed||tds.step>=3)return;
-  scoreAction('Thief: Deadly Shadows');
-  const expected=tds.order[tds.step];
-  if(tds.selectedRing!==expected){tdsBreakPick();return}
-  if(!tds.hot){tdsBreakPick('Промах мимо сладкой точки — отмычка сломалась.');return}
-  if(tds.step===2&&!LockRuntime.tensionReady('Thief: Deadly Shadows',{statusEl:tdsStatus,messageEl:tdsMsg})){tds.down=null;return}
-  tds.done.add(tds.selectedRing);
-  tds.step++;
-  tds.hot=false;
-  if(tds.step>=3)LockRuntime.open('Thief: Deadly Shadows',{statusEl:tdsStatus,statusHtml:'<strong>Замок открыт</strong>последовательность выполнена',messageEl:tdsMsg,message:'Все три кольца выставлены в правильном порядке.'});
-  else tdsMsg.textContent='Верно. Найди следующее кольцо сам.';
-  tds.down=null;
-  renderTds()
-}
-function tdsLoop(now){const dt=Math.min(.05,(now-tds.last)/1000);tds.last=now;if(activeName()==='Thief: Deadly Shadows'&&!tds.failed&&tds.step<3){tds.time=Math.max(0,tds.time-dt);if(tds.time<=0){tds.failed=true;tds.hot=false;tdsMsg.textContent='Время вышло.'}renderTds()}}
-tdsLock.addEventListener('pointermove',e=>{if(e.pointerType!=='touch')tdsPointerAngle(e)});tdsLock.addEventListener('pointerdown',tdsPointerDown);tdsLock.addEventListener('pointerup',tdsPointerUp);tdsLock.addEventListener('pointercancel',()=>{tds.down=null});document.getElementById('tdsSet').onclick=tdsSet;document.getElementById('tdsReset').onclick=tdsReset;
-function tdsKeyAngle(dir){const d=dir==='left'?-6:dir==='right'?6:0;if(!d)return;tds.ang=(tds.ang+d+360)%360;tdsUpdateHot();renderTds()}
-GameHub.register('Thief: Deadly Shadows',{reset:tdsReset,tick:tdsLoop,keydown:e=>{const d=directionFromCode(e.code);if(e.code==='KeyR'){tdsReset();return true}if(e.code==='Space'){tdsSet();return true}if(d==='left'||d==='right'){tdsKeyAngle(d);return true}if(d==='up'){tdsSelectDelta(-1);return true}if(d==='down'){tdsSelectDelta(1);return true}return false}});
 
 })();
 (()=>{

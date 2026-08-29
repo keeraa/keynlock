@@ -96,7 +96,7 @@
   // shortfall as --reward-clear (consumed as extra padding-bottom by each
   // panel's own CSS) keeps their content from rendering underneath it,
   // without hardcoding a value per breakpoint.
-  const FLUID_PANEL_MODES=new Set(['oblivion','watchmen','museum','mass2','pipeline','wharf']);
+  const FLUID_PANEL_MODES=new Set(['oblivion','watchmen','museum','mass2','pipeline','wharf','thiefds']);
   function syncPuzzleRewardClearance(){
     if(!FLUID_PANEL_MODES.has(mode)) return;
     const status=document.querySelector('.challengeStatus');
@@ -310,6 +310,7 @@
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='museum'&&e.code==='Space'){e.preventDefault();hmPick(hmKb);}});
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='mass2'&&e.code==='Space'){e.preventDefault();m2Click(m2Kb);}});
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='pipeline'&&e.code==='Space'){e.preventDefault();plKeyboardAction();}});
+  addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='thiefds'&&e.code==='Space'){e.preventDefault();tdsCommit();}});
   $plBoostBtn?.addEventListener('click',()=>plBoost());
   document.querySelector('#shopHudButton')?.addEventListener('click',()=>{
     if(lairOpen) closeLair();

@@ -35,7 +35,8 @@
     { mode: 'museum',    x: 25, y: 82 },
     { mode: 'mass2',     x: 76, y: 82 },
     { mode: 'pipeline',  x: 14, y: 40 },
-    { mode: 'wharf',     x: 11, y: 61 }
+    { mode: 'wharf',     x: 11, y: 61 },
+    { mode: 'thiefds',   x: 48, y: 15 }
   ];
 
   const MISSION_STORAGE_KEY = 'lockpickMissions';

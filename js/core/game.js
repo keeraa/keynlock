@@ -17,6 +17,7 @@
     else if(mode==='museum') setGlobalTimer(true, hmTimeLeft || hmTimeMax, hmTimeMax || 1, 'ТАЙМЕР');
     else if(mode==='mass2') setGlobalTimer(true, m2TimeLeft || m2TimeMax, m2TimeMax || 1, 'ТАЙМЕР');
     else if(mode==='pipeline') setGlobalTimer(plState==='prep', Math.max(0,plStartAt-performance.now())/1000, plPrepMax/1000, 'ТАЙМЕР');
+    else if(mode==='thiefds') setGlobalTimer(!tdsFailed, tdsTimeLeft||tdsTimeMax, tdsTimeMax||1, 'ТАЙМЕР');
     else setGlobalTimer(false);
 if(mode==='classic'){
       $objectiveLine.innerHTML = `ЦЕЛЬ: <b>ПОДНЯТЬ ВСЕ ШТИФТЫ</b> · ${generatedDistance} ходов минимум`;
@@ -66,6 +67,8 @@ if(mode==='classic'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>СОБРАТЬ МАРШРУТ ОТ ВХОДА ДО ВЫХОДА ДО ЗАПУСКА ПОТОКА</b>';
     }else if(mode==='wharf'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ОТКРЫТЬ ЗАДВИЖКИ ПО ПОРЯДКУ</b>';
+    }else if(mode==='thiefds'){
+      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ВЫСТАВИТЬ КОЛЬЦА В СКРЫТОМ ПОРЯДКЕ</b>';
     }
     if(typeof syncPuzzleRewardClearance==='function') requestAnimationFrame(syncPuzzleRewardClearance);
   }

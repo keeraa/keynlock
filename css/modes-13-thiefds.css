@@ -1,0 +1,132 @@
+/* Thief: Deadly Shadows — three concentric rings, each hiding one of 5
+   symbols and a random "sweet spot" angle; find the hidden order and the
+   angle on each ring in turn. Markup/CSS ported from the old prototype scene
+   (prototypes/lockpicking-mechanics-v63.html, .tds-*) with classes renamed
+   to .tdsRing/.tdsLock/etc so they don't collide with the same-named
+   prototype classes still used by other, not-yet-ported scenes. The
+   tension-tool "sweet symbol" gate and its pattern-ring hint
+   (.tds-pattern/.tds-pattern-mark) are dropped entirely — that system only
+   ever matched the unrelated Classic/Alternative typed-tensioner mechanic. */
+.tdsMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:14px;background:rgba(17,13,9,.985);overflow:auto;}
+.tdsMode[hidden]{display:none!important;pointer-events:none!important;}
+/* .challengeStatus (reward+timer HUD) is a viewport-fixed overlay that
+   sits inside the bottom of #puzzleArea on most non-phone breakpoints;
+   js/core/init.js's syncPuzzleRewardClearance() measures the shortfall
+   into --reward-clear so the lock stops above it instead of rendering
+   underneath it. Needs !important + this specificity to beat the shared
+   body.importedMode .puzzleArea>.modePanel padding rule. */
+body.importedMode .puzzleArea>.modePanel.tdsMode:not([hidden]){padding-bottom:calc(14px + var(--reward-clear,0px))!important;}
+
+.tdsSequence{
+  flex:none;
+  display:flex;
+  justify-content:center;
+  gap:min(2.2vw,10px);
+}
+.tdsSeqItem{
+  width:min(10vw,46px);
+  height:min(10vw,46px);
+  display:grid;
+  place-items:center;
+  border:1px solid #4d5344;
+  border-radius:11px;
+  color:#bbb49d;
+  background:#11150f;
+}
+.tdsSeqItem svg{width:60%;height:60%;}
+.tdsSeqItem svg path,.tdsRingSymbol svg path{fill:none;stroke:currentColor;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;}
+.tdsSeqItem.current{border-color:#d8b871;color:#efd38b;}
+.tdsSeqItem.done{border-color:#769066;color:#91af7b;background:#172016;}
+
+/* No fixed height: .tdsLockWrap fills whatever room #puzzleArea actually
+   gives it, .tdsLock is fit to whichever of width/height is tighter via
+   height:100%+aspect-ratio+max-width. Ring sizes were already % of .tdsLock
+   in the prototype (78/58/38%); only the lock's own outer size and the
+   small decorative bits (tip, ring badge) needed converting to cqw so they
+   scale with the actual rendered lock instead of a fixed px. */
+.tdsLockWrap{
+  flex:1 1 auto;
+  min-height:0;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.tdsLock{
+  height:100%;
+  width:auto;
+  max-width:min(420px,100%);
+  aspect-ratio:1;
+  border-radius:50%;
+  position:relative;
+  background:radial-gradient(circle,#11150f 0 13%,#272b21 14% 68%,#11140f 69%);
+  border:2px solid #5b604d;
+  box-shadow:inset 0 0 45px #000;
+  touch-action:none;
+  cursor:crosshair;
+  container-type:inline-size;
+}
+.tdsRing{
+  position:absolute;
+  border-radius:50%;
+  border:3px solid #606552;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+}
+.tdsRing.r1{width:78%;height:78%;}
+.tdsRing.r2{width:58%;height:58%;}
+.tdsRing.r3{width:38%;height:38%;}
+.tdsRing.set{border-color:#769066;}
+.tdsRing.selected{border-color:#c2a765;box-shadow:0 0 0 2px rgba(194,167,101,.13);}
+.tdsRingSymbol{
+  position:absolute;
+  left:50%;
+  top:calc(0px - min(4.5cqw,17px));
+  transform:translateX(-50%);
+  width:min(7.3cqw,28px);
+  height:min(7.3cqw,28px);
+  display:grid;
+  place-items:center;
+  color:#d5c695;
+  background:#171a13;
+  border:1px solid #555b4a;
+  border-radius:50%;
+  z-index:4;
+  pointer-events:none;
+}
+.tdsRingSymbol svg{width:60%;height:60%;}
+.tdsProbe{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:42%;
+  height:min(.8cqw,3px);
+  background:linear-gradient(90deg,#bdb398,#eee1bd);
+  transform-origin:0 50%;
+  z-index:5;
+}
+.tdsTip{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:min(4.7cqw,18px);
+  height:min(4.7cqw,18px);
+  margin:calc(0px - min(2.35cqw,9px));
+  border-radius:50%;
+  border:1px solid rgba(214,184,113,.35);
+  pointer-events:none;
+}
+.tdsLock.hot .tdsTip{
+  box-shadow:0 0 18px rgba(214,184,113,.7);
+  border-color:#d8b871;
+}
+
+.tdsHelp{
+  flex:none;
+  color:#b5a080;
+  text-align:center;
+  font:14px/1.35 Arial,sans-serif;
+  max-width:560px;
+}
+.tdsHelp:empty{display:none;}

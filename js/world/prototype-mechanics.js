@@ -2,7 +2,6 @@
   const PROTOTYPE_MECHANIC_PLACES=[
     {id:'bioshock2',name:'Охранный дрон',game:'BioShock 2',x:17,y:23},
     {id:'alpha-protocol',name:'Архив пазов',game:'Alpha Protocol',x:31,y:17},
-    {id:'thief-ds',name:'Теневой квартал',game:'Thief: Deadly Shadows',x:48,y:15},
     {id:'kingdom-come',name:'Дом бронника',game:'Kingdom Come',x:64,y:16},
     {id:'thief-12',name:'Гильдия воров',game:'Thief 1/2',x:88,y:49},
     {id:'fallout',name:'Старый бункер',game:'Fallout',x:88,y:70},

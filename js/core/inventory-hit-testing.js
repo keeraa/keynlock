@@ -447,6 +447,11 @@
     };
   }
 
+  // Base modes are registered in GameActions through tryOpenBaseLock, so the
+  // physical lock click must guard that canonical opener as well. Guarding
+  // only the legacy tryOpenLock entry let Classic bypass the typed tensioner
+  // check entirely.
+  tryOpenBaseLock=guardOpen(tryOpenBaseLock);
   tryOpenLock=guardOpen(tryOpenLock);
   tryOpenTension=guardOpen(tryOpenTension);
   tryOpenResonance=guardOpen(tryOpenResonance);

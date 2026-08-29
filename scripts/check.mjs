@@ -87,6 +87,10 @@ const openerSource = readFileSync(resolve(root, 'js/modes/base-locks.js'), 'utf8
 const registeredOpeners = new Set([...openerSource.matchAll(/^\s*([a-z][\w-]*):/gm)].map(match => match[1]));
 const missingOpeners = nativeGames.filter(id => !registeredOpeners.has(id));
 if (missingOpeners.length) fail(`Native games missing a shared open action: ${missingOpeners.join(', ')}`);
+const tensionGuardSource = readFileSync(resolve(root, 'js/core/inventory-hit-testing.js'), 'utf8');
+if (!tensionGuardSource.includes('tryOpenBaseLock=guardOpen(tryOpenBaseLock)')) {
+  fail('Classic base-lock opener must enforce the typed tensioner guard.');
+}
 
 const prototypeHtml = readFileSync(resolve(root, 'prototypes/lockpicking-mechanics-v63.html'), 'utf8');
 const prototypeScenes = new Set([...prototypeHtml.matchAll(/<section\b[^>]*\bdata-name=["']([^"']+)["']/gi)].map(match => match[1]));

@@ -317,6 +317,8 @@ let plateEls=[], pinTopPlateEls=[];
       startMuseumRound();
     }else if(mode==='mass2'){
       startMass2Round();
+    }else if(mode==='pipeline'){
+      startPipelineRound();
     }
 
     updateModeUI();
@@ -345,6 +347,7 @@ let plateEls=[], pinTopPlateEls=[];
       mode==='watchmen' ? 'Новые тумблеры' :
       mode==='museum' ? 'Новый набор профилей' :
       mode==='mass2' ? 'Новая схема узлов' :
+      mode==='pipeline' ? 'Новая схема трубопровода' :
       'Новый сигнал осциллографа';
     if(notify){
       toast(msg);
@@ -371,6 +374,7 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='watchmen'){ startWatchmenRound(); toast('Тумблеры обновлены'); return; }
     if(mode==='museum'){ startMuseumRound(); toast('Профили обновлены'); return; }
     if(mode==='mass2'){ startMass2Round(); toast('Схема узлов обновлена'); return; }
+    if(mode==='pipeline'){ startPipelineRound(); toast('Схема трубопровода обновлена'); return; }
     state=[...initial]; solved=false; $lock.classList.remove('win');
     $mechanism.classList.remove('ready','opening','opened');
     render(); toast('Механизм сброшен');
@@ -422,6 +426,7 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='watchmen') return wmMove(dir);
     if(mode==='museum') return hmMoveKb(dir<0?'left':'right');
     if(mode==='mass2') return m2MoveKb(dir<0?'left':'right');
+    if(mode==='pipeline') return plMoveCursor(0,dir);
     if(mode==='g1') return g1Press(dir);
     if(mode==='mass') return moveMass(dir);
     if(mode==='hillsfar') return;
@@ -518,7 +523,8 @@ let plateEls=[], pinTopPlateEls=[];
     oblivion:()=>tryOpenOblivion(),
     watchmen:()=>tryOpenWatchmen(),
     museum:()=>tryOpenMuseum(),
-    mass2:()=>tryOpenMass2()
+    mass2:()=>tryOpenMass2(),
+    pipeline:()=>tryOpenPipeline()
   });
 
   function select(delta){
@@ -548,6 +554,10 @@ let plateEls=[], pinTopPlateEls=[];
       m2MoveKb(delta<0?'up':'down');
       return;
     }
+    if(mode==='pipeline'){
+      plMoveCursor(delta,0);
+      return;
+    }
     if(mode==='g1') return;
     if(mode==='heatcold'||mode==='drum'||mode==='scope') return;
     if(mode==='mass') return selectMass(delta);
@@ -570,6 +580,7 @@ let plateEls=[], pinTopPlateEls=[];
     else if(mode==='watchmen'){ $mechanism.classList.remove('ready'); }
     else if(mode==='museum'){ $mechanism.classList.remove('ready'); }
     else if(mode==='mass2'){ $mechanism.classList.remove('ready'); }
+    else if(mode==='pipeline'){ $mechanism.classList.remove('ready'); }
     else if(mode==='g1'){ $mechanism.classList.remove('ready'); }
     else if(mode==='mass'){ $mechanism.classList.remove('ready'); }
     else if(mode!=='hillsfar') $mechanism.classList.toggle('ready',!solved && goalMet());
@@ -664,6 +675,9 @@ let plateEls=[], pinTopPlateEls=[];
     }
     if(mode==='mass2' && !solved){
       m2Tick(Math.min(.05,dt/1000));
+    }
+    if(mode==='pipeline' && !solved){
+      plTick(now);
     }
     scheduleAnimationLoop(solved ? 160 : ACTIVE_FRAME_MS);
   }

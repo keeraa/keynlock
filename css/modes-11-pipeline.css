@@ -1,0 +1,123 @@
+/* Трубопровод (Pipeline) — 6×6 grid of hidden pipe tiles; reveal, rotate,
+   race a flow from a fixed start port to a fixed exit port. Markup/CSS
+   ported from the old prototype scene
+   (prototypes/lockpicking-mechanics-v63.html, .bs1-*) with classes renamed
+   to .plTile/.plGrid/etc so they don't collide with the same-named classes
+   still used by other prototype scenes. */
+.plMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:16px;padding-bottom:calc(var(--template-puzzle-bottom,56px) + 16px);background:rgba(17,13,9,.985);overflow:auto;}
+.plMode[hidden]{display:none!important;pointer-events:none!important;}
+
+.plGridWrap{
+  position:relative;
+  width:min(420px,84vw);
+  padding:0 28px;
+}
+.plGrid{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:1px;
+  aspect-ratio:1;
+}
+.plPort{
+  position:absolute;
+  top:0;
+  width:31px;
+  height:22px;
+  background:#34483f;
+  border:1px solid #6b8172;
+  z-index:3;
+  overflow:hidden;
+  transition:background .18s,box-shadow .18s;
+}
+.plPort.filled{
+  background:#6fd1c1;
+  box-shadow:0 0 10px rgba(75,225,202,.45),inset 0 0 0 2px rgba(33,84,75,.28);
+}
+.plPort.start{left:0;border-radius:8px 0 0 8px;}
+.plPort.exit{right:0;border-radius:0 8px 8px 0;}
+
+.plTile{
+  position:relative;
+  border:1px solid #38463e;
+  border-radius:8px;
+  background:#101713;
+  min-width:0;
+  cursor:pointer;
+  overflow:hidden;
+  box-shadow:inset 0 0 12px rgba(0,0,0,.35);
+}
+.plTile.hidden:before{
+  content:'?';
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  color:#59685e;
+  font:700 22px/1 Georgia,serif;
+  background:repeating-linear-gradient(45deg,#111a15 0 8px,#152019 8px 16px);
+}
+.plTile.flow{
+  box-shadow:inset 0 0 12px rgba(0,0,0,.25),0 0 0 2px rgba(102,205,190,.68),0 0 16px rgba(74,196,180,.28);
+}
+.plTile.done{background:#153028;}
+.plTile.waterLocked{cursor:not-allowed;}
+.plTile.hazard{background:#2b1514;border-color:#75463f;}
+.plTile.hazard:after{
+  content:'!';
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  color:#d98a78;
+  font-weight:800;
+  font-size:24px;
+}
+.plTile.kbFocus{outline:2px solid #d8b871!important;outline-offset:1px!important;}
+
+.plPipe{position:absolute;inset:0;}
+.plSeg{position:absolute;background:linear-gradient(#89a98e,#536d59);box-shadow:0 0 0 2px #273a2e inset;}
+.plSeg.N,.plSeg.S{width:24px;left:50%;margin-left:-12px;height:54%;}
+.plSeg.N{top:0;}
+.plSeg.S{bottom:0;}
+.plSeg.E,.plSeg.W{height:24px;top:50%;margin-top:-12px;width:54%;}
+.plSeg.E{right:0;}
+.plSeg.W{left:0;}
+.plHub{
+  position:absolute;
+  width:30px;
+  height:30px;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  border-radius:5px;
+  background:#708f76;
+  box-shadow:0 0 0 2px #334a39 inset;
+}
+.plTile.flow .plSeg,.plTile.flow .plHub,.plTile.done .plSeg,.plTile.done .plHub{
+  background:#6fd1c1;
+  box-shadow:0 0 8px rgba(75,225,202,.45);
+}
+
+.plHelp{
+  color:#bcb39a;
+  text-align:center;
+  font:14px/1.35 Arial,sans-serif;
+  max-width:560px;
+}
+.plHelp:empty{display:none;}
+
+.plBoostBtn.active{
+  background:linear-gradient(180deg,#3c6f52,#1b2c1d);
+  border-color:#5fa87d;
+  color:#d7f1e0;
+}
+
+@media (max-width:650px){
+  .plGridWrap{padding:0 20px;}
+  .plGrid{gap:0;}
+  .plPort{width:23px;}
+  .plTile.hidden:before{font-size:17px;}
+  .plSeg.N,.plSeg.S{width:21px;margin-left:-10.5px;}
+  .plSeg.E,.plSeg.W{height:21px;margin-top:-10.5px;}
+  .plHub{width:26px;height:26px;}
+}

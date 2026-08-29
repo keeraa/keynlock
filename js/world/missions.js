@@ -33,7 +33,8 @@
     { mode: 'oblivion',  x: 79, y: 20 },
     { mode: 'watchmen',  x: 86, y: 34 },
     { mode: 'museum',    x: 25, y: 82 },
-    { mode: 'mass2',     x: 76, y: 82 }
+    { mode: 'mass2',     x: 76, y: 82 },
+    { mode: 'pipeline',  x: 14, y: 40 }
   ];
 
   const MISSION_STORAGE_KEY = 'lockpickMissions';

@@ -16,6 +16,7 @@
     if(mode==='hillsfar') setGlobalTimer(true, hfTimeLeft || hfTimeMax, hfTimeMax || 1, 'ТАЙМЕР');
     else if(mode==='museum') setGlobalTimer(true, hmTimeLeft || hmTimeMax, hmTimeMax || 1, 'ТАЙМЕР');
     else if(mode==='mass2') setGlobalTimer(true, m2TimeLeft || m2TimeMax, m2TimeMax || 1, 'ТАЙМЕР');
+    else if(mode==='pipeline') setGlobalTimer(plState==='prep', Math.max(0,plStartAt-performance.now())/1000, plPrepMax/1000, 'ТАЙМЕР');
     else setGlobalTimer(false);
 if(mode==='classic'){
       $objectiveLine.innerHTML = `ЦЕЛЬ: <b>ПОДНЯТЬ ВСЕ ШТИФТЫ</b> · ${generatedDistance} ходов минимум`;
@@ -61,6 +62,8 @@ if(mode==='classic'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ПОДОБРАТЬ ПРОФИЛЬ ОТМЫЧКИ ДЛЯ КАЖДОГО ТУМБЛЕРА</b>';
     }else if(mode==='mass2'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>НАЙТИ ВСЕ ПАРЫ УЗЛОВ ДО ИСТЕЧЕНИЯ ВРЕМЕНИ</b>';
+    }else if(mode==='pipeline'){
+      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>СОБРАТЬ МАРШРУТ ОТ ВХОДА ДО ВЫХОДА ДО ЗАПУСКА ПОТОКА</b>';
     }
   }
 

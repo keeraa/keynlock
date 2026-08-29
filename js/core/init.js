@@ -282,6 +282,8 @@
   $wmOpenBtn?.addEventListener('click',()=>GameActions.attemptOpen({modeId:'watchmen',source:'puzzle-control'}));
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='museum'&&e.code==='Space'){e.preventDefault();hmPick(hmKb);}});
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='mass2'&&e.code==='Space'){e.preventDefault();m2Click(m2Kb);}});
+  addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='pipeline'&&e.code==='Space'){e.preventDefault();plKeyboardAction();}});
+  $plBoostBtn?.addEventListener('click',()=>plBoost());
   document.querySelector('#shopHudButton')?.addEventListener('click',()=>{
     if(lairOpen) closeLair();
     if(mapOpen) closeMap(false);

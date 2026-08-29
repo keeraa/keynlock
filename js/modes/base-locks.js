@@ -67,10 +67,13 @@ let plateEls=[], pinTopPlateEls=[];
       const p=document.createElement('div');
       p.className='plate';
       if(mode==='target') p.classList.add('mode-target');
+      if(mode==='classic') p.classList.add('mouseSteer');
       p.dataset.index=i;
       p.setAttribute('role','button');
       p.setAttribute('tabindex','0');
-      p.setAttribute('aria-label',`Выбрать пластину ${i+1}`);
+      p.setAttribute('aria-label',mode==='classic'
+        ? `Пластина ${i+1}: левая половина двигает штифт влево, правая — вправо`
+        : `Выбрать пластину ${i+1}`);
 
       const x=0, y=i*spacing;
       p.style.setProperty('--dx',`${x}px`);
@@ -121,8 +124,16 @@ let plateEls=[], pinTopPlateEls=[];
       p._pinState=null;
       p.addEventListener('pointerdown',e=>e.preventDefault());
       p.addEventListener('mousedown',e=>e.preventDefault());
-      p.addEventListener('click',()=>{
+      p.addEventListener('click',event=>{
         if(solved) return;
+        if(mode==='classic'){
+          const rect=p.getBoundingClientRect();
+          const dir=event.clientX<rect.left+rect.width/2?-1:1;
+          if(selected!==i)SFX.select();
+          selected=i;
+          move(dir);
+          return;
+        }
         selected=i;
         SFX.select();
         render();

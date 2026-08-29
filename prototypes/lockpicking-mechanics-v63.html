@@ -533,7 +533,7 @@ button {
   position:relative;
   border:2px solid #675d49;
   border-radius:18px;
-  background:linear-gradient(180deg,#3f382a 0 17%,#191711 17% 100%);
+  background:#191711;
   box-shadow:inset 0 0 34px rgba(0,0,0,.75),0 15px 30px rgba(0,0,0,.26);
   padding:42px 34px 30px;
   display:flex;
@@ -1663,9 +1663,10 @@ function r2Try(){
   renderR2()
 }
 function r2Open(){if(r2.failed||r2.step<r2.bars){r2Status.innerHTML='<strong>Замок не готов</strong>сначала выставь все задвижки';return false}return LockRuntime.open('Risen 2',{statusEl:r2Status,statusHtml:'<strong>Замок открыт</strong>все задвижки пройдены'})}
-function renderR2(){LockRuntime.syncPicks('Risen 2',r2.picks);const bars=[...r2Lock.querySelectorAll('.r2-bar')];bars.forEach((b,i)=>{b.classList.toggle('current',i===r2.pos);b.classList.toggle('open',r2.seq.slice(0,r2.step).includes(i));b.classList.toggle('wrong',i===r2.wrong)});r2Lock.style.setProperty('--r2-x',`calc(${((r2.pos+.5)/r2.bars)*100}% - 36px)`);if(r2.failed)r2Status.innerHTML='<strong>Отмычки закончились</strong>перезапусти замок';else if(r2.step<r2.bars&&r2.wrong<0)r2Status.innerHTML='<strong>'+r2.step+' / '+r2.bars+'</strong>задвижек открыто'}
+function r2PositionPick(){const activeBar=r2Lock.querySelectorAll('.r2-bar')[r2.pos];if(activeBar?.offsetWidth)r2Lock.style.setProperty('--r2-x',`${activeBar.offsetLeft+activeBar.offsetWidth/2-180}px`)}
+function renderR2(){LockRuntime.syncPicks('Risen 2',r2.picks);const bars=[...r2Lock.querySelectorAll('.r2-bar')];bars.forEach((b,i)=>{b.classList.toggle('current',i===r2.pos);b.classList.toggle('open',r2.seq.slice(0,r2.step).includes(i));b.classList.toggle('wrong',i===r2.wrong)});requestAnimationFrame(r2PositionPick);if(r2.failed)r2Status.innerHTML='<strong>Отмычки закончились</strong>перезапусти замок';else if(r2.step<r2.bars&&r2.wrong<0)r2Status.innerHTML='<strong>'+r2.step+' / '+r2.bars+'</strong>задвижек открыто'}
 
-GameHub.register('Risen 2',{reset:r2Reset,open:r2Open,keydown:e=>{const d=directionFromCode(e.code);if(e.code==='KeyR'){r2Reset();return true}if(e.code==='Space'||d==='up'){r2Try();return true}if(d==='left'){r2Move(-1);return true}if(d==='right'){r2Move(1);return true}return false}});
+GameHub.register('Risen 2',{reset:r2Reset,open:r2Open,enter:()=>requestAnimationFrame(r2PositionPick),keydown:e=>{const d=directionFromCode(e.code);if(e.code==='KeyR'){r2Reset();return true}if(e.code==='Space'||d==='up'){r2Try();return true}if(d==='left'){r2Move(-1);return true}if(d==='right'){r2Move(1);return true}return false}});
 })();
 (()=>{
 'use strict';

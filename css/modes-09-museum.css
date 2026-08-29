@@ -5,7 +5,7 @@
    (prototypes/lockpicking-mechanics-v63.html, .hill-*) with classes renamed
    to .hmTumb/.hmPick/etc so they don't collide with the same-named classes
    still used by other prototype scenes. */
-.hmMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;background:rgba(17,13,9,.985);overflow:auto;}
+.hmMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px;padding-bottom:calc(var(--template-puzzle-bottom,56px) + 16px);background:rgba(17,13,9,.985);overflow:auto;}
 .hmMode[hidden]{display:none!important;pointer-events:none!important;}
 
 .hmLock{
@@ -47,17 +47,6 @@
 .hmOcclusion{position:absolute;inset:0;z-index:20;pointer-events:none;background:#0b0e0b;}
 .hmOcclusion.left{clip-path:polygon(0 0,0 100%,100% 100%);}
 .hmOcclusion.right{clip-path:polygon(0 0,100% 0,100% 100%);}
-
-.hmTimeBar{
-  width:min(650px,92vw);
-  height:8px;
-  border:1px solid #343b31;
-  border-radius:99px;
-  overflow:hidden;
-  background:#0b0e0b;
-  flex:none;
-}
-.hmTimeBar span{display:block;height:100%;width:100%;background:#a38d58;transition:width .08s linear;}
 
 .hmPicks{
   width:min(650px,92vw);
@@ -102,12 +91,12 @@
 .hmPickSymbol[data-glyph="☽"]{--hm-scale:1.08;--hm-shift:-1px;}
 
 .hmHelp{
-  min-height:20px;
   color:#bcb39a;
   text-align:center;
   font:14px/1.35 Arial,sans-serif;
   max-width:560px;
 }
+.hmHelp:empty{display:none;}
 
 @media (max-width:650px){
   .hmLock{grid-template-columns:repeat(3,1fr);}

@@ -14,6 +14,7 @@
     document.body.dataset.gameMode=mode;
     if(mode!=='hillsfar') clearHillsfarTimer();
     if(mode==='hillsfar') setGlobalTimer(true, hfTimeLeft || hfTimeMax, hfTimeMax || 1, 'ТАЙМЕР');
+    else if(mode==='museum') setGlobalTimer(true, hmTimeLeft || hmTimeMax, hmTimeMax || 1, 'ТАЙМЕР');
     else setGlobalTimer(false);
 if(mode==='classic'){
       $objectiveLine.innerHTML = `ЦЕЛЬ: <b>ПОДНЯТЬ ВСЕ ШТИФТЫ</b> · ${generatedDistance} ходов минимум`;

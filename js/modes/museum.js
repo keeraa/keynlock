@@ -85,11 +85,12 @@
       $hmPicks.replaceChildren(frag);
     }
     hmPickEls.forEach((b,i)=>b.classList.toggle('kbFocus',i===hmKb));
-    if($hmTimerBar) $hmTimerBar.style.width=Math.max(0,hmTimeLeft/hmTimeMax*100)+'%';
-    if($hmHelp){
-      if(solved) $hmHelp.textContent='Замок открыт — все профили подобраны';
-      else $hmHelp.textContent=`Тумблер ${Math.min(6,hmStep+1)} / 6 · ${hmJam[hmStep]>1?'заклинивший профиль':'подбери форму'}`;
-    }
+    if($hmHelp) $hmHelp.textContent=solved?'Замок открыт — все профили подобраны':'';
+    renderMuseumHud();
+  }
+
+  function renderMuseumHud(){
+    setGlobalTimer(mode==='museum' && !solved, hmTimeLeft, hmTimeMax, 'ТАЙМЕР');
   }
 
   function hmMoveKb(dir){

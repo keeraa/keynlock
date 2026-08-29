@@ -185,7 +185,7 @@
         $scopeMode=document.querySelector('#scopeMode'), $scopeCanvas=document.querySelector('#scopeCanvas'), $scopeWheels=document.querySelector('#scopeWheels'), $scopeScore=document.querySelector('#scopeScore'), $scopeBar=document.querySelector('#scopeBar'), $scopeCheck=document.querySelector('#scopeCheck'), $scopeResult=document.querySelector('#scopeResult'), $scopeNew=document.querySelector('#scopeNew'),
         $obMode=document.querySelector('#obMode'), $obLock=document.querySelector('#obLock'), $obMessage=document.querySelector('#obMessage'),
         $wmMode=document.querySelector('#wmMode'), $wmLock=document.querySelector('#wmLock'), $wmHelp=document.querySelector('#wmHelp'), $wmTimerBar=document.querySelector('#wmTimerBar'), $wmOpenBtn=document.querySelector('#wmOpenBtn'),
-        $museumMode=document.querySelector('#museumMode'), $hmLock=document.querySelector('#hmLock'), $hmPicks=document.querySelector('#hmPicks'), $hmHelp=document.querySelector('#hmHelp'), $hmTimerBar=document.querySelector('#hmTimerBar');
+        $museumMode=document.querySelector('#museumMode'), $hmLock=document.querySelector('#hmLock'), $hmPicks=document.querySelector('#hmPicks'), $hmHelp=document.querySelector('#hmHelp');
 
   const MODE_PANELS=Object.freeze({
     hillsfar:$hillsfarMode,

@@ -383,6 +383,20 @@ body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none !important
 .lairCharacterDesc{text-align:center !important;}
 .lairCharacterSelect{display:grid !important;place-items:center !important;}
 
+/* A tighter portrait row reads as character selection instead of three wide
+   text panels. Keep the group centered inside the existing modal. */
+.lairCharacters{
+  width:min(1120px,100%) !important;
+  margin-inline:auto !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+}
+.lairCharacterName{text-transform:uppercase !important;letter-spacing:.055em !important;}
+.lairActiveCharacterBadge{text-transform:uppercase !important;letter-spacing:.045em !important;}
+.lairPortrait{
+  background:radial-gradient(ellipse at 50% 26%,rgba(211,165,103,.26),transparent 58%),linear-gradient(180deg,rgba(91,67,45,.96),rgba(45,33,24,.98)) !important;
+  box-shadow:inset 0 -32px 42px rgba(18,12,8,.24),inset 0 1px 0 rgba(255,226,172,.08) !important;
+}
+
 @media (max-width:760px){
   .lairHotspotAlchemy{left:57.5% !important;top:62% !important;}
   .lairHotspotCity{left:75% !important;top:44% !important;}
@@ -390,4 +404,5 @@ body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none !important
   .lairHotspotTeam{right:10px !important;bottom:10px !important;width:72px !important;min-width:72px !important;height:72px !important;border-radius:14px !important;}
   .lairActiveCharacterBadge{left:4px;right:4px;bottom:4px;font-size:6px;}
   .lairPortrait{height:170px !important;}
+  .lairCharacters{width:100% !important;grid-template-columns:1fr !important;}
 }

@@ -1,4 +1,42 @@
   let audioCtx=null;
+  const audioAssets=window.KeynlockAudioAssets||{};
+  const activePlayers=new Set();
+  let soundtrack=null;
+
+  function assetUrl(key){
+    const choices=audioAssets[key]||[];
+    return choices.length ? choices[Math.floor(Math.random()*choices.length)] : '';
+  }
+
+  function playAsset(key,volume=.55){
+    const src=assetUrl(key);
+    if(!src) return false;
+    const player=new Audio(src);
+    player.preload='auto';
+    player.volume=Math.max(0,Math.min(1,volume));
+    activePlayers.add(player);
+    const release=()=>activePlayers.delete(player);
+    player.addEventListener('ended',release,{once:true});
+    player.addEventListener('error',release,{once:true});
+    player.play().catch(release);
+    return true;
+  }
+
+  function startSoundtrack(){
+    if(!soundtrack){
+      const src=assetUrl('music');
+      if(!src) return;
+      soundtrack=new Audio(src);
+      soundtrack.preload='auto';
+      soundtrack.loop=true;
+      soundtrack.volume=.28;
+    }
+    soundtrack.play().then(()=>{
+      document.documentElement.dataset.soundtrack='playing';
+    }).catch(()=>{
+      document.documentElement.dataset.soundtrack='blocked';
+    });
+  }
 
   function ensureAudio(){
     if(!audioCtx){
@@ -53,33 +91,52 @@
   }
 
   const SFX={
+    uiClick(){ playAsset('uiClick',.42); },
+    uiBack(){ playAsset('uiBack',.42); },
+    inventoryOpen(){ playAsset('inventoryOpen',.48); },
+    inventoryClose(){ playAsset('inventoryClose',.48); },
+    pickDraw(){ playAsset('pickDraw',.5); },
+    tensionDraw(){ playAsset('tensionDraw',.5); },
     select(){ tone(520,.045,'triangle',.022,600); },
     move(){
       buzz(12);
-      tone(250,.07,'triangle',.026,330);
-      setTimeout(()=>tone(620,.045,'sine',.018,700),40);
+      if(!playAsset('pinMove',.42)){
+        tone(250,.07,'triangle',.026,330);
+        setTimeout(()=>tone(620,.045,'sine',.018,700),40);
+      }
     },
-    blocked(){ tone(145,.10,'sawtooth',.025,95); },
+    pinMove(){ this.move(); },
+    plateMove(){ buzz(12); if(!playAsset('plateMove',.42)) this.move(); },
+    blocked(){ if(!playAsset('uiDenied',.44)) tone(145,.10,'sawtooth',.025,95); },
     break(){
       buzz([28,40,28]);
-      noise(.09,.036);
-      tone(120,.12,'square',.022,70);
+      if(!playAsset('pickBreak',.58)){
+        noise(.09,.036);
+        tone(120,.12,'square',.022,70);
+      }
     },
     survive(){ tone(390,.06,'triangle',.018,470); },
     ready(){
-      tone(660,.08,'sine',.018,820);
-      setTimeout(()=>tone(880,.09,'sine',.016,990),70);
+      if(!playAsset('lockCorrect',.52)){
+        tone(660,.08,'sine',.018,820);
+        setTimeout(()=>tone(880,.09,'sine',.016,990),70);
+      }
     },
     wrongLock(){
-      tone(180,.09,'triangle',.022,130);
-      setTimeout(()=>tone(130,.08,'triangle',.018,100),70);
+      if(!playAsset('lockFail',.52)){
+        tone(180,.09,'triangle',.022,130);
+        setTimeout(()=>tone(130,.08,'triangle',.018,100),70);
+      }
     },
     open(){
       buzz([45,55,45,55,90]);
-      tone(240,.09,'triangle',.025,360);
-      setTimeout(()=>tone(480,.11,'sine',.025,720),80);
-      setTimeout(()=>tone(760,.16,'sine',.022,980),165);
+      if(!playAsset('lockOpen',.62)){
+        tone(240,.09,'triangle',.025,360);
+        setTimeout(()=>tone(480,.11,'sine',.025,720),80);
+        setTimeout(()=>tone(760,.16,'sine',.022,980),165);
+      }
     },
+    defeat(){ playAsset('missionLost',.62); },
     newRound(){ tone(330,.06,'sine',.012,410); },
     // The noise meter entering its warning band: a held, uneasy note rather
     // than a sting, so it reads as "someone is listening", not "you lost".
@@ -108,3 +165,17 @@
     }
   };
 
+  window.KeynlockAudio={
+    startSoundtrack,
+    playAsset,
+    getMusicState:()=>({playing:Boolean(soundtrack&&!soundtrack.paused),loop:Boolean(soundtrack?.loop)})
+  };
+  window.addEventListener('keynlock:play',startSoundtrack);
+
+  document.addEventListener('click',event=>{
+    const button=event.target.closest?.('button');
+    if(!button || button.disabled) return;
+    if(button.closest('#inventoryDrawer,#puzzleArea,.gameDefeatOverlay')) return;
+    if(button.matches('[aria-label*="Закрыть"],.shopClose,.lairWorkbenchClose,.alchemyTopHudClose')) SFX.uiBack();
+    else SFX.uiClick();
+  });

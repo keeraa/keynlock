@@ -62,11 +62,16 @@
   function setInventoryOpen(force){
     const {root,toggle}=inventoryEls();
     if(!root || !toggle) return;
+    const wasOpen=root.classList.contains('open');
     const next=typeof force==='boolean' ? force : !root.classList.contains('open');
     root.classList.toggle('open',next);
     document.body.classList.toggle('inventory-open',next);
     toggle.setAttribute('aria-expanded',next?'true':'false');
     toggle.setAttribute('aria-label',next?'Закрыть инвентарь':'Открыть инвентарь');
+    if(next!==wasOpen){
+      if(next) SFX.inventoryOpen?.();
+      else SFX.inventoryClose?.();
+    }
   }
 
   function renderInventoryAvatar(){
@@ -99,6 +104,8 @@
       if(options.onClick) options.onClick();
       else if(kind==='pick') selectPickSkin(index);
       else selectTensionSkin(index);
+      if(kind==='pick') SFX.pickDraw?.();
+      else SFX.tensionDraw?.();
     });
     return btn;
   }

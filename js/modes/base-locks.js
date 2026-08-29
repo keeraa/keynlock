@@ -443,7 +443,7 @@ let plateEls=[], pinTopPlateEls=[];
       state[selected] = next;
       registerMove();
     }
-    SFX.move();
+    SFX.plateMove();
     const wasReady=$mechanism.classList.contains('ready');
     render();
     const isReady=goalMet();

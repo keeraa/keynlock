@@ -128,9 +128,10 @@
 
   // Wrapping the sounds catches every game at once: anything that makes a noiseLevel
   // the player can hear is a noiseLevel a guard can hear.
-  const baseMove = SFX.move, baseBlocked = SFX.blocked;
+  const baseMove = SFX.move, basePlateMove = SFX.plateMove, baseBlocked = SFX.blocked;
   const baseBreak = SFX.break, baseWrong = SFX.wrongLock;
   SFX.move = function(){ addNoise(NOISE_PER_MOVE); return baseMove.apply(this, arguments); };
+  SFX.plateMove = function(){ addNoise(NOISE_PER_MOVE); return basePlateMove.apply(this, arguments); };
   SFX.blocked = function(){ addNoise(NOISE_PER_BLOCKED); return baseBlocked.apply(this, arguments); };
   SFX.break = function(){ addNoise(NOISE_PER_BREAK); return baseBreak.apply(this, arguments); };
   SFX.wrongLock = function(){ addNoise(NOISE_PER_WRONG); return baseWrong.apply(this, arguments); };

@@ -21,6 +21,7 @@
         generic:{title:'Попытка провалена',text:'Попробуй пройти головоломку ещё раз.'}
       }[reason]||{title:'Попытка провалена',text:'Попробуй пройти головоломку ещё раз.'};
       this.active=true;
+      if(typeof SFX!=='undefined') SFX.defeat?.();
       this.root.dataset.reason=reason;
       this.title.textContent=options.title||message.title;
       this.text.textContent=options.text||message.text;

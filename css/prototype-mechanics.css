@@ -41,11 +41,16 @@ body.game-inactive.prototype-has-classic-lock[data-prototype-game-id="prototype:
 }
 body.game-inactive.prototype-has-classic-lock[data-prototype-game-id="prototype:fallout"] #lock.universalLockBlock .pick,
 body.game-inactive.prototype-has-classic-lock[data-prototype-game-id="prototype:fallout"] #lock.universalLockBlock .tension{display:block!important;opacity:1!important;}
+body.game-inactive.prototype-has-classic-lock[data-prototype-game-id="prototype:fallout"] #lock.universalLockBlock>.mechanismZone{
+  transform:translateX(-50%)!important;
+}
 body.game-inactive.prototype-has-classic-lock[data-prototype-game-id="prototype:fallout"] #lock.universalLockBlock .pick{
-  transform:translate(var(--pick-react-x),var(--pick-react-y)) rotate(calc(var(--fallout-pick-angle,-90deg) + 90deg))!important;
+  transition:none!important;
+  transform:rotate(calc(var(--fallout-pick-angle,-90deg) + 90deg))!important;
 }
 body.game-inactive.prototype-has-classic-lock[data-prototype-game-id="prototype:fallout"] #lock.universalLockBlock .tension{
-  transform:translate(var(--tension-react-x),var(--tension-react-y)) rotate(calc(var(--fallout-turn-angle,0deg) + 18deg))!important;
+  transition:none!important;
+  transform:rotate(calc(var(--fallout-turn-angle,0deg) + 18deg))!important;
 }
 body[data-prototype-game-id="prototype:fallout"] #noiseMeter{z-index:370!important;}
 body.prototype-mechanic-open .topRightHud{z-index:360!important;}

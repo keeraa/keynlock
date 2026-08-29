@@ -351,7 +351,6 @@
   // until every image asset has preloaded — js/core/asset-preload.js drives
   // the #bootLoader overlay covering/blurring everything until then.
   function bootGame(){
-    applyPickSkin();
     applyTensionSkin();
     initPickSkinShop();
     initTensionSkinShop();

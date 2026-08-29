@@ -186,14 +186,17 @@
   function restoreEquipped(){
     let saved = null;
     try{ saved = JSON.parse(STORE.getItem(EQUIPPED_KEY) || 'null'); }catch(_){ saved = null; }
-    if(!saved) return;
-    const col = PICK_COLLECTIONS.find(c => c.id === saved.collectionId);
-    const handle = col?.handles.find(h => h.id === saved.handleId);
-    if(handle && isUnlocked(handle)){
-      state.collectionId = col.id;
-      state.handle = handle;
-      applyEquippedSkin(handle);
+    if(saved){
+      const col = PICK_COLLECTIONS.find(c => c.id === saved.collectionId);
+      const handle = col?.handles.find(h => h.id === saved.handleId);
+      if(handle && isUnlocked(handle)){
+        state.collectionId = col.id;
+        state.handle = handle;
+      }
     }
+    // The collection is the only live source of pick artwork. Apply its
+    // default too, instead of letting the retired PICK_SKINS flash first.
+    applyEquippedSkin(state.handle);
   }
 
   // ===== Feeding the inventory case's own pick rail =====

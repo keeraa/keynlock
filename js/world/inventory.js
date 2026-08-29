@@ -88,10 +88,12 @@
     if(options.hidden || options.breaking) btn.disabled = true;
     btn.title=label;
     btn.setAttribute('aria-label',label);
-    const img=document.createElement('img');
-    img.src=src;
-    img.alt='';
-    btn.appendChild(img);
+    if(src){
+      const img=document.createElement('img');
+      img.src=src;
+      img.alt='';
+      btn.appendChild(img);
+    }
     if(!(options.hidden || options.breaking)) btn.addEventListener('click',e=>{
       e.stopPropagation();
       if(options.onClick) options.onClick();
@@ -114,8 +116,8 @@
     // The rail shows the player's own Коллекция picks when that screen
     // (js/world/collection.js) has set itself up — its own currently
     // equipped collection's handles, first-come first-slot — falling
-    // back to the older fixed PICK_SKINS set if that API isn't present
-    // or a given slot's composite hasn't finished rendering yet.
+    // Slots stay visually empty until their composite is ready; showing the
+    // retired fixed PICK_SKINS here caused the old wooden models to flash.
     const rail = window.KeynlockCollection?.getInventoryRail(5) || [];
     const equippedHandleId = window.KeynlockCollection?.getEquippedHandleId();
 
@@ -125,9 +127,9 @@
       const isBreaking=(i===inventoryBrokenSlot && i===visiblePicks+1 && i<=pickCapacity+1);
       const isRenderable=isAvailable || isBreaking;
       const railEntry=rail[i-1];
-      const src=railEntry?.image || PICK_SKINS[pickIndex];
+      const src=railEntry?.image || '';
       const btn=inventoryTool('pick',pickIndex,src,`Отмычка ${pickIndex} · слот ${i}${isAvailable ? ` · осталось ${visiblePicks}` : ''}`,{
-        hidden: !isRenderable,
+        hidden: !isRenderable || !src,
         breaking: isBreaking,
         active: railEntry ? railEntry.id===equippedHandleId : undefined,
         onClick: railEntry ? (()=>window.KeynlockCollection.equipHandleById(railEntry.id)) : undefined

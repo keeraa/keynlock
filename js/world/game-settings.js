@@ -10,6 +10,7 @@
     try{recentGames=JSON.parse(STORE.getItem(recentStorageKey)||'[]').filter(id=>GameCatalog.has(id)).slice(0,3);}catch(_){recentGames=[];}
     let sortPath='title';
     let sortDirection=1;
+    let settingsReturnToLair=false;
     const featureColumns=[
       ['lock.present','Физический замок'],
       ['lock.manualOpen','Отдельное открытие'],
@@ -163,7 +164,7 @@
     }
 
     function launchGame(id,level=1){
-      closeGameSettings();
+      closeGameSettings(false);
       const game=GameCatalog.get(id);
       if(game?.kind==='native'){
         setModeDifficulty(level,id,false);
@@ -176,6 +177,7 @@
 
     function openGameSettings(){
       if(!screen)return;
+      settingsReturnToLair=lairOpen;
       if(shopOpen)closeShop();
       if(lairOpen)closeLair();
       if(mapOpen)closeMap(false);
@@ -187,17 +189,20 @@
       requestAnimationFrame(()=>search?.focus({preventScroll:true}));
     }
 
-    function closeGameSettings(){
+    function closeGameSettings(restorePrevious=true){
       if(!screen||screen.hidden)return;
+      const restoreLair=restorePrevious&&settingsReturnToLair;
+      settingsReturnToLair=false;
       screen.hidden=true;
       document.body.classList.remove('game-settings-open');
       setGameInactive(false);
       render();
+      if(restoreLair)openLair();
     }
 
     document.querySelector('#gameSettingsButton')?.addEventListener('click',openGameSettings);
-    document.querySelector('#gameSettingsClose')?.addEventListener('click',closeGameSettings);
-    screen?.addEventListener('pointerdown',event=>{if(event.target===screen)closeGameSettings();});
+    document.querySelector('#gameSettingsClose')?.addEventListener('click',()=>closeGameSettings(true));
+    screen?.addEventListener('pointerdown',event=>{if(event.target===screen)closeGameSettings(true);});
     search?.addEventListener('input',renderGameSettings);
     table?.querySelector('thead')?.addEventListener('click',event=>{
       const button=event.target.closest?.('[data-sort]');
@@ -236,7 +241,7 @@
       if(event.code!=='Escape'||!document.body.classList.contains('game-settings-open'))return;
       event.preventDefault();
       event.stopImmediatePropagation();
-      closeGameSettings();
+      closeGameSettings(true);
     },{capture:true});
 
     window.openGameSettings=openGameSettings;

@@ -2,6 +2,9 @@
   const audioAssets=window.KeynlockAudioAssets||{};
   const activePlayers=new Set();
   let soundtrack=null;
+  const MUSIC_VOLUME_KEY='keynlockMusicVolume';
+  const savedMusicVolume=localStorage.getItem(MUSIC_VOLUME_KEY);
+  let musicVolume=Math.max(0,Math.min(1,(savedMusicVolume===null?28:Number(savedMusicVolume)||0)/100));
 
   function assetUrl(key){
     const choices=audioAssets[key]||[];
@@ -29,13 +32,20 @@
       soundtrack=new Audio(src);
       soundtrack.preload='auto';
       soundtrack.loop=true;
-      soundtrack.volume=.28;
+      soundtrack.volume=musicVolume;
     }
     soundtrack.play().then(()=>{
       document.documentElement.dataset.soundtrack='playing';
     }).catch(()=>{
       document.documentElement.dataset.soundtrack='blocked';
     });
+  }
+
+  function setMusicVolume(value){
+    musicVolume=Math.max(0,Math.min(1,Number(value)||0));
+    localStorage.setItem(MUSIC_VOLUME_KEY,String(Math.round(musicVolume*100)));
+    if(soundtrack)soundtrack.volume=musicVolume;
+    return Math.round(musicVolume*100);
   }
 
   function ensureAudio(){
@@ -168,8 +178,11 @@
   window.KeynlockAudio={
     startSoundtrack,
     playAsset,
+    setMusicVolume,
+    getMusicVolume:()=>Math.round(musicVolume*100),
     getMusicState:()=>({playing:Boolean(soundtrack&&!soundtrack.paused),loop:Boolean(soundtrack?.loop)})
   };
+  window.addEventListener('keynlock:audio-ready',startSoundtrack);
   window.addEventListener('keynlock:play',startSoundtrack);
 
   document.addEventListener('click',event=>{

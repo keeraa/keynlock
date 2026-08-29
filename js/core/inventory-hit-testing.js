@@ -325,6 +325,7 @@
   const tensionLabels=[null,'Bar','Hook','Kink','Wave','Angle'];
   const typeOrder=['bar','hook','kink','wave','angle'];
   const typeBySkin={1:'bar',2:'hook',3:'kink',4:'wave',5:'angle'};
+  const typedTensionModes=new Set(['classic','target','line','sequence','special']);
 
   TENSION_SKINS.splice(0,TENSION_SKINS.length,...tensionSkins);
   TENSION_SKIN_LABELS.splice(0,TENSION_SKIN_LABELS.length,...tensionLabels);
@@ -379,9 +380,9 @@
     return typeOrder.find(type=>low.includes(type)) || null;
   }
   function currentRequiredTensionType(){
-    // Gothic's square frame is itself the tension clue on every tier. Keep
-    // that clue rotating even when higher-tier asset names carry no type.
-    if(mode==='g1') return roundTensionPatternType||'bar';
+    // A special tensioner is required only where the puzzle visibly contains
+    // both the shared tension tool and a typed plate that provides its clue.
+    if(!typedTensionModes.has(mode)||!levelUsesTypedPlates())return null;
     const names=[currentLockBodyEntry().name,currentLockerEntry().name,currentPlateName()];
     for(const name of names){
       const type=extractTensionTypeFromText(name);
@@ -453,18 +454,6 @@
   // check entirely.
   tryOpenBaseLock=guardOpen(tryOpenBaseLock);
   tryOpenLock=guardOpen(tryOpenLock);
-  tryOpenTension=guardOpen(tryOpenTension);
-  tryOpenResonance=guardOpen(tryOpenResonance);
-  tryOpenDeduction=guardOpen(tryOpenDeduction);
-  tryOpenComposite=guardOpen(tryOpenComposite);
-  tryOpenAn=guardOpen(tryOpenAn);
-  tryTorqueSkyrim=guardOpen(tryTorqueSkyrim);
-  tryOpenR2=guardOpen(tryOpenR2);
-  tryOpenG1=guardOpen(tryOpenG1);
-  tryOpenHillsfar=guardOpen(tryOpenHillsfar);
-  tryOpenMass=guardOpen(tryOpenMass);
-  tryOpenOblivion=guardOpen(tryOpenOblivion);
-  tryOpenWatchmen=guardOpen(tryOpenWatchmen);
 
   // init.js bound these two handlers by function reference before this patch runs.
   // Capture them so the same guard still applies to their dedicated controls.

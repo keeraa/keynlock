@@ -95,6 +95,7 @@
     const caption=document.querySelector('#bootLoaderCaption');
     if(caption) caption.textContent='Всё готово';
     document.body.classList.add('assets-ready');
+    window.dispatchEvent(new CustomEvent('keynlock:audio-ready'));
     if(play) play.hidden=false;
     play?.addEventListener('click',()=>{
       window.dispatchEvent(new CustomEvent('keynlock:play'));

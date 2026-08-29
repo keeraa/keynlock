@@ -5,6 +5,10 @@
 .gameSettingsKicker{display:block;margin-bottom:5px;color:#bd8e49;font:700 11px/1.2 var(--ui-font);letter-spacing:.2em;}
 .gameSettingsHeader h1{margin:0;color:#f1d38e;font:700 clamp(26px,3vw,42px)/1.05 Georgia,serif;}
 .gameSettingsHeader p{margin:8px 0 0;color:#bba986;font-size:14px;}
+.gameSettingsHeaderActions{display:flex;align-items:center;gap:18px;margin-left:auto;}
+.gameMusicVolume{display:grid;grid-template-columns:auto 150px 38px;align-items:center;gap:10px;color:#bfa878;font:700 10px/1 var(--ui-font);text-transform:uppercase;letter-spacing:.08em;}
+.gameMusicVolume input{width:150px;accent-color:#b77b27;cursor:pointer;}
+.gameMusicVolume output{color:#efd18e;font:700 11px/1 var(--ui-font);text-align:right;letter-spacing:0;}
 .gameSettingsClose{flex:0 0 52px;width:52px;height:52px;border:1px solid #88652e;border-radius:12px;background:#17120d;color:#e5c37b;font:700 30px/1 var(--ui-font);cursor:pointer;}
 .gameSettingsClose:hover{filter:brightness(1.18);}
 .gameSettingsToolbar{display:flex;align-items:end;gap:14px;padding:18px 30px;border-bottom:1px solid rgba(178,132,65,.24);}
@@ -54,6 +58,9 @@ body.game-settings-open .globalTopHud,body.game-settings-open .inventoryDrawer,b
   .gameSettingsScreen{padding:0;}
   .gameSettingsDialog{min-height:100vh;border:0;border-radius:0;}
   .gameSettingsHeader{padding:18px 16px 14px;}
+  .gameSettingsHeaderActions{gap:9px;}
+  .gameMusicVolume{grid-template-columns:auto 82px 34px;gap:6px;}
+  .gameMusicVolume input{width:82px;}
   .gameSettingsHeader p{font-size:12px;}
   .gameSettingsClose{width:44px;height:44px;flex-basis:44px;}
   .gameSettingsToolbar{padding:12px 16px;flex-wrap:wrap;}

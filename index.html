@@ -133,7 +133,14 @@
         <h1 id="gameSettingsTitle">Настройки игр</h1>
         <p>Общие возможности механик. Изменения применяются сразу и сохраняются в этом браузере.</p>
       </div>
-      <button class="gameSettingsClose" id="gameSettingsClose" type="button" aria-label="Закрыть настройки">×</button>
+      <div class="gameSettingsHeaderActions">
+        <label class="gameMusicVolume" for="gameMusicVolume">
+          <span>Музыка</span>
+          <input id="gameMusicVolume" type="range" min="0" max="100" step="1" value="28" aria-label="Громкость музыки">
+          <output id="gameMusicVolumeValue" for="gameMusicVolume">28%</output>
+        </label>
+        <button class="gameSettingsClose" id="gameSettingsClose" type="button" aria-label="Закрыть настройки">×</button>
+      </div>
     </div>
     <div class="gameSettingsToolbar">
       <label class="gameSettingsSearch"><span>Поиск</span><input id="gameSettingsSearch" type="search" placeholder="Название игры"></label>

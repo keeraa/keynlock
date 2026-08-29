@@ -13,7 +13,7 @@ const GAME_DEFINITIONS={
   special:{title:'Особые замки',kind:'native',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:true,noiseSensor:true,guards:true,birds:true}},
   hillsfar:{title:'Hillsfar',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   mass:{title:'Mass Effect',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
-  g1:{title:'Gothic 1',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
+  g1:{title:'Gothic 1',kind:'native',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:false,guards:false,birds:false}},
   r2:{title:'Risen 2',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   skyrim:{title:'Skyrim',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   anach:{title:'Anachronox',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},

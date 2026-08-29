@@ -95,12 +95,15 @@ const physicalNativeGames = catalogueEntries
   .filter(entry => entry.kind === 'native')
   .filter(entry => new RegExp(`^\\s*${entry.id}:\\{[^\\n]+lock:\\{present:true,manualOpen:true,specialTool:true\\}`,'m').test(catalogueSource))
   .map(entry => entry.id);
-const expectedTypedTensionGames = ['classic','target','line','sequence','special'];
+const expectedTypedTensionGames = ['classic','target','line','sequence','special','g1'];
 if (JSON.stringify(physicalNativeGames) !== JSON.stringify(expectedTypedTensionGames)) {
   fail('Physical native games and typed-tension catalogue flags are out of sync.');
 }
-if (!tensionGuardSource.includes("const typedTensionModes=new Set(['classic','target','line','sequence','special'])")) {
+if (!tensionGuardSource.includes("const typedTensionModes=new Set(['classic','target','line','sequence','special','g1'])")) {
   fail('Typed-tension mode list must match games that render typed plates and a tensioner.');
+}
+if (!tensionGuardSource.includes('tryOpenG1=guardOpen(tryOpenG1)')) {
+  fail('Gothic 1 opener must enforce the typed tensioner guard.');
 }
 
 const prototypeHtml = readFileSync(resolve(root, 'prototypes/lockpicking-mechanics-v63.html'), 'utf8');

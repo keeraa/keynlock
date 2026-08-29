@@ -325,7 +325,7 @@
   const tensionLabels=[null,'Bar','Hook','Kink','Wave','Angle'];
   const typeOrder=['bar','hook','kink','wave','angle'];
   const typeBySkin={1:'bar',2:'hook',3:'kink',4:'wave',5:'angle'};
-  const typedTensionModes=new Set(['classic','target','line','sequence','special']);
+  const typedTensionModes=new Set(['classic','target','line','sequence','special','g1']);
 
   TENSION_SKINS.splice(0,TENSION_SKINS.length,...tensionSkins);
   TENSION_SKIN_LABELS.splice(0,TENSION_SKIN_LABELS.length,...tensionLabels);
@@ -454,6 +454,7 @@
   // check entirely.
   tryOpenBaseLock=guardOpen(tryOpenBaseLock);
   tryOpenLock=guardOpen(tryOpenLock);
+  tryOpenG1=guardOpen(tryOpenG1);
 
   // init.js bound these two handlers by function reference before this patch runs.
   // Capture them so the same guard still applies to their dedicated controls.

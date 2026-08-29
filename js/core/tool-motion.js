@@ -42,14 +42,14 @@
       const idle=Math.sin(now*.0016)*.55;
       const px=this.parallaxX,py=this.parallaxY;
       const values={
-        '--pick-rot-drift':`${(idle*1.15+px*.08-py*.05).toFixed(2)}deg`,
-        '--tension-rot-drift':`${(idle*.95+px*.06+py*.05).toFixed(2)}deg`,
-        '--pick-react-x':`${(this.row*-18+pulseSin*2.8+px*.18).toFixed(2)}px`,
-        '--pick-react-y':`${(this.depth*13-pulse*3+py*.35).toFixed(2)}px`,
-        '--pick-react-rot':`${(this.row*4.8+this.depth*3.2+pulseSin*2-px*.04-py*.12).toFixed(2)}deg`,
-        '--tension-react-x':`${(this.row*9+pulseSin*1.5+px*.10).toFixed(2)}px`,
-        '--tension-react-y':`${(this.depth*7-pulse*1.5+py*.18).toFixed(2)}px`,
-        '--tension-react-rot':`${(this.row*-3+this.depth*2.3+pulseSin*1.25+px*.03+py*.07).toFixed(2)}deg`
+        '--pick-rot-drift':`${(idle*1.15).toFixed(2)}deg`,
+        '--tension-rot-drift':`${(idle*.95).toFixed(2)}deg`,
+        '--pick-react-x':`${(this.row*-18+pulseSin*2.8+px*.30).toFixed(2)}px`,
+        '--pick-react-y':`${(this.depth*13-pulse*3+py*.50).toFixed(2)}px`,
+        '--pick-react-rot':`${(this.row*4.8+this.depth*3.2+pulseSin*2-px*.14-py*.22).toFixed(2)}deg`,
+        '--tension-react-x':`${(this.row*9+pulseSin*1.5+px*.28).toFixed(2)}px`,
+        '--tension-react-y':`${(this.depth*7-pulse*1.5+py*.28).toFixed(2)}px`,
+        '--tension-react-rot':`${(this.row*-3+this.depth*2.3+pulseSin*1.25+px*.16+py*.11).toFixed(2)}deg`
       };
       for(const [name,value] of Object.entries(values))this.root.style.setProperty(name,value);
       return values;

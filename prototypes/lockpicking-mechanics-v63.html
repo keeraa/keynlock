@@ -1309,6 +1309,8 @@ html.embedded .scene[data-name="Kingdom Come"] .kcd-lock{border-color:#8b6638;ba
 html.embedded .scene[data-name="Kingdom Come"] .kcd-rotor{border-color:#8c693b;background:repeating-conic-gradient(from 0deg,#4b351f 0 19deg,#2d1f14 19deg 39deg)}
 html.embedded .scene[data-name="Risen 2"]{padding-top:340px}
 html.embedded .scene[data-name="Risen 2"] .lab{align-items:flex-start}
+html.embedded .scene[data-name="Alpha Protocol"]{padding-top:340px}
+html.embedded .scene[data-name="Alpha Protocol"] .lab{align-items:flex-start}
 @media(max-width:760px){html.embedded .scene{padding:58px 10px 118px}html.embedded .lab{min-height:calc(100vh - 176px);padding:10px}}
 </style>
 </head>
@@ -1326,7 +1328,7 @@ html.embedded .scene[data-name="Risen 2"] .lab{align-items:flex-start}
         </section>
     <section class="scene" data-name="Alpha Protocol" data-tab-check="true">
           <div class="scene-head"><div><div class="scene-title-row"><h2>Выравнивание пазов</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="apStatus"><strong>0 / 5</strong>Выставляй пины в порядке символов под замком</div></div>
-          <div class="lab"><div class="museum-wrap"><div class="museum-panel"><div class="ap-time"><span id="apTimer"></span></div><div class="ap-lock" id="apLock"><div class="ap-beam"><span class="ap-beam-fill" id="apBeamFill"></span></div><div class="ap-line"></div></div><div class="ap-sequence" id="apSequence" aria-label="Порядок символов"></div></div><div class="museum-actions"><button class="btn" id="apSet">Фиксировать · Space</button><button class="btn" id="apReset"><span aria-hidden="true">↻</span></button></div><div class="museum-msg" id="apMsg"></div></div></div>
+          <div class="lab"><div class="museum-wrap"><div class="museum-panel"><div class="ap-time"><span id="apTimer"></span></div><div class="ap-lock" id="apLock"><div class="ap-beam"><span class="ap-beam-fill" id="apBeamFill"></span></div><div class="ap-line"></div></div><div class="ap-sequence" id="apSequence" aria-label="Порядок символов"></div></div><div class="museum-msg" id="apMsg"></div></div></div>
 
         </section>
     <section class="scene" data-name="Thief: Deadly Shadows" data-tab-check="true">
@@ -2142,7 +2144,7 @@ function apSet(){
   if(apReadyIndex(ap.sel)){
     if(ap.orderStep===ap.order.length-1&&!LockRuntime.tensionReady('Alpha Protocol',{statusEl:apStatus,messageEl:apMsg}))return;
     p.set=true;ap.orderStep++;
-    if(ap.orderStep>=ap.order.length){ap.won=true;LockRuntime.open('Alpha Protocol',{statusEl:apStatus,statusHtml:'<strong>Замок открыт</strong>последовательность выполнена',messageEl:apMsg,message:'Все пины выставлены в правильном порядке.'})}
+    if(ap.orderStep>=ap.order.length){ap.won=true;apMsg.textContent='';LockRuntime.open('Alpha Protocol',{statusEl:apStatus,statusHtml:'<strong>Механизм выставлен</strong>нажми на замок наверху'})}
     else{apMsg.textContent='Верно. Найди следующий символ сам.'}
     renderAp();return
   }
@@ -2167,9 +2169,22 @@ function renderAp(markReady=true){LockRuntime.syncPicks('Alpha Protocol',ap.pick
   apTimer.style.width=Math.max(0,ap.time/AP_TIME*100)+'%';
   if(!ap.won&&!ap.failed){const n=apCountSet();apStatus.innerHTML=`<strong>${n} / 5</strong>Выставляй пины в порядке символов под замком`}
 }
-function apLoop(now){const dt=Math.min(.05,(now-ap.last)/1000);ap.last=now;if(activeName()==='Alpha Protocol'&&ap.calibrated&&!ap.won&&!ap.failed&&ap.time>0){ap.time=Math.max(0,ap.time-dt);apTimer.style.width=Math.max(0,ap.time/AP_TIME*100)+'%';if(ap.time<=0){ap.time=0;ap.failed=true;apStatus.innerHTML='<strong>Время вышло</strong>сработала тревога';apMsg.textContent='Новая попытка потребуется.';window.parent?.postMessage({type:'keynlock-mechanic-loss',game:'Alpha Protocol',reason:'time'},location.origin)}}}document.getElementById('apSet').onclick=apSet;document.getElementById('apReset').onclick=apReset;
+function apLoop(now){const dt=Math.min(.05,(now-ap.last)/1000);ap.last=now;if(activeName()==='Alpha Protocol'&&ap.calibrated&&!ap.won&&!ap.failed&&ap.time>0){ap.time=Math.max(0,ap.time-dt);apTimer.style.width=Math.max(0,ap.time/AP_TIME*100)+'%';if(ap.time<=0){ap.time=0;ap.failed=true;apStatus.innerHTML='<strong>Время вышло</strong>сработала тревога';apMsg.textContent='Новая попытка потребуется.';window.parent?.postMessage({type:'keynlock-mechanic-loss',game:'Alpha Protocol',reason:'time'},location.origin)}}}
 
-GameHub.register('Alpha Protocol',{reset:apReset,tick:apLoop,enter:apEnsureCalibrated,keydown:e=>{const d=directionFromCode(e.code);if(e.code==='KeyR'){apReset();return true}if(e.code==='Space'){apSet();return true}if(d==='left'){apSelect(-1);return true}if(d==='right'){apSelect(1);return true}if(d==='up'){apMove(-AP_STEP);return true}if(d==='down'){apMove(AP_STEP);return true}return false}});
+GameHub.register('Alpha Protocol',{
+  reset:apReset,
+  tick:apLoop,
+  enter:apEnsureCalibrated,
+  mistake:()=>{
+    if(!ap.won||ap.orderStep<ap.order.length)return;
+    ap.won=false;
+    ap.orderStep=ap.order.length-1;
+    ap.pins[ap.order[ap.orderStep]].set=false;
+    LockRuntime.breakPick('Alpha Protocol',ap,{messageEl:apMsg,message:'Неверный натяжитель — отмычка сломалась.',onEmpty:()=>{ap.failed=true;apStatus.innerHTML='<strong>Отмычки закончились</strong>замок не открыт'}});
+    renderAp();
+  },
+  keydown:e=>{const d=directionFromCode(e.code);if(e.code==='KeyR'){apReset();return true}if(e.code==='Space'){apSet();return true}if(d==='left'){apSelect(-1);return true}if(d==='right'){apSelect(1);return true}if(d==='up'){apMove(-AP_STEP);return true}if(d==='down'){apMove(AP_STEP);return true}return false}
+});
 
 })();
 (()=>{

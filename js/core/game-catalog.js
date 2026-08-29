@@ -32,7 +32,7 @@ const GAME_DEFINITIONS={
 
   'prototype:bioshock2':{title:'BioShock 2',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
   'prototype:risen-2':{title:'Risen 2 — верфь',kind:'prototype',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
-  'prototype:alpha-protocol':{title:'Alpha Protocol',kind:'prototype',lock:{present:false,manualOpen:false,specialTool:true},world:{noise:false,guards:false,birds:false}},
+  'prototype:alpha-protocol':{title:'Alpha Protocol',kind:'prototype',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:false,guards:false,birds:false}},
   'prototype:thief-ds':{title:'Thief: Deadly Shadows',kind:'prototype',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:false,guards:false,birds:false}},
   'prototype:kingdom-come':{title:'Kingdom Come',kind:'prototype',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   'prototype:thief-12':{title:'Thief 1/2',kind:'prototype',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
@@ -90,6 +90,12 @@ const GameCatalog=(()=>{
     for(const part of parts)value=value?.[part];
     return value;
   }
+  function mapLabel(id,label){
+    const game=get(id);
+    if(!game)return String(label||id);
+    const readiness=Math.max(1,Math.min(5,Number(game.readiness)||1));
+    return `${readiness===5?'✓':readiness} ${label||game.title}`;
+  }
   function setFeature(id,path,value){
     if(!definitions[id])throw new Error(`Unknown game: ${id}`);
     if(!editablePaths.includes(path))throw new Error(`Game feature is not editable: ${path}`);
@@ -117,7 +123,7 @@ const GameCatalog=(()=>{
   function emitChange(id,path){
     window.dispatchEvent(new CustomEvent('keynlock-game-catalog-change',{detail:{id,path,game:id?get(id):null}}));
   }
-  return Object.freeze({definitions,nativeIds,prototypeIds,editablePaths,get,feature,setFeature,reset,has:id=>!!get(id)});
+  return Object.freeze({definitions,nativeIds,prototypeIds,editablePaths,get,feature,mapLabel,setFeature,reset,has:id=>!!get(id)});
 })();
 
 const GameActions=(()=>{

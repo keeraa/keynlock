@@ -163,7 +163,7 @@
       dot.className = 'mapNodeDot missionDot';
       const label = document.createElement('span');
       label.className = 'mapNodeLabel';
-      label.textContent = missionLabel(place);
+      label.textContent = GameCatalog.mapLabel(place.mode,missionLabel(place));
       const tiers = document.createElement('span');
       tiers.className = 'mapNodeTiers';
       for (const tier of MISSION_TIERS) {
@@ -242,6 +242,9 @@
 
   renderChapterPicker();
   renderMissionNodes();
+  window.addEventListener('keynlock-game-catalog-change',event=>{
+    if(event.detail?.path==='readiness'||event.detail?.path==='reset')renderMissionNodes();
+  });
 
   // Dev helper: shift-click the artwork to print map coordinates for a node.
   document.querySelector('#worldMapCanvas')?.addEventListener('click', e => {

@@ -199,7 +199,8 @@
   const BIRD_GAP_MAX = 26000;    // ...and high end
   const BIRD_WARN_MS = 5200;     // how long it circles before it comes down
   const BIRD_HOLD_MS = 1500;     // how long you have to keep watching it
-  const BIRD_NOISE_HIT = 0.60;   // what an unnoticed bird costs
+  const BIRD_NOISE_MIN = 0.50;   // an unnoticed bird costs 50–80% noise
+  const BIRD_NOISE_MAX = 0.80;
   const BIRD_LOOK_UP = -0.55;    // share of the upward sweep that counts as looking up
 
   // "Looking up" is raising your gaze on either device: tipping the phone, or
@@ -331,7 +332,7 @@
     void document.body.offsetWidth;
     document.body.classList.add('flash');
     toast('Птица заметила тебя · шум');
-    addNoise(BIRD_NOISE_HIT);
+    addNoise(BIRD_NOISE_MIN+Math.random()*(BIRD_NOISE_MAX-BIRD_NOISE_MIN));
   }
 
   // Looking up is the same gesture the parallax already reads: on a phone the

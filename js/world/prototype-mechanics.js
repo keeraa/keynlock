@@ -62,7 +62,7 @@
       node.style.setProperty('--mx',`${place.x}%`);
       node.style.setProperty('--my',`${place.y}%`);
       const dot=document.createElement('span');dot.className='mapNodeDot';
-      const label=document.createElement('span');label.className='mapNodeLabel';label.textContent=place.name;
+      const label=document.createElement('span');label.className='mapNodeLabel';label.textContent=GameCatalog.mapLabel(`prototype:${place.id}`,place.game);
       node.append(dot,label);
       canvas.insertBefore(node,player||null);
     });
@@ -270,3 +270,6 @@
   };
 
   renderPrototypeMechanicNodes();
+  window.addEventListener('keynlock-game-catalog-change',event=>{
+    if(event.detail?.path==='readiness'||event.detail?.path==='reset')renderPrototypeMechanicNodes();
+  });

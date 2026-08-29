@@ -251,9 +251,11 @@
     // itself off height via aspect-ratio); plGrid is often narrower than
     // the wrap and centered within it, so the ports must be pinned to
     // plGrid's actual edges, not the wrap's — plain CSS left:0/right:0
-    // would sit at the wrap's edges and float away from the grid.
-    $plStartPort.style.left=`${gr.left-wr.left}px`;
-    $plExitPort.style.right=`${wr.right-gr.right}px`;
+    // would sit at the wrap's edges and float away from the grid. They
+    // sit just outside the grid (flush against its edge, not overlapping
+    // into the first/last tile) like a pipe stub plugged into the socket.
+    $plStartPort.style.left=`${gr.left-wr.left-$plStartPort.offsetWidth}px`;
+    $plExitPort.style.right=`${wr.right-gr.right-$plExitPort.offsetWidth}px`;
     [[$plStartPort,startTile],[$plExitPort,exitTile]].forEach(([port,tile])=>{
       const tr=tile.getBoundingClientRect();
       port.style.top=`${tr.top-wr.top+(tr.height-port.offsetHeight)/2}px`;

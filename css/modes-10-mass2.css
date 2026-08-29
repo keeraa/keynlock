@@ -4,6 +4,13 @@
    to .m2Board/.m2Node/etc so they don't collide with the same-named
    classes still used by other prototype scenes. */
 .m2Mode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:12px;background:rgba(17,13,9,.985);overflow:auto;}
+/* .challengeStatus (reward+timer HUD) is a viewport-fixed overlay that
+   sits inside the bottom of #puzzleArea on most non-phone breakpoints;
+   js/core/init.js's syncPuzzleRewardClearance() measures the shortfall
+   into --reward-clear so the board stops above it instead of rendering
+   underneath it. Needs !important + this specificity to beat the shared
+   body.importedMode .puzzleArea>.modePanel padding rule. */
+body.importedMode .puzzleArea>.modePanel.m2Mode:not([hidden]){padding-bottom:calc(12px + var(--reward-clear,0px))!important;}
 .m2Mode[hidden]{display:none!important;pointer-events:none!important;}
 
 /* Fits the board to whichever of width/height is tighter: flex:1/min-height:0

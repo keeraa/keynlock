@@ -4,6 +4,13 @@
    .tumbler-slot/.pin) with classes renamed to .obSlot/.obPin so they don't
    collide with the same-named classes still used by other prototype scenes. */
 .obMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:16px;background:rgba(17,13,9,.985);overflow:auto;}
+/* .challengeStatus (reward+timer HUD) is a viewport-fixed overlay that
+   sits inside the bottom of #puzzleArea on most non-phone breakpoints;
+   js/core/init.js's syncPuzzleRewardClearance() measures the shortfall
+   into --reward-clear so the lock stops above it instead of rendering
+   underneath it. Needs !important + this specificity to beat the shared
+   body.importedMode .puzzleArea>.modePanel padding rule. */
+body.importedMode .puzzleArea>.modePanel.obMode:not([hidden]){padding-bottom:calc(16px + var(--reward-clear,0px))!important;}
 .obMode[hidden]{display:none!important;pointer-events:none!important;}
 
 /* No fixed/min height here on purpose: obLock is a flex item that fills

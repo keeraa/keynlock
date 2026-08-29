@@ -65,6 +65,7 @@ if(mode==='classic'){
     }else if(mode==='pipeline'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>СОБРАТЬ МАРШРУТ ОТ ВХОДА ДО ВЫХОДА ДО ЗАПУСКА ПОТОКА</b>';
     }
+    if(typeof syncPuzzleRewardClearance==='function') requestAnimationFrame(syncPuzzleRewardClearance);
   }
 
   window.addEventListener('keynlock-game-catalog-change',event=>{

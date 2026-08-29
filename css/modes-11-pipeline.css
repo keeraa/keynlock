@@ -6,6 +6,13 @@
    still used by other prototype scenes. */
 .plMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:10px;background:rgba(17,13,9,.985);overflow:auto;}
 .plMode[hidden]{display:none!important;pointer-events:none!important;}
+/* .challengeStatus (reward+timer HUD) is a viewport-fixed overlay that
+   sits inside the bottom of #puzzleArea on most non-phone breakpoints;
+   js/core/init.js's syncPuzzleRewardClearance() measures the shortfall
+   into --reward-clear so the grid stops above it instead of rendering
+   underneath. Needs !important + this specificity to beat the shared
+   body.importedMode .puzzleArea>.modePanel padding rule. */
+body.importedMode .puzzleArea>.modePanel.plMode:not([hidden]){padding-bottom:calc(12px + var(--reward-clear,0px))!important;}
 
 /* plGridWrap fills whatever height is actually left (flex:1/min-height:0)
    and centers plGrid within it; plGrid is fit to whichever of width/height

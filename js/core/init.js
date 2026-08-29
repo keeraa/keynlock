@@ -86,6 +86,29 @@
     else if(k==='n')newLock();
   }
 
+  // The 5 fluid-sized custom panels (oblivion/watchmen/museum/mass2/pipeline)
+  // fill 100% of #puzzleArea's height by design, but .challengeStatus (the
+  // "ЗА ЗАМОК / ВРЕМЯ" reward+timer HUD) is a viewport-fixed overlay that
+  // sits inside the *bottom* of that same box on most non-phone breakpoints
+  // (--template-puzzle-bottom only reserves 48-56px there, well short of
+  // .challengeStatus's ~128px footprint — only narrow portrait phones
+  // reserve enough room on their own). Measuring both boxes and writing the
+  // shortfall as --reward-clear (consumed as extra padding-bottom by each
+  // panel's own CSS) keeps their content from rendering underneath it,
+  // without hardcoding a value per breakpoint.
+  const FLUID_PANEL_MODES=new Set(['oblivion','watchmen','museum','mass2','pipeline']);
+  function syncPuzzleRewardClearance(){
+    if(!FLUID_PANEL_MODES.has(mode)) return;
+    const status=document.querySelector('.challengeStatus');
+    const puzzle=document.querySelector('#puzzleArea');
+    if(!status || !puzzle) return;
+    const sr=status.getBoundingClientRect();
+    if(!sr.width && !sr.height) return;
+    const pr=puzzle.getBoundingClientRect();
+    const gap=Math.max(0, pr.bottom-sr.top+10);
+    document.documentElement.style.setProperty('--reward-clear', gap.toFixed(1)+'px');
+  }
+
   addEventListener('resize',()=>{
     if(mode==='composite' && !$compositeMode.hidden){
       requestAnimationFrame(()=>{
@@ -97,6 +120,7 @@
     if(mode==='pipeline' && !$pipelineMode.hidden){
       requestAnimationFrame(()=>{ if(typeof plAlignPorts==='function') plAlignPorts(); });
     }
+    requestAnimationFrame(syncPuzzleRewardClearance);
   },{passive:true});
 
   const KEY_ACTIONS={

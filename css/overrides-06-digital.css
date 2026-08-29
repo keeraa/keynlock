@@ -317,29 +317,71 @@ body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none !important
 .lairActiveCharacterPortrait{
   position:absolute;
   left:50%;
-  top:-7%;
+  top:5%;
   width:auto;
-  height:285%;
+  height:350%;
   max-width:none;
   transform:translateX(-50%);
   object-fit:contain;
   object-position:center top;
   pointer-events:none;
 }
+.lairHotspotTeam[data-character="sai"] .lairActiveCharacterPortrait{height:310%;}
+.lairHotspotTeam[data-character="tik"] .lairActiveCharacterPortrait{height:365%;}
 .lairActiveCharacterBadge{
   position:absolute;
   left:7px;
   right:7px;
   bottom:6px;
-  padding:4px 3px;
+  padding:5px 3px 4px;
   border-radius:7px;
   background:rgba(12,9,7,.76);
   color:#efd18d;
-  font:700 8px/1 var(--ui-font);
+  font:700 10px/1 var(--title-font);
   text-align:center;
   text-shadow:0 1px 3px #000;
   pointer-events:none;
 }
+
+/* Team cards use deliberate bust portraits instead of showing arbitrary slices
+   of the full-height transparent character sheets. */
+.lairCharacters{gap:18px !important;}
+.lairCharacter{
+  padding:16px !important;
+  border-color:rgba(139,101,52,.5) !important;
+  background:radial-gradient(circle at 50% 13%,rgba(151,103,48,.13),transparent 33%),linear-gradient(180deg,rgba(38,28,19,.9),rgba(15,12,9,.94)) !important;
+  box-shadow:inset 0 0 0 1px rgba(255,225,166,.025),0 14px 34px rgba(0,0,0,.2) !important;
+}
+.lairCharacter:hover{border-color:rgba(204,156,77,.78) !important;box-shadow:inset 0 0 0 1px rgba(255,225,166,.05),0 16px 38px rgba(0,0,0,.28),0 0 22px rgba(190,137,59,.08) !important;}
+.lairCharacter.active{border-color:#d1a556 !important;box-shadow:inset 0 0 0 1px rgba(255,225,166,.09),0 16px 38px rgba(0,0,0,.3),0 0 28px rgba(198,146,65,.15) !important;}
+.lairPortrait{
+  position:relative !important;
+  height:220px !important;
+  overflow:hidden !important;
+  border:1px solid rgba(126,91,48,.48) !important;
+  border-radius:14px !important;
+  background:radial-gradient(ellipse at 50% 28%,rgba(137,97,54,.2),transparent 55%),linear-gradient(180deg,rgba(43,31,21,.82),rgba(20,15,11,.9)) !important;
+  box-shadow:inset 0 -35px 45px rgba(0,0,0,.28) !important;
+}
+.lairPortraitInner{position:absolute !important;inset:0 !important;padding:0 !important;overflow:hidden !important;}
+.lairPortraitArt{
+  position:absolute !important;
+  left:50% !important;
+  top:4% !important;
+  width:auto !important;
+  max-width:none !important;
+  height:310% !important;
+  transform:translateX(-50%) !important;
+  object-fit:contain !important;
+  object-position:center top !important;
+  filter:drop-shadow(0 12px 18px rgba(0,0,0,.34)) !important;
+}
+.lairCharacter[data-character="sai"] .lairPortraitArt{height:285% !important;}
+.lairCharacter[data-character="tik"] .lairPortraitArt{height:330% !important;}
+.lairCharacterName{margin-top:14px !important;font-size:22px !important;text-align:center !important;}
+.lairCharacterRole{text-align:center !important;}
+.lairCharacterDesc{text-align:center !important;}
+.lairCharacterSelect{display:grid !important;place-items:center !important;}
 
 @media (max-width:760px){
   .lairHotspotAlchemy{left:57.5% !important;top:62% !important;}
@@ -347,4 +389,5 @@ body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none !important
   .lairHotspotCollection{left:60% !important;top:45% !important;}
   .lairHotspotTeam{right:10px !important;bottom:10px !important;width:72px !important;min-width:72px !important;height:72px !important;border-radius:14px !important;}
   .lairActiveCharacterBadge{left:4px;right:4px;bottom:4px;font-size:6px;}
+  .lairPortrait{height:170px !important;}
 }

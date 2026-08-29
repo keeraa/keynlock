@@ -18,10 +18,13 @@
     const activeCharacter=LAIR_CHARACTERS[lairCharacter]||LAIR_CHARACTERS.kai;
     const activePortrait=document.querySelector('#lairActiveCharacterPortrait');
     const teamHotspot=document.querySelector('.lairHotspotTeam');
+    const activeName=document.querySelector('#lairActiveCharacterName');
     if(activePortrait){
       activePortrait.src=activeCharacter.portrait;
       activePortrait.alt=activeCharacter.name;
     }
+    if(activeName)activeName.textContent=activeCharacter.name;
+    if(teamHotspot)teamHotspot.dataset.character=lairCharacter;
     teamHotspot?.setAttribute('aria-label',`Выбор персонажа: ${activeCharacter.name}`);
     const order=['kai','sai','tik'];
     $lairSceneCharacters.innerHTML=order.map((id,index)=>{
@@ -98,6 +101,7 @@
       const card=document.createElement('button');
       card.type='button';
       card.className='lairCharacter'+(id===lairCharacter?' active':'');
+      card.dataset.character=id;
       card.innerHTML=`
         ${lairPortraitMarkup(ch)}
         <div class="lairCharacterName">${ch.name}</div>

@@ -217,6 +217,12 @@
       $prototypeMechanicOverlay.dataset.requiredTension=String(Math.max(1,Math.min(5,Number(event.data.required)||1)));
       return;
     }
+    if(event.data.type==='keynlock-mechanic-tools'){
+      const lock=document.querySelector('#lock.universalLockBlock');
+      lock?.style.setProperty('--fallout-pick-angle',`${Number(event.data.angle)||-90}deg`);
+      lock?.style.setProperty('--fallout-turn-angle',`${Number(event.data.turn)||0}deg`);
+      return;
+    }
     if(event.data.type==='keynlock-mechanic-ready'){
       prototypeMechanicReady=!!event.data.ready;
       document.body.classList.toggle('prototype-lock-ready',prototypeMechanicReady);

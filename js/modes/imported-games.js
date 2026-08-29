@@ -37,37 +37,14 @@
         .lockpick-prototype .scene-head h2{font-family:var(--title-font,"Cormorant Garamond",Georgia,serif)!important}
         .lockpick-prototype .status,.lockpick-prototype .museum-msg{font-family:var(--accent-font,"Forum",Georgia,serif)!important}
 
-        /* Fallout is hosted by the application's integrated runtime. Its old
-           procedural tool bars are replaced with the same selected tool
-           assets used by the native lock block and inventory. */
-        .lockpick-prototype .scene[data-name="Fallout"] .sf-pick{
-          left:50%!important;
-          top:50%!important;
-          width:72px!important;
-          height:360px!important;
-          border-radius:0!important;
-          background:var(--pick-skin-image) center top/contain no-repeat!important;
-          box-shadow:none!important;
-          filter:drop-shadow(0 5px 8px rgba(0,0,0,.48));
-          transform-origin:50% 6%!important;
-          transform:translate(-50%,-6%) rotate(calc(var(--angle,-90deg) + 90deg))!important;
-        }
+        /* Fallout uses the application's shared physical-lock tools. The
+           prototype's bars stay as state carriers only and are never painted. */
+        .lockpick-prototype .scene[data-name="Fallout"] .sf-pick,
+        .lockpick-prototype .scene[data-name="Fallout"] .sf-wrench{display:none!important}
         .lockpick-prototype .scene[data-name="Fallout"],
         .lockpick-prototype .scene[data-name="Fallout"] .lab,
         .lockpick-prototype .scene[data-name="Fallout"] .museum-wrap,
         .lockpick-prototype .scene[data-name="Fallout"] .sf-lock{overflow:visible!important}
-        .lockpick-prototype .scene[data-name="Fallout"] .sf-wrench{
-          left:50%!important;
-          top:50%!important;
-          width:239px!important;
-          height:59px!important;
-          border-radius:0!important;
-          background:var(--tension-skin-image) center/contain no-repeat!important;
-          box-shadow:none!important;
-          filter:drop-shadow(0 4px 7px rgba(0,0,0,.52));
-          transform-origin:6% 50%!important;
-          transform:translate(-6%,-50%) rotate(calc(var(--turn,0deg) + 18deg))!important;
-        }
         .lockpick-prototype .scene[data-name="Fallout"] .museum-actions{display:none!important}`;
     shadow.append(style,prototypeRoot.cloneNode(true));
     host.classList.add('embedded');

@@ -151,7 +151,8 @@
     if(speed<NOISE_MOUSE_SPEED||now-noisePointerBurstAt<NOISE_MOUSE_COOLDOWN)return;
     noisePointerBurstAt=now;
     const strength=Math.min(1,(speed-NOISE_MOUSE_SPEED)/2.5);
-    addNoise(.032+strength*.100);
+    const gameScale=noiseGameId()==='prototype:fallout' ? .18 : 1;
+    addNoise((.032+strength*.100)*gameScale);
   }
   window.addEventListener('pointermove',trackPointerNoise,{passive:true});
 
@@ -164,10 +165,9 @@
 
   let noiseLast = performance.now();
   let noiseWasShowing = null;
-  let noiseLoopParked = false;
   function noiseTick(now){
-    if(isWorldPaused()){ noiseLoopParked=true; return; }
-    noiseLoopParked=false;
+    const paused=isWorldPaused()&&!document.body.classList.contains('prototype-mechanic-open');
+    if(paused){noiseLast=now;setTimeout(()=>requestAnimationFrame(noiseTick),100);return;}
     const dt = Math.min(200, now - noiseLast);
     noiseLast = now;
     if(noiseLevel > 0 && !guardsCalled){
@@ -180,13 +180,6 @@
     if(showing !== noiseWasShowing){ noiseWasShowing = showing; renderNoise(); }
     setTimeout(()=>requestAnimationFrame(noiseTick),100);
   }
-  window.addEventListener('keynlock-world-pausechange',event=>{
-    if(!event.detail?.paused && noiseLoopParked){
-      noiseLoopParked=false;
-      noiseLast=performance.now();
-      requestAnimationFrame(noiseTick);
-    }
-  });
 
   buildGuardFace();
   buildNoiseMeter();

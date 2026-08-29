@@ -1850,6 +1850,7 @@ GameHub.register('Thief: Deadly Shadows',{reset:tdsReset,tick:tdsLoop,keydown:e=
 const sfLock=document.getElementById('sfLock'),sfSymbolRing=document.getElementById('sfSymbolRing'),sfStatus=document.getElementById('sfStatus'),sfTurnBar=document.getElementById('sfTurnBar'),sfTurnText=document.getElementById('sfTurnText'),sfWearBar=document.getElementById('sfWearBar'),sfWearText=document.getElementById('sfWearText'),sfLeftBtn=document.getElementById('sfTorqueLeft'),sfRightBtn=document.getElementById('sfTorqueRight');
 const SF_SUCCESS=8,SF_MAX_TURN=88;
 let sf={secret:0,angle:-90,turn:0,wear:0,torqueDir:0,openDir:1,last:performance.now(),solved:false,failed:false,picks:3,symbol:0,stall:0};
+let sfToolsState='';
 function renderSfSymbolRing(){
   if(!sfSymbolRing)return;
   sfSymbolRing.innerHTML='';
@@ -1895,6 +1896,8 @@ function sfOpenMistake(){sf.solved=false;sfBreakPick()}
 function renderSf(){LockRuntime.syncPicks('Fallout',sf.picks);
   sfLock.style.setProperty('--angle',sf.angle+'deg');
   sfLock.style.setProperty('--turn',sf.turn+'deg');
+  const toolsState=`${sf.angle.toFixed(2)}:${sf.turn.toFixed(2)}`;
+  if(toolsState!==sfToolsState){sfToolsState=toolsState;window.parent?.postMessage({type:'keynlock-mechanic-tools',game:'Fallout',angle:sf.angle,turn:sf.turn},location.origin)}
   const p=Math.min(100,Math.abs(sf.turn)/SF_MAX_TURN*100),w=Math.min(100,sf.wear*100);
   sfTurnBar.style.width=p+'%';sfTurnText.textContent=Math.round(p)+'%';
   sfWearBar.style.width=w+'%';sfWearText.textContent=Math.round(w)+'%';
@@ -1943,6 +1946,7 @@ function sfLoop(now){
 }
 sfLock.addEventListener('pointermove',sfPointer);
 sfLock.addEventListener('pointerdown',e=>{e.preventDefault();sfPointer(e);try{sfLock.setPointerCapture(e.pointerId)}catch(_){}});
+window.addEventListener('pointermove',e=>{if(activeName()==='Fallout')sfPointer(e)},{passive:true});
 function bindSfTorqueButton(btn,dir){
   btn.addEventListener('pointerdown',e=>{e.preventDefault();sfTorque(dir)});
   ['pointerup','pointerleave','pointercancel','lostpointercapture'].forEach(ev=>btn.addEventListener(ev,()=>sfRelease(dir)))

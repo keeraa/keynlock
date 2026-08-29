@@ -246,6 +246,14 @@
     const startTile=tiles[plIndex(PL_START.r,PL_START.c)], exitTile=tiles[plIndex(PL_EXIT.r,PL_EXIT.c)];
     if(!startTile||!exitTile) return;
     const wr=$plGridWrap.getBoundingClientRect();
+    const gr=$plGrid.getBoundingClientRect();
+    // plGridWrap is a wide centering flex box (needed so plGrid can size
+    // itself off height via aspect-ratio); plGrid is often narrower than
+    // the wrap and centered within it, so the ports must be pinned to
+    // plGrid's actual edges, not the wrap's — plain CSS left:0/right:0
+    // would sit at the wrap's edges and float away from the grid.
+    $plStartPort.style.left=`${gr.left-wr.left}px`;
+    $plExitPort.style.right=`${wr.right-gr.right}px`;
     [[$plStartPort,startTile],[$plExitPort,exitTile]].forEach(([port,tile])=>{
       const tr=tile.getBoundingClientRect();
       port.style.top=`${tr.top-wr.top+(tr.height-port.offsetHeight)/2}px`;
@@ -338,6 +346,11 @@
 
   function plStep(now){
     if(plState==='prep'){
+      const startIdx=plIndex(PL_START.r,PL_START.c);
+      if(!plRevealed.has(startIdx)){
+        plFail('Входная клетка не подготовлена');
+        return;
+      }
       plState='flow';
       plPos={r:PL_START.r,c:PL_START.c};
       plInDir=PL_START.in;

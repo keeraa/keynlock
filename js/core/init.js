@@ -94,6 +94,9 @@
         cpRenderJoints(cpBuiltNodes());
       });
     }
+    if(mode==='pipeline' && !$pipelineMode.hidden){
+      requestAnimationFrame(()=>{ if(typeof plAlignPorts==='function') plAlignPorts(); });
+    }
   },{passive:true});
 
   const KEY_ACTIONS={

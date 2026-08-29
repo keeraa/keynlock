@@ -14,8 +14,10 @@
    "short == phone == tiny". Port/pipe-segment/hub sizes are cqw-relative
    to their nearest container-type ancestor so they scale with the board
    instead of staying a fixed px size that would look oversized on a
-   shrunk grid; js/modes/pipeline.js's plAlignPorts() still measures real
-   tile rects each render, so the ports track the grid at any size. */
+   shrunk grid; js/modes/pipeline.js's plAlignPorts() measures plGrid's
+   real rect each render (not just tile rects) and sets left/right in px,
+   since plGrid is often narrower than plGridWrap and centered within it —
+   plain CSS left:0/right:0 below is only a pre-JS fallback. */
 .plGridWrap{
   position:relative;
   flex:1 1 auto;

@@ -31,6 +31,17 @@ body.prototype-mechanic-open.game-inactive #objectiveLine{filter:none!important;
    inert the entire time you're actually playing. */
 body.prototype-mechanic-open.game-inactive #lock.universalLockBlock .pick,
 body.prototype-mechanic-open.game-inactive #lock.universalLockBlock .tension{filter:none!important;}
+/* Fallout's moving tools belong to its dial. Keep the shared physical lock as
+   the centered click target, but do not paint a second, inert pair over it. */
+body.game-inactive.prototype-has-classic-lock[data-prototype-game-id="prototype:fallout"] #lock.universalLockBlock{
+  position:fixed!important;
+  left:calc(50% + var(--fallout-lock-align-x,0px))!important;
+  top:calc(50% + var(--fallout-lock-align-y,0px))!important;
+  transform:translate(-50%,-50%) scale(var(--template-lock-scale))!important;
+}
+body.game-inactive.prototype-has-classic-lock[data-prototype-game-id="prototype:fallout"] #lock.universalLockBlock .pick,
+body.game-inactive.prototype-has-classic-lock[data-prototype-game-id="prototype:fallout"] #lock.universalLockBlock .tension{display:none!important;}
+body[data-prototype-game-id="prototype:fallout"] #noiseMeter{z-index:370!important;}
 body.prototype-mechanic-open .topRightHud{z-index:360!important;}
 body.prototype-mechanic-open .inventoryDrawer{z-index:215!important;}
 #worldMapCanvas .mapNode.prototypeMechanicNode{z-index:10;padding-top:22px;}

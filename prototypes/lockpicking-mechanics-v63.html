@@ -1891,6 +1891,7 @@ function sfBreakPick(){
   else sfStatus.innerHTML=`<strong>Отмычка сломалась</strong>осталось ${sf.picks}`;
   renderSf()
 }
+function sfOpenMistake(){sf.solved=false;sfBreakPick()}
 function renderSf(){LockRuntime.syncPicks('Fallout',sf.picks);
   sfLock.style.setProperty('--angle',sf.angle+'deg');
   sfLock.style.setProperty('--turn',sf.turn+'deg');
@@ -1948,7 +1949,7 @@ function bindSfTorqueButton(btn,dir){
 }
 bindSfTorqueButton(sfLeftBtn,-1);bindSfTorqueButton(sfRightBtn,1);
 document.getElementById('sfReset').onclick=sfReset;
-GameHub.register('Fallout',{reset:sfReset,tick:sfLoop,enter:()=>requestAnimationFrame(renderSfSymbolRing),leave:()=>sfRelease(),keydown:e=>{
+GameHub.register('Fallout',{reset:sfReset,tick:sfLoop,mistake:sfOpenMistake,enter:()=>requestAnimationFrame(renderSfSymbolRing),leave:()=>sfRelease(),keydown:e=>{
   if(e.code==='KeyR'){sfReset();return true}
   if(e.code==='KeyA'||e.code==='ArrowLeft'){sfTorque(-1);return true}
   if(e.code==='KeyD'||e.code==='ArrowRight'){sfTorque(1);return true}

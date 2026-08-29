@@ -36,7 +36,7 @@ const GAME_DEFINITIONS={
   'prototype:thief-ds':{title:'Thief: Deadly Shadows',kind:'prototype',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:false,guards:false,birds:false}},
   'prototype:kingdom-come':{title:'Kingdom Come',kind:'prototype',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   'prototype:thief-12':{title:'Thief 1/2',kind:'prototype',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
-  'prototype:fallout':{title:'Fallout',kind:'prototype',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:false,guards:false,birds:false}},
+  'prototype:fallout':{title:'Fallout',kind:'prototype',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:true,noiseSensor:true,guards:false,birds:false}},
   'prototype:anachronox':{title:'Anachronox — лаборатория',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
   'prototype:mass-effect':{title:'Mass Effect — узел',kind:'prototype',lock:{present:false,manualOpen:false,specialTool:true},world:{noise:false,guards:false,birds:false}},
   'prototype:pathologic-2':{title:'Pathologic 2',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}}

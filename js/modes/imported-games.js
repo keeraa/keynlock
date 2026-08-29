@@ -52,6 +52,10 @@
           transform-origin:50% 6%!important;
           transform:translate(-50%,-6%) rotate(calc(var(--angle,-90deg) + 90deg))!important;
         }
+        .lockpick-prototype .scene[data-name="Fallout"],
+        .lockpick-prototype .scene[data-name="Fallout"] .lab,
+        .lockpick-prototype .scene[data-name="Fallout"] .museum-wrap,
+        .lockpick-prototype .scene[data-name="Fallout"] .sf-lock{overflow:visible!important}
         .lockpick-prototype .scene[data-name="Fallout"] .sf-wrench{
           left:50%!important;
           top:50%!important;
@@ -200,7 +204,13 @@
         replay(){if(EMBEDDED_GAME){integratedTimerDefeated=false;GameHub.get(EMBEDDED_GAME)?.reset?.();observeIntegratedTimer(EMBEDDED_GAME)}},
         attemptOpen(){
           if(integratedPendingOpen){
-            if(integratedPendingTension&&!integratedOriginalTensionReady(integratedPendingTension.game,integratedPendingTension.options))return false;
+            if(integratedPendingTension&&!integratedOriginalTensionReady(integratedPendingTension.game,integratedPendingTension.options)){
+              integratedPendingOpen=null;
+              integratedPendingTension=null;
+              window.postMessage({type:'keynlock-mechanic-ready',game:EMBEDDED_GAME,ready:false},location.origin);
+              GameHub.get(EMBEDDED_GAME)?.mistake?.();
+              return false;
+            }
             const pending=integratedPendingOpen;
             integratedPendingOpen=null;
             integratedPendingTension=null;
@@ -209,6 +219,7 @@
           }
           return GameHub.get(EMBEDDED_GAME)?.open?.();
         },
+        penalizeOpenAttempt(){return GameHub.get(EMBEDDED_GAME)?.mistake?.()},
         setTools(options={}){playerTensionSkin=Math.max(1,Math.min(5,Math.round(Number(options.tension)||1)))},
         active(){return EMBEDDED_GAME}
       };`;
@@ -226,6 +237,7 @@
     close:()=>runtime?.close(),
     replay:()=>runtime?.replay(),
     attemptOpen:()=>runtime?.attemptOpen(),
+    penalizeOpenAttempt:()=>runtime?.penalizeOpenAttempt(),
     setTools:options=>runtime?.setTools(options),
     active:()=>runtime?.active()||''
   };

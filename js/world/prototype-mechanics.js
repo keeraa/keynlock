@@ -25,6 +25,23 @@
     window.KeynlockImportedGames?.setTools({tension:Math.max(1,Math.min(5,tensionSkin||1))});
   }
 
+  function alignFalloutLock(){
+    if(activePrototypeMechanic?.id!=='fallout')return;
+    const dial=$prototypeMechanicOverlay?.querySelector('#prototypeMechanicHost')?.shadowRoot?.querySelector('#sfLock');
+    const lock=document.querySelector('#lock.universalLockBlock');
+    const panel=lock?.querySelector('.lockPanel');
+    if(!dial||!lock||!panel)return;
+    document.body.style.setProperty('--fallout-lock-align-x','0px');
+    document.body.style.setProperty('--fallout-lock-align-y','0px');
+    requestAnimationFrame(()=>{
+      if(activePrototypeMechanic?.id!=='fallout')return;
+      const dialRect=dial.getBoundingClientRect();
+      const panelRect=panel.getBoundingClientRect();
+      document.body.style.setProperty('--fallout-lock-align-x',`${dialRect.left+dialRect.width/2-(panelRect.left+panelRect.width/2)}px`);
+      document.body.style.setProperty('--fallout-lock-align-y',`${dialRect.top+dialRect.height/2-(panelRect.top+panelRect.height/2)}px`);
+    });
+  }
+
   PROTOTYPE_MECHANIC_PLACES.forEach(place=>{
     if(!GameCatalog.has(`prototype:${place.id}`))throw new Error(`Missing game catalogue entry: prototype:${place.id}`);
     MAP_LOCATIONS[prototypeLocationId(place)]={name:place.name,x:place.x,y:place.y,text:`Новая механика: ${place.game}.`,action:'prototype-mechanic',prototypeId:place.id,game:place.game};
@@ -64,6 +81,7 @@
     document.body.classList.add('prototype-mechanic-open');
     document.body.classList.remove('prototype-lock-ready');
     document.body.classList.toggle('prototype-has-classic-lock',!!GameCatalog.feature(`prototype:${place.id}`,'lock.present'));
+    resetNoise?.();
     setGameInactive(true);
     gameDefeat.reset();
     $prototypeMechanicOverlay.hidden=false;
@@ -77,7 +95,7 @@
       picks,
       tension:Math.max(1,Math.min(5,tensionSkin||1)),
       manualOpen:!!GameCatalog.feature(`prototype:${place.id}`,'lock.present')&&!!GameCatalog.feature(`prototype:${place.id}`,'lock.manualOpen')
-    })
+    }).then(()=>{if(place.id==='fallout')requestAnimationFrame(alignFalloutLock);})
       .catch(error=>{console.error('[prototype-mechanic]',error);toast('Не удалось открыть механику');});
   }
 
@@ -86,6 +104,8 @@
     activePrototypeMechanic=null;
     prototypeMechanicReady=false;
     delete document.body.dataset.prototypeGameId;
+    document.body.style.removeProperty('--fallout-lock-align-x');
+    document.body.style.removeProperty('--fallout-lock-align-y');
     $prototypeMechanicOverlay.hidden=true;
     gameDefeat.reset();
     window.KeynlockImportedGames?.close();
@@ -102,6 +122,8 @@
     activePrototypeMechanic=null;
     prototypeMechanicReady=false;
     delete document.body.dataset.prototypeGameId;
+    document.body.style.removeProperty('--fallout-lock-align-x');
+    document.body.style.removeProperty('--fallout-lock-align-y');
     $prototypeMechanicOverlay.hidden=true;
     gameDefeat.reset();
     window.KeynlockImportedGames?.close();
@@ -143,12 +165,19 @@
       void lock?.offsetWidth;
       lock?.classList.add('prototype-wrong-tension');
       setTimeout(()=>lock?.classList.remove('prototype-wrong-tension'),420);
-      toast('Сначала выставь головоломку');
+      if(activePrototypeMechanic.id==='fallout'){
+        window.KeynlockImportedGames?.penalizeOpenAttempt();
+        SFX.wrongLock();
+        toast('Замок не готов · отмычка сломана');
+      }else{
+        toast('Сначала выставь головоломку');
+      }
       return;
     }
     window.KeynlockImportedGames?.attemptOpen();
   },{capture:true});
   document.querySelector('#inventoryTensionRail')?.addEventListener('click',()=>requestAnimationFrame(syncPrototypeTools));
+  window.addEventListener('resize',()=>requestAnimationFrame(alignFalloutLock),{passive:true});
   ['#lairHudButton','#mapTab','#gameSettingsButton'].forEach(selector=>{
     document.querySelector(selector)?.addEventListener('click',()=>leavePrototypeMechanic(),{capture:true});
   });

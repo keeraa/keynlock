@@ -20,16 +20,20 @@
   let guardsCalled = false;
   let noiseBar = null, noiseFill = null;
 
+  function noiseGameId(){
+    return document.body.dataset.prototypeGameId || mode;
+  }
+
   function noiseActive(){
-    return !!GameCatalog.feature(mode,'world.noise') && !shopOpen && !lairOpen && !mapOpen;
+    return !!GameCatalog.feature(noiseGameId(),'world.noise') && !shopOpen && !lairOpen && !mapOpen;
   }
 
   function guardsActive(){
-    return !!GameCatalog.feature(mode,'world.guards') && noiseActive();
+    return !!GameCatalog.feature(noiseGameId(),'world.guards') && noiseActive();
   }
 
   function noiseSensorActive(){
-    return !!GameCatalog.feature(mode,'world.noiseSensor') && noiseActive();
+    return !!GameCatalog.feature(noiseGameId(),'world.noiseSensor') && noiseActive();
   }
 
   let guardFace = null;
@@ -188,7 +192,7 @@
   buildNoiseMeter();
   renderNoise();
   window.addEventListener('keynlock-game-catalog-change',event=>{
-    if(!event.detail?.id || event.detail.id===mode)renderNoise();
+    if(!event.detail?.id || event.detail.id===noiseGameId())renderNoise();
   });
   addEventListener('resize', placeNoiseMeter, { passive:true });
   requestAnimationFrame(noiseTick);

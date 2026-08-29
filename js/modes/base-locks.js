@@ -542,8 +542,6 @@ let plateEls=[], pinTopPlateEls=[];
     $status.innerHTML = '';
   }
 
-  const toolShakeQuery = window.matchMedia('(max-width:760px), (max-height:560px) and (orientation:landscape), (pointer:coarse)');
-
   // Все динамические эффекты идут через requestAnimationFrame:
   // на дисплее 120 Гц браузер отрисовывает их до 120 кадров/с.
   let lastFrame=performance.now();
@@ -565,7 +563,6 @@ let plateEls=[], pinTopPlateEls=[];
     document.body.style.setProperty('--bg-parallax-x', `${bgParallaxX.toFixed(2)}px`);
     document.body.style.setProperty('--bg-parallax-y', `${bgParallaxY.toFixed(2)}px`);
     toolMotionController.setTarget(toolMotionController.targetFromLinear(state,selected,{min:MIN,max:MAX}));
-    toolMotionController.update(dt,{pointerX,pointerY,now,touch:toolShakeQuery.matches});
 
     $lock.style.setProperty('--px', `${pointerX.toFixed(2)}px`);
     $lock.style.setProperty('--py', `${pointerY.toFixed(2)}px`);

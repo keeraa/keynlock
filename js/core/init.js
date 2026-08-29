@@ -131,10 +131,12 @@
     const ny=Math.max(-1,Math.min(1,dy/Math.max(1,dy<0?centerY:innerHeight-centerY)));
     pointerTargetX = nx * POINTER_SWEEP_X;
     pointerTargetY = ny * POINTER_SWEEP_Y;
+    toolMotionController.setPointer(pointerTargetX,pointerTargetY);
   },{passive:true});
   document.documentElement.addEventListener('mouseleave', ()=>{
     pointerTargetX = 0;
     pointerTargetY = 0;
+    toolMotionController.setPointer(0,0);
   });
 
   // Tilt parallax. A phone has no cursor to drive the scene, so the gyroscope
@@ -161,6 +163,7 @@
     function apply(nx, ny){
       pointerTargetX = clamp(nx) * TILT_X;
       pointerTargetY = clamp(ny) * TILT_Y;
+      toolMotionController.setPointer(pointerTargetX,pointerTargetY,{touch:true});
       bgParallaxTargetX = -clamp(nx) * innerWidth * 0.055;
       bgParallaxTargetY = -clamp(ny) * innerHeight * 0.090;
     }

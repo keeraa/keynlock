@@ -286,22 +286,30 @@ body.game-inactive.shop-open::after,body.game-inactive.lair-open::after,body.gam
 .topRightHud .assetNameHud{position:fixed!important;left:18px!important;right:auto!important;top:auto!important;bottom:18px!important;z-index:360!important;display:flex!important;width:min(320px,calc(100vw - 36px))!important;max-width:none!important;align-items:flex-start!important;justify-content:flex-end!important;padding:0!important;margin:0!important;text-align:left!important;}
 .topRightHud .assetNameHud>div{max-width:100%!important;text-align:left!important;}
 
-/* Sky bird. The silhouette is a placeholder for real artwork — swap the svg in
-   guards.js and the sizing here follows. */
+/* Six hand-drawn crow frames run independently from the flight path, keeping
+   the wing cycle smooth while the button itself crosses the viewport. */
 /* Rides the vertical parallax: looking up walks the sky down into frame, so
    the gesture actually shows you the bird instead of only registering. Sits
    below the lock (z 60) so the lock passes in front of it — it is far away. */
-.skyBird{position:fixed;top:calc(4vh + var(--bg-parallax-y,0px) * 0.75);left:0;z-index:19;width:66px;height:26px;padding:0;border:0;background:none;color:#20160e;opacity:0;pointer-events:none;transform:translateX(var(--bird-from,-14vw));}
+.skyBird{position:fixed;top:calc(2vh + var(--bg-parallax-y,0px) * 0.75);left:0;z-index:19;width:124px;height:104px;padding:0;border:0;background:none;color:#20160e;opacity:0;pointer-events:none;transform:translateX(var(--bird-from,-14vw));}
 .skyBird{box-sizing:content-box;padding:22px 26px !important;margin:-22px -26px;}
-.skyBird svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;filter:drop-shadow(0 2px 5px rgba(0,0,0,.35));}
-.skyBird.active{opacity:.92;pointer-events:auto;animation:birdCross var(--bird-flight,5200ms) linear forwards,birdFlap 320ms ease-in-out infinite;}
+.skyBirdSprite{display:block;width:100%;height:100%;background:center/contain no-repeat url("../assets/birds/crow-01.png");filter:drop-shadow(0 3px 6px rgba(0,0,0,.48));animation:birdFrames 600ms step-end infinite;transform-origin:center;}
+.skyBird.reverse .skyBirdSprite{transform:scaleX(-1);}
+.skyBird.active{opacity:.96;pointer-events:auto;animation:birdCross var(--bird-flight,5200ms) linear forwards;}
 .skyBird.passing{opacity:0;transition:opacity .3s ease;}
 /* While it is being watched it lightens towards leaving, so holding your gaze
    visibly does something instead of being a silent timer. */
 .skyBird.watched{color:color-mix(in srgb,#20160e,#e8cf95 calc(var(--bird-watch,0) * 100%));}
-.skyBird.watched svg{filter:drop-shadow(0 0 calc(6px * var(--bird-watch,0)) rgba(240,200,120,.7));}
+.skyBird.watched .skyBirdSprite{filter:brightness(calc(1 + var(--bird-watch,0) * .28)) drop-shadow(0 0 calc(6px * var(--bird-watch,0)) rgba(240,200,120,.7));}
 @keyframes birdCross{from{transform:translateX(var(--bird-from,-14vw));}to{transform:translateX(var(--bird-to,108vw));}}
-@keyframes birdFlap{0%,100%{scale:1 1;}50%{scale:1 .62;}}
+@keyframes birdFrames{
+  0%,100%{background-image:url("../assets/birds/crow-01.png");}
+  16.667%{background-image:url("../assets/birds/crow-02.png");}
+  33.333%{background-image:url("../assets/birds/crow-03.png");}
+  50%{background-image:url("../assets/birds/crow-04.png");}
+  66.667%{background-image:url("../assets/birds/crow-05.png");}
+  83.333%{background-image:url("../assets/birds/crow-06.png");}
+}
 
 /* Its shadow crosses the plates, so the warning still reads with sound off. */
 /* multiply, not a translucent overlay: laid flat it greyed everything equally
@@ -321,7 +329,7 @@ body.game-inactive.shop-open::after,body.game-inactive.lair-open::after,body.gam
 @media (max-width:760px){
   /* Parked above the top edge at rest, so it takes an actual look up to bring
      it into frame — the call and the shadow are what tell you it is there. */
-  .skyBird{width:52px;height:20px;top:calc(-3vh + var(--bg-parallax-y,0px) * 0.95);}
+  .skyBird{width:92px;height:78px;top:calc(-3vh + var(--bg-parallax-y,0px) * 0.95);}
 }
 
 /* Hit from above: the shooter-style wedge at the edge the blow came from. The

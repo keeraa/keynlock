@@ -224,10 +224,7 @@
     birdEl.className = 'skyBird';
     birdEl.id = 'skyBird';
     birdEl.setAttribute('aria-label', 'Заметить птицу');
-    // Placeholder silhouette — swap this markup for the real artwork.
-    birdEl.innerHTML = '<svg viewBox="0 0 64 24" aria-hidden="true">'
-      + '<path d="M2 18 C12 4 22 4 32 14 C42 4 52 4 62 18" />'
-      + '</svg>';
+    birdEl.innerHTML = '<span class="skyBirdSprite" aria-hidden="true"></span>';
     // On a desktop watching means keeping the cursor on it, which is the same
     // "hold your attention there" the tilt asks for rather than a stray click.
     birdEl.addEventListener('pointerenter', () => { birdHovered = true; });
@@ -264,6 +261,7 @@
     // Fly it across the sky above the lock, and drag its shadow over the plates
     // so the warning still lands with the sound off.
     const fromLeft = Math.random() < 0.5;
+    birdEl.classList.toggle('reverse', !fromLeft);
     birdEl.style.setProperty('--bird-from', fromLeft ? '-14vw' : '108vw');
     birdEl.style.setProperty('--bird-to', fromLeft ? '108vw' : '-14vw');
     // Flight and deadline come from the same number: they drifted apart once

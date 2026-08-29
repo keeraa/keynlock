@@ -96,7 +96,7 @@
   // shortfall as --reward-clear (consumed as extra padding-bottom by each
   // panel's own CSS) keeps their content from rendering underneath it,
   // without hardcoding a value per breakpoint.
-  const FLUID_PANEL_MODES=new Set(['oblivion','watchmen','museum','mass2','pipeline','wharf','thiefds','kingdomcome']);
+  const FLUID_PANEL_MODES=new Set(['oblivion','watchmen','museum','mass2','pipeline','wharf','thiefds','kingdomcome','thief12']);
   function syncPuzzleRewardClearance(){
     if(!FLUID_PANEL_MODES.has(mode)) return;
     const status=document.querySelector('.challengeStatus');
@@ -313,6 +313,22 @@
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='thiefds'&&e.code==='Space'){e.preventDefault();tdsCommit();}});
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='kingdomcome'&&e.code==='Space'&&!e.repeat){e.preventDefault();kcdSetTurning(true);}});
   addEventListener('keyup',e=>{if(mode==='kingdomcome'&&e.code==='Space'){kcdSetTurning(false);}});
+  const TH12_KEY_MAP={Digit1:'p1',Digit2:'p2',Digit3:'p3',Digit4:'p4',Digit5:'p5',Numpad1:'p1',Numpad2:'p2',Numpad3:'p3',Numpad4:'p4',Numpad5:'p5'};
+  addEventListener('keydown',e=>{
+    if(gameplayInputBlocked()||mode!=='thief12') return;
+    const type=TH12_KEY_MAP[e.code];
+    if(!type) return;
+    e.preventDefault();
+    if(!e.repeat||th12KeyType!==type){
+      if(th12KeyType&&th12KeyType!==type) th12Use(th12KeyType,false);
+      th12KeyType=type;
+      th12Use(type,true);
+    }
+  });
+  addEventListener('keyup',e=>{
+    const type=TH12_KEY_MAP[e.code];
+    if(type&&th12KeyType===type){ th12Use(type,false); th12KeyType=null; }
+  });
   $plBoostBtn?.addEventListener('click',()=>plBoost());
   document.querySelector('#shopHudButton')?.addEventListener('click',()=>{
     if(lairOpen) closeLair();

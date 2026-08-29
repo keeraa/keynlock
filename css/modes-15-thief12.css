@@ -1,0 +1,115 @@
+/* Thief 1/2 — five pick profiles, one correct per stage; hold the right one
+   until it catches. Markup/CSS ported from the old prototype scene
+   (prototypes/lockpicking-mechanics-v63.html, .th12-*/.pick-type) with
+   classes renamed to .th12Door/.th12Profile/etc so they don't collide with
+   the same-named prototype classes still used by other, not-yet-ported
+   scenes. */
+.th12Mode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:12px;background:rgba(17,13,9,.985);overflow:auto;}
+.th12Mode[hidden]{display:none!important;pointer-events:none!important;}
+/* .challengeStatus (reward+timer HUD) is a viewport-fixed overlay that
+   sits inside the bottom of #puzzleArea on most non-phone breakpoints;
+   js/core/init.js's syncPuzzleRewardClearance() measures the shortfall
+   into --reward-clear so the door stops above it instead of rendering
+   underneath it. Needs !important + this specificity to beat the shared
+   body.importedMode .puzzleArea>.modePanel padding rule. */
+body.importedMode .puzzleArea>.modePanel.th12Mode:not([hidden]){padding-bottom:calc(12px + var(--reward-clear,0px))!important;}
+
+.th12DoorWrap{
+  flex:1 1 auto;
+  min-height:0;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.th12Door{
+  height:100%;
+  width:auto;
+  max-width:min(430px,100%);
+  aspect-ratio:430/240;
+  border:2px solid #504b3c;
+  border-radius:18px;
+  background:linear-gradient(90deg,#201d17,#332d22 48%,#1d1b16);
+  position:relative;
+  overflow:hidden;
+  box-shadow:inset 0 0 35px #000;
+  container-type:inline-size;
+}
+.th12Keyhole{
+  position:absolute;
+  left:50%;
+  top:48%;
+  width:min(6.5cqw,28px);
+  height:min(13.5cqw,58px);
+  transform:translate(-50%,-50%);
+  background:#090a08;
+  border-radius:50% 50% 8px 8px;
+}
+.th12Keyhole:after{
+  content:'';
+  position:absolute;
+  left:min(2.1cqw,9px);
+  top:min(4.7cqw,20px);
+  width:min(2.3cqw,10px);
+  height:min(8.8cqw,38px);
+  background:#090a08;
+}
+.th12Stages{
+  position:absolute;
+  left:12%;
+  right:12%;
+  bottom:min(4.2cqw,18px);
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:min(1.6cqw,7px);
+}
+.th12Stage{
+  height:min(1.9cqw,8px);
+  background:#151710;
+  border:1px solid #464a3b;
+  border-radius:99px;
+}
+.th12Stage.done{background:#819a68;}
+.th12Door.working{animation:th12fiddle .12s linear infinite alternate;}
+@keyframes th12fiddle{to{transform:translateX(1px);}}
+
+.th12Profiles{
+  flex:none;
+  width:min(430px,100%);
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:min(1.9vw,8px);
+  container-type:inline-size;
+}
+.th12Profile{
+  min-width:0;
+  padding:min(2.3vw,10px) min(1.6vw,7px);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  border:1px solid #4c5142;
+  border-radius:10px;
+  background:rgba(20,19,17,.72);
+  color:#aaa38e;
+  cursor:pointer;
+}
+.th12Shape{
+  width:min(20cqw,42px);
+  height:min(23cqw,48px);
+  display:block;
+}
+.th12Shape svg{width:100%;height:100%;overflow:visible;}
+.th12Shape svg path{fill:none;stroke:currentColor;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;}
+.th12Profile small{font-size:10px;color:#aaa38e;}
+.th12Profile.active{border-color:#d8b871;color:#f3dfaa;background:#342d20;}
+
+.th12Help{
+  flex:none;
+  color:#b5a080;
+  text-align:center;
+  font:14px/1.35 Arial,sans-serif;
+  max-width:560px;
+}
+.th12Help:empty{display:none;}

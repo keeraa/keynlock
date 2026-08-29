@@ -18,6 +18,7 @@
     else if(mode==='mass2') setGlobalTimer(true, m2TimeLeft || m2TimeMax, m2TimeMax || 1, 'ТАЙМЕР');
     else if(mode==='pipeline') setGlobalTimer(plState==='prep', Math.max(0,plStartAt-performance.now())/1000, plPrepMax/1000, 'ТАЙМЕР');
     else if(mode==='thiefds') setGlobalTimer(!tdsFailed, tdsTimeLeft||tdsTimeMax, tdsTimeMax||1, 'ТАЙМЕР');
+    else if(mode==='thief12') setGlobalTimer(!th12Failed, th12TimeLeft||th12TimeMax, th12TimeMax||1, 'ТАЙМЕР');
     else setGlobalTimer(false);
 if(mode==='classic'){
       $objectiveLine.innerHTML = `ЦЕЛЬ: <b>ПОДНЯТЬ ВСЕ ШТИФТЫ</b> · ${generatedDistance} ходов минимум`;
@@ -71,6 +72,8 @@ if(mode==='classic'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ВЫСТАВИТЬ КОЛЬЦА В СКРЫТОМ ПОРЯДКЕ</b>';
     }else if(mode==='kingdomcome'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>НАЙТИ И УДЕРЖАТЬ РАБОЧУЮ ТОЧКУ ДО КОНЦА ПОВОРОТА</b>';
+    }else if(mode==='thief12'){
+      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>НАЙТИ И УДЕРЖАТЬ ПРОФИЛЬ ОТМЫЧКИ НА КАЖДОЙ СТАДИИ</b>';
     }
     if(typeof syncPuzzleRewardClearance==='function') requestAnimationFrame(syncPuzzleRewardClearance);
   }

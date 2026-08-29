@@ -37,7 +37,8 @@
     { mode: 'pipeline',  x: 14, y: 40 },
     { mode: 'wharf',     x: 11, y: 61 },
     { mode: 'thiefds',   x: 48, y: 15 },
-    { mode: 'kingdomcome', x: 64, y: 16 }
+    { mode: 'kingdomcome', x: 64, y: 16 },
+    { mode: 'thief12',   x: 88, y: 49 }
   ];
 
   const MISSION_STORAGE_KEY = 'lockpickMissions';

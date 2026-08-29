@@ -23,6 +23,7 @@
 <link rel="stylesheet" href="css/modes-12-wharf.css">
 <link rel="stylesheet" href="css/modes-13-thiefds.css">
 <link rel="stylesheet" href="css/modes-14-kingdomcome.css">
+<link rel="stylesheet" href="css/modes-15-thief12.css">
 <link rel="stylesheet" href="css/world-01-shop-shared.css">
 <link rel="stylesheet" href="css/overrides-01-tools-shared.css">
 <link rel="stylesheet" href="css/overrides-02-map.css">
@@ -497,6 +498,27 @@
 <button class="digitalBtn kcdTurnBtn" id="kcdTurnBtn" type="button">Удерживать вращение · Space</button>
 <div class="kcdHelp" id="kcdHelp"></div>
 </div>
+<!-- MODE: THIEF 1/2 -->
+<div class="modePanel th12Mode" data-mode="thief12" hidden="" id="thief12Mode">
+<div class="th12DoorWrap"><div class="th12Door" id="th12Door">
+<div class="th12Keyhole"></div>
+<div class="th12Stages" id="th12Stages">
+<span class="th12Stage"></span>
+<span class="th12Stage"></span>
+<span class="th12Stage"></span>
+<span class="th12Stage"></span>
+<span class="th12Stage"></span>
+</div>
+</div></div>
+<div class="th12Profiles">
+<button class="th12Profile" id="th12P1" data-type="p1" type="button"><span class="th12Shape"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 5V43"/></svg></span><small>Профиль 1</small></button>
+<button class="th12Profile" id="th12P2" data-type="p2" type="button"><span class="th12Shape"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 8H27Q38 8 38 20V43"/></svg></span><small>Профиль 2</small></button>
+<button class="th12Profile" id="th12P3" data-type="p3" type="button"><span class="th12Shape"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M25 5C14 11 35 17 24 24C14 31 35 37 24 43"/></svg></span><small>Профиль 3</small></button>
+<button class="th12Profile" id="th12P4" data-type="p4" type="button"><span class="th12Shape"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 43V23Q14 7 28 7Q41 7 41 22V25"/></svg></span><small>Профиль 4</small></button>
+<button class="th12Profile" id="th12P5" data-type="p5" type="button"><span class="th12Shape"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M39 6L14 24L39 43"/></svg></span><small>Профиль 5</small></button>
+</div>
+<div class="th12Help" id="th12Help"></div>
+</div>
 <!-- MODE: HILLSFAR -->
 <div class="modePanel hillsfarMode" data-mode="hillsfar" hidden="" id="hillsfarMode">
 <div class="hfLockBox">
@@ -818,6 +840,7 @@
 <script src="js/modes/wharf.js"></script>
 <script src="js/modes/thiefds.js"></script>
 <script src="js/modes/kingdomcome.js"></script>
+<script src="js/modes/thief12.js"></script>
 <script src="js/modes/base-locks.js"></script>
 <script src="js/world/alchemy.js"></script>
 <script src="js/world/guards.js"></script>

@@ -163,6 +163,7 @@
   let wfSequence=[], wfStep=0, wfPos=0, wfWrong=-1, wfStress=0, wfBarEls=[], wfBarCount=6;
   let tdsRingSymbols=[], tdsOrder=[], tdsStep=0, tdsSelectedRing=0, tdsAngle=0, tdsTargets=[], tdsHot=false, tdsDone=new Set(), tdsFailed=false, tdsTimeLeft=22, tdsTimeMax=22, tdsDownInfo=null, tdsRingEls=[], tdsSeqEls=[];
   let kcdSweetR=.25, kcdSweetA=0, kcdRot=0, kcdStress=0, kcdTurning=false, kcdPointerX=.5, kcdPointerY=.5, kcdTolerance=.082, kcdTargetRot=220;
+  let th12Seq=[], th12Near=[], th12Step=0, th12Hold=null, th12HoldProgress=0, th12Tried=new Set(), th12Failed=false, th12TimeLeft=22, th12TimeMax=22, th12HoldDuration=.63, th12LastHint='', th12KeyType=null;
   const CP_LEVEL_NAMES=['ВЕРХ','ЦЕНТР','НИЗ'];
   let cpNodes=[1,1,1,1,1], cpTarget=[1,1,1,1], cpVals=[1,1,1,1], cpInitial=[1,1,1,1], cpSelected=0, cpReady=false;
   let hcSecret=[0,0,0,0], hcAttempts=[], hcDigits=[0,0,0,0], hcActiveIndex=0;
@@ -209,7 +210,8 @@
         $pipelineMode=document.querySelector('#pipelineMode'), $plGridWrap=document.querySelector('#plGridWrap'), $plStartPort=document.querySelector('#plStartPort'), $plExitPort=document.querySelector('#plExitPort'), $plGrid=document.querySelector('#plGrid'), $plHelp=document.querySelector('#plHelp'), $plBoostBtn=document.querySelector('#plBoostBtn'),
         $wharfMode=document.querySelector('#wharfMode'), $wfLock=document.querySelector('#wfLock'), $wfHelp=document.querySelector('#wfHelp'),
         $thiefdsMode=document.querySelector('#thiefdsMode'), $tdsLock=document.querySelector('#tdsLock'), $tdsProbe=document.querySelector('#tdsProbe'), $tdsTip=document.querySelector('#tdsTip'), $tdsSequence=document.querySelector('#tdsSequence'), $tdsHelp=document.querySelector('#tdsHelp'),
-        $kingdomcomeMode=document.querySelector('#kingdomcomeMode'), $kcdLock=document.querySelector('#kcdLock'), $kcdTurnBtn=document.querySelector('#kcdTurnBtn'), $kcdProgressBar=document.querySelector('#kcdProgressBar'), $kcdStressBar=document.querySelector('#kcdStressBar'), $kcdProgressText=document.querySelector('#kcdProgressText'), $kcdStressText=document.querySelector('#kcdStressText'), $kcdHelp=document.querySelector('#kcdHelp');
+        $kingdomcomeMode=document.querySelector('#kingdomcomeMode'), $kcdLock=document.querySelector('#kcdLock'), $kcdTurnBtn=document.querySelector('#kcdTurnBtn'), $kcdProgressBar=document.querySelector('#kcdProgressBar'), $kcdStressBar=document.querySelector('#kcdStressBar'), $kcdProgressText=document.querySelector('#kcdProgressText'), $kcdStressText=document.querySelector('#kcdStressText'), $kcdHelp=document.querySelector('#kcdHelp'),
+        $thief12Mode=document.querySelector('#thief12Mode'), $th12Door=document.querySelector('#th12Door'), $th12Stages=document.querySelector('#th12Stages'), $th12Help=document.querySelector('#th12Help');
 
   const MODE_PANELS=Object.freeze({
     hillsfar:$hillsfarMode,
@@ -232,13 +234,14 @@
     pipeline:$pipelineMode,
     wharf:$wharfMode,
     thiefds:$thiefdsMode,
-    kingdomcome:$kingdomcomeMode
+    kingdomcome:$kingdomcomeMode,
+    thief12:$thief12Mode
   });
   const IMPORTED_MODES=new Set(Object.keys(MODE_PANELS));
   const ALL_MODES=new Set(GameCatalog.nativeIds);
 
   const DIFFICULTY_STORAGE_KEY='lockpickModeDifficulty';
-  const DEFAULT_MODE_DIFFICULTY=Object.freeze({classic:1,target:1,line:1,sequence:1,special:1,hillsfar:1,mass:1,g1:1,r2:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,heatcold:1,drum:1,scope:1,oblivion:1,watchmen:1,museum:1,mass2:1,pipeline:1,wharf:1,thiefds:1,kingdomcome:1});
+  const DEFAULT_MODE_DIFFICULTY=Object.freeze({classic:1,target:1,line:1,sequence:1,special:1,hillsfar:1,mass:1,g1:1,r2:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,heatcold:1,drum:1,scope:1,oblivion:1,watchmen:1,museum:1,mass2:1,pipeline:1,wharf:1,thiefds:1,kingdomcome:1,thief12:1});
   function loadModeDifficulty(){
     try{
       const saved=JSON.parse(STORE.getItem(DIFFICULTY_STORAGE_KEY)||'{}');

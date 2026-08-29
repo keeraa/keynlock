@@ -325,6 +325,8 @@ let plateEls=[], pinTopPlateEls=[];
       startThiefDsRound();
     }else if(mode==='kingdomcome'){
       startKingdomComeRound();
+    }else if(mode==='thief12'){
+      startThief12Round();
     }
 
     updateModeUI();
@@ -357,6 +359,7 @@ let plateEls=[], pinTopPlateEls=[];
       mode==='wharf' ? 'Новый набор задвижек' :
       mode==='thiefds' ? 'Новый замок' :
       mode==='kingdomcome' ? 'Новый замок' :
+      mode==='thief12' ? 'Новый замок' :
       'Новый сигнал осциллографа';
     if(notify){
       toast(msg);
@@ -387,6 +390,7 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='wharf'){ startWharfRound(); toast('Задвижки обновлены'); return; }
     if(mode==='thiefds'){ startThiefDsRound(); toast('Замок обновлён'); return; }
     if(mode==='kingdomcome'){ startKingdomComeRound(); toast('Замок обновлён'); return; }
+    if(mode==='thief12'){ startThief12Round(); toast('Замок обновлён'); return; }
     state=[...initial]; solved=false; $lock.classList.remove('win');
     $mechanism.classList.remove('ready','opening','opened');
     render(); toast('Механизм сброшен');
@@ -442,6 +446,7 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='wharf') return wfMove(dir);
     if(mode==='thiefds') return tdsMove(dir);
     if(mode==='kingdomcome') return kcdKeyMove(dir<0?'left':'right');
+    if(mode==='thief12') return;
     if(mode==='g1') return g1Press(dir);
     if(mode==='mass') return moveMass(dir);
     if(mode==='hillsfar') return;
@@ -542,7 +547,8 @@ let plateEls=[], pinTopPlateEls=[];
     pipeline:()=>tryOpenPipeline(),
     wharf:()=>tryOpenWharf(),
     thiefds:()=>tryOpenThiefDs(),
-    kingdomcome:()=>tryOpenKingdomCome()
+    kingdomcome:()=>tryOpenKingdomCome(),
+    thief12:()=>tryOpenThief12()
   });
 
   function select(delta){
@@ -588,6 +594,7 @@ let plateEls=[], pinTopPlateEls=[];
       kcdKeyMove(delta<0?'up':'down');
       return;
     }
+    if(mode==='thief12') return;
     if(mode==='g1') return;
     if(mode==='heatcold'||mode==='drum'||mode==='scope') return;
     if(mode==='mass') return selectMass(delta);
@@ -614,6 +621,7 @@ let plateEls=[], pinTopPlateEls=[];
     else if(mode==='wharf'){ $mechanism.classList.remove('ready'); }
     else if(mode==='thiefds'){ $mechanism.classList.remove('ready'); }
     else if(mode==='kingdomcome'){ $mechanism.classList.remove('ready'); }
+    else if(mode==='thief12'){ $mechanism.classList.remove('ready'); }
     else if(mode==='g1'){ $mechanism.classList.remove('ready'); }
     else if(mode==='mass'){ $mechanism.classList.remove('ready'); }
     else if(mode!=='hillsfar') $mechanism.classList.toggle('ready',!solved && goalMet());
@@ -717,6 +725,9 @@ let plateEls=[], pinTopPlateEls=[];
     }
     if(mode==='kingdomcome' && !solved){
       kcdTick(Math.min(.04,dt/1000));
+    }
+    if(mode==='thief12' && !solved){
+      th12Tick(Math.min(.05,dt/1000));
     }
     scheduleAnimationLoop(solved ? 160 : ACTIVE_FRAME_MS);
   }

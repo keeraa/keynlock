@@ -1,0 +1,166 @@
+/* Kingdom Come — a rotor lock with a hidden sweet spot that rotates as you
+   make progress; aim a pick at it and hold "turn" to accelerate rotation
+   while staying close, or build stress by drifting away. Markup/CSS ported
+   from the old prototype scene (prototypes/lockpicking-mechanics-v63.html,
+   .kcd-*) with classes renamed to .kcdLock/.kcdRotor/etc so they don't
+   collide with the same-named prototype classes still used by other,
+   not-yet-ported scenes. */
+.kcdMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:12px;background:rgba(17,13,9,.985);overflow:auto;}
+.kcdMode[hidden]{display:none!important;pointer-events:none!important;}
+/* .challengeStatus (reward+timer HUD) is a viewport-fixed overlay that
+   sits inside the bottom of #puzzleArea on most non-phone breakpoints;
+   js/core/init.js's syncPuzzleRewardClearance() measures the shortfall
+   into --reward-clear so the lock stops above it instead of rendering
+   underneath it. Needs !important + this specificity to beat the shared
+   body.importedMode .puzzleArea>.modePanel padding rule. */
+body.importedMode .puzzleArea>.modePanel.kcdMode:not([hidden]){padding-bottom:calc(12px + var(--reward-clear,0px))!important;}
+
+.kcdLockWrap{
+  flex:1 1 auto;
+  min-height:0;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.kcdLock{
+  --rot:0deg;
+  --pick-x:50%;
+  --pick-y:50%;
+  --pick-angle:-45deg;
+  --pick-length:120px;
+  --feedback:0;
+  height:100%;
+  width:auto;
+  max-width:min(420px,100%);
+  aspect-ratio:1;
+  position:relative;
+  border-radius:50%;
+  overflow:hidden;
+  touch-action:none;
+  cursor:crosshair;
+  border:2px solid #5b604e;
+  background:radial-gradient(circle at 50% 50%,transparent 0 11%,rgba(0,0,0,.28) 11.5% 13%,transparent 13.5%),repeating-conic-gradient(from 3deg,rgba(255,255,255,.035) 0 2deg,transparent 2deg 15deg),radial-gradient(circle at 46% 42%,#363b2f 0 16%,#24291f 17% 48%,#171b15 49% 72%,#10130f 73% 100%);
+  box-shadow:inset 0 0 0 10px #1b1f18,inset 0 0 0 12px #4a5041,inset 0 0 50px rgba(0,0,0,.65),0 18px 40px rgba(0,0,0,.32);
+  container-type:inline-size;
+}
+.kcdLock:before{
+  content:"";
+  position:absolute;
+  inset:10%;
+  border-radius:50%;
+  border:1px solid rgba(214,179,111,.16);
+  box-shadow:0 0 0 20px rgba(0,0,0,.06),inset 0 0 24px rgba(0,0,0,.34);
+}
+.kcdRotor{
+  position:absolute;
+  inset:19%;
+  border-radius:50%;
+  transform:rotate(var(--rot));
+  border:2px solid #59604d;
+  background:repeating-conic-gradient(from 0deg,#2b3025 0 19deg,#20241c 19deg 39deg);
+  box-shadow:inset 0 0 28px rgba(0,0,0,.48),0 0 0 5px rgba(0,0,0,.18);
+}
+.kcdRotor:after{
+  content:"";
+  position:absolute;
+  inset:37%;
+  border-radius:50%;
+  background:#10130f;
+  border:2px solid #626755;
+}
+.kcdKeyway{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:min(4.6cqw,18px);
+  height:min(11cqw,43px);
+  transform:translate(-50%,-43%);
+  z-index:5;
+}
+.kcdKeyway:before{
+  content:"";
+  position:absolute;
+  left:min(.8cqw,3px);
+  top:0;
+  width:min(3.1cqw,12px);
+  height:min(3.1cqw,12px);
+  border-radius:50%;
+  background:#070907;
+}
+.kcdKeyway:after{
+  content:"";
+  position:absolute;
+  left:min(1.5cqw,6px);
+  top:min(2cqw,8px);
+  width:min(1.5cqw,6px);
+  height:min(8cqw,31px);
+  background:#070907;
+  border-radius:0 0 4px 4px;
+}
+.kcdPick{
+  position:absolute;
+  left:13%;
+  top:83%;
+  height:min(1cqw,4px);
+  width:var(--pick-length);
+  transform:rotate(var(--pick-angle));
+  transform-origin:0 50%;
+  z-index:8;
+  border-radius:999px;
+  background:linear-gradient(90deg,#6d705e,#c6bea2 48%,#efe3c3);
+  box-shadow:0 1px 2px #000;
+}
+.kcdPick:after{
+  content:"";
+  position:absolute;
+  right:min(-1.3cqw,-5px);
+  top:min(-.8cqw,-3px);
+  width:min(2.6cqw,10px);
+  height:min(2.6cqw,10px);
+  border-radius:50%;
+  background:#efe3c3;
+  box-shadow:0 0 calc(5px + 16px * var(--feedback)) rgba(214,179,111,calc(.10 + .72 * var(--feedback)));
+}
+.kcdFeedback{
+  position:absolute;
+  left:var(--pick-x);
+  top:var(--pick-y);
+  width:min(8.7cqw,34px);
+  height:min(8.7cqw,34px);
+  margin:calc(0px - min(4.35cqw,17px));
+  border-radius:50%;
+  z-index:7;
+  border:1px solid rgba(214,179,111,calc(.10 + .65 * var(--feedback)));
+  opacity:calc(.15 + .85 * var(--feedback));
+  box-shadow:0 0 calc(3px + 18px * var(--feedback)) rgba(214,179,111,calc(.08 + .32 * var(--feedback)));
+}
+.kcdLock.shaking{animation:shake .13s linear infinite;}
+.kcdLock.solved{box-shadow:inset 0 0 0 10px #1b1f18,inset 0 0 0 12px #78945e,inset 0 0 50px rgba(93,140,77,.32),0 18px 40px rgba(0,0,0,.32);}
+
+.kcdMeters{
+  flex:none;
+  width:min(420px,100%);
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.kcdMeter{display:flex;flex-direction:column;gap:3px;}
+.kcdMeterHead{display:flex;justify-content:space-between;color:#b5a080;font:12px/1 var(--ui-font,Arial,sans-serif);}
+.kcdBar{height:6px;border-radius:999px;background:#0b0e0b;border:1px solid #343b31;overflow:hidden;}
+.kcdBar>span{display:block;height:100%;width:0;background:#899d6d;transition:width .12s linear;}
+
+.kcdTurnBtn.active{
+  background:linear-gradient(180deg,#3c6f52,#1b2c1d);
+  border-color:#5fa87d;
+  color:#d7f1e0;
+}
+
+.kcdHelp{
+  flex:none;
+  color:#b5a080;
+  text-align:center;
+  font:14px/1.35 Arial,sans-serif;
+  max-width:560px;
+}
+.kcdHelp:empty{display:none;}

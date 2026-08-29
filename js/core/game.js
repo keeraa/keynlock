@@ -69,6 +69,8 @@ if(mode==='classic'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ОТКРЫТЬ ЗАДВИЖКИ ПО ПОРЯДКУ</b>';
     }else if(mode==='thiefds'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ВЫСТАВИТЬ КОЛЬЦА В СКРЫТОМ ПОРЯДКЕ</b>';
+    }else if(mode==='kingdomcome'){
+      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>НАЙТИ И УДЕРЖАТЬ РАБОЧУЮ ТОЧКУ ДО КОНЦА ПОВОРОТА</b>';
     }
     if(typeof syncPuzzleRewardClearance==='function') requestAnimationFrame(syncPuzzleRewardClearance);
   }

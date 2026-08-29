@@ -22,6 +22,7 @@
 <link rel="stylesheet" href="css/modes-11-pipeline.css">
 <link rel="stylesheet" href="css/modes-12-wharf.css">
 <link rel="stylesheet" href="css/modes-13-thiefds.css">
+<link rel="stylesheet" href="css/modes-14-kingdomcome.css">
 <link rel="stylesheet" href="css/world-01-shop-shared.css">
 <link rel="stylesheet" href="css/overrides-01-tools-shared.css">
 <link rel="stylesheet" href="css/overrides-02-map.css">
@@ -481,6 +482,21 @@
 </div></div>
 <div class="tdsHelp" id="tdsHelp"></div>
 </div>
+<!-- MODE: KINGDOM COME -->
+<div class="modePanel kcdMode" data-mode="kingdomcome" hidden="" id="kingdomcomeMode">
+<div class="kcdLockWrap"><div class="kcdLock" id="kcdLock">
+<div class="kcdRotor"></div>
+<div class="kcdKeyway"></div>
+<div class="kcdFeedback"></div>
+<div class="kcdPick"></div>
+</div></div>
+<div class="kcdMeters">
+<div class="kcdMeter"><div class="kcdMeterHead"><span>Поворот</span><span id="kcdProgressText">0%</span></div><div class="kcdBar"><span id="kcdProgressBar"></span></div></div>
+<div class="kcdMeter"><div class="kcdMeterHead"><span>Напряжение</span><span id="kcdStressText">0%</span></div><div class="kcdBar"><span id="kcdStressBar"></span></div></div>
+</div>
+<button class="digitalBtn kcdTurnBtn" id="kcdTurnBtn" type="button">Удерживать вращение · Space</button>
+<div class="kcdHelp" id="kcdHelp"></div>
+</div>
 <!-- MODE: HILLSFAR -->
 <div class="modePanel hillsfarMode" data-mode="hillsfar" hidden="" id="hillsfarMode">
 <div class="hfLockBox">
@@ -801,6 +817,7 @@
 <script src="js/modes/pipeline.js"></script>
 <script src="js/modes/wharf.js"></script>
 <script src="js/modes/thiefds.js"></script>
+<script src="js/modes/kingdomcome.js"></script>
 <script src="js/modes/base-locks.js"></script>
 <script src="js/world/alchemy.js"></script>
 <script src="js/world/guards.js"></script>

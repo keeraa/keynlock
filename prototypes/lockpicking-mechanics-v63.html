@@ -273,129 +273,6 @@ button {
     margin-top:10px
   }
 }
-/* Kingdom Come */
-.lockpick-prototype .scene[data-name="Kingdom Come"] .kcd-board {
-  width:min(440px,100%);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:14px
-}
-.lockpick-prototype .scene[data-name="Kingdom Come"] .kcd-lock {
-  --rot:0deg;
-  --pick-x:50%;
-  --pick-y:50%;
-  --pick-angle:-45deg;
-  --pick-length:120px;
-  --feedback:0;
-  width:min(390px,82vw);
-  aspect-ratio:1;
-  position:relative;
-  border-radius:50%;
-  overflow:hidden;
-  touch-action:none;
-  cursor:crosshair;
-  border:2px solid #5b604e;
-  background:radial-gradient(circle at 50% 50%,transparent 0 11%,rgba(0,0,0,.28) 11.5% 13%,transparent 13.5%),repeating-conic-gradient(from 3deg,rgba(255,255,255,.035) 0 2deg,transparent 2deg 15deg),radial-gradient(circle at 46% 42%,#363b2f 0 16%,#24291f 17% 48%,#171b15 49% 72%,#10130f 73% 100%);
-  box-shadow:inset 0 0 0 10px #1b1f18,inset 0 0 0 12px #4a5041,inset 0 0 50px rgba(0,0,0,.65),0 18px 40px rgba(0,0,0,.32)
-}
-.lockpick-prototype .scene[data-name="Kingdom Come"] .kcd-lock:before {
-  content:"";
-  position:absolute;
-  inset:10%;
-  border-radius:50%;
-  border:1px solid rgba(214,179,111,.16);
-  box-shadow:0 0 0 20px rgba(0,0,0,.06),inset 0 0 24px rgba(0,0,0,.34)
-}
-.lockpick-prototype .scene[data-name="Kingdom Come"] .kcd-rotor {
-  position:absolute;
-  inset:19%;
-  border-radius:50%;
-  transform:rotate(var(--rot));
-  border:2px solid #59604d;
-  background:repeating-conic-gradient(from 0deg,#2b3025 0 19deg,#20241c 19deg 39deg);
-  box-shadow:inset 0 0 28px rgba(0,0,0,.48),0 0 0 5px rgba(0,0,0,.18)
-}
-.lockpick-prototype .scene[data-name="Kingdom Come"] .kcd-rotor:after {
-  content:"";
-  position:absolute;
-  inset:37%;
-  border-radius:50%;
-  background:#10130f;
-  border:2px solid #626755
-}
-.lockpick-prototype .scene[data-name="Kingdom Come"] .keyway {
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:18px;
-  height:43px;
-  transform:translate(-50%,-43%);
-  z-index:5
-}
-.lockpick-prototype .scene[data-name="Kingdom Come"] .keyway:before {
-  content:"";
-  position:absolute;
-  left:3px;
-  top:0;
-  width:12px;
-  height:12px;
-  border-radius:50%;
-  background:#070907
-}
-.lockpick-prototype .scene[data-name="Kingdom Come"] .keyway:after {
-  content:"";
-  position:absolute;
-  left:6px;
-  top:8px;
-  width:6px;
-  height:31px;
-  background:#070907;
-  border-radius:0 0 4px 4px
-}
-.lockpick-prototype .scene[data-name="Kingdom Come"] .pick {
-  position:absolute;
-  left:13%;
-  top:83%;
-  height:4px;
-  width:var(--pick-length);
-  transform:rotate(var(--pick-angle));
-  transform-origin:0 50%;
-  z-index:8;
-  border-radius:999px;
-  background:linear-gradient(90deg,#6d705e,#c6bea2 48%,#efe3c3);
-  box-shadow:0 1px 2px #000
-}
-.lockpick-prototype .scene[data-name="Kingdom Come"] .pick:after {
-  content:"";
-  position:absolute;
-  right:-5px;
-  top:-3px;
-  width:10px;
-  height:10px;
-  border-radius:50%;
-  background:#efe3c3;
-  box-shadow:0 0 calc(5px + 16px * var(--feedback)) rgba(214,179,111,calc(.10 + .72 * var(--feedback)))
-}
-.lockpick-prototype .scene[data-name="Kingdom Come"] .feedback {
-  position:absolute;
-  left:var(--pick-x);
-  top:var(--pick-y);
-  width:34px;
-  height:34px;
-  margin:-17px;
-  border-radius:50%;
-  z-index:7;
-  border:1px solid rgba(214,179,111,calc(.10 + .65 * var(--feedback)));
-  opacity:calc(.15 + .85 * var(--feedback));
-  box-shadow:0 0 calc(3px + 18px * var(--feedback)) rgba(214,179,111,calc(.08 + .32 * var(--feedback)))
-}
-.lockpick-prototype .scene[data-name="Kingdom Come"] .kcd-lock.shaking {
-  animation:shake .13s linear infinite
-}
-.lockpick-prototype .scene[data-name="Kingdom Come"] .kcd-lock.solved {
-  box-shadow:inset 0 0 0 10px #1b1f18,inset 0 0 0 12px #78945e,inset 0 0 50px rgba(93,140,77,.32),0 18px 40px rgba(0,0,0,.32)
-}
 @keyframes shake {
   25% {
     translate:-1px .5px
@@ -1156,10 +1033,6 @@ html.embedded .scene[data-name="Alpha Protocol"] .lab{align-items:flex-start}
           <div class="lab"><div class="museum-wrap"><div class="museum-panel"><div class="ap-time"><span id="apTimer"></span></div><div class="ap-lock" id="apLock"><div class="ap-beam"><span class="ap-beam-fill" id="apBeamFill"></span></div><div class="ap-line"></div></div><div class="ap-sequence" id="apSequence" aria-label="Порядок символов"></div></div><div class="museum-msg" id="apMsg"></div></div></div>
 
         </section>
-<section class="scene" data-name="Kingdom Come" data-tab-check="true">
-          <div class="scene-head"><div><div class="scene-title-row"><h2>Вращающийся замок</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="kcdStatus"><strong>Ищи рабочую точку</strong>двигай отмычку внутри замка</div></div>
-          <div class="lab"><div class="kcd-board"><div class="kcd-lock" id="kcdLock"><div class="kcd-rotor"></div><div class="keyway"></div><div class="feedback"></div><div class="pick"></div></div><div class="meters"><div><div class="meter-head"><span>Поворот</span><span id="kcdProgressText">0%</span></div><div class="bar"><span id="kcdProgressBar"></span></div></div><div><div class="meter-head"><span>Напряжение</span><span id="kcdStressText">0%</span></div><div class="bar"><span id="kcdStressBar"></span></div></div></div><button class="btn" id="kcdTurn">Удерживать вращение · Space</button><button class="btn" id="kcdReset">Новый замок</button></div></div>
-        </section>
     <section class="scene" data-name="Thief 1/2" data-tab-check="true">
           <div class="scene-head"><div><div class="scene-title-row"><h2>Пять профилей отмычки</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="th12Status"><strong>Стадия 1 / 5</strong>подбери профиль</div></div>
           <div class="lab"><div class="museum-wrap"><div class="th12-time"><span id="th12Timer"></span></div><div class="th12-door" id="th12Door"><div class="th12-keyhole"></div><div class="th12-stages" id="th12Stages"></div></div><div class="th12-profiles">
@@ -1345,28 +1218,6 @@ const LockRuntime=(()=>{
   function isOpen(game){return scene(game)?.dataset.lockOpened==='true'}
   function initAll(){GameHub.scenes.forEach(s=>{if(!s.querySelector('[data-head-picks]'))return;const el=s.querySelector('[data-head-picks]');if(!el.textContent.trim())el.textContent=String(DEFAULT_PICKS)})}
   return{DEFAULT_PICKS,syncPicks,resetPicks,breakPick,setRequiredTension,markTensionHint,tensionReady,open,resetOpen,isOpen,initAll};
-})();
-(()=>{
-'use strict';
-// Portable game module: kingdom-come
-// Kingdom Come-inspired
-const kcdLock=document.getElementById('kcdLock'),kcdStatus=document.getElementById('kcdStatus'),kcdTurnBtn=document.getElementById('kcdTurn');
-const kcdProgressBar=document.getElementById('kcdProgressBar'),kcdStressBar=document.getElementById('kcdStressBar'),kcdProgressText=document.getElementById('kcdProgressText'),kcdStressText=document.getElementById('kcdStressText');
-const KCD_TARGET=220;let kcd={sweetR:.28,sweetA:0,rot:0,stress:0,turning:false,solved:false,failed:false,picks:LockRuntime.DEFAULT_PICKS,notice:false,pointerX:.5,pointerY:.5,last:performance.now()};
-function kcdRandomPointer(){const a=Math.random()*Math.PI*2,r=.11+Math.random()*.14;kcd.pointerX=.5+Math.cos(a)*r;kcd.pointerY=.5+Math.sin(a)*r}
-function kcdReset(){LockRuntime.resetOpen('Kingdom Come');kcd.sweetR=.18+Math.random()*.18;kcd.sweetA=Math.random()*Math.PI*2;kcd.rot=0;kcd.stress=0;kcd.turning=false;kcd.solved=false;kcd.failed=false;kcd.picks=LockRuntime.DEFAULT_PICKS;kcd.notice=false;kcdRandomPointer();kcdLock.classList.remove('shaking','solved');renderKcd()}
-function kcdSweet(){const a=kcd.sweetA+kcd.rot*Math.PI/180;return{x:.5+Math.cos(a)*kcd.sweetR,y:.5+Math.sin(a)*kcd.sweetR}}
-function kcdDist(){const s=kcdSweet();return Math.hypot(kcd.pointerX-s.x,kcd.pointerY-s.y)}
-function kcdClose(){return Math.max(0,Math.min(1,1-kcdDist()/(.082*3.4)))}
-function kcdPointer(x,y){if(kcd.solved||kcd.failed)return;kcd.notice=false;const r=kcdLock.getBoundingClientRect();let px=(x-r.left)/r.width,py=(y-r.top)/r.height;const dx=px-.5,dy=py-.5,m=Math.hypot(dx,dy);if(m>.43){px=.5+dx/m*.43;py=.5+dy/m*.43}kcd.pointerX=px;kcd.pointerY=py;renderKcd()}
-function kcdTurn(v){if(kcd.solved||kcd.failed)return;kcd.notice=false;kcd.turning=!!v;kcdTurnBtn.classList.toggle('active',kcd.turning)}
-function kcdBreakPick(){kcdTurn(false);kcd.picks--;kcd.stress=0;kcd.rot=0;kcdLock.classList.remove('shaking');if(kcd.picks<=0){kcd.picks=0;kcd.failed=true;kcdStatus.innerHTML='<strong>Отмычки закончились</strong>нажми «Новый замок»'}else{kcd.notice=true;kcdRandomPointer();kcdStatus.innerHTML=`<strong>Отмычка сломалась</strong>осталось ${kcd.picks}`}renderKcd()}
-function renderKcd(){LockRuntime.syncPicks('Kingdom Come',kcd.picks);const c=kcdClose(),rect=kcdLock.getBoundingClientRect(),ax=.13,ay=.83,dx=kcd.pointerX-ax,dy=kcd.pointerY-ay,len=Math.max(38,Math.hypot(dx*rect.width,dy*rect.height)),ang=Math.atan2(dy,dx)*180/Math.PI;kcdLock.style.setProperty('--rot',kcd.rot+'deg');kcdLock.style.setProperty('--pick-x',kcd.pointerX*100+'%');kcdLock.style.setProperty('--pick-y',kcd.pointerY*100+'%');kcdLock.style.setProperty('--pick-angle',ang+'deg');kcdLock.style.setProperty('--pick-length',len+'px');kcdLock.style.setProperty('--feedback',c);const p=Math.min(100,kcd.rot/KCD_TARGET*100),s=Math.min(100,kcd.stress*100);kcdProgressBar.style.width=p+'%';kcdStressBar.style.width=s+'%';kcdProgressText.textContent=Math.round(p)+'%';kcdStressText.textContent=Math.round(s)+'%';kcdStressBar.style.background=s>70?'#b9655c':s>38?'#b08a58':'#899d6d';if(kcd.failed)kcdStatus.innerHTML='<strong>Отмычки закончились</strong>нажми «Новый замок»';else if(!kcd.solved&&!kcd.turning&&!kcd.notice){kcdStatus.innerHTML=c>.8?'<strong>Рабочая точка найдена</strong>зажми вращение и веди отмычку':c>.5?'<strong>Очень близко</strong>двигайся точнее':c>.2?'<strong>Есть сопротивление</strong>ищи рядом':'<strong>Ищи рабочую точку</strong>двигай отмычку внутри замка'}}
-function kcdLoop(now){const dt=Math.min(.04,(now-kcd.last)/1000);kcd.last=now;if(activeName()==='Kingdom Come'&&kcd.turning&&!kcd.solved&&!kcd.failed){const d=kcdDist(),tol=.082,q=Math.max(0,Math.min(1,1-d/(tol*2.9)));kcd.rot+=dt*(46+104*q);if(d<=tol)kcd.stress=Math.max(0,kcd.stress-dt*1.15);else kcd.stress=Math.min(1.1,kcd.stress+dt*(.15+Math.min(2.2,(d-tol)/(tol*2.8))*.46));kcdLock.classList.toggle('shaking',kcd.stress>.3);if(kcd.stress>=1){kcdBreakPick()}else if(kcd.rot>=KCD_TARGET){kcd.rot=KCD_TARGET;kcd.solved=true;kcdTurn(false);kcdLock.classList.add('solved');LockRuntime.open('Kingdom Come',{statusEl:kcdStatus,statusHtml:'<strong>Замок открыт</strong>рабочая точка удержана до конца'})}else{kcdStatus.innerHTML=q>.65?'<strong>Держи точку</strong>цилиндр продолжает вращаться':'<strong>Отмычка уходит</strong>вернись в рабочую точку'}renderKcd()}}
-kcdLock.addEventListener('pointermove',e=>kcdPointer(e.clientX,e.clientY));kcdLock.addEventListener('pointerdown',e=>{e.preventDefault();kcdPointer(e.clientX,e.clientY);if(e.pointerType!=='touch')kcdTurn(true);try{kcdLock.setPointerCapture(e.pointerId)}catch(_){}});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>kcdLock.addEventListener(ev,()=>kcdTurn(false)));kcdTurnBtn.onpointerdown=e=>{e.preventDefault();kcdTurn(true)};['pointerup','pointerleave','pointercancel'].forEach(ev=>kcdTurnBtn.addEventListener(ev,()=>kcdTurn(false)));document.getElementById('kcdReset').onclick=kcdReset;
-function kcdKeyMove(dir){const d=.03;let dx=0,dy=0;if(dir==='left')dx=-d;else if(dir==='right')dx=d;else if(dir==='up')dy=-d;else if(dir==='down')dy=d;let px=kcd.pointerX+dx,py=kcd.pointerY+dy;const x=px-.5,y=py-.5,m=Math.hypot(x,y);if(m>.43){px=.5+x/m*.43;py=.5+y/m*.43}kcd.pointerX=px;kcd.pointerY=py;renderKcd()}
-GameHub.register('Kingdom Come',{reset:kcdReset,tick:kcdLoop,leave:()=>kcdTurn(false),keydown:e=>{const d=directionFromCode(e.code);if(e.code==='KeyR'){kcdReset();return true}if(e.code==='Space'){kcdTurn(true);return true}if(d){kcdKeyMove(d);return true}return false},keyup:e=>{if(e.code==='Space'){kcdTurn(false);return true}return false}});
-
 })();
 (()=>{
 'use strict';

@@ -519,91 +519,6 @@ button {
   flex-wrap:wrap;
   justify-content:center
 }
-/* Risen 2 */
-.lockpick-prototype .scene[data-name="Risen 2"] .r2-wrap {
-  width:min(650px,100%);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:18px
-}
-.lockpick-prototype .scene[data-name="Risen 2"] .r2-lock {
-  width:100%;
-  height:300px;
-  position:relative;
-  border:2px solid #675d49;
-  border-radius:18px;
-  background:#191711;
-  box-shadow:inset 0 0 34px rgba(0,0,0,.75),0 15px 30px rgba(0,0,0,.26);
-  padding:42px 34px 30px;
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:10px
-}
-.lockpick-prototype .scene[data-name="Risen 2"] .r2-bar {
-  flex:1;
-  height:190px;
-  position:relative;
-  max-width:64px;
-  border-left:1px solid rgba(255,255,255,.07);
-  border-right:1px solid rgba(0,0,0,.45);
-  cursor:pointer
-}
-.lockpick-prototype .scene[data-name="Risen 2"] .r2-bar:before {
-  content:"";
-  position:absolute;
-  left:20%;
-  right:20%;
-  bottom:12px;
-  height:var(--bar-h,72%);
-  border:2px solid #71664f;
-  border-radius:8px 8px 3px 3px;
-  background:linear-gradient(90deg,#433a2b,#a48d62 48%,#63543d);
-  transition:transform .18s ease,filter .18s ease
-}
-.lockpick-prototype .scene[data-name="Risen 2"] .r2-bar.open:before {
-  transform:translateY(-68px);
-  filter:brightness(1.18);
-  border-color:#8ca768
-}
-.lockpick-prototype .scene[data-name="Risen 2"] .r2-bar.wrong:before {
-  transform:translateY(-14px);
-  filter:brightness(1.08);
-  border-color:#d0b171
-}
-.lockpick-prototype .scene[data-name="Risen 2"] .r2-bar.current {
-  box-shadow:inset 0 -3px 0 var(--gold)
-}
-.lockpick-prototype .scene[data-name="Risen 2"] .r2-bar.current:after {
-  content:"▲";
-  position:absolute;
-  left:50%;
-  bottom:-18px;
-  transform:translateX(-50%);
-  color:var(--gold);
-  font-size:13px
-}
-.lockpick-prototype .scene[data-name="Risen 2"] .r2-pick {
-  position:absolute;
-  left:var(--r2-x,calc(50% - 36px));
-  bottom:-130px;
-  width:72px;
-  height:360px;
-  background:var(--pick-skin-image) center/contain no-repeat;
-  pointer-events:none;
-  filter:drop-shadow(0 5px 8px rgba(0,0,0,.45));
-  transform:rotate(90deg);
-  transform-origin:50% 50%;
-  transition:left .12s ease
-}
-@media(max-width:650px) {
-  .lockpick-prototype .scene[data-name="Risen 2"] .r2-lock {
-    padding-inline:18px;
-    gap:5px
-  }
-}
-
 /* Thief 1/2 */
 .lockpick-prototype .scene[data-name="Thief 1/2"] .th12-door {
   width:min(430px,100%);
@@ -1322,10 +1237,6 @@ html.embedded .scene[data-name="Alpha Protocol"] .lab{align-items:flex-start}
           <div class="scene-head"><div><div class="scene-title-row"><h2>Взлом охранного дрона</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="bioStatus"><strong>Этап 1 / 5</strong>успехов 0 / 5</div></div>
           <div class="lab"><div class="bio-wrap"><div class="bot" id="bioBot"><div class="bot-eye"></div></div><div class="hack-panel"><div class="hack-track" id="bioTrack"><div class="needle" id="bioNeedle"></div></div></div><div class="bio-meta"><span id="bioStage">Этап 1 / 5</span><span id="bioPasses">Успехов 0 / 5</span></div><div class="bio-result" id="bioResult"></div><div class="bio-actions"><button class="btn" id="bioStop">Стоп · Space</button><button class="btn" id="bioReset">Новый взлом</button></div></div></div>
         </section>
-    <section class="scene" data-name="Risen 2" data-tab-check="true">
-          <div class="scene-head"><div><div class="scene-title-row"><h2>Последовательность задвижек</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="r2Status"><strong>0 / 6</strong>задвижек открыто</div></div>
-          <div class="lab"><div class="r2-wrap"><div class="r2-lock" id="r2Lock"><div class="r2-pick"></div></div></div></div>
-        </section>
     <section class="scene" data-name="Alpha Protocol" data-tab-check="true">
           <div class="scene-head"><div><div class="scene-title-row"><h2>Выравнивание пазов</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="apStatus"><strong>0 / 5</strong>Выставляй пины в порядке символов под замком</div></div>
           <div class="lab"><div class="museum-wrap"><div class="museum-panel"><div class="ap-time"><span id="apTimer"></span></div><div class="ap-lock" id="apLock"><div class="ap-beam"><span class="ap-beam-fill" id="apBeamFill"></span></div><div class="ap-line"></div></div><div class="ap-sequence" id="apSequence" aria-label="Порядок символов"></div></div><div class="museum-msg" id="apMsg"></div></div></div>
@@ -1633,42 +1544,6 @@ document.getElementById('bioStop').onclick=bioStop;document.getElementById('bioR
 
 GameHub.register('BioShock 2',{reset:bioReset,tick:bioLoop,keydown:e=>{const d=directionFromCode(e.code);if(e.code==='KeyR'){bioReset();return true}if(e.code==='Space'||d==='up'){bioStop();return true}return false}});
 
-})();
-(()=>{
-'use strict';
-// Portable game module: risen-2
-// Risen 2-inspired
-const r2Lock=document.getElementById('r2Lock'),r2Status=document.getElementById('r2Status');
-let r2={bars:6,pos:0,seq:[],step:0,wrong:-1,wrongTimer:0,stress:0,picks:3,failed:false};
-function r2MakeSequence(n){const seq=[];let pos=Math.floor(Math.random()*n);seq.push(pos);while(seq.length<n){const options=[];for(let i=0;i<n;i++)if(!seq.includes(i))options.push(i);options.sort((a,b)=>Math.abs(a-pos)-Math.abs(b-pos));const pool=options.slice(0,Math.min(3,options.length));pos=pool[Math.floor(Math.random()*pool.length)];seq.push(pos)}return seq}
-function r2Ready(ready){if(EMBEDDED_GAME==='Risen 2')window.parent?.postMessage({type:'keynlock-mechanic-ready',game:'Risen 2',ready:!!ready},location.origin)}
-function r2Reset(){LockRuntime.resetOpen('Risen 2');r2Ready(false);r2.pos=0;r2.step=0;r2.wrong=-1;r2.stress=0;r2.picks=LockRuntime.DEFAULT_PICKS;r2.failed=false;clearTimeout(r2.wrongTimer);r2.seq=r2MakeSequence(r2.bars);scoreReset('Risen 2',r2.bars);r2Lock.querySelectorAll('.r2-bar').forEach(n=>n.remove());for(let i=0;i<r2.bars;i++){const b=document.createElement('div');b.className='r2-bar';b.dataset.i=i;b.style.setProperty('--bar-h',(48+Math.random()*43)+'%');b.onclick=()=>{r2.pos=i;r2Try();renderR2()};r2Lock.appendChild(b)}renderR2()}
-function r2Move(d){if(r2.failed)return;r2.pos=Math.max(0,Math.min(r2.bars-1,r2.pos+d));renderR2()}
-function r2WrongPulse(i){clearTimeout(r2.wrongTimer);r2.wrong=i;renderR2();r2.wrongTimer=setTimeout(()=>{r2.wrong=-1;renderR2()},170)}
-function r2BreakPick(){r2.picks--;r2.stress=0;if(r2.picks<=0){r2.picks=0;r2.failed=true;r2Status.innerHTML='<strong>Отмычки закончились</strong>нажми «Новый замок»'}else r2Status.innerHTML=`<strong>Отмычка сломалась</strong>осталось ${r2.picks}`}
-function r2Try(){
-  if(r2.failed||r2.step>=r2.bars)return;
-  const opened=r2.seq.slice(0,r2.step);
-  if(opened.includes(r2.pos))return;
-  scoreAction('Risen 2');
-  if(r2.pos===r2.seq[r2.step]){
-    r2.step++;
-    r2.stress=Math.max(0,r2.stress-1);
-    r2.wrong=-1;
-    if(r2.step===r2.bars){r2Ready(true);r2Status.innerHTML='<strong>Задвижки выставлены</strong>нажми на замок наверху'}
-  }else{
-    r2WrongPulse(r2.pos);
-    r2.step=0;
-    r2.stress++;
-    if(r2.stress>=2)r2BreakPick();
-  }
-  renderR2()
-}
-function r2Open(){if(r2.failed||r2.step<r2.bars){r2Status.innerHTML='<strong>Замок не готов</strong>сначала выставь все задвижки';return false}return LockRuntime.open('Risen 2',{statusEl:r2Status,statusHtml:'<strong>Замок открыт</strong>все задвижки пройдены'})}
-function r2PositionPick(){const activeBar=r2Lock.querySelectorAll('.r2-bar')[r2.pos];if(activeBar?.offsetWidth)r2Lock.style.setProperty('--r2-x',`${activeBar.offsetLeft+activeBar.offsetWidth/2-180}px`)}
-function renderR2(){LockRuntime.syncPicks('Risen 2',r2.picks);const bars=[...r2Lock.querySelectorAll('.r2-bar')];bars.forEach((b,i)=>{b.classList.toggle('current',i===r2.pos);b.classList.toggle('open',r2.seq.slice(0,r2.step).includes(i));b.classList.toggle('wrong',i===r2.wrong)});requestAnimationFrame(r2PositionPick);if(r2.failed)r2Status.innerHTML='<strong>Отмычки закончились</strong>перезапусти замок';else if(r2.step<r2.bars&&r2.wrong<0)r2Status.innerHTML='<strong>'+r2.step+' / '+r2.bars+'</strong>задвижек открыто'}
-
-GameHub.register('Risen 2',{reset:r2Reset,open:r2Open,enter:()=>requestAnimationFrame(r2PositionPick),keydown:e=>{const d=directionFromCode(e.code);if(e.code==='KeyR'){r2Reset();return true}if(e.code==='Space'||d==='up'){r2Try();return true}if(d==='left'){r2Move(-1);return true}if(d==='right'){r2Move(1);return true}return false}});
 })();
 (()=>{
 'use strict';

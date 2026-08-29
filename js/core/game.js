@@ -64,6 +64,8 @@ if(mode==='classic'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>НАЙТИ ВСЕ ПАРЫ УЗЛОВ ДО ИСТЕЧЕНИЯ ВРЕМЕНИ</b>';
     }else if(mode==='pipeline'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>СОБРАТЬ МАРШРУТ ОТ ВХОДА ДО ВЫХОДА ДО ЗАПУСКА ПОТОКА</b>';
+    }else if(mode==='wharf'){
+      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ОТКРЫТЬ ЗАДВИЖКИ ПО ПОРЯДКУ</b>';
     }
     if(typeof syncPuzzleRewardClearance==='function') requestAnimationFrame(syncPuzzleRewardClearance);
   }

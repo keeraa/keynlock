@@ -29,9 +29,9 @@ const GAME_DEFINITIONS={
   museum:{title:'Подбор формы отмычки',kind:'native',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
   mass2:{title:'Парные узлы',kind:'native',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
   pipeline:{title:'Трубопровод',kind:'native',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
+  wharf:{title:'Risen 2 — верфь',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
 
   'prototype:bioshock2':{title:'BioShock 2',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
-  'prototype:risen-2':{title:'Risen 2 — верфь',kind:'prototype',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   'prototype:alpha-protocol':{title:'Alpha Protocol',kind:'prototype',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:false,guards:false,birds:false}},
   'prototype:thief-ds':{title:'Thief: Deadly Shadows',kind:'prototype',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:false,guards:false,birds:false}},
   'prototype:kingdom-come':{title:'Kingdom Come',kind:'prototype',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},

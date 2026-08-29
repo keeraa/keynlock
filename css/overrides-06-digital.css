@@ -289,3 +289,62 @@ body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none !important
 @media (max-width:760px){
   .lairHotspotCollection{left:8% !important;top:18% !important;}
 }
+
+/* Lair interaction map: controls now sit on the objects they describe. */
+.lairHotspotAlchemy{left:57.5% !important;top:62% !important;}
+.lairHotspotCity{left:75% !important;top:44% !important;}
+.lairHotspotCollection{left:60% !important;top:45% !important;}
+
+/* Character selection is persistent scene UI rather than a label over Tik. */
+.lairHotspotTeam{
+  left:auto !important;
+  right:1.6% !important;
+  top:auto !important;
+  bottom:3% !important;
+  width:96px !important;
+  min-width:96px !important;
+  height:96px !important;
+  padding:0 !important;
+  overflow:hidden !important;
+  border:2px solid rgba(205,157,78,.86) !important;
+  border-radius:18px !important;
+  background:linear-gradient(145deg,rgba(58,42,27,.96),rgba(17,13,10,.98)) !important;
+  box-shadow:0 10px 30px rgba(0,0,0,.42),inset 0 0 0 2px rgba(255,224,160,.08) !important;
+  backdrop-filter:none !important;
+  transform:none !important;
+}
+.lairHotspotTeam:hover{filter:brightness(1.1) !important;}
+.lairActiveCharacterPortrait{
+  position:absolute;
+  left:50%;
+  top:-7%;
+  width:auto;
+  height:285%;
+  max-width:none;
+  transform:translateX(-50%);
+  object-fit:contain;
+  object-position:center top;
+  pointer-events:none;
+}
+.lairActiveCharacterBadge{
+  position:absolute;
+  left:7px;
+  right:7px;
+  bottom:6px;
+  padding:4px 3px;
+  border-radius:7px;
+  background:rgba(12,9,7,.76);
+  color:#efd18d;
+  font:700 8px/1 var(--ui-font);
+  text-align:center;
+  text-shadow:0 1px 3px #000;
+  pointer-events:none;
+}
+
+@media (max-width:760px){
+  .lairHotspotAlchemy{left:57.5% !important;top:62% !important;}
+  .lairHotspotCity{left:75% !important;top:44% !important;}
+  .lairHotspotCollection{left:60% !important;top:45% !important;}
+  .lairHotspotTeam{right:10px !important;bottom:10px !important;width:72px !important;min-width:72px !important;height:72px !important;border-radius:14px !important;}
+  .lairActiveCharacterBadge{left:4px;right:4px;bottom:4px;font-size:6px;}
+}

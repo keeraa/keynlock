@@ -302,7 +302,6 @@
   document.querySelectorAll('.lairHotspot').forEach(btn=>{
     btn.addEventListener('click',()=>openLairModule(btn.dataset.lairOpen));
   });
-  document.querySelector('#lairWorkbenchHotspot')?.addEventListener('click',openLairWorkbench);
   document.querySelector('#lairWorkbenchClose')?.addEventListener('click',closeLairWorkbench);
   document.querySelector('#lairWorkbenchModal')?.addEventListener('pointerdown',e=>{
     if(e.target===e.currentTarget) closeLairWorkbench();

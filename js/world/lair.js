@@ -15,6 +15,14 @@
   function renderLairScene(){
     if(!$lairSceneCharacters) return;
     renderInventoryAvatar();
+    const activeCharacter=LAIR_CHARACTERS[lairCharacter]||LAIR_CHARACTERS.kai;
+    const activePortrait=document.querySelector('#lairActiveCharacterPortrait');
+    const teamHotspot=document.querySelector('.lairHotspotTeam');
+    if(activePortrait){
+      activePortrait.src=activeCharacter.portrait;
+      activePortrait.alt=activeCharacter.name;
+    }
+    teamHotspot?.setAttribute('aria-label',`Выбор персонажа: ${activeCharacter.name}`);
     const order=['kai','sai','tik'];
     $lairSceneCharacters.innerHTML=order.map((id,index)=>{
       const ch=LAIR_CHARACTERS[id];
@@ -283,7 +291,7 @@
     const scene = document.querySelector('.lairScene');
     if(scene){
       const chars = document.querySelector('.lairSceneCharacters');
-      const spots = () => document.querySelectorAll('.lairHotspot');
+      const spots = () => document.querySelectorAll('.lairHotspot:not(.lairHotspotTeam)');
       // How far the cover-fitted backdrop hangs off each side.
       const roomRange = () => {
         const vw = scene.clientWidth, vh = scene.clientHeight;

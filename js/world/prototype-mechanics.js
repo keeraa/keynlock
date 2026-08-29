@@ -7,7 +7,6 @@
     {id:'hillsfar',name:'Музей Hillsfar',game:'Hillsfar',x:25,y:82},
     {id:'thief-ds',name:'Теневой квартал',game:'Thief: Deadly Shadows',x:48,y:15},
     {id:'kingdom-come',name:'Дом бронника',game:'Kingdom Come',x:64,y:16},
-    {id:'watchmen',name:'Часовая мастерская',game:'Watchmen',x:86,y:34},
     {id:'thief-12',name:'Гильдия воров',game:'Thief 1/2',x:88,y:49},
     {id:'fallout',name:'Старый бункер',game:'Fallout',x:88,y:70},
     {id:'anachronox',name:'Лаборатория Anachronox',game:'Anachronox',x:57,y:86},

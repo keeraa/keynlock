@@ -53,6 +53,8 @@ if(mode==='classic'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>СОВМЕСТИТЬ ТЕКУЩИЙ СИГНАЛ С ЭТАЛОНОМ</b>';
     }else if(mode==='oblivion'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ПОДНЯТЬ И ЗАФИКСИРОВАТЬ ВСЕ ШТИФТЫ</b>';
+    }else if(mode==='watchmen'){
+      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ВЫСТАВИТЬ И ЗАФИКСИРОВАТЬ ВСЕ ТУМБЛЕРЫ ДО ИСТЕЧЕНИЯ ВРЕМЕНИ</b>';
     }
   }
 

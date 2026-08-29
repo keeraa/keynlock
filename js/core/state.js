@@ -131,6 +131,12 @@
   // 'up'|'pause'|'down'),phase,speed,baseSpeed,pinH,apex,set}.
   let obPins=[], obSelected=0, obPinEls=[];
   const OB_READY_MIN=76, OB_READY_MAX=112;
+  // Подпружиненные тумблеры (Watchmen): 5 spring-loaded pins raised/lowered
+  // toward a hidden target height each; nudging one also disturbs its
+  // neighbors (coupled springs), and a countdown adds pressure on top of
+  // the shared pick economy.
+  let wmPins=[], wmSelected=0, wmPinEls=[], wmTimeLeft=16, wmTimeMax=16, wmTimerHandle=null, wmLastTick=0;
+  const WM_SCALE=2.05, WM_LOCK_TOL=3.8, WM_MIN=0, WM_MAX=96, WM_ROUGH_MISS=18;
   const CP_LEVEL_NAMES=['ВЕРХ','ЦЕНТР','НИЗ'];
   let cpNodes=[1,1,1,1,1], cpTarget=[1,1,1,1], cpVals=[1,1,1,1], cpInitial=[1,1,1,1], cpSelected=0, cpReady=false;
   let hcSecret=[0,0,0,0], hcAttempts=[], hcDigits=[0,0,0,0], hcActiveIndex=0;
@@ -170,7 +176,8 @@
         $heatColdMode=document.querySelector('#heatColdMode'), $hcInput=document.querySelector('#hcInput'), $hcDialRow=document.querySelector('#hcDialRow'), $hcSlots=document.querySelector('#hcSlots'), $hcResult=document.querySelector('#hcResult'), $hcRows=document.querySelector('#hcRows'),
         $drumMode=document.querySelector('#drumMode'), $drumWheels=document.querySelector('#drumWheels'), $drumCheck=document.querySelector('#drumCheck'), $drumResult=document.querySelector('#drumResult'), $drumSound=document.querySelector('#drumSound'), $drumNew=document.querySelector('#drumNew'),
         $scopeMode=document.querySelector('#scopeMode'), $scopeCanvas=document.querySelector('#scopeCanvas'), $scopeWheels=document.querySelector('#scopeWheels'), $scopeScore=document.querySelector('#scopeScore'), $scopeBar=document.querySelector('#scopeBar'), $scopeCheck=document.querySelector('#scopeCheck'), $scopeResult=document.querySelector('#scopeResult'), $scopeNew=document.querySelector('#scopeNew'),
-        $obMode=document.querySelector('#obMode'), $obLock=document.querySelector('#obLock'), $obMessage=document.querySelector('#obMessage');
+        $obMode=document.querySelector('#obMode'), $obLock=document.querySelector('#obLock'), $obMessage=document.querySelector('#obMessage'),
+        $wmMode=document.querySelector('#wmMode'), $wmLock=document.querySelector('#wmLock'), $wmHelp=document.querySelector('#wmHelp'), $wmTimerBar=document.querySelector('#wmTimerBar'), $wmOpenBtn=document.querySelector('#wmOpenBtn');
 
   const MODE_PANELS=Object.freeze({
     hillsfar:$hillsfarMode,
@@ -186,13 +193,14 @@
     heatcold:$heatColdMode,
     drum:$drumMode,
     scope:$scopeMode,
-    oblivion:$obMode
+    oblivion:$obMode,
+    watchmen:$wmMode
   });
   const IMPORTED_MODES=new Set(Object.keys(MODE_PANELS));
   const ALL_MODES=new Set(GameCatalog.nativeIds);
 
   const DIFFICULTY_STORAGE_KEY='lockpickModeDifficulty';
-  const DEFAULT_MODE_DIFFICULTY=Object.freeze({classic:1,target:1,line:1,sequence:1,special:1,hillsfar:1,mass:1,g1:1,r2:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,heatcold:1,drum:1,scope:1,oblivion:1});
+  const DEFAULT_MODE_DIFFICULTY=Object.freeze({classic:1,target:1,line:1,sequence:1,special:1,hillsfar:1,mass:1,g1:1,r2:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,heatcold:1,drum:1,scope:1,oblivion:1,watchmen:1});
   function loadModeDifficulty(){
     try{
       const saved=JSON.parse(STORE.getItem(DIFFICULTY_STORAGE_KEY)||'{}');

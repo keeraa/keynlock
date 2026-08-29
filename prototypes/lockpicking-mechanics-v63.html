@@ -212,7 +212,7 @@ button {
 /* Mobile controls */ .sf-lock,.me1-arena {
   touch-action:none
 }
-.btn,.tab,.bs1-tile,.tumbler-slot,.wm-slot,.hill-pick,.me2-node,.pick-type {
+.btn,.tab,.bs1-tile,.tumbler-slot,.hill-pick,.me2-node,.pick-type {
   -webkit-tap-highlight-color:transparent
 }
 @media(max-width:650px) {
@@ -234,10 +234,10 @@ button {
     min-height:46px;
     touch-action:manipulation
   }
-  .museum-actions,.bio-actions,.r2-actions,.wm-controls,.bs1-actions {
+  .museum-actions,.bio-actions,.r2-actions,.bs1-actions {
     width:100%
   }
-  .museum-actions .btn,.bio-actions .btn,.r2-actions .btn,.wm-controls .btn,.bs1-actions .btn {
+  .museum-actions .btn,.bio-actions .btn,.r2-actions .btn,.bs1-actions .btn {
     flex:1 1 112px
   }
   .me2-node {
@@ -250,7 +250,7 @@ button {
     min-height:72px;
     touch-action:none
   }
-  .bs1-tile,.tumbler-slot,.wm-slot,.hill-pick {
+  .bs1-tile,.tumbler-slot,.hill-pick {
     touch-action:manipulation
   }
   .tds-lock,.kcd-lock,.sf-lock {
@@ -609,140 +609,6 @@ button {
     gap:5px
   }
 }
-/* Watchmen */
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-wrap {
-  width:min(650px,100%);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:18px
-}
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-lock {
-  width:100%;
-  height:350px;
-  border:2px solid #4d5050;
-  border-radius:18px;
-  background:linear-gradient(180deg,#323737 0 16%,#121616 16% 100%);
-  box-shadow:inset 0 0 38px #000,0 15px 30px rgba(0,0,0,.28);
-  padding:34px 18px 26px;
-  display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  align-items:stretch;
-  gap:8px;
-  position:relative
-}
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-slot {
-  min-width:0;
-  position:relative;
-  border-left:1px solid rgba(255,255,255,.06);
-  border-right:1px solid rgba(0,0,0,.45)
-}
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-spring {
-  position:absolute;
-  left:50%;
-  top:5px;
-  width:22px;
-  height:64px;
-  transform:translateX(-50%);
-  background:repeating-linear-gradient(180deg,transparent 0 5px,#8e918a 5px 7px);
-  opacity:.72
-}
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-pin {
-  position:absolute;
-  left:20%;
-  right:20%;
-  bottom:22px;
-  height:112px;
-  transform:translateY(calc(-1px * var(--wm-rise,0)));
-  transition:transform .08s linear;
-  background:linear-gradient(90deg,#7d6b4d 0 42%,#c2c5bf 42% 100%);
-  border:2px solid #5b5f5a;
-  border-radius:7px 7px 2px 2px
-}
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-pin:before {
-  content:"";
-  position:absolute;
-  left:-8%;
-  right:-8%;
-  top:-14px;
-  height:17px;
-  border-radius:50%;
-  background:#b9bbb4;
-  border:1px solid #595d58
-}
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-pin:after {
-  content:"";
-  position:absolute;
-  left:-12%;
-  right:-12%;
-  bottom:7px;
-  height:6px;
-  border-top:2px solid #e2c87f;
-  border-bottom:2px solid #e2c87f;
-  background:#27271f;
-  box-shadow:0 0 5px rgba(226,200,127,.22)
-}
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-slot.selected {
-  background:linear-gradient(180deg,transparent,rgba(214,184,113,.06))
-}
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-slot.locked .wm-pin {
-  background:linear-gradient(90deg,#536542 0 42%,#a4c482 42% 100%);
-  box-shadow:0 0 12px rgba(126,190,112,.24)
-}
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-controls {
-  display:flex;
-  gap:10px;
-  flex-wrap:nowrap;
-  justify-content:center;
-  align-items:center
-}
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-help {
-  min-height:20px;
-  color:#bcb39a;
-  text-align:center;
-  font-size:12px
-}
-
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-slot {
-  cursor:pointer
-}
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-slot::before,
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-slot::after {
-  content:"";
-  position:absolute;
-  left:0;
-  right:0;
-  height:50%;
-  pointer-events:none
-}
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-slot::before { top:0 }
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-slot::after { bottom:0 }
-@media(max-width:650px) {
-  .lockpick-prototype .scene[data-name="Watchmen"] .wm-lock {
-    padding-inline:16px;
-    gap:6px
-  }
-}
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-target {
-  position:absolute;
-  left:10%;
-  right:10%;
-  bottom:calc(34px + var(--wm-target,70) * 2.05px);
-  height:20px;
-  transform:translateY(50%);
-  border-top:2px solid rgba(214,184,113,.72);
-  border-bottom:2px solid rgba(214,184,113,.72);
-  background:rgba(214,184,113,.08);
-  pointer-events:none;
-  z-index:2
-}
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-slot.lockable .wm-target {
-  background:rgba(214,184,113,.17);
-  border-color:#e8c977
-}
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-slot.lockable {
-  box-shadow:inset 0 0 0 1px rgba(214,184,113,.48),0 0 16px rgba(214,184,113,.12)
-}
 /* Трубопровод */
 .lockpick-prototype .scene[data-name="Трубопровод"] .bs1-wrap {
   width:min(620px,100%);
@@ -956,8 +822,6 @@ button {
 
 .lockpick-prototype .scene[data-name="Трубопровод"] .bs1-msg {display:none}
 
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-time {width:100%;height:9px;background:#0b0e0b;border:1px solid #33392f;border-radius:99px;overflow:hidden}
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-time span {display:block;height:100%;width:100%;background:#9e8253;transition:width .08s linear}
 /* Thief 1/2 */
 .lockpick-prototype .scene[data-name="Thief 1/2"] .th12-door {
   width:min(430px,100%);
@@ -1848,15 +1712,6 @@ button {
   }
 }
 
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-open-btn{
-  width:min(260px,100%);
-  align-self:center
-}
-.lockpick-prototype .scene[data-name="Watchmen"] .wm-open-btn:disabled{
-  opacity:.38;
-  cursor:default;
-  box-shadow:none
-}
 html.embedded{--bg:#17100a;--panel:#261a10;--panel2:#352516;--line:#71512b;--line2:#a6783d;--ink:#eee0c0;--muted:#b7a17c;--gold:#d8b871;--good:#c69b52;--blue:#b98443}
 html.embedded,html.embedded body{width:100%;height:100%;overflow:hidden;background:transparent;color:#ead7ad}
 html.embedded .app{width:100%;height:100%;padding:0}
@@ -1912,10 +1767,6 @@ html.embedded .scene[data-name="Risen 2"] .lab{align-items:flex-start}
     <section class="scene" data-name="Kingdom Come" data-tab-check="true">
           <div class="scene-head"><div><div class="scene-title-row"><h2>Вращающийся замок</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="kcdStatus"><strong>Ищи рабочую точку</strong>двигай отмычку внутри замка</div></div>
           <div class="lab"><div class="kcd-board"><div class="kcd-lock" id="kcdLock"><div class="kcd-rotor"></div><div class="keyway"></div><div class="feedback"></div><div class="pick"></div></div><div class="meters"><div><div class="meter-head"><span>Поворот</span><span id="kcdProgressText">0%</span></div><div class="bar"><span id="kcdProgressBar"></span></div></div><div><div class="meter-head"><span>Напряжение</span><span id="kcdStressText">0%</span></div><div class="bar"><span id="kcdStressBar"></span></div></div></div><button class="btn" id="kcdTurn">Удерживать вращение · Space</button><button class="btn" id="kcdReset">Новый замок</button></div></div>
-        </section>
-    <section class="scene" data-name="Watchmen">
-          <div class="scene-head"><div><div class="scene-title-row"><h2>Подпружиненные тумблеры</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="wmStatus"><strong>0 / 5</strong>тумблеров зафиксировано</div></div>
-          <div class="lab"><div class="wm-wrap"><div class="wm-time"><span id="wmTimer"></span></div><div class="wm-lock" id="wmLock"></div><div class="wm-help" id="wmHelp"></div><div class="wm-controls"><button class="btn" id="wmLockBtn">Зафиксировать · Space</button><button class="btn" id="wmReset">Обновить</button></div><button class="btn wm-open-btn" id="wmOpen" disabled>Открыть замок</button></div></div>
         </section>
     <section class="scene" data-name="Thief 1/2" data-tab-check="true">
           <div class="scene-head"><div><div class="scene-title-row"><h2>Пять профилей отмычки</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="th12Status"><strong>Стадия 1 / 5</strong>подбери профиль</div></div>
@@ -2250,93 +2101,6 @@ function r2Open(){if(r2.failed||r2.step<r2.bars){r2Status.innerHTML='<strong>З�
 function renderR2(){LockRuntime.syncPicks('Risen 2',r2.picks);const bars=[...r2Lock.querySelectorAll('.r2-bar')];bars.forEach((b,i)=>{b.classList.toggle('current',i===r2.pos);b.classList.toggle('open',r2.seq.slice(0,r2.step).includes(i));b.classList.toggle('wrong',i===r2.wrong)});r2Lock.style.setProperty('--r2-x',`calc(${((r2.pos+.5)/r2.bars)*100}% - 36px)`);if(r2.failed)r2Status.innerHTML='<strong>Отмычки закончились</strong>перезапусти замок';else if(r2.step<r2.bars&&r2.wrong<0)r2Status.innerHTML='<strong>'+r2.step+' / '+r2.bars+'</strong>задвижек открыто'}
 
 GameHub.register('Risen 2',{reset:r2Reset,open:r2Open,keydown:e=>{const d=directionFromCode(e.code);if(e.code==='KeyR'){r2Reset();return true}if(e.code==='Space'||d==='up'){r2Try();return true}if(d==='left'){r2Move(-1);return true}if(d==='right'){r2Move(1);return true}return false}});
-})();
-(()=>{
-'use strict';
-// Portable game module: watchmen
-// Watchmen-inspired
-const wmLock=document.getElementById('wmLock'),wmStatus=document.getElementById('wmStatus'),wmHelp=document.getElementById('wmHelp');
-const WM_SCALE=2.05,WM_LOCK_TOL=3.8,WM_TIME=16,WM_MAX_PICKS=LockRuntime.DEFAULT_PICKS,WM_MIN=0,WM_MAX=96,WM_ROUGH_MISS=18;let wm={pins:[],sel:0,time:WM_TIME,last:performance.now(),failed:false,picks:WM_MAX_PICKS};
-function wmReset(){LockRuntime.resetOpen('Watchmen');
-  wm.sel=0;wm.time=WM_TIME;wm.failed=false;wm.last=performance.now();wm.picks=WM_MAX_PICKS;
-  const invertCount=Math.random()<.5?1:2,order=[0,1,2,3,4];
-  for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]]}
-  const inverted=new Set(order.slice(0,invertCount));
-  wm.pins=Array.from({length:5},(_,i)=>({h:10+Math.random()*20,target:58+Math.random()*30,locked:false,weight:.7+Math.random()*.7,inverted:inverted.has(i)}));
-  wmLock.innerHTML='';
-  wm.pins.forEach((p,i)=>{const s=document.createElement('div');s.className='wm-slot';s.dataset.i=i;s.innerHTML='<div class="wm-spring"></div><div class="wm-target"></div><div class="wm-pin"></div>';s.style.setProperty('--wm-target',p.target.toFixed(1));s.addEventListener('pointerdown',e=>{const r=s.getBoundingClientRect();wm.sel=i;wmHelp.textContent='';if(Math.abs((e.clientY-r.top)-r.height/2)<16){renderWm();return}if(e.clientY-r.top<r.height/2)wmRaise();else wmLower()});wmLock.appendChild(s)});
-  wmHelp.textContent='';
-  renderWm()
-}
-function wmMove(d){if(wm.failed)return;wm.sel=(wm.sel+d+wm.pins.length)%wm.pins.length;wmHelp.textContent='';renderWm()}
-function wmAdjust(dir){
-  if(wm.failed)return;
-  const p=wm.pins[wm.sel];
-  if(p.locked)return;
-  wmHelp.textContent='';
-  const actual=p.inverted?-dir:dir,delta=5*p.weight*actual;
-  const next=p.h+delta;
-  if((actual>0&&p.h>=WM_MAX-1)||(actual<0&&p.h<=WM_MIN+1)){
-    wmBreakPick('Штифт упёрся в стену — сломалась отмычка.');
-    renderWm();
-    return;
-  }
-  p.h=Math.max(WM_MIN,Math.min(WM_MAX,next));
-  wm.pins.forEach((q,i)=>{
-    if(i!==wm.sel&&!q.locked){
-      const dist=Math.abs(i-wm.sel);
-      if(dist===1)q.h=Math.max(WM_MIN,Math.min(WM_MAX,q.h+actual*(Math.random()>.45?3.5:-2)));
-      else if(dist===2)q.h=Math.max(WM_MIN,Math.min(WM_MAX,q.h-actual));
-    }
-  });
-  renderWm()
-}
-function wmRaise(){wmAdjust(1)}
-function wmLower(){wmAdjust(-1)}
-function wmCanLock(i){const p=wm.pins[i];return !p.locked&&Math.abs(p.h-p.target)<=WM_LOCK_TOL}
-function wmBreakPick(msg){
-  wm.picks--;
-  if(wm.picks<=0){
-    wm.picks=0;
-    wm.failed=true;
-    wmHelp.textContent='Отмычки закончились.'
-  }else wmHelp.textContent=msg||`Грубая ошибка — сломалась отмычка. Осталось ${wm.picks}.`;
-}
-function wmTryLock(){
-  if(wm.failed)return;
-  const p=wm.pins[wm.sel];
-  if(p.locked)return;
-  const miss=Math.abs(p.h-p.target);
-  if(wmCanLock(wm.sel)){
-    p.locked=true;
-    wmHelp.textContent='Тумблер зафиксирован.'
-  }else if(miss>=WM_ROUGH_MISS){
-    p.h=Math.max(WM_MIN,p.h-18);
-    wm.pins.forEach(q=>{if(!q.locked)q.h=Math.max(WM_MIN,q.h-4)});
-    wmBreakPick()
-  }else{
-    p.h=Math.max(WM_MIN,p.h-12);
-    wm.pins.forEach(q=>{if(!q.locked)q.h=Math.max(WM_MIN,q.h-3)});
-    wmHelp.textContent='Промах: штифт сорвался.'
-  }
-  renderWm()
-}
-function renderWm(){LockRuntime.syncPicks('Watchmen',wm.picks);
-  wm.pins.forEach((p,i)=>{const s=wmLock.querySelector('.wm-slot[data-i="'+i+'"]');if(!s)return;s.classList.toggle('selected',i===wm.sel);s.classList.toggle('locked',p.locked);s.classList.toggle('lockable',!wm.failed&&wmCanLock(i));s.querySelector('.wm-pin').style.setProperty('--wm-rise',(p.h*WM_SCALE).toFixed(1))});
-  const n=wm.pins.filter(p=>p.locked).length,cur=wm.pins[wm.sel];
-  document.getElementById('wmTimer').style.width=Math.max(0,wm.time/WM_TIME*100)+'%';
-  
-  if(wm.failed&&wm.time<=0)wmHelp.textContent='Время вышло — начни заново.';
-  else if(cur.locked&&wmHelp.textContent==='')wmHelp.textContent='Этот тумблер уже зафиксирован.';
-  document.getElementById('wmLockBtn').classList.toggle('active',!wm.failed&&wmCanLock(wm.sel));
-  if(wm.failed)wmStatus.innerHTML='<strong>Попытка провалена</strong>начни новый замок';
-  else if(LockRuntime.isOpen('Watchmen'))wmStatus.innerHTML='<strong>Замок открыт</strong>все штифты выставлены';else wmStatus.innerHTML=n===5?'<strong>Все штифты выставлены</strong>можно открыть замок':'<strong>'+n+' / 5</strong>тумблеров зафиксировано';const openBtn=document.getElementById('wmOpen');if(openBtn)openBtn.disabled=wm.failed||n!==5||LockRuntime.isOpen('Watchmen')
-}
-function wmOpen(){if(wm.failed||wm.pins.filter(p=>p.locked).length!==wm.pins.length)return;LockRuntime.open('Watchmen',{statusEl:wmStatus,statusHtml:'<strong>Замок открыт</strong>все штифты выставлены',messageEl:wmHelp,message:'Замок открыт.'});renderWm()}
-function wmLoop(now){const dt=Math.min(.04,(now-wm.last)/1000);wm.last=now;if(activeName()==='Watchmen'&&!wm.failed&&wm.pins.length){const done=wm.pins.filter(p=>p.locked).length===wm.pins.length;if(!done){wm.time=Math.max(0,wm.time-dt);if(wm.time<=0){wm.time=0;wm.failed=true}renderWm()}}}
-document.getElementById('wmLockBtn').onclick=wmTryLock;document.getElementById('wmReset').onclick=wmReset;document.getElementById('wmOpen').onclick=wmOpen;
-
-GameHub.register('Watchmen',{reset:wmReset,tick:wmLoop,keydown:e=>{const d=directionFromCode(e.code);if(e.code==='KeyR'){wmReset();return true}if(e.code==='Space'){wmTryLock();return true}if(d==='left'){wmMove(-1);return true}if(d==='right'){wmMove(1);return true}if(d==='up'){wmRaise();return true}if(d==='down'){wmLower();return true}return false}});
 })();
 (()=>{
 'use strict';

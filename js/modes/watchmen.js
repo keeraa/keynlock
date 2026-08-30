@@ -1,4 +1,7 @@
+(function(){
   // ===== WATCHMEN (Подпружиненные тумблеры) =====
+  let wmPins=[], wmSelected=0, wmPinEls=[], wmTimeLeft=16, wmTimeMax=16;
+  const WM_SCALE=2.05, WM_LOCK_TOL=3.8, WM_MIN=0, WM_MAX=96, WM_ROUGH_MISS=18;
   // Five spring-loaded pins, each with a hidden target height. Raising or
   // lowering the selected pin also nudges its neighbors (coupled springs;
   // some pins are randomly "inverted" and move opposite to the input), and
@@ -44,7 +47,6 @@
     wmSelected=0;
     wmTimeMax=diffStep(20,16,12);
     wmTimeLeft=wmTimeMax;
-    wmLastTick=performance.now();
     const invertCount=Math.random()<.5?1:2;
     const order=[0,1,2,3,4];
     for(let i=order.length-1;i>0;i--){
@@ -211,3 +213,20 @@
     renderWatchmen();
     setTimeout(()=>celebrate(),420);
   }
+
+  PuzzleModes.register({
+    id:'watchmen',
+    start:startWatchmenRound,
+    render:renderWatchmen,
+    tick:({dt})=>wmTick(Math.min(.04,dt/1000)),
+    resize:()=>{ wmApplyGeometry(); renderWatchmen(); },
+    objective:()=>GameCatalog.get('watchmen')?.objective,
+    restartMessage:'Новые подпружиненные тумблеры',
+    input:{
+      horizontal:wmMove,
+      vertical:delta=>delta<0?wmRaise():wmLower()
+    },
+    actions:{primary:wmTryLock},
+    attemptOpen:tryOpenWatchmen
+  });
+})();

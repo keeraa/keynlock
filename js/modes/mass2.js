@@ -1,4 +1,7 @@
+(function(){
   // ===== MASS2 (Mass Effect 2: Парные узлы) =====
+  const M2_SYMBOLS=['◈','⌁','Ψ','⊙','✦','⌬','☿','♀'], M2_HOLD_MS=900;
+  let m2Nodes=[], m2Sel=-1, m2Matched=new Set(), m2Kb=0, m2Lock=false, m2UnlockTimer=0, m2TimeLeft=40, m2TimeMax=40, m2NodeEls=[];
   // Memory-match: 16 nodes (8 symbols × 2), symbols hidden until hovered
   // (mouse) or held for M2_HOLD_MS (touch). Pick two — a match stays
   // revealed, a miss briefly reveals both before hiding again. A countdown
@@ -183,3 +186,20 @@
     renderMass2();
     setTimeout(()=>celebrate(),420);
   }
+
+  PuzzleModes.register({
+    id:'mass2',
+    start:startMass2Round,
+    render:renderMass2,
+    tick:({dt})=>m2Tick(Math.min(.05,dt/1000)),
+    syncHud:renderMass2Hud,
+    objective:()=>GameCatalog.get('mass2')?.objective,
+    restartMessage:'Новая схема парных узлов',
+    input:{
+      horizontal:dir=>m2MoveKb(dir<0?'left':'right'),
+      vertical:dir=>m2MoveKb(dir<0?'up':'down')
+    },
+    actions:{primary:()=>m2Click(m2Kb)},
+    attemptOpen:tryOpenMass2
+  });
+})();

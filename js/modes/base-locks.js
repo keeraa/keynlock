@@ -309,12 +309,6 @@ let plateEls=[], pinTopPlateEls=[];
       startDrumRound();
     }else if(mode==='scope'){
       startScopeRound();
-    }else if(mode==='oblivion'){
-      startOblivionRound();
-    }else if(mode==='watchmen'){
-      startWatchmenRound();
-    }else if(mode==='mass2'){
-      startMass2Round();
     }else if(mode==='wharf'){
       startWharfRound();
     }else if(mode==='thiefds'){
@@ -358,9 +352,6 @@ let plateEls=[], pinTopPlateEls=[];
       mode==='deduction' ? 'Новый слепок ключа' :
       mode==='heatcold' ? 'Новый цифровой код' :
       mode==='drum' ? 'Новый барабанный замок' :
-      mode==='oblivion' ? 'Новый штифтовый замок' :
-      mode==='watchmen' ? 'Новые тумблеры' :
-      mode==='mass2' ? 'Новая схема узлов' :
       mode==='wharf' ? 'Новый набор задвижек' :
       mode==='thiefds' ? 'Новый замок' :
       mode==='kingdomcome' ? 'Новый замок' :
@@ -393,9 +384,6 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='heatcold'){ startHeatColdRound(); toast('Цифровой код обновлён'); return; }
     if(mode==='drum'){ startDrumRound(); toast('Барабанный замок обновлён'); return; }
     if(mode==='scope'){ startScopeRound(); toast('Сигнал обновлён'); return; }
-    if(mode==='oblivion'){ startOblivionRound(); toast('Штифтовый замок обновлён'); return; }
-    if(mode==='watchmen'){ startWatchmenRound(); toast('Тумблеры обновлены'); return; }
-    if(mode==='mass2'){ startMass2Round(); toast('Схема узлов обновлена'); return; }
     if(mode==='wharf'){ startWharfRound(); toast('Задвижки обновлены'); return; }
     if(mode==='thiefds'){ startThiefDsRound(); toast('Замок обновлён'); return; }
     if(mode==='kingdomcome'){ startKingdomComeRound(); toast('Замок обновлён'); return; }
@@ -453,9 +441,6 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='anach') return moveAn(dir);
     if(mode==='skyrim') return moveSkyrim(dir);
     if(mode==='r2') return moveR2(dir);
-    if(mode==='oblivion') return obMove(dir);
-    if(mode==='watchmen') return wmMove(dir);
-    if(mode==='mass2') return m2MoveKb(dir<0?'left':'right');
     if(mode==='wharf') return wfMove(dir);
     if(mode==='thiefds') return tdsMove(dir);
     if(mode==='kingdomcome') return kcdKeyMove(dir<0?'left':'right');
@@ -559,10 +544,10 @@ let plateEls=[], pinTopPlateEls=[];
     g1:()=>tryOpenG1(),
     hillsfar:()=>tryOpenHillsfar(),
     mass:()=>tryOpenMass(),
-    oblivion:()=>tryOpenOblivion(),
-    watchmen:()=>tryOpenWatchmen(),
+    oblivion:()=>PuzzleModes.call('oblivion','attemptOpen'),
+    watchmen:()=>PuzzleModes.call('watchmen','attemptOpen'),
     museum:()=>PuzzleModes.call('museum','attemptOpen'),
-    mass2:()=>tryOpenMass2(),
+    mass2:()=>PuzzleModes.call('mass2','attemptOpen'),
     pipeline:()=>PuzzleModes.call('pipeline','attemptOpen'),
     wharf:()=>tryOpenWharf(),
     thiefds:()=>tryOpenThiefDs(),
@@ -585,18 +570,6 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='skyrim'){ if(delta<0) GameActions.attemptOpen({modeId:'skyrim',source:'keyboard'}); return; }
     if(mode==='r2'){
       if(delta<0) return attemptR2Pin();
-      return;
-    }
-    if(mode==='oblivion'){
-      if(delta<0) obClick(obSelected);
-      return;
-    }
-    if(mode==='watchmen'){
-      if(delta<0) wmRaise(); else wmLower();
-      return;
-    }
-    if(mode==='mass2'){
-      m2MoveKb(delta<0?'up':'down');
       return;
     }
     if(mode==='wharf'){
@@ -632,15 +605,11 @@ let plateEls=[], pinTopPlateEls=[];
     for(let i=0;i<n;i++) updatePlateVisual(i);
 
     updatePickUI();
-    if(mode==='tension'||mode==='resonance'||mode==='deduction'||mode==='composite'){ $mechanism.classList.remove('ready'); }
+    if(PuzzleModes.has(mode)){ $mechanism.classList.remove('ready'); }
+    else if(mode==='tension'||mode==='resonance'||mode==='deduction'){ $mechanism.classList.remove('ready'); }
     else if(mode==='anach'){ $mechanism.classList.remove('ready'); }
     else if(mode==='skyrim'){ $mechanism.classList.remove('ready'); }
     else if(mode==='r2'){ $mechanism.classList.remove('ready'); }
-    else if(mode==='oblivion'){ $mechanism.classList.remove('ready'); }
-    else if(mode==='watchmen'){ $mechanism.classList.remove('ready'); }
-    else if(mode==='museum'){ $mechanism.classList.remove('ready'); }
-    else if(mode==='mass2'){ $mechanism.classList.remove('ready'); }
-    else if(mode==='pipeline'){ $mechanism.classList.remove('ready'); }
     else if(mode==='wharf'){ $mechanism.classList.remove('ready'); }
     else if(mode==='thiefds'){ $mechanism.classList.remove('ready'); }
     else if(mode==='kingdomcome'){ $mechanism.classList.remove('ready'); }
@@ -734,16 +703,7 @@ let plateEls=[], pinTopPlateEls=[];
       if(tnTension>98){tnTension=98;tnDrift=-Math.abs(tnDrift);}
       if($tnNeedle) $tnNeedle.style.left=`${tnTension}%`;
     }
-    if(mode==='oblivion' && !solved){
-      obTick(Math.min(.035,dt/1000));
-    }
-    if(mode==='watchmen' && !solved){
-      wmTick(Math.min(.04,dt/1000));
-    }
     if(!solved) PuzzleModes.call(mode,'tick',{now,dt});
-    if(mode==='mass2' && !solved){
-      m2Tick(Math.min(.05,dt/1000));
-    }
     if(mode==='thiefds' && !solved){
       tdsTick(Math.min(.05,dt/1000));
     }

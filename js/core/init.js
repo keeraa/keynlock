@@ -295,11 +295,8 @@
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='resonance'&&e.code==='Space'){e.preventDefault();hitResonance();}});
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='tension'&&e.code==='Space'){e.preventDefault();setTensionPin();}});
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='deduction'&&e.code==='Space'){e.preventDefault();checkDeduction();}});
-  addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='oblivion'&&e.code==='Space'){e.preventDefault();obClick(obSelected);}});
-  addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='watchmen'&&e.code==='Space'){e.preventDefault();wmTryLock();}});
   $wmOpenBtn?.addEventListener('click',()=>GameActions.attemptOpen({modeId:'watchmen',source:'puzzle-control'}));
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&e.code==='Space'&&PuzzleModes.action(mode,'primary')) e.preventDefault();});
-  addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='mass2'&&e.code==='Space'){e.preventDefault();m2Click(m2Kb);}});
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='thiefds'&&e.code==='Space'){e.preventDefault();tdsCommit();}});
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='kingdomcome'&&e.code==='Space'&&!e.repeat){e.preventDefault();kcdSetTurning(true);}});
   addEventListener('keyup',e=>{if(mode==='kingdomcome'&&e.code==='Space'){kcdSetTurning(false);}});

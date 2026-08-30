@@ -121,23 +121,6 @@
   let tnTension=40, tnTarget=52, tnWidth=18, tnIndex=0, tnDrift=.05, tnDragging=false, tnReady=false;
   let rsIndex=0, rsT=0, rsSpeeds=[], rsBaseSpeeds=[], rsSpeedTargets=[], rsSpeedChangeAt=[], rsPauseUntil=[], rsOffsets=[], rsPhases=[], rsLaneEls=[], rsOrbEls=[], rsReady=false;
   let kdVals=[2,2,2,2,2], kdTarget=[2,2,2,2,2], kdSelected=0, kdTests=0, kdFailures=0, kdLogs=[], kdReady=false;
-  // Штифтовый замок (Oblivion): each pin springs up on its own timer, pauses
-  // briefly at its own apex height, then falls — click/select during that
-  // pause to set it. obPins holds one record per pin: {rise,state('idle'|
-  // 'up'|'pause'|'down'),phase,speed,baseSpeed,pinH,apex,set}.
-  let obPins=[], obSelected=0, obPinEls=[];
-  const OB_READY_MIN=76, OB_READY_MAX=112;
-  // Подпружиненные тумблеры (Watchmen): 5 spring-loaded pins raised/lowered
-  // toward a hidden target height each; nudging one also disturbs its
-  // neighbors (coupled springs), and a countdown adds pressure on top of
-  // the shared pick economy.
-  let wmPins=[], wmSelected=0, wmPinEls=[], wmTimeLeft=16, wmTimeMax=16, wmTimerHandle=null, wmLastTick=0;
-  const WM_SCALE=2.05, WM_LOCK_TOL=3.8, WM_MIN=0, WM_MAX=96, WM_ROUGH_MISS=18;
-  // Mass Effect 2 (Парные узлы): memory-match — 16 nodes (8 symbols × 2),
-  // hidden until hovered (mouse) or held (touch), find all 8 pairs against
-  // a countdown.
-  const M2_SYMBOLS=['◈','⌁','Ψ','⊙','✦','⌬','☿','♀'], M2_HOLD_MS=900;
-  let m2Nodes=[], m2Sel=-1, m2Matched=new Set(), m2Kb=0, m2Lock=false, m2UnlockTimer=0, m2TimeLeft=40, m2TimeMax=40, m2NodeEls=[];
   let wfSequence=[], wfStep=0, wfPos=0, wfWrong=-1, wfStress=0, wfBarEls=[], wfBarCount=6;
   let tdsRingSymbols=[], tdsOrder=[], tdsStep=0, tdsSelectedRing=0, tdsAngle=0, tdsTargets=[], tdsHot=false, tdsDone=new Set(), tdsFailed=false, tdsTimeLeft=22, tdsTimeMax=22, tdsDownInfo=null, tdsRingEls=[], tdsSeqEls=[];
   let kcdSweetR=.25, kcdSweetA=0, kcdRot=0, kcdStress=0, kcdTurning=false, kcdPointerX=.5, kcdPointerY=.5, kcdTolerance=.082, kcdTargetRot=220;

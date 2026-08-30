@@ -15,7 +15,6 @@
     if(mode!=='hillsfar') clearHillsfarTimer();
     if(mode==='hillsfar') setGlobalTimer(true, hfTimeLeft || hfTimeMax, hfTimeMax || 1, 'ТАЙМЕР');
     else if(PuzzleModes.call(mode,'syncHud')){}
-    else if(mode==='mass2') setGlobalTimer(true, m2TimeLeft || m2TimeMax, m2TimeMax || 1, 'ТАЙМЕР');
     else if(mode==='thiefds') setGlobalTimer(!tdsFailed, tdsTimeLeft||tdsTimeMax, tdsTimeMax||1, 'ТАЙМЕР');
     else if(mode==='thief12') setGlobalTimer(!th12Failed, th12TimeLeft||th12TimeMax, th12TimeMax||1, 'ТАЙМЕР');
     else if(mode==='alphaprotocol') setGlobalTimer(apTimeLeft>0, apTimeLeft||apTimeMax, apTimeMax||1, 'ТАЙМЕР');
@@ -57,12 +56,6 @@
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ВЫСТАВИТЬ 4 БАРАБАНА ПО СИЛЕ ЩЕЛЧКА</b>';
     }else if(mode==='scope'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>СОВМЕСТИТЬ ТЕКУЩИЙ СИГНАЛ С ЭТАЛОНОМ</b>';
-    }else if(mode==='oblivion'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ПОДНЯТЬ И ЗАФИКСИРОВАТЬ ВСЕ ШТИФТЫ</b>';
-    }else if(mode==='watchmen'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ВЫСТАВИТЬ И ЗАФИКСИРОВАТЬ ВСЕ ТУМБЛЕРЫ ДО ИСТЕЧЕНИЯ ВРЕМЕНИ</b>';
-    }else if(mode==='mass2'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>НАЙТИ ВСЕ ПАРЫ УЗЛОВ ДО ИСТЕЧЕНИЯ ВРЕМЕНИ</b>';
     }else if(mode==='wharf'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ОТКРЫТЬ ЗАДВИЖКИ ПО ПОРЯДКУ</b>';
     }else if(mode==='thiefds'){

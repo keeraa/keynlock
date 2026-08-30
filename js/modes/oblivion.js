@@ -1,4 +1,7 @@
+(function(){
   // ===== OBLIVION (Штифтовый замок) =====
+  let obPins=[], obSelected=0, obPinEls=[];
+  const OB_READY_MIN=76, OB_READY_MAX=112;
   // Five independent pins. Each one springs upward on its own timer, pauses
   // briefly right at its own apex height, then falls back down if nothing
   // happens — clicking/selecting it during that pause sets it in place.
@@ -184,3 +187,19 @@
     renderOblivion();
     setTimeout(()=>celebrate(),420);
   }
+
+  PuzzleModes.register({
+    id:'oblivion',
+    start:startOblivionRound,
+    render:renderOblivion,
+    tick:({dt})=>obTick(Math.min(.035,dt/1000)),
+    objective:()=>GameCatalog.get('oblivion')?.objective,
+    restartMessage:'Новый штифтовый замок',
+    input:{
+      horizontal:obMove,
+      vertical:delta=>{ if(delta<0) obClick(obSelected); }
+    },
+    actions:{primary:()=>obClick(obSelected)},
+    attemptOpen:tryOpenOblivion
+  });
+})();

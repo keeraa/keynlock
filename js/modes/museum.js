@@ -85,7 +85,9 @@
       $hmPicks.replaceChildren(frag);
     }
     hmPickEls.forEach((b,i)=>b.classList.toggle('kbFocus',i===hmKb));
-    if($hmHelp) $hmHelp.textContent=solved?'Замок открыт — все профили подобраны':'';
+    if($hmHelp) $hmHelp.textContent=solved
+      ? 'Замок открыт — все профили подобраны'
+      : 'Сопоставь профиль текущего тумблера с формой в нижнем наборе. Закрытый наполовину профиль определи по видимой части.';
     renderMuseumHud();
   }
 

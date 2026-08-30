@@ -26,7 +26,7 @@ const GAME_DEFINITIONS={
   scope:{title:'Осциллограф',kind:'native',lock:{present:false,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
   oblivion:{title:'Штифтовый замок',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
   watchmen:{title:'Подпружиненные тумблеры',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
-  museum:{title:'Подбор формы отмычки',kind:'native',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
+  museum:{title:'Подбор формы отмычки',description:'Сопоставляй профиль текущего тумблера с формой в нижнем наборе. Частично закрытый профиль нужно узнать по видимой половине, а заклинивший — выбрать повторно.',kind:'native',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
   mass2:{title:'Парные узлы',kind:'native',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
   pipeline:{title:'Трубопровод',kind:'native',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
   wharf:{title:'Risen 2 — верфь',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},

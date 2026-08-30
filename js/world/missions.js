@@ -243,7 +243,8 @@
     if (loc?.action === 'mission' && $mapInfoText) {
       const supported=gameSupportsTier(loc.mode,mapChapter);
       const cleared = missionCleared(loc.mode, mapChapter);
-      $mapInfoText.textContent = supported?`Замок этого типа, сложность ${mapChapter}. `
+      const description=GameCatalog.get(loc.mode)?.description;
+      $mapInfoText.textContent = supported?`${description||'Головоломка с замком.'} Сложность ${mapChapter}. `
         + (cleared ? 'Уже пройден в этой главе. ' : '')
         + 'Нажми на точку ещё раз, чтобы начать.':`Уровень ${mapChapter} для этой игры ещё не готов.`;
     }

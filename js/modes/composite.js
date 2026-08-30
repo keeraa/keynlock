@@ -1,4 +1,7 @@
+(function(){
   // ===== COMPOSITE PICK — CONTINUOUS BUILDER =====
+  const CP_LEVEL_NAMES=['ВЕРХ','ВЫШЕ','НИЖЕ','НИЗ'];
+  let cpNodes=[1,1,1,1], cpTarget=[1,1,1,1], cpVals=[1,1,1,1], cpInitial=[1,1,1,1], cpSelected=-1, cpReady=false;
   const CP_XS=[0,160,320,480,640];
   const CP_PIN_COUNT=4;
   const CP_LEVEL_Y=[10,20,30,40];
@@ -273,3 +276,22 @@
     renderComposite();
     setTimeout(()=>celebrate(),420);
   }
+
+  PuzzleModes.register({
+    id:'composite',
+    start:startCompositeRound,
+    render:renderComposite,
+    resize:()=>{
+      cpRenderPinRail($cpPins,cpNodes);
+      cpRenderPinRail($cpBuildPins,cpBuiltNodes());
+      cpRenderJoints(cpBuiltNodes());
+    },
+    objective:()=>GameCatalog.get('composite')?.objective,
+    restartMessage:'Новая составная отмычка',
+    input:{
+      horizontal:dir=>changeCompositeShape(cpSelected,dir),
+      vertical:moveCompositeSelection
+    },
+    attemptOpen:tryOpenComposite
+  });
+})();

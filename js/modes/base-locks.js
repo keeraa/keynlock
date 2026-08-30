@@ -283,6 +283,8 @@ let plateEls=[], pinTopPlateEls=[];
       initial=[...state];
       rebuildPlates();
       render();
+    }else if(PuzzleModes.call(mode,'start')){
+      // Registered puzzle owns its complete round lifecycle.
     }else if(mode==='hillsfar'){
       startHillsfarRound();
     }else if(mode==='mass'){
@@ -301,8 +303,6 @@ let plateEls=[], pinTopPlateEls=[];
       startResonanceRound();
     }else if(mode==='deduction'){
       startDeductionRound();
-    }else if(mode==='composite'){
-      startCompositeRound();
     }else if(mode==='heatcold'){
       startHeatColdRound();
     }else if(mode==='drum'){
@@ -313,12 +313,8 @@ let plateEls=[], pinTopPlateEls=[];
       startOblivionRound();
     }else if(mode==='watchmen'){
       startWatchmenRound();
-    }else if(mode==='museum'){
-      startMuseumRound();
     }else if(mode==='mass2'){
       startMass2Round();
-    }else if(mode==='pipeline'){
-      startPipelineRound();
     }else if(mode==='wharf'){
       startWharfRound();
     }else if(mode==='thiefds'){
@@ -345,7 +341,7 @@ let plateEls=[], pinTopPlateEls=[];
     updateEconomyUI();
     if(mode==='r2') requestAnimationFrame(renderR2);
 
-    const msg =
+    const msg = PuzzleModes.has(mode) ? PuzzleModes.restartMessage(mode) :
       mode==='classic' ? 'Новый замок' :
       mode==='target' ? 'Новая цель' :
       mode==='line' ? `Новая линия: ${goalLine}` :
@@ -360,14 +356,11 @@ let plateEls=[], pinTopPlateEls=[];
       mode==='tension' ? 'Новый замок с натяжением' :
       mode==='resonance' ? 'Новый резонансный замок' :
       mode==='deduction' ? 'Новый слепок ключа' :
-      mode==='composite' ? 'Новая составная отмычка' :
       mode==='heatcold' ? 'Новый цифровой код' :
       mode==='drum' ? 'Новый барабанный замок' :
       mode==='oblivion' ? 'Новый штифтовый замок' :
       mode==='watchmen' ? 'Новые тумблеры' :
-      mode==='museum' ? 'Новый набор профилей' :
       mode==='mass2' ? 'Новая схема узлов' :
-      mode==='pipeline' ? 'Новая схема трубопровода' :
       mode==='wharf' ? 'Новый набор задвижек' :
       mode==='thiefds' ? 'Новый замок' :
       mode==='kingdomcome' ? 'Новый замок' :
@@ -387,6 +380,7 @@ let plateEls=[], pinTopPlateEls=[];
 
   function reset(){
     beginRoundState();
+    if(PuzzleModes.call(mode,'start')){ toast(PuzzleModes.restartMessage(mode)); return; }
     if(mode==='hillsfar'){ startHillsfarRound(); toast('Набор ключей обновлён'); return; }
     if(mode==='mass'){ startMassRound(); toast('Круговой замок обновлён'); return; }
     if(mode==='g1'){ startG1Round(); toast('Последовательность обновлена'); return; }
@@ -396,15 +390,12 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='tension'){ startTensionRound(); toast('Натяжение обновлено'); return; }
     if(mode==='resonance'){ startResonanceRound(); toast('Резонанс обновлён'); return; }
     if(mode==='deduction'){ startDeductionRound(); toast('Слепок обновлён'); return; }
-    if(mode==='composite'){ startCompositeRound(); toast('Профиль штифтов обновлён'); return; }
     if(mode==='heatcold'){ startHeatColdRound(); toast('Цифровой код обновлён'); return; }
     if(mode==='drum'){ startDrumRound(); toast('Барабанный замок обновлён'); return; }
     if(mode==='scope'){ startScopeRound(); toast('Сигнал обновлён'); return; }
     if(mode==='oblivion'){ startOblivionRound(); toast('Штифтовый замок обновлён'); return; }
     if(mode==='watchmen'){ startWatchmenRound(); toast('Тумблеры обновлены'); return; }
-    if(mode==='museum'){ startMuseumRound(); toast('Профили обновлены'); return; }
     if(mode==='mass2'){ startMass2Round(); toast('Схема узлов обновлена'); return; }
-    if(mode==='pipeline'){ startPipelineRound(); toast('Схема трубопровода обновлена'); return; }
     if(mode==='wharf'){ startWharfRound(); toast('Задвижки обновлены'); return; }
     if(mode==='thiefds'){ startThiefDsRound(); toast('Замок обновлён'); return; }
     if(mode==='kingdomcome'){ startKingdomComeRound(); toast('Замок обновлён'); return; }
@@ -455,18 +446,16 @@ let plateEls=[], pinTopPlateEls=[];
   }
 
   function move(dir){
+    if(PuzzleModes.input(mode,'horizontal',dir)) return;
     if(mode==='tension') return moveTension(dir);
     if(mode==='resonance') return;
     if(mode==='deduction') return moveDeductionSelection(dir);
-    if(mode==='composite') return changeCompositeShape(cpSelected,dir);
     if(mode==='anach') return moveAn(dir);
     if(mode==='skyrim') return moveSkyrim(dir);
     if(mode==='r2') return moveR2(dir);
     if(mode==='oblivion') return obMove(dir);
     if(mode==='watchmen') return wmMove(dir);
-    if(mode==='museum') return hmMoveKb(dir<0?'left':'right');
     if(mode==='mass2') return m2MoveKb(dir<0?'left':'right');
-    if(mode==='pipeline') return plMoveCursor(0,dir);
     if(mode==='wharf') return wfMove(dir);
     if(mode==='thiefds') return tdsMove(dir);
     if(mode==='kingdomcome') return kcdKeyMove(dir<0?'left':'right');
@@ -560,7 +549,7 @@ let plateEls=[], pinTopPlateEls=[];
     tension:()=>tryOpenTension(),
     resonance:()=>tryOpenResonance(),
     deduction:()=>tryOpenDeduction(),
-    composite:()=>tryOpenComposite(),
+    composite:()=>PuzzleModes.call('composite','attemptOpen'),
     heatcold:()=>scanHeatCold(),
     drum:()=>checkDrum(),
     scope:()=>checkScope(),
@@ -572,9 +561,9 @@ let plateEls=[], pinTopPlateEls=[];
     mass:()=>tryOpenMass(),
     oblivion:()=>tryOpenOblivion(),
     watchmen:()=>tryOpenWatchmen(),
-    museum:()=>tryOpenMuseum(),
+    museum:()=>PuzzleModes.call('museum','attemptOpen'),
     mass2:()=>tryOpenMass2(),
-    pipeline:()=>tryOpenPipeline(),
+    pipeline:()=>PuzzleModes.call('pipeline','attemptOpen'),
     wharf:()=>tryOpenWharf(),
     thiefds:()=>tryOpenThiefDs(),
     kingdomcome:()=>tryOpenKingdomCome(),
@@ -588,10 +577,10 @@ let plateEls=[], pinTopPlateEls=[];
   });
 
   function select(delta){
+    if(PuzzleModes.input(mode,'vertical',delta)) return;
     if(mode==='tension'){ if(delta<0) setTensionPin(); return; }
     if(mode==='resonance'){ if(delta<0) hitResonance(); return; }
     if(mode==='deduction') return changeDeduction(kdSelected,delta<0?1:-1);
-    if(mode==='composite') return moveCompositeSelection(delta);
     if(mode==='anach') return adjustAn(delta<0?1:-1);
     if(mode==='skyrim'){ if(delta<0) GameActions.attemptOpen({modeId:'skyrim',source:'keyboard'}); return; }
     if(mode==='r2'){
@@ -606,16 +595,8 @@ let plateEls=[], pinTopPlateEls=[];
       if(delta<0) wmRaise(); else wmLower();
       return;
     }
-    if(mode==='museum'){
-      hmMoveKb(delta<0?'up':'down');
-      return;
-    }
     if(mode==='mass2'){
       m2MoveKb(delta<0?'up':'down');
-      return;
-    }
-    if(mode==='pipeline'){
-      plMoveCursor(delta,0);
       return;
     }
     if(mode==='wharf'){
@@ -759,14 +740,9 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='watchmen' && !solved){
       wmTick(Math.min(.04,dt/1000));
     }
-    if(mode==='museum' && !solved){
-      hmTick(Math.min(.05,dt/1000));
-    }
+    if(!solved) PuzzleModes.call(mode,'tick',{now,dt});
     if(mode==='mass2' && !solved){
       m2Tick(Math.min(.05,dt/1000));
-    }
-    if(mode==='pipeline' && !solved){
-      plTick(now);
     }
     if(mode==='thiefds' && !solved){
       tdsTick(Math.min(.05,dt/1000));

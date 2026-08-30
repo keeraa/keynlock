@@ -1,4 +1,12 @@
+(function(){
   // ===== PIPELINE (Трубопровод) =====
+  const PL_ROWS=6, PL_PREP_MS=17000,
+    PL_START={r:2,c:0,in:'W'},
+    PL_DIR_OPP={N:'S',S:'N',E:'W',W:'E'}, PL_DIR_VEC={N:[-1,0],S:[1,0],E:[0,1],W:[0,-1]}, PL_DIR_ORDER=['N','E','S','W'];
+  let PL_COLS=6, PL_EXIT={r:3,c:5,out:'E'},
+    plTiles=[], plRevealed=new Set(), plVisited=new Set(), plCursor=0, plState='prep',
+    plStartAt=0, plPrepMax=PL_PREP_MS, plLastStep=0, plPos=null, plInDir='W',
+    plTileEls=[], plLastLevelSig='';
   // A difficulty-scaled grid of hidden pipe tiles. Reveal a tile to see its shape, click it
   // again to rotate 90° clockwise. Once the prep countdown runs out, a flow
   // auto-traces from a fixed start port to a fixed exit port. A complete,
@@ -429,3 +437,21 @@
     renderPipeline();
     setTimeout(()=>celebrate(),420);
   }
+
+  PuzzleModes.register({
+    id:'pipeline',
+    start:startPipelineRound,
+    render:renderPipeline,
+    tick:({now})=>plTick(now),
+    resize:plAlignPorts,
+    syncHud:renderPipelineHud,
+    objective:()=>GameCatalog.get('pipeline')?.objective,
+    restartMessage:'Новая схема трубопровода',
+    input:{
+      horizontal:dir=>plMoveCursor(0,dir),
+      vertical:dir=>plMoveCursor(dir,0)
+    },
+    actions:{primary:plKeyboardAction},
+    attemptOpen:tryOpenPipeline
+  });
+})();

@@ -133,30 +133,11 @@
   // the shared pick economy.
   let wmPins=[], wmSelected=0, wmPinEls=[], wmTimeLeft=16, wmTimeMax=16, wmTimerHandle=null, wmLastTick=0;
   const WM_SCALE=2.05, WM_LOCK_TOL=3.8, WM_MIN=0, WM_MAX=96, WM_ROUGH_MISS=18;
-  // Hillsfar — музей (Museum): 6 tumblers, each needs its target pick-shape
-  // symbol clicked from a 21-symbol grid (some tumblers half-occluded, some
-  // "jammed" and needing the correct symbol clicked twice), against a
-  // countdown. Ported from the old prototype scene
-  // (prototypes/lockpicking-mechanics-v63.html, "// Hillsfar").
-  const HM_SYMBOLS=['△','◇','○','⌒','⊥','≋','∩','▽','◁','▷','◊','◌','⌣','◠','☉','☽','☿','♀','♂','♃','♄'];
-  let hmSeq=[], hmJam=[], hmCover=[], hmStep=0, hmKb=0, hmTimeLeft=28, hmTimeMax=28, hmTumbEls=[], hmPickEls=[];
   // Mass Effect 2 (Парные узлы): memory-match — 16 nodes (8 symbols × 2),
   // hidden until hovered (mouse) or held (touch), find all 8 pairs against
   // a countdown.
   const M2_SYMBOLS=['◈','⌁','Ψ','⊙','✦','⌬','☿','♀'], M2_HOLD_MS=900;
   let m2Nodes=[], m2Sel=-1, m2Matched=new Set(), m2Kb=0, m2Lock=false, m2UnlockTimer=0, m2TimeLeft=40, m2TimeMax=40, m2NodeEls=[];
-  // Трубопровод (Pipeline): a 6×6 / 6×8 / 6×10 grid of hidden pipe tiles. Reveal a tile to
-  // see its shape, click again to rotate it 90° clockwise. A flow auto-traces
-  // from a fixed start port to a fixed exit port along whatever connections
-  // exist once the prep countdown runs out — keep building the route before,
-  // and racing to fix it during, the flow's advance.
-  const PL_ROWS=6, PL_PREP_MS=17000,
-    PL_START={r:2,c:0,in:'W'},
-    PL_DIR_OPP={N:'S',S:'N',E:'W',W:'E'}, PL_DIR_VEC={N:[-1,0],S:[1,0],E:[0,1],W:[0,-1]}, PL_DIR_ORDER=['N','E','S','W'];
-  let PL_COLS=6, PL_EXIT={r:3,c:5,out:'E'},
-    plTiles=[], plRevealed=new Set(), plVisited=new Set(), plCursor=0, plState='prep',
-    plStartAt=0, plPrepMax=PL_PREP_MS, plLastStep=0, plPos=null, plInDir='W',
-    plTileEls=[], plLastLevelSig='';
   let wfSequence=[], wfStep=0, wfPos=0, wfWrong=-1, wfStress=0, wfBarEls=[], wfBarCount=6;
   let tdsRingSymbols=[], tdsOrder=[], tdsStep=0, tdsSelectedRing=0, tdsAngle=0, tdsTargets=[], tdsHot=false, tdsDone=new Set(), tdsFailed=false, tdsTimeLeft=22, tdsTimeMax=22, tdsDownInfo=null, tdsRingEls=[], tdsSeqEls=[];
   let kcdSweetR=.25, kcdSweetA=0, kcdRot=0, kcdStress=0, kcdTurning=false, kcdPointerX=.5, kcdPointerY=.5, kcdTolerance=.082, kcdTargetRot=220;
@@ -167,8 +148,6 @@
   let ptgY=[.08,.08], ptgV=[0,0], ptgTarget=[.37,.51], ptgDur=1.35;
   let bioZonesArr=[], bioZoneEls=[], bioX=0, bioDir=1, bioSpeed=58, bioStage=0, bioRunning=true;
   let apPins=[], apSel=0, apOrder=[], apOrderStep=0, apTimeLeft=26, apTimeMax=26, apSeqEls=[];
-  const CP_LEVEL_NAMES=['ВЕРХ','ВЫШЕ','НИЖЕ','НИЗ'];
-  let cpNodes=[1,1,1,1], cpTarget=[1,1,1,1], cpVals=[1,1,1,1], cpInitial=[1,1,1,1], cpSelected=-1, cpReady=false;
   let hcSecret=[0,0,0,0], hcAttempts=[], hcDigits=[0,0,0,0], hcActiveIndex=0;
   let drumSecret=[0,0,0,0], drumState=[0,0,0,0], drumSoundOn=true, drumAudioCtx=null;
   let scopeSecret=[0,0,0,0], scopeState=[0,0,0,0];

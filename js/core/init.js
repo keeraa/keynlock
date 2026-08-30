@@ -110,16 +110,7 @@
   }
 
   addEventListener('resize',()=>{
-    if(mode==='composite' && !$compositeMode.hidden){
-      requestAnimationFrame(()=>{
-        cpRenderPinRail($cpPins, cpNodes);
-        cpRenderPinRail($cpBuildPins, cpBuiltNodes());
-        cpRenderJoints(cpBuiltNodes());
-      });
-    }
-    if(mode==='pipeline' && !$pipelineMode.hidden){
-      requestAnimationFrame(()=>{ if(typeof plAlignPorts==='function') plAlignPorts(); });
-    }
+    requestAnimationFrame(()=>PuzzleModes.call(mode,'resize'));
     requestAnimationFrame(syncPuzzleRewardClearance);
   },{passive:true});
 
@@ -307,9 +298,8 @@
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='oblivion'&&e.code==='Space'){e.preventDefault();obClick(obSelected);}});
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='watchmen'&&e.code==='Space'){e.preventDefault();wmTryLock();}});
   $wmOpenBtn?.addEventListener('click',()=>GameActions.attemptOpen({modeId:'watchmen',source:'puzzle-control'}));
-  addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='museum'&&e.code==='Space'){e.preventDefault();hmPick(hmKb);}});
+  addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&e.code==='Space'&&PuzzleModes.action(mode,'primary')) e.preventDefault();});
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='mass2'&&e.code==='Space'){e.preventDefault();m2Click(m2Kb);}});
-  addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='pipeline'&&e.code==='Space'){e.preventDefault();plKeyboardAction();}});
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='thiefds'&&e.code==='Space'){e.preventDefault();tdsCommit();}});
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='kingdomcome'&&e.code==='Space'&&!e.repeat){e.preventDefault();kcdSetTurning(true);}});
   addEventListener('keyup',e=>{if(mode==='kingdomcome'&&e.code==='Space'){kcdSetTurning(false);}});

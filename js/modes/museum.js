@@ -1,4 +1,7 @@
+(function(){
   // ===== MUSEUM (Hillsfar — музей: подбор формы отмычки) =====
+  const HM_SYMBOLS=['△','◇','○','⌒','⊥','≋','∩','▽','◁','▷','◊','◌','⌣','◠','☉','☽','☿','♀','♂','♃','♄'];
+  let hmSeq=[], hmJam=[], hmCover=[], hmStep=0, hmKb=0, hmTimeLeft=28, hmTimeMax=28, hmTumbEls=[], hmPickEls=[];
   // Six tumblers, each hiding a target pick-shape symbol. The player clicks
   // the matching symbol out of a 21-symbol grid; some tumblers are half
   // occluded (harder to read) and some are "jammed" (need the right symbol
@@ -162,3 +165,20 @@
     renderMuseum();
     setTimeout(()=>celebrate(),420);
   }
+
+  PuzzleModes.register({
+    id:'museum',
+    start:startMuseumRound,
+    render:renderMuseum,
+    tick:({dt})=>hmTick(Math.min(.05,dt/1000)),
+    syncHud:renderMuseumHud,
+    objective:()=>GameCatalog.get('museum')?.objective,
+    restartMessage:'Новый набор профилей',
+    input:{
+      horizontal:dir=>hmMoveKb(dir<0?'left':'right'),
+      vertical:dir=>hmMoveKb(dir<0?'up':'down')
+    },
+    actions:{primary:()=>hmPick(hmKb)},
+    attemptOpen:tryOpenMuseum
+  });
+})();

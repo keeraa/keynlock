@@ -14,14 +14,16 @@
     document.body.dataset.gameMode=mode;
     if(mode!=='hillsfar') clearHillsfarTimer();
     if(mode==='hillsfar') setGlobalTimer(true, hfTimeLeft || hfTimeMax, hfTimeMax || 1, 'ТАЙМЕР');
-    else if(mode==='museum') setGlobalTimer(true, hmTimeLeft || hmTimeMax, hmTimeMax || 1, 'ТАЙМЕР');
+    else if(PuzzleModes.call(mode,'syncHud')){}
     else if(mode==='mass2') setGlobalTimer(true, m2TimeLeft || m2TimeMax, m2TimeMax || 1, 'ТАЙМЕР');
-    else if(mode==='pipeline') setGlobalTimer(plState==='prep', Math.max(0,plStartAt-performance.now())/1000, plPrepMax/1000, 'ТАЙМЕР');
     else if(mode==='thiefds') setGlobalTimer(!tdsFailed, tdsTimeLeft||tdsTimeMax, tdsTimeMax||1, 'ТАЙМЕР');
     else if(mode==='thief12') setGlobalTimer(!th12Failed, th12TimeLeft||th12TimeMax, th12TimeMax||1, 'ТАЙМЕР');
     else if(mode==='alphaprotocol') setGlobalTimer(apTimeLeft>0, apTimeLeft||apTimeMax, apTimeMax||1, 'ТАЙМЕР');
     else setGlobalTimer(false);
-if(mode==='classic'){
+    const registeredObjective=PuzzleModes.objective(mode);
+    if(registeredObjective){
+      $objectiveLine.innerHTML=`ЦЕЛЬ: <b>${registeredObjective}</b>`;
+    }else if(mode==='classic'){
       $objectiveLine.innerHTML = `ЦЕЛЬ: <b>ПОДНЯТЬ ВСЕ ШТИФТЫ</b> · ${generatedDistance} ходов минимум`;
     }else if(mode==='target'){
       $objectiveLine.innerHTML = `ЦЕЛЬ: <b>СОВМЕСТИТЬ ШТЫРИ С СИНИМИ МЕТКАМИ</b> · ${generatedDistance} ходов минимум`;
@@ -49,8 +51,6 @@ if(mode==='classic'){
       $objectiveLine.innerHTML = `ЦЕЛЬ: <b>ЗАФИКСИРОВАТЬ ${rsPinCount} ШТИФТОВ ТОЧНО НА ЗОЛОТОЙ ЛИНИИ</b>`;
     }else if(mode==='deduction'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ВОССТАНОВИТЬ ПРОФИЛЬ КЛЮЧА ПО ОБРАТНОЙ СВЯЗИ</b>';
-    }else if(mode==='composite'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>СОБРАТЬ ОТМЫЧКУ ИЗ 4 ЧАСТЕЙ ПОД ПРОФИЛЬ ШТИФТОВ</b>';
     }else if(mode==='heatcold'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ПОДОБРАТЬ 4-ЗНАЧНЫЙ КОД ПО ПОДСКАЗКАМ ТЕПЛО / ХОЛОДНО</b>';
     }else if(mode==='drum'){
@@ -61,12 +61,8 @@ if(mode==='classic'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ПОДНЯТЬ И ЗАФИКСИРОВАТЬ ВСЕ ШТИФТЫ</b>';
     }else if(mode==='watchmen'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ВЫСТАВИТЬ И ЗАФИКСИРОВАТЬ ВСЕ ТУМБЛЕРЫ ДО ИСТЕЧЕНИЯ ВРЕМЕНИ</b>';
-    }else if(mode==='museum'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ПОДОБРАТЬ ПРОФИЛЬ ОТМЫЧКИ ДЛЯ КАЖДОГО ТУМБЛЕРА</b>';
     }else if(mode==='mass2'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>НАЙТИ ВСЕ ПАРЫ УЗЛОВ ДО ИСТЕЧЕНИЯ ВРЕМЕНИ</b>';
-    }else if(mode==='pipeline'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>СОБРАТЬ МАРШРУТ ОТ ВХОДА ДО ВЫХОДА ДО ЗАПУСКА ПОТОКА</b>';
     }else if(mode==='wharf'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ОТКРЫТЬ ЗАДВИЖКИ ПО ПОРЯДКУ</b>';
     }else if(mode==='thiefds'){

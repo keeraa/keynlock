@@ -113,7 +113,7 @@ body:not(.importedMode) #lock{transform:translateX(-50%) scale(.68)!important;he
 body:not(.importedMode) #lock>.platesZone{top:379px!important;}
 body.importedMode .modePanel:not([hidden]),body.mode-hillsfar .hillsfarMode{padding-top:242px!important;padding-bottom:54px!important;}
 }
-:root{--template-lock-top:58px;--template-lock-scale:.80;--template-puzzle-top:300px;--template-puzzle-bottom:56px;}
+:root{--template-lock-top:58px;--template-lock-scale:.56;--template-puzzle-top:300px;--template-puzzle-bottom:56px;}
 .app{grid-template-rows:minmax(0,1fr)!important;}
 .main{grid-row:1!important;width:100%!important;height:100%!important;min-height:0!important;display:grid!important;place-items:center!important;}
 .scene{position:relative!important;width:min(1180px,100vw)!important;height:100vh!important;min-height:0!important;overflow:visible!important;}

@@ -21,7 +21,7 @@ body.importedMode .anInstructions{margin-top:0!important;}
 body.importedMode .tnPanel,body.importedMode .rsBoard,body.importedMode .kdPanel,body.importedMode .cpBoard{margin-top:0!important;}
 #objectiveLine.difficulty{position:fixed!important;left:50%!important;bottom:18px!important;transform:translateX(-50%)!important;z-index:310!important;}
 @media (max-width:900px){
-:root{--template-lock-top:48px;--template-lock-scale:.68;--template-puzzle-top:274px;--template-puzzle-bottom:48px;}
+:root{--template-lock-top:48px;--template-lock-scale:.476;--template-puzzle-top:274px;--template-puzzle-bottom:48px;}
 .scene{width:100vw!important;}
 .puzzleArea>.platesZone{transform:translateX(-50%) scale(.88)!important;transform-origin:top center!important;}
 body.importedMode .puzzleArea>.modePanel:not([hidden]){padding:6px 12px 10px!important;}
@@ -52,7 +52,7 @@ body.importedMode .scene,body.mode-hillsfar .scene{position:relative!important;w
 html,body,.app{height:100dvh;}
 }
 @media (max-width:760px),(max-height:560px) and (orientation:landscape){
-:root{--mobile-safe-top:env(safe-area-inset-top,0px);--mobile-safe-right:env(safe-area-inset-right,0px);--mobile-safe-bottom:env(safe-area-inset-bottom,0px);--mobile-safe-left:env(safe-area-inset-left,0px);--mobile-hud-size:40px;--template-lock-top:calc(var(--mobile-safe-top) + 104px);--template-lock-scale:.56;--template-puzzle-top:calc(var(--mobile-safe-top) + 318px);--template-puzzle-bottom:calc(var(--mobile-safe-bottom) + 48px);}
+:root{--mobile-safe-top:env(safe-area-inset-top,0px);--mobile-safe-right:env(safe-area-inset-right,0px);--mobile-safe-bottom:env(safe-area-inset-bottom,0px);--mobile-safe-left:env(safe-area-inset-left,0px);--mobile-hud-size:40px;--template-lock-top:calc(var(--mobile-safe-top) + 104px);--template-lock-scale:.392;--template-puzzle-top:calc(var(--mobile-safe-top) + 318px);--template-puzzle-bottom:calc(var(--mobile-safe-bottom) + 48px);}
 html,body{width:100%;min-width:0;height:100dvh;min-height:100dvh;overflow:hidden;overscroll-behavior:none;-webkit-text-size-adjust:100%;}
 body{background-attachment:scroll!important;}
 .app,.main,.scene{width:100%!important;height:100dvh!important;min-height:0!important;}
@@ -152,7 +152,7 @@ body.shop-open .topRightHud{display:none!important;}
 .pickSkinGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important;}
 }
 @media (max-width:760px) and (max-height:620px) and (orientation:portrait){
-:root{--template-lock-top:calc(var(--mobile-safe-top) + 86px);--template-lock-scale:.50;--template-puzzle-top:calc(var(--mobile-safe-top) + 268px);--template-puzzle-bottom:calc(var(--mobile-safe-bottom) + 43px);--mobile-hud-size:37px;}
+:root{--template-lock-top:calc(var(--mobile-safe-top) + 86px);--template-lock-scale:.35;--template-puzzle-top:calc(var(--mobile-safe-top) + 268px);--template-puzzle-bottom:calc(var(--mobile-safe-bottom) + 43px);--mobile-hud-size:37px;}
 
 .topRightHud{width:calc(var(--mobile-hud-size) * 3 + 6px)!important;gap:3px!important;}
 .topRightHud .economyHud{gap:3px!important;}
@@ -163,7 +163,7 @@ body.importedMode .skBoardViewport{width:300px!important;height:300px!important;
 body.importedMode .skBoardViewport .skBoard{transform:translateX(-50%) scale(.432)!important;}
 }
 @media (max-height:560px) and (orientation:landscape){
-:root{--mobile-hud-size:34px;--template-lock-top:calc(var(--mobile-safe-top) + 10px);--template-lock-scale:.42;--template-puzzle-top:calc(var(--mobile-safe-top) + 148px);--template-puzzle-bottom:calc(var(--mobile-safe-bottom) + 34px);}
+:root{--mobile-hud-size:34px;--template-lock-top:calc(var(--mobile-safe-top) + 10px);--template-lock-scale:.294;--template-puzzle-top:calc(var(--mobile-safe-top) + 148px);--template-puzzle-bottom:calc(var(--mobile-safe-bottom) + 34px);}
 .topRightHud{top:calc(var(--mobile-safe-top) + 6px)!important;right:calc(var(--mobile-safe-right) + 6px)!important;width:calc(var(--mobile-hud-size) * 3 + 6px)!important;gap:3px!important;}
 .topRightHud .economyHud{gap:3px!important;}
 .topRightHud .hudNavIcon,.topRightHud #mapTab .mapTabIcon{width:19px!important;height:19px!important;}

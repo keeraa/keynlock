@@ -82,6 +82,8 @@ if(mode==='classic'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ПРОЙТИ ВСЕ 5 КОЛЕЦ И ПОДТВЕРДИТЬ ЯДРО</b>';
     }else if(mode==='pathologic'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>СОВМЕСТИТЬ ОБЕ ЗОНЫ С ЦЕНТРАЛЬНОЙ ЛИНИЕЙ И ЗАФИКСИРОВАТЬ</b>';
+    }else if(mode==='bioshock2'){
+      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ОСТАНОВИТЬ ИГЛУ НА ЗЕЛЁНОЙ ЗОНЕ 5 РАЗ ПОДРЯД</b>';
     }
     if(typeof syncPuzzleRewardClearance==='function') requestAnimationFrame(syncPuzzleRewardClearance);
   }

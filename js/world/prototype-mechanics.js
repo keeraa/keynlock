@@ -1,6 +1,5 @@
   // ===== IMPORTED V63 MECHANIC LOCATIONS =====
   const PROTOTYPE_MECHANIC_PLACES=[
-    {id:'bioshock2',name:'Охранный дрон',game:'BioShock 2',x:17,y:23},
     {id:'alpha-protocol',name:'Архив пазов',game:'Alpha Protocol',x:31,y:17}
   ];
   const PROTOTYPE_MECHANIC_DONE_KEY='keynlockPrototypeMechanicsDone';

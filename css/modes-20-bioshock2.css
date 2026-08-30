@@ -1,0 +1,102 @@
+.bioMode{display:flex;flex-direction:column;align-items:center;gap:12px;height:100%;overflow:hidden;}
+.bioTopWrap{flex:1 1 auto;min-height:0;width:100%;max-width:min(620px,100%);display:flex;flex-direction:column;align-items:center;gap:min(2vh,16px);}
+.bioBot{
+  flex:0 1 92px;
+  min-height:0;
+  position:relative;
+  width:auto;
+  max-width:150px;
+  aspect-ratio:170/104;
+  border:2px solid #58605a;
+  border-radius:34px 34px 22px 22px;
+  background:linear-gradient(180deg,#343b37,#1b211e);
+  box-shadow:inset 0 0 26px #000,0 14px 30px rgba(0,0,0,.28);
+}
+.bioBot::before,.bioBot::after{
+  content:"";
+  position:absolute;
+  top:29%;
+  width:20%;
+  height:33%;
+  border:2px solid #626a62;
+  border-radius:50%;
+  background:#101410;
+}
+.bioBot::before{left:13%;}
+.bioBot::after{right:13%;}
+.bioEye{
+  position:absolute;
+  left:50%;
+  top:40%;
+  width:11%;
+  height:17%;
+  border-radius:50%;
+  transform:translateX(-50%);
+  background:#d16a5e;
+  box-shadow:0 0 14px #d16a5e;
+  transition:background .2s,box-shadow .2s;
+}
+.bioBot.hacked .bioEye{
+  background:#6fd083;
+  box-shadow:0 0 16px #6fd083;
+}
+.bioPanel{
+  flex:1 1 auto;
+  min-height:0;
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  border:1px solid #3a433f;
+  background:#101512;
+  border-radius:18px;
+  padding:min(3vw,18px);
+  box-sizing:border-box;
+}
+.bioTrack{
+  flex:1 1 auto;
+  min-height:18px;
+  max-height:128px;
+  position:relative;
+  border-radius:10px;
+  overflow:hidden;
+  border:2px solid #69716a;
+  background:#d7dbd5;
+  display:flex;
+}
+.bioZone{height:100%;}
+.bioZone.white{background:#d8ddd8;}
+.bioZone.green{background:#59b36b;}
+.bioZone.red{background:#aa4e49;}
+.bioNeedle{
+  position:absolute;
+  top:-6px;
+  bottom:-6px;
+  width:4px;
+  margin-left:-2px;
+  background:#f8e5b0;
+  box-shadow:0 0 10px rgba(255,229,170,.8);
+  left:0%;
+}
+.bioNeedle::after{
+  content:"";
+  position:absolute;
+  top:-8px;
+  left:-6px;
+  border-left:8px solid transparent;
+  border-right:8px solid transparent;
+  border-top:10px solid #f8e5b0;
+}
+.bioMeta{
+  flex:0 0 auto;
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  width:100%;
+  color:#aaa38e;
+  font-size:12px;
+}
+.bioControls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.bioHelp{flex:none;color:#9db3bf;text-align:center;font:14px/1.35 Arial,sans-serif;max-width:560px;}
+body.importedMode .puzzleArea>.modePanel.bioMode:not([hidden]){padding-bottom:calc(16px + var(--reward-clear,0px))!important;}

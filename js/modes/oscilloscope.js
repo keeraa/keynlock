@@ -1,4 +1,6 @@
+(function(){
   // Oscilloscope
+  let scopeSecret=[0,0,0,0], scopeState=[0,0,0,0];
   const scopeFreqs=[1,2,3,5];
   const scopeWeights=[.22,.18,.14,.11];
   const scopePhases=[.1,.7,1.3,2.1];
@@ -122,3 +124,13 @@
     SFX.wrongLock();
   }
 
+  $scopeWheels?.addEventListener('click',e=>{const b=e.target.closest('[data-scope-i]');if(b)changeScope(Number(b.dataset.scopeI),Number(b.dataset.dir));});
+
+  PuzzleModes.register({
+    id:'scope',start:startScopeRound,render:renderScope,
+    objective:()=>GameCatalog.get('scope')?.objective,restartMessage:'Новый сигнал осциллографа',
+    input:{horizontal:()=>{},vertical:()=>{}},
+    actions:{swipe:(dir,target)=>{const wheel=target?.closest?.('.digitalWheel');const control=wheel?.querySelector('[data-scope-i]');if(control)changeScope(Number(control.dataset.scopeI),dir==='up'||dir==='right'?1:-1);}},
+    attemptOpen:checkScope
+  });
+})();

@@ -1,4 +1,6 @@
+(function(){
   // Drum clicks
+  let drumSecret=[0,0,0,0], drumState=[0,0,0,0], drumSoundOn=true, drumAudioCtx=null;
   function drumCircDist(a,b){
     const distance=Math.abs(a-b);
     return Math.min(distance,10-distance);
@@ -93,3 +95,16 @@
     SFX.wrongLock();
   }
 
+  $drumWheels?.addEventListener('click',e=>{const b=e.target.closest('[data-drum-i]');if(b)changeDrum(Number(b.dataset.drumI),Number(b.dataset.dir));});
+  $drumCheck?.addEventListener('click',()=>GameActions.attemptOpen({modeId:'drum',source:'puzzle-control'}));
+  $drumNew?.addEventListener('click',()=>newLock());
+  $drumSound?.addEventListener('click',()=>{drumSoundOn=!drumSoundOn;$drumSound.textContent='Звук: '+(drumSoundOn?'вкл':'выкл');});
+
+  PuzzleModes.register({
+    id:'drum',start:startDrumRound,render:renderDrum,
+    objective:()=>GameCatalog.get('drum')?.objective,restartMessage:'Новый барабанный замок',
+    input:{horizontal:()=>{},vertical:()=>{}},
+    actions:{swipe:(dir,target)=>{const wheel=target?.closest?.('.digitalWheel[id^="drumWheel"]');if(wheel)changeDrum(Number(wheel.id.replace('drumWheel','')),dir==='up'||dir==='right'?1:-1);}},
+    attemptOpen:checkDrum
+  });
+})();

@@ -129,32 +129,7 @@
   }
 
   function useDigitalSwipe(dir,target){
-    if(mode==='heatcold'){
-      const col=target?.closest?.('[data-hc-col]');
-      if(col) setHeatColdActive(Number(col.dataset.hcCol));
-      if(dir==='left') setHeatColdActive(hcActiveIndex-1);
-      else if(dir==='right') setHeatColdActive(hcActiveIndex+1);
-      else if(dir==='up') adjustHeatColdDigit(hcActiveIndex,1);
-      else adjustHeatColdDigit(hcActiveIndex,-1);
-      return true;
-    }
-
-    const drumWheel=target?.closest?.('.digitalWheel[id^="drumWheel"]');
-    if(mode==='drum' && drumWheel){
-      const index=Number(drumWheel.id.replace('drumWheel',''));
-      changeDrum(index,dir==='up'||dir==='right'?1:-1);
-      return true;
-    }
-
-    const scopeWheel=target?.closest?.('.digitalWheel');
-    if(mode==='scope' && scopeWheel){
-      const control=scopeWheel.querySelector('[data-scope-i]');
-      if(control){
-        changeScope(Number(control.dataset.scopeI),dir==='up'||dir==='right'?1:-1);
-        return true;
-      }
-    }
-    return false;
+    return PuzzleModes.action(mode,'swipe',dir,target);
   }
 
   function applySwipe(dir,target){

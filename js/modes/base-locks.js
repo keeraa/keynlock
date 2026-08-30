@@ -285,12 +285,6 @@ let plateEls=[], pinTopPlateEls=[];
       render();
     }else if(PuzzleModes.call(mode,'start')){
       // Registered puzzle owns its complete round lifecycle.
-    }else if(mode==='heatcold'){
-      startHeatColdRound();
-    }else if(mode==='drum'){
-      startDrumRound();
-    }else if(mode==='scope'){
-      startScopeRound();
     }
 
     updateModeUI();
@@ -301,10 +295,7 @@ let plateEls=[], pinTopPlateEls=[];
       mode==='target' ? 'Новая цель' :
       mode==='line' ? `Новая линия: ${goalLine}` :
       mode==='sequence' ? `Новый код: ${targets.join(', ')}` :
-      mode==='special' ? `Особый замок: ${specialTypeName()}` :
-      mode==='heatcold' ? 'Новый цифровой код' :
-      mode==='drum' ? 'Новый барабанный замок' :
-      'Новый сигнал осциллографа';
+      `Особый замок: ${specialTypeName()}`;
     if(notify){
       toast(msg);
       SFX.newRound();
@@ -314,9 +305,6 @@ let plateEls=[], pinTopPlateEls=[];
   function reset(){
     beginRoundState();
     if(PuzzleModes.call(mode,'start')){ toast(PuzzleModes.restartMessage(mode)); return; }
-    if(mode==='heatcold'){ startHeatColdRound(); toast('Цифровой код обновлён'); return; }
-    if(mode==='drum'){ startDrumRound(); toast('Барабанный замок обновлён'); return; }
-    if(mode==='scope'){ startScopeRound(); toast('Сигнал обновлён'); return; }
     state=[...initial]; solved=false; $lock.classList.remove('win');
     $mechanism.classList.remove('ready','opening','opened');
     render(); toast('Механизм сброшен');
@@ -358,7 +346,6 @@ let plateEls=[], pinTopPlateEls=[];
 
   function move(dir){
     if(PuzzleModes.input(mode,'horizontal',dir)) return;
-    if(mode==='heatcold'||mode==='drum'||mode==='scope') return;
     if(solved) return;
     nudgeTools();
     if(mode==='classic' || mode==='line' || mode==='special'){
@@ -439,9 +426,9 @@ let plateEls=[], pinTopPlateEls=[];
     resonance:()=>PuzzleModes.call('resonance','attemptOpen'),
     deduction:()=>PuzzleModes.call('deduction','attemptOpen'),
     composite:()=>PuzzleModes.call('composite','attemptOpen'),
-    heatcold:()=>scanHeatCold(),
-    drum:()=>checkDrum(),
-    scope:()=>checkScope(),
+    heatcold:()=>PuzzleModes.call('heatcold','attemptOpen'),
+    drum:()=>PuzzleModes.call('drum','attemptOpen'),
+    scope:()=>PuzzleModes.call('scope','attemptOpen'),
     anach:()=>PuzzleModes.call('anach','attemptOpen'),
     skyrim:()=>PuzzleModes.call('skyrim','attemptOpen'),
     r2:()=>PuzzleModes.call('r2','attemptOpen'),
@@ -467,7 +454,6 @@ let plateEls=[], pinTopPlateEls=[];
 
   function select(delta){
     if(PuzzleModes.input(mode,'vertical',delta)) return;
-    if(mode==='heatcold'||mode==='drum'||mode==='scope') return;
     if(solved)return;
     selected=(selected+delta+n)%n;
     SFX.select();

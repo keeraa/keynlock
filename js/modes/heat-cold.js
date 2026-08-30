@@ -1,4 +1,6 @@
+(function(){
   // Heat / cold
+  let hcSecret=[0,0,0,0], hcAttempts=[], hcDigits=[0,0,0,0], hcActiveIndex=0;
   function hcGrade(distance){
     if(distance===0)return ['точно',100];
     if(distance===1)return ['очень горячо',88];
@@ -125,3 +127,33 @@
       setDigitalResult($hcResult);
     }
   }
+
+  $hcInput?.addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&e.key==='Enter'){e.preventDefault();GameActions.attemptOpen({modeId:'heatcold',source:'keyboard'});}});
+  $hcInput?.addEventListener('input',()=>{$hcInput.value=$hcInput.value.replace(/\D/g,'').slice(0,4);});
+  document.addEventListener('keydown',handleHeatColdKey);
+  $hcDialRow?.addEventListener('click',e=>{
+    const btn=e.target.closest('[data-hc-step]');
+    if(btn){adjustHeatColdDigit(Number(btn.dataset.hcIndex),Number(btn.dataset.hcStep));return;}
+    const col=e.target.closest('[data-hc-col]');
+    if(col)setHeatColdActive(Number(col.dataset.hcCol));
+  });
+  $hcDialRow?.addEventListener('focusin',e=>{
+    const col=e.target.closest('[data-hc-col]');
+    if(col&&Number(col.dataset.hcCol)!==hcActiveIndex){hcActiveIndex=Number(col.dataset.hcCol);renderHeatColdControls();focusHeatColdDigit(hcActiveIndex);}
+  });
+
+  PuzzleModes.register({
+    id:'heatcold',start:startHeatColdRound,render:renderHeatColdEmpty,
+    objective:()=>GameCatalog.get('heatcold')?.objective,restartMessage:'Новый цифровой код',
+    input:{horizontal:()=>{},vertical:()=>{}},
+    actions:{swipe:(dir,target)=>{
+      const col=target?.closest?.('[data-hc-col]');
+      if(col)setHeatColdActive(Number(col.dataset.hcCol));
+      if(dir==='left')setHeatColdActive(hcActiveIndex-1);
+      else if(dir==='right')setHeatColdActive(hcActiveIndex+1);
+      else if(dir==='up')adjustHeatColdDigit(hcActiveIndex,1);
+      else adjustHeatColdDigit(hcActiveIndex,-1);
+    }},
+    attemptOpen:scanHeatCold
+  });
+})();

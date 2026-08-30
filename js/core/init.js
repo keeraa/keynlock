@@ -318,31 +318,6 @@
     if(mapOpen){ e.preventDefault(); closeMap(true); }
   });
 
-  $hcInput?.addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&e.key==='Enter'){e.preventDefault();GameActions.attemptOpen({modeId:'heatcold',source:'keyboard'});}});
-  $hcInput?.addEventListener('input',()=>{$hcInput.value=$hcInput.value.replace(/\D/g,'').slice(0,4);});
-  document.addEventListener('keydown',handleHeatColdKey);
-  $drumWheels?.addEventListener('click',e=>{const b=e.target.closest('[data-drum-i]');if(!b)return;changeDrum(Number(b.dataset.drumI),Number(b.dataset.dir));});
-  $drumCheck?.addEventListener('click',()=>GameActions.attemptOpen({modeId:'drum',source:'puzzle-control'}));
-  $drumNew?.addEventListener('click',()=>newLock());
-  $drumSound?.addEventListener('click',()=>{drumSoundOn=!drumSoundOn;$drumSound.textContent='Звук: '+(drumSoundOn?'вкл':'выкл');});
-  $scopeWheels?.addEventListener('click',e=>{const b=e.target.closest('[data-scope-i]');if(!b)return;changeScope(Number(b.dataset.scopeI),Number(b.dataset.dir));});
-  $hcDialRow?.addEventListener('click',e=>{
-    const btn=e.target.closest('[data-hc-step]');
-    if(btn){
-      adjustHeatColdDigit(Number(btn.dataset.hcIndex),Number(btn.dataset.hcStep));
-      return;
-    }
-    const col=e.target.closest('[data-hc-col]');
-    if(col) setHeatColdActive(Number(col.dataset.hcCol));
-  });
-  $hcDialRow?.addEventListener('focusin',e=>{
-    const col=e.target.closest('[data-hc-col]');
-    if(col && Number(col.dataset.hcCol)!==hcActiveIndex){
-      hcActiveIndex=Number(col.dataset.hcCol);
-      renderHeatColdControls();
-      focusHeatColdDigit(hcActiveIndex);
-    }
-  });
   // The game doesn't actually start (first puzzle generated, lair shown)
   // until every image asset has preloaded — js/core/asset-preload.js drives
   // the #bootLoader overlay covering/blurring everything until then.

@@ -17,8 +17,11 @@ function apMakePin(){
 }
 function apReady(i){ const p=apPins[i]; return Math.abs(p.y-p.target)<=AP_TOL; }
 function apBeamProgress(){
-  for(let i=0;i<5;i++) if(!apReady(i)) return i/5*100;
-  return 100;
+  const p=apPins[apSel];
+  if(!p) return 0;
+  if(p.set) return 100;
+  const diff=Math.abs(p.y-p.target);
+  return Math.max(0,Math.min(100,Math.round((1-diff/16)*100)));
 }
 function apSymbolTop(p){ return p.groove>50?18:82; }
 function startAlphaProtocolRound(){
@@ -124,3 +127,6 @@ function renderAlphaProtocol(){
         : `Выставлено ${apOrderStep} / 5 — соверши щель паза с золотой линией и зафиксируй Space`;
   }
 }
+document.getElementById('apUpBtn')?.addEventListener('click',()=>apMovePin(-1));
+document.getElementById('apDownBtn')?.addEventListener('click',()=>apMovePin(1));
+document.getElementById('apConfirmBtn')?.addEventListener('click',()=>apSet());

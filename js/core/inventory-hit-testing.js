@@ -418,15 +418,7 @@
     SFX.wrongLock();
 
     if(mode==='skyrim'){
-      skPickAngle=0;
-      skCylinderAngle=0;
-      skTorqueBusy=false;
-      const centerLock=document.querySelector('.skCenterLock');
-      centerLock?.classList.remove('shake-fail');
-      void centerLock?.offsetWidth;
-      centerLock?.classList.add('shake-fail');
-      setTimeout(()=>centerLock?.classList.remove('shake-fail'),380);
-      renderSkyrim();
+      PuzzleModes.action('skyrim','wrongTool');
     }else{
       shakeUniversalLock?.();
     }

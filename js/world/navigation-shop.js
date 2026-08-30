@@ -103,7 +103,6 @@
       modeSwitchFrame=0;
       if(mode!==requestedMode) return;
       newLock(false);
-      if(mode==='r2') requestAnimationFrame(renderR2);
     });
   }
 

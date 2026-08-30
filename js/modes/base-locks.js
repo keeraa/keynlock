@@ -285,12 +285,6 @@ let plateEls=[], pinTopPlateEls=[];
       render();
     }else if(PuzzleModes.call(mode,'start')){
       // Registered puzzle owns its complete round lifecycle.
-    }else if(mode==='r2'){
-      startR2Round();
-    }else if(mode==='skyrim'){
-      startSkyrimRound();
-    }else if(mode==='anach'){
-      startAnRound();
     }else if(mode==='heatcold'){
       startHeatColdRound();
     }else if(mode==='drum'){
@@ -321,7 +315,6 @@ let plateEls=[], pinTopPlateEls=[];
 
     updateModeUI();
     updateEconomyUI();
-    if(mode==='r2') requestAnimationFrame(renderR2);
 
     const msg = PuzzleModes.has(mode) ? PuzzleModes.restartMessage(mode) :
       mode==='classic' ? 'Новый замок' :
@@ -329,9 +322,6 @@ let plateEls=[], pinTopPlateEls=[];
       mode==='line' ? `Новая линия: ${goalLine}` :
       mode==='sequence' ? `Новый код: ${targets.join(', ')}` :
       mode==='special' ? `Особый замок: ${specialTypeName()}` :
-      mode==='r2' ? 'Новый замок Risen 2' :
-      mode==='skyrim' ? 'Новый замок Skyrim' :
-      mode==='anach' ? 'Новый контур Anachronox' :
       mode==='heatcold' ? 'Новый цифровой код' :
       mode==='drum' ? 'Новый барабанный замок' :
       mode==='wharf' ? 'Новый набор задвижек' :
@@ -354,9 +344,6 @@ let plateEls=[], pinTopPlateEls=[];
   function reset(){
     beginRoundState();
     if(PuzzleModes.call(mode,'start')){ toast(PuzzleModes.restartMessage(mode)); return; }
-    if(mode==='r2'){ startR2Round(); toast('Замок Risen 2 обновлён'); return; }
-    if(mode==='skyrim'){ startSkyrimRound(); toast('Замок Skyrim обновлён'); return; }
-    if(mode==='anach'){ startAnRound(); toast('Контур Anachronox обновлён'); return; }
     if(mode==='heatcold'){ startHeatColdRound(); toast('Цифровой код обновлён'); return; }
     if(mode==='drum'){ startDrumRound(); toast('Барабанный замок обновлён'); return; }
     if(mode==='scope'){ startScopeRound(); toast('Сигнал обновлён'); return; }
@@ -411,9 +398,6 @@ let plateEls=[], pinTopPlateEls=[];
 
   function move(dir){
     if(PuzzleModes.input(mode,'horizontal',dir)) return;
-    if(mode==='anach') return moveAn(dir);
-    if(mode==='skyrim') return moveSkyrim(dir);
-    if(mode==='r2') return moveR2(dir);
     if(mode==='wharf') return wfMove(dir);
     if(mode==='thiefds') return tdsMove(dir);
     if(mode==='kingdomcome') return kcdKeyMove(dir<0?'left':'right');
@@ -508,9 +492,9 @@ let plateEls=[], pinTopPlateEls=[];
     heatcold:()=>scanHeatCold(),
     drum:()=>checkDrum(),
     scope:()=>checkScope(),
-    anach:()=>tryOpenAn(),
-    skyrim:()=>tryTorqueSkyrim(),
-    r2:()=>tryOpenR2(),
+    anach:()=>PuzzleModes.call('anach','attemptOpen'),
+    skyrim:()=>PuzzleModes.call('skyrim','attemptOpen'),
+    r2:()=>PuzzleModes.call('r2','attemptOpen'),
     g1:()=>PuzzleModes.call('g1','attemptOpen'),
     hillsfar:()=>PuzzleModes.call('hillsfar','attemptOpen'),
     mass:()=>PuzzleModes.call('mass','attemptOpen'),
@@ -533,12 +517,6 @@ let plateEls=[], pinTopPlateEls=[];
 
   function select(delta){
     if(PuzzleModes.input(mode,'vertical',delta)) return;
-    if(mode==='anach') return adjustAn(delta<0?1:-1);
-    if(mode==='skyrim'){ if(delta<0) GameActions.attemptOpen({modeId:'skyrim',source:'keyboard'}); return; }
-    if(mode==='r2'){
-      if(delta<0) return attemptR2Pin();
-      return;
-    }
     if(mode==='wharf'){
       if(delta<0) return wfTry();
       return;
@@ -571,9 +549,6 @@ let plateEls=[], pinTopPlateEls=[];
 
     updatePickUI();
     if(PuzzleModes.has(mode)){ $mechanism.classList.remove('ready'); }
-    else if(mode==='anach'){ $mechanism.classList.remove('ready'); }
-    else if(mode==='skyrim'){ $mechanism.classList.remove('ready'); }
-    else if(mode==='r2'){ $mechanism.classList.remove('ready'); }
     else if(mode==='wharf'){ $mechanism.classList.remove('ready'); }
     else if(mode==='thiefds'){ $mechanism.classList.remove('ready'); }
     else if(mode==='kingdomcome'){ $mechanism.classList.remove('ready'); }

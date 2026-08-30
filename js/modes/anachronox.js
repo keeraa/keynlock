@@ -1,4 +1,6 @@
+(function(){
   // ===== ANACHRONOX =====
+  let anTarget=[0,0,0], anState=[0,0,0], anInitialState=[0,0,0], anSelected=0;
   function anReadoutValue(){
     const distance=Math.abs(anState[0]-anTarget[0]) + Math.abs(anState[1]-anTarget[1]) + Math.abs(anState[2]-anTarget[2]);
     return Math.max(0, 100 - distance*2.5);
@@ -90,4 +92,23 @@
     setTimeout(()=>celebrate(),420);
   }
 
+  document.querySelectorAll('[data-an-col]').forEach(btn=>btn.addEventListener('click',e=>{
+    e.stopPropagation();
+    adjustAn(btn.dataset.anDir==='up'?1:-1,Number(btn.dataset.anCol));
+  }));
+  document.querySelectorAll('.anChannel').forEach(ch=>ch.addEventListener('click',e=>{
+    if(e.target.closest('.anBtn')) return;
+    anSelected=Number(ch.dataset.col);
+    SFX.select();
+    renderAn();
+  }));
+
+  PuzzleModes.register({
+    id:'anach', start:startAnRound, render:renderAn,
+    objective:()=>GameCatalog.get('anach')?.objective,
+    restartMessage:'Новый контур Anachronox',
+    input:{horizontal:moveAn,vertical:delta=>adjustAn(delta<0?1:-1)},
+    attemptOpen:tryOpenAn
+  });
+})();
 

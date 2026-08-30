@@ -1,4 +1,6 @@
+(function(){
   // ===== RISEN 2 =====
+  let r2Sequence=[], r2ProgressCount=0, r2PickPos=0, r2PinEls=[], r2PinCount=6;
   function getR2Layout(){
     const count = r2PinCount;
     const pinGap = count >= 8 ? 12 : 18;
@@ -127,3 +129,15 @@
     setTimeout(()=>celebrate(),420);
   }
 
+  PuzzleModes.register({
+    id:'r2', start:startR2Round, render:renderR2,
+    objective:()=>GameCatalog.get('r2')?.objective,
+    restartMessage:'Новый замок Risen 2',
+    input:{
+      horizontal:moveR2,
+      vertical:delta=>{ if(delta<0) attemptR2Pin(); }
+    },
+    actions:{primary:attemptR2Pin},
+    attemptOpen:tryOpenR2
+  });
+})();

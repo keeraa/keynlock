@@ -30,12 +30,6 @@
       $objectiveLine.innerHTML = `КОД: <b>${targets.join(', ')}</b> · ${generatedDistance} ходов минимум`;
     }else if(mode==='special'){
       $objectiveLine.innerHTML = `ОСОБЫЙ ЗАМОК: <b>${specialTypeName()}</b> · ${generatedDistance} ходов минимум`;
-    }else if(mode==='r2'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ПОДНЯТЬ ШТИФТЫ В ПРАВИЛЬНОМ ПОРЯДКЕ</b>';
-    }else if(mode==='skyrim'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>НАЙТИ ПРАВИЛЬНЫЙ УГОЛ ОТМЫЧКИ</b>';
-    }else if(mode==='anach'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>МЕНЯЙ 3 КАНАЛА ТАК, ЧТОБЫ ЧИСЛО ВЫРОСЛО ДО 100.0</b>';
     }else if(mode==='heatcold'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ПОДОБРАТЬ 4-ЗНАЧНЫЙ КОД ПО ПОДСКАЗКАМ ТЕПЛО / ХОЛОДНО</b>';
     }else if(mode==='drum'){

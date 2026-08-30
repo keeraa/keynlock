@@ -135,7 +135,6 @@
     syncModePanels(mode);
     updateModeUI();
     newLock(false);
-    if(mode==='r2') requestAnimationFrame(renderR2);
     activeMissionRun = { id: missionRunId(loc.mode, mapChapter), mode: loc.mode, tier: mapChapter, roundId: activeRoundId };
     toast(`${loc.name} · глава ${mapChapter}`);
   }

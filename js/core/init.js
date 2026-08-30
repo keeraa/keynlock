@@ -259,30 +259,11 @@
     addEventListener('click', ask);
   })();
 
-  $skBoard.addEventListener('pointerdown',e=>{
-    if(mode!=='skyrim' || e.target.closest('.skTorqueButton')) return;
-    skDragging=true;
-    $skBoard.setPointerCapture?.(e.pointerId);
-    setSkyrimAngle(skyrimAngleFromPointer(e));
-  });
-  $skBoard.addEventListener('pointermove',e=>{
-    if(mode!=='skyrim' || !skDragging) return;
-    setSkyrimAngle(skyrimAngleFromPointer(e));
-  });
-  $skBoard.addEventListener('pointerup',e=>{
-    if(mode!=='skyrim') return;
-    skDragging=false;
-    $skBoard.releasePointerCapture?.(e.pointerId);
-  });
-  $skBoard.addEventListener('pointercancel',()=>{ skDragging=false; });
-
   $lockHitArea.addEventListener('click',handleUniversalLockClick);
   $massCenter.addEventListener('click',()=>GameActions.attemptOpen({modeId:'mass',source:'puzzle-control'}));
   $skTorqueButton.addEventListener('click',()=>GameActions.attemptOpen({modeId:'skyrim',source:'puzzle-control'}));
   $anUnlock.addEventListener('click',e=>{ if(e.target.closest('.anBtn')) return; GameActions.attemptOpen({modeId:'anach',source:'puzzle-control'}); });
   $anUnlock.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&!e.target.closest('.anBtn')){ e.preventDefault(); GameActions.attemptOpen({modeId:'anach',source:'keyboard'}); } });
-  document.querySelectorAll('[data-an-col]').forEach(btn=>btn.addEventListener('click',e=>{ e.stopPropagation(); adjustAn(btn.dataset.anDir==='up'?1:-1, Number(btn.dataset.anCol)); }));
-  document.querySelectorAll('.anChannel').forEach(ch=>ch.addEventListener('click',e=>{ if(e.target.closest('.anBtn')) return; anSelected=Number(ch.dataset.col); SFX.select(); renderAn(); }));
   $wmOpenBtn?.addEventListener('click',()=>GameActions.attemptOpen({modeId:'watchmen',source:'puzzle-control'}));
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&e.code==='Space'&&PuzzleModes.action(mode,'primary')) e.preventDefault();});
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='thiefds'&&e.code==='Space'){e.preventDefault();tdsCommit();}});

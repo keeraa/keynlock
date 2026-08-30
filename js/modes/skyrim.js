@@ -1,4 +1,6 @@
+(function(){
   // ===== SKYRIM =====
+  let skTargetAngle=0, skPickAngle=0, skCylinderAngle=0, skTorqueBusy=false, skDragging=false, skSolveTolerance=6;
   function skAngleDiff(){
     return Math.abs(skPickAngle-skTargetAngle);
   }
@@ -164,3 +166,45 @@
     const angle=Math.atan2(dx,-dy)*180/Math.PI;
     return clamp(angle,-80,80);
   }
+
+  function skyrimWrongTool(){
+    skPickAngle=0;
+    skCylinderAngle=0;
+    skTorqueBusy=false;
+    const centerLock=document.querySelector('.skCenterLock');
+    centerLock?.classList.remove('shake-fail');
+    void centerLock?.offsetWidth;
+    centerLock?.classList.add('shake-fail');
+    setTimeout(()=>centerLock?.classList.remove('shake-fail'),380);
+    renderSkyrim();
+  }
+
+  $skBoard.addEventListener('pointerdown',e=>{
+    if(mode!=='skyrim'||e.target.closest('.skTorqueButton')) return;
+    skDragging=true;
+    $skBoard.setPointerCapture?.(e.pointerId);
+    setSkyrimAngle(skyrimAngleFromPointer(e));
+  });
+  $skBoard.addEventListener('pointermove',e=>{
+    if(mode!=='skyrim'||!skDragging) return;
+    setSkyrimAngle(skyrimAngleFromPointer(e));
+  });
+  $skBoard.addEventListener('pointerup',e=>{
+    if(mode!=='skyrim') return;
+    skDragging=false;
+    $skBoard.releasePointerCapture?.(e.pointerId);
+  });
+  $skBoard.addEventListener('pointercancel',()=>{skDragging=false;});
+
+  PuzzleModes.register({
+    id:'skyrim', start:startSkyrimRound, render:renderSkyrim,
+    objective:()=>GameCatalog.get('skyrim')?.objective,
+    restartMessage:'Новый замок Skyrim',
+    input:{
+      horizontal:moveSkyrim,
+      vertical:delta=>{ if(delta<0) GameActions.attemptOpen({modeId:'skyrim',source:'keyboard'}); }
+    },
+    actions:{wrongTool:skyrimWrongTool},
+    attemptOpen:tryTorqueSkyrim
+  });
+})();

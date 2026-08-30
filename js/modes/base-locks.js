@@ -267,6 +267,7 @@ let plateEls=[], pinTopPlateEls=[];
     $mechanism.classList.remove('ready','opening','opened');
     const baseDifficulty = getModeDifficulty(mode);
     n=((mode==='classic' || mode==='target' || mode==='line' || mode==='sequence' || mode==='special') && baseDifficulty===1) ? 4 : 5;
+    window.LockShell?.syncMode(mode,{rows:n});
     selected=0; solved=false; picks=pickCapacity; moves=0; brokenPicks=0; runReward=1000;
 
     PuzzleModes.call(mode,'start');

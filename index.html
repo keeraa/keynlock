@@ -48,6 +48,7 @@
 <link rel="stylesheet" href="css/challenge-hud.css">
 <link rel="stylesheet" href="css/typography.css">
 <link rel="stylesheet" href="css/game-defeat.css">
+<link rel="stylesheet" href="css/lock-shell.css">
 
 
 
@@ -385,12 +386,21 @@
 <main class="main">
 <div class="scene">
 <div class="glow"></div>
+<div class="lockShellFrame" id="lockShellFrame" aria-hidden="true">
+  <img class="lockShellBackground" id="lockShellBackground" src="assets/lock-shell/lock-bg-01.png" alt="">
+  <div class="lockShellOverlayLayer" id="lockShellOverlayLayer"></div>
+</div>
 <div id="lock" class="universalLockBlock">
 <div class="mechanismZone">
+<img class="lockShellFunnel lockShellFunnelBack" id="lockShellFunnelBack" src="assets/lock-shell/funnel-lower-01.png" alt="">
+<div class="lockShellPhysicalLock">
+<div class="lockShellShackle"></div>
 <div class="lockPanel"></div>
+<button aria-label="Открыть замок" class="lockHitArea" id="lockHitArea" type="button"></button>
+</div>
 <div class="pick"></div>
 <div class="tension"></div>
-<button aria-label="Открыть замок" class="lockHitArea" id="lockHitArea" type="button"></button>
+<img class="lockShellFunnel lockShellFunnelFront" id="lockShellFunnelFront" src="assets/lock-shell/funnel-upper-01.png" alt="">
 </div>
 </div>
 <div class="pinTopLayer" id="pinTopLayer" aria-hidden="true"><div class="pinTopPlates" id="pinTopPlates"></div></div>

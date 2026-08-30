@@ -58,3 +58,73 @@ const PuzzleModes=(()=>{
 })();
 
 window.PuzzleModes=PuzzleModes;
+
+/* Reusable visual shell for lock mechanisms and optional per-game overlays. */
+(() => {
+  const BASE_MODES = new Set(['classic', 'target', 'line', 'sequence', 'special']);
+  const frame = document.querySelector('#lockShellFrame');
+  const background = document.querySelector('#lockShellBackground');
+  const funnelBack = document.querySelector('#lockShellFunnelBack');
+  const funnelFront = document.querySelector('#lockShellFunnelFront');
+  const overlayLayer = document.querySelector('#lockShellOverlayLayer');
+  const profiles = new Map();
+  let activeProfile = null;
+
+  function registerProfile(id, profile) {
+    profiles.set(id, {background:'',funnelBack:'',funnelFront:'',className:'',...profile});
+  }
+  function renderOverlays(overlays = []) {
+    overlayLayer.replaceChildren();
+    overlays.forEach((overlay, index) => {
+      if (!overlay?.src) return;
+      const image = document.createElement('img');
+      image.src = overlay.src;
+      image.alt = '';
+      image.className = `lockShellOverlay ${overlay.className || ''}`.trim();
+      image.dataset.overlayIndex = String(index);
+      if (overlay.style) Object.assign(image.style, overlay.style);
+      overlayLayer.appendChild(image);
+    });
+  }
+  function activate(id, options = {}) {
+    const profile = profiles.get(id);
+    if (!profile || !frame) return false;
+    const rows = String(options.rows || 5);
+    activeProfile = id;
+    document.body.classList.add('lock-shell-active');
+    document.body.dataset.lockShellRows = rows;
+    frame.dataset.profile = id;
+    frame.dataset.rows = rows;
+    frame.className = `lockShellFrame ${profile.className || ''}`.trim();
+    if (profile.background) background.src = profile.background;
+    if (profile.funnelBack) funnelBack.src = profile.funnelBack;
+    if (profile.funnelFront) funnelFront.src = profile.funnelFront;
+    renderOverlays(options.overlays || profile.overlays);
+    return true;
+  }
+  function deactivate() {
+    activeProfile = null;
+    document.body.classList.remove('lock-shell-active');
+    delete document.body.dataset.lockShellRows;
+    renderOverlays();
+  }
+  function syncMode(mode, options = {}) {
+    if (BASE_MODES.has(mode)) activate(options.profile || 'base-plates', options);
+    else deactivate();
+  }
+
+  registerProfile('base-plates', {
+    background:'assets/lock-shell/lock-bg-01.png',
+    funnelBack:'assets/lock-shell/funnel-lower-01.png',
+    funnelFront:'assets/lock-shell/funnel-upper-01.png'
+  });
+  window.LockShell = {
+    registerProfile,activate,deactivate,syncMode,setOverlays:renderOverlays,
+    setRows(rows) {
+      const value = String(rows || 5);
+      if (frame) frame.dataset.rows = value;
+      document.body.dataset.lockShellRows = value;
+    },
+    get activeProfile() { return activeProfile; }
+  };
+})();

@@ -17,16 +17,6 @@
     const registeredObjective=PuzzleModes.objective(mode);
     if(registeredObjective){
       $objectiveLine.innerHTML=`ЦЕЛЬ: <b>${registeredObjective}</b>`;
-    }else if(mode==='classic'){
-      $objectiveLine.innerHTML = `ЦЕЛЬ: <b>ПОДНЯТЬ ВСЕ ШТИФТЫ</b> · ${generatedDistance} ходов минимум`;
-    }else if(mode==='target'){
-      $objectiveLine.innerHTML = `ЦЕЛЬ: <b>СОВМЕСТИТЬ ШТЫРИ С СИНИМИ МЕТКАМИ</b> · ${generatedDistance} ходов минимум`;
-    }else if(mode==='line'){
-      $objectiveLine.innerHTML = `ЦЕЛЬ: <b>ВЫСТРОИТЬ ВСЕ ШТИФТЫ ПО ЛИНИИ ${goalLine}</b> · ${generatedDistance} ходов минимум`;
-    }else if(mode==='sequence'){
-      $objectiveLine.innerHTML = `КОД: <b>${targets.join(', ')}</b> · ${generatedDistance} ходов минимум`;
-    }else if(mode==='special'){
-      $objectiveLine.innerHTML = `ОСОБЫЙ ЗАМОК: <b>${specialTypeName()}</b> · ${generatedDistance} ходов минимум`;
     }
     if(typeof syncPuzzleRewardClearance==='function') requestAnimationFrame(syncPuzzleRewardClearance);
   }

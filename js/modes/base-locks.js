@@ -1,4 +1,5 @@
   // ===== BASE / SPECIAL LOCKS =====
+  const BASE_MODE_IDS=new Set(['classic','target','line','sequence','special']);
   function buildSpecialLinks(type){
     links=Array.from({length:n},()=>Array(n).fill(0));
 
@@ -231,6 +232,31 @@ let plateEls=[], pinTopPlateEls=[];
     animatePinTo(p,state[i]);
   }
 
+  function startBaseLock(modeId){
+    if(modeId==='classic'){
+      goalLine=GOAL; targets=[]; makeLinks();
+      state=generateLinkedPuzzle(GOAL,diffStep(6,8,11),diffStep(9,12,15));
+    }else if(modeId==='target'){
+      goalLine=GOAL; links=[];
+      makeSmartTargetModeStart(diffStep(6,8,12),diffStep(10,14,18));
+    }else if(modeId==='line'){
+      targets=[]; goalLine=shuffle([2,3,5,6])[0]; makeLinks();
+      state=generateLinkedPuzzle(goalLine,diffStep(6,8,11),diffStep(9,12,15));
+    }else if(modeId==='sequence'){
+      goalLine=GOAL; links=[];
+      makeSmartTargetModeStart(diffStep(6,8,12),diffStep(10,14,18));
+    }else{
+      targets=[]; goalLine=GOAL;
+      const difficulty=getModeDifficulty('special');
+      specialType=shuffle(difficulty===1?['chain']:(difficulty===2?['chain','mirror']:['chain','mirror','wave']))[0];
+      buildSpecialLinks(specialType);
+      state=generateLinkedPuzzle(GOAL,diffStep(5,7,10,'special'),diffStep(8,11,14,'special'));
+    }
+    initial=[...state];
+    rebuildPlates();
+    render();
+  }
+
   function newLock(notify=true){
     beginRoundState();
     $toast.classList.remove('show','actionable');
@@ -243,59 +269,12 @@ let plateEls=[], pinTopPlateEls=[];
     n=((mode==='classic' || mode==='target' || mode==='line' || mode==='sequence' || mode==='special') && baseDifficulty===1) ? 4 : 5;
     selected=0; solved=false; picks=pickCapacity; moves=0; brokenPicks=0; runReward=1000;
 
-    if(mode==='classic'){
-      goalLine=GOAL;
-      targets=[];
-      makeLinks();
-      state=generateLinkedPuzzle(GOAL,diffStep(6,8,11),diffStep(9,12,15));
-      initial=[...state];
-      rebuildPlates();
-      render();
-    }else if(mode==='target'){
-      goalLine=GOAL;
-      links=[];
-      makeSmartTargetModeStart(diffStep(6,8,12),diffStep(10,14,18));
-      initial=[...state];
-      rebuildPlates();
-      render();
-    }else if(mode==='line'){
-      targets=[];
-      goalLine=shuffle([2,3,5,6])[0];
-      makeLinks();
-      state=generateLinkedPuzzle(goalLine,diffStep(6,8,11),diffStep(9,12,15));
-      initial=[...state];
-      rebuildPlates();
-      render();
-    }else if(mode==='sequence'){
-      goalLine=GOAL;
-      links=[];
-      makeSmartTargetModeStart(diffStep(6,8,12),diffStep(10,14,18));
-      initial=[...state];
-      rebuildPlates();
-      render();
-    }else if(mode==='special'){
-      targets=[];
-      goalLine=GOAL;
-      const specialDifficulty=getModeDifficulty('special');
-      specialType=shuffle(specialDifficulty===1 ? ['chain'] : (specialDifficulty===2 ? ['chain','mirror'] : ['chain','mirror','wave']))[0];
-      buildSpecialLinks(specialType);
-      state=generateLinkedPuzzle(GOAL,diffStep(5,7,10,'special'),diffStep(8,11,14,'special'));
-      initial=[...state];
-      rebuildPlates();
-      render();
-    }else if(PuzzleModes.call(mode,'start')){
-      // Registered puzzle owns its complete round lifecycle.
-    }
+    PuzzleModes.call(mode,'start');
 
     updateModeUI();
     updateEconomyUI();
 
-    const msg = PuzzleModes.has(mode) ? PuzzleModes.restartMessage(mode) :
-      mode==='classic' ? 'Новый замок' :
-      mode==='target' ? 'Новая цель' :
-      mode==='line' ? `Новая линия: ${goalLine}` :
-      mode==='sequence' ? `Новый код: ${targets.join(', ')}` :
-      `Особый замок: ${specialTypeName()}`;
+    const msg=PuzzleModes.restartMessage(mode);
     if(notify){
       toast(msg);
       SFX.newRound();
@@ -304,6 +283,7 @@ let plateEls=[], pinTopPlateEls=[];
 
   function reset(){
     beginRoundState();
+    if(PuzzleModes.action(mode,'reset')) return;
     if(PuzzleModes.call(mode,'start')){ toast(PuzzleModes.restartMessage(mode)); return; }
     state=[...initial]; solved=false; $lock.classList.remove('win');
     $mechanism.classList.remove('ready','opening','opened');
@@ -344,8 +324,7 @@ let plateEls=[], pinTopPlateEls=[];
     $mechanism.classList.toggle('ready',goalMet());
   }
 
-  function move(dir){
-    if(PuzzleModes.input(mode,'horizontal',dir)) return;
+  function moveBase(dir){
     if(solved) return;
     nudgeTools();
     if(mode==='classic' || mode==='line' || mode==='special'){
@@ -364,6 +343,10 @@ let plateEls=[], pinTopPlateEls=[];
     const isReady=goalMet();
     $mechanism.classList.toggle('ready',isReady);
     if(isReady&&!wasReady) SFX.ready();
+  }
+
+  function move(dir){
+    PuzzleModes.input(mode,'horizontal',dir);
   }
 
   function shakeUniversalLock(){
@@ -412,16 +395,47 @@ let plateEls=[], pinTopPlateEls=[];
     },1000);
   }
 
+  function resetBaseLock(){
+    state=[...initial]; solved=false; $lock.classList.remove('win');
+    $mechanism.classList.remove('ready','opening','opened');
+    render(); toast('Механизм сброшен');
+  }
+
+  function selectBase(delta){
+    if(solved)return;
+    selected=(selected+delta+n)%n;
+    SFX.select();
+    render();
+  }
+
+  const baseModeDefinitions={
+    classic:{restartMessage:'Новый замок',objective:()=>`ПОДНЯТЬ ВСЕ ШТИФТЫ · ${generatedDistance} ХОДОВ МИНИМУМ`},
+    target:{restartMessage:'Новая цель',objective:()=>`СОВМЕСТИТЬ ШТЫРИ С СИНИМИ МЕТКАМИ · ${generatedDistance} ХОДОВ МИНИМУМ`},
+    line:{restartMessage:()=>`Новая линия: ${goalLine}`,objective:()=>`ВЫСТРОИТЬ ВСЕ ШТИФТЫ ПО ЛИНИИ ${goalLine} · ${generatedDistance} ХОДОВ МИНИМУМ`},
+    sequence:{restartMessage:()=>`Новый код: ${targets.join(', ')}`,objective:()=>`КОД: ${targets.join(', ')} · ${generatedDistance} ХОДОВ МИНИМУМ`},
+    special:{restartMessage:()=>`Особый замок: ${specialTypeName()}`,objective:()=>`${specialTypeName().toUpperCase()} ОСОБЫЙ ЗАМОК · ${generatedDistance} ХОДОВ МИНИМУМ`}
+  };
+  Object.entries(baseModeDefinitions).forEach(([id,definition])=>PuzzleModes.register({
+    id,
+    start:()=>startBaseLock(id),
+    render,
+    objective:definition.objective,
+    restartMessage:definition.restartMessage,
+    attemptOpen:tryOpenBaseLock,
+    input:{horizontal:moveBase,vertical:selectBase},
+    actions:{reset:resetBaseLock}
+  }));
+
   /* Mode files keep ownership of their puzzle-specific validation, but every
      UI surface enters through GameActions.attemptOpen. Lambdas intentionally
      resolve the function variables at call time: the inventory/tension layer
      may wrap those functions later without leaving stale registrations. */
   GameActions.registerOpeners({
-    classic:()=>tryOpenBaseLock(),
-    target:()=>tryOpenBaseLock(),
-    line:()=>tryOpenBaseLock(),
-    sequence:()=>tryOpenBaseLock(),
-    special:()=>tryOpenBaseLock(),
+    classic:()=>PuzzleModes.call('classic','attemptOpen'),
+    target:()=>PuzzleModes.call('target','attemptOpen'),
+    line:()=>PuzzleModes.call('line','attemptOpen'),
+    sequence:()=>PuzzleModes.call('sequence','attemptOpen'),
+    special:()=>PuzzleModes.call('special','attemptOpen'),
     tension:()=>PuzzleModes.call('tension','attemptOpen'),
     resonance:()=>PuzzleModes.call('resonance','attemptOpen'),
     deduction:()=>PuzzleModes.call('deduction','attemptOpen'),
@@ -453,11 +467,7 @@ let plateEls=[], pinTopPlateEls=[];
   });
 
   function select(delta){
-    if(PuzzleModes.input(mode,'vertical',delta)) return;
-    if(solved)return;
-    selected=(selected+delta+n)%n;
-    SFX.select();
-    render();
+    PuzzleModes.input(mode,'vertical',delta);
   }
 
   function render(){
@@ -465,8 +475,8 @@ let plateEls=[], pinTopPlateEls=[];
     for(let i=0;i<n;i++) updatePlateVisual(i);
 
     updatePickUI();
-    if(PuzzleModes.has(mode)){ $mechanism.classList.remove('ready'); }
-    else $mechanism.classList.toggle('ready',!solved && goalMet());
+    if(BASE_MODE_IDS.has(mode)) $mechanism.classList.toggle('ready',!solved && goalMet());
+    else if(PuzzleModes.has(mode)) $mechanism.classList.remove('ready');
     $status.innerHTML = '';
   }
 

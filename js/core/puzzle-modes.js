@@ -49,7 +49,10 @@ const PuzzleModes=(()=>{
     const value=get(id)?.objective;
     return typeof value==='function'?value():value||GameCatalog.get(id)?.objective||'';
   }
-  function restartMessage(id){return get(id)?.restartMessage||'Головоломка обновлена';}
+  function restartMessage(id){
+    const value=get(id)?.restartMessage;
+    return (typeof value==='function'?value():value)||'Головоломка обновлена';
+  }
 
   return Object.freeze({register,get,has:id=>modes.has(id),call,input,action,objective,restartMessage});
 })();

@@ -267,10 +267,16 @@
   }
   let modeDifficultyMap=loadModeDifficulty();
   function saveModeDifficulty(){ STORE.setItem(DIFFICULTY_STORAGE_KEY, JSON.stringify(modeDifficultyMap)); }
-  function getModeDifficulty(modeName=mode){ const v=Number(modeDifficultyMap?.[modeName]); return [1,2,3].includes(v)?v:1; }
+  function getModeDifficulty(modeName=mode){
+    const supported=GameCatalog.get(modeName)?.difficulty.levels||[1];
+    const v=Number(modeDifficultyMap?.[modeName]);
+    return supported.includes(v)?v:(supported[0]||1);
+  }
   function diffStep(a,b,c,modeName=mode){ const level=getModeDifficulty(modeName); return level===1?a:level===2?b:c; }
   function setModeDifficulty(level, modeName=mode, regenerate=true){
     level=Math.max(1,Math.min(3,Number(level)||1));
+    const supported=GameCatalog.get(modeName)?.difficulty.levels||[1];
+    if(!supported.includes(level))level=supported[0]||1;
     modeDifficultyMap[modeName]=level;
     saveModeDifficulty();
     if(modeName!==mode || !regenerate) return;

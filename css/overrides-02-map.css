@@ -127,6 +127,8 @@
 #worldMapCanvas .mapTierPip{width:5px;height:5px;border-radius:50%;background:rgba(30,23,16,.75);box-shadow:inset 0 0 0 1px rgba(196,166,110,.45);}
 #worldMapCanvas .mapTierPip.done{background:#d9a74c;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35);}
 #worldMapCanvas .mapTierPip.current{outline:1px solid rgba(240,200,110,.75);outline-offset:1px;}
+#worldMapCanvas .mapTierPip.unsupported{position:relative;width:7px;height:7px;background:transparent;box-shadow:none;}
+#worldMapCanvas .mapTierPip.unsupported::after{content:"×";position:absolute;inset:-2px;color:#9b7051;font:700 9px/1 Arial,sans-serif;}
 
 /* Half the width it used to take, tucked into the left corner. */
 #worldMapCanvas .worldMapInfoOverlay{width:min(470px,52%)!important;padding:9px 12px!important;}

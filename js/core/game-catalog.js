@@ -21,10 +21,10 @@ const GAME_DEFINITIONS={
   resonance:{title:'Резонанс',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   deduction:{title:'Слепок ключа',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   composite:{title:'Составная',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
-  heatcold:{title:'Тепло — холодно',kind:'native',lock:{present:false,manualOpen:true},world:{noise:false,guards:false,birds:false}},
-  drum:{title:'Щелчки барабана',kind:'native',lock:{present:false,manualOpen:true},world:{noise:false,guards:false,birds:false}},
-  scope:{title:'Осциллограф',kind:'native',lock:{present:false,manualOpen:true},world:{noise:false,guards:false,birds:false}},
-  oblivion:{title:'Штифтовый замок',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
+  heatcold:{title:'Тепло — холодно',kind:'native',lock:{present:false,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
+  drum:{title:'Щелчки барабана',kind:'native',lock:{present:false,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
+  scope:{title:'Осциллограф',kind:'native',lock:{present:false,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
+  oblivion:{title:'Штифтовый замок',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
   watchmen:{title:'Подпружиненные тумблеры',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   museum:{title:'Подбор формы отмычки',kind:'native',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
   mass2:{title:'Парные узлы',kind:'native',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
@@ -35,9 +35,9 @@ const GAME_DEFINITIONS={
   thief12:{title:'Thief 1/2',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   fallout:{title:'Fallout',kind:'native',lock:{present:true,manualOpen:true},world:{noise:true,noiseSensor:true,guards:false,birds:false}},
   anachlab:{title:'Anachronox — лаборатория',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
-  masshack:{title:'Mass Effect — узел',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
-  pathologic:{title:'Pathologic 2',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
-  bioshock2:{title:'BioShock 2',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
+  masshack:{title:'Mass Effect — узел',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
+  pathologic:{title:'Pathologic 2',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
+  bioshock2:{title:'BioShock 2',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
   alphaprotocol:{title:'Alpha Protocol',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}}
 };
 

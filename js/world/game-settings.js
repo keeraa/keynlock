@@ -149,10 +149,18 @@
           button.dataset.level=String(level);
           button.textContent=String(level);
           button.disabled=!supported;
+          button.classList.toggle('unsupported',!supported);
+          button.title=supported?`Уровень ${level}`:`Уровень ${level} ещё не готов`;
           button.classList.toggle('active',supported&&game.kind==='native'&&id===mode&&getModeDifficulty(id)===level);
           button.setAttribute('aria-label',`${game.title}: сложность ${level}${supported?'':' недоступна'}`);
           difficulty.appendChild(button);
         });
+        if(supportedLevels.length<3){
+          const note=document.createElement('em');
+          note.className='gameLevelsNote';
+          note.textContent='только 1 уровень';
+          difficulty.appendChild(note);
+        }
         name.querySelector('.gameSettingName').appendChild(difficulty);
         tr.appendChild(name);
         featureColumns.forEach(([path,label])=>{
@@ -173,8 +181,12 @@
     }
 
     function launchGame(id,level=1){
-      closeGameSettings(false);
       const game=GameCatalog.get(id);
+      if(!game?.difficulty.levels.includes(level)){
+        toast(`${game?.title||id}: уровень ${level} ещё не готов`);
+        return;
+      }
+      closeGameSettings(false);
       if(game?.kind==='native'){
         setModeDifficulty(level,id,false);
         switchMode(id,true);

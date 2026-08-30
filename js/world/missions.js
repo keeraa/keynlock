@@ -53,6 +53,7 @@
   function missionNodeId(mode) { return `mission-${mode}`; }
   function missionRunId(mode, tier) { return `${mode}-${tier}`; }
   function missionLabel(place) { return GameCatalog.get(place.mode)?.title || place.mode; }
+  function gameSupportsTier(mode,tier){ return GameCatalog.get(mode)?.difficulty.levels.includes(tier)??false; }
 
   let missionsDone = {};
   try {
@@ -65,7 +66,7 @@
   if (!MISSION_TIERS.includes(mapChapter)) mapChapter = 1;
 
   function missionCleared(mode, tier) { return !!missionsDone[missionRunId(mode, tier)]; }
-  function chapterCleared(tier) { return MISSION_PLACES.every(p => missionCleared(p.mode, tier)); }
+  function chapterCleared(tier) { return MISSION_PLACES.filter(p=>gameSupportsTier(p.mode,tier)).every(p => missionCleared(p.mode, tier)); }
   // A chapter opens once the one before it is finished. With the dev flag on,
   // every chapter and every place is reachable from the start.
   function chapterUnlocked(tier) {
@@ -109,6 +110,7 @@
     const loc = MAP_LOCATIONS[id];
     if (!loc || loc.action !== 'mission') return;
     if (!missionUnlocked()) { toast('Эта глава ещё закрыта'); return; }
+    if(!gameSupportsTier(loc.mode,mapChapter)){toast(`${loc.name}: уровень ${mapChapter} ещё не готов`);return;}
 
     if (lairOpen) closeLair();
     if (shopOpen) closeShop();
@@ -159,7 +161,8 @@
 
     for (const place of MISSION_PLACES) {
       const id = missionNodeId(place.mode);
-      const open = missionUnlocked();
+      const supported=gameSupportsTier(place.mode,mapChapter);
+      const open = missionUnlocked()&&supported;
       const node = document.createElement('button');
       node.type = 'button';
       node.className = 'mapNode missionNode mission ' + (open ? 'accessible' : 'locked');
@@ -173,13 +176,15 @@
       dot.className = 'mapNodeDot missionDot';
       const label = document.createElement('span');
       label.className = 'mapNodeLabel';
-      label.textContent = GameCatalog.mapLabel(place.mode,missionLabel(place));
+      label.textContent = GameCatalog.mapLabel(place.mode,missionLabel(place))+(GameCatalog.get(place.mode).difficulty.levels.length<3?' · только 1 ур.':'');
       const tiers = document.createElement('span');
       tiers.className = 'mapNodeTiers';
       for (const tier of MISSION_TIERS) {
         const pip = document.createElement('i');
-        pip.className = 'mapTierPip' + (missionCleared(place.mode, tier) ? ' done' : '')
-          + (tier === mapChapter ? ' current' : '');
+        const tierSupported=gameSupportsTier(place.mode,tier);
+        pip.className = 'mapTierPip' + (!tierSupported?' unsupported':missionCleared(place.mode,tier) ? ' done' : '')
+          + (tierSupported&&tier === mapChapter ? ' current' : '');
+        pip.title=tierSupported?`Уровень ${tier}`:`Уровень ${tier} не готов`;
         tiers.appendChild(pip);
       }
       node.append(dot, label, tiers);
@@ -227,10 +232,11 @@
     baseRenderWorldMap();
     const loc = MAP_LOCATIONS[mapLocation];
     if (loc?.action === 'mission' && $mapInfoText) {
+      const supported=gameSupportsTier(loc.mode,mapChapter);
       const cleared = missionCleared(loc.mode, mapChapter);
-      $mapInfoText.textContent = `Замок этого типа, сложность ${mapChapter}. `
+      $mapInfoText.textContent = supported?`Замок этого типа, сложность ${mapChapter}. `
         + (cleared ? 'Уже пройден в этой главе. ' : '')
-        + 'Нажми на точку ещё раз, чтобы начать.';
+        + 'Нажми на точку ещё раз, чтобы начать.':`Уровень ${mapChapter} для этой игры ещё не готов.`;
     }
     syncChapterPicker();
   };

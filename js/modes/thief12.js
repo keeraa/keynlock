@@ -134,6 +134,7 @@
 
   function renderThief12(){
     if(!$th12Door) return;
+    setGlobalTimer(mode==='thief12' && !th12Failed, th12TimeLeft, th12TimeMax, 'ТАЙМЕР');
     if($th12Stages){
       [...$th12Stages.children].forEach((s,i)=>s.classList.toggle('done',i<th12Step));
     }

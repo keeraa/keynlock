@@ -180,6 +180,7 @@
 
   function renderThiefDs(){
     if(!$tdsLock) return;
+    setGlobalTimer(mode==='thiefds' && !tdsFailed, tdsTimeLeft, tdsTimeMax, 'ТАЙМЕР');
     if(tdsRingEls.length!==3){
       tdsRingEls=[];
       for(let i=0;i<3;i++){

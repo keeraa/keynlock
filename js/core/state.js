@@ -61,14 +61,10 @@
   let mapOpen=false, mapMoving=false;
   const MAP_LOCATIONS={
     lair:{name:'Логово',x:20,y:68,text:'Точка старта. Здесь находится база команды.',action:'lair'},
-    shop:{name:'Лавка отмычек',x:49,y:55,text:'Здесь можно покупать материалы, внешний вид и увеличивать запас отмычек.',action:'shop'},
-    upper:{name:'Верхний город',x:56,y:18,text:'Район пока закрыт.',locked:true},
-    port:{name:'Порт',x:73,y:84,text:'Район пока закрыт.',locked:true},
-    old:{name:'Старый квартал',x:65,y:48,text:'Район пока закрыт.',locked:true}
+    shop:{name:'Лавка отмычек',x:49,y:55,text:'Здесь можно покупать материалы, внешний вид и увеличивать запас отмычек.',action:'shop'}
   };
   const MAP_CONNECTIONS={lair:['shop'],shop:['lair']};
   let mapLocation=MAP_LOCATIONS[STORE.getItem('lockpickMapLocation')]?STORE.getItem('lockpickMapLocation'):'lair';
-  if(MAP_LOCATIONS[mapLocation]?.locked) mapLocation='lair';
   let lairOpen=false;
   const LAIR_KAI_PORTRAIT="assets/characters/kai.png";
   const LAIR_SAI_PORTRAIT="assets/characters/sai.png";

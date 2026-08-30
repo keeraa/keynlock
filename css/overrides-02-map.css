@@ -14,7 +14,7 @@
 .mapWallA{width:24%;left:9%;top:29%;transform:rotate(-16deg);}
 .mapWallB{width:20%;right:18%;top:57%;transform:rotate(12deg);}
 .mapNode{position:absolute;left:var(--mx);top:var(--my);transform:translate(-50%,-50%);min-width:110px;padding:40px 8px 4px;border:0;background:transparent;color:#a49478;font:12px/1.12 Arial,sans-serif;text-align:center;cursor:pointer;z-index:8;}
-.mapNodeDot{position:absolute;left:50%;top:16px;width:22px;height:22px;transform:translate(-50%,-50%);border:3px solid #765d37;border-radius:50%;background:#17130f;box-shadow:0 2px 10px rgba(0,0,0,.5);transition:transform .18s ease,border-color .18s ease,background .18s ease;}
+.mapNodeDot{position:absolute;left:50%;top:18px;width:26px;height:26px;transform:translate(-50%,-50%);display:grid;place-items:center;border:3px solid #765d37;border-radius:50%;background:#17130f;color:#e2bd71;font:700 14px/1 Forum,Georgia,serif;box-shadow:0 2px 10px rgba(0,0,0,.5);transition:transform .18s ease,border-color .18s ease,background .18s ease;}
 .mapNode.accessible:hover .mapNodeDot{transform:translate(-50%,-50%) scale(1.14);border-color:#d6ab5e;}
 .mapNode.accessible{color:#d1b783;}
 .mapNode.current .mapNodeDot{border-color:#f0c86e;background:#a9772f;box-shadow:0 0 0 5px rgba(217,167,76,.12),0 0 19px rgba(226,178,81,.26);}
@@ -108,7 +108,7 @@
    than a text shadow. Every node gets it — the lair and the shop read the same
    as the games. These are prefixed with the canvas id because this file loads
    before overrides-03-lair and overrides-06-digital, which both restyle nodes. */
-#worldMapCanvas .mapNodeLabel{display:inline-block;padding:2px 7px;border:1px solid rgba(122,95,52,.55);border-radius:7px;background:rgba(22,17,12,.88);color:#e6d2a6;font:600 11px/1.25 Arial,sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.45);text-shadow:none;white-space:nowrap;}
+#worldMapCanvas .mapNodeLabel{display:inline-block;padding:3px 8px;border:1px solid rgba(122,95,52,.55);border-radius:8px;background:rgba(22,17,12,.88);color:#e6d2a6;font:600 13px/1.25 Arial,sans-serif;letter-spacing:.025em;text-transform:uppercase;box-shadow:0 2px 6px rgba(0,0,0,.45);text-shadow:none;white-space:nowrap;}
 #worldMapCanvas .mapNode.accessible:hover .mapNodeLabel{border-color:#d6ab5e;color:#f6e3b6;}
 #worldMapCanvas .mapNode.current .mapNodeLabel{background:rgba(74,47,19,.94);border-color:#f0c86e;color:#ffe6b4;}
 #worldMapCanvas .mapNodeLock{color:#8d7c60;text-shadow:0 1px 2px rgba(20,14,8,.8);}
@@ -120,15 +120,15 @@
 
 /* One node per lock game means they sit far tighter than the old district
    markers, so the hit box hugs its own label instead of a fixed 110px. */
-#worldMapCanvas .mapNode.missionNode{min-width:0;padding:26px 2px 2px;z-index:9;}
+#worldMapCanvas .mapNode.missionNode{min-width:0;padding:32px 2px 2px;z-index:9;}
 #worldMapCanvas .mapNode.missionNode:hover{z-index:12;}
-#worldMapCanvas .mapNode.missionNode .mapNodeDot{top:11px;width:18px;height:18px;border-width:2px;}
-#worldMapCanvas .mapNodeTiers{display:flex;gap:3px;justify-content:center;margin-top:3px;}
-#worldMapCanvas .mapTierPip{width:5px;height:5px;border-radius:50%;background:rgba(30,23,16,.75);box-shadow:inset 0 0 0 1px rgba(196,166,110,.45);}
+#worldMapCanvas .mapNode.missionNode .mapNodeDot{top:13px;width:22px;height:22px;border-width:2px;font-size:12px;}
+#worldMapCanvas .mapNodeTiers{display:flex;gap:4px;justify-content:center;margin-top:4px;}
+#worldMapCanvas .mapTierPip{width:6px;height:6px;border-radius:50%;background:rgba(30,23,16,.75);box-shadow:inset 0 0 0 1px rgba(196,166,110,.45);}
 #worldMapCanvas .mapTierPip.done{background:#d9a74c;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35);}
 #worldMapCanvas .mapTierPip.current{outline:1px solid rgba(240,200,110,.75);outline-offset:1px;}
-#worldMapCanvas .mapTierPip.unsupported{position:relative;width:7px;height:7px;background:transparent;box-shadow:none;}
-#worldMapCanvas .mapTierPip.unsupported::after{content:"×";position:absolute;inset:-2px;color:#9b7051;font:700 9px/1 Arial,sans-serif;}
+#worldMapCanvas .mapTierPip.unsupported{position:relative;width:8px;height:8px;background:transparent;box-shadow:none;}
+#worldMapCanvas .mapTierPip.unsupported::after{content:"×";position:absolute;inset:-2px;color:#9b7051;font:700 11px/1 Arial,sans-serif;}
 
 /* Half the width it used to take, tucked into the left corner. */
 #worldMapCanvas .worldMapInfoOverlay{width:min(470px,52%)!important;padding:9px 12px!important;}

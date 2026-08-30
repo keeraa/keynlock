@@ -9,6 +9,14 @@
   const MISSIONS_UNLOCK_ALL = true;
 
   const MISSION_TIERS = [1, 2, 3];
+  const MISSION_SYMBOLS = {
+    classic:'⇅', target:'◎', line:'━', sequence:'ⅠⅡ', special:'✦', hillsfar:'✣',
+    mass:'⌁', g1:'⛓', r2:'⌇', skyrim:'✧', anach:'⧖', tension:'∠', resonance:'≋',
+    deduction:'◇', composite:'⛓', heatcold:'◐', drum:'⚙', scope:'∿', oblivion:'⊙',
+    watchmen:'⌚', museum:'⚿', mass2:'⬡', pipeline:'┣', wharf:'↕', thiefds:'⌁',
+    kingdomcome:'⊙', thief12:'◉', fallout:'⟳', anachlab:'⚗', masshack:'⌬',
+    pathologic:'∥', bioshock2:'⌁', alphaprotocol:'≡'
+  };
 
   // Position is the only thing authored per game; labels come from the catalog.
   const MISSION_PLACES = [
@@ -174,9 +182,10 @@
 
       const dot = document.createElement('span');
       dot.className = 'mapNodeDot missionDot';
+      dot.textContent = MISSION_SYMBOLS[place.mode] || '◇';
       const label = document.createElement('span');
       label.className = 'mapNodeLabel';
-      label.textContent = GameCatalog.mapLabel(place.mode,missionLabel(place))+(GameCatalog.get(place.mode).difficulty.levels.length<3?' · только 1 ур.':'');
+      label.textContent = (GameCatalog.mapLabel(place.mode,missionLabel(place))+(GameCatalog.get(place.mode).difficulty.levels.length<3?' · только 1 ур.':'')).toLocaleUpperCase('ru-RU');
       const tiers = document.createElement('span');
       tiers.className = 'mapNodeTiers';
       for (const tier of MISSION_TIERS) {

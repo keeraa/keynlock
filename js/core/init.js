@@ -363,7 +363,6 @@
   addEventListener('keydown',e=>{
     if(!gameplayInputBlocked()&&mode==='alphaprotocol'&&e.code==='Enter'){ e.preventDefault(); GameActions.attemptOpen({modeId:'alphaprotocol',source:'keyboard'}); }
   });
-  $plBoostBtn?.addEventListener('click',()=>plBoost());
   document.querySelector('#shopHudButton')?.addEventListener('click',()=>{
     if(lairOpen) closeLair();
     if(mapOpen) closeMap(false);

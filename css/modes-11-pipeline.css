@@ -1,4 +1,4 @@
-/* Трубопровод (Pipeline) — 6×6 grid of hidden pipe tiles; reveal, rotate,
+/* Трубопровод (Pipeline) — difficulty-scaled grid of hidden pipe tiles; reveal, rotate,
    race a flow from a fixed start port to a fixed exit port. Markup/CSS
    ported from the old prototype scene
    (prototypes/lockpicking-mechanics-v63.html, .bs1-*) with classes renamed
@@ -37,14 +37,15 @@ body.importedMode .puzzleArea>.modePanel.plMode:not([hidden]){padding-bottom:cal
   justify-content:center;
 }
 .plGrid{
-  height:100%;
+  height:min(100%,504px);
   width:auto;
-  max-width:min(420px,100%);
-  aspect-ratio:1;
+  max-width:100%;
+  aspect-ratio:var(--pl-aspect,1);
   container-type:inline-size;
   display:grid;
-  grid-template-columns:repeat(6,1fr);
-  gap:1px;
+  grid-template-columns:repeat(var(--pl-cols,6),1fr);
+  grid-template-rows:repeat(6,1fr);
+  gap:0;
 }
 .plPort{
   position:absolute;
@@ -67,7 +68,7 @@ body.importedMode .puzzleArea>.modePanel.plMode:not([hidden]){padding-bottom:cal
 .plTile{
   position:relative;
   border:1px solid #38463e;
-  border-radius:8px;
+  border-radius:5px;
   background:#101713;
   min-width:0;
   cursor:pointer;
@@ -134,9 +135,3 @@ body.importedMode .puzzleArea>.modePanel.plMode:not([hidden]){padding-bottom:cal
   max-width:560px;
 }
 .plHelp:empty{display:none;}
-
-.plBoostBtn.active{
-  background:linear-gradient(180deg,#3c6f52,#1b2c1d);
-  border-color:#5fa87d;
-  color:#d7f1e0;
-}

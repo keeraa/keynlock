@@ -149,16 +149,17 @@
   // a countdown.
   const M2_SYMBOLS=['◈','⌁','Ψ','⊙','✦','⌬','☿','♀'], M2_HOLD_MS=900;
   let m2Nodes=[], m2Sel=-1, m2Matched=new Set(), m2Kb=0, m2Lock=false, m2UnlockTimer=0, m2TimeLeft=40, m2TimeMax=40, m2NodeEls=[];
-  // Трубопровод (Pipeline): 6×6 grid of hidden pipe tiles. Reveal a tile to
+  // Трубопровод (Pipeline): a 6×6 / 6×8 / 6×10 grid of hidden pipe tiles. Reveal a tile to
   // see its shape, click again to rotate it 90° clockwise. A flow auto-traces
   // from a fixed start port to a fixed exit port along whatever connections
   // exist once the prep countdown runs out — keep building the route before,
   // and racing to fix it during, the flow's advance.
-  const PL_ROWS=6, PL_COLS=6, PL_PREP_MS=17000, PL_RETRY_MS=1400,
-    PL_START={r:2,c:0,in:'W'}, PL_EXIT={r:3,c:5,out:'E'},
+  const PL_ROWS=6, PL_PREP_MS=17000,
+    PL_START={r:2,c:0,in:'W'},
     PL_DIR_OPP={N:'S',S:'N',E:'W',W:'E'}, PL_DIR_VEC={N:[-1,0],S:[1,0],E:[0,1],W:[0,-1]}, PL_DIR_ORDER=['N','E','S','W'];
-  let plTiles=[], plRevealed=new Set(), plVisited=new Set(), plCursor=0, plState='prep',
-    plStartAt=0, plPrepMax=PL_PREP_MS, plLastStep=0, plPos=null, plInDir='W', plFast=false,
+  let PL_COLS=6, PL_EXIT={r:3,c:5,out:'E'},
+    plTiles=[], plRevealed=new Set(), plVisited=new Set(), plCursor=0, plState='prep',
+    plStartAt=0, plPrepMax=PL_PREP_MS, plLastStep=0, plPos=null, plInDir='W',
     plTileEls=[], plLastLevelSig='';
   let wfSequence=[], wfStep=0, wfPos=0, wfWrong=-1, wfStress=0, wfBarEls=[], wfBarCount=6;
   let tdsRingSymbols=[], tdsOrder=[], tdsStep=0, tdsSelectedRing=0, tdsAngle=0, tdsTargets=[], tdsHot=false, tdsDone=new Set(), tdsFailed=false, tdsTimeLeft=22, tdsTimeMax=22, tdsDownInfo=null, tdsRingEls=[], tdsSeqEls=[];
@@ -210,7 +211,7 @@
         $wmMode=document.querySelector('#wmMode'), $wmLock=document.querySelector('#wmLock'), $wmHelp=document.querySelector('#wmHelp'), $wmTimerBar=document.querySelector('#wmTimerBar'), $wmOpenBtn=document.querySelector('#wmOpenBtn'),
         $museumMode=document.querySelector('#museumMode'), $hmLock=document.querySelector('#hmLock'), $hmPicks=document.querySelector('#hmPicks'), $hmHelp=document.querySelector('#hmHelp'),
         $mass2Mode=document.querySelector('#mass2Mode'), $m2Board=document.querySelector('#m2Board'), $m2Help=document.querySelector('#m2Help'),
-        $pipelineMode=document.querySelector('#pipelineMode'), $plGridWrap=document.querySelector('#plGridWrap'), $plStartPort=document.querySelector('#plStartPort'), $plExitPort=document.querySelector('#plExitPort'), $plGrid=document.querySelector('#plGrid'), $plHelp=document.querySelector('#plHelp'), $plBoostBtn=document.querySelector('#plBoostBtn'),
+        $pipelineMode=document.querySelector('#pipelineMode'), $plGridWrap=document.querySelector('#plGridWrap'), $plStartPort=document.querySelector('#plStartPort'), $plExitPort=document.querySelector('#plExitPort'), $plGrid=document.querySelector('#plGrid'), $plHelp=document.querySelector('#plHelp'),
         $wharfMode=document.querySelector('#wharfMode'), $wfLock=document.querySelector('#wfLock'), $wfHelp=document.querySelector('#wfHelp'),
         $thiefdsMode=document.querySelector('#thiefdsMode'), $tdsLock=document.querySelector('#tdsLock'), $tdsProbe=document.querySelector('#tdsProbe'), $tdsTip=document.querySelector('#tdsTip'), $tdsSequence=document.querySelector('#tdsSequence'), $tdsHelp=document.querySelector('#tdsHelp'),
         $kingdomcomeMode=document.querySelector('#kingdomcomeMode'), $kcdLock=document.querySelector('#kcdLock'), $kcdTurnBtn=document.querySelector('#kcdTurnBtn'), $kcdProgressBar=document.querySelector('#kcdProgressBar'), $kcdStressBar=document.querySelector('#kcdStressBar'), $kcdProgressText=document.querySelector('#kcdProgressText'), $kcdStressText=document.querySelector('#kcdStressText'), $kcdHelp=document.querySelector('#kcdHelp'),

@@ -1,12 +1,10 @@
   // ===== PIPELINE (Трубопровод) =====
-  // 6×6 grid of hidden pipe tiles. Reveal a tile to see its shape, click it
-  // again to rotate 90° clockwise. Once the prep countdown runs out (or is
-  // boosted), a flow auto-traces from a fixed start port to a fixed exit
-  // port, hopping along whatever connections currently exist — reveal and
-  // rotate ahead of it, or race to fix a tile it just reached. Hitting a
+  // A difficulty-scaled grid of hidden pipe tiles. Reveal a tile to see its shape, click it
+  // again to rotate 90° clockwise. Once the prep countdown runs out, a flow
+  // auto-traces from a fixed start port to a fixed exit port. A complete,
+  // revealed route accelerates automatically. Hitting an unrevealed tile, a
   // hazard tile, a dead end, a disconnect, a loop, or the grid edge fails
-  // the attempt (the board and every tile the player already discovered or
-  // rotated stay put — only the flow itself restarts). Ported from the old
+  // the attempt and consumes all remaining picks. Ported from the old
   // prototype scene (prototypes/lockpicking-mechanics-v63.html, "Portable
   // game module: bioshock-1") into a fully native mode: the path-generation
   // and flow-trace algorithms are carried over faithfully, wired through
@@ -211,8 +209,6 @@
     plPos=null;
     plInDir='W';
     plVisited=new Set();
-    plFast=false;
-    if($plBoostBtn) $plBoostBtn.classList.remove('active');
   }
 
   function startPipelineRound(){
@@ -223,6 +219,12 @@
     moves=0;
     brokenPicks=0;
     runReward=1000;
+    PL_COLS=diffStep(6,8,10,'pipeline');
+    PL_EXIT={r:3,c:PL_COLS-1,out:'E'};
+    if($plGrid){
+      $plGrid.style.setProperty('--pl-cols',String(PL_COLS));
+      $plGrid.style.setProperty('--pl-aspect',`${PL_COLS} / ${PL_ROWS}`);
+    }
     plTileEls=[];
     const tiles=plBuildBoard();
     plTiles=tiles;
@@ -283,15 +285,16 @@
       const el=plTileEls[i];
       if(!el) return;
       const revealed=plRevealed.has(i);
+      const waterLocked=plWaterLocked(i);
       el.className='plTile'
         +(!revealed?' hidden':t.type==='X'?' hazard':'')
-        +(i===plCursor?' kbFocus':'')
+        +(i===plCursor && !waterLocked?' kbFocus':'')
         +(plVisited.has(i)?' done':'')
         +(plPos && plIndex(plPos.r,plPos.c)===i && plState==='flow' ? ' flow' : '')
-        +(plWaterLocked(i)?' waterLocked':'');
+        +(waterLocked?' waterLocked':'');
       el.innerHTML=revealed?plPipeHtml(t.type):'';
     });
-    if($plHelp) $plHelp.textContent=solved?'Система взломана — маршрут собран':'';
+    if($plHelp) $plHelp.textContent='';
     renderPipelineHud();
     plAlignPorts();
   }
@@ -306,6 +309,7 @@
     const nr=Math.max(0,Math.min(PL_ROWS-1,r+dr)), nc=Math.max(0,Math.min(PL_COLS-1,c+dc));
     const next=plIndex(nr,nc);
     if(next===plCursor){ SFX.blocked(); return; }
+    if(plWaterLocked(next)){ SFX.blocked(); return; }
     plCursor=next;
     SFX.select();
     renderPipeline();
@@ -321,8 +325,8 @@
 
   function plClick(i){
     if(solved || plState==='won') return;
+    if(plWaterLocked(i)){ SFX.blocked(); return; }
     plCursor=i;
-    if(plWaterLocked(i)){ renderPipeline(); return; }
     if(!plRevealed.has(i)){
       registerMove();
       plRevealed.add(i);
@@ -340,10 +344,18 @@
   }
 
   function plFail(msg){
+    if(solved || plState==='failed') return;
+    plState='failed';
+    plPos=null;
     SFX.wrongLock();
-    damagePick({ renderState:renderPipeline, surviveText:msg });
-    plRestartAttempt(PL_RETRY_MS);
+    const remaining=Math.max(0,Math.min(pickCapacity,picks));
+    picks=0;
+    brokenPicks+=remaining;
+    for(let slot=remaining;slot>0;slot--) triggerInventoryBreakAnimation(slot);
+    SFX.break();
+    updatePickUI();
     renderPipeline();
+    showGameDefeat('picks',{text:`${msg}. Все отмычки потеряны.`});
   }
 
   function plStep(now){
@@ -363,9 +375,7 @@
     if(plState!=='flow' || !plPos) return;
     const idx=plIndex(plPos.r,plPos.c);
     if(!plRevealed.has(idx)){
-      plRevealed.add(idx);
-      plLastStep=now;
-      renderPipeline();
+      plFail('Поток упёрся в нераскрытую плитку');
       return;
     }
     const tile=plTiles[idx], dirs=plDirs(tile.type);
@@ -381,18 +391,18 @@
     if(plVisited.has(ni)){ plFail('Поток замкнулся в петлю'); return; }
     const next=plTiles[ni];
     if(!next){ plFail('Следующая плитка отсутствует'); return; }
+    if(!plRevealed.has(ni)){ plFail('Поток упёрся в нераскрытую плитку'); return; }
+    if(next.type==='X'){ plFail('Поток попал в аварийную плитку'); return; }
+    if(!plDirs(next.type).includes(PL_DIR_OPP[out])){ plFail('Следующая труба подключена неверно'); return; }
     plPos={r:nr,c:nc};
     plInDir=PL_DIR_OPP[out];
     plLastStep=now;
     renderPipeline();
   }
 
-  function plBoost(){
-    if(plState==='prep'){ plStartAt=performance.now(); return; }
-    if(plState==='flow'){
-      plFast=!plFast;
-      if($plBoostBtn) $plBoostBtn.classList.toggle('active',plFast);
-    }
+  function plHasReadyRoute(){
+    const trace=plTraceTiles(plTiles);
+    return trace.ok && trace.route.every(i=>plRevealed.has(i));
   }
 
   function plTick(now){
@@ -404,7 +414,7 @@
     }
     if(plState==='flow'){
       const introDelay=plVisited.size<1?1200:plVisited.size<2?1050:plVisited.size<3?900:820;
-      const delay=plFast?240:introDelay;
+      const delay=plHasReadyRoute()?240:introDelay;
       if(now-plLastStep>=delay) plStep(now);
     }
   }

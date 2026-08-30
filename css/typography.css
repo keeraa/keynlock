@@ -16,5 +16,5 @@ h1,h2,h3,
 
 .shopCardName,.pickSkinLabel,.collectionRowLabel,
 .challengeMetricLabel,.hudBadgeLabel,.lairSceneKicker,.gameSettingsKicker,.digitalKicker,
-.solvedPuzzleKicker,.g1ProgressTitle,.anActionLabel,.tnGaugeLabels,.cpSectionTitle,.cpPartLabel,
+.solvedPuzzleKicker,.g1ProgressTitle,.anActionLabel,.tnGaugeLabels,.cpSectionTitle,
 .hcHistoryTitle,.mapChapterCaption{font-family:var(--accent-font)!important;font-weight:400!important;}

@@ -26,7 +26,7 @@
 :where(
   button,[role="button"],.tab,.hudNavBtn,.shopCard,.pickSkinCard,
   .inventoryTool,.lairCharacter,.lairPersonBtn,.lairTopic,.lairIntelCard,
-  .hcStepBtn,.digitalMiniBtn,.digitalBtn,.digitalWheel button,.anBtn,.cpPart,.cpLevelBtn
+  .hcStepBtn,.digitalMiniBtn,.digitalBtn,.digitalWheel button,.anBtn,.cpPart
 ){
   transition-timing-function:var(--motion-ease) !important;
 }

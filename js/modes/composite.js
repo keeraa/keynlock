@@ -1,9 +1,13 @@
   // ===== COMPOSITE PICK — CONTINUOUS BUILDER =====
   const CP_XS=[0,160,320,480,640];
   const CP_PIN_COUNT=5;
-  function cpY(level){ return [14,24,34][level] ?? 24; }
+  const CP_LEVEL_Y=[10,20,30,40];
+  function cpY(level){ return CP_LEVEL_Y[level] ?? CP_LEVEL_Y[1]; }
   function cpSvgY(level){ return cpY(level) + 12; }
-  function cpMiniY(level){ return [8,13,18][level] ?? 13; }
+  function cpMiniY(level){
+    const y=cpY(level);
+    return 6+((y-CP_LEVEL_Y[0])/(CP_LEVEL_Y.at(-1)-CP_LEVEL_Y[0]))*17;
+  }
 
   function cpPathD(nodes){
     return nodes.map((level,i)=>`${i?'L':'M'} ${CP_XS[i]} ${cpSvgY(level)}`).join(' ');
@@ -13,7 +17,7 @@
     const bottomY=74;
     let d=`M 0 ${bottomY} L 0 ${cpSvgY(nodes[0])}`;
     for(let i=1;i<nodes.length;i++) d+=` L ${CP_XS[i]} ${cpSvgY(nodes[i])}`;
-    d+=` L 632 ${bottomY} L 0 ${bottomY} Z`;
+    d+=` L 640 ${bottomY} L 0 ${bottomY} Z`;
     return d;
   }
 
@@ -33,7 +37,7 @@
       const seg = Math.min(totalSegments-1, Math.floor(t));
       const local = Math.max(0, Math.min(1, t-seg));
       const x1=CP_XS[seg], x2=CP_XS[seg+1];
-      const y1=cpY(nodes[seg]), y2=cpY(nodes[seg+1]);
+      const y1=cpSvgY(nodes[seg]), y2=cpSvgY(nodes[seg+1]);
       pts.push({
         x: x1 + (x2-x1)*local,
         y: y1 + (y2-y1)*local
@@ -57,9 +61,8 @@
     cpSetPath(glow,lineD);
   }
 
-  function cpPartPreviewSvg(index,level){
-    const leftLevel=index===0 ? cpNodes[0] : cpVals[index-1];
-    const y1=cpMiniY(leftLevel), y2=cpMiniY(level);
+  function cpPartPreviewSvg(index,nodes){
+    const y1=cpMiniY(nodes[index]), y2=cpMiniY(nodes[index+1]);
     const gradId=`cpMiniMetal${index}`;
     const path=`M 6 26 L 6 ${y1} L 56 ${y1} L 104 ${y2} L 110 26 Z`;
     const line=`M 6 ${y1} L 56 ${y1} L 104 ${y2}`;
@@ -120,7 +123,7 @@
 
   function setCompositeLevel(i,level){
     if(solved||cpReady) return;
-    level=clamp(level,0,2);
+    level=clamp(level,0,CP_LEVEL_NAMES.length-1);
     cpSelected=i;
     if(cpVals[i]===level){
       renderComposite();
@@ -166,30 +169,15 @@
       wrap.setAttribute('role','group');
       wrap.setAttribute('aria-label',`Сегмент ${i+1}`);
 
-      const buttons=CP_LEVEL_NAMES.map((name,buttonLevel)=>
-        `<button class="cpLevelBtn${level===buttonLevel?' active':''}" data-level="${buttonLevel}" type="button" aria-label="Сегмент ${i+1}: ${name.toLowerCase()}">${name}</button>`
-      ).join('');
-
       wrap.innerHTML=`
-        <div class="cpPartPreview">${cpPartPreviewSvg(i,level)}</div>
-        <div class="cpPartLabel">КОНЕЦ: ${CP_LEVEL_NAMES[level]}</div>
-        <div class="cpLevelControls">${buttons}</div>
+        <div class="cpPartPreview">${cpPartPreviewSvg(i,builtNodes)}</div>
       `;
+      wrap.setAttribute('aria-label',`Сегмент ${i+1}: ${CP_LEVEL_NAMES[level].toLowerCase()}. Нажми, чтобы изменить высоту`);
 
-      wrap.addEventListener('click',e=>{
+      wrap.addEventListener('click',()=>{
         if(solved||cpReady) return;
-        if(!e.target.closest('.cpLevelBtn')){
-          cpSelected=i;
-          SFX.select();
-          renderComposite();
-        }
-      });
-
-      wrap.querySelectorAll('.cpLevelBtn').forEach(btn=>{
-        btn.addEventListener('click',e=>{
-          e.stopPropagation();
-          setCompositeLevel(i,Number(btn.dataset.level));
-        });
+        cpSelected=i;
+        setCompositeLevel(i,(level+1)%CP_LEVEL_NAMES.length);
       });
 
       $cpParts.appendChild(wrap);
@@ -214,16 +202,16 @@
     brokenPicks=0;
     runReward=1000;
 
-    cpNodes=[rand(0,2)];
+    cpNodes=[rand(0,CP_LEVEL_NAMES.length-1)];
     for(let i=0;i<4;i++){
       const prev=cpNodes[i];
-      const options=[prev-1,prev,prev+1].filter(v=>v>=0&&v<=2);
+      const options=[prev-1,prev,prev+1].filter(v=>v>=0&&v<CP_LEVEL_NAMES.length);
       cpNodes.push(options[rand(0,options.length-1)]);
     }
     cpTarget=cpNodes.slice(1);
 
     const minDistance=diffStep(2,4,6,'composite');
-    do{ cpVals=Array.from({length:4},()=>rand(0,2)); }
+    do{ cpVals=Array.from({length:4},()=>rand(0,CP_LEVEL_NAMES.length-1)); }
     while(cpMatchesTarget(cpVals) || cpVals.reduce((sum,v,i)=>sum+Math.abs(v-cpTarget[i]),0) < minDistance);
 
     cpInitial=[...cpVals];
@@ -248,7 +236,7 @@
 
   function changeCompositeShape(i,delta){
     if(solved||cpReady) return;
-    const next=clamp(cpVals[i]+delta,0,2);
+    const next=clamp(cpVals[i]+delta,0,CP_LEVEL_NAMES.length-1);
     if(next===cpVals[i]){
       SFX.blocked();
       return;
@@ -279,4 +267,3 @@
     renderComposite();
     setTimeout(()=>celebrate(),420);
   }
-

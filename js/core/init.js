@@ -96,7 +96,7 @@
   // shortfall as --reward-clear (consumed as extra padding-bottom by each
   // panel's own CSS) keeps their content from rendering underneath it,
   // without hardcoding a value per breakpoint.
-  const FLUID_PANEL_MODES=new Set(['oblivion','watchmen','museum','mass2','pipeline','wharf','thiefds','kingdomcome','thief12','fallout','anachlab','masshack','pathologic','bioshock2']);
+  const FLUID_PANEL_MODES=new Set(['oblivion','watchmen','museum','mass2','pipeline','wharf','thiefds','kingdomcome','thief12','fallout','anachlab','masshack','pathologic','bioshock2','alphaprotocol']);
   function syncPuzzleRewardClearance(){
     if(!FLUID_PANEL_MODES.has(mode)) return;
     const status=document.querySelector('.challengeStatus');
@@ -357,6 +357,13 @@
   addEventListener('keydown',e=>{
     if(!gameplayInputBlocked()&&mode==='bioshock2'&&e.code==='Space'){ e.preventDefault(); bioStop(); }
   });
+  addEventListener('keydown',e=>{
+    if(!gameplayInputBlocked()&&mode==='alphaprotocol'&&e.code==='Space'){ e.preventDefault(); apSet(); }
+  });
+  addEventListener('keydown',e=>{
+    if(!gameplayInputBlocked()&&mode==='alphaprotocol'&&e.code==='Enter'){ e.preventDefault(); GameActions.attemptOpen({modeId:'alphaprotocol',source:'keyboard'}); }
+  });
+  document.querySelectorAll('.apPin').forEach((pin,i)=>pin.addEventListener('click',()=>apSelectPin(i)));
   $plBoostBtn?.addEventListener('click',()=>plBoost());
   document.querySelector('#shopHudButton')?.addEventListener('click',()=>{
     if(lairOpen) closeLair();

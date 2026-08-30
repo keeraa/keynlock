@@ -1,7 +1,5 @@
   // ===== IMPORTED V63 MECHANIC LOCATIONS =====
-  const PROTOTYPE_MECHANIC_PLACES=[
-    {id:'alpha-protocol',name:'Архив пазов',game:'Alpha Protocol',x:31,y:17}
-  ];
+  const PROTOTYPE_MECHANIC_PLACES=[];
   const PROTOTYPE_MECHANIC_DONE_KEY='keynlockPrototypeMechanicsDone';
   let prototypeMechanicsDone={};
   try{prototypeMechanicsDone=JSON.parse(STORE.getItem(PROTOTYPE_MECHANIC_DONE_KEY)||'{}')||{};}catch(_){prototypeMechanicsDone={};}

@@ -337,6 +337,8 @@ let plateEls=[], pinTopPlateEls=[];
       startPathologicRound();
     }else if(mode==='bioshock2'){
       startBioshock2Round();
+    }else if(mode==='alphaprotocol'){
+      startAlphaProtocolRound();
     }
 
     updateModeUI();
@@ -375,6 +377,7 @@ let plateEls=[], pinTopPlateEls=[];
       mode==='masshack' ? 'Новый обход' :
       mode==='pathologic' ? 'Новый замок' :
       mode==='bioshock2' ? 'Новый взлом' :
+      mode==='alphaprotocol' ? 'Новый замок' :
       'Новый сигнал осциллографа';
     if(notify){
       toast(msg);
@@ -411,6 +414,7 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='masshack'){ startMassHackRound(); toast('Обход обновлён'); return; }
     if(mode==='pathologic'){ startPathologicRound(); toast('Замок обновлён'); return; }
     if(mode==='bioshock2'){ startBioshock2Round(); toast('Взлом обновлён'); return; }
+    if(mode==='alphaprotocol'){ startAlphaProtocolRound(); toast('Замок обновлён'); return; }
     state=[...initial]; solved=false; $lock.classList.remove('win');
     $mechanism.classList.remove('ready','opening','opened');
     render(); toast('Механизм сброшен');
@@ -472,6 +476,7 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='masshack') return hackMove(dir);
     if(mode==='pathologic') return;
     if(mode==='bioshock2') return;
+    if(mode==='alphaprotocol'){ apSelectPin(apSel+dir); return; }
     if(mode==='g1') return g1Press(dir);
     if(mode==='mass') return moveMass(dir);
     if(mode==='hillsfar') return;
@@ -578,7 +583,8 @@ let plateEls=[], pinTopPlateEls=[];
     anachlab:()=>tryOpenAnachLab(),
     masshack:()=>tryOpenMassHack(),
     pathologic:()=>tryOpenPathologic(),
-    bioshock2:()=>tryOpenBioshock2()
+    bioshock2:()=>tryOpenBioshock2(),
+    alphaprotocol:()=>tryOpenAlphaProtocol()
   });
 
   function select(delta){
@@ -630,6 +636,7 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='masshack'){ if(delta<0) hackIn(); else hackOut(); return; }
     if(mode==='pathologic') return;
     if(mode==='bioshock2') return;
+    if(mode==='alphaprotocol'){ apMovePin(delta<0?-1:1); return; }
     if(mode==='g1') return;
     if(mode==='heatcold'||mode==='drum'||mode==='scope') return;
     if(mode==='mass') return selectMass(delta);
@@ -662,6 +669,7 @@ let plateEls=[], pinTopPlateEls=[];
     else if(mode==='masshack'){ $mechanism.classList.remove('ready'); }
     else if(mode==='pathologic'){ $mechanism.classList.remove('ready'); }
     else if(mode==='bioshock2'){ $mechanism.classList.remove('ready'); }
+    else if(mode==='alphaprotocol'){ $mechanism.classList.remove('ready'); }
     else if(mode==='g1'){ $mechanism.classList.remove('ready'); }
     else if(mode==='mass'){ $mechanism.classList.remove('ready'); }
     else if(mode!=='hillsfar') $mechanism.classList.toggle('ready',!solved && goalMet());
@@ -783,6 +791,9 @@ let plateEls=[], pinTopPlateEls=[];
     }
     if(mode==='bioshock2' && !solved){
       bioTick(Math.min(.04,dt/1000));
+    }
+    if(mode==='alphaprotocol' && !solved){
+      apTick(Math.min(.05,dt/1000));
     }
     scheduleAnimationLoop(solved ? 160 : ACTIVE_FRAME_MS);
   }

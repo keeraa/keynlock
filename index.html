@@ -29,6 +29,7 @@
 <link rel="stylesheet" href="css/modes-18-masshack.css">
 <link rel="stylesheet" href="css/modes-19-pathologic.css">
 <link rel="stylesheet" href="css/modes-20-bioshock2.css">
+<link rel="stylesheet" href="css/modes-21-alphaprotocol.css">
 <link rel="stylesheet" href="css/world-01-shop-shared.css">
 <link rel="stylesheet" href="css/overrides-01-tools-shared.css">
 <link rel="stylesheet" href="css/overrides-02-map.css">
@@ -580,6 +581,19 @@
 <div class="bioControls"><button class="digitalBtn" id="bioStopBtn" type="button">Стоп · Space</button></div>
 <div class="bioHelp" id="bioHelp"></div>
 </div>
+<!-- MODE: ALPHA PROTOCOL -->
+<div class="modePanel apMode" data-mode="alphaprotocol" hidden="" id="alphaprotocolMode">
+<div class="apLockWrap"><div class="apLock" id="apLock">
+<div class="apBeam"><span class="apBeamFill" id="apBeamFill"></span></div>
+<div class="apPin" id="apPin0"><div class="apShaft" id="apShaft0"><span class="apSymbol"></span><span class="apGroove"></span></div></div>
+<div class="apPin" id="apPin1"><div class="apShaft" id="apShaft1"><span class="apSymbol"></span><span class="apGroove"></span></div></div>
+<div class="apPin" id="apPin2"><div class="apShaft" id="apShaft2"><span class="apSymbol"></span><span class="apGroove"></span></div></div>
+<div class="apPin" id="apPin3"><div class="apShaft" id="apShaft3"><span class="apSymbol"></span><span class="apGroove"></span></div></div>
+<div class="apPin" id="apPin4"><div class="apShaft" id="apShaft4"><span class="apSymbol"></span><span class="apGroove"></span></div></div>
+</div></div>
+<div class="apSequence" id="apSequence"></div>
+<div class="apHelp" id="apHelp"></div>
+</div>
 <!-- MODE: HILLSFAR -->
 <div class="modePanel hillsfarMode" data-mode="hillsfar" hidden="" id="hillsfarMode">
 <div class="hfLockBox">
@@ -907,6 +921,7 @@
 <script src="js/modes/masshack.js"></script>
 <script src="js/modes/pathologic.js"></script>
 <script src="js/modes/bioshock2.js"></script>
+<script src="js/modes/alphaprotocol.js"></script>
 <script src="js/modes/base-locks.js"></script>
 <script src="js/world/alchemy.js"></script>
 <script src="js/world/guards.js"></script>

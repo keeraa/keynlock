@@ -169,6 +169,7 @@
   let hackRing=5, hackAng=90, hackBlocks=[], hackHitUntil=0, hackCollapse=false, hackCollapseStart=0, hackRingEls=[], hackBlockEls=[];
   let ptgY=[.08,.08], ptgV=[0,0], ptgTarget=[.37,.51], ptgDur=1.35;
   let bioZonesArr=[], bioZoneEls=[], bioX=0, bioDir=1, bioSpeed=58, bioStage=0, bioRunning=true;
+  let apPins=[], apSel=0, apOrder=[], apOrderStep=0, apTimeLeft=26, apTimeMax=26, apSeqEls=[];
   const CP_LEVEL_NAMES=['ВЕРХ','ЦЕНТР','НИЗ'];
   let cpNodes=[1,1,1,1,1], cpTarget=[1,1,1,1], cpVals=[1,1,1,1], cpInitial=[1,1,1,1], cpSelected=0, cpReady=false;
   let hcSecret=[0,0,0,0], hcAttempts=[], hcDigits=[0,0,0,0], hcActiveIndex=0;
@@ -221,7 +222,8 @@
         $anachlabMode=document.querySelector('#anachlabMode'), $alabSlots=document.querySelector('#alabSlots'), $alabHelp=document.querySelector('#alabHelp'),
         $masshackMode=document.querySelector('#masshackMode'), $hackArena=document.querySelector('#hackArena'), $hackCore=document.querySelector('#hackCore'), $hackPlayer=document.querySelector('#hackPlayer'), $hackHelp=document.querySelector('#hackHelp'),
         $pathologicMode=document.querySelector('#pathologicMode'), $ptgColL=document.querySelector('#ptgColL'), $ptgColR=document.querySelector('#ptgColR'), $ptgDur=document.querySelector('#ptgDur'), $ptgHelp=document.querySelector('#ptgHelp'),
-        $bioshock2Mode=document.querySelector('#bioshock2Mode'), $bioTrack=document.querySelector('#bioTrack'), $bioNeedle=document.querySelector('#bioNeedle'), $bioBot=document.querySelector('#bioBot'), $bioStageText=document.querySelector('#bioStage'), $bioPassesText=document.querySelector('#bioPasses'), $bioHelp=document.querySelector('#bioHelp');
+        $bioshock2Mode=document.querySelector('#bioshock2Mode'), $bioTrack=document.querySelector('#bioTrack'), $bioNeedle=document.querySelector('#bioNeedle'), $bioBot=document.querySelector('#bioBot'), $bioStageText=document.querySelector('#bioStage'), $bioPassesText=document.querySelector('#bioPasses'), $bioHelp=document.querySelector('#bioHelp'),
+        $alphaprotocolMode=document.querySelector('#alphaprotocolMode'), $apLock=document.querySelector('#apLock'), $apBeamFill=document.querySelector('#apBeamFill'), $apSequence=document.querySelector('#apSequence'), $apHelp=document.querySelector('#apHelp');
 
   const MODE_PANELS=Object.freeze({
     hillsfar:$hillsfarMode,
@@ -250,13 +252,14 @@
     anachlab:$anachlabMode,
     masshack:$masshackMode,
     pathologic:$pathologicMode,
-    bioshock2:$bioshock2Mode
+    bioshock2:$bioshock2Mode,
+    alphaprotocol:$alphaprotocolMode
   });
   const IMPORTED_MODES=new Set(Object.keys(MODE_PANELS));
   const ALL_MODES=new Set(GameCatalog.nativeIds);
 
   const DIFFICULTY_STORAGE_KEY='lockpickModeDifficulty';
-  const DEFAULT_MODE_DIFFICULTY=Object.freeze({classic:1,target:1,line:1,sequence:1,special:1,hillsfar:1,mass:1,g1:1,r2:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,heatcold:1,drum:1,scope:1,oblivion:1,watchmen:1,museum:1,mass2:1,pipeline:1,wharf:1,thiefds:1,kingdomcome:1,thief12:1,fallout:1,anachlab:1,masshack:1,pathologic:1,bioshock2:1});
+  const DEFAULT_MODE_DIFFICULTY=Object.freeze({classic:1,target:1,line:1,sequence:1,special:1,hillsfar:1,mass:1,g1:1,r2:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,heatcold:1,drum:1,scope:1,oblivion:1,watchmen:1,museum:1,mass2:1,pipeline:1,wharf:1,thiefds:1,kingdomcome:1,thief12:1,fallout:1,anachlab:1,masshack:1,pathologic:1,bioshock2:1,alphaprotocol:1});
   function loadModeDifficulty(){
     try{
       const saved=JSON.parse(STORE.getItem(DIFFICULTY_STORAGE_KEY)||'{}');

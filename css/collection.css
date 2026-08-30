@@ -34,8 +34,8 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
      scroll WITHIN, so .collectionListCol's own overflow-y:auto had nowhere
      bounded to apply and the list just grew past the window instead. */
   overflow:hidden;
-  max-height:90vh;
-  width:min(860px,90vw);
+  max-height:96vh;
+  width:min(1180px,96vw);
 }
 #lairModuleWindow:has(.lairPanel[data-lair-panel="collection"].active) .lairModuleHeader{
   display:none!important;
@@ -46,7 +46,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   flex:1 1 auto;
   min-height:0;
   overflow:hidden;
-  max-height:90vh;
+  max-height:96vh;
   /* Clears the fixed top HUD bar (68px tall, 14px from the top) that
      replaces the hidden shared header. */
   padding-top:74px;
@@ -56,7 +56,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   display:none;
   position:fixed;
   z-index:361;
-  left:clamp(124px,8vw,180px);
+  left:clamp(90px,6vw,150px);
   right:clamp(340px,25vw,520px);
   top:14px;
   height:68px;
@@ -189,14 +189,18 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
      stage/strip below reading --preview-w — a circular reference that
      silently clamped the stage down to whatever flex leftover space
      happened to exist instead of the intended size. */
-  --preview-h:414px;
-  --preview-w:455px;
+  /* 15% smaller than the original 414/455 pass, on request — the stage,
+     handle strip and every handle card below all read off these two vars
+     (or --preview-w directly), so shrinking them here shrinks the whole
+     column in one place. */
+  --preview-h:352px;
+  --preview-w:387px;
   flex:0 1 auto;
   min-width:0;
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:10px;
+  gap:9px;
 }
 .collectionStage{
   position:relative;
@@ -274,7 +278,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   padding-top:4px;
 }
 .collectionHandleCard{
-  width:42px;height:42px;
+  width:36px;height:36px;
   padding:0;
   border:0;
   background:transparent;
@@ -302,6 +306,35 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
    --handle-mask per card) so the grain follows the pick's actual
    silhouette instead of covering the whole square button box with a
    visible block around the artwork. */
+/* --- right: per-collection description --- */
+.collectionInfoCol{
+  flex:1 1 300px;
+  max-width:360px;
+  min-width:220px;
+  min-height:0;
+  align-self:stretch;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding:18px 20px;
+  border:1px solid rgba(138,100,52,.5);
+  border-radius:10px;
+  background:rgba(22,17,12,.7);
+  overflow-y:auto;
+}
+.collectionInfoTitle{
+  margin:0;
+  font:600 19px/1.25 Georgia,serif;
+  color:#e4c788;
+}
+.collectionInfoText{
+  font-size:14px;
+  line-height:1.6;
+  color:#cbb489;
+}
+.collectionInfoText p{margin:0 0 12px;}
+.collectionInfoText p:last-child{margin-bottom:0;}
+
 .collectionHandleCard.locked::after{
   content:"";
   position:absolute;
@@ -379,6 +412,12 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
     --preview-w:min(86vw,418px);
   }
   .collectionHandleCard{width:min(9vw,38px);height:min(9vw,38px);}
+  .collectionInfoCol{
+    width:100%;
+    max-width:min(86vw,420px);
+    flex:0 0 auto;
+    padding:14px 16px;
+  }
 }
 @media (max-width:480px){
   .collectionRow{flex:1 1 100%;}

@@ -26,18 +26,54 @@
       return { id: `${idPrefix}-${n}`, image: `assets/picks/handles/${folder}/${filePrefix}_${n}.png`, shaft: shaftFor(i), unlocked };
     });
   }
+  // Shown in the third column of the Коллекция screen — what each set is
+  // going for and why its handles look the way they do. Collection-level
+  // only (not per-handle): six short write-ups, not forty-eight.
   const PICK_COLLECTIONS = [
-    { id:'japan-wood', name:'Japan Wood', handles: buildHandles('japan-wood', 'japan-wood', 'japan_wood',
+    { id:'japan-wood', name:'Japan Wood', description:
+      `<p>Голое дерево, без единого мазка краски — резьба сама несёт узор: волна, ракушка, дракон, ирис.
+      Каждая рукоять — отдельный японский мотив, вырезанный прямо по волокну, а не нанесённый поверх него.</p>
+      <p>Это набор для тех, кто ценит инструмент, а не украшение: материал остаётся видимым материалом,
+      мастерство — в глубине резьбы, а не в лаке и позолоте.</p>`,
+      handles: buildHandles('japan-wood', 'japan-wood', 'japan_wood',
       [true, true, true, true, true, true, true, true]) },
-    { id:'japan', name:'Japan', handles: buildHandles('japan', 'japan', 'japan_big_art',
+    { id:'japan', name:'Japan', description:
+      `<p>Классические образы укиё-э, перенесённые на рукоять: журавль, карп, бамбук, гора Фудзи, ветка сакуры,
+      дракон, гейша с веером, хризантема. Каждый — устойчивый символ японской культуры: удача и долголетие,
+      упорство и стойкость к течению, стойкость характера, священная вершина, скоротечность красоты, сила и защита,
+      изящество и статус, благородство.</p>
+      <p>Собранные вместе, они складываются в маленькую антологию образов, которыми принято описывать саму Японию —
+      носить такую рукоять означает нести с собой один из этих символов.</p>`,
+      handles: buildHandles('japan', 'japan', 'japan_big_art',
       [true, true, true, true, true, true, true, false]) },
-    { id:'decodance', name:'Decodance Black', handles: buildHandles('decodance', 'decodance', 'decodance_black',
+    { id:'decodance', name:'Decodance Black', description:
+      `<p>Чёрный лак и золотая линия — эстетика ар-деко 1920–30-х, наложенная на те же японские мотивы (журавль,
+      сосна, сакура, веер), но прочерченная геометрией, а не кистью укиё-э. Тёмный фон превращает узор в блеск
+      витрины ночного города, а не в страницу гравюры.</p>
+      <p>Это Япония, увиденная сквозь стекло дорогого отеля межвоенной эпохи: те же символы, но заново
+      огранённые под роскошь и полумрак.</p>`,
+      handles: buildHandles('decodance', 'decodance', 'decodance_black',
       [true, true, true, true, false, true, true, true]) },
-    { id:'decodance-white', name:'Decodance White', handles: buildHandles('decodance-white', 'decodance-white', 'decodance_white',
+    { id:'decodance-white', name:'Decodance White', description:
+      `<p>Тот же ар-деко словарь, что и в чёрной версии коллекции, но на светлом, слоновой кости лаке — острая
+      геометрия смягчается, золото и металл читаются тоньше, драгоценнее. Там, где чёрная версия — блеск ночного
+      клуба, белая — утренний свет и фарфор.</p>
+      <p>Пара к Decodance Black: один и тот же стиль, показанный с двух разных сторон суток.</p>`,
+      handles: buildHandles('decodance-white', 'decodance-white', 'decodance_white',
       [true, true, true, true, true, true, true, true]) },
-    { id:'japan-classic-white', name:'Japan Classic White', handles: buildHandles('japan-classic-white', 'japan-classic-white', 'japan_classic_white',
+    { id:'japan-classic-white', name:'Japan Classic White', description:
+      `<p>Светлое лаковое покрытие в духе традиционной японской посуды — сдержанные, почти монохромные узоры,
+      без ярких акцентов основного набора «Japan». Здесь важна не картинка, а сама поверхность: гладкий белый лак,
+      как на старом фарфоре или в чайном доме.</p>
+      <p>Минимализм вместо иллюстрации — рукоять, которая не рассказывает историю, а просто хорошо сделана.</p>`,
+      handles: buildHandles('japan-classic-white', 'japan-classic-white', 'japan_classic_white',
       [true, true, true, true, true, true, true, true]) },
-    { id:'japan-classic-black', name:'Japan Classic Black', handles: buildHandles('japan-classic-black', 'japan-classic-black', 'japan_classic_black',
+    { id:'japan-classic-black', name:'Japan Classic Black', description:
+      `<p>Чёрный близнец «Japan Classic White» — тот же сдержанный, почти монохромный лак, но в цвете
+      традиционной чёрной лаковой утвари. Строгость вместо орнамента: рукоять как предмет обихода мастера,
+      а не витрина с символами.</p>
+      <p>Две классические версии рядом дают выбор между светлым и тёмным лаком одного и того же спокойного стиля.</p>`,
+      handles: buildHandles('japan-classic-black', 'japan-classic-black', 'japan_classic_black',
       [true, true, true, true, true, true, true, true]) }
   ];
 
@@ -55,6 +91,8 @@
   if(!$root) return;
 
   const $collectionList = $root.querySelector('#collectionList');
+  const $infoTitle = $root.querySelector('#collectionInfoTitle');
+  const $infoText = $root.querySelector('#collectionInfoText');
   const $handleStrip = $root.querySelector('#collectionHandleStrip');
   const $stage = $root.querySelector('#collectionStage');
   const $stageInner = $root.querySelector('#collectionStageInner');
@@ -259,11 +297,18 @@
         equipHandle(firstUnlocked);
         renderCollectionList();
         renderHandleStrip();
+        renderCollectionInfo();
         renderStage();
         burstSmoke();
       });
       $collectionList.appendChild(row);
     });
+  }
+
+  function renderCollectionInfo(){
+    const col = collectionById(state.collectionId);
+    if($infoTitle) $infoTitle.textContent = col.name;
+    if($infoText) $infoText.innerHTML = col.description || '';
   }
 
   function renderHandleStrip(){
@@ -418,6 +463,7 @@
   restoreEquipped();
   renderCollectionList();
   renderHandleStrip();
+  renderCollectionInfo();
   renderStage();
   refreshInventoryRail();
 })();

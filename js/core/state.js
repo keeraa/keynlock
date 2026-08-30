@@ -223,7 +223,7 @@
         $masshackMode=document.querySelector('#masshackMode'), $hackArena=document.querySelector('#hackArena'), $hackCore=document.querySelector('#hackCore'), $hackPlayer=document.querySelector('#hackPlayer'), $hackHelp=document.querySelector('#hackHelp'),
         $pathologicMode=document.querySelector('#pathologicMode'), $ptgColL=document.querySelector('#ptgColL'), $ptgColR=document.querySelector('#ptgColR'), $ptgDur=document.querySelector('#ptgDur'), $ptgHelp=document.querySelector('#ptgHelp'),
         $bioshock2Mode=document.querySelector('#bioshock2Mode'), $bioTrack=document.querySelector('#bioTrack'), $bioNeedle=document.querySelector('#bioNeedle'), $bioBot=document.querySelector('#bioBot'), $bioStageText=document.querySelector('#bioStage'), $bioPassesText=document.querySelector('#bioPasses'), $bioHelp=document.querySelector('#bioHelp'),
-        $alphaprotocolMode=document.querySelector('#alphaprotocolMode'), $apLock=document.querySelector('#apLock'), $apBeamFill=document.querySelector('#apBeamFill'), $apSequence=document.querySelector('#apSequence'), $apHelp=document.querySelector('#apHelp');
+        $alphaprotocolMode=document.querySelector('#alphaprotocolMode'), $apLock=document.querySelector('#apLock'), $apBeamFill=document.querySelector('#apBeamFill'), $apSequence=document.querySelector('#apSequence');
 
   const MODE_PANELS=Object.freeze({
     hillsfar:$hillsfarMode,

@@ -119,14 +119,38 @@ function renderAlphaProtocol(){
     el.classList.toggle('done', step<apOrderStep);
     el.classList.toggle('current', step===apOrderStep && apOrderStep<apOrder.length);
   });
-  if($apHelp){
-    $apHelp.textContent = apOrderStep>=apOrder.length
-      ? 'Механизм выставлен — нажми на замок или Enter'
-      : apTimeLeft<=0
-        ? 'Время вышло — начни заново (R)'
-        : `Выставлено ${apOrderStep} / 5 — соверши щель паза с золотой линией и зафиксируй Space`;
-  }
 }
-document.getElementById('apUpBtn')?.addEventListener('click',()=>apMovePin(-1));
-document.getElementById('apDownBtn')?.addEventListener('click',()=>apMovePin(1));
-document.getElementById('apConfirmBtn')?.addEventListener('click',()=>apSet());
+let apDrag=null;
+for(let apPinIndex=0;apPinIndex<5;apPinIndex++){
+  const apPinEl=document.getElementById('apPin'+apPinIndex);
+  if(!apPinEl) continue;
+  apPinEl.addEventListener('pointerdown',e=>{
+    if(solved) return;
+    apSelectPin(apPinIndex);
+    const p=apPins[apPinIndex];
+    if(p.set||apTimeLeft<=0) return;
+    const rect=apPinEl.getBoundingClientRect();
+    apDrag={i:apPinIndex, startY:e.clientY, startPinY:p.y, pinHeight:rect.height||1, moved:false};
+    try{ apPinEl.setPointerCapture(e.pointerId); }catch(_){}
+  });
+  apPinEl.addEventListener('pointermove',e=>{
+    if(!apDrag||apDrag.i!==apPinIndex) return;
+    const p=apPins[apPinIndex];
+    if(p.set) return;
+    const deltaPercent=(e.clientY-apDrag.startY)/apDrag.pinHeight*100;
+    const newY=apClampY(apDrag.startPinY+deltaPercent);
+    if(newY!==p.y){
+      if(!apDrag.moved){ registerMove(); apDrag.moved=true; }
+      p.y=newY;
+      renderAlphaProtocol();
+    }
+  });
+  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>apPinEl.addEventListener(ev,()=>{
+    if(apDrag&&apDrag.i===apPinIndex) apDrag=null;
+  }));
+  apPinEl.addEventListener('dblclick',e=>{
+    e.preventDefault();
+    apSelectPin(apPinIndex);
+    apSet();
+  });
+}

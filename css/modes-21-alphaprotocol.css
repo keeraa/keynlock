@@ -46,6 +46,7 @@
   background:#121711;
   overflow:hidden;
   cursor:pointer;
+  touch-action:none;
 }
 .apPin.active{ border-color:#8d7a50; }
 .apPin.set{ border-style:dashed; border-color:#769066; border-width:1px; }
@@ -113,6 +114,4 @@
 .apSeqItem path{ fill:none; stroke:currentColor; stroke-width:5; stroke-linecap:round; stroke-linejoin:round; }
 .apSeqItem.current{ border-color:#e0b463; color:#efd38b; }
 .apSeqItem.done{ border-color:#6e8f61; color:#8eb27b; background:#172016; }
-.apControls{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
-.apHelp{ flex:none; color:#9db3bf; text-align:center; font:14px/1.35 Arial,sans-serif; max-width:560px; }
 body.importedMode .puzzleArea>.modePanel.apMode:not([hidden]){ padding-bottom:calc(16px + var(--reward-clear,0px))!important; }

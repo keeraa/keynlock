@@ -1,4 +1,6 @@
+(function(){
   // ===== GOTHIC 1 =====
+  let g1Sequence=[], g1Input=[], g1Length=4;
   const G1_SYMBOL_PATHS={
     bar:'M0 -7V7',
     kink:'M-7 -6H-1Q6 -6 6 1V7',
@@ -92,3 +94,12 @@
     renderG1();
     setTimeout(()=>celebrate(), 420);
   }
+
+  PuzzleModes.register({
+    id:'g1', start:startG1Round, render:renderG1,
+    objective:()=>`УГАДАТЬ ПОСЛЕДОВАТЕЛЬНОСТЬ ИЗ ${g1Length} ШАГОВ`,
+    restartMessage:'Новая последовательность',
+    input:{horizontal:g1Press,vertical:()=>{}},
+    attemptOpen:tryOpenG1
+  });
+})();

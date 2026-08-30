@@ -112,9 +112,6 @@
     }
   }catch{}
 
-  let hfTarget=[], hfOptions=[], hfSelected=-1;
-  let meRings=[], meSelected=0, meInitialPositions=[];
-  let g1Sequence=[], g1Input=[];
   let r2Sequence=[], r2ProgressCount=0, r2PickPos=0, r2PinEls=[];
   let skTargetAngle=0, skPickAngle=0, skCylinderAngle=0, skTorqueBusy=false, skDragging=false;
   let anTarget=[0,0,0], anState=[0,0,0], anInitialState=[0,0,0], anSelected=0;
@@ -131,8 +128,8 @@
   let hcSecret=[0,0,0,0], hcAttempts=[], hcDigits=[0,0,0,0], hcActiveIndex=0;
   let drumSecret=[0,0,0,0], drumState=[0,0,0,0], drumSoundOn=true, drumAudioCtx=null;
   let scopeSecret=[0,0,0,0], scopeState=[0,0,0,0];
-  let n=5, selected=0, picks=pickCapacity, state=[], initial=[], links=[], targets=[], solved=false, mode='classic', goalLine=GOAL, moves=0, brokenPicks=0, runReward=1000, specialType='chain', generatedDistance=0, balance=Math.max(0,Number(STORE.getItem('lockpickBalance'))||0), hfTimeLeft=45, hfTimeMax=45, hfTimerHandle=null, hfLastTick=0, inventoryBrokenSlot=0, inventoryBreakTimer=null;
-  let g1Length=4, r2PinCount=6, skSolveTolerance=6;
+  let n=5, selected=0, picks=pickCapacity, state=[], initial=[], links=[], targets=[], solved=false, mode='classic', goalLine=GOAL, moves=0, brokenPicks=0, runReward=1000, specialType='chain', generatedDistance=0, balance=Math.max(0,Number(STORE.getItem('lockpickBalance'))||0), inventoryBrokenSlot=0, inventoryBreakTimer=null;
+  let r2PinCount=6, skSolveTolerance=6;
   const $plates=document.querySelector('#plates'), $status=document.querySelector('#status'),
         $lock=document.querySelector('#lock'),
         challengeHud=new GameChallengeHud(document.querySelector('#challengeHud')),

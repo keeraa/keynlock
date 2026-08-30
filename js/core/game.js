@@ -12,9 +12,7 @@
     document.body.classList.toggle('game-manual-open', !!GameCatalog.feature(mode,'lock.manualOpen'));
     document.body.classList.toggle('game-noise-sensor', !!GameCatalog.feature(mode,'world.noiseSensor'));
     document.body.dataset.gameMode=mode;
-    if(mode!=='hillsfar') clearHillsfarTimer();
-    if(mode==='hillsfar') setGlobalTimer(true, hfTimeLeft || hfTimeMax, hfTimeMax || 1, 'ТАЙМЕР');
-    else if(PuzzleModes.call(mode,'syncHud')){}
+    if(PuzzleModes.call(mode,'syncHud')){}
     else if(mode==='thiefds') setGlobalTimer(!tdsFailed, tdsTimeLeft||tdsTimeMax, tdsTimeMax||1, 'ТАЙМЕР');
     else if(mode==='thief12') setGlobalTimer(!th12Failed, th12TimeLeft||th12TimeMax, th12TimeMax||1, 'ТАЙМЕР');
     else if(mode==='alphaprotocol') setGlobalTimer(apTimeLeft>0, apTimeLeft||apTimeMax, apTimeMax||1, 'ТАЙМЕР');
@@ -32,12 +30,6 @@
       $objectiveLine.innerHTML = `КОД: <b>${targets.join(', ')}</b> · ${generatedDistance} ходов минимум`;
     }else if(mode==='special'){
       $objectiveLine.innerHTML = `ОСОБЫЙ ЗАМОК: <b>${specialTypeName()}</b> · ${generatedDistance} ходов минимум`;
-    }else if(mode==='hillsfar'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ПОДОБРАТЬ ПРАВИЛЬНЫЙ КЛЮЧ</b>';
-    }else if(mode==='mass'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ВЫСТРОИТЬ ВСЕ КОЛЬЦА И ОТКРЫТЬ ЗАМОК</b>';
-    }else if(mode==='g1'){
-      $objectiveLine.innerHTML = `ЦЕЛЬ: <b>УГАДАТЬ ПОСЛЕДОВАТЕЛЬНОСТЬ ИЗ ${g1Length} ШАГОВ</b>`;
     }else if(mode==='r2'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ПОДНЯТЬ ШТИФТЫ В ПРАВИЛЬНОМ ПОРЯДКЕ</b>';
     }else if(mode==='skyrim'){

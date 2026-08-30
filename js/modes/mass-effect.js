@@ -1,4 +1,6 @@
+(function(){
   // ===== MASS EFFECT =====
+  let meRings=[], meSelected=0, meInitialPositions=[];
   function massGradientForRing(ring){
     const step = 360 / ring.count;
     const goodColor = '#f0c878';
@@ -147,5 +149,14 @@
     SFX.select();
     renderMassEffect();
   }
+
+  PuzzleModes.register({
+    id:'mass', start:startMassRound, render:renderMassEffect,
+    objective:()=>GameCatalog.get('mass')?.objective,
+    restartMessage:'Новый круговой замок',
+    input:{horizontal:moveMass,vertical:selectMass},
+    attemptOpen:tryOpenMass
+  });
+})();
 
   function clamp(v,min,max){ return Math.max(min,Math.min(max,v)); }

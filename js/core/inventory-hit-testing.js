@@ -454,7 +454,7 @@
   // check entirely.
   tryOpenBaseLock=guardOpen(tryOpenBaseLock);
   tryOpenLock=guardOpen(tryOpenLock);
-  tryOpenG1=guardOpen(tryOpenG1);
+  GameActions.registerOpenGuard('g1',()=>!forceWrongTensionBreak());
 
   // init.js bound these two handlers by function reference before this patch runs.
   // Capture them so the same guard still applies to their dedicated controls.

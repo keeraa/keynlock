@@ -1,4 +1,6 @@
+(function(){
   // ===== HILLSFAR =====
+  let hfTarget=[], hfOptions=[], hfSelected=-1, hfTimeLeft=45, hfTimeMax=45, hfTimerHandle=null, hfLastTick=0;
   function clearHillsfarTimer(){
     hfTimerHandle=null;
     hfLastTick=0;
@@ -202,3 +204,21 @@ function hillsfarPattern(len=6){
     failHillsfarAttempt('Ключ не подходит');
   }
 
+  function tickHillsfar({now}){
+    if(!hfTimerHandle||solved) return;
+    const dt=Math.max(0,now-(hfLastTick||now))/1000;
+    hfLastTick=now;
+    hfTimeLeft=Math.max(0,hfTimeLeft-dt);
+    renderHillsfarHud();
+    if(hfTimeLeft<=0){ clearHillsfarTimer(); showGameDefeat('time'); }
+  }
+
+  PuzzleModes.register({
+    id:'hillsfar', start:startHillsfarRound, render:renderHillsfar,
+    tick:tickHillsfar, syncHud:renderHillsfarHud,
+    objective:()=>GameCatalog.get('hillsfar')?.objective,
+    restartMessage:'Новый набор ключей',
+    input:{horizontal:()=>{},vertical:()=>{}},
+    attemptOpen:tryOpenHillsfar
+  });
+})();

@@ -127,23 +127,32 @@ const GameCatalog=(()=>{
 
 const GameActions=(()=>{
   const openers=new Map();
+  const openGuards=new Map();
   function registerOpen(modeId,handler){
     if(!GameCatalog.has(modeId))throw new Error(`Unknown game mode: ${modeId}`);
     if(typeof handler!=='function')throw new TypeError(`Open action for ${modeId} must be a function`);
     openers.set(modeId,handler);
   }
   function registerOpeners(entries){Object.entries(entries).forEach(([id,handler])=>registerOpen(id,handler));}
+  function registerOpenGuard(modeId,guard){
+    if(!GameCatalog.has(modeId))throw new Error(`Unknown game mode: ${modeId}`);
+    if(typeof guard!=='function')throw new TypeError(`Open guard for ${modeId} must be a function`);
+    if(!openGuards.has(modeId))openGuards.set(modeId,[]);
+    openGuards.get(modeId).push(guard);
+  }
   function attemptOpen({modeId=mode,source='interface'}={}){
     const game=GameCatalog.get(modeId);
     if(!game?.lock.manualOpen)return false;
     const handler=openers.get(modeId);
     if(!handler){console.warn(`No open action registered for ${modeId}`);return false;}
     const solvedBefore=!!solved;
-    const result=handler({modeId,source,game});
+    const context={modeId,source,game,solvedBefore};
+    for(const guard of openGuards.get(modeId)||[]) if(guard(context)===false)return false;
+    const result=handler(context);
     window.dispatchEvent(new CustomEvent('keynlock-game-action',{detail:{action:'open',modeId,source,solvedBefore,solvedAfter:!!solved}}));
     return result;
   }
-  return Object.freeze({registerOpen,registerOpeners,attemptOpen,hasOpen:id=>openers.has(id)});
+  return Object.freeze({registerOpen,registerOpeners,registerOpenGuard,attemptOpen,hasOpen:id=>openers.has(id)});
 })();
 
 // Deliberate public surface for diagnostics and future isolated mechanics.

@@ -101,7 +101,7 @@ if (JSON.stringify(physicalNativeGames) !== JSON.stringify(expectedTypedTensionG
 if (!tensionGuardSource.includes("const typedTensionModes=new Set(['classic','target','line','sequence','special','g1'])")) {
   fail('Typed-tension mode list must match games that render typed plates and a tensioner.');
 }
-if (!tensionGuardSource.includes('tryOpenG1=guardOpen(tryOpenG1)')) {
+if (!tensionGuardSource.includes("GameActions.registerOpenGuard('g1',()=>!forceWrongTensionBreak())")) {
   fail('Gothic 1 opener must enforce the typed tensioner guard.');
 }
 

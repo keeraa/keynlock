@@ -285,12 +285,6 @@ let plateEls=[], pinTopPlateEls=[];
       render();
     }else if(PuzzleModes.call(mode,'start')){
       // Registered puzzle owns its complete round lifecycle.
-    }else if(mode==='hillsfar'){
-      startHillsfarRound();
-    }else if(mode==='mass'){
-      startMassRound();
-    }else if(mode==='g1'){
-      startG1Round();
     }else if(mode==='r2'){
       startR2Round();
     }else if(mode==='skyrim'){
@@ -335,9 +329,6 @@ let plateEls=[], pinTopPlateEls=[];
       mode==='line' ? `Новая линия: ${goalLine}` :
       mode==='sequence' ? `Новый код: ${targets.join(', ')}` :
       mode==='special' ? `Особый замок: ${specialTypeName()}` :
-      mode==='hillsfar' ? 'Новый набор ключей' :
-      mode==='mass' ? 'Новый круговой замок' :
-      mode==='g1' ? 'Новая последовательность' :
       mode==='r2' ? 'Новый замок Risen 2' :
       mode==='skyrim' ? 'Новый замок Skyrim' :
       mode==='anach' ? 'Новый контур Anachronox' :
@@ -363,9 +354,6 @@ let plateEls=[], pinTopPlateEls=[];
   function reset(){
     beginRoundState();
     if(PuzzleModes.call(mode,'start')){ toast(PuzzleModes.restartMessage(mode)); return; }
-    if(mode==='hillsfar'){ startHillsfarRound(); toast('Набор ключей обновлён'); return; }
-    if(mode==='mass'){ startMassRound(); toast('Круговой замок обновлён'); return; }
-    if(mode==='g1'){ startG1Round(); toast('Последовательность обновлена'); return; }
     if(mode==='r2'){ startR2Round(); toast('Замок Risen 2 обновлён'); return; }
     if(mode==='skyrim'){ startSkyrimRound(); toast('Замок Skyrim обновлён'); return; }
     if(mode==='anach'){ startAnRound(); toast('Контур Anachronox обновлён'); return; }
@@ -436,9 +424,6 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='pathologic') return;
     if(mode==='bioshock2') return;
     if(mode==='alphaprotocol'){ apSelectPin(apSel+dir); return; }
-    if(mode==='g1') return g1Press(dir);
-    if(mode==='mass') return moveMass(dir);
-    if(mode==='hillsfar') return;
     if(mode==='heatcold'||mode==='drum'||mode==='scope') return;
     if(solved) return;
     nudgeTools();
@@ -526,9 +511,9 @@ let plateEls=[], pinTopPlateEls=[];
     anach:()=>tryOpenAn(),
     skyrim:()=>tryTorqueSkyrim(),
     r2:()=>tryOpenR2(),
-    g1:()=>tryOpenG1(),
-    hillsfar:()=>tryOpenHillsfar(),
-    mass:()=>tryOpenMass(),
+    g1:()=>PuzzleModes.call('g1','attemptOpen'),
+    hillsfar:()=>PuzzleModes.call('hillsfar','attemptOpen'),
+    mass:()=>PuzzleModes.call('mass','attemptOpen'),
     oblivion:()=>PuzzleModes.call('oblivion','attemptOpen'),
     watchmen:()=>PuzzleModes.call('watchmen','attemptOpen'),
     museum:()=>PuzzleModes.call('museum','attemptOpen'),
@@ -573,10 +558,8 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='pathologic') return;
     if(mode==='bioshock2') return;
     if(mode==='alphaprotocol'){ apMovePin(delta<0?-1:1); return; }
-    if(mode==='g1') return;
     if(mode==='heatcold'||mode==='drum'||mode==='scope') return;
-    if(mode==='mass') return selectMass(delta);
-    if(solved||mode==='hillsfar')return;
+    if(solved)return;
     selected=(selected+delta+n)%n;
     SFX.select();
     render();
@@ -642,16 +625,6 @@ let plateEls=[], pinTopPlateEls=[];
           p._pinTopPlate.style.setProperty('--px',px);
           p._pinTopPlate.style.setProperty('--py',py);
         }
-      }
-    }
-    if(hfTimerHandle && mode==='hillsfar' && !solved){
-      const hfDt = Math.max(0, now - (hfLastTick || now)) / 1000;
-      hfLastTick = now;
-      hfTimeLeft = Math.max(0, hfTimeLeft - hfDt);
-      renderHillsfarHud();
-      if(hfTimeLeft <= 0){
-        clearHillsfarTimer();
-        showGameDefeat('time');
       }
     }
     if(!solved) PuzzleModes.call(mode,'tick',{now,dt});

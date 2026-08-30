@@ -168,7 +168,7 @@
   let bioZonesArr=[], bioZoneEls=[], bioX=0, bioDir=1, bioSpeed=58, bioStage=0, bioRunning=true;
   let apPins=[], apSel=0, apOrder=[], apOrderStep=0, apTimeLeft=26, apTimeMax=26, apSeqEls=[];
   const CP_LEVEL_NAMES=['ВЕРХ','ВЫШЕ','НИЖЕ','НИЗ'];
-  let cpNodes=[1,1,1,1,1], cpTarget=[1,1,1,1], cpVals=[1,1,1,1], cpInitial=[1,1,1,1], cpSelected=0, cpReady=false;
+  let cpNodes=[1,1,1,1,1], cpTarget=[1,1,1,1], cpVals=[1,1,1,1], cpInitial=[1,1,1,1], cpSelected=-1, cpReady=false;
   let hcSecret=[0,0,0,0], hcAttempts=[], hcDigits=[0,0,0,0], hcActiveIndex=0;
   let drumSecret=[0,0,0,0], drumState=[0,0,0,0], drumSoundOn=true, drumAudioCtx=null;
   let scopeSecret=[0,0,0,0], scopeState=[0,0,0,0];

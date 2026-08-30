@@ -79,3 +79,61 @@
   backface-visibility:hidden;
   -webkit-backface-visibility:hidden;
 }
+
+/* Composite pick: compare two vertical profiles, with the four editable
+   segments stacked beside the player's pick. */
+@media (min-width:901px){
+  body.importedMode .cpBoard{
+    width:min(680px,88vw)!important;
+    height:min(560px,calc(100% - 18px))!important;
+    display:grid!important;
+    grid-template-columns:190px 450px!important;
+    gap:24px!important;
+    align-items:stretch!important;
+  }
+  body.importedMode .cpTarget,
+  body.importedMode .cpBuild{
+    height:100%!important;
+    min-height:0!important;
+    padding:34px 0 0!important;
+    overflow:visible!important;
+  }
+  body.importedMode .cpProfileTray{
+    position:absolute!important;
+    left:50%!important;
+    top:52%!important;
+    width:420px!important;
+    height:82px!important;
+    margin:0!important;
+    transform:translate(-50%,-50%) rotate(90deg)!important;
+  }
+  body.importedMode .cpBuildCanvas{
+    position:absolute!important;
+    left:104px!important;
+    top:52%!important;
+    width:420px!important;
+    height:84px!important;
+    margin:0!important;
+    transform:translate(-50%,-50%) rotate(90deg)!important;
+  }
+  body.importedMode .cpBuild>.cpSectionTitle{
+    right:auto!important;
+    width:208px!important;
+  }
+  body.importedMode .cpParts{
+    position:absolute!important;
+    right:0!important;
+    top:50%!important;
+    width:160px!important;
+    margin:0!important;
+    padding:0!important;
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:8px!important;
+    overflow:visible!important;
+    transform:translateY(-50%)!important;
+  }
+  body.importedMode .cpPart{min-width:0!important;padding:4px!important;}
+  body.importedMode .cpPartPreview{height:62px!important;}
+  body.importedMode .cpPartPreview svg{height:48px!important;}
+}

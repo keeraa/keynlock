@@ -1,6 +1,6 @@
   // ===== COMPOSITE PICK — CONTINUOUS BUILDER =====
   const CP_XS=[0,160,320,480,640];
-  const CP_PIN_COUNT=5;
+  const CP_PIN_COUNT=4;
   const CP_LEVEL_Y=[10,20,30,40];
   function cpY(level){ return CP_LEVEL_Y[level] ?? CP_LEVEL_Y[1]; }
   function cpSvgY(level){ return cpY(level) + 12; }
@@ -33,7 +33,10 @@
     const pts=[];
     const totalSegments=nodes.length-1;
     for(let i=0;i<count;i++){
-      const t = (i/(count-1))*totalSegments;
+      // One pin per editable segment, placed at its centre. The old endpoint
+      // sampling produced five pins for four controls and left two looking
+      // detached at the outer edges of the pick.
+      const t = i+.5;
       const seg = Math.min(totalSegments-1, Math.floor(t));
       const local = Math.max(0, Math.min(1, t-seg));
       const x1=CP_XS[seg], x2=CP_XS[seg+1];
@@ -87,9 +90,9 @@
     const points=cpSamplePoints(nodes);
     const pinSkin=currentPinSkin();
     const frag=document.createDocumentFragment();
-    points.forEach(pt=>{
+    points.forEach((pt,i)=>{
       const pin=document.createElement('div');
-      pin.className='cpPin';
+      pin.className=`cpPin cpPinSegment${i+1}`;
       pin.style.left=`${(pt.x/640)*100}%`;
       pin.style.setProperty('--cp-pin-top', `${Math.round(pt.y - 36)}px`);
 
@@ -112,7 +115,7 @@
 
     nodes.forEach((level,i)=>{
       const dot=document.createElement('div');
-      dot.className='cpJoint'+(i===0?' start':'')+(i===cpSelected+1&&!cpReady?' selected':'');
+      dot.className='cpJoint'+(i===0?' start':'')+(cpSelected>=0&&i===cpSelected+1&&!cpReady?' selected':'');
       const px=(CP_XS[i]/640)*svgBox.width + (svgBox.left-canvasBox.left);
       const py=(cpSvgY(level)/90)*svgBox.height + (svgBox.top-canvasBox.top);
       dot.style.left=`${px}px`;
@@ -176,7 +179,12 @@
 
       wrap.addEventListener('click',()=>{
         if(solved||cpReady) return;
-        cpSelected=i;
+        if(cpSelected!==i){
+          cpSelected=i;
+          SFX.select();
+          renderComposite();
+          return;
+        }
         setCompositeLevel(i,(level+1)%CP_LEVEL_NAMES.length);
       });
 
@@ -186,11 +194,7 @@
     cpReady=cpMatchesTarget();
     $cpState.classList.remove('ready');
 
-    if(solved) {
-      $cpState.textContent='Замок открыт';
-    } else {
-      $cpState.textContent=`Сегмент ${cpSelected+1}/4 · конец: ${CP_LEVEL_NAMES[cpVals[cpSelected]].toLowerCase()}`;
-    }
+    $cpState.textContent='';
 
     requestAnimationFrame(()=>cpRenderJoints(builtNodes));
   }
@@ -215,7 +219,7 @@
     while(cpMatchesTarget(cpVals) || cpVals.reduce((sum,v,i)=>sum+Math.abs(v-cpTarget[i]),0) < minDistance);
 
     cpInitial=[...cpVals];
-    cpSelected=0;
+    cpSelected=-1;
     cpReady=false;
     generatedDistance=cpVals.reduce((sum,v,i)=>sum+Math.abs(v-cpTarget[i]),0);
     updateEconomyUI();
@@ -224,7 +228,7 @@
 
   function moveCompositeSelection(dir){
     if(solved||cpReady) return;
-    const next=clamp(cpSelected+dir,0,3);
+    const next=cpSelected<0 ? (dir<0?3:0) : clamp(cpSelected+dir,0,3);
     if(next===cpSelected){
       SFX.blocked();
       return;
@@ -236,6 +240,12 @@
 
   function changeCompositeShape(i,delta){
     if(solved||cpReady) return;
+    if(i<0){
+      cpSelected=0;
+      SFX.select();
+      renderComposite();
+      return;
+    }
     const next=clamp(cpVals[i]+delta,0,CP_LEVEL_NAMES.length-1);
     if(next===cpVals[i]){
       SFX.blocked();
@@ -253,7 +263,7 @@
       damagePick({
         resetProgress:()=>{
           cpVals=[...cpInitial];
-          cpSelected=0;
+          cpSelected=-1;
           cpReady=false;
         },
         renderState:renderComposite,

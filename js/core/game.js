@@ -44,12 +44,6 @@
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>НАЙТИ ПРАВИЛЬНЫЙ УГОЛ ОТМЫЧКИ</b>';
     }else if(mode==='anach'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>МЕНЯЙ 3 КАНАЛА ТАК, ЧТОБЫ ЧИСЛО ВЫРОСЛО ДО 100.0</b>';
-    }else if(mode==='tension'){
-      $objectiveLine.innerHTML = `ЦЕЛЬ: <b>УДЕРЖИВАТЬ НАТЯЖЕНИЕ В РАБОЧЕЙ ЗОНЕ И ПОСТАВИТЬ ${tnPinCount} ШТИФТОВ</b>`;
-    }else if(mode==='resonance'){
-      $objectiveLine.innerHTML = `ЦЕЛЬ: <b>ЗАФИКСИРОВАТЬ ${rsPinCount} ШТИФТОВ ТОЧНО НА ЗОЛОТОЙ ЛИНИИ</b>`;
-    }else if(mode==='deduction'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ВОССТАНОВИТЬ ПРОФИЛЬ КЛЮЧА ПО ОБРАТНОЙ СВЯЗИ</b>';
     }else if(mode==='heatcold'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ПОДОБРАТЬ 4-ЗНАЧНЫЙ КОД ПО ПОДСКАЗКАМ ТЕПЛО / ХОЛОДНО</b>';
     }else if(mode==='drum'){

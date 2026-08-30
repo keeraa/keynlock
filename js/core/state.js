@@ -118,9 +118,6 @@
   let r2Sequence=[], r2ProgressCount=0, r2PickPos=0, r2PinEls=[];
   let skTargetAngle=0, skPickAngle=0, skCylinderAngle=0, skTorqueBusy=false, skDragging=false;
   let anTarget=[0,0,0], anState=[0,0,0], anInitialState=[0,0,0], anSelected=0;
-  let tnTension=40, tnTarget=52, tnWidth=18, tnIndex=0, tnDrift=.05, tnDragging=false, tnReady=false;
-  let rsIndex=0, rsT=0, rsSpeeds=[], rsBaseSpeeds=[], rsSpeedTargets=[], rsSpeedChangeAt=[], rsPauseUntil=[], rsOffsets=[], rsPhases=[], rsLaneEls=[], rsOrbEls=[], rsReady=false;
-  let kdVals=[2,2,2,2,2], kdTarget=[2,2,2,2,2], kdSelected=0, kdTests=0, kdFailures=0, kdLogs=[], kdReady=false;
   let wfSequence=[], wfStep=0, wfPos=0, wfWrong=-1, wfStress=0, wfBarEls=[], wfBarCount=6;
   let tdsRingSymbols=[], tdsOrder=[], tdsStep=0, tdsSelectedRing=0, tdsAngle=0, tdsTargets=[], tdsHot=false, tdsDone=new Set(), tdsFailed=false, tdsTimeLeft=22, tdsTimeMax=22, tdsDownInfo=null, tdsRingEls=[], tdsSeqEls=[];
   let kcdSweetR=.25, kcdSweetA=0, kcdRot=0, kcdStress=0, kcdTurning=false, kcdPointerX=.5, kcdPointerY=.5, kcdTolerance=.082, kcdTargetRot=220;
@@ -135,7 +132,7 @@
   let drumSecret=[0,0,0,0], drumState=[0,0,0,0], drumSoundOn=true, drumAudioCtx=null;
   let scopeSecret=[0,0,0,0], scopeState=[0,0,0,0];
   let n=5, selected=0, picks=pickCapacity, state=[], initial=[], links=[], targets=[], solved=false, mode='classic', goalLine=GOAL, moves=0, brokenPicks=0, runReward=1000, specialType='chain', generatedDistance=0, balance=Math.max(0,Number(STORE.getItem('lockpickBalance'))||0), hfTimeLeft=45, hfTimeMax=45, hfTimerHandle=null, hfLastTick=0, inventoryBrokenSlot=0, inventoryBreakTimer=null;
-  let g1Length=4, r2PinCount=6, tnPinCount=5, rsPinCount=5, kdToothCount=5, skSolveTolerance=6;
+  let g1Length=4, r2PinCount=6, skSolveTolerance=6;
   const $plates=document.querySelector('#plates'), $status=document.querySelector('#status'),
         $lock=document.querySelector('#lock'),
         challengeHud=new GameChallengeHud(document.querySelector('#challengeHud')),

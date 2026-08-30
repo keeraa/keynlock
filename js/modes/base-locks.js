@@ -297,12 +297,6 @@ let plateEls=[], pinTopPlateEls=[];
       startSkyrimRound();
     }else if(mode==='anach'){
       startAnRound();
-    }else if(mode==='tension'){
-      startTensionRound();
-    }else if(mode==='resonance'){
-      startResonanceRound();
-    }else if(mode==='deduction'){
-      startDeductionRound();
     }else if(mode==='heatcold'){
       startHeatColdRound();
     }else if(mode==='drum'){
@@ -347,9 +341,6 @@ let plateEls=[], pinTopPlateEls=[];
       mode==='r2' ? 'Новый замок Risen 2' :
       mode==='skyrim' ? 'Новый замок Skyrim' :
       mode==='anach' ? 'Новый контур Anachronox' :
-      mode==='tension' ? 'Новый замок с натяжением' :
-      mode==='resonance' ? 'Новый резонансный замок' :
-      mode==='deduction' ? 'Новый слепок ключа' :
       mode==='heatcold' ? 'Новый цифровой код' :
       mode==='drum' ? 'Новый барабанный замок' :
       mode==='wharf' ? 'Новый набор задвижек' :
@@ -378,9 +369,6 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='r2'){ startR2Round(); toast('Замок Risen 2 обновлён'); return; }
     if(mode==='skyrim'){ startSkyrimRound(); toast('Замок Skyrim обновлён'); return; }
     if(mode==='anach'){ startAnRound(); toast('Контур Anachronox обновлён'); return; }
-    if(mode==='tension'){ startTensionRound(); toast('Натяжение обновлено'); return; }
-    if(mode==='resonance'){ startResonanceRound(); toast('Резонанс обновлён'); return; }
-    if(mode==='deduction'){ startDeductionRound(); toast('Слепок обновлён'); return; }
     if(mode==='heatcold'){ startHeatColdRound(); toast('Цифровой код обновлён'); return; }
     if(mode==='drum'){ startDrumRound(); toast('Барабанный замок обновлён'); return; }
     if(mode==='scope'){ startScopeRound(); toast('Сигнал обновлён'); return; }
@@ -435,9 +423,6 @@ let plateEls=[], pinTopPlateEls=[];
 
   function move(dir){
     if(PuzzleModes.input(mode,'horizontal',dir)) return;
-    if(mode==='tension') return moveTension(dir);
-    if(mode==='resonance') return;
-    if(mode==='deduction') return moveDeductionSelection(dir);
     if(mode==='anach') return moveAn(dir);
     if(mode==='skyrim') return moveSkyrim(dir);
     if(mode==='r2') return moveR2(dir);
@@ -531,9 +516,9 @@ let plateEls=[], pinTopPlateEls=[];
     line:()=>tryOpenBaseLock(),
     sequence:()=>tryOpenBaseLock(),
     special:()=>tryOpenBaseLock(),
-    tension:()=>tryOpenTension(),
-    resonance:()=>tryOpenResonance(),
-    deduction:()=>tryOpenDeduction(),
+    tension:()=>PuzzleModes.call('tension','attemptOpen'),
+    resonance:()=>PuzzleModes.call('resonance','attemptOpen'),
+    deduction:()=>PuzzleModes.call('deduction','attemptOpen'),
     composite:()=>PuzzleModes.call('composite','attemptOpen'),
     heatcold:()=>scanHeatCold(),
     drum:()=>checkDrum(),
@@ -563,9 +548,6 @@ let plateEls=[], pinTopPlateEls=[];
 
   function select(delta){
     if(PuzzleModes.input(mode,'vertical',delta)) return;
-    if(mode==='tension'){ if(delta<0) setTensionPin(); return; }
-    if(mode==='resonance'){ if(delta<0) hitResonance(); return; }
-    if(mode==='deduction') return changeDeduction(kdSelected,delta<0?1:-1);
     if(mode==='anach') return adjustAn(delta<0?1:-1);
     if(mode==='skyrim'){ if(delta<0) GameActions.attemptOpen({modeId:'skyrim',source:'keyboard'}); return; }
     if(mode==='r2'){
@@ -606,7 +588,6 @@ let plateEls=[], pinTopPlateEls=[];
 
     updatePickUI();
     if(PuzzleModes.has(mode)){ $mechanism.classList.remove('ready'); }
-    else if(mode==='tension'||mode==='resonance'||mode==='deduction'){ $mechanism.classList.remove('ready'); }
     else if(mode==='anach'){ $mechanism.classList.remove('ready'); }
     else if(mode==='skyrim'){ $mechanism.classList.remove('ready'); }
     else if(mode==='r2'){ $mechanism.classList.remove('ready'); }
@@ -672,36 +653,6 @@ let plateEls=[], pinTopPlateEls=[];
         clearHillsfarTimer();
         showGameDefeat('time');
       }
-    }
-    if(mode==='resonance' && !solved && !rsReady && rsLaneEls.length){
-      rsT += dt * .001;
-      const rsLevel=getModeDifficulty('resonance');
-      rsLaneEls.forEach((lane,i)=>{
-        const orb=rsOrbEls[i];
-        if(!orb || i<rsIndex) return;
-        if(rsLevel>=2){
-          if(now >= (rsSpeedChangeAt[i]||0)){
-            const base=rsBaseSpeeds[i] || rsSpeeds[i] || 1;
-            const vary=rsLevel===2 ? .18 : .24;
-            rsSpeedTargets[i]=Math.max(.28, base*(1 + rand(Math.round(-vary*100), Math.round(vary*100))/100));
-            rsSpeedChangeAt[i]=now + rand(rsLevel===2 ? 1100 : 900, rsLevel===2 ? 2300 : 1800);
-            if(rsLevel===3 && Math.random()<.34){
-              rsPauseUntil[i]=now + rand(180,420);
-            }
-          }
-          rsSpeeds[i] += (rsSpeedTargets[i]-rsSpeeds[i]) * Math.min(1, dt/900);
-        }
-        if(!(rsLevel===3 && now < (rsPauseUntil[i]||0))){
-          rsOffsets[i] = (rsOffsets[i]||0) + dt * .001 * (rsSpeeds[i]||1);
-        }
-        orb.style.top=`${rsPos(i)}%`;
-      });
-    }
-    if(mode==='tension' && !solved && !tnReady){
-      tnTension += tnDrift * (dt/16.67);
-      if(tnTension<2){tnTension=2;tnDrift=Math.abs(tnDrift);}
-      if(tnTension>98){tnTension=98;tnDrift=-Math.abs(tnDrift);}
-      if($tnNeedle) $tnNeedle.style.left=`${tnTension}%`;
     }
     if(!solved) PuzzleModes.call(mode,'tick',{now,dt});
     if(mode==='thiefds' && !solved){

@@ -1,4 +1,6 @@
+(function(){
   // ===== KEY DEDUCTION =====
+  let kdVals=[2,2,2,2,2], kdTarget=[2,2,2,2,2], kdSelected=0, kdTests=0, kdFailures=0, kdLogs=[], kdReady=false, kdToothCount=5;
   function renderDeduction(){
     if(!$kdKey) return;
     const pinSkin=currentPinSkin();
@@ -63,3 +65,19 @@
     solved=true;SFX.open();renderDeduction();setTimeout(()=>celebrate(),420);
   }
 
+  $kdCheck?.addEventListener('click',checkDeduction);
+
+  PuzzleModes.register({
+    id:'deduction',
+    start:startDeductionRound,
+    render:renderDeduction,
+    objective:()=>GameCatalog.get('deduction')?.objective,
+    restartMessage:'Новый слепок ключа',
+    input:{
+      horizontal:moveDeductionSelection,
+      vertical:delta=>changeDeduction(kdSelected,delta<0?1:-1)
+    },
+    actions:{primary:checkDeduction},
+    attemptOpen:tryOpenDeduction
+  });
+})();

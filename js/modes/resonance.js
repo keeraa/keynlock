@@ -1,4 +1,6 @@
+(function(){
   // ===== RESONANCE =====
+  let rsIndex=0, rsT=0, rsSpeeds=[], rsBaseSpeeds=[], rsSpeedTargets=[], rsSpeedChangeAt=[], rsPauseUntil=[], rsOffsets=[], rsPhases=[], rsLaneEls=[], rsOrbEls=[], rsReady=false, rsPinCount=5;
   function rsPos(i){ return 50+43*Math.sin((rsOffsets[i]||0)+(rsPhases[i]||0)); }
   function renderResonance(){
     if(!$rsLanes) return;
@@ -55,3 +57,40 @@
     solved=true;SFX.open();renderResonance();setTimeout(()=>celebrate(),420);
   }
 
+  function tickResonance({now,dt}){
+    if(solved||rsReady||!rsLaneEls.length) return;
+    rsT+=dt*.001;
+    const rsLevel=getModeDifficulty('resonance');
+    rsLaneEls.forEach((lane,i)=>{
+      const orb=rsOrbEls[i];
+      if(!orb||i<rsIndex) return;
+      if(rsLevel>=2){
+        if(now>=(rsSpeedChangeAt[i]||0)){
+          const base=rsBaseSpeeds[i]||rsSpeeds[i]||1;
+          const vary=rsLevel===2?.18:.24;
+          rsSpeedTargets[i]=Math.max(.28,base*(1+rand(Math.round(-vary*100),Math.round(vary*100))/100));
+          rsSpeedChangeAt[i]=now+rand(rsLevel===2?1100:900,rsLevel===2?2300:1800);
+          if(rsLevel===3&&Math.random()<.34) rsPauseUntil[i]=now+rand(180,420);
+        }
+        rsSpeeds[i]+=(rsSpeedTargets[i]-rsSpeeds[i])*Math.min(1,dt/900);
+      }
+      if(!(rsLevel===3&&now<(rsPauseUntil[i]||0))) rsOffsets[i]=(rsOffsets[i]||0)+dt*.001*(rsSpeeds[i]||1);
+      orb.style.top=`${rsPos(i)}%`;
+    });
+  }
+
+  PuzzleModes.register({
+    id:'resonance',
+    start:startResonanceRound,
+    render:renderResonance,
+    tick:tickResonance,
+    objective:()=>`ЗАФИКСИРОВАТЬ ${rsPinCount} ШТИФТОВ ТОЧНО НА ЗОЛОТОЙ ЛИНИИ`,
+    restartMessage:'Новый резонансный замок',
+    input:{
+      horizontal:()=>{},
+      vertical:delta=>{ if(delta<0) hitResonance(); }
+    },
+    actions:{primary:hitResonance},
+    attemptOpen:tryOpenResonance
+  });
+})();

@@ -278,23 +278,11 @@
 
   $lockHitArea.addEventListener('click',handleUniversalLockClick);
   $massCenter.addEventListener('click',()=>GameActions.attemptOpen({modeId:'mass',source:'puzzle-control'}));
-  $kdCheck?.addEventListener('click',checkDeduction);
   $skTorqueButton.addEventListener('click',()=>GameActions.attemptOpen({modeId:'skyrim',source:'puzzle-control'}));
   $anUnlock.addEventListener('click',e=>{ if(e.target.closest('.anBtn')) return; GameActions.attemptOpen({modeId:'anach',source:'puzzle-control'}); });
   $anUnlock.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&!e.target.closest('.anBtn')){ e.preventDefault(); GameActions.attemptOpen({modeId:'anach',source:'keyboard'}); } });
   document.querySelectorAll('[data-an-col]').forEach(btn=>btn.addEventListener('click',e=>{ e.stopPropagation(); adjustAn(btn.dataset.anDir==='up'?1:-1, Number(btn.dataset.anCol)); }));
   document.querySelectorAll('.anChannel').forEach(ch=>ch.addEventListener('click',e=>{ if(e.target.closest('.anBtn')) return; anSelected=Number(ch.dataset.col); SFX.select(); renderAn(); }));
-  $tnGauge?.addEventListener('pointerdown',e=>{
-    if(mode!=='tension'||solved||tnReady) return;
-    tnDragging=true;$tnGauge.setPointerCapture?.(e.pointerId);
-    const r=$tnGauge.getBoundingClientRect();tnTension=clamp((e.clientX-r.left)/r.width*100,0,100);renderTension();
-  });
-  $tnGauge?.addEventListener('pointermove',e=>{if(!tnDragging||mode!=='tension')return;const r=$tnGauge.getBoundingClientRect();tnTension=clamp((e.clientX-r.left)/r.width*100,0,100);if($tnNeedle)$tnNeedle.style.left=`${tnTension}%`;});
-  $tnGauge?.addEventListener('pointerup',()=>{tnDragging=false;});
-  $tnGauge?.addEventListener('pointercancel',()=>{tnDragging=false;});
-  addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='resonance'&&e.code==='Space'){e.preventDefault();hitResonance();}});
-  addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='tension'&&e.code==='Space'){e.preventDefault();setTensionPin();}});
-  addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='deduction'&&e.code==='Space'){e.preventDefault();checkDeduction();}});
   $wmOpenBtn?.addEventListener('click',()=>GameActions.attemptOpen({modeId:'watchmen',source:'puzzle-control'}));
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&e.code==='Space'&&PuzzleModes.action(mode,'primary')) e.preventDefault();});
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='thiefds'&&e.code==='Space'){e.preventDefault();tdsCommit();}});

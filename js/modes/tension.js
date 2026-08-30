@@ -1,4 +1,6 @@
+(function(){
   // ===== TENSION CONTROL =====
+  let tnTension=40, tnTarget=52, tnWidth=18, tnIndex=0, tnDrift=.05, tnDragging=false, tnReady=false, tnPinCount=5;
   function tnInBand(){ return Math.abs(tnTension-tnTarget)<=tnWidth/2; }
   function renderTension(){
     if(!$tnNeedle) return;
@@ -54,3 +56,43 @@
     solved=true; SFX.open(); renderTension(); setTimeout(()=>celebrate(),420);
   }
 
+  function tickTension({dt}){
+    if(solved||tnReady) return;
+    tnTension+=tnDrift*(dt/16.67);
+    if(tnTension<2){tnTension=2;tnDrift=Math.abs(tnDrift);}
+    if(tnTension>98){tnTension=98;tnDrift=-Math.abs(tnDrift);}
+    if($tnNeedle) $tnNeedle.style.left=`${tnTension}%`;
+  }
+
+  $tnGauge?.addEventListener('pointerdown',e=>{
+    if(mode!=='tension'||solved||tnReady) return;
+    tnDragging=true;
+    $tnGauge.setPointerCapture?.(e.pointerId);
+    const r=$tnGauge.getBoundingClientRect();
+    tnTension=clamp((e.clientX-r.left)/r.width*100,0,100);
+    renderTension();
+  });
+  $tnGauge?.addEventListener('pointermove',e=>{
+    if(!tnDragging||mode!=='tension') return;
+    const r=$tnGauge.getBoundingClientRect();
+    tnTension=clamp((e.clientX-r.left)/r.width*100,0,100);
+    if($tnNeedle) $tnNeedle.style.left=`${tnTension}%`;
+  });
+  $tnGauge?.addEventListener('pointerup',()=>{tnDragging=false;});
+  $tnGauge?.addEventListener('pointercancel',()=>{tnDragging=false;});
+
+  PuzzleModes.register({
+    id:'tension',
+    start:startTensionRound,
+    render:renderTension,
+    tick:tickTension,
+    objective:()=>`УДЕРЖИВАТЬ НАТЯЖЕНИЕ В РАБОЧЕЙ ЗОНЕ И ПОСТАВИТЬ ${tnPinCount} ШТИФТОВ`,
+    restartMessage:'Новый замок с натяжением',
+    input:{
+      horizontal:moveTension,
+      vertical:delta=>{ if(delta<0) setTensionPin(); }
+    },
+    actions:{primary:setTensionPin},
+    attemptOpen:tryOpenTension
+  });
+})();

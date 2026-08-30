@@ -178,10 +178,7 @@
       if(game?.kind==='native'){
         setModeDifficulty(level,id,false);
         switchMode(id,true);
-        return;
       }
-      const location=MAP_LOCATIONS[`prototype-${id.replace(/^prototype:/,'')}`];
-      if(location)openPrototypeMechanic(location);
     }
 
     function openGameSettings(){
@@ -190,7 +187,6 @@
       if(shopOpen)closeShop();
       if(lairOpen)closeLair();
       if(mapOpen)closeMap(false);
-      leavePrototypeMechanic?.();
       document.body.classList.add('game-settings-open');
       setGameInactive(true);
       screen.hidden=false;

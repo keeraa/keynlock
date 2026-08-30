@@ -181,10 +181,7 @@
         $lock=document.querySelector('#lock'),
         challengeHud=new GameChallengeHud(document.querySelector('#challengeHud')),
         toolMotionController=new ToolMotionController(document.documentElement),
-        gameDefeat=new GameDefeat(document.querySelector('#gameDefeatOverlay'),{onRestart:()=>{
-          if(activePrototypeMechanic)replayPrototypeMechanic();
-          else restartCurrentRound();
-        }}),
+        gameDefeat=new GameDefeat(document.querySelector('#gameDefeatOverlay'),{onRestart:()=>restartCurrentRound()}),
         $toast=document.querySelector('#toast'), $toastText=document.querySelector('#toastText'), $toastAction=document.querySelector('#toastAction'), $scene=document.querySelector('.scene'), $mechanism=document.querySelector('.mechanismZone'), $lockHitArea=document.querySelector('#lockHitArea'),
         $objectiveLine=document.querySelector('#objectiveLine'),
         $mapTab=document.querySelector('#mapTab'),

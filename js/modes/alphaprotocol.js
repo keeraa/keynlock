@@ -1,4 +1,6 @@
+(function(){
 // ===== ALPHA PROTOCOL (alphaprotocol / ap) =====
+let apPins=[], apSel=0, apOrder=[], apOrderStep=0, apTimeLeft=26, apTimeMax=26, apSeqEls=[];
 const AP_SYMBOLS=[
   '<svg viewBox="0 0 48 48"><path d="M24 5V43"/></svg>',
   '<svg viewBox="0 0 48 48"><path d="M8 8H27Q38 8 38 20V43"/></svg>',
@@ -154,3 +156,5 @@ for(let apPinIndex=0;apPinIndex<5;apPinIndex++){
     apSet();
   });
 }
+PuzzleModes.register({id:'alphaprotocol',start:startAlphaProtocolRound,render:renderAlphaProtocol,tick:({dt})=>apTick(Math.min(.05,dt/1000)),syncHud:renderAlphaProtocol,objective:()=>GameCatalog.get('alphaprotocol')?.objective,restartMessage:'Новый замок Alpha Protocol',input:{horizontal:dir=>apSelectPin(apSel+dir),vertical:delta=>apMovePin(delta<0?-1:1)},actions:{primary:apSet,secondary:()=>GameActions.attemptOpen({modeId:'alphaprotocol',source:'keyboard'})},attemptOpen:tryOpenAlphaProtocol});
+})();

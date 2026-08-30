@@ -35,10 +35,10 @@ const GAME_DEFINITIONS={
   thief12:{title:'Thief 1/2',description:'Определяй правильный профиль по звуку и удерживай его до полного зацепления на каждой стадии.',objective:'НАЙТИ И УДЕРЖАТЬ ПРОФИЛЬ ОТМЫЧКИ НА КАЖДОЙ СТАДИИ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   fallout:{title:'Fallout',description:'Подбери угол отмычки и направление вращения, не доводя износ инструмента до предела.',objective:'НАЙТИ УГОЛ И ВЕРНОЕ НАПРАВЛЕНИЕ ВРАЩЕНИЯ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:true,noiseSensor:true,guards:false,birds:false}},
   anachlab:{title:'Anachronox — лаборатория',description:'Подбери трёхзначный код по измерению близости каждой отдельно проверяемой цифры.',objective:'ПОДОБРАТЬ ТРЁХЗНАЧНЫЙ КОД ПО ПОДСКАЗКАМ БЛИЗОСТИ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
-  masshack:{title:'Mass Effect — узел',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
-  pathologic:{title:'Pathologic 2',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
-  bioshock2:{title:'BioShock 2',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
-  alphaprotocol:{title:'Alpha Protocol',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}}
+  masshack:{title:'Mass Effect — узел',description:'Проходи через вращающиеся кольца к ядру, избегая движущихся блоков.',objective:'ПРОЙТИ ВСЕ 5 КОЛЕЦ И ПОДТВЕРДИТЬ ЯДРО',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
+  pathologic:{title:'Pathologic 2',description:'Ударами удерживай обе стороны механизма в центральных зонах и зафиксируй совпадение.',objective:'СОВМЕСТИТЬ ОБЕ ЗОНЫ С ЦЕНТРАЛЬНОЙ ЛИНИЕЙ И ЗАФИКСИРОВАТЬ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
+  bioshock2:{title:'BioShock 2',description:'Останавливай движущуюся иглу в зелёных зонах пять этапов подряд.',objective:'ОСТАНОВИТЬ ИГЛУ НА ЗЕЛЁНОЙ ЗОНЕ 5 РАЗ ПОДРЯД',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
+  alphaprotocol:{title:'Alpha Protocol',description:'Выставляй пины по высоте и фиксируй их в порядке показанных символов.',objective:'ВЫСТАВИТЬ 5 ПИНОВ В ПОРЯДКЕ СИМВОЛОВ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}}
 };
 
 function freezeGameDefinitions(definitions){

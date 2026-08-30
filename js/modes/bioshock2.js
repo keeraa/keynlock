@@ -1,4 +1,6 @@
+(function(){
 // ===== BIOSHOCK 2 (bioshock2 / bio) =====
+let bioZonesArr=[], bioZoneEls=[], bioX=0, bioDir=1, bioSpeed=58, bioStage=0, bioRunning=true;
 const BIO_STAGES=5;
 const BIO_STAGE_CFG=[
   {redCount:2,redW:6.5, greenCount:2,greenW:14.0},
@@ -121,3 +123,5 @@ function renderBio(){
   }
 }
 document.getElementById('bioStopBtn')?.addEventListener('click',bioStop);
+PuzzleModes.register({id:'bioshock2',start:startBioshock2Round,render:renderBio,tick:({dt})=>bioTick(Math.min(.04,dt/1000)),objective:()=>GameCatalog.get('bioshock2')?.objective,restartMessage:'Новый взлом BioShock 2',input:{horizontal:()=>{},vertical:()=>{}},actions:{primary:bioStop},attemptOpen:tryOpenBioshock2});
+})();

@@ -291,14 +291,6 @@ let plateEls=[], pinTopPlateEls=[];
       startDrumRound();
     }else if(mode==='scope'){
       startScopeRound();
-    }else if(mode==='masshack'){
-      startMassHackRound();
-    }else if(mode==='pathologic'){
-      startPathologicRound();
-    }else if(mode==='bioshock2'){
-      startBioshock2Round();
-    }else if(mode==='alphaprotocol'){
-      startAlphaProtocolRound();
     }
 
     updateModeUI();
@@ -312,10 +304,6 @@ let plateEls=[], pinTopPlateEls=[];
       mode==='special' ? `Особый замок: ${specialTypeName()}` :
       mode==='heatcold' ? 'Новый цифровой код' :
       mode==='drum' ? 'Новый барабанный замок' :
-      mode==='masshack' ? 'Новый обход' :
-      mode==='pathologic' ? 'Новый замок' :
-      mode==='bioshock2' ? 'Новый взлом' :
-      mode==='alphaprotocol' ? 'Новый замок' :
       'Новый сигнал осциллографа';
     if(notify){
       toast(msg);
@@ -329,10 +317,6 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='heatcold'){ startHeatColdRound(); toast('Цифровой код обновлён'); return; }
     if(mode==='drum'){ startDrumRound(); toast('Барабанный замок обновлён'); return; }
     if(mode==='scope'){ startScopeRound(); toast('Сигнал обновлён'); return; }
-    if(mode==='masshack'){ startMassHackRound(); toast('Обход обновлён'); return; }
-    if(mode==='pathologic'){ startPathologicRound(); toast('Замок обновлён'); return; }
-    if(mode==='bioshock2'){ startBioshock2Round(); toast('Взлом обновлён'); return; }
-    if(mode==='alphaprotocol'){ startAlphaProtocolRound(); toast('Замок обновлён'); return; }
     state=[...initial]; solved=false; $lock.classList.remove('win');
     $mechanism.classList.remove('ready','opening','opened');
     render(); toast('Механизм сброшен');
@@ -374,10 +358,6 @@ let plateEls=[], pinTopPlateEls=[];
 
   function move(dir){
     if(PuzzleModes.input(mode,'horizontal',dir)) return;
-    if(mode==='masshack') return hackMove(dir);
-    if(mode==='pathologic') return;
-    if(mode==='bioshock2') return;
-    if(mode==='alphaprotocol'){ apSelectPin(apSel+dir); return; }
     if(mode==='heatcold'||mode==='drum'||mode==='scope') return;
     if(solved) return;
     nudgeTools();
@@ -479,18 +459,14 @@ let plateEls=[], pinTopPlateEls=[];
     thief12:()=>PuzzleModes.call('thief12','attemptOpen'),
     fallout:()=>PuzzleModes.call('fallout','attemptOpen'),
     anachlab:()=>PuzzleModes.call('anachlab','attemptOpen'),
-    masshack:()=>tryOpenMassHack(),
-    pathologic:()=>tryOpenPathologic(),
-    bioshock2:()=>tryOpenBioshock2(),
-    alphaprotocol:()=>tryOpenAlphaProtocol()
+    masshack:()=>PuzzleModes.call('masshack','attemptOpen'),
+    pathologic:()=>PuzzleModes.call('pathologic','attemptOpen'),
+    bioshock2:()=>PuzzleModes.call('bioshock2','attemptOpen'),
+    alphaprotocol:()=>PuzzleModes.call('alphaprotocol','attemptOpen')
   });
 
   function select(delta){
     if(PuzzleModes.input(mode,'vertical',delta)) return;
-    if(mode==='masshack'){ if(delta<0) hackIn(); else hackOut(); return; }
-    if(mode==='pathologic') return;
-    if(mode==='bioshock2') return;
-    if(mode==='alphaprotocol'){ apMovePin(delta<0?-1:1); return; }
     if(mode==='heatcold'||mode==='drum'||mode==='scope') return;
     if(solved)return;
     selected=(selected+delta+n)%n;
@@ -504,14 +480,7 @@ let plateEls=[], pinTopPlateEls=[];
 
     updatePickUI();
     if(PuzzleModes.has(mode)){ $mechanism.classList.remove('ready'); }
-    else if(mode==='masshack'){ $mechanism.classList.remove('ready'); }
-    else if(mode==='pathologic'){ $mechanism.classList.remove('ready'); }
-    else if(mode==='bioshock2'){ $mechanism.classList.remove('ready'); }
-    else if(mode==='alphaprotocol'){ $mechanism.classList.remove('ready'); }
-    else if(mode==='g1'){ $mechanism.classList.remove('ready'); }
-    else if(mode==='mass'){ $mechanism.classList.remove('ready'); }
-    else if(mode!=='hillsfar') $mechanism.classList.toggle('ready',!solved && goalMet());
-    else $mechanism.classList.remove('ready');
+    else $mechanism.classList.toggle('ready',!solved && goalMet());
     $status.innerHTML = '';
   }
 
@@ -552,18 +521,6 @@ let plateEls=[], pinTopPlateEls=[];
       }
     }
     if(!solved) PuzzleModes.call(mode,'tick',{now,dt});
-    if(mode==='masshack' && !solved){
-      hackTick(Math.min(.05,dt/1000));
-    }
-    if(mode==='pathologic' && !solved){
-      ptgTick(Math.min(.035,dt/1000));
-    }
-    if(mode==='bioshock2' && !solved){
-      bioTick(Math.min(.04,dt/1000));
-    }
-    if(mode==='alphaprotocol' && !solved){
-      apTick(Math.min(.05,dt/1000));
-    }
     scheduleAnimationLoop(solved ? 160 : ACTIVE_FRAME_MS);
   }
   window.addEventListener('keynlock-world-pausechange',event=>{

@@ -113,10 +113,6 @@
     }
   }catch{}
 
-  let hackRing=5, hackAng=90, hackBlocks=[], hackHitUntil=0, hackCollapse=false, hackCollapseStart=0, hackRingEls=[], hackBlockEls=[];
-  let ptgY=[.08,.08], ptgV=[0,0], ptgTarget=[.37,.51], ptgDur=1.35;
-  let bioZonesArr=[], bioZoneEls=[], bioX=0, bioDir=1, bioSpeed=58, bioStage=0, bioRunning=true;
-  let apPins=[], apSel=0, apOrder=[], apOrderStep=0, apTimeLeft=26, apTimeMax=26, apSeqEls=[];
   let hcSecret=[0,0,0,0], hcAttempts=[], hcDigits=[0,0,0,0], hcActiveIndex=0;
   let drumSecret=[0,0,0,0], drumState=[0,0,0,0], drumSoundOn=true, drumAudioCtx=null;
   let scopeSecret=[0,0,0,0], scopeState=[0,0,0,0];

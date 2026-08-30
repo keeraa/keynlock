@@ -13,7 +13,6 @@
     document.body.classList.toggle('game-noise-sensor', !!GameCatalog.feature(mode,'world.noiseSensor'));
     document.body.dataset.gameMode=mode;
     if(PuzzleModes.call(mode,'syncHud')){}
-    else if(mode==='alphaprotocol') setGlobalTimer(apTimeLeft>0, apTimeLeft||apTimeMax, apTimeMax||1, 'ТАЙМЕР');
     else setGlobalTimer(false);
     const registeredObjective=PuzzleModes.objective(mode);
     if(registeredObjective){
@@ -34,14 +33,6 @@
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ВЫСТАВИТЬ 4 БАРАБАНА ПО СИЛЕ ЩЕЛЧКА</b>';
     }else if(mode==='scope'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>СОВМЕСТИТЬ ТЕКУЩИЙ СИГНАЛ С ЭТАЛОНОМ</b>';
-    }else if(mode==='masshack'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ПРОЙТИ ВСЕ 5 КОЛЕЦ И ПОДТВЕРДИТЬ ЯДРО</b>';
-    }else if(mode==='pathologic'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>СОВМЕСТИТЬ ОБЕ ЗОНЫ С ЦЕНТРАЛЬНОЙ ЛИНИЕЙ И ЗАФИКСИРОВАТЬ</b>';
-    }else if(mode==='bioshock2'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ОСТАНОВИТЬ ИГЛУ НА ЗЕЛЁНОЙ ЗОНЕ 5 РАЗ ПОДРЯД</b>';
-    }else if(mode==='alphaprotocol'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ВЫСТАВИТЬ 5 ПИНОВ В ПОРЯДКЕ СИМВОЛОВ</b>';
     }
     if(typeof syncPuzzleRewardClearance==='function') requestAnimationFrame(syncPuzzleRewardClearance);
   }

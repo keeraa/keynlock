@@ -1,4 +1,6 @@
+(function(){
 // ===== MASS EFFECT — УЗЕЛ (masshack) =====
+let hackRing=5, hackAng=90, hackBlocks=[], hackHitUntil=0, hackCollapse=false, hackCollapseStart=0, hackRingEls=[], hackBlockEls=[];
 const HACK_RING_RATIOS=[.12,.20,.28,.36,.44];
 function hackArenaMetrics(){
   const w=$hackArena?.clientWidth||0, h=$hackArena?.clientHeight||0, s=Math.min(w,h);
@@ -161,3 +163,5 @@ if($hackArena){
   $hackArena.addEventListener('pointercancel',()=>{ hackSwipe=null; });
 }
 $hackCore?.addEventListener('click',()=>GameActions.attemptOpen({modeId:'masshack',source:'puzzle-control'}));
+PuzzleModes.register({id:'masshack',start:startMassHackRound,render:renderMassHack,tick:({dt})=>hackTick(Math.min(.05,dt/1000)),objective:()=>GameCatalog.get('masshack')?.objective,restartMessage:'Новый обход Mass Effect',input:{horizontal:hackMove,vertical:delta=>delta<0?hackIn():hackOut()},actions:{primary:()=>GameActions.attemptOpen({modeId:'masshack',source:'keyboard'}),secondary:()=>GameActions.attemptOpen({modeId:'masshack',source:'keyboard'})},attemptOpen:tryOpenMassHack});
+})();

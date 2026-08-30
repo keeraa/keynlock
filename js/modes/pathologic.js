@@ -1,4 +1,6 @@
+(function(){
 // ===== PATHOLOGIC 2 (pathologic / ptg) =====
+let ptgY=[.08,.08], ptgV=[0,0], ptgTarget=[.37,.51], ptgDur=1.35;
 const PTG_TOOTH_H=.38, PTG_BAND_H=.32, PTG_DUR_MAX=1.35, PTG_GRAVITY=1.75, PTG_HIT_IMPULSE=1.18;
 function ptgGood(i){
   const bandBottom=ptgY[i]+ptgTarget[i]*PTG_TOOTH_H, bandTop=bandBottom+PTG_BAND_H*PTG_TOOTH_H;
@@ -78,3 +80,5 @@ function renderPathologic(){
 document.getElementById('ptgHitLeft')?.addEventListener('click',()=>ptgHit(0));
 document.getElementById('ptgHitRight')?.addEventListener('click',()=>ptgHit(1));
 document.getElementById('ptgConfirmBtn')?.addEventListener('click',()=>GameActions.attemptOpen({modeId:'pathologic',source:'puzzle-control'}));
+PuzzleModes.register({id:'pathologic',start:startPathologicRound,render:renderPathologic,tick:({dt})=>ptgTick(Math.min(.035,dt/1000)),objective:()=>GameCatalog.get('pathologic')?.objective,restartMessage:'Новый замок Pathologic 2',input:{horizontal:dir=>ptgHit(dir<0?0:1),vertical:()=>{}},actions:{primary:()=>GameActions.attemptOpen({modeId:'pathologic',source:'keyboard'})},attemptOpen:tryOpenPathologic});
+})();

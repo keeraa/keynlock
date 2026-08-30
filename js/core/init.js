@@ -273,22 +273,7 @@
     if(e.code==='Space'&&PuzzleModes.action(mode,'primaryEnd')) e.preventDefault();
   });
   addEventListener('keydown',e=>{
-    if(!gameplayInputBlocked()&&mode==='masshack'&&(e.code==='Enter'||e.code==='Space')){ e.preventDefault(); GameActions.attemptOpen({modeId:'masshack',source:'keyboard'}); }
-  });
-  addEventListener('keydown',e=>{
-    if(gameplayInputBlocked()||mode!=='pathologic') return;
-    if(e.code==='KeyA'||e.code==='ArrowLeft'){ e.preventDefault(); ptgHit(0); }
-    else if(e.code==='KeyD'||e.code==='ArrowRight'){ e.preventDefault(); ptgHit(1); }
-    else if(e.code==='Space'){ e.preventDefault(); GameActions.attemptOpen({modeId:'pathologic',source:'keyboard'}); }
-  });
-  addEventListener('keydown',e=>{
-    if(!gameplayInputBlocked()&&mode==='bioshock2'&&e.code==='Space'){ e.preventDefault(); bioStop(); }
-  });
-  addEventListener('keydown',e=>{
-    if(!gameplayInputBlocked()&&mode==='alphaprotocol'&&e.code==='Space'){ e.preventDefault(); apSet(); }
-  });
-  addEventListener('keydown',e=>{
-    if(!gameplayInputBlocked()&&mode==='alphaprotocol'&&e.code==='Enter'){ e.preventDefault(); GameActions.attemptOpen({modeId:'alphaprotocol',source:'keyboard'}); }
+    if(!gameplayInputBlocked()&&e.code==='Enter'&&PuzzleModes.action(mode,'secondary')) e.preventDefault();
   });
   document.querySelector('#shopHudButton')?.addEventListener('click',()=>{
     if(lairOpen) closeLair();

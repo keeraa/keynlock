@@ -360,7 +360,7 @@ body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none !important
 .lairCharacter.active{border-color:#d1a556 !important;box-shadow:inset 0 0 0 1px rgba(255,225,166,.09),0 16px 38px rgba(0,0,0,.3),0 0 28px rgba(198,146,65,.15) !important;}
 .lairPortrait{
   position:relative !important;
-  height:220px !important;
+  height:300px !important;
   overflow:hidden !important;
   border:1px solid rgba(126,91,48,.48) !important;
   border-radius:14px !important;
@@ -382,6 +382,7 @@ body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none !important
 }
 .lairCharacter[data-character="sai"] .lairPortraitArt{height:142% !important;}
 .lairCharacter[data-character="tik"] .lairPortraitArt{height:145% !important;}
+.lairCharacter[data-character] .lairPortraitArt:is(video){width:100% !important;height:100% !important;object-fit:cover !important;}
 .lairCharacterName{margin-top:14px !important;font-size:22px !important;text-align:center !important;}
 .lairCharacterRole{text-align:center !important;}
 .lairCharacterDesc{text-align:center !important;}
@@ -390,10 +391,11 @@ body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none !important
 /* A tighter portrait row reads as character selection instead of three wide
    text panels. Keep the group centered inside the existing modal. */
 .lairCharacters{
-  width:min(1120px,100%) !important;
+  width:100% !important;
   margin-inline:auto !important;
   grid-template-columns:repeat(3,minmax(0,1fr)) !important;
 }
+.lairModuleWindow[data-module="team"]{width:min(651px,88vw) !important;}
 .lairCharacterName{text-transform:uppercase !important;letter-spacing:.055em !important;}
 .lairActiveCharacterBadge{text-transform:uppercase !important;letter-spacing:.045em !important;}
 .lairPortrait{

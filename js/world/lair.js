@@ -56,6 +56,7 @@
     if(!$lairModuleWindow) return;
     const titles={team:'Выбор персонажа',dialogue:'Диалоги',city:'Анализ города',alchemy:'Алхимия',collection:'Коллекция'};
     $lairModuleTitle.textContent=titles[next]||'Логово';
+    $lairModuleWindow.dataset.module=next;
     $lairModuleWindow.hidden=false;
     $lairModuleWindow.classList.add('open');
     // Alchemy measures and creates part of its scene during the first start.
@@ -103,7 +104,10 @@
     if(small){
       return `<span class="lairPersonThumb"><img src="${ch.portrait}" alt="${ch.name}"></span>`;
     }
-    return `<div class="lairPortrait hasArt"><div class="lairPortraitInner"><img class="lairPortraitArt" src="${ch.portrait}" alt="${ch.name}"></div></div>`;
+    const art=ch.portraitVideo
+      ? `<video class="lairPortraitArt" src="${ch.portraitVideo}" poster="${ch.portrait}" autoplay muted loop playsinline preload="auto" aria-label="${ch.name}"></video>`
+      : `<img class="lairPortraitArt" src="${ch.portrait}" alt="${ch.name}">`;
+    return `<div class="lairPortrait hasArt"><div class="lairPortraitInner">${art}</div></div>`;
   }
 
   function renderLairTeam(){

@@ -11,8 +11,8 @@
   function obApex(i){
     const s=obPinEls[i];
     const pin=s?.querySelector('.obPin');
-    if(!s||!pin||!s.clientHeight) return 145;
-    return Math.max(72,s.clientHeight-24-pin.offsetHeight-12);
+    if(!s||!pin||!s.clientHeight) return 116;
+    return Math.max(58,s.clientHeight-19-pin.offsetHeight-12);
   }
 
   function obStartPin(p,i){
@@ -43,14 +43,14 @@
     brokenPicks=0;
     runReward=1000;
     obSelected=0;
-    const tiers=[420,520,640,780,930].map(v=>v*(.94+Math.random()*.12));
+    const tiers=[420,520,640,780,930].map(v=>v*.8*(.94+Math.random()*.12));
     for(let i=tiers.length-1;i>0;i--){
       const j=Math.floor(Math.random()*(i+1));
       [tiers[i],tiers[j]]=[tiers[j],tiers[i]];
     }
     obPins=Array.from({length:5},(_,i)=>({
       rise:0, state:'idle', phase:0, speed:0, pause:0, set:false,
-      baseSpeed:tiers[i], pinH:108+Math.random()*52, apex:145
+      baseSpeed:tiers[i], pinH:(108+Math.random()*52)*.8, apex:116
     }));
     generatedDistance=5;
     updateEconomyUI();
@@ -84,12 +84,14 @@
     obPins.forEach((p,i)=>{
       const s=obPinEls[i];
       if(!s) return;
+      const pin=s.querySelector('.obPin');
+      pin?.style.setProperty('--ob-pin-h',p.pinH.toFixed(1)+'px');
       const ready=!p.set && !solved && p.state==='pause' && Math.abs(p.rise-p.apex)<.5;
       s.classList.toggle('set',p.set);
       s.classList.toggle('ready',ready);
       s.classList.toggle('selected',i===obSelected);
       if(i===obSelected) selectedReady=ready;
-      s.querySelector('.obPin').style.setProperty('--rise',p.rise.toFixed(1));
+      pin?.style.setProperty('--rise',p.rise.toFixed(1));
     });
     if(!$obMessage) return;
     const n=obPins.filter(p=>p.set).length;
@@ -119,6 +121,10 @@
       return;
     }
     if(p.state==='pause' && Math.abs(p.rise-p.apex)<.5){
+      // Re-read the rendered geometry at the moment of capture. Pin heights
+      // change between rounds, so a stale apex would leave a visually valid
+      // pin above or below the slot even though the state considered it set.
+      p.apex=obApex(i);
       p.set=true;
       p.state='set';
       p.rise=p.apex;

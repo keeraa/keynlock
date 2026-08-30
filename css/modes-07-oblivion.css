@@ -21,25 +21,25 @@ body.importedMode .puzzleArea>.modePanel.obMode:not([hidden]){padding-bottom:cal
    always matches whatever size actually rendered — no breakpoint-specific
    magic numbers needed for any viewport shape. */
 .obLock{
-  width:min(760px,92vw);
+  width:min(608px,73.6vw);
   flex:1 1 auto;
   min-height:0;
-  max-height:420px;
+  max-height:336px;
   position:relative;
   border:2px solid #6a5942;
   border-radius:18px;
   background:linear-gradient(180deg,#59482f,#30271c 18%,#17140f 18% 100%);
   box-shadow:inset 0 0 36px #000,0 16px 30px rgba(0,0,0,.28);
-  padding:20px clamp(14px,4vw,38px) 16px;
+  padding:16px clamp(11px,3.2vw,30px) 13px;
   display:flex;
   align-items:stretch;
   justify-content:space-around;
-  gap:clamp(4px,1.5vw,16px);
+  gap:clamp(3px,1.2vw,13px);
 }
 .obSlot{
   position:relative;
   flex:1;
-  max-width:96px;
+  max-width:77px;
   min-width:0;
   border-left:1px solid rgba(255,255,255,.07);
   border-right:1px solid rgba(0,0,0,.4);
@@ -62,7 +62,7 @@ body.importedMode .puzzleArea>.modePanel.obMode:not([hidden]){padding-bottom:cal
   position:absolute;
   left:20%;
   right:20%;
-  bottom:24px;
+  bottom:19px;
   height:var(--ob-pin-h,124px);
   border:2px solid #71664f;
   border-radius:8px 8px 3px 3px;

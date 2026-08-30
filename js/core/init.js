@@ -96,7 +96,7 @@
   // shortfall as --reward-clear (consumed as extra padding-bottom by each
   // panel's own CSS) keeps their content from rendering underneath it,
   // without hardcoding a value per breakpoint.
-  const FLUID_PANEL_MODES=new Set(['oblivion','watchmen','museum','mass2','pipeline','wharf','thiefds','kingdomcome','thief12']);
+  const FLUID_PANEL_MODES=new Set(['oblivion','watchmen','museum','mass2','pipeline','wharf','thiefds','kingdomcome','thief12','fallout']);
   function syncPuzzleRewardClearance(){
     if(!FLUID_PANEL_MODES.has(mode)) return;
     const status=document.querySelector('.challengeStatus');
@@ -328,6 +328,16 @@
   addEventListener('keyup',e=>{
     const type=TH12_KEY_MAP[e.code];
     if(type&&th12KeyType===type){ th12Use(type,false); th12KeyType=null; }
+  });
+  addEventListener('keydown',e=>{
+    if(gameplayInputBlocked()||mode!=='fallout') return;
+    if(e.code==='KeyA'||e.code==='ArrowLeft'){ e.preventDefault(); sfTorque(-1); }
+    else if(e.code==='KeyD'||e.code==='ArrowRight'){ e.preventDefault(); sfTorque(1); }
+  });
+  addEventListener('keyup',e=>{
+    if(mode!=='fallout') return;
+    if(e.code==='KeyA'||e.code==='ArrowLeft') sfRelease(-1);
+    else if(e.code==='KeyD'||e.code==='ArrowRight') sfRelease(1);
   });
   $plBoostBtn?.addEventListener('click',()=>plBoost());
   document.querySelector('#shopHudButton')?.addEventListener('click',()=>{

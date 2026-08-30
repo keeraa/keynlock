@@ -396,56 +396,6 @@ button {
   flex-wrap:wrap;
   justify-content:center
 }
-/* Fallout */
-.lockpick-prototype .scene[data-name="Fallout"] .sf-lock {
-  width:min(380px,82vw);
-  aspect-ratio:1;
-  border-radius:50%;
-  position:relative;
-  background:radial-gradient(circle,#11130f 0 17%,#3d3d32 18% 51%,#22241d 52% 100%);
-  border:3px solid #666658;
-  box-shadow:inset 0 0 45px #000;
-  overflow:hidden
-}
-.lockpick-prototype .scene[data-name="Fallout"] .sf-cylinder {
-  position:absolute;
-  inset:23%;
-  border-radius:50%;
-  border:3px solid #767462;
-  background:repeating-conic-gradient(#303128 0 20deg,#24251e 20deg 40deg);
-  transform:rotate(var(--turn,0deg));
-  box-shadow:inset 0 0 18px #000
-}
-.lockpick-prototype .scene[data-name="Fallout"] .sf-cylinder.strain {
-  animation:sfshake .09s linear infinite alternate
-}
-.lockpick-prototype .scene[data-name="Fallout"] .sf-pick {
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:43%;
-  height:3px;
-  background:#d0c7aa;
-  transform-origin:0 50%;
-  transform:rotate(var(--angle,-90deg));
-  z-index:4
-}
-.lockpick-prototype .scene[data-name="Fallout"] .sf-wrench {
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:30%;
-  height:7px;
-  background:#85816d;
-  transform-origin:0 50%;
-  transform:rotate(calc(var(--turn,0deg) + 18deg));
-  z-index:3
-}
-@keyframes sfshake {
-  to {
-    translate:1px -1px
-  }
-}
 /* Anachronox */
 .lockpick-prototype .scene[data-name="Anachronox"] .an-slots {
   display:grid;
@@ -846,11 +796,6 @@ button {
 .lockpick-prototype .restart-icon-btn{width:44px;min-width:44px;height:44px;padding:0!important;border-radius:12px;display:inline-grid;place-items:center;line-height:1}
 .lockpick-prototype .restart-icon-btn svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
-.lockpick-prototype .scene[data-name="Fallout"] .sf-symbol-ring{position:absolute;inset:0;z-index:2;pointer-events:none}
-.lockpick-prototype .scene[data-name="Fallout"] .sf-ring-symbol{position:absolute;width:34px;height:34px;color:rgba(216,184,113,.58);transform:translate(-50%,-50%)}
-.lockpick-prototype .scene[data-name="Fallout"] .sf-ring-symbol svg{width:100%;height:100%;overflow:visible}
-.lockpick-prototype .scene[data-name="Fallout"] .sf-ring-symbol path{fill:none;stroke:currentColor;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
-
 /* Shared title lockpick counter */
 .lockpick-prototype .scene-title-row{
   display:flex;
@@ -917,10 +862,6 @@ html.embedded .scene[data-name="Alpha Protocol"] .lab{align-items:flex-start}
           <div class="scene-head"><div><div class="scene-title-row"><h2>Выравнивание пазов</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="apStatus"><strong>0 / 5</strong>Выставляй пины в порядке символов под замком</div></div>
           <div class="lab"><div class="museum-wrap"><div class="museum-panel"><div class="ap-time"><span id="apTimer"></span></div><div class="ap-lock" id="apLock"><div class="ap-beam"><span class="ap-beam-fill" id="apBeamFill"></span></div><div class="ap-line"></div></div><div class="ap-sequence" id="apSequence" aria-label="Порядок символов"></div></div><div class="museum-msg" id="apMsg"></div></div></div>
 
-        </section>
-    <section class="scene" data-name="Fallout" data-tab-check="true">
-          <div class="scene-head"><div><div class="scene-title-row"><h2>Fallout</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="sfStatus"><strong>Найди угол</strong>мышь — отмычка, A / D — вращать замок</div></div>
-          <div class="lab"><div class="museum-wrap"><div class="sf-lock" id="sfLock"><div class="sf-symbol-ring" id="sfSymbolRing"></div><div class="sf-cylinder"></div><div class="sf-wrench"></div><div class="sf-pick"></div></div><div class="meters"><div><div class="meter-head"><span>Поворот</span><span id="sfTurnText">0%</span></div><div class="bar"><span id="sfTurnBar"></span></div></div><div><div class="meter-head"><span>Износ отмычки</span><span id="sfWearText">0%</span></div><div class="bar"><span id="sfWearBar"></span></div></div></div><div class="museum-actions"><button class="btn" id="sfTorqueLeft">← Повернуть · A</button><button class="btn" id="sfTorqueRight">Повернуть · D →</button><button class="btn" id="sfReset">Новый замок</button></div></div></div>
         </section>
     <section class="scene" data-name="Anachronox" data-tab-check="true">
           <div class="scene-head"><div><div class="scene-title-row"><h2>Числовые тумблеры</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="anStatus"><strong>3 тумблера</strong>угадай комбинацию до конца времени</div></div>
@@ -1178,129 +1119,6 @@ function bioLoop(now){const dt=Math.min(.04,(now-bio.last)/1000);bio.last=now;if
 document.getElementById('bioStop').onclick=bioStop;document.getElementById('bioReset').onclick=bioReset;
 
 GameHub.register('BioShock 2',{reset:bioReset,tick:bioLoop,keydown:e=>{const d=directionFromCode(e.code);if(e.code==='KeyR'){bioReset();return true}if(e.code==='Space'||d==='up'){bioStop();return true}return false}});
-
-})();
-(()=>{
-'use strict';
-// Portable game module: fallout
-// Fallout-style pin + directional cylinder torque
-const sfLock=document.getElementById('sfLock'),sfSymbolRing=document.getElementById('sfSymbolRing'),sfStatus=document.getElementById('sfStatus'),sfTurnBar=document.getElementById('sfTurnBar'),sfTurnText=document.getElementById('sfTurnText'),sfWearBar=document.getElementById('sfWearBar'),sfWearText=document.getElementById('sfWearText'),sfLeftBtn=document.getElementById('sfTorqueLeft'),sfRightBtn=document.getElementById('sfTorqueRight');
-const SF_SUCCESS=8,SF_MAX_TURN=88;
-let sf={secret:0,angle:-90,turn:0,wear:0,torqueDir:0,openDir:1,last:performance.now(),solved:false,failed:false,picks:3,symbol:0,stall:0};
-let sfToolsState='';
-function renderSfSymbolRing(){
-  if(!sfSymbolRing)return;
-  sfSymbolRing.innerHTML='';
-  const w=sfLock.clientWidth,h=sfLock.clientHeight,cx=w/2,cy=h/2,R=Math.max(10,Math.min(w,h)/2-24);
-  for(let i=0;i<10;i++){
-    const a=i*36-90,rad=a*Math.PI/180,d=document.createElement('span');
-    d.className='sf-ring-symbol';LockRuntime.markTensionHint(d,sf.symbol);d.style.left=(cx+Math.cos(rad)*R)+'px';d.style.top=(cy+Math.sin(rad)*R)+'px';
-    d.style.transform=`translate(-50%,-50%) rotate(${a+90}deg)`;d.innerHTML=LOCK_SYMBOLS[sf.symbol];sfSymbolRing.appendChild(d)
-  }
-}
-function sfReset(){LockRuntime.resetOpen('Fallout');
-  sf={secret:-150+Math.random()*120,angle:-90,turn:0,wear:0,torqueDir:0,openDir:Math.random()<.5?-1:1,last:performance.now(),solved:false,failed:false,picks:LockRuntime.DEFAULT_PICKS,symbol:Math.floor(Math.random()*5),stall:0};
-  LockRuntime.setRequiredTension('Fallout',sf.symbol);
-  renderSfSymbolRing();
-  sfLock.querySelector('.sf-cylinder')?.classList.remove('strain');
-  sfLeftBtn.classList.remove('active');sfRightBtn.classList.remove('active');
-  renderSf();
-  sfStatus.innerHTML='<strong>Найди угол</strong>сначала выставь отмычку, затем пробуй A / D'
-}
-function sfPointer(e){
-  if(sf.solved||sf.failed||sf.torqueDir)return;
-  const r=sfLock.getBoundingClientRect(),x=(e.clientX-r.left)/r.width;
-  sf.angle=Math.max(-165,Math.min(-15,-165+x*150));renderSf()
-}
-function sfTorque(dir){
-  if(sf.solved||sf.failed)return;
-  sf.torqueDir=dir;
-  sfLeftBtn.classList.toggle('active',dir<0);
-  sfRightBtn.classList.toggle('active',dir>0)
-}
-function sfRelease(dir=0){
-  if(dir&&sf.torqueDir!==dir)return;
-  sf.torqueDir=0;sf.stall=0;sfLeftBtn.classList.remove('active');sfRightBtn.classList.remove('active')
-}
-function sfBreakPick(){
-  sfRelease();sf.picks--;sf.wear=0;sf.turn=0;
-  sfLock.querySelector('.sf-cylinder')?.classList.remove('strain');
-  if(sf.picks<=0){sf.picks=0;sf.failed=true;sfStatus.innerHTML='<strong>Отмычки закончились</strong>нажми «Новый замок»'}
-  else sfStatus.innerHTML=`<strong>Отмычка сломалась</strong>осталось ${sf.picks}`;
-  renderSf()
-}
-function sfOpenMistake(){sf.solved=false;sfBreakPick()}
-function renderSf(){LockRuntime.syncPicks('Fallout',sf.picks);
-  sfLock.style.setProperty('--angle',sf.angle+'deg');
-  sfLock.style.setProperty('--turn',sf.turn+'deg');
-  const toolsState=`${sf.angle.toFixed(2)}:${sf.turn.toFixed(2)}`;
-  if(toolsState!==sfToolsState){sfToolsState=toolsState;window.parent?.postMessage({type:'keynlock-mechanic-tools',game:'Fallout',angle:sf.angle,turn:sf.turn},location.origin)}
-  const p=Math.min(100,Math.abs(sf.turn)/SF_MAX_TURN*100),w=Math.min(100,sf.wear*100);
-  sfTurnBar.style.width=p+'%';sfTurnText.textContent=Math.round(p)+'%';
-  sfWearBar.style.width=w+'%';sfWearText.textContent=Math.round(w)+'%';
-  
-  sfWearBar.style.background=w>70?'#b9655c':'#899d6d';
-  if(sf.failed)sfStatus.innerHTML='<strong>Отмычки закончились</strong>нажми «Новый замок»'
-}
-function sfLoop(now){
-  const dt=Math.min(.04,(now-sf.last)/1000);sf.last=now;
-  if(activeName()==='Fallout'&&!sf.solved&&!sf.failed){
-    const d=Math.abs(sf.angle-sf.secret),q=Math.max(0,1-d/58),maxMag=d<=SF_SUCCESS?SF_MAX_TURN:Math.min(80,8+70*q),cyl=sfLock.querySelector('.sf-cylinder');
-    if(sf.torqueDir){
-      if(sf.torqueDir!==sf.openDir){
-        sf.turn+=(0-sf.turn)*Math.min(1,dt*14);
-        if(Math.abs(sf.turn)<.2)sf.turn=0;
-        sf.stall+=dt;
-        sf.wear=Math.min(1,sf.wear+dt);
-        if(cyl)cyl.classList.add('strain');
-        sfStatus.innerHTML='<strong>Не идёт</strong>неверное направление — отмычка изнашивается';
-        if(sf.wear>=1||sf.stall>=1){sfBreakPick();return}
-      }else{
-        const target=sf.openDir*maxMag,step=dt*105*sf.openDir;
-        if(Math.abs(sf.turn)<maxMag-.15){
-          sf.turn=sf.openDir>0?Math.min(target,sf.turn+Math.abs(step)):Math.max(target,sf.turn-Math.abs(step));
-          sf.stall=0;
-        }else if(d>SF_SUCCESS){
-          sf.wear+=dt*(.11+d/200);
-          sf.stall+=dt;
-        }else{
-          sf.stall=0;
-        }
-        if(cyl)cyl.classList.toggle('strain',d>SF_SUCCESS&&Math.abs(sf.turn)>=maxMag-.5);
-        if(sf.stall>=1){sfBreakPick();return}
-        if(sf.wear>=1)sfBreakPick();
-        else if(Math.abs(sf.turn)>=87&&d<=SF_SUCCESS){
-          if(!LockRuntime.tensionReady('Fallout',{statusEl:sfStatus})){sfRelease();sf.turn=0;sf.stall=0;if(cyl)cyl.classList.remove('strain')}
-          else{sf.solved=true;sf.turn=sf.openDir*SF_MAX_TURN;sfRelease();if(cyl)cyl.classList.remove('strain');LockRuntime.open('Fallout',{statusEl:sfStatus,statusHtml:'<strong>Замок открыт</strong>угол и направление найдены'})}
-        }else sfStatus.innerHTML=d<=SF_SUCCESS?'<strong>Есть полный ход</strong>держи вращение':d<32?'<strong>Есть ход</strong>подкорректируй отмычку':'<strong>Сильное сопротивление</strong>измени угол отмычки'
-      }
-    }else{
-      sf.stall=0;
-      sf.turn+=(0-sf.turn)*Math.min(1,dt*12);if(Math.abs(sf.turn)<.2)sf.turn=0;if(cyl)cyl.classList.remove('strain')
-    }
-    renderSf()
-  }
-}
-sfLock.addEventListener('pointermove',sfPointer);
-sfLock.addEventListener('pointerdown',e=>{e.preventDefault();sfPointer(e);try{sfLock.setPointerCapture(e.pointerId)}catch(_){}});
-window.addEventListener('pointermove',e=>{if(activeName()==='Fallout')sfPointer(e)},{passive:true});
-function bindSfTorqueButton(btn,dir){
-  btn.addEventListener('pointerdown',e=>{e.preventDefault();sfTorque(dir)});
-  ['pointerup','pointerleave','pointercancel','lostpointercapture'].forEach(ev=>btn.addEventListener(ev,()=>sfRelease(dir)))
-}
-bindSfTorqueButton(sfLeftBtn,-1);bindSfTorqueButton(sfRightBtn,1);
-document.getElementById('sfReset').onclick=sfReset;
-GameHub.register('Fallout',{reset:sfReset,tick:sfLoop,mistake:sfOpenMistake,enter:()=>requestAnimationFrame(renderSfSymbolRing),leave:()=>sfRelease(),keydown:e=>{
-  if(e.code==='KeyR'){sfReset();return true}
-  if(e.code==='KeyA'||e.code==='ArrowLeft'){sfTorque(-1);return true}
-  if(e.code==='KeyD'||e.code==='ArrowRight'){sfTorque(1);return true}
-  return false
-},keyup:e=>{
-  if(e.code==='KeyA'||e.code==='ArrowLeft'){sfRelease(-1);return true}
-  if(e.code==='KeyD'||e.code==='ArrowRight'){sfRelease(1);return true}
-  return false
-}});
-window.addEventListener('resize',()=>{if(activeName()==='Fallout')renderSfSymbolRing()});
 
 })();
 (()=>{

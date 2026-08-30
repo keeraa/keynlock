@@ -74,6 +74,8 @@ if(mode==='classic'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>НАЙТИ И УДЕРЖАТЬ РАБОЧУЮ ТОЧКУ ДО КОНЦА ПОВОРОТА</b>';
     }else if(mode==='thief12'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>НАЙТИ И УДЕРЖАТЬ ПРОФИЛЬ ОТМЫЧКИ НА КАЖДОЙ СТАДИИ</b>';
+    }else if(mode==='fallout'){
+      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>НАЙТИ УГОЛ И ВЕРНОЕ НАПРАВЛЕНИЕ ВРАЩЕНИЯ</b>';
     }
     if(typeof syncPuzzleRewardClearance==='function') requestAnimationFrame(syncPuzzleRewardClearance);
   }

@@ -2,7 +2,6 @@
   const PROTOTYPE_MECHANIC_PLACES=[
     {id:'bioshock2',name:'Охранный дрон',game:'BioShock 2',x:17,y:23},
     {id:'alpha-protocol',name:'Архив пазов',game:'Alpha Protocol',x:31,y:17},
-    {id:'fallout',name:'Старый бункер',game:'Fallout',x:88,y:70},
     {id:'anachronox',name:'Лаборатория Anachronox',game:'Anachronox',x:57,y:86},
     {id:'mass-effect',name:'Узел Mass Effect',game:'Mass Effect',x:96,y:59},
     {id:'pathologic-2',name:'Дом механика',game:'Pathologic 2',x:40,y:82}

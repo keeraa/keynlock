@@ -24,6 +24,7 @@
 <link rel="stylesheet" href="css/modes-13-thiefds.css">
 <link rel="stylesheet" href="css/modes-14-kingdomcome.css">
 <link rel="stylesheet" href="css/modes-15-thief12.css">
+<link rel="stylesheet" href="css/modes-16-fallout.css">
 <link rel="stylesheet" href="css/world-01-shop-shared.css">
 <link rel="stylesheet" href="css/overrides-01-tools-shared.css">
 <link rel="stylesheet" href="css/overrides-02-map.css">
@@ -519,6 +520,23 @@
 </div>
 <div class="th12Help" id="th12Help"></div>
 </div>
+<!-- MODE: FALLOUT -->
+<div class="modePanel sfMode" data-mode="fallout" hidden="" id="falloutMode">
+<div class="sfLockWrap"><div class="sfLock" id="sfLock">
+<div class="sfCylinder" id="sfCylinder"></div>
+<div class="sfWrench"></div>
+<div class="sfPick"></div>
+</div></div>
+<div class="sfMeters">
+<div class="sfMeter"><div class="sfMeterHead"><span>Поворот</span><span id="sfTurnText">0%</span></div><div class="sfBar"><span id="sfTurnBar"></span></div></div>
+<div class="sfMeter"><div class="sfMeterHead"><span>Износ отмычки</span><span id="sfWearText">0%</span></div><div class="sfBar"><span id="sfWearBar"></span></div></div>
+</div>
+<div class="sfTorqueRow">
+<button class="digitalBtn sfTorqueBtn" id="sfTorqueLeft" type="button">← Повернуть · A</button>
+<button class="digitalBtn sfTorqueBtn" id="sfTorqueRight" type="button">Повернуть · D →</button>
+</div>
+<div class="sfHelp" id="sfHelp"></div>
+</div>
 <!-- MODE: HILLSFAR -->
 <div class="modePanel hillsfarMode" data-mode="hillsfar" hidden="" id="hillsfarMode">
 <div class="hfLockBox">
@@ -841,6 +859,7 @@
 <script src="js/modes/thiefds.js"></script>
 <script src="js/modes/kingdomcome.js"></script>
 <script src="js/modes/thief12.js"></script>
+<script src="js/modes/fallout.js"></script>
 <script src="js/modes/base-locks.js"></script>
 <script src="js/world/alchemy.js"></script>
 <script src="js/world/guards.js"></script>

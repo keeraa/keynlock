@@ -10,19 +10,29 @@
   }
 
   function cpPathD(nodes){
-    return nodes.map((level,i)=>`${i?'L':'M'} ${CP_XS[i]} ${cpSvgY(level)}`).join(' ');
+    let d=`M 0 ${cpSvgY(nodes[0])}`;
+    nodes.forEach((level,i)=>{
+      const right=CP_XS[i+1];
+      d+=` L ${right} ${cpSvgY(level)}`;
+      if(i<nodes.length-1) d+=` L ${right} ${cpSvgY(nodes[i+1])}`;
+    });
+    return d;
   }
 
   function cpProfileD(nodes){
     const bottomY=74;
     let d=`M 0 ${bottomY} L 0 ${cpSvgY(nodes[0])}`;
-    for(let i=1;i<nodes.length;i++) d+=` L ${CP_XS[i]} ${cpSvgY(nodes[i])}`;
+    nodes.forEach((level,i)=>{
+      const right=CP_XS[i+1];
+      d+=` L ${right} ${cpSvgY(level)}`;
+      if(i<nodes.length-1) d+=` L ${right} ${cpSvgY(nodes[i+1])}`;
+    });
     d+=` L 640 ${bottomY} L 0 ${bottomY} Z`;
     return d;
   }
 
   function cpBuiltNodes(vals=cpVals){
-    return [cpNodes[0], ...vals];
+    return [...vals];
   }
 
   function cpMatchesTarget(vals=cpVals){
@@ -30,23 +40,10 @@
   }
 
   function cpSamplePoints(nodes,count=CP_PIN_COUNT){
-    const pts=[];
-    const totalSegments=nodes.length-1;
-    for(let i=0;i<count;i++){
-      // One pin per editable segment, placed at its centre. The old endpoint
-      // sampling produced five pins for four controls and left two looking
-      // detached at the outer edges of the pick.
-      const t = i+.5;
-      const seg = Math.min(totalSegments-1, Math.floor(t));
-      const local = Math.max(0, Math.min(1, t-seg));
-      const x1=CP_XS[seg], x2=CP_XS[seg+1];
-      const y1=cpSvgY(nodes[seg]), y2=cpSvgY(nodes[seg+1]);
-      pts.push({
-        x: x1 + (x2-x1)*local,
-        y: y1 + (y2-y1)*local
-      });
-    }
-    return pts;
+    return nodes.slice(0,count).map((level,i)=>({
+      x:(CP_XS[i]+CP_XS[i+1])/2,
+      y:cpSvgY(level)
+    }));
   }
 
   function cpSetPath($el,d){
@@ -65,10 +62,10 @@
   }
 
   function cpPartPreviewSvg(index,nodes){
-    const y1=cpMiniY(nodes[index]), y2=cpMiniY(nodes[index+1]);
+    const y=cpMiniY(nodes[index]);
     const gradId=`cpMiniMetal${index}`;
-    const path=`M 6 26 L 6 ${y1} L 56 ${y1} L 104 ${y2} L 110 26 Z`;
-    const line=`M 6 ${y1} L 56 ${y1} L 104 ${y2}`;
+    const path=`M 6 26 L 6 ${y} L 104 ${y} L 110 26 Z`;
+    const line=`M 6 ${y} L 104 ${y}`;
     return `
       <svg viewBox="0 0 116 32" aria-hidden="true">
         <defs>
@@ -78,7 +75,6 @@
             <stop offset="1" stop-color="#895821"></stop>
           </linearGradient>
         </defs>
-        <rect x="1" y="3" width="114" height="28" rx="9" fill="rgba(0,0,0,.16)" stroke="rgba(219,175,88,.12)"></rect>
         <path d="${path}" fill="rgba(0,0,0,.28)" transform="translate(0,2)"></path>
         <path d="${path}" fill="url(#${gradId})" stroke="rgba(92,60,24,.55)" stroke-width="1"></path>
         <path d="${line}" stroke="rgba(255,245,213,.42)" stroke-width="1.15" fill="none" stroke-linecap="round"></path>
@@ -115,8 +111,8 @@
 
     nodes.forEach((level,i)=>{
       const dot=document.createElement('div');
-      dot.className='cpJoint'+(i===0?' start':'')+(cpSelected>=0&&i===cpSelected+1&&!cpReady?' selected':'');
-      const px=(CP_XS[i]/640)*svgBox.width + (svgBox.left-canvasBox.left);
+      dot.className='cpJoint'+(i===cpSelected&&!cpReady?' selected':'');
+      const px=(((CP_XS[i]+CP_XS[i+1])/2)/640)*svgBox.width + (svgBox.left-canvasBox.left);
       const py=(cpSvgY(level)/90)*svgBox.height + (svgBox.top-canvasBox.top);
       dot.style.left=`${px}px`;
       dot.style.top=`${py}px`;
@@ -207,12 +203,12 @@
     runReward=1000;
 
     cpNodes=[rand(0,CP_LEVEL_NAMES.length-1)];
-    for(let i=0;i<4;i++){
-      const prev=cpNodes[i];
+    for(let i=1;i<4;i++){
+      const prev=cpNodes[i-1];
       const options=[prev-1,prev,prev+1].filter(v=>v>=0&&v<CP_LEVEL_NAMES.length);
       cpNodes.push(options[rand(0,options.length-1)]);
     }
-    cpTarget=cpNodes.slice(1);
+    cpTarget=[...cpNodes];
 
     const minDistance=diffStep(2,4,6,'composite');
     do{ cpVals=Array.from({length:4},()=>rand(0,CP_LEVEL_NAMES.length-1)); }

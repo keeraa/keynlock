@@ -84,11 +84,11 @@
    segments stacked beside the player's pick. */
 @media (min-width:901px){
   body.importedMode .cpBoard{
-    width:min(680px,88vw)!important;
+    width:min(488px,88vw)!important;
     height:min(560px,calc(100% - 18px))!important;
     display:grid!important;
-    grid-template-columns:190px 450px!important;
-    gap:24px!important;
+    grid-template-columns:150px 330px!important;
+    gap:8px!important;
     align-items:stretch!important;
   }
   body.importedMode .cpTarget,
@@ -109,7 +109,7 @@
   }
   body.importedMode .cpBuildCanvas{
     position:absolute!important;
-    left:104px!important;
+    left:74px!important;
     top:52%!important;
     width:420px!important;
     height:84px!important;
@@ -118,13 +118,13 @@
   }
   body.importedMode .cpBuild>.cpSectionTitle{
     right:auto!important;
-    width:208px!important;
+    width:148px!important;
   }
   body.importedMode .cpParts{
     position:absolute!important;
     right:0!important;
     top:50%!important;
-    width:160px!important;
+    width:154px!important;
     margin:0!important;
     padding:0!important;
     display:grid!important;

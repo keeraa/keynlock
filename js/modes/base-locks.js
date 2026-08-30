@@ -458,7 +458,7 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='tension') return moveTension(dir);
     if(mode==='resonance') return;
     if(mode==='deduction') return moveDeductionSelection(dir);
-    if(mode==='composite') return moveCompositeSelection(dir);
+    if(mode==='composite') return changeCompositeShape(cpSelected,dir);
     if(mode==='anach') return moveAn(dir);
     if(mode==='skyrim') return moveSkyrim(dir);
     if(mode==='r2') return moveR2(dir);
@@ -591,7 +591,7 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='tension'){ if(delta<0) setTensionPin(); return; }
     if(mode==='resonance'){ if(delta<0) hitResonance(); return; }
     if(mode==='deduction') return changeDeduction(kdSelected,delta<0?1:-1);
-    if(mode==='composite') return changeCompositeShape(cpSelected,delta);
+    if(mode==='composite') return moveCompositeSelection(delta);
     if(mode==='anach') return adjustAn(delta<0?1:-1);
     if(mode==='skyrim'){ if(delta<0) GameActions.attemptOpen({modeId:'skyrim',source:'keyboard'}); return; }
     if(mode==='r2'){

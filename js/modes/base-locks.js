@@ -272,6 +272,7 @@ let plateEls=[], pinTopPlateEls=[];
     PuzzleModes.call(mode,'start');
 
     updateModeUI();
+    updatePickUI();
     updateEconomyUI();
 
     const msg=PuzzleModes.restartMessage(mode);
@@ -284,7 +285,11 @@ let plateEls=[], pinTopPlateEls=[];
   function reset(){
     beginRoundState();
     if(PuzzleModes.action(mode,'reset')) return;
-    if(PuzzleModes.call(mode,'start')){ toast(PuzzleModes.restartMessage(mode)); return; }
+    if(PuzzleModes.call(mode,'start')){
+      updatePickUI();
+      toast(PuzzleModes.restartMessage(mode));
+      return;
+    }
     state=[...initial]; solved=false; $lock.classList.remove('win');
     $mechanism.classList.remove('ready','opening','opened');
     render(); toast('Механизм сброшен');

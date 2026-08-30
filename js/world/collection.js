@@ -271,7 +271,10 @@
   }
   window.KeynlockCollection = {
     getInventoryRail(count){
-      return getInventoryRail(count).map(h => ({ id: h.id, image: cachedImage(h.id) }));
+      // Keep every available slot visible while the shaft+handle composite
+      // is still being prepared. The raw handle is a temporary visual
+      // fallback; refreshInventoryRail() replaces it with the composite.
+      return getInventoryRail(count).map(h => ({ id: h.id, image: cachedImage(h.id) || h.image }));
     },
     getEquippedHandleId(){ return state.handle.id; },
     equipHandleById(handleId){

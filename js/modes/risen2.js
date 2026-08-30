@@ -22,7 +22,7 @@
     moves=0;
     brokenPicks=0;
     runReward=1000;
-    r2PinCount=diffStep(4,6,8,'r2');
+    r2PinCount=diffStep(5,6,7,'r2');
     r2ProgressCount=0;
     r2PickPos=rand(0,r2PinCount-1);
     r2Sequence=shuffle(Array.from({length:r2PinCount},(_,i)=>i));

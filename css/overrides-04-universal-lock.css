@@ -285,6 +285,9 @@ body.game-inactive.shop-open::after,body.game-inactive.lair-open::after,body.gam
 /* Development metadata lives away from the navigation controls. */
 .topRightHud .assetNameHud{position:fixed!important;left:18px!important;right:auto!important;top:auto!important;bottom:18px!important;z-index:360!important;display:flex!important;width:min(320px,calc(100vw - 36px))!important;max-width:none!important;align-items:flex-start!important;justify-content:flex-end!important;padding:0!important;margin:0!important;text-align:left!important;}
 .topRightHud .assetNameHud>div{max-width:100%!important;text-align:left!important;}
+/* Development asset metadata belongs to playable missions, never to the
+   self-contained lair or any of its modules (Alchemy, Collection, etc.). */
+body.lair-open .topRightHud .assetNameHud{display:none!important;}
 
 /* Six hand-drawn crow frames run independently from the flight path, keeping
    the wing cycle smooth while the button itself crosses the viewport. */

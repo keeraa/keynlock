@@ -55,10 +55,22 @@
   function openLairModule(next){
     if(!$lairModuleWindow) return;
     const titles={team:'Выбор персонажа',dialogue:'Диалоги',city:'Анализ города',alchemy:'Алхимия',collection:'Коллекция'};
-    setLairTab(next);
     $lairModuleTitle.textContent=titles[next]||'Логово';
     $lairModuleWindow.hidden=false;
     $lairModuleWindow.classList.add('open');
+    // Alchemy measures and creates part of its scene during the first start.
+    // Make the window measurable before booting it; starting while [hidden]
+    // produced a zero-size first layout that jumped into place one frame later.
+    setLairTab(next);
+    if(next==='alchemy'){
+      const stabilize=()=>{
+        const moduleBody=$lairModuleWindow.querySelector('.lairModuleBody');
+        if(moduleBody) moduleBody.scrollTop=0;
+        window.dispatchEvent(new Event('resize'));
+      };
+      requestAnimationFrame(()=>requestAnimationFrame(stabilize));
+      document.fonts?.ready.then(stabilize);
+    }
   }
 
   function closeLairModule(){

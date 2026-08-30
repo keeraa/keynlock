@@ -329,6 +329,8 @@ let plateEls=[], pinTopPlateEls=[];
       startThief12Round();
     }else if(mode==='fallout'){
       startFalloutRound();
+    }else if(mode==='anachlab'){
+      startAnachLabRound();
     }
 
     updateModeUI();
@@ -363,6 +365,7 @@ let plateEls=[], pinTopPlateEls=[];
       mode==='kingdomcome' ? 'Новый замок' :
       mode==='thief12' ? 'Новый замок' :
       mode==='fallout' ? 'Новый замок' :
+      mode==='anachlab' ? 'Новый код' :
       'Новый сигнал осциллографа';
     if(notify){
       toast(msg);
@@ -395,6 +398,7 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='kingdomcome'){ startKingdomComeRound(); toast('Замок обновлён'); return; }
     if(mode==='thief12'){ startThief12Round(); toast('Замок обновлён'); return; }
     if(mode==='fallout'){ startFalloutRound(); toast('Замок обновлён'); return; }
+    if(mode==='anachlab'){ startAnachLabRound(); toast('Код обновлён'); return; }
     state=[...initial]; solved=false; $lock.classList.remove('win');
     $mechanism.classList.remove('ready','opening','opened');
     render(); toast('Механизм сброшен');
@@ -452,6 +456,7 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='kingdomcome') return kcdKeyMove(dir<0?'left':'right');
     if(mode==='thief12') return;
     if(mode==='fallout') return;
+    if(mode==='anachlab') return alabSelectSlot(dir);
     if(mode==='g1') return g1Press(dir);
     if(mode==='mass') return moveMass(dir);
     if(mode==='hillsfar') return;
@@ -554,7 +559,8 @@ let plateEls=[], pinTopPlateEls=[];
     thiefds:()=>tryOpenThiefDs(),
     kingdomcome:()=>tryOpenKingdomCome(),
     thief12:()=>tryOpenThief12(),
-    fallout:()=>tryOpenFallout()
+    fallout:()=>tryOpenFallout(),
+    anachlab:()=>tryOpenAnachLab()
   });
 
   function select(delta){
@@ -602,6 +608,7 @@ let plateEls=[], pinTopPlateEls=[];
     }
     if(mode==='thief12') return;
     if(mode==='fallout') return;
+    if(mode==='anachlab'){ alabAdjustDigit(delta<0?1:-1); return; }
     if(mode==='g1') return;
     if(mode==='heatcold'||mode==='drum'||mode==='scope') return;
     if(mode==='mass') return selectMass(delta);
@@ -630,6 +637,7 @@ let plateEls=[], pinTopPlateEls=[];
     else if(mode==='kingdomcome'){ $mechanism.classList.remove('ready'); }
     else if(mode==='thief12'){ $mechanism.classList.remove('ready'); }
     else if(mode==='fallout'){ $mechanism.classList.remove('ready'); }
+    else if(mode==='anachlab'){ $mechanism.classList.remove('ready'); }
     else if(mode==='g1'){ $mechanism.classList.remove('ready'); }
     else if(mode==='mass'){ $mechanism.classList.remove('ready'); }
     else if(mode!=='hillsfar') $mechanism.classList.toggle('ready',!solved && goalMet());
@@ -739,6 +747,9 @@ let plateEls=[], pinTopPlateEls=[];
     }
     if(mode==='fallout' && !solved){
       sfTick(Math.min(.04,dt/1000));
+    }
+    if(mode==='anachlab' && !solved){
+      alabTick(Math.min(.05,dt/1000));
     }
     scheduleAnimationLoop(solved ? 160 : ACTIVE_FRAME_MS);
   }

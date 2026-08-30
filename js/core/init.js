@@ -96,7 +96,7 @@
   // shortfall as --reward-clear (consumed as extra padding-bottom by each
   // panel's own CSS) keeps their content from rendering underneath it,
   // without hardcoding a value per breakpoint.
-  const FLUID_PANEL_MODES=new Set(['oblivion','watchmen','museum','mass2','pipeline','wharf','thiefds','kingdomcome','thief12','fallout']);
+  const FLUID_PANEL_MODES=new Set(['oblivion','watchmen','museum','mass2','pipeline','wharf','thiefds','kingdomcome','thief12','fallout','anachlab']);
   function syncPuzzleRewardClearance(){
     if(!FLUID_PANEL_MODES.has(mode)) return;
     const status=document.querySelector('.challengeStatus');
@@ -338,6 +338,12 @@
     if(mode!=='fallout') return;
     if(e.code==='KeyA'||e.code==='ArrowLeft') sfRelease(-1);
     else if(e.code==='KeyD'||e.code==='ArrowRight') sfRelease(1);
+  });
+  addEventListener('keydown',e=>{
+    if(!gameplayInputBlocked()&&mode==='anachlab'&&e.code==='Space'){ e.preventDefault(); alabTest(); }
+  });
+  addEventListener('keydown',e=>{
+    if(!gameplayInputBlocked()&&mode==='anachlab'&&e.code==='Enter'){ e.preventDefault(); GameActions.attemptOpen({modeId:'anachlab',source:'keyboard'}); }
   });
   $plBoostBtn?.addEventListener('click',()=>plBoost());
   document.querySelector('#shopHudButton')?.addEventListener('click',()=>{

@@ -34,10 +34,10 @@ const GAME_DEFINITIONS={
   kingdomcome:{title:'Kingdom Come',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   thief12:{title:'Thief 1/2',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   fallout:{title:'Fallout',kind:'native',lock:{present:true,manualOpen:true},world:{noise:true,noiseSensor:true,guards:false,birds:false}},
+  anachlab:{title:'Anachronox — лаборатория',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
 
   'prototype:bioshock2':{title:'BioShock 2',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
   'prototype:alpha-protocol':{title:'Alpha Protocol',kind:'prototype',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:false,guards:false,birds:false}},
-  'prototype:anachronox':{title:'Anachronox — лаборатория',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
   'prototype:mass-effect':{title:'Mass Effect — узел',kind:'prototype',lock:{present:false,manualOpen:false,specialTool:true},world:{noise:false,guards:false,birds:false}},
   'prototype:pathologic-2':{title:'Pathologic 2',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}}
 };

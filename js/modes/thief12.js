@@ -1,4 +1,6 @@
+(function(){
   // ===== THIEF 1/2 =====
+  let th12Seq=[], th12Near=[], th12Step=0, th12Hold=null, th12HoldProgress=0, th12Tried=new Set(), th12Failed=false, th12TimeLeft=22, th12TimeMax=22, th12HoldDuration=.63, th12LastHint='', th12KeyType=null;
   // Five hidden pick profiles, one correct per stage. Press-and-hold a
   // profile (mouse/touch on its button, or number keys 1-5) to test it: the
   // wrong one gives a "near" or "miss" cue depending on whether it's the
@@ -156,3 +158,31 @@
     b.addEventListener('pointerdown',e=>{ e.preventDefault(); th12Use(b.dataset.type,true); });
     ['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>th12Use(b.dataset.type,false)));
   });
+
+  const TH12_KEY_MAP={Digit1:'p1',Digit2:'p2',Digit3:'p3',Digit4:'p4',Digit5:'p5',Numpad1:'p1',Numpad2:'p2',Numpad3:'p3',Numpad4:'p4',Numpad5:'p5'};
+  addEventListener('keydown',e=>{
+    if(gameplayInputBlocked()||mode!=='thief12') return;
+    const type=TH12_KEY_MAP[e.code];
+    if(!type) return;
+    e.preventDefault();
+    if(!e.repeat||th12KeyType!==type){
+      if(th12KeyType&&th12KeyType!==type) th12Use(th12KeyType,false);
+      th12KeyType=type;
+      th12Use(type,true);
+    }
+  });
+  addEventListener('keyup',e=>{
+    const type=TH12_KEY_MAP[e.code];
+    if(type&&th12KeyType===type){th12Use(type,false);th12KeyType=null;}
+  });
+
+  PuzzleModes.register({
+    id:'thief12', start:startThief12Round, render:renderThief12,
+    tick:({dt})=>th12Tick(Math.min(.05,dt/1000)),
+    syncHud:renderThief12,
+    objective:()=>GameCatalog.get('thief12')?.objective,
+    restartMessage:'Новый замок Thief 1/2',
+    input:{horizontal:()=>{},vertical:()=>{}},
+    attemptOpen:tryOpenThief12
+  });
+})();

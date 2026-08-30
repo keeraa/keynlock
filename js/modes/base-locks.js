@@ -291,12 +291,6 @@ let plateEls=[], pinTopPlateEls=[];
       startDrumRound();
     }else if(mode==='scope'){
       startScopeRound();
-    }else if(mode==='thief12'){
-      startThief12Round();
-    }else if(mode==='fallout'){
-      startFalloutRound();
-    }else if(mode==='anachlab'){
-      startAnachLabRound();
     }else if(mode==='masshack'){
       startMassHackRound();
     }else if(mode==='pathologic'){
@@ -318,9 +312,6 @@ let plateEls=[], pinTopPlateEls=[];
       mode==='special' ? `Особый замок: ${specialTypeName()}` :
       mode==='heatcold' ? 'Новый цифровой код' :
       mode==='drum' ? 'Новый барабанный замок' :
-      mode==='thief12' ? 'Новый замок' :
-      mode==='fallout' ? 'Новый замок' :
-      mode==='anachlab' ? 'Новый код' :
       mode==='masshack' ? 'Новый обход' :
       mode==='pathologic' ? 'Новый замок' :
       mode==='bioshock2' ? 'Новый взлом' :
@@ -338,9 +329,6 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='heatcold'){ startHeatColdRound(); toast('Цифровой код обновлён'); return; }
     if(mode==='drum'){ startDrumRound(); toast('Барабанный замок обновлён'); return; }
     if(mode==='scope'){ startScopeRound(); toast('Сигнал обновлён'); return; }
-    if(mode==='thief12'){ startThief12Round(); toast('Замок обновлён'); return; }
-    if(mode==='fallout'){ startFalloutRound(); toast('Замок обновлён'); return; }
-    if(mode==='anachlab'){ startAnachLabRound(); toast('Код обновлён'); return; }
     if(mode==='masshack'){ startMassHackRound(); toast('Обход обновлён'); return; }
     if(mode==='pathologic'){ startPathologicRound(); toast('Замок обновлён'); return; }
     if(mode==='bioshock2'){ startBioshock2Round(); toast('Взлом обновлён'); return; }
@@ -386,9 +374,6 @@ let plateEls=[], pinTopPlateEls=[];
 
   function move(dir){
     if(PuzzleModes.input(mode,'horizontal',dir)) return;
-    if(mode==='thief12') return;
-    if(mode==='fallout') return;
-    if(mode==='anachlab') return alabSelectSlot(dir);
     if(mode==='masshack') return hackMove(dir);
     if(mode==='pathologic') return;
     if(mode==='bioshock2') return;
@@ -491,9 +476,9 @@ let plateEls=[], pinTopPlateEls=[];
     wharf:()=>PuzzleModes.call('wharf','attemptOpen'),
     thiefds:()=>PuzzleModes.call('thiefds','attemptOpen'),
     kingdomcome:()=>PuzzleModes.call('kingdomcome','attemptOpen'),
-    thief12:()=>tryOpenThief12(),
-    fallout:()=>tryOpenFallout(),
-    anachlab:()=>tryOpenAnachLab(),
+    thief12:()=>PuzzleModes.call('thief12','attemptOpen'),
+    fallout:()=>PuzzleModes.call('fallout','attemptOpen'),
+    anachlab:()=>PuzzleModes.call('anachlab','attemptOpen'),
     masshack:()=>tryOpenMassHack(),
     pathologic:()=>tryOpenPathologic(),
     bioshock2:()=>tryOpenBioshock2(),
@@ -502,9 +487,6 @@ let plateEls=[], pinTopPlateEls=[];
 
   function select(delta){
     if(PuzzleModes.input(mode,'vertical',delta)) return;
-    if(mode==='thief12') return;
-    if(mode==='fallout') return;
-    if(mode==='anachlab'){ alabAdjustDigit(delta<0?1:-1); return; }
     if(mode==='masshack'){ if(delta<0) hackIn(); else hackOut(); return; }
     if(mode==='pathologic') return;
     if(mode==='bioshock2') return;
@@ -522,9 +504,6 @@ let plateEls=[], pinTopPlateEls=[];
 
     updatePickUI();
     if(PuzzleModes.has(mode)){ $mechanism.classList.remove('ready'); }
-    else if(mode==='thief12'){ $mechanism.classList.remove('ready'); }
-    else if(mode==='fallout'){ $mechanism.classList.remove('ready'); }
-    else if(mode==='anachlab'){ $mechanism.classList.remove('ready'); }
     else if(mode==='masshack'){ $mechanism.classList.remove('ready'); }
     else if(mode==='pathologic'){ $mechanism.classList.remove('ready'); }
     else if(mode==='bioshock2'){ $mechanism.classList.remove('ready'); }
@@ -573,15 +552,6 @@ let plateEls=[], pinTopPlateEls=[];
       }
     }
     if(!solved) PuzzleModes.call(mode,'tick',{now,dt});
-    if(mode==='thief12' && !solved){
-      th12Tick(Math.min(.05,dt/1000));
-    }
-    if(mode==='fallout' && !solved){
-      sfTick(Math.min(.04,dt/1000));
-    }
-    if(mode==='anachlab' && !solved){
-      alabTick(Math.min(.05,dt/1000));
-    }
     if(mode==='masshack' && !solved){
       hackTick(Math.min(.05,dt/1000));
     }

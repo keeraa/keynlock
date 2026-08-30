@@ -113,9 +113,6 @@
     }
   }catch{}
 
-  let th12Seq=[], th12Near=[], th12Step=0, th12Hold=null, th12HoldProgress=0, th12Tried=new Set(), th12Failed=false, th12TimeLeft=22, th12TimeMax=22, th12HoldDuration=.63, th12LastHint='', th12KeyType=null;
-  let sfSecret=0, sfAngle=-90, sfTurn=0, sfWear=0, sfTorqueDir=0, sfOpenDir=1, sfStall=0, sfFailed=false, sfSuccessTol=8, sfLastHint='';
-  let alabSecret=[0,0,0], alabVals=[0,0,0], alabMeters=[0,0,0], alabSlot=0, alabChecked=[new Set(),new Set(),new Set()], alabFailed=false, alabTimeLeft=30, alabTimeMax=30, alabLastHint='';
   let hackRing=5, hackAng=90, hackBlocks=[], hackHitUntil=0, hackCollapse=false, hackCollapseStart=0, hackRingEls=[], hackBlockEls=[];
   let ptgY=[.08,.08], ptgV=[0,0], ptgTarget=[.37,.51], ptgDur=1.35;
   let bioZonesArr=[], bioZoneEls=[], bioX=0, bioDir=1, bioSpeed=58, bioStage=0, bioRunning=true;

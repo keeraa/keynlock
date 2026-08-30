@@ -13,7 +13,6 @@
     document.body.classList.toggle('game-noise-sensor', !!GameCatalog.feature(mode,'world.noiseSensor'));
     document.body.dataset.gameMode=mode;
     if(PuzzleModes.call(mode,'syncHud')){}
-    else if(mode==='thief12') setGlobalTimer(!th12Failed, th12TimeLeft||th12TimeMax, th12TimeMax||1, 'ТАЙМЕР');
     else if(mode==='alphaprotocol') setGlobalTimer(apTimeLeft>0, apTimeLeft||apTimeMax, apTimeMax||1, 'ТАЙМЕР');
     else setGlobalTimer(false);
     const registeredObjective=PuzzleModes.objective(mode);
@@ -35,12 +34,6 @@
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ВЫСТАВИТЬ 4 БАРАБАНА ПО СИЛЕ ЩЕЛЧКА</b>';
     }else if(mode==='scope'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>СОВМЕСТИТЬ ТЕКУЩИЙ СИГНАЛ С ЭТАЛОНОМ</b>';
-    }else if(mode==='thief12'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>НАЙТИ И УДЕРЖАТЬ ПРОФИЛЬ ОТМЫЧКИ НА КАЖДОЙ СТАДИИ</b>';
-    }else if(mode==='fallout'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>НАЙТИ УГОЛ И ВЕРНОЕ НАПРАВЛЕНИЕ ВРАЩЕНИЯ</b>';
-    }else if(mode==='anachlab'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ПОДОБРАТЬ ТРЁХЗНАЧНЫЙ КОД ПО ПОДСКАЗКАМ БЛИЗОСТИ</b>';
     }else if(mode==='masshack'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ПРОЙТИ ВСЕ 5 КОЛЕЦ И ПОДТВЕРДИТЬ ЯДРО</b>';
     }else if(mode==='pathologic'){

@@ -1,4 +1,6 @@
+(function(){
   // ===== FALLOUT =====
+  let sfSecret=0, sfAngle=-90, sfTurn=0, sfWear=0, sfTorqueDir=0, sfOpenDir=1, sfStall=0, sfFailed=false, sfSuccessTol=8, sfLastHint='';
   // A hidden secret angle and a hidden torque direction. Move the mouse
   // across the lock to aim the pick at an angle; hold A/D (or the torque
   // buttons, for touch) to try turning. The wrong direction springs back
@@ -165,3 +167,24 @@
   }
   sfBindTorqueButton($sfTorqueLeft,-1);
   sfBindTorqueButton($sfTorqueRight,1);
+
+  addEventListener('keydown',e=>{
+    if(gameplayInputBlocked()||mode!=='fallout') return;
+    if(e.code==='KeyA'||e.code==='ArrowLeft'){e.preventDefault();sfTorque(-1);}
+    else if(e.code==='KeyD'||e.code==='ArrowRight'){e.preventDefault();sfTorque(1);}
+  });
+  addEventListener('keyup',e=>{
+    if(mode!=='fallout') return;
+    if(e.code==='KeyA'||e.code==='ArrowLeft')sfRelease(-1);
+    else if(e.code==='KeyD'||e.code==='ArrowRight')sfRelease(1);
+  });
+
+  PuzzleModes.register({
+    id:'fallout', start:startFalloutRound, render:renderFallout,
+    tick:({dt})=>sfTick(Math.min(.04,dt/1000)),
+    objective:()=>GameCatalog.get('fallout')?.objective,
+    restartMessage:'Новый замок Fallout',
+    input:{horizontal:()=>{},vertical:()=>{}},
+    attemptOpen:tryOpenFallout
+  });
+})();

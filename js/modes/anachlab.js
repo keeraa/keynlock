@@ -1,4 +1,6 @@
+(function(){
   // ===== ANACHRONOX — ЛАБОРАТОРИЯ (anachlab) =====
+  let alabSecret=[0,0,0], alabVals=[0,0,0], alabMeters=[0,0,0], alabSlot=0, alabChecked=[new Set(),new Set(),new Set()], alabFailed=false, alabTimeLeft=30, alabTimeMax=30, alabLastHint='';
   // A 3-digit hidden code. Select a dial, dial in a candidate digit, and
   // test it: the meter shows how close that digit is (circular distance,
   // so 9 is one step from 0). Testing the same digit on the same dial
@@ -153,3 +155,22 @@
       else $alabHelp.textContent=alabLastHint||'Выбери тумблер, выставь цифру и проверь расстояние';
     }
   }
+
+  addEventListener('keydown',e=>{
+    if(!gameplayInputBlocked()&&mode==='anachlab'&&e.code==='Enter'){
+      e.preventDefault();
+      GameActions.attemptOpen({modeId:'anachlab',source:'keyboard'});
+    }
+  });
+
+  PuzzleModes.register({
+    id:'anachlab', start:startAnachLabRound, render:renderAnachLab,
+    tick:({dt})=>alabTick(Math.min(.05,dt/1000)),
+    syncHud:renderAnachLab,
+    objective:()=>GameCatalog.get('anachlab')?.objective,
+    restartMessage:'Новый лабораторный код',
+    input:{horizontal:alabSelectSlot,vertical:delta=>alabAdjustDigit(delta<0?1:-1)},
+    actions:{primary:alabTest},
+    attemptOpen:tryOpenAnachLab
+  });
+})();

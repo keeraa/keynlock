@@ -272,38 +272,6 @@
   addEventListener('keyup',e=>{
     if(e.code==='Space'&&PuzzleModes.action(mode,'primaryEnd')) e.preventDefault();
   });
-  const TH12_KEY_MAP={Digit1:'p1',Digit2:'p2',Digit3:'p3',Digit4:'p4',Digit5:'p5',Numpad1:'p1',Numpad2:'p2',Numpad3:'p3',Numpad4:'p4',Numpad5:'p5'};
-  addEventListener('keydown',e=>{
-    if(gameplayInputBlocked()||mode!=='thief12') return;
-    const type=TH12_KEY_MAP[e.code];
-    if(!type) return;
-    e.preventDefault();
-    if(!e.repeat||th12KeyType!==type){
-      if(th12KeyType&&th12KeyType!==type) th12Use(th12KeyType,false);
-      th12KeyType=type;
-      th12Use(type,true);
-    }
-  });
-  addEventListener('keyup',e=>{
-    const type=TH12_KEY_MAP[e.code];
-    if(type&&th12KeyType===type){ th12Use(type,false); th12KeyType=null; }
-  });
-  addEventListener('keydown',e=>{
-    if(gameplayInputBlocked()||mode!=='fallout') return;
-    if(e.code==='KeyA'||e.code==='ArrowLeft'){ e.preventDefault(); sfTorque(-1); }
-    else if(e.code==='KeyD'||e.code==='ArrowRight'){ e.preventDefault(); sfTorque(1); }
-  });
-  addEventListener('keyup',e=>{
-    if(mode!=='fallout') return;
-    if(e.code==='KeyA'||e.code==='ArrowLeft') sfRelease(-1);
-    else if(e.code==='KeyD'||e.code==='ArrowRight') sfRelease(1);
-  });
-  addEventListener('keydown',e=>{
-    if(!gameplayInputBlocked()&&mode==='anachlab'&&e.code==='Space'){ e.preventDefault(); alabTest(); }
-  });
-  addEventListener('keydown',e=>{
-    if(!gameplayInputBlocked()&&mode==='anachlab'&&e.code==='Enter'){ e.preventDefault(); GameActions.attemptOpen({modeId:'anachlab',source:'keyboard'}); }
-  });
   addEventListener('keydown',e=>{
     if(!gameplayInputBlocked()&&mode==='masshack'&&(e.code==='Enter'||e.code==='Space')){ e.preventDefault(); GameActions.attemptOpen({modeId:'masshack',source:'keyboard'}); }
   });

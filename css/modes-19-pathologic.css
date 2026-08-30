@@ -1,0 +1,76 @@
+.ptgMode{display:flex;flex-direction:column;align-items:center;gap:14px;height:100%;}
+.ptgLockWrap{flex:1 1 auto;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;}
+.ptgLock{
+  position:relative;
+  height:100%;
+  width:auto;
+  max-width:min(440px,100%);
+  aspect-ratio:440/330;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  justify-content:center;
+  gap:5.9%;
+  border:1px solid #514d42;
+  border-radius:18px;
+  background:#171712;
+  padding:5% 10.2%;
+  box-sizing:border-box;
+}
+.ptgShear{
+  position:absolute;
+  left:8%;
+  right:8%;
+  top:50%;
+  height:3px;
+  background:#d3c2a0;
+  z-index:5;
+  box-shadow:0 0 8px rgba(211,194,160,.3);
+}
+.ptgCol{
+  position:relative;
+  background:#0d100d;
+  border:1px solid #383b31;
+  border-radius:9px;
+  overflow:hidden;
+}
+.ptgTooth{
+  position:absolute;
+  left:18%;
+  right:18%;
+  height:38%;
+  bottom:var(--bottom,8%);
+  background:linear-gradient(90deg,#55574d,#8b8876,#505249);
+  border-radius:7px;
+  will-change:bottom;
+}
+.ptgTarget{
+  position:absolute;
+  left:-3px;
+  right:-3px;
+  top:var(--target,45%);
+  height:24%;
+  border:3px solid #9c5148;
+  background:rgba(156,81,72,.12);
+}
+.ptgCol.good .ptgTarget{
+  border-color:#7fb079;
+  background:rgba(127,176,121,.13);
+}
+.ptgDurWrap{
+  width:min(440px,100%);
+  height:8px;
+  background:#0b0e0b;
+  border:1px solid #393b32;
+  border-radius:99px;
+  overflow:hidden;
+}
+.ptgDur{
+  display:block;
+  height:100%;
+  background:#a58c62;
+  width:100%;
+  transition:width .1s linear;
+}
+.ptgControls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.ptgHelp{flex:none;color:#9db3bf;text-align:center;font:14px/1.35 Arial,sans-serif;max-width:560px;}
+body.importedMode .puzzleArea>.modePanel.ptgMode:not([hidden]){padding-bottom:calc(16px + var(--reward-clear,0px))!important;}

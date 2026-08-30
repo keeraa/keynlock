@@ -541,82 +541,6 @@ button {
 .lockpick-prototype .scene[data-name="Alpha Protocol"] .ap-seq-item{width:42px;height:42px;border:1px solid #454b3d;border-radius:10px;display:grid;place-items:center;color:#b8b39e;background:#101510}
 .lockpick-prototype .scene[data-name="Alpha Protocol"] .ap-seq-item svg{width:24px;height:24px}.lockpick-prototype .scene[data-name="Alpha Protocol"] .ap-seq-item path{fill:none;stroke:currentColor;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
 .lockpick-prototype .scene[data-name="Alpha Protocol"] .ap-seq-item.current{border-color:var(--gold);color:#efd38b}.lockpick-prototype .scene[data-name="Alpha Protocol"] .ap-seq-item.done{border-color:#6e8f61;color:#8eb27b;background:#172016}
-/* Pathologic 2 */
-.lockpick-prototype .scene[data-name="Pathologic 2"] .path-lock {
-  width:min(440px,100%);
-  height:330px;
-  display:grid;
-  grid-template-columns:82px 82px;
-  justify-content:center;
-  gap:26px;
-  position:relative;
-  border:1px solid #514d42;
-  border-radius:18px;
-  background:#171712;
-  padding:22px 45px
-}
-.lockpick-prototype .scene[data-name="Pathologic 2"] .path-shear {
-  position:absolute;
-  left:8%;
-  right:8%;
-  top:50%;
-  height:3px;
-  background:#d3c2a0;
-  z-index:5;
-  box-shadow:0 0 8px rgba(211,194,160,.3)
-}
-.lockpick-prototype .scene[data-name="Pathologic 2"] .path-col {
-  position:relative;
-  background:#0d100d;
-  border:1px solid #383b31;
-  border-radius:9px;
-  overflow:hidden
-}
-.lockpick-prototype .scene[data-name="Pathologic 2"] .path-tooth {
-  position:absolute;
-  left:18%;
-  right:18%;
-  height:38%;
-  bottom:var(--bottom,8%);
-  background:linear-gradient(90deg,#55574d,#8b8876,#505249);
-  border-radius:7px;
-  will-change:bottom
-}
-.lockpick-prototype .scene[data-name="Pathologic 2"] .path-target {
-  position:absolute;
-  left:-3px;
-  right:-3px;
-  top:var(--target,45%);
-  height:24%;
-  border:3px solid #9c5148;
-  background:rgba(156,81,72,.12)
-}
-.lockpick-prototype .scene[data-name="Pathologic 2"] .path-col.good .path-target {
-  border-color:#7fb079;
-  background:rgba(127,176,121,.13)
-}
-.lockpick-prototype .scene[data-name="Pathologic 2"] .path-dur {
-  height:8px;
-  background:#0b0e0b;
-  border:1px solid #393b32;
-  border-radius:99px;
-  overflow:hidden
-}
-.lockpick-prototype .scene[data-name="Pathologic 2"] .path-dur span {
-  display:block;
-  height:100%;
-  background:#a58c62;
-  width:100%
-}
-@media(max-width:650px) {
-  .lockpick-prototype .scene[data-name="Pathologic 2"] .path-lock {
-    grid-template-columns:70px 70px;
-    justify-content:center;
-    padding-inline:20px;
-    gap:12px
-  }
-}
-
 /* Shared controls and symbols */
 .lockpick-prototype .restart-icon-btn{width:44px;min-width:44px;height:44px;padding:0!important;border-radius:12px;display:inline-grid;place-items:center;line-height:1}
 .lockpick-prototype .restart-icon-btn svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -686,11 +610,6 @@ html.embedded .scene[data-name="Alpha Protocol"] .lab{align-items:flex-start}
     <section class="scene" data-name="Alpha Protocol" data-tab-check="true">
           <div class="scene-head"><div><div class="scene-title-row"><h2>Выравнивание пазов</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="apStatus"><strong>0 / 5</strong>Выставляй пины в порядке символов под замком</div></div>
           <div class="lab"><div class="museum-wrap"><div class="museum-panel"><div class="ap-time"><span id="apTimer"></span></div><div class="ap-lock" id="apLock"><div class="ap-beam"><span class="ap-beam-fill" id="apBeamFill"></span></div><div class="ap-line"></div></div><div class="ap-sequence" id="apSequence" aria-label="Порядок символов"></div></div><div class="museum-msg" id="apMsg"></div></div></div>
-
-        </section>
-    <section class="scene" data-name="Pathologic 2" data-tab-check="true">
-          <div class="scene-head"><div><div class="scene-title-row"><h2>Два инерционных тумблера</h2><div class="head-picks">Отмычки <strong data-head-picks>3</strong></div></div></div><div class="status" id="pathStatus"><strong>Совмести обе стороны</strong>каждый удар изнашивает отмычку</div></div>
-          <div class="lab"><div class="museum-wrap"><div class="path-lock"><div class="path-shear"></div><div class="path-col" id="pathL"><div class="path-tooth"><div class="path-target"></div></div></div><div class="path-col" id="pathR"><div class="path-tooth"><div class="path-target"></div></div></div></div><div class="path-dur"><span id="pathDur"></span></div><div class="museum-actions"><button class="btn" id="pathLeft">Левый удар · A</button><button class="btn" id="pathLock">Зафиксировать · Space</button><button class="btn" id="pathRight">Правый удар · D</button><button class="btn" id="pathReset">Новый замок</button></div><div class="museum-msg" id="pathMsg">Добейся одновременного совпадения красных зон с центральной линией.</div></div></div>
 
         </section>
   </main>
@@ -1080,24 +999,6 @@ GameHub.register('Alpha Protocol',{
   },
   keydown:e=>{const d=directionFromCode(e.code);if(e.code==='KeyR'){apReset();return true}if(e.code==='Space'){apSet();return true}if(d==='left'){apSelect(-1);return true}if(d==='right'){apSelect(1);return true}if(d==='up'){apMove(-AP_STEP);return true}if(d==='down'){apMove(AP_STEP);return true}return false}
 });
-
-})();
-(()=>{
-'use strict';
-// Portable game module: pathologic-2
-// Pathologic 2
-// v7 audit: slightly wider human timing window
-const pathL=document.getElementById('pathL'),pathR=document.getElementById('pathR'),pathStatus=document.getElementById('pathStatus'),pathDur=document.getElementById('pathDur'),pathMsg=document.getElementById('pathMsg');let path={y:[.08,.08],v:[0,0],target:[.37,.51],dur:1.35,last:performance.now(),won:false,failed:false,picks:3};
-function pathReset(){LockRuntime.resetOpen('Pathologic 2');path={y:[.06+.06*Math.random(),.06+.06*Math.random()],v:[0,0],target:[.24+Math.random()*.18,.24+Math.random()*.18],dur:1.35,last:performance.now(),won:false,failed:false,picks:LockRuntime.DEFAULT_PICKS};renderPath();pathMsg.textContent='Добейся одновременного совпадения красных зон с центральной линией.'}
-function pathReplacePick(reason='Отмычка сломалась.'){path.picks--;if(path.picks<=0){path.picks=0;path.failed=true;path.dur=0;path.v=[0,0];pathStatus.innerHTML='<strong>Отмычки закончились</strong>нажми «Новый замок»';pathMsg.textContent=reason}else{path.dur=1.35;path.y=[.06+.06*Math.random(),.06+.06*Math.random()];path.v=[0,0];pathStatus.innerHTML=`<strong>Новая отмычка</strong>осталось ${path.picks}`;pathMsg.textContent=reason}renderPath()}
-function pathHit(i){if(path.won||path.failed)return;path.v[i]+=1.18;path.dur=Math.max(0,path.dur-.032);if(path.dur<=0){pathReplacePick('Отмычка не выдержала ударов.');return}renderPath()}
-function pathGood(i){const toothH=.38,targetRel=path.target[i],bandH=.32;const bandBottom=path.y[i]+targetRel*toothH,bandTop=bandBottom+bandH*toothH;return bandBottom<=.52&&bandTop>=.48}
-function pathCanLock(){return pathGood(0)&&pathGood(1)}
-function pathSet(){if(path.won||path.failed)return;if(pathCanLock()){path.won=true;path.v=[0,0];LockRuntime.open('Pathologic 2',{statusEl:pathStatus,statusHtml:'<strong>Замок открыт</strong>обе зоны зафиксированы',messageEl:pathMsg,message:'Успешная фиксация.'})}else{path.dur=Math.max(0,path.dur-.10);pathMsg.textContent='Фиксация мимо линии — потеря ресурса.';if(path.dur<=0){pathReplacePick('Неудачная фиксация сломала отмычку.');return}}renderPath()}
-function renderPath(){LockRuntime.syncPicks('Pathologic 2',path.picks);[pathL,pathR].forEach((c,i)=>{const t=c.querySelector('.path-tooth'),z=t.querySelector('.path-target');t.style.setProperty('--bottom',path.y[i]*100+'%');z.style.setProperty('--target',path.target[i]*100+'%');c.classList.toggle('good',pathGood(i))});pathDur.style.width=Math.max(0,(path.dur/1.35)*100)+'%';const lockBtn=document.getElementById('pathLock');if(lockBtn)lockBtn.classList.toggle('active',pathCanLock()&&!path.won&&!path.failed);if(path.failed)pathStatus.innerHTML='<strong>Отмычки закончились</strong>нажми «Новый замок»';else if(!path.won)pathStatus.innerHTML=pathCanLock()?'<strong>Обе зоны совпали</strong>нажми Space, чтобы зафиксировать':`<strong>${pathGood(0)?'Левая ✓':'Левая —'} / ${pathGood(1)?'Правая ✓':'Правая —'}</strong>совмести обе стороны`}
-function pathLoop(now){const dt=Math.min(.035,(now-path.last)/1000);path.last=now;if(activeName()==='Pathologic 2'&&!path.won&&!path.failed){for(let i=0;i<2;i++){path.v[i]-=1.75*dt;path.y[i]+=path.v[i]*dt;if(path.y[i]<.02){path.y[i]=.02;path.v[i]=Math.max(0,path.v[i]*-.18)}if(path.y[i]>.58){path.y[i]=.58;path.v[i]*=-.24}}renderPath()}}document.getElementById('pathLeft').onclick=()=>pathHit(0);document.getElementById('pathLock').onclick=pathSet;document.getElementById('pathRight').onclick=()=>pathHit(1);document.getElementById('pathReset').onclick=pathReset;
-
-GameHub.register('Pathologic 2',{reset:pathReset,tick:pathLoop,keydown:e=>{if(e.code==='KeyR'){pathReset();return true}if(e.code==='Space'){pathSet();return true}if(e.code==='KeyA'||e.code==='ArrowLeft'){pathHit(0);return true}if(e.code==='KeyD'||e.code==='ArrowRight'){pathHit(1);return true}return false}});
 
 })();
 GameHub.boot();

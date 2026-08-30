@@ -41,7 +41,8 @@
     { mode: 'thief12',   x: 88, y: 49 },
     { mode: 'fallout',   x: 88, y: 70 },
     { mode: 'anachlab',  x: 57, y: 86 },
-    { mode: 'masshack',  x: 96, y: 59 }
+    { mode: 'masshack',  x: 96, y: 59 },
+    { mode: 'pathologic', x: 40, y: 82 }
   ];
 
   const MISSION_STORAGE_KEY = 'lockpickMissions';

@@ -96,7 +96,7 @@
   // shortfall as --reward-clear (consumed as extra padding-bottom by each
   // panel's own CSS) keeps their content from rendering underneath it,
   // without hardcoding a value per breakpoint.
-  const FLUID_PANEL_MODES=new Set(['oblivion','watchmen','museum','mass2','pipeline','wharf','thiefds','kingdomcome','thief12','fallout','anachlab','masshack']);
+  const FLUID_PANEL_MODES=new Set(['oblivion','watchmen','museum','mass2','pipeline','wharf','thiefds','kingdomcome','thief12','fallout','anachlab','masshack','pathologic']);
   function syncPuzzleRewardClearance(){
     if(!FLUID_PANEL_MODES.has(mode)) return;
     const status=document.querySelector('.challengeStatus');
@@ -347,6 +347,12 @@
   });
   addEventListener('keydown',e=>{
     if(!gameplayInputBlocked()&&mode==='masshack'&&(e.code==='Enter'||e.code==='Space')){ e.preventDefault(); GameActions.attemptOpen({modeId:'masshack',source:'keyboard'}); }
+  });
+  addEventListener('keydown',e=>{
+    if(gameplayInputBlocked()||mode!=='pathologic') return;
+    if(e.code==='KeyA'||e.code==='ArrowLeft'){ e.preventDefault(); ptgHit(0); }
+    else if(e.code==='KeyD'||e.code==='ArrowRight'){ e.preventDefault(); ptgHit(1); }
+    else if(e.code==='Space'){ e.preventDefault(); GameActions.attemptOpen({modeId:'pathologic',source:'keyboard'}); }
   });
   $plBoostBtn?.addEventListener('click',()=>plBoost());
   document.querySelector('#shopHudButton')?.addEventListener('click',()=>{

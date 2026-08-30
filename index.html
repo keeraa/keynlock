@@ -27,6 +27,7 @@
 <link rel="stylesheet" href="css/modes-16-fallout.css">
 <link rel="stylesheet" href="css/modes-17-anachlab.css">
 <link rel="stylesheet" href="css/modes-18-masshack.css">
+<link rel="stylesheet" href="css/modes-19-pathologic.css">
 <link rel="stylesheet" href="css/world-01-shop-shared.css">
 <link rel="stylesheet" href="css/overrides-01-tools-shared.css">
 <link rel="stylesheet" href="css/overrides-02-map.css">
@@ -552,6 +553,21 @@
 </div></div>
 <div class="hackHelp" id="hackHelp"></div>
 </div>
+<!-- MODE: PATHOLOGIC 2 -->
+<div class="modePanel ptgMode" data-mode="pathologic" hidden="" id="pathologicMode">
+<div class="ptgLockWrap"><div class="ptgLock" id="ptgLock">
+<div class="ptgShear"></div>
+<div class="ptgCol" id="ptgColL"><div class="ptgTooth"><div class="ptgTarget"></div></div></div>
+<div class="ptgCol" id="ptgColR"><div class="ptgTooth"><div class="ptgTarget"></div></div></div>
+</div></div>
+<div class="ptgDurWrap"><span class="ptgDur" id="ptgDur"></span></div>
+<div class="ptgControls">
+<button class="digitalBtn" id="ptgHitLeft" type="button">Левый удар · A</button>
+<button class="digitalBtn" id="ptgConfirmBtn" type="button">Зафиксировать · Space</button>
+<button class="digitalBtn" id="ptgHitRight" type="button">Правый удар · D</button>
+</div>
+<div class="ptgHelp" id="ptgHelp"></div>
+</div>
 <!-- MODE: HILLSFAR -->
 <div class="modePanel hillsfarMode" data-mode="hillsfar" hidden="" id="hillsfarMode">
 <div class="hfLockBox">
@@ -877,6 +893,7 @@
 <script src="js/modes/fallout.js"></script>
 <script src="js/modes/anachlab.js"></script>
 <script src="js/modes/masshack.js"></script>
+<script src="js/modes/pathologic.js"></script>
 <script src="js/modes/base-locks.js"></script>
 <script src="js/world/alchemy.js"></script>
 <script src="js/world/guards.js"></script>

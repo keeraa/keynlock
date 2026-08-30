@@ -36,10 +36,10 @@ const GAME_DEFINITIONS={
   fallout:{title:'Fallout',kind:'native',lock:{present:true,manualOpen:true},world:{noise:true,noiseSensor:true,guards:false,birds:false}},
   anachlab:{title:'Anachronox — лаборатория',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   masshack:{title:'Mass Effect — узел',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
+  pathologic:{title:'Pathologic 2',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
 
   'prototype:bioshock2':{title:'BioShock 2',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
-  'prototype:alpha-protocol':{title:'Alpha Protocol',kind:'prototype',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:false,guards:false,birds:false}},
-  'prototype:pathologic-2':{title:'Pathologic 2',kind:'prototype',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}}
+  'prototype:alpha-protocol':{title:'Alpha Protocol',kind:'prototype',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:false,guards:false,birds:false}}
 };
 
 function freezeGameDefinitions(definitions){

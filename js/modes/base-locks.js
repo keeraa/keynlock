@@ -291,12 +291,6 @@ let plateEls=[], pinTopPlateEls=[];
       startDrumRound();
     }else if(mode==='scope'){
       startScopeRound();
-    }else if(mode==='wharf'){
-      startWharfRound();
-    }else if(mode==='thiefds'){
-      startThiefDsRound();
-    }else if(mode==='kingdomcome'){
-      startKingdomComeRound();
     }else if(mode==='thief12'){
       startThief12Round();
     }else if(mode==='fallout'){
@@ -324,9 +318,6 @@ let plateEls=[], pinTopPlateEls=[];
       mode==='special' ? `Особый замок: ${specialTypeName()}` :
       mode==='heatcold' ? 'Новый цифровой код' :
       mode==='drum' ? 'Новый барабанный замок' :
-      mode==='wharf' ? 'Новый набор задвижек' :
-      mode==='thiefds' ? 'Новый замок' :
-      mode==='kingdomcome' ? 'Новый замок' :
       mode==='thief12' ? 'Новый замок' :
       mode==='fallout' ? 'Новый замок' :
       mode==='anachlab' ? 'Новый код' :
@@ -347,9 +338,6 @@ let plateEls=[], pinTopPlateEls=[];
     if(mode==='heatcold'){ startHeatColdRound(); toast('Цифровой код обновлён'); return; }
     if(mode==='drum'){ startDrumRound(); toast('Барабанный замок обновлён'); return; }
     if(mode==='scope'){ startScopeRound(); toast('Сигнал обновлён'); return; }
-    if(mode==='wharf'){ startWharfRound(); toast('Задвижки обновлены'); return; }
-    if(mode==='thiefds'){ startThiefDsRound(); toast('Замок обновлён'); return; }
-    if(mode==='kingdomcome'){ startKingdomComeRound(); toast('Замок обновлён'); return; }
     if(mode==='thief12'){ startThief12Round(); toast('Замок обновлён'); return; }
     if(mode==='fallout'){ startFalloutRound(); toast('Замок обновлён'); return; }
     if(mode==='anachlab'){ startAnachLabRound(); toast('Код обновлён'); return; }
@@ -398,9 +386,6 @@ let plateEls=[], pinTopPlateEls=[];
 
   function move(dir){
     if(PuzzleModes.input(mode,'horizontal',dir)) return;
-    if(mode==='wharf') return wfMove(dir);
-    if(mode==='thiefds') return tdsMove(dir);
-    if(mode==='kingdomcome') return kcdKeyMove(dir<0?'left':'right');
     if(mode==='thief12') return;
     if(mode==='fallout') return;
     if(mode==='anachlab') return alabSelectSlot(dir);
@@ -503,9 +488,9 @@ let plateEls=[], pinTopPlateEls=[];
     museum:()=>PuzzleModes.call('museum','attemptOpen'),
     mass2:()=>PuzzleModes.call('mass2','attemptOpen'),
     pipeline:()=>PuzzleModes.call('pipeline','attemptOpen'),
-    wharf:()=>tryOpenWharf(),
-    thiefds:()=>tryOpenThiefDs(),
-    kingdomcome:()=>tryOpenKingdomCome(),
+    wharf:()=>PuzzleModes.call('wharf','attemptOpen'),
+    thiefds:()=>PuzzleModes.call('thiefds','attemptOpen'),
+    kingdomcome:()=>PuzzleModes.call('kingdomcome','attemptOpen'),
     thief12:()=>tryOpenThief12(),
     fallout:()=>tryOpenFallout(),
     anachlab:()=>tryOpenAnachLab(),
@@ -517,18 +502,6 @@ let plateEls=[], pinTopPlateEls=[];
 
   function select(delta){
     if(PuzzleModes.input(mode,'vertical',delta)) return;
-    if(mode==='wharf'){
-      if(delta<0) return wfTry();
-      return;
-    }
-    if(mode==='thiefds'){
-      tdsSelectRing(tdsSelectedRing+(delta<0?-1:1));
-      return;
-    }
-    if(mode==='kingdomcome'){
-      kcdKeyMove(delta<0?'up':'down');
-      return;
-    }
     if(mode==='thief12') return;
     if(mode==='fallout') return;
     if(mode==='anachlab'){ alabAdjustDigit(delta<0?1:-1); return; }
@@ -549,9 +522,6 @@ let plateEls=[], pinTopPlateEls=[];
 
     updatePickUI();
     if(PuzzleModes.has(mode)){ $mechanism.classList.remove('ready'); }
-    else if(mode==='wharf'){ $mechanism.classList.remove('ready'); }
-    else if(mode==='thiefds'){ $mechanism.classList.remove('ready'); }
-    else if(mode==='kingdomcome'){ $mechanism.classList.remove('ready'); }
     else if(mode==='thief12'){ $mechanism.classList.remove('ready'); }
     else if(mode==='fallout'){ $mechanism.classList.remove('ready'); }
     else if(mode==='anachlab'){ $mechanism.classList.remove('ready'); }
@@ -603,12 +573,6 @@ let plateEls=[], pinTopPlateEls=[];
       }
     }
     if(!solved) PuzzleModes.call(mode,'tick',{now,dt});
-    if(mode==='thiefds' && !solved){
-      tdsTick(Math.min(.05,dt/1000));
-    }
-    if(mode==='kingdomcome' && !solved){
-      kcdTick(Math.min(.04,dt/1000));
-    }
     if(mode==='thief12' && !solved){
       th12Tick(Math.min(.05,dt/1000));
     }

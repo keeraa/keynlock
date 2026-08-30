@@ -1,4 +1,6 @@
+(function(){
   // ===== RISEN 2 — ВЕРФЬ (wharf) =====
+  let wfSequence=[], wfStep=0, wfPos=0, wfWrong=-1, wfStress=0, wfBarEls=[], wfBarCount=6;
   // A row of bolts ("задвижки") must be raised in a hidden order. The order
   // isn't a flat shuffle — wfMakeSequence walks it so each next bolt tends to
   // be spatially close to the last, like sliding a pick along physically
@@ -136,3 +138,13 @@
     renderWharf();
     setTimeout(()=>celebrate(),420);
   }
+
+  PuzzleModes.register({
+    id:'wharf', start:startWharfRound, render:renderWharf,
+    objective:()=>GameCatalog.get('wharf')?.objective,
+    restartMessage:'Новый набор задвижек',
+    input:{horizontal:wfMove,vertical:delta=>{if(delta<0)wfTry();}},
+    actions:{primary:wfTry},
+    attemptOpen:tryOpenWharf
+  });
+})();

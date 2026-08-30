@@ -1,4 +1,6 @@
+(function(){
   // ===== THIEF: DEADLY SHADOWS =====
+  let tdsRingSymbols=[], tdsOrder=[], tdsStep=0, tdsSelectedRing=0, tdsAngle=0, tdsTargets=[], tdsHot=false, tdsDone=new Set(), tdsFailed=false, tdsTimeLeft=22, tdsTimeMax=22, tdsDownInfo=null, tdsRingEls=[], tdsSeqEls=[];
   // Three concentric rings, each hiding one of 5 abstract symbols and a
   // random target angle. A hidden (never-trivial) order says which ring to
   // set first; rotate the pick to a ring's hidden "sweet spot" angle and
@@ -210,6 +212,10 @@
     }
   }
 
+  function renderThiefDsHud(){
+    setGlobalTimer(mode==='thiefds'&&!tdsFailed,tdsTimeLeft,tdsTimeMax,'ТАЙМЕР');
+  }
+
   function tryOpenThiefDs(){
     if(shopOpen || solved) return;
     if(tdsFailed || tdsStep<3){
@@ -230,3 +236,18 @@
     $tdsLock.addEventListener('pointerup',tdsPointerUp);
     $tdsLock.addEventListener('pointercancel',()=>{ tdsDownInfo=null; });
   }
+
+  PuzzleModes.register({
+    id:'thiefds', start:startThiefDsRound, render:renderThiefDs,
+    tick:({dt})=>tdsTick(Math.min(.05,dt/1000)),
+    syncHud:renderThiefDsHud,
+    objective:()=>GameCatalog.get('thiefds')?.objective,
+    restartMessage:'Новый замок Thief: Deadly Shadows',
+    input:{
+      horizontal:tdsMove,
+      vertical:delta=>tdsSelectRing(tdsSelectedRing+(delta<0?-1:1))
+    },
+    actions:{primary:tdsCommit},
+    attemptOpen:tryOpenThiefDs
+  });
+})();

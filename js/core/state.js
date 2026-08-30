@@ -113,9 +113,6 @@
     }
   }catch{}
 
-  let wfSequence=[], wfStep=0, wfPos=0, wfWrong=-1, wfStress=0, wfBarEls=[], wfBarCount=6;
-  let tdsRingSymbols=[], tdsOrder=[], tdsStep=0, tdsSelectedRing=0, tdsAngle=0, tdsTargets=[], tdsHot=false, tdsDone=new Set(), tdsFailed=false, tdsTimeLeft=22, tdsTimeMax=22, tdsDownInfo=null, tdsRingEls=[], tdsSeqEls=[];
-  let kcdSweetR=.25, kcdSweetA=0, kcdRot=0, kcdStress=0, kcdTurning=false, kcdPointerX=.5, kcdPointerY=.5, kcdTolerance=.082, kcdTargetRot=220;
   let th12Seq=[], th12Near=[], th12Step=0, th12Hold=null, th12HoldProgress=0, th12Tried=new Set(), th12Failed=false, th12TimeLeft=22, th12TimeMax=22, th12HoldDuration=.63, th12LastHint='', th12KeyType=null;
   let sfSecret=0, sfAngle=-90, sfTurn=0, sfWear=0, sfTorqueDir=0, sfOpenDir=1, sfStall=0, sfFailed=false, sfSuccessTol=8, sfLastHint='';
   let alabSecret=[0,0,0], alabVals=[0,0,0], alabMeters=[0,0,0], alabSlot=0, alabChecked=[new Set(),new Set(),new Set()], alabFailed=false, alabTimeLeft=30, alabTimeMax=30, alabLastHint='';

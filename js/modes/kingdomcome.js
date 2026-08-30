@@ -1,4 +1,6 @@
+(function(){
   // ===== KINGDOM COME =====
+  let kcdSweetR=.25, kcdSweetA=0, kcdRot=0, kcdStress=0, kcdTurning=false, kcdPointerX=.5, kcdPointerY=.5, kcdTolerance=.082, kcdTargetRot=220;
   // A hidden "sweet spot" sits inside the rotor at a random radius/angle and
   // ROTATES together with the rotor as you make progress. Aim a pointer at
   // it (mouse, or arrow keys) and hold "turn" (Space, pointer-down on the
@@ -176,3 +178,17 @@
     $kcdTurnBtn.addEventListener('pointerdown',e=>{ e.preventDefault(); kcdSetTurning(true); });
     ['pointerup','pointerleave','pointercancel'].forEach(ev=>$kcdTurnBtn.addEventListener(ev,()=>kcdSetTurning(false)));
   }
+
+  PuzzleModes.register({
+    id:'kingdomcome', start:startKingdomComeRound, render:renderKingdomCome,
+    tick:({dt})=>kcdTick(Math.min(.04,dt/1000)),
+    objective:()=>GameCatalog.get('kingdomcome')?.objective,
+    restartMessage:'Новый замок Kingdom Come',
+    input:{
+      horizontal:dir=>kcdKeyMove(dir<0?'left':'right'),
+      vertical:dir=>kcdKeyMove(dir<0?'up':'down')
+    },
+    actions:{primaryStart:()=>kcdSetTurning(true),primaryEnd:()=>kcdSetTurning(false)},
+    attemptOpen:tryOpenKingdomCome
+  });
+})();

@@ -13,7 +13,6 @@
     document.body.classList.toggle('game-noise-sensor', !!GameCatalog.feature(mode,'world.noiseSensor'));
     document.body.dataset.gameMode=mode;
     if(PuzzleModes.call(mode,'syncHud')){}
-    else if(mode==='thiefds') setGlobalTimer(!tdsFailed, tdsTimeLeft||tdsTimeMax, tdsTimeMax||1, 'ТАЙМЕР');
     else if(mode==='thief12') setGlobalTimer(!th12Failed, th12TimeLeft||th12TimeMax, th12TimeMax||1, 'ТАЙМЕР');
     else if(mode==='alphaprotocol') setGlobalTimer(apTimeLeft>0, apTimeLeft||apTimeMax, apTimeMax||1, 'ТАЙМЕР');
     else setGlobalTimer(false);
@@ -36,12 +35,6 @@
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ВЫСТАВИТЬ 4 БАРАБАНА ПО СИЛЕ ЩЕЛЧКА</b>';
     }else if(mode==='scope'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>СОВМЕСТИТЬ ТЕКУЩИЙ СИГНАЛ С ЭТАЛОНОМ</b>';
-    }else if(mode==='wharf'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ОТКРЫТЬ ЗАДВИЖКИ ПО ПОРЯДКУ</b>';
-    }else if(mode==='thiefds'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ВЫСТАВИТЬ КОЛЬЦА В СКРЫТОМ ПОРЯДКЕ</b>';
-    }else if(mode==='kingdomcome'){
-      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>НАЙТИ И УДЕРЖАТЬ РАБОЧУЮ ТОЧКУ ДО КОНЦА ПОВОРОТА</b>';
     }else if(mode==='thief12'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>НАЙТИ И УДЕРЖАТЬ ПРОФИЛЬ ОТМЫЧКИ НА КАЖДОЙ СТАДИИ</b>';
     }else if(mode==='fallout'){

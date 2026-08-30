@@ -266,9 +266,12 @@
   $anUnlock.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&!e.target.closest('.anBtn')){ e.preventDefault(); GameActions.attemptOpen({modeId:'anach',source:'keyboard'}); } });
   $wmOpenBtn?.addEventListener('click',()=>GameActions.attemptOpen({modeId:'watchmen',source:'puzzle-control'}));
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&e.code==='Space'&&PuzzleModes.action(mode,'primary')) e.preventDefault();});
-  addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='thiefds'&&e.code==='Space'){e.preventDefault();tdsCommit();}});
-  addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&mode==='kingdomcome'&&e.code==='Space'&&!e.repeat){e.preventDefault();kcdSetTurning(true);}});
-  addEventListener('keyup',e=>{if(mode==='kingdomcome'&&e.code==='Space'){kcdSetTurning(false);}});
+  addEventListener('keydown',e=>{
+    if(!gameplayInputBlocked()&&e.code==='Space'&&!e.repeat&&PuzzleModes.action(mode,'primaryStart')) e.preventDefault();
+  });
+  addEventListener('keyup',e=>{
+    if(e.code==='Space'&&PuzzleModes.action(mode,'primaryEnd')) e.preventDefault();
+  });
   const TH12_KEY_MAP={Digit1:'p1',Digit2:'p2',Digit3:'p3',Digit4:'p4',Digit5:'p5',Numpad1:'p1',Numpad2:'p2',Numpad3:'p3',Numpad4:'p4',Numpad5:'p5'};
   addEventListener('keydown',e=>{
     if(gameplayInputBlocked()||mode!=='thief12') return;

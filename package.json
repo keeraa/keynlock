@@ -1,7 +1,7 @@
 {
   "name": "keynlock",
   "private": true,
-  "version": "0.362.0",
+  "version": "0.363.0",
   "type": "module",
   "scripts": {
     "dev": "node scripts/write-build-info.mjs && node scripts/write-asset-manifest.mjs && node scripts/serve.mjs",

@@ -1,0 +1,73 @@
+.hackMode{display:flex;flex-direction:column;align-items:center;gap:14px;height:100%;}
+.hackArenaWrap{flex:1 1 auto;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;}
+.hackArena{
+  position:relative;
+  height:100%;
+  width:auto;
+  max-width:min(410px,100%);
+  aspect-ratio:1;
+  container-type:inline-size;
+  border-radius:50%;
+  background:radial-gradient(circle,#09151b,#0b212b 67%,#071015);
+  border:2px solid #46768a;
+  overflow:hidden;
+  touch-action:none;
+}
+.hackRing{
+  position:absolute;
+  left:50%;
+  top:50%;
+  border:1px solid rgba(98,178,208,.30);
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+.hackCore{
+  position:absolute;
+  width:13%;
+  height:13%;
+  left:43.5%;
+  top:43.5%;
+  z-index:4;
+  padding:0;
+  border:0;
+  border-radius:50%;
+  background:#7fcfe6;
+  box-shadow:0 0 18px #4fa7c7;
+  cursor:pointer;
+}
+.hackCore.ready{
+  outline:2px solid #f2e5bd;
+  box-shadow:0 0 22px #72cce6,0 0 0 5px rgba(242,229,189,.16);
+}
+.hackPlayer{
+  position:absolute;
+  width:min(3.4cqw,13px);
+  height:min(3.4cqw,13px);
+  border:2px solid white;
+  background:#69c8df;
+  transform:translate(-50%,-50%) rotate(45deg);
+  z-index:5;
+  pointer-events:none;
+}
+.hackPlayer.hit{
+  animation:hackHitFlash .18s linear 2;
+  box-shadow:0 0 16px #d4645c;
+  background:#d4645c;
+}
+@keyframes hackHitFlash{
+  50%{ opacity:.2; transform:translate(-50%,-50%) rotate(45deg) scale(1.45); }
+}
+.hackBlock{
+  position:absolute;
+  width:min(3.1cqw,12px);
+  height:min(12cqw,46px);
+  background:#d4645c;
+  border-radius:4px;
+  transform-origin:50% 50%;
+  box-shadow:0 0 8px rgba(212,100,92,.35);
+  will-change:left,top,transform;
+  pointer-events:none;
+}
+.hackHelp{flex:none;color:#9db3bf;text-align:center;font:14px/1.35 Arial,sans-serif;max-width:560px;}
+body.importedMode .puzzleArea>.modePanel.hackMode:not([hidden]){padding-bottom:calc(16px + var(--reward-clear,0px))!important;}

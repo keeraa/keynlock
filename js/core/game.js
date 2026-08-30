@@ -78,6 +78,8 @@ if(mode==='classic'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>НАЙТИ УГОЛ И ВЕРНОЕ НАПРАВЛЕНИЕ ВРАЩЕНИЯ</b>';
     }else if(mode==='anachlab'){
       $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ПОДОБРАТЬ ТРЁХЗНАЧНЫЙ КОД ПО ПОДСКАЗКАМ БЛИЗОСТИ</b>';
+    }else if(mode==='masshack'){
+      $objectiveLine.innerHTML = 'ЦЕЛЬ: <b>ПРОЙТИ ВСЕ 5 КОЛЕЦ И ПОДТВЕРДИТЬ ЯДРО</b>';
     }
     if(typeof syncPuzzleRewardClearance==='function') requestAnimationFrame(syncPuzzleRewardClearance);
   }

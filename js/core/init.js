@@ -96,7 +96,7 @@
   // shortfall as --reward-clear (consumed as extra padding-bottom by each
   // panel's own CSS) keeps their content from rendering underneath it,
   // without hardcoding a value per breakpoint.
-  const FLUID_PANEL_MODES=new Set(['oblivion','watchmen','museum','mass2','pipeline','wharf','thiefds','kingdomcome','thief12','fallout','anachlab']);
+  const FLUID_PANEL_MODES=new Set(['oblivion','watchmen','museum','mass2','pipeline','wharf','thiefds','kingdomcome','thief12','fallout','anachlab','masshack']);
   function syncPuzzleRewardClearance(){
     if(!FLUID_PANEL_MODES.has(mode)) return;
     const status=document.querySelector('.challengeStatus');
@@ -344,6 +344,9 @@
   });
   addEventListener('keydown',e=>{
     if(!gameplayInputBlocked()&&mode==='anachlab'&&e.code==='Enter'){ e.preventDefault(); GameActions.attemptOpen({modeId:'anachlab',source:'keyboard'}); }
+  });
+  addEventListener('keydown',e=>{
+    if(!gameplayInputBlocked()&&mode==='masshack'&&(e.code==='Enter'||e.code==='Space')){ e.preventDefault(); GameActions.attemptOpen({modeId:'masshack',source:'keyboard'}); }
   });
   $plBoostBtn?.addEventListener('click',()=>plBoost());
   document.querySelector('#shopHudButton')?.addEventListener('click',()=>{

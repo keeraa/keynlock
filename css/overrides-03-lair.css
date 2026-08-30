@@ -35,7 +35,7 @@
 .lairModuleWindow.open{opacity:1;transform:translate(-50%,-50%) scale(1);}
 .lairModuleHeader{height:54px;padding:0 14px 0 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(128,94,48,.34);}
 .lairModuleTitle{color:#e4c788;font:600 17px/1 Georgia,serif;}
-.lairModuleClose{width:34px;height:34px;border:1px solid #664d2c;border-radius:8px;background:#17120e;color:#c6a66f;font:22px/1 Arial,sans-serif;cursor:pointer;}
+.lairModuleClose{width:34px;height:34px;border:1px solid #664d2c;border-radius:var(--radius-control);font:22px/1 Arial,sans-serif;}
 .lairModuleBody{max-height:calc(82vh - 54px);overflow:auto;padding:20px;}
 .lairPanel{display:none!important;}
 .lairPanel.active{display:block!important;}
@@ -58,7 +58,7 @@
 .mapNode.mission .mapNodeDot{width:26px;height:26px;border-color:#e0ae53;background:#4a2d16;box-shadow:0 0 0 6px rgba(222,169,75,.10),0 0 20px rgba(228,173,74,.28);}
 .mapNodeMissionType{display:block;margin-top:3px;color:#947847;font:700 9px/1 Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;}
 .mapNode.mission.current .mapNodeDot{background:#936126;border-color:#ffd77c;}
-#mapTab.mapCornerBtn{width:68px;height:68px;flex:0 0 68px;display:grid;place-items:center;padding:0;border:1px solid rgba(161,121,59,.76);border-radius:14px;background:linear-gradient(180deg,rgba(43,33,23,.94),rgba(19,15,12,.96));color:#e4c37f;box-shadow:0 8px 24px rgba(0,0,0,.30),inset 0 0 0 1px rgba(255,229,176,.04);cursor:pointer;pointer-events:auto;transition:transform .16s ease,filter .16s ease,border-color .16s ease;}
+#mapTab.mapCornerBtn{width:68px;height:68px;flex:0 0 68px;display:grid;place-items:center;padding:0;border:1px solid var(--color-border);border-radius:var(--radius-panel);background:var(--surface-panel);color:var(--color-gold-soft);box-shadow:var(--shadow-panel);cursor:pointer;pointer-events:auto;transition:transform var(--motion-fast),filter var(--motion-fast),border-color var(--motion-fast);}
 #mapTab.mapCornerBtn:hover{transform:translateY(-2px);filter:brightness(1.12);border-color:#c79648;}
 #mapTab.mapCornerBtn:active{transform:scale(.97);}
 #mapTab .mapTabIcon{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
@@ -82,11 +82,11 @@
 .assetNameHud .assetNameGame{margin-bottom:3px;color:#efd18f;font:700 12px/1.15 Georgia,serif;letter-spacing:.055em;}
 .assetNameHud .assetNameBuild{margin-bottom:3px;color:#aa936d;font:600 9px/1.15 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.02em;}
 .topRightHud .economyHud{position:static!important;inset:auto!important;display:flex!important;flex-direction:row!important;gap:8px!important;margin:0!important;padding:0!important;transform:none!important;z-index:auto!important;}
-.topRightHud .hudSquareBadge,#mapTab.mapCornerBtn{width:var(--top-hud-size)!important;min-width:var(--top-hud-size)!important;max-width:var(--top-hud-size)!important;height:var(--top-hud-size)!important;min-height:var(--top-hud-size)!important;max-height:var(--top-hud-size)!important;box-sizing:border-box!important;border:1px solid rgba(161,121,59,.76)!important;border-radius:14px!important;background:linear-gradient(180deg,rgba(43,33,23,.94),rgba(19,15,12,.96))!important;box-shadow:0 8px 24px rgba(0,0,0,.30), inset 0 0 0 1px rgba(255,229,176,.04)!important;}
-.topRightHud .hudSquareBadge{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:5px!important;padding:6px 4px!important;color:#e4c37f!important;text-align:center!important;}
+.topRightHud .hudSquareBadge,#mapTab.mapCornerBtn{width:var(--top-hud-size)!important;min-width:var(--top-hud-size)!important;max-width:var(--top-hud-size)!important;height:var(--top-hud-size)!important;min-height:var(--top-hud-size)!important;max-height:var(--top-hud-size)!important;box-sizing:border-box!important;border:1px solid var(--color-border)!important;border-radius:var(--radius-panel)!important;background:var(--surface-panel)!important;box-shadow:var(--shadow-panel)!important;}
+.topRightHud .hudSquareBadge{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:5px!important;padding:6px 4px!important;color:var(--color-gold-soft)!important;text-align:center!important;}
 .hudBadgeLabel{display:block;color:#9e8966;font:700 9px/1 var(--ui-font);letter-spacing:.04em;white-space:nowrap;}
-.hudBadgeValue{display:flex;align-items:center;justify-content:center;gap:4px;color:#f0d497!important;font:700 14px/1 var(--ui-font)!important;}
-.hudBadgeValue strong,.topRightHud .hudSquareBadge strong{color:#f0d497!important;font:700 14px/1 var(--ui-font)!important;}
+.hudBadgeValue{display:flex;align-items:center;justify-content:center;gap:4px;color:var(--color-gold-pale)!important;font:700 14px/1 var(--ui-font)!important;}
+.hudBadgeValue strong,.topRightHud .hudSquareBadge strong{color:var(--color-gold-pale)!important;font:700 14px/1 var(--ui-font)!important;}
 .topRightHud .coinIcon{font-size:13px;}
 .topRightHud .headerPickIcon{width:14px!important;height:14px!important;transform:scale(.8);}
 #mapTab .mapTabIcon{width:36px!important;height:36px!important;}

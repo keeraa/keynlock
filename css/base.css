@@ -1,5 +1,4 @@
 /* Refactored stylesheet: stale legacy selectors removed; cascade-preserving declarations retained. */
-:root{--paper:#d7c8b5;--title-font:"Cormorant Garamond",Georgia,"Times New Roman",serif;--ui-font:"Golos Text",Arial,sans-serif;--accent-font:"Forum",Georgia,serif;}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 [hidden]{display:none!important;}
 .modePanel{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:auto;}

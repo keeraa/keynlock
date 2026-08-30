@@ -1,0 +1,27 @@
+/* Shared visual language. Feature styles may override these tokens locally. */
+:root{
+  --color-paper:#d7c8b5;
+  --color-text:#ead6ad;
+  --color-text-strong:#f1d38e;
+  --color-text-muted:#9d8d75;
+  --color-gold:#d9a74c;
+  --color-gold-soft:#e4c37f;
+  --color-gold-pale:#f0d497;
+  --color-border:rgba(161,121,59,.76);
+  --color-border-soft:rgba(120,94,52,.42);
+  --color-surface:#17120d;
+  --color-surface-deep:#0e0b08;
+  --surface-panel:linear-gradient(180deg,rgba(43,33,23,.94),rgba(19,15,12,.96));
+  --surface-dialog:linear-gradient(180deg,rgba(44,31,21,.98),rgba(20,16,12,.99));
+  --shadow-panel:0 8px 24px rgba(0,0,0,.30),inset 0 0 0 1px rgba(255,229,176,.04);
+  --shadow-dialog:0 28px 80px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,226,164,.04);
+  --radius-control:8px;
+  --radius-panel:14px;
+  --radius-dialog:20px;
+  --motion-fast:.16s ease;
+  --motion-normal:.24s cubic-bezier(.22,.78,.22,1);
+  --title-font:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --ui-font:"Golos Text",Arial,sans-serif;
+  --accent-font:"Forum",Georgia,serif;
+  --paper:var(--color-paper);
+}

@@ -1,0 +1,28 @@
+/* Low-specificity primitives shared by existing named components. */
+:where(.gameSettingsClose,.lairModuleClose,.globalTopHudClose,.alchemyTopHudClose,.collectionTopHudClose){
+  border-color:var(--color-border-soft);
+  background:var(--color-surface);
+  color:var(--color-gold-soft);
+  cursor:pointer;
+  transition:filter var(--motion-fast),border-color var(--motion-fast),transform var(--motion-fast);
+}
+:where(.gameSettingsClose,.lairModuleClose,.globalTopHudClose,.alchemyTopHudClose,.collectionTopHudClose):hover{
+  filter:brightness(1.18);
+}
+:where(.gameSettingsClose,.lairModuleClose,.globalTopHudClose,.alchemyTopHudClose,.collectionTopHudClose):active{
+  transform:scale(.97);
+}
+
+:where(.mapChapterBtn,.gameDifficulty button,.digitalBtn,.digitalMiniBtn,.anBtn,.hcStepBtn){
+  border-radius:var(--radius-control);
+  cursor:pointer;
+  transition:background var(--motion-fast),color var(--motion-fast),border-color var(--motion-fast),filter var(--motion-fast);
+}
+
+:where(button,[role="button"],input,select):focus-visible{
+  outline:2px solid var(--color-gold);
+  outline-offset:2px;
+}
+:where(button,[role="button"])[disabled],:where(button,[role="button"])[aria-disabled="true"]{
+  cursor:not-allowed;
+}

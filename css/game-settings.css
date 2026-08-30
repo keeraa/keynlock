@@ -1,6 +1,6 @@
 .gameSettingsScreen{position:fixed;inset:0;z-index:700;padding:28px;background:radial-gradient(circle at 50% 10%,rgba(105,74,43,.35),transparent 42%),rgba(11,9,7,.94);color:#e7d4ae;font-family:var(--ui-font);overflow:auto;box-sizing:border-box;}
 .gameSettingsScreen[hidden]{display:none!important;}
-.gameSettingsDialog{width:min(1500px,100%);min-height:calc(100vh - 56px);margin:auto;border:1px solid rgba(178,132,65,.55);border-radius:20px;background:linear-gradient(180deg,rgba(44,31,21,.98),rgba(20,16,12,.99));box-shadow:0 28px 80px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,226,164,.04);overflow:hidden;}
+.gameSettingsDialog{width:min(1500px,100%);min-height:calc(100vh - 56px);margin:auto;border:1px solid rgba(178,132,65,.55);border-radius:var(--radius-dialog);background:var(--surface-dialog);box-shadow:var(--shadow-dialog);overflow:hidden;}
 .gameSettingsHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding:28px 30px 22px;border-bottom:1px solid rgba(178,132,65,.32);background:linear-gradient(180deg,rgba(92,55,29,.3),transparent);}
 .gameSettingsKicker{display:block;margin-bottom:5px;color:#bd8e49;font:700 11px/1.2 var(--ui-font);letter-spacing:.2em;}
 .gameSettingsHeader h1{margin:0;color:#f1d38e;font:700 clamp(26px,3vw,42px)/1.05 Georgia,serif;}
@@ -9,8 +9,7 @@
 .gameMusicVolume{display:grid;grid-template-columns:auto 150px 38px;align-items:center;gap:10px;color:#bfa878;font:700 10px/1 var(--ui-font);text-transform:uppercase;letter-spacing:.08em;}
 .gameMusicVolume input{width:150px;accent-color:#b77b27;cursor:pointer;}
 .gameMusicVolume output{color:#efd18e;font:700 11px/1 var(--ui-font);text-align:right;letter-spacing:0;}
-.gameSettingsClose{flex:0 0 52px;width:52px;height:52px;border:1px solid #88652e;border-radius:12px;background:#17120d;color:#e5c37b;font:700 30px/1 var(--ui-font);cursor:pointer;}
-.gameSettingsClose:hover{filter:brightness(1.18);}
+.gameSettingsClose{flex:0 0 52px;width:52px;height:52px;border:1px solid #88652e;border-radius:12px;font:700 30px/1 var(--ui-font);}
 .gameSettingsToolbar{display:flex;align-items:end;gap:14px;padding:18px 30px;border-bottom:1px solid rgba(178,132,65,.24);}
 .gameSettingsToolbar label{display:grid;gap:6px;color:#ad9872;font-size:11px;text-transform:uppercase;letter-spacing:.1em;}
 .gameSettingsSearch{flex:1;max-width:420px;}

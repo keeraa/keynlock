@@ -17,20 +17,46 @@ function apMakePin(){
   const y=candidates.length?candidates[Math.floor(Math.random()*candidates.length)]:apClampY(target+6);
   return {y,groove,target,set:false};
 }
-function apReady(i){ const p=apPins[i]; return Math.abs(p.y-p.target)<=AP_TOL; }
+function apBeamY(){
+  const beam=$apLock?.querySelector('.apBeam');
+  const rect=beam?.getBoundingClientRect();
+  return rect?.height ? (rect.top+rect.bottom)/2 : NaN;
+}
+function apPassesPin(i){
+  const shaft=document.getElementById('apShaft'+i);
+  const groove=shaft?.querySelector('.apGroove');
+  const beamY=apBeamY();
+  if(!shaft||!groove||!Number.isFinite(beamY)) return null;
+  const shaftRect=shaft.getBoundingClientRect();
+  if(beamY<shaftRect.top||beamY>shaftRect.bottom) return true;
+  const grooveRect=groove.getBoundingClientRect();
+  return beamY>=grooveRect.top&&beamY<=grooveRect.bottom;
+}
+function apReady(i){
+  const passes=apPassesPin(i);
+  return passes??Math.abs(apPins[i].y-apPins[i].target)<=AP_TOL;
+}
 function apBeamProgress(){
-  const p=apPins[apSel];
-  if(!p) return 0;
-  if(p.set) return 100;
-  const diff=Math.abs(p.y-p.target);
-  return Math.max(0,Math.min(100,Math.round((1-diff/16)*100)));
+  const beam=$apLock?.querySelector('.apBeam');
+  const beamRect=beam?.getBoundingClientRect();
+  const beamY=apBeamY();
+  if(!beamRect?.width||!Number.isFinite(beamY)) return 0;
+  for(let i=0;i<apPins.length;i++){
+    if(apPassesPin(i)) continue;
+    const shaft=document.getElementById('apShaft'+i);
+    const shaftRect=shaft?.getBoundingClientRect();
+    if(!shaftRect) continue;
+    const stop=Math.max(0,Math.min(beamRect.width,shaftRect.left-beamRect.left));
+    return stop/beamRect.width*100;
+  }
+  return 100;
 }
 function apSymbolTop(p){ return p.groove>50?18:82; }
 function startAlphaProtocolRound(){
   solved=false; $lock.classList.remove('win'); $mechanism.classList.remove('ready','opening','opened');
   picks=pickCapacity; moves=0; brokenPicks=0; runReward=1000;
   apPins=Array.from({length:5},apMakePin);
-  apSel=0; apOrder=shuffle([0,1,2,3,4]); apOrderStep=0;
+  apSel=0; apOrder=shuffle([0,1,2,3,4]); apOrderStep=0; apSeqEls=[];
   apTimeMax=diffStep(30,26,22,'alphaprotocol'); apTimeLeft=apTimeMax;
   updateEconomyUI(); renderAlphaProtocol();
 }

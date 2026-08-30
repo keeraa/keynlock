@@ -67,13 +67,10 @@
   const MAP_CONNECTIONS={lair:['shop'],shop:['lair']};
   let mapLocation=MAP_LOCATIONS[STORE.getItem('lockpickMapLocation')]?STORE.getItem('lockpickMapLocation'):'lair';
   let lairOpen=false;
-  const LAIR_KAI_PORTRAIT="assets/characters/kai.png";
-  const LAIR_SAI_PORTRAIT="assets/characters/sai.png";
-  const LAIR_TIK_PORTRAIT="assets/characters/tik.png";
   const LAIR_CHARACTERS={
-    kai:{name:'Кай',role:'Взломщик',desc:'Работает аккуратно и предпочитает понятные цели. Хорош как основной персонаж для первых вылазок.',portrait:LAIR_KAI_PORTRAIT},
-    sai:{name:'Сай',role:'Разведчик',desc:'Собирает слухи, замечает связи между районами и помогает оценивать риск до выхода в город.',portrait:LAIR_SAI_PORTRAIT},
-    tik:{name:'Тик',role:'Механик',desc:'Разбирается в инструментах и конструкциях замков. Полезен при подготовке снаряжения.',portrait:LAIR_TIK_PORTRAIT}
+    kai:{name:'Кай',role:'Взломщик',desc:'Работает аккуратно и предпочитает понятные цели. Хорош как основной персонаж для первых вылазок.',portrait:'assets/characters/portraits/kai.png',full:'assets/characters/full/kai.png'},
+    sai:{name:'Сай',role:'Разведчик',desc:'Собирает слухи, замечает связи между районами и помогает оценивать риск до выхода в город.',portrait:'assets/characters/portraits/sai.png',full:'assets/characters/full/sai.png'},
+    tik:{name:'Тик',role:'Механик',desc:'Разбирается в инструментах и конструкциях замков. Полезен при подготовке снаряжения.',portrait:'assets/characters/portraits/tik.png',full:'assets/characters/full/tik.png'}
   };
   let lairCharacter=LAIR_CHARACTERS[STORE.getItem('lockpickLairCharacter')]?STORE.getItem('lockpickLairCharacter'):'kai';
   let lairTab='team';

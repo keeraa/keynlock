@@ -31,7 +31,7 @@
       const ch=LAIR_CHARACTERS[id];
       return `
         <div class="lairSceneCharacter ${id}${id===lairCharacter?' active':''}" data-lair-character="${id}" role="button" tabindex="0" aria-label="Выбрать персонажа ${ch.name}">
-          <img src="${ch.portrait}" alt="${ch.name}">
+          <img src="${ch.full}" alt="${ch.name}">
         </div>
       `;
     }).join('');

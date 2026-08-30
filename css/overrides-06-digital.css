@@ -321,17 +321,17 @@ body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none !important
 .lairActiveCharacterPortrait{
   position:absolute;
   left:50%;
-  top:5%;
+  top:0;
   width:auto;
-  height:350%;
+  height:155%;
   max-width:none;
   transform:translateX(-50%);
   object-fit:contain;
   object-position:center top;
   pointer-events:none;
 }
-.lairHotspotTeam[data-character="sai"] .lairActiveCharacterPortrait{height:310%;}
-.lairHotspotTeam[data-character="tik"] .lairActiveCharacterPortrait{height:365%;}
+.lairHotspotTeam[data-character="sai"] .lairActiveCharacterPortrait{height:150%;}
+.lairHotspotTeam[data-character="tik"] .lairActiveCharacterPortrait{height:155%;}
 .lairActiveCharacterBadge{
   position:absolute;
   left:7px;
@@ -371,17 +371,17 @@ body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none !important
 .lairPortraitArt{
   position:absolute !important;
   left:50% !important;
-  top:4% !important;
+  top:0 !important;
   width:auto !important;
   max-width:none !important;
-  height:310% !important;
+  height:145% !important;
   transform:translateX(-50%) !important;
   object-fit:contain !important;
   object-position:center top !important;
   filter:drop-shadow(0 12px 18px rgba(0,0,0,.34)) !important;
 }
-.lairCharacter[data-character="sai"] .lairPortraitArt{height:285% !important;}
-.lairCharacter[data-character="tik"] .lairPortraitArt{height:330% !important;}
+.lairCharacter[data-character="sai"] .lairPortraitArt{height:142% !important;}
+.lairCharacter[data-character="tik"] .lairPortraitArt{height:145% !important;}
 .lairCharacterName{margin-top:14px !important;font-size:22px !important;text-align:center !important;}
 .lairCharacterRole{text-align:center !important;}
 .lairCharacterDesc{text-align:center !important;}

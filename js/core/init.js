@@ -415,7 +415,6 @@
   $drumNew?.addEventListener('click',()=>newLock());
   $drumSound?.addEventListener('click',()=>{drumSoundOn=!drumSoundOn;$drumSound.textContent='Звук: '+(drumSoundOn?'вкл':'выкл');});
   $scopeWheels?.addEventListener('click',e=>{const b=e.target.closest('[data-scope-i]');if(!b)return;changeScope(Number(b.dataset.scopeI),Number(b.dataset.dir));});
-  $scopeCheck?.addEventListener('click',()=>GameActions.attemptOpen({modeId:'scope',source:'puzzle-control'}));
   $scopeNew?.addEventListener('click',()=>newLock());
   $hcDialRow?.addEventListener('click',e=>{
     const btn=e.target.closest('[data-hc-step]');

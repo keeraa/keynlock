@@ -63,6 +63,11 @@
 .scopeMode .digitalWheel{width:92px;padding:7px;}
 .scopeMode .digitalWheelValue{font-size:28px;padding:5px 0;}
 .scopeMode .digitalWheel button{padding:4px 6px;}
+.scopeMode .digitalCard{width:min(658px,calc(70vw - 39px));}
+.scopeMode .digitalHead{justify-content:flex-end;margin-bottom:8px;}
+@media (min-width:761px){
+body.mode-scope .puzzleArea{top:calc(var(--template-puzzle-top) - 90px)!important;}
+}
 @media (max-width:760px){
 .digitalMode{padding:4px 8px 22px;}
 .digitalCard{width:96vw;padding:12px 10px 14px;}

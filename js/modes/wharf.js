@@ -9,11 +9,8 @@
   // (prototypes/lockpicking-mechanics-v63.html, "Portable game module:
   // risen-2", data-name="Risen 2") into a fully native mode.
   //
-  // Naming note: there is a SEPARATE, unrelated native mode also called
-  // "Risen 2" (mode id 'r2', js/modes/risen2.js — a pin-lifting game, not
-  // this one) that already owns every "r2"-prefixed identifier. Everything
-  // here uses a "wf" prefix instead so the two never collide in the shared
-  // module scope.
+  // Everything here uses a "wf" prefix to keep the mode isolated in the
+  // shared module scope.
 
   function wfMakeSequence(n){
     const seq=[];

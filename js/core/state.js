@@ -127,7 +127,6 @@
         $hillsfarMode=document.querySelector('#hillsfarMode'), $hfTryArea=document.querySelector('#hfTryArea'), $hfLockCut=document.querySelector('#hfLockCut'), $hfCandidates=document.querySelector('#hfCandidates'),
         $massMode=document.querySelector('#massMode'), $massRings=document.querySelector('#massRings'), $massCenter=document.querySelector('#massCenter'), $massCenterText=document.querySelector('#massCenterText'),
         $g1Mode=document.querySelector('#g1Mode'), $g1ProgressRow=document.querySelector('#g1ProgressRow'),
-        $r2Mode=document.querySelector('#r2Mode'), $r2Pins=document.querySelector('#r2Pins'), $r2Pick=document.querySelector('#r2Pick'), $r2Progress=document.querySelector('#r2Progress'), $r2Message=document.querySelector('#r2Message'),
         $skMode=document.querySelector('#skMode'), $skBoard=document.querySelector('#skBoard'), $skTorqueButton=document.querySelector('#skTorqueButton'), $skFeedbackText=document.querySelector('#skFeedbackText'),
         $shopWood=document.querySelector('#shopWood'), $shopIron=document.querySelector('#shopIron'), $shopDiamond=document.querySelector('#shopDiamond'),
         $woodAction=document.querySelector('#woodAction'), $ironAction=document.querySelector('#ironAction'), $diamondAction=document.querySelector('#diamondAction'),
@@ -160,7 +159,6 @@
     hillsfar:$hillsfarMode,
     mass:$massMode,
     g1:$g1Mode,
-    r2:$r2Mode,
     skyrim:$skMode,
     anach:$anMode,
     tension:$tensionMode,
@@ -190,7 +188,7 @@
   const ALL_MODES=new Set(GameCatalog.nativeIds);
 
   const DIFFICULTY_STORAGE_KEY='lockpickModeDifficulty';
-  const DEFAULT_MODE_DIFFICULTY=Object.freeze({classic:1,target:1,line:1,sequence:1,special:1,hillsfar:1,mass:1,g1:1,r2:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,heatcold:1,drum:1,scope:1,oblivion:1,watchmen:1,museum:1,mass2:1,pipeline:1,wharf:1,thiefds:1,kingdomcome:1,thief12:1,fallout:1,anachlab:1,masshack:1,pathologic:1,bioshock2:1,alphaprotocol:1});
+  const DEFAULT_MODE_DIFFICULTY=Object.freeze({classic:1,target:1,line:1,sequence:1,special:1,hillsfar:1,mass:1,g1:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,heatcold:1,drum:1,scope:1,oblivion:1,watchmen:1,museum:1,mass2:1,pipeline:1,wharf:1,thiefds:1,kingdomcome:1,thief12:1,fallout:1,anachlab:1,masshack:1,pathologic:1,bioshock2:1,alphaprotocol:1});
   function loadModeDifficulty(){
     try{
       const saved=JSON.parse(STORE.getItem(DIFFICULTY_STORAGE_KEY)||'{}');

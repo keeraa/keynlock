@@ -1,9 +1,6 @@
-/* Risen 2 — верфь (wharf) — a row of bolts, raise them in a hidden,
-   spatially-clustered order (js/modes/wharf.js's wfMakeSequence). Markup/CSS
-   ported from the old prototype scene (prototypes/lockpicking-mechanics-v63.html,
-   .r2-*) with classes renamed to .wfBar/.wfLock/etc so they don't collide with
-   the unrelated native "Risen 2" pin-lifting mode (mode id 'r2', .r2Pin/etc
-   in css/modes-04-risen2.css) or with the prototype's own hyphenated classes. */
+/* Risen 2 — верфь (wharf) — a row of bolts raised in a hidden,
+   spatially clustered order. The native port is isolated in the .wf*
+   namespace so it cannot collide with other puzzle mechanics. */
 .wfMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:16px;background:rgba(17,13,9,.985);overflow:auto;}
 .wfMode[hidden]{display:none!important;pointer-events:none!important;}
 /* .challengeStatus (reward+timer HUD) is a viewport-fixed overlay that

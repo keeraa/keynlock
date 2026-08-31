@@ -14,7 +14,6 @@ const GAME_DEFINITIONS={
   hillsfar:{title:'Hillsfar',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   mass:{title:'Mass Effect',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   g1:{title:'Gothic 1',kind:'native',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:false,guards:false,birds:false}},
-  r2:{title:'Risen 2',description:'Поднимай штифты в скрытом правильном порядке; ошибка сбрасывает набранный прогресс.',objective:'ПОДНЯТЬ ШТИФТЫ В ПРАВИЛЬНОМ ПОРЯДКЕ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   skyrim:{title:'Skyrim',description:'Найди рабочий угол отмычки по сопротивлению механизма, затем проверни цилиндр.',objective:'НАЙТИ ПРАВИЛЬНЫЙ УГОЛ ОТМЫЧКИ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   anach:{title:'Anachronox',description:'Настрой три канала так, чтобы их суммарное отклонение исчезло и сигнал достиг 100.0.',objective:'МЕНЯЙ 3 КАНАЛА ТАК, ЧТОБЫ ЧИСЛО ВЫРОСЛО ДО 100.0',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   tension:{title:'Натяжение',description:'Удерживай натяжение в движущейся рабочей зоне и последовательно выставляй штифты.',objective:'УДЕРЖИВАТЬ НАТЯЖЕНИЕ В РАБОЧЕЙ ЗОНЕ И ВЫСТАВИТЬ ВСЕ ШТИФТЫ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},

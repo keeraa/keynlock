@@ -25,7 +25,7 @@
     body.classList.add('pick-breaking');
 
     const sources=[...document.querySelectorAll(
-      '.mechanismZone .pick,.sharedModeLockArt .pick,.r2Pick,.skPickArm,.inventoryTool-pick.selected img'
+      '.mechanismZone .pick,.sharedModeLockArt .pick,.skPickArm,.inventoryTool-pick.selected img'
     )].filter(el=>{
       const style=getComputedStyle(el);
       const r=el.getBoundingClientRect();

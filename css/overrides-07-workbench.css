@@ -33,7 +33,7 @@
 
 /* Moving puzzle parts: compositor-friendly and smooth on 120 Hz displays. */
 :where(
-  .plate,.pin,.pick,.tension,.r2Pick,.r2PinImg,.r2PinStem,.r2PinHead,
+  .plate,.pin,.pick,.tension,
   .skCylinder,.skWrench,.anLevel,.tnBand,.tnNeedle,.tnPinImg,.rsOrb,
   .massRing,.massRingDisc,.cpPinImg,.inventoryDrawer,.inventoryTool,
   .lairSceneCharacter,.solvedPuzzleOverlay,.timerCircleHud
@@ -42,17 +42,14 @@
   -webkit-backface-visibility:hidden;
 }
 
-:where(.plate,.pick,.tension,.r2Pick,.skCylinder,.skWrench,.rsOrb,.inventoryDrawer,.lairSceneCharacter){
+:where(.plate,.pick,.tension,.skCylinder,.skWrench,.rsOrb,.inventoryDrawer,.lairSceneCharacter){
   will-change:transform;
 }
-:where(.anLevel,.tnBand,.tnNeedle,.tnPinImg,.r2PinImg,.massRingDisc){
+:where(.anLevel,.tnBand,.tnNeedle,.tnPinImg,.massRingDisc){
   will-change:transform,opacity,filter;
 }
 
 /* Soften all high-frequency puzzle movement without making controls sluggish. */
-.r2Pick,.r2PinImg,.r2PinStem,.r2PinHead{
-  transition-timing-function:var(--motion-ease) !important;
-}
 .skCylinder,.skWrench{
   transition-timing-function:var(--motion-ease-soft) !important;
 }

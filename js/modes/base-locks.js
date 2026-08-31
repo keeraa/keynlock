@@ -453,7 +453,6 @@ let plateEls=[], pinTopPlateEls=[];
     scope:()=>PuzzleModes.call('scope','attemptOpen'),
     anach:()=>PuzzleModes.call('anach','attemptOpen'),
     skyrim:()=>PuzzleModes.call('skyrim','attemptOpen'),
-    r2:()=>PuzzleModes.call('r2','attemptOpen'),
     g1:()=>PuzzleModes.call('g1','attemptOpen'),
     hillsfar:()=>PuzzleModes.call('hillsfar','attemptOpen'),
     mass:()=>PuzzleModes.call('mass','attemptOpen'),

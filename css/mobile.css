@@ -154,21 +154,6 @@ body.importedMode .pinTopLayer{display:none!important;}
   }
   .plate{touch-action:none!important;}
 
-  /* Risen 2: make the active pick visually match the pin assembly. */
-  body.importedMode .r2Lock{
-    margin-top:-8px!important;
-    margin-bottom:-250px!important;
-    transform:scale(.36)!important;
-    transform-origin:top center!important;
-  }
-  body.importedMode .r2Pick{top:276px!important;width:290px!important;height:90px!important;}
-  body.importedMode .r2Pick::before{
-    left:54px!important;
-    top:-204px!important;
-    width:92px!important;
-    height:530px!important;
-  }
-
   /* Gothic 1 was sitting too close to the bottom controls. */
   body.importedMode .g1ProgressWrap{
     margin-top:-24px!important;

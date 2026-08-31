@@ -31,20 +31,16 @@
 }
 .pick{border-radius:0!important;box-shadow:none!important;filter:drop-shadow(0 4px 5px rgba(0,0,0,.48));}
 .pick:before,.pick:after{display:none!important;content:none!important;}
-.r2PickHandle,.r2PickShaft,.r2PickTip{visibility:hidden!important;}
-.r2Pick::before{content:"";position:absolute;filter:drop-shadow(0 4px 5px rgba(0,0,0,.45));pointer-events:none;}
 .skPickNeedle,.skPickGrip{display:none!important;}
 .skPickArm::before{content:"";position:absolute;filter:drop-shadow(0 4px 6px rgba(0,0,0,.5));pointer-events:none;}
 :root{--mechanism-w:540px;--mechanism-h:266px;}
 .sharedModeLockArt,body.importedMode .sharedModeLockArt,body.importedMode .skMode .sharedModeLockArt{width:var(--mechanism-w)!important;height:var(--mechanism-h)!important;top:0!important;left:50%!important;transform:translateX(-50%) scale(1)!important;transform-origin:top center!important;}
-.r2Pick::before{left:72px!important;top:-166px!important;width:64px!important;height:410px!important;background:var(--pick-skin-image) center/contain no-repeat!important;}
 @media (max-width: 900px){
 
 .sharedModeLockArt,body.importedMode .sharedModeLockArt,
 
 }
-.r2Pick::before{transform:rotate(90deg)!important;transform-origin:50% 50%!important;}
-body.importedMode .hillsfarMode,body.importedMode .massMode,body.importedMode .g1Mode,body.importedMode .r2Mode,body.importedMode .skMode,body.importedMode .anMode,body.importedMode .tnMode,body.importedMode .rsMode,body.importedMode .kdMode,body.importedMode .cpMode{background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
+body.importedMode .hillsfarMode,body.importedMode .massMode,body.importedMode .g1Mode,body.importedMode .skMode,body.importedMode .anMode,body.importedMode .tnMode,body.importedMode .rsMode,body.importedMode .kdMode,body.importedMode .cpMode{background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
 body.importedMode .skMode{overflow:visible!important;}
 body.importedMode .skBoardViewport{overflow:visible!important;}
 .skPickArm,.skPickArm::before{overflow:visible!important;}
@@ -71,8 +67,7 @@ body{background-size:100% 100%, auto 105%!important;}
 }
 .plate,.plateFace{background-size:contain!important;background-position:center!important;background-repeat:no-repeat!important;border-radius:0!important;}
 .pin{width:60.64px!important;height:113px!important;z-index:14!important;background-size:contain!important;background-repeat:no-repeat!important;background-position:center bottom!important;transform-origin:50% 88%!important;}
-.r2PinStem,.r2PinHead,.tnPinStem,.tnPinHead{opacity:0!important;}
-.r2PinImg{width:58px!important;max-height:188px!important;object-fit:contain!important;}
+.tnPinStem,.tnPinHead{opacity:0!important;}
 .tnPinImg{width:42px!important;max-height:104px!important;object-fit:contain!important;}
 .cpPinImg{width:38px!important;max-height:110px!important;object-fit:contain!important;}
 .sharedModeLockArt,.sharedModeLockArt .lockPanel{visibility:visible!important;opacity:1!important;}

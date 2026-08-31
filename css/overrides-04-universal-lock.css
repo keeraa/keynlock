@@ -10,7 +10,7 @@ body.importedMode .puzzleArea>.platesZone,body.importedMode .puzzleArea>#status{
 body:not(.importedMode) .puzzleArea>.platesZone{display:block!important;}
 body.importedMode .puzzleArea>.modePanel:not([hidden]),body.mode-hillsfar .puzzleArea>.hillsfarMode:not([hidden]){position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;max-width:none!important;margin:0!important;padding:8px 20px 12px!important;display:flex!important;visibility:visible!important;opacity:1!important;align-items:center!important;justify-content:flex-start!important;flex-direction:column!important;overflow:auto!important;background:transparent!important;background-image:none!important;box-shadow:none!important;filter:none!important;z-index:5!important;}
 body.importedMode .puzzleArea>.skMode:not([hidden]){overflow:visible!important;}
-body.importedMode .g1Mode,body.importedMode .r2Mode,body.importedMode .hillsfarMode,body.importedMode .massMode,body.importedMode .skMode,body.importedMode .anMode,body.importedMode .tnMode,body.importedMode .rsMode,body.importedMode .kdMode,body.importedMode .cpMode{top:0!important;right:0!important;bottom:0!important;left:0!important;inset:0!important;}
+body.importedMode .g1Mode,body.importedMode .hillsfarMode,body.importedMode .massMode,body.importedMode .skMode,body.importedMode .anMode,body.importedMode .tnMode,body.importedMode .rsMode,body.importedMode .kdMode,body.importedMode .cpMode{top:0!important;right:0!important;bottom:0!important;left:0!important;inset:0!important;}
 body.mode-hillsfar .hfLockBox{margin-top:0!important;}
 body.mode-hillsfar .hfCandidates{margin-top:18px!important;}
 body.importedMode .g1ProgressWrap{margin-top:54px!important;}
@@ -90,9 +90,6 @@ body.importedMode .massCenter span{font-size:11px!important;}
 body.importedMode .g1ProgressWrap{position:relative!important;top:0!important;width:100%!important;margin:8px auto 0!important;transform:none!important;}
 body.importedMode .g1ProgressRow{gap:7px!important;flex-wrap:wrap!important;justify-content:center!important;}
 body.importedMode .g1Slot{width:52px!important;height:52px!important;}
-body.importedMode .r2Mode{overflow-x:hidden!important;}
-body.importedMode .r2Lock{width:860px!important;height:420px!important;flex:0 0 420px!important;margin:0 0 -258px!important;transform:scale(.38)!important;transform-origin:top center!important;}
-body.importedMode .r2Status{margin-top:4px!important;max-width:94vw!important;font-size:10px!important;text-align:center!important;flex-wrap:wrap!important;justify-content:center!important;}
 body.importedMode .skBoardViewport{width:382px!important;height:382px!important;flex:0 0 382px!important;max-width:96vw!important;margin-bottom:-76px!important;}
 body.importedMode .skBoardViewport .skBoard{transform:translateX(-50%) scale(.552)!important;}
 body.importedMode .skFeedback{max-width:92vw!important;font-size:11px!important;}

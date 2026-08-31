@@ -11,7 +11,7 @@
   const MISSION_TIERS = [1, 2, 3];
   const MISSION_SYMBOLS = {
     classic:'⇅', target:'◎', line:'━', sequence:'ⅠⅡ', special:'✦', hillsfar:'✣',
-    mass:'⌁', g1:'⛓', r2:'⌇', skyrim:'✧', anach:'⧖', tension:'∠', resonance:'≋',
+    mass:'⌁', g1:'⛓', skyrim:'✧', anach:'⧖', tension:'∠', resonance:'≋',
     deduction:'◇', composite:'⛓', heatcold:'◐', drum:'⚙', scope:'∿', oblivion:'⊙',
     watchmen:'⌚', museum:'⚿', mass2:'⬡', pipeline:'┣', wharf:'↕', thiefds:'⌁',
     kingdomcome:'⊙', thief12:'◉', fallout:'⟳', anachlab:'⚗', masshack:'⌬',
@@ -28,7 +28,6 @@
     { mode: 'hillsfar',  x: 26, y: 28 },
     { mode: 'mass',      x: 42, y: 24 },
     { mode: 'g1',        x: 44, y: 44 },
-    { mode: 'r2',        x: 52, y: 40 },
     { mode: 'skyrim',    x: 44, y: 64 },
     { mode: 'anach',     x: 55, y: 63 },
     { mode: 'tension',   x: 62, y: 33 },

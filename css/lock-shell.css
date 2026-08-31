@@ -211,20 +211,20 @@ body.lock-shell-active:not(.importedMode) .lockShellFunnel{
 }
 
 body.lock-shell-active:not(.importedMode) .lockShellFunnelBack{z-index:3;}
-body.lock-shell-active:not(.importedMode) .lockShellFunnelFront{z-index:6;width:54px;}
+body.lock-shell-active:not(.importedMode) .lockShellFunnelFront{z-index:6;left:-6px;width:54px;}
 
 body.lock-shell-active:not(.importedMode) .mechanismZone .pick,
 body.lock-shell-active:not(.importedMode) .mechanismZone .tension{z-index:5!important;}
 
 body.lock-shell-active:not(.importedMode) .mechanismZone .pick{
-  left:25px!important;
+  left:-20px!important;
   top:112px!important;
   transform-origin:50% 6%!important;
   transform:translate(var(--pick-react-x),var(--pick-react-y)) rotate(calc(90deg + var(--pick-rot-drift) + var(--pick-react-rot)))!important;
 }
 
 body.lock-shell-active:not(.importedMode) .mechanismZone .tension{
-  left:-164px!important;
+  left:-425px!important;
   top:110px!important;
   transform-origin:94% 50%!important;
   transform:translate(var(--tension-react-x),var(--tension-react-y)) rotate(calc(0deg + var(--tension-rot-drift) + var(--tension-react-rot))) scaleX(-1)!important;

@@ -6,6 +6,9 @@
 html{height:100%;}
 body{height:100%;margin:0;overflow:hidden;background:linear-gradient(rgba(10,8,6,.48), rgba(10,8,6,.60)),
       url("../assets/backgrounds/bg-church-01.jpg") center center / cover no-repeat fixed;color:var(--paper);font-family:var(--ui-font);user-select:none;-webkit-user-select:none;}
+@media (min-aspect-ratio:17/10) and (max-aspect-ratio:19/10){
+body{background-position:center center,center top;}
+}
 body.world-paused .main{visibility:hidden!important;}
 body.world-paused .main *,body.world-paused .main *::before,body.world-paused .main *::after,body.world-paused .skyBird,body.world-paused .skyBirdSprite,body.world-paused .birdShadow{animation-play-state:paused!important;}
 body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.14;background-image:repeating-linear-gradient(7deg, transparent 0 19px, rgba(255,255,255,.018) 20px 21px),

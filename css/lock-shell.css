@@ -25,7 +25,7 @@ body.lock-shell-active .lockShellFrame{
 }
 
 body.lock-shell-active[data-lock-shell-rows="4"]{
-  --lock-shell-height:521px;
+  --lock-shell-height:448px;
 }
 
 body.lock-shell-active .lockShellBackground{
@@ -77,6 +77,11 @@ body.lock-shell-active:not(.importedMode) .plates{
   bottom:auto!important;
   height:455px!important;
   transform:translateY(-50%)!important;
+}
+
+body.lock-shell-active[data-lock-shell-rows="4"]:not(.importedMode) .plates,
+body.lock-shell-active[data-lock-shell-rows="4"]:not(.importedMode) #pinTopPlates{
+  height:361px!important;
 }
 
 body.lock-shell-active:not(.importedMode) #pinTopLayer{
@@ -137,14 +142,20 @@ body.lock-shell-active:not(.importedMode) .lockShellPhysicalLock{
 body.lock-shell-active:not(.importedMode) .lockShellPhysicalLock .lockPanel{
   position:absolute!important;
   inset:0!important;
+  display:none!important;
 }
 
 body.lock-shell-active:not(.importedMode) .lockShellShackle{
   display:block;
   position:absolute;
-  inset:0;
+  left:12px;
+  top:79px;
+  width:107px;
+  height:107px;
   background:var(--locker-image) center/contain no-repeat;
   filter:drop-shadow(0 9px 12px rgba(0,0,0,.25));
+  transform:rotate(90deg);
+  transform-origin:center;
   z-index:-1;
 }
 
@@ -184,14 +195,14 @@ body.lock-shell-active:not(.importedMode) .mechanismZone .pick,
 body.lock-shell-active:not(.importedMode) .mechanismZone .tension{z-index:5!important;}
 
 body.lock-shell-active:not(.importedMode) .mechanismZone .pick{
-  left:-175px!important;
+  left:-126px!important;
   top:87px!important;
   transform-origin:50% 6%!important;
   transform:translate(var(--pick-react-x),var(--pick-react-y)) rotate(calc(90deg + var(--pick-rot-drift) + var(--pick-react-rot)))!important;
 }
 
 body.lock-shell-active:not(.importedMode) .mechanismZone .tension{
-  left:-116px!important;
+  left:-164px!important;
   top:110px!important;
   transform-origin:6% 50%!important;
   transform:translate(var(--tension-react-x),var(--tension-react-y)) rotate(calc(0deg + var(--tension-rot-drift) + var(--tension-react-rot)))!important;

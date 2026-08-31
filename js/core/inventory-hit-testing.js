@@ -515,6 +515,7 @@
       const r=(hit||lock).getBoundingClientRect();
       const t=seen ? ease(clamp01(1 - gapTo(r)/LOCK_REACH)) : 0;
       lock.style.setProperty('--lock-glow',t.toFixed(3));
+      document.querySelector('#lockShellFrame')?.style.setProperty('--lock-glow',t.toFixed(3));
     }
   }
   function schedule(){ if(!queued){ queued=true; requestAnimationFrame(apply); } }

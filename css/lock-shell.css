@@ -3,11 +3,11 @@
 
 body.lock-shell-active{
   --lock-shell-size:610px;
-  --lock-shell-height:609px;
+  --lock-shell-height:529px;
   --lock-shell-top:50%;
   --lock-shell-scale:.85;
-  --lock-shell-inner-width:552px;
-  --lock-shell-plate-scale:.94;
+  --lock-shell-inner-width:581px;
+  --lock-shell-plate-scale:1;
 }
 
 body.lock-shell-active .lockShellFrame{
@@ -25,7 +25,7 @@ body.lock-shell-active .lockShellFrame{
 }
 
 body.lock-shell-active[data-lock-shell-rows="4"]{
-  --lock-shell-height:448px;
+  --lock-shell-height:405px;
 }
 
 body.lock-shell-active .lockShellBackground{
@@ -66,7 +66,7 @@ body.lock-shell-active:not(.importedMode) .puzzleArea>.platesZone{
   left:50%!important;
   top:var(--lock-shell-top)!important;
   width:var(--lock-shell-inner-width)!important;
-  height:calc(var(--lock-shell-height) - 58px)!important;
+  height:calc(var(--lock-shell-height) - 29px)!important;
   transform:translate(-50%,-50%) scale(calc(var(--lock-shell-scale) * var(--lock-shell-plate-scale)))!important;
   transform-origin:center!important;
   overflow:hidden!important;
@@ -81,6 +81,11 @@ body.lock-shell-active:not(.importedMode) .plates{
   transform:translateY(-50%)!important;
 }
 
+body.lock-shell-active:not(.importedMode) .plate,
+body.lock-shell-active:not(.importedMode) .pinTopPlate{
+  width:565px!important;
+}
+
 body.lock-shell-active[data-lock-shell-rows="4"]:not(.importedMode) .plates,
 body.lock-shell-active[data-lock-shell-rows="4"]:not(.importedMode) #pinTopPlates{
   height:361px!important;
@@ -92,7 +97,7 @@ body.lock-shell-active:not(.importedMode) #pinTopLayer{
   left:50%!important;
   top:var(--lock-shell-top)!important;
   width:var(--lock-shell-inner-width)!important;
-  height:calc(var(--lock-shell-height) - 58px)!important;
+  height:calc(var(--lock-shell-height) - 29px)!important;
   transform:translate(-50%,-50%) scale(calc(var(--lock-shell-scale) * var(--lock-shell-plate-scale)))!important;
   transform-origin:center!important;
   overflow:hidden!important;
@@ -156,10 +161,24 @@ body.lock-shell-active:not(.importedMode) .lockShellShackle{
   width:171px;
   height:171px;
   background:var(--locker-image) center/contain no-repeat;
-  filter:drop-shadow(0 9px 12px rgba(0,0,0,.25));
+  filter:brightness(calc(1 + .22 * var(--lock-glow,0))) saturate(calc(1 + .10 * var(--lock-glow,0))) drop-shadow(0 9px 12px rgba(0,0,0,.25)) drop-shadow(0 0 calc(22px * var(--lock-glow,0)) rgba(236,192,96,calc(.32 * var(--lock-glow,0))));
   transform:translateY(-50%) rotate(90deg);
   transform-origin:center;
   z-index:0;
+  transition:filter .18s cubic-bezier(.22,.84,.22,1);
+}
+
+body.lock-shell-active:not(.importedMode):has(.mechanismZone.opening) .lockShellShackle{
+  animation:lockShellShackleOpen 950ms cubic-bezier(.20,.76,.18,1) forwards;
+}
+body.lock-shell-active:not(.importedMode):has(.mechanismZone.opened) .lockShellShackle{
+  transform:translate(42px,-70%) rotate(82deg);
+}
+@keyframes lockShellShackleOpen{
+  0%{transform:translate(0,-50%) rotate(90deg);}
+  58%{transform:translate(27px,-61%) rotate(87deg);}
+  84%{transform:translate(45px,-73%) rotate(81deg);}
+  100%{transform:translate(42px,-70%) rotate(82deg);}
 }
 
 body.lock-shell-active:not(.importedMode) .lockShellPhysicalLock .lockHitArea{
@@ -182,7 +201,7 @@ body.lock-shell-active:not(.importedMode) .mechanismZone.opening .lockPanel{
 body.lock-shell-active:not(.importedMode) .lockShellFunnel{
   display:block;
   position:absolute;
-  left:-42px;
+  left:-12px;
   top:100px;
   width:60px;
   height:67px;
@@ -199,7 +218,7 @@ body.lock-shell-active:not(.importedMode) .mechanismZone .tension{z-index:5!impo
 
 body.lock-shell-active:not(.importedMode) .mechanismZone .pick{
   left:25px!important;
-  top:87px!important;
+  top:112px!important;
   transform-origin:50% 6%!important;
   transform:translate(var(--pick-react-x),var(--pick-react-y)) rotate(calc(90deg + var(--pick-rot-drift) + var(--pick-react-rot)))!important;
 }
@@ -208,7 +227,7 @@ body.lock-shell-active:not(.importedMode) .mechanismZone .tension{
   left:-164px!important;
   top:110px!important;
   transform-origin:94% 50%!important;
-  transform:translate(var(--tension-react-x),var(--tension-react-y)) rotate(calc(0deg + var(--tension-rot-drift) + var(--tension-react-rot)))!important;
+  transform:translate(var(--tension-react-x),var(--tension-react-y)) rotate(calc(0deg + var(--tension-rot-drift) + var(--tension-react-rot))) scaleX(-1)!important;
 }
 
 @media (min-width:1600px) and (min-height:900px){

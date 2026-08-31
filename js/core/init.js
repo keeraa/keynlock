@@ -291,7 +291,14 @@
     node.addEventListener('click',()=>travelToMapLocation(node.dataset.location));
   });
   document.querySelectorAll('.lairHotspot').forEach(btn=>{
-    btn.addEventListener('click',()=>openLairModule(btn.dataset.lairOpen));
+    btn.addEventListener('click',()=>{
+      if(btn.dataset.lairAction==='missions'){
+        closeLair();
+        openMap();
+        return;
+      }
+      openLairModule(btn.dataset.lairOpen);
+    });
   });
   document.querySelector('#lairWorkbenchClose')?.addEventListener('click',closeLairWorkbench);
   document.querySelector('#lairWorkbenchModal')?.addEventListener('pointerdown',e=>{

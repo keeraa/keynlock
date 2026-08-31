@@ -298,6 +298,27 @@ body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none !important
 .lairHotspotAlchemy{left:57.5% !important;top:62% !important;}
 .lairHotspotCity{left:75% !important;top:44% !important;}
 .lairHotspotCollection{left:60% !important;top:45% !important;}
+.lairHotspotMissions{left:25% !important;top:68% !important;}
+.lairHotspot:not(.lairHotspotTeam){
+  min-width:132px !important;
+  padding:62px 12px 10px !important;
+}
+.lairHotspotIcon{
+  position:absolute;
+  left:50%;
+  top:5px;
+  width:54px;
+  height:54px;
+  transform:translateX(-50%);
+  object-fit:contain;
+  filter:drop-shadow(0 5px 9px rgba(0,0,0,.42));
+  pointer-events:none;
+  transition:transform .16s ease,filter .16s ease;
+}
+.lairHotspot:not(.lairHotspotTeam):hover .lairHotspotIcon{
+  transform:translateX(-50%) scale(1.08);
+  filter:brightness(1.1) drop-shadow(0 6px 12px rgba(0,0,0,.48));
+}
 
 /* Character selection is persistent scene UI rather than a label over Tik. */
 .lairHotspotTeam{
@@ -407,6 +428,9 @@ body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none !important
   .lairHotspotAlchemy{left:57.5% !important;top:62% !important;}
   .lairHotspotCity{left:75% !important;top:44% !important;}
   .lairHotspotCollection{left:60% !important;top:45% !important;}
+  .lairHotspotMissions{left:25% !important;top:68% !important;}
+  .lairHotspot:not(.lairHotspotTeam){min-width:106px !important;padding:50px 8px 8px !important;}
+  .lairHotspotIcon{top:4px;width:44px;height:44px;}
   .lairHotspotTeam{right:10px !important;bottom:10px !important;width:72px !important;min-width:72px !important;height:72px !important;border-radius:14px !important;}
   .lairActiveCharacterBadge{left:4px;right:4px;bottom:4px;font-size:6px;}
   .lairPortrait{height:170px !important;}

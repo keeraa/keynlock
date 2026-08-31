@@ -453,5 +453,6 @@ function applyMechanismSkin(){
     el.style.setProperty('--lock-body-image', lockBody);
     el.style.setProperty('--locker-image', locker);
   });
+  document.querySelector('#lockShellFrame')?.style.setProperty('--locker-image',locker);
   updateMechanismAssetHud();
 }

@@ -108,6 +108,20 @@ renderInventoryTools();
     return {broke:true, kept, depleted:false};
   }
 
+  function forceBreakOnePick(message='Замок ещё не готов · отмычка сломалась'){
+    if(solved || picks<=0)return false;
+    const previousVisiblePicks=Math.max(0,Math.min(pickCapacity,picks));
+    picks=Math.max(0,picks-1);
+    if(previousVisiblePicks>0)triggerInventoryBreakAnimation(previousVisiblePicks);
+    brokenPicks++;
+    SFX.break();
+    updatePickUI();
+    if(picks<=0)showPickDepletedLoss();
+    else toast(message);
+    return true;
+  }
+  window.forceBreakOnePick=forceBreakOnePick;
+
   function applyPickSkin(){
     const uri=PICK_SKINS[pickSkin]||PICK_SKINS[1];
     document.documentElement.style.setProperty('--pick-skin-image',cssUrl(uri));

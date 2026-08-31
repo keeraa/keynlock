@@ -146,9 +146,16 @@ const GameActions=(()=>{
     const handler=openers.get(modeId);
     if(!handler){console.warn(`No open action registered for ${modeId}`);return false;}
     const solvedBefore=!!solved;
+    const picksBefore=Number(picks);
     const context={modeId,source,game,solvedBefore};
-    for(const guard of openGuards.get(modeId)||[]) if(guard(context)===false)return false;
+    const playerAttempt=['interface','puzzle-control','universal-lock'].includes(source);
+    for(const guard of openGuards.get(modeId)||[]) if(guard(context)===false){
+      if(playerAttempt && Number(picks)===picksBefore)window.forceBreakOnePick?.();
+      return false;
+    }
     const result=handler(context);
+    const failedPlayerAttempt=!solved && !solvedBefore && playerAttempt;
+    if(failedPlayerAttempt && Number(picks)===picksBefore)window.forceBreakOnePick?.();
     window.dispatchEvent(new CustomEvent('keynlock-game-action',{detail:{action:'open',modeId,source,solvedBefore,solvedAfter:!!solved}}));
     return result;
   }

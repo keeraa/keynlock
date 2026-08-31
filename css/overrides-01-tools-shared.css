@@ -82,7 +82,7 @@ body{background-size:100% 100%, auto 105%!important;}
 .skinPreviewMain[data-kind="tension"] .pickSkinPreview{width:180px!important;height:70px!important;}
 .pickSkinCard[data-kind="tension"] .pickSkinPreview{width:110px!important;height:44px!important;}
 }
-body.importedMode .skMode .skPickArm::before{left:-35px!important;bottom:-125px!important;width:70px!important;height:500px!important;background:var(--pick-skin-image) center bottom/contain no-repeat!important;transform:scaleY(-1)!important;transform-origin:50% 50%!important;}
+body.importedMode .skMode .skPickArm::before{left:-35px!important;bottom:15px!important;width:70px!important;height:500px!important;background:var(--pick-skin-image) center bottom/contain no-repeat!important;transform:scaleY(-1)!important;transform-origin:50% 50%!important;}
 body.importedMode .skMode .skWrenchBar,body.importedMode .skMode .skWrenchHandle{display:none!important;}
 body.importedMode .skMode .skWrench::before{content:"";position:absolute;left:-12px;top:-24px;width:199px;height:49px;background:var(--tension-skin-image) center/contain no-repeat;transform-origin:6% 50%;transform:rotate(13.5deg);filter:drop-shadow(0 4px 7px rgba(0,0,0,.5));pointer-events:none;}
 body.map-open header,body.map-open .main,body.map-open .topRightHud{display:none!important;}

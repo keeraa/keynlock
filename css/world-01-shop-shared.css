@@ -100,7 +100,7 @@ body.importedMode .g1ProgressWrap{gap:10px!important;}
 .toastAction{align-items:center;gap:6px;}
 .shopCardName{display:flex;align-items:center;justify-content:center;gap:7px;}
 .anBtn,.btn{display:grid;place-items:center;}
-body.importedMode .skBoardViewport{position:relative!important;width:497px!important;height:497px!important;flex:0 0 497px!important;margin:0 auto -99px!important;transform:translateY(-20%)!important;}
+body.importedMode .skBoardViewport{position:relative!important;width:497px!important;height:497px!important;flex:0 0 497px!important;margin:0 auto -99px!important;transform:translateY(-40%)!important;}
 body.importedMode .skBoardViewport .skBoard{position:absolute!important;left:50%!important;top:0!important;width:690px!important;height:690px!important;max-width:none!important;max-height:none!important;margin:0!important;transform:translateX(-50%) scale(.72)!important;transform-origin:top center!important;}
 body.importedMode .skMode .sharedModeLockArt{transform:translateX(-50%) scale(.4445)!important;}
 @media (max-width:900px){

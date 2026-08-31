@@ -158,7 +158,8 @@ let plateEls=[], pinTopPlateEls=[];
 
   function pinXForState(pos){
     const i=Math.max(0,Math.min(6,pos-1));
-    return PLATE_HOLE_X[i]*520;
+    const plateW=document.body.classList.contains('lock-shell-active')?565:520;
+    return PLATE_HOLE_X[i]*plateW;
   }
 
   function targetLineFor(i){
@@ -174,7 +175,8 @@ let plateEls=[], pinTopPlateEls=[];
   }
 
   function pinTransform(x, scale=1){
-    const xShift=(520*0.01);
+    const plateW=document.body.classList.contains('lock-shell-active')?565:520;
+    const xShift=(plateW*0.01);
     const yShift=(scale>=0.70 ? -5 : 0);
     return `translate3d(${(x-23-xShift).toFixed(2)}px,${yShift.toFixed(2)}px,0) scaleX(1) scaleY(${scale})`;
   }

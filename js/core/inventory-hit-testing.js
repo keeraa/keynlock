@@ -324,8 +324,13 @@
   // .plate is a fixed 520x97 box and .plateFace paints with `contain`, so a
   // plate narrower than the box is letterboxed; hole positions have to be
   // mapped through that fit before pins can line up with them.
-  const BOX_W=520, BOX_H=97, BOX_AR=BOX_W/BOX_H;
+  const BASE_BOX_W=520, SHELL_BOX_W=565, BOX_H=97;
+  function currentBoxW(){
+    return document.body.classList.contains('lock-shell-active')?SHELL_BOX_W:BASE_BOX_W;
+  }
   function fitBox(ar){
+    const BOX_W=currentBoxW();
+    const BOX_AR=BOX_W/BOX_H;
     const rw = ar>=BOX_AR ? BOX_W : BOX_H*ar;
     const rh = ar>=BOX_AR ? BOX_W/ar : BOX_H;
     return {rw,rh,ox:(BOX_W-rw)/2,oy:(BOX_H-rh)/2};

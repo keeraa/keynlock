@@ -224,10 +224,20 @@ body.lock-shell-active:not(.importedMode) .mechanismZone .pick{
 }
 
 body.lock-shell-active:not(.importedMode) .mechanismZone .tension{
-  left:-425px!important;
+  left:-4px!important;
   top:110px!important;
-  transform-origin:94% 50%!important;
+  transform-origin:6% 50%!important;
   transform:translate(var(--tension-react-x),var(--tension-react-y)) rotate(calc(0deg + var(--tension-rot-drift) + var(--tension-react-rot))) scaleX(-1)!important;
+}
+
+body.lock-shell-active:not(.importedMode) .mechanismZone.nudge .tension{
+  animation:lockShellTensionNudge 242ms ease!important;
+}
+
+@keyframes lockShellTensionNudge{
+  0%,100%{transform:translate(var(--tension-react-x),var(--tension-react-y)) rotate(calc(var(--tension-rot-drift) + var(--tension-react-rot))) scaleX(-1);}
+  35%{transform:translate(var(--tension-react-x),var(--tension-react-y)) rotate(calc(-6deg + var(--tension-rot-drift) + var(--tension-react-rot))) scaleX(-1);}
+  70%{transform:translate(var(--tension-react-x),var(--tension-react-y)) rotate(calc(6deg + var(--tension-rot-drift) + var(--tension-react-rot))) scaleX(-1);}
 }
 
 @media (min-width:1600px) and (min-height:900px){

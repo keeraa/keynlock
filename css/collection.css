@@ -34,6 +34,14 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
      scroll WITHIN, so .collectionListCol's own overflow-y:auto had nowhere
      bounded to apply and the list just grew past the window instead. */
   overflow:hidden;
+  /* height, not just max-height: with only a cap, an auto-height flex
+     column shrink-wraps to whatever its shortest sibling column needs —
+     the window then stopped short of 96vh, and .collectionListCol's own
+     overflow-y:auto clipped rows against that shorter box even though the
+     screen still had room below the window. Explicit height forces the
+     row to actually claim the full 96vh so every column's flex:1 1 auto
+     stretch has that much real space to hand out. */
+  height:96vh;
   max-height:96vh;
   width:min(1180px,96vw);
 }
@@ -46,6 +54,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   flex:1 1 auto;
   min-height:0;
   overflow:hidden;
+  height:100%;
   max-height:96vh;
   /* Clears the fixed top HUD bar (68px tall, 14px from the top) that
      replaces the hidden shared header. */
@@ -159,12 +168,12 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
      stage/strip below reading --preview-w — a circular reference that
      silently clamped the stage down to whatever flex leftover space
      happened to exist instead of the intended size. */
-  /* 15% smaller than the original 414/455 pass, on request — the stage,
-     handle strip and every handle card below all read off these two vars
-     (or --preview-w directly), so shrinking them here shrinks the whole
-     column in one place. */
-  --preview-h:352px;
-  --preview-w:387px;
+  /* 15% smaller than the original 414/455 pass, then +5% back on request —
+     net -10.75% from the original. The stage, handle strip and every
+     handle card below all read off these two vars (or --preview-w
+     directly), so resizing them here resizes the whole column at once. */
+  --preview-h:370px;
+  --preview-w:406px;
   flex:0 1 auto;
   min-width:0;
   display:flex;
@@ -248,7 +257,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   padding-top:4px;
 }
 .collectionHandleCard{
-  width:36px;height:36px;
+  width:38px;height:38px;
   padding:0;
   border:0;
   background:transparent;

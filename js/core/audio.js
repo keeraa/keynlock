@@ -189,6 +189,6 @@
     const button=event.target.closest?.('button');
     if(!button || button.disabled) return;
     if(button.closest('#inventoryDrawer,#puzzleArea,.gameDefeatOverlay')) return;
-    if(button.matches('[aria-label*="Закрыть"],.shopClose,.lairWorkbenchClose,.alchemyTopHudClose')) SFX.uiBack();
+    if(button.matches('[aria-label*="Закрыть"],.shopClose,.lairWorkbenchClose')) SFX.uiBack();
     else SFX.uiClick();
   });

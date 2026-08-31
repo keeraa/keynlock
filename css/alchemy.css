@@ -2153,52 +2153,13 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   transform: translateY(10vh) !important;
 }
 
-.alchemyTopHud {
-  display: none;
-  position: fixed;
-  z-index: 361;
-  left: clamp(124px, 8vw, 180px);
-  right: clamp(340px, 25vw, 520px);
-  top: 14px;
-  height: 68px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(152, 110, 54, 0.38);
-  border-radius: 12px;
-  background: linear-gradient(
-    90deg,
-    rgba(22, 15, 10, 0.28),
-    rgba(40, 25, 15, 0.82),
-    rgba(22, 15, 10, 0.28)
-  );
-  backdrop-filter: blur(8px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
-}
+/* Bar chrome (box/border/title/close) now lives in the shared
+   .screenTopHud* classes, css/components.css — .alchemyTopHud only still
+   needs its own visibility toggle (tied to this screen's own lair panel)
+   and to host the station tabs below the title. */
 body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   .alchemyTopHud {
   display: flex;
-}
-.alchemyTopHudTitle {
-  color: #e4c788;
-  font:
-    600 20px/1 Georgia,
-    serif;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
-}
-.alchemyTopHudClose {
-  position: absolute;
-  right: 10px;
-  width: 44px;
-  height: 44px;
-  border: 1px solid #664d2c;
-  border-radius: 9px;
-  background: #17120e;
-  color: #c6a66f;
-  font:
-    25px/1 Arial,
-    sans-serif;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 .alchemyTopHud .alchemyStations {
   position: absolute;
@@ -2294,20 +2255,8 @@ body:has(#alchemyGuideViewer:not([hidden])) #lairOverlay {
 }
 
 @media (max-width: 899px) {
-  .alchemyTopHud {
-    left: calc(var(--mobile-safe-left, 0px) + 58px);
-    right: calc(var(--mobile-safe-right, 0px) + 8px);
-    top: calc(var(--mobile-safe-top, 0px) + 7px);
-    height: 54px;
-  }
-  .alchemyTopHudTitle {
-    font-size: 17px;
-  }
-  .alchemyTopHudClose {
-    right: 7px;
-    width: 38px;
-    height: 38px;
-  }
+  /* Bar position/close-button sizing at this width now comes from the
+     shared .screenTopHud rules, css/components.css. */
   .alchemyTopHud .alchemyStations {
     top: 60px;
     gap: 5px;

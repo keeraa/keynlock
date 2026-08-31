@@ -11,7 +11,7 @@ html,body,button,input,select,textarea{font-family:var(--ui-font);}
 
 h1,h2,h3,
 .lairSceneTitle,.lairModuleTitle,.lairPanelTitle,.lairCharacterName,.lairIntelName,.lairIntelDetailTitle,
-.worldMapInfoTitle,.mapNodeLabel,.alchemyTopHudTitle,.collectionTopHudTitle,
+.worldMapInfoTitle,.mapNodeLabel,
 .gameSettingsTitle,.digitalTitle,.solvedPuzzleTitle,.assetNameGame{font-family:var(--title-font)!important;}
 
 .shopCardName,.pickSkinLabel,.collectionRowLabel,

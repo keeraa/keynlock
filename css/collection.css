@@ -52,40 +52,10 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   padding-top:74px;
 }
 
-.collectionTopHud{
-  display:none;
-  position:fixed;
-  z-index:361;
-  left:clamp(90px,6vw,150px);
-  right:clamp(340px,25vw,520px);
-  top:14px;
-  height:68px;
-  align-items:center;
-  justify-content:center;
-  border:1px solid rgba(152,110,54,.38);
-  border-radius:12px;
-  background:linear-gradient(90deg,rgba(22,15,10,.28),rgba(40,25,15,.82),rgba(22,15,10,.28));
-  backdrop-filter:blur(8px);
-  box-shadow:0 8px 24px rgba(0,0,0,.22);
-}
+/* Bar chrome (box/border/title/close) lives in the shared .screenTopHud*
+   classes, css/components.css — this screen only needs its own
+   visibility toggle. */
 body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active) .collectionTopHud{display:flex;}
-.collectionTopHudTitle{
-  color:#e4c788;
-  font:600 20px/1 Georgia,serif;
-  text-shadow:0 1px 4px rgba(0,0,0,.7);
-}
-.collectionTopHudClose{
-  position:absolute;
-  right:10px;
-  width:44px;height:44px;
-  border:1px solid #664d2c;
-  border-radius:9px;
-  background:#17120e;
-  color:#c6a66f;
-  font:25px/1 Arial,sans-serif;
-  cursor:pointer;
-  box-shadow:0 2px 8px rgba(0,0,0,.5);
-}
 .alchemyRoot ~ #collectionRoot,
 #collectionRoot{
   display:flex;
@@ -167,7 +137,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   height:101px;
   object-fit:contain;
 }
-/* Same face as the top HUD's "Коллекция" title (.collectionTopHudTitle) —
+/* Same face as the top HUD's "Коллекция" title (.screenTopHudTitle) —
    Georgia serif, not the UI sans-serif everything else in this row uses. */
 .collectionRowLabel{
   font:600 15px/1.2 Georgia,serif;
@@ -361,14 +331,8 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
    once already: this file used to open with the 899px block, so its
    #collectionRoot padding always lost to the later plain rule below.) */
 @media (max-width:899px){
-  .collectionTopHud{
-    left:calc(var(--mobile-safe-left,0px) + 58px);
-    right:calc(var(--mobile-safe-right,0px) + 8px);
-    top:calc(var(--mobile-safe-top,0px) + 7px);
-    height:54px;
-  }
-  .collectionTopHudTitle{font-size:17px;}
-  .collectionTopHudClose{right:7px;width:38px;height:38px;}
+  /* Bar position/close-button sizing at this width now comes from the
+     shared .screenTopHud rules, css/components.css. */
   #lairModuleWindow:has(.lairPanel[data-lair-panel="collection"].active) .lairModuleBody{padding-top:60px;}
   /* Below the phone breakpoint there isn't room for a list column next
      to a preview column side by side — stack them, and let the

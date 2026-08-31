@@ -1,15 +1,15 @@
 /* Low-specificity primitives shared by existing named components. */
-:where(.gameSettingsClose,.lairModuleClose,.globalTopHudClose,.alchemyTopHudClose,.collectionTopHudClose){
+:where(.gameSettingsClose,.lairModuleClose,.globalTopHudClose){
   border-color:var(--color-border-soft);
   background:var(--color-surface);
   color:var(--color-gold-soft);
   cursor:pointer;
   transition:filter var(--motion-fast),border-color var(--motion-fast),transform var(--motion-fast);
 }
-:where(.gameSettingsClose,.lairModuleClose,.globalTopHudClose,.alchemyTopHudClose,.collectionTopHudClose):hover{
+:where(.gameSettingsClose,.lairModuleClose,.globalTopHudClose):hover{
   filter:brightness(1.18);
 }
-:where(.gameSettingsClose,.lairModuleClose,.globalTopHudClose,.alchemyTopHudClose,.collectionTopHudClose):active{
+:where(.gameSettingsClose,.lairModuleClose,.globalTopHudClose):active{
   transform:scale(.97);
 }
 
@@ -25,4 +25,64 @@
 }
 :where(button,[role="button"])[disabled],:where(button,[role="button"])[aria-disabled="true"]{
   cursor:not-allowed;
+}
+
+/* Shared full-screen module header — Коллекция, Алхимия, and any future
+   panel opened the same way (js/core/init.js's openLairModule) all use
+   this instead of their own boxed bar: no border/background of its own
+   (the panel underneath already sits on #alchemyFullBlur's blur layer),
+   caps title, and a close button on the LEFT sized to match the
+   persistent nav icons on the right (--top-hud-size, css/overrides-03-lair.css). */
+.screenTopHud{
+  display:none;
+  position:fixed;
+  z-index:361;
+  left:clamp(124px,8vw,180px);
+  right:clamp(340px,25vw,520px);
+  top:14px;
+  height:68px;
+  align-items:center;
+  justify-content:center;
+}
+.screenTopHudTitle{
+  color:#e4c788;
+  font:600 20px/1 var(--title-font,Georgia,serif);
+  text-shadow:0 1px 4px rgba(0,0,0,.7);
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+.screenTopHudClose{
+  position:absolute;
+  left:0;
+  top:50%;
+  transform:translateY(-50%);
+  width:var(--top-hud-size,68px);
+  height:var(--top-hud-size,68px);
+  display:grid;
+  place-items:center;
+  padding:0;
+  border:1px solid rgba(161,121,59,.76);
+  border-radius:14px;
+  background:linear-gradient(180deg,rgba(43,33,23,.94),rgba(19,15,12,.96));
+  color:#e4c37f;
+  font:25px/1 Arial,sans-serif;
+  cursor:pointer;
+  box-shadow:0 8px 24px rgba(0,0,0,.30),inset 0 0 0 1px rgba(255,229,176,.04);
+  transition:transform .16s ease,filter .16s ease,border-color .16s ease;
+}
+.screenTopHudClose:hover{transform:translateY(-50%) translateY(-2px);filter:brightness(1.12);border-color:#c79648;}
+.screenTopHudClose:active{transform:translateY(-50%) scale(.97);}
+@media (max-width:899px){
+  /* --top-hud-size itself drops to 58px at this breakpoint (see
+     css/overrides-03-lair.css) — .screenTopHudClose reads that var
+     directly, so only the bar's own position/height and the title need
+     their own tweak. Identical mobile-safe-inset math previously lived
+     duplicated in both alchemy.css and collection.css. */
+  .screenTopHud{
+    left:calc(var(--mobile-safe-left,0px) + 58px);
+    right:calc(var(--mobile-safe-right,0px) + 8px);
+    top:calc(var(--mobile-safe-top,0px) + 7px);
+    height:54px;
+  }
+  .screenTopHudTitle{font-size:17px;}
 }

@@ -41,9 +41,10 @@ body.mode-hillsfar .globalTopHud{
   transform-origin:initial!important;
 }
 
-/* All icon controls in the shared HUD use the same material and ink. */
-.globalTopHud .hudNavBtn,
-.globalTopHud .alchemyTopHudClose{
+/* All icon controls in the shared HUD use the same material and ink.
+   .screenTopHudClose (css/components.css) already carries this same look
+   on its own, unconditionally — it doesn't need reinforcing here. */
+.globalTopHud .hudNavBtn{
   border-color:rgba(161,121,59,.82)!important;
   border-radius:12px!important;
   background:linear-gradient(180deg,rgba(43,33,23,.97),rgba(19,15,12,.98))!important;
@@ -66,14 +67,12 @@ body.mode-hillsfar .globalTopHud{
   border-radius:inherit;
   pointer-events:none;
 }
-.globalTopHud .hudNavBtn:hover,
-.globalTopHud .alchemyTopHudClose:hover{
+.globalTopHud .hudNavBtn:hover{
   border-color:#c79648!important;
   color:#f0d497!important;
   filter:brightness(1.12);
 }
-.globalTopHud .hudNavBtn:focus-visible,
-.globalTopHud .alchemyTopHudClose:focus-visible{
+.globalTopHud .hudNavBtn:focus-visible{
   outline:2px solid #d9a74c!important;
   outline-offset:2px!important;
 }
@@ -90,7 +89,11 @@ body.mode-hillsfar .globalTopHud{
   margin:0!important;
   transform:none!important;
 }
-.globalTopHud .alchemyTopHud{
+/* .screenTopHud (css/components.css) is the shared bar every full-screen
+   module uses (Алхимия, Коллекция, future panels) — generalized from what
+   used to be an alchemy-only rule so every one of them gets the same
+   grid integration for free. */
+.globalTopHud .screenTopHud{
   grid-area:context;
   position:relative!important;
   inset:auto!important;
@@ -102,11 +105,11 @@ body.mode-hillsfar .globalTopHud{
 
 /* On desktop the context grid column is narrower on the right because the
    economy/navigation group is much wider than the menu button. Center the
-   complete Alchemy title block against the viewport instead of that asymmetric
+   complete title block against the viewport instead of that asymmetric
    leftover column. */
 @media (min-width:1101px){
-  body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
-    .globalTopHud .alchemyTopHud{
+  body:has(#lairModuleWindow.open .lairPanel.active)
+    .globalTopHud .screenTopHud{
     position:fixed!important;
     top:14px!important;
     left:50%!important;
@@ -137,6 +140,6 @@ body.lair-open .globalTopHud #rewardBox{display:none!important;}
     gap:6px;
     min-height:54px!important;
   }
-  .globalTopHud .alchemyTopHud{height:54px;}
+  .globalTopHud .screenTopHud{height:54px;}
   .globalTopHud .topRightHud{max-width:min(58vw,260px)!important;}
 }

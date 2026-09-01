@@ -12,11 +12,8 @@
 body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:calc(16px + var(--reward-clear,0px))!important;}
 
 /* No fixed height: .wfLockWrap fills whatever room #puzzleArea actually
-   gives it, .wfLock is fit to whichever of width/height is tighter via
-   height:100%+aspect-ratio+max-width. align-items:stretch (unlike the
-   prototype's flex-end) gives every .wfBar a definite 100% height so the
-   random --bar-h percentage — and the .open rise, also a percentage —
-   resolve correctly at any size, with no JS measurement needed. */
+   gives it. Pins always keep one physical size; a moving lower sleeve masks
+   part of each image to show how deeply it is seated in the mechanism. */
 .wfLockWrap{
   flex:1 1 auto;
   min-height:0;
@@ -38,27 +35,43 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   padding:7% 5.5% 5%;
   display:flex;
   align-items:stretch;
-  justify-content:space-between;
-  gap:min(1.7cqw,10px);
+  justify-content:center;
+  gap:0;
   container-type:inline-size;
 }
 .wfBar{
-  flex:1;
+  flex:0 1 54px;
+  width:54px;
   position:relative;
-  max-width:64px;
+  max-width:54px;
   min-width:0;
   border-left:1px solid rgba(255,255,255,.07);
   border-right:1px solid rgba(0,0,0,.45);
   cursor:pointer;
 }
+.wfBar:before{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:calc(12px + var(--pin-depth,0%));
+  z-index:2;
+  pointer-events:none;
+  background:linear-gradient(90deg,#11100c,#242119 48%,#11100c);
+  border-top:2px solid #554c3b;
+  box-shadow:0 -5px 10px rgba(0,0,0,.42),inset 0 1px rgba(255,255,255,.04);
+  transition:height .18s ease,border-color .18s ease;
+}
 .wfPin{
   position:absolute;
   left:50%;
   bottom:12px;
-  height:var(--bar-h,72%);
+  height:78%;
   width:auto;
-  max-width:62%;
-  object-fit:fill;
+  max-width:none;
+  object-fit:contain;
+  z-index:1;
   transform:translateX(-50%);
   transition:transform .18s ease,filter .18s ease;
   filter:drop-shadow(0 4px 5px rgba(0,0,0,.45));
@@ -68,10 +81,12 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   transform:translate(-50%,-36%);
   filter:brightness(1.18);
 }
+.wfBar.open:before{height:12px;border-color:#7f9663;}
 .wfBar.wrong .wfPin{
   transform:translate(-50%,-7%);
   filter:brightness(1.08);
 }
+.wfBar.wrong:before{border-color:#c3a466;}
 .wfBar.current{box-shadow:inset 0 -3px 0 #d8b871;}
 .wfBar.current:after{
   content:"▲";
@@ -81,6 +96,7 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   transform:translateX(-50%);
   color:#d8b871;
   font-size:min(3.4cqw,13px);
+  z-index:3;
 }
 
 .wfHelp{
@@ -93,5 +109,5 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
 .wfHelp:empty{display:none;}
 
 @media (max-width:650px){
-  .wfBar{max-width:44px;}
+  .wfBar{flex-basis:42px;width:42px;max-width:42px;}
 }

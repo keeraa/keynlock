@@ -56,7 +56,9 @@
       for(let i=0;i<wfBarCount;i++){
         const b=document.createElement('div');
         b.className='wfBar';
-        b.style.setProperty('--bar-h',(48+Math.random()*43)+'%');
+        // Every pin keeps its real dimensions. Different apparent lengths
+        // come from how deeply the lower part sits inside the mechanism.
+        b.style.setProperty('--pin-depth',(4+Math.random()*38).toFixed(1)+'%');
         b.innerHTML=`<img class="wfPin" src="${currentGamePinSkin()}" alt="">`;
         b.addEventListener('click',()=>{
           if(solved) return;

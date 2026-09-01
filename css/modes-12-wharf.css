@@ -48,26 +48,58 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   cursor:pointer;
   overflow:hidden;
 }
-.wfPin{
+.wfPinRig{
   position:absolute;
   left:50%;
   top:0;
   bottom:auto;
   height:clamp(180px,32vh,380px);
-  width:auto;
+  width:calc(clamp(180px,32vh,380px) * .248);
   max-width:none;
-  object-fit:contain;
   z-index:1;
   transform:translate(-50%,calc(-1 * var(--pin-depth,0%)));
   transition:transform .22s ease,filter .18s ease;
   filter:drop-shadow(0 4px 5px rgba(0,0,0,.45));
   pointer-events:none;
 }
-.wfBar.open .wfPin{
+.wfPin{
+  position:relative;
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  z-index:2;
+}
+.wfSpring{
+  position:absolute;
+  left:50%;
+  top:calc(100% - 4px);
+  width:100%;
+  height:clamp(90px,18vh,170px);
+  transform:translateX(-50%);
+  z-index:1;
+}
+.wfSpring img{
+  position:absolute;
+  left:50%;
+  top:0;
+  width:auto;
+  max-width:100%;
+  object-fit:contain;
+  object-position:top center;
+  transform:translateX(-50%);
+  transform-origin:top center;
+  transition:opacity .16s ease,filter .22s ease;
+}
+.wfSpringIdle{height:clamp(90px,18vh,170px);opacity:0;}
+.wfSpringCompressed{height:clamp(48px,9vh,82px);opacity:1;}
+.wfBar.open .wfPinRig{
   transform:translate(-50%,calc(-1 * (var(--pin-depth,0%) + 22%)));
   filter:brightness(1.18);
 }
-.wfBar.wrong .wfPin{
+.wfBar.open .wfSpringIdle{opacity:1;}
+.wfBar.open .wfSpringCompressed{opacity:0;}
+.wfBar.wrong .wfPinRig{
   transform:translate(-50%,calc(-1 * var(--pin-depth,0%) + 3%));
   filter:brightness(1.08);
 }
@@ -95,7 +127,7 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
 
 @media (max-width:650px){
   .wfLock{height:min(38vh,300px);}
-  .wfPin{height:clamp(140px,28vh,260px);}
+  .wfPinRig{height:clamp(140px,28vh,260px);width:calc(clamp(140px,28vh,260px) * .248);}
   .wfBar{flex-basis:58px;width:58px;max-width:58px;}
   .wfBar.current:after{top:calc(clamp(140px,28vh,260px) + 6px);}
 }

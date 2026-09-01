@@ -59,17 +59,7 @@
     balance += earned;
     STORE.setItem('lockpickBalance', String(balance));
     updateEconomyUI();
-    updateShopUI();
     return {earned, cleanBonus};
-  }
-
-  function savePickProgress(){
-    pickProgress={iron:pickProgress.iron,diamond:pickProgress.diamond,capacity:pickCapacity,equipped:pickType};
-    STORE.setItem('lockpickProgress',JSON.stringify(pickProgress));
-  }
-
-  function ownsPick(type){
-    return type==='wood' || (type==='iron'&&pickProgress.iron) || (type==='diamond'&&pickProgress.diamond);
   }
 function setGlobalTimer(active=false, timeLeft=0, timeMax=1, label='ТАЙМЕР'){
     challengeHud.setTimer({active,timeLeft,timeMax,label});
@@ -131,50 +121,8 @@ renderInventoryTools();
     pickSkin=Math.max(1,Math.min(5,Number(index)||1));
     STORE.setItem('lockpickSkin',String(pickSkin));
     applyPickSkin();
-    updatePickSkinShop();
     renderInventoryTools();
     SFX.select();
-  }
-
-  function buildSkinMain($mount, uri, label, kind){
-    if(!$mount) return;
-    $mount.innerHTML='';
-    const img=document.createElement('img');
-    img.className='pickSkinPreview';
-    img.alt=label;
-    img.src=uri;
-    const cap=document.createElement('div');
-    cap.className='pickSkinLabel';
-    cap.textContent=label;
-    $mount.dataset.kind=kind;
-    $mount.append(img,cap);
-  }
-
-  function updatePickSkinShop(){
-    if(!$pickSkinGrid || !$pickSkinMain) return;
-    buildSkinMain($pickSkinMain,PICK_SKINS[pickSkin]||PICK_SKINS[1],`Вариант ${pickSkin}`,'pick');
-    $pickSkinGrid.innerHTML='';
-    for(let i=1;i<=5;i++){
-      const btn=document.createElement('button');
-      btn.type='button';
-      btn.className='pickSkinCard'+(i===pickSkin?' selected':'');
-      btn.dataset.pickSkin=String(i);
-      btn.dataset.kind='pick';
-      const img=document.createElement('img');
-      img.className='pickSkinPreview';
-      img.alt=`Отмычка ${i}`;
-      img.src=PICK_SKINS[i];
-      const label=document.createElement('span');
-      label.className='pickSkinLabel';
-      label.textContent=`Вариант ${i}`;
-      btn.append(img,label);
-      btn.addEventListener('click',()=>selectPickSkin(i));
-      $pickSkinGrid.appendChild(btn);
-    }
-  }
-
-  function initPickSkinShop(){
-    updatePickSkinShop();
   }
 
   function applyTensionSkin(){
@@ -186,52 +134,6 @@ renderInventoryTools();
     tensionSkin=Math.max(1,Math.min(5,Number(index)||1));
     STORE.setItem('tensionSkin',String(tensionSkin));
     applyTensionSkin();
-    updateTensionSkinShop();
     renderInventoryTools();
     SFX.select();
-  }
-
-  function updateTensionSkinShop(){
-    if(!$tensionSkinGrid || !$tensionSkinMain) return;
-    buildSkinMain($tensionSkinMain,TENSION_SKINS[tensionSkin]||TENSION_SKINS[1],TENSION_SKIN_LABELS[tensionSkin]||`Вариант ${tensionSkin}`,'tension');
-    $tensionSkinGrid.innerHTML='';
-    for(let i=1;i<=5;i++){
-      const btn=document.createElement('button');
-      btn.type='button';
-      btn.className='pickSkinCard'+(i===tensionSkin?' selected':'');
-      btn.dataset.tensionSkin=String(i);
-      btn.dataset.kind='tension';
-      const img=document.createElement('img');
-      img.className='pickSkinPreview';
-      img.alt=`Натяжитель ${i}`;
-      img.src=TENSION_SKINS[i];
-      const label=document.createElement('span');
-      label.className='pickSkinLabel';
-      label.textContent=TENSION_SKIN_LABELS[i]||`Вариант ${i}`;
-      btn.append(img,label);
-      btn.addEventListener('click',()=>selectTensionSkin(i));
-      $tensionSkinGrid.appendChild(btn);
-    }
-  }
-
-  function initTensionSkinShop(){
-    updateTensionSkinShop();
-  }
-
-  function updateShopUI(){
-    $shopBalance.textContent=balance;
-    updatePickSkinShop();
-    updateTensionSkinShop();
-    const cards={wood:$shopWood,iron:$shopIron,diamond:$shopDiamond};
-    Object.entries(cards).forEach(([type,el])=>{
-      el.classList.toggle('equipped',pickType===type);
-      el.classList.toggle('locked',!ownsPick(type));
-    });
-    $woodAction.textContent=pickType==='wood'?'Используется':'Использовать';
-    $ironAction.textContent=pickProgress.iron?(pickType==='iron'?'Используется':'Использовать'):`Купить · ${SHOP_PRICES.iron}`;
-    $diamondAction.textContent=pickProgress.diamond?(pickType==='diamond'?'Используется':'Использовать'):`Купить · ${SHOP_PRICES.diamond}`;
-    $pouchTitle.textContent=`Чехол · ${pickCapacity} ${pickCapacity===5?'отмычек':'отмычки'}`;
-    if(pickCapacity===3){ $pouchBuy.textContent='3 → 4 · 4500'; $pouchBuy.disabled=false; }
-    else if(pickCapacity===4){ $pouchBuy.textContent='4 → 5 · 9000'; $pouchBuy.disabled=false; }
-    else { $pouchBuy.textContent='Максимум · 5'; $pouchBuy.disabled=true; }
   }

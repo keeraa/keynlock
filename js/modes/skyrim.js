@@ -114,7 +114,7 @@
   }
 
   function tryTorqueSkyrim(){
-    if(shopOpen || solved || skTorqueBusy) return;
+    if(solved || skTorqueBusy) return;
     skTorqueBusy=true;
     registerMove();
 

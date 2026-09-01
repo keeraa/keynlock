@@ -53,6 +53,7 @@ function apBeamProgress(){
 }
 function apSymbolTop(p){ return p.groove>50?18:82; }
 function startAlphaProtocolRound(){
+  chooseGamePinSkin();
   solved=false; $lock.classList.remove('win'); $mechanism.classList.remove('ready','opening','opened');
   picks=pickCapacity; moves=0; brokenPicks=0; runReward=1000;
   apPins=Array.from({length:5},apMakePin);
@@ -101,7 +102,7 @@ function apSet(){
   damagePick({ resetProgress:()=>{}, renderState:renderAlphaProtocol, surviveText:'Щель не совпала' });
 }
 function tryOpenAlphaProtocol(){
-  if(shopOpen||solved) return;
+  if(solved) return;
   if(apOrderStep<apOrder.length){
     SFX.wrongLock();
     toast('Сначала выставь все 5 пинов по порядку символов');
@@ -122,6 +123,7 @@ function renderAlphaProtocol(){
   apPins.forEach((p,i)=>{
     const pinEl=document.getElementById('apPin'+i), shaft=document.getElementById('apShaft'+i);
     if(!pinEl||!shaft) return;
+    shaft.style.backgroundImage=`url("${currentGamePinSkin()}")`;
     pinEl.classList.toggle('active', i===apSel);
     pinEl.classList.toggle('set', p.set);
     pinEl.classList.toggle('ready', !p.set && apReady(i));

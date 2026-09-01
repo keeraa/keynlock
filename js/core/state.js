@@ -1,6 +1,6 @@
   const GOAL=4, MIN=1, MAX=7;
   function clamp(value,min,max){ return Math.max(min,Math.min(max,value)); }
-  const WORLD_PAUSE_CLASSES=['lair-open','shop-open','map-open','prototype-mechanic-open','game-settings-open','game-defeat'];
+  const WORLD_PAUSE_CLASSES=['lair-open','map-open','prototype-mechanic-open','game-settings-open','game-defeat'];
   let worldPauseState=null;
   function isWorldPaused(){
     return document.hidden || WORLD_PAUSE_CLASSES.some(name=>document.body.classList.contains(name));
@@ -37,7 +37,6 @@
     iron:{name:'Железная',breakChance:.30,saveChance:.30},
     diamond:{name:'Алмазная',breakChance:.20,saveChance:.50}
   };
-  const SHOP_PRICES={iron:3000,diamond:10000,pouch4:4500,pouch5:9000};
   const PICK_SKINS=[null,
     'assets/picks/pick_01.webp',
     'assets/picks/pick_02.webp',
@@ -58,13 +57,12 @@
   let pickProgress=loadPickProgress();
   if(pickProgress.equipped==='iron'&&!pickProgress.iron) pickProgress.equipped='wood';
   if(pickProgress.equipped==='diamond'&&!pickProgress.diamond) pickProgress.equipped=pickProgress.iron?'iron':'wood';
-  let pickType=pickProgress.equipped, pickCapacity=pickProgress.capacity, shopOpen=false;
+  let pickType=pickProgress.equipped, pickCapacity=pickProgress.capacity;
   let mapOpen=false, mapMoving=false;
   const MAP_LOCATIONS={
-    lair:{name:'Логово',x:20,y:68,text:'Точка старта. Здесь находится база команды.',action:'lair'},
-    shop:{name:'Лавка отмычек',x:49,y:55,text:'Здесь можно покупать материалы, внешний вид и увеличивать запас отмычек.',action:'shop'}
+    lair:{name:'Логово',x:20,y:68,text:'Точка старта. Здесь находится база команды.',action:'lair'}
   };
-  const MAP_CONNECTIONS={lair:['shop'],shop:['lair']};
+  const MAP_CONNECTIONS={lair:[]};
   let mapLocation=MAP_LOCATIONS[STORE.getItem('lockpickMapLocation')]?STORE.getItem('lockpickMapLocation'):'lair';
   let lairOpen=false;
   const LAIR_CHARACTERS={
@@ -84,23 +82,22 @@
     ],
     sai:[
       {label:'Слухи',text:'В старом квартале много закрытых мастерских. В верхнем городе замки лучше, но и добыча заметно выше.'},
-      {label:'Районы',text:'Пока безопасный маршрут только между логовом и лавкой. Остальные направления стоит сначала изучить.'},
+      {label:'Районы',text:'Доступные цели отмечены на карте. Перед вылазкой стоит оценить сложность замка и путь отхода.'},
       {label:'Что анализировать',text:'Смотри на три вещи: сложность замков, ценность целей и насколько понятен путь отхода.'}
     ],
     tik:[
       {label:'Инструменты',text:'Дешёвые отмычки подходят для тренировки. Хороший металл имеет смысл беречь для сложных механизмов.'},
-      {label:'Лавка',text:'Лавка рядом — удобно. Сначала увеличил бы запас, потом уже собирал дорогие варианты.'},
+      {label:'Снаряжение',text:'Текущий набор инструментов временный. Перед следующей вылазкой стоит проверить запас отмычек.'},
       {label:'Новые замки',text:'Если найдём незнакомый механизм, тащи сведения сюда. Разберём его как отдельную схему.'}
     ]
   };
   const LAIR_INTEL_INFO={
     lair:{name:'Логово',risk:'Низкий',locks:'Тренировочные',loot:'Нет',notes:['База команды и точка старта.','Здесь безопасно менять персонажа и обсуждать планы.','Полная информация собрана.']},
-    shop:{name:'Лавка отмычек',risk:'Низкий',locks:'Нет',loot:'Снаряжение',notes:['Доступный маршрут от логова.','Можно покупать и улучшать отмычки.','Полная информация собрана.']},
     old:{name:'Старый квартал',risk:'Средний',locks:'Средние',loot:'Средняя',notes:['Район закрыт, известны только общие слухи.','Много мастерских и подсобных помещений.','Известны основные типы целей и подходы.']},
     upper:{name:'Верхний город',risk:'Высокий',locks:'Сложные',loot:'Высокая',notes:['Район закрыт, сведений мало.','Богатые дома и более сложные механизмы.','Известны ключевые точки и уровень охраны.']},
     port:{name:'Порт',risk:'Средний',locks:'Разные',loot:'Высокая',notes:['Район закрыт, сведений мало.','Склады дают много разных типов замков.','Известны основные склады и время активности.']}
   };
-  let lairIntel={lair:3,shop:3,old:0,upper:0,port:0};
+  let lairIntel={lair:3,old:0,upper:0,port:0};
   try{
     const savedIntel=JSON.parse(STORE.getItem('lockpickLairIntel')||'null');
     if(savedIntel && typeof savedIntel==='object'){
@@ -120,17 +117,12 @@
         $objectiveLine=document.querySelector('#objectiveLine'),
         $mapTab=document.querySelector('#mapTab'),
         $coinBalance=document.querySelector('#coinBalance'), $runReward=document.querySelector('#runReward'), $rewardBox=document.querySelector('#rewardBox'),
-        $shopTab=document.querySelector('#shopTab'), $shopOverlay=document.querySelector('#shopOverlay'), $shopClose=document.querySelector('#shopClose'), $shopBalance=document.querySelector('#shopBalance'),
         $worldMapScreen=document.querySelector('#worldMapScreen'), $worldMapCanvas=document.querySelector('#worldMapCanvas'), $mapPlayer=document.querySelector('#mapPlayer'), $mapCurrentName=document.querySelector('#mapCurrentName'), $mapInfoTitle=document.querySelector('#mapInfoTitle'), $mapInfoText=document.querySelector('#mapInfoText'), $mapLocationAction=document.querySelector('#mapLocationAction'),
         $lairOverlay=document.querySelector('#lairOverlay'), $lairSceneCharacters=document.querySelector('#lairSceneCharacters'), $lairModuleWindow=document.querySelector('#lairModuleWindow'), $lairModuleTitle=document.querySelector('#lairModuleTitle'), $lairModuleClose=document.querySelector('#lairModuleClose'), $lairCharacters=document.querySelector('#lairCharacters'), $lairDialoguePeople=document.querySelector('#lairDialoguePeople'), $lairDialogueSpeaker=document.querySelector('#lairDialogueSpeaker'), $lairDialogueText=document.querySelector('#lairDialogueText'), $lairDialogueTopics=document.querySelector('#lairDialogueTopics'), $lairIntelGrid=document.querySelector('#lairIntelGrid'), $lairIntelDetail=document.querySelector('#lairIntelDetail'),
-        $pickSkinGrid=document.querySelector('#pickSkinGrid'), $pickSkinMain=document.querySelector('#pickSkinMain'), $tensionSkinGrid=document.querySelector('#tensionSkinGrid'), $tensionSkinMain=document.querySelector('#tensionSkinMain'),
         $hillsfarMode=document.querySelector('#hillsfarMode'), $hfTryArea=document.querySelector('#hfTryArea'), $hfLockCut=document.querySelector('#hfLockCut'), $hfCandidates=document.querySelector('#hfCandidates'),
         $massMode=document.querySelector('#massMode'), $massRings=document.querySelector('#massRings'), $massCenter=document.querySelector('#massCenter'), $massCenterText=document.querySelector('#massCenterText'),
         $g1Mode=document.querySelector('#g1Mode'), $g1ProgressRow=document.querySelector('#g1ProgressRow'),
         $skMode=document.querySelector('#skMode'), $skBoard=document.querySelector('#skBoard'), $skTorqueButton=document.querySelector('#skTorqueButton'), $skFeedbackText=document.querySelector('#skFeedbackText'),
-        $shopWood=document.querySelector('#shopWood'), $shopIron=document.querySelector('#shopIron'), $shopDiamond=document.querySelector('#shopDiamond'),
-        $woodAction=document.querySelector('#woodAction'), $ironAction=document.querySelector('#ironAction'), $diamondAction=document.querySelector('#diamondAction'),
-        $pouchTitle=document.querySelector('#pouchTitle'), $pouchBuy=document.querySelector('#pouchBuy'),
         $anMode=document.querySelector('#anMode'), $anUnlock=document.querySelector('#anUnlock'), $anReadout=document.querySelector('#anReadout'), $anActionLabel=document.querySelector('#anActionLabel'), $anSelectedHint=document.querySelector('#anSelectedHint'),
         $tensionMode=document.querySelector('#tensionMode'), $tnGauge=document.querySelector('#tnGauge'), $tnBand=document.querySelector('#tnBand'), $tnNeedle=document.querySelector('#tnNeedle'), $tnPins=document.querySelector('#tnPins'), $tnMessage=document.querySelector('#tnMessage'),
         $resonanceMode=document.querySelector('#resonanceMode'), $rsLanes=document.querySelector('#rsLanes'),
@@ -188,7 +180,7 @@
   const ALL_MODES=new Set(GameCatalog.nativeIds);
 
   const DIFFICULTY_STORAGE_KEY='lockpickModeDifficulty';
-  const DEFAULT_MODE_DIFFICULTY=Object.freeze({classic:1,target:1,line:1,sequence:1,special:1,hillsfar:1,mass:1,g1:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,heatcold:1,drum:1,scope:1,oblivion:1,watchmen:1,museum:1,mass2:1,pipeline:1,wharf:1,thiefds:1,kingdomcome:1,thief12:1,fallout:1,anachlab:1,masshack:1,pathologic:1,bioshock2:1,alphaprotocol:1});
+  const DEFAULT_MODE_DIFFICULTY=Object.freeze({classic:1,sequence:1,special:1,hillsfar:1,mass:1,g1:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,heatcold:1,drum:1,scope:1,oblivion:1,watchmen:1,museum:1,mass2:1,pipeline:1,wharf:1,thiefds:1,kingdomcome:1,thief12:1,fallout:1,anachlab:1,masshack:1,pathologic:1,bioshock2:1,alphaprotocol:1});
   function loadModeDifficulty(){
     try{
       const saved=JSON.parse(STORE.getItem(DIFFICULTY_STORAGE_KEY)||'{}');
@@ -214,7 +206,6 @@
     if(modeName!==mode || !regenerate) return;
     if(lairOpen) closeLair();
     if(mapOpen) closeMap(false);
-    if(shopOpen) closeShop();
     requestAnimationFrame(()=>newLock(false));
   }
 
@@ -272,6 +263,15 @@
     'assets/pins/gold/gold_pin_10.png'
   ];
   const GOLD_PIN_SKIN_NAMES=['gold_pin_01.png','gold_pin_02.png','gold_pin_03.png','gold_pin_04.png','gold_pin_05.png','gold_pin_06.png','gold_pin_07.png','gold_pin_08.png','gold_pin_09.png','gold_pin_10.png'];
+  const GAME_PIN_SKINS=[
+    'assets/pins/location/pin_01.png',
+    'assets/pins/location/pin_02.png',
+    'assets/pins/location/pin_03.png',
+    'assets/pins/location/pin_04.png',
+    'assets/pins/location/pin_05.png'
+  ];
+  const GAME_PIN_SKIN_NAMES=['pin_01.png','pin_02.png','pin_03.png','pin_04.png','pin_05.png'];
+  const GAME_PIN_MODES=new Set(['deduction','oblivion','watchmen','wharf','alphaprotocol']);
   const TENSION_SKINS=[null,
     'assets/tensions/tension_01.webp',
     'assets/tensions/tension_02.webp',
@@ -284,7 +284,7 @@
   const PLATE_SKIN_NAMES=['plate_01.png','plate_02.png','plate_03.png','plate_04.png'];
   const PLATE_HOLE_Y=[0.41711230,0.44547872,0.47406417,0.49202128,0.52032086];
   const PLATE_HOLE_X=[150.5,275,399.5,524.5,649,773.5,898].map(x=>x/1054);
-  let roundPinSkin=0, roundPlateSkin=0, currentPinLevel=1;
+  let roundPinSkin=0, roundGamePinSkin=0, roundPlateSkin=0, currentPinLevel=1;
   function pinSkinPoolForLevel(level=currentPinLevel){ return level===2 ? GOLD_PIN_SKINS : PIN_SKINS; }
   function pinNamePoolForLevel(level=currentPinLevel){ return level===2 ? GOLD_PIN_SKIN_NAMES : PIN_SKIN_NAMES; }
   function chooseRoundPinSkin(){
@@ -293,9 +293,18 @@
     roundPinSkin=rand(0,Math.max(0,pool.length-1));
     updateMechanismAssetHud();
   }
+  function chooseGamePinSkin(){
+    roundGamePinSkin=rand(0,GAME_PIN_SKINS.length-1);
+    updateMechanismAssetHud();
+  }
   function chooseRoundPlateSkin(){ roundPlateSkin=rand(0,Math.max(0,Math.min(ACTIVE_PLATE_SKIN_COUNT,PLATE_SKINS.length)-1)); }
   function currentPinSkin(){ const pool=pinSkinPoolForLevel(); return pool[roundPinSkin] || pool[0] || ''; }
-  function currentPinName(){ const pool=pinNamePoolForLevel(); return pool[roundPinSkin] || pool[0] || '—'; }
+  function currentGamePinSkin(){ return GAME_PIN_SKINS[roundGamePinSkin] || GAME_PIN_SKINS[0]; }
+  function currentPinName(){
+    if(GAME_PIN_MODES.has(mode)) return GAME_PIN_SKIN_NAMES[roundGamePinSkin] || GAME_PIN_SKIN_NAMES[0];
+    const pool=pinNamePoolForLevel();
+    return pool[roundPinSkin] || pool[0] || '—';
+  }
   function currentPlateName(){ return PLATE_SKIN_NAMES[Math.min(roundPlateSkin||0,ACTIVE_PLATE_SKIN_COUNT-1)] || 'plate_01.png'; }
   function currentPlateSkin(){ return PLATE_SKINS[Math.min(roundPlateSkin||0,ACTIVE_PLATE_SKIN_COUNT-1)] || PLATE_SKINS[0]; }
   function currentPlateHoleY(){ return PLATE_HOLE_Y[Math.min(roundPlateSkin||0,ACTIVE_PLATE_SKIN_COUNT-1)] ?? .47; }

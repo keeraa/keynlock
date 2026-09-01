@@ -52,7 +52,7 @@
     });
   }
   function tryOpenResonance(){
-    if(shopOpen||solved) return;
+    if(solved) return;
     if(!rsReady){SFX.wrongLock();toast('Сначала зафиксируй все штифты');return;}
     solved=true;SFX.open();renderResonance();setTimeout(()=>celebrate(),420);
   }

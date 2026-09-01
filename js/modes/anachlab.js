@@ -88,7 +88,7 @@
   }
 
   function tryOpenAnachLab(){
-    if(shopOpen || solved || alabFailed) return;
+    if(solved || alabFailed) return;
     registerMove();
     if(alabCorrect() && alabAllChecked()){
       solved=true;

@@ -56,12 +56,13 @@
 .apPin.ready .apGroove{ background:#302819; border-color:#efd38b; }
 .apShaft{
   position:absolute;
-  left:25%;
-  right:25%;
+  left:37%;
+  right:37%;
   height:52%;
   top:var(--y,24%);
-  background:linear-gradient(90deg,#6d705f,#a29c82,#656858);
-  border-radius:5px;
+  background-position:center;
+  background-size:contain;
+  background-repeat:no-repeat;
   transition:top .05s;
   overflow:visible;
   z-index:1;

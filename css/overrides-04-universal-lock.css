@@ -111,7 +111,6 @@ body.importedMode .cpTarget,body.importedMode .cpBuild{padding-inline:6px!import
 body.importedMode .cpBuildCanvas{width:96%!important;}
 body.importedMode .cpParts{justify-content:flex-start!important;overflow-x:auto!important;overflow-y:hidden!important;gap:5px!important;padding-bottom:5px!important;-webkit-overflow-scrolling:touch;}
 body.importedMode .cpPart{min-width:82px!important;}
-body.shop-open .topRightHud{display:none!important;}
 .worldMapScreen{padding:calc(var(--mobile-safe-top) + 14px) 10px calc(var(--mobile-safe-bottom) + 14px)!important;gap:10px!important;}
 .worldMapCurrent{font-size:10px!important;text-align:right!important;}
 .worldMapCanvas{min-height:min(56dvh,420px)!important;border-radius:12px!important;}
@@ -140,13 +139,6 @@ body.shop-open .topRightHud{display:none!important;}
 .lairDialoguePeople{flex-direction:row!important;overflow-x:auto!important;}
 .lairPersonBtn{min-width:142px!important;}
 .lairIntelGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important;}
-.shopOverlay{z-index:420!important;padding:calc(var(--mobile-safe-top) + 8px) 8px calc(var(--mobile-safe-bottom) + 8px)!important;}
-.shopPanel{width:100%!important;max-height:100%!important;padding:13px!important;border-radius:12px!important;}
-.shopGrid{grid-template-columns:1fr!important;gap:8px!important;}
-.shopCard{min-height:124px!important;padding:12px!important;}
-.shopPouch{align-items:flex-start!important;flex-direction:column!important;gap:10px!important;}
-.shopBuy{min-height:42px!important;width:100%!important;}
-.pickSkinGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important;}
 }
 @media (max-width:760px) and (max-height:620px) and (orientation:portrait){
 :root{--template-lock-top:calc(var(--mobile-safe-top) + 86px);--template-lock-scale:.35;--template-puzzle-top:calc(var(--mobile-safe-top) + 268px);--template-puzzle-bottom:calc(var(--mobile-safe-bottom) + 43px);--mobile-hud-size:37px;}
@@ -190,71 +182,11 @@ body.mode-hillsfar .hfCandidate{min-height:56px!important;}
 /* Was eight opaque gold shadows ringing the plate plus a glow — a neon outline.
    A single soft halo is enough to say "selected". */
 .plate.selected .plateFace{filter:drop-shadow(0 0 2px rgba(241,191,91,.30)) drop-shadow(0 0 7px rgba(241,191,91,.16));}
-.skinPreviewMain{padding:10px 10px 8px!important;}
-#pickSkinMain .pickSkinPreview{transform:rotate(90deg) scale(1.40)!important;transform-origin:50% 50%!important;}
-#tensionSkinMain .pickSkinPreview{transform:none!important;transform-origin:50% 50%!important;}
-#pickSkinMain .pickSkinLabel,#tensionSkinMain .pickSkinLabel{font-size:16px!important;line-height:1.05!important;}
-.pickSkinGrid{gap:8px!important;}
-.pickSkinCard{height:136px!important;padding:8px 4px 7px!important;}
-.pickSkinCard .pickSkinPreview{width:58px!important;height:104px!important;}
-.pickSkinLabel{font-size:11px!important;}
-#pickSkinMain .pickSkinPreview{animation-name:previewSwayPickHorizontal!important;}
-#tensionSkinMain .pickSkinPreview{animation-name:previewSwayTensionHorizontal!important;}
-@keyframes previewSwayPickHorizontal{
-0%,100%{transform: rotate(90deg) scale(1.40) translateY(0);}
-50%{transform: rotate(90deg) scale(1.40) translateY(-2px);}
-}
-@keyframes previewSwayTensionHorizontal{
-0%,100%{transform: translateY(0) rotate(0deg);}
-50%{transform: translateY(-2px) rotate(0.8deg);}
-}
-@media (max-width:720px){
-.skinPreviewMain{min-height:128px!important;padding:8px 8px 6px!important;}
-#pickSkinMain .pickSkinPreview{width:74px!important;height:128px!important;transform:rotate(90deg) scale(1.24)!important;margin:8px 0 10px!important;}
-#tensionSkinMain .pickSkinPreview{width:188px!important;height:72px!important;}
-.pickSkinGrid{grid-template-columns:repeat(3,minmax(0,1fr))!important;}
-.pickSkinCard{height:112px!important;}
-.pickSkinCard .pickSkinPreview{width:42px!important;height:78px!important;}
-.pickSkinCard[data-kind="tension"] .pickSkinPreview{width:74px!important;height:28px!important;}
-}
-body.game-inactive.shop-open::after,body.game-inactive.lair-open::after,body.game-inactive.map-open::after{display:none;}
+body.game-inactive.lair-open::after,body.game-inactive.map-open::after{display:none;}
 .topRightHud{z-index:360!important;}
 .mechanismZone::before,.sharedModeLockArt::before{top:-28px!important;}
 .mechanismZone.opening::before,.sharedModeLockArt.opening::before{animation:keynlockShackleOpenFast 950ms cubic-bezier(.20,.76,.18,1) forwards!important;}
 .mechanismZone.opened::before,.sharedModeLockArt.opened::before{transform:translateX(-50%) translateY(-40%) rotate(-14deg)!important;}
-.skinPreviewMain{min-height:172px!important;height:172px!important;justify-content:center!important;gap:8px!important;overflow:hidden!important;}
-#pickSkinMain,#tensionSkinMain{min-height:172px!important;height:172px!important;}
-#pickSkinMain{position:relative!important;width:50%!important;max-width:320px!important;margin-inline:auto!important;}
-#pickSkinMain .pickSkinPreview,#tensionSkinMain .pickSkinPreview{filter:drop-shadow(0 6px 12px rgba(0,0,0,.42)) drop-shadow(0 0 10px rgba(236,192,96,.12));}
-#pickSkinMain .pickSkinPreview{width:96px!important;height:164px!important;margin:8px 0 10px!important;animation:v159PickShowcase 4.4s ease-in-out infinite, v159Glow 2.8s ease-in-out infinite!important;}
-#tensionSkinMain .pickSkinPreview{width:448px!important;height:132px!important;margin:4px 0 8px!important;animation:v159TensionShowcase 4.4s ease-in-out infinite, v159Glow 2.8s ease-in-out infinite!important;}
-#pickSkinMain .pickSkinLabel,#tensionSkinMain .pickSkinLabel{margin-top:auto!important;text-align:center!important;}
-#pickSkinMain .pickSkinLabel{position:absolute!important;left:8px!important;right:8px!important;bottom:10px!important;margin:0!important;z-index:3!important;font-size:16px!important;line-height:1.05!important;}
-@keyframes v159Glow{
-0%,100%{filter: drop-shadow(0 6px 12px rgba(0,0,0,.42)) drop-shadow(0 0 8px rgba(236,192,96,.10));opacity: .96;}
-50%{filter: drop-shadow(0 8px 14px rgba(0,0,0,.48)) drop-shadow(0 0 15px rgba(236,192,96,.22));opacity: 1;}
-}
-@keyframes v159PickShowcase{
-0%,100%{transform: rotate(90deg) scale(1.36) translateY(0);}
-50%{transform: rotate(90deg) scale(1.36) translateY(-2px) rotate(.001deg);}
-}
-@keyframes v159TensionShowcase{
-0%,100%{transform: translateY(0) rotate(0deg) scale(1.05);}
-50%{transform: translateY(-2px) rotate(.8deg) scale(1.05);}
-}
-.pickSkinGrid{grid-template-columns:repeat(5,minmax(0,1fr))!important;}
-.pickSkinCard{overflow:hidden!important;}
-.pickSkinCard[data-kind="tension"]{overflow:hidden!important;}
-.pickSkinCard[data-kind="tension"] .pickSkinPreview{width:46px!important;height:76px!important;max-width:54px!important;max-height:76px!important;transform:rotate(90deg) scale(.88)!important;transform-origin:50% 50%!important;margin:4px 0 8px!important;}
-@media (max-width:760px),(max-height:560px) and (orientation:landscape){
-.topRightHud .economyHud{grid-template-columns:repeat(3,var(--mobile-hud-size))!important;}
-#pickSkinMain,#tensionSkinMain,.skinPreviewMain{min-height:146px!important;height:146px!important;}
-#pickSkinMain{width:100%!important;max-width:none!important;}
-#pickSkinMain .pickSkinPreview{width:76px!important;height:132px!important;transform:rotate(90deg) scale(1.20)!important;}
-#pickSkinMain .pickSkinLabel{position:absolute!important;left:6px!important;right:6px!important;bottom:8px!important;font-size:13px!important;}
-#tensionSkinMain .pickSkinPreview{width:356px!important;height:108px!important;}
-.pickSkinCard[data-kind="tension"] .pickSkinPreview{width:46px!important;height:68px!important;max-width:46px!important;max-height:68px!important;}
-}
 
 /* The round reward and the balance report numbers; they are not buttons, so
    they carry no frame. They also read as a pair, so they sit on one line and

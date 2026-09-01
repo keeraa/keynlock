@@ -14,7 +14,7 @@ body #challengeHud #objectiveLine.challengeObjective.difficulty{position:absolut
 .challengeTimer[data-level="danger"] .challengeTimerTrack>span{background:#e58468;}
 .challengeReward.drop{animation:rewardDrop 240ms ease;}
 body.inventory-open .challengeStatus{opacity:0;transform:translateX(-50%) translateY(8px);visibility:hidden;}
-body.lair-open .challengeHud,body.shop-open .challengeHud,body.map-open .challengeHud,body.alchemy-open .challengeHud,body.collection-open .challengeHud,body.game-settings-open .challengeHud{display:none!important;}
+body.lair-open .challengeHud,body.map-open .challengeHud,body.alchemy-open .challengeHud,body.collection-open .challengeHud,body.game-settings-open .challengeHud{display:none!important;}
 body.game-inactive .challengeHud{filter:brightness(.58) saturate(.62);}
 
 @media (max-width:1100px){

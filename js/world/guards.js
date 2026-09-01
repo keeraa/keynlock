@@ -25,7 +25,7 @@
   }
 
   function noiseActive(){
-    return !!GameCatalog.feature(noiseGameId(),'world.noise') && !shopOpen && !lairOpen && !mapOpen;
+    return !!GameCatalog.feature(noiseGameId(),'world.noise') && !lairOpen && !mapOpen;
   }
 
   function guardsActive(){

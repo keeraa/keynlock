@@ -39,7 +39,7 @@ function ptgHit(i){
   renderPathologic();
 }
 function tryOpenPathologic(){
-  if(shopOpen||solved) return;
+  if(solved) return;
   registerMove();
   if(ptgCanLock()){
     solved=true; ptgV=[0,0];

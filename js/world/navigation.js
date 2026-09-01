@@ -17,7 +17,6 @@
 
   function openMap(){
     setInventoryOpen(false);
-    if(shopOpen) closeShop();
     mapReturnToLair=lairOpen;
     if(lairOpen) closeLair();
     mapOpen=true;
@@ -46,8 +45,7 @@
   function arriveAtLocation(id){
     const loc=MAP_LOCATIONS[id];
     if(!loc) return;
-    if(loc.action==='shop') openShop();
-    else if(loc.action==='lair') openLair();
+    if(loc.action==='lair') openLair();
     else if(loc.action==='mission') window.startMapMission?.(id);
   }
 
@@ -84,15 +82,12 @@
     },1180);
   }
 
-  function openShop(){ setInventoryOpen(false); if(mapOpen) closeMap(false); shopOpen=true; document.body.classList.add('shop-open'); $toast.classList.remove('show','actionable'); updateShopUI(); $shopOverlay.classList.add('open'); }
-  function closeShop(){ shopOpen=false; document.body.classList.remove('shop-open'); $shopOverlay.classList.remove('open'); updatePickUI(); }
   let modeSwitchFrame=0;
   function switchMode(nextMode,forceRestart=false){
     if(!ALL_MODES.has(nextMode)) return;
     window.dispatchEvent(new CustomEvent('keynlock-game-opened',{detail:{id:nextMode}}));
     if(lairOpen) closeLair();
     if(mapOpen) closeMap(false);
-    if(shopOpen) closeShop();
     if(!forceRestart && mode===nextMode && !solved && !document.body.classList.contains('game-inactive')) return;
     mode=nextMode;
     syncModePanels(mode);
@@ -104,42 +99,4 @@
       if(mode!==requestedMode) return;
       newLock(false);
     });
-  }
-
-  function spend(cost){
-    if(balance<cost){ toast('Не хватает монет'); return false; }
-    balance-=cost;
-    STORE.setItem('lockpickBalance',String(balance));
-    updateEconomyUI();
-    return true;
-  }
-
-  function buyOrEquipPick(type){
-    if(ownsPick(type)){
-      pickType=type;
-      savePickProgress();
-      updatePickUI();
-      updateShopUI();
-      return;
-    }
-    const cost=SHOP_PRICES[type];
-    if(!spend(cost)) return;
-    pickProgress[type]=true;
-    pickType=type;
-    savePickProgress();
-    updatePickUI();
-    updateShopUI();
-    toast(`${PICK_TYPES[type].name} отмычка куплена`);
-  }
-
-  function buyPouch(){
-    if(pickCapacity>=5) return;
-    const cost=pickCapacity===3?SHOP_PRICES.pouch4:SHOP_PRICES.pouch5;
-    if(!spend(cost)) return;
-    pickCapacity++;
-    picks=Math.min(pickCapacity,picks+1);
-    savePickProgress();
-    updatePickUI();
-    updateShopUI();
-    toast(`Запас увеличен до ${pickCapacity}`);
   }

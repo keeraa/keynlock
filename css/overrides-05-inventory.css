@@ -58,7 +58,7 @@ body.pick-reforming .mechanismZone .pick,body.pick-reforming .sharedModeLockArt 
 .inventoryAvatar span{margin-top:28px;width:94px;height:94px;border-radius:50%;display:grid;place-items:center;color:#ead6a6;background:#181515;font:700 48px/1 Georgia,serif;}
 body:not(.inventory-open) #objectiveLine.difficulty{bottom:48px!important;}
 body.inventory-open #objectiveLine.difficulty{opacity:0!important;pointer-events:none!important;}
-body.shop-open .inventoryDrawer,body.lair-open .inventoryDrawer,body.map-open .inventoryDrawer{opacity:0;pointer-events:none;transform:translate(calc(-50% + var(--inv-shift-x)),calc(100% + 24px));}
+body.lair-open .inventoryDrawer,body.map-open .inventoryDrawer{opacity:0;pointer-events:none;transform:translate(calc(-50% + var(--inv-shift-x)),calc(100% + 24px));}
 body.game-inactive .inventoryDrawer{filter:saturate(.6) brightness(.76);pointer-events:none;}
 @media (max-width:960px){
 .inventoryDrawer{--inv-peek:48px;width:min(92vw,calc(100vw - 28px));max-width:calc(100vw - 28px);}

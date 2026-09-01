@@ -51,27 +51,26 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   border-right:1px solid rgba(0,0,0,.45);
   cursor:pointer;
 }
-.wfBar:before{
-  content:"";
+.wfPin{
   position:absolute;
-  left:20%;
-  right:20%;
+  left:50%;
   bottom:12px;
   height:var(--bar-h,72%);
-  border:2px solid #71664f;
-  border-radius:8px 8px 3px 3px;
-  background:linear-gradient(90deg,#433a2b,#a48d62 48%,#63543d);
+  width:auto;
+  max-width:62%;
+  object-fit:fill;
+  transform:translateX(-50%);
   transition:transform .18s ease,filter .18s ease;
+  filter:drop-shadow(0 4px 5px rgba(0,0,0,.45));
+  pointer-events:none;
 }
-.wfBar.open:before{
-  transform:translateY(-36%);
+.wfBar.open .wfPin{
+  transform:translate(-50%,-36%);
   filter:brightness(1.18);
-  border-color:#8ca768;
 }
-.wfBar.wrong:before{
-  transform:translateY(-7%);
+.wfBar.wrong .wfPin{
+  transform:translate(-50%,-7%);
   filter:brightness(1.08);
-  border-color:#d0b171;
 }
 .wfBar.current{box-shadow:inset 0 -3px 0 #d8b871;}
 .wfBar.current:after{

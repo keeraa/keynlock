@@ -3,7 +3,7 @@
   let kdVals=[2,2,2,2,2], kdTarget=[2,2,2,2,2], kdSelected=0, kdTests=0, kdFailures=0, kdLogs=[], kdReady=false, kdToothCount=5;
   function renderDeduction(){
     if(!$kdKey) return;
-    const pinSkin=currentPinSkin();
+    const pinSkin=currentGamePinSkin();
     const frag=document.createDocumentFragment();
     kdVals.forEach((v,i)=>{
       const t=document.createElement('div');
@@ -21,6 +21,7 @@
   }
   function startDeductionRound(){
     solved=false;picks=pickCapacity;moves=0;brokenPicks=0;runReward=1000;
+    chooseGamePinSkin();
     kdToothCount=diffStep(4,5,6,'deduction');
     const maxTooth=diffStep(3,4,4,'deduction');
     kdVals=Array.from({length:kdToothCount},()=>2);kdTarget=Array.from({length:kdToothCount},()=>rand(0,maxTooth));kdSelected=0;kdTests=0;kdFailures=0;kdLogs=[];kdReady=false;
@@ -60,7 +61,7 @@
     } else renderDeduction();
   }
   function tryOpenDeduction(){
-    if(shopOpen||solved) return;
+    if(solved) return;
     if(!kdReady){SFX.wrongLock();toast('Сначала восстанови профиль ключа');return;}
     solved=true;SFX.open();renderDeduction();setTimeout(()=>celebrate(),420);
   }

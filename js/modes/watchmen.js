@@ -62,6 +62,7 @@
   }
 
   function startWatchmenRound(){
+    chooseGamePinSkin();
     solved=false;
     $lock.classList.remove('win');
     $mechanism.classList.remove('ready','opening','opened');
@@ -83,7 +84,7 @@
         const s=document.createElement('div');
         s.className='wmSlot';
         s.dataset.i=i;
-        s.innerHTML='<div class="wmSpring"></div><div class="wmTarget"></div><div class="wmPin"></div>';
+        s.innerHTML=`<div class="wmSpring"></div><div class="wmTarget"></div><img class="wmPin" src="${currentGamePinSkin()}" alt="">`;
         s.style.setProperty('--wm-target',p.target.toFixed(1));
         s.addEventListener('click',()=>{
           if(solved) return;
@@ -99,12 +100,14 @@
     const scale=wmApplyGeometry();
     wmPins.forEach((p,i)=>{
       const s=wmPinEls[i];
+      const pin=s.querySelector('.wmPin');
+      if(pin && pin.getAttribute('src')!==currentGamePinSkin()) pin.src=currentGamePinSkin();
       if(!s) return;
       s.style.setProperty('--wm-target',p.target.toFixed(1));
       s.classList.toggle('selected',i===wmSelected);
       s.classList.toggle('locked',p.locked);
       s.classList.toggle('lockable',!solved && wmCanLock(i));
-      s.querySelector('.wmPin').style.setProperty('--wm-rise',(p.h*scale).toFixed(1));
+      pin.style.setProperty('--wm-rise',(p.h*scale).toFixed(1));
     });
     if($wmTimerBar) $wmTimerBar.style.width=Math.max(0,wmTimeLeft/wmTimeMax*100)+'%';
     const n=wmPins.filter(p=>p.locked).length;
@@ -201,7 +204,7 @@
   }
 
   function tryOpenWatchmen(){
-    if(shopOpen || solved) return;
+    if(solved) return;
     if(!wmPins.length || !wmPins.every(p=>p.locked)){
       SFX.wrongLock();
       toast('Сначала зафиксируй все тумблеры');

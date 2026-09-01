@@ -179,7 +179,7 @@
   }
 
   function tryOpenMass2(){
-    if(shopOpen || solved || m2Matched.size<m2Nodes.length) return;
+    if(solved || m2Matched.size<m2Nodes.length) return;
     solved=true;
     $lock.classList.add('win');
     SFX.open();

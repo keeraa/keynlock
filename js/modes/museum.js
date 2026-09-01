@@ -158,7 +158,7 @@
   }
 
   function tryOpenMuseum(){
-    if(shopOpen || solved || hmStep<hmSeq.length) return;
+    if(solved || hmStep<hmSeq.length) return;
     solved=true;
     $lock.classList.add('win');
     SFX.open();

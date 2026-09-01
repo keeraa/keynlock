@@ -151,7 +151,7 @@
   }
 
   function tryOpenFallout(){
-    if(shopOpen || solved) return;
+    if(solved) return;
     toast('Найди угол и держи верное направление — замок откроется сам');
   }
 

@@ -5,7 +5,7 @@ Browser lockpicking puzzle game. v253 adds a repeatable local verification workf
 - `index.html` — KEYNLOCK entry point
 - `css/` — modular CSS
 - `js/core/` — shared runtime
-- `js/world/` — inventory, lair, map/navigation and shop
+- `js/world/` — inventory, lair, map/navigation and missions
 - `js/modes/` — puzzle mechanics
 - `assets/` — active artwork
 - `scripts/serve.mjs` — dependency-free local static server

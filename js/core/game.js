@@ -61,7 +61,6 @@
   }
 
   function restartCurrentRound(){
-    if(shopOpen) closeShop();
     if(lairOpen) closeLair();
     if(mapOpen) closeMap(false);
     newLock(false);
@@ -111,8 +110,9 @@
   }
 
   function goalMet(){
-    if(mode==='classic' || mode==='special') return state.every(v=>v===GOAL);
-    if(mode==='target' || mode==='sequence') return state.every((v,i)=>v===targets[i]);
+    if(mode==='classic') return state.every(v=>v===goalLine);
+    if(mode==='special') return state.every(v=>v===GOAL);
+    if(mode==='sequence') return state.every((v,i)=>v===targets[i]);
     return state.every(v=>v===goalLine);
   }
 function stateKey(s){ return s.join(''); }

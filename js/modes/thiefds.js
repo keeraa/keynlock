@@ -217,7 +217,7 @@
   }
 
   function tryOpenThiefDs(){
-    if(shopOpen || solved) return;
+    if(solved) return;
     if(tdsFailed || tdsStep<3){
       SFX.wrongLock();
       toast('Сначала выставь все три кольца');

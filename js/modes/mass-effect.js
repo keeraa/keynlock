@@ -109,7 +109,7 @@
   }
 
   function tryOpenMass(){
-    if(shopOpen || solved) return;
+    if(solved) return;
     if(!meRings.every(massRingSolved)){
       SFX.wrongLock();
       damagePick({

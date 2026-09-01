@@ -14,7 +14,7 @@ h1,h2,h3,
 .worldMapInfoTitle,.mapNodeLabel,
 .gameSettingsTitle,.digitalTitle,.solvedPuzzleTitle,.assetNameGame{font-family:var(--title-font)!important;}
 
-.shopCardName,.pickSkinLabel,.collectionRowLabel,
+.collectionRowLabel,
 .challengeMetricLabel,.hudBadgeLabel,.lairSceneKicker,.gameSettingsKicker,.digitalKicker,
 .solvedPuzzleKicker,.g1ProgressTitle,.anActionLabel,.tnGaugeLabels,.cpSectionTitle,
 .hcHistoryTitle,.mapChapterCaption{font-family:var(--accent-font)!important;font-weight:400!important;}

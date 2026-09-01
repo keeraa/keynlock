@@ -89,7 +89,7 @@ function bioStop(){
   }
 }
 function tryOpenBioshock2(){
-  if(shopOpen||solved) return;
+  if(solved) return;
   toast('Останови стрелку на зелёной зоне все 5 этапов — дрон взломается сам');
 }
 function bioTick(dt){

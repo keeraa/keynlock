@@ -60,22 +60,19 @@ body.importedMode .puzzleArea>.modePanel.obMode:not([hidden]){padding-bottom:cal
 }
 .obPin{
   position:absolute;
-  left:20%;
-  right:20%;
+  left:50%;
   bottom:19px;
   height:var(--ob-pin-h,124px);
-  border:2px solid #71664f;
-  border-radius:8px 8px 3px 3px;
-  background:linear-gradient(90deg,#433a2b,#a48d62 48%,#63543d);
-  transform:translateY(calc(-1px * var(--rise,0)));
+  width:auto;
+  object-fit:contain;
+  transform:translate(-50%,calc(-1px * var(--rise,0)));
   will-change:transform;
+  filter:drop-shadow(0 4px 5px rgba(0,0,0,.45));
 }
 .obSlot.ready:before{box-shadow:0 0 0 1px #d8b871,0 0 9px rgba(216,184,113,.38);}
-.obSlot.ready .obPin{border-color:#d3b66f;box-shadow:0 0 8px rgba(216,184,113,.28);}
+.obSlot.ready .obPin{filter:brightness(1.16) drop-shadow(0 0 8px rgba(216,184,113,.38));}
 .obSlot.set .obPin{
-  background:linear-gradient(90deg,#435238,#8eaa6e 48%,#566c45);
-  border-color:#78945e;
-  box-shadow:0 0 12px rgba(135,188,99,.25);
+  filter:sepia(.18) hue-rotate(42deg) brightness(1.12) drop-shadow(0 0 10px rgba(135,188,99,.3));
 }
 /* Same gold glow as Классика's .plate.selected (css/base.css) — copied
    rgba values rather than the class itself, since that class is styled

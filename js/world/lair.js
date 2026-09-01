@@ -197,7 +197,7 @@
   function renderLairIntel(){
     if(!$lairIntelGrid) return;
     $lairIntelGrid.innerHTML='';
-    ['lair','shop','old','upper','port'].forEach(id=>{
+    ['lair','old','upper','port'].forEach(id=>{
       const info=LAIR_INTEL_INFO[id];
       const level=lairIntel[id]||0;
       const card=document.createElement('button');
@@ -222,7 +222,6 @@
   function openLair(){
     setInventoryOpen(false);
     if(mapLocation!=='lair' || !$lairOverlay) return;
-    if(shopOpen) closeShop();
     if(mapOpen){
       mapOpen=false;
       document.body.classList.remove('map-open');
@@ -252,7 +251,6 @@
   }
 
   function openLairFromHud(){
-    if(shopOpen) closeShop();
     if(mapOpen){
       mapOpen=false;
       document.body.classList.remove('map-open');

@@ -133,7 +133,7 @@
   }
 
   function applySwipe(dir,target){
-    if(solved || shopOpen || mapOpen || lairOpen) return;
+    if(solved || mapOpen || lairOpen) return;
     if(useDigitalSwipe(dir,target)) return;
 
     const plate=target?.closest?.('.plate');
@@ -152,7 +152,7 @@
 
     scene.addEventListener('pointerdown',e=>{
       if(!mobileQuery.matches || e.pointerType!=='touch') return;
-      if(e.target.closest('.topRightHud,.inventoryDrawer,.worldMapScreen,.lairOverlay,.shopOverlay,.skBoard,.tnGauge')) return;
+      if(e.target.closest('.topRightHud,.inventoryDrawer,.worldMapScreen,.lairOverlay,.skBoard,.tnGauge')) return;
       gesture={id:e.pointerId,x:e.clientX,y:e.clientY,target:e.target};
     },{passive:true});
 
@@ -300,7 +300,7 @@
   const tensionLabels=[null,'Bar','Hook','Kink','Wave','Angle'];
   const typeOrder=['bar','hook','kink','wave','angle'];
   const typeBySkin={1:'bar',2:'hook',3:'kink',4:'wave',5:'angle'};
-  const typedTensionModes=new Set(['classic','target','line','sequence','special','g1']);
+  const typedTensionModes=new Set(['classic','sequence','special','g1']);
 
   TENSION_SKINS.splice(0,TENSION_SKINS.length,...tensionSkins);
   TENSION_SKIN_LABELS.splice(0,TENSION_SKIN_LABELS.length,...tensionLabels);
@@ -414,7 +414,7 @@
 
   function guardOpen(fn){
     return function(...args){
-      if(shopOpen || solved) return fn.apply(this,args);
+      if(solved) return fn.apply(this,args);
       if(forceWrongTensionBreak()) return;
       return fn.apply(this,args);
     };
@@ -432,14 +432,13 @@
   // Capture them so the same guard still applies to their dedicated controls.
   document.addEventListener('click',e=>{
     if(!e.target.closest('#massCenter,#skTorqueButton')) return;
-    if(shopOpen || solved || tensionCompatible()) return;
+    if(solved || tensionCompatible()) return;
     e.preventDefault();
     e.stopImmediatePropagation();
     forceWrongTensionBreak();
   },true);
 
   applyTensionSkin();
-  updateTensionSkinShop();
   renderInventoryTools();
   chooseRoundPlateSkin();
   rebuildPlates();

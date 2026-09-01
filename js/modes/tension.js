@@ -51,7 +51,7 @@
     renderTension();
   }
   function tryOpenTension(){
-    if(shopOpen||solved) return;
+    if(solved) return;
     if(!tnReady){ SFX.wrongLock(); toast('Сначала выставь все штифты'); return; }
     solved=true; SFX.open(); renderTension(); setTimeout(()=>celebrate(),420);
   }

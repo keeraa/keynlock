@@ -18,7 +18,6 @@
 .mapNode.accessible:hover .mapNodeDot{transform:translate(-50%,-50%) scale(1.14);border-color:#d6ab5e;}
 .mapNode.accessible{color:#d1b783;}
 .mapNode.current .mapNodeDot{border-color:#f0c86e;background:#a9772f;box-shadow:0 0 0 5px rgba(217,167,76,.12),0 0 19px rgba(226,178,81,.26);}
-.mapNode .shopDot:after{content:"";position:absolute;inset:4px;border:1px solid #e5bf72;transform:rotate(45deg);}
 .mapNode.locked{cursor:not-allowed;opacity:.45;}
 .mapNodeLock{display:block;margin-top:3px;color:#665b4a;font-size:9px;letter-spacing:.08em;text-transform:uppercase;}
 .mapPlayer{position:absolute;left:var(--mx);top:var(--my);width:18px;height:18px;transform:translate(-50%,-50%);pointer-events:none;z-index:12;transition:left 1.16s cubic-bezier(.2,.8,.25,1),top 1.16s cubic-bezier(.2,.8,.25,1);}
@@ -34,7 +33,6 @@
 .worldMapCanvas{min-height:330px;}
 .mapNode{min-width:92px;font-size:11px;}
 }
-#shopTab[hidden]{display:none!important;}
 #mapLocationAction{display:none!important;}
 .lairOverlay{position:fixed;inset:0;z-index:160;display:none;}
 .lairOverlay.open{display:block;}
@@ -105,7 +103,7 @@
     var(--lair-bg, none) center center/cover no-repeat!important;overflow:hidden;}
 
 /* Map labels sit on light parchment, so they need their own dark plate rather
-   than a text shadow. Every node gets it — the lair and the shop read the same
+   than a text shadow. Every node gets the same
    as the games. These are prefixed with the canvas id because this file loads
    before overrides-03-lair and overrides-06-digital, which both restyle nodes. */
 #worldMapCanvas .mapNodeLabel{display:inline-block;padding:3px 8px;border:1px solid rgba(122,95,52,.55);border-radius:8px;background:rgba(22,17,12,.88);color:#e6d2a6;font:600 13px/1.25 Arial,sans-serif;letter-spacing:.025em;text-transform:uppercase;box-shadow:0 2px 6px rgba(0,0,0,.45);text-shadow:none;white-space:nowrap;}

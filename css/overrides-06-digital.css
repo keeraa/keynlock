@@ -99,7 +99,7 @@ body.importedMode .kdPanel{border:0!important;box-shadow:none!important;}
 body.importedMode .kdKey{overflow:hidden!important;}
 body.importedMode .kdTooth{height:162px!important;}
 body.importedMode .kdBar{height:116px!important;overflow:hidden!important;}
-body.importedMode .kdPinImg{left:50%!important;bottom:calc((var(--h) - 4) * 21px)!important;transform:translateX(-50%) scaleX(1.55)!important;clip-path:inset(0 0 34px 0)!important;}
+body.importedMode .kdPinImg{left:50%!important;bottom:calc((var(--h) - 4) * 21px)!important;transform:translateX(-50%)!important;clip-path:none!important;}
 body.importedMode .kdControls{bottom:8px!important;}
 body.importedMode .kdFeedback{white-space:normal!important;}
 @media (max-width:900px){

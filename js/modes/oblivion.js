@@ -38,6 +38,7 @@
   }
 
   function startOblivionRound(){
+    chooseGamePinSkin();
     solved=false;
     $lock.classList.remove('win');
     $mechanism.classList.remove('ready','opening','opened');
@@ -69,7 +70,7 @@
         const s=document.createElement('div');
         s.className='obSlot';
         s.dataset.i=i;
-        s.innerHTML='<div class="obPin"></div>';
+        s.innerHTML=`<img class="obPin" src="${currentGamePinSkin()}" alt="">`;
         s.querySelector('.obPin').style.setProperty('--ob-pin-h',p.pinH.toFixed(1)+'px');
         s.addEventListener('click',()=>{
           if(solved) return;
@@ -88,6 +89,7 @@
       const s=obPinEls[i];
       if(!s) return;
       const pin=s.querySelector('.obPin');
+      if(pin && pin.getAttribute('src')!==currentGamePinSkin()) pin.src=currentGamePinSkin();
       pin?.style.setProperty('--ob-pin-h',p.pinH.toFixed(1)+'px');
       const ready=!p.set && !solved && p.state==='pause' && Math.abs(p.rise-p.apex)<.5;
       s.classList.toggle('set',p.set);
@@ -175,7 +177,7 @@
   }
 
   function tryOpenOblivion(){
-    if(shopOpen || solved) return;
+    if(solved) return;
     if(!obPins.length || !obPins.every(p=>p.set)){
       SFX.wrongLock();
       toast('Сначала выставь все штифты');

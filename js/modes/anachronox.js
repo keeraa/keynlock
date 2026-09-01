@@ -75,7 +75,7 @@
   }
 
   function tryOpenAn(){
-    if(shopOpen || solved) return;
+    if(solved) return;
     if(!anSolved()){
       SFX.wrongLock();
       damagePick({
@@ -111,4 +111,3 @@
     attemptOpen:tryOpenAn
   });
 })();
-

@@ -254,7 +254,7 @@
   }
 
   function tryOpenComposite(){
-    if(shopOpen||solved) return;
+    if(solved) return;
     cpReady=cpMatchesTarget();
 
     if(!cpReady){

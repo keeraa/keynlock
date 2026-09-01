@@ -39,7 +39,7 @@ const modes = split('css/modes.css', 'modes', [
 ]);
 
 const worldText = read('css/world.css');
-const world = 'css/world-01-shop-shared.css';
+const world = 'css/world-01-shared.css';
 write(world, worldText);
 unlinkSync('css/world.css');
 
@@ -90,7 +90,7 @@ const checkAnchor = "const scripts = localAttributeRefs(html, 'script', 'src');\
 assert(check.split(checkAnchor).length - 1 === 1, 'check.mjs script-order anchor not found exactly once');
 const expectedScripts = [
   'js/core/state.js','js/core/audio.js','js/core/ui.js',
-  'js/world/inventory.js','js/world/lair.js','js/world/navigation-shop.js',
+  'js/world/inventory.js','js/world/lair.js','js/world/navigation.js',
   'js/core/digital-helpers.js','js/modes/heat-cold.js','js/modes/drum.js','js/modes/oscilloscope.js',
   'js/core/game.js','js/modes/mass-effect.js','js/modes/anachronox.js','js/modes/composite.js',
   'js/modes/tension.js','js/modes/resonance.js','js/modes/deduction.js','js/modes/skyrim.js',
@@ -108,7 +108,7 @@ delete pkg.scripts['upgrade:v254'];
 write('package.json', JSON.stringify(pkg, null, 2) + '\n');
 write('VERSION', '254\n');
 
-write('css/README.md', `# KEYNLOCK CSS architecture\n\nv254 preserves the v253 cascade while splitting large stylesheets into contiguous chronological fragments. File order in index.html is significant.\n\n- base.css — foundation, HUD and classic-lock base styles\n- modes-01 … modes-06 — Hillsfar, Mass Effect, Gothic 1, Skyrim and Anachronox base sections\n- world-01-shop-shared.css — shop plus shared early imported-mode overrides\n- overrides-* — later tools/shared, map, lair, universal-lock, inventory, digital and workbench sections\n- mobile.css — final mobile layer and must remain last\n\nAll fragments stay directly in css/, so existing relative asset paths remain valid. Selectors are never regrouped across their original cascade positions.\n`);
+write('css/README.md', `# KEYNLOCK CSS architecture\n\nv254 preserves the v253 cascade while splitting large stylesheets into contiguous chronological fragments. File order in index.html is significant.\n\n- base.css — foundation, HUD and classic-lock base styles\n- modes-01 … modes-06 — Hillsfar, Mass Effect, Gothic 1, Skyrim and Anachronox base sections\n- world-01-shared.css — shared early imported-mode overrides\n- overrides-* — later tools/shared, map, lair, universal-lock, inventory, digital and workbench sections\n- mobile.css — final mobile layer and must remain last\n\nAll fragments stay directly in css/, so existing relative asset paths remain valid. Selectors are never regrouped across their original cascade positions.\n`);
 
 console.log(`KEYNLOCK upgraded to v254. ${orderedCss.length} CSS files are now loaded in cascade order.`);
 console.log('Next: npm run check && npm run smoke && npm run dev');

@@ -1,5 +1,5 @@
   // ===== BASE / SPECIAL LOCKS =====
-  const BASE_MODE_IDS=new Set(['classic','target','line','sequence','special']);
+  const BASE_MODE_IDS=new Set(['classic','sequence','special']);
   function buildSpecialLinks(type){
     links=Array.from({length:n},()=>Array(n).fill(0));
 
@@ -53,7 +53,7 @@
   }
 let plateEls=[], pinTopPlateEls=[];
   function plateMouseSteeringActive(){
-    return mode==='classic'||mode==='target'||mode==='line'||mode==='sequence'||mode==='special';
+    return mode==='classic'||mode==='sequence'||mode==='special';
   }
 
   function rebuildPlates(){
@@ -70,7 +70,6 @@ let plateEls=[], pinTopPlateEls=[];
     state.forEach((pos,i)=>{
       const p=document.createElement('div');
       p.className='plate';
-      if(mode==='target') p.classList.add('mode-target');
       p.dataset.index=i;
       p.setAttribute('role','button');
       p.setAttribute('tabindex','0');
@@ -112,18 +111,14 @@ let plateEls=[], pinTopPlateEls=[];
       face.className='plateFace';
       face.style.backgroundImage=plateImage;
 
-      const target=document.createElement('div');
-      target.className='target';
-
       const idx=document.createElement('div');
       idx.className='index';
       idx.textContent=String(i+1).padStart(2,'0');
 
-      p.append(pin,face,target,idx);
+      p.append(pin,face,idx);
       p._pin=pin;
       p._pinTop=pinTop;
       p._pinTopPlate=pinTopPlate;
-      p._target=target;
       p._pinState=null;
       p.addEventListener('pointerdown',e=>e.preventDefault());
       p.addEventListener('mousedown',e=>e.preventDefault());
@@ -163,8 +158,9 @@ let plateEls=[], pinTopPlateEls=[];
   }
 
   function targetLineFor(i){
-    if(mode==='classic' || mode==='special') return GOAL;
-    if(mode==='target' || mode==='sequence') return targets[i] || GOAL;
+    if(mode==='classic') return goalLine;
+    if(mode==='special') return GOAL;
+    if(mode==='sequence') return targets[i] || GOAL;
     return goalLine;
   }
 
@@ -217,32 +213,22 @@ let plateEls=[], pinTopPlateEls=[];
     if(!p) return;
     const isSelected = i===selected;
     const codeSolved = mode==='sequence' && goalMet();
-    const isSolved = (mode==='classic' || mode==='special') ? state[i]===GOAL : (mode==='target' ? state[i]===targets[i] : (mode==='line' ? state[i]===goalLine : codeSolved));
+    const isSolved = mode==='classic' ? state[i]===goalLine : (mode==='special' ? state[i]===GOAL : codeSolved);
     p.classList.toggle('selected',isSelected);
     p.classList.toggle('solved',isSolved);
-    p.classList.toggle('mode-target', mode==='target');
     if(p._pinTopPlate){
       p._pinTopPlate.classList.toggle('selected',isSelected);
       p._pinTopPlate.classList.toggle('solved',isSolved);
     }
     p.style.zIndex = 20 + i;
-    if(p._target){
-      const tx = pinXForState((targets[i]||1)) - 8;
-      p._target.style.transform = `translate3d(${tx.toFixed(2)}px,0,0)`;
-      p._target.style.opacity = mode==='target' ? '1' : '0';
-    }
     animatePinTo(p,state[i]);
   }
 
   function startBaseLock(modeId){
     if(modeId==='classic'){
-      goalLine=GOAL; targets=[]; makeLinks();
-      state=generateLinkedPuzzle(GOAL,diffStep(6,8,11),diffStep(9,12,15));
-    }else if(modeId==='target'){
-      goalLine=GOAL; links=[];
-      makeSmartTargetModeStart(diffStep(6,8,12),diffStep(10,14,18));
-    }else if(modeId==='line'){
-      targets=[]; goalLine=shuffle([2,3,5,6])[0]; makeLinks();
+      const classicLevel=getModeDifficulty('classic');
+      goalLine=classicLevel===3 ? shuffle([2,3,5,6])[0] : GOAL;
+      targets=[]; makeLinks();
       state=generateLinkedPuzzle(goalLine,diffStep(6,8,11),diffStep(9,12,15));
     }else if(modeId==='sequence'){
       goalLine=GOAL; links=[];
@@ -268,7 +254,7 @@ let plateEls=[], pinTopPlateEls=[];
     $lock.classList.remove('win');
     $mechanism.classList.remove('ready','opening','opened');
     const baseDifficulty = getModeDifficulty(mode);
-    n=((mode==='classic' || mode==='target' || mode==='line' || mode==='sequence' || mode==='special') && baseDifficulty===1) ? 4 : 5;
+    n=((mode==='classic' || mode==='sequence' || mode==='special') && baseDifficulty===1) ? 4 : 5;
     window.LockShell?.syncMode(mode,{rows:n});
     selected=0; solved=false; picks=pickCapacity; moves=0; brokenPicks=0; runReward=1000;
 
@@ -335,7 +321,7 @@ let plateEls=[], pinTopPlateEls=[];
   function moveBase(dir){
     if(solved) return;
     nudgeTools();
-    if(mode==='classic' || mode==='line' || mode==='special'){
+    if(mode==='classic' || mode==='special'){
       if(!legal(state,selected,dir)){SFX.blocked();failMove();return}
       state=applyRaw(state,selected,dir);
       registerMove();
@@ -366,7 +352,7 @@ let plateEls=[], pinTopPlateEls=[];
   }
 
   function handleUniversalLockClick(){
-    if(shopOpen || solved) return;
+    if(solved) return;
     const solvedBefore = solved;
     GameActions.attemptOpen({modeId:mode,source:'universal-lock'});
     if(!solved && !solvedBefore) shakeUniversalLock();
@@ -377,7 +363,7 @@ let plateEls=[], pinTopPlateEls=[];
   }
 
   function tryOpenBaseLock(){
-    if(solved || shopOpen) return;
+    if(solved) return;
 
     if(!goalMet()){
       $mechanism.classList.remove('ready');
@@ -417,9 +403,7 @@ let plateEls=[], pinTopPlateEls=[];
   }
 
   const baseModeDefinitions={
-    classic:{restartMessage:'Новый замок',objective:()=>`ПОДНЯТЬ ВСЕ ШТИФТЫ · ${generatedDistance} ХОДОВ МИНИМУМ`},
-    target:{restartMessage:'Новая цель',objective:()=>`СОВМЕСТИТЬ ШТЫРИ С СИНИМИ МЕТКАМИ · ${generatedDistance} ХОДОВ МИНИМУМ`},
-    line:{restartMessage:()=>`Новая линия: ${goalLine}`,objective:()=>`ВЫСТРОИТЬ ВСЕ ШТИФТЫ ПО ЛИНИИ ${goalLine} · ${generatedDistance} ХОДОВ МИНИМУМ`},
+    classic:{restartMessage:()=>getModeDifficulty('classic')===3?`Новая линия: ${goalLine}`:'Новый замок',objective:()=>getModeDifficulty('classic')===3?`ВЫСТРОИТЬ ВСЕ ШТИФТЫ ПО ЛИНИИ ${goalLine} · ${generatedDistance} ХОДОВ МИНИМУМ`:`ПОДНЯТЬ ВСЕ ШТИФТЫ · ${generatedDistance} ХОДОВ МИНИМУМ`},
     sequence:{restartMessage:()=>`Новый код: ${targets.join(', ')}`,objective:()=>`КОД: ${targets.join(', ')} · ${generatedDistance} ХОДОВ МИНИМУМ`},
     special:{restartMessage:()=>`Особый замок: ${specialTypeName()}`,objective:()=>`${specialTypeName().toUpperCase()} ОСОБЫЙ ЗАМОК · ${generatedDistance} ХОДОВ МИНИМУМ`}
   };
@@ -440,8 +424,6 @@ let plateEls=[], pinTopPlateEls=[];
      may wrap those functions later without leaving stale registrations. */
   GameActions.registerOpeners({
     classic:()=>PuzzleModes.call('classic','attemptOpen'),
-    target:()=>PuzzleModes.call('target','attemptOpen'),
-    line:()=>PuzzleModes.call('line','attemptOpen'),
     sequence:()=>PuzzleModes.call('sequence','attemptOpen'),
     special:()=>PuzzleModes.call('special','attemptOpen'),
     tension:()=>PuzzleModes.call('tension','attemptOpen'),

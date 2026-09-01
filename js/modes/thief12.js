@@ -150,7 +150,7 @@
   }
 
   function tryOpenThief12(){
-    if(shopOpen || solved) return;
+    if(solved) return;
     toast('Удерживай подходящий профиль до конца — дверь откроется сама');
   }
 

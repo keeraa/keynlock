@@ -24,7 +24,7 @@
 
 /* Use one smooth easing language across all interactive UI. */
 :where(
-  button,[role="button"],.tab,.hudNavBtn,.shopCard,.pickSkinCard,
+  button,[role="button"],.tab,.hudNavBtn,
   .inventoryTool,.lairCharacter,.lairPersonBtn,.lairTopic,.lairIntelCard,
   .hcStepBtn,.digitalMiniBtn,.digitalBtn,.digitalWheel button,.anBtn,.cpPart
 ){
@@ -60,15 +60,8 @@
 
 /* Panels / drawers / overlays use a slightly softer curve. */
 .inventoryDrawer,.solvedPuzzleOverlay,
-.lairModuleWindow,.lairSceneCharacter,.worldMapDialog,.shopPanel{
+.lairModuleWindow,.lairSceneCharacter,.worldMapDialog{
   transition-timing-function:var(--motion-ease-soft) !important;
-}
-
-/* Keep continuous showcase movement smooth rather than stepping at endpoints. */
-.skinPreviewMain .pickSkinPreview,
-#pickSkinMain .pickSkinPreview,
-#tensionSkinMain .pickSkinPreview{
-  animation-timing-function:ease-in-out !important;
 }
 
 /* GPU/compositor hints for parallax layers. */

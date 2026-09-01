@@ -85,7 +85,7 @@ function hackCollapseReachedCore(now){
   return hackBlocks.some(b=>hackCollapseRadius(b,now,m)<=12);
 }
 function tryOpenMassHack(){
-  if(shopOpen||solved) return;
+  if(solved) return;
   if(hackRing!==0){
     SFX.wrongLock();
     toast('Сначала доберись до ядра');

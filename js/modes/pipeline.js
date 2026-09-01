@@ -428,7 +428,7 @@
   }
 
   function tryOpenPipeline(){
-    if(shopOpen || solved) return;
+    if(solved) return;
     plState='won';
     plPos=null;
     solved=true;

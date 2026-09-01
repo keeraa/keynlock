@@ -41,17 +41,7 @@
     if(coinIcon) coinIcon.innerHTML=tablerIcon('coin',16);
     const headerPickIcon=document.querySelector('.headerPickIcon');
     if(headerPickIcon) headerPickIcon.innerHTML=tablerIcon('key',18);
-    if($shopClose) $shopClose.innerHTML=tablerIcon('x',20);
     if($toastAction) $toastAction.innerHTML=`${tablerIcon('refresh',16)}<span>Новый замок</span>`;
-
-    const woodName=$shopWood?.querySelector('.shopCardName');
-    const ironName=$shopIron?.querySelector('.shopCardName');
-    const diamondName=$shopDiamond?.querySelector('.shopCardName');
-    if(woodName) woodName.innerHTML=`${tablerIcon('tree',18)}<span>Деревянная</span>`;
-    if(ironName) ironName.innerHTML=`${tablerIcon('hammer',18)}<span>Железная</span>`;
-    if(diamondName) diamondName.innerHTML=`${tablerIcon('diamond',18)}<span>Алмазная</span>`;
-    const pouchName=document.querySelector('#pouchTitle');
-    if(pouchName) pouchName.dataset.iconReady='1';
 
     document.querySelectorAll('.anBtn.anUp').forEach(b=>b.innerHTML=tablerIcon('up',18));
     document.querySelectorAll('.anBtn.anDown').forEach(b=>b.innerHTML=tablerIcon('down',18));
@@ -72,7 +62,7 @@
   },true);
 
   function gameplayInputBlocked(){
-    return shopOpen || mapOpen || lairOpen || document.body.classList.contains('game-inactive');
+    return mapOpen || lairOpen || document.body.classList.contains('game-inactive');
   }
 
   function input(k){
@@ -275,11 +265,6 @@
   addEventListener('keydown',e=>{
     if(!gameplayInputBlocked()&&e.code==='Enter'&&PuzzleModes.action(mode,'secondary')) e.preventDefault();
   });
-  document.querySelector('#shopHudButton')?.addEventListener('click',()=>{
-    if(lairOpen) closeLair();
-    if(mapOpen) closeMap(false);
-    openShop();
-  });
   document.querySelector('#lairHudButton')?.addEventListener('click',openLairFromHud);
   document.querySelector('#newPuzzleButton')?.addEventListener('click',restartCurrentRound);
   $mapTab.onclick=openMap;
@@ -308,16 +293,8 @@
   document.querySelector('#alchemyTopHudClose')?.addEventListener('click',closeLairModule);
   document.querySelector('#collectionTopHudClose')?.addEventListener('click',closeLairModule);
 
-  if($shopTab) $shopTab.onclick=null;
-  $shopClose.onclick=closeShop;
-  $shopOverlay.addEventListener('pointerdown',e=>{ if(e.target===$shopOverlay) closeShop(); });
-  $shopWood.onclick=()=>buyOrEquipPick('wood');
-  $shopIron.onclick=()=>buyOrEquipPick('iron');
-  $shopDiamond.onclick=()=>buyOrEquipPick('diamond');
-  $pouchBuy.onclick=buyPouch;
   addEventListener('keydown',e=>{
     if(e.code!=='Escape') return;
-    if(shopOpen){ e.preventDefault(); closeShop(); return; }
     const workbenchModal=document.querySelector('#lairWorkbenchModal');
     if(lairOpen && workbenchModal && !workbenchModal.hidden){ e.preventDefault(); closeLairWorkbench(); return; }
     if(lairOpen && $lairModuleWindow && !$lairModuleWindow.hidden){ e.preventDefault(); closeLairModule(); return; }
@@ -330,14 +307,11 @@
   // the #bootLoader overlay covering/blurring everything until then.
   function bootGame(){
     applyTensionSkin();
-    initPickSkinShop();
-    initTensionSkinShop();
     initInventoryDrawer();
     applyTablerIcons();
     updateModeUI();
     updateEconomyUI();
     updatePickUI();
-    updateShopUI();
     newLock(false);
     openLairFromHud();
   }

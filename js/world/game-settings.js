@@ -196,7 +196,6 @@
     function openGameSettings(){
       if(!screen)return;
       settingsReturnToLair=lairOpen;
-      if(shopOpen)closeShop();
       if(lairOpen)closeLair();
       if(mapOpen)closeMap(false);
       document.body.classList.add('game-settings-open');

@@ -10,7 +10,7 @@
 
   const MISSION_TIERS = [1, 2, 3];
   const MISSION_SYMBOLS = {
-    classic:'⇅', target:'◎', line:'━', sequence:'ⅠⅡ', special:'✦', hillsfar:'✣',
+    classic:'⇅', sequence:'ⅠⅡ', special:'✦', hillsfar:'✣',
     mass:'⌁', g1:'⛓', skyrim:'✧', anach:'⧖', tension:'∠', resonance:'≋',
     deduction:'◇', composite:'⛓', heatcold:'◐', drum:'⚙', scope:'∿', oblivion:'⊙',
     watchmen:'⌚', museum:'⚿', mass2:'⬡', pipeline:'┣', wharf:'↕', thiefds:'⌁',
@@ -21,8 +21,6 @@
   // Position is the only thing authored per game; labels come from the catalog.
   const MISSION_PLACES = [
     { mode: 'classic',   x: 28, y: 62 },
-    { mode: 'target',    x: 22, y: 50 },
-    { mode: 'line',      x: 30, y: 38 },
     { mode: 'sequence',  x: 38, y: 30 },
     { mode: 'special',   x: 34, y: 47 },
     { mode: 'hillsfar',  x: 26, y: 28 },
@@ -120,7 +118,6 @@
     if(!gameSupportsTier(loc.mode,mapChapter)){toast(`${loc.name}: уровень ${mapChapter} ещё не готов`);return;}
 
     if (lairOpen) closeLair();
-    if (shopOpen) closeShop();
     if (mapOpen) {
       mapOpen = false;
       document.body.classList.remove('map-open');

@@ -28,6 +28,7 @@
   }
 
   function startWharfRound(){
+    chooseGamePinSkin();
     solved=false;
     $lock.classList.remove('win');
     $mechanism.classList.remove('ready','opening','opened');
@@ -35,7 +36,7 @@
     moves=0;
     brokenPicks=0;
     runReward=1000;
-    wfBarCount=diffStep(4,6,8,'wharf');
+    wfBarCount=diffStep(5,6,7,'wharf');
     wfPos=0;
     wfStep=0;
     wfWrong=-1;
@@ -56,6 +57,7 @@
         const b=document.createElement('div');
         b.className='wfBar';
         b.style.setProperty('--bar-h',(48+Math.random()*43)+'%');
+        b.innerHTML=`<img class="wfPin" src="${currentGamePinSkin()}" alt="">`;
         b.addEventListener('click',()=>{
           if(solved) return;
           wfPos=i;
@@ -68,6 +70,8 @@
     }
     const opened=wfSequence.slice(0,wfStep);
     wfBarEls.forEach((b,i)=>{
+      const pin=b.querySelector('.wfPin');
+      if(pin && pin.getAttribute('src')!==currentGamePinSkin()) pin.src=currentGamePinSkin();
       b.classList.toggle('current', i===wfPos);
       b.classList.toggle('open', opened.includes(i));
       b.classList.toggle('wrong', i===wfWrong);
@@ -123,7 +127,7 @@
   }
 
   function tryOpenWharf(){
-    if(shopOpen || solved) return;
+    if(solved) return;
     if(wfStep<wfBarCount){
       SFX.wrongLock();
       toast('Сначала пройди все задвижки по порядку');

@@ -59,7 +59,7 @@
   }
 
   function g1Press(dir){
-    if(shopOpen || solved) return;
+    if(solved) return;
     const expected = g1Sequence[g1Input.length];
     registerMove();
     if(dir === expected){
@@ -79,7 +79,7 @@
   }
 
   function tryOpenG1(auto=false){
-    if(shopOpen || solved) return;
+    if(solved) return;
     const ready = g1Input.length === g1Length && g1Input.every((v,i)=>v===g1Sequence[i]);
     if(!ready){
       if(!auto){

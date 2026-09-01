@@ -183,7 +183,7 @@ function hillsfarPattern(len=6){
   }
 
   function tryOpenHillsfar(){
-    if(shopOpen || solved) return;
+    if(solved) return;
     if(hfSelected<0){
       SFX.wrongLock();
       toast('Сначала выбери ключ');

@@ -165,7 +165,7 @@
   }
 
   function tryOpenKingdomCome(){
-    if(shopOpen || solved) return;
+    if(solved) return;
     toast('Удерживай отмычку в рабочей точке, пока замок не откроется сам');
   }
 

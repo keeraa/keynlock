@@ -32,7 +32,7 @@
   html,body,.app,.main,.scene{max-width:100vw!important;}
   .scene{padding-left:0!important;padding-right:0!important;}
   .inventoryDrawer{width:min(96vw,calc(100vw - 16px))!important;max-width:calc(100vw - 16px)!important;}
-  .shopPanel,.lairPanel{width:min(100%,calc(100vw - 16px))!important;max-width:calc(100vw - 16px)!important;box-sizing:border-box!important;}
+  .lairPanel{width:min(100%,calc(100vw - 16px))!important;max-width:calc(100vw - 16px)!important;box-sizing:border-box!important;}
 }
 @media (max-width:390px) and (orientation:portrait){
   :root{--mobile-hud-size:38px;}
@@ -133,7 +133,6 @@ body.importedMode .pinTopLayer{display:none!important;}
     --inv-peek:34px!important;
     --inv-open-y:7%!important;
   }
-  body.shop-open .inventoryDrawer,
   body.lair-open .inventoryDrawer,
   body.map-open .inventoryDrawer{
     max-width:none!important;

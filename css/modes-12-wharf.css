@@ -24,7 +24,7 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
 }
 .wfLock{
   width:min(650px,100%);
-  height:min(42vh,420px);
+  height:min(58vh,560px);
   flex:0 1 auto;
   position:relative;
   border:0;
@@ -51,14 +51,14 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
 .wfPinRig{
   position:absolute;
   left:50%;
-  top:0;
+  top:calc(clamp(90px,18vh,170px) * var(--spring-rest,1) - 4px);
   bottom:auto;
   height:clamp(180px,32vh,380px);
   width:calc(clamp(180px,32vh,380px) * .248);
   max-width:none;
   z-index:1;
-  transform:translate(-50%,calc(-1 * var(--pin-depth,0%)));
-  transition:transform .22s ease,filter .18s ease;
+  transform:translateX(-50%);
+  transition:top .3s cubic-bezier(.2,.75,.25,1),transform .18s ease,filter .18s ease;
   filter:drop-shadow(0 4px 5px rgba(0,0,0,.45));
   pointer-events:none;
 }
@@ -73,11 +73,12 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
 .wfSpring{
   position:absolute;
   left:50%;
-  top:calc(100% - 4px);
+  top:0;
   width:100%;
-  height:clamp(90px,18vh,170px);
+  height:calc(clamp(90px,18vh,170px) * var(--spring-rest,1));
   transform:translateX(-50%);
   z-index:1;
+  transition:height .3s cubic-bezier(.2,.75,.25,1),filter .2s ease;
 }
 .wfSpring img{
   position:absolute;
@@ -85,22 +86,24 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   top:0;
   width:auto;
   max-width:100%;
+  height:100%;
   object-fit:contain;
   object-position:top center;
   transform:translateX(-50%);
   transform-origin:top center;
-  transition:opacity .16s ease,filter .22s ease;
+  transition:opacity .24s ease,filter .22s ease;
 }
-.wfSpringIdle{height:clamp(90px,18vh,170px);opacity:0;}
-.wfSpringCompressed{height:clamp(48px,9vh,82px);opacity:1;}
+.wfSpringIdle{opacity:1;}
+.wfSpringCompressed{opacity:0;}
 .wfBar.open .wfPinRig{
-  transform:translate(-50%,calc(-1 * (var(--pin-depth,0%) + 22%)));
+  top:calc(clamp(48px,9vh,82px) - 4px);
   filter:brightness(1.18);
 }
-.wfBar.open .wfSpringIdle{opacity:1;}
-.wfBar.open .wfSpringCompressed{opacity:0;}
+.wfBar.open .wfSpring{height:clamp(48px,9vh,82px);filter:brightness(1.08);}
+.wfBar.open .wfSpringIdle{opacity:0;}
+.wfBar.open .wfSpringCompressed{opacity:1;}
 .wfBar.wrong .wfPinRig{
-  transform:translate(-50%,calc(-1 * var(--pin-depth,0%) + 3%));
+  transform:translate(-50%,3%);
   filter:brightness(1.08);
 }
 .wfBar.current{filter:drop-shadow(0 0 8px rgba(216,184,113,.24));}
@@ -108,13 +111,14 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   content:"▲";
   position:absolute;
   left:50%;
-  top:calc(clamp(180px,32vh,380px) + 8px);
+  top:calc(clamp(90px,18vh,170px) * var(--spring-rest,1) + clamp(180px,32vh,380px) + 8px);
   bottom:auto;
   transform:translateX(-50%);
   color:#d8b871;
   font-size:min(3.4cqw,13px);
   z-index:3;
 }
+.wfBar.current.open:after{top:calc(clamp(48px,9vh,82px) + clamp(180px,32vh,380px) + 8px);}
 
 .wfHelp{
   flex:none;
@@ -126,8 +130,9 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
 .wfHelp:empty{display:none;}
 
 @media (max-width:650px){
-  .wfLock{height:min(38vh,300px);}
+  .wfLock{height:min(58vh,360px);}
   .wfPinRig{height:clamp(140px,28vh,260px);width:calc(clamp(140px,28vh,260px) * .248);}
   .wfBar{flex-basis:58px;width:58px;max-width:58px;}
-  .wfBar.current:after{top:calc(clamp(140px,28vh,260px) + 6px);}
+  .wfBar.current:after{top:calc(clamp(90px,18vh,170px) * var(--spring-rest,1) + clamp(140px,28vh,260px) + 6px);}
+  .wfBar.current.open:after{top:calc(clamp(48px,9vh,82px) + clamp(140px,28vh,260px) + 6px);}
 }

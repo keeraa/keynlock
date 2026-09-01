@@ -57,15 +57,15 @@
         const b=document.createElement('div');
         b.className='wfBar';
         const spring=String(1+Math.floor(Math.random()*6)).padStart(2,'0');
-        // Every pin keeps its real dimensions. Different apparent lengths
-        // come from how deeply the lower part sits inside the mechanism.
-        b.style.setProperty('--pin-depth',(4+Math.random()*38).toFixed(1)+'%');
-        b.innerHTML=`<div class="wfPinRig">
-          <img class="wfPin" src="${currentGamePinSkin()}" alt="">
-          <span class="wfSpring" aria-hidden="true">
+        // The spring is fixed to the top of its channel. Its resting length
+        // sets the pin position; raising the pin compresses the spring.
+        b.style.setProperty('--spring-rest',(0.72+Math.random()*0.36).toFixed(2));
+        b.innerHTML=`<span class="wfSpring" aria-hidden="true">
             <img class="wfSpringIdle" src="assets/springs/spring_idle_${spring}.png" alt="">
             <img class="wfSpringCompressed" src="assets/springs/spring_compressed_${spring}.png" alt="">
           </span>
+          <div class="wfPinRig">
+            <img class="wfPin" src="${currentGamePinSkin()}" alt="">
         </div>`;
         b.addEventListener('click',()=>{
           if(solved) return;

@@ -12,8 +12,8 @@
 body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:calc(16px + var(--reward-clear,0px))!important;}
 
 /* No fixed height: .wfLockWrap fills whatever room #puzzleArea actually
-   gives it. Pins always keep one physical size; a moving lower sleeve masks
-   part of each image to show how deeply it is seated in the mechanism. */
+   gives it. Pins always keep one physical size and slide as whole images
+   inside hidden vertical channels, so their rounded tips remain visible. */
 .wfLockWrap{
   flex:1 1 auto;
   min-height:0;
@@ -31,7 +31,7 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   border-radius:0;
   background:transparent;
   box-shadow:none;
-  padding:0 1.375% 5%;
+  padding:0 1.375%;
   display:flex;
   align-items:stretch;
   justify-content:center;
@@ -46,6 +46,7 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   min-width:0;
   border:0;
   cursor:pointer;
+  overflow:hidden;
 }
 .wfPin{
   position:absolute;
@@ -57,19 +58,17 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   max-width:none;
   object-fit:contain;
   z-index:1;
-  transform:translateX(-50%);
-  clip-path:inset(0 0 var(--pin-depth,0%) 0);
-  transition:clip-path .18s ease,transform .18s ease,filter .18s ease;
+  transform:translate(-50%,calc(-1 * var(--pin-depth,0%)));
+  transition:transform .22s ease,filter .18s ease;
   filter:drop-shadow(0 4px 5px rgba(0,0,0,.45));
   pointer-events:none;
 }
 .wfBar.open .wfPin{
-  transform:translateX(-50%);
-  clip-path:inset(0 0 0 0);
+  transform:translate(-50%,calc(-1 * (var(--pin-depth,0%) + 22%)));
   filter:brightness(1.18);
 }
 .wfBar.wrong .wfPin{
-  transform:translate(-50%,3%);
+  transform:translate(-50%,calc(-1 * var(--pin-depth,0%) + 3%));
   filter:brightness(1.08);
 }
 .wfBar.current{filter:drop-shadow(0 0 8px rgba(216,184,113,.24));}

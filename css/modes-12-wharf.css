@@ -23,10 +23,9 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   justify-content:center;
 }
 .wfLock{
-  height:100%;
-  width:auto;
-  max-width:min(650px,100%);
-  aspect-ratio:3/2;
+  width:min(650px,100%);
+  height:min(42vh,420px);
+  flex:0 1 auto;
   position:relative;
   border:0;
   border-radius:0;
@@ -40,10 +39,10 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   container-type:inline-size;
 }
 .wfBar{
-  flex:0 1 54px;
-  width:54px;
+  flex:0 1 92px;
+  width:92px;
   position:relative;
-  max-width:54px;
+  max-width:92px;
   min-width:0;
   border:0;
   cursor:pointer;
@@ -53,7 +52,7 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   left:50%;
   top:0;
   bottom:auto;
-  height:156%;
+  height:clamp(180px,32vh,380px);
   width:auto;
   max-width:none;
   object-fit:contain;
@@ -78,7 +77,8 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   content:"▲";
   position:absolute;
   left:50%;
-  bottom:-18px;
+  top:calc(clamp(180px,32vh,380px) + 8px);
+  bottom:auto;
   transform:translateX(-50%);
   color:#d8b871;
   font-size:min(3.4cqw,13px);
@@ -95,5 +95,8 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
 .wfHelp:empty{display:none;}
 
 @media (max-width:650px){
-  .wfBar{flex-basis:42px;width:42px;max-width:42px;}
+  .wfLock{height:min(38vh,300px);}
+  .wfPin{height:clamp(140px,28vh,260px);}
+  .wfBar{flex-basis:58px;width:58px;max-width:58px;}
+  .wfBar.current:after{top:calc(clamp(140px,28vh,260px) + 6px);}
 }

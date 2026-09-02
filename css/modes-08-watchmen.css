@@ -4,7 +4,8 @@
 body.importedMode .puzzleArea>.modePanel.wmMode:not([hidden]){padding-bottom:calc(12px + var(--reward-clear,0px))!important;}
 .wmLockWrap{position:absolute;inset:0;display:block;overflow:visible;}
 .wmLock{box-sizing:border-box;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:hidden;container-type:inline-size;}
-.wmChannels{position:absolute;inset:12% 4.5% 16%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4.5%;align-items:stretch;}
+.wmLockerUp{--wf-bars:5;}
+.wmChannels{position:absolute;left:7.2%;top:15%;width:85.6%;height:69%;z-index:2;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4.5%;align-items:stretch;}
 .wmSlot{min-width:0;position:relative;cursor:pointer;border:0;border-radius:0;background:transparent;box-shadow:none;}
 .wmSlot::after{content:"▲";position:absolute;left:50%;bottom:1%;transform:translateX(-50%);color:transparent;font-size:2.4cqw;transition:color .16s ease,filter .16s ease;}
 .wmSlot.selected::after{color:#d8b871;filter:drop-shadow(0 0 5px rgba(216,184,113,.5));}
@@ -17,4 +18,4 @@ body.importedMode .puzzleArea>.modePanel.wmMode:not([hidden]){padding-bottom:cal
 .wmTimeBar{position:absolute;left:8%;right:8%;bottom:4%;height:6px;background:#0b0e0b;border:1px solid #4b4434;border-radius:99px;overflow:hidden;z-index:7;}
 .wmTimeBar span{display:block;height:100%;width:100%;background:#b39158;transition:width .08s linear;}
 .wmHelp,.wmOpenBtn{display:none!important;}
-@media (max-width:760px){.wmChannels{inset:14% 4.5% 19%;}.wmTimeBar{bottom:6%;}}
+@media (max-width:760px){.wmChannels{top:15%;height:66%;}.wmTimeBar{bottom:6%;}}

@@ -283,7 +283,7 @@ body.lair-open .topRightHud .assetNameHud{display:none!important;}
   transition:opacity .28s ease,transform .28s cubic-bezier(.22,.78,.22,1),filter .28s ease;
   filter:drop-shadow(-6px 6px 12px rgba(0,0,0,.5)) grayscale(calc(1 - var(--guard-alert,0)));}
 .guardWatch img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%;
-  border:2px solid rgba(150,110,58,.7);background:rgba(14,11,8,.9);}
+  object-position:50% 14%;border:2px solid rgba(150,110,58,.7);background:rgba(14,11,8,.9);}
 .guardWatch.watching{opacity:calc(.30 + .7 * var(--guard-alert,0));}
 .guardWatch.caught{opacity:1;transform:translateX(0) scale(1.22);
   filter:drop-shadow(-8px 8px 18px rgba(0,0,0,.6)) grayscale(0);

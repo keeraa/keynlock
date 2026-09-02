@@ -12,6 +12,8 @@
     document.body.classList.toggle('game-manual-open', !!GameCatalog.feature(mode,'lock.manualOpen'));
     document.body.classList.toggle('game-noise-sensor', !!GameCatalog.feature(mode,'world.noiseSensor'));
     document.body.dataset.gameMode=mode;
+    const location=GameCatalog.get(mode)?.location||'/assets/backgrounds/bg-church-01.jpg';
+    document.body.dataset.location=location.split('/').at(-1).replace(/^bg-|\.jpg$/g,'');
     window.LockShell?.syncMode(mode,{rows:typeof n==='number'?n:5});
     if(PuzzleModes.call(mode,'syncHud')){}
     else setGlobalTimer(false);

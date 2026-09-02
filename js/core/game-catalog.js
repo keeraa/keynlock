@@ -38,8 +38,24 @@ const GAME_DEFINITIONS={
   alphaprotocol:{title:'Alpha Protocol',description:'Выставляй пины по высоте и фиксируй их в порядке показанных символов.',objective:'ВЫСТАВИТЬ 5 ПИНОВ В ПОРЯДКЕ СИМВОЛОВ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}}
 };
 
+// Scene art belongs to the game catalogue rather than individual mechanics,
+// so changing a location never requires editing puzzle code.
+const GAME_LOCATIONS={
+  classic:'bg-church-01.jpg',sequence:'bg-church-01.jpg',special:'bg-church-01.jpg',
+  hillsfar:'bg-street-01.jpg',skyrim:'bg-street-01.jpg',thiefds:'bg-street-01.jpg',
+  g1:'bg-basement-01.jpg',oblivion:'bg-basement-01.jpg',thief12:'bg-basement-01.jpg',
+  fallout:'bg-basement-01.jpg',pathologic:'bg-basement-01.jpg',
+  kingdomcome:'bg-house-01.jpg',watchmen:'bg-house-01.jpg',
+  anachlab:'bg-house-02.jpg',bioshock2:'bg-house-02.jpg',
+  deduction:'bg-house-03.jpg',composite:'bg-house-03.jpg',museum:'bg-house-03.jpg',
+  tension:'bg-house-04.jpg',resonance:'bg-house-04.jpg',alphaprotocol:'bg-house-04.jpg',
+  anach:'bg-orangery-01.jpg',mass:'bg-orangery-01.jpg',masshack:'bg-orangery-01.jpg',scope:'bg-orangery-01.jpg',
+  heatcold:'bg-orangery-02.jpg',drum:'bg-orangery-02.jpg',mass2:'bg-orangery-02.jpg',
+  wharf:'bg-port-01.jpg',pipeline:'bg-port-01.jpg'
+};
+
 function freezeGameDefinitions(definitions){
-  Object.values(definitions).forEach(entry=>{
+  Object.entries(definitions).forEach(([id,entry])=>{
     // Quiet locations omit the flag for readability; normalization keeps the
     // catalogue schema complete for every consumer.
     if(entry.world.noiseSensor===undefined)entry.world.noiseSensor=false;
@@ -47,6 +63,7 @@ function freezeGameDefinitions(definitions){
     if(entry.readiness===undefined)entry.readiness=entry.kind==='native'?4:3;
     if(entry.rating===undefined)entry.rating=null;
     if(entry.difficulty===undefined)entry.difficulty={levels:entry.kind==='native'?[1,2,3]:[]};
+    entry.location=`/assets/backgrounds/${GAME_LOCATIONS[id]||'bg-church-01.jpg'}`;
     Object.freeze(entry.lock);
     Object.freeze(entry.world);
     Object.freeze(entry.difficulty.levels);

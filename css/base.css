@@ -4,8 +4,17 @@
 .modePanel{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:auto;}
 .modePanel[hidden]{display:none!important;}
 html{height:100%;}
-body{height:100%;margin:0;overflow:hidden;background:linear-gradient(rgba(10,8,6,.48), rgba(10,8,6,.60)),
-      url("../assets/backgrounds/bg-church-01.jpg") center center / cover no-repeat fixed;color:var(--paper);font-family:var(--ui-font);user-select:none;-webkit-user-select:none;}
+body{--location-bg:url("../assets/backgrounds/bg-church-01.jpg");height:100%;margin:0;overflow:hidden;background-color:#171411;background-image:linear-gradient(rgba(10,8,6,.48),rgba(10,8,6,.60)),var(--location-bg);background-position:center center,center center;background-size:100% 100%,cover;background-repeat:no-repeat;background-attachment:fixed;color:var(--paper);font-family:var(--ui-font);user-select:none;-webkit-user-select:none;}
+body[data-location="basement-01"]{--location-bg:url("../assets/backgrounds/bg-basement-01.jpg");}
+body[data-location="church-01"]{--location-bg:url("../assets/backgrounds/bg-church-01.jpg");}
+body[data-location="house-01"]{--location-bg:url("../assets/backgrounds/bg-house-01.jpg");}
+body[data-location="house-02"]{--location-bg:url("../assets/backgrounds/bg-house-02.jpg");}
+body[data-location="house-03"]{--location-bg:url("../assets/backgrounds/bg-house-03.jpg");}
+body[data-location="house-04"]{--location-bg:url("../assets/backgrounds/bg-house-04.jpg");}
+body[data-location="orangery-01"]{--location-bg:url("../assets/backgrounds/bg-orangery-01.jpg");}
+body[data-location="orangery-02"]{--location-bg:url("../assets/backgrounds/bg-orangery-02.jpg");}
+body[data-location="port-01"]{--location-bg:url("../assets/backgrounds/bg-port-01.jpg");}
+body[data-location="street-01"]{--location-bg:url("../assets/backgrounds/bg-street-01.jpg");}
 @media (min-aspect-ratio:17/10) and (max-aspect-ratio:19/10){
 body{background-position:center center,center top;}
 }

@@ -23,26 +23,49 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   justify-content:center;
 }
 .wfLock{
-  width:min(650px,100%);
-  height:min(58vh,560px);
+  width:min(58vh,560px,96vw);
+  height:min(58vh,560px,96vw);
   flex:0 1 auto;
   position:relative;
   border:0;
   border-radius:0;
   background:transparent;
   box-shadow:none;
-  padding:0 1.375%;
-  display:flex;
-  align-items:stretch;
-  justify-content:center;
-  gap:0;
+  padding:0;
   container-type:inline-size;
 }
+.wfLockBackground,.wfLockerUp,.wfLockerLip{
+  position:absolute;
+  display:block;
+  pointer-events:none;
+  user-select:none;
+}
+.wfLockBackground{inset:0;width:100%;height:100%;object-fit:fill;z-index:0;}
+.wfLockerUp{left:2%;top:7%;width:96%;height:auto;z-index:1;}
+.wfLockerLip{
+  left:2%;
+  top:7%;
+  width:96%;
+  height:auto;
+  clip-path:inset(0 0 78% 0);
+  z-index:5;
+}
+.wfChannels{
+  position:absolute;
+  left:7.2%;
+  top:8.1%;
+  width:85.6%;
+  height:86%;
+  display:flex;
+  align-items:stretch;
+  justify-content:space-between;
+  z-index:2;
+}
 .wfBar{
-  flex:0 1 92px;
-  width:92px;
+  flex:1 1 0;
+  width:auto;
   position:relative;
-  max-width:92px;
+  max-width:none;
   min-width:0;
   border:0;
   cursor:pointer;
@@ -56,7 +79,7 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   height:clamp(180px,32vh,380px);
   width:calc(clamp(180px,32vh,380px) * .248);
   max-width:none;
-  z-index:1;
+  z-index:4;
   transform:translateX(-50%);
   transition:top .3s cubic-bezier(.2,.75,.25,1),transform .18s ease,filter .18s ease;
   filter:drop-shadow(0 4px 5px rgba(0,0,0,.45));
@@ -130,9 +153,8 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
 .wfHelp:empty{display:none;}
 
 @media (max-width:650px){
-  .wfLock{height:min(58vh,360px);}
+  .wfLock{width:min(58vh,360px,96vw);height:min(58vh,360px,96vw);}
   .wfPinRig{height:clamp(140px,28vh,260px);width:calc(clamp(140px,28vh,260px) * .248);}
-  .wfBar{flex-basis:58px;width:58px;max-width:58px;}
   .wfBar.current:after{top:calc(clamp(90px,18vh,170px) * var(--spring-rest,1) + clamp(140px,28vh,260px) + 6px);}
   .wfBar.current.open:after{top:calc(clamp(48px,9vh,82px) + clamp(140px,28vh,260px) + 6px);}
 }

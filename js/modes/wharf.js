@@ -51,12 +51,14 @@
   function renderWharf(){
     if(!$wfLock) return;
     if(wfBarEls.length!==wfBarCount){
-      const frag=document.createDocumentFragment();
+      const channels=document.createElement('div');
+      channels.className='wfChannels';
       wfBarEls=[];
       for(let i=0;i<wfBarCount;i++){
         const b=document.createElement('div');
         b.className='wfBar';
-        const spring=String(1+Math.floor(Math.random()*6)).padStart(2,'0');
+        const silverSprings=['01','03','04'];
+        const spring=silverSprings[Math.floor(Math.random()*silverSprings.length)];
         // The spring is fixed to the top of its channel. Its resting length
         // sets the pin position; raising the pin compresses the spring.
         b.style.setProperty('--spring-rest',(0.72+Math.random()*0.36).toFixed(2));
@@ -72,10 +74,20 @@
           wfPos=i;
           wfTry();
         });
-        frag.appendChild(b);
+        channels.appendChild(b);
         wfBarEls.push(b);
       }
-      $wfLock.replaceChildren(frag);
+      const background=document.createElement('img');
+      background.className='wfLockBackground';
+      background.src='assets/lock-shell/lock-bg-01.png';
+      background.alt='';
+      const locker=document.createElement('img');
+      locker.className='wfLockerUp';
+      locker.src='assets/lock-shell/locker-up-01.png';
+      locker.alt='';
+      const lockerLip=locker.cloneNode();
+      lockerLip.className='wfLockerLip';
+      $wfLock.replaceChildren(background,locker,channels,lockerLip);
     }
     const opened=wfSequence.slice(0,wfStep);
     wfBarEls.forEach((b,i)=>{

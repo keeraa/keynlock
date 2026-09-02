@@ -23,12 +23,14 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   justify-content:center;
 }
 .wfLock{
-  --wf-pin-h:clamp(180px,32vh,380px);
-  --wf-spring-idle-h:clamp(90px,18vh,170px);
-  --wf-spring-compressed-h:clamp(48px,9vh,82px);
+  --wf-pin-h:55cqw;
+  --wf-spring-idle-h:25cqw;
+  --wf-spring-compressed-h:13cqw;
   --wf-pin-join:calc(var(--wf-pin-h) * .05);
-  width:min(58vh,560px,96vw);
-  height:min(58vh,560px,96vw);
+  width:auto;
+  height:min(100%,560px,96vw);
+  max-width:min(560px,96vw);
+  aspect-ratio:1;
   flex:0 1 auto;
   position:relative;
   border:0;
@@ -157,7 +159,7 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
 .wfHelp:empty{display:none;}
 
 @media (max-width:650px){
-  .wfLock{--wf-pin-h:clamp(140px,28vh,260px);width:min(58vh,360px,96vw);height:min(58vh,360px,96vw);}
+  .wfLock{height:min(100%,360px,96vw);max-width:min(360px,96vw);}
   .wfPinRig{height:var(--wf-pin-h);width:calc(var(--wf-pin-h) * .248);}
   .wfBar.current:after{top:calc(var(--wf-spring-idle-h) * var(--spring-rest,1) + var(--wf-pin-h) - var(--wf-pin-join) + 6px);}
   .wfBar.current.open:after{top:calc(var(--wf-spring-compressed-h) + var(--wf-pin-h) - var(--wf-pin-join) + 6px);}

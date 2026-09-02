@@ -3,10 +3,10 @@
   let meRings=[], meSelected=0, meInitialPositions=[];
   function massGradientForRing(ring){
     const step = 360 / ring.count;
-    const goodColor = '#74f1ff';
-    const decoyColor = '#317f9c';
-    const baseColor = '#172c3b';
-    const darkGap = '#07131c';
+    const goodColor = '#e4bd70';
+    const decoyColor = '#796340';
+    const baseColor = '#363633';
+    const darkGap = '#171714';
     const gap = Math.max(2.2, step * .11);
     const parts = [];
 
@@ -44,7 +44,7 @@
       btn.style.setProperty('--mass-marker-width', `${Math.max(14, Math.round(ring.thickness * .34))}px`);
       btn.style.setProperty('--mass-marker-height', `${Math.max(10, Math.round(ring.thickness * .24))}px`);
       btn.style.setProperty('--mass-marker-bottom', `${Math.max(8, Math.round(ring.thickness * .18))}px`);
-      btn.style.setProperty('--mass-ring-color', ['#7cecff','#5db9ff','#8d8cff'][i] || '#7cecff');
+      btn.style.setProperty('--mass-ring-color', ['#d8bd83','#b7a77f','#9f9277'][i] || '#d8bd83');
       const ringNames = ['Внешнее кольцо','Среднее кольцо','Внутреннее кольцо'];
       btn.setAttribute('aria-label', ringNames[i] || `Кольцо ${i+1}`);
 
@@ -54,11 +54,6 @@
       disc.style.transform = `rotate(${(ring.pos * 360 / ring.count).toFixed(2)}deg)`;
       disc.style.webkitMask = disc.style.mask = `radial-gradient(circle, transparent calc(50% - ${ring.thickness}px), #000 calc(50% - ${ring.thickness}px + 1px), #000 calc(50% - 1px), transparent 50%)`;
       btn.appendChild(disc);
-
-      const badge=document.createElement('span');
-      badge.className='massRingBadge';
-      badge.textContent=massRingSolved(ring)?'✓':String(i+1);
-      btn.appendChild(badge);
 
       btn.addEventListener('click', () => {
         if(solved) return;
@@ -74,7 +69,8 @@
     const active=meRings[meSelected];
     const status=document.querySelector('#massStatus');
     const progress=document.querySelector('#massProgress');
-    if(status) status.textContent=solved?'ДОСТУП РАЗРЕШЁН':ready?'ВСЕ КОНТУРЫ СОВПАЛИ':`КОЛЬЦО ${meSelected+1} · ${massRingSolved(active)?'СОВПАДЕНИЕ':'СОВМЕСТИ ЯРКИЙ СЕКТОР С ЛУЧОМ'}`;
+    const ringNames=['ВНЕШНЕЕ','СРЕДНЕЕ','ВНУТРЕННЕЕ'];
+    if(status) status.textContent=solved?'ЗАМОК ОТКРЫТ':ready?'ВСЕ КОЛЬЦА ВЫСТАВЛЕНЫ':`${ringNames[meSelected]} КОЛЬЦО · ${massRingSolved(active)?'ВЫСТАВЛЕНО':'ПОДВЕДИ ЗОЛОТОЙ СЕКТОР К МЕТКЕ'}`;
     if(progress) progress.innerHTML=meRings.map((item,i)=>`<i class="${massRingSolved(item)?'ready ':''}${i===meSelected?'selected':''}"></i>`).join('');
     $massCenter.classList.toggle('ready', ready && !solved);
     $massCenterText.textContent = solved ? 'ОТКРЫТО' : (ready ? 'ОТКРЫТЬ' : 'ПОВОРОТ');

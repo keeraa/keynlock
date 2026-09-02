@@ -10,6 +10,7 @@
    underneath it. Needs !important + this specificity to beat the shared
    body.importedMode .puzzleArea>.modePanel padding rule. */
 body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:calc(16px + var(--reward-clear,0px))!important;}
+body.importedMode[data-game-mode="wharf"] #lock.universalLockBlock{display:none!important;}
 
 /* No fixed height: .wfLockWrap fills whatever room #puzzleArea actually
    gives it. Pins always keep one physical size and slide as whole images
@@ -56,6 +57,68 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   clip-path:inset(0 0 78% 0);
   z-index:5;
 }
+.wfSideTools{
+  position:absolute;
+  left:0;
+  top:46%;
+  width:1px;
+  height:1px;
+  z-index:7;
+  pointer-events:none;
+}
+.wfSideTools .lockShellFunnel{
+  display:block;
+  position:absolute;
+  left:-22px;
+  top:-26px;
+  width:46px;
+  height:54px;
+  object-fit:contain;
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,.48));
+}
+.wfSideTools .lockShellFunnelBack{z-index:1;}
+.wfSideTools .lockShellFunnelFront{left:-18px;width:42px;z-index:4;}
+.wfSideTools .wfSidePick.pick{
+  left:-182px!important;
+  top:-118px!important;
+  width:48px!important;
+  height:238px!important;
+  background:var(--pick-skin-image) center/contain no-repeat!important;
+  transform:rotate(90deg)!important;
+  transform-origin:50% 94%!important;
+  filter:drop-shadow(0 5px 8px rgba(0,0,0,.48));
+  z-index:2;
+}
+.wfSideTools .wfSideTension.tension{
+  left:-156px!important;
+  top:10px!important;
+  width:168px!important;
+  height:42px!important;
+  background:var(--tension-skin-image) center/contain no-repeat!important;
+  transform:rotate(-7deg) scaleX(-1)!important;
+  transform-origin:94% 50%!important;
+  translate:0 0!important;
+  filter:drop-shadow(0 4px 7px rgba(0,0,0,.52));
+  z-index:3;
+}
+.wfSideLock{
+  position:absolute;
+  right:-112px;
+  top:50%;
+  width:112px;
+  height:150px;
+  padding:0;
+  border:0;
+  background:transparent;
+  transform:translateY(-50%);
+  transform-origin:center;
+  cursor:pointer;
+  z-index:7;
+  transition:transform .72s cubic-bezier(.2,.78,.2,1),filter .18s ease;
+}
+.wfSideLock img{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 12px 16px rgba(0,0,0,.48));pointer-events:none;}
+.wfSideLock:hover{filter:brightness(1.14) drop-shadow(0 0 12px rgba(236,192,96,.25));}
+.wfLock.solved .wfSideLock{transform:translate(54px,-66%) rotate(8deg);}
 .wfChannels{
   position:absolute;
   left:7.2%;
@@ -156,11 +219,13 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   font:14px/1.35 Arial,sans-serif;
   max-width:560px;
 }
-.wfHelp:empty{display:none;}
+.wfHelp{display:none!important;}
 
 @media (max-width:650px){
   .wfLock{height:min(100%,360px,96vw);max-width:min(360px,96vw);}
   .wfPinRig{height:var(--wf-pin-h);width:calc(var(--wf-pin-h) * .248);}
   .wfBar.current:after{top:calc(var(--wf-spring-idle-h) * var(--spring-rest,1) + var(--wf-pin-h) - var(--wf-pin-join) + 6px);}
   .wfBar.current.open:after{top:calc(var(--wf-spring-compressed-h) + var(--wf-pin-h) - var(--wf-pin-join) + 6px);}
+  .wfSideTools{transform:scale(.72);transform-origin:right center;}
+  .wfSideLock{right:-82px;width:82px;height:112px;}
 }

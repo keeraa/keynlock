@@ -10,6 +10,14 @@ body.lock-shell-active{
   --lock-shell-plate-scale:1;
 }
 
+/* Imported mechanisms can occupy the shell's central content slot. The frame
+   becomes the back layer, while the existing universal tools remain in front. */
+body.lock-shell-slotted{--lock-shell-top:43%;}
+body.lock-shell-slotted .lockShellFrame{z-index:19;}
+body.lock-shell-slotted .lockShellBackground,
+body.lock-shell-slotted .lockShellOverlayLayer{display:none!important;}
+body.lock-shell-slotted .puzzleArea{inset:0!important;height:100%!important;}
+
 body.lock-shell-active .lockShellFrame{
   display:block;
   position:absolute;

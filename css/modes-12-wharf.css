@@ -10,21 +10,17 @@
    underneath it. Needs !important + this specificity to beat the shared
    body.importedMode .puzzleArea>.modePanel padding rule. */
 body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:calc(16px + var(--reward-clear,0px))!important;}
-body.importedMode[data-game-mode="wharf"] .lockShellBackground,
-body.importedMode[data-game-mode="wharf"] .lockShellOverlayLayer{display:none!important;}
-
 /* No fixed height: .wfLockWrap fills whatever room #puzzleArea actually
    gives it. Pins always keep one physical size and slide as whole images
    inside hidden vertical channels, so their rounded tips remain visible. */
 .wfLockWrap{
   position:absolute;
   inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display:block;
 }
 .wfLock{
   --wf-pin-h:55cqw;
+  --wf-channel-w:10cqw;
   --wf-spring-idle-h:25cqw;
   --wf-spring-compressed-h:13cqw;
   --wf-pin-join:calc(var(--wf-pin-h) * .05);
@@ -32,8 +28,10 @@ body.importedMode[data-game-mode="wharf"] .lockShellOverlayLayer{display:none!im
   height:var(--lock-shell-height);
   max-width:none;
   flex:none;
-  position:relative;
-  transform:scale(var(--lock-shell-scale));
+  position:absolute;
+  left:50%;
+  top:var(--lock-shell-top);
+  transform:translate(-50%,-50%) scale(var(--lock-shell-scale));
   transform-origin:center;
   border:0;
   border-radius:0;
@@ -85,7 +83,7 @@ body.importedMode[data-game-mode="wharf"] .lockShellOverlayLayer{display:none!im
   top:calc(var(--wf-spring-idle-h) * var(--spring-rest,1) - var(--wf-pin-join));
   bottom:auto;
   height:var(--wf-pin-h);
-  width:calc(var(--wf-pin-h) * .248);
+  width:var(--wf-channel-w);
   max-width:none;
   z-index:4;
   transform:translateX(-50%);
@@ -107,7 +105,7 @@ body.importedMode[data-game-mode="wharf"] .lockShellOverlayLayer{display:none!im
   top:0;
   width:100%;
   height:calc(var(--wf-spring-idle-h) * var(--spring-rest,1));
-  transform:translateX(-50%);
+  transform:translateX(-50%) scaleX(var(--spring-width-normalizer,1));
   z-index:1;
   transition:height .3s cubic-bezier(.2,.75,.25,1),filter .2s ease;
 }
@@ -115,10 +113,10 @@ body.importedMode[data-game-mode="wharf"] .lockShellOverlayLayer{display:none!im
   position:absolute;
   left:50%;
   top:0;
-  width:58%;
+  width:100%;
   max-width:none;
   height:100%;
-  object-fit:contain;
+  object-fit:fill;
   object-position:top center;
   transform:translateX(-50%);
   transform-origin:top center;
@@ -161,7 +159,7 @@ body.importedMode[data-game-mode="wharf"] .lockShellOverlayLayer{display:none!im
 .wfHelp{display:none!important;}
 
 @media (max-width:650px){
-  .wfPinRig{height:var(--wf-pin-h);width:calc(var(--wf-pin-h) * .248);}
+  .wfPinRig{height:var(--wf-pin-h);width:var(--wf-channel-w);}
   .wfBar.current:after{top:calc(var(--wf-spring-idle-h) * var(--spring-rest,1) + var(--wf-pin-h) - var(--wf-pin-join) + 6px);}
   .wfBar.current.open:after{top:calc(var(--wf-spring-compressed-h) + var(--wf-pin-h) - var(--wf-pin-join) + 6px);}
 }

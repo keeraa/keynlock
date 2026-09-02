@@ -92,6 +92,7 @@ window.PuzzleModes=PuzzleModes;
     const rows = String(options.rows || 5);
     activeProfile = id;
     document.body.classList.add('lock-shell-active');
+    document.body.classList.toggle('lock-shell-slotted', !!options.slotted);
     document.body.dataset.lockShellRows = rows;
     frame.dataset.profile = id;
     frame.dataset.rows = rows;
@@ -104,12 +105,12 @@ window.PuzzleModes=PuzzleModes;
   }
   function deactivate() {
     activeProfile = null;
-    document.body.classList.remove('lock-shell-active');
+    document.body.classList.remove('lock-shell-active','lock-shell-slotted');
     delete document.body.dataset.lockShellRows;
     renderOverlays();
   }
   function syncMode(mode, options = {}) {
-    if (BASE_MODES.has(mode)) activate(options.profile || 'base-plates', options);
+    if (BASE_MODES.has(mode)) activate(options.profile || 'base-plates', {...options,slotted:mode==='wharf'});
     else deactivate();
   }
 

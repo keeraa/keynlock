@@ -61,7 +61,7 @@ window.PuzzleModes=PuzzleModes;
 
 /* Reusable visual shell for lock mechanisms and optional per-game overlays. */
 (() => {
-  const BASE_MODES = new Set(['classic', 'sequence', 'special']);
+  const BASE_MODES = new Set(['classic', 'sequence', 'special', 'wharf']);
   const frame = document.querySelector('#lockShellFrame');
   const background = document.querySelector('#lockShellBackground');
   const funnelBack = document.querySelector('#lockShellFunnelBack');

@@ -87,24 +87,9 @@
       locker.alt='';
       const lockerLip=locker.cloneNode();
       lockerLip.className='wfLockerLip';
-      const tools=document.createElement('div');
-      tools.className='wfSideTools';
-      tools.innerHTML=`<img class="lockShellFunnel lockShellFunnelBack" src="assets/lock-shell/funnel-lower-01.png" alt="">
-        <div class="pick wfSidePick"></div>
-        <div class="tension wfSideTension"></div>
-        <img class="lockShellFunnel lockShellFunnelFront" src="assets/lock-shell/funnel-upper-01.png" alt="">`;
-      const sideLock=document.createElement('button');
-      sideLock.className='wfSideLock';
-      sideLock.type='button';
-      sideLock.setAttribute('aria-label','Открыть замок');
-      sideLock.innerHTML=`<img src="${currentLockBodySkin()}" alt="">`;
-      sideLock.addEventListener('click',()=>GameActions.attemptOpen({modeId:'wharf',source:'puzzle-control'}));
-      $wfLock.replaceChildren(background,locker,channels,lockerLip,tools,sideLock);
+      $wfLock.replaceChildren(background,locker,channels,lockerLip);
     }
     const opened=wfSequence.slice(0,wfStep);
-    $wfLock.classList.toggle('solved',solved);
-    const sideLockImage=$wfLock.querySelector('.wfSideLock img');
-    if(sideLockImage && sideLockImage.getAttribute('src')!==currentLockBodySkin()) sideLockImage.src=currentLockBodySkin();
     wfBarEls.forEach((b,i)=>{
       const pin=b.querySelector('.wfPin');
       if(pin && pin.getAttribute('src')!==currentGamePinSkin()) pin.src=currentGamePinSkin();

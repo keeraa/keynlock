@@ -114,7 +114,7 @@ body.lock-shell-active:not(.importedMode) #pinTopPlates{
 }
 
 /* Tools and the physical lock meet at the shell's horizontal mechanism axis. */
-body.lock-shell-active:not(.importedMode) #lock.universalLockBlock{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) #lock.universalLockBlock{
   left:50%!important;
   top:var(--lock-shell-top)!important;
   width:var(--lock-shell-size)!important;
@@ -125,7 +125,7 @@ body.lock-shell-active:not(.importedMode) #lock.universalLockBlock{
   z-index:60!important;
 }
 
-body.lock-shell-active:not(.importedMode) #lock.universalLockBlock>.mechanismZone{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) #lock.universalLockBlock>.mechanismZone{
   left:0!important;
   top:0!important;
   width:var(--lock-shell-size)!important;
@@ -134,9 +134,9 @@ body.lock-shell-active:not(.importedMode) #lock.universalLockBlock>.mechanismZon
   overflow:visible!important;
 }
 
-body.lock-shell-active:not(.importedMode) .mechanismZone::before{display:none!important;}
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .mechanismZone::before{display:none!important;}
 
-body.lock-shell-active:not(.importedMode) .lockShellPhysicalLock{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .lockShellPhysicalLock{
   position:absolute;
   left:558px;
   top:0;
@@ -146,13 +146,13 @@ body.lock-shell-active:not(.importedMode) .lockShellPhysicalLock{
   transition:transform .72s cubic-bezier(.2,.78,.2,1),opacity .45s ease;
 }
 
-body.lock-shell-active:not(.importedMode) .lockShellPhysicalLock .lockPanel{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .lockShellPhysicalLock .lockPanel{
   position:absolute!important;
   inset:0!important;
   display:none!important;
 }
 
-body.lock-shell-active:not(.importedMode) .lockShellShackle{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .lockShellShackle{
   display:block;
   position:absolute;
   left:auto;
@@ -168,10 +168,10 @@ body.lock-shell-active:not(.importedMode) .lockShellShackle{
   transition:filter .18s cubic-bezier(.22,.84,.22,1);
 }
 
-body.lock-shell-active:not(.importedMode):has(.mechanismZone.opening) .lockShellShackle{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]):has(.mechanismZone.opening) .lockShellShackle{
   animation:lockShellShackleOpen 950ms cubic-bezier(.20,.76,.18,1) forwards;
 }
-body.lock-shell-active:not(.importedMode):has(.mechanismZone.opened) .lockShellShackle{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]):has(.mechanismZone.opened) .lockShellShackle{
   transform:translate(42px,-70%) rotate(82deg);
 }
 @keyframes lockShellShackleOpen{
@@ -181,7 +181,7 @@ body.lock-shell-active:not(.importedMode):has(.mechanismZone.opened) .lockShellS
   100%{transform:translate(42px,-70%) rotate(82deg);}
 }
 
-body.lock-shell-active:not(.importedMode) .lockShellPhysicalLock .lockHitArea{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .lockShellPhysicalLock .lockHitArea{
   left:0!important;
   top:0!important;
   width:270px!important;
@@ -189,16 +189,16 @@ body.lock-shell-active:not(.importedMode) .lockShellPhysicalLock .lockHitArea{
   transform:none!important;
 }
 
-body.lock-shell-active:not(.importedMode) .mechanismZone.opening .lockShellPhysicalLock,
-body.lock-shell-active:not(.importedMode) .mechanismZone.opened .lockShellPhysicalLock{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .mechanismZone.opening .lockShellPhysicalLock,
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .mechanismZone.opened .lockShellPhysicalLock{
   transform:translateX(155px);
 }
 
-body.lock-shell-active:not(.importedMode) .mechanismZone.opening .lockPanel{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .mechanismZone.opening .lockPanel{
   animation:none!important;
 }
 
-body.lock-shell-active:not(.importedMode) .lockShellFunnel{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .lockShellFunnel{
   display:block;
   position:absolute;
   left:-12px;
@@ -210,27 +210,27 @@ body.lock-shell-active:not(.importedMode) .lockShellFunnel{
   filter:drop-shadow(0 5px 7px rgba(0,0,0,.42));
 }
 
-body.lock-shell-active:not(.importedMode) .lockShellFunnelBack{z-index:3;}
-body.lock-shell-active:not(.importedMode) .lockShellFunnelFront{z-index:6;left:-6px;width:54px;}
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .lockShellFunnelBack{z-index:3;}
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .lockShellFunnelFront{z-index:6;left:-6px;width:54px;}
 
-body.lock-shell-active:not(.importedMode) .mechanismZone .pick,
-body.lock-shell-active:not(.importedMode) .mechanismZone .tension{z-index:5!important;}
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .mechanismZone .pick,
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .mechanismZone .tension{z-index:5!important;}
 
-body.lock-shell-active:not(.importedMode) .mechanismZone .pick{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .mechanismZone .pick{
   left:-20px!important;
   top:112px!important;
   transform-origin:50% 6%!important;
   transform:translate(var(--pick-react-x),var(--pick-react-y)) rotate(calc(90deg + var(--pick-rot-drift) + var(--pick-react-rot)))!important;
 }
 
-body.lock-shell-active:not(.importedMode) .mechanismZone .tension{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .mechanismZone .tension{
   left:-4px!important;
   top:110px!important;
   transform-origin:6% 50%!important;
   transform:translate(var(--tension-react-x),var(--tension-react-y)) rotate(calc(0deg + var(--tension-rot-drift) + var(--tension-react-rot))) scaleX(-1)!important;
 }
 
-body.lock-shell-active:not(.importedMode) .mechanismZone.nudge .tension{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .mechanismZone.nudge .tension{
   animation:lockShellTensionNudge 242ms ease!important;
 }
 

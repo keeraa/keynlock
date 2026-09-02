@@ -186,7 +186,10 @@
       const preview=document.createElement('span');
       preview.className='mapMissionPreview';
       const previewImage=document.createElement('img');
-      previewImage.src=GameCatalog.get(place.mode).location;
+      previewImage.src=`assets/map/mechanics/${place.mode}.png`;
+      previewImage.addEventListener('error',()=>{
+        previewImage.src=GameCatalog.get(place.mode).location;
+      },{once:true});
       previewImage.alt='';
       previewImage.loading='lazy';
       const readiness=document.createElement('span');

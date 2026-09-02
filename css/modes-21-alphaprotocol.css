@@ -2,8 +2,8 @@
 .apMode[hidden]{display:none!important;pointer-events:none!important;}
 body.importedMode .puzzleArea>.modePanel.apMode:not([hidden]){padding-bottom:calc(16px + var(--reward-clear,0px))!important;}
 .apLockWrap{position:absolute;inset:0;display:block;overflow:visible;}
-.apLock{box-sizing:border-box;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1.8%;padding:12% 8.2% 15%;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:hidden;container-type:inline-size;}
-.apBeam{position:absolute;left:8.2%;right:8.2%;top:49%;height:4px;transform:translateY(-50%);pointer-events:none;z-index:6;overflow:hidden;}
+.apLock{box-sizing:border-box;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4.5%;padding:12% 4.5% 15%;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:hidden;container-type:inline-size;}
+.apBeam{position:absolute;left:4.5%;right:4.5%;top:49%;height:4px;transform:translateY(-50%);pointer-events:none;z-index:6;overflow:hidden;}
 .apBeamFill{position:relative;display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,rgba(245,210,96,0),rgba(245,210,96,.42) 8%,rgba(245,210,96,.95) 58%,rgba(255,242,182,.42));box-shadow:0 0 9px rgba(245,210,96,.42);transition:width .14s ease-out;}
 .apBeamFill::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 14px,rgba(255,247,205,.82) 14px 20px,transparent 20px 34px);animation:apBeamFlow .85s linear infinite;}
 @keyframes apBeamFlow{from{transform:translateX(-30px)}to{transform:translateX(0)}}
@@ -14,10 +14,10 @@ body.importedMode .puzzleArea>.modePanel.apMode:not([hidden]){padding-bottom:cal
 .apPin.active::after{color:#d8b871;filter:drop-shadow(0 0 5px rgba(216,184,113,.5));}
 .apPin.set{filter:sepia(.18) brightness(1.08);}
 .apPin.ready .apGroove{background:#302819;border-color:#efd38b;box-shadow:0 0 7px rgba(239,211,139,.28);}
-.apShaft{position:absolute;left:16%;right:16%;height:60%;top:var(--y,24%);background-position:center;background-size:contain;background-repeat:no-repeat;transition:top .05s;overflow:visible;z-index:1;filter:drop-shadow(0 5px 5px rgba(0,0,0,.42));}
+.apShaft{position:absolute;left:-5%;right:-5%;height:72%;top:var(--y,24%);background-position:center;background-size:100% 100%;background-repeat:no-repeat;transition:top .05s;overflow:visible;z-index:1;filter:drop-shadow(0 5px 5px rgba(0,0,0,.42));}
 .apPin.active .apShaft{filter:brightness(1.12) drop-shadow(0 0 7px rgba(216,184,113,.26)) drop-shadow(0 5px 5px rgba(0,0,0,.42));}
 .apPin.set .apShaft{filter:sepia(.18) brightness(1.12) drop-shadow(0 0 7px rgba(123,191,120,.2));}
-.apGroove{position:absolute;left:-4px;right:-4px;top:var(--groove,55%);height:10px;transform:translateY(-50%);background:#11100c;border-top:1px solid #c1b58f;border-bottom:1px solid #c1b58f;z-index:1;}
+.apGroove{position:absolute;left:0;right:0;top:var(--groove,55%);height:12px;transform:translateY(-50%);background:#11100c;border-top:1px solid #c1b58f;border-bottom:1px solid #c1b58f;box-sizing:border-box;z-index:1;}
 .apSymbol{position:absolute;left:50%;top:var(--symbol-top,18%);width:4.8cqw;height:4.8cqw;transform:translate(-50%,-50%);z-index:2;color:#e4dcc3;background:rgba(64,60,49,.9);border:1px solid rgba(197,173,118,.28);border-radius:50%;padding:.5cqw;box-sizing:border-box;}
 .apSymbol svg{width:100%;height:100%;overflow:visible;}
 .apSymbol path{fill:none;stroke:currentColor;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;}

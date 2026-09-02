@@ -8,18 +8,19 @@ const AP_SYMBOLS=[
   '<svg viewBox="0 0 48 48"><path d="M14 43V23Q14 7 28 7Q41 7 41 22V25"/></svg>',
   '<svg viewBox="0 0 48 48"><path d="M39 6L14 24L39 43"/></svg>'
 ];
-const AP_STEP=.5, AP_SHAFT_RATIO=.825, AP_MIN_Y=0, AP_MAX_Y=17.5, AP_TOL=1.5;
-const AP_GROOVE_MIN=40, AP_GROOVE_MAX=60;
+const AP_STEP=.5, AP_SHAFT_RATIO=.825, AP_SPRING_MIN=4, AP_MIN_Y=0, AP_MAX_Y=13.5, AP_TOL=1.5;
+const AP_GROOVE_MIN=40, AP_GROOVE_MAX=55;
+const AP_SPRINGS=Object.freeze(['01','03','04']);
 function apClampY(v){ return Math.max(AP_MIN_Y,Math.min(AP_MAX_Y,Math.round(v/AP_STEP)*AP_STEP)); }
 // The beam crosses the exact centre of the interaction channel. Restricting
 // the groove to the visible middle of the enlarged shaft guarantees that
 // every generated pin can reach it without clipping either end of the pin.
-function apTargetFor(groove){ return apClampY(50-groove*AP_SHAFT_RATIO); }
+function apTargetFor(groove){ return apClampY(50-AP_SPRING_MIN-groove*AP_SHAFT_RATIO); }
 function apMakePin(){
   const groove=AP_GROOVE_MIN+Math.floor(Math.random()*(AP_GROOVE_MAX-AP_GROOVE_MIN+1)), target=apTargetFor(groove);
   const candidates=[-16,-12,-9,-6,6,9,12,16].map(v=>apClampY(target+v)).filter(v=>v!==target);
   const y=candidates.length?candidates[Math.floor(Math.random()*candidates.length)]:apClampY(target+6);
-  return {y,groove,target,set:false};
+  return {y,groove,target,set:false,spring:AP_SPRINGS[Math.floor(Math.random()*AP_SPRINGS.length)]};
 }
 function apBeamY(){
   const beam=$apLock?.querySelector('.apBeam');
@@ -136,11 +137,14 @@ function renderAlphaProtocol(){
     const pinEl=document.getElementById('apPin'+i), shaft=document.getElementById('apShaft'+i);
     if(!pinEl||!shaft) return;
     shaft.style.backgroundImage=`url("${currentGamePinSkin()}")`;
+    pinEl.style.setProperty('--ap-pin-y',p.y+'%');
     pinEl.classList.toggle('active', i===apSel);
     pinEl.classList.toggle('set', p.set);
     pinEl.classList.toggle('ready', !p.set && apReady(i));
-    shaft.style.setProperty('--y', p.y+'%');
     shaft.style.setProperty('--symbol-top', apSymbolTop(p)+'%');
+    const spring=pinEl.querySelector('.apSpring img');
+    const springSrc=`assets/springs/spring_idle_${p.spring}.png`;
+    if(spring && spring.getAttribute('src')!==springSrc) spring.src=springSrc;
     const groove=shaft.querySelector('.apGroove');
     if(groove) groove.style.setProperty('--groove', p.groove+'%');
     const symbol=shaft.querySelector('.apSymbol');

@@ -10,12 +10,13 @@ body.importedMode .puzzleArea>.modePanel.apMode:not([hidden]){padding-bottom:cal
 @keyframes apBeamFlow{from{transform:translateX(-30px)}to{transform:translateX(0)}}
 
 /* Pins share one lock cavity. A pin is only an interaction channel, never a card. */
-.apPin{position:relative;z-index:2;min-width:0;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:hidden;cursor:pointer;touch-action:none;}
+.apPin{--ap-channel-width:48%;--ap-spring-min:4%;z-index:2;border:0;border-radius:0;background:transparent;box-shadow:none;cursor:pointer;touch-action:none;}
 .apPin::after{content:"▲";position:absolute;left:50%;bottom:4%;z-index:8;transform:translateX(-50%);color:transparent;font-size:2.4cqw;transition:color .16s ease,filter .16s ease;}
 .apPin.active::after{color:#d8b871;filter:drop-shadow(0 0 5px rgba(216,184,113,.5));}
 .apPin.set{filter:sepia(.18) brightness(1.08);}
 .apPin.ready .apGroove{background:#302819;border-color:#efd38b;box-shadow:0 0 7px rgba(239,211,139,.28);}
-.apShaft{position:absolute;left:5%;right:5%;height:82.5%;top:var(--y,8%);background-position:center;background-size:100% 100%;background-repeat:no-repeat;transition:top .08s ease-out;overflow:visible;z-index:1;filter:drop-shadow(0 5px 5px rgba(0,0,0,.42));}
+.apSpring{width:var(--ap-channel-width);height:calc(var(--ap-spring-min) + var(--ap-pin-y,8%) + 2px);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));transition:height .08s ease-out,filter .18s ease;}
+.apShaft{width:var(--ap-channel-width);height:82.5%;top:calc(var(--ap-spring-min) + var(--ap-pin-y,8%));background-position:center;background-size:100% 100%;background-repeat:no-repeat;transition:top .08s ease-out;overflow:visible;filter:drop-shadow(0 5px 5px rgba(0,0,0,.42));}
 .apPin.active .apShaft{filter:brightness(1.12) drop-shadow(0 0 7px rgba(216,184,113,.26)) drop-shadow(0 5px 5px rgba(0,0,0,.42));}
 .apPin.set .apShaft{filter:sepia(.18) brightness(1.12) drop-shadow(0 0 7px rgba(123,191,120,.2));}
 .apGroove{position:absolute;left:0;right:0;top:var(--groove,55%);height:6px;transform:translateY(-50%);background:#11100c;border-top:1px solid #c1b58f;border-bottom:1px solid #c1b58f;box-sizing:border-box;z-index:1;}

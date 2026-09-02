@@ -13,8 +13,7 @@ body.lock-shell-active{
 /* Imported mechanisms can occupy the shell's central content slot. The frame
    becomes the back layer, while the existing universal tools remain in front. */
 body.lock-shell-slotted{--lock-shell-top:43%;}
-body.lock-shell-slotted .lockShellFrame{z-index:19;}
-body.lock-shell-slotted .lockShellBackground,
+body.lock-shell-slotted .lockShellFrame{z-index:19!important;}
 body.lock-shell-slotted .lockShellOverlayLayer{display:none!important;}
 body.lock-shell-slotted .puzzleArea{inset:0!important;height:100%!important;}
 
@@ -170,9 +169,8 @@ body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .lockShe
   height:171px;
   background:var(--locker-image) center/contain no-repeat;
   filter:brightness(calc(1 + .22 * var(--lock-glow,0))) saturate(calc(1 + .10 * var(--lock-glow,0))) drop-shadow(0 9px 12px rgba(0,0,0,.25)) drop-shadow(0 0 calc(22px * var(--lock-glow,0)) rgba(236,192,96,calc(.32 * var(--lock-glow,0))));
-  transform:translateY(-50%) rotate(90deg);
+  transform:translateY(-50%) rotate(90deg) scale(.97);
   transform-origin:center;
-  clip-path:inset(0 0 0 68px);
   z-index:0;
   transition:filter .18s cubic-bezier(.22,.84,.22,1);
 }
@@ -181,13 +179,13 @@ body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]):has(.mec
   animation:lockShellShackleOpen 950ms cubic-bezier(.20,.76,.18,1) forwards;
 }
 body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]):has(.mechanismZone.opened) .lockShellShackle{
-  transform:translate(42px,-70%) rotate(82deg);
+  transform:translate(42px,-70%) rotate(82deg) scale(.97);
 }
 @keyframes lockShellShackleOpen{
-  0%{transform:translate(0,-50%) rotate(90deg);}
-  58%{transform:translate(27px,-61%) rotate(87deg);}
-  84%{transform:translate(45px,-73%) rotate(81deg);}
-  100%{transform:translate(42px,-70%) rotate(82deg);}
+  0%{transform:translate(0,-50%) rotate(90deg) scale(.97);}
+  58%{transform:translate(27px,-61%) rotate(87deg) scale(.97);}
+  84%{transform:translate(45px,-73%) rotate(81deg) scale(.97);}
+  100%{transform:translate(42px,-70%) rotate(82deg) scale(.97);}
 }
 
 body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .lockShellPhysicalLock .lockHitArea{

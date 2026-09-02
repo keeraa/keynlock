@@ -77,17 +77,13 @@
         channels.appendChild(b);
         wfBarEls.push(b);
       }
-      const background=document.createElement('img');
-      background.className='wfLockBackground';
-      background.src='assets/lock-shell/lock-bg-01.png';
-      background.alt='';
       const locker=document.createElement('img');
       locker.className='wfLockerUp';
       locker.src='assets/lock-shell/locker-up-01.png';
       locker.alt='';
       const lockerLip=locker.cloneNode();
       lockerLip.className='wfLockerLip';
-      $wfLock.replaceChildren(background,locker,channels,lockerLip);
+      $wfLock.replaceChildren(locker,channels,lockerLip);
     }
     const opened=wfSequence.slice(0,wfStep);
     wfBarEls.forEach((b,i)=>{

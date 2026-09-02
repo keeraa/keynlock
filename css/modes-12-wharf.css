@@ -23,6 +23,10 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   justify-content:center;
 }
 .wfLock{
+  --wf-pin-h:clamp(180px,32vh,380px);
+  --wf-spring-idle-h:clamp(90px,18vh,170px);
+  --wf-spring-compressed-h:clamp(48px,9vh,82px);
+  --wf-pin-join:calc(var(--wf-pin-h) * .05);
   width:min(58vh,560px,96vw);
   height:min(58vh,560px,96vw);
   flex:0 1 auto;
@@ -53,9 +57,9 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
 .wfChannels{
   position:absolute;
   left:7.2%;
-  top:8.1%;
+  top:15%;
   width:85.6%;
-  height:86%;
+  height:79%;
   display:flex;
   align-items:stretch;
   justify-content:space-between;
@@ -74,10 +78,10 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
 .wfPinRig{
   position:absolute;
   left:50%;
-  top:calc(clamp(90px,18vh,170px) * var(--spring-rest,1) - 4px);
+  top:calc(var(--wf-spring-idle-h) * var(--spring-rest,1) - var(--wf-pin-join));
   bottom:auto;
-  height:clamp(180px,32vh,380px);
-  width:calc(clamp(180px,32vh,380px) * .248);
+  height:var(--wf-pin-h);
+  width:calc(var(--wf-pin-h) * .248);
   max-width:none;
   z-index:4;
   transform:translateX(-50%);
@@ -98,7 +102,7 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   left:50%;
   top:0;
   width:100%;
-  height:calc(clamp(90px,18vh,170px) * var(--spring-rest,1));
+  height:calc(var(--wf-spring-idle-h) * var(--spring-rest,1));
   transform:translateX(-50%);
   z-index:1;
   transition:height .3s cubic-bezier(.2,.75,.25,1),filter .2s ease;
@@ -107,8 +111,8 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   position:absolute;
   left:50%;
   top:0;
-  width:auto;
-  max-width:100%;
+  width:58%;
+  max-width:none;
   height:100%;
   object-fit:contain;
   object-position:top center;
@@ -119,10 +123,10 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
 .wfSpringIdle{opacity:1;}
 .wfSpringCompressed{opacity:0;}
 .wfBar.open .wfPinRig{
-  top:calc(clamp(48px,9vh,82px) - 4px);
+  top:calc(var(--wf-spring-compressed-h) - var(--wf-pin-join));
   filter:brightness(1.18);
 }
-.wfBar.open .wfSpring{height:clamp(48px,9vh,82px);filter:brightness(1.08);}
+.wfBar.open .wfSpring{height:var(--wf-spring-compressed-h);filter:brightness(1.08);}
 .wfBar.open .wfSpringIdle{opacity:0;}
 .wfBar.open .wfSpringCompressed{opacity:1;}
 .wfBar.wrong .wfPinRig{
@@ -134,14 +138,14 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   content:"▲";
   position:absolute;
   left:50%;
-  top:calc(clamp(90px,18vh,170px) * var(--spring-rest,1) + clamp(180px,32vh,380px) + 8px);
+  top:calc(var(--wf-spring-idle-h) * var(--spring-rest,1) + var(--wf-pin-h) - var(--wf-pin-join) + 8px);
   bottom:auto;
   transform:translateX(-50%);
   color:#d8b871;
   font-size:min(3.4cqw,13px);
   z-index:3;
 }
-.wfBar.current.open:after{top:calc(clamp(48px,9vh,82px) + clamp(180px,32vh,380px) + 8px);}
+.wfBar.current.open:after{top:calc(var(--wf-spring-compressed-h) + var(--wf-pin-h) - var(--wf-pin-join) + 8px);}
 
 .wfHelp{
   flex:none;
@@ -153,8 +157,8 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
 .wfHelp:empty{display:none;}
 
 @media (max-width:650px){
-  .wfLock{width:min(58vh,360px,96vw);height:min(58vh,360px,96vw);}
-  .wfPinRig{height:clamp(140px,28vh,260px);width:calc(clamp(140px,28vh,260px) * .248);}
-  .wfBar.current:after{top:calc(clamp(90px,18vh,170px) * var(--spring-rest,1) + clamp(140px,28vh,260px) + 6px);}
-  .wfBar.current.open:after{top:calc(clamp(48px,9vh,82px) + clamp(140px,28vh,260px) + 6px);}
+  .wfLock{--wf-pin-h:clamp(140px,28vh,260px);width:min(58vh,360px,96vw);height:min(58vh,360px,96vw);}
+  .wfPinRig{height:var(--wf-pin-h);width:calc(var(--wf-pin-h) * .248);}
+  .wfBar.current:after{top:calc(var(--wf-spring-idle-h) * var(--spring-rest,1) + var(--wf-pin-h) - var(--wf-pin-join) + 6px);}
+  .wfBar.current.open:after{top:calc(var(--wf-spring-compressed-h) + var(--wf-pin-h) - var(--wf-pin-join) + 6px);}
 }

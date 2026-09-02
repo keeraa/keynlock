@@ -67,10 +67,18 @@ function apSelectPin(i){
   SFX.select();
   renderAlphaProtocol();
 }
+function apReleasePin(i){
+  const p=apPins[i];
+  if(!p?.set) return;
+  const step=apOrder.indexOf(i);
+  if(step<0) return;
+  for(let s=step;s<apOrder.length;s++) apPins[apOrder[s]].set=false;
+  apOrderStep=Math.min(apOrderStep,step);
+}
 function apMovePin(dir){
   if(solved||apTimeLeft<=0) return;
   const p=apPins[apSel];
-  if(p.set){ toast('Этот пин уже зафиксирован — перейди к другому'); return; }
+  apReleasePin(apSel);
   registerMove();
   p.y=apClampY(p.y+dir*AP_STEP);
   renderAlphaProtocol();
@@ -166,10 +174,10 @@ for(let apPinIndex=0;apPinIndex<5;apPinIndex++){
   apPinEl.addEventListener('pointermove',e=>{
     if(!apDrag||apDrag.i!==apPinIndex) return;
     const p=apPins[apPinIndex];
-    if(p.set) return;
     const deltaPercent=(e.clientY-apDrag.startY)/apDrag.pinHeight*100;
     const newY=apClampY(apDrag.startPinY+deltaPercent);
     if(newY!==p.y){
+      apReleasePin(apPinIndex);
       if(!apDrag.moved){ registerMove(); apDrag.moved=true; }
       p.y=newY;
       renderAlphaProtocol();

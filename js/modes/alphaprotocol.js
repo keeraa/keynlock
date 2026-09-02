@@ -8,11 +8,15 @@ const AP_SYMBOLS=[
   '<svg viewBox="0 0 48 48"><path d="M14 43V23Q14 7 28 7Q41 7 41 22V25"/></svg>',
   '<svg viewBox="0 0 48 48"><path d="M39 6L14 24L39 43"/></svg>'
 ];
-const AP_STEP=.5, AP_MIN_Y=2, AP_MAX_Y=43, AP_TOL=2;
+const AP_STEP=.5, AP_SHAFT_RATIO=.825, AP_MIN_Y=0, AP_MAX_Y=17.5, AP_TOL=1.5;
+const AP_GROOVE_MIN=40, AP_GROOVE_MAX=60;
 function apClampY(v){ return Math.max(AP_MIN_Y,Math.min(AP_MAX_Y,Math.round(v/AP_STEP)*AP_STEP)); }
-function apTargetFor(groove){ return apClampY(50-groove*.55); }
+// The beam crosses the exact centre of the interaction channel. Restricting
+// the groove to the visible middle of the enlarged shaft guarantees that
+// every generated pin can reach it without clipping either end of the pin.
+function apTargetFor(groove){ return apClampY(50-groove*AP_SHAFT_RATIO); }
 function apMakePin(){
-  const groove=14+Math.floor(Math.random()*73), target=apTargetFor(groove);
+  const groove=AP_GROOVE_MIN+Math.floor(Math.random()*(AP_GROOVE_MAX-AP_GROOVE_MIN+1)), target=apTargetFor(groove);
   const candidates=[-16,-12,-9,-6,6,9,12,16].map(v=>apClampY(target+v)).filter(v=>v!==target);
   const y=candidates.length?candidates[Math.floor(Math.random()*candidates.length)]:apClampY(target+6);
   return {y,groove,target,set:false};

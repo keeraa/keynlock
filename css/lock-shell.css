@@ -11,6 +11,7 @@ body.lock-shell-active{
 }
 
 body.lock-shell-active[data-game-mode="watchmen"]{--lock-shell-height:470px;}
+body.lock-shell-active[data-game-mode="alphaprotocol"]{--lock-shell-height:430px;}
 
 /* Shared spring-and-pin primitive used by Wharf and spring-tumbler modes. */
 .springPinChannel{position:relative;min-width:0;overflow:hidden;}

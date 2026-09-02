@@ -580,8 +580,14 @@
 <!-- MODE: MASS EFFECT -->
 <div class="modePanel massMode" data-mode="mass" hidden="" id="massMode">
 <div class="massBoardViewport">
+<div class="massReadout" aria-live="polite">
+<span class="massReadoutKicker">КОНТУРЫ ДОСТУПА</span>
+<strong id="massStatus">ВЫБЕРИ КОЛЬЦО</strong>
+<span class="massProgress" id="massProgress" aria-label="Прогресс колец"></span>
+</div>
 <div class="massBoard">
-<div class="massPointer"></div>
+<div class="massTargetBeam" aria-hidden="true"></div>
+<div class="massPointer" aria-hidden="true"></div>
 <div class="massRings" id="massRings"></div>
 <button aria-label="Открыть замок" class="massCenter" id="massCenter" type="button">
 <span class="massCenterLock" aria-hidden="true">
@@ -593,6 +599,7 @@
 <span id="massCenterText" hidden>ОТКРЫТЬ</span>
 </button>
 </div>
+<div class="massControlsHint"><b>← →</b> вращать кольцо <span></span><b>↑ ↓</b> выбрать кольцо</div>
 </div>
 
 </div>

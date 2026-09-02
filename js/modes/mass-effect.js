@@ -3,10 +3,10 @@
   let meRings=[], meSelected=0, meInitialPositions=[];
   function massGradientForRing(ring){
     const step = 360 / ring.count;
-    const goodColor = '#f0c878';
-    const decoyColor = '#8e6a39';
-    const baseColor = '#2f2418';
-    const darkGap = '#15100b';
+    const goodColor = '#74f1ff';
+    const decoyColor = '#317f9c';
+    const baseColor = '#172c3b';
+    const darkGap = '#07131c';
     const gap = Math.max(2.2, step * .11);
     const parts = [];
 
@@ -44,6 +44,7 @@
       btn.style.setProperty('--mass-marker-width', `${Math.max(14, Math.round(ring.thickness * .34))}px`);
       btn.style.setProperty('--mass-marker-height', `${Math.max(10, Math.round(ring.thickness * .24))}px`);
       btn.style.setProperty('--mass-marker-bottom', `${Math.max(8, Math.round(ring.thickness * .18))}px`);
+      btn.style.setProperty('--mass-ring-color', ['#7cecff','#5db9ff','#8d8cff'][i] || '#7cecff');
       const ringNames = ['Внешнее кольцо','Среднее кольцо','Внутреннее кольцо'];
       btn.setAttribute('aria-label', ringNames[i] || `Кольцо ${i+1}`);
 
@@ -53,6 +54,11 @@
       disc.style.transform = `rotate(${(ring.pos * 360 / ring.count).toFixed(2)}deg)`;
       disc.style.webkitMask = disc.style.mask = `radial-gradient(circle, transparent calc(50% - ${ring.thickness}px), #000 calc(50% - ${ring.thickness}px + 1px), #000 calc(50% - 1px), transparent 50%)`;
       btn.appendChild(disc);
+
+      const badge=document.createElement('span');
+      badge.className='massRingBadge';
+      badge.textContent=massRingSolved(ring)?'✓':String(i+1);
+      btn.appendChild(badge);
 
       btn.addEventListener('click', () => {
         if(solved) return;
@@ -65,6 +71,11 @@
     });
 
     const ready = meRings.length && meRings.every(massRingSolved);
+    const active=meRings[meSelected];
+    const status=document.querySelector('#massStatus');
+    const progress=document.querySelector('#massProgress');
+    if(status) status.textContent=solved?'ДОСТУП РАЗРЕШЁН':ready?'ВСЕ КОНТУРЫ СОВПАЛИ':`КОЛЬЦО ${meSelected+1} · ${massRingSolved(active)?'СОВПАДЕНИЕ':'СОВМЕСТИ ЯРКИЙ СЕКТОР С ЛУЧОМ'}`;
+    if(progress) progress.innerHTML=meRings.map((item,i)=>`<i class="${massRingSolved(item)?'ready ':''}${i===meSelected?'selected':''}"></i>`).join('');
     $massCenter.classList.toggle('ready', ready && !solved);
     $massCenterText.textContent = solved ? 'ОТКРЫТО' : (ready ? 'ОТКРЫТЬ' : 'ПОВОРОТ');
   }
@@ -87,7 +98,9 @@
     ];
     meRings = configs.map(cfg => {
       const goodIndex = rand(0, cfg.count-1);
-      const targetIndex = Math.floor(cfg.count / 2);
+      // The scanner and pointer are at 12 o'clock, so the highlighted sector
+      // is solved only when its centre reaches index zero (the top).
+      const targetIndex = 0;
       const solution = (targetIndex - goodIndex + cfg.count) % cfg.count;
       const decoys = [];
       while(decoys.length < decoyCount){

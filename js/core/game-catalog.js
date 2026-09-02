@@ -10,7 +10,7 @@ const GAME_DEFINITIONS={
   sequence:{title:'Альтернатива 2',kind:'native',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:true,noiseSensor:true,guards:true,birds:true}},
   special:{title:'Особые замки',kind:'native',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:true,noiseSensor:true,guards:true,birds:true}},
   hillsfar:{title:'Hillsfar',description:'Сравни слепок замочной скважины с заготовками ключей и выбери ключ с подходящим профилем.',objective:'ВЫБРАТЬ КЛЮЧ, СОВПАДАЮЩИЙ СО СЛЕПКОМ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
-  mass:{title:'Mass Effect',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
+  mass:{title:'Mass Effect',description:'Вращай три контура и совмести яркий сектор каждого кольца с верхним сканирующим лучом.',objective:'СОВМЕСТИТЬ ЯРКИЕ СЕКТОРЫ ТРЁХ КОЛЕЦ С ВЕРХНИМ ЛУЧОМ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   g1:{title:'Gothic 1',kind:'native',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:false,guards:false,birds:false}},
   skyrim:{title:'Skyrim',description:'Найди рабочий угол отмычки по сопротивлению механизма, затем проверни цилиндр.',objective:'НАЙТИ ПРАВИЛЬНЫЙ УГОЛ ОТМЫЧКИ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   anach:{title:'Anachronox',description:'Настрой три канала так, чтобы их суммарное отклонение исчезло и сигнал достиг 100.0.',objective:'МЕНЯЙ 3 КАНАЛА ТАК, ЧТОБЫ ЧИСЛО ВЫРОСЛО ДО 100.0',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},

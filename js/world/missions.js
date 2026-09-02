@@ -9,15 +9,6 @@
   const MISSIONS_UNLOCK_ALL = true;
 
   const MISSION_TIERS = [1, 2, 3];
-  const MISSION_SYMBOLS = {
-    classic:'⇅', sequence:'ⅠⅡ', special:'✦', hillsfar:'✣',
-    mass:'⌁', g1:'⛓', skyrim:'✧', anach:'⧖', tension:'∠', resonance:'≋',
-    deduction:'◇', composite:'⛓', heatcold:'◐', drum:'⚙', scope:'∿', oblivion:'⊙',
-    watchmen:'⌚', museum:'⚿', mass2:'⬡', pipeline:'┣', wharf:'↕', thiefds:'⌁',
-    kingdomcome:'⊙', thief12:'◉', fallout:'⟳', anachlab:'⚗', masshack:'⌬',
-    pathologic:'∥', bioshock2:'⌁', alphaprotocol:'≡'
-  };
-
   // Position is the only thing authored per game; labels come from the catalog.
   const MISSION_PLACES = [
     { mode: 'classic',   x: 28, y: 62 },
@@ -185,26 +176,27 @@
       const open = missionUnlocked()&&supported;
       const node = document.createElement('button');
       node.type = 'button';
-      node.className = 'mapNode missionNode mission ' + (open ? 'accessible' : 'locked');
+      node.className = 'mapNode mapPreviewNode missionNode mission ' + (open ? 'accessible' : 'locked');
       node.dataset.location = id;
       node.disabled=!open;
       node.setAttribute('aria-disabled', open?'false':'true');
       node.style.setProperty('--mx', `${place.x}%`);
       node.style.setProperty('--my', `${place.y}%`);
 
-      const dot = document.createElement('span');
-      dot.className = 'mapNodeDot missionDot';
-      dot.textContent = MISSION_SYMBOLS[place.mode] || '◇';
       const preview=document.createElement('span');
       preview.className='mapMissionPreview';
       const previewImage=document.createElement('img');
       previewImage.src=GameCatalog.get(place.mode).location;
       previewImage.alt='';
       previewImage.loading='lazy';
-      preview.append(previewImage,dot);
+      const readiness=document.createElement('span');
+      readiness.className='mapMissionReadiness';
+      readiness.textContent=String(GameCatalog.get(place.mode).readiness);
+      readiness.title='Готовность игры';
+      preview.append(previewImage,readiness);
       const label = document.createElement('span');
       label.className = 'mapNodeLabel';
-      label.textContent = (GameCatalog.mapLabel(place.mode,missionLabel(place))+(GameCatalog.get(place.mode).difficulty.levels.length<3?' · только 1 ур.':'')).toLocaleUpperCase('ru-RU');
+      label.textContent = missionLabel(place).toLocaleUpperCase('ru-RU');
       const tiers = document.createElement('span');
       tiers.className = 'mapNodeTiers';
       for (const tier of MISSION_TIERS) {

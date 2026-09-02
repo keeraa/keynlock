@@ -118,15 +118,16 @@
 
 /* One node per lock game means they sit far tighter than the old district
    markers, so the hit box hugs its own label instead of a fixed 110px. */
-#worldMapCanvas .mapNode.missionNode{width:max-content;min-width:0;padding:52px 2px 2px;z-index:9;}
-#worldMapCanvas .mapNode.missionNode:hover,#worldMapCanvas .mapNode.missionNode:focus-visible{z-index:30;}
-#worldMapCanvas .mapMissionPreview{position:absolute;left:50%;bottom:25px;width:78px;height:46px;transform:translateX(-50%);overflow:hidden;border:2px solid rgba(151,116,64,.72);border-radius:10px;background:#17130f;box-shadow:0 5px 14px rgba(0,0,0,.5);transition:width .2s ease,height .2s ease,border-color .2s ease,box-shadow .2s ease;}
+#worldMapCanvas .mapNode.mapPreviewNode{width:max-content;min-width:0;padding:78px 2px 2px;z-index:9;}
+#worldMapCanvas .mapNode.mapPreviewNode:hover,#worldMapCanvas .mapNode.mapPreviewNode:focus-visible{z-index:30;}
+#worldMapCanvas .mapMissionPreview{position:absolute;left:50%;bottom:25px;width:117px;height:69px;transform:translateX(-50%);overflow:hidden;border:2px solid rgba(151,116,64,.72);border-radius:10px;background:#17130f;box-shadow:0 5px 14px rgba(0,0,0,.5);transition:width .4s ease,height .4s ease,border-color .4s ease,box-shadow .4s ease;}
 #worldMapCanvas .mapMissionPreview::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,6,5,.05) 25%,rgba(7,6,5,.82) 100%);pointer-events:none;}
-#worldMapCanvas .mapMissionPreview>img{display:block;width:100%;height:100%;object-fit:cover;filter:saturate(.78) brightness(.72);transition:filter .2s ease,transform .25s ease;}
-#worldMapCanvas .mapNode.missionNode:hover .mapMissionPreview,#worldMapCanvas .mapNode.missionNode:focus-visible .mapMissionPreview{width:224px;height:126px;border-color:#d6ab5e;box-shadow:0 12px 30px rgba(0,0,0,.7);}
-#worldMapCanvas .mapNode.missionNode:hover .mapMissionPreview>img,#worldMapCanvas .mapNode.missionNode:focus-visible .mapMissionPreview>img{filter:saturate(.95) brightness(.86);transform:scale(1.035);}
-#worldMapCanvas .mapNode.missionNode .mapNodeDot{left:50%;top:45%;width:34px;height:34px;border-width:2px;font-size:18px;z-index:2;}
-#worldMapCanvas .mapNodeTiers{position:absolute;left:0;right:0;bottom:6px;z-index:2;display:flex;gap:6px;justify-content:center;margin:0;}
+#worldMapCanvas .mapMissionPreview>img{display:block;width:100%;height:100%;object-fit:cover;filter:saturate(.78) brightness(.72);transition:filter .4s ease,transform .5s ease;}
+#worldMapCanvas .mapNode.mapPreviewNode:hover .mapMissionPreview,#worldMapCanvas .mapNode.mapPreviewNode:focus-visible .mapMissionPreview{width:224px;height:126px;border-color:#d6ab5e;box-shadow:0 12px 30px rgba(0,0,0,.7);}
+#worldMapCanvas .mapNode.mapPreviewNode:hover .mapMissionPreview>img,#worldMapCanvas .mapNode.mapPreviewNode:focus-visible .mapMissionPreview>img{filter:saturate(.95) brightness(.86);transform:scale(1.035);}
+#worldMapCanvas .mapMissionReadiness{position:absolute;right:7px;top:6px;z-index:2;min-width:23px;height:23px;padding:0 5px;display:grid;place-items:center;border:1px solid rgba(232,194,114,.72);border-radius:7px;background:rgba(20,15,10,.86);color:#f0ca79;font:700 13px/1 Arial,sans-serif;box-shadow:0 2px 7px rgba(0,0,0,.5);}
+#worldMapCanvas .mapNodeTiers{position:absolute;left:0;right:0;bottom:6px;z-index:2;display:flex;gap:6px;justify-content:center;margin:0;opacity:0;transform:translateY(5px);transition:opacity .2s ease .2s,transform .2s ease .2s;}
+#worldMapCanvas .mapNode.mapPreviewNode:hover .mapNodeTiers,#worldMapCanvas .mapNode.mapPreviewNode:focus-visible .mapNodeTiers{opacity:1;transform:translateY(0);}
 #worldMapCanvas .mapTierPip{width:18px;height:18px;border-radius:50%;background:rgba(30,23,16,.75);box-shadow:inset 0 0 0 1px rgba(196,166,110,.45);}
 #worldMapCanvas .mapTierPip.done{background:#d9a74c;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35);}
 #worldMapCanvas .mapTierPip.current{outline:2px solid rgba(240,200,110,.75);outline-offset:2px;}

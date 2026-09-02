@@ -77,12 +77,19 @@
         channels.appendChild(b);
         wfBarEls.push(b);
       }
-      const locker=document.createElement('img');
+      const locker=document.createElement('div');
       locker.className='wfLockerUp';
-      locker.src='assets/lock-shell/locker-up-01.png';
-      locker.alt='';
-      const lockerLip=locker.cloneNode();
+      locker.style.setProperty('--wf-bars',wfBarCount);
+      locker.setAttribute('aria-hidden','true');
+      for(let i=0;i<wfBarCount;i++){
+        const cell=document.createElement('span');
+        cell.className='wfLockerCell';
+        locker.appendChild(cell);
+      }
+      const lockerLip=document.createElement('img');
       lockerLip.className='wfLockerLip';
+      lockerLip.src='assets/lock-shell/locker-up-01.png';
+      lockerLip.alt='';
       $wfLock.replaceChildren(locker,channels,lockerLip);
     }
     const opened=wfSequence.slice(0,wfStep);

@@ -10,7 +10,7 @@ const AP_SYMBOLS=[
 ];
 const AP_STEP=.5, AP_MIN_Y=-2, AP_MAX_Y=50, AP_TOL=2;
 function apClampY(v){ return Math.max(AP_MIN_Y,Math.min(AP_MAX_Y,Math.round(v/AP_STEP)*AP_STEP)); }
-function apTargetFor(groove){ return apClampY(50-groove*.52); }
+function apTargetFor(groove){ return apClampY(50-groove*.60); }
 function apMakePin(){
   const groove=14+Math.floor(Math.random()*73), target=apTargetFor(groove);
   const candidates=[-16,-12,-9,-6,6,9,12,16].map(v=>apClampY(target+v)).filter(v=>v!==target);

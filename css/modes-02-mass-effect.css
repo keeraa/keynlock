@@ -17,3 +17,13 @@
 .massRing::before{opacity:.08;box-shadow:inset 0 0 0 1px rgba(145,122,84,.35)}.massRing.selected::before{opacity:1;box-shadow:inset 0 0 0 3px var(--mass-ring-color),0 0 10px rgba(197,158,91,.38)}.massRing.ready::before{box-shadow:inset 0 0 0 2px #b9914f,0 0 9px rgba(185,145,75,.32)}
 .massRingDisc{opacity:1;filter:brightness(.82) saturate(.72) drop-shadow(0 6px 12px rgba(0,0,0,.42))}.massRing.selected .massRingDisc{opacity:1;filter:brightness(1.18) saturate(.92) drop-shadow(0 4px 10px rgba(0,0,0,.45))}.massRing.ready .massRingDisc{opacity:.72;filter:sepia(.22) brightness(.94) saturate(.72)}
 .massCenter{border-color:rgba(171,137,82,.38);background:radial-gradient(circle,rgba(55,45,32,.86),rgba(17,14,11,.96));box-shadow:0 0 0 8px rgba(90,69,39,.18),inset 0 0 28px rgba(0,0,0,.36)}.massCenter.ready{border-color:#d1ad67;box-shadow:0 0 0 8px rgba(151,111,52,.16),0 0 22px rgba(205,158,77,.34)}
+
+/* Selection belongs to the segmented band, never to an empty circumference. */
+.massBoard{background:transparent;box-shadow:none}
+.massBoard::before,.massBoard::after{display:none}
+.massRing{opacity:.16;filter:grayscale(.38) brightness(.72)}
+.massRing.selected{opacity:1;filter:none}
+.massRing.ready:not(.selected){opacity:.42}
+.massRing::before{inset:0;border:0;background:rgba(229,192,119,.18);box-shadow:none;opacity:0;-webkit-mask:radial-gradient(circle,transparent calc(50% - var(--mass-thickness) - 5px),#000 calc(50% - var(--mass-thickness) - 1px),#000 calc(50% - 1px),transparent 50%);mask:radial-gradient(circle,transparent calc(50% - var(--mass-thickness) - 5px),#000 calc(50% - var(--mass-thickness) - 1px),#000 calc(50% - 1px),transparent 50%)}
+.massRing.selected::before{opacity:1;box-shadow:none;filter:drop-shadow(0 0 7px rgba(217,176,97,.48))}
+.massRing.ready::before{background:rgba(207,169,96,.2);box-shadow:none}

@@ -2,6 +2,8 @@
   // ===== WATCHMEN (Подпружиненные тумблеры) =====
   let wmPins=[], wmSelected=0, wmPinEls=[], wmTimeLeft=16, wmTimeMax=16;
   const WM_SCALE=2.05, WM_LOCK_TOL=3.8, WM_MIN=0, WM_MAX=96, WM_ROUGH_MISS=18;
+  const WM_SPRINGS=Object.freeze(['01','03','04']);
+  const WM_FALLBACK_GEOMETRY=Object.freeze({pinH:140,springMin:20,scale:WM_SCALE});
   // Five spring-loaded pins, each with a hidden target height. Raising or
   // lowering the selected pin also nudges its neighbors (coupled springs;
   // some pins are randomly "inverted" and move opposite to the input), and
@@ -17,28 +19,23 @@
     return !!p && !p.locked && Math.abs(p.h-p.target)<=WM_LOCK_TOL;
   }
 
-  // The pin's own height, its resting offset off the slot floor, and the
-  // rise-per-unit scale (--wm-scale, also read by .wmTarget's CSS formula
-  // so the target line always lines up with the pin) are all derived from
-  // wmLock's actual rendered height rather than fixed pixels — wmLock has
-  // no min-height (css/modes-08-watchmen.css), so this keeps the physics
-  // correct whether the shared puzzle area gives it 150px or 400px+.
+  // One geometry function owns the spring end, pin top and target marker.
+  // Keeping those coordinates in the same system prevents visual drift when
+  // the universal shell changes size.
   function wmApplyGeometry(){
-    if(!$wmLock) return WM_SCALE;
+    if(!$wmLock) return WM_FALLBACK_GEOMETRY;
     const channels=$wmLock.querySelector('.wmChannels');
-    if(!channels) return WM_SCALE;
+    if(!channels) return WM_FALLBACK_GEOMETRY;
     const cs=getComputedStyle(channels);
     const h=channels.clientHeight-(parseFloat(cs.paddingTop)||0)-(parseFloat(cs.paddingBottom)||0);
-    if(!h || h<0) return WM_SCALE;
-    const pinBottom=Math.max(8,Math.min(22,h*.07));
-    const pinH=Math.max(36,Math.min(112,h*.36));
-    const topClearance=Math.max(8,h*.09);
-    const availableRise=Math.max(24,h-pinBottom-pinH-topClearance);
+    if(!h || h<0) return WM_FALLBACK_GEOMETRY;
+    const pinH=Math.max(78,Math.min(152,h*.5));
+    const springMin=Math.max(18,h*.065);
+    const bottomClearance=Math.max(18,h*.07);
+    const availableRise=Math.max(24,h-pinH-springMin-bottomClearance);
     const scale=availableRise/WM_MAX;
-    $wmLock.style.setProperty('--wm-pin-bottom',pinBottom.toFixed(1)+'px');
     $wmLock.style.setProperty('--wm-pin-h',pinH.toFixed(1)+'px');
-    $wmLock.style.setProperty('--wm-scale',scale.toFixed(3));
-    return scale;
+    return {pinH,springMin,scale};
   }
 
   // Regenerates just the puzzle state (pins + timer) without touching the
@@ -58,7 +55,8 @@
     const inverted=new Set(order.slice(0,invertCount));
     wmPins=Array.from({length:5},(_,i)=>({
       h:10+Math.random()*20, target:58+Math.random()*30, locked:false,
-      weight:.7+Math.random()*.7, inverted:inverted.has(i)
+      weight:.7+Math.random()*.7, inverted:inverted.has(i),
+      spring:WM_SPRINGS[Math.floor(Math.random()*WM_SPRINGS.length)]
     }));
     generatedDistance=5;
   }
@@ -86,10 +84,9 @@
       wmPinEls=[];
       wmPins.forEach((p,i)=>{
         const s=document.createElement('div');
-        s.className='wmSlot';
+        s.className='wmSlot springPinChannel';
         s.dataset.i=i;
-        s.innerHTML=`<div class="wmSpring"></div><div class="wmTarget"></div><img class="wmPin" src="${currentGamePinSkin()}" alt="">`;
-        s.style.setProperty('--wm-target',p.target.toFixed(1));
+        s.innerHTML=`<span class="wmSpring springPinSpring" aria-hidden="true"><img src="assets/springs/spring_idle_${p.spring}.png" alt=""></span><div class="wmTarget"></div><div class="wmPinRig springPinRig"><img class="wmPin springPinImage" src="${currentGamePinSkin()}" alt=""></div>`;
         s.addEventListener('click',()=>{
           if(solved) return;
           wmSelected=i;
@@ -101,17 +98,19 @@
       });
       channels.replaceChildren(frag);
     }
-    const scale=wmApplyGeometry();
+    const geometry=wmApplyGeometry();
     wmPins.forEach((p,i)=>{
       const s=wmPinEls[i];
       const pin=s.querySelector('.wmPin');
       if(pin && pin.getAttribute('src')!==currentGamePinSkin()) pin.src=currentGamePinSkin();
       if(!s) return;
-      s.style.setProperty('--wm-target',p.target.toFixed(1));
+      const pinTop=geometry.springMin+(WM_MAX-p.h)*geometry.scale;
+      const targetTop=geometry.springMin+(WM_MAX-p.target)*geometry.scale+geometry.pinH*.82;
+      s.style.setProperty('--wm-pin-top',pinTop.toFixed(1)+'px');
+      s.style.setProperty('--wm-target-top',targetTop.toFixed(1)+'px');
       s.classList.toggle('selected',i===wmSelected);
       s.classList.toggle('locked',p.locked);
       s.classList.toggle('lockable',!solved && wmCanLock(i));
-      pin.style.setProperty('--wm-rise',(p.h*scale).toFixed(1));
     });
     if($wmTimerBar) $wmTimerBar.style.width=Math.max(0,wmTimeLeft/wmTimeMax*100)+'%';
     const n=wmPins.filter(p=>p.locked).length;

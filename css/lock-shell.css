@@ -10,6 +10,15 @@ body.lock-shell-active{
   --lock-shell-plate-scale:1;
 }
 
+body.lock-shell-active[data-game-mode="watchmen"]{--lock-shell-height:470px;}
+
+/* Shared spring-and-pin primitive used by Wharf and spring-tumbler modes. */
+.springPinChannel{position:relative;min-width:0;overflow:hidden;}
+.springPinSpring{position:absolute;left:50%;top:0;z-index:1;transform:translateX(-50%);pointer-events:none;}
+.springPinSpring img{position:absolute;left:50%;top:0;width:100%;max-width:none;height:100%;object-fit:fill;object-position:top center;transform:translateX(-50%);transform-origin:top center;}
+.springPinRig{position:absolute;left:50%;z-index:4;transform:translateX(-50%);pointer-events:none;}
+.springPinImage{position:relative;display:block;width:100%;height:100%;z-index:2;}
+
 /* One geometry contract for every puzzle rendered inside the universal shell. */
 .lockShellPuzzleBlock{
   width:var(--lock-shell-size);

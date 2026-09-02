@@ -5,16 +5,17 @@ body.importedMode .puzzleArea>.modePanel.wmMode:not([hidden]){padding-bottom:cal
 .wmLockWrap{position:absolute;inset:0;display:block;overflow:visible;}
 .wmLock{box-sizing:border-box;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:hidden;container-type:inline-size;}
 .wmLockerUp{--wf-bars:5;}
-.wmChannels{position:absolute;left:7.2%;top:15%;width:85.6%;height:69%;z-index:2;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4.5%;align-items:stretch;}
-.wmSlot{min-width:0;position:relative;cursor:pointer;border:0;border-radius:0;background:transparent;box-shadow:none;}
+.wmChannels{position:absolute;left:7.2%;top:15%;width:85.6%;height:72%;z-index:2;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:stretch;}
+.wmSlot{cursor:pointer;border:0;border-radius:0;background:transparent;box-shadow:none;}
 .wmSlot::after{content:"▲";position:absolute;left:50%;bottom:1%;transform:translateX(-50%);color:transparent;font-size:2.4cqw;transition:color .16s ease,filter .16s ease;}
 .wmSlot.selected::after{color:#d8b871;filter:drop-shadow(0 0 5px rgba(216,184,113,.5));}
-.wmSpring{position:absolute;left:50%;top:1%;width:48%;height:22%;transform:translateX(-50%);background:repeating-linear-gradient(180deg,transparent 0 5px,#a5a69f 5px 7px);opacity:.78;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));}
-.wmPin{position:absolute;left:20%;bottom:var(--wm-pin-bottom,22px);width:60%;height:var(--wm-pin-h,112px);object-fit:fill;transform:translateY(calc(-1px * var(--wm-rise,0)));transition:transform .08s linear;filter:drop-shadow(0 4px 5px rgba(0,0,0,.42));}
-.wmTarget{position:absolute;left:20%;right:20%;bottom:calc(var(--wm-pin-bottom,22px) + 12px + var(--wm-target,70) * var(--wm-scale,2.05) * 1px);height:12px;transform:translateY(50%);border-top:1px solid rgba(214,184,113,.76);border-bottom:1px solid rgba(214,184,113,.76);background:rgba(18,16,11,.9);box-sizing:border-box;pointer-events:none;z-index:2;}
-.wmSlot.locked .wmPin{filter:sepia(.18) hue-rotate(42deg) brightness(1.12) drop-shadow(0 0 9px rgba(135,188,99,.28));}
+.wmSpring{width:48%;height:calc(var(--wm-pin-top,80px) + 2px);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));transition:height .12s linear,filter .18s ease;}
+.wmPinRig{top:var(--wm-pin-top,80px);width:48%;height:var(--wm-pin-h,140px);transition:top .12s linear,filter .18s ease;filter:drop-shadow(0 4px 5px rgba(0,0,0,.42));}
+.wmPin{object-fit:fill;}
+.wmTarget{position:absolute;left:26%;width:48%;top:var(--wm-target-top,180px);height:8px;transform:translateY(-50%);border-top:1px solid rgba(214,184,113,.76);border-bottom:1px solid rgba(214,184,113,.76);background:rgba(18,16,11,.9);box-sizing:border-box;pointer-events:none;z-index:5;}
+.wmSlot.locked .wmPinRig{filter:sepia(.18) hue-rotate(42deg) brightness(1.12) drop-shadow(0 0 9px rgba(135,188,99,.28));}
 .wmSlot.lockable .wmTarget{background:rgba(214,184,113,.2);border-color:#e8c977;box-shadow:0 0 7px rgba(232,201,119,.3);}
-.wmSlot.lockable .wmPin{filter:brightness(1.12) drop-shadow(0 0 7px rgba(216,184,113,.25));}
+.wmSlot.lockable .wmPinRig{filter:brightness(1.12) drop-shadow(0 0 7px rgba(216,184,113,.25));}
 .wmTimeBar{position:absolute;left:8%;right:8%;bottom:4%;height:6px;background:#0b0e0b;border:1px solid #4b4434;border-radius:99px;overflow:hidden;z-index:7;}
 .wmTimeBar span{display:block;height:100%;width:100%;background:#b39158;transition:width .08s linear;}
 .wmHelp,.wmOpenBtn{display:none!important;}

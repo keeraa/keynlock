@@ -63,18 +63,18 @@
       wfBarEls=[];
       for(let i=0;i<wfBarCount;i++){
         const b=document.createElement('div');
-        b.className='wfBar';
+        b.className='wfBar springPinChannel';
         const silverSprings=['01','03','04'];
         const spring=silverSprings[Math.floor(Math.random()*silverSprings.length)];
         // The spring is fixed to the top of its channel. Its resting length
         // sets the pin position; raising the pin compresses the spring.
         b.style.setProperty('--spring-rest',(0.72+Math.random()*0.36).toFixed(2));
-        b.innerHTML=`<span class="wfSpring" aria-hidden="true">
+        b.innerHTML=`<span class="wfSpring springPinSpring" aria-hidden="true">
             <img class="wfSpringIdle" src="assets/springs/spring_idle_${spring}.png" alt="">
             <img class="wfSpringCompressed" src="assets/springs/spring_compressed_${spring}.png" alt="">
           </span>
-          <div class="wfPinRig">
-            <img class="wfPin" src="${currentGamePinSkin()}" alt="">
+          <div class="wfPinRig springPinRig">
+            <img class="wfPin springPinImage" src="${currentGamePinSkin()}" alt="">
         </div>`;
         b.addEventListener('click',()=>{
           if(solved) return;

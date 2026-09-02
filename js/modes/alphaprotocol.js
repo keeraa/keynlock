@@ -8,9 +8,9 @@ const AP_SYMBOLS=[
   '<svg viewBox="0 0 48 48"><path d="M14 43V23Q14 7 28 7Q41 7 41 22V25"/></svg>',
   '<svg viewBox="0 0 48 48"><path d="M39 6L14 24L39 43"/></svg>'
 ];
-const AP_STEP=.5, AP_MIN_Y=-14, AP_MAX_Y=50, AP_TOL=2;
+const AP_STEP=.5, AP_MIN_Y=2, AP_MAX_Y=43, AP_TOL=2;
 function apClampY(v){ return Math.max(AP_MIN_Y,Math.min(AP_MAX_Y,Math.round(v/AP_STEP)*AP_STEP)); }
-function apTargetFor(groove){ return apClampY(50-groove*.72); }
+function apTargetFor(groove){ return apClampY(50-groove*.55); }
 function apMakePin(){
   const groove=14+Math.floor(Math.random()*73), target=apTargetFor(groove);
   const candidates=[-16,-12,-9,-6,6,9,12,16].map(v=>apClampY(target+v)).filter(v=>v!==target);

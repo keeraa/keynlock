@@ -14,7 +14,7 @@ body.importedMode .puzzleArea>.modePanel.apMode:not([hidden]){padding-bottom:cal
 .apPin.active::after{color:#d8b871;filter:drop-shadow(0 0 5px rgba(216,184,113,.5));}
 .apPin.set{filter:sepia(.18) brightness(1.08);}
 .apPin.ready .apGroove{background:#302819;border-color:#efd38b;box-shadow:0 0 7px rgba(239,211,139,.28);}
-.apShaft{position:absolute;left:-5%;right:-5%;height:72%;top:var(--y,24%);background-position:center;background-size:100% 100%;background-repeat:no-repeat;transition:top .05s;overflow:visible;z-index:1;filter:drop-shadow(0 5px 5px rgba(0,0,0,.42));}
+.apShaft{position:absolute;left:20%;right:20%;height:55%;top:var(--y,24%);background-position:center;background-size:100% 100%;background-repeat:no-repeat;transition:top .05s;overflow:visible;z-index:1;filter:drop-shadow(0 5px 5px rgba(0,0,0,.42));}
 .apPin.active .apShaft{filter:brightness(1.12) drop-shadow(0 0 7px rgba(216,184,113,.26)) drop-shadow(0 5px 5px rgba(0,0,0,.42));}
 .apPin.set .apShaft{filter:sepia(.18) brightness(1.12) drop-shadow(0 0 7px rgba(123,191,120,.2));}
 .apGroove{position:absolute;left:0;right:0;top:var(--groove,55%);height:12px;transform:translateY(-50%);background:#11100c;border-top:1px solid #c1b58f;border-bottom:1px solid #c1b58f;box-sizing:border-box;z-index:1;}

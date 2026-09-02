@@ -99,6 +99,23 @@
 
   const readyPromise=preloadAll();
 
+  const stage=document.querySelector('.bootLoaderStage');
+  if(stage && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+    let frame=0;
+    const setParallax=(x=0,y=0)=>{
+      cancelAnimationFrame(frame);
+      frame=requestAnimationFrame(()=>{
+        stage.style.setProperty('--boot-parallax-x',`${x.toFixed(2)}px`);
+        stage.style.setProperty('--boot-parallax-y',`${y.toFixed(2)}px`);
+      });
+    };
+    stage.addEventListener('pointermove',event=>{
+      const rect=stage.getBoundingClientRect();
+      setParallax(((event.clientX-rect.left)/rect.width-.5)*10,((event.clientY-rect.top)/rect.height-.5)*7);
+    });
+    stage.addEventListener('pointerleave',()=>setParallax());
+  }
+
   readyPromise.then(()=>{
     const loader=document.querySelector('#bootLoader');
     const play=document.querySelector('#bootLoaderPlay');

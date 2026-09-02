@@ -16,12 +16,43 @@
 .bootLoader.bootLoaderHidden{opacity:0;pointer-events:none;}
 
 .bootLoaderStage{
+  --boot-parallax-x:0px;
+  --boot-parallax-y:0px;
   position:relative;
   height:100%;
   max-width:100%;
   aspect-ratio:2018 / 1387;
   flex:0 0 auto;
   margin:auto;
+}
+.bootLoaderStage::before,
+.bootLoaderStage::after{
+  content:"";
+  position:absolute;
+  right:-8%;
+  bottom:-12%;
+  width:72%;
+  height:66%;
+  border-radius:50%;
+  pointer-events:none;
+  background:
+    radial-gradient(ellipse at 38% 52%,rgba(226,214,196,.28),transparent 35%),
+    radial-gradient(ellipse at 66% 38%,rgba(70,64,59,.18),transparent 42%);
+  filter:blur(28px);
+  opacity:.5;
+  transform:translate3d(calc(var(--boot-parallax-x) * .45),calc(var(--boot-parallax-y) * .45),0) scale(1.08);
+  animation:bootSmokeDrift 10s ease-in-out infinite alternate;
+}
+.bootLoaderStage::before{z-index:1;}
+.bootLoaderStage::after{
+  z-index:3;
+  right:3%;
+  bottom:-20%;
+  width:55%;
+  height:50%;
+  opacity:.22;
+  animation-duration:14s;
+  animation-direction:alternate-reverse;
 }
 .bootLoaderHero,
 .bootLoaderLogo{
@@ -31,14 +62,18 @@
   pointer-events:none;
 }
 .bootLoaderHero{
+  z-index:2;
   right:0;
   bottom:0;
   width:58%;
   height:96%;
   object-fit:contain;
   object-position:right bottom;
+  transform:translate3d(var(--boot-parallax-x),var(--boot-parallax-y),0) scale(1.012);
+  transition:transform 1.4s cubic-bezier(.2,.75,.25,1);
 }
 .bootLoaderLogo{
+  z-index:4;
   left:9%;
   top:44%;
   width:30%;
@@ -46,22 +81,23 @@
 }
 .bootLoaderControls{
   position:absolute;
-  left:25.4%;
+  left:24%;
   top:55%;
-  z-index:1;
+  z-index:4;
   width:13.5%;
   min-width:170px;
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:11px;
+  gap:5px;
   transform:translateX(-50%);
 }
 
 .bootLoaderCaption{
-  color:#3e3024;
-  font:600 10px/1.2 var(--ui-font,Arial,sans-serif);
-  letter-spacing:.11em;
+  margin-top:1px;
+  color:rgba(255,244,226,.72);
+  font:600 8px/1.1 var(--ui-font,Arial,sans-serif);
+  letter-spacing:.14em;
   text-transform:uppercase;
 }
 
@@ -87,8 +123,10 @@
   letter-spacing:.09em;
   text-transform:uppercase;
   cursor:pointer;
+  transition:transform .7s cubic-bezier(.2,.7,.2,1),filter .7s ease,box-shadow .7s ease;
+  animation:bootPlayBreathe 4.8s ease-in-out infinite;
 }
-.bootLoaderPlay:hover{filter:brightness(1.08);transform:translateY(-1px);}
+.bootLoaderPlay:hover{filter:brightness(1.08);transform:translateY(-2px);box-shadow:0 12px 28px rgba(82,50,19,.3);}
 .bootLoaderPlay:focus-visible{outline:3px solid rgba(159,109,49,.35);outline-offset:3px;}
 .bootLoaderPlay[hidden]{display:none!important;}
 .assets-ready .bootLoaderBar{display:none;}
@@ -108,6 +146,19 @@ body.assets-loading .app{
 
 @media (max-width:900px){
   .bootLoaderStage{width:100%;height:auto;max-height:100%;}
-  .bootLoaderControls{left:25.4%;top:55%;width:15%;min-width:130px;}
+  .bootLoaderControls{left:24%;top:55%;width:15%;min-width:130px;}
   .bootLoaderPlay{min-height:44px;font-size:16px;}
+}
+
+@keyframes bootSmokeDrift{
+  from{translate:-2% 1%;scale:1;}
+  to{translate:3% -3%;scale:1.1;}
+}
+@keyframes bootPlayBreathe{
+  0%,100%{box-shadow:0 9px 24px rgba(82,50,19,.2);}
+  50%{box-shadow:0 11px 30px rgba(128,78,29,.34);}
+}
+@media (prefers-reduced-motion:reduce){
+  .bootLoaderStage::before,.bootLoaderStage::after,.bootLoaderPlay{animation:none;}
+  .bootLoaderHero,.bootLoaderPlay{transition:none;}
 }

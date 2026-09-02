@@ -214,35 +214,6 @@ body.importedMode .pinTopLayer{display:none!important;}
   body.importedMode .anBtn{width:38px!important;height:38px!important;}
   body.importedMode .anValue{font-size:16px!important;}
 
-  /* Heat/cold: four feedback cards stay aligned with the four digits.
-     Arrow buttons get a larger touch target. */
-  .heatColdMode .digitalCard{
-    width:min(396px,96vw)!important;
-    padding-inline:8px!important;
-  }
-  .hcDialRow,.hcSlots{
-    width:100%!important;
-    grid-template-columns:repeat(4,minmax(0,1fr))!important;
-    gap:7px!important;
-    justify-content:center!important;
-  }
-  .hcDigitCol{gap:7px!important;}
-  .hcStepBtn{
-    min-height:46px!important;
-    padding:10px 5px!important;
-    font-size:16px!important;
-    border-radius:11px!important;
-  }
-  .hcDigitValue{padding:12px 5px!important;font-size:26px!important;}
-  .hcSlot{
-    min-width:0!important;
-    min-height:116px!important;
-    padding:10px 5px!important;
-    display:flex!important;
-    flex-direction:column!important;
-    justify-content:space-between!important;
-  }
-
   /* Hillsfar: six candidate keys are larger and begin lower so they do not
      visually collide with the lock-cut pattern above them. */
   body.mode-hillsfar .hfCandidates{
@@ -267,7 +238,7 @@ body.importedMode .pinTopLayer{display:none!important;}
   /* Gesture surfaces should receive a full pointer sequence instead of
      browser pan gestures. Native-drag mechanics keep their own handling. */
   .platesZone,.r2Lock,.anBoard,.massBoard,.kdPanel,.cpBoard,.rsBoard,
-  .heatColdMode .digitalCard,.drumMode .digitalCard,.scopeMode .digitalCard{
+  .drumMode .digitalCard,.scopeMode .digitalCard{
     touch-action:none!important;
   }
 }

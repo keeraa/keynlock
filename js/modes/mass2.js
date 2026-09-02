@@ -39,7 +39,7 @@
     picks=pickCapacity;
     moves=0;
     brokenPicks=0;
-    runReward=1000;
+    runReward=100;
     m2NodeEls=[];
     m2RegenerateBoard();
     updateEconomyUI();

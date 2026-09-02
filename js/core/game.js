@@ -55,6 +55,8 @@
     gameDefeat.reset();
     setGameInactive(false);
     setToastActionLabel('Новый замок');
+    const loot=document.querySelector('#solvedPuzzleLoot');
+    if(loot)loot.textContent='';
     document.querySelectorAll('.mechanismZone, .sharedModeLockArt').forEach(el=>{
       el.classList.remove('opening','opened');
     });

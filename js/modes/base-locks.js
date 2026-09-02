@@ -256,7 +256,9 @@ let plateEls=[], pinTopPlateEls=[];
     const baseDifficulty = getModeDifficulty(mode);
     n=((mode==='classic' || mode==='sequence' || mode==='special') && baseDifficulty===1) ? 4 : 5;
     window.LockShell?.syncMode(mode,{rows:n});
-    selected=0; solved=false; picks=pickCapacity; moves=0; brokenPicks=0; runReward=1000;
+    const roundSupply=window.KeynlockResources?.prepareRound?.();
+    pickCapacity=roundSupply?.picks??pickProgress.capacity;
+    selected=0; solved=false; picks=pickCapacity; moves=0; brokenPicks=0; runReward=100;
 
     PuzzleModes.call(mode,'start');
 
@@ -266,7 +268,7 @@ let plateEls=[], pinTopPlateEls=[];
 
     const msg=PuzzleModes.restartMessage(mode);
     if(notify){
-      toast(msg);
+      toast(roundSupply?.emergency?'Последняя аварийная отмычка выдана в логове':msg);
       SFX.newRound();
     }
   }
@@ -301,6 +303,7 @@ let plateEls=[], pinTopPlateEls=[];
 
     const previousVisiblePicks=Math.max(0, Math.min(pickCapacity, picks));
     picks=Math.max(0,picks-1);
+    window.KeynlockResources?.consumePicks?.(1);
     if(previousVisiblePicks>0) triggerInventoryBreakAnimation(previousVisiblePicks);
     brokenPicks++;
     SFX.break();
@@ -430,7 +433,6 @@ let plateEls=[], pinTopPlateEls=[];
     resonance:()=>PuzzleModes.call('resonance','attemptOpen'),
     deduction:()=>PuzzleModes.call('deduction','attemptOpen'),
     composite:()=>PuzzleModes.call('composite','attemptOpen'),
-    heatcold:()=>PuzzleModes.call('heatcold','attemptOpen'),
     drum:()=>PuzzleModes.call('drum','attemptOpen'),
     scope:()=>PuzzleModes.call('scope','attemptOpen'),
     anach:()=>PuzzleModes.call('anach','attemptOpen'),
@@ -447,7 +449,6 @@ let plateEls=[], pinTopPlateEls=[];
     kingdomcome:()=>PuzzleModes.call('kingdomcome','attemptOpen'),
     thief12:()=>PuzzleModes.call('thief12','attemptOpen'),
     fallout:()=>PuzzleModes.call('fallout','attemptOpen'),
-    anachlab:()=>PuzzleModes.call('anachlab','attemptOpen'),
     masshack:()=>PuzzleModes.call('masshack','attemptOpen'),
     pathologic:()=>PuzzleModes.call('pathologic','attemptOpen'),
     bioshock2:()=>PuzzleModes.call('bioshock2','attemptOpen'),

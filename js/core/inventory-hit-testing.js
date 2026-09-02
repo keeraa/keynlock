@@ -389,6 +389,7 @@
 
     const previousVisiblePicks=Math.max(0,Math.min(pickCapacity,picks));
     picks=Math.max(0,picks-1);
+    window.KeynlockResources?.consumePicks?.(1);
     if(previousVisiblePicks>0) triggerInventoryBreakAnimation(previousVisiblePicks);
     brokenPicks++;
     SFX.break();

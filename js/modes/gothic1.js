@@ -48,7 +48,7 @@
     picks=pickCapacity;
     moves=0;
     brokenPicks=0;
-    runReward=1000;
+    runReward=100;
     g1Length=diffStep(4,6,8,'g1');
     g1Input=[];
     g1Sequence = Array.from({length:g1Length}, ()=> Math.random() < .5 ? -1 : 1);

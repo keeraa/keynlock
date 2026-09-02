@@ -25,7 +25,6 @@
 <link rel="stylesheet" href="css/modes-14-kingdomcome.css">
 <link rel="stylesheet" href="css/modes-15-thief12.css">
 <link rel="stylesheet" href="css/modes-16-fallout.css">
-<link rel="stylesheet" href="css/modes-17-anachlab.css">
 <link rel="stylesheet" href="css/modes-18-masshack.css">
 <link rel="stylesheet" href="css/modes-19-pathologic.css">
 <link rel="stylesheet" href="css/modes-20-bioshock2.css">
@@ -63,7 +62,22 @@
   <img class="bootLoaderLogo" src="assets/branding/logo-01.png" alt="KEYNLOCK">
   <div class="bootLoaderControls">
     <div class="bootLoaderBar"><span id="bootLoaderProgress"></span></div>
-    <button class="bootLoaderPlay" id="bootLoaderPlay" type="button" hidden>Играть</button>
+    <nav class="mainMenu" id="mainMenu" aria-label="Главное меню" hidden>
+      <button class="mainMenuButton mainMenuPrimary" id="mainMenuNew" type="button">Новая игра</button>
+      <button class="mainMenuButton" id="mainMenuContinue" type="button">Продолжить</button>
+      <button class="mainMenuButton" id="mainMenuSave" type="button">Сохранить игру</button>
+      <button class="mainMenuButton" id="mainMenuLoad" type="button">Загрузить игру</button>
+      <button class="mainMenuButton" id="mainMenuSettings" type="button">Настройки</button>
+    </nav>
+    <section class="mainMenuPanel" id="mainMenuSlots" hidden aria-label="Слоты сохранений">
+      <div class="mainMenuPanelHeader"><strong id="mainMenuSlotsTitle">Сохранить игру</strong><button type="button" data-main-menu-back aria-label="Назад">×</button></div>
+      <div class="mainMenuSlotList" id="mainMenuSlotList"></div>
+    </section>
+    <section class="mainMenuPanel mainMenuSettings" id="mainMenuSettingsPanel" hidden aria-label="Настройки">
+      <div class="mainMenuPanelHeader"><strong>Настройки</strong><button type="button" data-main-menu-back aria-label="Назад">×</button></div>
+      <label><span>Громкость музыки</span><input id="mainMenuMusicVolume" type="range" min="0" max="100" step="1" value="28"><output id="mainMenuMusicVolumeValue">28%</output></label>
+      <label class="mainMenuCheck"><input id="mainMenuReduceMotion" type="checkbox"><span>Уменьшить анимацию</span></label>
+    </section>
     <div class="bootLoaderCaption" id="bootLoaderCaption">Загрузка…</div>
   </div>
 </div>
@@ -76,6 +90,9 @@
     <span class="hudBadgeLabel">Деньги</span>
     <strong class="hudBadgeValue"><span class="coinIcon">◈</span><span id="coinBalance">0</span></strong>
   </div>
+  <div class="resourceHudBadge" title="Отмычки"><span>Отмычки</span><b id="resourcePicks">3/3</b></div>
+  <div class="resourceHudBadge" title="Детали замков"><span>Детали</span><b id="resourceParts">0</b></div>
+  <div class="resourceHudBadge" title="Масло в маслёнке"><span>Масло</span><b id="resourceOil">0/3</b></div>
 </div>
   <button class="mapCornerBtn hudNavBtn" id="lairHudButton" type="button" aria-label="Логово" title="Логово">
     <img class="hudNavArtwork" src="assets/ui/lair-ico.png" alt="">
@@ -254,6 +271,20 @@
     <div class="lairWorkbenchModal" id="lairWorkbenchModal" hidden aria-label="Верстак">
       <div class="lairWorkbenchDialog" role="dialog" aria-modal="true" aria-label="Верстак и чертежи">
         <img class="lairWorkbenchImage" src="assets/lair/workbench.jpg" alt="Верстак с чертежами замков и инструментами">
+        <section class="workbenchCraftPanel" aria-label="Изготовление">
+          <h2>Верстак</h2>
+          <div class="workbenchResources"><span>Отмычки <b id="resourcePicksWorkbench"></b></span><span>Детали <b id="resourcePartsWorkbench"></b></span></div>
+          <div class="resourceComponents" id="resourceComponents" aria-label="Цветные алхимические компоненты"></div>
+          <button id="craftPickButton" type="button">Создать отмычку <small>2 детали</small></button>
+          <button id="craftAllPicksButton" type="button">Заполнить футляр <small>по 2 детали за отмычку</small></button>
+          <button id="buyPickButton" type="button">Купить отмычку <small>30 монет</small></button>
+          <button id="craftOilButton" type="button">Приготовить масло <small>оранжевый + жёлтый</small></button>
+          <button id="upgradePickCaseButton" type="button"></button>
+          <details class="lootTablePreview">
+            <summary>Таблица добычи</summary>
+            <div id="lootTablePreview"></div>
+          </details>
+        </section>
         <button class="lairWorkbenchClose" id="lairWorkbenchClose" type="button" aria-label="Закрыть">×</button>
       </div>
     </div>
@@ -364,7 +395,7 @@
   <div class="challengeStatus" id="challengeStatus">
     <div class="rewardBox challengeMetric challengeReward" id="rewardBox">
       <span class="challengeMetricLabel">За замок</span>
-      <strong class="challengeMetricValue" id="runReward">1000</strong>
+      <strong class="challengeMetricValue" id="runReward">100</strong>
     </div>
     <div class="challengeDivider" aria-hidden="true"></div>
     <div class="challengeMetric challengeTimer hidden" id="challengeTimer" aria-hidden="true">
@@ -519,11 +550,6 @@
 <button class="digitalBtn sfTorqueBtn" id="sfTorqueRight" type="button">Повернуть · D →</button>
 </div>
 <div class="sfHelp" id="sfHelp"></div>
-</div>
-<!-- MODE: ANACHRONOX LAB -->
-<div class="modePanel alabMode" data-mode="anachlab" hidden="" id="anachlabMode">
-<div class="alabSlotsWrap"><div class="alabSlots" id="alabSlots"></div></div>
-<div class="alabHelp" id="alabHelp"></div>
 </div>
 <!-- MODE: MASS EFFECT — УЗЕЛ -->
 <div class="modePanel hackMode" data-mode="masshack" hidden="" id="masshackMode">
@@ -748,17 +774,6 @@
 </div>
 
 
-<!-- MODE: HEAT / COLD DIGITAL LOCK -->
-<div class="modePanel digitalMode heatColdMode" data-mode="heatcold" hidden id="heatColdMode">
-  <div class="digitalCard">
-    <input class="hcInput" id="hcInput" maxlength="4" inputmode="numeric" autocomplete="off" placeholder="0000" hidden aria-hidden="true" tabindex="-1">
-    <div class="hcDialRow" id="hcDialRow"></div>
-    <div class="hcSlots" id="hcSlots"></div>
-    <div class="digitalResult" id="hcResult"></div>
-    <div class="hcHistory"><div class="hcHistoryTitle">Последние попытки</div><div class="hcRows" id="hcRows"></div></div>
-  </div>
-</div>
-
 <!-- MODE: DRUM CLICKS DIGITAL LOCK -->
 <div class="modePanel digitalMode drumMode" data-mode="drum" hidden id="drumMode">
   <div class="digitalCard">
@@ -788,6 +803,7 @@
   <div class="solvedPuzzleCard">
     <div class="solvedPuzzleKicker">ГОТОВО</div>
     <div class="solvedPuzzleTitle">Замок открыт</div>
+    <div class="solvedPuzzleLoot" id="solvedPuzzleLoot"></div>
     <button class="solvedPuzzleButton" id="newPuzzleButton" type="button">Новая головоломка</button>
   </div>
 </div>
@@ -795,11 +811,13 @@
 </main>
 <div class="toast" id="toast"><span class="toastText" id="toastText"></span><button class="toastAction" id="toastAction" type="button" onclick="restartCurrentRound();document.querySelector('#toast')?.classList.remove('show','actionable')">Новый замок</button></div>
 <script src="js/core/asset-preload.js"></script>
+<script src="js/core/main-menu.js"></script>
 <script src="js/core/game-catalog.js"></script>
 <script src="js/core/challenge-hud.js"></script>
 <script src="js/core/tool-motion.js"></script>
 <script src="js/core/game-defeat.js"></script>
 <script src="js/core/state.js"></script>
+<script src="js/core/resources.js"></script>
 <script src="js/core/puzzle-modes.js"></script>
 <script src="js/core/audio.js"></script>
 <script src="js/core/ui.js"></script>
@@ -807,7 +825,6 @@
 <script src="js/world/lair.js"></script>
 <script src="js/world/navigation.js"></script>
 <script src="js/core/digital-helpers.js"></script>
-<script src="js/modes/heat-cold.js"></script>
 <script src="js/modes/drum.js"></script>
 <script src="js/modes/oscilloscope.js"></script>
 <script src="js/core/game.js"></script>
@@ -829,7 +846,6 @@
 <script src="js/modes/kingdomcome.js"></script>
 <script src="js/modes/thief12.js"></script>
 <script src="js/modes/fallout.js"></script>
-<script src="js/modes/anachlab.js"></script>
 <script src="js/modes/masshack.js"></script>
 <script src="js/modes/pathologic.js"></script>
 <script src="js/modes/bioshock2.js"></script>

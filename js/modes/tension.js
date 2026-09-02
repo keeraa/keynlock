@@ -21,7 +21,7 @@
     else $tnMessage.textContent=tnInBand()?'Натяжение в рабочей зоне · W / ↑ / Space — поставить штифт':'A / D — удерживай натяжение в зелёной зоне';
   }
   function startTensionRound(){
-    solved=false; picks=pickCapacity; moves=0; brokenPicks=0; runReward=1000;
+    solved=false; picks=pickCapacity; moves=0; brokenPicks=0; runReward=100;
     tnPinCount=diffStep(4,5,6,'tension');
     tnTension=rand(28,60); tnTarget=rand(25,75); tnWidth=rand(diffStep(22,14,10,'tension'),diffStep(32,22,16,'tension')); tnIndex=0; tnReady=false;
     tnDrift=(Math.random()>.5?1:-1)*(diffStep(.03,.05,.075,'tension')+Math.random()*diffStep(.02,.025,.03,'tension'));

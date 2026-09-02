@@ -5,6 +5,21 @@
 .lairWorkbenchModal[hidden]{display:none !important;}
 .lairWorkbenchDialog{position:relative;width:min(1420px,94vw);max-height:92vh;display:flex;align-items:center;justify-content:center;padding:12px;border:1px solid rgba(170,127,63,.72);border-radius:16px;background:rgba(20,15,11,.96);box-shadow:0 30px 90px rgba(0,0,0,.62),inset 0 0 0 1px rgba(255,227,177,.035);}
 .lairWorkbenchImage{display:block;width:100%;height:auto;max-height:calc(92vh - 24px);object-fit:contain;border-radius:10px;}
+.workbenchCraftPanel{position:absolute;left:4%;bottom:6%;z-index:2;width:min(330px,32%);padding:18px;border:1px solid rgba(190,145,70,.72);border-radius:14px;background:rgba(17,13,10,.92);box-shadow:0 16px 40px rgba(0,0,0,.5);color:#d9c7a5;}
+.workbenchCraftPanel h2{margin:0 0 10px;color:#efd69f;font:700 24px/1.1 var(--title-font);}
+.workbenchResources{display:flex;gap:14px;margin-bottom:10px;color:#9e8f78;font-size:11px;}
+.workbenchResources b{color:#edcf91;}
+.resourceComponents{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:10px 0 14px;}
+.resourceColor{display:grid;justify-items:center;gap:3px;color:#c6b38f;font:700 10px/1 var(--ui-font);}
+.resourceColor i{width:19px;height:19px;border:2px solid rgba(255,255,255,.24);border-radius:50%;background:var(--resource-color);box-shadow:inset 0 0 7px rgba(0,0,0,.38),0 2px 6px rgba(0,0,0,.34);}
+.workbenchCraftPanel button{width:100%;margin-top:7px;padding:10px;border:1px solid #7d6138;border-radius:9px;background:linear-gradient(#3b2d1e,#201810);color:#ead09a;font:700 12px/1.15 var(--ui-font);cursor:pointer;}
+.workbenchCraftPanel button small{display:block;margin-top:3px;color:#98866d;font-size:9px;}
+.workbenchCraftPanel button:disabled{opacity:.42;cursor:not-allowed;}
+.lootTablePreview{margin-top:10px;border-top:1px solid rgba(128,99,57,.45);padding-top:8px;}
+.lootTablePreview summary{color:#bda477;font:700 10px/1.2 var(--ui-font);cursor:pointer;}
+.lootTablePreview table{width:100%;margin-top:7px;border-collapse:collapse;color:#aa9a82;font:9px/1.2 var(--ui-font);}
+.lootTablePreview th,.lootTablePreview td{padding:4px 2px;border-bottom:1px solid rgba(108,85,53,.35);text-align:center;}
+.lootTablePreview th{color:#d2ba8b;font-weight:700;}
 .lairWorkbenchClose{position:absolute;top:18px;right:18px;z-index:3;width:44px;height:44px;display:grid;place-items:center;border:1px solid rgba(176,132,65,.82);border-radius:11px;background:rgba(28,21,15,.94);color:#e7c783;font:700 27px/1 Arial,sans-serif;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.36);}
 .lairWorkbenchClose:hover{filter:brightness(1.16);}
 @media (max-width:760px){
@@ -13,6 +28,7 @@
 .lairWorkbenchDialog{width:calc(100vw - 16px);max-height:calc(100dvh - 16px);padding:7px;border-radius:12px;}
 .lairWorkbenchImage{max-height:calc(100dvh - 30px);}
 .lairWorkbenchClose{top:12px;right:12px;width:40px;height:40px;border-radius:10px;}
+.workbenchCraftPanel{left:14px;right:14px;bottom:14px;width:auto;padding:12px;}
 }
 
 
@@ -26,7 +42,7 @@
 :where(
   button,[role="button"],.tab,.hudNavBtn,
   .inventoryTool,.lairCharacter,.lairPersonBtn,.lairTopic,.lairIntelCard,
-  .hcStepBtn,.digitalMiniBtn,.digitalBtn,.digitalWheel button,.anBtn,.cpPart
+  .digitalMiniBtn,.digitalBtn,.digitalWheel button,.anBtn,.cpPart
 ){
   transition-timing-function:var(--motion-ease) !important;
 }
@@ -54,7 +70,7 @@
   transition-timing-function:var(--motion-ease-soft) !important;
 }
 .anLevel,.tnBand,.tnPinStem,.tnPinHead,.tnPinImg,.kdPinImg,
-.massRing,.massRingDisc,.hcThermo>i,.drumMeter>i,.scopeBar>i{
+.massRing,.massRingDisc,.drumMeter>i,.scopeBar>i{
   transition-timing-function:var(--motion-ease) !important;
 }
 

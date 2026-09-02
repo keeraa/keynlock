@@ -35,7 +35,7 @@
     picks=pickCapacity;
     moves=0;
     brokenPicks=0;
-    runReward=1000;
+    runReward=100;
     wfBarCount=diffStep(5,6,7,'wharf');
     wfPos=0;
     wfStep=0;

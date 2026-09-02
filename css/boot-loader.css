@@ -84,8 +84,8 @@
   left:24%;
   top:55%;
   z-index:4;
-  width:13.5%;
-  min-width:170px;
+  width:16%;
+  min-width:210px;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -109,26 +109,37 @@
   overflow:hidden;
 }
 
-.bootLoaderPlay{
+.mainMenu{width:100%;display:flex;flex-direction:column;gap:7px;}
+.mainMenu[hidden],.mainMenuPanel[hidden]{display:none!important;}
+.mainMenuButton{
   width:100%;
   min-width:0;
-  min-height:50px;
-  padding:11px 24px;
-  border:1px solid #9f6d31;
-  border-radius:12px;
-  color:#fff;
-  background:linear-gradient(180deg,#9f6d31,#68431f);
-  box-shadow:0 9px 24px rgba(82,50,19,.2);
-  font:700 19px/1 var(--title-font,Georgia,serif);
-  letter-spacing:.09em;
+  min-height:39px;
+  padding:9px 18px;
+  border:1px solid rgba(113,75,37,.58);
+  border-radius:8px;
+  color:#f7ead5;
+  background:linear-gradient(180deg,rgba(91,58,29,.94),rgba(48,30,17,.96));
+  box-shadow:0 7px 18px rgba(58,34,15,.16);
+  font:700 14px/1 var(--title-font,Georgia,serif);
+  letter-spacing:.075em;
   text-transform:uppercase;
   cursor:pointer;
   transition:transform .7s cubic-bezier(.2,.7,.2,1),filter .7s ease,box-shadow .7s ease;
-  animation:bootPlayBreathe 4.8s ease-in-out infinite;
 }
-.bootLoaderPlay:hover{filter:brightness(1.08);transform:translateY(-2px);box-shadow:0 12px 28px rgba(82,50,19,.3);}
-.bootLoaderPlay:focus-visible{outline:3px solid rgba(159,109,49,.35);outline-offset:3px;}
-.bootLoaderPlay[hidden]{display:none!important;}
+.mainMenuPrimary{border-color:#b9823f;background:linear-gradient(180deg,#a36f32,#68431f);animation:bootPlayBreathe 4.8s ease-in-out infinite;}
+.mainMenuButton:hover:not(:disabled){filter:brightness(1.12);transform:translateY(-1px);box-shadow:0 10px 24px rgba(82,50,19,.25);}
+.mainMenuButton:focus-visible,.mainMenuPanel button:focus-visible,.mainMenuPanel input:focus-visible{outline:3px solid rgba(159,109,49,.35);outline-offset:3px;}
+.mainMenuButton:disabled{opacity:.42;cursor:default;filter:saturate(.5);}
+.mainMenuPanel{width:145%;margin-left:-22.5%;padding:12px;border:1px solid rgba(116,78,40,.55);border-radius:10px;background:rgba(39,27,19,.91);box-shadow:0 14px 35px rgba(45,27,15,.24);color:#f4e4ca;}
+.mainMenuPanelHeader{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;font:700 13px/1 var(--title-font,Georgia,serif);letter-spacing:.08em;text-transform:uppercase;}
+.mainMenuPanelHeader button{width:25px;height:25px;border:1px solid #80603b;border-radius:50%;color:#ead5b4;background:#35261b;cursor:pointer;}
+.mainMenuSlotList{display:grid;gap:7px;}
+.mainMenuSlot{display:grid;grid-template-columns:1fr auto;gap:2px 8px;width:100%;padding:9px 10px;text-align:left;border:1px solid rgba(148,110,65,.45);border-radius:7px;color:#f5e8d2;background:rgba(20,15,12,.65);cursor:pointer;}
+.mainMenuSlot:hover:not(:disabled){border-color:#c38b46;background:rgba(69,46,27,.82);}
+.mainMenuSlot:disabled{opacity:.48;cursor:default;}
+.mainMenuSlot strong{font:700 12px/1.2 var(--title-font,Georgia,serif);}.mainMenuSlot small{grid-column:1/-1;color:#c8b392;font:10px/1.3 var(--ui-font,Arial,sans-serif);}.mainMenuSlot time{font:9px/1.2 var(--ui-font,Arial,sans-serif);color:#d6bd94;}
+.mainMenuSettings{display:grid;gap:13px;}.mainMenuSettings label{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;font:11px/1.2 var(--ui-font,Arial,sans-serif);}.mainMenuSettings input[type="range"]{grid-column:1/2;width:100%;}.mainMenuSettings output{grid-column:2;grid-row:2;color:#ddbd84;}.mainMenuSettings .mainMenuCheck{display:flex;}.mainMenuSettings .mainMenuCheck input{accent-color:#a97135;}
 .assets-ready .bootLoaderBar{display:none;}
 .bootLoaderBar span{
   display:block;
@@ -147,7 +158,7 @@ body.assets-loading .app{
 @media (max-width:900px){
   .bootLoaderStage{width:100%;height:auto;max-height:100%;}
   .bootLoaderControls{left:24%;top:55%;width:15%;min-width:130px;}
-  .bootLoaderPlay{min-height:44px;font-size:16px;}
+  .mainMenuButton{min-height:38px;font-size:13px;}
 }
 
 @keyframes bootSmokeDrift{
@@ -159,6 +170,7 @@ body.assets-loading .app{
   50%{box-shadow:0 11px 30px rgba(128,78,29,.34);}
 }
 @media (prefers-reduced-motion:reduce){
-  .bootLoaderStage::before,.bootLoaderStage::after,.bootLoaderPlay{animation:none;}
-  .bootLoaderHero,.bootLoaderPlay{transition:none;}
+  .bootLoaderStage::before,.bootLoaderStage::after,.mainMenuPrimary{animation:none;}
+  .bootLoaderHero,.mainMenuButton{transition:none;}
 }
+html.reduce-motion *,html.reduce-motion *::before,html.reduce-motion *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}

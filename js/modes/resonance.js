@@ -19,7 +19,7 @@
     $rsLanes.replaceChildren(frag);
   }
   function startResonanceRound(){
-    solved=false; picks=pickCapacity; moves=0; brokenPicks=0; runReward=1000;
+    solved=false; picks=pickCapacity; moves=0; brokenPicks=0; runReward=100;
     rsPinCount=diffStep(4,5,6,'resonance');
     rsIndex=0; rsT=0; rsReady=false;
     const speedBase=diffStep(.72,.85,1.02,'resonance');

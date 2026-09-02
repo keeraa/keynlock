@@ -17,7 +17,6 @@ const GAME_DEFINITIONS={
   resonance:{title:'Резонанс',description:'Останавливай движущиеся штифты точно на центральной линии резонанса.',objective:'ЗАФИКСИРОВАТЬ ВСЕ ШТИФТЫ ТОЧНО НА ЗОЛОТОЙ ЛИНИИ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   deduction:{title:'Слепок ключа',description:'Восстанови скрытый профиль ключа, используя подсказку о первом неверном зубце.',objective:'ВОССТАНОВИТЬ ПРОФИЛЬ КЛЮЧА ПО ОБРАТНОЙ СВЯЗИ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   composite:{title:'Составная',description:'Собери профиль отмычки из четырёх независимых участков и совмести каждый участок с соответствующим штифтом.',objective:'СОБРАТЬ ОТМЫЧКУ ИЗ 4 УЧАСТКОВ ПОД ЦЕЛЕВОЙ ПРОФИЛЬ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
-  heatcold:{title:'Тепло — холодно',description:'Подбери четыре цифры по независимым подсказкам температуры для каждого разряда.',objective:'ПОДОБРАТЬ 4-ЗНАЧНЫЙ КОД ПО ПОДСКАЗКАМ ТЕПЛО / ХОЛОДНО',kind:'native',lock:{present:false,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
   drum:{title:'Щелчки барабана',description:'Выстави четыре барабана, ориентируясь на громкость и характер щелчка каждого положения.',objective:'ВЫСТАВИТЬ 4 БАРАБАНА ПО СИЛЕ ЩЕЛЧКА',kind:'native',lock:{present:false,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
   scope:{title:'Осциллограф',description:'Настрой четыре гармоники так, чтобы текущая форма сигнала полностью совпала с эталоном.',objective:'СОВМЕСТИТЬ ТЕКУЩИЙ СИГНАЛ С ЭТАЛОНОМ',kind:'native',lock:{present:false,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
   oblivion:{title:'Штифтовый замок',description:'Подбрасывай штифты и фиксируй каждый точно в момент совпадения с верхней прорезью.',objective:'ПОДНЯТЬ И ЗАФИКСИРОВАТЬ ВСЕ ШТИФТЫ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
@@ -30,7 +29,6 @@ const GAME_DEFINITIONS={
   kingdomcome:{title:'Kingdom Come',description:'Найди рабочую точку и веди отмычку вслед за вращающимся цилиндром, не накапливая стресс.',objective:'НАЙТИ И УДЕРЖАТЬ РАБОЧУЮ ТОЧКУ ДО КОНЦА ПОВОРОТА',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   thief12:{title:'Thief 1/2',description:'Определяй правильный профиль по звуку и удерживай его до полного зацепления на каждой стадии.',objective:'НАЙТИ И УДЕРЖАТЬ ПРОФИЛЬ ОТМЫЧКИ НА КАЖДОЙ СТАДИИ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   fallout:{title:'Fallout',description:'Подбери угол отмычки и направление вращения, не доводя износ инструмента до предела.',objective:'НАЙТИ УГОЛ И ВЕРНОЕ НАПРАВЛЕНИЕ ВРАЩЕНИЯ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:true,noiseSensor:true,guards:false,birds:false}},
-  anachlab:{title:'Anachronox — лаборатория',description:'Подбери трёхзначный код по измерению близости каждой отдельно проверяемой цифры.',objective:'ПОДОБРАТЬ ТРЁХЗНАЧНЫЙ КОД ПО ПОДСКАЗКАМ БЛИЗОСТИ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
   masshack:{title:'Mass Effect — узел',description:'Проходи через вращающиеся кольца к ядру, избегая движущихся блоков.',objective:'ПРОЙТИ ВСЕ 5 КОЛЕЦ И ПОДТВЕРДИТЬ ЯДРО',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
   pathologic:{title:'Pathologic 2',description:'Ударами удерживай обе стороны механизма в центральных зонах и зафиксируй совпадение.',objective:'СОВМЕСТИТЬ ОБЕ ЗОНЫ С ЦЕНТРАЛЬНОЙ ЛИНИЕЙ И ЗАФИКСИРОВАТЬ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
   bioshock2:{title:'BioShock 2',description:'Останавливай движущуюся иглу в зелёных зонах пять этапов подряд.',objective:'ОСТАНОВИТЬ ИГЛУ НА ЗЕЛЁНОЙ ЗОНЕ 5 РАЗ ПОДРЯД',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
@@ -45,11 +43,11 @@ const GAME_LOCATIONS={
   g1:'bg-basement-01.jpg',oblivion:'bg-basement-01.jpg',thief12:'bg-basement-01.jpg',
   fallout:'bg-basement-01.jpg',pathologic:'bg-basement-01.jpg',
   kingdomcome:'bg-house-01.jpg',watchmen:'bg-house-01.jpg',
-  anachlab:'bg-house-02.jpg',bioshock2:'bg-house-02.jpg',
+  bioshock2:'bg-house-02.jpg',
   deduction:'bg-house-03.jpg',composite:'bg-house-03.jpg',museum:'bg-house-03.jpg',
   tension:'bg-house-04.jpg',resonance:'bg-house-04.jpg',alphaprotocol:'bg-house-04.jpg',
   anach:'bg-orangery-01.jpg',masshack:'bg-orangery-01.jpg',scope:'bg-orangery-01.jpg',
-  heatcold:'bg-orangery-02.jpg',drum:'bg-orangery-02.jpg',mass2:'bg-orangery-02.jpg',
+  drum:'bg-orangery-02.jpg',mass2:'bg-orangery-02.jpg',
   wharf:'bg-port-01.jpg',pipeline:'bg-port-01.jpg'
 };
 

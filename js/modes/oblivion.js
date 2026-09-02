@@ -45,7 +45,7 @@
     picks=pickCapacity;
     moves=0;
     brokenPicks=0;
-    runReward=1000;
+    runReward=100;
     obSelected=0;
     const tiers=[420,520,640,780,930].map(v=>v*.8*(.94+Math.random()*.12));
     for(let i=tiers.length-1;i>0;i--){

@@ -36,7 +36,7 @@
     picks=pickCapacity;
     moves=0;
     brokenPicks=0;
-    runReward=1000;
+    runReward=100;
     const anMax=diffStep(6,8,9,'anach');
     const minDistance=diffStep(6,10,14,'anach');
     let dist=0;

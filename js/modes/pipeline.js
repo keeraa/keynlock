@@ -226,7 +226,7 @@
     picks=pickCapacity;
     moves=0;
     brokenPicks=0;
-    runReward=1000;
+    runReward=100;
     PL_COLS=diffStep(6,8,10,'pipeline');
     PL_EXIT={r:3,c:PL_COLS-1,out:'E'};
     if($plGrid){
@@ -358,6 +358,7 @@
     SFX.wrongLock();
     const remaining=Math.max(0,Math.min(pickCapacity,picks));
     picks=0;
+    window.KeynlockResources?.consumePicks?.(remaining);
     brokenPicks+=remaining;
     for(let slot=remaining;slot>0;slot--) triggerInventoryBreakAnimation(slot);
     SFX.break();

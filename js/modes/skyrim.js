@@ -72,7 +72,7 @@
     picks=pickCapacity;
     moves=0;
     brokenPicks=0;
-    runReward=1000;
+    runReward=100;
     skSolveTolerance=diffStep(10,6,4,'skyrim');
     const angleRange=diffStep(42,60,72,'skyrim');
     skTargetAngle=rand(-angleRange,angleRange);

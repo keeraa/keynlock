@@ -37,7 +37,7 @@
     picks=pickCapacity;
     moves=0;
     brokenPicks=0;
-    runReward=1000;
+    runReward=100;
     tdsRingSymbols=shuffle([0,1,2,3,4]).slice(0,3);
     tdsOrder=tdsMakeOrder();
     tdsSelectedRing=2;

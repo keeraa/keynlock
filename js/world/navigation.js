@@ -91,6 +91,7 @@
     if(mapOpen) closeMap(false);
     if(!forceRestart && mode===nextMode && !solved && !document.body.classList.contains('game-inactive')) return;
     mode=nextMode;
+    STORE.setItem('lockpickCurrentMode',mode);
     syncModePanels(mode);
     updateModeUI();
     if(modeSwitchFrame) cancelAnimationFrame(modeSwitchFrame);

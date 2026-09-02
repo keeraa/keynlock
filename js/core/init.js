@@ -86,7 +86,7 @@
   // shortfall as --reward-clear (consumed as extra padding-bottom by each
   // panel's own CSS) keeps their content from rendering underneath it,
   // without hardcoding a value per breakpoint.
-  const FLUID_PANEL_MODES=new Set(['oblivion','watchmen','museum','mass2','pipeline','wharf','thiefds','kingdomcome','thief12','fallout','anachlab','masshack','pathologic','bioshock2','alphaprotocol']);
+  const FLUID_PANEL_MODES=new Set(['oblivion','watchmen','museum','mass2','pipeline','wharf','thiefds','kingdomcome','thief12','fallout','masshack','pathologic','bioshock2','alphaprotocol']);
   function syncPuzzleRewardClearance(){
     if(!FLUID_PANEL_MODES.has(mode)) return;
     const status=document.querySelector('.challengeStatus');
@@ -277,7 +277,9 @@
   document.querySelectorAll('.lairHotspot').forEach(btn=>{
     btn.addEventListener('click',()=>{
       if(btn.dataset.lairAction==='missions'){
-        closeLair();
+        // openMap remembers that it was opened from the lair and performs the
+        // close itself. Closing first erased that return context, so the map's
+        // close button exposed the default Classic puzzle underneath.
         openMap();
         return;
       }
@@ -312,6 +314,6 @@
     updateEconomyUI();
     updatePickUI();
     newLock(false);
-    openLairFromHud();
+    if(mapLocation==='lair')openLair();
   }
   (window.KeynlockAssetsReady || Promise.resolve()).then(bootGame);

@@ -27,7 +27,7 @@
     picks=pickCapacity;
     moves=0;
     brokenPicks=0;
-    runReward=1000;
+    runReward=100;
     sfSecret=-150+Math.random()*120;
     sfAngle=-90;
     sfTurn=0;

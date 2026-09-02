@@ -13,7 +13,7 @@
   transform:scale(.97);
 }
 
-:where(.mapChapterBtn,.gameDifficulty button,.digitalBtn,.digitalMiniBtn,.anBtn,.hcStepBtn){
+:where(.mapChapterBtn,.gameDifficulty button,.digitalBtn,.digitalMiniBtn,.anBtn){
   border-radius:var(--radius-control);
   cursor:pointer;
   transition:background var(--motion-fast),color var(--motion-fast),border-color var(--motion-fast),filter var(--motion-fast);

@@ -30,7 +30,7 @@ function hackSafeOuterAngle(){
 }
 function startMassHackRound(){
   solved=false; $lock.classList.remove('win'); $mechanism.classList.remove('ready','opening','opened');
-  picks=pickCapacity; moves=0; brokenPicks=0; runReward=1000;
+  picks=pickCapacity; moves=0; brokenPicks=0; runReward=100;
   const ringPlan=[1,2,3,4,5,3,5], baseSpeeds=[24,28,32,36,40,30,38];
   hackRing=5; hackAng=Math.random()*360;
   hackBlocks=ringPlan.map((ring,i)=>({ ring, a:(Math.random()*360+i*43)%360, s:(baseSpeeds[i]+(Math.random()*10-5))*(Math.random()<.5?-1:1) }));

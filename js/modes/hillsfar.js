@@ -162,7 +162,7 @@ function hillsfarPattern(len=6){
     picks=pickCapacity;
     moves=0;
     brokenPicks=0;
-    runReward=1000;
+    runReward=100;
     picks=pickCapacity;
     updatePickUI();
     hfTimeMax=diffStep(70,45,30,'hillsfar');

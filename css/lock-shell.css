@@ -241,7 +241,7 @@ body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .lockShe
 body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .lockShellFunnelBack{z-index:3;}
 body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .lockShellFunnelFront{z-index:6;left:-6px;width:54px;}
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .mechanismZone .pick,
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .mechanismZone .pick{z-index:6!important;}
 body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .mechanismZone .tension{z-index:5!important;}
 
 body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .mechanismZone .pick{
@@ -279,7 +279,7 @@ body.lock-shell-active:is([data-game-mode="alphaprotocol"],[data-game-mode="watc
 body.lock-shell-active:is([data-game-mode="alphaprotocol"],[data-game-mode="watchmen"]) .lockShellFunnel{display:block;position:absolute;left:-12px;top:100px;width:60px;height:67px;object-fit:contain;pointer-events:none;filter:drop-shadow(0 5px 7px rgba(0,0,0,.42));}
 body.lock-shell-active:is([data-game-mode="alphaprotocol"],[data-game-mode="watchmen"]) .lockShellFunnelBack{z-index:3;}
 body.lock-shell-active:is([data-game-mode="alphaprotocol"],[data-game-mode="watchmen"]) .lockShellFunnelFront{z-index:6;left:-6px;width:54px;}
-body.lock-shell-active:is([data-game-mode="alphaprotocol"],[data-game-mode="watchmen"]) .mechanismZone .pick{z-index:5!important;left:-20px!important;top:112px!important;transform-origin:50% 6%!important;transform:translate(var(--pick-react-x),var(--pick-react-y)) rotate(calc(90deg + var(--pick-rot-drift) + var(--pick-react-rot)))!important;}
+body.lock-shell-active:is([data-game-mode="alphaprotocol"],[data-game-mode="watchmen"]) .mechanismZone .pick{z-index:6!important;left:-20px!important;top:112px!important;transform-origin:50% 6%!important;transform:translate(var(--pick-react-x),var(--pick-react-y)) rotate(calc(90deg + var(--pick-rot-drift) + var(--pick-react-rot)))!important;}
 body.lock-shell-active:is([data-game-mode="alphaprotocol"],[data-game-mode="watchmen"]) .mechanismZone .tension{z-index:5!important;left:-4px!important;top:110px!important;transform-origin:6% 50%!important;transform:translate(var(--tension-react-x),var(--tension-react-y)) rotate(calc(var(--tension-rot-drift) + var(--tension-react-rot))) scaleX(-1)!important;}
 
 @media (min-width:1600px) and (min-height:900px){

@@ -69,7 +69,7 @@
     picks=pickCapacity;
     moves=0;
     brokenPicks=0;
-    runReward=1000;
+    runReward=100;
     wmRegeneratePins();
     updateEconomyUI();
     renderWatchmen();

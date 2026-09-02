@@ -10,7 +10,7 @@
 
   function triggerInventoryBreakAnimation(slot){
     triggerPickBreakVisual();
-    inventoryBrokenSlot = Math.max(0, Math.min(5, Number(slot)||0));
+    inventoryBrokenSlot = Math.max(0, Math.min(7, Number(slot)||0));
     if(inventoryBreakTimer) clearTimeout(inventoryBreakTimer);
     inventoryBreakTimer = setTimeout(()=>{
       inventoryBrokenSlot = 0;
@@ -117,7 +117,9 @@
     tensionRail.replaceChildren();
 
     const visiblePicks=Math.max(0, Math.min(pickCapacity, picks));
-    pickRail.style.gridTemplateColumns = 'repeat(5,1fr)';
+    const caseSlots=pickProgress.capacity;
+    pickRail.dataset.slots=String(caseSlots);
+    pickRail.style.gridTemplateColumns = `repeat(${caseSlots},1fr)`;
     pickRail.style.opacity = pickCapacity > 0 ? '1' : '.45';
 
     // The rail shows the player's own Коллекция picks when that screen
@@ -125,10 +127,10 @@
     // equipped collection's handles, first-come first-slot — falling
     // Slots stay visually empty until their composite is ready; showing the
     // retired fixed PICK_SKINS here caused the old wooden models to flash.
-    const rail = window.KeynlockCollection?.getInventoryRail(5) || [];
+    const rail = window.KeynlockCollection?.getInventoryRail(caseSlots) || [];
     const equippedHandleId = window.KeynlockCollection?.getEquippedHandleId();
 
-    for(let i=1;i<=5;i++){
+    for(let i=1;i<=caseSlots;i++){
       const pickIndex=i;
       const isAvailable=i<=visiblePicks;
       const isBreaking=(i===inventoryBrokenSlot && i===visiblePicks+1 && i<=pickCapacity+1);

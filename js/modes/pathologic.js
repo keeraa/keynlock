@@ -9,7 +9,7 @@ function ptgGood(i){
 function ptgCanLock(){ return ptgGood(0) && ptgGood(1); }
 function startPathologicRound(){
   solved=false; $lock.classList.remove('win'); $mechanism.classList.remove('ready','opening','opened');
-  picks=pickCapacity; moves=0; brokenPicks=0; runReward=1000;
+  picks=pickCapacity; moves=0; brokenPicks=0; runReward=100;
   ptgY=[.06+.06*Math.random(),.06+.06*Math.random()];
   ptgV=[0,0];
   ptgTarget=[.24+Math.random()*.18,.24+Math.random()*.18];

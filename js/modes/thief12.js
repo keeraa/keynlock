@@ -31,7 +31,7 @@
     picks=pickCapacity;
     moves=0;
     brokenPicks=0;
-    runReward=1000;
+    runReward=100;
     th12Seq=Array.from({length:5},()=>TH12_TYPES[Math.floor(Math.random()*TH12_TYPES.length)]);
     th12Near=th12Seq.map(th12MakeNear);
     th12Step=0;

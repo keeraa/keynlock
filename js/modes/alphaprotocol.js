@@ -60,7 +60,7 @@ function apSymbolTop(p){ return p.groove>50?18:82; }
 function startAlphaProtocolRound(){
   chooseGamePinSkin();
   solved=false; $lock.classList.remove('win'); $mechanism.classList.remove('ready','opening','opened');
-  picks=pickCapacity; moves=0; brokenPicks=0; runReward=1000;
+  picks=pickCapacity; moves=0; brokenPicks=0; runReward=100;
   apPins=Array.from({length:5},apMakePin);
   apSel=0; apOrder=shuffle([0,1,2,3,4]); apOrderStep=0; apSeqEls=[];
   apTimeMax=diffStep(30,26,22,'alphaprotocol'); apTimeLeft=apTimeMax;

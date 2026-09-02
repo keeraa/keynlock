@@ -45,7 +45,7 @@
   function registerMove(){
     toolMotionController.impulse();
     moves++;
-    const next=Math.max(100, 1000 - moves*50);
+    const next=Math.max(10, 100 - moves*5);
     if(next!==runReward){
       runReward=next;
       animateRewardDrop();
@@ -54,10 +54,24 @@
   }
 
   function awardRun(){
-    const cleanBonus = brokenPicks===0 ? 250 : 0;
-    const earned = runReward + cleanBonus;
+    const cleanBonus = brokenPicks===0 ? 25 : 0;
+    const baseCoins=runReward+cleanBonus;
+    const resources=window.KeynlockResources?.awardLock?.({tier:getModeDifficulty(mode),baseCoins});
+    const earned=resources?.coins??baseCoins;
     balance += earned;
     STORE.setItem('lockpickBalance', String(balance));
+    const loot=document.querySelector('#solvedPuzzleLoot');
+    if(loot&&resources){
+      const componentRows=Object.entries(resources.components).map(([id,count])=>{
+        const component=window.KeynlockResources.components.find(item=>item.id===id);
+        return `<span class="lootRow"><i class="lootColor" style="--loot-color:${component?.color||'#888'}"></i><b>+${count}</b> ${component?.name||id} компонент</span>`;
+      }).join('');
+      loot.innerHTML=`
+        <span class="lootRow lootCoins"><b>+${earned}</b> монет</span>
+        <span class="lootRow"><b>+${resources.parts}</b> дет. замка</span>
+        ${componentRows}
+        ${resources.handle?`<span class="lootRow lootRare">Редкая рукоятка: <b>${resources.handle.name}</b></span>`:''}`;
+    }
     updateEconomyUI();
     return {earned, cleanBonus};
   }
@@ -83,6 +97,7 @@ renderInventoryTools();
 
     const previousVisiblePicks=Math.max(0, Math.min(pickCapacity, picks));
     picks=Math.max(0,picks-1);
+    window.KeynlockResources?.consumePicks?.(1);
     if(previousVisiblePicks>0) triggerInventoryBreakAnimation(previousVisiblePicks);
     brokenPicks++;
     if(picks<=0)showPickDepletedLoss();
@@ -102,6 +117,7 @@ renderInventoryTools();
     if(solved || picks<=0)return false;
     const previousVisiblePicks=Math.max(0,Math.min(pickCapacity,picks));
     picks=Math.max(0,picks-1);
+    window.KeynlockResources?.consumePicks?.(1);
     if(previousVisiblePicks>0)triggerInventoryBreakAnimation(previousVisiblePicks);
     brokenPicks++;
     SFX.break();

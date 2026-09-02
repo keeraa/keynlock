@@ -20,7 +20,7 @@
     else if(kdReady) $kdFeedback.textContent=`Профиль совпал за ${kdTests} проверок — нажми на замок`;
   }
   function startDeductionRound(){
-    solved=false;picks=pickCapacity;moves=0;brokenPicks=0;runReward=1000;
+    solved=false;picks=pickCapacity;moves=0;brokenPicks=0;runReward=100;
     chooseGamePinSkin();
     kdToothCount=diffStep(4,5,6,'deduction');
     const maxTooth=diffStep(3,4,4,'deduction');

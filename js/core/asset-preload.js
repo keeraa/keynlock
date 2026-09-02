@@ -117,20 +117,11 @@
   }
 
   readyPromise.then(()=>{
-    const loader=document.querySelector('#bootLoader');
-    const play=document.querySelector('#bootLoaderPlay');
     const caption=document.querySelector('#bootLoaderCaption');
     if(caption) caption.textContent='Всё готово';
     document.body.classList.add('assets-ready');
     window.dispatchEvent(new CustomEvent('keynlock:audio-ready'));
-    if(play) play.hidden=false;
-    play?.addEventListener('click',()=>{
-      window.dispatchEvent(new CustomEvent('keynlock:play'));
-      document.body.classList.remove('assets-loading');
-      if(!loader) return;
-      loader.classList.add('bootLoaderHidden');
-      loader.addEventListener('transitionend',()=>{ loader.hidden=true; },{once:true});
-    },{once:true});
+    window.KeynlockMainMenu?.assetsReady();
   });
 
   window.KeynlockAssetsReady=readyPromise;

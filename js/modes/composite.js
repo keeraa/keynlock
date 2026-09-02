@@ -203,7 +203,7 @@
     picks=pickCapacity;
     moves=0;
     brokenPicks=0;
-    runReward=1000;
+    runReward=100;
 
     cpNodes=[rand(0,CP_LEVEL_NAMES.length-1)];
     for(let i=1;i<4;i++){

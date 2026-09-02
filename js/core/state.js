@@ -1,6 +1,6 @@
   const GOAL=4, MIN=1, MAX=7;
   function clamp(value,min,max){ return Math.max(min,Math.min(max,value)); }
-  const WORLD_PAUSE_CLASSES=['lair-open','map-open','prototype-mechanic-open','game-settings-open','game-defeat'];
+  const WORLD_PAUSE_CLASSES=['lair-open','map-open','prototype-mechanic-open','game-settings-open','game-defeat','main-menu-open'];
   let worldPauseState=null;
   function isWorldPaused(){
     return document.hidden || WORLD_PAUSE_CLASSES.some(name=>document.body.classList.contains(name));
@@ -32,11 +32,7 @@
       };
     }
   })();
-  const PICK_TYPES={
-    wood:{name:'Деревянная',breakChance:1,saveChance:0},
-    iron:{name:'Железная',breakChance:.30,saveChance:.30},
-    diamond:{name:'Алмазная',breakChance:.20,saveChance:.50}
-  };
+  const PICK_TYPES={standard:{name:'Обычная',breakChance:1,saveChance:0}};
   const PICK_SKINS=[null,
     'assets/picks/pick_01.webp',
     'assets/picks/pick_02.webp',
@@ -51,12 +47,10 @@
   function loadPickProgress(){
     try{
       const saved=JSON.parse(STORE.getItem('lockpickProgress')||'{}');
-      return {iron:!!saved.iron,diamond:!!saved.diamond,capacity:[3,4,5].includes(saved.capacity)?saved.capacity:3,equipped:PICK_TYPES[saved.equipped]?saved.equipped:'wood'};
-    }catch{ return {iron:false,diamond:false,capacity:3,equipped:'wood'}; }
+      return {capacity:[3,5,7].includes(saved.capacity)?saved.capacity:3,equipped:'standard'};
+    }catch{ return {capacity:3,equipped:'standard'}; }
   }
   let pickProgress=loadPickProgress();
-  if(pickProgress.equipped==='iron'&&!pickProgress.iron) pickProgress.equipped='wood';
-  if(pickProgress.equipped==='diamond'&&!pickProgress.diamond) pickProgress.equipped=pickProgress.iron?'iron':'wood';
   let pickType=pickProgress.equipped, pickCapacity=pickProgress.capacity;
   let mapOpen=false, mapMoving=false;
   const MAP_LOCATIONS={
@@ -107,7 +101,8 @@
     }
   }catch{}
 
-  let n=5, selected=0, picks=pickCapacity, state=[], initial=[], links=[], targets=[], solved=false, mode='classic', goalLine=GOAL, moves=0, brokenPicks=0, runReward=1000, specialType='chain', generatedDistance=0, balance=Math.max(0,Number(STORE.getItem('lockpickBalance'))||0), inventoryBrokenSlot=0, inventoryBreakTimer=null;
+  const savedMode=STORE.getItem('lockpickCurrentMode');
+  let n=5, selected=0, picks=pickCapacity, state=[], initial=[], links=[], targets=[], solved=false, mode=GameCatalog.has(savedMode)?savedMode:'classic', goalLine=GOAL, moves=0, brokenPicks=0, runReward=100, specialType='chain', generatedDistance=0, balance=Math.max(0,Number(STORE.getItem('lockpickBalance'))||0), inventoryBrokenSlot=0, inventoryBreakTimer=null;
   const $plates=document.querySelector('#plates'), $status=document.querySelector('#status'),
         $lock=document.querySelector('#lock'),
         challengeHud=new GameChallengeHud(document.querySelector('#challengeHud')),
@@ -127,7 +122,6 @@
         $resonanceMode=document.querySelector('#resonanceMode'), $rsLanes=document.querySelector('#rsLanes'),
         $deductionMode=document.querySelector('#deductionMode'), $kdPanel=document.querySelector('#kdPanel'), $kdKey=document.querySelector('#kdKey'), $kdCheck=document.querySelector('#kdCheck'), $kdFeedback=document.querySelector('#kdFeedback'), $kdHistory=document.querySelector('#kdHistory'),
         $compositeMode=document.querySelector('#compositeMode'), $cpPins=document.querySelector('#cpPins'), $cpBuildPins=document.querySelector('#cpBuildPins'), $cpTargetShadow=document.querySelector('#cpTargetShadow'), $cpTargetFill=document.querySelector('#cpTargetFill'), $cpTargetTopLine=document.querySelector('#cpTargetTopLine'), $cpTargetBevel=document.querySelector('#cpTargetBevel'), $cpTargetPath=document.querySelector('#cpTargetPath'), $cpTargetGlow=document.querySelector('#cpTargetGlow'), $cpBuildShadow=document.querySelector('#cpBuildShadow'), $cpBuildFill=document.querySelector('#cpBuildFill'), $cpBuildTopLine=document.querySelector('#cpBuildTopLine'), $cpBuildBevel=document.querySelector('#cpBuildBevel'), $cpBuildPath=document.querySelector('#cpBuildPath'), $cpBuildGlow=document.querySelector('#cpBuildGlow'), $cpBuildJoints=document.querySelector('#cpBuildJoints'), $cpParts=document.querySelector('#cpParts'), $cpState=document.querySelector('#cpState'),
-        $heatColdMode=document.querySelector('#heatColdMode'), $hcInput=document.querySelector('#hcInput'), $hcDialRow=document.querySelector('#hcDialRow'), $hcSlots=document.querySelector('#hcSlots'), $hcResult=document.querySelector('#hcResult'), $hcRows=document.querySelector('#hcRows'),
         $drumMode=document.querySelector('#drumMode'), $drumWheels=document.querySelector('#drumWheels'), $drumCheck=document.querySelector('#drumCheck'), $drumResult=document.querySelector('#drumResult'), $drumSound=document.querySelector('#drumSound'), $drumNew=document.querySelector('#drumNew'),
         $scopeMode=document.querySelector('#scopeMode'), $scopeCanvas=document.querySelector('#scopeCanvas'), $scopeWheels=document.querySelector('#scopeWheels'), $scopeScore=document.querySelector('#scopeScore'), $scopeBar=document.querySelector('#scopeBar'), $scopeCheck=document.querySelector('#scopeCheck'), $scopeResult=document.querySelector('#scopeResult'), $scopeNew=document.querySelector('#scopeNew'),
         $obMode=document.querySelector('#obMode'), $obLock=document.querySelector('#obLock'), $obMessage=document.querySelector('#obMessage'),
@@ -140,7 +134,6 @@
         $kingdomcomeMode=document.querySelector('#kingdomcomeMode'), $kcdLock=document.querySelector('#kcdLock'), $kcdTurnBtn=document.querySelector('#kcdTurnBtn'), $kcdProgressBar=document.querySelector('#kcdProgressBar'), $kcdStressBar=document.querySelector('#kcdStressBar'), $kcdProgressText=document.querySelector('#kcdProgressText'), $kcdStressText=document.querySelector('#kcdStressText'), $kcdHelp=document.querySelector('#kcdHelp'),
         $thief12Mode=document.querySelector('#thief12Mode'), $th12Door=document.querySelector('#th12Door'), $th12Stages=document.querySelector('#th12Stages'), $th12Help=document.querySelector('#th12Help'),
         $falloutMode=document.querySelector('#falloutMode'), $sfLock=document.querySelector('#sfLock'), $sfCylinder=document.querySelector('#sfCylinder'), $sfTurnBar=document.querySelector('#sfTurnBar'), $sfTurnText=document.querySelector('#sfTurnText'), $sfWearBar=document.querySelector('#sfWearBar'), $sfWearText=document.querySelector('#sfWearText'), $sfTorqueLeft=document.querySelector('#sfTorqueLeft'), $sfTorqueRight=document.querySelector('#sfTorqueRight'), $sfHelp=document.querySelector('#sfHelp'),
-        $anachlabMode=document.querySelector('#anachlabMode'), $alabSlots=document.querySelector('#alabSlots'), $alabHelp=document.querySelector('#alabHelp'),
         $masshackMode=document.querySelector('#masshackMode'), $hackArena=document.querySelector('#hackArena'), $hackCore=document.querySelector('#hackCore'), $hackPlayer=document.querySelector('#hackPlayer'), $hackHelp=document.querySelector('#hackHelp'),
         $pathologicMode=document.querySelector('#pathologicMode'), $ptgColL=document.querySelector('#ptgColL'), $ptgColR=document.querySelector('#ptgColR'), $ptgDur=document.querySelector('#ptgDur'), $ptgHelp=document.querySelector('#ptgHelp'),
         $bioshock2Mode=document.querySelector('#bioshock2Mode'), $bioTrack=document.querySelector('#bioTrack'), $bioNeedle=document.querySelector('#bioNeedle'), $bioBot=document.querySelector('#bioBot'), $bioStageText=document.querySelector('#bioStage'), $bioPassesText=document.querySelector('#bioPasses'), $bioHelp=document.querySelector('#bioHelp'),
@@ -155,7 +148,6 @@
     resonance:$resonanceMode,
     deduction:$deductionMode,
     composite:$compositeMode,
-    heatcold:$heatColdMode,
     drum:$drumMode,
     scope:$scopeMode,
     oblivion:$obMode,
@@ -168,7 +160,6 @@
     kingdomcome:$kingdomcomeMode,
     thief12:$thief12Mode,
     fallout:$falloutMode,
-    anachlab:$anachlabMode,
     masshack:$masshackMode,
     pathologic:$pathologicMode,
     bioshock2:$bioshock2Mode,
@@ -178,7 +169,7 @@
   const ALL_MODES=new Set(GameCatalog.nativeIds);
 
   const DIFFICULTY_STORAGE_KEY='lockpickModeDifficulty';
-  const DEFAULT_MODE_DIFFICULTY=Object.freeze({classic:1,sequence:1,special:1,hillsfar:1,g1:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,heatcold:1,drum:1,scope:1,oblivion:1,watchmen:1,museum:1,mass2:1,pipeline:1,wharf:1,thiefds:1,kingdomcome:1,thief12:1,fallout:1,anachlab:1,masshack:1,pathologic:1,bioshock2:1,alphaprotocol:1});
+  const DEFAULT_MODE_DIFFICULTY=Object.freeze({classic:1,sequence:1,special:1,hillsfar:1,g1:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,drum:1,scope:1,oblivion:1,watchmen:1,museum:1,mass2:1,pipeline:1,wharf:1,thiefds:1,kingdomcome:1,thief12:1,fallout:1,masshack:1,pathologic:1,bioshock2:1,alphaprotocol:1});
   function loadModeDifficulty(){
     try{
       const saved=JSON.parse(STORE.getItem(DIFFICULTY_STORAGE_KEY)||'{}');

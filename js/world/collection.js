@@ -256,7 +256,7 @@
     // Composites for the rail's handles may not be cached yet — kick
     // them off, then re-render once ready so the rail doesn't sit on
     // stale/missing thumbnails while they load.
-    const handles = getInventoryRail(5);
+    const handles = getInventoryRail(Math.max(5,pickProgress.capacity));
     Promise.all(handles.map(compositeHandle)).then(() => {
       if(typeof renderInventoryTools === 'function') renderInventoryTools();
     }).catch(() => {});
@@ -280,6 +280,17 @@
     equipHandleById(handleId){
       const handle = railCollection().handles.find(h => h.id === handleId);
       if(handle && isUnlocked(handle)) equipHandle(handle);
+    },
+    unlockRandomHandle(){
+      const locked=PICK_COLLECTIONS.flatMap(collection=>collection.handles.map(handle=>({collection,handle}))).filter(({handle})=>!isUnlocked(handle));
+      if(!locked.length)return null;
+      const reward=locked[Math.floor(Math.random()*locked.length)];
+      unlockedOverrides[reward.handle.id]=true;
+      STORE.setItem(UNLOCKED_KEY,JSON.stringify(unlockedOverrides));
+      renderCollectionList();
+      if(reward.collection.id===state.collectionId)renderHandleStrip();
+      refreshInventoryRail();
+      return {id:reward.handle.id,name:`${reward.collection.name} · ${reward.handle.id.split('-').at(-1)}`};
     }
   };
 

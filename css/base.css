@@ -66,6 +66,9 @@ header{padding-top:14px;}
 }
 body.importedMode .main{place-items:stretch;}
 .economyHud{z-index:190!important;}
+.resourceHudBadge{min-width:58px;padding:5px 7px;border:1px solid rgba(145,108,55,.55);border-radius:9px;background:rgba(19,15,12,.82);text-align:center;}
+.resourceHudBadge span{display:block;color:#8e7b61;font:8px/1 var(--ui-font);text-transform:uppercase;}
+.resourceHudBadge b{display:block;margin-top:3px;color:#e2c58e;font:700 12px/1 var(--ui-font);}
 @media (max-width: 900px){
 .tab{padding:7px 10px;font-size:12px;}
 }
@@ -87,7 +90,7 @@ body.importedMode .main{place-items:stretch;}
 .plate .index{display:none!important;}
 .kdPinImg{position:absolute;left:50%;bottom:calc((var(--h) - 4) * 25px);height:124px;width:auto;max-width:none;object-fit:contain;transform:translateX(-50%);transform-origin:center bottom;filter:drop-shadow(0 5px 8px rgba(0,0,0,.32));pointer-events:none;transition:bottom .16s ease;}
 .cpMode .cpPinImg,.cpMode header .difficulty{margin-top:4px!important;}
-header .economyHud{position:static!important;top:auto!important;right:auto!important;transform:none!important;display:flex;justify-content:center;gap:10px;margin:8px auto 0;z-index:auto;}
+header .economyHud{position:static!important;top:auto!important;right:auto!important;transform:none!important;display:flex;justify-content:center;gap:6px;margin:8px auto 0;z-index:auto;}
 @media (max-width:900px){
 .timerCircleHud{width:66px;height:66px;}
 .timerCircleSvg{width:66px;height:66px;}

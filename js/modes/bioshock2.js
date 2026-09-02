@@ -47,7 +47,7 @@ function bioTypeAt(x){
 }
 function startBioshock2Round(){
   solved=false; $lock.classList.remove('win'); $mechanism.classList.remove('ready','opening','opened');
-  picks=pickCapacity; moves=0; brokenPicks=0; runReward=1000;
+  picks=pickCapacity; moves=0; brokenPicks=0; runReward=100;
   bioStage=0; bioRunning=true; bioSpeed=54+Math.random()*12;
   bioZonesArr=bioZones(0); bioRandomStart();
   bioZoneEls=[];

@@ -28,7 +28,7 @@
     picks=pickCapacity;
     moves=0;
     brokenPicks=0;
-    runReward=1000;
+    runReward=100;
     kcdSweetR=.18+Math.random()*.18;
     kcdSweetA=Math.random()*Math.PI*2;
     kcdRot=0;

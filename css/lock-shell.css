@@ -172,6 +172,7 @@ body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .lockShe
   filter:brightness(calc(1 + .22 * var(--lock-glow,0))) saturate(calc(1 + .10 * var(--lock-glow,0))) drop-shadow(0 9px 12px rgba(0,0,0,.25)) drop-shadow(0 0 calc(22px * var(--lock-glow,0)) rgba(236,192,96,calc(.32 * var(--lock-glow,0))));
   transform:translateY(-50%) rotate(90deg);
   transform-origin:center;
+  clip-path:inset(0 0 0 68px);
   z-index:0;
   transition:filter .18s cubic-bezier(.22,.84,.22,1);
 }

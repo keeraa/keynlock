@@ -59,11 +59,9 @@
         b.className='wfBar';
         const silverSprings=['01','03','04'];
         const spring=silverSprings[Math.floor(Math.random()*silverSprings.length)];
-        const springWidth={'01':1.75,'03':1.08,'04':.92}[spring];
         // The spring is fixed to the top of its channel. Its resting length
         // sets the pin position; raising the pin compresses the spring.
         b.style.setProperty('--spring-rest',(0.72+Math.random()*0.36).toFixed(2));
-        b.style.setProperty('--spring-width-normalizer',springWidth);
         b.innerHTML=`<span class="wfSpring" aria-hidden="true">
             <img class="wfSpringIdle" src="assets/springs/spring_idle_${spring}.png" alt="">
             <img class="wfSpringCompressed" src="assets/springs/spring_compressed_${spring}.png" alt="">

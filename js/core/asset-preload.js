@@ -25,14 +25,24 @@
   });
   window.KeynlockAudioAssets=AUDIO_ASSETS;
 
+  const imageLoads=new Map();
+
   function preloadImage(src){
-    return new Promise(resolve=>{
+    if(!src) return Promise.resolve(false);
+    if(imageLoads.has(src)) return imageLoads.get(src);
+    const load=new Promise(resolve=>{
       const img=new Image();
       img.onload=()=>resolve(true);
       img.onerror=()=>resolve(false);
       img.src=src;
     });
+    imageLoads.set(src,load);
+    return load;
   }
+
+  window.KeynlockPreloadImages=sources=>Promise.all(
+    [...new Set((sources||[]).filter(Boolean))].map(preloadImage)
+  );
 
   function preloadAudio(src){
     return new Promise(resolve=>{

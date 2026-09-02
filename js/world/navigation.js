@@ -67,6 +67,7 @@
     }
     mapMoving=true;
     const travelId=++mapTravelId;
+    if(target.action==='mission') window.preloadMapMission?.(target.mode);
     $mapInfoTitle.textContent='В пути';
     $mapInfoText.textContent=`Идём: ${target.name}`;
     if($mapLocationAction) $mapLocationAction.hidden=true;

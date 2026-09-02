@@ -60,6 +60,23 @@
   function missionLabel(place) { return GameCatalog.get(place.mode)?.title || place.mode; }
   function gameSupportsTier(mode,tier){ return GameCatalog.get(mode)?.difficulty.levels.includes(tier)??false; }
 
+  function preloadMapMission(mode,tier=mapChapter){
+    const game=GameCatalog.get(mode);
+    if(!game || typeof window.KeynlockPreloadImages!=='function') return Promise.resolve([]);
+    const panel=MODE_PANELS[mode];
+    const sources=[
+      game.location,
+      'assets/lock-shell/lock-bg-01.png',
+      'assets/lock-shell/locker-up-01.png',
+      ...(panel?[...panel.querySelectorAll('img[src]')].map(img=>img.getAttribute('src')):[]),
+      ...(LOCK_BODY_SKINS_BY_LEVEL[tier]||[]).map(item=>item.data),
+      ...(LOCKER_SKINS_BY_LEVEL[tier]||[]).map(item=>item.data),
+      ...pinSkinPoolForLevel(tier),
+    ];
+    return window.KeynlockPreloadImages(sources);
+  }
+  window.preloadMapMission=preloadMapMission;
+
   let missionsDone = {};
   try {
     const saved = JSON.parse(STORE.getItem(MISSION_STORAGE_KEY) || 'null');
@@ -178,6 +195,13 @@
       const dot = document.createElement('span');
       dot.className = 'mapNodeDot missionDot';
       dot.textContent = MISSION_SYMBOLS[place.mode] || '◇';
+      const preview=document.createElement('span');
+      preview.className='mapMissionPreview';
+      const previewImage=document.createElement('img');
+      previewImage.src=GameCatalog.get(place.mode).location;
+      previewImage.alt='';
+      previewImage.loading='lazy';
+      preview.append(previewImage,dot);
       const label = document.createElement('span');
       label.className = 'mapNodeLabel';
       label.textContent = (GameCatalog.mapLabel(place.mode,missionLabel(place))+(GameCatalog.get(place.mode).difficulty.levels.length<3?' · только 1 ур.':'')).toLocaleUpperCase('ru-RU');
@@ -191,7 +215,8 @@
         pip.title=tierSupported?`Уровень ${tier}`:`Уровень ${tier} не готов`;
         tiers.appendChild(pip);
       }
-      node.append(dot, label, tiers);
+      preview.appendChild(tiers);
+      node.append(preview,label);
       canvas.insertBefore(node, player || null);
     }
   }

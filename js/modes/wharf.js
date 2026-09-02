@@ -50,6 +50,13 @@
 
   function renderWharf(){
     if(!$wfLock) return;
+    // Keep the five-channel level at its approved size. Extra channels need
+    // genuinely smaller mechanisms, not only tighter spacing, so the pin and
+    // both spring states scale together around the same channel centre.
+    const mechanismScale=diffStep(1,0.84,0.72,'wharf');
+    $wfLock.style.setProperty('--wf-channel-w',`${(9.215*mechanismScale).toFixed(3)}cqw`);
+    $wfLock.style.setProperty('--wf-spring-idle-h',`${(23.75*mechanismScale).toFixed(3)}cqw`);
+    $wfLock.style.setProperty('--wf-spring-compressed-h',`${(12.35*mechanismScale).toFixed(3)}cqw`);
     if(wfBarEls.length!==wfBarCount){
       const channels=document.createElement('div');
       channels.className='wfChannels';

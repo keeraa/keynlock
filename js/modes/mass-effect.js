@@ -66,6 +66,9 @@
     });
 
     const ready = meRings.length && meRings.every(massRingSolved);
+    let beamDepth=0;
+    while(beamDepth<meRings.length && massRingSolved(meRings[beamDepth])) beamDepth++;
+    document.querySelector('.massBoard')?.setAttribute('data-beam-depth',String(beamDepth));
     const active=meRings[meSelected];
     const status=document.querySelector('#massStatus');
     const progress=document.querySelector('#massProgress');

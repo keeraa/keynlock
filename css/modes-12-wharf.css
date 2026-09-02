@@ -45,22 +45,27 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   pointer-events:none;
   user-select:none;
 }
-.wfLockerUp{left:2%;top:7%;width:96%;height:auto;z-index:1;}
+/* The source plate has two independent regions.  Its upper cap, including
+   the dark horizontal seam, must stay a single piece; only the grooved body
+   below that seam may be repeated when a level adds channels. */
 .wfLockerUp{
   left:7.2%;
-  top:7%;
+  top:20.75%;
   width:85.6%;
-  height:43%;
+  height:29.25%;
   display:grid;
   grid-template-columns:repeat(var(--wf-bars,5),minmax(0,1fr));
   overflow:hidden;
+  z-index:1;
 }
 .wfLockerCell{
   min-width:0;
   height:100%;
   background-image:url("../assets/lock-shell/locker-up-01.png");
-  background-size:500% 100%;
-  background-position:50% 50%;
+  /* Restore the full source height, align it to the bottom and let the cell
+     crop away the cap. This starts every repeated groove below the seam. */
+  background-size:500% 147.06%;
+  background-position:50% 100%;
   background-repeat:no-repeat;
 }
 .wfLockerLip{
@@ -68,7 +73,7 @@ body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:cal
   top:7%;
   width:96%;
   height:auto;
-  clip-path:inset(0 0 78% 0);
+  clip-path:inset(0 0 68% 0);
   z-index:5;
 }
 .wfChannels{

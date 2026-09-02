@@ -6,7 +6,6 @@
     $scene.classList.toggle('hideBase',isImported);
     document.body.classList.toggle('importedMode',isImported);
     document.body.classList.toggle('mode-hillsfar', mode==='hillsfar');
-    document.body.classList.toggle('mode-mass', mode==='mass');
     document.body.classList.toggle('mode-skyrim', mode==='skyrim');
     document.body.classList.toggle('game-has-lock', !!GameCatalog.feature(mode,'lock.present'));
     document.body.classList.toggle('game-manual-open', !!GameCatalog.feature(mode,'lock.manualOpen'));

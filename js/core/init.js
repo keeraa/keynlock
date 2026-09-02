@@ -250,7 +250,6 @@
   })();
 
   $lockHitArea.addEventListener('click',handleUniversalLockClick);
-  $massCenter.addEventListener('click',()=>GameActions.attemptOpen({modeId:'mass',source:'puzzle-control'}));
   $skTorqueButton.addEventListener('click',()=>GameActions.attemptOpen({modeId:'skyrim',source:'puzzle-control'}));
   $anUnlock.addEventListener('click',e=>{ if(e.target.closest('.anBtn')) return; GameActions.attemptOpen({modeId:'anach',source:'puzzle-control'}); });
   $anUnlock.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&!e.target.closest('.anBtn')){ e.preventDefault(); GameActions.attemptOpen({modeId:'anach',source:'keyboard'}); } });

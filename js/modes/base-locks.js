@@ -437,7 +437,6 @@ let plateEls=[], pinTopPlateEls=[];
     skyrim:()=>PuzzleModes.call('skyrim','attemptOpen'),
     g1:()=>PuzzleModes.call('g1','attemptOpen'),
     hillsfar:()=>PuzzleModes.call('hillsfar','attemptOpen'),
-    mass:()=>PuzzleModes.call('mass','attemptOpen'),
     oblivion:()=>PuzzleModes.call('oblivion','attemptOpen'),
     watchmen:()=>PuzzleModes.call('watchmen','attemptOpen'),
     museum:()=>PuzzleModes.call('museum','attemptOpen'),

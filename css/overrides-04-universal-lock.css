@@ -10,7 +10,7 @@ body.importedMode .puzzleArea>.platesZone,body.importedMode .puzzleArea>#status{
 body:not(.importedMode) .puzzleArea>.platesZone{display:block!important;}
 body.importedMode .puzzleArea>.modePanel:not([hidden]),body.mode-hillsfar .puzzleArea>.hillsfarMode:not([hidden]){position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;max-width:none!important;margin:0!important;padding:8px 20px 12px!important;display:flex!important;visibility:visible!important;opacity:1!important;align-items:center!important;justify-content:flex-start!important;flex-direction:column!important;overflow:auto!important;background:transparent!important;background-image:none!important;box-shadow:none!important;filter:none!important;z-index:5!important;}
 body.importedMode .puzzleArea>.skMode:not([hidden]){overflow:visible!important;}
-body.importedMode .g1Mode,body.importedMode .hillsfarMode,body.importedMode .massMode,body.importedMode .skMode,body.importedMode .anMode,body.importedMode .tnMode,body.importedMode .rsMode,body.importedMode .kdMode,body.importedMode .cpMode{top:0!important;right:0!important;bottom:0!important;left:0!important;inset:0!important;}
+body.importedMode .g1Mode,body.importedMode .hillsfarMode,body.importedMode .skMode,body.importedMode .anMode,body.importedMode .tnMode,body.importedMode .rsMode,body.importedMode .kdMode,body.importedMode .cpMode{top:0!important;right:0!important;bottom:0!important;left:0!important;inset:0!important;}
 body.mode-hillsfar .hfLockBox{margin-top:0!important;}
 body.mode-hillsfar .hfCandidates{margin-top:18px!important;}
 body.importedMode .g1ProgressWrap{margin-top:54px!important;}
@@ -85,8 +85,6 @@ body.mode-hillsfar .hfCandidates{width:min(94vw,420px)!important;grid-template-c
 body.mode-hillsfar .hfCandidate{min-height:72px!important;}
 body.mode-hillsfar .hfCandidate svg{max-width:125px!important;max-height:72px!important;}
 body.importedMode .massBoard{width:min(82vw,300px)!important;height:min(82vw,300px)!important;flex:0 0 auto!important;}
-body.importedMode .massCenter{width:92px!important;height:92px!important;}
-body.importedMode .massCenter span{font-size:11px!important;}
 body.importedMode .g1ProgressWrap{position:relative!important;top:0!important;width:100%!important;margin:8px auto 0!important;transform:none!important;}
 body.importedMode .g1ProgressRow{gap:7px!important;flex-wrap:wrap!important;justify-content:center!important;}
 body.importedMode .g1Slot{width:52px!important;height:52px!important;}
@@ -297,27 +295,3 @@ body.lair-open .topRightHud .assetNameHud{display:none!important;}
 /* Skyrim deliberately lifts the enlarged dial above the panel's content box. */
 body.mode-skyrim .puzzleArea,
 body.mode-skyrim .puzzleArea>.skMode:not([hidden]){overflow:visible!important;}
-
-/* Mass Effect owns the central lock and now lays out its readout, scanner and
-   controls as one panel. Do not revive the legacy 2x dial transform here. */
-body.mode-mass #lock.universalLockBlock{display:none!important;}
-body.mode-mass .puzzleArea,
-body.mode-mass .puzzleArea>.massMode:not([hidden]){overflow:visible!important;}
-body.mode-mass .massBoardViewport{top:-270px!important;width:560px!important;height:650px!important;flex:0 0 650px!important;}
-body.mode-mass .massBoard{width:430px!important;height:430px!important;max-width:430px!important;max-height:430px!important;transform:none!important;margin:0!important;}
-@media (max-width:900px){
-  body.mode-mass .massBoardViewport{top:-190px!important;width:500px!important;height:570px!important;flex-basis:570px!important;}
-  body.mode-mass .massBoard{transform:scale(.82)!important;}
-}
-@media (max-width:760px){
-  body.mode-mass .massBoardViewport{top:auto!important;width:min(94vw,400px)!important;height:min(88dvh,500px)!important;flex-basis:min(88dvh,500px)!important;}
-  body.mode-mass .massBoard{transform:scale(.72)!important;}
-}
-@media (max-width:760px) and (max-height:620px) and (orientation:portrait){
-  body.mode-mass .massBoardViewport{top:auto!important;width:330px!important;height:430px!important;flex-basis:430px!important;}
-  body.mode-mass .massBoard{transform:scale(.62)!important;}
-}
-@media (max-height:560px) and (orientation:landscape){
-  body.mode-mass .massBoardViewport{top:auto!important;width:390px!important;height:430px!important;flex-basis:430px!important;}
-  body.mode-mass .massBoard{transform:scale(.62)!important;}
-}

@@ -15,7 +15,6 @@
     { mode: 'sequence',  x: 38, y: 30 },
     { mode: 'special',   x: 34, y: 47 },
     { mode: 'hillsfar',  x: 26, y: 28 },
-    { mode: 'mass',      x: 42, y: 24 },
     { mode: 'g1',        x: 44, y: 44 },
     { mode: 'skyrim',    x: 44, y: 64 },
     { mode: 'anach',     x: 55, y: 63 },

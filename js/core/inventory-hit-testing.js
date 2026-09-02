@@ -179,7 +179,7 @@
 
   document.addEventListener('animationend',e=>{
     if(e.animationName!=='keynlockShackleOpenFast') return;
-    const lockArt=e.target?.closest?.('.mechanismZone,.sharedModeLockArt,.skCenterLock,.massCenterLock') || e.target;
+    const lockArt=e.target?.closest?.('.mechanismZone,.sharedModeLockArt,.skCenterLock') || e.target;
     if(!lockArt?.classList?.contains('opening')) return;
 
     lockArt.classList.remove('opening');
@@ -431,7 +431,7 @@
   // init.js bound these two handlers by function reference before this patch runs.
   // Capture them so the same guard still applies to their dedicated controls.
   document.addEventListener('click',e=>{
-    if(!e.target.closest('#massCenter,#skTorqueButton')) return;
+    if(!e.target.closest('#skTorqueButton')) return;
     if(solved || tensionCompatible()) return;
     e.preventDefault();
     e.stopImmediatePropagation();

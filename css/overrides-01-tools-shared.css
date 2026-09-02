@@ -10,7 +10,7 @@
 .sharedModeLockArt,body.importedMode .sharedModeLockArt,
 
 }
-body.importedMode .hillsfarMode,body.importedMode .massMode,body.importedMode .g1Mode,body.importedMode .skMode,body.importedMode .anMode,body.importedMode .tnMode,body.importedMode .rsMode,body.importedMode .kdMode,body.importedMode .cpMode{background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
+body.importedMode .hillsfarMode,body.importedMode .g1Mode,body.importedMode .skMode,body.importedMode .anMode,body.importedMode .tnMode,body.importedMode .rsMode,body.importedMode .kdMode,body.importedMode .cpMode{background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
 body.importedMode .skMode{overflow:visible!important;}
 body.importedMode .skBoardViewport{overflow:visible!important;}
 .skPickArm,.skPickArm::before{overflow:visible!important;}

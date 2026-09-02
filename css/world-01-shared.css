@@ -12,11 +12,11 @@ body.mode-hillsfar .hfCandidates{width:min(620px, 82vw)!important;column-gap:6px
 body.mode-hillsfar .hfCandidate{max-width:198px!important;height:50px!important;min-height:48px!important;}
 body.mode-hillsfar .hfCandidate svg{width:188px!important;height:36px!important;max-height:36px!important;}
 }
-body.importedMode .hillsfarMode,body.importedMode .massMode,body.importedMode .g1Mode,body.importedMode .skMode,body.importedMode .anMode{top:0!important;right:0!important;bottom:0!important;left:0!important;height:100%!important;min-height:0!important;}
+body.importedMode .hillsfarMode,body.importedMode .g1Mode,body.importedMode .skMode,body.importedMode .anMode{top:0!important;right:0!important;bottom:0!important;left:0!important;height:100%!important;min-height:0!important;}
 body.mode-hillsfar .hillsfarMode{bottom:0!important;}
 body.importedMode .main{grid-row:2!important;min-height:0!important;}
 body.importedMode .scene{width:100%!important;height:100%!important;min-height:0!important;}
-body.importedMode .hillsfarMode,body.importedMode .massMode,body.importedMode .g1Mode,body.importedMode .skMode,body.importedMode .anMode{background:radial-gradient(circle at 20% 8%, rgba(106,74,40,.22) 0%, rgba(106,74,40,.10) 12%, rgba(106,74,40,0) 32%),
+body.importedMode .hillsfarMode,body.importedMode .g1Mode,body.importedMode .skMode,body.importedMode .anMode{background:radial-gradient(circle at 20% 8%, rgba(106,74,40,.22) 0%, rgba(106,74,40,.10) 12%, rgba(106,74,40,0) 32%),
     radial-gradient(circle at 82% 12%, rgba(72,50,30,.16) 0%, rgba(72,50,30,.08) 10%, rgba(72,50,30,0) 28%),
     linear-gradient(180deg, rgba(53,37,24,.56) 0%, rgba(27,19,13,.34) 18%, rgba(10,8,6,.12) 34%, rgba(0,0,0,0) 60%)!important;background-repeat:no-repeat!important;background-size:100% 100%!important;}
 body.mode-hillsfar .hfCandidate:hover{transform:none!important;background:transparent!important;}

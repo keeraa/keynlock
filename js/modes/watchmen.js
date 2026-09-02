@@ -25,8 +25,10 @@
   // correct whether the shared puzzle area gives it 150px or 400px+.
   function wmApplyGeometry(){
     if(!$wmLock) return WM_SCALE;
-    const cs=getComputedStyle($wmLock);
-    const h=$wmLock.clientHeight-(parseFloat(cs.paddingTop)||0)-(parseFloat(cs.paddingBottom)||0);
+    const channels=$wmLock.querySelector('.wmChannels');
+    if(!channels) return WM_SCALE;
+    const cs=getComputedStyle(channels);
+    const h=channels.clientHeight-(parseFloat(cs.paddingTop)||0)-(parseFloat(cs.paddingBottom)||0);
     if(!h || h<0) return WM_SCALE;
     const pinBottom=Math.max(8,Math.min(22,h*.07));
     const pinH=Math.max(36,Math.min(112,h*.36));
@@ -78,6 +80,8 @@
   function renderWatchmen(){
     if(!$wmLock) return;
     if(wmPinEls.length!==wmPins.length){
+      const channels=$wmLock.querySelector('.wmChannels');
+      if(!channels) return;
       const frag=document.createDocumentFragment();
       wmPinEls=[];
       wmPins.forEach((p,i)=>{
@@ -95,7 +99,7 @@
         frag.appendChild(s);
         wmPinEls.push(s);
       });
-      $wmLock.replaceChildren(frag);
+      channels.replaceChildren(frag);
     }
     const scale=wmApplyGeometry();
     wmPins.forEach((p,i)=>{

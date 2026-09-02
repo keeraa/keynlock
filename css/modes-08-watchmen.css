@@ -1,121 +1,20 @@
-/* Подпружиненные тумблеры (Watchmen) — five coupled spring-loaded pins,
-   each with a hidden target height; nudging one disturbs its neighbors.
-   Markup/CSS ported from the old prototype scene
-   (prototypes/lockpicking-mechanics-v63.html, .wm-*) with classes renamed
-   to .wmSlot/.wmSpring/.wmPin/etc so they don't collide with the same-named
-   classes still used by other prototype scenes. */
-.wmMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px;background:rgba(17,13,9,.985);overflow:auto;}
-/* .challengeStatus (reward+timer HUD) is a viewport-fixed overlay that
-   sits inside the bottom of #puzzleArea on most non-phone breakpoints;
-   js/core/init.js's syncPuzzleRewardClearance() measures the shortfall
-   into --reward-clear so the lock stops above it instead of rendering
-   underneath it. Needs !important + this specificity to beat the shared
-   body.importedMode .puzzleArea>.modePanel padding rule. */
-body.importedMode .puzzleArea>.modePanel.wmMode:not([hidden]){padding-bottom:calc(12px + var(--reward-clear,0px))!important;}
+/* Подпружиненные тумблеры share the universal LockShell with Wharf and Alpha Protocol. */
+.wmMode{position:absolute;inset:0;z-index:12;display:flex;align-items:center;justify-content:center;padding:8px;overflow:visible;}
 .wmMode[hidden]{display:none!important;pointer-events:none!important;}
-
-.wmTimeBar{width:min(650px,92vw);height:9px;background:#0b0e0b;border:1px solid #33392f;border-radius:99px;overflow:hidden;flex:none;}
-.wmTimeBar span{display:block;height:100%;width:100%;background:#9e8253;transition:width .08s linear;}
-
-/* No fixed/min height here on purpose: wmLock is a flex item that fills
-   whatever room is actually available (from ~150px on a short phone up to
-   350px+ on a tall screen). js/modes/watchmen.js recomputes --wm-scale
-   from the slot's real rendered height on every render, and both the
-   pin-rise transform and the .wmTarget marker below read that same
-   variable — so the target line and the pin's resting height always agree,
-   at any viewport size, instead of assuming a fixed pixel scale. */
-.wmLock{
-  width:min(650px,92vw);
-  flex:1 1 auto;
-  min-height:0;
-  max-height:350px;
-  border:2px solid #4d5050;
-  border-radius:18px;
-  background:linear-gradient(180deg,#323737 0 16%,#121616 16% 100%);
-  box-shadow:inset 0 0 38px #000,0 15px 30px rgba(0,0,0,.28);
-  padding:10px 18px 8px;
-  display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  align-items:stretch;
-  gap:8px;
-  position:relative;
-}
-.wmSlot{
-  min-width:0;
-  position:relative;
-  cursor:pointer;
-  border-left:1px solid rgba(255,255,255,.06);
-  border-right:1px solid rgba(0,0,0,.45);
-  border-radius:6px;
-  transition:box-shadow .16s ease,border-color .16s ease;
-}
-.wmSpring{
-  position:absolute;
-  left:50%;
-  top:5px;
-  width:22px;
-  height:64px;
-  transform:translateX(-50%);
-  background:repeating-linear-gradient(180deg,transparent 0 5px,#8e918a 5px 7px);
-  opacity:.72;
-}
-.wmPin{
-  position:absolute;
-  left:50%;
-  bottom:var(--wm-pin-bottom,22px);
-  height:var(--wm-pin-h,112px);
-  width:auto;
-  object-fit:contain;
-  transform:translate(-50%,calc(-1px * var(--wm-rise,0)));
-  transition:transform .08s linear;
-  filter:drop-shadow(0 4px 5px rgba(0,0,0,.42));
-}
-.wmTarget{
-  position:absolute;
-  left:10%;
-  right:10%;
-  bottom:calc(var(--wm-pin-bottom,22px) + 12px + var(--wm-target,70) * var(--wm-scale,2.05) * 1px);
-  height:20px;
-  transform:translateY(50%);
-  border-top:2px solid rgba(214,184,113,.72);
-  border-bottom:2px solid rgba(214,184,113,.72);
-  background:rgba(214,184,113,.08);
-  pointer-events:none;
-  z-index:2;
-}
-.wmSlot.locked .wmPin{
-  filter:sepia(.18) hue-rotate(42deg) brightness(1.12) drop-shadow(0 0 9px rgba(135,188,99,.28));
-}
-.wmSlot.lockable .wmTarget{background:rgba(214,184,113,.17);border-color:#e8c977;}
-.wmSlot.lockable{box-shadow:inset 0 0 0 1px rgba(214,184,113,.48),0 0 16px rgba(214,184,113,.12);}
-/* Same gold glow as Классика's .plate.selected (css/base.css) — copied
-   rgba values rather than the class itself, since that class is styled
-   for a rotating plate, not a tumbler column. */
-.wmSlot.selected{
-  border-color:#e2c487!important;
-  box-shadow:0 0 0 2px rgba(241,191,91,.14),0 0 18px rgba(241,191,91,.24),0 0 38px rgba(241,191,91,.12),inset 0 0 14px rgba(255,224,152,.04);
-}
-
-.wmHelp{
-  flex:none;
-  color:#bcb39a;
-  text-align:center;
-  font:14px/1.35 Arial,sans-serif;
-  max-width:560px;
-}
-.wmHelp:empty{display:none;}
-
-.wmOpenBtn{
-  flex:none;
-  width:min(260px,100%);
-  align-self:center;
-}
-.wmOpenBtn:disabled{
-  opacity:.38;
-  cursor:default;
-  box-shadow:none;
-}
-
-@media (max-width:650px){
-  .wmLock{padding-inline:16px;gap:6px;}
-}
+body.importedMode .puzzleArea>.modePanel.wmMode:not([hidden]){padding-bottom:calc(12px + var(--reward-clear,0px))!important;}
+.wmLockWrap{position:absolute;inset:0;display:block;overflow:visible;}
+.wmLock{box-sizing:border-box;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:hidden;container-type:inline-size;}
+.wmChannels{position:absolute;inset:12% 4.5% 16%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4.5%;align-items:stretch;}
+.wmSlot{min-width:0;position:relative;cursor:pointer;border:0;border-radius:0;background:transparent;box-shadow:none;}
+.wmSlot::after{content:"▲";position:absolute;left:50%;bottom:1%;transform:translateX(-50%);color:transparent;font-size:2.4cqw;transition:color .16s ease,filter .16s ease;}
+.wmSlot.selected::after{color:#d8b871;filter:drop-shadow(0 0 5px rgba(216,184,113,.5));}
+.wmSpring{position:absolute;left:50%;top:1%;width:48%;height:22%;transform:translateX(-50%);background:repeating-linear-gradient(180deg,transparent 0 5px,#a5a69f 5px 7px);opacity:.78;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));}
+.wmPin{position:absolute;left:20%;bottom:var(--wm-pin-bottom,22px);width:60%;height:var(--wm-pin-h,112px);object-fit:fill;transform:translateY(calc(-1px * var(--wm-rise,0)));transition:transform .08s linear;filter:drop-shadow(0 4px 5px rgba(0,0,0,.42));}
+.wmTarget{position:absolute;left:20%;right:20%;bottom:calc(var(--wm-pin-bottom,22px) + 12px + var(--wm-target,70) * var(--wm-scale,2.05) * 1px);height:12px;transform:translateY(50%);border-top:1px solid rgba(214,184,113,.76);border-bottom:1px solid rgba(214,184,113,.76);background:rgba(18,16,11,.9);box-sizing:border-box;pointer-events:none;z-index:2;}
+.wmSlot.locked .wmPin{filter:sepia(.18) hue-rotate(42deg) brightness(1.12) drop-shadow(0 0 9px rgba(135,188,99,.28));}
+.wmSlot.lockable .wmTarget{background:rgba(214,184,113,.2);border-color:#e8c977;box-shadow:0 0 7px rgba(232,201,119,.3);}
+.wmSlot.lockable .wmPin{filter:brightness(1.12) drop-shadow(0 0 7px rgba(216,184,113,.25));}
+.wmTimeBar{position:absolute;left:8%;right:8%;bottom:4%;height:6px;background:#0b0e0b;border:1px solid #4b4434;border-radius:99px;overflow:hidden;z-index:7;}
+.wmTimeBar span{display:block;height:100%;width:100%;background:#b39158;transition:width .08s linear;}
+.wmHelp,.wmOpenBtn{display:none!important;}
+@media (max-width:760px){.wmChannels{inset:14% 4.5% 19%;}.wmTimeBar{bottom:6%;}}

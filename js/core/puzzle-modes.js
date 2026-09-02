@@ -61,7 +61,7 @@ window.PuzzleModes=PuzzleModes;
 
 /* Reusable visual shell for lock mechanisms and optional per-game overlays. */
 (() => {
-  const BASE_MODES = new Set(['classic', 'sequence', 'special', 'wharf', 'alphaprotocol']);
+  const BASE_MODES = new Set(['classic', 'sequence', 'special', 'wharf', 'watchmen', 'alphaprotocol']);
   const frame = document.querySelector('#lockShellFrame');
   const background = document.querySelector('#lockShellBackground');
   const funnelBack = document.querySelector('#lockShellFunnelBack');
@@ -110,7 +110,7 @@ window.PuzzleModes=PuzzleModes;
     renderOverlays();
   }
   function syncMode(mode, options = {}) {
-    if (BASE_MODES.has(mode)) activate(options.profile || 'base-plates', {...options,slotted:mode==='wharf'||mode==='alphaprotocol'});
+    if (BASE_MODES.has(mode)) activate(options.profile || 'base-plates', {...options,slotted:mode==='wharf'||mode==='watchmen'||mode==='alphaprotocol'});
     else deactivate();
   }
 

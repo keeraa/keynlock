@@ -258,19 +258,19 @@ body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"]) .mechani
   70%{transform:translate(var(--tension-react-x),var(--tension-react-y)) rotate(calc(6deg + var(--tension-rot-drift) + var(--tension-react-rot))) scaleX(-1);}
 }
 
-/* Alpha Protocol shares Wharf's physical lock, tools and shell coordinates. */
-body.lock-shell-active[data-game-mode="alphaprotocol"] #lock.universalLockBlock{left:50%!important;top:var(--lock-shell-top)!important;width:var(--lock-shell-size)!important;height:266px!important;min-width:var(--lock-shell-size)!important;transform:translate(-50%,-50%) scale(var(--lock-shell-scale))!important;transform-origin:center!important;z-index:60!important;}
-body.lock-shell-active[data-game-mode="alphaprotocol"] #lock.universalLockBlock>.mechanismZone{left:0!important;top:0!important;width:var(--lock-shell-size)!important;height:266px!important;transform:translate3d(calc(var(--px) * -.04),calc(var(--py) * -.04),0)!important;overflow:visible!important;}
-body.lock-shell-active[data-game-mode="alphaprotocol"] .mechanismZone::before{display:none!important;}
-body.lock-shell-active[data-game-mode="alphaprotocol"] .lockShellPhysicalLock{position:absolute;left:558px;top:0;width:270px;height:266px;z-index:7;}
-body.lock-shell-active[data-game-mode="alphaprotocol"] .lockShellPhysicalLock .lockPanel{display:none!important;}
-body.lock-shell-active[data-game-mode="alphaprotocol"] .lockShellShackle{display:block;position:absolute;right:-103px;top:50%;width:171px;height:171px;background:var(--locker-image) center/contain no-repeat;filter:drop-shadow(0 9px 12px rgba(0,0,0,.25));transform:translateY(-50%) rotate(90deg) scale(.97);z-index:0;}
-body.lock-shell-active[data-game-mode="alphaprotocol"] .lockShellPhysicalLock .lockHitArea{left:0!important;top:0!important;width:270px!important;height:266px!important;transform:none!important;}
-body.lock-shell-active[data-game-mode="alphaprotocol"] .lockShellFunnel{display:block;position:absolute;left:-12px;top:100px;width:60px;height:67px;object-fit:contain;pointer-events:none;filter:drop-shadow(0 5px 7px rgba(0,0,0,.42));}
-body.lock-shell-active[data-game-mode="alphaprotocol"] .lockShellFunnelBack{z-index:3;}
-body.lock-shell-active[data-game-mode="alphaprotocol"] .lockShellFunnelFront{z-index:6;left:-6px;width:54px;}
-body.lock-shell-active[data-game-mode="alphaprotocol"] .mechanismZone .pick{z-index:5!important;left:-20px!important;top:112px!important;transform-origin:50% 6%!important;transform:translate(var(--pick-react-x),var(--pick-react-y)) rotate(calc(90deg + var(--pick-rot-drift) + var(--pick-react-rot)))!important;}
-body.lock-shell-active[data-game-mode="alphaprotocol"] .mechanismZone .tension{z-index:5!important;left:-4px!important;top:110px!important;transform-origin:6% 50%!important;transform:translate(var(--tension-react-x),var(--tension-react-y)) rotate(calc(var(--tension-rot-drift) + var(--tension-react-rot))) scaleX(-1)!important;}
+/* Slotted modes share Wharf's physical lock, tools and shell coordinates. */
+body.lock-shell-active:is([data-game-mode="alphaprotocol"],[data-game-mode="watchmen"]) #lock.universalLockBlock{left:50%!important;top:var(--lock-shell-top)!important;width:var(--lock-shell-size)!important;height:266px!important;min-width:var(--lock-shell-size)!important;transform:translate(-50%,-50%) scale(var(--lock-shell-scale))!important;transform-origin:center!important;z-index:60!important;}
+body.lock-shell-active:is([data-game-mode="alphaprotocol"],[data-game-mode="watchmen"]) #lock.universalLockBlock>.mechanismZone{left:0!important;top:0!important;width:var(--lock-shell-size)!important;height:266px!important;transform:translate3d(calc(var(--px) * -.04),calc(var(--py) * -.04),0)!important;overflow:visible!important;}
+body.lock-shell-active:is([data-game-mode="alphaprotocol"],[data-game-mode="watchmen"]) .mechanismZone::before{display:none!important;}
+body.lock-shell-active:is([data-game-mode="alphaprotocol"],[data-game-mode="watchmen"]) .lockShellPhysicalLock{position:absolute;left:558px;top:0;width:270px;height:266px;z-index:7;}
+body.lock-shell-active:is([data-game-mode="alphaprotocol"],[data-game-mode="watchmen"]) .lockShellPhysicalLock .lockPanel{display:none!important;}
+body.lock-shell-active:is([data-game-mode="alphaprotocol"],[data-game-mode="watchmen"]) .lockShellShackle{display:block;position:absolute;right:-103px;top:50%;width:171px;height:171px;background:var(--locker-image) center/contain no-repeat;filter:drop-shadow(0 9px 12px rgba(0,0,0,.25));transform:translateY(-50%) rotate(90deg) scale(.97);z-index:0;}
+body.lock-shell-active:is([data-game-mode="alphaprotocol"],[data-game-mode="watchmen"]) .lockShellPhysicalLock .lockHitArea{left:0!important;top:0!important;width:270px!important;height:266px!important;transform:none!important;}
+body.lock-shell-active:is([data-game-mode="alphaprotocol"],[data-game-mode="watchmen"]) .lockShellFunnel{display:block;position:absolute;left:-12px;top:100px;width:60px;height:67px;object-fit:contain;pointer-events:none;filter:drop-shadow(0 5px 7px rgba(0,0,0,.42));}
+body.lock-shell-active:is([data-game-mode="alphaprotocol"],[data-game-mode="watchmen"]) .lockShellFunnelBack{z-index:3;}
+body.lock-shell-active:is([data-game-mode="alphaprotocol"],[data-game-mode="watchmen"]) .lockShellFunnelFront{z-index:6;left:-6px;width:54px;}
+body.lock-shell-active:is([data-game-mode="alphaprotocol"],[data-game-mode="watchmen"]) .mechanismZone .pick{z-index:5!important;left:-20px!important;top:112px!important;transform-origin:50% 6%!important;transform:translate(var(--pick-react-x),var(--pick-react-y)) rotate(calc(90deg + var(--pick-rot-drift) + var(--pick-react-rot)))!important;}
+body.lock-shell-active:is([data-game-mode="alphaprotocol"],[data-game-mode="watchmen"]) .mechanismZone .tension{z-index:5!important;left:-4px!important;top:110px!important;transform-origin:6% 50%!important;transform:translate(var(--tension-react-x),var(--tension-react-y)) rotate(calc(var(--tension-rot-drift) + var(--tension-react-rot))) scaleX(-1)!important;}
 
 @media (min-width:1600px) and (min-height:900px){
   body.lock-shell-active{--lock-shell-scale:.986;}

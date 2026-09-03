@@ -39,6 +39,7 @@
 <link rel="stylesheet" href="css/overrides-07-workbench.css">
 <link rel="stylesheet" href="css/alchemy.css">
 <link rel="stylesheet" href="css/collection.css">
+<link rel="stylesheet" href="css/restoration.css">
 <link rel="stylesheet" href="css/mobile.css">
 <link rel="stylesheet" href="css/global-top-hud.css">
 <link rel="stylesheet" href="css/game-settings.css">
@@ -268,6 +269,11 @@
       <span>Коллекция</span>
     </button>
 
+    <button class="lairHotspot lairHotspotRestoration" type="button" data-lair-open="restoration">
+      <img class="lairHotspotIcon" src="assets/map/mechanics/museum.png" alt="">
+      <span>Реставрация</span>
+    </button>
+
     <div class="lairWorkbenchModal" id="lairWorkbenchModal" hidden aria-label="Верстак">
       <div class="lairWorkbenchDialog" role="dialog" aria-modal="true" aria-label="Верстак и чертежи">
         <img class="lairWorkbenchImage" src="assets/lair/workbench.jpg" alt="Верстак с чертежами замков и инструментами">
@@ -370,6 +376,33 @@
                 <h3 class="collectionInfoTitle" id="collectionInfoTitle"></h3>
                 <div class="collectionInfoText" id="collectionInfoText"></div>
               </div>
+            </div>
+          </div>
+        </section>
+        <section class="lairPanel" data-lair-panel="restoration">
+          <div class="restorationRoot" id="restorationRoot">
+            <div class="restorationToolbar">
+              <label class="restorationSelectLabel"><span>Заказ</span><select id="restorationPaintingSelect" aria-label="Выбрать картину"></select></label>
+              <div class="restorationProgress" id="restorationProgress">Восстановлено 0/25</div>
+              <button class="restorationToolButton active" id="restorationLoupeButton" type="button">Лупа</button>
+              <button class="restorationToolButton" id="restorationNewDamage" type="button">Новое повреждение</button>
+            </div>
+            <div class="restorationWorkspace">
+              <figure class="restorationPanel"><figcaption>Оригинал</figcaption><div class="restorationArtwork" data-restoration-art="original"><img id="restorationOriginal" alt=""><span class="restorationLens" aria-hidden="true"></span></div></figure>
+              <figure class="restorationPanel"><figcaption>Повреждённая картина</figcaption><div class="restorationArtwork" data-restoration-art="damaged"><img id="restorationDamaged" alt=""><span class="restorationLens" aria-hidden="true"></span></div></figure>
+            </div>
+            <div class="restorationControls">
+              <div class="restorationSliders">
+                <label><span>Оттенок <b id="restorationHueValue">0</b></span><input id="restorationHue" type="range" min="-60" max="60" step="1" value="0"></label>
+                <label><span>Насыщенность <b id="restorationSatValue">100%</b></span><input id="restorationSat" type="range" min="50" max="150" step="1" value="100"></label>
+                <label><span>Яркость <b id="restorationLightValue">100%</b></span><input id="restorationLight" type="range" min="50" max="150" step="1" value="100"></label>
+              </div>
+              <aside class="restorationCheckPanel">
+                <button class="restorationCheckButton" id="restorationCheck" type="button">Проверить</button>
+                <strong class="restorationScore" id="restorationScore">—</strong>
+                <p id="restorationHint">Добейся совпадения не ниже 88%.</p>
+                <div class="restorationReward" id="restorationReward" hidden></div>
+              </aside>
             </div>
           </div>
         </section>
@@ -852,6 +885,7 @@
 <script src="js/modes/alphaprotocol.js"></script>
 <script src="js/modes/base-locks.js"></script>
 <script src="js/world/alchemy.js"></script>
+<script src="js/world/restoration.js"></script>
 <script src="js/world/guards.js"></script>
 <script src="js/world/missions.js"></script>
 <script src="js/world/game-settings.js"></script>

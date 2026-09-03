@@ -101,6 +101,21 @@
     saveKeynlockResources();
     return {tier:level,coins,parts,components:componentDrops,handle,table};
   }
+  function awardRestoration({coins=50,componentCount=2,preferredColors=[]}={}){
+    const palette=preferredColors.filter(id=>KEYNLOCK_COMPONENTS.some(item=>item.id===id));
+    const pool=palette.length?palette:KEYNLOCK_COMPONENTS.map(item=>item.id);
+    const componentDrops={};
+    for(let roll=0;roll<Math.max(0,componentCount);roll++){
+      const id=pool[rand(0,pool.length-1)];
+      keynlockResources.components[id]++;
+      componentDrops[id]=(componentDrops[id]||0)+1;
+    }
+    balance+=Math.max(0,Number(coins)||0);
+    STORE.setItem('lockpickBalance',String(balance));
+    saveKeynlockResources();
+    updateEconomyUI();
+    return {coins,components:componentDrops};
+  }
   function craftKeynlockPick(){
     if(keynlockResources.parts<2||keynlockResources.picks>=resourceCaseCapacity())return false;
     keynlockResources.parts-=2;
@@ -164,6 +179,7 @@
     prepareRound:prepareKeynlockRound,
     consumePicks:consumeKeynlockPicks,
     awardLock:awardKeynlockResources,
+    awardRestoration,
     render:renderKeynlockResources
   };
   document.addEventListener('click',event=>{

@@ -9,7 +9,7 @@
     slots:root.querySelector('#pigmentSlots'),palette:root.querySelector('#pigmentPalette'),
     status:root.querySelector('#pigmentStatus'),check:root.querySelector('#pigmentCheck')
   };
-  const state={slots:[null,null,null],solution:[],selected:null};
+  const state={slots:[null,null,null],solution:[],selected:null,dragging:false,suppressClick:false};
   const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
   const colors=()=>window.KeynlockResources?.components||[];
   const stock=id=>Math.max(0,Number(window.KeynlockResources?.state?.components?.[id])||0);
@@ -47,6 +47,62 @@
   }
   function firstEmpty(){return state.slots.findIndex(value=>!value);}
   function addSelected(index){if(!state.selected)return;state.slots[index]=state.selected;render();}
+  function slotAt(x,y){
+    return [...elements.slots.querySelectorAll('[data-pigment-slot]')].find(slot=>{
+      const rect=slot.getBoundingClientRect();
+      return x>=rect.left&&x<=rect.right&&y>=rect.top&&y<=rect.bottom;
+    })||null;
+  }
+  function clearDropState(){elements.slots.querySelectorAll('.dropReady,.dragOver').forEach(slot=>slot.classList.remove('dropReady','dragOver'));}
+  function startDrag(event,id,fromSlot=null){
+    if(event.pointerType==='mouse'&&event.button!==0)return;
+    const source=event.target.closest('[data-pigment-color],[data-pigment-slot]');
+    if(!source||!id)return;
+    const start={x:event.clientX,y:event.clientY};
+    let ghost=null,started=false;
+    const move=pointer=>{
+      if(!started&&Math.hypot(pointer.clientX-start.x,pointer.clientY-start.y)<7)return;
+      if(!started){
+        started=true;state.dragging=true;
+        const color=byId(id);
+        ghost=document.createElement('div');
+        ghost.className='pigmentDragGhost';
+        ghost.style.setProperty('--pigment-color',color?.color||'#888');
+        ghost.innerHTML=`<i></i><span>${color?.name||id}</span>`;
+        document.body.appendChild(ghost);
+        elements.slots.querySelectorAll('.pigmentSlot').forEach(slot=>slot.classList.add('dropReady'));
+      }
+      pointer.preventDefault();
+      ghost.style.left=`${pointer.clientX}px`;ghost.style.top=`${pointer.clientY}px`;
+      const over=slotAt(pointer.clientX,pointer.clientY);
+      elements.slots.querySelectorAll('.pigmentSlot').forEach(slot=>slot.classList.toggle('dragOver',slot===over));
+    };
+    const finish=pointer=>{
+      document.removeEventListener('pointermove',move);
+      document.removeEventListener('pointerup',finish);
+      document.removeEventListener('pointercancel',cancel);
+      clearDropState();ghost?.remove();state.dragging=false;
+      if(!started)return;
+      state.suppressClick=true;
+      const target=slotAt(pointer.clientX,pointer.clientY);
+      if(target){
+        const to=Number(target.dataset.pigmentSlot);
+        if(fromSlot===null)state.slots[to]=id;
+        else if(to!==fromSlot){const displaced=state.slots[to];state.slots[to]=id;state.slots[fromSlot]=displaced||null;}
+      }else if(fromSlot!==null)state.slots[fromSlot]=null;
+      state.selected=null;render();
+      setTimeout(()=>{state.suppressClick=false;},0);
+    };
+    const cancel=()=>{
+      document.removeEventListener('pointermove',move);
+      document.removeEventListener('pointerup',finish);
+      document.removeEventListener('pointercancel',cancel);
+      clearDropState();ghost?.remove();state.dragging=false;
+    };
+    document.addEventListener('pointermove',move,{passive:false});
+    document.addEventListener('pointerup',finish);
+    document.addEventListener('pointercancel',cancel);
+  }
   function renderSlots(){
     elements.slots.innerHTML=state.slots.map((id,index)=>`<button class="pigmentSlot${id?' filled':''}" type="button" data-pigment-slot="${index}" style="--pigment-color:${byId(id)?.color||'transparent'}" aria-label="${id?(byId(id)?.name||'Пигмент')+', убрать':'Добавить пигмент'}">${id?`<span>${byId(id)?.name||id}</span>`:''}</button>`).join('');
   }
@@ -65,10 +121,18 @@
     renderSlots();renderPalette();
   }
   root.addEventListener('click',event=>{
+    if(state.suppressClick)return;
     const colorButton=event.target.closest('[data-pigment-color]');
     if(colorButton){state.selected=state.selected===colorButton.dataset.pigmentColor?null:colorButton.dataset.pigmentColor;render();return;}
     const slot=event.target.closest('[data-pigment-slot]');
     if(slot){const index=Number(slot.dataset.pigmentSlot);if(state.selected)addSelected(index);else if(state.slots[index]){state.slots[index]=null;render();}}
+  });
+  root.addEventListener('pointerdown',event=>{
+    const colorButton=event.target.closest('[data-pigment-color]');
+    if(colorButton&&!colorButton.disabled){startDrag(event,colorButton.dataset.pigmentColor);return;}
+    const slot=event.target.closest('[data-pigment-slot]');
+    const index=Number(slot?.dataset.pigmentSlot);
+    if(slot&&state.slots[index])startDrag(event,state.slots[index],index);
   });
   root.addEventListener('dblclick',event=>{const button=event.target.closest('[data-pigment-color]');const index=firstEmpty();if(button&&index>=0){event.preventDefault();state.slots[index]=button.dataset.pigmentColor;state.selected=null;render();}});
   root.querySelector('#pigmentClear').addEventListener('click',()=>{state.slots=[null,null,null];state.selected=null;render();});

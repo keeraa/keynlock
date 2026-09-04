@@ -93,14 +93,6 @@
   transform:translateX(-50%);
 }
 
-.bootLoaderCaption{
-  margin-top:1px;
-  color:rgba(255,244,226,.72);
-  font:600 8px/1.1 var(--ui-font,Arial,sans-serif);
-  letter-spacing:.14em;
-  text-transform:uppercase;
-}
-
 .bootLoaderBar{
   width:100%;
   height:4px;
@@ -159,6 +151,34 @@ body.assets-loading .app{
   .bootLoaderStage{width:100%;height:auto;max-height:100%;}
   .bootLoaderControls{left:24%;top:55%;width:15%;min-width:130px;}
   .mainMenuButton{min-height:38px;font-size:13px;}
+}
+
+/* On narrow portrait screens the menu is a vertical composition: branding
+   and controls first, Say's portrait beneath them instead of beside them. */
+@media (max-width:700px) and (orientation:portrait),(max-aspect-ratio:4/5){
+  .bootLoaderStage{width:100%;height:100%;max-height:none;aspect-ratio:auto;}
+  .bootLoaderLogo{
+    left:50%;
+    top:7%;
+    width:min(48%,360px);
+    transform:translateX(-50%);
+  }
+  .bootLoaderControls{
+    left:50%;
+    top:19%;
+    width:min(58%,320px);
+    min-width:210px;
+    transform:translateX(-50%);
+  }
+  .bootLoaderHero{
+    right:auto;
+    left:50%;
+    bottom:0;
+    width:min(90%,680px);
+    height:53%;
+    object-position:center bottom;
+    transform:translate3d(calc(-50% + var(--boot-parallax-x)),var(--boot-parallax-y),0) scale(1.012);
+  }
 }
 
 @keyframes bootSmokeDrift{

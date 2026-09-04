@@ -1,11 +1,14 @@
 (function(){
   'use strict';
-  // Preloads every image under assets/ (per the generated asset-manifest.json)
-  // before the game boots. js/core/init.js awaits window.KeynlockAssetsReady
+  // Preloads shared interface/gameplay art from asset-manifest.json before the
+  // game boots. The 127 MB restoration gallery loads on demand when opened;
+  // decoding it all here could make memory-constrained mobile tabs restart.
+  // js/core/init.js awaits window.KeynlockAssetsReady
   // before running its final "start the game" calls, and this file drives
   // the #bootLoader overlay (logo + progress bar) that blocks/blurs
   // everything else meanwhile — see css/boot-loader.css.
   const MANIFEST_URL='./asset-manifest.json';
+  const BOOT_PRELOAD_CONCURRENCY=4;
   const AUDIO_ASSETS=Object.freeze({
     music:['./assets/audio/locksmith-alley.mp3'],
     inventoryOpen:['./assets/audio/inv_open_01.wav'],
@@ -85,16 +88,22 @@
   }
 
   async function preloadAll(){
-    const images=await loadManifest();
+    const images=(await loadManifest()).filter(src=>!src.startsWith('assets/restoration/'));
     const sounds=[...new Set(Object.values(AUDIO_ASSETS).flat())];
     const assets=[...images.map(src=>({src,type:'image'})),...sounds.map(src=>({src,type:'audio'}))];
     let loaded=0;
     setProgress(0,assets.length);
-    await Promise.all(assets.map(({src,type})=>(type==='image'?preloadImage(src):preloadAudio(src)).then(ok=>{
-      loaded++;
-      setProgress(loaded,assets.length);
-      if(!ok) console.warn(`[asset-preload] failed to load ${src}`);
-    })));
+    let cursor=0;
+    async function worker(){
+      while(cursor<assets.length){
+        const {src,type}=assets[cursor++];
+        const ok=await (type==='image'?preloadImage(src):preloadAudio(src));
+        loaded++;
+        setProgress(loaded,assets.length);
+        if(!ok) console.warn(`[asset-preload] failed to load ${src}`);
+      }
+    }
+    await Promise.all(Array.from({length:Math.min(BOOT_PRELOAD_CONCURRENCY,assets.length)},worker));
   }
 
   const readyPromise=preloadAll();
@@ -117,8 +126,6 @@
   }
 
   readyPromise.then(()=>{
-    const caption=document.querySelector('#bootLoaderCaption');
-    if(caption) caption.textContent='Всё готово';
     document.body.classList.add('assets-ready');
     window.dispatchEvent(new CustomEvent('keynlock:audio-ready'));
     window.KeynlockMainMenu?.assetsReady();

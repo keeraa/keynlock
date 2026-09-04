@@ -103,14 +103,7 @@ body.mode-hillsfar .globalTopHud{
   margin:0!important;
 }
 
-/* On desktop the context grid column is narrower on the right because the
-   economy/navigation group is much wider than the menu button. Center the
-   complete title block against the viewport instead of that asymmetric
-   leftover column.
-   Centered with margin-left, not transform: a transform on this element
-   would give its position:fixed close button (.screenTopHudClose) a new
-   containing block right here instead of the viewport, pulling the button
-   back in from the real screen corner where it belongs. */
+
 @media (min-width:1101px){
   body:has(#lairModuleWindow.open .lairPanel.active)
     .globalTopHud .screenTopHud{

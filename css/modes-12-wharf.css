@@ -2,13 +2,8 @@
    spatially clustered order. The native port is isolated in the .wf*
    namespace so it cannot collide with other puzzle mechanics. */
 .wfMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:16px;background:rgba(17,13,9,.985);overflow:auto;}
-.wfMode[hidden]{display:none!important;pointer-events:none!important;}
-/* .challengeStatus (reward+timer HUD) is a viewport-fixed overlay that
-   sits inside the bottom of #puzzleArea on most non-phone breakpoints;
-   js/core/init.js's syncPuzzleRewardClearance() measures the shortfall
-   into --reward-clear so the lock stops above it instead of rendering
-   underneath it. Needs !important + this specificity to beat the shared
-   body.importedMode .puzzleArea>.modePanel padding rule. */
+.wfMode[hidden]{display:none!important;}
+
 body.importedMode .puzzleArea>.modePanel.wfMode:not([hidden]){padding-bottom:calc(16px + var(--reward-clear,0px))!important;}
 /* No fixed height: .wfLockWrap fills whatever room #puzzleArea actually
    gives it. Pins always keep one physical size and slide as whole images

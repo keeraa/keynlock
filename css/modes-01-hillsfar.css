@@ -43,7 +43,7 @@ body.importedMode .hfLockBox{width:min(760px,94vw);height:min(230px,24vh);min-he
 body.importedMode .hfCandidates{width:min(760px,94vw);gap:10px 12px;}
 body.importedMode .hfCandidate{min-height:58px;}
 }
-.hillsfarMode[hidden]{display:none!important;pointer-events:none!important;}
+.hillsfarMode[hidden]{display:none!important;}
 body.importedMode .hillsfarMode{inset:0!important;width:100%!important;height:100%!important;min-height:0!important;max-width:none!important;z-index:20!important;}
 body.mode-hillsfar header{visibility:visible!important;opacity:1!important;height:auto!important;min-height:0!important;padding:18px 14px 0 170px!important;margin:0!important;overflow:visible!important;pointer-events:auto!important;}
 body.mode-hillsfar .economyHud{z-index:95;}

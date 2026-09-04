@@ -1,6 +1,6 @@
 /* Подпружиненные тумблеры share the universal LockShell with Wharf and Alpha Protocol. */
 .wmMode{position:absolute;inset:0;z-index:12;display:flex;align-items:center;justify-content:center;padding:8px;overflow:visible;}
-.wmMode[hidden]{display:none!important;pointer-events:none!important;}
+.wmMode[hidden]{display:none!important;}
 body.importedMode .puzzleArea>.modePanel.wmMode:not([hidden]){padding-bottom:calc(12px + var(--reward-clear,0px))!important;}
 .wmLockWrap{position:absolute;inset:0;display:block;overflow:visible;}
 .wmLock{box-sizing:border-box;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:hidden;container-type:inline-size;}

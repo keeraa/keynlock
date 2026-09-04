@@ -1,20 +1,7 @@
-/* Thief: Deadly Shadows — three concentric rings, each hiding one of 5
-   symbols and a random "sweet spot" angle; find the hidden order and the
-   angle on each ring in turn. Markup/CSS ported from the old prototype scene
-   (prototypes/lockpicking-mechanics-v63.html, .tds-*) with classes renamed
-   to .tdsRing/.tdsLock/etc so they don't collide with the same-named
-   prototype classes still used by other, not-yet-ported scenes. The
-   tension-tool "sweet symbol" gate and its pattern-ring hint
-   (.tds-pattern/.tds-pattern-mark) are dropped entirely — that system only
-   ever matched the unrelated Classic/Alternative typed-tensioner mechanic. */
+
 .tdsMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:14px;background:rgba(17,13,9,.985);overflow:auto;}
-.tdsMode[hidden]{display:none!important;pointer-events:none!important;}
-/* .challengeStatus (reward+timer HUD) is a viewport-fixed overlay that
-   sits inside the bottom of #puzzleArea on most non-phone breakpoints;
-   js/core/init.js's syncPuzzleRewardClearance() measures the shortfall
-   into --reward-clear so the lock stops above it instead of rendering
-   underneath it. Needs !important + this specificity to beat the shared
-   body.importedMode .puzzleArea>.modePanel padding rule. */
+.tdsMode[hidden]{display:none!important;}
+
 body.importedMode .puzzleArea>.modePanel.tdsMode:not([hidden]){padding-bottom:calc(14px + var(--reward-clear,0px))!important;}
 
 .tdsSequence{
@@ -38,12 +25,7 @@ body.importedMode .puzzleArea>.modePanel.tdsMode:not([hidden]){padding-bottom:ca
 .tdsSeqItem.current{border-color:#d8b871;color:#efd38b;}
 .tdsSeqItem.done{border-color:#769066;color:#91af7b;background:#172016;}
 
-/* No fixed height: .tdsLockWrap fills whatever room #puzzleArea actually
-   gives it, .tdsLock is fit to whichever of width/height is tighter via
-   height:100%+aspect-ratio+max-width. Ring sizes were already % of .tdsLock
-   in the prototype (78/58/38%); only the lock's own outer size and the
-   small decorative bits (tip, ring badge) needed converting to cqw so they
-   scale with the actual rendered lock instead of a fixed px. */
+
 .tdsLockWrap{
   flex:1 1 auto;
   min-height:0;

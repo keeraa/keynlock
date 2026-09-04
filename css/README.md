@@ -13,6 +13,7 @@ v254 preserves the v253 cascade while splitting large stylesheets into contiguou
 
 All fragments stay directly in css/, so existing relative asset paths remain valid. Selectors are never regrouped across their original cascade positions.
 
-`scripts/check.mjs` enforces the current specificity ceiling and rejects empty
-media queries. Lower the ceiling whenever obsolete overrides are removed; do
-not raise it for new UI.
+`scripts/check.mjs` enforces the current specificity and source-size ceilings
+and rejects empty media queries. Comment text is excluded from the specificity
+count. Lower the ceilings whenever obsolete CSS is removed; do not raise them
+for new UI.

@@ -30,6 +30,20 @@ function localAttributeRefs(html, tag, attr) {
   return refs.filter(x => !/^(?:https?:|data:|#)/i.test(x));
 }
 
+function assertBalancedCss(css,path){
+  let depth=0,quote='',comment=false;
+  for(let i=0;i<css.length;i++){
+    const char=css[i],next=css[i+1];
+    if(comment){if(char==='*'&&next==='/'){comment=false;i++;}continue;}
+    if(quote){if(char==='\\'){i++;continue;}if(char===quote)quote='';continue;}
+    if(char==='/'&&next==='*'){comment=true;i++;continue;}
+    if(char==='"'||char==="'"){quote=char;continue;}
+    if(char==='{')depth++;
+    if(char==='}'&&--depth<0)fail(`Unexpected CSS closing brace in ${path}`);
+  }
+  if(comment||quote||depth!==0)fail(`Unbalanced CSS syntax in ${path}`);
+}
+
 const htmlPath = resolve(root, 'index.html');
 const html = readFileSync(htmlPath, 'utf8');
 const scripts = localAttributeRefs(html, 'script', 'src');
@@ -111,11 +125,15 @@ for (const file of cssFiles) {
   const path = posix(relative(root, file));
   if (!indexedCss.has(path)) fail(`CSS file not loaded by index.html: ${path}`);
   const css=readFileSync(file,'utf8');
+  assertBalancedCss(css,path);
   if(/@media[^{}]*\{\s*\}/s.test(css))fail(`Empty media query in ${path}`);
 }
 
-const importantCount=cssFiles.reduce((count,file)=>count+(readFileSync(file,'utf8').match(/!important/g)||[]).length,0);
-if(importantCount>2265)fail(`CSS specificity budget regressed: ${importantCount} !important declarations (budget 2265).`);
+const cssText=cssFiles.map(file=>readFileSync(file,'utf8')).join('\n');
+const cssWithoutComments=cssText.replace(/\/\*[\s\S]*?\*\//g,'');
+const importantCount=(cssWithoutComments.match(/!important/g)||[]).length;
+if(importantCount>2215)fail(`CSS specificity budget regressed: ${importantCount} !important declarations (budget 2215).`);
+if(Buffer.byteLength(cssText)>375000)fail('CSS source-size budget exceeded (375 KB).');
 
 const sourceFiles = [htmlPath, ...cssFiles, ...jsFiles];
 const assetPattern = /(?:\.\.\/|\.\/)?assets\/[A-Za-z0-9_./-]+\.(?:png|webp|jpe?g|svg|gif|woff2?)/gi;

@@ -1,30 +1,10 @@
-/* Трубопровод (Pipeline) — difficulty-scaled grid of hidden pipe tiles; reveal, rotate,
-   race a flow from a fixed start port to a fixed exit port. Markup/CSS
-   ported from the old prototype scene
-   (prototypes/lockpicking-mechanics-v63.html, .bs1-*) with classes renamed
-   to .plTile/.plGrid/etc so they don't collide with the same-named classes
-   still used by other prototype scenes. */
+
 .plMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:10px;background:rgba(17,13,9,.985);overflow:auto;}
-.plMode[hidden]{display:none!important;pointer-events:none!important;}
-/* .challengeStatus (reward+timer HUD) is a viewport-fixed overlay that
-   sits inside the bottom of #puzzleArea on most non-phone breakpoints;
-   js/core/init.js's syncPuzzleRewardClearance() measures the shortfall
-   into --reward-clear so the grid stops above it instead of rendering
-   underneath. Needs !important + this specificity to beat the shared
-   body.importedMode .puzzleArea>.modePanel padding rule. */
+.plMode[hidden]{display:none!important;}
+
 body.importedMode .puzzleArea>.modePanel.plMode:not([hidden]){padding-bottom:calc(12px + var(--reward-clear,0px))!important;}
 
-/* plGridWrap fills whatever height is actually left (flex:1/min-height:0)
-   and centers plGrid within it; plGrid is fit to whichever of width/height
-   is tighter via height:100%+aspect-ratio+max-width — a wide-but-short
-   desktop window sizes the board off its real height instead of assuming
-   "short == phone == tiny". Port/pipe-segment/hub sizes are cqw-relative
-   to their nearest container-type ancestor so they scale with the board
-   instead of staying a fixed px size that would look oversized on a
-   shrunk grid; js/modes/pipeline.js's plAlignPorts() measures plGrid's
-   real rect each render (not just tile rects) and sets left/right in px,
-   since plGrid is often narrower than plGridWrap and centered within it —
-   plain CSS left:0/right:0 below is only a pre-JS fallback. */
+
 .plGridWrap{
   position:relative;
   flex:1 1 auto;

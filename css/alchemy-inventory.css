@@ -1,21 +1,6 @@
 /* Alchemy inventory: shared ingredient rack and bottle interactions. */
 
-/* ============================================================
-   Ingredient rack drawer — moved out of the alchemy modal (v296-301
-   had it as a fourth "Стойка" tab) into its own bottom drawer, built
-   the same way as the lockpick case (css/overrides-05-inventory.css
-   .inventoryDrawer): fixed to the bottom of the screen, peeking above
-   the edge until clicked open, a back board / contents / front board
-   sandwich, closes on an outside click. Shown only while the alchemy
-   module is the open one — closing it or switching to another lair
-   tab hides the drawer the same way leaving the lair hides the
-   lockpick case.
 
-   Picking a bottle is meant to gate which elixirs are buildable, the
-   way a tension tool's type gates which lock it opens
-   (js/core/inventory-hit-testing.js) — not built yet, this only
-   remembers the selection.
-   ============================================================ */
 
 .alchemyRackDrawer {
   /* --inv-open-y on .inventoryDrawer is 20%; this sits a further 10 points
@@ -61,14 +46,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   transform: translate(-50%, var(--rack-open-y));
 }
 
-/* z-index:0 while peeking — *below* .alchemyRackDrawerBottles (z-index:2) —
-   so a bottle poking up into the peek strip takes the click over the
-   toggle wherever the two overlap; the toggle only catches clicks in the
-   gaps between bottles. It used to sit above everything, which meant
-   clicking a bottle that was only partly revealed by the approach lift
-   opened the drawer instead of selecting it — the bottle was there to see
-   but not to click. The open-state pull-tab goes back to z-index:5, since
-   closing has to win even where it overlaps a bottle underneath. */
+
 .alchemyRackDrawerToggle {
   position: absolute;
   inset: 0;
@@ -131,15 +109,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   inset: 0;
   z-index: 2;
 }
-/* Shorter than the bottle art's own proportions would give at top:7% —
-   deliberately: the ring hole sits at ~32% down the rack, which used to land
-   on each bottle at roughly its neck-to-shoulder line (~35% into the bottle
-   image), right where the pendant's chain hangs — length that varies a
-   little bottle to bottle since these are seven separate illustrations, not
-   one template. At height:61% the same ring lands past that well into the
-   wide jar body every one of the seven fills solidly (98-100% of its own
-   width from that point down, measured across all seven) — clear of the one
-   part of the art that wasn't guaranteed to line up the same way twice. */
+
 .alchemyRackDrawerBottle {
   position: absolute;
   top: 7%;
@@ -172,12 +142,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
 .alchemyRackDrawerBottle:hover {
   transform: translateX(-50%) translateY(-5px);
 }
-/* Once picked, the bottle is standing on the table (the element cell), not
-   sitting on this shelf any more — hidden instead of just glowing in place,
-   per feedback. pointer-events:none so the empty slot it leaves behind
-   isn't a dead click target; picking a *different* bottle still works
-   (select() below un-hides this one and hides the new pick instead), the
-   only way back is choosing another element. */
+
 .alchemyRackDrawerBottle.selected {
   opacity: 0;
   pointer-events: none;
@@ -199,17 +164,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   background-size: contain;
   background-position: center;
 }
-/* Ring centres, measured from rack-back.png at 1614px width. Three earlier
-   passes: v296 eyeballed a gridline overlay (200, 412, 623, 835, 1047,
-   1258, 1470 — a guessed 212px step that compounded, ring 1 close and ring
-   7 ~65px off); v299's cv2.matchTemplate pass (212, 412, 611, 810, 1011,
-   1210, 1405) fixed the compounding but carried its own ~7px rightward bias
-   on six of the seven, inherited from a template crop that wasn't quite
-   centered on the ring it was cut from. v300 fits an ellipse to each ring's
-   own edge contour instead (Canny edges, cv2.findContours, cv2.fitEllipse —
-   two independent contours per ring, inner and outer, agreeing to ~1px)
-   rather than comparing rings to each other: 204.5, 405.0, 604.1, 803.0,
-   1003.3, 1201.6, 1401.9 → percent of 1614. */
+
 .alchemyRackDrawerBottle:nth-child(1) {
   left: 12.67%;
 }

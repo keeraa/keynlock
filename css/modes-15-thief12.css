@@ -1,17 +1,12 @@
 /* Thief 1/2 — five pick profiles, one correct per stage; hold the right one
    until it catches. Markup/CSS ported from the old prototype scene
-   (prototypes/lockpicking-mechanics-v63.html, .th12-*/.pick-type) with
+   (prototypes/lockpicking-mechanics-v63.html, .th12-* and .pick-type) with
    classes renamed to .th12Door/.th12Profile/etc so they don't collide with
    the same-named prototype classes still used by other, not-yet-ported
    scenes. */
 .th12Mode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:12px;background:rgba(17,13,9,.985);overflow:auto;}
-.th12Mode[hidden]{display:none!important;pointer-events:none!important;}
-/* .challengeStatus (reward+timer HUD) is a viewport-fixed overlay that
-   sits inside the bottom of #puzzleArea on most non-phone breakpoints;
-   js/core/init.js's syncPuzzleRewardClearance() measures the shortfall
-   into --reward-clear so the door stops above it instead of rendering
-   underneath it. Needs !important + this specificity to beat the shared
-   body.importedMode .puzzleArea>.modePanel padding rule. */
+.th12Mode[hidden]{display:none!important;}
+
 body.importedMode .puzzleArea>.modePanel.th12Mode:not([hidden]){padding-bottom:calc(12px + var(--reward-clear,0px))!important;}
 
 .th12DoorWrap{

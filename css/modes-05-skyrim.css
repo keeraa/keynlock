@@ -55,9 +55,8 @@ body.importedMode .skMode{inset:0;padding:14px 14px 16px;}
 body.importedMode .skBoard{width:min(78vh,94vw);height:min(78vh,94vw);}
 body.importedMode .skMode .sharedModeLockArt{transform:translateX(-50%) scale(.3556);}
 }
-.skMode[hidden]{display:none!important;pointer-events:none!important;}
+.skMode[hidden]{display:none!important;}
 body.importedMode .skMode{inset:0!important;width:100%!important;height:100%!important;min-height:0!important;max-width:none!important;z-index:20!important;}
-body.mode-skyrim #lock.universalLockBlock{display:none!important;}
 body.mode-skyrim,body.mode-skyrim .app{overflow:hidden!important;}
 @media (max-width:720px){
 .skCenterLock{transform:translate(-50%,-50%) scale(1.15);}

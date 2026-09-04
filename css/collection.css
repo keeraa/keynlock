@@ -3,15 +3,7 @@
    reaching into the shared .lairPanelHead/.lairPanelTitle classes (those
    vary per game-mode theme file; this screen doesn't need to). */
 
-/* ============================================================
-   Full-screen takeover, same pattern as alchemy (css/alchemy-workshop.css):
-   strip the shared modal's chrome (border/background/header) and show
-   a fixed top HUD bar instead, so this reads as its own screen rather
-   than a dialog box floating over the lair. Reuses alchemy's own blur
-   layer and hotspot-lockout rules (same #alchemyFullBlur element,
-   same .lairHotspot/.lairWorkbenchHotspot selector) rather than
-   duplicating them for a second element.
-   ============================================================ */
+
 body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active) #alchemyFullBlur{opacity:1;}
 body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active) :is(.lairHotspot,.lairWorkbenchHotspot){pointer-events:none!important;}
 
@@ -34,13 +26,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
      scroll WITHIN, so .collectionListCol's own overflow-y:auto had nowhere
      bounded to apply and the list just grew past the window instead. */
   overflow:hidden;
-  /* height, not just max-height: with only a cap, an auto-height flex
-     column shrink-wraps to whatever its shortest sibling column needs —
-     the window then stopped short of 96vh, and .collectionListCol's own
-     overflow-y:auto clipped rows against that shorter box even though the
-     screen still had room below the window. Explicit height forces the
-     row to actually claim the full 96vh so every column's flex:1 1 auto
-     stretch has that much real space to hand out. */
+
   height:96vh;
   max-height:96vh;
   width:min(1180px,96vw);
@@ -71,15 +57,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   flex-direction:column;
   flex:1 1 auto;
   gap:14px;
-  /* Not height:100% — percentage heights on a flex item that's itself
-     sized by a parent flex-grow (.lairPanel[…].active, a row-direction
-     flex container) turned out not to resolve reliably here (stayed at
-     the content's own natural height instead of the ~689px actually
-     available). flex:1 1 auto + min-height:0 gets the same "fill the
-     available cross size" result through the ordinary stretch/grow
-     mechanism instead of percentage resolution, which is what actually
-     let .collectionListCol's overflow-y:auto have a bounded box to
-     scroll within. */
+
   min-height:0;
   padding:0 28px;
   color:#e2c487;
@@ -155,14 +133,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
 
 /* --- right: preview stage + zoom + handle strip --- */
 .collectionPreviewCol{
-  /* The stage is 10% wider than it is tall — a square clipped the glow
-     of the outermost handles once the strip below it grew to the same
-     width. --preview-h stays the old square size; --preview-w (used by
-     both the stage and the handle strip, so they keep lining up) is
-     10% wider. overflow-y:auto here would force overflow-x to 'auto'
-     too (CSS's visible/non-visible pairing rule) and clip that same
-     glow sideways, so this column doesn't scroll — nothing in it
-     outgrows the window's own max-height. */
+
   /* Fixed px, not min(…,100%): that percentage resolved against this
      very column's own auto-sized width, which is itself driven by the
      stage/strip below reading --preview-w — a circular reference that
@@ -333,22 +304,12 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   mask-position:center;
 }
 
-/* Media queries live at the end of the file on purpose: a media block
-   earlier than the base rule it overrides loses even while its
-   condition matches, since @media adds no specificity — source order
-   alone decides between two otherwise-equal rules. (Cost a real bug
-   once already: this file used to open with the 899px block, so its
-   #collectionRoot padding always lost to the later plain rule below.) */
+
 @media (max-width:899px){
   /* Bar position/close-button sizing at this width now comes from the
      shared .screenTopHud rules, css/components.css. */
   #lairModuleWindow:has(.lairPanel[data-lair-panel="collection"].active) .lairModuleBody{padding-top:60px;}
-  /* Below the phone breakpoint there isn't room for a list column next
-     to a preview column side by side — stack them, and let the
-     collections become a wrapping row of cards instead of a tall rail
-     (which would otherwise push the preview off the bottom of the
-     screen). Sizes below are vw-scaled rather than the desktop's fixed
-     px so they keep shrinking gracefully down to small phones. */
+
   #lairModuleWindow:has(.lairPanel[data-lair-panel="collection"].active){
     width:96vw;
     max-height:94vh;

@@ -1,25 +1,10 @@
-/* Штифтовый замок (Oblivion) — five pins, each springs up on its own timer
-   and pauses briefly at its own apex; catch it there to set it. Markup/CSS
-   ported from the old prototype scene (prototypes/lockpicking-mechanics-v63.html,
-   .tumbler-slot/.pin) with classes renamed to .obSlot/.obPin so they don't
-   collide with the same-named classes still used by other prototype scenes. */
-.obMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:16px;background:rgba(17,13,9,.985);overflow:auto;}
-/* .challengeStatus (reward+timer HUD) is a viewport-fixed overlay that
-   sits inside the bottom of #puzzleArea on most non-phone breakpoints;
-   js/core/init.js's syncPuzzleRewardClearance() measures the shortfall
-   into --reward-clear so the lock stops above it instead of rendering
-   underneath it. Needs !important + this specificity to beat the shared
-   body.importedMode .puzzleArea>.modePanel padding rule. */
-body.importedMode .puzzleArea>.modePanel.obMode:not([hidden]){padding-bottom:calc(16px + var(--reward-clear,0px))!important;}
-.obMode[hidden]{display:none!important;pointer-events:none!important;}
 
-/* No fixed/min height here on purpose: obLock is a flex item that fills
-   whatever room is actually available (obMode's shared puzzle-area box can
-   be anywhere from ~150px tall on a short phone to 400px+ on a tall
-   screen), and js/modes/oblivion.js's obApex() reads the slot's real
-   rendered clientHeight each time a pin starts, so the rise animation
-   always matches whatever size actually rendered — no breakpoint-specific
-   magic numbers needed for any viewport shape. */
+.obMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:16px;background:rgba(17,13,9,.985);overflow:auto;}
+
+body.importedMode .puzzleArea>.modePanel.obMode:not([hidden]){padding-bottom:calc(16px + var(--reward-clear,0px))!important;}
+.obMode[hidden]{display:none!important;}
+
+
 .obLock{
   width:min(608px,73.6vw);
   flex:1 1 auto;

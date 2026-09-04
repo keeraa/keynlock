@@ -1,5 +1,5 @@
 .apMode{position:absolute;inset:0;z-index:12;display:flex;align-items:center;justify-content:center;padding:16px;overflow:visible;}
-.apMode[hidden]{display:none!important;pointer-events:none!important;}
+.apMode[hidden]{display:none!important;}
 body.importedMode .puzzleArea>.modePanel.apMode:not([hidden]){padding-bottom:calc(16px + var(--reward-clear,0px))!important;}
 .apLockWrap{position:absolute;inset:0;display:block;overflow:visible;}
 .apLock{box-sizing:border-box;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:43px 44px;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:hidden;container-type:inline-size;}

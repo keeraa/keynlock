@@ -42,7 +42,7 @@ body.importedMode .anBoard{max-height:none;}
 body.importedMode .anMode{inset:0;padding:14px 14px 16px;}
 body.importedMode .anBoard{width:100%;height:auto;min-height:0;gap:16px;flex-direction:column;align-items:center;}
 }
-.anMode[hidden]{display:none!important;pointer-events:none!important;}
+.anMode[hidden]{display:none!important;}
 body.importedMode .anMode{inset:0!important;width:100%!important;height:100%!important;min-height:0!important;max-width:none!important;z-index:20!important;}
 body.importedMode .anMode:not([hidden]){display:flex!important;}
 body.importedMode .anBoard{flex-direction:row!important;}

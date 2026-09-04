@@ -1,30 +1,4 @@
-/* Alchemy foundation: glassware, liquids and shared station controls.
-   Alchemy stations, from the standalone prototypes.
-   Every selector is scoped under .alchemyRoot: eleven class names collide with
-   the game and several are load-bearing there — .tab dresses the mode tabs,
-   .scene is the main stage, .locked the map nodes. Regenerate with the same
-   prefixing if the prototype changes; keyframes stay unscoped.
 
-   Map of this file, in source order:
-   - Legacy prototype block (from here down to the "prototype showed one
-     scene at a time" banner below) — ported wholesale from the 10-station
-     prototype. Most of it belongs to the 7 stations with no markup yet and
-     was pruned in v335's dead-code audit; what's left is either still load-
-     bearing for the 3 built stations (see the list at that banner) or is
-     the tube-liquid mask/frame system these stations depend on directly.
-   - "=== Station layout ===" banner — the live layout for the 3 built
-     stations (Смешение/Концентрации/Разделение): scene/tab scoping, the
-     desk backdrop, tube-pair, the reagent row, the element slot, the
-     success-shake/landing-pop keyframes.
-   - Positioning tokens (--bench-raise, --reagent-scale, etc., v335) — the
-     base rules reading them sit right after the station-layout banner;
-     each breakpoint below (mobile default, `@media (min-width:900px)`,
-     `@media (min-width:900px) and (max-height:760px)`) sets its own values
-     in one `.alchemyRoot{...}` block per breakpoint (v340 merge — these
-     used to be scattered one-token-at-a-time through each block).
-   - "Ingredient rack drawer" banner — the bottom-drawer picker, outside
-     `#alchemyRoot` entirely (documented there: a `position:fixed`
-     containing-block reason). */
 .alchemyRoot {
   --line: rgba(120, 94, 52, 0.34);
   --ink: #e2c487;
@@ -527,17 +501,7 @@
     transform: translate(calc(var(--bubble-drift) * 1.15), -420px) scale(0.45);
     opacity: 0;
   }
-} /* right/bottom only, never top/left: the base rule above sets inset:0
-   (non-!important), which JS's own inline top/left (liquidBurst() in
-   js/world/alchemy-stations.js) is meant to override — inline beats a non-!important
-   stylesheet rule regardless of specificity. An earlier version of this
-   fix reset the whole inset shorthand to auto, which is !important and so
-   beats the inline top/left too (the one thing they were suddenly unable
-   to override) — for the big bottles that went unnoticed because their
-   burst host and vessel are nearly the same box already, but for a
-   reagent swatch's own burst, "auto" top/left falls back to the burst
-   element's flow position inside its .color-card vessel: dead last among
-   swatch/label/drops/buttons, well under the tube instead of inside it. */
+}
 .alchemyRoot .liquid-burst-v13 {
   overflow: visible !important;
   right: auto !important;
@@ -613,21 +577,7 @@
   background: var(--tube-big-frame) center/100% 100% no-repeat !important;
   z-index: 30 !important;
   pointer-events: none !important;
-} /* mask-position:0 0 / mask-size:100% 100% — a plain, untransformed fit.
-   tube-big-mask.png (v328) is generated *from* tube-big-frame.png itself
-   (threshold its alpha to a binary outline, flood-fill inward from the
-   four image edges to find the true "outside," everything the fill
-   doesn't reach becomes the mask), so the two share one coordinate
-   system pixel-for-pixel with zero baked-in margin either side — unlike
-   the old hand-authored pair this replaced, which came from unrelated
-   source files with their own independent margins and needed a
-   compensating position/size (14.6%/102.6%) to land the mask's silhouette
-   back on the frame's. Retune both together (regenerate the mask from
-   whatever frame replaces this one) rather than reintroducing an offset
-   here if the art changes again.
-   The gradient stop below is the static fill shown when nothing drives
-   --liquid-top-v88 (the sample/target tubes never pour, so they never get
-   one) — 88% read as brim-full against the shoulder; 78% leaves it room. */
+}
 .alchemyRoot .test-tube > .tube-liquid {
   position: absolute !important;
   inset: 0 !important;
@@ -698,23 +648,8 @@
 .alchemyRoot .color-controls.side-color-controls .mini-swatch::after {
   display: none !important;
   content: none !important;
-} /* Insets measured against the new tube art (lab_test_small.png, v328) —
-   its glass reads much narrower and its neck ring much taller than the
-   old frame's did, so the old 17%/17%/9%/7% (tuned for that art) sat the
-   liquid rectangle half outside the new glass walls. Sampled the source
-   PNG's own alpha channel directly (where the frame is actually
-   transparent, i.e. real glass interior) rather than eyeballing: ~44%
-   from each side and ~18%/9% top/bottom is where the interior consistently
-   falls across the tube's straight-sided body. */
-/* One shared inset for four different tube drawings (tube-small-1..4.png,
-   one per reagent card — v333) rather than four separately tuned ones,
-   per feedback: the four are close enough in proportion that a single
-   averaged inset reads fine on all of them, and it's one fewer thing to
-   retune if the art changes again. Measured each source PNG's own
-   transparent interior at several rows/columns and averaged: ~34-38%
-   left, ~37-47% right, ~15-27% top, ~12-17% bottom across the four —
-   the neck rim height is what varies most between them, so top is the
-   least precise of the four numbers on any single tube. */
+}
+
 .alchemyRoot .side-color-controls .mini-liquid-layer {
   position: absolute !important;
   left: 25% !important;
@@ -838,27 +773,8 @@
   height: auto !important;
   border-radius: 5px 5px 28px 28px !important;
 }
-/* The v109 pixel nudge that used to live here (left:3px/right:3px/top:8px/
-   bottom:-1px, border-radius:6px 6px 32px 32px) shrank and shifted
-   .tube-liquid's own box away from .test-tube's — harmless against the
-   old mask, which was hand-tuned to compensate for exactly that box, but
-   v328's replacement mask/frame pair (tube-big-mask.png, generated
-   directly from tube-big-frame.png's own alpha) assumes the liquid box
-   matches .test-tube's *exactly*, since that's what mask-position:0 0;
-   mask-size:100% 100% (a few hundred lines up) lines it up against.
-   Left in place, the liquid rectangle no longer matched the frame's own
-   silhouette — visibly off left and up (the bottle's neck/shoulder taper
-   makes an X/Y mismatch there more noticeable than lower in the body).
-   The mask already carves the exact silhouette including the rounded
-   bottom, so there's no border-radius left to reintroduce either. */
-/* Still a sliver of colour past the drawn glass on the right/bottom after
-   the fix above — tube-big-mask.png's own flood fill (v328) reads a few
-   anti-aliased edge pixels of the frame art as "inside," landing the
-   mask's silhouette a hair outside the crisp visible line rather than a
-   coordinate mismatch this time. A transform on the liquid layer nudges
-   it (and its mask, riding along in the same transform) back inside the
-   line instead of regenerating the mask over it — percentages here are
-   of .tube-liquid's own box, per feedback against a screenshot. */
+
+
 .alchemyRoot .test-tube.tube-lg > .tube-liquid {
   transform: translate(-2%, -2%);
 }

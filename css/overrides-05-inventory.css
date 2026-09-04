@@ -100,14 +100,7 @@ body.game-inactive.solved-notice-visible .solvedPuzzleOverlay{opacity:1;visibili
 .solvedPuzzleButton:hover{filter:brightness(1.18);border-color:#d2a75d;transform:translateY(-1px);}
 .solvedPuzzleButton:active{transform:translateY(0);}
 
-/* Mobile: most of the case is a plain middle panel carrying the avatar, plus a
-   decorative strap on the right — between them they left the two tool rails
-   tiny on a phone. mobile.css used to blow the whole sheet up to 136vw so the
-   useful middle filled the screen, which pushed the right rail off the edge.
-   Cut instead: keep source 0-29% and 52-82%, which is everything except the
-   plain panel and the strap, trimmed right up to the stitch lines. 59% of the
-   art remains, and the case is then drawn 10% wider than the screen so the
-   tools read at a usable size; only the rounded ends fall outside. */
+
 @media (max-width:760px){
   .inventoryDrawer.inventoryDrawer{
     --inv-shift-x:0%;

@@ -24,5 +24,5 @@ body.importedMode .g1Mode{inset:0;padding:14px 14px 16px;}
 .g1ProgressWrap{top:-24vh;left:0!important;right:0!important;transform:none!important;}
 .g1ProgressRow{width:230px;max-width:230px;margin-inline:auto;flex-wrap:wrap;}
 }
-.g1Mode[hidden]{display:none!important;pointer-events:none!important;}
+.g1Mode[hidden]{display:none!important;}
 body.importedMode .g1Mode{inset:0!important;width:100%!important;height:100%!important;min-height:0!important;max-width:none!important;z-index:20!important;}

@@ -1,16 +1,6 @@
 /* Alchemy workshop: modal chrome, station layout and responsive positioning. */
 
-/* === Station layout === Everything above this line is the legacy
-   prototype block; everything below is written for the lair window (see
-   the file map at the top). Classes from above that are still load-
-   bearing for the 3 built stations today, confirmed against live DOM and
-   JS reachability in v335's dead-code audit — do not remove without
-   re-running that check: `.tube-liquid`, `.mini-swatch`, `.test-tube` (+
-   its mask/frame system), `.passive-bubble-v44`/`.passive-bubbles-v44`,
-   `.liquid-burst-v13`/`.liquid-bubble-v13`, `.liquid-surface-pulse-v83`,
-   `.tab`, `.ctl`, `.side-color-controls`, and their keyframes. Everything
-   else above belonged to the 7 stations with no markup yet and was
-   already removed. */
+
 
 /* The lab scrolls, the verdict and its buttons never do: a result you cannot
    see while you act is not a result. */
@@ -29,13 +19,7 @@
   min-height: 0;
   min-width: 0;
 }
-/* ============================================================
-   Station layout — written for the lair window.
-   Replaces the prototype's own, which was built for a scrolling
-   catalogue page: an absolute grid of named corners around the flask,
-   a 690px floor per station, and percentage heights that could not
-   resolve inside a flex chain. The glassware above is untouched.
-   ============================================================ */
+
 
 /* The game owns .scene, .status and .tab as well, and thirteen of its rules
    reach in here — the mirror of the scoping that keeps alchemy out of the game.
@@ -68,40 +52,14 @@
   min-height: 0;
   overflow: hidden;
 }
-/* No card behind the tabs/title either — the desk is what the player
-   should see, not a window that happens to contain one. Strips the shared
-   dark window chrome (css/overrides-03-lair.css) only while alchemy is
-   the open panel; every other lair panel (dialogue, map, team) keeps its
-   own card exactly as before, since this selector only matches when
-   alchemy's own .lairPanel is .active. */
+
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) {
   border: none;
   border-radius: 0;
   box-shadow: none;
   background: none;
 }
-/* Full-screen blur, not just behind the window: a backdrop-filter on the
-   window itself only ever blurs what's directly behind *its own box* —
-   at the window's capped width that left the room sharp everywhere
-   outside it (visible past the window's edges on a wide screen). This is
-   a dedicated layer instead, `position:absolute;inset:0` inside
-   `#lairOverlay` (itself `position:fixed`, so inset:0 already spans the
-   full viewport without needing position:fixed here too — sidesteps the
-   containing-block trap `.lairModuleWindow`'s own transform sets for any
-   position:fixed descendant, same lesson as the rack drawer). Sits right
-   before `#lairModuleWindow` in the DOM, after the room/hotspot markup —
-   backdrop-filter only picks up what's already painted behind it, so
-   this order is what makes the room blur and the window itself, its
-   tabs, and its buttons stay sharp. The rack drawer and the top HUD live
-   outside `#lairOverlay` entirely (z-index 214 and 360 against
-   `#lairOverlay`'s 160), so they're unaffected without any extra rule.
-   z-index:30, not 9: 9 was enough to clear the room's character
-   portraits (`#lairSceneCharacters`, z-index:8) but not its hotspot
-   buttons — `.lairHotspot` ("Диалоги", "Выбор персонажа" etc.,
-   css/overrides-03-lair.css) sits at z-index:18, so those kept painting
-   sharp on top of the blur meant to cover them too. 30 clears every
-   z-index this file's room content actually uses (highest is
-   `.lairSceneTop`'s 25) while staying well under the window's own 40. */
+
 .alchemyFullBlur {
   position: absolute;
   inset: 0;
@@ -257,22 +215,8 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
     rgba(0, 0, 0, 0.16)
   );
 }
-/* Wood desk backdrop for the three built color-game stations: bench,
-   reagent band and element slot each read as their own little tabletop.
-   Left/right cap images (each still carrying a table leg) plus a repeating
-   flat-grain middle tile — a 3-slice background, same idea as the rack
-   front board's repeating cubby band. `auto 100%` scales every layer to
-   the element's own height (not a fixed px), so a shorter box (the
-   reagent band) gets proportionally narrower caps instead of oversized
-   legs. Stacked on mobile or sitting side by side on the wide grid, each
-   of the three gets a complete desk this way — no separate mobile/desktop
-   asset needed. */
-/* Mobile: each stacked block is narrower than the two leg caps combined
-   (250px apiece), so drawing both caps overlapped them into a messy double
-   edge at the top instead of a clean tabletop. Flat tabletop only here —
-   no leg art — repeating the same grain-only tile the wide layout also
-   uses for its own stretch. The wide layout below replaces this with a
-   single continuous desk (caps included) behind the whole row instead. */
+
+
 .alchemyRoot .lab.color-game-lab,
 .alchemyRoot .alchemyReagents,
 .alchemyRoot .alchemyElementColumn {
@@ -321,25 +265,11 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   align-items: center;
   gap: 6px;
 }
-/* Taken out of flow and centered by its own transform, not by its parent's
-   flex sizing. In flow, a long label ("текущая смесь", "грязная смесь") is
-   wider than the 70-something px tube and forces .tube-box to that width —
-   the target tube's box stays narrow (its label is just "цель"), so the two
-   columns end up different widths and .tube-pair's justify-content:center
-   centers the whole *row* on that mismatch, not on the tubes. The result was
-   the left flask sitting at a different x on every station, tracking
-   whatever the right-hand label happened to say. Absolute removes the label
-   from that math entirely — both boxes are exactly tube-width, every time. */
+
 .alchemyRoot .tube-box {
   position: relative;
 }
-/* "цель"/"текущая смесь"/"получилось"/"грязная смесь" — dropped per
-   feedback, same reasoning as the reagent names and .lab h3 above: the
-   bottles' own position (left=target, right=current) and the verdict
-   text already say what's what. display:none rather than deleting the
-   rule: the --label-raise token above still exists for a future revival,
-   and nothing else depends on this element occupying space (it was
-   already taken out of flow, see the comment below). */
+
 .alchemyRoot .swatch-label {
   display: none;
   color: #9d8d75;
@@ -352,20 +282,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   margin-top: 6px;
   white-space: nowrap;
 }
-/* The element a round is built around — a planet-sigil label stuck on the
-   target bottle itself now (a parchment card per element, assets/alchemy/
-   label-*.png, JS sets --element-label-img), not a name printed below it.
-   A child of .test-tube rather than a sibling in .tube-box: the tube
-   itself is raised off the table with its own transform at every
-   breakpoint (see the "stand on the table" rules throughout this file),
-   and transforms carry their whole subtree — riding along inside .test-tube
-   means this needs no matching per-breakpoint offset of its own, unlike
-   .swatch-label ("цель"), which stays outside and did need one back when
-   this hung below it too. 60% of the tube's own width (was 30%, doubled
-   per feedback) — aspect-ratio keeps the
-   card's own proportions (208/330, its source art) rather than stretching
-   to a guessed height. z-index above the glass frame (30, test-tube:after)
-   so the label reads as stuck to the *outside* of the glass. */
+
 .alchemyRoot .target-element-hint {
   position: absolute;
   top: 55%;
@@ -378,14 +295,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   z-index: 31;
 }
 
-/* The glassware is sized from the window, not pinned in pixels. At a fixed
-   96x224 the two flasks were a small island in a bench that stretched to
-   whatever the column gave it — 244px of content inside 854px. Height leads
-   and the frame PNG keeps its own ratio, so the flasks grow with the window
-   instead of the bench growing around them.
-   Smaller across the board now that the bench shares the row with a third
-   column (the element slot, below) as well as the reagents — the same
-   window budget has to fit three things side by side instead of two. */
+
 .alchemyRoot .scene[data-name="Смешение"] .test-tube.tube-lg,
 .alchemyRoot .scene[data-name="Концентрации"] .test-tube.tube-lg,
 .alchemyRoot .scene[data-name="Разделение"] .test-tube.tube-lg {
@@ -394,21 +304,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   aspect-ratio: 96/224;
 }
 
-/* Positioning tokens: "stand on the table" raise/scale/offset values that
-   used to be full `transform:` shorthand strings, redeclared whole at every
-   breakpoint (mobile default, wide, short-screen) plus a couple of single-
-   button-card variants. A "move X down 5px" request meant finding which
-   candidate rule actually won the cascade, editing the whole string without
-   dropping `scale()`/`transform-origin`, and repeating per breakpoint.
-   `translate`/`scale` as individual CSS properties compose in the same
-   order as the `translateY() scale()` shorthand (translate always resolves
-   in the un-scaled parent coordinate system either way), so each element
-   below gets ONE rule declaring `translate`/`scale`/`transform-origin` off
-   custom properties, and every breakpoint further down only reassigns the
-   2-3 numbers — no shorthand string to reconstruct, and a later one-off
-   `rotate`/`transform` addition can layer on top instead of clobbering it
-   (hit twice before this: the drag-over highlight and the swatch-label
-   offset both had to route around a monolithic `transform:`). */
+
 .alchemyRoot .scene.active .lab.color-game-lab .test-tube.tube-lg {
   translate: 0 var(--bench-raise, 0);
   scale: var(--bench-scale, 1);
@@ -587,14 +483,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   cursor: not-allowed;
   filter: none;
 }
-/* Сброс/Новая партия/Новая смесь — a reset icon, not a text button, per
-   feedback ("просто сделай иконкой сброса"). Fixed square instead of
-   `.ctl`'s own text-driven padding, so the icon centers regardless of how
-   wide the neighbouring "Проверить" text button ends up. !important:
-   `.alchemyElementColumn .ctl` (mobile and wide both set its own width,
-   for the stacked/row text-button layouts) outranks a bare `.ctl-icon` on
-   specificity alone — this is a deliberate "always render as a fixed
-   icon square" override, not a fight worth winning on specificity. */
+
 .alchemyRoot .ctl-icon {
   width: 38px !important;
   height: 38px !important;
@@ -658,13 +547,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
 .alchemyRoot .alchemyElementCell.filled .alchemyElementCellHint {
   display: none;
 }
-/* A bottle landing in the cell (js/world/alchemy-inventory.js, drag-drop or a plain
-   click-select both trigger this) pops in rather than just appearing —
-   animates the `scale` custom property directly, not `transform`, so it
-   doesn't fight the cell's own token-driven translate/scale (the "stand
-   on the table" raise, above) the way a `transform:` keyframe would; once
-   the animation ends (no fill-mode) the static scale:var(--element-scale)
-   rule takes back over on its own. */
+
 @keyframes elementCellLandV1 {
   0% {
     scale: 0.6;
@@ -680,14 +563,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   animation: elementCellLandV1 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* A correct Check shakes and flashes the *current* bottle (js/world/
-   alchemy.js triggerSuccessPulseV1). Shakes via `translate` alone, each
-   keyframe re-reading var(--bench-raise) so the bottle's own "stand on
-   the table" raise (positioning tokens, above) isn't lost mid-shake — an
-   animated `transform:` shorthand would replace the static translate/
-   scale individual properties wholesale for its duration instead of
-   composing with them. `scale` itself is left alone (not listed in any
-   keyframe), so the bottle's normal size holds throughout. */
+
 @keyframes alchemySuccessShakeV1 {
   0%,
   100% {
@@ -729,42 +605,19 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
      tabs, per feedback — margin-top on the panel itself, not the bottles
      inside it (that's .tube-pair's own margin-top below), so it moves the
      whole block including its background wood. */
-  /* flex-shrink:0: the base rule's .scene.active > .lab{flex:1 1 auto} is
-     meant for the wide layout, where .lab is one column in a height-capped
-     grid row and legitimately needs to shrink+scroll. Stacked on mobile
-     nothing caps .scene's height (the whole modal body scrolls instead),
-     but the shrink behavior still applied — .lab's own box could compress
-     shorter than its raised bottles actually need, and the *next* panel
-     (positioned right after .lab's own, now-too-short, box in normal
-     flow) started overlapping the target-element-hint text still hanging
-     below it. Locked to its natural content height instead. */
+
   .alchemyRoot .scene.active > .lab.color-game-lab {
     margin-top: 20%;
     flex-shrink: 0 !important;
   }
-  /* Full width instead of stopping at .lairModuleBody's own 12px padding
-     (css/overrides-04-universal-lock.css, shared with every lair panel) —
-     per feedback the three shelves shouldn't be boxed in left/right.
-     Negative margin cancels exactly that padding; the panels' own inner
-     padding (.lab/.alchemyReagents/.alchemyElementColumn) keeps their
-     actual content off the wood's own edge same as before. */
+
   .alchemyRoot .scene.active > .lab.color-game-lab,
   .alchemyRoot .scene.active > .alchemyReagents,
   .alchemyRoot .scene.active > .alchemyElementColumn {
     margin-left: -12px;
     margin-right: -12px;
   }
-  /* The -12px above only cancels .lairModuleBody's own padding — the
-     window itself still sat inset from the true screen edge by another
-     8px a side (css/overrides-04-universal-lock.css's shared mobile
-     #lairModuleWindow{width:calc(100vw - 16px)}, meant to keep *other*
-     lair panels' visible card border off the bezel). Alchemy already
-     strips that window chrome entirely (border/shadow/background, see
-     the :has() rule below), so there's no border left for the 8px to
-     protect here — just the wood shelves stopping short of the edge with
-     a strip of unrelated blurred room behind them showing through. An ID
-     beats the shared rule's plain class regardless of !important vs.
-     !important, so this doesn't need to fight specificity, only exist. */
+
   #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) {
     width: 100vw !important;
     border-radius: 0 !important;
@@ -806,25 +659,11 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   .alchemyRoot .tube-pair {
     padding-bottom: 36px;
   }
-  /* The two bench bottles stand higher above the panel's own table level,
-     same "push the surface down, raise what stands on it" pass the wide
-     layout already got (see the wide media query below) — just tuned for
-     the stacked mobile panel instead of the grid row. margin-top on
-     .tube-pair (not a transform) opens the extra headroom above the
-     bottles since nothing needs to track that shift; the bottles
-     themselves use transform so .swatch-label/.target-element-hint (both
-     position:absolute off .tube-box, whose own layout box a transform on
-     the tube inside it does not move) can be pulled up to match. */
+
   .alchemyRoot .tube-pair {
     margin-top: 47px;
   }
-  /* Same fix as the wide layout's own .lab overflow:visible!important
-     (a few hundred lines down): raising the bottles above their
-     un-transformed layout box (next rule) makes .lab's base overflow:auto
-     (it's there for a long verdict to scroll instead of blowing out the
-     modal) see overflow at the *top* and grow a permanent scrollbar next
-     to the target/current bottles — nothing here actually needs to
-     scroll at this width. */
+
   .alchemyRoot .scene.active > .lab.color-game-lab {
     overflow: visible !important;
   }
@@ -865,13 +704,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
    window has, so the flasks were cut off. Side by side each gets its own
    column and the bench keeps the full height. */
 @media (min-width: 900px) {
-  /* Positioning tokens for this breakpoint, one place instead of six
-     separate .alchemyRoot rules scattered through this block (merged
-     v340 — later rounds had each added their own token declaration next
-     to whatever rule they were tuning at the time, instead of here).
-     Each token's own "why this number" reasoning stays as a comment on
-     it; the rules that consume them, below, keep their own comments
-     about layout/ordering instead. */
+
   .alchemyRoot {
     /* Per feedback the two bottles should stand closer together (roughly
        half the gap they had) on top of .tube-pair's own translateX —
@@ -908,12 +741,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   }
   .alchemyRoot .scene.active {
     display: grid;
-    /* minmax(0,1fr), not 1fr: a 1fr track will not shrink below its own
-       min-content, and the bench was pushing the whole grid past the window.
-       Three columns now — bench, reagents, element — all in one row: the
-       element slot sits right where the old "foot" row used to span, since
-       its own column already carries the verdict and the buttons stacked
-       inside it (see .alchemyElementColumn above). */
+
     grid-template-columns: minmax(0, 1fr) minmax(220px, 280px) minmax(
         210px,
         260px
@@ -928,12 +756,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
     /* a flex item will not shrink below its content unless told to, and the
        grid was pushing the reagent column out past the window */
     min-width: 0;
-    /* Capped, not left to `minmax(0,1fr)` fill whatever height the window
-       has to spare: on a tall enough browser window the row — and with it
-       the desk photo stretched 100%/100% across it — grew well past a
-       sensible table height, reading as a wall of wood rather than a
-       tabletop. The window itself still sizes to content above/below
-       this row as usual; only the row stops growing past this point. */
+
     max-height: 420px;
     position: relative;
   }
@@ -991,14 +814,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   }
   /* Both columns end at the same line and scroll inside themselves rather than
      growing past it: whichever is taller no longer sets the height. */
-  /* align-items:flex-end, not center: centered in the full band height put
-     the reagent row's natural baseline well above the table's own front
-     edge, which is what needed such a large translateY on the swatches
-     below to reach it — that shift outran the (label-less) gap to the
-     Фильтр/±  button beneath, overlapping it. Anchoring the row's bottom
-     to the band's bottom (same idea as .tube-pair for the big bottles)
-     means the swatches only need a small nudge, not one that swallows
-     their own controls. */
+
   .alchemyRoot .scene.active > .alchemyReagents {
     grid-area: reagents;
     min-width: 0;
@@ -1022,20 +838,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   .alchemyRoot .scene.active > .scene-head {
     display: none;
   }
-  /* Wide: one continuous desk behind the whole row instead of three
-     separate tabletops with a gap of bare panel between them — the grid
-     gap still separates the columns, but the desk paints straight through
-     it since it's one background on the grid container, not per-column.
-     `background-size:contain`, not `100% 100%`: the row's own box (740
-     wide by the 420 max-height below, ~1.76:1) is nowhere near the source
-     photo's own proportions (1086×266, ~4.08:1) — stretching to fill it
-     exactly meant scaling the image roughly 2.3x more on the vertical
-     axis than the horizontal, which is the "table stretched vertically,
-     definitely by double" from testing. `contain` scales the photo
-     uniformly instead, by whichever axis is more constraining (here,
-     width) — undistorted at any row size, centered, with blur (v312)
-     showing in the letterboxed space above/below rather than the table
-     photo being warped to fill it. */
+
   .alchemyRoot .scene.active:has(> .lab.color-game-lab) {
     isolation: isolate;
     background: none;
@@ -1118,24 +921,11 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   .alchemyRoot .alchemyElementCell {
     width: clamp(40px, 6vh, 60px);
   }
-  /* .lab's own overflow:auto (line ~105, !important — it's there so a
-     long verdict on a short window scrolls instead of blowing out the
-     modal) started showing a permanent scrollbar once the bench bottles
-     below render translateY'd upward: the transform moves them outside
-     .lab's own layout box without .lab's box growing to match (transforms
-     never affect layout), so the auto-scroll region "saw" overflow at the
-     top. Nothing in here actually needs to scroll at this width — visible
-     instead, !important to beat that earlier !important. */
+
   .alchemyRoot .scene.active > .lab.color-game-lab {
     overflow: visible !important;
   }
-  /* Same fix as the bench above, for the other two columns: raising the
-     reagent swatches and the element cell (below) off their own table
-     level moves them past their column's own top edge the same way the
-     bench bottles moved past .lab's — .alchemyReagents/.alchemyElementColumn
-     both kept the base grid rule's overflow:auto (set for scrolling long
-     content, not for this), which clipped a few px off the top of both
-     instead of scrolling. */
+
   .alchemyRoot .scene.active > .alchemyReagents,
   .alchemyRoot .scene.active > .alchemyElementColumn {
     overflow: visible !important;
@@ -1145,13 +935,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
      keeps each one's own footprint anchored while it scales, so "raise"
      and "resize" don't fight each other. Token values themselves are
      declared with this breakpoint's other tokens, above. */
-  /* Every card in a row shares the same bottom edge
-     (.alchemyReagents/.color-controls both align-items:flex-end), so a
-     shorter card's (Separation's single-button one) un-transformed top —
-     and with it its swatch's own resting position — starts lower than a
-     two-button station's, breaking the tube line across stations despite
-     an identical raise. --reagent-solo-raise (declared above) corrects
-     just this card. */
+
   .alchemyRoot
     .alchemyReagents
     .color-card:has(.ctrl-row .small-btn:only-child)
@@ -1183,28 +967,14 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   .alchemyRoot .scene.active > .alchemyElementColumn .alchemyElementCell {
     flex-shrink: 0;
   }
-  /* align-items:center on the row (above) centers big-actions against the
-     element cell's own *layout* box — but the cell also carries its own
-     translateY raise (below, to stand on the table like the bottles), which
-     moves it up visually without moving its layout box, so a plain
-     align-items:center still centers big-actions against where the cell
-     *would* be un-raised. Matching translateY here re-centers it against
-     the cell's actual rendered height instead — tuned by eye, retune
-     alongside the cell's own raise if that changes. */
+
   .alchemyRoot .scene.active > .alchemyElementColumn .big-actions {
     width: auto;
     min-width: 100px;
     flex-shrink: 0;
     transform: translateY(-114px);
   }
-  /* The verdict/status text ("Подбери оттенок…", "Мимо" etc.) moves to a
-     strip directly under the station tabs instead of living in the
-     element column. `.alchemyRoot` is the nearest positioned ancestor for
-     every station's own #mixStatus/#unknownStatus/#sepStatus either way
-     (its own position:relative is declared with this breakpoint's other
-     tokens, above), so this is pure repositioning — each stays exactly as
-     tied to its own scene's .active visibility as before, it just paints
-     somewhere else. */
+
   .alchemyRoot .scene.active .status {
     /* !important to win against the earlier "neutralise the game's leaking
        styles" rule above (.alchemyRoot .scene,.alchemyRoot .status,
@@ -1226,18 +996,8 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   .alchemyRoot .alchemyReagents .color-card .ctrl-row {
     display: contents;
   }
-  /* order:-1 alone put both buttons directly above the swatch's own
-     *layout* position — but the swatch itself renders well above that via
-     transform (transforms don't move flow, so reordering before it
-     doesn't know about that shift), so the two ended up overlapping.
-     Pushed up by roughly the same amount to actually clear it — retune
-     this alongside the swatch's own translateY above if that changes. */
-  /* Only "+" (last-child) moves above the swatch — "-" stays below it in
-     normal flow, per feedback that both above was one too many. But
-     "below it in flow" means below the swatch's *untransformed* layout
-     box, not its visibly-higher one (transforms don't move flow) — same
-     gap problem as the buttons-above fix, just the other direction.
-     Pulled up to actually sit under the swatch instead of ~110px below it. */
+
+
   .alchemyRoot .alchemyReagents .color-card .ctrl-row .small-btn:last-child {
     order: -1;
   }
@@ -1246,20 +1006,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
      the two rules' conflicting raises (this one's vs. the other's) fought
      each other, landing it short of clearing the swatch. Token values
      themselves are declared with this breakpoint's other tokens, above. */
-  /* Separation's single button matches :last-child too (it's the only
-     child), so without this it inherits the rule above wholesale — same
-     order:-1 flip AND the same big upward translateY the "+" button uses,
-     rendering it above the swatch like a "+" instead of below like a "−"
-     (feedback: minus signs belong under the tube everywhere). order:-1
-     stays (not overridden here) on purpose: with only one button in flow,
-     removing the reorder would make this card's own flow height shorter
-     than the two-button stations' by one button's height — and since
-     every card in a row shares the same bottom edge
-     (.alchemyReagents/.color-controls both align-items:flex-end), a
-     shorter card starts its flow *lower*, pushing this station's swatch
-     down and breaking the tube line across stations. Keeping order:-1
-     preserves the leading flow slot (same flow height as "+"'s station),
-     just aimed at a different landing spot via transform. */
+
 }
 
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) {
@@ -1398,13 +1145,7 @@ body:has(#alchemyGuideViewer:not([hidden])) #lairOverlay {
   }
 }
 
-/* The window is cut to the station rather than the station spread over the
-   window. At 1280px — which is what it took when the flasks were 96px wide and
-   the bench had to look deliberate around them — two columns of content sat in
-   the middle of a great deal of nothing. Two flasks and four reagents measure
-   about 700px; the window is that, a little under the 930px the other lair
-   modules use.
-   Raise this when a station lands that genuinely needs more. */
+
 @media (min-width: 900px) {
   #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) {
     width: min(780px, calc(100vw - 80px)) !important;
@@ -1434,14 +1175,7 @@ body:has(#alchemyGuideViewer:not([hidden])) #lairOverlay {
     padding: 3px 8px;
     font-size: 11px;
   }
-  /* The v311 "stand on the table" desk push-down eats into a short
-     window's already-tight budget — Новая партия/Проверить were clipping
-     at the window's own bottom edge before this. Scaled back here rather
-     than fighting the window's max-height. (v315 also scaled the element
-     cell's own margin-top down here, back when the cell used margin-top
-     for its vertical placement — v316 switched that to the same
-     transform: translateY approach as the bottles/swatches above, so
-     there's nothing left here for the cell to override.) */
+
   /* The v311 "stand on the table" desk push-down eats into a short window's
      already-tight budget — Новая партия/Проверить were clipping at the
      window's own bottom edge without this, and the glassware/label/button

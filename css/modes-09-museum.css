@@ -1,18 +1,7 @@
-/* Hillsfar — музей (подбор формы отмычки) — six tumblers, each hiding a
-   target pick-shape symbol chosen from a 21-symbol grid; some tumblers are
-   half occluded, some need the right symbol clicked twice. Markup/CSS
-   ported from the old prototype scene
-   (prototypes/lockpicking-mechanics-v63.html, .hill-*) with classes renamed
-   to .hmTumb/.hmPick/etc so they don't collide with the same-named classes
-   still used by other prototype scenes. */
+
 .hmMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:10px;background:rgba(17,13,9,.985);overflow:auto;}
-.hmMode[hidden]{display:none!important;pointer-events:none!important;}
-/* .challengeStatus (reward+timer HUD) is a viewport-fixed overlay that
-   sits inside the bottom of #puzzleArea on most non-phone breakpoints;
-   js/core/init.js's syncPuzzleRewardClearance() measures the shortfall
-   into --reward-clear so the picks grid stops above it instead of
-   rendering underneath it. Needs !important + this specificity to beat
-   the shared body.importedMode .puzzleArea>.modePanel padding rule. */
+.hmMode[hidden]{display:none!important;}
+
 body.importedMode .puzzleArea>.modePanel.hmMode:not([hidden]){padding-bottom:calc(12px + var(--reward-clear,0px))!important;}
 
 /* Two grids share whatever height is actually available (flex-grow ratio

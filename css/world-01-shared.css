@@ -65,7 +65,7 @@ body.importedMode .anActionLabel{left:20px!important;right:20px!important;bottom
 @media (max-width:900px){
 body.importedMode .anConsole{width:min(520px,94vw)!important;height:396px!important;}
 }
-body .modePanel[hidden],body.importedMode .modePanel[hidden]{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;}
+body .modePanel[hidden],body.importedMode .modePanel[hidden]{display:none!important;visibility:hidden!important;opacity:0!important;}
 body .modePanel:not([hidden]){visibility:visible!important;opacity:1!important;}
 body.importedMode .tnMode,body.importedMode .rsMode,body.importedMode .kdMode{background:radial-gradient(circle at 22% 10%, rgba(106,74,40,.22) 0%, rgba(106,74,40,.09) 15%, transparent 36%),
     radial-gradient(circle at 82% 18%, rgba(72,50,30,.15) 0%, transparent 30%),

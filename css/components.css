@@ -27,12 +27,7 @@
   cursor:not-allowed;
 }
 
-/* Shared full-screen module header — Коллекция, Алхимия, and any future
-   panel opened the same way (js/core/init.js's openLairModule) all use
-   this instead of their own boxed bar: no border/background of its own
-   (the panel underneath already sits on #alchemyFullBlur's blur layer),
-   caps title, and a close button on the LEFT sized to match the
-   persistent nav icons on the right (--top-hud-size, css/overrides-03-lair.css). */
+
 .screenTopHud{
   display:none;
   position:fixed;

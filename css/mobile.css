@@ -52,11 +52,6 @@
     top:calc(var(--mobile-safe-top) + 6px)!important;
     right:calc(var(--mobile-safe-right) + 6px)!important;
   }
-  .topRightHud #lairHudButton{grid-column:1!important;grid-row:1!important;}
-  .topRightHud #mapTab{grid-column:2!important;grid-row:1!important;}
-  .topRightHud #gameSettingsButton{grid-column:3!important;grid-row:1!important;}
-  .topRightHud .economyHud{grid-column:3!important;grid-row:2!important;}
-  .topRightHud .assetNameHud{display:none!important;}
 }
 
 /* v248 — only plate pins render above the padlock; plates stay below it. */

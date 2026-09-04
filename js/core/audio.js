@@ -1,9 +1,10 @@
   let audioCtx=null;
   const audioAssets=window.KeynlockAudioAssets||{};
+  const audioStore=window.KeynlockSaveStore;
   const activePlayers=new Set();
   let soundtrack=null;
   const MUSIC_VOLUME_KEY='keynlockMusicVolume';
-  const savedMusicVolume=localStorage.getItem(MUSIC_VOLUME_KEY);
+  const savedMusicVolume=audioStore.getItem(MUSIC_VOLUME_KEY);
   let musicVolume=Math.max(0,Math.min(1,(savedMusicVolume===null?28:Number(savedMusicVolume)||0)/100));
 
   function assetUrl(key){
@@ -43,7 +44,7 @@
 
   function setMusicVolume(value){
     musicVolume=Math.max(0,Math.min(1,Number(value)||0));
-    localStorage.setItem(MUSIC_VOLUME_KEY,String(Math.round(musicVolume*100)));
+    audioStore.setItem(MUSIC_VOLUME_KEY,String(Math.round(musicVolume*100)));
     if(soundtrack)soundtrack.volume=musicVolume;
     return Math.round(musicVolume*100);
   }

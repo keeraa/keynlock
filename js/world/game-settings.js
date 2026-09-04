@@ -5,11 +5,9 @@
     const empty=document.querySelector('#gameSettingsEmpty');
     const search=document.querySelector('#gameSettingsSearch');
     const table=document.querySelector('.gameSettingsTable');
-    const musicVolume=document.querySelector('#gameMusicVolume');
-    const musicVolumeValue=document.querySelector('#gameMusicVolumeValue');
     const recentStorageKey='keynlockRecentlyOpenedGames';
     let recentGames=[];
-    try{recentGames=JSON.parse(STORE.getItem(recentStorageKey)||'[]').filter(id=>GameCatalog.has(id)).slice(0,3);}catch(_){recentGames=[];}
+    try{recentGames=STORE.getJSON(recentStorageKey,[]).filter(id=>GameCatalog.has(id)).slice(0,3);}catch(_){recentGames=[];}
     let sortPath='title';
     let sortDirection=1;
     let settingsReturnToLair=false;
@@ -23,17 +21,10 @@
       ['world.birds','Птицы']
     ];
 
-    function syncMusicVolume(){
-      if(!musicVolume)return;
-      const value=window.KeynlockAudio?.getMusicVolume?.() ?? 28;
-      musicVolume.value=String(value);
-      if(musicVolumeValue)musicVolumeValue.value=`${value}%`;
-    }
-
     function recordRecentGame(id){
       if(!GameCatalog.has(id))return;
       recentGames=[id,...recentGames.filter(saved=>saved!==id)].slice(0,3);
-      try{STORE.setItem(recentStorageKey,JSON.stringify(recentGames));}catch(_){}
+      try{STORE.setJSON(recentStorageKey,recentGames);}catch(_){}
       if(!screen?.hidden)renderGameSettings();
     }
 
@@ -201,7 +192,6 @@
       document.body.classList.add('game-settings-open');
       setGameInactive(true);
       screen.hidden=false;
-      syncMusicVolume();
       renderGameSettings();
       requestAnimationFrame(()=>search?.focus({preventScroll:true}));
     }
@@ -217,14 +207,9 @@
       if(restoreLair)openLair();
     }
 
-    document.querySelector('#gameSettingsButton')?.addEventListener('click',openGameSettings);
     document.querySelector('#gameSettingsClose')?.addEventListener('click',()=>closeGameSettings(true));
     screen?.addEventListener('pointerdown',event=>{if(event.target===screen)closeGameSettings(true);});
     search?.addEventListener('input',renderGameSettings);
-    musicVolume?.addEventListener('input',()=>{
-      const value=window.KeynlockAudio?.setMusicVolume?.(Number(musicVolume.value)/100) ?? Number(musicVolume.value);
-      if(musicVolumeValue)musicVolumeValue.value=`${value}%`;
-    });
     table?.querySelector('thead')?.addEventListener('click',event=>{
       const button=event.target.closest?.('[data-sort]');
       if(!button)return;

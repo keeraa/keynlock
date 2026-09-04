@@ -427,6 +427,9 @@
   // check entirely.
   tryOpenBaseLock=guardOpen(tryOpenBaseLock);
   tryOpenLock=guardOpen(tryOpenLock);
+  ['classic','sequence','special'].forEach(modeId=>{
+    GameActions.registerOpenGuard(modeId,()=>!forceWrongTensionBreak());
+  });
   GameActions.registerOpenGuard('g1',()=>!forceWrongTensionBreak());
 
   // init.js bound these two handlers by function reference before this patch runs.

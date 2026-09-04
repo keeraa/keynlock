@@ -37,7 +37,9 @@
 <link rel="stylesheet" href="css/overrides-05-inventory.css">
 <link rel="stylesheet" href="css/overrides-06-digital.css">
 <link rel="stylesheet" href="css/overrides-07-workbench.css">
-<link rel="stylesheet" href="css/alchemy.css">
+<link rel="stylesheet" href="css/alchemy-foundation.css">
+<link rel="stylesheet" href="css/alchemy-workshop.css">
+<link rel="stylesheet" href="css/alchemy-inventory.css">
 <link rel="stylesheet" href="css/collection.css">
 <link rel="stylesheet" href="css/restoration.css">
 <link rel="stylesheet" href="css/mobile.css">
@@ -46,6 +48,7 @@
 <link rel="stylesheet" href="css/challenge-hud.css">
 <link rel="stylesheet" href="css/typography.css">
 <link rel="stylesheet" href="css/game-defeat.css">
+<link rel="stylesheet" href="css/tooltips.css">
 <link rel="stylesheet" href="css/lock-shell.css">
 
 
@@ -101,7 +104,7 @@
   <button class="mapCornerBtn hudNavBtn" id="mapTab" type="button" aria-label="Карта города" title="Карта города">
     <img class="hudNavArtwork" src="assets/ui/map-ico.png" alt="">
   </button>
-  <button class="mapCornerBtn hudNavBtn" id="gameSettingsButton" type="button" aria-label="Настройки игр" title="Настройки игр">
+  <button class="mapCornerBtn hudNavBtn" id="gameSettingsButton" type="button" aria-label="Главное меню" title="Главное меню">
     <img class="hudNavArtwork" src="assets/ui/settings-ico.png" alt="">
   </button>
   <div class="assetNameHud" id="assetNameHud" aria-live="polite">
@@ -183,11 +186,6 @@
         <p>Общие возможности механик. Изменения применяются сразу и сохраняются в этом браузере.</p>
       </div>
       <div class="gameSettingsHeaderActions">
-        <label class="gameMusicVolume" for="gameMusicVolume">
-          <span>Музыка</span>
-          <input id="gameMusicVolume" type="range" min="0" max="100" step="1" value="28" aria-label="Громкость музыки">
-          <output id="gameMusicVolumeValue" for="gameMusicVolume">28%</output>
-        </label>
         <button class="gameSettingsClose" id="gameSettingsClose" type="button" aria-label="Закрыть настройки">×</button>
       </div>
     </div>
@@ -867,6 +865,11 @@
 </main>
 <div class="toast" id="toast"><span class="toastText" id="toastText"></span><button class="toastAction" id="toastAction" type="button" onclick="restartCurrentRound();document.querySelector('#toast')?.classList.remove('show','actionable')">Новый замок</button></div>
 <script src="js/core/asset-preload.js"></script>
+<script src="js/core/save-store.js"></script>
+<script src="js/data/world.js"></script>
+<script src="js/data/economy.js"></script>
+<script src="js/data/restoration.js"></script>
+<script src="js/data/paintings.js"></script>
 <script src="js/core/main-menu.js"></script>
 <script src="js/core/game-catalog.js"></script>
 <script src="js/core/challenge-hud.js"></script>
@@ -907,7 +910,9 @@
 <script src="js/modes/bioshock2.js"></script>
 <script src="js/modes/alphaprotocol.js"></script>
 <script src="js/modes/base-locks.js"></script>
-<script src="js/world/alchemy.js"></script>
+<script src="js/world/alchemy-stations.js"></script>
+<script src="js/world/alchemy-ui.js"></script>
+<script src="js/world/alchemy-inventory.js"></script>
 <script src="js/world/restoration.js"></script>
 <script src="js/world/guards.js"></script>
 <script src="js/world/missions.js"></script>
@@ -915,6 +920,7 @@
 <script src="js/world/collection.js"></script>
 <script src="js/core/init.js"></script>
 <script src="js/core/inventory-hit-testing.js"></script>
+<script src="js/core/tooltips.js"></script>
 
 
 </body>

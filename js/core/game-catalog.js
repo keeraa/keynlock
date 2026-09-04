@@ -71,11 +71,12 @@ function freezeGameDefinitions(definitions){
 }
 
 const GameCatalog=(()=>{
+  const store=window.KeynlockSaveStore;
   const definitions=freezeGameDefinitions(GAME_DEFINITIONS);
   const storageKey='keynlockGameCatalogOverrides';
   const editablePaths=Object.freeze(['lock.present','lock.manualOpen','lock.specialTool','world.noise','world.noiseSensor','world.guards','world.birds','readiness','rating']);
   let overrides={};
-  try{overrides=JSON.parse(localStorage.getItem(storageKey)||'{}')||{};}catch(_){overrides={};}
+  overrides=store.getJSON(storageKey,{})||{};
   const nativeIds=Object.freeze(Object.keys(definitions).filter(id=>definitions[id].kind==='native'));
   const prototypeIds=Object.freeze(Object.keys(definitions).filter(id=>definitions[id].kind==='prototype'));
   function get(id){
@@ -128,7 +129,7 @@ const GameCatalog=(()=>{
     emitChange(id||null,'reset');
   }
   function persist(){
-    try{localStorage.setItem(storageKey,JSON.stringify(overrides));}catch(_){}
+    store.setJSON(storageKey,overrides);
   }
   function emitChange(id,path){
     window.dispatchEvent(new CustomEvent('keynlock-game-catalog-change',{detail:{id,path,game:id?get(id):null}}));

@@ -2,6 +2,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { runInNewContext } from 'node:vm';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const posix = value => value.replaceAll('\\', '/');
@@ -32,12 +33,41 @@ function localAttributeRefs(html, tag, attr) {
 const htmlPath = resolve(root, 'index.html');
 const html = readFileSync(htmlPath, 'utf8');
 const scripts = localAttributeRefs(html, 'script', 'src');
-const expectedScriptOrder = ["js/core/asset-preload.js","js/core/game-catalog.js","js/core/challenge-hud.js","js/core/tool-motion.js","js/core/game-defeat.js","js/core/state.js","js/core/puzzle-modes.js","js/core/audio.js","js/core/ui.js","js/world/inventory.js","js/world/lair.js","js/world/navigation.js","js/core/digital-helpers.js","js/modes/drum.js","js/modes/oscilloscope.js","js/core/game.js","js/modes/anachronox.js","js/modes/composite.js","js/modes/tension.js","js/modes/resonance.js","js/modes/deduction.js","js/modes/skyrim.js","js/modes/gothic1.js","js/modes/hillsfar.js","js/modes/oblivion.js","js/modes/watchmen.js","js/modes/museum.js","js/modes/mass2.js","js/modes/pipeline.js","js/modes/wharf.js","js/modes/thiefds.js","js/modes/kingdomcome.js","js/modes/thief12.js","js/modes/fallout.js","js/modes/masshack.js","js/modes/pathologic.js","js/modes/bioshock2.js","js/modes/alphaprotocol.js","js/modes/base-locks.js","js/world/alchemy.js","js/world/guards.js","js/world/missions.js","js/world/game-settings.js","js/world/collection.js","js/core/init.js","js/core/inventory-hit-testing.js"];
+const expectedScriptOrder = ["js/core/asset-preload.js","js/core/game-catalog.js","js/core/challenge-hud.js","js/core/tool-motion.js","js/core/game-defeat.js","js/core/state.js","js/core/puzzle-modes.js","js/core/audio.js","js/core/ui.js","js/world/inventory.js","js/world/lair.js","js/world/navigation.js","js/core/digital-helpers.js","js/modes/drum.js","js/modes/oscilloscope.js","js/core/game.js","js/modes/anachronox.js","js/modes/composite.js","js/modes/tension.js","js/modes/resonance.js","js/modes/deduction.js","js/modes/skyrim.js","js/modes/gothic1.js","js/modes/hillsfar.js","js/modes/oblivion.js","js/modes/watchmen.js","js/modes/museum.js","js/modes/mass2.js","js/modes/pipeline.js","js/modes/wharf.js","js/modes/thiefds.js","js/modes/kingdomcome.js","js/modes/thief12.js","js/modes/fallout.js","js/modes/masshack.js","js/modes/pathologic.js","js/modes/bioshock2.js","js/modes/alphaprotocol.js","js/modes/base-locks.js","js/world/alchemy-stations.js","js/world/alchemy-ui.js","js/world/alchemy-inventory.js","js/world/guards.js","js/world/missions.js","js/world/game-settings.js","js/world/collection.js","js/core/init.js","js/core/inventory-hit-testing.js"];
 expectedScriptOrder.splice(1,0,'js/core/main-menu.js');
+expectedScriptOrder.splice(1,0,'js/data/world.js','js/data/economy.js','js/data/restoration.js','js/data/paintings.js');
+expectedScriptOrder.splice(1,0,'js/core/save-store.js');
 expectedScriptOrder.splice(expectedScriptOrder.indexOf('js/core/puzzle-modes.js'),0,'js/core/resources.js');
 expectedScriptOrder.splice(expectedScriptOrder.indexOf('js/world/guards.js'),0,'js/world/restoration.js');
+expectedScriptOrder.push('js/core/tooltips.js');
 if (JSON.stringify(scripts) !== JSON.stringify(expectedScriptOrder)) fail('JavaScript load order changed; classic scripts share one lexical environment.');
 const links = localAttributeRefs(html, 'link', 'href').filter(x => x.endsWith('.css'));
+
+const contentContext = { window: {} };
+for (const ref of ['js/data/world.js','js/data/economy.js','js/data/restoration.js','js/data/paintings.js']) {
+  runInNewContext(readFileSync(resolve(root, ref), 'utf8'), contentContext, { filename: ref });
+}
+const content = contentContext.window.KeynlockContent;
+if (!content?.world || !content?.economy || !content?.restoration || !content?.paintings) fail('Content catalog is incomplete.');
+const districtIds = new Set(Object.keys(content.world.districts));
+const componentIds = new Set(content.economy.components.map(item => item.id));
+const paintingIds = content.paintings.map(item => item.id);
+const gameCatalogSource = readFileSync(resolve(root, 'js/core/game-catalog.js'), 'utf8');
+const gameDefinitionBlock = gameCatalogSource.split('const GAME_DEFINITIONS={')[1]?.split('// Scene art belongs')[0] || '';
+const gameIds = new Set([...gameDefinitionBlock.matchAll(/^\s{2}([a-z0-9]+):\{/gm)].map(match => match[1]));
+if (new Set(paintingIds).size !== paintingIds.length) fail('Painting ids must be unique.');
+for (const painting of content.paintings) {
+  if (!painting.id || !painting.title || !painting.artist || !painting.year || !painting.image) fail(`Incomplete painting: ${painting.id || 'unknown'}`);
+  if (!painting.colors.every(color => componentIds.has(color))) fail(`Unknown reward color in painting: ${painting.id}`);
+}
+for (const place of content.world.missionPlaces) {
+  if (!gameIds.has(place.mode)) fail(`Unknown mission game: ${place.mode}`);
+  if (!districtIds.has(place.district)) fail(`Unknown mission district: ${place.district}`);
+  if (!Number.isFinite(place.x) || !Number.isFinite(place.y)) fail(`Invalid mission coordinates: ${place.mode}`);
+}
+for (const district of Object.values(content.restoration.categoryDistricts)) {
+  if (!districtIds.has(district)) fail(`Unknown restoration district: ${district}`);
+}
 
 for (const ref of [...scripts, ...links]) {
   if (!existsSync(resolve(root, ref))) fail(`Missing index resource: ${ref}`);
@@ -47,6 +77,15 @@ const jsFiles = walk(resolve(root, 'js'), f => f.endsWith('.js'));
 for (const file of jsFiles) {
   const result = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
   if (result.status !== 0) fail(`JS syntax failed: ${posix(relative(root, file))}\n${result.stderr}`);
+}
+const moduleFiles = walk(resolve(root, 'js/modules'), f => f.endsWith('.mjs'));
+for (const file of moduleFiles) {
+  const result = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
+  if (result.status !== 0) fail(`Module syntax failed: ${posix(relative(root, file))}\n${result.stderr}`);
+}
+for (const file of [...jsFiles,...moduleFiles]) {
+  if (file.endsWith('/core/save-store.js')) continue;
+  if (/\blocalStorage\b/.test(readFileSync(file,'utf8'))) fail(`Direct localStorage access outside SaveStore: ${posix(relative(root,file))}`);
 }
 
 const indexedScripts = new Set(scripts.map(posix));

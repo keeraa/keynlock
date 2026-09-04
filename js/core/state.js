@@ -17,21 +17,7 @@
   new MutationObserver(syncWorldPauseState).observe(document.body,{attributes:true,attributeFilter:['class']});
   document.addEventListener('visibilitychange',syncWorldPauseState);
   queueMicrotask(syncWorldPauseState);
-  const STORE=(()=>{
-    try{
-      const s=window.localStorage;
-      const k='__lockpick_probe__';
-      s.setItem(k,'1'); s.removeItem(k);
-      return s;
-    }catch{
-      const mem={};
-      return {
-        getItem:k=>Object.prototype.hasOwnProperty.call(mem,k)?mem[k]:null,
-        setItem:(k,v)=>{mem[k]=String(v)},
-        removeItem:k=>{delete mem[k]}
-      };
-    }
-  })();
+  const STORE=window.KeynlockSaveStore;
   const PICK_TYPES={standard:{name:'Обычная',breakChance:1,saveChance:0}};
   const PICK_SKINS=[null,
     'assets/picks/pick_01.webp',
@@ -46,21 +32,13 @@
 
   function loadPickProgress(){
     try{
-      const saved=JSON.parse(STORE.getItem('lockpickProgress')||'{}');
+      const saved=STORE.getJSON('lockpickProgress',{});
       return {capacity:[3,5,7].includes(saved.capacity)?saved.capacity:3,equipped:'standard'};
     }catch{ return {capacity:3,equipped:'standard'}; }
   }
   let pickProgress=loadPickProgress();
   let pickType=pickProgress.equipped, pickCapacity=pickProgress.capacity;
-  const DISTRICTS=Object.freeze({
-    old:{order:1,name:'Старый квартал',color:'red',colorName:'Красный',hex:'#b94a42',risk:'Низкий',locks:'Простые',loot:'Невысокая',art:'Старые лавки и небольшие европейские собрания'},
-    port:{order:2,name:'Порт',color:'orange',colorName:'Оранжевый',hex:'#d5823b',risk:'Средний',locks:'Разные',loot:'Высокая',art:'Япония, Китай, Корея и Индия'},
-    arts:{order:3,name:'Район искусств',color:'yellow',colorName:'Жёлтый',hex:'#d8b34b',risk:'Средний',locks:'Галерейные',loot:'Высокая',art:'Импрессионизм, модерн и рынок искусства'},
-    bohemian:{order:4,name:'Богемный квартал',color:'green',colorName:'Зелёный',hex:'#57945b',risk:'Средний',locks:'Хитрые',loot:'Средняя',art:'Рококо, романтизм и символизм'},
-    industrial:{order:5,name:'Промышленный район',color:'cyan',colorName:'Голубой',hex:'#4d9da4',risk:'Высокий',locks:'Технические',loot:'Высокая',art:'Модерн, авангард и сюрреализм'},
-    upper:{order:6,name:'Верхний город',color:'blue',colorName:'Синий',hex:'#4c6ea9',risk:'Высокий',locks:'Сложные',loot:'Очень высокая',art:'Возрождение, барокко и частные коллекции'},
-    palace:{order:7,name:'Дворцовый район',color:'violet',colorName:'Фиолетовый',hex:'#7656a5',risk:'Очень высокий',locks:'Особые',loot:'Уникальная',art:'Шедевры и особые серии всех направлений'}
-  });
+  const DISTRICTS=window.KeynlockContent.world.districts;
   const DISTRICT_IDS=Object.freeze(Object.keys(DISTRICTS));
   let mapOpen=false, mapMoving=false;
   const MAP_LOCATIONS={
@@ -105,7 +83,7 @@
   })));
   let lairIntel=Object.fromEntries(DISTRICT_IDS.map(id=>[id,0]));
   try{
-    const savedIntel=JSON.parse(STORE.getItem('lockpickLairIntel')||'null');
+    const savedIntel=STORE.getJSON('lockpickLairIntel');
     if(savedIntel && typeof savedIntel==='object'){
       Object.keys(lairIntel).forEach(k=>{
         if(Number.isFinite(Number(savedIntel[k]))) lairIntel[k]=Math.max(0,Math.min(3,Number(savedIntel[k])));
@@ -119,7 +97,7 @@
         $lock=document.querySelector('#lock'),
         challengeHud=new GameChallengeHud(document.querySelector('#challengeHud')),
         toolMotionController=new ToolMotionController(document.documentElement),
-        gameDefeat=new GameDefeat(document.querySelector('#gameDefeatOverlay'),{onRestart:()=>restartCurrentRound()}),
+        gameDefeat=new GameDefeat(document.querySelector('#gameDefeatOverlay'),{onRestart:()=>restartCurrentRound(),onReturnToLair:()=>{solved=false;setGameInactive(false);openLairFromHud();}}),
         $toast=document.querySelector('#toast'), $toastText=document.querySelector('#toastText'), $toastAction=document.querySelector('#toastAction'), $scene=document.querySelector('.scene'), $mechanism=document.querySelector('.mechanismZone'), $lockHitArea=document.querySelector('#lockHitArea'),
         $objectiveLine=document.querySelector('#objectiveLine'),
         $mapTab=document.querySelector('#mapTab'),
@@ -184,14 +162,14 @@
   const DEFAULT_MODE_DIFFICULTY=Object.freeze({classic:1,sequence:1,special:1,hillsfar:1,g1:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,drum:1,scope:1,oblivion:1,watchmen:1,museum:1,mass2:1,pipeline:1,wharf:1,thiefds:1,kingdomcome:1,thief12:1,fallout:1,masshack:1,pathologic:1,bioshock2:1,alphaprotocol:1});
   function loadModeDifficulty(){
     try{
-      const saved=JSON.parse(STORE.getItem(DIFFICULTY_STORAGE_KEY)||'{}');
+      const saved=STORE.getJSON(DIFFICULTY_STORAGE_KEY,{});
       const out={...DEFAULT_MODE_DIFFICULTY};
       Object.keys(out).forEach(key=>{ const v=Number(saved?.[key]); if([1,2,3].includes(v)) out[key]=v; });
       return out;
     }catch{ return {...DEFAULT_MODE_DIFFICULTY}; }
   }
   let modeDifficultyMap=loadModeDifficulty();
-  function saveModeDifficulty(){ STORE.setItem(DIFFICULTY_STORAGE_KEY, JSON.stringify(modeDifficultyMap)); }
+  function saveModeDifficulty(){ STORE.setJSON(DIFFICULTY_STORAGE_KEY,modeDifficultyMap); }
   function getModeDifficulty(modeName=mode){
     const supported=GameCatalog.get(modeName)?.difficulty.levels||[1];
     const v=Number(modeDifficultyMap?.[modeName]);

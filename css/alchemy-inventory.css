@@ -1,0 +1,247 @@
+/* Alchemy inventory: shared ingredient rack and bottle interactions. */
+
+/* ============================================================
+   Ingredient rack drawer — moved out of the alchemy modal (v296-301
+   had it as a fourth "Стойка" tab) into its own bottom drawer, built
+   the same way as the lockpick case (css/overrides-05-inventory.css
+   .inventoryDrawer): fixed to the bottom of the screen, peeking above
+   the edge until clicked open, a back board / contents / front board
+   sandwich, closes on an outside click. Shown only while the alchemy
+   module is the open one — closing it or switching to another lair
+   tab hides the drawer the same way leaving the lair hides the
+   lockpick case.
+
+   Picking a bottle is meant to gate which elixirs are buildable, the
+   way a tension tool's type gates which lock it opens
+   (js/core/inventory-hit-testing.js) — not built yet, this only
+   remembers the selection.
+   ============================================================ */
+
+.alchemyRackDrawer {
+  /* --inv-open-y on .inventoryDrawer is 20%; this sits a further 10 points
+     below that on request, so more of the rack's own bottom trim tucks
+     under the screen edge at full open than the lockpick case leaves. */
+  --rack-peek: 72px;
+  --rack-open-y: 30%;
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 214;
+  width: min(760px, calc(100vw - 48px));
+  max-width: calc(100vw - 48px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, calc(100% + 24px));
+  transition:
+    transform 0.3s cubic-bezier(0.22, 0.78, 0.22, 1),
+    opacity 0.2s ease;
+}
+/* The gate: only #lairModuleWindow carries .open in sync with its own
+   hidden attribute (js/world/lair.js openLairModule/closeLairModule), and
+   only the active .lairPanel is "alchemy" while that station is showing —
+   so this alone stands in for "the alchemy module is open right now"
+   without any extra class to keep in sync from JS. */
+body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
+  .alchemyRackDrawer {
+  pointer-events: auto;
+  opacity: 1;
+  /* --rack-approach is written from JS (js/core/inventory-hit-testing.js,
+     the same pointer-proximity easing that already drives --inv-approach)
+     so the drawer rises a little as the cursor nears it, before any click. */
+  transform: translate(
+    -50%,
+    calc(100% - var(--rack-peek) - var(--rack-approach, 0px))
+  );
+}
+body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
+  .alchemyRackDrawer.open {
+  transform: translate(-50%, var(--rack-open-y));
+}
+
+/* z-index:0 while peeking — *below* .alchemyRackDrawerBottles (z-index:2) —
+   so a bottle poking up into the peek strip takes the click over the
+   toggle wherever the two overlap; the toggle only catches clicks in the
+   gaps between bottles. It used to sit above everything, which meant
+   clicking a bottle that was only partly revealed by the approach lift
+   opened the drawer instead of selecting it — the bottle was there to see
+   but not to click. The open-state pull-tab goes back to z-index:5, since
+   closing has to win even where it overlaps a bottle underneath. */
+.alchemyRackDrawerToggle {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+/* Matches the approach lift so the hit area always covers what is actually
+   on screen (css/overrides-05-inventory.css .inventoryToggle does the same). */
+.alchemyRackDrawer:not(.open) .alchemyRackDrawerToggle {
+  height: calc(var(--rack-peek) + var(--rack-approach, 0px));
+}
+.alchemyRackDrawer.open .alchemyRackDrawerToggle {
+  inset: auto;
+  left: 38%;
+  right: 38%;
+  top: 0;
+  height: var(--rack-peek);
+  z-index: 5;
+}
+
+.alchemyRackDrawerRack {
+  position: relative;
+  width: 100%;
+  /* Matches rack-back.png's own canvas (1614x690) so the two boards
+     and the bottle slots below stay in proportion at any width. */
+  aspect-ratio: 1614/690;
+  filter: drop-shadow(0 -8px 18px rgba(0, 0, 0, 0.32));
+}
+.alchemyRackDrawerBack,
+.alchemyRackDrawerFront {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  pointer-events: none;
+}
+.alchemyRackDrawerBack {
+  top: 0;
+  bottom: 0;
+  background-image: url("../assets/alchemy/rack-back.png");
+  z-index: 1;
+}
+/* rack-front.png is rack-back.png's own bottom 439 of 690px, bottom-
+   aligned — measured, not guessed. Its middle band is punched
+   transparent so a bottle's body shows through; only the shelf lip
+   and the cubby dividers around it are solid, in front of the glass. */
+.alchemyRackDrawerFront {
+  bottom: 0;
+  height: 63.62%;
+  background-image: url("../assets/alchemy/rack-front.png");
+  z-index: 3;
+}
+
+.alchemyRackDrawerBottles {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+/* Shorter than the bottle art's own proportions would give at top:7% —
+   deliberately: the ring hole sits at ~32% down the rack, which used to land
+   on each bottle at roughly its neck-to-shoulder line (~35% into the bottle
+   image), right where the pendant's chain hangs — length that varies a
+   little bottle to bottle since these are seven separate illustrations, not
+   one template. At height:61% the same ring lands past that well into the
+   wide jar body every one of the seven fills solidly (98-100% of its own
+   width from that point down, measured across all seven) — clear of the one
+   part of the art that wasn't guaranteed to line up the same way twice. */
+.alchemyRackDrawerBottle {
+  position: absolute;
+  top: 7%;
+  height: 61%;
+  width: auto;
+  aspect-ratio: 150/409;
+  transform: translateX(-50%);
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.4));
+  transition:
+    transform 0.16s ease,
+    filter 0.16s ease,
+    opacity 0.16s ease;
+  /* Without this a touch-drag toward an element cell reads as a page
+     scroll to the browser before the pointermove handler (js/world/
+     alchemy.js) ever gets to call it a drag. */
+  touch-action: none;
+}
+.alchemyRackDrawerBottle img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+.alchemyRackDrawerBottle:hover {
+  transform: translateX(-50%) translateY(-5px);
+}
+/* Once picked, the bottle is standing on the table (the element cell), not
+   sitting on this shelf any more — hidden instead of just glowing in place,
+   per feedback. pointer-events:none so the empty slot it leaves behind
+   isn't a dead click target; picking a *different* bottle still works
+   (select() below un-hides this one and hides the new pick instead), the
+   only way back is choosing another element. */
+.alchemyRackDrawerBottle.selected {
+  opacity: 0;
+  pointer-events: none;
+}
+/* The dragged bottle's own stand-in while a pointer-drag (js/world/
+   alchemy.js) is in flight — a clone positioned at the pointer, the
+   original stays put in the rack (still visible, not yet .selected)
+   until the drop actually lands. */
+.alchemyRackDrawerBottleDragGhost {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 400;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 1;
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.5));
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+/* Ring centres, measured from rack-back.png at 1614px width. Three earlier
+   passes: v296 eyeballed a gridline overlay (200, 412, 623, 835, 1047,
+   1258, 1470 — a guessed 212px step that compounded, ring 1 close and ring
+   7 ~65px off); v299's cv2.matchTemplate pass (212, 412, 611, 810, 1011,
+   1210, 1405) fixed the compounding but carried its own ~7px rightward bias
+   on six of the seven, inherited from a template crop that wasn't quite
+   centered on the ring it was cut from. v300 fits an ellipse to each ring's
+   own edge contour instead (Canny edges, cv2.findContours, cv2.fitEllipse —
+   two independent contours per ring, inner and outer, agreeing to ~1px)
+   rather than comparing rings to each other: 204.5, 405.0, 604.1, 803.0,
+   1003.3, 1201.6, 1401.9 → percent of 1614. */
+.alchemyRackDrawerBottle:nth-child(1) {
+  left: 12.67%;
+}
+.alchemyRackDrawerBottle:nth-child(2) {
+  left: 25.09%;
+}
+.alchemyRackDrawerBottle:nth-child(3) {
+  left: 37.43%;
+}
+.alchemyRackDrawerBottle:nth-child(4) {
+  left: 49.75%;
+}
+.alchemyRackDrawerBottle:nth-child(5) {
+  left: 62.16%;
+}
+.alchemyRackDrawerBottle:nth-child(6) {
+  left: 74.45%;
+}
+.alchemyRackDrawerBottle:nth-child(7) {
+  left: 86.86%;
+}
+
+@media (max-width: 760px) {
+  /* Matches the lockpick case's own mobile width step
+     (css/overrides-05-inventory.css) — the rack was still sized off the
+     760px desktop cap here, noticeably smaller than the case despite
+     sitting right next to it. Bottles and rack art both scale off this
+     width (percentage/aspect-ratio throughout), so widening it alone
+     grows everything in proportion. */
+  .alchemyRackDrawer {
+    --rack-peek: 56px;
+    width: min(96vw, calc(100vw - 16px));
+    max-width: calc(100vw - 16px);
+  }
+}

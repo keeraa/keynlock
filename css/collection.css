@@ -4,7 +4,7 @@
    vary per game-mode theme file; this screen doesn't need to). */
 
 /* ============================================================
-   Full-screen takeover, same pattern as alchemy (css/alchemy.css):
+   Full-screen takeover, same pattern as alchemy (css/alchemy-workshop.css):
    strip the shared modal's chrome (border/background/header) and show
    a fixed top HUD bar instead, so this reads as its own screen rather
    than a dialog box floating over the lair. Reuses alchemy's own blur

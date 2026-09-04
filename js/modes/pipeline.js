@@ -364,7 +364,7 @@
     SFX.break();
     updatePickUI();
     renderPipeline();
-    showGameDefeat('picks',{text:`${msg}. Все отмычки потеряны.`});
+    showGameDefeat('picks',{text:`${msg}. Все отмычки потеряны. Вернись в логово и подготовь новый комплект.`});
   }
 
   function plStep(now){

@@ -266,9 +266,14 @@ let plateEls=[], pinTopPlateEls=[];
     updatePickUI();
     updateEconomyUI();
 
+    if(picks<=0){
+      showPickDepletedLoss();
+      return;
+    }
+
     const msg=PuzzleModes.restartMessage(mode);
     if(notify){
-      toast(roundSupply?.emergency?'Последняя аварийная отмычка выдана в логове':msg);
+      toast(msg);
       SFX.newRound();
     }
   }

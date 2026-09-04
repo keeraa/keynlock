@@ -2,189 +2,8 @@
   'use strict';
 
   const STORAGE_KEY='keynlockRestoredPaintings';
-  const TARGET_SCORE=88;
-  const PAINTINGS=Object.freeze([
-    {id:'sunflowers',title:'Подсолнухи',artist:'Винсент ван Гог',year:'1888',image:'assets/restoration/sunflowers.jpg',colors:['yellow','orange','green']},
-    {id:'starry-night',title:'Звёздная ночь',artist:'Винсент ван Гог',year:'1889',image:'assets/restoration/starry-night.jpg',colors:['blue','yellow','violet']},
-    {id:'great-wave',title:'Большая волна в Канагаве',artist:'Кацусика Хокусай',year:'ок. 1831',image:'assets/restoration/great-wave.jpg',colors:['blue','cyan']},
-    {id:'mona-lisa',title:'Мона Лиза',artist:'Леонардо да Винчи',year:'1503–1519',image:'assets/restoration/mona-lisa.jpg',colors:['green','yellow','orange']},
-    {id:'girl-pearl',title:'Девушка с жемчужной серёжкой',artist:'Ян Вермеер',year:'ок. 1665',image:'assets/restoration/girl-pearl.jpg',colors:['blue','yellow']},
-    {id:'birth-venus',title:'Рождение Венеры',artist:'Сандро Боттичелли',year:'1480-е',image:'assets/restoration/birth-venus.jpg',colors:['cyan','orange','green']},
-    {id:'the-kiss',title:'Поцелуй',artist:'Густав Климт',year:'1907–1908',image:'assets/restoration/the-kiss.jpg',colors:['yellow','orange']},
-    {id:'the-scream',title:'Крик',artist:'Эдвард Мунк',year:'1893',image:'assets/restoration/the-scream.jpg',colors:['orange','blue','violet']},
-    {id:'las-meninas',title:'Менины',artist:'Диего Веласкес',year:'1656',image:'assets/restoration/las-meninas.jpg',colors:['yellow','violet']},
-    {id:'impression-sunrise',title:'Впечатление. Восход солнца',artist:'Клод Моне',year:'1872',image:'assets/restoration/impression-sunrise.jpg',colors:['orange','cyan','blue']},
-    {id:'boating-party',title:'Завтрак гребцов',artist:'Пьер Огюст Ренуар',year:'1880–1881',image:'assets/restoration/impressionism/boating-party.jpg',colors:['blue','orange','yellow'],category:'impressionism'},
-    {id:'moulin-galette',title:'Бал в Мулен де ла Галетт',artist:'Пьер Огюст Ренуар',year:'1876',image:'assets/restoration/impressionism/moulin-galette.jpg',colors:['blue','green','yellow'],category:'impressionism'},
-    {id:'dance-class',title:'Танцевальный класс',artist:'Эдгар Дега',year:'1874',image:'assets/restoration/impressionism/dance-class.jpg',colors:['green','yellow','orange'],category:'impressionism'},
-    {id:'paris-rain',title:'Парижская улица в дождливую погоду',artist:'Гюстав Кайботт',year:'1877',image:'assets/restoration/impressionism/paris-rain.jpg',colors:['blue','cyan','violet'],category:'impressionism'},
-    {id:'woman-parasol',title:'Дама с зонтиком',artist:'Клод Моне',year:'1875',image:'assets/restoration/impressionism/woman-parasol.jpg',colors:['blue','green','yellow'],category:'impressionism'},
-    {id:'water-lilies',title:'Водяные лилии',artist:'Клод Моне',year:'1916',image:'assets/restoration/impressionism/water-lilies.jpg',colors:['blue','green','violet'],category:'impressionism'},
-    {id:'boulevard-montmartre',title:'Бульвар Монмартр весной',artist:'Камиль Писсарро',year:'1897',image:'assets/restoration/impressionism/boulevard-montmartre.jpg',colors:['blue','green','yellow'],category:'impressionism'},
-    {id:'cradle',title:'Колыбель',artist:'Берта Моризо',year:'1872',image:'assets/restoration/impressionism/cradle.jpg',colors:['blue','green','yellow'],category:'impressionism'},
-    {id:'poppies',title:'Маки',artist:'Клод Моне',year:'1873',image:'assets/restoration/impressionism/poppies.jpg',colors:['red','green','blue'],category:'impressionism'},
-    {id:'absinthe',title:'Абсент',artist:'Эдгар Дега',year:'1875–1876',image:'assets/restoration/impressionism/absinthe.jpg',colors:['green','yellow','blue'],category:'impressionism'},
-    {id:'folies-bergere',title:'Бар в «Фоли-Бержер»',artist:'Эдуард Мане',year:'1882',image:'assets/restoration/impressionism/folies-bergere.jpg',colors:['blue','yellow','red'],category:'impressionism'},
-    {id:'montmartre-night',title:'Бульвар Монмартр ночью',artist:'Камиль Писсарро',year:'1897',image:'assets/restoration/impressionism/montmartre-night.jpg',colors:['blue','yellow','orange'],category:'impressionism'},
-    {id:'red-fuji',title:'Красная Фудзи',artist:'Кацусика Хокусай',year:'ок. 1830–1832',image:'assets/restoration/red-fuji.jpg',colors:['red','blue','green']},
-    {id:'kajikazawa',title:'Кадзикадзава в провинции Каи',artist:'Кацусика Хокусай',year:'ок. 1830–1832',image:'assets/restoration/kajikazawa.jpg',colors:['blue','cyan','yellow']},
-    {id:'sea-satta',title:'Море в Сатта, провинция Суруга',artist:'Утагава Хиросигэ',year:'1858',image:'assets/restoration/sea-satta.jpg',colors:['blue','cyan','green']},
-    {id:'sudden-shower',title:'Внезапный ливень над мостом Син-Охаси',artist:'Утагава Хиросигэ',year:'1857',image:'assets/restoration/sudden-shower.jpg',colors:['blue','cyan','violet']},
-    {id:'plum-garden',title:'Сливовый сад в Камэйдо',artist:'Утагава Хиросигэ',year:'1857',image:'assets/restoration/plum-garden.jpg',colors:['red','green','cyan']},
-    {id:'ejiri',title:'Эдзири в провинции Суруга',artist:'Кацусика Хокусай',year:'ок. 1830–1832',image:'assets/restoration/ejiri.jpg',colors:['green','yellow','blue']},
-    {id:'umezawa',title:'Умэдзава в провинции Сагами',artist:'Кацусика Хокусай',year:'ок. 1830–1832',image:'assets/restoration/umezawa.jpg',colors:['green','yellow','blue']},
-    {id:'inume',title:'Перевал Инумэ в провинции Каи',artist:'Кацусика Хокусай',year:'ок. 1830–1832',image:'assets/restoration/inume.jpg',colors:['blue','green','yellow']},
-    {id:'mishima',title:'Перевал Мисима в провинции Каи',artist:'Кацусика Хокусай',year:'ок. 1830–1832',image:'assets/restoration/mishima.jpg',colors:['blue','cyan','green']},
-    {id:'shono',title:'Сёно. Внезапный дождь',artist:'Утагава Хиросигэ',year:'1833–1834',image:'assets/restoration/shono.jpg',colors:['blue','green','violet']},
-    {id:'yokkaichi',title:'Ёккаити',artist:'Утагава Хиросигэ',year:'1833–1834',image:'assets/restoration/yokkaichi.jpg',colors:['blue','green','yellow']},
-    {id:'kameyama',title:'Камэяма',artist:'Утагава Хиросигэ',year:'1833–1834',image:'assets/restoration/kameyama.jpg',colors:['cyan','blue','violet']},
-    {id:'nihonbashi',title:'Нихонбаси. Утро',artist:'Утагава Хиросигэ',year:'1833–1834',image:'assets/restoration/nihonbashi.jpg',colors:['blue','yellow','red']},
-    {id:'kanbara',title:'Камбара. Ночной снег',artist:'Утагава Хиросигэ',year:'1833–1834',image:'assets/restoration/kanbara.jpg',colors:['blue','cyan','violet']},
-    {id:'last-supper',title:'Тайная вечеря',artist:'Леонардо да Винчи',year:'1495–1498',image:'assets/restoration/renaissance/last-supper.jpg',colors:['blue','yellow','red'],category:'renaissance'},
-    {id:'school-of-athens',title:'Афинская школа',artist:'Рафаэль Санти',year:'1509–1511',image:'assets/restoration/renaissance/school-of-athens.jpg',colors:['blue','orange','yellow'],category:'renaissance'},
-    {id:'creation-of-adam',title:'Сотворение Адама',artist:'Микеланджело',year:'ок. 1512',image:'assets/restoration/renaissance/creation-of-adam.jpg',colors:['cyan','orange','green'],category:'renaissance'},
-    {id:'arnolfini-portrait',title:'Портрет четы Арнольфини',artist:'Ян ван Эйк',year:'1434',image:'assets/restoration/renaissance/arnolfini-portrait.jpg',colors:['green','red','yellow'],category:'renaissance'},
-    {id:'primavera',title:'Весна',artist:'Сандро Боттичелли',year:'ок. 1482',image:'assets/restoration/renaissance/primavera.jpg',colors:['green','orange','red'],category:'renaissance'},
-    {id:'sistine-madonna',title:'Сикстинская Мадонна',artist:'Рафаэль Санти',year:'1512–1513',image:'assets/restoration/renaissance/sistine-madonna.jpg',colors:['blue','green','red'],category:'renaissance'},
-    {id:'lady-ermine',title:'Дама с горностаем',artist:'Леонардо да Винчи',year:'1489–1490',image:'assets/restoration/renaissance/lady-ermine.jpg',colors:['blue','green','red'],category:'renaissance'},
-    {id:'castiglione',title:'Портрет Бальдассаре Кастильоне',artist:'Рафаэль Санти',year:'1514–1515',image:'assets/restoration/renaissance/castiglione.jpg',colors:['blue','yellow','violet'],category:'renaissance'},
-    {id:'ghent-altarpiece',title:'Гентский алтарь',artist:'Ян ван Эйк и Хуберт ван Эйк',year:'1432',image:'assets/restoration/renaissance/ghent-altarpiece.jpg',colors:['red','green','yellow'],category:'renaissance'},
-    {id:'garden-earthly-delights',title:'Сад земных наслаждений',artist:'Иероним Босх',year:'ок. 1490–1510',image:'assets/restoration/renaissance/garden-delights.jpg',colors:['blue','green','red'],category:'renaissance'},
-    {id:'assumption-virgin',title:'Вознесение Девы Марии',artist:'Тициан',year:'1516–1518',image:'assets/restoration/renaissance/assumption.jpg',colors:['red','blue','yellow'],category:'renaissance'},
-    {id:'ambassadors',title:'Послы',artist:'Ганс Гольбейн Младший',year:'1533',image:'assets/restoration/renaissance/ambassadors.jpg',colors:['green','red','yellow'],category:'renaissance'},
-    {id:'tower-of-babel',title:'Вавилонская башня',artist:'Питер Брейгель Старший',year:'1563',image:'assets/restoration/renaissance/tower-babel.jpg',colors:['blue','green','orange'],category:'renaissance'},
-    {id:'calling-saint-matthew',title:'Призвание апостола Матфея',artist:'Караваджо',year:'1599–1600',image:'assets/restoration/baroque/calling-saint-matthew.jpg',colors:['yellow','orange','violet'],category:'baroque'},
-    {id:'judith-holofernes',title:'Юдифь, обезглавливающая Олоферна',artist:'Артемизия Джентилески',year:'ок. 1620',image:'assets/restoration/baroque/judith-holofernes.jpg',colors:['red','yellow','violet'],category:'baroque'},
-    {id:'anatomy-lesson',title:'Урок анатомии доктора Тульпа',artist:'Рембрандт',year:'1632',image:'assets/restoration/baroque/anatomy-lesson.jpg',colors:['yellow','orange','violet'],category:'baroque'},
-    {id:'milkmaid',title:'Молочница',artist:'Ян Вермеер',year:'ок. 1658–1660',image:'assets/restoration/baroque/milkmaid.jpg',colors:['blue','yellow','red'],category:'baroque'},
-    {id:'elevation-cross',title:'Воздвижение Креста',artist:'Питер Пауль Рубенс',year:'1610–1611',image:'assets/restoration/baroque/elevation-cross.jpg',colors:['red','yellow','violet'],category:'baroque'},
-    {id:'surrender-breda',title:'Сдача Бреды',artist:'Диего Веласкес',year:'1634–1635',image:'assets/restoration/baroque/surrender-breda.jpg',colors:['blue','green','yellow'],category:'baroque'},
-    {id:'art-of-painting',title:'Искусство живописи',artist:'Ян Вермеер',year:'ок. 1666–1668',image:'assets/restoration/baroque/art-of-painting.jpg',colors:['blue','yellow','orange'],category:'baroque'},
-    {id:'prodigal-son',title:'Возвращение блудного сына',artist:'Рембрандт',year:'ок. 1668–1669',image:'assets/restoration/baroque/prodigal-son.jpg',colors:['red','yellow','violet'],category:'baroque'},
-    {id:'supper-emmaus',title:'Ужин в Эммаусе',artist:'Караваджо',year:'1601',image:'assets/restoration/baroque/supper-emmaus.jpg',colors:['red','green','yellow'],category:'baroque'},
-    {id:'three-graces',title:'Три грации',artist:'Питер Пауль Рубенс',year:'1630–1635',image:'assets/restoration/baroque/three-graces.jpg',colors:['red','green','yellow'],category:'baroque'},
-    {id:'night-watch',title:'Ночной дозор',artist:'Рембрандт',year:'1642',image:'assets/restoration/baroque/night-watch.jpg',colors:['yellow','red','violet'],category:'baroque'},
-    {id:'rokeby-venus',title:'Венера с зеркалом',artist:'Диего Веласкес',year:'1647–1651',image:'assets/restoration/baroque/rokeby-venus.jpg',colors:['red','blue','yellow'],category:'baroque'},
-    {id:'jewish-bride',title:'Еврейская невеста',artist:'Рембрандт',year:'ок. 1665–1669',image:'assets/restoration/baroque/jewish-bride.jpg',colors:['red','yellow','green'],category:'baroque'},
-    {id:'rococo-swing',title:'Качели',artist:'Жан-Оноре Фрагонар',year:'1767',image:'assets/restoration/rococo/swing.jpg',colors:['green','red','yellow'],category:'rococo'},
-    {id:'rococo-cythera',title:'Паломничество на остров Киферу',artist:'Антуан Ватто',year:'1717',image:'assets/restoration/rococo/cythera.jpg',colors:['green','blue','orange'],category:'rococo'},
-    {id:'rococo-pierrot',title:'Пьеро',artist:'Антуан Ватто',year:'ок. 1718–1719',image:'assets/restoration/rococo/pierrot.jpg',colors:['yellow','green','blue'],category:'rococo'},
-    {id:'rococo-gersaint',title:'Вывеска лавки Жерсена',artist:'Антуан Ватто',year:'1720',image:'assets/restoration/rococo/gersaint.jpg',colors:['red','yellow','blue'],category:'rococo'},
-    {id:'rococo-stolen-kiss',title:'Украденный поцелуй',artist:'Жан-Оноре Фрагонар',year:'конец 1780-х',image:'assets/restoration/rococo/stolen-kiss.jpg',colors:['red','green','yellow'],category:'rococo'},
-    {id:'rococo-reader',title:'Читающая девушка',artist:'Жан-Оноре Фрагонар',year:'ок. 1770',image:'assets/restoration/rococo/reader.jpg',colors:['yellow','violet','orange'],category:'rococo'},
-    {id:'rococo-bolt',title:'Задвижка',artist:'Жан-Оноре Фрагонар',year:'1777',image:'assets/restoration/rococo/bolt.jpg',colors:['red','yellow','violet'],category:'rococo'},
-    {id:'rococo-blind-mans-bluff',title:'Жмурки',artist:'Жан-Оноре Фрагонар',year:'ок. 1750–1752',image:'assets/restoration/rococo/blind-mans-bluff.jpg',colors:['blue','red','green'],category:'rococo'},
-    {id:'rococo-diana-bath',title:'Диана после купания',artist:'Франсуа Буше',year:'1742',image:'assets/restoration/rococo/diana-bath.jpg',colors:['blue','green','orange'],category:'rococo'},
-    {id:'rococo-breakfast',title:'Завтрак',artist:'Франсуа Буше',year:'1739',image:'assets/restoration/rococo/pompadour.jpg',colors:['red','yellow','green'],category:'rococo'},
-    {id:'rococo-venus-toilet',title:'Туалет Венеры',artist:'Франсуа Буше',year:'1751',image:'assets/restoration/rococo/venus-toilet.jpg',colors:['blue','yellow','orange'],category:'rococo'},
-    {id:'rococo-triumph-venus',title:'Триумф Венеры',artist:'Франсуа Буше',year:'1740',image:'assets/restoration/rococo/triumph-venus.jpg',colors:['blue','red','yellow'],category:'rococo'},
-    {id:'rococo-meeting',title:'Встреча',artist:'Жан-Оноре Фрагонар',year:'1771–1773',image:'assets/restoration/rococo/lover-crowned.jpg',colors:['green','red','blue'],category:'rococo'},
-    {id:'rococo-mezzetin',title:'Меццетен',artist:'Антуан Ватто',year:'ок. 1718–1720',image:'assets/restoration/rococo/mezzetin.jpg',colors:['red','blue','yellow'],category:'rococo'},
-    {id:'rococo-rinaldo-armida',title:'Ринальдо и Армида',artist:'Франсуа Буше',year:'1734',image:'assets/restoration/rococo/rinaldo-armida.jpg',colors:['red','blue','yellow'],category:'rococo'},
-    {id:'adele-bloch-bauer',title:'Портрет Адели Блох-Бауэр I',artist:'Густав Климт',year:'1907',image:'assets/restoration/modern/adele-bloch-bauer.jpg',colors:['yellow','orange','green'],category:'modern'},
-    {id:'judith-i',title:'Юдифь I',artist:'Густав Климт',year:'1901',image:'assets/restoration/modern/judith-i.jpg',colors:['yellow','green','violet'],category:'modern'},
-    {id:'mucha-dance',title:'Танец',artist:'Альфонс Муха',year:'1898',image:'assets/restoration/modern/mucha-dance.jpg',colors:['red','orange','green'],category:'modern'},
-    {id:'munch-madonna',title:'Мадонна',artist:'Эдвард Мунк',year:'1894–1895',image:'assets/restoration/modern/munch-madonna.jpg',colors:['red','blue','violet'],category:'modern'},
-    {id:'composition-vii',title:'Композиция VII',artist:'Василий Кандинский',year:'1913',image:'assets/restoration/modern/composition-vii.jpg',colors:['red','blue','yellow'],category:'modern'},
-    {id:'schiele-self-portrait',title:'Автопортрет с физалисом',artist:'Эгон Шиле',year:'1912',image:'assets/restoration/modern/schiele-self-portrait.jpg',colors:['orange','green','violet'],category:'modern'},
-    {id:'blue-horse',title:'Синяя лошадь I',artist:'Франц Марк',year:'1911',image:'assets/restoration/modern/blue-horse.jpg',colors:['blue','red','yellow'],category:'modern'},
-    {id:'woman-with-hat',title:'Женщина в шляпе',artist:'Анри Матисс',year:'1905',image:'assets/restoration/modern/woman-with-hat.jpg',colors:['green','red','violet'],category:'modern'},
-    {id:'tree-of-life',title:'Древо жизни',artist:'Густав Климт',year:'1905–1909',image:'assets/restoration/modern/tree-life.jpg',colors:['yellow','orange','green'],category:'modern'},
-    {id:'matisse-dance',title:'Танец',artist:'Анри Матисс',year:'1910',image:'assets/restoration/modern/dance-matisse.jpg',colors:['red','blue','green'],category:'modern'},
-    {id:'franz-marc-fox',title:'Лиса',artist:'Франц Марк',year:'1911',image:'assets/restoration/modern/fox.jpg',colors:['red','blue','yellow'],category:'modern'},
-    {id:'portrait-wally',title:'Портрет Валли',artist:'Эгон Шиле',year:'1912',image:'assets/restoration/modern/wally.jpg',colors:['red','green','yellow'],category:'modern'},
-    {id:'composition-viii',title:'Композиция VIII',artist:'Василий Кандинский',year:'1923',image:'assets/restoration/modern/composition-viii.jpg',colors:['red','blue','yellow'],category:'modern'},
-    {id:'wanderer',title:'Странник над морем тумана',artist:'Каспар Давид Фридрих',year:'ок. 1818',image:'assets/restoration/romanticism/wanderer.jpg',colors:['blue','green','violet'],category:'romanticism'},
-    {id:'liberty',title:'Свобода, ведущая народ',artist:'Эжен Делакруа',year:'1830',image:'assets/restoration/romanticism/liberty.jpg',colors:['red','blue','yellow'],category:'romanticism'},
-    {id:'raft-medusa',title:'Плот «Медузы»',artist:'Теодор Жерико',year:'1818–1819',image:'assets/restoration/romanticism/raft-medusa.jpg',colors:['yellow','orange','violet'],category:'romanticism'},
-    {id:'third-may',title:'Третье мая 1808 года',artist:'Франсиско Гойя',year:'1814',image:'assets/restoration/romanticism/third-may.jpg',colors:['yellow','red','violet'],category:'romanticism'},
-    {id:'fighting-temeraire',title:'Последний рейс корабля «Отважный»',artist:'Уильям Тёрнер',year:'1839',image:'assets/restoration/romanticism/fighting-temeraire.jpg',colors:['yellow','orange','blue'],category:'romanticism'},
-    {id:'hay-wain',title:'Телега для сена',artist:'Джон Констебл',year:'1821',image:'assets/restoration/romanticism/hay-wain.jpg',colors:['green','blue','yellow'],category:'romanticism'},
-    {id:'nightmare',title:'Кошмар',artist:'Иоганн Генрих Фюсли',year:'1781',image:'assets/restoration/romanticism/nightmare.jpg',colors:['red','yellow','violet'],category:'romanticism'},
-    {id:'monk-sea',title:'Монах у моря',artist:'Каспар Давид Фридрих',year:'1808–1810',image:'assets/restoration/romanticism/monk-sea.jpg',colors:['blue','cyan','violet'],category:'romanticism'},
-    {id:'saturn-devouring-son',title:'Сатурн, пожирающий своего сына',artist:'Франсиско Гойя',year:'1819–1823',image:'assets/restoration/romanticism/saturn.jpg',colors:['red','yellow','violet'],category:'romanticism'},
-    {id:'sea-of-ice',title:'Море льда',artist:'Каспар Давид Фридрих',year:'1823–1824',image:'assets/restoration/romanticism/sea-ice.jpg',colors:['blue','cyan','yellow'],category:'romanticism'},
-    {id:'slave-ship',title:'Невольничий корабль',artist:'Уильям Тёрнер',year:'1840',image:'assets/restoration/romanticism/slave-ship.jpg',colors:['red','orange','blue'],category:'romanticism'},
-    {id:'rain-steam-speed',title:'Дождь, пар и скорость',artist:'Уильям Тёрнер',year:'1844',image:'assets/restoration/romanticism/rain-steam-speed.jpg',colors:['yellow','blue','green'],category:'romanticism'},
-    {id:'death-sardanapalus',title:'Смерть Сарданапала',artist:'Эжен Делакруа',year:'1827',image:'assets/restoration/romanticism/sardanapalus.jpg',colors:['red','yellow','orange'],category:'romanticism'},
-    {id:'salisbury-cathedral',title:'Солсберийский собор с лугов',artist:'Джон Констебл',year:'1831',image:'assets/restoration/romanticism/salisbury.jpg',colors:['green','blue','yellow'],category:'romanticism'},
-    {id:'lady-of-shalott',title:'Леди Шалотт',artist:'Джон Уильям Уотерхаус',year:'1888',image:'assets/restoration/romanticism/lady-shalott.jpg',colors:['red','green','yellow'],category:'romanticism'},
-    {id:'isle-dead',title:'Остров мёртвых',artist:'Арнольд Бёклин',year:'1883',image:'assets/restoration/symbolism/isle-dead.jpg',colors:['green','blue','violet'],category:'symbolism'},
-    {id:'oedipus-sphinx',title:'Эдип и Сфинкс',artist:'Гюстав Моро',year:'1864',image:'assets/restoration/symbolism/oedipus-sphinx.jpg',colors:['red','orange','violet'],category:'symbolism'},
-    {id:'hope',title:'Надежда',artist:'Джордж Фредерик Уоттс',year:'1886',image:'assets/restoration/symbolism/hope.jpg',colors:['blue','green','yellow'],category:'symbolism'},
-    {id:'death-life',title:'Смерть и жизнь',artist:'Густав Климт',year:'1910–1915',image:'assets/restoration/symbolism/death-life.jpg',colors:['blue','red','yellow'],category:'symbolism'},
-    {id:'wounded-angel',title:'Раненый ангел',artist:'Хуго Симберг',year:'1903',image:'assets/restoration/symbolism/wounded-angel.jpg',colors:['blue','green','yellow'],category:'symbolism'},
-    {id:'jupiter-semele',title:'Юпитер и Семела',artist:'Гюстав Моро',year:'1894–1895',image:'assets/restoration/symbolism/jupiter-semele.jpg',colors:['blue','yellow','violet'],category:'symbolism'},
-    {id:'the-sin',title:'Грех',artist:'Франц фон Штук',year:'1893',image:'assets/restoration/symbolism/the-sin.jpg',colors:['green','red','violet'],category:'symbolism'},
-    {id:'poor-fisherman',title:'Бедный рыбак',artist:'Пюви де Шаванн',year:'1881',image:'assets/restoration/symbolism/poor-fisherman.jpg',colors:['blue','green','orange'],category:'symbolism'},
-    {id:'apparition',title:'Видение',artist:'Гюстав Моро',year:'ок. 1876',image:'assets/restoration/symbolism/apparition.jpg',colors:['red','yellow','violet'],category:'symbolism'},
-    {id:'cyclops',title:'Циклоп',artist:'Одилон Редон',year:'ок. 1914',image:'assets/restoration/symbolism/cyclops.jpg',colors:['yellow','green','blue'],category:'symbolism'},
-    {id:'demon-seated',title:'Демон сидящий',artist:'Михаил Врубель',year:'1890',image:'assets/restoration/symbolism/demon-seated.jpg',colors:['blue','violet','orange'],category:'symbolism'},
-    {id:'rex',title:'Король',artist:'Микалоюс Чюрлёнис',year:'1904–1905',image:'assets/restoration/symbolism/rex.jpg',colors:['blue','yellow','green'],category:'symbolism'},
-    {id:'symbolist-dream',title:'Сон',artist:'Пюви де Шаванн',year:'1883',image:'assets/restoration/symbolism/dream.jpg',colors:['blue','green','yellow'],category:'symbolism'},
-    {id:'kiss-sphinx',title:'Поцелуй Сфинкса',artist:'Франц фон Штук',year:'1895',image:'assets/restoration/symbolism/kiss-sphinx.jpg',colors:['red','yellow','violet'],category:'symbolism'},
-    {id:'death-gravedigger',title:'Смерть и могильщик',artist:'Карлос Швабе',year:'ок. 1895',image:'assets/restoration/symbolism/death-gravedigger.jpg',colors:['green','blue','violet'],category:'symbolism'},
-    {id:'persistence-memory',title:'Постоянство памяти',artist:'Сальвадор Дали',year:'1931',image:'assets/restoration/surrealism/persistence-memory.jpg',colors:['blue','yellow','orange'],category:'surrealism'},
-    {id:'son-of-man',title:'Сын человеческий',artist:'Рене Магритт',year:'1964',image:'assets/restoration/surrealism/son-of-man.jpg',colors:['green','blue','red'],category:'surrealism'},
-    {id:'treachery-images',title:'Вероломство образов',artist:'Рене Магритт',year:'1929',image:'assets/restoration/surrealism/treachery-images.jpg',colors:['yellow','orange','violet'],category:'surrealism'},
-    {id:'elephants',title:'Слоны',artist:'Сальвадор Дали',year:'1948',image:'assets/restoration/surrealism/elephants.jpg',colors:['blue','orange','red'],category:'surrealism'},
-    {id:'human-condition',title:'Условия человеческого существования',artist:'Рене Магритт',year:'1933',image:'assets/restoration/surrealism/human-condition.jpg',colors:['blue','green','yellow'],category:'surrealism'},
-    {id:'golconda',title:'Голконда',artist:'Рене Магритт',year:'1953',image:'assets/restoration/surrealism/golconda.jpg',colors:['blue','red','violet'],category:'surrealism'},
-    {id:'narcissus',title:'Метаморфозы Нарцисса',artist:'Сальвадор Дали',year:'1937',image:'assets/restoration/surrealism/narcissus.jpg',colors:['blue','orange','yellow'],category:'surrealism'},
-    {id:'swans-elephants',title:'Лебеди, отражённые в слонах',artist:'Сальвадор Дали',year:'1937',image:'assets/restoration/surrealism/swans-elephants.jpg',colors:['blue','orange','green'],category:'surrealism'},
-    {id:'magritte-lovers',title:'Влюблённые',artist:'Рене Магритт',year:'1928',image:'assets/restoration/surrealism/lovers.jpg',colors:['blue','red','yellow'],category:'surrealism'},
-    {id:'false-mirror',title:'Ложное зеркало',artist:'Рене Магритт',year:'1928',image:'assets/restoration/surrealism/false-mirror.jpg',colors:['blue','cyan','yellow'],category:'surrealism'},
-    {id:'time-transfixed',title:'Пронзённое время',artist:'Рене Магритт',year:'1938',image:'assets/restoration/surrealism/time-transfixed.jpg',colors:['red','green','violet'],category:'surrealism'},
-    {id:'harlequin-carnival',title:'Карнавал Арлекина',artist:'Жоан Миро',year:'1924–1925',image:'assets/restoration/surrealism/harlequin-carnival.jpg',colors:['red','blue','yellow'],category:'surrealism'},
-    {id:'dream-flight-bee',title:'Сон, вызванный полётом пчелы',artist:'Сальвадор Дали',year:'1944',image:'assets/restoration/surrealism/dream-bee.jpg',colors:['blue','yellow','orange'],category:'surrealism'},
-    {id:'miro-painting-1936',title:'Живопись',artist:'Жоан Миро',year:'1936',image:'assets/restoration/surrealism/painting-1936.jpg',colors:['red','blue','yellow'],category:'surrealism'},
-    {id:'surrealism-and-painting',title:'Сюрреализм и живопись',artist:'Макс Эрнст',year:'1942',image:'assets/restoration/surrealism/surrealism-painting.jpg',colors:['red','green','yellow'],category:'surrealism'},
-    {id:'journey-sichuan',title:'Путешествие императора Минхуана в Сычуань',artist:'Неизвестный мастер эпохи Тан',year:'VIII век',image:'assets/restoration/china/journey-sichuan.jpg',colors:['green','blue','yellow'],category:'china'},
-    {id:'listening-qin',title:'Император Хуэйцзун слушает цинь',artist:'Неизвестный придворный мастер',year:'XI–XII век',image:'assets/restoration/china/listening-qin.jpg',colors:['green','red','yellow'],category:'china'},
-    {id:'ladies-silk',title:'Придворные дамы готовят шёлк',artist:'Чжан Сюань',year:'VIII век',image:'assets/restoration/china/ladies-silk.jpg',colors:['red','yellow','green'],category:'china'},
-    {id:'court-ladies',title:'Придворные дамы с цветами в волосах',artist:'Чжоу Фан',year:'VIII век',image:'assets/restoration/china/court-ladies.jpg',colors:['red','yellow','green'],category:'china'},
-    {id:'han-palace',title:'Весеннее утро во дворце Хань',artist:'Цю Ин',year:'XVI век',image:'assets/restoration/china/han-palace.jpg',colors:['red','green','yellow'],category:'china'},
-    {id:'nomad-flute',title:'Восемнадцать песен кочевой флейты',artist:'Неизвестный мастер',year:'XIV век',image:'assets/restoration/china/nomad-flute.jpg',colors:['green','red','yellow'],category:'china'},
-    {id:'qianlong-hunt',title:'Император Цяньлун на охоте',artist:'Джузеппе Кастильоне',year:'XVIII век',image:'assets/restoration/china/qianlong-hunt.jpg',colors:['red','green','yellow'],category:'china'},
-    {id:'tibetan-envoy',title:'Император Тай-цзун принимает тибетского посла',artist:'Янь Либэнь',year:'VII век',image:'assets/restoration/china/tibetan-envoy.jpg',colors:['red','green','yellow'],category:'china'},
-    {id:'double-sixes',title:'Придворные дамы играют в шуанлу',artist:'Чжоу Фан',year:'VIII век',image:'assets/restoration/china/double-sixes.jpg',colors:['red','green','yellow'],category:'china'},
-    {id:'auspicious-cranes',title:'Благоприятные журавли',artist:'Император Хуэйцзун',year:'1112',image:'assets/restoration/china/auspicious-cranes.jpg',colors:['blue','yellow','red'],category:'china'},
-    {id:'night-revels',title:'Ночной пир Хань Сицзая',artist:'Гу Хунчжун',year:'X век',image:'assets/restoration/china/night-revels.jpg',colors:['red','green','yellow'],category:'china'},
-    {id:'peach-blossom-spring',title:'Источник персиковых цветов',artist:'Цю Ин',year:'XVI век',image:'assets/restoration/china/peach-blossom.jpg',colors:['red','green','blue'],category:'china'},
-    {id:'birds-flowers',title:'Птицы и цветы четырёх сезонов',artist:'Бянь Вэньцзинь',year:'XV век',image:'assets/restoration/china/birds-flowers.jpg',colors:['green','red','yellow'],category:'china'},
-    {id:'qianlong-armour',title:'Император Цяньлун в церемониальных доспехах',artist:'Джузеппе Кастильоне',year:'1739',image:'assets/restoration/china/qianlong-armour.jpg',colors:['yellow','red','blue'],category:'china'},
-    {id:'kangxi-southern-tour',title:'Южная инспекционная поездка императора Канси',artist:'Ван Хуэй и помощники',year:'1698',image:'assets/restoration/china/kangxi-tour.jpg',colors:['green','blue','yellow'],category:'china'},
-    {id:'lovers-moon',title:'Влюблённые под луной',artist:'Син Юн Бок',year:'конец XVIII века',image:'assets/restoration/korea/lovers-moon.jpg',colors:['blue','red','yellow'],category:'korea'},
-    {id:'tiger-magpie',title:'Тигр и сорока',artist:'Неизвестный мастер минхва',year:'XIX век',image:'assets/restoration/korea/tiger-magpie.jpg',colors:['green','red','yellow'],category:'korea'},
-    {id:'korean-beauty',title:'Портрет красавицы',artist:'Син Юн Бок',year:'конец XVIII века',image:'assets/restoration/korea/beauty.jpg',colors:['red','yellow','green'],category:'korea'},
-    {id:'dancing-boy',title:'Танцующий мальчик',artist:'Ким Хон До',year:'конец XVIII века',image:'assets/restoration/korea/dancing-boy.jpg',colors:['red','blue','yellow'],category:'korea'},
-    {id:'ssireum',title:'Ссирым',artist:'Ким Хон До',year:'конец XVIII века',image:'assets/restoration/korea/ssireum.jpg',colors:['yellow','orange','blue'],category:'korea'},
-    {id:'tiger-pine',title:'Тигр под сосной',artist:'Ким Хон До',year:'XVIII век',image:'assets/restoration/korea/tiger-pine.jpg',colors:['green','yellow','orange'],category:'korea'},
-    {id:'royal-procession',title:'Королевская процессия в Хвасон',artist:'Придворные художники Чосон',year:'1795',image:'assets/restoration/korea/royal-procession.jpg',colors:['red','blue','yellow'],category:'korea'},
-    {id:'sun-moon-peaks',title:'Солнце, Луна и пять вершин',artist:'Неизвестный мастер Чосон',year:'XIX век',image:'assets/restoration/korea/sun-moon-peaks.jpg',colors:['red','blue','green'],category:'korea'},
-    {id:'cats-sparrows',title:'Кошки и воробьи',artist:'Пён Санбёк',year:'XVIII век',image:'assets/restoration/korea/cats-sparrows.jpg',colors:['green','yellow','red'],category:'korea'},
-    {id:'dano-day',title:'Праздник Дано',artist:'Син Юн Бок',year:'конец XVIII века',image:'assets/restoration/korea/dano-day.jpg',colors:['red','green','blue'],category:'korea'},
-    {id:'geomungo-women',title:'Женщины выбирают комунго',artist:'Син Юн Бок',year:'конец XVIII века',image:'assets/restoration/korea/geomungo-women.jpg',colors:['red','yellow','blue'],category:'korea'},
-    {id:'board-game',title:'Игра в традиционную настольную игру',artist:'Син Юн Бок',year:'конец XVIII века',image:'assets/restoration/korea/board-game.jpg',colors:['green','red','yellow'],category:'korea'},
-    {id:'welcoming-governor',title:'Встреча губернатора Пхёнана',artist:'Ким Хон До',year:'конец XVIII века',image:'assets/restoration/korea/welcoming-governor.jpg',colors:['red','blue','yellow'],category:'korea'},
-    {id:'lotus-dragonflies',title:'Лотосы и стрекозы',artist:'Ким Хон До',year:'XVIII век',image:'assets/restoration/korea/lotus-dragonflies.jpg',colors:['green','red','blue'],category:'korea'},
-    {id:'flowers-birds-minhwa',title:'Цветы и птицы',artist:'Неизвестный мастер минхва',year:'XIX век',image:'assets/restoration/korea/flowers-birds.jpg',colors:['red','green','yellow'],category:'korea'},
-    {id:'bharat-mata',title:'Мать-Индия',artist:'Абаниндранат Тагор',year:'1905',image:'assets/restoration/india/bharat-mata.jpg',colors:['orange','yellow','green'],category:'india'},
-    {id:'shakuntala',title:'Шакунтала',artist:'Раджа Рави Варма',year:'1870',image:'assets/restoration/india/shakuntala.jpg',colors:['green','red','yellow'],category:'india'},
-    {id:'hamsa-damayanti',title:'Дамаянти беседует с лебедем',artist:'Раджа Рави Варма',year:'1899',image:'assets/restoration/india/hamsa-damayanti.jpg',colors:['blue','yellow','orange'],category:'india'},
-    {id:'galaxy-musicians',title:'Галактика музыкантов',artist:'Раджа Рави Варма',year:'1889',image:'assets/restoration/india/galaxy-musicians.jpg',colors:['red','blue','yellow'],category:'india'},
-    {id:'akbar-elephant',title:'Акбар укрощает слона Хаваи',artist:'Басаван и Четар Мунти',year:'ок. 1590',image:'assets/restoration/india/akbar-elephant.jpg',colors:['red','green','yellow'],category:'india'},
-    {id:'bani-thani',title:'Бани Тхани',artist:'Нихал Чанд',year:'ок. 1750',image:'assets/restoration/india/bani-thani.jpg',colors:['green','red','yellow'],category:'india'},
-    {id:'radha-krishna',title:'Кришна с гопи и печаль Радхи',artist:'Пуркху из Кангры',year:'1810–1820',image:'assets/restoration/india/radha-krishna.jpg',colors:['green','blue','red'],category:'india'},
-    {id:'lakshmi',title:'Богиня Лакшми',artist:'Раджа Рави Варма',year:'1896',image:'assets/restoration/india/lakshmi.jpg',colors:['red','yellow','green'],category:'india'},
-    {id:'keechaka-sairandhri',title:'Кичака и Сайрандхри',artist:'Раджа Рави Варма',year:'1890',image:'assets/restoration/india/keechaka-sairandhri.jpg',colors:['red','green','yellow'],category:'india'},
-    {id:'there-comes-papa',title:'Папа идёт',artist:'Раджа Рави Варма',year:'1893',image:'assets/restoration/india/there-comes-papa.jpg',colors:['red','green','yellow'],category:'india'},
-    {id:'india-milkmaid',title:'Молочница',artist:'Раджа Рави Варма',year:'1904',image:'assets/restoration/india/milkmaid.jpg',colors:['blue','red','yellow'],category:'india'},
-    {id:'krishna-holi',title:'Кришна празднует Холи с Радхой и гопи',artist:'Нихал Чанд',year:'1750–1760',image:'assets/restoration/india/krishna-holi.jpg',colors:['red','blue','yellow'],category:'india'},
-    {id:'birth-krishna',title:'Рождение Кришны',artist:'Мастер школы Кангра',year:'1790',image:'assets/restoration/india/birth-krishna.jpg',colors:['blue','red','yellow'],category:'india'},
-    {id:'murugan',title:'Муруган',artist:'Раджа Рави Варма',year:'XIX век',image:'assets/restoration/india/murugan.jpg',colors:['red','yellow','green'],category:'india'},
-    {id:'jatayu-vadham',title:'Равана похищает Ситу и сражается с Джатаю',artist:'Раджа Рави Варма',year:'1895',image:'assets/restoration/india/jatayu.jpg',colors:['red','green','yellow'],category:'india'}
-  ]);
+  const TARGET_SCORE=window.KeynlockContent.restoration.targetScore;
+  const PAINTINGS=window.KeynlockContent.paintings;
   const DAMAGE=Object.freeze({hue:[-44,-38,-31,-25,24,29,36,43],sat:[.62,.70,.78,1.22,1.30,1.38],light:[.74,.82,.88,1.12,1.20,1.28]});
   const TEXTURES=Object.freeze({
     dirt:['mask_dirt_light_dust.png','mask_dirt_heavy_dust.png','mask_dirt_soot.png','mask_dirt_streaks.png','mask_old_varnish.png'].map(name=>`assets/restoration/masks/${name}`),
@@ -205,10 +24,10 @@
     damagedArea:root.querySelector('[data-restoration-art="damaged"]'),dirt:root.querySelector('#restorationDirtSurface'),repair:root.querySelector('#restorationRepairSurface'),overpaint:root.querySelector('#restorationOverpaintSurface'),uv:root.querySelector('#restorationUvSurface'),scan:root.querySelector('#restorationScanSurface'),activeTool:root.querySelector('#restorationActiveTool'),toolEffect:root.querySelector('#restorationToolEffect'),drawer:document.querySelector('#restorationInventoryDrawer'),drawerToggle:document.querySelector('#restorationInventoryToggle'),tools:[...document.querySelectorAll('#restorationInventoryDrawer [data-restoration-tool]')]
   };
   let completed={};
-  try{completed=JSON.parse(STORE.getItem(STORAGE_KEY)||'{}')||{};}catch(_){completed={};}
+  completed=STORE.getJSON(STORAGE_KEY,{})||{};
   function ownedPaintingIds(){
     try{
-      const ids=JSON.parse(STORE.getItem('keynlockOwnedPaintings')||'[]');
+      const ids=STORE.getJSON('keynlockOwnedPaintings',[]);
       return new Set(Array.isArray(ids)?ids:[]);
     }catch(_){return new Set();}
   }
@@ -233,9 +52,9 @@
   };
   const pick=array=>array[Math.floor(Math.random()*array.length)];
   const current=()=>PAINTINGS[state.painting];
-  const JAPANESE_IDS=new Set(['great-wave','red-fuji','kajikazawa','sea-satta','sudden-shower','plum-garden','ejiri','umezawa','inume','mishima','shono','yokkaichi','kameyama','nihonbashi','kanbara']);
+  const JAPANESE_IDS=new Set(window.KeynlockContent.restoration.japaneseIds);
   const categoryOf=painting=>painting.category||(JAPANESE_IDS.has(painting.id)?'japan':(['mona-lisa','birth-venus'].includes(painting.id)?'renaissance':(['girl-pearl','las-meninas'].includes(painting.id)?'baroque':(['sunflowers','starry-night','impression-sunrise'].includes(painting.id)?'impressionism':'modern'))));
-  const PAINTING_DISTRICTS=Object.freeze({japan:'port',china:'port',korea:'port',india:'port',impressionism:'arts',modern:'arts',rococo:'bohemian',romanticism:'bohemian',symbolism:'bohemian',surrealism:'industrial',renaissance:'upper',baroque:'upper'});
+  const PAINTING_DISTRICTS=window.KeynlockContent.restoration.categoryDistricts;
   const districtOf=painting=>{
     const categoryDistrict=PAINTING_DISTRICTS[categoryOf(painting)]||'arts';
     if(categoryDistrict==='port') return 'port';
@@ -254,7 +73,7 @@
     [...roman[0]].reverse().forEach(character=>{const value=values[character];if(value<previous)total-=value;else{total+=value;previous=value;}});
     return Math.max(0,(total-1)*100);
   }
-  const ORDER_CATEGORIES=[['all','Все'],['japan','Укиё-э'],['china','Китай'],['korea','Корея'],['india','Индия'],['renaissance','Возрождение'],['baroque','Барокко'],['rococo','Рококо'],['impressionism','Импрессионизм'],['modern','Модерн'],['romanticism','Романтизм'],['symbolism','Символизм'],['surrealism','Сюрреализм']];
+  const ORDER_CATEGORIES=window.KeynlockContent.restoration.orderCategories;
   let orderCategory='all';
 
   function filterValue(){
@@ -519,7 +338,7 @@
       return;
     }
     completed[painting.id]={score:value,completedAt:new Date().toISOString()};
-    STORE.setItem(STORAGE_KEY,JSON.stringify(completed));
+    STORE.setJSON(STORAGE_KEY,completed);
     const result=window.KeynlockResources?.awardRestoration?.({coins:50,componentCount:2,preferredColors:painting.colors})||{coins:50,components:{}};
     elements.hint.textContent='Картина восстановлена и возвращена заказчику.';
     elements.reward.innerHTML=rewardMarkup(result);

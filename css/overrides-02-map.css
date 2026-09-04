@@ -133,6 +133,9 @@
 #worldMapCanvas .mapNode.mapPreviewNode:hover .mapMissionPreview,#worldMapCanvas .mapNode.mapPreviewNode:focus-visible .mapMissionPreview{width:179px;height:101px;border-color:#d6ab5e;box-shadow:0 12px 30px rgba(0,0,0,.7);}
 #worldMapCanvas .mapNode.mapPreviewNode:hover .mapMissionPreview>img,#worldMapCanvas .mapNode.mapPreviewNode:focus-visible .mapMissionPreview>img{filter:saturate(.95) brightness(.86);transform:scale(1.035);}
 #worldMapCanvas .mapMissionReadiness{position:absolute;right:7px;top:6px;z-index:2;min-width:23px;height:23px;padding:0 5px;display:grid;place-items:center;border:1px solid rgba(232,194,114,.72);border-radius:7px;background:rgba(20,15,10,.86);color:#f0ca79;font:700 13px/1 Arial,sans-serif;box-shadow:0 2px 7px rgba(0,0,0,.5);}
+#worldMapCanvas .missionNode.no-picks .mapMissionPreview>img{filter:grayscale(.82) saturate(.25) brightness(.38);}
+#worldMapCanvas .missionNode.no-picks :is(.mapNodeLabel,.mapMissionDistrict){opacity:.58;}
+#worldMapCanvas .mapMissionUnavailable{position:absolute;z-index:3;left:50%;top:50%;padding:4px 6px;transform:translate(-50%,-50%);border:1px solid rgba(190,145,77,.5);border-radius:6px;background:rgba(18,13,10,.92);color:#d1b17a;font:700 8px/1 Arial,sans-serif;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;}
 #worldMapCanvas .mapNodeTiers{position:absolute;left:0;right:0;bottom:6px;z-index:2;display:flex;gap:6px;justify-content:center;margin:0;opacity:0;transform:translateY(5px);transition:opacity .2s ease .2s,transform .2s ease .2s;}
 #worldMapCanvas .mapNode.mapPreviewNode:hover .mapNodeTiers,#worldMapCanvas .mapNode.mapPreviewNode:focus-visible .mapNodeTiers{opacity:1;transform:translateY(0);}
 #worldMapCanvas .mapTierPip{width:18px;height:18px;border-radius:50%;background:rgba(30,23,16,.75);box-shadow:inset 0 0 0 1px rgba(196,166,110,.45);}

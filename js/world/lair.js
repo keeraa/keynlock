@@ -1,5 +1,5 @@
   function saveLairIntel(){
-    STORE.setItem('lockpickLairIntel',JSON.stringify(lairIntel));
+    STORE.setJSON('lockpickLairIntel',lairIntel);
   }
 
   const LAIR_MODULE_TITLES={team:'Выбор персонажа',dialogue:'Диалоги',city:'Анализ города',alchemy:'Алхимия',collection:'Коллекция',restoration:'Мастерская'};

@@ -1,22 +1,10 @@
-  const KEYNLOCK_COMPONENTS=Object.freeze([
-    {id:'red',name:'Красный',color:'#b9473f'},
-    {id:'orange',name:'Оранжевый',color:'#d9853d'},
-    {id:'yellow',name:'Жёлтый',color:'#d7bd4a'},
-    {id:'green',name:'Зелёный',color:'#55945d'},
-    {id:'cyan',name:'Голубой',color:'#59a9b8'},
-    {id:'blue',name:'Синий',color:'#506fae'},
-    {id:'violet',name:'Фиолетовый',color:'#875c9e'}
-  ]);
-  const KEYNLOCK_LOCK_LOOT_TABLE=Object.freeze({
-    1:Object.freeze({coinMultiplier:1,parts:[1,2],components:[1,1],handleChance:.02,paintingChance:.2}),
-    2:Object.freeze({coinMultiplier:1.4,parts:[2,3],components:[1,2],handleChance:.04,paintingChance:.35}),
-    3:Object.freeze({coinMultiplier:2,parts:[3,5],components:[2,3],handleChance:.07,paintingChance:.5})
-  });
+  const KEYNLOCK_COMPONENTS=window.KeynlockContent.economy.components;
+  const KEYNLOCK_LOCK_LOOT_TABLE=window.KeynlockContent.economy.lockLoot;
 
   function loadKeynlockResources(){
     const fallback={picks:3,parts:0,oil:0,oilerCapacity:3,components:Object.fromEntries(KEYNLOCK_COMPONENTS.map(item=>[item.id,0]))};
     try{
-      const saved=JSON.parse(STORE.getItem('keynlockResources')||'null');
+      const saved=STORE.getJSON('keynlockResources');
       if(!saved)return fallback;
       return {
         picks:Math.max(0,Number(saved.picks)||0),
@@ -30,8 +18,9 @@
 
   const keynlockResources=loadKeynlockResources();
   function saveKeynlockResources(){
-    STORE.setItem('keynlockResources',JSON.stringify(keynlockResources));
+    STORE.setJSON('keynlockResources',keynlockResources);
     renderKeynlockResources();
+    window.dispatchEvent(new CustomEvent('keynlock-resources-change',{detail:{picks:keynlockResources.picks,parts:keynlockResources.parts,oil:keynlockResources.oil}}));
   }
   function resourceCaseCapacity(){return pickProgress.capacity;}
   function renderKeynlockResources(){
@@ -70,13 +59,7 @@
   }
 
   function prepareKeynlockRound(){
-    let emergency=false;
-    if(keynlockResources.picks<=0){
-      keynlockResources.picks=1;
-      emergency=true;
-      saveKeynlockResources();
-    }
-    return {picks:Math.min(resourceCaseCapacity(),keynlockResources.picks),emergency};
+    return {picks:Math.min(resourceCaseCapacity(),keynlockResources.picks)};
   }
   function consumeKeynlockPicks(count=1){
     const spent=Math.min(keynlockResources.picks,Math.max(0,count));
@@ -164,7 +147,7 @@
     balance-=price;
     STORE.setItem('lockpickBalance',String(balance));
     pickProgress.capacity=next;
-    STORE.setItem('lockpickProgress',JSON.stringify(pickProgress));
+    STORE.setJSON('lockpickProgress',pickProgress);
     updateEconomyUI();
     saveKeynlockResources();
     renderInventoryTools();

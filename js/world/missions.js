@@ -6,26 +6,9 @@
 
   // Open everything while the game is being built. Flip this off to let the
   // chapter gate below decide.
-  const MISSIONS_UNLOCK_ALL = true;
-
-  const MISSION_TIERS = [1, 2, 3];
-  // Position is the only thing authored per game; labels come from the catalog.
-  const MISSION_PLACES = [
-    { mode:'classic',x:28,y:62,district:'old' }, { mode:'sequence',x:38,y:30,district:'old' },
-    { mode:'special',x:34,y:47,district:'old' }, { mode:'hillsfar',x:26,y:28,district:'old' },
-    { mode:'wharf',x:11,y:61,district:'port' }, { mode:'pipeline',x:14,y:40,district:'port' },
-    { mode:'bioshock2',x:17,y:23,district:'port' }, { mode:'mass2',x:76,y:82,district:'port' },
-    { mode:'museum',x:25,y:82,district:'arts' }, { mode:'composite',x:72,y:52,district:'arts' },
-    { mode:'scope',x:56,y:80,district:'arts' }, { mode:'g1',x:44,y:44,district:'arts' },
-    { mode:'drum',x:65,y:72,district:'bohemian' }, { mode:'resonance',x:70,y:28,district:'bohemian' },
-    { mode:'anach',x:50,y:72,district:'bohemian' }, { mode:'tension',x:62,y:33,district:'bohemian' },
-    { mode:'fallout',x:88,y:70,district:'industrial' }, { mode:'masshack',x:96,y:59,district:'industrial' },
-    { mode:'alphaprotocol',x:31,y:17,district:'industrial' }, { mode:'watchmen',x:86,y:34,district:'industrial' },
-    { mode:'skyrim',x:44,y:64,district:'upper' }, { mode:'deduction',x:78,y:38,district:'upper' },
-    { mode:'kingdomcome',x:64,y:16,district:'upper' }, { mode:'thiefds',x:48,y:15,district:'upper' },
-    { mode:'thief12',x:88,y:49,district:'palace' }, { mode:'pathologic',x:40,y:82,district:'palace' },
-    { mode:'oblivion',x:79,y:20,district:'palace' }
-  ];
+  const MISSIONS_UNLOCK_ALL=window.KeynlockContent.world.missionsUnlockedForTesting;
+  const MISSION_TIERS=window.KeynlockContent.world.missionTiers;
+  const MISSION_PLACES=window.KeynlockContent.world.missionPlaces;
 
   const MISSION_STORAGE_KEY = 'lockpickMissions';
   const CHAPTER_STORAGE_KEY = 'lockpickChapter';
@@ -54,15 +37,15 @@
 
   let missionsDone = {};
   try {
-    const saved = JSON.parse(STORE.getItem(MISSION_STORAGE_KEY) || 'null');
+    const saved=STORE.getJSON(MISSION_STORAGE_KEY);
     if (saved && typeof saved === 'object') missionsDone = saved;
   } catch (e) { missionsDone = {}; }
-  function saveMissionsDone() { STORE.setItem(MISSION_STORAGE_KEY, JSON.stringify(missionsDone)); }
+  function saveMissionsDone(){STORE.setJSON(MISSION_STORAGE_KEY,missionsDone);}
 
   const PAINTING_STORAGE_KEY='keynlockOwnedPaintings';
   let ownedPaintings=[];
   try{
-    const saved=JSON.parse(STORE.getItem(PAINTING_STORAGE_KEY)||'[]');
+    const saved=STORE.getJSON(PAINTING_STORAGE_KEY,[]);
     if(Array.isArray(saved))ownedPaintings=saved.filter(id=>typeof id==='string');
   }catch(_){ownedPaintings=[];}
   function awardMissionPainting(){
@@ -77,7 +60,7 @@
     if(!firstClear&&Math.random()>=repeatChance)return null;
     const painting=candidates[Math.floor(Math.random()*candidates.length)];
     ownedPaintings.push(painting.id);
-    STORE.setItem(PAINTING_STORAGE_KEY,JSON.stringify(ownedPaintings));
+    STORE.setJSON(PAINTING_STORAGE_KEY,ownedPaintings);
     return {id:painting.id,title:painting.title,artist:painting.artist,year:painting.year,image:painting.image,district:place.district};
   }
   window.awardMissionPainting=awardMissionPainting;
@@ -86,6 +69,8 @@
   if (!MISSION_TIERS.includes(mapChapter)) mapChapter = 1;
 
   function missionCleared(mode, tier) { return !!missionsDone[missionRunId(mode, tier)]; }
+  function missionRequiresPicks(mode){return !!GameCatalog.feature(mode,'lock.present');}
+  function playerHasPicks(){return Number(window.KeynlockResources?.state?.picks)>0;}
   function chapterCleared(tier) { return MISSION_PLACES.filter(p=>gameSupportsTier(p.mode,tier)).every(p => missionCleared(p.mode, tier)); }
   // A chapter opens once the one before it is finished. With the dev flag on,
   // every chapter and every place is reachable from the start.
@@ -132,6 +117,7 @@
     if (!loc || loc.action !== 'mission') return;
     if (!missionUnlocked()) { toast('Эта глава ещё закрыта'); return; }
     if(!gameSupportsTier(loc.mode,mapChapter)){toast(`${loc.name}: уровень ${mapChapter} ещё не готов`);return;}
+    if(missionRequiresPicks(loc.mode)&&!playerHasPicks()){toast('Нет отмычек · вернись в логово и подготовь новые');return;}
 
     if (lairOpen) closeLair();
     if (mapOpen) {
@@ -181,12 +167,14 @@
     for (const place of MISSION_PLACES) {
       const id = missionNodeId(place.mode);
       const supported=gameSupportsTier(place.mode,mapChapter);
-      const open = missionUnlocked()&&supported;
+      const missingPicks=missionRequiresPicks(place.mode)&&!playerHasPicks();
+      const open = missionUnlocked()&&supported&&!missingPicks;
       const node = document.createElement('button');
       node.type = 'button';
       node.className = 'mapNode mapPreviewNode missionNode mission ' + (open ? 'accessible' : 'locked');
       const district=DISTRICTS[place.district];
       node.classList.add(`district-${place.district}`);
+      node.classList.toggle('no-picks',missingPicks);
       node.style.setProperty('--district-color',district.hex);
       node.dataset.location = id;
       node.disabled=!open;
@@ -208,6 +196,13 @@
       readiness.textContent=String(GameCatalog.get(place.mode).readiness);
       readiness.title='Готовность игры';
       preview.append(previewImage,readiness);
+      if(missingPicks){
+        const unavailable=document.createElement('span');
+        unavailable.className='mapMissionUnavailable';
+        unavailable.textContent='Нет отмычек';
+        preview.appendChild(unavailable);
+        node.title='Для этой головоломки нужна отмычка. Вернись в логово и подготовь новые.';
+      }
       const label = document.createElement('span');
       label.className = 'mapNodeLabel';
       label.textContent = missionLabel(place).toLocaleUpperCase('ru-RU');
@@ -301,6 +296,7 @@
   window.addEventListener('keynlock-game-catalog-change',event=>{
     if(event.detail?.path==='readiness'||event.detail?.path==='reset')renderMissionNodes();
   });
+  window.addEventListener('keynlock-resources-change',renderMissionNodes);
 
   // Dev helper: shift-click the artwork to print map coordinates for a node.
   document.querySelector('#worldMapCanvas')?.addEventListener('click', e => {

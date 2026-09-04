@@ -82,7 +82,7 @@
   // without touching this file.
   const UNLOCKED_KEY = 'keynlockUnlockedHandles';
   let unlockedOverrides = {};
-  try{ unlockedOverrides = JSON.parse(STORE.getItem(UNLOCKED_KEY) || '{}') || {}; }catch(_){ unlockedOverrides = {}; }
+  unlockedOverrides=STORE.getJSON(UNLOCKED_KEY,{})||{};
   function isUnlocked(handle){
     return Object.prototype.hasOwnProperty.call(unlockedOverrides, handle.id) ? !!unlockedOverrides[handle.id] : !!handle.unlocked;
   }
@@ -217,13 +217,13 @@
   }
   function equipHandle(handle){
     state.handle = handle;
-    try{ STORE.setItem(EQUIPPED_KEY, JSON.stringify({ collectionId: state.collectionId, handleId: handle.id })); }catch(_){}
+    try{STORE.setJSON(EQUIPPED_KEY,{collectionId:state.collectionId,handleId:handle.id});}catch(_){}
     applyEquippedSkin(handle);
     refreshInventoryRail();
   }
   function restoreEquipped(){
     let saved = null;
-    try{ saved = JSON.parse(STORE.getItem(EQUIPPED_KEY) || 'null'); }catch(_){ saved = null; }
+    saved=STORE.getJSON(EQUIPPED_KEY);
     if(saved){
       const col = PICK_COLLECTIONS.find(c => c.id === saved.collectionId);
       const handle = col?.handles.find(h => h.id === saved.handleId);
@@ -286,7 +286,7 @@
       if(!locked.length)return null;
       const reward=locked[Math.floor(Math.random()*locked.length)];
       unlockedOverrides[reward.handle.id]=true;
-      STORE.setItem(UNLOCKED_KEY,JSON.stringify(unlockedOverrides));
+      STORE.setJSON(UNLOCKED_KEY,unlockedOverrides);
       renderCollectionList();
       if(reward.collection.id===state.collectionId)renderHandleStrip();
       refreshInventoryRail();

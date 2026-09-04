@@ -165,7 +165,10 @@
     const visiblePicks=Math.max(0, Math.min(pickCapacity, picks));
     const caseSlots=pickProgress.capacity;
     pickRail.dataset.slots=String(caseSlots);
-    pickRail.style.gridTemplateColumns = `repeat(${caseSlots},1fr)`;
+    // The artwork always contains seven fixed pockets. Capacity controls how
+    // many of those pockets are usable, not how widely the visible picks are
+    // spread across the rail.
+    pickRail.style.gridTemplateColumns = 'repeat(7,1fr)';
     pickRail.style.opacity = pickCapacity > 0 ? '1' : '.45';
 
     // The rail shows the player's own Коллекция picks when that screen

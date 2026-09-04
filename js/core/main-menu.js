@@ -1,6 +1,7 @@
 (function(){
   'use strict';
 
+  const STORE=window.KeynlockSaveStore;
   const SAVE_KEY='keynlockSaveSlots';
   const STARTED_KEY='keynlockGameStarted';
   const SESSION_KEY='keynlockSessionActive';
@@ -30,13 +31,13 @@
 
   function readSlots(){
     try{
-      const parsed=JSON.parse(localStorage.getItem(SAVE_KEY)||'[]');
+      const parsed=STORE.getJSON(SAVE_KEY,[]);
       return Array.from({length:3},(_,index)=>parsed[index]||null);
     }catch(_){ return [null,null,null]; }
   }
 
   function writeSlots(slots){
-    localStorage.setItem(SAVE_KEY,JSON.stringify(slots));
+    STORE.setJSON(SAVE_KEY,slots);
   }
 
   function isGameKey(key){
@@ -45,22 +46,19 @@
 
   function gameSnapshot(){
     const state={};
-    for(let index=0;index<localStorage.length;index++){
-      const key=localStorage.key(index);
-      if(key&&isGameKey(key))state[key]=localStorage.getItem(key);
-    }
+    STORE.keys().filter(isGameKey).forEach(key=>{state[key]=STORE.getItem(key);});
     state[STARTED_KEY]='1';
     return state;
   }
 
   function hasProgress(){
-    if(localStorage.getItem(STARTED_KEY)==='1')return true;
+    if(STORE.getItem(STARTED_KEY)==='1')return true;
     return ['lockpickBalance','keynlockResources','lockpickMissionsDone','lockpickMapLocation']
-      .some(key=>localStorage.getItem(key)!==null);
+      .some(key=>STORE.getItem(key)!==null);
   }
 
   function applyMotionSetting(){
-    const reduced=localStorage.getItem(REDUCE_MOTION_KEY)==='1';
+    const reduced=STORE.getItem(REDUCE_MOTION_KEY)==='1';
     document.documentElement.classList.toggle('reduce-motion',reduced);
     if(reduceMotion)reduceMotion.checked=reduced;
   }
@@ -80,7 +78,7 @@
 
   function hideMenu(){
     if(!ready)return;
-    localStorage.setItem(STARTED_KEY,'1');
+    STORE.setItem(STARTED_KEY,'1');
     sessionStorage.setItem(SESSION_KEY,'1');
     document.body.classList.remove('assets-loading','main-menu-open');
     loader?.classList.add('bootLoaderHidden');
@@ -102,12 +100,7 @@
   }
 
   function resetGameState(){
-    const keys=[];
-    for(let index=0;index<localStorage.length;index++){
-      const key=localStorage.key(index);
-      if(key&&isGameKey(key))keys.push(key);
-    }
-    keys.forEach(key=>localStorage.removeItem(key));
+    STORE.keys().filter(isGameKey).forEach(key=>STORE.removeItem(key));
   }
 
   function startNewGame(){
@@ -144,11 +137,11 @@
   function saveToSlot(index){
     const slots=readSlots();
     if(slots[index]&&!confirm(`Перезаписать слот ${index+1}?`))return;
-    const place=localStorage.getItem('lockpickMapLocation')||'lair';
+    const place=STORE.getItem('lockpickMapLocation')||'lair';
     slots[index]={
       version:1,
       savedAt:new Date().toISOString(),
-      summary:{place:place==='lair'?'Логово':place,coins:Number(localStorage.getItem('lockpickBalance'))||0},
+      summary:{place:place==='lair'?'Логово':place,coins:Number(STORE.getItem('lockpickBalance'))||0},
       state:gameSnapshot()
     };
     writeSlots(slots);
@@ -159,7 +152,7 @@
     const slot=readSlots()[index];
     if(!slot?.state)return;
     resetGameState();
-    Object.entries(slot.state).forEach(([key,value])=>localStorage.setItem(key,String(value)));
+    STORE.restore(slot.state);
     sessionStorage.setItem(PENDING_KEY,'load');
     sessionStorage.setItem(SESSION_KEY,'1');
     location.reload();
@@ -169,7 +162,7 @@
     if(menu)menu.hidden=true;
     if(slotPanel)slotPanel.hidden=true;
     if(settingsPanel)settingsPanel.hidden=false;
-    const value=window.KeynlockAudio?.getMusicVolume?.() ?? Number(localStorage.getItem('keynlockMusicVolume')||28);
+    const value=window.KeynlockAudio?.getMusicVolume?.() ?? Number(STORE.getItem('keynlockMusicVolume')||28);
     if(music)music.value=String(value);
     if(musicValue)musicValue.value=`${value}%`;
     applyMotionSetting();
@@ -180,6 +173,7 @@
   saveButton?.addEventListener('click',()=>renderSlots('save'));
   document.querySelector('#mainMenuLoad')?.addEventListener('click',()=>renderSlots('load'));
   document.querySelector('#mainMenuSettings')?.addEventListener('click',openSettings);
+  document.querySelector('#gameSettingsButton')?.addEventListener('click',openMenu);
   document.querySelectorAll('[data-main-menu-back]').forEach(button=>button.addEventListener('click',showRoot));
   slotList?.addEventListener('click',event=>{
     const button=event.target.closest?.('[data-slot]');
@@ -189,11 +183,11 @@
   });
   music?.addEventListener('input',()=>{
     const value=window.KeynlockAudio?.setMusicVolume?.(Number(music.value)/100)??Number(music.value);
-    localStorage.setItem('keynlockMusicVolume',String(value));
+    STORE.setItem('keynlockMusicVolume',String(value));
     if(musicValue)musicValue.value=`${value}%`;
   });
   reduceMotion?.addEventListener('change',()=>{
-    localStorage.setItem(REDUCE_MOTION_KEY,reduceMotion.checked?'1':'0');
+    STORE.setItem(REDUCE_MOTION_KEY,reduceMotion.checked?'1':'0');
     applyMotionSetting();
   });
   addEventListener('keydown',event=>{

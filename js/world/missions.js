@@ -11,33 +11,20 @@
   const MISSION_TIERS = [1, 2, 3];
   // Position is the only thing authored per game; labels come from the catalog.
   const MISSION_PLACES = [
-    { mode: 'classic',   x: 28, y: 62 },
-    { mode: 'sequence',  x: 38, y: 30 },
-    { mode: 'special',   x: 34, y: 47 },
-    { mode: 'hillsfar',  x: 26, y: 28 },
-    { mode: 'g1',        x: 44, y: 44 },
-    { mode: 'skyrim',    x: 44, y: 64 },
-    { mode: 'anach',     x: 50, y: 72 },
-    { mode: 'tension',   x: 62, y: 33 },
-    { mode: 'resonance', x: 70, y: 28 },
-    { mode: 'deduction', x: 78, y: 38 },
-    { mode: 'composite', x: 72, y: 52 },
-    { mode: 'drum',      x: 65, y: 72 },
-    { mode: 'scope',     x: 56, y: 80 },
-    { mode: 'oblivion',  x: 79, y: 20 },
-    { mode: 'watchmen',  x: 86, y: 34 },
-    { mode: 'museum',    x: 25, y: 82 },
-    { mode: 'mass2',     x: 76, y: 82 },
-    { mode: 'pipeline',  x: 14, y: 40 },
-    { mode: 'wharf',     x: 11, y: 61 },
-    { mode: 'thiefds',   x: 48, y: 15 },
-    { mode: 'kingdomcome', x: 64, y: 16 },
-    { mode: 'thief12',   x: 88, y: 49 },
-    { mode: 'fallout',   x: 88, y: 70 },
-    { mode: 'masshack',  x: 96, y: 59 },
-    { mode: 'pathologic', x: 40, y: 82 },
-    { mode: 'bioshock2', x: 17, y: 23 },
-    { mode: 'alphaprotocol', x: 31, y: 17 }
+    { mode:'classic',x:28,y:62,district:'old' }, { mode:'sequence',x:38,y:30,district:'old' },
+    { mode:'special',x:34,y:47,district:'old' }, { mode:'hillsfar',x:26,y:28,district:'old' },
+    { mode:'wharf',x:11,y:61,district:'port' }, { mode:'pipeline',x:14,y:40,district:'port' },
+    { mode:'bioshock2',x:17,y:23,district:'port' }, { mode:'mass2',x:76,y:82,district:'port' },
+    { mode:'museum',x:25,y:82,district:'arts' }, { mode:'composite',x:72,y:52,district:'arts' },
+    { mode:'scope',x:56,y:80,district:'arts' }, { mode:'g1',x:44,y:44,district:'arts' },
+    { mode:'drum',x:65,y:72,district:'bohemian' }, { mode:'resonance',x:70,y:28,district:'bohemian' },
+    { mode:'anach',x:50,y:72,district:'bohemian' }, { mode:'tension',x:62,y:33,district:'bohemian' },
+    { mode:'fallout',x:88,y:70,district:'industrial' }, { mode:'masshack',x:96,y:59,district:'industrial' },
+    { mode:'alphaprotocol',x:31,y:17,district:'industrial' }, { mode:'watchmen',x:86,y:34,district:'industrial' },
+    { mode:'skyrim',x:44,y:64,district:'upper' }, { mode:'deduction',x:78,y:38,district:'upper' },
+    { mode:'kingdomcome',x:64,y:16,district:'upper' }, { mode:'thiefds',x:48,y:15,district:'upper' },
+    { mode:'thief12',x:88,y:49,district:'palace' }, { mode:'pathologic',x:40,y:82,district:'palace' },
+    { mode:'oblivion',x:79,y:20,district:'palace' }
   ];
 
   const MISSION_STORAGE_KEY = 'lockpickMissions';
@@ -72,6 +59,29 @@
   } catch (e) { missionsDone = {}; }
   function saveMissionsDone() { STORE.setItem(MISSION_STORAGE_KEY, JSON.stringify(missionsDone)); }
 
+  const PAINTING_STORAGE_KEY='keynlockOwnedPaintings';
+  let ownedPaintings=[];
+  try{
+    const saved=JSON.parse(STORE.getItem(PAINTING_STORAGE_KEY)||'[]');
+    if(Array.isArray(saved))ownedPaintings=saved.filter(id=>typeof id==='string');
+  }catch(_){ownedPaintings=[];}
+  function awardMissionPainting(){
+    const run=activeMissionRun;
+    if(!run||run.roundId!==activeRoundId||mode!==run.mode)return null;
+    const place=MISSION_PLACES.find(item=>item.mode===run.mode);
+    const paintings=window.KeynlockRestoration?.paintings||[];
+    const candidates=paintings.filter(painting=>painting.district===place?.district&&!ownedPaintings.includes(painting.id));
+    if(!candidates.length)return null;
+    const firstClear=!missionsDone[run.id];
+    const repeatChance=window.KeynlockResources?.lootTable?.[run.tier]?.paintingChance??.2;
+    if(!firstClear&&Math.random()>=repeatChance)return null;
+    const painting=candidates[Math.floor(Math.random()*candidates.length)];
+    ownedPaintings.push(painting.id);
+    STORE.setItem(PAINTING_STORAGE_KEY,JSON.stringify(ownedPaintings));
+    return {id:painting.id,title:painting.title,artist:painting.artist,year:painting.year,image:painting.image,district:place.district};
+  }
+  window.awardMissionPainting=awardMissionPainting;
+
   let mapChapter = Number(STORE.getItem(CHAPTER_STORAGE_KEY)) || 1;
   if (!MISSION_TIERS.includes(mapChapter)) mapChapter = 1;
 
@@ -104,7 +114,8 @@
       y: place.y,
       text: '',
       action: 'mission',
-      mode: place.mode
+      mode: place.mode,
+      district:place.district
     };
   }
 
@@ -174,6 +185,9 @@
       const node = document.createElement('button');
       node.type = 'button';
       node.className = 'mapNode mapPreviewNode missionNode mission ' + (open ? 'accessible' : 'locked');
+      const district=DISTRICTS[place.district];
+      node.classList.add(`district-${place.district}`);
+      node.style.setProperty('--district-color',district.hex);
       node.dataset.location = id;
       node.disabled=!open;
       node.setAttribute('aria-disabled', open?'false':'true');
@@ -197,6 +211,9 @@
       const label = document.createElement('span');
       label.className = 'mapNodeLabel';
       label.textContent = missionLabel(place).toLocaleUpperCase('ru-RU');
+      const districtLabel=document.createElement('span');
+      districtLabel.className='mapMissionDistrict';
+      districtLabel.textContent=district.name;
       const tiers = document.createElement('span');
       tiers.className = 'mapNodeTiers';
       for (const tier of MISSION_TIERS) {
@@ -208,7 +225,7 @@
         tiers.appendChild(pip);
       }
       preview.appendChild(tiers);
-      node.append(preview,label);
+      node.append(preview,label,districtLabel);
       canvas.insertBefore(node, player || null);
     }
   }
@@ -256,7 +273,8 @@
       const supported=gameSupportsTier(loc.mode,mapChapter);
       const cleared = missionCleared(loc.mode, mapChapter);
       const description=GameCatalog.get(loc.mode)?.description;
-      $mapInfoText.textContent = supported?`${description||'Головоломка с замком.'} Сложность ${mapChapter}. `
+      const district=DISTRICTS[loc.district];
+      $mapInfoText.textContent = supported?`${district?.name||'Район'} · ${description||'Головоломка с замком.'} Сложность ${mapChapter}. `
         + (cleared ? 'Уже пройден в этой главе. ' : '')
         + 'Нажми на точку ещё раз, чтобы начать.':`Уровень ${mapChapter} для этой игры ещё не готов.`;
     }

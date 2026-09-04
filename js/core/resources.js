@@ -8,9 +8,9 @@
     {id:'violet',name:'Фиолетовый',color:'#875c9e'}
   ]);
   const KEYNLOCK_LOCK_LOOT_TABLE=Object.freeze({
-    1:Object.freeze({coinMultiplier:1,parts:[1,2],components:[1,1],handleChance:.02}),
-    2:Object.freeze({coinMultiplier:1.4,parts:[2,3],components:[1,2],handleChance:.04}),
-    3:Object.freeze({coinMultiplier:2,parts:[3,5],components:[2,3],handleChance:.07})
+    1:Object.freeze({coinMultiplier:1,parts:[1,2],components:[1,1],handleChance:.02,paintingChance:.2}),
+    2:Object.freeze({coinMultiplier:1.4,parts:[2,3],components:[1,2],handleChance:.04,paintingChance:.35}),
+    3:Object.freeze({coinMultiplier:2,parts:[3,5],components:[2,3],handleChance:.07,paintingChance:.5})
   });
 
   function loadKeynlockResources(){
@@ -65,7 +65,7 @@
     }
     const lootPreview=document.querySelector('#lootTablePreview');
     if(lootPreview&&!lootPreview.childElementCount){
-      lootPreview.innerHTML=`<table><thead><tr><th>Ур.</th><th>Монеты</th><th>Детали</th><th>Цвета</th><th>Рукоять</th></tr></thead><tbody>${Object.entries(KEYNLOCK_LOCK_LOOT_TABLE).map(([level,row])=>`<tr><td>${level}</td><td>×${String(row.coinMultiplier).replace('.',',')}</td><td>${row.parts.join('–')}</td><td>${row.components.join('–')}</td><td>${Math.round(row.handleChance*100)}%</td></tr>`).join('')}</tbody></table>`;
+      lootPreview.innerHTML=`<table><thead><tr><th>Ур.</th><th>Монеты</th><th>Детали</th><th>Цвета</th><th>Рукоять</th><th>Картина</th></tr></thead><tbody>${Object.entries(KEYNLOCK_LOCK_LOOT_TABLE).map(([level,row])=>`<tr><td>${level}</td><td>×${String(row.coinMultiplier).replace('.',',')}</td><td>${row.parts.join('–')}</td><td>${row.components.join('–')}</td><td>${Math.round(row.handleChance*100)}%</td><td>${Math.round(row.paintingChance*100)}%</td></tr>`).join('')}</tbody></table>`;
     }
   }
 

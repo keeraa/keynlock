@@ -206,6 +206,12 @@
   };
   let completed={};
   try{completed=JSON.parse(STORE.getItem(STORAGE_KEY)||'{}')||{};}catch(_){completed={};}
+  function ownedPaintingIds(){
+    try{
+      const ids=JSON.parse(STORE.getItem('keynlockOwnedPaintings')||'[]');
+      return new Set(Array.isArray(ids)?ids:[]);
+    }catch(_){return new Set();}
+  }
   const state={painting:0,hue:0,sat:100,light:100,damage:{hue:34,sat:.72,light:1.18},tool:'loupe',loupe:true,working:false,toolActing:false,lastPoint:null,lastMetricAt:0,damageReady:false,initialDirt:1,initialContamination:1,layerRefresh:0,layerImages:{dirt:'',repair:'',overpaint:'',scan:''},checked:false,started:false,focus:{x:50,y:50,pinned:false}};
   function restorationItemAt(x,y){
     let nearest=null;
@@ -229,6 +235,16 @@
   const current=()=>PAINTINGS[state.painting];
   const JAPANESE_IDS=new Set(['great-wave','red-fuji','kajikazawa','sea-satta','sudden-shower','plum-garden','ejiri','umezawa','inume','mishima','shono','yokkaichi','kameyama','nihonbashi','kanbara']);
   const categoryOf=painting=>painting.category||(JAPANESE_IDS.has(painting.id)?'japan':(['mona-lisa','birth-venus'].includes(painting.id)?'renaissance':(['girl-pearl','las-meninas'].includes(painting.id)?'baroque':(['sunflowers','starry-night','impression-sunrise'].includes(painting.id)?'impressionism':'modern'))));
+  const PAINTING_DISTRICTS=Object.freeze({japan:'port',china:'port',korea:'port',india:'port',impressionism:'arts',modern:'arts',rococo:'bohemian',romanticism:'bohemian',symbolism:'bohemian',surrealism:'industrial',renaissance:'upper',baroque:'upper'});
+  const districtOf=painting=>{
+    const categoryDistrict=PAINTING_DISTRICTS[categoryOf(painting)]||'arts';
+    if(categoryDistrict==='port') return 'port';
+    const bucket=[...painting.id].reduce((sum,character)=>sum+character.charCodeAt(0),0)%11;
+    if(bucket===0) return 'palace';
+    if(bucket===1) return 'old';
+    return categoryDistrict;
+  };
+  PAINTINGS.forEach(painting=>{painting.district=districtOf(painting);});
   function yearStart(year){
     const numeric=year.match(/\d{3,4}/);
     if(numeric)return Number(numeric[0]);
@@ -280,6 +296,7 @@
   }
   function renderOrders(){
     const selected=current();
+    const owned=ownedPaintingIds();
     elements.orderName.textContent=`${selected.title} (${selected.year})`;
     elements.orderArtist.textContent=selected.artist;
     const categories=`<nav class="restorationOrderCategories" aria-label="Категории картин">${ORDER_CATEGORIES.map(([id,label])=>`<button type="button" data-order-category="${id}" class="${id===orderCategory?'active':''}">${label}</button>`).join('')}</nav>`;
@@ -288,8 +305,10 @@
     const skeletonCount=orderCategory==='all'?0:Math.max(0,orderColumns*3-filtered.length);
     const skeletons=Array.from({length:skeletonCount},()=>'<div class="restorationOrderCard restorationOrderSkeleton" aria-hidden="true"><i></i><span></span><small></small></div>').join('');
     elements.orderGrid.innerHTML=categories+filtered.map(({painting,index})=>`
-      <button class="restorationOrderCard${index===state.painting?' active':''}" type="button" data-painting="${index}" aria-label="${painting.title}, ${painting.artist}">
+      <button class="restorationOrderCard${index===state.painting?' active':''}" type="button" data-painting="${index}" data-district="${painting.district}" style="--district-color:${DISTRICTS[painting.district].hex}" aria-label="${painting.title}, ${painting.artist}; ${DISTRICTS[painting.district].name}">
         <img src="${painting.image}" alt="">
+        ${owned.has(painting.id)?`<i class="restorationOrderStatus restorationOrderFound" title="Найдена в миссии" aria-label="Найдена в миссии">${tablerIcon('eye',14)}</i>`:''}
+        ${completed[painting.id]?`<i class="restorationOrderStatus restorationOrderCompleted" title="Отреставрирована" aria-label="Отреставрирована">${tablerIcon('check',14)}</i>`:''}
         <span>${painting.title} (${painting.year})</span>
         <small>${painting.artist}</small>
       </button>`).join('')+skeletons;
@@ -559,12 +578,10 @@
   function hideLenses(){if(state.focus.pinned)return;root.querySelectorAll('.restorationLens').forEach(lens=>lens.classList.remove('visible','pinned'));}
   function start(){
     setDrawerOpen(false);
-    if(!state.started){
-      state.started=true;
-      const next=PAINTINGS.findIndex(painting=>!completed[painting.id]);
-      state.painting=next<0?0:next;
-      renderOrders();newDamage();renderPainting();
-    }else{renderOrders();renderLive();}
+    state.started=true;
+    const previous=state.painting;
+    state.painting=PAINTINGS.length>1?(previous+1+Math.floor(Math.random()*(PAINTINGS.length-1)))%PAINTINGS.length:0;
+    closeOrders();renderOrders();newDamage();renderPainting();
     requestAnimationFrame(sizePaintings);
   }
 

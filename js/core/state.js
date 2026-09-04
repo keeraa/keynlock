@@ -52,6 +52,16 @@
   }
   let pickProgress=loadPickProgress();
   let pickType=pickProgress.equipped, pickCapacity=pickProgress.capacity;
+  const DISTRICTS=Object.freeze({
+    old:{order:1,name:'Старый квартал',color:'red',colorName:'Красный',hex:'#b94a42',risk:'Низкий',locks:'Простые',loot:'Невысокая',art:'Старые лавки и небольшие европейские собрания'},
+    port:{order:2,name:'Порт',color:'orange',colorName:'Оранжевый',hex:'#d5823b',risk:'Средний',locks:'Разные',loot:'Высокая',art:'Япония, Китай, Корея и Индия'},
+    arts:{order:3,name:'Район искусств',color:'yellow',colorName:'Жёлтый',hex:'#d8b34b',risk:'Средний',locks:'Галерейные',loot:'Высокая',art:'Импрессионизм, модерн и рынок искусства'},
+    bohemian:{order:4,name:'Богемный квартал',color:'green',colorName:'Зелёный',hex:'#57945b',risk:'Средний',locks:'Хитрые',loot:'Средняя',art:'Рококо, романтизм и символизм'},
+    industrial:{order:5,name:'Промышленный район',color:'cyan',colorName:'Голубой',hex:'#4d9da4',risk:'Высокий',locks:'Технические',loot:'Высокая',art:'Модерн, авангард и сюрреализм'},
+    upper:{order:6,name:'Верхний город',color:'blue',colorName:'Синий',hex:'#4c6ea9',risk:'Высокий',locks:'Сложные',loot:'Очень высокая',art:'Возрождение, барокко и частные коллекции'},
+    palace:{order:7,name:'Дворцовый район',color:'violet',colorName:'Фиолетовый',hex:'#7656a5',risk:'Очень высокий',locks:'Особые',loot:'Уникальная',art:'Шедевры и особые серии всех направлений'}
+  });
+  const DISTRICT_IDS=Object.freeze(Object.keys(DISTRICTS));
   let mapOpen=false, mapMoving=false;
   const MAP_LOCATIONS={
     lair:{name:'Логово',x:20,y:68,text:'Точка старта. Здесь находится база команды.',action:'lair'}
@@ -67,7 +77,7 @@
   let lairCharacter=LAIR_CHARACTERS[STORE.getItem('lockpickLairCharacter')]?STORE.getItem('lockpickLairCharacter'):'kai';
   let lairTab='team';
   let lairDialoguePerson='sai';
-  let lairIntelSelected='lair';
+  let lairIntelSelected='old';
   const LAIR_DIALOGUES={
     kai:[
       {label:'Следующая цель',text:'Сначала нужны простые замки рядом с базой. Набьём руку, потом полезем глубже в город.'},
@@ -85,13 +95,15 @@
       {label:'Новые замки',text:'Если найдём незнакомый механизм, тащи сведения сюда. Разберём его как отдельную схему.'}
     ]
   };
-  const LAIR_INTEL_INFO={
-    lair:{name:'Логово',risk:'Низкий',locks:'Тренировочные',loot:'Нет',notes:['База команды и точка старта.','Здесь безопасно менять персонажа и обсуждать планы.','Полная информация собрана.']},
-    old:{name:'Старый квартал',risk:'Средний',locks:'Средние',loot:'Средняя',notes:['Район закрыт, известны только общие слухи.','Много мастерских и подсобных помещений.','Известны основные типы целей и подходы.']},
-    upper:{name:'Верхний город',risk:'Высокий',locks:'Сложные',loot:'Высокая',notes:['Район закрыт, сведений мало.','Богатые дома и более сложные механизмы.','Известны ключевые точки и уровень охраны.']},
-    port:{name:'Порт',risk:'Средний',locks:'Разные',loot:'Высокая',notes:['Район закрыт, сведений мало.','Склады дают много разных типов замков.','Известны основные склады и время активности.']}
-  };
-  let lairIntel={lair:3,old:0,upper:0,port:0};
+  const LAIR_INTEL_INFO=Object.freeze(Object.fromEntries(DISTRICT_IDS.map(id=>{
+    const district=DISTRICTS[id];
+    return [id,{...district,notes:[
+      `${district.name}: собраны первые слухи. Основной цвет района — ${district.colorName.toLocaleLowerCase('ru-RU')}.`,
+      `Картины района: ${district.art}. Известны основные типы целей.`,
+      `Найдены мастерские, хранилища и места появления особых картин.`
+    ]}];
+  })));
+  let lairIntel=Object.fromEntries(DISTRICT_IDS.map(id=>[id,0]));
   try{
     const savedIntel=JSON.parse(STORE.getItem('lockpickLairIntel')||'null');
     if(savedIntel && typeof savedIntel==='object'){

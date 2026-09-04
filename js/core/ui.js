@@ -57,6 +57,7 @@
     const cleanBonus = brokenPicks===0 ? 25 : 0;
     const baseCoins=runReward+cleanBonus;
     const resources=window.KeynlockResources?.awardLock?.({tier:getModeDifficulty(mode),baseCoins});
+    const painting=window.awardMissionPainting?.()||null;
     const earned=resources?.coins??baseCoins;
     balance += earned;
     STORE.setItem('lockpickBalance', String(balance));
@@ -70,6 +71,7 @@
         <span class="lootRow lootCoins"><b>+${earned}</b> монет</span>
         <span class="lootRow"><b>+${resources.parts}</b> дет. замка</span>
         ${componentRows}
+        ${painting?`<span class="lootPainting"><img src="${painting.image}" alt=""><span><small>Найдена картина</small><b>${painting.title} (${painting.year})</b><em>${painting.artist}</em></span></span>`:''}
         ${resources.handle?`<span class="lootRow lootRare">Редкая рукоятка: <b>${resources.handle.name}</b></span>`:''}`;
     }
     updateEconomyUI();

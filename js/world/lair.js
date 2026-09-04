@@ -224,11 +224,13 @@
   function renderLairIntelDetail(){
     if(!$lairIntelDetail) return;
     const info=LAIR_INTEL_INFO[lairIntelSelected];
+    if(!info) return;
     const level=lairIntel[lairIntelSelected]||0;
     const revealed=level ? info.notes[Math.min(level-1,info.notes.length-1)] : 'Достоверных сведений пока нет.';
     const maxed=level>=3;
     $lairIntelDetail.innerHTML=`
       <div class="lairIntelDetailTitle">${info.name}</div>
+      <div class="lairIntelDistrictColor" style="--district-color:${info.hex}"><i></i>${info.colorName}</div>
       <div class="lairIntelDetailText">${revealed}</div>
       <div class="lairIntelRows">
         <div class="lairIntelRow"><span>Риск</span><strong>${level>=1?info.risk:'?'}</strong></div>
@@ -249,15 +251,17 @@
   function renderLairIntel(){
     if(!$lairIntelGrid) return;
     $lairIntelGrid.innerHTML='';
-    ['lair','old','upper','port'].forEach(id=>{
+    DISTRICT_IDS.forEach(id=>{
       const info=LAIR_INTEL_INFO[id];
       const level=lairIntel[id]||0;
       const card=document.createElement('button');
       card.type='button';
-      card.className='lairIntelCard'+(id===lairIntelSelected?' active':'')+(MAP_LOCATIONS[id]?.locked?' locked':'');
+      card.className='lairIntelCard'+(id===lairIntelSelected?' active':'');
+      card.style.setProperty('--district-color',info.hex);
       const pips=[0,1,2].map(i=>`<span class="${i<level?'on':''}"></span>`).join('');
       card.innerHTML=`
-        <div class="lairIntelName">${info.name}</div>
+        <div class="lairIntelName"><small>${String(info.order).padStart(2,'0')}</small>${info.name}</div>
+        <div class="lairIntelColor"><i></i>${info.colorName}</div>
         <div class="lairIntelLevel">СВЕДЕНИЯ ${level}/3</div>
         <div class="lairIntelPips">${pips}</div>
         <div class="lairIntelMini">${level?info.notes[Math.min(level-1,2)]:'Нет данных'}</div>

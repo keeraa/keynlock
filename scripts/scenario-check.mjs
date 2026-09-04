@@ -104,5 +104,8 @@ const defeat=source('js/core/game-defeat.js');
 assert(defeat.includes("reason==='picks'"),'Out-of-picks defeat must have a dedicated return-to-lair flow.');
 const inventoryGuard=source('js/core/inventory-hit-testing.js');
 for(const mode of ['classic','sequence','special','g1'])assert(inventoryGuard.includes(`'${mode}'`),`Typed tension guard is missing ${mode}.`);
+const pigmentMixing=source('js/world/alchemy-pigments.js');
+assert(pigmentMixing.includes('KeynlockResources?.components'),'Pigment mixing must use the shared color resource catalogue.');
+assert(pigmentMixing.includes('KeynlockResources?.state?.components'),'Pigment mixing must respect the player color inventory.');
 
-console.log('KEYNLOCK scenarios OK — saves, content, rewards, restoration, missions and typed tools.');
+console.log('KEYNLOCK scenarios OK — saves, content, rewards, restoration, missions, pigments and typed tools.');

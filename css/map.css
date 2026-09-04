@@ -109,7 +109,7 @@
 /* Map labels sit on light parchment, so they need their own dark plate rather
    than a text shadow. Every node gets the same
    as the games. These are prefixed with the canvas id because this file loads
-   before overrides-03-lair and overrides-06-digital, which both restyle nodes. */
+   before lair and digital, which both restyle nodes. */
 #worldMapCanvas .mapNodeLabel{display:inline-block;padding:3px 8px;border:1px solid rgba(122,95,52,.55);border-radius:8px;background:rgba(22,17,12,.88);color:#e6d2a6;font:600 13px/1.25 Arial,sans-serif;letter-spacing:.025em;text-transform:uppercase;box-shadow:0 2px 6px rgba(0,0,0,.45);text-shadow:none;white-space:nowrap;}
 #worldMapCanvas .mapNode.accessible:hover .mapNodeLabel{border-color:#d6ab5e;color:#f6e3b6;}
 #worldMapCanvas .mapNode.current .mapNodeLabel{background:rgba(74,47,19,.94);border-color:#f0c86e;color:#ffe6b4;}

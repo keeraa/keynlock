@@ -10,6 +10,7 @@ v252 splits the former `app.js` into ordered classic scripts. Script order in `i
 - `core/ui.js` — economy, skins and common UI
 - `world/` — inventory, lair, map/navigation and missions
 - `world/alchemy-engine.js` — scoped station DOM and parked animation scheduler
+- `world/alchemy-distillation.js` — distillation state, rendering and controls
 - `world/alchemy-stations.js` — individual station mechanics and liquid rendering
 - `world/alchemy-ui.js` — station switching and per-station element state
 - `world/alchemy-inventory.js` — ingredient rack, bottle selection and element slots

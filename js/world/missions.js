@@ -286,13 +286,3 @@
     if(event.detail?.path==='readiness'||event.detail?.path==='reset')renderMissionNodes();
   });
   window.addEventListener('keynlock-resources-change',renderMissionNodes);
-
-  // Dev helper: shift-click the artwork to print map coordinates for a node.
-  document.querySelector('#worldMapCanvas')?.addEventListener('click', e => {
-    if (!e.shiftKey) return;
-    const canvas = document.querySelector('#worldMapCanvas');
-    const r = canvas.getBoundingClientRect();
-    const x = ((e.clientX - r.left) / r.width) * 100;
-    const y = ((e.clientY - r.top) / r.height) * 100;
-    console.log(`x: ${x.toFixed(0)}, y: ${y.toFixed(0)}`);
-  }, true);

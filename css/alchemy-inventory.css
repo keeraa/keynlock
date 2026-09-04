@@ -57,7 +57,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   cursor: pointer;
 }
 /* Matches the approach lift so the hit area always covers what is actually
-   on screen (css/overrides-05-inventory.css .inventoryToggle does the same). */
+   on screen (css/inventory.css .inventoryToggle does the same). */
 .alchemyRackDrawer:not(.open) .alchemyRackDrawerToggle {
   height: calc(var(--rack-peek) + var(--rack-approach, 0px));
 }
@@ -189,7 +189,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
 
 @media (max-width: 760px) {
   /* Matches the lockpick case's own mobile width step
-     (css/overrides-05-inventory.css) — the rack was still sized off the
+     (css/inventory.css) — the rack was still sized off the
      760px desktop cap here, noticeably smaller than the case despite
      sitting right next to it. Bottles and rack art both scale off this
      width (percentage/aspect-ratio throughout), so widening it alone

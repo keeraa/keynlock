@@ -77,7 +77,7 @@
 .screenTopHudClose:active{transform:scale(.97);}
 @media (max-width:899px){
   /* --top-hud-size itself drops to 58px at this breakpoint (see
-     css/overrides-03-lair.css) — .screenTopHudClose reads that var
+     css/lair.css) — .screenTopHudClose reads that var
      directly. Identical mobile-safe-inset math previously lived
      duplicated in both alchemy.css and collection.css. */
   .screenTopHud{

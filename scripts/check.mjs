@@ -55,6 +55,7 @@ expectedScriptOrder.splice(expectedScriptOrder.indexOf('js/core/puzzle-modes.js'
 expectedScriptOrder.splice(expectedScriptOrder.indexOf('js/world/guards.js'),0,'js/world/restoration.js');
 expectedScriptOrder.splice(expectedScriptOrder.indexOf('js/world/guards.js'),0,'js/core/painting-rewards.js');
 expectedScriptOrder.splice(expectedScriptOrder.indexOf('js/world/alchemy-stations.js'),0,'js/world/alchemy-engine.js');
+expectedScriptOrder.splice(expectedScriptOrder.indexOf('js/world/alchemy-stations.js'),0,'js/world/alchemy-distillation.js');
 expectedScriptOrder.push('js/core/tooltips.js');
 if (JSON.stringify(scripts) !== JSON.stringify(expectedScriptOrder)) fail('JavaScript load order changed; classic scripts share one lexical environment.');
 const links = localAttributeRefs(html, 'link', 'href').filter(x => x.endsWith('.css'));
@@ -113,6 +114,7 @@ for(const [path,token] of forbiddenWindowBridges){
 const alchemyStationSource=readFileSync(resolve(root,'js/world/alchemy-stations.js'),'utf8');
 if(alchemyStationSource.includes('window.requestAnimationFrame.bind(window)'))fail('Alchemy station code bypasses its animation scheduler.');
 if(!alchemyStationSource.includes('window.KeynlockAlchemyEngine'))fail('Alchemy stations must use the isolated engine service.');
+if(!alchemyStationSource.includes('window.KeynlockAlchemyDistillation.create'))fail('Distillation must stay isolated from the station coordinator.');
 
 const indexedScripts = new Set(scripts.map(posix));
 const actualScripts = new Set(jsFiles.map(f => posix(relative(root, f))));

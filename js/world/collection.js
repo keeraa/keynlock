@@ -136,8 +136,8 @@
   // The lock minigame, inventory case, and every imported-mode skin all
   // already read one shared CSS var (--pick-skin-image, set by
   // js/core/ui.js's applyPickSkin() for the older single-image pick-skin
-  // inventory) as a single flat background-image — see css/overrides-01-tools-shared.css,
-  // css/overrides-05-inventory.css. Rather
+  // inventory) as a single flat background-image — see css/tools-shared.css,
+  // css/inventory.css. Rather
   // than teach five different already-tuned rendering contexts to layer
   // two separate shaft/handle backgrounds each with their own sizing math,
   // this composites the pair once onto an offscreen canvas (same layering

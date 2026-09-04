@@ -12,3 +12,7 @@ v254 preserves the v253 cascade while splitting large stylesheets into contiguou
 - mobile.css — shared mobile adaptations; later component files may add their own scoped responsive rules
 
 All fragments stay directly in css/, so existing relative asset paths remain valid. Selectors are never regrouped across their original cascade positions.
+
+`scripts/check.mjs` enforces the current specificity ceiling and rejects empty
+media queries. Lower the ceiling whenever obsolete overrides are removed; do
+not raise it for new UI.

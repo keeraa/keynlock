@@ -10,6 +10,7 @@ export const gameCatalog=()=>window.GameCatalog;
 export const gameActions=()=>window.GameActions;
 export const resources=()=>window.KeynlockResources;
 export const restoration=()=>window.KeynlockRestoration;
+export const paintingRewards=()=>window.KeynlockPaintingRewards;
 export const alchemy=()=>window.Alchemy;
 
 export function requireService(name,service){

@@ -39,6 +39,8 @@ expectedScriptOrder.splice(1,0,'js/data/world.js','js/data/economy.js','js/data/
 expectedScriptOrder.splice(1,0,'js/core/save-store.js');
 expectedScriptOrder.splice(expectedScriptOrder.indexOf('js/core/puzzle-modes.js'),0,'js/core/resources.js');
 expectedScriptOrder.splice(expectedScriptOrder.indexOf('js/world/guards.js'),0,'js/world/restoration.js');
+expectedScriptOrder.splice(expectedScriptOrder.indexOf('js/world/guards.js'),0,'js/core/painting-rewards.js');
+expectedScriptOrder.splice(expectedScriptOrder.indexOf('js/world/alchemy-stations.js'),0,'js/world/alchemy-engine.js');
 expectedScriptOrder.push('js/core/tooltips.js');
 if (JSON.stringify(scripts) !== JSON.stringify(expectedScriptOrder)) fail('JavaScript load order changed; classic scripts share one lexical environment.');
 const links = localAttributeRefs(html, 'link', 'href').filter(x => x.endsWith('.css'));
@@ -87,6 +89,16 @@ for (const file of [...jsFiles,...moduleFiles]) {
   if (file.endsWith('/core/save-store.js')) continue;
   if (/\blocalStorage\b/.test(readFileSync(file,'utf8'))) fail(`Direct localStorage access outside SaveStore: ${posix(relative(root,file))}`);
 }
+const forbiddenWindowBridges=[
+  ['js/world/missions.js','window.awardMissionPainting'],
+  ['js/core/ui.js','window.awardMissionPainting']
+];
+for(const [path,token] of forbiddenWindowBridges){
+  if(readFileSync(resolve(root,path),'utf8').includes(token))fail(`Legacy global bridge returned: ${token} in ${path}`);
+}
+const alchemyStationSource=readFileSync(resolve(root,'js/world/alchemy-stations.js'),'utf8');
+if(alchemyStationSource.includes('window.requestAnimationFrame.bind(window)'))fail('Alchemy station code bypasses its animation scheduler.');
+if(!alchemyStationSource.includes('window.KeynlockAlchemyEngine'))fail('Alchemy stations must use the isolated engine service.');
 
 const indexedScripts = new Set(scripts.map(posix));
 const actualScripts = new Set(jsFiles.map(f => posix(relative(root, f))));
@@ -98,7 +110,12 @@ const indexedCss = new Set(links.map(posix));
 for (const file of cssFiles) {
   const path = posix(relative(root, file));
   if (!indexedCss.has(path)) fail(`CSS file not loaded by index.html: ${path}`);
+  const css=readFileSync(file,'utf8');
+  if(/@media[^{}]*\{\s*\}/s.test(css))fail(`Empty media query in ${path}`);
 }
+
+const importantCount=cssFiles.reduce((count,file)=>count+(readFileSync(file,'utf8').match(/!important/g)||[]).length,0);
+if(importantCount>2265)fail(`CSS specificity budget regressed: ${importantCount} !important declarations (budget 2265).`);
 
 const sourceFiles = [htmlPath, ...cssFiles, ...jsFiles];
 const assetPattern = /(?:\.\.\/|\.\/)?assets\/[A-Za-z0-9_./-]+\.(?:png|webp|jpe?g|svg|gif|woff2?)/gi;

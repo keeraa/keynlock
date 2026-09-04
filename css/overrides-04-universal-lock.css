@@ -163,7 +163,6 @@ body.importedMode .massBoard{width:min(52dvh,205px)!important;height:min(52dvh,2
 body.importedMode .r2Lock{margin-bottom:-294px!important;transform:scale(.30)!important;}
 body.importedMode .skBoardViewport{width:246px!important;height:246px!important;flex-basis:246px!important;margin-bottom:-49px!important;}
 body.importedMode .skBoardViewport .skBoard{transform:translateX(-50%) scale(.3564)!important;}
-body.importedMode .anInstructions{display:none!important;}
 body.importedMode .anBoard{margin-bottom:-286px!important;transform:scale(.285)!important;}
 body.mode-hillsfar .hfTryArea,body.mode-hillsfar .hfLockCut{height:82px!important;}
 body.mode-hillsfar .hfCandidates{grid-template-columns:repeat(3,minmax(0,1fr))!important;max-width:520px!important;}

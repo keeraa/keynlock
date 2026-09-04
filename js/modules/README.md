@@ -11,3 +11,6 @@ be converted one subsystem at a time without changing their public contracts.
 
 `content-catalog.mjs` is the first read-only domain module. New screens should
 use its named accessors instead of reading `window.KeynlockContent` directly.
+
+`painting-rewards.mjs` exposes the mission-painting reward service without
+reintroducing its storage or random-selection details into UI code.

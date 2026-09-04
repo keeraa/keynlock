@@ -42,28 +42,17 @@
   } catch (e) { missionsDone = {}; }
   function saveMissionsDone(){STORE.setJSON(MISSION_STORAGE_KEY,missionsDone);}
 
-  const PAINTING_STORAGE_KEY='keynlockOwnedPaintings';
-  let ownedPaintings=[];
-  try{
-    const saved=STORE.getJSON(PAINTING_STORAGE_KEY,[]);
-    if(Array.isArray(saved))ownedPaintings=saved.filter(id=>typeof id==='string');
-  }catch(_){ownedPaintings=[];}
   function awardMissionPainting(){
-    const run=activeMissionRun;
-    if(!run||run.roundId!==activeRoundId||mode!==run.mode)return null;
-    const place=MISSION_PLACES.find(item=>item.mode===run.mode);
-    const paintings=window.KeynlockRestoration?.paintings||[];
-    const candidates=paintings.filter(painting=>painting.district===place?.district&&!ownedPaintings.includes(painting.id));
-    if(!candidates.length)return null;
-    const firstClear=!missionsDone[run.id];
-    const repeatChance=window.KeynlockResources?.lootTable?.[run.tier]?.paintingChance??.2;
-    if(!firstClear&&Math.random()>=repeatChance)return null;
-    const painting=candidates[Math.floor(Math.random()*candidates.length)];
-    ownedPaintings.push(painting.id);
-    STORE.setJSON(PAINTING_STORAGE_KEY,ownedPaintings);
-    return {id:painting.id,title:painting.title,artist:painting.artist,year:painting.year,image:painting.image,district:place.district};
+    return window.KeynlockPaintingRewards.award({
+      run:activeMissionRun,
+      currentRoundId:activeRoundId,
+      currentMode:mode,
+      missionsDone,
+      missionPlaces:MISSION_PLACES,
+      paintings:window.KeynlockRestoration?.paintings||[],
+      lootTable:window.KeynlockResources?.lootTable
+    });
   }
-  window.awardMissionPainting=awardMissionPainting;
 
   let mapChapter = Number(STORE.getItem(CHAPTER_STORAGE_KEY)) || 1;
   if (!MISSION_TIERS.includes(mapChapter)) mapChapter = 1;

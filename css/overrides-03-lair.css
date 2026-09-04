@@ -89,10 +89,6 @@ body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none!important;
 .mechanismZone.opening .lockPanel,.sharedModeLockArt.opening .lockPanel{animation:keynlockBodyOpenFast 950ms cubic-bezier(.20,.76,.18,1);}
 .sharedModeLockArt{position:relative;}
 .objectiveDiff{display:inline-block;margin-left:6px;color:#e8c77e;}
-@media (max-width:1200px){
-}
-@media (max-width:900px){
-}
 :root{--top-hud-size:68px;--lock-src-w:540px;--lock-src-h:266px;--lock-scale:.80;--lock-visual-w:432px;--lock-visual-h:213px;--lock-top:36px;--pick-left:222px;--pick-top:146px;--tension-left:272px;--tension-top:137px;--objective-bottom:18px;}
 #objectiveLine b{color:#dcc9aa;}
 .topRightHud{top:14px!important;right:14px!important;gap:8px!important;align-items:flex-start!important;justify-content:flex-end!important;flex-wrap:wrap!important;}

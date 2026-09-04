@@ -53,6 +53,48 @@ assert(Object.keys(catalogModule.getComponents()).length>0,'Content module must 
 assert(Object.keys(catalogModule.getLockLoot()).length>0,'Content module must expose lock loot.');
 delete globalThis.window;
 
+const scheduledFrames=[];
+const fakeDocument={
+  getElementById:()=>null,
+  querySelector:()=>null,
+  querySelectorAll:()=>[],
+  createElement:()=>({style:{}}),
+  addEventListener:()=>{},
+  body:{},documentElement:{}
+};
+const engineContext={document:fakeDocument,window:{requestAnimationFrame:callback=>{scheduledFrames.push(callback);return scheduledFrames.length;}}};
+runInNewContext(source('js/world/alchemy-engine.js'),engineContext,{filename:'alchemy-engine.js'});
+const engine=engineContext.window.KeynlockAlchemyEngine;
+engine.requestFrame(()=>{});
+assert(scheduledFrames.length===0,'Closed alchemy must park animation frames.');
+engine.start();
+assert(scheduledFrames.length===1,'Opening alchemy must release parked animation frames.');
+engine.stop();
+engine.requestFrame(()=>{});
+assert(scheduledFrames.length===1,'Stopped alchemy must park new animation frames.');
+
+const rewardStorage=memoryStorage();
+const rewardContext={window:{KeynlockSaveStore:null}};
+const rewardSaveContext={window:{localStorage:rewardStorage}};
+runInNewContext(source('js/core/save-store.js'),rewardSaveContext,{filename:'save-store.js'});
+rewardContext.window.KeynlockSaveStore=rewardSaveContext.window.KeynlockSaveStore;
+runInNewContext(source('js/core/painting-rewards.js'),rewardContext,{filename:'painting-rewards.js'});
+const rewards=rewardContext.window.KeynlockPaintingRewards;
+const rewardOptions={
+  run:{id:'classic-1',mode:'classic',tier:1,roundId:7},currentRoundId:7,currentMode:'classic',
+  missionsDone:{},missionPlaces:[{mode:'classic',district:'port'}],
+  paintings:[{id:'p1',title:'One',artist:'Artist',year:'1900',image:'one.png',district:'port'}],
+  lootTable:{1:{paintingChance:.2}},random:()=>0
+};
+assert(rewards.award(rewardOptions)?.id==='p1','First mission clear must award an available district painting.');
+assert(rewards.ownedIds()[0]==='p1','Awarded painting must be persisted as owned.');
+assert(rewards.award(rewardOptions)===null,'An owned painting must not be awarded twice.');
+assert(rewards.award({...rewardOptions,currentRoundId:8})===null,'A stale mission round must not award a painting.');
+globalThis.window=rewardContext.window;
+const rewardModule=await import('../js/modules/painting-rewards.mjs');
+assert(rewardModule.getOwnedPaintingIds()[0]==='p1','Painting reward module must expose owned paintings.');
+delete globalThis.window;
+
 const restoration=source('js/world/restoration.js');
 assert(restoration.includes('const success=value>=TARGET_SCORE&&clean>=100;'),'Restoration must require both target light and complete cleaning.');
 const missions=source('js/world/missions.js');
@@ -63,4 +105,4 @@ assert(defeat.includes("reason==='picks'"),'Out-of-picks defeat must have a dedi
 const inventoryGuard=source('js/core/inventory-hit-testing.js');
 for(const mode of ['classic','sequence','special','g1'])assert(inventoryGuard.includes(`'${mode}'`),`Typed tension guard is missing ${mode}.`);
 
-console.log('KEYNLOCK scenarios OK — saves, content, restoration, missions and typed tools.');
+console.log('KEYNLOCK scenarios OK — saves, content, rewards, restoration, missions and typed tools.');

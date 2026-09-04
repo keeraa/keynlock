@@ -57,7 +57,7 @@
     const cleanBonus = brokenPicks===0 ? 25 : 0;
     const baseCoins=runReward+cleanBonus;
     const resources=window.KeynlockResources?.awardLock?.({tier:getModeDifficulty(mode),baseCoins});
-    const painting=window.awardMissionPainting?.()||null;
+    const painting=typeof awardMissionPainting==='function'?awardMissionPainting():null;
     const earned=resources?.coins??baseCoins;
     balance += earned;
     STORE.setItem('lockpickBalance', String(balance));

@@ -9,47 +9,10 @@
   (function(){
   'use strict';
 
-  let alchemyReady = false, alchemyRunning = false;
-  const rawRAF = window.requestAnimationFrame.bind(window);
-  let parked = [];
-
-  // Seventeen animation loops live in here. Off-screen they park themselves
-  // instead of burning frames next to the parallax, the noise decay and the
-  // bird watcher; opening the station lets them all go again.
-  function requestAnimationFrame(cb){
-    if(alchemyRunning) return rawRAF(cb);
-    parked.push(cb);
-    return 0;
-  }
-  function releaseParked(){
-    const queued = parked;
-    parked = [];
-    queued.forEach(cb => rawRAF(cb));
-  }
-
-  // A station whose markup has not been ported yet simply has no elements. The
-  // prototype wires handlers straight onto the results of getElementById, so
-  // missing ones get a stand-in rather than throwing and killing every station
-  // after them in the file.
-  const spare = () => {
-    const node = document.createElement('div');
-    node.style.display = 'none';
-    return node;
-  };
-  const realById = document.getElementById.bind(document);
-  // Searches stay inside the station panel. The prototype asks for '.scene',
-  // and so does the game — that selector is its main stage — so an unscoped
-  // query hands the alchemy code the game's own board to drive.
-  const scope = () => realById('alchemyRoot') || document;
-  const doc = {
-    getElementById: id => realById(id) || spare(),
-    querySelector: sel => scope().querySelector(sel),
-    querySelectorAll: sel => scope().querySelectorAll(sel),
-    createElement: tag => document.createElement(tag),
-    addEventListener: (...a) => document.addEventListener(...a),
-    get body(){ return document.body; },
-    get documentElement(){ return document.documentElement; }
-  };
+  let alchemyReady=false;
+  const engine=window.KeynlockAlchemyEngine;
+  const doc=engine.document;
+  const requestAnimationFrame=engine.requestFrame;
 
   function boot(){
   const scenes=[...doc.querySelectorAll('.scene')];
@@ -1129,10 +1092,9 @@
 
   window.Alchemy = {
     start(){
-      alchemyRunning = true;
+      engine.start();
       if(!alchemyReady){ alchemyReady = true; boot(); }
-      releaseParked();
     },
-    stop(){ alchemyRunning = false; }
+    stop(){ engine.stop(); }
   };
   })();

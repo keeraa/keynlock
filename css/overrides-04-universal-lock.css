@@ -173,8 +173,6 @@ body.mode-hillsfar .hfCandidate{min-height:56px!important;}
 .lairSceneCharacter.tik{height:47%!important;}
 .lairHotspotDialogue{top:62%!important;}
 }
-@media (prefers-reduced-motion:reduce){
-}
 .plate.selected:after{content:none!important;display:none!important;}
 .plateFace{transition:filter 180ms ease;}
 /* Was eight opaque gold shadows ringing the plate plus a glow — a neon outline.

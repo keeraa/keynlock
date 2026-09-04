@@ -1,0 +1,66 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { runInNewContext } from 'node:vm';
+
+const root=resolve(import.meta.dirname,'..');
+const source=path=>readFileSync(resolve(root,path),'utf8');
+const assert=(condition,message)=>{if(!condition)throw new Error(message);};
+
+function memoryStorage(seed={}){
+  const values=new Map(Object.entries(seed).map(([key,value])=>[key,String(value)]));
+  return {
+    get length(){return values.size;},
+    key:index=>[...values.keys()][index]??null,
+    getItem:key=>values.has(key)?values.get(key):null,
+    setItem:(key,value)=>values.set(key,String(value)),
+    removeItem:key=>values.delete(key)
+  };
+}
+
+const storage=memoryStorage({
+  keynlockResources:JSON.stringify({picks:0,parts:2,oil:1}),
+  lockpickBalance:'125'
+});
+const saveContext={window:{localStorage:storage}};
+runInNewContext(source('js/core/save-store.js'),saveContext,{filename:'save-store.js'});
+const store=saveContext.window.KeynlockSaveStore;
+assert(store.schemaVersion===1,'SaveStore schema version must be 1.');
+assert(store.getJSON('keynlockResources').picks===0,'SaveStore must preserve zero picks.');
+assert(store.getJSON('keynlockResources').components&&typeof store.getJSON('keynlockResources').components==='object','Migration must add the components object.');
+store.setJSON('scenario',{ok:true});
+assert(store.getJSON('scenario').ok===true,'SaveStore JSON round trip failed.');
+const snapshot=store.snapshot(key=>key.startsWith('lockpick'));
+assert(snapshot.lockpickBalance==='125','SaveStore snapshot omitted game progress.');
+store.restore({lockpickBalance:'250'},{clear:key=>key.startsWith('lockpick')});
+assert(store.getItem('lockpickBalance')==='250','SaveStore restore failed.');
+
+const contentContext={window:{}};
+for(const file of ['js/data/world.js','js/data/economy.js','js/data/restoration.js','js/data/paintings.js']){
+  runInNewContext(source(file),contentContext,{filename:file});
+}
+const content=contentContext.window.KeynlockContent;
+assert(Object.keys(content.world.districts).length===7,'The world must contain seven districts.');
+assert(content.world.missionPlaces.length===27,'Mission catalogue size changed unexpectedly.');
+assert(content.paintings.length===180,'Painting catalogue size changed unexpectedly.');
+assert(content.restoration.targetScore===88,'Restoration target changed unexpectedly.');
+
+globalThis.window=contentContext.window;
+const catalogModule=await import('../js/modules/content-catalog.mjs');
+assert(catalogModule.getPaintings().length===180,'Content module must expose every painting.');
+assert(catalogModule.getDistricts().length===7,'Content module must expose every district.');
+assert(catalogModule.getMissions().length===27,'Content module must expose every mission.');
+assert(Object.keys(catalogModule.getComponents()).length>0,'Content module must expose components.');
+assert(Object.keys(catalogModule.getLockLoot()).length>0,'Content module must expose lock loot.');
+delete globalThis.window;
+
+const restoration=source('js/world/restoration.js');
+assert(restoration.includes('const success=value>=TARGET_SCORE&&clean>=100;'),'Restoration must require both target light and complete cleaning.');
+const missions=source('js/world/missions.js');
+assert(missions.includes("missionRequiresPicks(loc.mode)&&!playerHasPicks()"),'Physical missions must reject a run without picks.');
+assert(missions.includes("missionRequiresPicks(place.mode)&&!playerHasPicks()"),'Physical mission thumbnails must be disabled without picks.');
+const defeat=source('js/core/game-defeat.js');
+assert(defeat.includes("reason==='picks'"),'Out-of-picks defeat must have a dedicated return-to-lair flow.');
+const inventoryGuard=source('js/core/inventory-hit-testing.js');
+for(const mode of ['classic','sequence','special','g1'])assert(inventoryGuard.includes(`'${mode}'`),`Typed tension guard is missing ${mode}.`);
+
+console.log('KEYNLOCK scenarios OK — saves, content, restoration, missions and typed tools.');

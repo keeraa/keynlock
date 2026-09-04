@@ -8,3 +8,6 @@ Do not add new cross-file lexical globals. Publish a small `window.Keynlock*`
 service from legacy code, expose it through `runtime.mjs`, and migrate the
 consumer. Once direct-file launch is retired, the remaining classic scripts can
 be converted one subsystem at a time without changing their public contracts.
+
+`content-catalog.mjs` is the first read-only domain module. New screens should
+use its named accessors instead of reading `window.KeynlockContent` directly.

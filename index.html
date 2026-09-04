@@ -121,10 +121,10 @@
   <button class="screenTopHudClose" id="alchemyTopHudClose" type="button" aria-label="Закрыть алхимию">×</button>
   <div class="screenTopHudTitle">Алхимия</div>
   <div class="alchemyStations" id="alchemyStations" role="tablist" aria-label="Станции">
-    <button class="alchemyStationTab active" type="button" data-station="0">Смешение</button>
-    <button class="alchemyStationTab" type="button" data-station="1">Концентрации</button>
-    <button class="alchemyStationTab" type="button" data-station="2">Разделение</button>
-    <button class="alchemyStationTab" type="button" data-station="3">Пигменты</button>
+    <button class="alchemyStationTab active" type="button" data-station="0">Пигменты</button>
+    <button class="alchemyStationTab" type="button" data-station="1">Смешение</button>
+    <button class="alchemyStationTab" type="button" data-station="2">Концентрации</button>
+    <button class="alchemyStationTab" type="button" data-station="3">Разделение</button>
   </div>
 </div>
 
@@ -354,6 +354,26 @@
 
         <section class="lairPanel" data-lair-panel="alchemy">
           <div class="alchemyRoot" id="alchemyRoot">
+          <section class="scene pigmentMixScene" data-name="Пигменты">
+            <div class="pigmentMixHeader">
+              <div><span>Колористика</span><strong>Собери цвет по образцу</strong></div>
+              <button class="ctl" id="pigmentNew" type="button">Новый образец</button>
+            </div>
+            <div class="pigmentMixBoard">
+              <div class="pigmentTargetCard"><span>Цвет заказа</span><i id="pigmentTarget"></i><strong id="pigmentTargetName">—</strong></div>
+              <div class="pigmentEquation" id="pigmentSlots" aria-label="Состав смеси"></div>
+              <div class="pigmentResultCard"><span>Текущая смесь</span><i id="pigmentResult"></i><strong id="pigmentResultName">Добавь пигменты</strong></div>
+            </div>
+            <div class="pigmentPaletteWrap">
+              <div class="pigmentPaletteHead"><span>Доступные цвета</span><small>Запасы из твоих ресурсов</small></div>
+              <div class="pigmentPalette" id="pigmentPalette"></div>
+            </div>
+            <div class="pigmentMixFooter">
+              <p id="pigmentStatus" aria-live="polite"></p>
+              <button class="ctl ctl-icon" id="pigmentClear" type="button" aria-label="Очистить смесь">↻</button>
+              <button class="ctl" id="pigmentCheck" type="button">Проверить</button>
+            </div>
+          </section>
           <section class="scene" data-name="Смешение">
             <button class="alchemyMixReference" type="button" aria-label="Открыть памятку по смешению">
               <img class="alchemyMixReferenceBoard" src="assets/alchemy/mixing-board.png" alt="">
@@ -375,34 +395,6 @@
             </div>
             <div class="scene-head"><div><h2>Разделение смеси</h2></div><div class="status" id="sepStatus"></div></div>
             <div class="lab color-game-lab"><div class="color-sample-panel"><h3>Цель и грязная смесь</h3><div class="tube-pair"><div class="tube-box"><div class="test-tube tube-lg"><div class="tube-liquid" id="sepTarget" style="--liquid-color:#5370c9;background-color:#5370c9"></div><div class="target-element-hint" id="sepTargetElement"></div></div><div class="swatch-label">цель</div></div><div class="current-cluster"><div class="tube-box current-main-box"><div class="test-tube tube-lg"><div class="tube-liquid" id="sepCurrent" style="--liquid-color:#8a647f;background-color:#8a647f"></div></div><div class="swatch-label">грязная смесь</div></div><div class="color-controls side-color-controls" id="sepControls"></div></div></div><button type="button" class="alchemyElementCell" id="sepElementCell" aria-label="Добавить элемент из стойки"><span class="alchemyElementCellHint">+</span></button><div class="big-actions centered-actions"><button class="ctl" id="sepCheck" disabled>Проверить</button><button class="ctl ctl-icon" id="sepReset" aria-label="Новая смесь"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg></button></div><div class="keyhint">Клавиатура: 1/2/3/4 — убрать примесь · Enter — проверить · R — сброс</div></div></div>
-          </section>
-          <section class="scene pigmentMixScene" data-name="Пигменты">
-            <div class="pigmentMixHeader">
-              <div><span>Колористика</span><strong>Собери цвет по образцу</strong></div>
-              <button class="ctl" id="pigmentNew" type="button">Новый образец</button>
-            </div>
-            <div class="pigmentMixBoard">
-              <div class="pigmentTargetCard">
-                <span>Цвет заказа</span>
-                <i id="pigmentTarget"></i>
-                <strong id="pigmentTargetName">—</strong>
-              </div>
-              <div class="pigmentEquation" id="pigmentSlots" aria-label="Состав смеси"></div>
-              <div class="pigmentResultCard">
-                <span>Текущая смесь</span>
-                <i id="pigmentResult"></i>
-                <strong id="pigmentResultName">Добавь пигменты</strong>
-              </div>
-            </div>
-            <div class="pigmentPaletteWrap">
-              <div class="pigmentPaletteHead"><span>Доступные цвета</span><small>Запасы из твоих ресурсов</small></div>
-              <div class="pigmentPalette" id="pigmentPalette"></div>
-            </div>
-            <div class="pigmentMixFooter">
-              <p id="pigmentStatus" aria-live="polite"></p>
-              <button class="ctl ctl-icon" id="pigmentClear" type="button" aria-label="Очистить смесь">↻</button>
-              <button class="ctl" id="pigmentCheck" type="button">Проверить</button>
-            </div>
           </section>
           </div>
         </section>

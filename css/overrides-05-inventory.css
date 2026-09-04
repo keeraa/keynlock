@@ -56,6 +56,8 @@ body.pick-reforming .mechanismZone .pick,body.pick-reforming .sharedModeLockArt 
 .inventoryAvatar{position:absolute;left:var(--avatar-left);top:var(--avatar-top);width:var(--avatar-width);height:var(--avatar-height);z-index:6;display:flex;justify-content:center;align-items:flex-start;overflow:hidden;pointer-events:none;}
 .inventoryDrawer:not(.open) .inventoryAvatar{opacity:0;}
 .inventoryAvatar img{width:100%;height:238%;object-fit:contain;object-position:50% 0%;transform:translateY(6%);filter:drop-shadow(0 8px 14px rgba(0,0,0,.38));-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 76%,rgba(0,0,0,.78) 89%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 76%,rgba(0,0,0,.78) 89%,transparent 100%);}
+.inventoryToolsPick .inventoryTool:first-child img{left:calc(50% + 10px)}
+.inventoryAvatar img{width:90%;height:190%;transform:translateY(8%) scale(.6048);transform-origin:50% 0;}
 .inventoryAvatar span{margin-top:28px;width:94px;height:94px;border-radius:50%;display:grid;place-items:center;color:#ead6a6;background:#181515;font:700 48px/1 Georgia,serif;}
 body:not(.inventory-open) #objectiveLine.difficulty{bottom:48px!important;}
 body.inventory-open #objectiveLine.difficulty{opacity:0!important;pointer-events:none!important;}
@@ -147,3 +149,4 @@ body.game-inactive.solved-notice-visible .solvedPuzzleOverlay{opacity:1;visibili
 .solvedPuzzleTitle{font-size:24px;}
 .solvedPuzzleButton{min-width:190px;min-height:40px;font-size:12px;}
 }
+.inventoryAvatar img{width:90%;height:190%;transform:translateY(8%) scale(.6048);transform-origin:50% 0;}

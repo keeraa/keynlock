@@ -283,6 +283,10 @@
         openMap();
         return;
       }
+      if(btn.dataset.lairAction==='workbench'){
+        openLairWorkbench();
+        return;
+      }
       openLairModule(btn.dataset.lairOpen);
     });
   });
@@ -293,6 +297,7 @@
   $lairModuleClose?.addEventListener('click',closeLairModule);
   document.querySelector('#alchemyTopHudClose')?.addEventListener('click',closeLairModule);
   document.querySelector('#collectionTopHudClose')?.addEventListener('click',closeLairModule);
+  document.querySelector('#restorationTopHudClose')?.addEventListener('click',closeLairModule);
 
   addEventListener('keydown',e=>{
     if(e.code!=='Escape') return;

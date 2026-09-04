@@ -170,37 +170,24 @@ body.map-open{overflow:hidden !important;}
 .worldMapArtwork{object-fit:contain !important;}
 .lairSceneTop{justify-content:flex-end !important;}
 .lairSceneTop > div:first-child{position:absolute !important;left:50% !important;top:0 !important;transform:translateX(-50%) !important;text-align:center !important;pointer-events:none !important;}
-.lairSceneCharacters{pointer-events:none !important;}
-.lairSceneCharacter{pointer-events:auto !important;cursor:pointer !important;transition:filter .2s ease, transform .2s ease !important;outline:none !important;}
+.lairSceneCharacters,.lairSceneCharacter{pointer-events:none !important;}
 .lairSceneCharacter img{pointer-events:none !important;}
-.lairSceneCharacter:hover,.lairSceneCharacter:focus-visible{filter:brightness(1.13) saturate(1.05) drop-shadow(0 0 18px rgba(231,190,102,.22)) drop-shadow(0 14px 20px rgba(0,0,0,.34)) !important;}
 .lairSceneCharacter.active{filter:brightness(1.08) saturate(1.03) drop-shadow(0 0 22px rgba(224,180,89,.28)) drop-shadow(0 14px 20px rgba(0,0,0,.34)) !important;}
-.lairSceneCharacter.tik{right:11.5% !important;bottom:2.5% !important;height:56% !important;}
 @media (max-width:760px){
 .lairSceneTop > div:first-child{top:2px !important;}
-.lairSceneCharacter.tik{right:6% !important;bottom:2% !important;height:41% !important;}
 }
 .lairPanel[data-lair-panel="team"] .lairPanelHead{display:none!important;}
 .lairPersonThumb img{object-position:center top!important;}
 .lairPortraitInner{place-items:start center!important;padding-top:10px!important;}
 .lairPortraitArt{height:122%!important;object-fit:contain!important;object-position:center top!important;transform:translateY(-2%)!important;}
-.lairSceneCharacter{animation:none!important;}
-.lairSceneCharacter.kai{left:13% !important;bottom:14% !important;height:53.3% !important;}
-@media (max-width:760px){
-.lairSceneCharacter.kai{left:7% !important;bottom:9% !important;height:39.3% !important;}
-}
 .worldMapClose{position:fixed !important;top:18px !important;right:18px !important;z-index:1320 !important;width:44px !important;height:44px !important;display:grid !important;place-items:center !important;padding:0 !important;border:1px solid rgba(176,132,65,.82) !important;border-radius:11px !important;background:rgba(28,21,15,.94) !important;color:#e7c783 !important;font:700 27px/1 Arial,sans-serif !important;cursor:pointer !important;box-shadow:0 8px 24px rgba(0,0,0,.36) !important;}
 .worldMapClose:hover{filter:brightness(1.16) !important;}
-.lairHotspotCity{left:23.5% !important;top:40.5% !important;}
-.lairHotspotTeam{left:83% !important;top:58.5% !important;}
 @media (max-width:760px){
 .worldMapScreen{padding:0 !important;align-items:stretch !important;justify-content:flex-start !important;overflow:hidden !important;}
 .worldMapDialog{width:100vw !important;height:100dvh !important;max-height:none !important;padding:0 !important;border:0 !important;border-radius:0 !important;overflow-x:auto !important;overflow-y:hidden !important;display:block !important;-webkit-overflow-scrolling:touch !important;scrollbar-width:thin !important;}
 .worldMapDialog .worldMapCanvas{height:100dvh !important;width:calc(100dvh * 1.775862) !important;min-width:calc(100dvh * 1.775862) !important;max-width:none !important;max-height:none !important;aspect-ratio:1648/928 !important;border:0 !important;border-radius:0 !important;margin:0 !important;}
 .worldMapArtwork{width:100% !important;height:100% !important;object-fit:contain !important;}
 .worldMapClose{top:10px !important;right:10px !important;width:42px !important;height:42px !important;border-radius:10px !important;}
-.lairHotspotCity{left:17% !important;top:36% !important;}
-.lairHotspotTeam{left:79% !important;top:62% !important;}
 }
 body.importedMode .g1ProgressWrap{position:absolute !important;left:50% !important;top:48% !important;bottom:auto !important;width:auto !important;margin:0 !important;transform:translateX(-50%) !important;z-index:30 !important;}
 body.importedMode .g1ProgressRow{display:flex !important;flex-wrap:nowrap !important;align-items:center !important;justify-content:center !important;gap:12px !important;min-height:74px !important;}
@@ -221,114 +208,6 @@ body.importedMode .anTracks{width:260px !important;gap:10px !important;}
 body.importedMode .anReadout{top:232px !important;font-size:44px !important;}
 }
 
-/* ---- Lair scene pass ---- */
-/* The objective belongs to the lock, not to the base. */
-body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none !important;}
-
-/* Tik stands further back than Sai, so he reads behind her and stands higher up
-   the room rather than at her feet. */
-.lairSceneCharacter.kai{z-index:2 !important;}
-.lairSceneCharacter.sai{z-index:3 !important;}
-.lairSceneCharacter.tik{z-index:1 !important;}
-
-/* Desktop figures come down to the proportions they already had on phones —
-   they were half again as tall for the same room. */
-.lairSceneCharacter.kai{height:39.3% !important;}
-.lairSceneCharacter.sai{height:46% !important;}
-.lairSceneCharacter.tik{right:11.5% !important;bottom:12% !important;height:41% !important;}
-
-/* Hotspots sat across the faces. City moves right, team drops below the figure. */
-.lairHotspotCity{left:32% !important;top:40.5% !important;}
-.lairHotspotTeam{left:83% !important;top:68% !important;}
-
-@media (max-width:760px){
-  .lairSceneCharacter.tik{right:6% !important;bottom:10% !important;height:41% !important;}
-  .lairHotspotCity{left:26% !important;top:36% !important;}
-  .lairHotspotTeam{left:79% !important;top:74% !important;}
-}
-
-/* Keep the full crew inside a phone viewport: 85% of the current figure sizes,
-   shifted toward the open right side of the room. */
-@media (max-width:760px), (max-height:560px) and (orientation:landscape) and (pointer:coarse){
-  .lairSceneCharacter.kai{left:30% !important;height:33.4% !important;}
-  .lairSceneCharacter.sai{left:47% !important;bottom:2% !important;height:39.1% !important;}
-  .lairSceneCharacter.tik{right:-13% !important;height:34.9% !important;}
-}
-
-/* Alchemy hotspot: left of the crew, on the wall the camera opens onto. */
-.lairHotspotAlchemy{left:52% !important;top:38% !important;}
-@media (max-width:760px){
-  .lairHotspotAlchemy{left:56% !important;top:30% !important;}
-}
-
-/* Collection hotspot: empty wall above Kai, clear of the city hotspot at
-   32%/40.5% and Kai's own sprite (left:13%, height:39.3% up from the
-   bottom — his head clears well below this). */
-.lairHotspotCollection{left:10% !important;top:24% !important;}
-@media (max-width:760px){
-  .lairHotspotCollection{left:8% !important;top:18% !important;}
-}
-
-/* Lair interaction map: controls now sit on the objects they describe. */
-.lairHotspotAlchemy{left:57.5% !important;top:62% !important;}
-.lairHotspotCity{left:75% !important;top:44% !important;}
-.lairHotspotCollection{left:60% !important;top:45% !important;}
-.lairHotspotMissions{left:25% !important;top:68% !important;}
-.lairHotspotRestoration{left:42% !important;top:44% !important;}
-.lairHotspot:not(.lairHotspotTeam){
-  min-width:132px !important;
-  padding:62px 12px 10px !important;
-}
-.lairHotspotIcon{
-  position:absolute;
-  left:50%;
-  top:5px;
-  width:54px;
-  height:54px;
-  transform:translateX(-50%);
-  object-fit:contain;
-  filter:drop-shadow(0 5px 9px rgba(0,0,0,.42));
-  pointer-events:none;
-  transition:transform .16s ease,filter .16s ease;
-}
-.lairHotspot:not(.lairHotspotTeam):hover .lairHotspotIcon{
-  transform:translateX(-50%) scale(1.08);
-  filter:brightness(1.1) drop-shadow(0 6px 12px rgba(0,0,0,.48));
-}
-
-/* Character selection is persistent scene UI rather than a label over Tik. */
-.lairHotspotTeam{
-  left:auto !important;
-  right:1.6% !important;
-  top:auto !important;
-  bottom:3% !important;
-  width:96px !important;
-  min-width:96px !important;
-  height:96px !important;
-  padding:0 !important;
-  overflow:hidden !important;
-  border:2px solid rgba(205,157,78,.86) !important;
-  border-radius:18px !important;
-  background:linear-gradient(145deg,rgba(58,42,27,.96),rgba(17,13,10,.98)) !important;
-  box-shadow:0 10px 30px rgba(0,0,0,.42),inset 0 0 0 2px rgba(255,224,160,.08) !important;
-  backdrop-filter:none !important;
-  transform:none !important;
-}
-.lairHotspotTeam:hover{filter:brightness(1.1) !important;}
-.lairActiveCharacterPortrait{
-  position:absolute;
-  left:50%;
-  top:0;
-  width:auto;
-  height:155%;
-  max-width:none;
-  transform:translateX(-50%);
-  object-fit:contain;
-  object-position:center top;
-  pointer-events:none;
-}
-.lairHotspotTeam[data-character="sai"] .lairActiveCharacterPortrait{height:150%;}
-.lairHotspotTeam[data-character="tik"] .lairActiveCharacterPortrait{height:155%;}
 .lairActiveCharacterBadge{
   position:absolute;
   left:7px;
@@ -401,14 +280,6 @@ body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none !important
 }
 
 @media (max-width:760px){
-  .lairHotspotAlchemy{left:57.5% !important;top:62% !important;}
-  .lairHotspotCity{left:75% !important;top:44% !important;}
-  .lairHotspotCollection{left:60% !important;top:45% !important;}
-  .lairHotspotMissions{left:25% !important;top:68% !important;}
-  .lairHotspotRestoration{left:42% !important;top:44% !important;}
-  .lairHotspot:not(.lairHotspotTeam){min-width:106px !important;padding:50px 8px 8px !important;}
-  .lairHotspotIcon{top:4px;width:44px;height:44px;}
-  .lairHotspotTeam{right:10px !important;bottom:10px !important;width:72px !important;min-width:72px !important;height:72px !important;border-radius:14px !important;}
   .lairActiveCharacterBadge{left:4px;right:4px;bottom:4px;font-size:6px;}
   .lairPortrait{height:170px !important;}
   .lairCharacters{width:100% !important;grid-template-columns:1fr !important;}

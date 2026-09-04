@@ -2,15 +2,57 @@
     STORE.setItem('lockpickLairIntel',JSON.stringify(lairIntel));
   }
 
+  const LAIR_MODULE_TITLES={team:'Выбор персонажа',dialogue:'Диалоги',city:'Анализ города',alchemy:'Алхимия',collection:'Коллекция',restoration:'Мастерская'};
+  let lairReturnFocus=null;
+  let workbenchReturnFocus=null;
+
+  function pauseLairPortraitVideos(){
+    $lairCharacters?.querySelectorAll('video').forEach(video=>video.pause());
+  }
+
+  function playLairPortraitVideos(){
+    $lairCharacters?.querySelectorAll('video').forEach(video=>video.play().catch(()=>{}));
+  }
+
+  function focusLairDialog(dialog,preferred){
+    requestAnimationFrame(()=>{
+      const target=preferred||dialog?.querySelector('button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])');
+      target?.focus({preventScroll:true});
+    });
+  }
+
+  function setLairBackgroundInert(activeDialog){
+    const scene=$lairOverlay?.querySelector('.lairScene');
+    if(!scene) return;
+    [...scene.children].forEach(child=>{
+      if(child===activeDialog) child.removeAttribute('inert');
+      else if(activeDialog) child.setAttribute('inert','');
+      else child.removeAttribute('inert');
+    });
+  }
+
+  function trapLairDialogFocus(event,dialog){
+    if(event.key!=='Tab'||!dialog||dialog.hidden) return;
+    const items=[...dialog.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')]
+      .filter(el=>el.getClientRects().length);
+    if(!items.length){ event.preventDefault(); dialog.focus?.(); return; }
+    const first=items[0],last=items.at(-1);
+    if(event.shiftKey&&document.activeElement===first){ event.preventDefault(); last.focus(); }
+    else if(!event.shiftKey&&document.activeElement===last){ event.preventDefault(); first.focus(); }
+  }
+
   function setLairTab(next){
+    if(!Object.hasOwn(LAIR_MODULE_TITLES,next)) return false;
     lairTab=next;
     document.querySelectorAll('.lairPanel').forEach(panel=>panel.classList.toggle('active',panel.dataset.lairPanel===next));
-    if(next==='team') renderLairTeam();
+    pauseLairPortraitVideos();
+    if(next==='team'){ renderLairTeam(); playLairPortraitVideos(); }
     if(next==='dialogue') renderLairDialogue();
     if(next==='city') renderLairIntel();
     if(next==='restoration') window.KeynlockRestoration?.start();
     // The stations boot on first open and park their loops when they close.
     if(next==='alchemy') window.Alchemy?.start(); else window.Alchemy?.stop();
+    return true;
   }
 
   function renderLairScene(){
@@ -27,43 +69,31 @@
     if(activeName)activeName.textContent=activeCharacter.name;
     if(teamHotspot)teamHotspot.dataset.character=lairCharacter;
     teamHotspot?.setAttribute('aria-label',`Выбор персонажа: ${activeCharacter.name}`);
-    const order=['kai','sai','tik'];
-    $lairSceneCharacters.innerHTML=order.map((id,index)=>{
-      const ch=LAIR_CHARACTERS[id];
-      return `
-        <div class="lairSceneCharacter ${id}${id===lairCharacter?' active':''}" data-lair-character="${id}" role="button" tabindex="0" aria-label="Выбрать персонажа ${ch.name}">
-          <img src="${ch.full}" alt="${ch.name}">
-        </div>
-      `;
-    }).join('');
-    $lairSceneCharacters.querySelectorAll('[data-lair-character]').forEach(el=>{
-      const selectCharacter=()=>{
-        const id=el.dataset.lairCharacter;
-        if(!LAIR_CHARACTERS[id]) return;
-        lairCharacter=id;
-        STORE.setItem('lockpickLairCharacter',id);
-        renderLairScene();
-        renderWorldMap();
-        if(lairOpen && $lairModuleWindow && !$lairModuleWindow.hidden && lairTab==='team') renderLairTeam();
-      };
-      el.addEventListener('click',selectCharacter);
-      el.addEventListener('keydown',e=>{
-        if(e.key==='Enter'||e.key===' '){e.preventDefault();selectCharacter();}
-      });
+    if(!$lairSceneCharacters.children.length){
+      $lairSceneCharacters.innerHTML=['kai','sai','tik'].map(id=>{
+        const ch=LAIR_CHARACTERS[id];
+        return `<div class="lairSceneCharacter ${id}" data-lair-character="${id}"><img src="${ch.full}" alt=""></div>`;
+      }).join('');
+    }
+    $lairSceneCharacters.querySelectorAll('[data-lair-character]').forEach(character=>{
+      character.classList.toggle('active',character.dataset.lairCharacter===lairCharacter);
     });
   }
 
   function openLairModule(next){
-    if(!$lairModuleWindow) return;
-    const titles={team:'Выбор персонажа',dialogue:'Диалоги',city:'Анализ города',alchemy:'Алхимия',collection:'Коллекция',restoration:'Реставрационная мастерская'};
-    $lairModuleTitle.textContent=titles[next]||'Логово';
+    if(!$lairModuleWindow||!Object.hasOwn(LAIR_MODULE_TITLES,next)) return false;
+    closeLairWorkbench({restoreFocus:false});
+    lairReturnFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;
+    $lairModuleTitle.textContent=LAIR_MODULE_TITLES[next];
     $lairModuleWindow.dataset.module=next;
     $lairModuleWindow.hidden=false;
     $lairModuleWindow.classList.add('open');
+    setLairBackgroundInert($lairModuleWindow);
     // Alchemy measures and creates part of its scene during the first start.
     // Make the window measurable before booting it; starting while [hidden]
     // produced a zero-size first layout that jumped into place one frame later.
     setLairTab(next);
+    focusLairDialog($lairModuleWindow,$lairModuleClose);
     if(next==='alchemy'){
       const stabilize=()=>{
         const moduleBody=$lairModuleWindow.querySelector('.lairModuleBody');
@@ -73,28 +103,44 @@
       requestAnimationFrame(()=>requestAnimationFrame(stabilize));
       document.fonts?.ready.then(stabilize);
     }
+    return true;
   }
 
-  function closeLairModule(){
+  function closeLairModule({restoreFocus=true}={}){
     window.Alchemy?.stop();
+    pauseLairPortraitVideos();
     if(!$lairModuleWindow) return;
     $lairModuleWindow.classList.remove('open');
     $lairModuleWindow.hidden=true;
+    setLairBackgroundInert(null);
+    if(restoreFocus&&lairReturnFocus?.isConnected) lairReturnFocus.focus({preventScroll:true});
+    lairReturnFocus=null;
   }
 
   function openLairWorkbench(){
     const modal=document.querySelector('#lairWorkbenchModal');
     if(!modal) return;
-    closeLairModule();
+    closeLairModule({restoreFocus:false});
+    workbenchReturnFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;
     modal.hidden=false;
-    document.querySelector('#lairWorkbenchClose')?.focus({preventScroll:true});
+    setLairBackgroundInert(modal);
+    focusLairDialog(modal,document.querySelector('#lairWorkbenchClose'));
   }
 
-  function closeLairWorkbench(){
+  function closeLairWorkbench({restoreFocus=true}={}){
     const modal=document.querySelector('#lairWorkbenchModal');
     if(!modal || modal.hidden) return;
     modal.hidden=true;
+    setLairBackgroundInert(null);
+    if(restoreFocus&&workbenchReturnFocus?.isConnected) workbenchReturnFocus.focus({preventScroll:true});
+    workbenchReturnFocus=null;
   }
+
+  document.addEventListener('keydown',event=>{
+    if(!$lairModuleWindow?.hidden) trapLairDialogFocus(event,$lairModuleWindow);
+    const workbench=document.querySelector('#lairWorkbenchModal');
+    if(workbench&&!workbench.hidden) trapLairDialogFocus(event,workbench);
+  });
 
   function lairPortraitMarkup(ch,{small=false}={}){
     if(!ch?.portrait){
@@ -106,27 +152,26 @@
       return `<span class="lairPersonThumb"><img src="${ch.portrait}" alt="${ch.name}"></span>`;
     }
     const art=ch.portraitVideo
-      ? `<video class="lairPortraitArt" src="${ch.portraitVideo}" poster="${ch.portrait}" autoplay muted loop playsinline preload="auto" aria-label="${ch.name}"></video>`
+      ? `<video class="lairPortraitArt" src="${ch.portraitVideo}" poster="${ch.portrait}" muted loop playsinline preload="metadata" aria-label="${ch.name}"></video>`
       : `<img class="lairPortraitArt" src="${ch.portrait}" alt="${ch.name}">`;
     return `<div class="lairPortrait hasArt"><div class="lairPortraitInner">${art}</div></div>`;
   }
 
   function renderLairTeam(){
     if(!$lairCharacters) return;
-    $lairCharacters.innerHTML='';
-    Object.entries(LAIR_CHARACTERS).forEach(([id,ch])=>{
-      const card=document.createElement('button');
-      card.type='button';
-      card.className='lairCharacter'+(id===lairCharacter?' active':'');
-      card.dataset.character=id;
-      card.innerHTML=`
-        ${lairPortraitMarkup(ch)}
-        <div class="lairCharacterName">${ch.name}</div>
-        <div class="lairCharacterRole">${ch.role}</div>
-        <div class="lairCharacterDesc">${ch.desc}</div>
-        <div class="lairCharacterSelect">${id===lairCharacter?'Активный персонаж':'Выбрать'}</div>
-      `;
-      card.addEventListener('click',()=>{
+    if(!$lairCharacters.children.length){
+      $lairCharacters.innerHTML=Object.entries(LAIR_CHARACTERS).map(([id,ch])=>`
+        <button type="button" class="lairCharacter" data-character="${id}">
+          ${lairPortraitMarkup(ch)}
+          <div class="lairCharacterName">${ch.name}</div>
+          <div class="lairCharacterRole">${ch.role}</div>
+          <div class="lairCharacterDesc">${ch.desc}</div>
+          <div class="lairCharacterSelect"></div>
+        </button>`).join('');
+      $lairCharacters.addEventListener('click',event=>{
+        const card=event.target.closest('[data-character]');
+        const id=card?.dataset.character;
+        if(!LAIR_CHARACTERS[id]) return;
         lairCharacter=id;
         STORE.setItem('lockpickLairCharacter',id);
         renderLairTeam();
@@ -134,7 +179,13 @@
         renderWorldMap();
         renderInventoryAvatar();
       });
-      $lairCharacters.appendChild(card);
+    }
+    $lairCharacters.querySelectorAll('[data-character]').forEach(card=>{
+      const active=card.dataset.character===lairCharacter;
+      card.classList.toggle('active',active);
+      card.setAttribute('aria-pressed',String(active));
+      const label=card.querySelector('.lairCharacterSelect');
+      if(label) label.textContent=active?'Активный персонаж':'Выбрать';
     });
   }
 
@@ -232,7 +283,8 @@
     document.body.classList.add('lair-open');
     $lairOverlay.hidden=false;
     $lairOverlay.classList.add('open');
-    closeLairModule();
+    closeLairWorkbench({restoreFocus:false});
+    closeLairModule({restoreFocus:false});
     renderLairScene();
     // The scene only has a size once the overlay is up, so the opening view is
     // set here rather than at load. Straight away if layout is already there,

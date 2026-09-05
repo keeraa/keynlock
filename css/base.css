@@ -70,6 +70,7 @@ body.importedMode .main{place-items:stretch;}
 .resourceHudBadge span{display:block;color:#8e7b61;font:8px/1 var(--ui-font);text-transform:uppercase;}
 .resourceHudBadge b{display:block;margin-top:3px;color:#e2c58e;font:700 12px/1 var(--ui-font);}
 .resourceHudBadgeParts b::before{display:inline-block;width:14px;height:16px;margin:-3px 4px -4px 0;background:url('../assets/ui/details-ico.png') center/contain no-repeat;content:'';filter:drop-shadow(0 1px 2px rgba(0,0,0,.55));}
+.resourceHudBadgeOil b::before{display:inline-block;width:10px;height:19px;margin:-5px 4px -5px 0;background:url('../assets/ui/maslenka-ico.png') center/contain no-repeat;content:'';filter:drop-shadow(0 1px 2px rgba(0,0,0,.6));}
 @media (max-width: 900px){
 .tab{padding:7px 10px;font-size:12px;}
 }

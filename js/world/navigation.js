@@ -22,7 +22,7 @@
     mapOpen=true;
     document.body.classList.add('map-open');
     $worldMapScreen.hidden=false;
-    $mapTab.classList.add('active');
+    $mapTab?.classList.add('active');
     renderWorldMap();
   }
 

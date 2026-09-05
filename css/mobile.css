@@ -1,8 +1,8 @@
-/* Mobile: the three shared navigation icons live on the top line. */
+/* Mobile: the two shared navigation icons live on the top line. */
 @media (max-width:760px),(max-height:560px) and (orientation:landscape){
   .topRightHud{
-    width:calc(var(--mobile-hud-size) * 3 + 8px)!important;
-    grid-template-columns:repeat(3,var(--mobile-hud-size))!important;
+    width:calc(var(--mobile-hud-size) * 2 + 4px)!important;
+    grid-template-columns:repeat(2,var(--mobile-hud-size))!important;
     grid-auto-rows:var(--mobile-hud-size)!important;
     gap:4px!important;
     top:calc(var(--mobile-safe-top) + 8px)!important;
@@ -10,20 +10,19 @@
     max-width:calc(100vw - var(--mobile-safe-left) - var(--mobile-safe-right) - 72px)!important;
   }
   .topRightHud #lairHudButton{grid-column:1!important;grid-row:1!important;}
-  .topRightHud #mapTab{grid-column:2!important;grid-row:1!important;}
-  .topRightHud #gameSettingsButton{grid-column:3!important;grid-row:1!important;}
+  .topRightHud #gameSettingsButton{grid-column:2!important;grid-row:1!important;}
   .topRightHud .economyHud{
-    grid-column:3!important;
+    grid-column:1 / 3!important;
     grid-row:2!important;
     display:grid!important;
-    grid-template-columns:var(--mobile-hud-size)!important;
-    width:var(--mobile-hud-size)!important;
-    min-width:var(--mobile-hud-size)!important;
-    max-width:var(--mobile-hud-size)!important;
+    grid-template-columns:none!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:none!important;
     height:var(--mobile-hud-size)!important;
     margin:0!important;
     padding:0!important;
-    gap:0!important;
+    gap:6px!important;
     justify-self:end!important;
   }
   .topRightHud .assetNameHud{display:none!important;}
@@ -36,8 +35,8 @@
 }
 @media (max-width:390px) and (orientation:portrait){
   :root{--mobile-hud-size:38px;}
-  .topRightHud{width:calc(var(--mobile-hud-size) * 3 + 6px)!important;gap:3px!important;}
-  .topRightHud .hudNavIcon,.topRightHud #mapTab .mapTabIcon{width:20px!important;height:20px!important;}
+  .topRightHud{width:calc(var(--mobile-hud-size) * 2 + 3px)!important;gap:3px!important;}
+  .topRightHud .hudNavIcon{width:20px!important;height:20px!important;}
   .topRightHud .hudBadgeValue,.topRightHud .hudBadgeValue strong,.topRightHud .hudSquareBadge strong{font-size:10.5px!important;}
 }
 @media (max-width:340px) and (orientation:portrait){
@@ -46,8 +45,8 @@
 }
 @media (max-height:560px) and (orientation:landscape){
   .topRightHud{
-    width:calc(var(--mobile-hud-size) * 3 + 6px)!important;
-    grid-template-columns:repeat(3,var(--mobile-hud-size))!important;
+    width:calc(var(--mobile-hud-size) * 2 + 3px)!important;
+    grid-template-columns:repeat(2,var(--mobile-hud-size))!important;
     gap:3px!important;
     top:calc(var(--mobile-safe-top) + 6px)!important;
     right:calc(var(--mobile-safe-right) + 6px)!important;
@@ -266,7 +265,7 @@ body.importedMode .pinTopLayer{display:none!important;}
    them and pushed the balance off the right edge. */
 @media (max-width:760px),(max-height:560px) and (orientation:landscape){
   .topRightHud #economyHud{
-    grid-column:1 / 4!important;grid-row:2!important;
+    grid-column:1 / 3!important;grid-row:2!important;
     display:flex!important;flex-direction:row!important;align-items:center!important;
     justify-content:flex-end!important;gap:10px!important;
     width:auto!important;min-width:0!important;max-width:none!important;

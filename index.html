@@ -90,19 +90,15 @@
 <header class="globalTopHud" id="globalTopHud" aria-label="Верхнее меню игры">
 <div class="topRightHud">
 <div class="economyHud" id="economyHud">
-  <div class="balanceBox hudSquareBadge" id="balanceBox" aria-label="Деньги">
-    <span class="hudBadgeLabel">Деньги</span>
+  <div class="balanceBox hudSquareBadge resourceReadout" id="balanceBox" tabindex="0" aria-label="Монеты" data-tip="Монеты · нужны для покупок и улучшений в логове">
     <strong class="hudBadgeValue"><span class="coinIcon gameResourceIcon" aria-hidden="true"></span><span id="coinBalance">0</span></strong>
   </div>
-  <div class="resourceHudBadge" title="Отмычки"><span>Отмычки</span><b id="resourcePicks">3/3</b></div>
-  <div class="resourceHudBadge resourceHudBadgeParts" title="Детали замков"><span>Детали</span><b id="resourceParts">0</b></div>
-  <div class="resourceHudBadge resourceHudBadgeOil" title="Масло в маслёнке"><span>Масло</span><b id="resourceOil">0/3</b></div>
+  <div class="resourceHudBadge" tabindex="0" aria-label="Отмычки" data-tip="Отмычки · запас инструментов для физических замков"><span class="resourceHudIcon resourceHudIconPicks" aria-hidden="true"></span><b id="resourcePicks">3/3</b></div>
+  <div class="resourceHudBadge" tabindex="0" aria-label="Детали замков" data-tip="Детали замков · материал для изготовления новых отмычек"><span class="resourceHudIcon resourceHudIconParts" aria-hidden="true"></span><b id="resourceParts">0</b></div>
+  <div class="resourceHudBadge" tabindex="0" aria-label="Масло в маслёнке" data-tip="Масло · защищает отмычку от поломки"><span class="resourceHudIcon resourceHudIconOil" aria-hidden="true"></span><b id="resourceOil">0/3</b></div>
 </div>
   <button class="mapCornerBtn hudNavBtn" id="lairHudButton" type="button" aria-label="Логово" title="Логово">
     <img class="hudNavArtwork" src="assets/ui/lair-ico.png" alt="">
-  </button>
-  <button class="mapCornerBtn hudNavBtn" id="mapTab" type="button" aria-label="Карта города" title="Карта города">
-    <img class="hudNavArtwork" src="assets/ui/map-ico.png" alt="">
   </button>
   <button class="mapCornerBtn hudNavBtn" id="gameSettingsButton" type="button" aria-label="Главное меню" title="Главное меню">
     <img class="hudNavArtwork" src="assets/ui/settings-ico.png" alt="">

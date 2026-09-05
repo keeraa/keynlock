@@ -266,7 +266,7 @@
   });
   document.querySelector('#lairHudButton')?.addEventListener('click',openLairFromHud);
   document.querySelector('#newPuzzleButton')?.addEventListener('click',restartCurrentRound);
-  $mapTab.onclick=openMap;
+  if($mapTab)$mapTab.onclick=openMap;
   document.querySelector('#worldMapClose')?.addEventListener('click',()=>closeMap(true));
   $worldMapScreen?.addEventListener('pointerdown',e=>{
     if(e.target===$worldMapScreen) closeMap(true);

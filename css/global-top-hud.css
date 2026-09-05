@@ -118,6 +118,37 @@ body.mode-hillsfar .globalTopHud{
 
 body.lair-open .globalTopHud #rewardBox{display:none!important;}
 
+/* Resources are compact readouts rather than navigation cards. */
+.globalTopHud .economyHud .resourceReadout,
+.globalTopHud .economyHud .resourceHudBadge{
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  width:auto;
+  min-width:0;
+  max-width:none;
+  height:auto;
+  min-height:30px;
+  max-height:none;
+  margin:0;
+  padding:2px;
+  border:0;
+  border-radius:0;
+  background:none;
+  box-shadow:none;
+  outline-offset:4px;
+}
+.globalTopHud .economyHud .resourceHudBadge b{margin:0;color:var(--color-gold-pale);font:700 14px/1 var(--ui-font);}
+.globalTopHud .resourceHudIcon{display:block;width:20px;height:24px;flex:0 0 auto;background-position:center;background-repeat:no-repeat;background-size:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.62));}
+.globalTopHud .resourceHudIconPicks{width:13px;background-image:url('../assets/picks/pick_01.webp');}
+.globalTopHud .resourceHudIconParts{width:18px;background-image:url('../assets/ui/details-ico.png');}
+.globalTopHud .resourceHudIconOil{width:13px;background-image:url('../assets/ui/maslenka-ico.png');}
+.globalTopHud .economyHud [data-tip]{transition:filter .18s ease,transform .18s ease;}
+.globalTopHud .economyHud [data-tip]:hover{filter:brightness(1.18);transform:translateY(-1px);}
+.globalTopHud .economyHud [data-tip]:focus-visible{outline:1px solid #d9a74c;}
+
 @media (max-width:1100px){
   .globalTopHud{
     grid-template-columns:minmax(0,1fr) auto;

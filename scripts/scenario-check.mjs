@@ -118,7 +118,9 @@ assert(missions.includes("missionRequiresPicks(loc.mode)&&!playerHasPicks()"),'P
 assert(missions.includes("missionRequiresPicks(place.mode)&&!playerHasPicks()"),'Physical mission thumbnails must be disabled without picks.');
 assert(missions.includes("GameCatalog.feature(mode,'lock.requiresPick')"),'Mission access must use the immutable lockpick requirement, not lock visibility.');
 const baseLocks=source('js/modes/base-locks.js');
-assert(baseLocks.includes("GameCatalog.feature(mode,'lock.requiresPick')&&picks<=0"),'Starting a pickless puzzle with zero picks must not trigger defeat.');
+assert(baseLocks.includes("GameCatalog.feature(mode,'lock.requiresPick')&&picks<=0&&!lairOpen"),'Starting a pickless puzzle or opening the lair with zero picks must not trigger defeat.');
+const init=source('js/core/init.js');
+assert(init.indexOf("if(mapLocation==='lair')openLair();")<init.indexOf('newLock(false);',init.indexOf('function bootGame')),'The saved lair must open before its hidden puzzle is initialized.');
 const gameCatalogSource=source('js/core/game-catalog.js');
 assert(gameCatalogSource.includes('game.lock.requiresPick&&failedPlayerAttempt'),'Failed pickless puzzles must not consume a pick.');
 const defeat=source('js/core/game-defeat.js');

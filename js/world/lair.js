@@ -278,6 +278,10 @@
   function openLair(){
     setInventoryOpen(false);
     if(mapLocation!=='lair' || !$lairOverlay) return;
+    if(gameDefeat.isActive()){
+      gameDefeat.reset();
+      setGameInactive(false);
+    }
     if(mapOpen){
       mapOpen=false;
       document.body.classList.remove('map-open');

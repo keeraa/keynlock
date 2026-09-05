@@ -266,7 +266,7 @@ let plateEls=[], pinTopPlateEls=[];
     updatePickUI();
     updateEconomyUI();
 
-    if(GameCatalog.feature(mode,'lock.requiresPick')&&picks<=0){
+    if(GameCatalog.feature(mode,'lock.requiresPick')&&picks<=0&&!lairOpen){
       showPickDepletedLoss();
       return;
     }

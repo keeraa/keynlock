@@ -318,7 +318,7 @@
     updateModeUI();
     updateEconomyUI();
     updatePickUI();
-    newLock(false);
     if(mapLocation==='lair')openLair();
+    newLock(false);
   }
   (window.KeynlockAssetsReady || Promise.resolve()).then(bootGame);

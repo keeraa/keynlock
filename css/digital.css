@@ -148,7 +148,7 @@ body.importedMode .drumMode .digitalResult{margin-top:6px!important;}
 .worldMapDialog .worldMapCanvas,.worldMapDialog .worldMapInfo{width:100% !important;max-width:none !important;}
 .worldMapDialog .worldMapCanvas{flex:0 0 auto;}
 body.map-open{overflow:hidden !important;}
-.lairScene{background-image:linear-gradient(rgba(10,7,4,.14),rgba(10,7,4,.22)),url("../assets/lair/lair-background.jpg") !important;background-size:100% 100%,cover !important;background-position:center center,calc(50% + var(--lair-pan,0px)) center !important;background-repeat:no-repeat !important;}
+.lairScene{background-image:linear-gradient(rgba(10,7,4,.14),rgba(10,7,4,.22)),url("../assets/lair/lair-room-bg-01.jpg") !important;background-size:100% 100%,cover !important;background-position:center center,calc(50% + var(--lair-pan,0px)) center !important;background-repeat:no-repeat !important;}
 @media (max-width:760px){
 .worldMapDialog{gap:10px;}
 }

@@ -103,7 +103,7 @@
 .lairPortraitArt{display:block;width:auto;max-width:none;filter:drop-shadow(0 10px 18px rgba(0,0,0,.32));}
 .lairPersonThumb{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:50%;border:1px solid #695437;background:#120f0c;font:16px/1 Georgia,serif;overflow:hidden;position:relative;}
 .lairPersonThumb img{position:absolute;left:50%;bottom:-3px;width:auto;height:120%;transform:translateX(-50%);object-fit:contain;}
-.lairOverlay{--lair-bg:url("../assets/lair/lair-background.jpg");padding:0!important;background:linear-gradient(rgba(6,5,4,.12),rgba(6,5,4,.24)),
+.lairOverlay{--lair-bg:url("../assets/lair/lair-room-bg-01.jpg");padding:0!important;background:linear-gradient(rgba(6,5,4,.12),rgba(6,5,4,.24)),
     var(--lair-bg, none) center center/cover no-repeat!important;overflow:hidden;}
 
 /* Map labels sit on light parchment, so they need their own dark plate rather

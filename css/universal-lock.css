@@ -121,9 +121,9 @@ body.importedMode .cpPart{min-width:82px!important;}
 .lairSceneKicker{font-size:8px!important;}
 .lairSceneTitle{font-size:22px!important;}
 .lairSceneActive{display:none!important;}
-.lairSceneCharacter.kai{left:-2%!important;height:42%!important;}
-.lairSceneCharacter.sai{left:29%!important;height:46%!important;}
-.lairSceneCharacter.tik{right:-1%!important;height:41%!important;}
+.lairSceneCharacter.kai{left:-2%!important;height:63%!important;}
+.lairSceneCharacter.sai{left:29%!important;height:69%!important;}
+.lairSceneCharacter.tik{right:-1%!important;height:61.5%!important;}
 .lairHotspot{min-width:94px!important;padding:28px 7px 7px!important;font-size:9px!important;}
 .lairHotspotDot{width:15px!important;height:15px!important;top:8px!important;}
 .lairHotspotCity{left:17%!important;top:43%!important;}
@@ -167,9 +167,9 @@ body.importedMode .anBoard{margin-bottom:-286px!important;transform:scale(.285)!
 body.mode-hillsfar .hfTryArea,body.mode-hillsfar .hfLockCut{height:82px!important;}
 body.mode-hillsfar .hfCandidates{grid-template-columns:repeat(3,minmax(0,1fr))!important;max-width:520px!important;}
 body.mode-hillsfar .hfCandidate{min-height:56px!important;}
-.lairSceneCharacter.kai{height:48%!important;}
-.lairSceneCharacter.sai{height:52%!important;}
-.lairSceneCharacter.tik{height:47%!important;}
+.lairSceneCharacter.kai{height:72%!important;}
+.lairSceneCharacter.sai{height:78%!important;}
+.lairSceneCharacter.tik{height:70.5%!important;}
 .lairHotspotDialogue{top:62%!important;}
 }
 .plate.selected:after{content:none!important;display:none!important;}

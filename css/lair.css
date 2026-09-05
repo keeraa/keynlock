@@ -37,9 +37,9 @@
    cross-feature override files so the cascade has one source of truth. */
 body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none!important;}
 .lairSceneCharacter{animation:none!important;}
-.lairSceneCharacter.kai{left:13%;bottom:14%;height:39.3%;z-index:2;}
-.lairSceneCharacter.sai{left:36.5%;height:46%;z-index:3;}
-.lairSceneCharacter.tik{right:11.5%;bottom:12%;height:41%;z-index:1;}
+.lairSceneCharacter.kai{left:13%;bottom:14%;height:58.95%;z-index:2;}
+.lairSceneCharacter.sai{left:36.5%;height:69%;z-index:3;}
+.lairSceneCharacter.tik{right:11.5%;bottom:12%;height:61.5%;z-index:1;}
 .lairHotspotAlchemy{left:57.5%;top:62%;}
 .lairHotspotCity{left:75%;top:44%;}
 .lairHotspotCollection{left:60%;top:45%;}
@@ -54,17 +54,17 @@ body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none!important;
 .lairHotspotTeam[data-character="sai"] .lairActiveCharacterPortrait{height:150%;}
 .lairHotspotTeam[data-character="tik"] .lairActiveCharacterPortrait{height:155%;}
 @media (max-width:760px){
-  .lairSceneCharacter.kai{left:30%;bottom:9%;height:33.4%;}
-  .lairSceneCharacter.sai{left:47%;bottom:2%;height:39.1%;}
-  .lairSceneCharacter.tik{right:-13%;bottom:10%;height:34.9%;}
+  .lairSceneCharacter.kai{left:30%;bottom:9%;height:50.1%;}
+  .lairSceneCharacter.sai{left:47%;bottom:2%;height:58.65%;}
+  .lairSceneCharacter.tik{right:-13%;bottom:10%;height:52.35%;}
   .lairHotspot:not(.lairHotspotTeam){min-width:106px;padding:50px 8px 8px;}
   .lairHotspotIcon{top:4px;width:44px;height:44px;}
   .lairHotspotTeam{right:10px;bottom:10px;width:72px;min-width:72px;height:72px;border-radius:14px;}
 }
 @media (max-height:560px) and (orientation:landscape) and (pointer:coarse){
-  .lairSceneCharacter.kai{left:30%;height:33.4%;}
-  .lairSceneCharacter.sai{left:47%;bottom:2%;height:39.1%;}
-  .lairSceneCharacter.tik{right:-13%;height:34.9%;}
+  .lairSceneCharacter.kai{left:30%;height:50.1%;}
+  .lairSceneCharacter.sai{left:47%;bottom:2%;height:58.65%;}
+  .lairSceneCharacter.tik{right:-13%;height:52.35%;}
 }
 .mapRoad.missionRoad{stroke:#b48643;stroke-width:5;stroke-dasharray:3 8;opacity:.9;}
 .mapNode.mission{color:#edca7e;}

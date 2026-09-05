@@ -34,6 +34,22 @@ assert(snapshot.lockpickBalance==='125','SaveStore snapshot omitted game progres
 store.restore({lockpickBalance:'250'},{clear:key=>key.startsWith('lockpick')});
 assert(store.getItem('lockpickBalance')==='250','SaveStore restore failed.');
 
+const gameCatalogContext={
+  window:{
+    KeynlockSaveStore:{
+      getJSON:()=>({drum:{lock:{present:true,requiresPick:true}}}),
+      setJSON:()=>{}
+    },
+    dispatchEvent:()=>{}
+  },
+  CustomEvent:class{}
+};
+runInNewContext(source('js/core/game-catalog.js'),gameCatalogContext,{filename:'game-catalog.js'});
+const gameCatalog=gameCatalogContext.window.GameCatalog;
+assert(gameCatalog.feature('classic','lock.requiresPick')===true,'Physical locks must require a pick.');
+assert(gameCatalog.feature('drum','lock.present')===true,'Saved lock visibility must remain editable.');
+assert(gameCatalog.feature('drum','lock.requiresPick')===false,'Saved display overrides must not make a logic puzzle require picks.');
+
 const contentContext={window:{}};
 for(const file of ['js/data/world.js','js/data/economy.js','js/data/restoration.js','js/data/paintings.js']){
   runInNewContext(source(file),contentContext,{filename:file});
@@ -100,6 +116,7 @@ assert(restoration.includes('const success=value>=TARGET_SCORE&&clean>=100;'),'R
 const missions=source('js/world/missions.js');
 assert(missions.includes("missionRequiresPicks(loc.mode)&&!playerHasPicks()"),'Physical missions must reject a run without picks.');
 assert(missions.includes("missionRequiresPicks(place.mode)&&!playerHasPicks()"),'Physical mission thumbnails must be disabled without picks.');
+assert(missions.includes("GameCatalog.feature(mode,'lock.requiresPick')"),'Mission access must use the immutable lockpick requirement, not lock visibility.');
 const defeat=source('js/core/game-defeat.js');
 assert(defeat.includes("reason==='picks'"),'Out-of-picks defeat must have a dedicated return-to-lair flow.');
 const inventoryGuard=source('js/core/inventory-hit-testing.js');

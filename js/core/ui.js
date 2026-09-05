@@ -68,10 +68,10 @@
         return `<span class="lootRow"><i class="lootColor" style="--loot-color:${component?.color||'#888'}"></i><b>+${count}</b> ${component?.name||id} компонент</span>`;
       }).join('');
       loot.innerHTML=`
-        <span class="lootRow lootCoins"><b>+${earned}</b> монет</span>
-        <span class="lootRow"><b>+${resources.parts}</b> дет. замка</span>
+        <span class="lootRow lootCoins"><img class="lootResourceIcon" src="assets/ui/money-ico.png" alt=""><b>+${earned}</b> монет</span>
+        <span class="lootRow"><img class="lootResourceIcon" src="assets/ui/details-ico.png" alt=""><b>+${resources.parts}</b> дет. замка</span>
         ${componentRows}
-        ${painting?`<span class="lootPainting"><img src="${painting.image}" alt=""><span><small>Найдена картина</small><b>${painting.title} (${painting.year})</b><em>${painting.artist}</em></span></span>`:''}
+        ${painting?`<span class="lootPainting"><img src="${painting.image}" alt=""><span><small><img class="lootResourceIcon" src="assets/ui/portrait-ico.png" alt="">Найдена картина</small><b>${painting.title} (${painting.year})</b><em>${painting.artist}</em></span></span>`:''}
         ${resources.handle?`<span class="lootRow lootRare">Редкая рукоятка: <b>${resources.handle.name}</b></span>`:''}`;
     }
     updateEconomyUI();

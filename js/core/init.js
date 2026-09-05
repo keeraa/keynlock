@@ -38,7 +38,7 @@
 
   function applyTablerIcons(){
     const coinIcon=document.querySelector('.coinIcon');
-    if(coinIcon) coinIcon.innerHTML=tablerIcon('coin',16);
+    if(coinIcon&&!coinIcon.classList.contains('gameResourceIcon')) coinIcon.innerHTML=tablerIcon('coin',16);
     const headerPickIcon=document.querySelector('.headerPickIcon');
     if(headerPickIcon) headerPickIcon.innerHTML=tablerIcon('key',18);
     if($toastAction) $toastAction.innerHTML=`${tablerIcon('refresh',16)}<span>Новый замок</span>`;

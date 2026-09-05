@@ -2,8 +2,8 @@
  * Canonical game catalogue and action dispatcher.
  *
  * A puzzle owns its algorithm, while this file owns the facts shared by the
- * world and UI: whether the location has a physical lock, which ambient
- * systems run there, and whether opening is an explicit player action.
+ * world and UI: whether the location has a physical lock, whether it consumes
+ * lockpicks, which ambient systems run there, and whether opening is explicit.
  */
 const GAME_DEFINITIONS={
   classic:{title:'Классика',kind:'native',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:true,noiseSensor:true,guards:true,birds:true}},
@@ -57,6 +57,9 @@ function freezeGameDefinitions(definitions){
     // catalogue schema complete for every consumer.
     if(entry.world.noiseSensor===undefined)entry.world.noiseSensor=false;
     if(entry.lock.specialTool===undefined)entry.lock.specialTool=false;
+    // This is a gameplay rule, not a display setting. Capture it from the
+    // canonical definition before user-editable `present` overrides are read.
+    if(entry.lock.requiresPick===undefined)entry.lock.requiresPick=entry.lock.present;
     if(entry.readiness===undefined)entry.readiness=entry.kind==='native'?4:3;
     if(entry.rating===undefined)entry.rating=null;
     if(entry.difficulty===undefined)entry.difficulty={levels:entry.kind==='native'?[1,2,3]:[]};
@@ -91,7 +94,7 @@ const GameCatalog=(()=>{
       rating:saved.rating===null||saved.rating===''||!Number.isFinite(+saved.rating)
         ? base.rating
         : Math.max(1,Math.min(5,+saved.rating>5?Math.round(+saved.rating/2):+saved.rating)),
-      lock:{...base.lock,...saved.lock},
+      lock:{...base.lock,...saved.lock,requiresPick:base.lock.requiresPick},
       world:{...base.world,...saved.world}
     };
   }

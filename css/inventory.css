@@ -91,11 +91,13 @@ body.game-inactive.solved-notice-visible .solvedPuzzleOverlay{opacity:1;visibili
 .solvedPuzzleLoot{min-height:16px;display:grid;gap:5px;color:#c7aa74;font:11px/1.3 var(--ui-font);}
 .lootRow{display:flex;align-items:center;justify-content:center;gap:5px;}
 .lootRow b{color:#edd19a;}
+.lootResourceIcon{width:20px;height:20px;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6));}
 .lootColor{width:11px;height:11px;border:1px solid rgba(255,255,255,.25);border-radius:50%;background:var(--loot-color);box-shadow:0 1px 4px rgba(0,0,0,.4);}
 .lootRare{margin-top:4px;color:#d8b365;text-shadow:0 0 10px rgba(216,179,101,.24);}
 .lootPainting{display:grid;grid-template-columns:50px minmax(0,1fr);gap:9px;align-items:center;margin-top:5px;padding:7px 9px;border:1px solid rgba(210,166,93,.5);border-radius:9px;background:rgba(83,57,27,.35);text-align:left;}
-.lootPainting img{width:50px;height:38px;border-radius:4px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.5);}
+.lootPainting>img{width:50px;height:38px;border-radius:4px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.5);}
 .lootPainting span{display:grid;gap:2px;min-width:0;}.lootPainting small{color:#aa8a54;font:700 8px/1 var(--ui-font);letter-spacing:.12em;text-transform:uppercase;}.lootPainting b{overflow:hidden;color:#efd49d;font:700 11px/1.2 var(--ui-font);text-overflow:ellipsis;white-space:nowrap;}.lootPainting em{color:#a99573;font:normal 9px/1.2 var(--ui-font);}
+.lootPainting small{display:flex;align-items:center;gap:5px;}.lootPainting small .lootResourceIcon{width:18px;height:18px;}
 .solvedPuzzleButton{margin-top:7px;min-width:220px;min-height:44px;padding:10px 18px;border:1px solid #b98942;border-radius:10px;background:linear-gradient(180deg,#4c3820,#2a1f16);color:#f0d39c;box-shadow:inset 0 0 0 1px rgba(255,229,177,.06),0 8px 20px rgba(0,0,0,.28);font:700 13px/1 var(--ui-font);letter-spacing:.05em;cursor:pointer;transition:filter .15s ease, transform .15s ease, border-color .15s ease;pointer-events:auto;}
 .solvedPuzzleButton:hover{filter:brightness(1.18);border-color:#d2a75d;transform:translateY(-1px);}
 .solvedPuzzleButton:active{transform:translateY(0);}

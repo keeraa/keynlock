@@ -49,7 +49,7 @@ h1{margin:0;font-size:clamp(27.5px,3.3vw,48.4px);font-weight:500;letter-spacing:
 .toast.actionable .toastAction{display:inline-block;}
 .toastAction:hover{filter:brightness(1.15);}
 .economyHud{position:fixed;top:18px;right:18px;display:flex;gap:8px;align-items:center;transform:scale(.80);transform-origin:top right;font:13.20px var(--ui-font);}
-.coinIcon{place-items:center;width:17px;height:17px;margin-right:5px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff2a8 0 15%,#e5b441 35%,#9a6a1e 76%,#4e3410 100%);border:1px solid #f2cc6b;color:#5c3b11;font:bold 11px Arial;box-shadow:0 0 7px rgba(226,177,63,.18);}
+.coinIcon{place-items:center;width:22px;height:22px;margin-right:3px;background:url('../assets/ui/money-ico.png') center/contain no-repeat;filter:drop-shadow(0 1px 3px rgba(0,0,0,.55));}
 .rewardBox{min-width:132px;padding:8px 11px;border:1px solid #806438;border-radius:7px;background:linear-gradient(#242128,#121114);color:#a99574;}
 .rewardBox strong{color:#e8c77e;font-weight:600;}
 .rewardBox.drop{animation:rewardDrop 240ms ease;}
@@ -69,6 +69,7 @@ body.importedMode .main{place-items:stretch;}
 .resourceHudBadge{min-width:58px;padding:5px 7px;border:1px solid rgba(145,108,55,.55);border-radius:9px;background:rgba(19,15,12,.82);text-align:center;}
 .resourceHudBadge span{display:block;color:#8e7b61;font:8px/1 var(--ui-font);text-transform:uppercase;}
 .resourceHudBadge b{display:block;margin-top:3px;color:#e2c58e;font:700 12px/1 var(--ui-font);}
+.resourceHudBadgeParts b::before{display:inline-block;width:14px;height:16px;margin:-3px 4px -4px 0;background:url('../assets/ui/details-ico.png') center/contain no-repeat;content:'';filter:drop-shadow(0 1px 2px rgba(0,0,0,.55));}
 @media (max-width: 900px){
 .tab{padding:7px 10px;font-size:12px;}
 }

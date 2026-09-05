@@ -58,7 +58,7 @@
   if (!MISSION_TIERS.includes(mapChapter)) mapChapter = 1;
 
   function missionCleared(mode, tier) { return !!missionsDone[missionRunId(mode, tier)]; }
-  function missionRequiresPicks(mode){return !!GameCatalog.feature(mode,'lock.present');}
+  function missionRequiresPicks(mode){return !!GameCatalog.feature(mode,'lock.requiresPick');}
   function playerHasPicks(){return Number(window.KeynlockResources?.state?.picks)>0;}
   function chapterCleared(tier) { return MISSION_PLACES.filter(p=>gameSupportsTier(p.mode,tier)).every(p => missionCleared(p.mode, tier)); }
   // A chapter opens once the one before it is finished. With the dev flag on,

@@ -24,30 +24,38 @@
   }
   function place(){
     if(!target||!tooltip.classList.contains('visible'))return;
-    let x=pointerX+14,y=pointerY+18;
-    if(keyboard){const rect=target.getBoundingClientRect();x=rect.left+rect.width/2;y=rect.bottom+9;}
+    const targetRect=target.getBoundingClientRect();
+    const anchorX=keyboard?targetRect.left+targetRect.width/2:pointerX;
+    let x=anchorX+14,y=keyboard?targetRect.bottom+9:pointerY+18;
     const rect=tooltip.getBoundingClientRect();
     x=Math.max(8,Math.min(innerWidth-rect.width-8,x));
-    if(y+rect.height>innerHeight-8)y=Math.max(8,(keyboard?target.getBoundingClientRect().top:pointerY)-rect.height-12);
+    const above=y+rect.height>innerHeight-8;
+    if(above)y=Math.max(8,(keyboard?targetRect.top:pointerY)-rect.height-12);
     tooltip.style.left=`${Math.round(x)}px`;
     tooltip.style.top=`${Math.round(y)}px`;
+    tooltip.style.setProperty('--tooltip-arrow-x',`${Math.round(Math.max(12,Math.min(rect.width-12,anchorX-x)))}px`);
+    tooltip.classList.toggle('above',above);
   }
   function show(next,fromKeyboard=false){
     if(!next?.dataset.keynlockTooltip)return;
+    const alreadyVisible=tooltip.classList.contains('visible');
+    if(target&&target!==next)target.removeAttribute('aria-describedby');
     clearTimeout(showTimer);target=next;keyboard=fromKeyboard;
-    showTimer=setTimeout(()=>{
+    const reveal=()=>{
       if(!target)return;
       tooltip.textContent=target.dataset.keynlockTooltip;
       tooltip.classList.add('visible');
       tooltip.setAttribute('aria-hidden','false');
       target.setAttribute('aria-describedby',tooltip.id);
       requestAnimationFrame(place);
-    },fromKeyboard?80:180);
+    };
+    if(alreadyVisible)reveal();
+    else showTimer=setTimeout(reveal,fromKeyboard?80:180);
   }
   function hide(){
     clearTimeout(showTimer);showTimer=0;
     target?.removeAttribute('aria-describedby');target=null;
-    tooltip.classList.remove('visible');tooltip.setAttribute('aria-hidden','true');
+    tooltip.classList.remove('visible','above');tooltip.setAttribute('aria-hidden','true');
   }
 
   normalizeTree(document);

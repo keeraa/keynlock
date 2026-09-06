@@ -21,9 +21,10 @@
     m2Sel=-1;
     m2Matched=new Set();
     m2Lock=false;
-    m2TimeMax=diffStep(48,40,32);
+    m2TimeMax=window.KeynlockCampaign?.training('mass2')?75:diffStep(48,40,32);
     m2TimeLeft=m2TimeMax;
-    const pairs=[...M2_SYMBOLS,...M2_SYMBOLS];
+    const symbols=window.KeynlockCampaign?.training('mass2')?M2_SYMBOLS.slice(0,4):M2_SYMBOLS;
+    const pairs=[...symbols,...symbols];
     for(let i=pairs.length-1;i>0;i--){
       const j=Math.floor(Math.random()*(i+1));
       [pairs[i],pairs[j]]=[pairs[j],pairs[i]];
@@ -166,13 +167,7 @@
     if(mode!=='mass2' || solved) return;
     m2TimeLeft=Math.max(0,m2TimeLeft-dt);
     if(m2TimeLeft<=0){
-      m2TimeLeft=0;
-      damagePick({
-        resetProgress:()=>{ m2RegenerateBoard(); },
-        renderState:renderMass2,
-        surviveText:'Время почти вышло — отмычка удержалась'
-      });
-      if(picks>0 && m2TimeLeft<=0) m2TimeLeft=m2TimeMax;
+      showGameDefeat('time');
       return;
     }
     renderMass2Hud();

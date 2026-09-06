@@ -61,16 +61,17 @@
     const earned=resources?.coins??baseCoins;
     balance += earned;
     STORE.setItem('lockpickBalance', String(balance));
+    window.KeynlockResources?.render();
     const loot=document.querySelector('#solvedPuzzleLoot');
     if(loot&&resources){
       const componentRows=Object.entries(resources.components).map(([id,count])=>{
         const component=window.KeynlockResources.components.find(item=>item.id===id);
-        return `<span class="lootRow"><i class="lootColor" style="--loot-color:${component?.color||'#888'}"></i><b>+${count}</b> ${component?.name||id} компонент</span>`;
+        return `<span class="lootRow" tabindex="0" data-tip="${component?.name||id} компонент: +${count}. Используется в алхимии." aria-label="${component?.name||id} компонент: +${count}"><i class="lootColor" style="--loot-color:${component?.color||'#888'}"></i><b>+${count}</b></span>`;
       }).join('');
       loot.innerHTML=`
-        <span class="lootRow lootCoins"><img class="lootResourceIcon" src="assets/ui/money-ico.png" alt=""><b>+${earned}</b> монет</span>
-        <span class="lootRow"><img class="lootResourceIcon" src="assets/ui/details-ico.png" alt=""><b>+${resources.parts}</b> дет. замка</span>
-        ${componentRows}
+        <div class="lootResources"><span class="lootRow lootCoins" tabindex="0" data-tip="Монеты: +${earned}. Нужны для покупки отмычек и улучшений." aria-label="Монеты: +${earned}"><img class="lootResourceIcon" src="assets/ui/money-ico.png" alt=""><b>+${earned}</b></span>
+        <span class="lootRow" tabindex="0" data-tip="Детали замков: +${resources.parts}. Из двух деталей можно создать одну отмычку." aria-label="Детали замков: +${resources.parts}"><img class="lootResourceIcon" src="assets/ui/details-ico.png" alt=""><b>+${resources.parts}</b></span>
+        <span class="lootComponents" tabindex="0" data-tip="Цветные компоненты нужны для алхимии и изготовления материалов.">${componentRows||'<span class="lootRow" tabindex="0" data-tip="Компоненты не найдены" aria-label="Компоненты не найдены">0</span>'}</span></div>
         ${painting?`<span class="lootPainting"><img src="${painting.image}" alt=""><span><small><img class="lootResourceIcon" src="assets/ui/portrait-ico.png" alt="">Найдена картина</small><b>${painting.title} (${painting.year})</b><em>${painting.artist}</em></span></span>`:''}
         ${resources.handle?`<span class="lootRow lootRare">Редкая рукоятка: <b>${resources.handle.name}</b></span>`:''}`;
     }
@@ -86,6 +87,12 @@ renderInventoryTools();
   }
 
   function damagePick({resetProgress=null, renderState=null, surviveText='Ошибка'}={}){
+    if(!GameCatalog.feature(mode,'lock.requiresPick')){
+      if(resetProgress)resetProgress();
+      if(renderState)renderState();
+      toast(surviveText);
+      return {broke:false,kept:true,depleted:false};
+    }
     const info=PICK_TYPES[pickType];
     const breaks=Math.random()<info.breakChance;
 
@@ -111,7 +118,7 @@ renderInventoryTools();
 
     if(picks<=0)return {broke:true, kept, depleted:true};
 
-    toast(kept?'Отмычка сломалась · прогресс сохранён':'Отмычка сломалась · прогресс сброшен');
+    toast(`${surviveText} · отмычка сломалась${kept?' · прогресс сохранён':''}`);
     return {broke:true, kept, depleted:false};
   }
 

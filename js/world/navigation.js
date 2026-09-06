@@ -90,6 +90,7 @@
     if(lairOpen) closeLair();
     if(mapOpen) closeMap(false);
     if(!forceRestart && mode===nextMode && !solved && !document.body.classList.contains('game-inactive')) return;
+    window.KeynlockCampaign?.prepare(nextMode,false);
     mode=nextMode;
     STORE.setItem('lockpickCurrentMode',mode);
     syncModePanels(mode);

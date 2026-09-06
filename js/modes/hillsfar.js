@@ -142,6 +142,7 @@ function hillsfarPattern(len=6){
     hfOptions.forEach((opt,i)=>{
       const btn=document.createElement('button');
       btn.type='button';
+      btn.setAttribute('aria-label',`Ключ ${i+1}`);
       btn.className='hfCandidate' + (i===hfSelected ? ' selected' : '');
       btn.innerHTML = hillsfarSvg(opt, 189, 64);
       btn.addEventListener('click', ()=>{
@@ -165,7 +166,7 @@ function hillsfarPattern(len=6){
     runReward=100;
     picks=pickCapacity;
     updatePickUI();
-    hfTimeMax=diffStep(70,45,30,'hillsfar');
+    hfTimeMax=window.KeynlockCampaign?.training('hillsfar')?90:diffStep(70,45,30,'hillsfar');
     hfTarget=hillsfarPattern(diffStep(4,5,6,'hillsfar'));
 
     const optionCount=diffStep(6,8,9,'hillsfar');
@@ -206,7 +207,7 @@ function hillsfarPattern(len=6){
 
   function tickHillsfar({now}){
     if(!hfTimerHandle||solved) return;
-    const dt=Math.max(0,now-(hfLastTick||now))/1000;
+    const dt=Math.min(.05,Math.max(0,now-(hfLastTick||now))/1000);
     hfLastTick=now;
     hfTimeLeft=Math.max(0,hfTimeLeft-dt);
     renderHillsfarHud();

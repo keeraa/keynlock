@@ -101,9 +101,14 @@
   }
   rebuildMapConnections();
 
-  function startMapMission(id) {
+  function startMapMission(id, options={}) {
+    if(window.KeynlockOnboarding?.active){toast('Сначала заверши обучение в логове. Продолжить его можно в журнале заказов.');return false;}
     const loc = MAP_LOCATIONS[id];
     if (!loc || loc.action !== 'mission') return;
+    if(options.tier!==undefined){
+      if(!MISSION_TIERS.includes(options.tier)||!chapterUnlocked(options.tier))return false;
+      mapChapter=options.tier;
+    }
     if (!missionUnlocked()) { toast('Эта глава ещё закрыта'); return; }
     if(!gameSupportsTier(loc.mode,mapChapter)){toast(`${loc.name}: уровень ${mapChapter} ещё не готов`);return;}
     if(missionRequiresPicks(loc.mode)&&!playerHasPicks()){toast('Нет отмычек · вернись в логово и подготовь новые');return;}
@@ -115,15 +120,22 @@
       $worldMapScreen.hidden = true;
     }
 
+    mapLocation=id;
+    STORE.setItem('lockpickMapLocation',id);
+    STORE.setItem('lockpickCurrentMode',loc.mode);
+    STORE.setItem(CHAPTER_STORAGE_KEY,String(mapChapter));
     // Build the mission round directly. Clicking the active tab is intentionally
     // a no-op during play, so it cannot be used as a reliable round launcher.
     setModeDifficulty(mapChapter, loc.mode, false);
     mode=loc.mode;
     syncModePanels(mode);
     updateModeUI();
+    window.KeynlockCampaign?.prepare(loc.mode,options.guided===true,mapChapter);
     newLock(false);
-    activeMissionRun = { id: missionRunId(loc.mode, mapChapter), mode: loc.mode, tier: mapChapter, roundId: activeRoundId };
+    activeMissionRun = { id: missionRunId(loc.mode, mapChapter), mode: loc.mode, tier: mapChapter, roundId: activeRoundId, guided:options.guided===true, orderId:options.orderId||null, stepId:options.stepId||null };
+    window.dispatchEvent(new CustomEvent('keynlock-mission-started',{detail:{...activeMissionRun}}));
     toast(`${loc.name} · глава ${mapChapter}`);
+    return true;
   }
   window.startMapMission = startMapMission;
 
@@ -135,8 +147,9 @@
   function markMissionCleared() {
     const run = activeMissionRun;
     if (!run) return;
-    if (!solved || run.roundId !== activeRoundId || mode !== run.mode || getModeDifficulty(run.mode) !== run.tier) { activeMissionRun = null; return; }
+    if (gameDefeat.isActive() || !solved || run.roundId !== activeRoundId || mode !== run.mode || getModeDifficulty(run.mode) !== run.tier) { activeMissionRun = null; return; }
     activeMissionRun = null;
+    window.dispatchEvent(new CustomEvent('keynlock-mission-cleared',{detail:{...run}}));
     if (missionsDone[run.id]) return;
     missionsDone[run.id] = true;
     saveMissionsDone();
@@ -205,7 +218,9 @@
         const tierSupported=gameSupportsTier(place.mode,tier);
         pip.className = 'mapTierPip' + (!tierSupported?' unsupported':missionCleared(place.mode,tier) ? ' done' : '')
           + (tierSupported&&tier === mapChapter ? ' current' : '');
-        pip.title=tierSupported?`Уровень ${tier}`:`Уровень ${tier} не готов`;
+        pip.textContent=tierSupported&&missionCleared(place.mode,tier)?'✓':'';
+        pip.setAttribute('aria-label',`Уровень ${tier}${missionCleared(place.mode,tier)?' пройден':''}`);
+        pip.title=tierSupported?`Уровень ${tier}${missionCleared(place.mode,tier)?' · пройден':''}`:`Уровень ${tier} не готов`;
         tiers.appendChild(pip);
       }
       preview.appendChild(tiers);
@@ -286,3 +301,10 @@
     if(event.detail?.path==='readiness'||event.detail?.path==='reset')renderMissionNodes();
   });
   window.addEventListener('keynlock-resources-change',renderMissionNodes);
+
+  window.KeynlockMissions={
+    start:(mode,tier=1,options={})=>startMapMission(missionNodeId(mode),{...options,tier}),
+    resume(){if(!activeMissionRun)return false;if(gameDefeat.isActive()||solved||(missionRequiresPicks(activeMissionRun.mode)&&picks<=0))return this.retry();if(lairOpen)closeLair();if(mapOpen)closeMap(false);return true;},
+    retry(){const run=activeMissionRun;return run?startMapMission(missionNodeId(run.mode),{tier:run.tier,guided:run.guided,orderId:run.orderId,stepId:run.stepId}):false;},
+    get active(){return activeMissionRun?{...activeMissionRun}:null;}
+  };

@@ -62,7 +62,7 @@
   },true);
 
   function gameplayInputBlocked(){
-    return mapOpen || lairOpen || document.body.classList.contains('game-inactive');
+    return isWorldPaused() || document.body.classList.contains('game-inactive');
   }
 
   function input(k){
@@ -72,8 +72,8 @@
     else if(k==='d'||k==='arrowright')move(1);
     else if(k==='w'||k==='arrowup')select(-1);
     else if(k==='s'||k==='arrowdown')select(1);
-    else if(k==='r')newLock();
-    else if(k==='n')newLock();
+    else if(k==='r')restartCurrentRound();
+    else if(k==='n')restartCurrentRound();
   }
 
   // The 5 fluid-sized custom panels (oblivion/watchmen/museum/mass2/pipeline)

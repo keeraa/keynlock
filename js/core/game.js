@@ -55,6 +55,7 @@
     gameDefeat.reset();
     setGameInactive(false);
     setToastActionLabel('Новый замок');
+    document.querySelector('#newPuzzleButton').textContent='Новая головоломка';
     const loot=document.querySelector('#solvedPuzzleLoot');
     if(loot)loot.textContent='';
     document.querySelectorAll('.mechanismZone, .sharedModeLockArt').forEach(el=>{
@@ -64,15 +65,17 @@
   }
 
   function restartCurrentRound(){
+    if(window.KeynlockOnboarding?.resume())return;
     if(lairOpen) closeLair();
     if(mapOpen) closeMap(false);
-    newLock(false);
+    if(!window.KeynlockMissions?.retry())newLock(false);
     SFX.newRound?.();
   }
 
   function celebrate(){
     if(!solved||gameDefeat.isActive()) return;
     const completedRoundId=activeRoundId;
+    if(document.body.classList.contains('game-inactive'))return;
     awardRun();
     setGameInactive(true);
     document.body.classList.remove('solved-notice-visible');

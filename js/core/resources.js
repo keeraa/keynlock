@@ -7,7 +7,7 @@
       const saved=STORE.getJSON('keynlockResources');
       if(!saved)return fallback;
       return {
-        picks:Math.max(0,Number(saved.picks)||0),
+        picks:saved.picks===undefined?3:Math.max(0,Math.floor(Number(saved.picks)||0)),
         parts:Math.max(0,Number(saved.parts)||0),
         oil:Math.max(0,Number(saved.oil)||0),
         oilerCapacity:Math.max(1,Number(saved.oilerCapacity)||3),
@@ -27,21 +27,23 @@
     const picksEl=document.querySelector('#resourcePicks');
     const partsEl=document.querySelector('#resourceParts');
     const oilEl=document.querySelector('#resourceOil');
-    if(picksEl)picksEl.textContent=`${keynlockResources.picks}/${resourceCaseCapacity()}`;
+    if(picksEl)picksEl.textContent=`${Math.min(keynlockResources.picks,resourceCaseCapacity())}/${resourceCaseCapacity()}${keynlockResources.picks>resourceCaseCapacity()?` + ${keynlockResources.picks-resourceCaseCapacity()} в запасе`:''}`;
     if(partsEl)partsEl.textContent=String(keynlockResources.parts);
     if(oilEl)oilEl.textContent=`${keynlockResources.oil}/${keynlockResources.oilerCapacity}`;
     const picksWorkbench=document.querySelector('#resourcePicksWorkbench');
     const partsWorkbench=document.querySelector('#resourcePartsWorkbench');
-    if(picksWorkbench)picksWorkbench.textContent=`${keynlockResources.picks}/${resourceCaseCapacity()}`;
+    if(picksWorkbench)picksWorkbench.textContent=`${Math.min(keynlockResources.picks,resourceCaseCapacity())}/${resourceCaseCapacity()}${keynlockResources.picks>resourceCaseCapacity()?` + ${keynlockResources.picks-resourceCaseCapacity()} в запасе`:''}`;
     if(partsWorkbench)partsWorkbench.textContent=String(keynlockResources.parts);
     const colors=document.querySelector('#resourceComponents');
     if(colors)colors.innerHTML=KEYNLOCK_COMPONENTS.map(item=>`<span class="resourceColor" style="--resource-color:${item.color}" title="${item.name}"><i></i><b>${keynlockResources.components[item.id]}</b></span>`).join('');
+    const salvage=document.querySelector('#salvagePickButton');
+    if(salvage)salvage.hidden=!(keynlockResources.picks===0&&keynlockResources.parts<2&&balance<30);
     const craftPick=document.querySelector('#craftPickButton');
-    if(craftPick)craftPick.disabled=keynlockResources.parts<2||keynlockResources.picks>=resourceCaseCapacity();
+    if(craftPick)craftPick.disabled=window.KeynlockOnboarding?.step==='buy'||keynlockResources.parts<2||keynlockResources.picks>=resourceCaseCapacity();
     const craftAll=document.querySelector('#craftAllPicksButton');
-    if(craftAll)craftAll.disabled=keynlockResources.parts<2||keynlockResources.picks>=resourceCaseCapacity();
+    if(craftAll)craftAll.disabled=!!window.KeynlockOnboarding?.active||keynlockResources.parts<2||keynlockResources.picks>=resourceCaseCapacity();
     const buyPick=document.querySelector('#buyPickButton');
-    if(buyPick)buyPick.disabled=balance<30||keynlockResources.picks>=resourceCaseCapacity();
+    if(buyPick)buyPick.disabled=window.KeynlockOnboarding?.step==='craft'||balance<30||(keynlockResources.picks>=resourceCaseCapacity()&&window.KeynlockOnboarding?.step!=='buy');
     const craftOil=document.querySelector('#craftOilButton');
     if(craftOil)craftOil.disabled=keynlockResources.components.orange<1||keynlockResources.components.yellow<1||keynlockResources.oil>=keynlockResources.oilerCapacity;
     const upgrade=document.querySelector('#upgradePickCaseButton');
@@ -106,6 +108,7 @@
     saveKeynlockResources();
     renderInventoryTools();
     toast('Создана новая отмычка');
+    window.dispatchEvent(new CustomEvent('keynlock-pick-acquired',{detail:{source:'craft'}}));
     return true;
   }
   function craftAllKeynlockPicks(){
@@ -120,7 +123,7 @@
     return true;
   }
   function buyKeynlockPick(){
-    if(balance<30||keynlockResources.picks>=resourceCaseCapacity())return false;
+    if(balance<30||(keynlockResources.picks>=resourceCaseCapacity()&&window.KeynlockOnboarding?.step!=='buy'))return false;
     balance-=30;
     keynlockResources.picks++;
     STORE.setItem('lockpickBalance',String(balance));
@@ -128,6 +131,7 @@
     saveKeynlockResources();
     renderInventoryTools();
     toast('Куплена обычная отмычка');
+    window.dispatchEvent(new CustomEvent('keynlock-pick-acquired',{detail:{source:'buy'}}));
     return true;
   }
   function craftKeynlockOil(){
@@ -166,6 +170,11 @@
     render:renderKeynlockResources
   };
   document.addEventListener('click',event=>{
+    if(event.target.closest('#salvagePickButton')&&lairOpen&&keynlockResources.picks===0&&keynlockResources.parts<2&&balance<30){
+      keynlockResources.parts=6;
+      saveKeynlockResources();
+      toast('Разобраны старые заготовки: 6 деталей. Нажми «Заполнить футляр», чтобы создать 3 отмычки.');
+    }
     if(event.target.closest('#craftPickButton'))craftKeynlockPick();
     if(event.target.closest('#craftAllPicksButton'))craftAllKeynlockPicks();
     if(event.target.closest('#buyPickButton'))buyKeynlockPick();

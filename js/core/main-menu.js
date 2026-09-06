@@ -103,8 +103,8 @@
     STORE.keys().filter(isGameKey).forEach(key=>STORE.removeItem(key));
   }
 
-  function startNewGame(){
-    if(hasProgress()&&!confirm('Начать новую игру? Несохранённый прогресс будет потерян.'))return;
+  async function startNewGame(){
+    if(hasProgress()&&!await window.KeynlockDialogs.confirm('Начать новую игру?','Текущий прогресс будет сброшен. Сохранения в слотах останутся доступны.'))return;
     resetGameState();
     sessionStorage.setItem(PENDING_KEY,'new');
     sessionStorage.setItem(SESSION_KEY,'1');
@@ -134,9 +134,9 @@
     });
   }
 
-  function saveToSlot(index){
+  async function saveToSlot(index){
     const slots=readSlots();
-    if(slots[index]&&!confirm(`Перезаписать слот ${index+1}?`))return;
+    if(slots[index]&&!await window.KeynlockDialogs.confirm(`Перезаписать слот ${index+1}?`,'Предыдущее сохранение в этом слоте будет заменено текущим прогрессом.','Сохранить'))return;
     const place=STORE.getItem('lockpickMapLocation')||'lair';
     slots[index]={
       version:1,
@@ -191,7 +191,7 @@
     applyMotionSetting();
   });
   addEventListener('keydown',event=>{
-    if(event.code!=='Escape')return;
+    if(event.code!=='Escape'||document.body.classList.contains('campaign-open'))return;
     if(document.body.classList.contains('main-menu-open')){
       event.preventDefault();
       event.stopImmediatePropagation();

@@ -51,6 +51,9 @@
 <link rel="stylesheet" href="css/game-defeat.css">
 <link rel="stylesheet" href="css/tooltips.css">
 <link rel="stylesheet" href="css/lock-shell.css">
+<link rel="stylesheet" href="css/campaign.css">
+<link rel="stylesheet" href="css/story-dialogs.css">
+<link rel="stylesheet" href="css/onboarding.css">
 
 
 
@@ -297,6 +300,7 @@
           <h2>Верстак</h2>
           <div class="workbenchResources"><span>Отмычки <b id="resourcePicksWorkbench"></b></span><span>Детали <b id="resourcePartsWorkbench"></b></span></div>
           <div class="resourceComponents" id="resourceComponents" aria-label="Цветные алхимические компоненты"></div>
+          <button id="salvagePickButton" type="button" hidden>Разобрать старые заготовки <small>Бесплатно · 6 деталей на 3 отмычки, если нечем продолжать</small></button>
           <button id="craftPickButton" type="button">Создать отмычку <small>2 детали</small></button>
           <button id="craftAllPicksButton" type="button">Заполнить футляр <small>по 2 детали за отмычку</small></button>
           <button id="buyPickButton" type="button">Купить отмычку <small>30 монет</small></button>
@@ -872,7 +876,6 @@
 </div><!-- /puzzleArea -->
 <div class="solvedPuzzleOverlay" id="solvedPuzzleOverlay" aria-live="polite" aria-atomic="true">
   <div class="solvedPuzzleCard">
-    <div class="solvedPuzzleKicker">ГОТОВО</div>
     <div class="solvedPuzzleTitle">Замок открыт</div>
     <div class="solvedPuzzleLoot" id="solvedPuzzleLoot"></div>
     <button class="solvedPuzzleButton" id="newPuzzleButton" type="button">Новая головоломка</button>
@@ -887,6 +890,7 @@
 <script src="js/data/economy.js"></script>
 <script src="js/data/restoration.js"></script>
 <script src="js/data/paintings.js"></script>
+<script src="js/core/story-dialogs.js"></script>
 <script src="js/core/main-menu.js"></script>
 <script src="js/core/game-catalog.js"></script>
 <script src="js/core/challenge-hud.js"></script>
@@ -939,6 +943,10 @@
 <script src="js/world/missions.js"></script>
 <script src="js/world/game-settings.js"></script>
 <script src="js/world/collection.js"></script>
+<script src="js/data/campaign.js"></script>
+<script src="js/core/campaign-route.js"></script>
+<script src="js/world/campaign.js"></script>
+<script src="js/world/onboarding.js"></script>
 <script src="js/core/init.js"></script>
 <script src="js/core/inventory-hit-testing.js"></script>
 <script src="js/core/tooltips.js"></script>

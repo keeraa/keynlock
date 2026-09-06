@@ -1,0 +1,76 @@
+[
+  {
+    "legacyId": "creation-of-adam",
+    "previousTitle": "Сотворение Адама",
+    "title": "Венера Урбинская",
+    "image": "assets/restoration/renaissance/venus-of-urbino.jpg"
+  },
+  {
+    "legacyId": "listening-qin",
+    "previousTitle": "Император Хуэйцзун слушает цинь",
+    "title": "Шесть плодов хурмы",
+    "image": "assets/restoration/china/six-persimmons.jpg"
+  },
+  {
+    "legacyId": "ladies-silk",
+    "previousTitle": "Придворные дамы готовят шёлк",
+    "title": "Белый конь, сияющий в ночи",
+    "image": "assets/restoration/china/night-shining-white.jpg"
+  },
+  {
+    "legacyId": "qianlong-hunt",
+    "previousTitle": "Император Цяньлун на охоте",
+    "title": "Пир в честь победы",
+    "image": "assets/restoration/china/victory-banquet.jpg"
+  },
+  {
+    "legacyId": "double-sixes",
+    "previousTitle": "Придворные дамы играют в шуанлу",
+    "title": "Храм Тёмэйдзи",
+    "image": "assets/restoration/replacements/met-853241.jpg",
+    "source": "https://www.metmuseum.org/art/collection/search/853241",
+    "publicDomain": true
+  },
+  {
+    "legacyId": "night-revels",
+    "previousTitle": "Ночной пир Хань Сицзая",
+    "title": "Весенний дождь в Цутияма",
+    "image": "assets/restoration/replacements/met-36971.jpg",
+    "source": "https://www.metmuseum.org/art/collection/search/36971",
+    "publicDomain": true
+  },
+  {
+    "legacyId": "peach-blossom-spring",
+    "previousTitle": "Источник персиковых цветов",
+    "title": "Оммаягаси на реке Сумида",
+    "image": "assets/restoration/replacements/met-55712.jpg",
+    "source": "https://www.metmuseum.org/art/collection/search/55712",
+    "publicDomain": true
+  },
+  {
+    "legacyId": "korean-beauty",
+    "previousTitle": "Портрет красавицы",
+    "title": "Гора Кымгансан",
+    "image": "assets/restoration/korea/geumgang.jpg"
+  },
+  {
+    "legacyId": "tiger-pine",
+    "previousTitle": "Тигр под сосной",
+    "title": "Ресторан Оно у моста Рёгоку Янагибаси",
+    "image": "assets/restoration/replacements/met-45305.jpg",
+    "source": "https://www.metmuseum.org/art/collection/search/45305",
+    "publicDomain": true
+  },
+  {
+    "legacyId": "royal-procession",
+    "previousTitle": "Королевская процессия в Хвасон",
+    "title": "Гора Инвансан после дождя",
+    "image": "assets/restoration/korea/inwang.jpg"
+  },
+  {
+    "legacyId": "sun-moon-peaks",
+    "previousTitle": "Солнце, Луна и пять вершин",
+    "title": "Эносима",
+    "image": "assets/restoration/enoshima.jpg"
+  }
+]

@@ -32,7 +32,11 @@
     hmCover=cover;
     const jamChance=diffStep(.15,.25,.35);
     hmJam=Array.from({length:6},()=>Math.random()<jamChance?2:1);
-    generatedDistance=6;
+    if(window.KeynlockCampaign?.training('museum')){
+      hmSeq=Array.from({length:3},()=>Math.floor(Math.random()*7));
+      hmCover=Array(3).fill(null);hmJam=Array(3).fill(1);
+    }
+    generatedDistance=hmSeq.length;
   }
 
   function startMuseumRound(){
@@ -95,7 +99,7 @@
   }
 
   function renderMuseumHud(){
-    setGlobalTimer(mode==='museum' && !solved, hmTimeLeft, hmTimeMax, 'ТАЙМЕР');
+    setGlobalTimer(mode==='museum' && !solved && !window.KeynlockCampaign?.training('museum'), hmTimeLeft, hmTimeMax, 'ТАЙМЕР');
   }
 
   function hmMoveKb(dir){
@@ -142,16 +146,10 @@
   }
 
   function hmTick(dt){
-    if(mode!=='museum' || solved) return;
+    if(mode!=='museum' || solved || window.KeynlockCampaign?.training('museum')) return;
     hmTimeLeft=Math.max(0,hmTimeLeft-dt);
     if(hmTimeLeft<=0){
-      hmTimeLeft=0;
-      damagePick({
-        resetProgress:()=>{ hmRegeneratePins(); },
-        renderState:renderMuseum,
-        surviveText:'Время почти вышло — отмычка удержалась'
-      });
-      if(picks>0 && hmTimeLeft<=0) hmTimeLeft=hmTimeMax;
+      showGameDefeat('time');
       return;
     }
     renderMuseum();

@@ -18,3 +18,7 @@ export function requireService(name,service){
   if(!value)throw new Error(`KEYNLOCK service is not ready: ${name}`);
   return value;
 }
+
+export const campaign=()=>window.KeynlockCampaign;
+export const missions=()=>window.KeynlockMissions;
+export const lair=()=>window.KeynlockLair;

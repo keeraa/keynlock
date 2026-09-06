@@ -1,6 +1,6 @@
-# KEYNLOCK — v253
+# KEYNLOCK — v372
 
-Browser lockpicking puzzle game. v253 adds a repeatable local verification workflow and static-hosting configuration on top of the v252 modular JavaScript structure.
+Browser lockpicking puzzle game. v372 expands the journal to every supported mission, ordered by difficulty (27 / 21 / 21), with configurable multi-puzzle jobs and recovery of three starter picks. See [campaign notes](docs/first-chapter.md) for configuration, saves and validation.
 
 - `index.html` — KEYNLOCK entry point
 - `css/` — modular CSS

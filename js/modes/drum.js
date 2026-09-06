@@ -97,7 +97,7 @@
 
   $drumWheels?.addEventListener('click',e=>{const b=e.target.closest('[data-drum-i]');if(b)changeDrum(Number(b.dataset.drumI),Number(b.dataset.dir));});
   $drumCheck?.addEventListener('click',()=>GameActions.attemptOpen({modeId:'drum',source:'puzzle-control'}));
-  $drumNew?.addEventListener('click',()=>newLock());
+  $drumNew?.addEventListener('click',()=>restartCurrentRound());
   $drumSound?.addEventListener('click',()=>{drumSoundOn=!drumSoundOn;$drumSound.textContent='Звук: '+(drumSoundOn?'вкл':'выкл');});
 
   PuzzleModes.register({

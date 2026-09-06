@@ -122,6 +122,7 @@
     if(!modal) return;
     closeLairModule({restoreFocus:false});
     workbenchReturnFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;
+    window.KeynlockResources?.render();
     modal.hidden=false;
     setLairBackgroundInert(modal);
     focusLairDialog(modal,document.querySelector('#lairWorkbenchClose'));
@@ -305,6 +306,8 @@
     if(!lairOpen || !$lairOverlay) return;
     closeLairWorkbench();
     closeLairModule();
+    const supply=window.KeynlockResources?.prepareRound?.();
+    if(supply && picks>0 && !solved){picks=supply.picks;pickCapacity=Math.max(pickCapacity,picks);updatePickUI();}
     lairOpen=false;
     document.body.classList.remove('lair-open');
     $lairOverlay.classList.remove('open');
@@ -408,3 +411,5 @@
       }, mapRange);
     }
   })();
+
+  window.KeynlockLair={open:openLairFromHud,workbench:()=>{openLairFromHud();openLairWorkbench();},module:next=>{openLairFromHud();openLairModule(next);}};

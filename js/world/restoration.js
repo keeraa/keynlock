@@ -148,7 +148,7 @@
     const painting=current();
     const applyRatio=()=>{
       if(!elements.original.naturalWidth||!elements.original.naturalHeight)return;
-      const ratio=Math.max(.55,Math.min(2.8,elements.original.naturalWidth/elements.original.naturalHeight));
+      const ratio=elements.original.naturalWidth/elements.original.naturalHeight;
       root.dataset.orientation=ratio<.86?'portrait':ratio>1.18?'landscape':'square';
       root.style.setProperty('--painting-ratio',String(ratio));
       sizePaintings();
@@ -334,6 +334,7 @@
     const painting=current();
     if(completed[painting.id]){
       elements.hint.textContent='Картина уже была восстановлена. Это тренировочная попытка.';
+      window.dispatchEvent(new CustomEvent('keynlock-restored',{detail:{id:painting.id}}));
       elements.reward.hidden=true;
       return;
     }
@@ -344,6 +345,7 @@
     elements.reward.innerHTML=rewardMarkup(result);
     elements.reward.hidden=false;
     renderOrders();
+    window.dispatchEvent(new CustomEvent('keynlock-restored',{detail:{id:painting.id}}));
   }
   function syncLenses(){
     root.querySelectorAll('.restorationLens').forEach(lens=>lens.classList.toggle('enabled',state.loupe));
@@ -396,10 +398,14 @@
   }
   function hideLenses(){if(state.focus.pinned)return;root.querySelectorAll('.restorationLens').forEach(lens=>lens.classList.remove('visible','pinned'));}
   function start(){
+    const target=window.KeynlockOnboarding?.paintingId;
+    if(state.started&&(!target||current().id===target)){requestAnimationFrame(sizePaintings);return;}
     setDrawerOpen(false);
     state.started=true;
     const previous=state.painting;
     state.painting=PAINTINGS.length>1?(previous+1+Math.floor(Math.random()*(PAINTINGS.length-1)))%PAINTINGS.length:0;
+    const training=PAINTINGS.findIndex(p=>p.id===window.KeynlockOnboarding?.paintingId);
+    if(training>=0)state.painting=training;
     closeOrders();renderOrders();newDamage();renderPainting();
     requestAnimationFrame(sizePaintings);
   }

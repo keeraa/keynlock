@@ -36,7 +36,7 @@
     moves=0;
     brokenPicks=0;
     runReward=100;
-    wfBarCount=diffStep(5,6,7,'wharf');
+    wfBarCount=window.KeynlockCampaign?.training('wharf')?4:diffStep(5,6,7,'wharf');
     wfPos=0;
     wfStep=0;
     wfWrong=-1;
@@ -62,7 +62,9 @@
       channels.className='wfChannels';
       wfBarEls=[];
       for(let i=0;i<wfBarCount;i++){
-        const b=document.createElement('div');
+        const b=document.createElement('button');
+        b.type='button';
+        b.setAttribute('aria-label',`Задвижка ${i+1}`);
         b.className='wfBar springPinChannel';
         const silverSprings=['01','03','04'];
         const spring=silverSprings[Math.floor(Math.random()*silverSprings.length)];
@@ -129,6 +131,12 @@
     if(solved || wfStep>=wfBarCount) return;
     const opened=wfSequence.slice(0,wfStep);
     if(opened.includes(wfPos)) return;
+    const firstLesson=window.KeynlockMissions?.active;
+    if(firstLesson?.guided&&firstLesson.orderId==='wharf-1'&&!STORE.getItem('keynlockFirstPickBroken')){
+      STORE.setItem('keynlockFirstPickBroken','1');
+      forceBreakOnePick('Сай: «Слишком сильно надавила… Отмычка сломалась. Попробую осторожнее».');
+      return;
+    }
     registerMove();
     if(wfPos===wfSequence[wfStep]){
       wfStep++;

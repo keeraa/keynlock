@@ -48,7 +48,7 @@ const htmlPath = resolve(root, 'index.html');
 const html = readFileSync(htmlPath, 'utf8');
 const scripts = localAttributeRefs(html, 'script', 'src');
 const expectedScriptOrder = ["js/core/asset-preload.js","js/core/game-catalog.js","js/core/challenge-hud.js","js/core/tool-motion.js","js/core/game-defeat.js","js/core/state.js","js/core/puzzle-modes.js","js/core/audio.js","js/core/ui.js","js/world/inventory.js","js/world/lair.js","js/world/navigation.js","js/core/digital-helpers.js","js/modes/drum.js","js/modes/oscilloscope.js","js/core/game.js","js/modes/anachronox.js","js/modes/composite.js","js/modes/tension.js","js/modes/resonance.js","js/modes/deduction.js","js/modes/skyrim.js","js/modes/gothic1.js","js/modes/hillsfar.js","js/modes/oblivion.js","js/modes/watchmen.js","js/modes/museum.js","js/modes/mass2.js","js/modes/pipeline.js","js/modes/wharf.js","js/modes/thiefds.js","js/modes/kingdomcome.js","js/modes/thief12.js","js/modes/fallout.js","js/modes/masshack.js","js/modes/pathologic.js","js/modes/bioshock2.js","js/modes/alphaprotocol.js","js/modes/base-locks.js","js/world/alchemy-stations.js","js/world/alchemy-ui.js","js/world/alchemy-inventory.js","js/world/guards.js","js/world/missions.js","js/world/game-settings.js","js/world/collection.js","js/core/init.js","js/core/inventory-hit-testing.js"];
-expectedScriptOrder.splice(1,0,'js/core/main-menu.js');
+expectedScriptOrder.splice(1,0,'js/core/story-dialogs.js','js/core/main-menu.js');
 expectedScriptOrder.splice(1,0,'js/data/world.js','js/data/economy.js','js/data/restoration.js','js/data/paintings.js');
 expectedScriptOrder.splice(1,0,'js/core/save-store.js');
 expectedScriptOrder.splice(expectedScriptOrder.indexOf('js/core/puzzle-modes.js'),0,'js/core/resources.js');
@@ -57,6 +57,7 @@ expectedScriptOrder.splice(expectedScriptOrder.indexOf('js/world/guards.js'),0,'
 expectedScriptOrder.splice(expectedScriptOrder.indexOf('js/world/alchemy-stations.js'),0,'js/world/alchemy-engine.js');
 expectedScriptOrder.splice(expectedScriptOrder.indexOf('js/world/alchemy-stations.js'),0,'js/world/alchemy-distillation.js');
 expectedScriptOrder.splice(expectedScriptOrder.indexOf('js/world/alchemy-ui.js'),0,'js/world/alchemy-pigments.js');
+expectedScriptOrder.splice(expectedScriptOrder.indexOf('js/core/init.js'),0,'js/data/campaign.js','js/core/campaign-route.js','js/world/campaign.js','js/world/onboarding.js');
 expectedScriptOrder.push('js/core/tooltips.js');
 if (JSON.stringify(scripts) !== JSON.stringify(expectedScriptOrder)) fail('JavaScript load order changed; classic scripts share one lexical environment.');
 const links = localAttributeRefs(html, 'link', 'href').filter(x => x.endsWith('.css'));
@@ -136,7 +137,14 @@ const cssText=cssFiles.map(file=>readFileSync(file,'utf8')).join('\n');
 const cssWithoutComments=cssText.replace(/\/\*[\s\S]*?\*\//g,'');
 const importantCount=(cssWithoutComments.match(/!important/g)||[]).length;
 if(importantCount>2215)fail(`CSS specificity budget regressed: ${importantCount} !important declarations (budget 2215).`);
-if(Buffer.byteLength(cssText)>380000)fail('CSS source-size budget exceeded (380 KB).');
+// Keep the existing game budget separate from the scoped journal stylesheet.
+const journalCssBytes=Buffer.byteLength(readFileSync(resolve(root,'css/campaign.css'),'utf8'));
+const storyCssBytes=Buffer.byteLength(readFileSync(resolve(root,'css/story-dialogs.css'),'utf8'));
+if(storyCssBytes>5000)fail('Story dialog CSS budget exceeded (5 KB).');
+const onboardingCssBytes=Buffer.byteLength(readFileSync(resolve(root,'css/onboarding.css'),'utf8'));
+if(onboardingCssBytes>3000)fail('Onboarding CSS budget exceeded.');
+if(Buffer.byteLength(cssText)-journalCssBytes-storyCssBytes-onboardingCssBytes>380000)fail('Game CSS source-size budget exceeded (380 KB).');
+if(journalCssBytes>9000)fail('Journal CSS source-size budget exceeded (9 KB).');
 
 const sourceFiles = [htmlPath, ...cssFiles, ...jsFiles];
 const assetPattern = /(?:\.\.\/|\.\/)?assets\/[A-Za-z0-9_./-]+\.(?:png|webp|jpe?g|svg|gif|woff2?)/gi;

@@ -22,19 +22,8 @@
   const bottles = [...document.querySelectorAll('.alchemyRackDrawerBottle')];
   if(!drawer || !toggle || !bottles.length) return;
 
-  function setOpen(force){
-    const next = typeof force === 'boolean' ? force : !drawer.classList.contains('open');
-    drawer.classList.toggle('open', next);
-    toggle.setAttribute('aria-expanded', next ? 'true' : 'false');
-    toggle.setAttribute('aria-label', next ? 'Закрыть стойку ингредиентов' : 'Открыть стойку ингредиентов');
-  }
-  toggle.addEventListener('click', () => setOpen());
-
-  document.addEventListener('pointerdown', e => {
-    if(!drawer.classList.contains('open')) return;
-    if(drawer.contains(e.target)) return;
-    setOpen(false);
-  }, true);
+  const controller=window.KeynlockEquipmentDrawers.create({root:'#alchemyRackDrawer',toggle:'#alchemyRackDrawerToggle',openLabel:'Открыть стойку ингредиентов',closeLabel:'Закрыть стойку ингредиентов',approachVar:'--rack-approach',itemSelector:'.alchemyRackDrawerBottle:not(:disabled)'});
+  const setOpen=force=>controller.setOpen(force);
 
   function applyElement(el){
     bottles.forEach(b => b.classList.toggle('selected', b === el));

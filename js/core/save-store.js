@@ -14,7 +14,7 @@
 
   const raw={
     getItem:key=>storage?storage.getItem(key):(memory.has(key)?memory.get(key):null),
-    setItem:(key,value)=>storage?storage.setItem(key,String(value)):memory.set(key,String(value)),
+    setItem:(key,value)=>{const text=String(value);if(storage){if(storage.getItem(key)!==text)storage.setItem(key,text);}else if(memory.get(key)!==text)memory.set(key,text);},
     removeItem:key=>storage?storage.removeItem(key):memory.delete(key),
     key:index=>storage?storage.key(index):[...memory.keys()][index]??null,
     get length(){return storage?storage.length:memory.size;}

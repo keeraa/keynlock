@@ -1,0 +1,1 @@
+.restorationGuide{display:flex;align-items:center;gap:14px;flex-shrink:0;padding:12px 16px;font:13px/1.5 var(--ui-font)}.restorationGuide[hidden]{display:none}.restorationGuide span{flex:1}.restorationGuideTarget{outline:2px solid #e5b65e;outline-offset:3px;box-shadow:0 0 15px #e5b65e70}@media(max-width:720px){.restorationGuide{font-size:11px;padding:8px}}

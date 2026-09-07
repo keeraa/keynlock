@@ -1,0 +1,47 @@
+{
+  "buttons": [
+    ".digitalBtn",
+    ".digitalMiniBtn",
+    ".solvedPuzzleButton",
+    ".gameDefeatRestart",
+    ".restorationCheckButton",
+    ".restorationNewDamageButton",
+    ".restorationOrderButton",
+    ".gameLaunchButton",
+    ".mainMenuButton",
+    ".mapChapterBtn",
+    ".workbenchCraftPanel button",
+    ".digitalWheel button"
+  ],
+  "panels": [
+    ".digitalCard",
+    ".solvedPuzzleCard",
+    ".gameDefeatCard",
+    ".restorationPanel",
+    ".restorationCheckPanel",
+    ".workbenchCraftPanel",
+    ".lairIntelCard",
+    ".collectionInfo",
+    ".pigmentResultCard",
+    ".pigmentTargetCard",
+    ".gameSettingsPanel",
+    ".lairModuleWindow",
+    ".lairWorkbenchModal"
+  ],
+  "close": [
+    ".gameSettingsClose",
+    ".lairModuleClose",
+    ".globalTopHudClose",
+    ".lairWorkbenchClose",
+    ".worldMapClose",
+    ".alchemyGuideViewerClose"
+  ],
+  "mechanismExceptions": [
+    "anBtn",
+    "skTorqueButton",
+    "pins",
+    "wires",
+    "rotating wheels",
+    "inventory art"
+  ]
+}

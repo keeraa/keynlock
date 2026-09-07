@@ -43,7 +43,7 @@
     });
     return nearest?.item||null;
   }
-  const drawerController=window.KeynlockEquipmentDrawers?.create({root:'#restorationInventoryDrawer',toggle:'#restorationInventoryToggle',bodyClass:'restoration-inventory-open',openLabel:'Открыть инвентарь реставратора',closeLabel:'Закрыть инвентарь реставратора',approachVar:'--equipment-approach',approachLift:42,approachDepth:90,itemSelector:'.equipmentInventoryItem:not(:disabled)',routeVisualItems:true,hitTest:restorationItemAt,ignoreApproach:event=>Boolean(event.target.closest?.('.restorationArtwork,.restorationSliders'))});
+  const drawerController=window.KeynlockEquipmentDrawers?.create({root:'#restorationInventoryDrawer',toggle:'#restorationInventoryToggle',bodyClass:'restoration-inventory-open',openLabel:'Открыть инвентарь реставратора',closeLabel:'Закрыть инвентарь реставратора',approachVar:'--equipment-approach',itemSelector:'.equipmentInventoryItem:not(:disabled)',routeVisualItems:true,hitTest:restorationItemAt,ignoreApproach:event=>Boolean(event.target.closest?.('.restorationArtwork,.restorationSliders'))});
   const TOOL_IMAGES={
     brush:{idle:'assets/restoration/tools/brush.png',active:'assets/restoration/tools/brush-active.png'},
     paint:{idle:'assets/restoration/tools/retouch-brush.png',active:'assets/restoration/tools/retouch-brush-active.png'},
@@ -76,6 +76,56 @@
   const ORDER_CATEGORIES=window.KeynlockContent.restoration.orderCategories;
   let orderCategory='all';
 
+  const guideSeen=STORE.getJSON('keynlockRestorationLessons',{});
+  const guide=document.createElement('div');guide.className='restorationGuide uiPanel';guide.hidden=true;guide.setAttribute('role','status');
+  guide.innerHTML='<span></span><label class="tutorialPreference"><input type="checkbox" data-hide-hints> Не показывать подсказки</label><button class="uiClose" type="button" aria-label="Скрыть объяснение">×</button>';root.prepend(guide);
+  let guideVisible=false,guideStep=0,guideSteps=[];
+  const lessonSteps={
+    1:[['Сай: «Сравни с оригиналом. Ползунки меняют оттенок, насыщенность и яркость. Добейся совпадения не ниже 88%».','#restorationHue',()=>score()>=TARGET_SCORE],
+       ['Сай: «Цвет совпадает. Нажми „Проверить“, чтобы закончить работу».','#restorationCheck',()=>false]],
+    2:[['Сай: «Теперь на полотне есть грязь. Открой инструменты и возьми щётку».','brush',()=>state.tool==='brush'],
+       ['Сай: «Зажми кнопку мыши или прижми палец и проведи щёткой по грязи на повреждённой картине».','canvas',()=>dirtCleanliness()>=99],
+       ['Сай: «Полотно чистое. Подбери цвет ползунками и нажми „Проверить“».','#restorationCheck',()=>false]],
+    3:[['Сай: «Сначала убери грязь щёткой — под ней видны утраты красочного слоя».','brush',()=>dirtCleanliness()>=99],
+       ['Сай: «Возьми тонкую кисть для восстановления утрат».','paint',()=>state.tool==='paint'],
+       ['Сай: «Проводи кистью по тёмным утраченным участкам, удерживая кнопку мыши или палец».','canvas',()=>alphaTotal(elements.repair)<25],
+       ['Сай: «Утраты восстановлены. Подбери цвет и нажми „Проверить“».','#restorationCheck',()=>false]],
+    4:[['Тик: «Сначала очисти поверхность щёткой. Затем посмотрим, что скрывается под ней».','brush',()=>dirtCleanliness()>=99],
+       ['Тик: «Возьми УФ-фонарь и медленно освети всё повреждённое полотно — появятся скрытые следы».','uv',()=>uvSearchComplete()],
+       ['Тик: «Выбери реагент и нажимай на подсвеченные пятна, чтобы проявить вмешательства».','reagent',()=>alphaTotal(elements.uv)<25],
+       ['Сай: «Теперь счисти проявленные пятна щёткой».','brush',()=>alphaTotal(elements.overpaint)<25],
+       ['Сай: «Восстанови оставшиеся утраты тонкой кистью».','paint',()=>alphaTotal(elements.repair)<25],
+       ['Сай: «Осталось подобрать цвет и проверить результат».','#restorationCheck',()=>false]]
+  };
+  function clearGuideHighlight(){document.querySelectorAll('.restorationGuideTarget').forEach(el=>el.classList.remove('restorationGuideTarget'));}
+  let lastGuideKey='',lastGuideTarget=null;
+  function renderGuide(){
+    const active=root.closest('.lairPanel')?.classList.contains('active')&&!document.querySelector('#lairModuleWindow')?.hidden;
+    guide.hidden=!guideVisible||!active;
+    if(active)document.querySelector('#trainingHelp')?.setAttribute('aria-expanded',String(!guide.hidden));
+    if(guide.hidden||!guideSteps.length){if(lastGuideKey){clearGuideHighlight();lastGuideKey='';lastGuideTarget=null;}return;}
+    if(state.damageReady)while(guideStep<guideSteps.length-1&&guideSteps[guideStep][2]())guideStep++;
+    const [text,target]=guideSteps[guideStep];
+
+    let element=target==='canvas'?elements.damagedArea:target.startsWith('#')?root.querySelector(target):elements.tools.find(b=>b.dataset.restorationTool===target);
+    if(element?.closest('#restorationInventoryDrawer')){
+      if(state.tool===target)element=elements.damagedArea;
+      else if(element.getBoundingClientRect().width===0||!elements.drawer.classList.contains('open'))element=elements.drawerToggle;
+    }
+    const key=`${state.lesson}/${guideStep}/${text}`;
+    if(lastGuideKey===key&&lastGuideTarget===element)return;
+    lastGuideKey=key;lastGuideTarget=element;clearGuideHighlight();
+    guide.querySelector('span').textContent=`${guideStep+1}/${guideSteps.length} · ${text}`;
+    element?.classList.add('restorationGuideTarget');
+    if(target==='#restorationHue')[elements.sat,elements.light].forEach(el=>el.classList.add('restorationGuideTarget'));
+  }
+  function startGuide(){guideSteps=lessonSteps[state.lesson];guideStep=0;guideVisible=!guideSeen[state.lesson]&&window.KeynlockTutorialPreferences.enabled&&window.KeynlockTutorialPreferences.hints;renderGuide();}
+  window.addEventListener('keynlock-tutorial-preferences',()=>{if(!window.KeynlockTutorialPreferences.enabled||!window.KeynlockTutorialPreferences.hints){guideVisible=false;renderGuide();}});
+  function toggleGuide(){guide.querySelector('[data-hide-hints]').checked=!window.KeynlockTutorialPreferences.hints;guideVisible=!guideVisible;renderGuide();requestAnimationFrame(sizePaintings);return guideVisible;}
+  guide.querySelector('button').addEventListener('click',()=>{guideVisible=false;renderGuide();requestAnimationFrame(sizePaintings);});
+  new MutationObserver(renderGuide).observe(document.querySelector('#lairModuleWindow'),{attributes:true,attributeFilter:['hidden','data-module']});
+  elements.drawerToggle.addEventListener('click',()=>requestAnimationFrame(renderGuide));
+
   function filterValue(){
     return `hue-rotate(${state.damage.hue+state.hue}deg) saturate(${(state.damage.sat*state.sat/100).toFixed(4)}) brightness(${(state.damage.light*state.light/100).toFixed(4)})`;
   }
@@ -85,33 +135,49 @@
     const lightScore=Math.max(0,1-Math.abs(state.damage.light*state.light/100-1)/.5);
     return Math.max(0,Math.min(100,Math.round((hueScore*.38+satScore*.31+lightScore*.31)*100)));
   }
+  const alphaCache=new WeakMap();
   function alphaTotal(canvas){
+    if(alphaCache.has(canvas))return alphaCache.get(canvas);
     const data=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;let total=0;
     for(let i=3;i<data.length;i+=16)total+=data[i];
+    alphaCache.set(canvas,total);
     return total;
   }
-  function contamination(){return alphaTotal(elements.dirt)+alphaTotal(elements.uv)+alphaTotal(elements.overpaint);}
+  function contamination(){return alphaTotal(elements.dirt)+alphaTotal(elements.uv)+alphaTotal(elements.overpaint)+alphaTotal(elements.repair);}
   function cleanliness(){return Math.max(0,Math.min(100,Math.round((1-contamination()/Math.max(1,state.initialContamination))*100)));}
   function dirtCleanliness(){return Math.max(0,Math.min(100,Math.round((1-alphaTotal(elements.dirt)/Math.max(1,state.initialDirt))*100)));}
   function dirtReady(){return state.damageReady&&dirtCleanliness()>=99;}
   function uvSearchComplete(){const hidden=alphaTotal(elements.uv);return hidden<25||alphaTotal(elements.scan)>=hidden*.96;}
+  function toolUnlocked(tool){return tool==='loupe'||(tool==='brush'&&state.lesson>=2)||(tool==='paint'&&state.lesson>=3)||(['uv','reagent'].includes(tool)&&state.lesson>=4);}
   function renderMetrics(){
     elements.lightMatch.textContent=`${score()}%`;elements.cleanliness.textContent=`${cleanliness()}%`;
     root.classList.toggle('show-check-result',state.checked);
+    renderGuide();
     const ready=dirtReady();
-    elements.tools.forEach(button=>{if(['paint','uv','reagent'].includes(button.dataset.restorationTool))button.disabled=!ready;});
+    elements.tools.forEach(button=>{const tool=button.dataset.restorationTool;button.hidden=!toolUnlocked(tool);button.disabled=!toolUnlocked(tool)||(['paint','uv','reagent'].includes(tool)&&!ready);});
   }
   function resetControls(){
     state.hue=0;state.sat=100;state.light=100;state.checked=false;
     elements.hue.value='0';elements.sat.value='100';elements.light.value='100';
   }
+  let damageRevision=0,initializedRevision=-1,damageFrame=0;
+  function scheduleDamage(){
+    if(damageFrame)return;
+    damageFrame=requestAnimationFrame(()=>{damageFrame=0;initDamageSurfaces();});
+  }
   function newDamage(){
+    damageRevision++;
+    state.lesson=completed[current().id]?.lesson||Math.min(4,Object.keys(completed).length+1);
+    state.tool='';state.loupe=false;root.dataset.activeTool='';
+    elements.tools.forEach(button=>button.classList.remove('active'));
+    updateToolVisual();
     state.damage={hue:pick(DAMAGE.hue),sat:pick(DAMAGE.sat),light:pick(DAMAGE.light)};
     state.focus.pinned=false;state.lastPoint=null;state.damageReady=false;
     hideLenses();
     resetControls();
+    startGuide();
     renderLive();
-    requestAnimationFrame(initDamageSurfaces);
+    if(elements.original.getAttribute('src')===current().image&&elements.original.complete&&elements.original.naturalWidth)scheduleDamage();
   }
   function renderOrders(){
     const selected=current();
@@ -145,17 +211,18 @@
     showOriginalActionDenied.timer=setTimeout(()=>originalArea.classList.remove('action-denied'),360);
   }
   function renderPainting(){
-    const painting=current();
+    const painting=current(),revision=damageRevision;
     const applyRatio=()=>{
+      if(revision!==damageRevision||painting!==current())return;
       if(!elements.original.naturalWidth||!elements.original.naturalHeight)return;
       const ratio=elements.original.naturalWidth/elements.original.naturalHeight;
       root.dataset.orientation=ratio<.86?'portrait':ratio>1.18?'landscape':'square';
       root.style.setProperty('--painting-ratio',String(ratio));
       sizePaintings();
-      requestAnimationFrame(initDamageSurfaces);
+      if(elements.original.getAttribute('src')===current().image&&elements.original.complete&&elements.original.naturalWidth)scheduleDamage();
       if(state.focus.pinned)placePinnedLenses();
     };
-    elements.original.addEventListener('load',applyRatio,{once:true});
+    elements.original.onload=applyRatio;
     elements.original.src=painting.image;
     elements.damaged.src=painting.image;
     elements.original.alt=`${painting.artist}, «${painting.title}», ${painting.year}`;
@@ -169,20 +236,21 @@
     const controls=root.querySelector('.restorationControls');
     const gap=7;
     const columnWidth=Math.max(180,(root.clientWidth-gap)/2-16);
-    const availableHeight=Math.max(180,root.clientHeight-(controls?.offsetHeight||112)-gap-38);
+    const availableHeight=Math.max(180,root.clientHeight-(controls?.offsetHeight||112)-(guide.hidden?0:guide.offsetHeight+gap)-gap-38);
     const heightBudget=root.dataset.orientation==='portrait'?availableHeight*.9:availableHeight;
     const width=Math.floor(Math.min(columnWidth,heightBudget*ratio));
     workspace.style.setProperty('--painting-width',`${width}px`);
     root.style.setProperty('--composition-width',`${Math.min(root.clientWidth,width*2+35)}px`);
   }
   function prepareCanvas(canvas){
+    alphaCache.delete(canvas);
     const width=Math.max(1,Math.round(elements.damagedArea.clientWidth));
     const height=Math.max(1,Math.round(elements.damagedArea.clientHeight));
     canvas.width=width;canvas.height=height;
     return canvas.getContext('2d');
   }
   function refreshLayerImages(){
-    if(state.layerRefresh)return;
+    if(!state.loupe||state.layerRefresh)return;
     state.layerRefresh=requestAnimationFrame(()=>{
       state.layerRefresh=0;
       state.layerImages={dirt:elements.dirt.toDataURL(),repair:elements.repair.toDataURL(),overpaint:elements.overpaint.toDataURL(),scan:elements.scan.toDataURL()};
@@ -193,8 +261,9 @@
     if(!textureCache.has(src))textureCache.set(src,new Promise(resolve=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>resolve(null);image.src=src;}));
     return textureCache.get(src);
   }
-  async function stampTextures(ctx,sources,count,w,h,minScale,maxScale){
+  async function stampTextures(ctx,sources,count,w,h,minScale,maxScale,revision){
     const images=(await Promise.all(sources.map(loadTexture))).filter(Boolean);
+    if(revision!==damageRevision)return;
     for(let i=0;i<count&&images.length;i++){
       const image=pick(images),scale=minScale+Math.random()*(maxScale-minScale);
       const drawW=w*scale,drawH=drawW*image.naturalHeight/image.naturalWidth;
@@ -203,11 +272,14 @@
     }
   }
   async function initDamageSurfaces(){
-    if(!elements.damagedArea.clientWidth)return;
+    if(!elements.damagedArea.clientWidth||initializedRevision===damageRevision)return;
+    const revision=damageRevision;initializedRevision=revision;
     const dirt=prepareCanvas(elements.dirt),repair=prepareCanvas(elements.repair),overpaint=prepareCanvas(elements.overpaint),uv=prepareCanvas(elements.uv),scan=prepareCanvas(elements.scan);
     const w=elements.dirt.width,h=elements.dirt.height;
-    await Promise.all([stampTextures(dirt,TEXTURES.dirt,8,w,h,.09,.2),stampTextures(repair,TEXTURES.loss,4,w,h,.055,.13),stampTextures(uv,TEXTURES.uv,5,w,h,.05,.1)]);
+    await Promise.all([state.lesson>=2?stampTextures(dirt,TEXTURES.dirt,8,w,h,.09,.2,revision):null,state.lesson>=3?stampTextures(repair,TEXTURES.loss,4,w,h,.055,.13,revision):null,state.lesson>=4?stampTextures(uv,TEXTURES.uv,5,w,h,.05,.1,revision):null]);
+    if(revision!==damageRevision)return;
     overpaint.clearRect(0,0,w,h);scan.clearRect(0,0,w,h);
+    [elements.dirt,elements.repair,elements.uv,elements.scan,elements.overpaint].forEach(canvas=>alphaCache.delete(canvas));
     state.initialDirt=Math.max(1,alphaTotal(elements.dirt));state.initialContamination=Math.max(1,contamination());state.damageReady=true;refreshLayerImages();renderMetrics();
   }
   function canvasPoint(event){
@@ -215,6 +287,7 @@
     return {x:(event.clientX-rect.left)/rect.width*elements.dirt.width,y:(event.clientY-rect.top)/rect.height*elements.dirt.height};
   }
   function softEraseAt(canvas,point,radius){
+    alphaCache.delete(canvas);
     const ctx=canvas.getContext('2d'),gradient=ctx.createRadialGradient(point.x,point.y,0,point.x,point.y,radius);
     gradient.addColorStop(0,'rgba(0,0,0,.9)');gradient.addColorStop(.62,'rgba(0,0,0,.58)');gradient.addColorStop(1,'rgba(0,0,0,0)');
     ctx.save();ctx.globalCompositeOperation='destination-out';ctx.fillStyle=gradient;ctx.beginPath();ctx.arc(point.x,point.y,radius,0,Math.PI*2);ctx.fill();ctx.restore();
@@ -236,6 +309,7 @@
     if(performance.now()-state.lastMetricAt>120){state.lastMetricAt=performance.now();renderMetrics();}
   }
   function selectTool(tool){
+    if(!toolUnlocked(tool))return;
     if(state.tool===tool){
       state.tool='';state.loupe=false;state.working=false;state.toolActing=false;state.lastPoint=null;state.focus.pinned=false;root.dataset.activeTool='';
       root.classList.remove('original-tool-blocked');
@@ -245,12 +319,13 @@
     }
     if(['paint','uv','reagent'].includes(tool)&&!dirtReady()){elements.hint.textContent='Сначала полностью очисти картину щёткой.';return;}
     state.tool=tool;state.loupe=tool==='loupe';state.working=false;state.toolActing=false;state.lastPoint=null;root.dataset.activeTool=tool;
-    if(state.loupe)root.classList.remove('original-tool-blocked');
+    if(state.loupe){root.classList.remove('original-tool-blocked');refreshLayerImages();}
     elements.tools.forEach(button=>button.classList.toggle('active',button.dataset.restorationTool===tool));
     elements.damagedArea.classList.remove('tool-brush','tool-paint','tool-uv','tool-reagent','working');
     elements.damagedArea.classList.add(`tool-${tool}`);
     if(!state.loupe){state.focus.pinned=false;hideLenses();}
     syncLenses();
+    renderGuide();
     const hasScan=alphaTotal(elements.scan)>25;
     const hints={loupe:'Изучи детали и закрепи лупу кликом.',brush:dirtCleanliness()<99?'Сначала очисти полотно от видимой грязи.':'Удаляй щёткой только уже проявленные реагентом вмешательства.',paint:'Проводи кончиком кисти по тёмным утраченным участкам.',uv:uvSearchComplete()?'Все скрытые следы уже обнаружены. Теперь используй реагент.':'Медленно освети всё полотно, чтобы обнаружить скрытые вмешательства.',reagent:hasScan?'Наноси реагент только на участки, уже обнаруженные УФ-светом.':'Сначала исследуй полотно УФ-фонарём — проявленных участков пока нет.'};
     elements.hint.textContent=hints[tool];
@@ -276,15 +351,18 @@
   }
   function scanUltraviolet(event){
     if(state.tool!=='uv'||event.currentTarget!==elements.damagedArea)return;
+    alphaCache.delete(elements.scan);
     const {x,y}=canvasPoint(event),radius=64,target=elements.scan.getContext('2d');
     elements.damagedArea.style.setProperty('--scan-x',`${x/elements.scan.width*100}%`);elements.damagedArea.style.setProperty('--scan-y',`${y/elements.scan.height*100}%`);
     target.save();target.beginPath();target.arc(x,y,radius,0,Math.PI*2);target.clip();target.drawImage(elements.uv,0,0);target.restore();
+    renderGuide();
     if(performance.now()-state.lastMetricAt>180){state.lastMetricAt=performance.now();elements.hint.textContent=uvSearchComplete()?'Все скрытые следы обнаружены. Выбери реагент и прояви подсвеченные участки.':'Продолжай вести УФ-фонарём по неисследованным участкам полотна.';}
   }
   function applyDiagnosticReagent(event){
     if(state.tool!=='reagent'||event.currentTarget!==elements.damagedArea)return;
     const {x,y}=canvasPoint(event),pixel=elements.scan.getContext('2d').getImageData(Math.round(x),Math.round(y),1,1).data;
     if(pixel[3]<=25){elements.hint.textContent=alphaTotal(elements.scan)>25?'На этом участке нет УФ-следа. Выбери видимое подсвеченное пятно.':'Сначала найди скрытые пятна УФ-фонарём — реагент пока наносить не на что.';return;}
+    [elements.uv,elements.scan,elements.overpaint].forEach(canvas=>alphaCache.delete(canvas));
     state.checked=false;setToolActing(true);setTimeout(()=>{if(state.tool==='reagent')setToolActing(false);},260);
     const radius=46,source=elements.uv.getContext('2d'),scan=elements.scan.getContext('2d'),target=elements.overpaint.getContext('2d');
     target.save();target.beginPath();target.arc(x,y,radius,0,Math.PI*2);target.clip();target.drawImage(elements.uv,0,0);target.restore();
@@ -307,7 +385,7 @@
     if(!state.checked){
       elements.score.textContent='—';
       elements.score.classList.remove('good');
-      elements.hint.textContent=`Добейся совпадения не ниже ${TARGET_SCORE}%.`;
+      elements.hint.textContent=[`Подбери оттенок, насыщенность и яркость ползунками. Нужно совпадение не ниже ${TARGET_SCORE}%.`,`Подбери цвет и очисти грязь щёткой.`,`Подбери цвет, очисти грязь и восстанови утраты кистью.`,`Подбери цвет, очисти и восстанови картину. УФ-фонарь и реагент помогут найти скрытые вмешательства.`][(state.lesson||1)-1];
       elements.reward.hidden=true;
     }
     syncLenses();
@@ -320,6 +398,7 @@
     return `<b>Награда</b><span>+${result.coins} монет</span>${rows}`;
   }
   function checkRestoration(){
+    if(!state.damageReady){elements.hint.textContent='Картина подготавливается. Подожди немного.';return;}
     const value=score();
     const clean=cleanliness();
     state.checked=true;
@@ -328,17 +407,18 @@
     elements.score.textContent=`${value}%`;
     elements.score.classList.toggle('good',success);
     if(!success){
-      elements.hint.textContent=value<TARGET_SCORE&&clean<100?'Нужно точнее подобрать цвет и полностью очистить картину.':(value<TARGET_SCORE?'Цвет всё ещё отличается от оригинала.':`Очистка не завершена: ${clean}%. Удали все видимые и проявленные загрязнения.`);
+      elements.hint.textContent=value<TARGET_SCORE&&clean<100?'Нужно точнее подобрать цвет и полностью очистить картину.':(value<TARGET_SCORE?'Цвет всё ещё отличается от оригинала.':`Очистка не завершена: ${clean}%. Удали загрязнения и восстанови утраченные участки кистью.`);
       elements.reward.hidden=true;return;
     }
     const painting=current();
+    guideSeen[state.lesson]=true;STORE.setJSON('keynlockRestorationLessons',guideSeen);guideVisible=false;renderGuide();
     if(completed[painting.id]){
       elements.hint.textContent='Картина уже была восстановлена. Это тренировочная попытка.';
       window.dispatchEvent(new CustomEvent('keynlock-restored',{detail:{id:painting.id}}));
       elements.reward.hidden=true;
       return;
     }
-    completed[painting.id]={score:value,completedAt:new Date().toISOString()};
+    completed[painting.id]={score:value,lesson:state.lesson,completedAt:new Date().toISOString()};
     STORE.setJSON(STORAGE_KEY,completed);
     const result=window.KeynlockResources?.awardRestoration?.({coins:50,componentCount:2,preferredColors:painting.colors})||{coins:50,components:{}};
     elements.hint.textContent='Картина восстановлена и возвращена заказчику.';
@@ -424,5 +504,5 @@
   document.addEventListener('pointerdown',event=>{if(elements.orderGrid.hidden||event.target.closest('#restorationOrderGrid,#restorationOrderButton'))return;closeOrders();});
   window.addEventListener('resize',()=>{sizePaintings();if(!elements.orderGrid.hidden)renderOrders();});
 
-  window.KeynlockRestoration=Object.freeze({start,paintings:PAINTINGS});
+  window.KeynlockRestoration=Object.freeze({start,toggleGuide,get guideVisible(){return guideVisible;},paintings:PAINTINGS});
 })();

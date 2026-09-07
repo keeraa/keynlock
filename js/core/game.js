@@ -55,7 +55,7 @@
     gameDefeat.reset();
     setGameInactive(false);
     setToastActionLabel('Новый замок');
-    document.querySelector('#newPuzzleButton').textContent='Новая головоломка';
+    document.querySelector('#newPuzzleButton').textContent='Вернуться в логово';
     const loot=document.querySelector('#solvedPuzzleLoot');
     if(loot)loot.textContent='';
     document.querySelectorAll('.mechanismZone, .sharedModeLockArt').forEach(el=>{
@@ -65,7 +65,7 @@
   }
 
   function restartCurrentRound(){
-    if(window.KeynlockOnboarding?.resume())return;
+    if((!window.KeynlockMissions?.active||window.KeynlockMissions.active.guided)&&window.KeynlockOnboarding?.resume())return;
     if(lairOpen) closeLair();
     if(mapOpen) closeMap(false);
     if(!window.KeynlockMissions?.retry())newLock(false);

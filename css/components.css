@@ -28,16 +28,18 @@
 }
 
 
+/* Shared module header: close control followed immediately by its title. */
 .screenTopHud{
   display:none;
   position:fixed;
   z-index:361;
-  left:clamp(124px,8vw,180px);
-  right:clamp(340px,25vw,520px);
+  left:14px;
+  right:14px;
   top:14px;
-  height:68px;
+  height:var(--ui-corner-icon-size);
   align-items:center;
-  justify-content:center;
+  justify-content:flex-start;
+  gap:14px;
 }
 .screenTopHudTitle{
   color:#e4c788;
@@ -46,28 +48,19 @@
   text-transform:uppercase;
   letter-spacing:.5px;
 }
-/* Fixed to the viewport's own corner (same 14px inset .globalTopHud itself
-   uses), not to .screenTopHud's box — that box's left/right clamp only
-   centers the title, so anchoring the close button to it would leave the
-   button short of the actual corner instead of flush with it. */
 .screenTopHudClose{
-  position:fixed;
-  z-index:362;
-  left:14px;
-  top:14px;
-  width:var(--top-hud-size,68px);
-  height:var(--top-hud-size,68px);
-  /* No visibility toggle of its own needed: it's a child of .screenTopHud,
-     and display:none on that parent already keeps a position:fixed child
-     from rendering too — the per-screen body:has(...) rules that flip the
-     parent to display:flex are what show this along with it. */
+  position:static;
+  flex:0 0 var(--ui-corner-icon-size);
+  box-sizing:border-box;
+  width:var(--ui-corner-icon-size);
+  height:var(--ui-corner-icon-size);
   display:grid;
   place-items:center;
   padding:0;
   border:1px solid rgba(161,121,59,.76);
   border-radius:14px;
   background:linear-gradient(180deg,rgba(43,33,23,.94),rgba(19,15,12,.96));
-  color:#e4c37f;
+  color:var(--color-gold-soft);
   font:25px/1 Arial,sans-serif;
   cursor:pointer;
   box-shadow:0 8px 24px rgba(0,0,0,.30),inset 0 0 0 1px rgba(255,229,176,.04);
@@ -76,12 +69,8 @@
 .screenTopHudClose:hover{transform:translateY(-2px);filter:brightness(1.12);border-color:#c79648;}
 .screenTopHudClose:active{transform:scale(.97);}
 @media (max-width:899px){
-  /* --top-hud-size itself drops to 58px at this breakpoint (see
-     css/lair.css) — .screenTopHudClose reads that var
-     directly. Identical mobile-safe-inset math previously lived
-     duplicated in both alchemy.css and collection.css. */
   .screenTopHud{
-    left:calc(var(--mobile-safe-left,0px) + 58px);
+    left:calc(var(--mobile-safe-left,0px) + 7px);
     right:calc(var(--mobile-safe-right,0px) + 8px);
     top:calc(var(--mobile-safe-top,0px) + 7px);
     height:54px;
@@ -92,3 +81,26 @@
     top:calc(var(--mobile-safe-top,0px) + 7px);
   }
 }
+/* Reusable UI: feature files own layout, not button/panel decoration. */
+.uiButton{font-family:var(--ui-font);font-size:var(--button-size,13px);padding:var(--button-padding,var(--ui-control-padding));border:1px solid var(--button-border,var(--ui-line));border-radius:var(--ui-control-radius);background:var(--button-bg,transparent);color:var(--button-ink,var(--ui-ink));cursor:pointer}
+.uiButton--primary{--button-bg:var(--ui-primary);--button-ink:var(--ui-primary-ink)}
+.uiButton--gold{--button-bg:linear-gradient(#b28b50,#876334);--button-ink:#fff3db;--button-border:#c2a271}
+.uiButton:hover:not(:disabled){filter:brightness(1.12)}
+.uiButton:disabled{opacity:.4;cursor:default}
+.uiButton:focus-visible{outline:2px solid var(--ui-focus);outline-offset:3px}
+.uiPanel{border:1px solid var(--ui-line);border-radius:var(--ui-panel-radius);background:var(--ui-panel);color:var(--ui-ink);font-family:var(--ui-font)}
+.uiActions{display:flex;gap:var(--actions-gap,12px)}
+.uiClose{border:0;background:none;color:inherit;font-size:23px;cursor:pointer}
+
+/* Standard game-screen surfaces; aliases keep dynamic legacy markup compatible. */
+.digitalBtn,.digitalMiniBtn,.solvedPuzzleButton,.gameDefeatRestart,.restorationCheckButton,.restorationNewDamageButton,.restorationOrderButton,.gameLaunchButton,.mainMenuButton,.mapChapterBtn,.workbenchCraftPanel button,.digitalWheel button{border:1px solid var(--ui-line);border-radius:var(--ui-control-radius);background:var(--surface-panel);color:var(--ui-ink);box-shadow:var(--shadow-panel);cursor:pointer;transition:filter var(--motion-fast),border-color var(--motion-fast)}
+.digitalCard,.solvedPuzzleCard,.gameDefeatCard,.restorationPanel,.restorationCheckPanel,.workbenchCraftPanel,.lairIntelCard,.collectionInfo,.pigmentResultCard,.pigmentTargetCard,.gameSettingsPanel,.lairModuleWindow{border:1px solid var(--ui-line);border-radius:var(--radius-panel);background:var(--surface-panel);color:var(--ui-ink);box-shadow:var(--shadow-panel)}
+.gameSettingsClose,.lairModuleClose,.globalTopHudClose,.lairWorkbenchClose,.worldMapClose,.alchemyGuideViewerClose{border:1px solid var(--ui-line);border-radius:var(--ui-control-radius);background:var(--color-surface);color:var(--ui-ink);cursor:pointer}
+:is(.digitalBtn,.digitalMiniBtn,.solvedPuzzleButton,.gameDefeatRestart,.restorationCheckButton,.restorationNewDamageButton,.restorationOrderButton,.gameLaunchButton,.mainMenuButton,.mapChapterBtn,.workbenchCraftPanel button,.digitalWheel button):hover:not(:disabled){filter:brightness(1.12);border-color:var(--ui-focus)}
+:is(.digitalBtn,.digitalMiniBtn,.solvedPuzzleButton,.gameDefeatRestart,.restorationCheckButton,.restorationNewDamageButton,.restorationOrderButton,.gameLaunchButton,.mainMenuButton,.mapChapterBtn,.workbenchCraftPanel button,.digitalWheel button):disabled{opacity:.4;cursor:not-allowed}
+.digitalBtn.primary,.restorationCheckButton,.gameDefeatRestart,.mainMenuPrimary,.solvedPuzzleButton{background:var(--surface-dialog);color:var(--color-text-strong);border-color:var(--color-gold)}
+:is(.digitalBtn,.digitalMiniBtn,.solvedPuzzleButton,.gameDefeatRestart,.restorationCheckButton,.restorationNewDamageButton,.restorationOrderButton,.gameLaunchButton,.mainMenuButton,.mapChapterBtn,.workbenchCraftPanel button,.digitalWheel button,.gameSettingsClose,.lairModuleClose,.globalTopHudClose,.lairWorkbenchClose,.worldMapClose,.alchemyGuideViewerClose):focus-visible{outline:2px solid var(--ui-focus);outline-offset:3px}
+
+.uiInventory{--inventory-item-lift:9px}.uiInventory .uiInventoryItem.visual-hover{filter:brightness(1.08)}.uiInventory .uiInventoryItem:focus-visible,.uiInventoryToggle:focus-visible{outline:2px solid var(--ui-focus);outline-offset:3px}
+
+.tutorialPreference{display:flex;align-items:center;gap:8px;margin:10px 0;font:13px/1.4 var(--ui-font);color:var(--color-text);}

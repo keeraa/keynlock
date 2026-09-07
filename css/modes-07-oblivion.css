@@ -39,7 +39,7 @@ body.importedMode .puzzleArea>.modePanel.obMode:not([hidden]){padding-bottom:cal
   right:8%;
   top:8px;
   height:8px;
-  background:#17120d;
+  background:var(--color-surface);
   border-radius:3px;
   box-shadow:0 0 0 1px #806c4b;
 }

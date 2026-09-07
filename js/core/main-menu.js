@@ -9,11 +9,29 @@
   const REDUCE_MOTION_KEY='keynlockReduceMotion';
   const PRESERVED_ON_NEW=new Set([
     SAVE_KEY,
+    'keynlockTrainingDisabled',
+    'keynlockHideHints',
     'keynlockMusicVolume',
     REDUCE_MOTION_KEY,
     'lockpickGameCatalogOverrides',
     'keynlockRecentlyOpenedGames'
   ]);
+  window.KeynlockTutorialPreferences={
+    get enabled(){return STORE.getItem('keynlockTrainingDisabled')!=='1';},
+    get hints(){return STORE.getItem('keynlockHideHints')!=='1';}
+  };
+  function syncTutorialPreferences(){
+    document.querySelector('#mainMenuTraining').checked=window.KeynlockTutorialPreferences.enabled;
+    document.querySelectorAll('[data-hide-hints]').forEach(input=>input.checked=!window.KeynlockTutorialPreferences.hints);
+  }
+  document.addEventListener('change',event=>{
+    if(event.target.id==='mainMenuTraining')STORE.setItem('keynlockTrainingDisabled',event.target.checked?'0':'1');
+    else if(event.target.matches('[data-hide-hints]'))STORE.setItem('keynlockHideHints',event.target.checked?'1':'0');
+    else return;
+    syncTutorialPreferences();window.dispatchEvent(new Event('keynlock-tutorial-preferences'));
+  });
+  window.addEventListener('keynlock-tutorial-preferences',syncTutorialPreferences);
+  syncTutorialPreferences();
   const loader=document.querySelector('#bootLoader');
   const menu=document.querySelector('#mainMenu');
   const slotPanel=document.querySelector('#mainMenuSlots');

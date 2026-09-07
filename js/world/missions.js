@@ -102,7 +102,7 @@
   rebuildMapConnections();
 
   function startMapMission(id, options={}) {
-    if(window.KeynlockOnboarding?.active){toast('Сначала заверши обучение в логове. Продолжить его можно в журнале заказов.');return false;}
+    if(options.guided&&window.KeynlockOnboarding?.active){toast('Сначала заверши обучение в логове. Продолжить его можно в «Заказах».');return false;}
     const loc = MAP_LOCATIONS[id];
     if (!loc || loc.action !== 'mission') return;
     if(options.tier!==undefined){
@@ -187,7 +187,7 @@
       const preview=document.createElement('span');
       preview.className='mapMissionPreview';
       const previewImage=document.createElement('img');
-      previewImage.src=`assets/map/mechanics/${place.mode}.png`;
+      previewImage.src=place.mode==='silhouettes'?'assets/map/mechanics/silhouettes.svg':`assets/map/mechanics/${place.mode}.png`;
       previewImage.addEventListener('error',()=>{
         previewImage.src=GameCatalog.get(place.mode).location;
       },{once:true});

@@ -139,8 +139,8 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   object-fit: contain;
   pointer-events: none;
 }
-.alchemyRackDrawerBottle:hover {
-  transform: translateX(-50%) translateY(-5px);
+.alchemyRackDrawerBottle:is(:hover,.visual-hover) {
+  transform: translateX(-50%) translateY(calc(-1 * var(--inventory-item-lift)));
 }
 
 .alchemyRackDrawerBottle.selected {

@@ -45,10 +45,6 @@
     hovered?.classList.add('visual-hover');
   }
   function clearVisualHover(){ setHovered(null); }
-  document.addEventListener('pointermove',e=>{
-    if(!root()) return;
-    setHovered(candidates(e.clientX,e.clientY)[0]?.btn || null);
-  },{passive:true});
   document.addEventListener('pointerleave',clearVisualHover,{passive:true});
 
   // Closed, the grab strip covers the whole peek so any press opens the case —
@@ -471,51 +467,9 @@
   // Ease so the last stretch of the approach moves more than the first.
   const ease=t=>t*t*(3-2*t);
 
-  // One of these per drawer, written as a CSS custom property that the drawer's
-  // own transitioned transform reads.
-  // maxLift is either a flat px number or, for a drawer that wants a bigger
-  // rise, a function of the drawer's own rect (the rack's is 15% of its own
-  // height taller than the flat LIFT everyone else gets, on request — more
-  // of the shelf clears the peek line at full approach, not just a few
-  // extra px of cork).
-  function makeApproach(selector, cssVar, maxLift=LIFT,onLift=null){
-    return function apply(){
-      const drawer=document.querySelector(selector);
-      if(!drawer) return;
-      if(drawer.classList.contains('open')){
-        drawer.style.setProperty(cssVar,'0px');
-        if(onLift) onLift(0);
-        return;
-      }
-      const r=drawer.getBoundingClientRect();
-      // Measure to the resting edge, not the lifted one, so the drawer cannot
-      // chase its own movement. Spread the rect field by field — DOMRect keeps
-      // its values on the prototype, so {...rect} comes out empty.
-      const lift=parseFloat(drawer.style.getPropertyValue(cssVar))||0;
-      const restingRect={left:r.left,right:r.right,top:r.top+lift,bottom:r.bottom+lift};
-      // The old radius started above the already-visible peek, so a requested
-      // 180px zone was really 180px + 56/72px. Subtract that peek here: the
-      // first movement now begins exactly 180px from the viewport bottom for
-      // both the lockpick case and the alchemy rack.
-      const peekName=cssVar==='--rack-approach' ? '--rack-peek' : '--inv-peek';
-      const peek=parseFloat(getComputedStyle(drawer).getPropertyValue(peekName))||0;
-      const reach=Math.max(1,TRIGGER_DEPTH-peek);
-      const t=seen ? ease(clamp01(1 - gapTo(restingRect)/reach)) : 0;
-      const peak=typeof maxLift==='function' ? maxLift(r) : maxLift;
-      const amount=t*peak;
-      drawer.style.setProperty(cssVar,`${amount.toFixed(2)}px`);
-      if(onLift) onLift(amount);
-    };
-  }
-  const applyInventoryApproach=makeApproach('#inventoryDrawer','--inv-approach',LIFT,amount=>{
-    document.querySelector('#challengeHud')?.style.setProperty('--challenge-inventory-lift',`${amount.toFixed(2)}px`);
-  });
-  const applyRackApproach=makeApproach('#alchemyRackDrawer','--rack-approach', r=>LIFT+r.height*0.15);
-
   function apply(){
     queued=false;
-    applyInventoryApproach();
-    applyRackApproach();
+
 
     const lock=document.querySelector('#lock.universalLockBlock');
     if(lock){

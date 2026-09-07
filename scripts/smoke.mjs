@@ -1,5 +1,6 @@
 import { existsSync } from 'node:fs';
-import { spawnSync } from 'node:child_process';
+import { spawnSync, execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { platform } from 'node:os';
 import { startServer } from './serve.mjs';
 
@@ -48,7 +49,8 @@ try {
   if (!chrome) {
     console.log('Browser smoke skipped: Chrome/Chromium not found.');
   } else {
-    const result = spawnSync(chrome, [
+    // Keep the local HTTP server responsive while Chrome loads it.
+    await promisify(execFile)(chrome, [
       '--headless=new',
       '--disable-gpu',
       '--no-sandbox',
@@ -56,7 +58,6 @@ try {
       '--dump-dom',
       url,
     ], { encoding: 'utf8', timeout: 20000, maxBuffer: 12 * 1024 * 1024 });
-    if (result.status !== 0) throw new Error(`Chrome smoke failed (${result.status}):\n${result.stderr}`);
     console.log('Browser smoke OK — Chrome loaded the KEYNLOCK entry page.');
   }
 } finally {

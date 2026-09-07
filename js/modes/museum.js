@@ -119,7 +119,6 @@
   function hmPick(i){
     if(solved) return;
     hmKb=i;
-    registerMove();
     if(i===hmSeq[hmStep]){
       hmJam[hmStep]--;
       SFX.move();
@@ -137,6 +136,7 @@
       renderMuseum();
       return;
     }
+    registerMove();
     hmTimeLeft=Math.max(0,hmTimeLeft-2.2);
     SFX.wrongLock();
     damagePick({

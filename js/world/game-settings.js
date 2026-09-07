@@ -114,7 +114,7 @@
         tr.dataset.gameId=id;
         const name=document.createElement('th');
         name.scope='row';
-        name.innerHTML=`<button class="gameLaunchButton" type="button" aria-label="Перейти в игру"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg></button><span class="gameSettingName"><button class="gameNameText" type="button"></button></span>`;
+        name.innerHTML=`<button class="gameLaunchButton uiButton" type="button" aria-label="Перейти в игру"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg></button><span class="gameSettingName"><button class="gameNameText" type="button"></button></span>`;
         name.querySelector('button').dataset.launchGame=id;
         name.querySelector('.gameNameText').dataset.launchGame=id;
         name.querySelector('.gameNameText').setAttribute('aria-label',`Открыть ${game.title}, первый уровень`);

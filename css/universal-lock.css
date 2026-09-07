@@ -29,7 +29,7 @@ body.importedMode .puzzleArea>.modePanel:not([hidden]){padding:6px 12px 10px!imp
 body.importedMode .app{grid-template-rows:minmax(0,1fr)!important;}
 body.importedMode .main,body.mode-hillsfar .main{grid-row:1!important;width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;display:grid!important;place-items:center!important;overflow:visible!important;}
 body.importedMode .scene,body.mode-hillsfar .scene{position:relative!important;width:min(1180px,100vw)!important;height:100vh!important;min-height:0!important;max-height:none!important;margin:0!important;overflow:visible!important;}
-.topRightHud .hudNavBtn{width:var(--top-hud-size,68px)!important;min-width:var(--top-hud-size,68px)!important;max-width:var(--top-hud-size,68px)!important;height:var(--top-hud-size,68px)!important;min-height:var(--top-hud-size,68px)!important;max-height:var(--top-hud-size,68px)!important;flex:0 0 var(--top-hud-size,68px)!important;display:grid!important;place-items:center!important;padding:0!important;border:1px solid rgba(161,121,59,.76)!important;border-radius:14px!important;background:linear-gradient(180deg,rgba(43,33,23,.94),rgba(19,15,12,.96))!important;color:#e4c37f!important;box-shadow:0 8px 24px rgba(0,0,0,.30),inset 0 0 0 1px rgba(255,229,176,.04)!important;cursor:pointer!important;pointer-events:auto!important;transition:transform .16s ease,filter .16s ease,border-color .16s ease!important;}
+.topRightHud .hudNavBtn{width:var(--ui-corner-icon-size)!important;min-width:var(--ui-corner-icon-size)!important;max-width:var(--ui-corner-icon-size)!important;height:var(--ui-corner-icon-size)!important;min-height:var(--ui-corner-icon-size)!important;max-height:var(--ui-corner-icon-size)!important;flex:0 0 var(--ui-corner-icon-size)!important;display:grid!important;place-items:center!important;padding:0!important;border:1px solid rgba(161,121,59,.76)!important;border-radius:14px!important;background:linear-gradient(180deg,rgba(43,33,23,.94),rgba(19,15,12,.96))!important;color:var(--color-gold-soft)!important;box-shadow:0 8px 24px rgba(0,0,0,.30),inset 0 0 0 1px rgba(255,229,176,.04)!important;cursor:pointer!important;pointer-events:auto!important;transition:transform .16s ease,filter .16s ease,border-color .16s ease!important;}
 .topRightHud .hudNavBtn:hover{transform:translateY(-2px)!important;filter:brightness(1.12)!important;border-color:#c79648!important;}
 .topRightHud .hudNavBtn:active{transform:scale(.97)!important;}
 .topRightHud .hudNavIcon{width:36px!important;height:36px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.7!important;stroke-linecap:round!important;stroke-linejoin:round!important;}
@@ -117,7 +117,7 @@ body.importedMode .cpPart{min-width:82px!important;}
 .worldMapAction{min-height:44px!important;}
 .lairOverlay{padding:0!important;width:100vw!important;height:100dvh!important;}
 .lairScene{width:100vw!important;height:100dvh!important;min-height:0!important;}
-.lairSceneTop{left:10px!important;right:10px!important;top:calc(var(--mobile-safe-top) + 10px)!important;}
+.lairSceneTop{left:calc(var(--mobile-safe-left) + 7px)!important;right:10px!important;top:calc(var(--mobile-safe-top) + 7px)!important;}
 .lairSceneKicker{font-size:8px!important;}
 .lairSceneTitle{font-size:22px!important;}
 .lairSceneActive{display:none!important;}
@@ -128,8 +128,7 @@ body.importedMode .cpPart{min-width:82px!important;}
 .lairHotspotDot{width:15px!important;height:15px!important;top:8px!important;}
 .lairHotspotCity{left:17%!important;top:43%!important;}
 .lairHotspotDialogue{left:36%!important;top:70%!important;}
-.lairHotspotTeam{left:68%!important;top:47%!important;}
-.lairModuleWindow{width:calc(100vw - 16px)!important;max-height:calc(100dvh - var(--mobile-safe-top) - var(--mobile-safe-bottom) - 16px)!important;border-radius:12px!important;}
+.lairHotspotTeam{left:68%!important;top:47%!important;}.lairModuleWindow{width:calc(100vw - 16px)!important;max-height:calc(100dvh - var(--mobile-safe-top) - var(--mobile-safe-bottom) - 16px)!important;}
 .lairModuleBody{max-height:calc(100dvh - var(--mobile-safe-top) - var(--mobile-safe-bottom) - 70px)!important;padding:12px!important;}
 .lairCharacters{grid-template-columns:1fr!important;}
 .lairCharacter{min-height:210px!important;}
@@ -195,9 +194,9 @@ body.game-inactive.lair-open::after,body.game-inactive.map-open::after{display:n
 /* Noise meter: a fixed vertical instrument at the right-hand screen edge. */
 .noiseMeter{position:fixed;z-index:70;right:max(22px,env(safe-area-inset-right));top:50%;display:none;width:42px;height:218px;transform:translateY(-50%);flex-direction:column;align-items:center;gap:9px;padding:11px 9px;border:1px solid rgba(120,94,52,.5);border-radius:14px;background:rgba(17,13,10,.78);box-shadow:0 10px 28px rgba(0,0,0,.36);pointer-events:none;}
 .noiseMeter.visible{display:flex;}
-.noiseMeterLabel{order:2;flex:0 0 auto;color:#9d8d75;font:600 9px/1 var(--ui-font);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;}
+.noiseMeterLabel{order:2;flex:0 0 auto;color:var(--color-text-muted);font:600 9px/1 var(--ui-font);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;}
 .noiseMeterTrack{order:1;position:relative;flex:1 1 auto;width:9px;min-height:0;border:1px solid rgba(132,105,62,.32);border-radius:99px;background:rgba(60,50,36,.68);overflow:hidden;}
-.noiseMeterFill{position:absolute;left:0;right:0;bottom:0;height:0;border-radius:99px;background:linear-gradient(0deg,#8a7a4e,#d9a74c);transition:height .16s linear,background .3s ease;}
+.noiseMeterFill{position:absolute;left:0;right:0;bottom:0;height:0;border-radius:99px;background:linear-gradient(0deg,#8a7a4e,var(--color-gold));transition:height .16s linear,background .3s ease;}
 .noiseMeter.warning .noiseMeterFill{background:linear-gradient(0deg,#c07a35,#e0503a);}
 .noiseMeter.warning{border-color:rgba(206,96,60,.72);animation:noisePulse 780ms ease-in-out infinite;}
 @keyframes noisePulse{0%,100%{box-shadow:0 6px 16px rgba(0,0,0,.3);}50%{box-shadow:0 6px 16px rgba(0,0,0,.3),0 0 14px rgba(214,88,54,.34);}}

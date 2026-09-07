@@ -2,18 +2,18 @@
   'use strict';
   const store=window.KeynlockSaveStore,key='keynlockLairTraining';
   let state=store.getJSON(key,{step:null});
-  const panel=document.createElement('aside');panel.id='lairTraining';panel.hidden=true;panel.setAttribute('aria-label','Обучение в логове');
-  panel.innerHTML='<small id="trainingCount"></small><strong id="trainingTitle"></strong><p id="trainingText" aria-live="polite"></p><button type="button" id="trainingAction"></button>';
+  const panel=document.createElement('aside');panel.id='lairTraining';panel.className='uiPanel';panel.hidden=true;panel.setAttribute('aria-label','Обучение в логове');
+  panel.innerHTML='<small id="trainingCount"></small><strong id="trainingTitle"></strong><p id="trainingText" aria-live="polite"></p><button type="button" id="trainingAction" class="uiButton uiButton--primary"></button><label class="tutorialPreference"><input type="checkbox" data-hide-hints> Не показывать подсказки</label>';
   document.body.append(panel);
   const help=document.createElement('button');help.id='trainingHelp';help.type='button';help.textContent='?';help.setAttribute('aria-label','Показать или скрыть обучение');help.setAttribute('aria-controls','lairTraining');document.body.append(help);
   let helpOpen=false,lastView='';
-  help.addEventListener('click',()=>{helpOpen=!helpOpen;render();});
+  help.addEventListener('click',()=>{if(lastView==='restoration'){window.KeynlockRestoration.toggleGuide();return;}helpOpen=!helpOpen;render();});
   const stages={
     return:['Снова в логове','Сай: «Замок открыт. Теперь займусь найденной картиной. В мастерской ей будет безопаснее».','Открыть мастерскую'],
-    restoration:['Реставрация картины','Очисти полотно щёткой, исследуй УФ-фонарём и обработай найденные следы реагентом. Удали проявленные пятна, восстанови утраты кистью и подбери цвет. Нажми «Проверить».','Открыть мастерскую'],
+    restoration:['Реставрация картины','Первая картина требует только подбора цвета. Настрой оттенок, насыщенность и яркость по оригиналу, затем нажми «Проверить». Щётка, кисть и УФ появятся на следующих картинах.','Открыть мастерскую'],
     craft:['Создай одну отмычку','Первая отмычка сломалась на заказе. Создай одну новую из двух деталей, чтобы пополнить футляр.','К верстаку'],
     buy:['Купи одну отмычку','Кай: «Запасной инструмент дешевле сорванного дела». Купи одну обычную отмычку за 30 монет. Если футляр полон, она останется в запасе; с собой можно взять три.','К верстаку'],
-    done:['Всё готово к следующему заказу','Картина восстановлена. Ты умеешь создавать и покупать отмычки. Теперь можно продолжить заказы первого уровня.','Открыть журнал']
+    done:['Всё готово к следующему заказу','Картина восстановлена. Ты умеешь создавать и покупать отмычки. Теперь можно продолжить заказы первого уровня.','Открыть заказы']
   };
   function persist(){store.setJSON(key,state);window.dispatchEvent(new Event('keynlock-training-change'));}
   let displayedStep=null;
@@ -22,11 +22,11 @@
     const view=module&&!module.hidden?module.dataset.module:workbench&&!workbench.hidden?'workbench':'';
     if(view!==lastView){lastView=view;helpOpen=false;}
     const available=!!state.step&&!state.finished&&state.step!=='loot';
-    help.hidden=!available;
+    help.hidden=!available&&view!=='restoration';
     const journal=document.querySelector('#campaignButton');
     if(journal)help.style.left=`${journal.offsetLeft+journal.offsetWidth+8}px`;
-    panel.hidden=!available||(!!view&&!helpOpen);
-    help.setAttribute('aria-expanded',String(!panel.hidden));
+    panel.hidden=!available||(!helpOpen&&(!window.KeynlockTutorialPreferences.enabled||!window.KeynlockTutorialPreferences.hints))||view==='restoration'||(!!view&&!helpOpen);
+    help.setAttribute('aria-expanded',String(view==='restoration'?window.KeynlockRestoration?.guideVisible:!panel.hidden));
     if(panel.hidden)return;
     if(displayedStep!==state.step){displayedStep=state.step;panel.classList.remove('trainingAttention');void panel.offsetWidth;panel.classList.add('trainingAttention');}
     const row=stages[state.step];
@@ -38,7 +38,7 @@
   }
   function advance(step){state.step=step;persist();render();window.KeynlockResources.render();}
   function resume(){
-    if(!state.step||state.finished)return false;
+    if(!window.KeynlockTutorialPreferences.enabled||!state.step||state.finished)return false;
     if(state.step==='loot'){document.body.classList.remove('solved-notice-visible');advance('return');window.KeynlockLair.open();}
     else if(state.step==='return'){advance('restoration');window.KeynlockLair.module('restoration');}
     else if(state.step==='restoration')window.KeynlockLair.module('restoration');
@@ -48,7 +48,7 @@
   }
   panel.querySelector('button').addEventListener('click',resume);
   window.addEventListener('keynlock-mission-cleared',event=>{
-    if(state.step||!event.detail.guided||event.detail.orderId!=='wharf-1')return;
+    if(!window.KeynlockTutorialPreferences.enabled||state.step||!event.detail.guided||event.detail.orderId!=='wharf-1')return;
     state={step:'loot',paintingId:window.KeynlockPaintingRewards.ownedIds().at(-1),lootText:document.querySelector('#solvedPuzzleLoot').textContent};persist();render();
     document.querySelector('#newPuzzleButton').textContent='Вернуться в логово';
   });
@@ -57,13 +57,14 @@
     advance('craft');
     keynlockResources.parts=Math.max(2,keynlockResources.parts);
     saveKeynlockResources();
-    window.KeynlockLair.workbench();
+    window.KeynlockLair.open();
   });
   window.addEventListener('keynlock-pick-acquired',event=>{
     if(state.step==='craft'&&event.detail.source==='craft')advance('buy');
     else if(state.step==='buy'&&event.detail.source==='buy')advance('done');
   });
   window.addEventListener('keynlock:play',()=>{
+    if(!window.KeynlockTutorialPreferences.enabled)return;
     if(!state.step&&window.KeynlockCampaign.progress.completed.includes('wharf-1')){state={step:'return',paintingId:window.KeynlockPaintingRewards.ownedIds().at(-1)};persist();}
     if(state.step==='loot'){
       if(lairOpen)closeLair();
@@ -73,8 +74,10 @@
       document.body.classList.add('solved-notice-visible');
       render();
     }else if(state.step&&!state.finished){window.KeynlockLair.open();render();}});
-  window.KeynlockOnboarding={resume,get active(){return !!state.step&&!state.finished;},get step(){return state.finished?null:state.step;},get paintingId(){return state.step==='restoration'?state.paintingId:null;}};
+  window.KeynlockOnboarding={resume,get active(){return window.KeynlockTutorialPreferences.enabled&&!!state.step&&!state.finished;},get step(){return !window.KeynlockTutorialPreferences.enabled||state.finished?null:state.step;},get paintingId(){return state.step==='restoration'?state.paintingId:null;}};
   const viewObserver=new MutationObserver(render);
   ['#lairModuleWindow','#lairWorkbenchModal'].forEach(selector=>{const target=document.querySelector(selector);if(target)viewObserver.observe(target,{attributes:true,attributeFilter:['hidden','data-module']});});
+  window.addEventListener('keynlock-tutorial-preferences',()=>{helpOpen=false;render();});
+  window.dispatchEvent(new Event('keynlock-tutorial-preferences'));
   render();
 })();

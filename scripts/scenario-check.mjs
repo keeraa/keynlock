@@ -50,13 +50,24 @@ assert(gameCatalog.feature('classic','lock.requiresPick')===true,'Physical locks
 assert(gameCatalog.feature('drum','lock.present')===true,'Saved lock visibility must remain editable.');
 assert(gameCatalog.feature('drum','lock.requiresPick')===false,'Saved display overrides must not make a logic puzzle require picks.');
 
+// Deferred opening owns its outcome; starting or repeating it is not a failed attempt.
+gameCatalogContext.solved=false;
+gameCatalogContext.picks=3;
+gameCatalogContext.mode='hillsfar';
+let deferredBreaks=0;
+gameCatalogContext.window.forceBreakOnePick=()=>{deferredBreaks++;};
+runInNewContext("GameActions.registerOpen('hillsfar',()=> 'pending'); GameActions.attemptOpen(); GameActions.attemptOpen();",gameCatalogContext);
+assert(deferredBreaks===0,'An inserting key must not consume picks before its result.');
+runInNewContext("GameActions.registerOpen('hillsfar',()=>undefined); GameActions.attemptOpen();",gameCatalogContext);
+assert(deferredBreaks===1,'An immediate failed opening must still consume one pick.');
+
 const contentContext={window:{}};
 for(const file of ['js/data/world.js','js/data/economy.js','js/data/restoration.js','js/data/paintings.js']){
   runInNewContext(source(file),contentContext,{filename:file});
 }
 const content=contentContext.window.KeynlockContent;
 assert(Object.keys(content.world.districts).length===7,'The world must contain seven districts.');
-assert(content.world.missionPlaces.length===27,'Mission catalogue size changed unexpectedly.');
+assert(content.world.missionPlaces.length===28,'Mission catalogue size changed unexpectedly.');
 assert(content.paintings.length===180,'Painting catalogue size changed unexpectedly.');
 assert(content.restoration.targetScore===88,'Restoration target changed unexpectedly.');
 
@@ -64,7 +75,7 @@ globalThis.window=contentContext.window;
 const catalogModule=await import('../js/modules/content-catalog.mjs');
 assert(catalogModule.getPaintings().length===180,'Content module must expose every painting.');
 assert(catalogModule.getDistricts().length===7,'Content module must expose every district.');
-assert(catalogModule.getMissions().length===27,'Content module must expose every mission.');
+assert(catalogModule.getMissions().length===28,'Content module must expose every mission.');
 assert(Object.keys(catalogModule.getComponents()).length>0,'Content module must expose components.');
 assert(Object.keys(catalogModule.getLockLoot()).length>0,'Content module must expose lock loot.');
 delete globalThis.window;
@@ -261,3 +272,69 @@ assert(flexibleProgress.complete('wharf-1','main','wharf',1),'A completed job ca
 assert(flexibleProgress.step(flexible[0]).id==='inner','Replay must continue to its second puzzle.');
 assert(flexibleProgress.complete('wharf-1','inner','hillsfar',1)&&flexibleProgress.complete('wharf-1','last','wharf',1),'Replay must allow all three puzzles.');
 assert(flexibleProgress.replayOrder===null&&flexibleProgress.done(flexible[0]),'Finishing a replay must preserve original completion.');
+
+// Repeated HUD ticks must not mutate the DOM when their displayed values match.
+{
+  let writes=0;
+  const tracked=()=>new Proxy({}, {set(target,key,value){writes++;target[key]=value;return true;}});
+  const nodes=new Map();
+  const node=()=>Object.assign(tracked(),{classList:{toggle(){writes++;}},setAttribute(){writes++;},style:tracked(),dataset:tracked()});
+  const hudRoot=node();hudRoot.querySelector=id=>{if(!nodes.has(id))nodes.set(id,node());return nodes.get(id);};
+  const context={window:{}};
+  runInNewContext(source('js/core/challenge-hud.js'),context);
+  const hud=new context.window.GameChallengeHud(hudRoot);
+  hud.setTimer({active:true,timeLeft:60,timeMax:70});writes=0;
+  for(let i=0;i<100;i++)hud.setTimer({active:true,timeLeft:60,timeMax:70});
+  assert(writes===0,'Identical timer ticks must not repeat DOM writes');
+  hud.setTimer({active:true,timeLeft:59,timeMax:70});
+  assert(nodes.get('#challengeTimerValue').textContent==='00:59','Changed timer value must still update');
+  hud.setTimer({active:false});assert(hud.timerActive===false,'Timer must still hide');
+}
+console.log('HUD performance OK — unchanged ticks avoid DOM writes; changing values still render.');
+
+// Teaching rounds allow exploration without making a long puzzle pay less than a spare pick.
+const lessonConfigContext={window:{KeynlockContent:{}}};
+runInNewContext(source('js/data/campaign.js'),lessonConfigContext);
+const lessonPolicies=lessonConfigContext.window.KeynlockContent.campaign.balance;
+assert(Object.keys(lessonPolicies).length===10,'The opening ten modes need explicit balance policies.');
+const moveSource=source('js/core/ui.js').split('  function registerMove(){')[1].split('\n  function awardRun(){')[0];
+const lessonRewardContext={mode:'pipeline',moves:0,runReward:100,toolMotionController:{impulse:()=>{}},animateRewardDrop:()=>{},updateEconomyUI:()=>{},window:{KeynlockCampaign:{balance:id=>lessonPolicies[id]}}};
+runInNewContext(`function registerMove(){${moveSource}\nthis.performMove=registerMove;`,lessonRewardContext);
+for(let i=0;i<32;i++)lessonRewardContext.performMove();
+assert(lessonRewardContext.runReward===100,'Revealing and planning the introductory pipe route must not immediately erase its reward.');
+for(let i=0;i<100;i++)lessonRewardContext.performMove();
+assert(lessonRewardContext.runReward===60,'A long introductory attempt must still cover two purchased picks.');
+lessonRewardContext.window.KeynlockCampaign.balance=()=>null;
+lessonRewardContext.performMove();
+assert(lessonRewardContext.runReward===10,'Advanced rounds retain their existing reward curve.');
+console.log('Opening balance OK — exploration allowance, reward floor and advanced-round isolation.');
+
+// A failed pipe route destroys the carried set exactly once, including repeat ticks.
+const pipeFailureSource=source('js/modes/pipeline.js').split('  function plFail(msg){')[1].split('\n  let plPausedAt')[0];
+const pipeFailureContext={solved:false,plState:'flow',plPos:{r:2,c:0},pickCapacity:3,picks:3,brokenPicks:0,SFX:{wrongLock:()=>{},break:()=>{}},updatePickUI:()=>{},renderPipeline:()=>{},spent:0,slots:[],failure:null};
+pipeFailureContext.window={KeynlockResources:{consumePicks:n=>{pipeFailureContext.spent+=n;}}};
+pipeFailureContext.triggerInventoryBreakAnimation=slot=>pipeFailureContext.slots.push(slot);
+pipeFailureContext.showGameDefeat=(reason,options)=>{pipeFailureContext.failure={reason,...options};};
+runInNewContext(`function plFail(msg){${pipeFailureSource}\nthis.fail=plFail;`,pipeFailureContext);
+pipeFailureContext.fail('Трубы не соединены');
+pipeFailureContext.fail('Повторный тик');
+assert(pipeFailureContext.picks===0&&pipeFailureContext.spent===3&&pipeFailureContext.brokenPicks===3,'Pipe failure must consume exactly the carried set once.');
+assert(pipeFailureContext.slots.join() === '3,2,1'&&pipeFailureContext.failure.reason==='picks','Pipe failure must animate every carried pick and return the player to the lair.');
+
+// Guard penalties are applied once per defeat, persist, and always lead home.
+for(const [roll,coins,expectedCoins,expectedPicks] of [[0,101,101,0],[.4,101,50,7],[.9,101,0,7],[.4,0,0,7]]){
+  const elements=Object.fromEntries(['Title','Text','Restart'].map(name=>['#gameDefeat'+name,{textContent:'',addEventListener(type,fn){this.click=fn;},focus(){}}]));
+  const resourceState={picks:7};const saved={};let home=0;
+  const context={Math:Object.assign(Object.create(Math),{random:()=>roll}),balance:coins,picks:3,
+    STORE:{setItem:(key,value)=>saved[key]=value},updatePickUI(){},updateEconomyUI(){},
+    window:{KeynlockResources:{state:resourceState,consumePicks(n){resourceState.picks-=n;saved.picks=resourceState.picks;return n;},render(){}}},
+    document:{body:{classList:{add(){},remove(){}}}},requestAnimationFrame:fn=>fn(),
+    root:{querySelector:key=>elements[key],dataset:{},hidden:true},goHome:()=>home++};
+  runInNewContext(source('js/core/game-defeat.js')+'\nconst defeat=new GameDefeat(root,{onReturnToLair:goHome}); defeat.show("noise"); defeat.show("noise");',context);
+  assert(context.balance===expectedCoins&&resourceState.picks===expectedPicks,'Guard penalty incorrect or charged twice.');
+  assert(elements['#gameDefeatText'].textContent.startsWith('Вы привлекли внимание шумным взломом.'),'Guard introduction missing.');
+  assert(elements['#gameDefeatRestart'].textContent==='Вернуться в логово','Guard action must lead home.');
+  elements['#gameDefeatRestart'].click();assert(home===1,'Guard defeat did not return home.');
+  if(roll>0)assert(saved.lockpickBalance===String(expectedCoins),'Guard coin penalty was not persisted.');
+}
+console.log('Guard encounters OK — three outcomes, zero coins, odd rounding, single charge and return home.');

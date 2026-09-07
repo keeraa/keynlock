@@ -443,9 +443,11 @@ let plateEls=[], pinTopPlateEls=[];
     anach:()=>PuzzleModes.call('anach','attemptOpen'),
     skyrim:()=>PuzzleModes.call('skyrim','attemptOpen'),
     g1:()=>PuzzleModes.call('g1','attemptOpen'),
-    hillsfar:()=>PuzzleModes.call('hillsfar','attemptOpen'),
+    // Preserve the deferred result: generic call() only reports that a handler ran.
+    hillsfar:()=>PuzzleModes.get('hillsfar').attemptOpen(),
     oblivion:()=>PuzzleModes.call('oblivion','attemptOpen'),
     watchmen:()=>PuzzleModes.call('watchmen','attemptOpen'),
+    silhouettes:()=>PuzzleModes.call('silhouettes','attemptOpen'),
     museum:()=>PuzzleModes.call('museum','attemptOpen'),
     mass2:()=>PuzzleModes.call('mass2','attemptOpen'),
     pipeline:()=>PuzzleModes.call('pipeline','attemptOpen'),
@@ -482,6 +484,9 @@ let plateEls=[], pinTopPlateEls=[];
     setTimeout(()=>requestAnimationFrame(animationLoop),delay);
   }
   let animationLoopParked=false;
+  function writeMotionStyle(element,name,value){
+    if(element.style.getPropertyValue(name)!==value)element.style.setProperty(name,value);
+  }
   function animationLoop(now){
     const dt=Math.min(50,now-lastFrame);
     lastFrame=now;
@@ -492,21 +497,21 @@ let plateEls=[], pinTopPlateEls=[];
     pointerY += (pointerTargetY - pointerY) * lerp;
     bgParallaxX += (bgParallaxTargetX - bgParallaxX) * lerp;
     bgParallaxY += (bgParallaxTargetY - bgParallaxY) * lerp;
-    document.body.style.setProperty('--bg-parallax-x', `${bgParallaxX.toFixed(2)}px`);
-    document.body.style.setProperty('--bg-parallax-y', `${bgParallaxY.toFixed(2)}px`);
+    writeMotionStyle(document.body,'--bg-parallax-x', `${bgParallaxX.toFixed(2)}px`);
+    writeMotionStyle(document.body,'--bg-parallax-y', `${bgParallaxY.toFixed(2)}px`);
     toolMotionController.setTarget(toolMotionController.targetFromLinear(state,selected,{min:MIN,max:MAX}));
 
-    $lock.style.setProperty('--px', `${pointerX.toFixed(2)}px`);
-    $lock.style.setProperty('--py', `${pointerY.toFixed(2)}px`);
+    writeMotionStyle($lock,'--px', `${pointerX.toFixed(2)}px`);
+    writeMotionStyle($lock,'--py', `${pointerY.toFixed(2)}px`);
     if(plateEls.length){
+      const px=`${pointerX.toFixed(2)}px`;
+      const py=`${pointerY.toFixed(2)}px`;
       for(const p of plateEls){
-        const px=`${pointerX.toFixed(2)}px`;
-        const py=`${pointerY.toFixed(2)}px`;
-        p.style.setProperty('--px',px);
-        p.style.setProperty('--py',py);
+        writeMotionStyle(p,'--px',px);
+        writeMotionStyle(p,'--py',py);
         if(p._pinTopPlate){
-          p._pinTopPlate.style.setProperty('--px',px);
-          p._pinTopPlate.style.setProperty('--py',py);
+          writeMotionStyle(p._pinTopPlate,'--px',px);
+          writeMotionStyle(p._pinTopPlate,'--py',py);
         }
       }
     }

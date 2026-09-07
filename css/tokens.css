@@ -1,5 +1,6 @@
 /* Shared visual language. Feature styles may override these tokens locally. */
 :root{
+  --ui-corner-icon-size:54px;
   --color-paper:#d7c8b5;
   --color-text:#ead6ad;
   --color-text-strong:#f1d38e;
@@ -24,4 +25,16 @@
   --ui-font:"Golos Text",Arial,sans-serif;
   --accent-font:"Forum",Georgia,serif;
   --paper:var(--color-paper);
+}
+/* Reusable UI tokens. */
+:root{
+  --ui-ink:#e4dac6;
+  --ui-panel:#242822;
+  --ui-line:#ad8f5b;
+  --ui-primary:#713f32;
+  --ui-primary-ink:#f7ecd8;
+  --ui-focus:#e5b65e;
+  --ui-control-radius:3px;
+  --ui-panel-radius:6px;
+  --ui-control-padding:11px 16px;
 }

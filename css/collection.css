@@ -356,3 +356,24 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
 @media (max-width:480px){
   .collectionRow{flex:1 1 100%;}
 }
+
+.collectionRow:disabled{cursor:not-allowed;opacity:.6;}
+.collectionRowThumbs img.undiscovered,.collectionHandleCard.locked img{filter:grayscale(1) blur(3px);opacity:.5;}
+.collectionLoadout{margin-top:16px;font:13px/1.5 var(--ui-font);}
+.collectionLoadout button{margin:4px;padding:8px;}
+.collectionLoadout button[aria-pressed="true"]{border-color:var(--ui-focus);background:rgba(176,128,53,.25);}
+
+.collectionCaseSlots{display:flex;flex-wrap:wrap;gap:10px;padding:14px;border-radius:var(--ui-panel-radius);background:rgba(15,11,7,.6);}
+.collectionCaseSlot{position:relative;display:grid;place-items:center;width:72px;height:150px;padding:8px 8px 24px;border:1px dashed var(--ui-line);border-radius:var(--ui-control-radius);background:rgba(123,92,47,.15);cursor:pointer;}
+.collectionLoadout .collectionCaseSlot{margin:0;}
+.collectionCaseSlot img{position:absolute;top:8px;left:8px;width:calc(100% - 16px);height:calc(100% - 32px);object-fit:contain;pointer-events:none;}
+.collectionSlotSilhouette{filter:brightness(0);opacity:.85;}
+.collectionCaseSlot span{position:absolute;bottom:5px;color:var(--color-gold-soft);font:12px/1 var(--ui-font);}
+.collectionCaseSlot.dropTarget{border-style:solid;border-color:var(--ui-focus);box-shadow:0 0 16px rgba(214,170,83,.45);background:rgba(186,137,60,.3);}
+.collectionCaseSlot:focus-visible{outline:2px solid var(--ui-focus);outline-offset:3px;}
+.collectionHandleCard:not(:disabled){touch-action:none;cursor:grab;}
+.collectionDragGhost{position:fixed;width:60px;height:140px;object-fit:contain;transform:translate(-50%,-50%);z-index:9999;pointer-events:none;filter:drop-shadow(0 8px 12px #0009);}
+@media(max-width:600px){.collectionCaseSlot{width:56px;height:116px;}.collectionCaseSlots{gap:6px;padding:8px;}}
+
+.collectionCaseSlots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:8px;}
+.collectionLoadout .collectionCaseSlot{width:100%;min-width:0;box-sizing:border-box;}

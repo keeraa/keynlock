@@ -140,7 +140,7 @@
     // Only a mouse aims the scene. A finger tapping a plate used to slam the
     // parallax target across to wherever it landed, which jolted the view and
     // whipped the pick and tensioner round with it.
-    if(e.pointerType !== 'mouse') return;
+    if(e.pointerType !== 'mouse'||isWorldPaused()) return;
     const r=$lock.getBoundingClientRect();
     const centerX=r.left+r.width/2,centerY=r.top+r.height/2;
     const dx=e.clientX-centerX,dy=e.clientY-centerY;
@@ -265,7 +265,11 @@
     if(!gameplayInputBlocked()&&e.code==='Enter'&&PuzzleModes.action(mode,'secondary')) e.preventDefault();
   });
   document.querySelector('#lairHudButton')?.addEventListener('click',openLairFromHud);
-  document.querySelector('#newPuzzleButton')?.addEventListener('click',restartCurrentRound);
+  document.querySelector('#newPuzzleButton')?.addEventListener('click',()=>{
+    document.body.classList.remove('solved-notice-visible');
+    if(window.KeynlockOnboarding?.step==='loot')window.KeynlockOnboarding.resume();
+    else window.KeynlockLair.open();
+  });
   if($mapTab)$mapTab.onclick=openMap;
   document.querySelector('#worldMapClose')?.addEventListener('click',()=>closeMap(true));
   $worldMapScreen?.addEventListener('pointerdown',e=>{
@@ -322,3 +326,34 @@
     newLock(false);
   }
   (window.KeynlockAssetsReady || Promise.resolve()).then(bootGame);
+
+// Observe only the shared header readouts: repeated renders with unchanged
+// values never pulse, and rapid changes replace the previous animation.
+(() => {
+  const counters=['coinBalance','resourcePicks','resourceParts','resourceOil'];
+  counters.forEach(id=>{
+    const element=document.getElementById(id);
+    if(!element)return;
+    function value(){
+      const text=element.textContent;
+      const count=Number.parseInt(text,10)||0;
+      return id==='resourcePicks'?count+(Number(text.match(/\+\s*(\d+)/)?.[1])||0):count;
+    }
+    let previous=value(),animation=null;
+    new MutationObserver(()=>{
+      const next=value();
+      if(next===previous)return;
+      const increased=next>previous;previous=next;
+      if(document.body.matches('.assets-loading,.main-menu-open'))return;
+      animation?.cancel();
+      const color=increased?'#8cda92':'#f17c73';
+      const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.classList.contains('reduce-motion');
+      animation=element.animate([
+        {transform:'scale(1)',color:getComputedStyle(element).color},
+        {transform:reduced?'scale(1)':'scale(1.3)',color,offset:.25},
+        {transform:'scale(1)',color,offset:.65},
+        {transform:'scale(1)',color:getComputedStyle(element).color}
+      ],{duration:850,easing:'ease-out'});
+    }).observe(element,{childList:true,characterData:true,subtree:true});
+  });
+})();

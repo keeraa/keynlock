@@ -48,7 +48,7 @@ body.mode-hillsfar .globalTopHud{
   border-color:rgba(161,121,59,.82)!important;
   border-radius:12px!important;
   background:linear-gradient(180deg,rgba(43,33,23,.97),rgba(19,15,12,.98))!important;
-  color:#e4c37f!important;
+  color:var(--color-gold-soft)!important;
   box-shadow:0 8px 24px rgba(0,0,0,.30),inset 0 0 0 1px rgba(255,229,176,.04)!important;
   transition:transform .16s ease,filter .16s ease,border-color .16s ease,color .16s ease!important;
 }
@@ -69,15 +69,15 @@ body.mode-hillsfar .globalTopHud{
 }
 .globalTopHud .hudNavBtn:hover{
   border-color:#c79648!important;
-  color:#f0d497!important;
+  color:var(--color-gold-pale)!important;
   filter:brightness(1.12);
 }
 .globalTopHud .hudNavBtn:focus-visible{
-  outline:2px solid #d9a74c!important;
+  outline:2px solid var(--color-gold)!important;
   outline-offset:2px!important;
 }
 .globalTopHud .alchemyStationTab:focus-visible{
-  outline:2px solid #d9a74c!important;
+  outline:2px solid var(--color-gold)!important;
   outline-offset:2px!important;
 }
 
@@ -95,30 +95,21 @@ body.mode-hillsfar .globalTopHud{
    grid integration for free. */
 .globalTopHud .screenTopHud{
   grid-area:context;
+  align-self:start;
   position:relative!important;
   inset:auto!important;
   width:100%;
   min-width:0;
-  height:68px;
+  height:var(--ui-corner-icon-size);
   margin:0!important;
 }
 
 
-@media (min-width:1101px){
-  body:has(#lairModuleWindow.open .lairPanel.active)
-    .globalTopHud .screenTopHud{
-    position:fixed!important;
-    top:14px!important;
-    left:50%!important;
-    right:auto!important;
-    width:min(840px,calc(100vw - 670px));
-    margin-left:calc(min(840px,calc(100vw - 670px)) / -2)!important;
-  }
-}
-
 body.lair-open .globalTopHud #rewardBox{display:none!important;}
 
-/* Resources are compact readouts rather than navigation cards. */
+/* Resource scaling participates in layout, keeping navigation unobstructed. */
+.globalTopHud .topRightHud{align-items:center!important;}
+.globalTopHud .economyHud{zoom:1.5;align-self:center;}
 .globalTopHud .economyHud .resourceReadout,
 .globalTopHud .economyHud .resourceHudBadge{
   display:flex;
@@ -147,7 +138,7 @@ body.lair-open .globalTopHud #rewardBox{display:none!important;}
 .globalTopHud .resourceHudIconOil{width:13px;background-image:url('../assets/ui/maslenka-ico.png');}
 .globalTopHud .economyHud [data-tip]{transition:filter .18s ease,transform .18s ease;}
 .globalTopHud .economyHud [data-tip]:hover{filter:brightness(1.18);transform:translateY(-1px);}
-.globalTopHud .economyHud [data-tip]:focus-visible{outline:1px solid #d9a74c;}
+.globalTopHud .economyHud [data-tip]:focus-visible{outline:1px solid var(--color-gold);}
 
 @media (max-width:1100px){
   .globalTopHud{
@@ -171,3 +162,5 @@ body.lair-open .globalTopHud #rewardBox{display:none!important;}
   .globalTopHud .screenTopHud{height:54px;}
   .globalTopHud .topRightHud{max-width:min(58vw,260px)!important;}
 }
+
+.globalTopHud :is(#coinBalance,#resourcePicks,#resourceParts,#resourceOil){display:inline-block;transform-origin:center;font-variant-numeric:tabular-nums;}

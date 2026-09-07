@@ -2,8 +2,8 @@
 .alchemyRoot {
   --line: rgba(120, 94, 52, 0.34);
   --ink: #e2c487;
-  --muted: #9d8d75;
-  --gold: #d9a74c;
+  --muted: var(--color-text-muted);
+  --gold: var(--color-gold);
   --bad: #c0603c;
   --shadow: 0 14px 40px rgba(0, 0, 0, 0.42);
   --tube-big-frame: url("../assets/alchemy/tube-big-frame.png");

@@ -1,19 +1,4 @@
-// ===== PICK COLLECTION SCREEN =====
-// Prototype: /Users/migachev/Desktop/123/stings/prototype.html proved the
-// layering trick (shaft on top under z-index, handle on bottom over it —
-// the overlap hides the seam on most pairs without hand-tuning) and the
-// grab-to-rotate + scale-to-fit preview. This ports both into the lair as
-// its own panel, opened the same generic way as every other one
-// (js/core/init.js's `.lairHotspot[data-lair-open]` -> openLairModule ->
-// js/world/lair.js's setLairTab toggling `.lairPanel[data-lair-panel]`).
-//
-// Scope, on purpose: this screen only *browses* handles inside one
-// collection at a time (each handle carries its own paired shaft) — not a
-// free shaft+handle mixer. The data shape below doesn't hard-code collection =
-// one fixed pair, though, so a future "build your own set" screen can
-// reuse PICK_COLLECTIONS without a rewrite. Economy (buying/unlocking) is
-// not built here either — `unlocked` is just a flag other code can flip
-// later; this screen only renders it (grayscale when false).
+// Handle collections, mission discovery, and the player’s case loadout.
 (function(){
   // Every handle gets its own numbered shaft (sting_01..08, matched to the
   // handle's position within its collection) rather than all sharing one
@@ -84,9 +69,19 @@
   let unlockedOverrides = {};
   unlockedOverrides=STORE.getJSON(UNLOCKED_KEY,{})||{};
   function isUnlocked(handle){
-    return Object.prototype.hasOwnProperty.call(unlockedOverrides, handle.id) ? !!unlockedOverrides[handle.id] : !!handle.unlocked;
+    return Object.prototype.hasOwnProperty.call(unlockedOverrides, handle.id) ? !!unlockedOverrides[handle.id] : handle.id.startsWith('japan-wood-');
   }
 
+  function collectionReady(col){return col.handles.every(isUnlocked);}
+  const LOADOUT_KEY='keynlockHandleLoadouts';
+  const loadouts=STORE.getJSON(LOADOUT_KEY,{})||{};
+  const assignedSlots=STORE.getJSON('keynlockHandleAssignedSlots',Object.fromEntries(Object.keys(loadouts).map(id=>[id,Array.from({length:8},(_,i)=>i)])))||{};
+  let selectedSlot=0,skinRequest=0;
+  function handlesFor(col){
+    const saved=Array.isArray(loadouts[col.id])?loadouts[col.id]:[];
+    const ids=[...new Set(saved.filter(id=>col.handles.some(h=>h.id===id)))];
+    return [...ids,...col.handles.map(h=>h.id).filter(id=>!ids.includes(id))].map(id=>col.handles.find(h=>h.id===id));
+  }
   const $root = document.querySelector('#collectionRoot');
   if(!$root) return;
 
@@ -129,6 +124,8 @@
     zoom: 39,
     rotate: 0
   };
+
+  let equippedHandle=state.handle;
 
   function collectionById(id){ return PICK_COLLECTIONS.find(c => c.id === id) || PICK_COLLECTIONS[0]; }
 
@@ -211,12 +208,16 @@
   }
   async function applyEquippedSkin(handle){
     try{
+      const request=++skinRequest;
       const url = await compositeHandle(handle);
+      if(request!==skinRequest)return;
       document.documentElement.style.setProperty('--pick-skin-image', `url("${url}")`);
     }catch(_){ /* an asset failed to load — leave whatever skin was already applied */ }
   }
   function equipHandle(handle){
+    if(!collectionReady(collectionById(state.collectionId))||!isUnlocked(handle))return;
     state.handle = handle;
+    equippedHandle=handle;
     try{STORE.setJSON(EQUIPPED_KEY,{collectionId:state.collectionId,handleId:handle.id});}catch(_){}
     applyEquippedSkin(handle);
     refreshInventoryRail();
@@ -227,14 +228,16 @@
     if(saved){
       const col = PICK_COLLECTIONS.find(c => c.id === saved.collectionId);
       const handle = col?.handles.find(h => h.id === saved.handleId);
-      if(handle && isUnlocked(handle)){
+      if(handle && isUnlocked(handle)&&collectionReady(col)){
         state.collectionId = col.id;
         state.handle = handle;
       }
     }
+    if(!handlesFor(collectionById(state.collectionId)).slice(0,pickProgress.capacity).some(h=>h.id===state.handle.id))state.handle=handlesFor(collectionById(state.collectionId))[0];
     // The collection is the only live source of pick artwork. Apply its
     // default too, instead of letting the retired PICK_SKINS flash first.
-    applyEquippedSkin(state.handle);
+    equippedHandle=state.handle;
+    applyEquippedSkin(equippedHandle);
   }
 
   // ===== Feeding the inventory case's own pick rail =====
@@ -250,7 +253,7 @@
     return collectionById(state.collectionId);
   }
   function getInventoryRail(count){
-    return railCollection().handles.filter(isUnlocked).slice(0, count);
+    return handlesFor(railCollection()).slice(0,Math.min(count,pickProgress.capacity));
   }
   function refreshInventoryRail(){
     // Composites for the rail's handles may not be cached yet — kick
@@ -276,13 +279,22 @@
       // fallback; refreshInventoryRail() replaces it with the composite.
       return getInventoryRail(count).map(h => ({ id: h.id, image: cachedImage(h.id) || h.image }));
     },
-    getEquippedHandleId(){ return state.handle.id; },
+    getEquippedHandleId(){ return equippedHandle.id; },
     equipHandleById(handleId){
       const handle = railCollection().handles.find(h => h.id === handleId);
-      if(handle && isUnlocked(handle)) equipHandle(handle);
+      if(handle && getInventoryRail(pickProgress.capacity).some(h=>h.id===handle.id)) equipHandle(handle);
+    },
+    awardMissionHandle(missionId){
+      if(!missionId)return null;
+      const rewarded=STORE.getJSON('keynlockHandleRewardedMissions',{});
+      if(rewarded[missionId])return null;
+      const reward=this.unlockRandomHandle();
+      rewarded[missionId]=true;STORE.setJSON('keynlockHandleRewardedMissions',rewarded);
+      return reward;
     },
     unlockRandomHandle(){
-      const locked=PICK_COLLECTIONS.flatMap(collection=>collection.handles.map(handle=>({collection,handle}))).filter(({handle})=>!isUnlocked(handle));
+      const collection=PICK_COLLECTIONS.find(col=>!collectionReady(col));
+      const locked=collection?collection.handles.filter(handle=>!isUnlocked(handle)).map(handle=>({collection,handle})):[];
       if(!locked.length)return null;
       const reward=locked[Math.floor(Math.random()*locked.length)];
       unlockedOverrides[reward.handle.id]=true;
@@ -290,7 +302,7 @@
       renderCollectionList();
       if(reward.collection.id===state.collectionId)renderHandleStrip();
       refreshInventoryRail();
-      return {id:reward.handle.id,name:`${reward.collection.name} · ${reward.handle.id.split('-').at(-1)}`};
+      return {id:reward.handle.id,image:reward.handle.image,name:`${reward.collection.name} · ${reward.handle.id.split('-').at(-1)}`};
     }
   };
 
@@ -299,15 +311,17 @@
     PICK_COLLECTIONS.forEach(col => {
       const row = document.createElement('button');
       row.type = 'button';
+      row.disabled=!collectionReady(col);
       row.className = 'collectionRow' + (col.id === state.collectionId ? ' active' : '');
       row.innerHTML = `
-        <span class="collectionRowThumbs">${col.handles.map(h => `<img src="${h.image}" alt="">`).join('')}</span>
-        <span class="collectionRowLabel">${col.name}</span>
+        <span class="collectionRowThumbs">${col.handles.map(h => `<img src="${h.image}" alt="" class="${isUnlocked(h)?'':'undiscovered'}">`).join('')}</span>
+        <span class="collectionRowLabel">${col.name} · ${col.handles.filter(isUnlocked).length}/8</span>
       `;
       row.addEventListener('click', () => {
-        if(col.id === state.collectionId) return;
+        if(!collectionReady(col)||col.id === state.collectionId) return;
+        selectedSlot=0;
         state.collectionId = col.id;
-        const firstUnlocked = col.handles.find(isUnlocked) || col.handles[0];
+        const firstUnlocked = handlesFor(col)[0];
         equipHandle(firstUnlocked);
         renderCollectionList();
         renderHandleStrip();
@@ -319,7 +333,69 @@
     });
   }
 
+  const slots=document.createElement('div');slots.className='collectionLoadout';
+  $infoTitle.after(slots);
+  function renderSlots(){
+    selectedSlot=Math.min(selectedSlot,pickProgress.capacity-1);
+    const chosen=getInventoryRail(pickProgress.capacity);
+    const assigned=assignedSlots[state.collectionId]||[];
+    slots.innerHTML='<p>Перетащи рукоятку на силуэт в футляре. Нажатие на рукоятку открывает превью. Для назначения без перетаскивания выбери рукоятку, затем нажми на место.</p><div class="collectionCaseSlots">'+chosen.map((h,i)=>`<button class="collectionCaseSlot" type="button" data-slot="${i}" aria-label="Место ${i+1}: рукоятка ${h.id.split('-').at(-1)}" aria-pressed="${i===selectedSlot}"><img class="collectionSlotSilhouette" src="${h.image}" alt="">${assigned.includes(i)?`<img class="collectionSlotHandle" src="${h.image}" alt="">`:''}<span>${i+1}</span></button>`).join('')+'</div>';
+
+  }
+  function assignHandle(handle,slot){
+    const col=collectionById(state.collectionId);
+    if(!collectionReady(col)||!isUnlocked(handle)||!Number.isInteger(slot)||slot<0||slot>=pickProgress.capacity)return;
+    const chosen=handlesFor(col),old=chosen.findIndex(h=>h.id===handle.id);
+    if(old<0)return;
+    selectedSlot=slot;
+    const assigned=new Set(assignedSlots[col.id]||[]);
+    if(assigned.has(slot)&&old<pickProgress.capacity)assigned.add(old);
+    assigned.add(slot);assignedSlots[col.id]=[...assigned];
+    STORE.setJSON('keynlockHandleAssignedSlots',assignedSlots);
+    [chosen[slot],chosen[old]]=[chosen[old],chosen[slot]];
+    loadouts[col.id]=chosen.map(h=>h.id);STORE.setJSON(LOADOUT_KEY,loadouts);
+    equipHandle(handle);renderSlots();renderHandleStrip();renderStage();
+  }
+  let drag=null,suppressClick=false;
+  $handleStrip.addEventListener('dragstart',event=>event.preventDefault());
+  $handleStrip.addEventListener('pointerdown',event=>{
+    const card=event.target.closest('[data-handle-id]');
+    if(!card||card.disabled||event.button!==0)return;
+    drag={id:card.dataset.handleId,pointer:event.pointerId,x:event.clientX,y:event.clientY,ghost:null};
+  });
+  window.addEventListener('pointermove',event=>{
+    if(!drag||drag.pointer!==event.pointerId)return;
+    if(!drag.ghost&&Math.hypot(event.clientX-drag.x,event.clientY-drag.y)<6)return;
+    event.preventDefault();
+    if(!drag.ghost){
+      $handleStrip.setPointerCapture(event.pointerId);
+      const handle=collectionById(state.collectionId).handles.find(h=>h.id===drag.id);
+      drag.ghost=document.createElement('img');drag.ghost.src=handle.image;drag.ghost.className='collectionDragGhost';drag.ghost.alt='';document.body.append(drag.ghost);
+      slots.classList.add('acceptingHandle');
+    }
+    drag.ghost.style.left=`${event.clientX}px`;drag.ghost.style.top=`${event.clientY}px`;
+    const target=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-slot]');
+    slots.querySelectorAll('[data-slot]').forEach(slot=>slot.classList.toggle('dropTarget',slot===target));
+  });
+  function finishDrag(event){
+    if(!drag||drag.pointer!==event.pointerId)return;
+    const current=drag;drag=null;
+    if(current.ghost){
+      const target=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-slot]');
+      current.ghost.remove();slots.classList.remove('acceptingHandle');
+      slots.querySelectorAll('.dropTarget').forEach(slot=>slot.classList.remove('dropTarget'));
+      suppressClick=true;setTimeout(()=>{suppressClick=false;},0);
+      if(event.type==='pointerup'&&target&&slots.contains(target))assignHandle(collectionById(state.collectionId).handles.find(h=>h.id===current.id),Number(target.dataset.slot));
+    }
+    if($handleStrip.hasPointerCapture(event.pointerId))$handleStrip.releasePointerCapture(event.pointerId);
+  }
+  window.addEventListener('pointerup',finishDrag);
+  window.addEventListener('pointercancel',finishDrag);
+  $handleStrip.addEventListener('lostpointercapture',finishDrag);
+  slots.addEventListener('click',event=>{const b=event.target.closest('[data-slot]');if(b&&!suppressClick){assignHandle(state.handle,Number(b.dataset.slot));}});
+  window.addEventListener('keynlock-resources-change',()=>{renderSlots();refreshInventoryRail();});
   function renderCollectionInfo(){
+    renderSlots();
     const col = collectionById(state.collectionId);
     if($infoTitle) $infoTitle.textContent = col.name;
     if($infoText) $infoText.innerHTML = col.description || '';
@@ -332,13 +408,15 @@
       const unlocked = isUnlocked(handle);
       const card = document.createElement('button');
       card.type = 'button';
+      card.dataset.handleId=handle.id;
+      card.setAttribute('aria-label',`Рукоятка ${handle.id.split('-').at(-1)}`);
       card.className = 'collectionHandleCard' + (handle.id === state.handle.id ? ' active' : '') + (unlocked ? '' : ' locked');
       card.innerHTML = `<img src="${handle.image}" alt="" loading="lazy">`;
       if(unlocked){
         card.addEventListener('click', () => {
-          equipHandle(handle);
-          renderHandleStrip();
-          renderStage();
+          if(suppressClick)return;
+          state.handle=handle;
+          renderHandleStrip();renderStage();
         });
       }else{
         card.disabled = true;

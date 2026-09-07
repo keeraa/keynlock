@@ -1,4 +1,4 @@
-.campaignButton{position:fixed;left:18px;bottom:18px;z-index:370;padding:12px 18px;border:1px solid #9d8255;border-radius:4px;background:#211f1a;color:#ebdbbb;font:500 12px/1.4 var(--ui-font);box-shadow:0 5px 22px #0006;cursor:pointer;}
+.campaignButton{display:inline-flex;align-items:center;gap:10px;position:fixed;left:18px;bottom:18px;z-index:370;padding:12px 18px;border:1px solid #9d8255;border-radius:4px;background:#211f1a;color:#ebdbbb;font:500 12px/1.4 var(--ui-font);box-shadow:0 5px 22px #0006;cursor:pointer;}
 body.main-menu-open .campaignButton,body.assets-loading .campaignButton,body.game-defeat .campaignButton{display:none;}
 .campaignDialog{box-sizing:border-box;width:min(816px,calc(100vw - 48px));max-height:calc(100dvh - 40px);padding:0;border:1px solid #95805c;border-radius:7px;background:#242822;color:#e4dac6;box-shadow:0 28px 100px #000a;font:400 13px/1.6 var(--ui-font);overflow:auto;scrollbar-width:thin;scrollbar-color:#b0a083 #e6dcc5;}
 .campaignDialog::backdrop{background:#080b0bd1;backdrop-filter:blur(7px);}
@@ -8,7 +8,7 @@ body.main-menu-open .campaignButton,body.assets-loading .campaignButton,body.gam
 .campaignDialog .campaignEyebrow{margin:0;font:500 9px/1.5 var(--ui-font);letter-spacing:.19em;text-transform:uppercase;color:#aa9470;}
 .campaignDialog button{cursor:pointer;font-family:var(--ui-font);}
 .campaignDialog .campaignClose{width:40px;height:40px;min-width:40px;border:1px solid #8c816250;border-radius:50%;background:none;color:#cec1a8;font-size:25px;line-height:1;}
-.campaignDialog button:focus-visible,.campaignButton:focus-visible,.campaignDialog summary:focus-visible{outline:2px solid #bb733e;outline-offset:3px;}
+.campaignDialog button:focus-visible,.campaignButton:focus-visible,.campaignDialog summary:focus-visible{outline:2px solid var(--ui-focus);outline-offset:3px;}
 .campaignPages{display:grid;grid-template-columns:290px minmax(0,1fr);align-items:stretch;background:#eee5d1;color:#373629;}
 .campaignIndex{padding:30px 22px;background:linear-gradient(90deg,#ddd3bc,#e9dfc8 95%,#c5baa0);border-right:1px solid #b2a384;}
 .campaignChapter{display:flex;gap:13px;align-items:center;}
@@ -55,11 +55,11 @@ body.main-menu-open .campaignButton,body.assets-loading .campaignButton,body.gam
 #campaignRisk{color:#89604a;font-size:11px;}
 .campaignFooter{padding:16px 32px 24px;border-top:1px solid #cabc9e;background:#e1d5bc55;}
 #campaignPreparation{margin:0 0 13px;color:#796b50;font-size:10px;}
-.campaignActions{display:flex;gap:9px;flex-wrap:wrap;}
-.campaignActions button{min-height:43px;padding:11px 16px;border:1px solid #b4a17e;border-radius:3px;background:transparent;color:#736044;font-size:11px;font-weight:500;}
-.campaignActions #campaignStart{background:#713f32;color:#f7ecd8;border-color:#713f32;flex:1;box-shadow:0 3px 7px #64352720;}
-.campaignActions #campaignStart:hover{background:#884b3c;}
-.campaignActions button:disabled{opacity:.4;cursor:default;}
+.campaignActions{--actions-gap:9px;--button-size:11px;--button-border:#b4a17e;--button-ink:#736044;flex-wrap:wrap;}
+.campaignActions button{min-height:43px;font-weight:500;}
+.campaignActions #campaignStart{--button-border:var(--ui-primary);flex:1;box-shadow:0 3px 7px #64352720;}
+
+
 .campaignFootnote{display:flex;justify-content:space-between;padding:11px 32px;color:#aaa089;font-size:9px;letter-spacing:.02em;}
 @media(max-width:720px){
 .campaignDialog{width:calc(100vw - 20px);max-height:calc(100dvh - 20px);}
@@ -77,3 +77,9 @@ body.main-menu-open .campaignButton,body.assets-loading .campaignButton,body.gam
 #campaignSteps{max-height:390px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#b5a384 transparent;}
 #campaignPart{margin:8px 0;color:#89604a;font-size:10px;}
 @media(max-width:720px){.campaignTierPicker{margin:0 0 12px;}#campaignSteps{max-height:155px;}}
+
+#campaignStart[aria-disabled="true"]{opacity:.5;cursor:not-allowed;}
+
+.campaignButton::before{content:"";flex:0 0 36px;width:36px;height:36px;background:url("../assets/lair/icons/missions.png") center/contain no-repeat;}
+
+#campaignButton{padding:0;border:0;background:transparent;box-shadow:none;gap:0;}#campaignButton::before{width:var(--ui-corner-icon-size);height:var(--ui-corner-icon-size);flex-basis:var(--ui-corner-icon-size);}#campaignButton:hover{filter:brightness(1.12);}

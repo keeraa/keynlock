@@ -238,7 +238,8 @@
     plTiles=tiles;
     plRevealed=new Set();
     plCursor=plIndex(PL_START.r,PL_START.c);
-    plPrepMax=diffStep(22000,PL_PREP_MS,13000);
+    plPausedAt=null;
+    plPrepMax=window.KeynlockCampaign?.balance?.('pipeline')?45000:diffStep(22000,PL_PREP_MS,13000);
     generatedDistance=plIdealMoves(tiles);
     plRestartAttempt(plPrepMax);
     updateEconomyUI();
@@ -360,12 +361,19 @@
     picks=0;
     window.KeynlockResources?.consumePicks?.(remaining);
     brokenPicks+=remaining;
-    for(let slot=remaining;slot>0;slot--) triggerInventoryBreakAnimation(slot);
+    for(let slot=remaining;slot>0;slot--)triggerInventoryBreakAnimation(slot);
     SFX.break();
     updatePickUI();
     renderPipeline();
-    showGameDefeat('picks',{text:`${msg}. Все отмычки потеряны. Вернись в логово и подготовь новый комплект.`});
+    showGameDefeat('picks',{text:`${msg}. Все отмычки в комплекте сломались. Вернись в логово и подготовь новый комплект.`});
   }
+
+  let plPausedAt=null;
+  window.addEventListener('keynlock-world-pausechange',event=>{
+    if(mode!=='pipeline')return;
+    if(event.detail.paused){plPausedAt=performance.now();return;}
+    if(plPausedAt!==null){const elapsed=performance.now()-plPausedAt;plStartAt+=elapsed;plLastStep+=elapsed;plPausedAt=null;}
+  });
 
   function plStep(now){
     if(plState==='prep'){

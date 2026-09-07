@@ -30,10 +30,6 @@
     if(picksEl)picksEl.textContent=`${Math.min(keynlockResources.picks,resourceCaseCapacity())}/${resourceCaseCapacity()}${keynlockResources.picks>resourceCaseCapacity()?` + ${keynlockResources.picks-resourceCaseCapacity()} в запасе`:''}`;
     if(partsEl)partsEl.textContent=String(keynlockResources.parts);
     if(oilEl)oilEl.textContent=`${keynlockResources.oil}/${keynlockResources.oilerCapacity}`;
-    const picksWorkbench=document.querySelector('#resourcePicksWorkbench');
-    const partsWorkbench=document.querySelector('#resourcePartsWorkbench');
-    if(picksWorkbench)picksWorkbench.textContent=`${Math.min(keynlockResources.picks,resourceCaseCapacity())}/${resourceCaseCapacity()}${keynlockResources.picks>resourceCaseCapacity()?` + ${keynlockResources.picks-resourceCaseCapacity()} в запасе`:''}`;
-    if(partsWorkbench)partsWorkbench.textContent=String(keynlockResources.parts);
     const colors=document.querySelector('#resourceComponents');
     if(colors)colors.innerHTML=KEYNLOCK_COMPONENTS.map(item=>`<span class="resourceColor" style="--resource-color:${item.color}" title="${item.name}"><i></i><b>${keynlockResources.components[item.id]}</b></span>`).join('');
     const salvage=document.querySelector('#salvagePickButton');
@@ -49,15 +45,12 @@
     const upgrade=document.querySelector('#upgradePickCaseButton');
     if(upgrade){
       const next=resourceCaseCapacity()===3?5:7;
-      const price=resourceCaseCapacity()===3?250:600;
+      const price=2500;
       upgrade.hidden=resourceCaseCapacity()>=7;
       upgrade.disabled=balance<price;
       upgrade.innerHTML=`Расширить футляр до ${next} <small>${price} монет</small>`;
     }
-    const lootPreview=document.querySelector('#lootTablePreview');
-    if(lootPreview&&!lootPreview.childElementCount){
-      lootPreview.innerHTML=`<table><thead><tr><th>Ур.</th><th>Монеты</th><th>Детали</th><th>Цвета</th><th>Рукоять</th><th>Картина</th></tr></thead><tbody>${Object.entries(KEYNLOCK_LOCK_LOOT_TABLE).map(([level,row])=>`<tr><td>${level}</td><td>×${String(row.coinMultiplier).replace('.',',')}</td><td>${row.parts.join('–')}</td><td>${row.components.join('–')}</td><td>${Math.round(row.handleChance*100)}%</td><td>${Math.round(row.paintingChance*100)}%</td></tr>`).join('')}</tbody></table>`;
-    }
+
   }
 
   function prepareKeynlockRound(){
@@ -73,7 +66,7 @@
     const level=clamp(Number(tier)||1,1,3);
     const table=KEYNLOCK_LOCK_LOOT_TABLE[level];
     const coins=Math.round(Math.max(0,baseCoins)*table.coinMultiplier);
-    const parts=rand(table.parts[0],table.parts[1]);
+    const parts=window.KeynlockCampaign?.balance?.(mode)?2:rand(table.parts[0],table.parts[1]);
     const componentCount=rand(table.components[0],table.components[1]);
     const componentDrops={};
     keynlockResources.parts+=parts;
@@ -82,7 +75,10 @@
       keynlockResources.components[component.id]++;
       componentDrops[component.id]=(componentDrops[component.id]||0)+1;
     }
-    const handle=Math.random()<table.handleChance ? window.KeynlockCollection?.unlockRandomHandle?.()||null : null;
+    // A failed roll leaves the mission eligible for a later handle discovery.
+    const handle=Math.random()<table.handleChance
+      ?window.KeynlockCollection?.awardMissionHandle?.(window.KeynlockMissions?.active?.id)||null
+      :null;
     saveKeynlockResources();
     return {tier:level,coins,parts,components:componentDrops,handle,table};
   }
@@ -146,7 +142,7 @@
   function upgradeKeynlockCase(){
     const current=resourceCaseCapacity();
     const next=current===3?5:current===5?7:null;
-    const price=current===3?250:current===5?600:Infinity;
+    const price=next?2500:Infinity;
     if(!next||balance<price)return false;
     balance-=price;
     STORE.setItem('lockpickBalance',String(balance));

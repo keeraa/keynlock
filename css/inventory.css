@@ -43,7 +43,7 @@ body.pick-reforming .mechanismZone .pick,body.pick-reforming .sharedModeLockArt 
    never moves, and --tool-lift is the single source of truth that the hit test
    reads back to undo the lift. */
 .inventoryTool{--tool-lift:0px;}
-.inventoryTool.visual-hover,.inventoryTool.selected{--tool-lift:9px;z-index:8;}
+.inventoryTool.visual-hover,.inventoryTool.selected{--tool-lift:var(--inventory-item-lift);z-index:8;}
 .inventoryToolsTension .inventoryTool.selected{--tool-lift:20px;}
 .inventoryTool img{transition:transform .17s ease,filter .17s ease;}
 .inventoryTool.visual-hover{filter:brightness(1.08);}
@@ -84,8 +84,7 @@ body.game-inactive #lock.universalLockBlock .pick,body.game-inactive #lock.unive
 body.game-inactive #objectiveLine,body.game-inactive .topRightHud>:not(.assetNameHud),body.game-inactive .inventoryDrawer{filter:brightness(.58) saturate(.62)!important;}
 body.game-inactive .assetNameHud{filter:brightness(.58) saturate(.62)!important;}
 .solvedPuzzleOverlay{position:absolute;left:0;right:0;top:var(--template-puzzle-top);bottom:var(--template-puzzle-bottom);z-index:80;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;pointer-events:none;transform:translateY(8px);transition:opacity .24s ease, transform .24s ease, visibility 0s linear .24s;}
-body.game-inactive.solved-notice-visible .solvedPuzzleOverlay{opacity:1;visibility:visible;transform:translateY(0);transition:opacity .24s ease .08s, transform .24s ease .08s, visibility 0s linear 0s;}
-.solvedPuzzleCard{min-width:min(390px,78vw);padding:22px 28px 24px;display:flex;flex-direction:column;align-items:center;gap:9px;border:1px solid rgba(203,156,74,.82);border-radius:16px;background:linear-gradient(180deg,rgba(39,31,25,.96),rgba(17,14,14,.97));box-shadow:0 22px 60px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,226,166,.055), 0 0 26px rgba(202,150,60,.08);backdrop-filter:blur(7px);text-align:center;pointer-events:auto;}
+body.game-inactive.solved-notice-visible .solvedPuzzleOverlay{opacity:1;visibility:visible;transform:translateY(0);transition:opacity .24s ease .08s, transform .24s ease .08s, visibility 0s linear 0s;}.solvedPuzzleCard{min-width:min(390px,78vw);padding:22px 28px 24px;display:flex;flex-direction:column;align-items:center;gap:9px;backdrop-filter:blur(7px);text-align:center;pointer-events:auto;}
 .solvedPuzzleTitle{color:#edd5a8;font:700 30px/1.05 var(--title-font);letter-spacing:.035em;text-shadow:0 2px 12px rgba(0,0,0,.6);}
 .solvedPuzzleLoot{min-height:16px;display:grid;gap:5px;color:#c7aa74;font:11px/1.3 var(--ui-font);}
 .lootRow{display:flex;align-items:center;justify-content:center;gap:5px;}
@@ -96,8 +95,7 @@ body.game-inactive.solved-notice-visible .solvedPuzzleOverlay{opacity:1;visibili
 .lootPainting{display:grid;grid-template-columns:100px minmax(0,1fr);gap:9px;align-items:center;margin-top:5px;padding:7px 9px;border:1px solid rgba(210,166,93,.5);border-radius:9px;background:rgba(83,57,27,.35);text-align:left;}
 .lootPainting>img{width:100px;height:76px;border-radius:4px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.5);}
 .lootPainting span{display:grid;gap:2px;min-width:0;}.lootPainting small{color:#aa8a54;font:700 10.4px/1 var(--ui-font);letter-spacing:.12em;text-transform:uppercase;}.lootPainting b{overflow:hidden;color:#efd49d;font:700 14.3px/1.2 var(--ui-font);text-overflow:ellipsis;white-space:normal;}.lootPainting em{color:#a99573;font:normal 11.7px/1.2 var(--ui-font);}
-.lootPainting small{display:flex;align-items:center;gap:5px;}.lootPainting small .lootResourceIcon{width:18px;height:18px;}
-.solvedPuzzleButton{margin-top:7px;min-width:220px;min-height:44px;padding:10px 18px;border:1px solid #b98942;border-radius:10px;background:linear-gradient(180deg,#4c3820,#2a1f16);color:#f0d39c;box-shadow:inset 0 0 0 1px rgba(255,229,177,.06),0 8px 20px rgba(0,0,0,.28);font:700 13px/1 var(--ui-font);letter-spacing:.05em;cursor:pointer;transition:filter .15s ease, transform .15s ease, border-color .15s ease;pointer-events:auto;}
+.lootPainting small{display:flex;align-items:center;gap:5px;}.lootPainting small .lootResourceIcon{width:18px;height:18px;}.solvedPuzzleButton{margin-top:7px;min-width:220px;min-height:44px;padding:10px 18px;font:700 13px/1 var(--ui-font);letter-spacing:.05em;pointer-events:auto;}
 .solvedPuzzleButton:hover{filter:brightness(1.18);border-color:#d2a75d;transform:translateY(-1px);}
 .solvedPuzzleButton:active{transform:translateY(0);}
 
@@ -134,12 +132,15 @@ body.game-inactive.solved-notice-visible .solvedPuzzleOverlay{opacity:1;visibili
 .topRightHud .economyHud{grid-column:1 / 3!important;grid-row:1!important;}
 .topRightHud #lairHudButton{grid-column:1!important;grid-row:2!important;}
 .topRightHud #gameSettingsButton{grid-column:2!important;grid-row:2!important;}
-.topRightHud .assetNameHud{grid-column:1 / 3!important;grid-row:3!important;}
-.solvedPuzzleCard{min-width:min(330px,86vw);padding:18px 20px 20px;}
-.solvedPuzzleTitle{font-size:24px;}
-.solvedPuzzleButton{min-width:190px;min-height:40px;font-size:12px;}
+.topRightHud .assetNameHud{grid-column:1 / 3!important;grid-row:3!important;}.solvedPuzzleCard{min-width:min(330px,86vw);padding:18px 20px 20px;}
+.solvedPuzzleTitle{font-size:24px;}.solvedPuzzleButton{min-width:190px;min-height:40px;font-size:12px;}
 }
 .inventoryAvatar img{width:90%;height:190%;transform:translateY(8%) scale(.6048);transform-origin:50% 0;}
 
 .lootResources{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:10px 0}.lootResources>.lootRow,.lootComponents{min-height:64px;padding:10px 5px;border:1px solid #a7804755;border-radius:9px;background:#53391b59}.lootResources .lootRow{font-size:22px;gap:8px}.lootResources .lootResourceIcon{width:40px;height:40px}.lootResources .lootColor{width:22px;height:22px;flex-shrink:0}.lootComponents{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px}.lootResources [tabindex]:focus-visible{outline:2px solid #d6ab5e;outline-offset:3px}
 body.game-inactive.solved-notice-visible .solvedPuzzleOverlay{position:fixed;inset:0;z-index:1600;padding:18px}.solvedPuzzleCard{max-width:calc(100vw - 36px);max-height:calc(100dvh - 36px);overflow-y:auto}.solvedPuzzleLoot{width:100%}
+
+.lootHandle{grid-template-columns:180px minmax(0,1fr);}
+.lootHandle .lootHandleArt{position:relative;display:block;width:180px;height:58px;overflow:hidden;}
+.lootHandleArt img{position:absolute;left:50%;top:50%;width:44px;height:166px;object-fit:contain;transform:translate(-50%,-50%) rotate(90deg);filter:drop-shadow(3px 2px 3px rgba(0,0,0,.5));}
+@media(max-width:480px){.lootHandle{grid-template-columns:minmax(0,1fr);}.lootHandle .lootHandleArt{justify-self:center;}}

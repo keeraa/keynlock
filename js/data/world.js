@@ -25,7 +25,8 @@
     {mode:'skyrim',x:44,y:64,district:'upper'}, {mode:'deduction',x:78,y:38,district:'upper'},
     {mode:'kingdomcome',x:64,y:16,district:'upper'}, {mode:'thiefds',x:48,y:15,district:'upper'},
     {mode:'thief12',x:88,y:49,district:'palace'}, {mode:'pathologic',x:40,y:82,district:'palace'},
-    {mode:'oblivion',x:79,y:20,district:'palace'}
+    {mode:'oblivion',x:79,y:20,district:'palace'},
+    {mode:'silhouettes',x:56,y:51,district:'arts'}
   ].map(Object.freeze));
 
   window.KeynlockContent=window.KeynlockContent||{};

@@ -58,7 +58,7 @@
   function renderLairScene(){
     if(!$lairSceneCharacters) return;
     renderInventoryAvatar();
-    const activeCharacter=LAIR_CHARACTERS[lairCharacter]||LAIR_CHARACTERS.kai;
+    const activeCharacter=LAIR_CHARACTERS[lairCharacter]||LAIR_CHARACTERS.sai;
     const activePortrait=document.querySelector('#lairActiveCharacterPortrait');
     const teamHotspot=document.querySelector('.lairHotspotTeam');
     const activeName=document.querySelector('#lairActiveCharacterName');

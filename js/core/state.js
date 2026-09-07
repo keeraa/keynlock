@@ -52,7 +52,7 @@
     sai:{name:'Сай',role:'Разведчик',desc:'Собирает слухи, замечает связи между районами и помогает оценивать риск до выхода в город.',portrait:'assets/characters/portraits/sai.png',portraitVideo:'assets/characters/portraits/sai.mp4',full:'assets/characters/full/sai.png'},
     tik:{name:'Тик',role:'Механик',desc:'Разбирается в инструментах и конструкциях замков. Полезен при подготовке снаряжения.',portrait:'assets/characters/portraits/tik.png',portraitVideo:'assets/characters/portraits/tik.mp4',full:'assets/characters/full/tik.png'}
   };
-  let lairCharacter=LAIR_CHARACTERS[STORE.getItem('lockpickLairCharacter')]?STORE.getItem('lockpickLairCharacter'):'kai';
+  let lairCharacter=LAIR_CHARACTERS[STORE.getItem('lockpickLairCharacter')]?STORE.getItem('lockpickLairCharacter'):'sai';
   let lairTab='team';
   let lairDialoguePerson='sai';
   let lairIntelSelected='old';
@@ -130,6 +130,7 @@
         $alphaprotocolMode=document.querySelector('#alphaprotocolMode'), $apLock=document.querySelector('#apLock'), $apBeamFill=document.querySelector('#apBeamFill'), $apSequence=document.querySelector('#apSequence');
 
   const MODE_PANELS=Object.freeze({
+    silhouettes:document.querySelector('#silhouettesMode'),
     hillsfar:$hillsfarMode,
     g1:$g1Mode,
     skyrim:$skMode,
@@ -159,7 +160,7 @@
   const ALL_MODES=new Set(GameCatalog.nativeIds);
 
   const DIFFICULTY_STORAGE_KEY='lockpickModeDifficulty';
-  const DEFAULT_MODE_DIFFICULTY=Object.freeze({classic:1,sequence:1,special:1,hillsfar:1,g1:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,drum:1,scope:1,oblivion:1,watchmen:1,museum:1,mass2:1,pipeline:1,wharf:1,thiefds:1,kingdomcome:1,thief12:1,fallout:1,masshack:1,pathologic:1,bioshock2:1,alphaprotocol:1});
+  const DEFAULT_MODE_DIFFICULTY=Object.freeze({silhouettes:1,classic:1,sequence:1,special:1,hillsfar:1,g1:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,drum:1,scope:1,oblivion:1,watchmen:1,museum:1,mass2:1,pipeline:1,wharf:1,thiefds:1,kingdomcome:1,thief12:1,fallout:1,masshack:1,pathologic:1,bioshock2:1,alphaprotocol:1});
   function loadModeDifficulty(){
     try{
       const saved=STORE.getJSON(DIFFICULTY_STORAGE_KEY,{});
@@ -395,42 +396,10 @@ function currentLockerEntry(){
 }
 function currentLockBodySkin(){ return currentLockBodyEntry().data || ''; }
 function currentLockerSkin(){ return currentLockerEntry().data || ''; }
-let buildInfoPromise=null;
-function updateBuildInfoHud(){
-  const buildEl=document.querySelector('#assetNameBuild');
-  if(!buildEl) return;
-  if(!buildInfoPromise){
-    buildInfoPromise=fetch('./build-info.json',{cache:'no-store'})
-      .then(response=>response.ok ? response.json() : Promise.reject(new Error(`HTTP ${response.status}`)))
-      .catch(()=>null);
-  }
-  buildInfoPromise.then(info=>{
-    if(!info?.commit) return;
-    const date=new Date(info.committedAt);
-    const time=Number.isNaN(date.getTime())
-      ? ''
-      : ` · ${new Intl.DateTimeFormat('ru-RU',{dateStyle:'short',timeStyle:'short'}).format(date)}`;
-    buildEl.textContent=`Коммит: ${String(info.commit).slice(0,7)}${time}`;
-    buildEl.title=`${info.commit}${info.committedAt ? ` · ${info.committedAt}` : ''}`;
-  });
-}
 function updateMechanismAssetHud(){
-  const wrap=document.querySelector('#assetNameHud');
   const gameEl=document.querySelector('#assetNameGame');
-  const lockEl=document.querySelector('#assetNameLock');
-  const shackleEl=document.querySelector('#assetNameShackle');
-  const plateEl=document.querySelector('#assetNamePlate');
-  const pinEl=document.querySelector('#assetNamePin');
-  if(!wrap || !lockEl || !shackleEl) return;
   const gameId=document.body.dataset.prototypeGameId || mode;
-  if(gameEl) gameEl.textContent=`Игра: ${GameCatalog.get(gameId)?.title || gameId}`;
-  updateBuildInfoHud();
-  const lockEntry=currentLockBodyEntry();
-  const shackleEntry=currentLockerEntry();
-  lockEl.textContent=`lock: ${lockEntry.name || '—'}`;
-  shackleEl.textContent=`shackle: ${shackleEntry.name || '—'}`;
-  if(plateEl) plateEl.textContent=`plate: ${currentPlateName()}`;
-  if(pinEl) pinEl.textContent=`pin: ${currentPinName()}`;
+  if(gameEl)gameEl.textContent=GameCatalog.get(gameId)?.title || gameId;
 }
 function applyMechanismSkin(){
   const lockBody=cssUrl(currentLockBodySkin());

@@ -1,6 +1,6 @@
 (function(){
   // ===== HILLSFAR =====
-  let hfTarget=[], hfOptions=[], hfSelected=-1, hfTimeLeft=45, hfTimeMax=45, hfTimerHandle=null, hfLastTick=0;
+  let hfTarget=[], hfOptions=[], hfSelected=-1, hfTimeLeft=45, hfTimeMax=45, hfTimerHandle=null, hfLastTick=0, hfInserting=false;
   function clearHillsfarTimer(){
     hfTimerHandle=null;
     hfLastTick=0;
@@ -25,7 +25,8 @@
     const outcome=damagePick({
       resetProgress:()=>{},
       renderState:renderHillsfar,
-      surviveText:message
+      surviveText:message,
+      forceBreak:true
     });
     if(!outcome.depleted){
       startHillsfarTimer();
@@ -54,25 +55,6 @@
     return `L ${x+step*.16} ${baseY} L ${x+step*.32} ${baseY-9} L ${x+step*.54} ${baseY-9} L ${x+step*.54} ${baseY-19} L ${x+step*.78} ${baseY-19} L ${x+step*.78} ${baseY} L ${x+step} ${baseY}`;
   }
 
-  function hillsfarLockShape(type, x, baseY, step){
-    if(type===0){
-      return `L ${x+step*.16} ${baseY} L ${x+step*.16} ${baseY+10} L ${x+step*.72} ${baseY+10} L ${x+step*.72} ${baseY} L ${x+step} ${baseY}`;
-    }
-    if(type===1){
-      return `L ${x+step*.18} ${baseY} L ${x+step*.48} ${baseY+20} L ${x+step*.76} ${baseY} L ${x+step} ${baseY}`;
-    }
-    if(type===2){
-      return `L ${x+step*.16} ${baseY} L ${x+step*.16} ${baseY+17} L ${x+step*.46} ${baseY+17} L ${x+step*.46} ${baseY+7} L ${x+step*.78} ${baseY+7} L ${x+step*.78} ${baseY} L ${x+step} ${baseY}`;
-    }
-    if(type===3){
-      return `L ${x+step*.12} ${baseY} L ${x+step*.29} ${baseY+14} L ${x+step*.45} ${baseY} L ${x+step*.58} ${baseY} L ${x+step*.72} ${baseY+18} L ${x+step*.86} ${baseY} L ${x+step} ${baseY}`;
-    }
-    if(type===4){
-      return `L ${x+step*.18} ${baseY} L ${x+step*.18} ${baseY+8} L ${x+step*.38} ${baseY+8} L ${x+step*.38} ${baseY+22} L ${x+step*.67} ${baseY+22} L ${x+step*.67} ${baseY} L ${x+step} ${baseY}`;
-    }
-    return `L ${x+step*.16} ${baseY} L ${x+step*.32} ${baseY+9} L ${x+step*.54} ${baseY+9} L ${x+step*.54} ${baseY+19} L ${x+step*.78} ${baseY+19} L ${x+step*.78} ${baseY} L ${x+step} ${baseY}`;
-  }
-
 function hillsfarPattern(len=6){
     const arr=[];
     for(let i=0;i<len;i++) arr.push(rand(0,5));
@@ -94,48 +76,26 @@ function hillsfarPattern(len=6){
     return a.length===b.length && a.every((v,i)=>v===b[i]);
   }
 
-  function hillsfarSvg(pattern, width=189, height=64){
-    const baseY = height * 0.70;
-    const shankH = Math.max(12, Math.round(height * 0.14));
-    const left = 1;
-    const right = 1;
-    const usable = width - left - right;
-    const step = usable / pattern.length;
-    let d = `M ${left} ${baseY}`;
-    for(let i=0;i<pattern.length;i++){
-      d += ' ' + hillsfarSegmentShape(pattern[i], left + i*step, baseY, step);
-    }
-    d += ` L ${width - right} ${baseY} L ${width - right} ${height - 10} L ${left} ${height - 10} Z`;
-
-    const metal = '#eadc93';
-    const shadow = '#8d7841';
-    const body = `<path d="${d}" fill="${metal}"/>`;
-    const spine = `<rect x="${left}" y="${height - 10 - shankH}" width="${width - left - right}" height="${shankH}" rx="2" fill="${metal}"/>`;
-    const tip = `<rect x="${width - 10}" y="${height - 30}" width="9" height="20" fill="${metal}"/>`;
-    const grooves = [0.28,0.56].map(k=>{
-      const y = baseY + k * (height - baseY - 16);
-      return `<path d="M ${left + 3} ${y} L ${width - right - 3} ${y}" stroke="${shadow}" stroke-opacity="0.28" stroke-width="1.5"/>`;
-    }).join('');
-    const bevel = `<path d="${d}" fill="none" stroke="rgba(255,247,206,.35)" stroke-width="1.6" stroke-linejoin="round"/>`;
-    return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" aria-hidden="true">${body}${spine}${tip}${grooves}${bevel}</svg>`;
+  // One shared contact edge: key metal lies below it, lock metal above it.
+  function hillsfarProfile(pattern,width=189,height=64){
+    const left=1,right=width-1,baseY=height*.70,step=(right-left)/pattern.length;
+    let edge=`M ${left} ${baseY}`;
+    pattern.forEach((type,i)=>{edge+=' '+hillsfarSegmentShape(type,left+i*step,baseY,step);});
+    return {edge,left,right};
   }
-
-  function hillsfarLockSvg(pattern, width=760, height=64){
-    const baseY = 22;
-    const step = width / pattern.length;
-    let d = `M 0 ${baseY}`;
-    for(let i=0;i<pattern.length;i++){
-      d += ' ' + hillsfarLockShape(pattern[i], i*step, baseY, step);
-    }
-    d += ` L ${width} ${baseY} L ${width} ${height} L 0 ${height} Z`;
-    const bg = `<rect x="0" y="0" width="${width}" height="${height}" fill="url(#hfBg)"/>`;
-    const cut = `<path d="${d}" fill="#e8d88e"/>`;
-    const defs = `<defs><linearGradient id="hfBg" x1="0" x2="1"><stop offset="0" stop-color="#8f8f8f"/><stop offset="0.55" stop-color="#9b9b9b"/><stop offset="1" stop-color="#8f8f8f"/></linearGradient></defs>`;
-    const bevels = `<path d="M 0 ${baseY} H ${width}" stroke="rgba(255,255,255,.12)" stroke-width="1.5"/>`;
-    return `<svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" preserveAspectRatio="none">${defs}${bg}${cut}${bevels}</svg>`;
+  function hillsfarSvg(pattern,width=189,height=64){
+    const {edge,left,right}=hillsfarProfile(pattern,width,height);
+    const body=`${edge} L ${right} ${height-10} L ${left} ${height-10} Z`;
+    return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" aria-hidden="true"><path d="${body}" fill="#eadc93"/><path d="${edge}" fill="none" stroke="#fff0bc" stroke-width="1"/></svg>`;
+  }
+  function hillsfarLockSvg(pattern){
+    const width=189,height=64,{edge,left,right}=hillsfarProfile(pattern,width,height);
+    const plate=`${edge} L ${right} 4 L ${left} 4 Z`;
+    return `<svg class="hfTargetProfile" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" aria-label="Выемка замка"><path d="${plate}" fill="#aaa99d"/><path d="${edge}" fill="none" stroke="#e0d4b2" stroke-width="1"/></svg>`;
   }
 
   function renderHillsfar(){
+    if(hfInserting || (solved && $hfLockCut.querySelector('.hfInsertedKey'))) return;
     $hfLockCut.innerHTML = hillsfarLockSvg(hfTarget);
     $hfCandidates.innerHTML = '';
     $hfCandidates.classList.toggle('has-selection', hfSelected !== -1);
@@ -146,7 +106,7 @@ function hillsfarPattern(len=6){
       btn.className='hfCandidate' + (i===hfSelected ? ' selected' : '');
       btn.innerHTML = hillsfarSvg(opt, 189, 64);
       btn.addEventListener('click', ()=>{
-        if(solved) return;
+        if(solved || hfInserting) return;
         hfSelected=i;
         SFX.select();
         renderHillsfar();
@@ -158,6 +118,7 @@ function hillsfarPattern(len=6){
   function startHillsfarRound(){
     clearHillsfarTimer();
     solved=false;
+    hfInserting=false;
     $lock.classList.remove('win');
     $mechanism.classList.remove('ready','opening','opened');
     picks=pickCapacity;
@@ -166,7 +127,7 @@ function hillsfarPattern(len=6){
     runReward=100;
     picks=pickCapacity;
     updatePickUI();
-    hfTimeMax=window.KeynlockCampaign?.training('hillsfar')?90:diffStep(70,45,30,'hillsfar');
+    hfTimeMax=(window.KeynlockCampaign?.training('hillsfar')?90:diffStep(70,45,30,'hillsfar'))/3;
     hfTarget=hillsfarPattern(diffStep(4,5,6,'hillsfar'));
 
     const optionCount=diffStep(6,8,9,'hillsfar');
@@ -185,24 +146,42 @@ function hillsfarPattern(len=6){
 
   function tryOpenHillsfar(){
     if(solved) return;
+    if(hfInserting) return 'pending';
     if(hfSelected<0){
       SFX.wrongLock();
       toast('Сначала выбери ключ');
       return;
     }
-    if(samePattern(hfOptions[hfSelected], hfTarget)){
+    const matches=samePattern(hfOptions[hfSelected],hfTarget);
+    hfInserting=true;
+    clearHillsfarTimer();
+    const candidate=$hfCandidates.children[hfSelected];
+    if(candidate) candidate.classList.add('inserting');
+    const key=document.createElement('span');
+    key.className='hfInsertedKey';
+    key.setAttribute('aria-hidden','true');
+    key.innerHTML=hillsfarSvg(hfOptions[hfSelected]);
+    $hfLockCut.appendChild(key);
+    const duration=matchMedia('(prefers-reduced-motion: reduce)').matches?0:1000;
+    if(duration) key.animate([
+      {transform:'translateX(-110%)'},
+      {transform:'translateX(0)'}
+    ],{duration,easing:'cubic-bezier(.3,0,.2,1)',fill:'backwards'});
+    scheduleRoundAction(()=>{
+      if(mode!=='hillsfar' || !hfInserting || !key.isConnected) return;
+      hfInserting=false;
+      if(!matches){
+        SFX.wrongLock();
+        failHillsfarAttempt('Ключ не подходит');
+        return;
+      }
       solved=true;
-      clearHillsfarTimer();
-      $lock.classList.add('win');
-      const candidate=$hfCandidates.children[hfSelected];
       if(candidate) candidate.classList.add('correctFlash');
+      $lock.classList.add('win');
       SFX.open();
-      setTimeout(()=>celebrate(),420);
-      return;
-    }
-
-    SFX.wrongLock();
-    failHillsfarAttempt('Ключ не подходит');
+      celebrate();
+    },duration+180);
+    return 'pending';
   }
 
   function tickHillsfar({now}){

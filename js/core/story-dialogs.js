@@ -5,7 +5,7 @@
   dialog.className='storyDialog';
   dialog.setAttribute('aria-labelledby','storyTitle');
   dialog.setAttribute('aria-describedby','storyText');
-  dialog.innerHTML='<div class="storyPortrait"><img src="assets/characters/portraits/sai.png" alt="Сай"></div><div class="storyContent"><div id="storyLabel"></div><h2 id="storyTitle"></h2><p id="storyText" aria-live="polite"></p><div class="storyActions"><button id="storyCancel" type="button"></button><button id="storyNext" type="button"></button></div></div>';
+  dialog.innerHTML='<div class="storyPortrait"><img src="assets/characters/portraits/sai.png" alt="Сай"></div><div class="storyContent"><div id="storyLabel"></div><h2 id="storyTitle"></h2><p id="storyText" aria-live="polite"></p><div class="storyActions uiActions"><button id="storyCancel" class="uiButton" type="button"></button><button id="storyNext" class="uiButton uiButton--gold" type="button"></button></div></div>';
   document.body.append(dialog);
   const title=dialog.querySelector('h2'),text=dialog.querySelector('p'),label=dialog.querySelector('#storyLabel');
   const cancel=dialog.querySelector('#storyCancel'),next=dialog.querySelector('#storyNext');
@@ -47,7 +47,7 @@
         'Начну с набережной. Инструменты уже со мной. Изучу заказ — и за дело.'
       ];
       let page=Math.min(lines.length-1,Math.max(0,Number(saved.page)||0));
-      function render(){label.textContent=`САЙ · РЕСТАВРАТОР   /   ${page+1} ИЗ ${lines.length}`;text.textContent=lines[page];next.textContent=page===lines.length-1?'Открыть журнал':'Далее';store.setJSON('keynlockIntro',{page,done:false});}
+      function render(){label.textContent=`САЙ · РЕСТАВРАТОР   /   ${page+1} ИЗ ${lines.length}`;text.textContent=lines[page];next.textContent=page===lines.length-1?'Открыть заказы':'Далее';store.setJSON('keynlockIntro',{page,done:false});}
       function finish(){store.setJSON('keynlockIntro',{done:true});close(true);done();}
       dialog.classList.add('storyIntro');title.textContent='Искусство стоит спасти';cancel.textContent='Пропустить';cancel.onclick=finish;
       next.onclick=()=>{if(page===lines.length-1)finish();else{page++;render();}};

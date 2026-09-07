@@ -45,7 +45,8 @@
   function registerMove(){
     toolMotionController.impulse();
     moves++;
-    const next=Math.max(10, 100 - moves*5);
+    const lessonBalance=window.KeynlockCampaign?.balance?.(mode);
+    const next=lessonBalance?Math.max(lessonBalance.rewardFloor,100-Math.max(0,moves-lessonBalance.freeMoves)*lessonBalance.movePenalty):Math.max(10,100-moves*5);
     if(next!==runReward){
       runReward=next;
       animateRewardDrop();
@@ -73,7 +74,7 @@
         <span class="lootRow" tabindex="0" data-tip="Детали замков: +${resources.parts}. Из двух деталей можно создать одну отмычку." aria-label="Детали замков: +${resources.parts}"><img class="lootResourceIcon" src="assets/ui/details-ico.png" alt=""><b>+${resources.parts}</b></span>
         <span class="lootComponents" tabindex="0" data-tip="Цветные компоненты нужны для алхимии и изготовления материалов.">${componentRows||'<span class="lootRow" tabindex="0" data-tip="Компоненты не найдены" aria-label="Компоненты не найдены">0</span>'}</span></div>
         ${painting?`<span class="lootPainting"><img src="${painting.image}" alt=""><span><small><img class="lootResourceIcon" src="assets/ui/portrait-ico.png" alt="">Найдена картина</small><b>${painting.title} (${painting.year})</b><em>${painting.artist}</em></span></span>`:''}
-        ${resources.handle?`<span class="lootRow lootRare">Редкая рукоятка: <b>${resources.handle.name}</b></span>`:''}`;
+        ${resources.handle?`<span class="lootPainting lootHandle"><span class="lootHandleArt"><img src="${resources.handle.image}" alt="Найденная рукоятка"></span><span><small>Найдена рукоятка</small><b>${resources.handle.name}</b></span></span>`:''}`;
     }
     updateEconomyUI();
     return {earned, cleanBonus};
@@ -86,7 +87,7 @@ function setGlobalTimer(active=false, timeLeft=0, timeMax=1, label='ТАЙМЕР
 renderInventoryTools();
   }
 
-  function damagePick({resetProgress=null, renderState=null, surviveText='Ошибка'}={}){
+  function damagePick({resetProgress=null, renderState=null, surviveText='Ошибка', forceBreak=false}={}){
     if(!GameCatalog.feature(mode,'lock.requiresPick')){
       if(resetProgress)resetProgress();
       if(renderState)renderState();
@@ -94,7 +95,7 @@ renderInventoryTools();
       return {broke:false,kept:true,depleted:false};
     }
     const info=PICK_TYPES[pickType];
-    const breaks=Math.random()<info.breakChance;
+    const breaks=forceBreak || Math.random()<info.breakChance;
 
     if(!breaks){
       SFX.survive();

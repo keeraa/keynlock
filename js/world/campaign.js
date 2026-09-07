@@ -5,9 +5,9 @@
   const store=window.KeynlockSaveStore;
   const briefs=[
     {mode:'wharf',title:'Набережная',mechanic:'Risen 2 · последовательность задвижек',place:'Порт',story:'Открой складской механизм. Найди порядок задвижек и повтори найденную последовательность до конца.',hint:'Нажимай на задвижки и запоминай, какие поднимаются. Ошибка сбрасывает цепочку; две ошибки подряд ломают отмычку. Когда поднимешь все четыре задвижки, нажми «Открыть».',time:'Без таймера',tool:'Нужна отмычка',risk:'Две ошибки подряд ломают отмычку. Правильный шаг уменьшает напряжение механизма.',after:'Первый замок открыт. На верстаке можно создать отмычку из двух деталей и подготовиться к следующему заказу.'},
-    {mode:'hillsfar',title:'Ключ от старой лавки',mechanic:'Подбор ключа по слепку',place:'Старый квартал',story:'Найди ключ, точно повторяющий слепок замочной скважины. Сравни каждый зубец, прежде чем провернуть механизм.',hint:'Сравни зубцы слева направо. Выбери ключ в нижнем наборе, затем нажми «Открыть». Неверный ключ ломает отмычку; сам выбор ключа безопасен.',time:'90 секунд',tool:'Нужна отмычка',risk:'Подтверждение неверного ключа расходует отмычку.',after:'Следующий заказ потребует памяти. Для парных узлов отмычки не нужны.'},
+    {mode:'hillsfar',title:'Ключ от старой лавки',mechanic:'Подбор ключа по слепку',place:'Старый квартал',story:'Найди ключ, точно повторяющий слепок замочной скважины. Сравни каждый зубец, прежде чем провернуть механизм.',hint:'Сравни зубцы слева направо. Выбери ключ в нижнем наборе, затем нажми «Открыть». Неверный ключ ломает отмычку; сам выбор ключа безопасен.',time:'30 секунд',tool:'Нужна отмычка',risk:'Подтверждение неверного ключа расходует отмычку.',after:'Следующий заказ потребует памяти. Для парных узлов отмычки не нужны.'},
     {mode:'mass2',title:'Архив портового смотрителя',mechanic:'Поиск парных символов',place:'Порт',story:'Восстанови четыре пары архивных меток. Запоминай расположение символов, чтобы открыть все узлы до окончания времени.',hint:'Наведи курсор на узел, чтобы увидеть знак, и выбери два одинаковых. На сенсорном экране удерживай узел около секунды для выбора. Несовпадение закрывает пару; отмычки не расходуются.',time:'75 секунд',tool:'Без отмычек',risk:'Когда время закончится, попытку придётся начать заново.',after:'Архив открыт. Осталось подобрать профили последнего механизма.'},
-    {mode:'museum',title:'Заказ переплётчика',mechanic:'Подбор формы отмычки',place:'Район искусств',story:'Сопоставь три профиля механизма с формами в наборе инструментов. Здесь можно спокойно поработать без ограничения времени.',hint:'Смотри на выделенный символ сверху. Нажми такую же форму в нижнем наборе. После трёх совпадений механизм откроется сам.',time:'Без таймера',tool:'Без отмычек',risk:'Ошибки не расходуют инструменты. Попробуй другую форму.',after:'Все четыре заказа выполнены. Загляни в коллекцию или выбери новое место на карте.'}
+    {mode:'museum',title:'Заказ переплётчика',mechanic:'Символьный замок',place:'Район искусств',story:'Сопоставь три профиля механизма с формами в наборе инструментов. Здесь можно спокойно поработать без ограничения времени.',hint:'Смотри на выделенный символ сверху. Нажми такую же форму в нижнем наборе. После трёх совпадений механизм откроется сам.',time:'Без таймера',tool:'Без отмычек',risk:'Ошибки не расходуют инструменты. Попробуй другую форму.',after:'Все четыре заказа выполнены. Загляни в коллекцию или выбери новое место на карте.'}
   ];
   const route=window.KeynlockCampaignRoute;
   const config=window.KeynlockContent.campaign;
@@ -31,7 +31,7 @@
       place:window.KeynlockContent.world.districts[place.district].name,
       mechanic:brief?.mechanic||game.title,
       story:step.tier===1&&brief?brief.story:story,
-      hint:step.tier===1&&brief?brief.hint:story,
+      hint:step.tier===1?(brief?.hint||window.KeynlockMissionLessons?.hint(step.mode)||story):story,
       risk:step.tier===1&&brief?brief.risk:game.lock.requiresPick?'Береги отмычки. Пополнить запас можно на верстаке.':'Эта головоломка не расходует отмычки.',
       tool:game.lock.requiresPick?'Нужна отмычка':'Без отмычек',
       image:game.location
@@ -39,12 +39,13 @@
   }
   const button=document.createElement('button');
   button.type='button';button.id='campaignButton';button.className='campaignButton';
+  button.setAttribute('aria-label','Заказы');button.title='Заказы';
   const dialog=document.createElement('dialog');
   dialog.id='campaignDialog';dialog.className='campaignDialog';
   dialog.setAttribute('aria-labelledby','campaignTitle');
   dialog.innerHTML=`<header class="campaignHeader">
-    <div><p class="campaignEyebrow">КИЙЕНЛОК · ЛИЧНЫЕ ЗАПИСИ</p><h1 id="campaignTitle">Журнал заказов</h1></div>
-    <form method="dialog"><button class="campaignClose" aria-label="Закрыть журнал" value="close">×</button></form>
+    <div><p class="campaignEyebrow">КИЙЕНЛОК · ЛИЧНЫЕ ЗАПИСИ</p><h1 id="campaignTitle">Заказы</h1></div>
+    <form method="dialog"><button class="campaignClose" aria-label="Закрыть заказы" value="close">×</button></form>
     </header>
     <div class="campaignPages">
       <aside class="campaignIndex" aria-label="Заказы по сложности">
@@ -61,7 +62,7 @@
           <dl class="campaignFacts"><div><dt>Сложность</dt><dd id="campaignTime"></dd></div><div><dt>Инструмент</dt><dd id="campaignTool"></dd></div><div><dt>Добыча</dt><dd>Монеты и материалы</dd></div></dl>
           <details id="campaignHelp"><summary>Заметки о механизме <span aria-hidden="true">+</span></summary><p id="campaignHint"></p><p id="campaignRisk"></p></details>
         </div>
-        <footer class="campaignFooter"><p id="campaignPreparation" role="status"></p><div class="campaignActions"><button id="campaignStart" type="button"></button><button id="campaignWorkbench" type="button">К верстаку</button><button id="campaignCollection" type="button" hidden>Коллекция</button></div></footer>
+        <footer class="campaignFooter"><p id="campaignPreparation" role="status"></p><div class="campaignActions uiActions"><button id="campaignStart" class="uiButton uiButton--primary" type="button"></button><button id="campaignWorkbench" class="uiButton" type="button">К верстаку</button><button id="campaignCollection" class="uiButton" type="button" hidden>Коллекция</button></div></footer>
       </article>
     </div><div class="campaignFootnote"><span>Прогресс сохраняется после победы</span><span>Игра на паузе</span></div>`;
   document.body.append(button,dialog);
@@ -76,7 +77,7 @@
     const current=progress.next(),order=selected(),step=progress.step(order),stage=describe(order,step);
     const visible=orders.filter(o=>o.tier===viewTier);
     const active=window.KeynlockMissions?.active;
-    button.textContent=active?.guided?'Журнал · текущий заказ':`Журнал заказов · ${progress.completed.length}/${orders.length}`;
+
     el('campaignTierNumber').textContent=String(viewTier).padStart(2,'0');
     el('campaignTierTitle').textContent=['Первые шаги','Новые испытания','Сложные механизмы'][viewTier-1];
     dialog.querySelectorAll('[data-tier]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.tier)===viewTier)));
@@ -115,13 +116,14 @@
     const resources=window.KeynlockResources.state;
     const missing=window.GameCatalog.feature(step.mode,'lock.requiresPick')&&resources.picks===0;
     const resume=resuming(order,step);
-    el('campaignPreparation').textContent=!progress.allowed(order)?`Сначала выполни «${describe(current,progress.step(current)).title}», уровень ${current.tier}.`:missing?'Отмычки закончились. На верстаке можно пополнить запас; если средств нет, бесплатные заготовки дадут материалы на три отмычки.':`С собой: ${route.quantity(resources.picks,['отмычка','отмычки','отмычек'])} · ${route.quantity(resources.parts,['деталь','детали','деталей'])}`;
-    el('campaignStart').disabled=missing||(!resume&&!progress.allowed(order));
+    el('campaignPreparation').textContent=!progress.allowed(order)?`Сначала выполни «${describe(current,progress.step(current)).title}», уровень ${current.tier}.`:missing?'Отмычки закончились. Пополни запас на верстаке.':`С собой: ${route.quantity(resources.picks,['отмычка','отмычки','отмычек'])} · ${route.quantity(resources.parts,['деталь','детали','деталей'])}`;
+    el('campaignStart').setAttribute('aria-disabled',String(missing||(!resume&&!progress.allowed(order))));
     el('campaignStart').textContent=resume?'Продолжить заказ':order.steps.indexOf(step)>0?'Следующая головоломка':progress.done(order)?'Повторить заказ':'Отправиться на заказ';
     el('campaignCollection').hidden=progress.completed.length===0;
+    el('campaignWorkbench').textContent='К верстаку';
     el('campaignWorkbench').hidden=progress.completed.length===0&&!missing;
     if(window.KeynlockOnboarding?.active){
-      el('campaignStart').disabled=false;
+      el('campaignStart').setAttribute('aria-disabled','false');
       el('campaignStart').textContent=window.KeynlockOnboarding.step==='done'?'Завершить обучение':'Продолжить обучение';
       el('campaignPreparation').textContent='Перед следующим заказом заверши обучение в логове: реставрация, изготовление и покупка отмычки.';
     }
@@ -162,7 +164,19 @@
   el('campaignStart').addEventListener('click',()=>{
     if(window.KeynlockOnboarding?.active){close();window.KeynlockOnboarding.resume();return;}
     const order=selected(),step=progress.step(order);
-    if(window.GameCatalog.feature(step.mode,'lock.requiresPick')&&window.KeynlockResources.state.picks===0)return;
+    if(window.GameCatalog.feature(step.mode,'lock.requiresPick')&&window.KeynlockResources.state.picks===0){
+      const notice=el('campaignPreparation');
+      notice.textContent='Нужна отмычка. Пополни запас на верстаке, чтобы отправиться на заказ.';
+      notice.setAttribute('role','status');
+      notice.scrollIntoView({block:'nearest'});
+      notice.getAnimations().forEach(animation=>animation.cancel());
+      if(!matchMedia('(prefers-reduced-motion: reduce)').matches) notice.animate([
+        {backgroundColor:'transparent'},
+        {backgroundColor:'#d5ab6570',color:'#743e2d',offset:.3},
+        {backgroundColor:'transparent'}
+      ],{duration:1200,iterations:2});
+      return;
+    }
     if(resuming(order,step)){close();window.KeynlockMissions.resume();return;}
     if(!progress.allowed(order))return;
     if(progress.done(order))progress.beginReplay(order);
@@ -183,7 +197,7 @@
     if(advanced)persist();
     render();
     const order=orders.find(o=>o.id===orderId);
-    button.textContent=order&&!progress.done(order)?'Головоломка пройдена · продолжить':progress.next()?'Журнал заказов':'Все заказы выполнены';
+
   });
   window.addEventListener('keynlock-training-change',()=>{if(dialog.open)render();});
   window.addEventListener('keynlock-resources-change',()=>{if(dialog.open)render();});
@@ -192,6 +206,7 @@
     open,
     prepare(mode,guided,tier=1){trainingMode=guided&&tier===1?mode:null;},
     training:mode=>trainingMode===mode,
+    balance:mode=>trainingMode===mode?config.balance?.[mode]:null,
     get progress(){return {completed:progress.completed,next:progress.next()?.id||null,total:orders.length};}
   };
   render();

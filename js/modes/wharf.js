@@ -132,7 +132,7 @@
     const opened=wfSequence.slice(0,wfStep);
     if(opened.includes(wfPos)) return;
     const firstLesson=window.KeynlockMissions?.active;
-    if(firstLesson?.guided&&firstLesson.orderId==='wharf-1'&&!STORE.getItem('keynlockFirstPickBroken')){
+    if(window.KeynlockTutorialPreferences.enabled&&firstLesson?.guided&&firstLesson.orderId==='wharf-1'&&!STORE.getItem('keynlockFirstPickBroken')){
       STORE.setItem('keynlockFirstPickBroken','1');
       forceBreakOnePick('Сай: «Слишком сильно надавила… Отмычка сломалась. Попробую осторожнее».');
       return;

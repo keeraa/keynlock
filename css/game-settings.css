@@ -3,17 +3,16 @@
 .gameSettingsDialog{width:min(1500px,100%);min-height:calc(100vh - 56px);margin:auto;border:1px solid rgba(178,132,65,.55);border-radius:var(--radius-dialog);background:var(--surface-dialog);box-shadow:var(--shadow-dialog);overflow:hidden;}
 .gameSettingsHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding:28px 30px 22px;border-bottom:1px solid rgba(178,132,65,.32);background:linear-gradient(180deg,rgba(92,55,29,.3),transparent);}
 .gameSettingsKicker{display:block;margin-bottom:5px;color:#bd8e49;font:700 11px/1.2 var(--ui-font);letter-spacing:.2em;}
-.gameSettingsHeader h1{margin:0;color:#f1d38e;font:700 clamp(26px,3vw,42px)/1.05 Georgia,serif;}
+.gameSettingsHeader h1{margin:0;color:var(--color-text-strong);font:700 clamp(26px,3vw,42px)/1.05 Georgia,serif;}
 .gameSettingsHeader p{margin:8px 0 0;color:#bba986;font-size:14px;}
 .gameSettingsHeaderActions{display:flex;align-items:center;gap:18px;margin-left:auto;}
 .gameMusicVolume{display:grid;grid-template-columns:auto 150px 38px;align-items:center;gap:10px;color:#bfa878;font:700 10px/1 var(--ui-font);text-transform:uppercase;letter-spacing:.08em;}
 .gameMusicVolume input{width:150px;accent-color:#b77b27;cursor:pointer;}
-.gameMusicVolume output{color:#efd18e;font:700 11px/1 var(--ui-font);text-align:right;letter-spacing:0;}
-.gameSettingsClose{flex:0 0 52px;width:52px;height:52px;border:1px solid #88652e;border-radius:12px;font:700 30px/1 var(--ui-font);}
+.gameMusicVolume output{color:#efd18e;font:700 11px/1 var(--ui-font);text-align:right;letter-spacing:0;}.gameSettingsClose{flex:0 0 52px;width:52px;height:52px;font:700 30px/1 var(--ui-font);}
 .gameSettingsToolbar{display:flex;align-items:end;gap:14px;padding:18px 30px;border-bottom:1px solid rgba(178,132,65,.24);}
 .gameSettingsToolbar label{display:grid;gap:6px;color:#ad9872;font-size:11px;text-transform:uppercase;letter-spacing:.1em;}
 .gameSettingsSearch{flex:1;max-width:420px;}
-.gameSettingsToolbar input[type="search"]{height:38px;border:1px solid rgba(166,124,58,.5);border-radius:9px;background:#15110d;color:#ead6ad;padding:0 13px;font:600 14px/1 var(--ui-font);}
+.gameSettingsToolbar input[type="search"]{height:38px;border:1px solid rgba(166,124,58,.5);border-radius:9px;background:#15110d;color:var(--color-text);padding:0 13px;font:600 14px/1 var(--ui-font);}
 .gameSettingsTableWrap{overflow:auto;max-height:calc(100vh - 315px);}
 .gameSettingsTable{width:100%;min-width:1320px;border-collapse:separate;border-spacing:0;}
 .gameSettingsTable thead{position:sticky;top:0;z-index:2;}
@@ -38,8 +37,7 @@
 .gameDifficulty button.unsupported{position:relative;opacity:.48;}
 .gameDifficulty button.unsupported::after{content:"";position:absolute;left:5px;right:5px;top:50%;height:1px;background:#8b6040;transform:rotate(-38deg);}
 .gameLevelsNote{align-self:center;margin-left:4px;color:#a77f4e;font:600 10px/1.1 var(--ui-font);white-space:nowrap;}
-.gameReadyMark{display:inline-grid;place-items:center;width:17px;height:17px;margin-left:7px;border-radius:50%;background:#8a611f;color:#fff0bd;font:700 11px/1 var(--ui-font);vertical-align:1px;}
-.gameLaunchButton{display:inline-grid;place-items:center;width:30px;height:30px;margin-right:9px;border:1px solid rgba(181,135,62,.58);border-radius:8px;background:#18120d;color:#d7ae64;vertical-align:middle;cursor:pointer;}
+.gameReadyMark{display:inline-grid;place-items:center;width:17px;height:17px;margin-left:7px;border-radius:50%;background:#8a611f;color:#fff0bd;font:700 11px/1 var(--ui-font);vertical-align:1px;}.gameLaunchButton{display:inline-grid;place-items:center;width:30px;height:30px;margin-right:9px;vertical-align:middle;}
 .gameLaunchButton:hover{border-color:#d2a24d;color:#ffe3a5;filter:brightness(1.15);}
 .gameLaunchButton svg{width:15px;height:15px;fill:currentColor;stroke:none;}
 .gameSettingToggle{display:inline-grid;place-items:center;cursor:pointer;}
@@ -63,8 +61,7 @@ body.game-settings-open .globalTopHud,body.game-settings-open .inventoryDrawer,b
   .gameSettingsHeaderActions{gap:9px;}
   .gameMusicVolume{grid-template-columns:auto 82px 34px;gap:6px;}
   .gameMusicVolume input{width:82px;}
-  .gameSettingsHeader p{font-size:12px;}
-  .gameSettingsClose{width:44px;height:44px;flex-basis:44px;}
+  .gameSettingsHeader p{font-size:12px;}.gameSettingsClose{width:44px;height:44px;flex-basis:44px;}
   .gameSettingsToolbar{padding:12px 16px;flex-wrap:wrap;}
   .gameSettingsSearch{min-width:100%;max-width:none;}
   .gameSettingsTableWrap{max-height:calc(100vh - 300px);}

@@ -5,10 +5,14 @@
       if(!root||!toggle)return null;
       if(controllers.has(root))return controllers.get(root);
       const approachVar=options.approachVar||'--equipment-approach';
+      root.classList.add('uiInventory');toggle.classList.add('uiInventoryToggle');
+      const decorate=()=>root.querySelectorAll(options.itemSelector||'.equipmentInventoryItem').forEach(item=>item.classList.add('uiInventoryItem'));decorate();
+      new MutationObserver(decorate).observe(root,{childList:true,subtree:true});
       let gesture=null,suppressClick=false,hovered=null;
       function setOpen(force){
         const wasOpen=root.classList.contains('open'),next=typeof force==='boolean'?force:!wasOpen;
         root.classList.toggle('open',next);
+        if(!next)setHovered(null);
         if(options.bodyClass)document.body.classList.toggle(options.bodyClass,next);
         toggle.setAttribute('aria-expanded',String(next));toggle.setAttribute('aria-label',next?options.closeLabel:options.openLabel);
         root.style.setProperty(approachVar,'0px');
@@ -37,15 +41,25 @@
         const item=itemAt(event.clientX,event.clientY);if(!item)return;
         event.preventDefault();event.stopPropagation();suppressClick=true;item.click();if(!root.classList.contains('open'))setOpen(true);setTimeout(()=>{suppressClick=false;},0);
       },true);
-      document.addEventListener('pointermove',event=>{
+      let pointerFrame=0,lastPointer=null;
+      function updatePointer(event){
         setHovered(root.classList.contains('open')?itemAt(event.clientX,event.clientY):null);
-        if(options.approachLift===false||event.pointerType==='touch'||root.classList.contains('open'))return;
+        if(event.pointerType==='touch'||root.classList.contains('open'))return;
+        if(!root.getClientRects().length||getComputedStyle(root).visibility==='hidden'||getComputedStyle(root).pointerEvents==='none'){root.style.setProperty(approachVar,'0px');return;}
         if(options.ignoreApproach?.(event)){root.style.setProperty(approachVar,'0px');return;}
         const rect=root.getBoundingClientRect(),horizontal=event.clientX>=rect.left-80&&event.clientX<=rect.right+80;
-        const distance=innerHeight-event.clientY,depth=options.approachDepth||180,lift=options.approachLift||34,amount=horizontal?lift*Math.max(0,Math.min(1,(depth-distance)/depth)):0;
+        const distance=innerHeight-event.clientY,depth=180,lift=42,amount=horizontal?lift*Math.max(0,Math.min(1,(depth-distance)/depth)):0;
         root.style.setProperty(approachVar,`${amount.toFixed(1)}px`);
+        if(root.id==='inventoryDrawer')document.querySelector('#challengeHud')?.style.setProperty('--challenge-inventory-lift',`${amount.toFixed(1)}px`);
+      }
+      document.addEventListener('pointermove',event=>{
+        lastPointer=event;
+        if(!pointerFrame)pointerFrame=requestAnimationFrame(()=>{pointerFrame=0;updatePointer(lastPointer);lastPointer=null;});
       },{passive:true});
-      document.addEventListener('pointerleave',()=>setHovered(null),{passive:true});
+      const resetPointer=()=>{cancelAnimationFrame(pointerFrame);pointerFrame=0;lastPointer=null;setHovered(null);root.style.setProperty(approachVar,'0px');};
+      document.addEventListener('pointerleave',resetPointer,{passive:true});window.addEventListener('blur',resetPointer);
+      root.addEventListener('focusin',event=>{if(event.target.matches('.uiInventoryItem'))setHovered(event.target);});
+      root.addEventListener('focusout',()=>setHovered(null));
       toggle.addEventListener('pointerdown',event=>{if(event.pointerType==='touch')gesture={id:event.pointerId,y:event.clientY};},{passive:true});
       toggle.addEventListener('pointerup',event=>{if(!gesture||gesture.id!==event.pointerId)return;const dy=event.clientY-gesture.y;gesture=null;if(Math.abs(dy)>24){suppressClick=true;setOpen(dy<0);}},{passive:true});
       const controller=Object.freeze({root,toggle,setOpen,itemAt});controllers.set(root,controller);return controller;
@@ -208,5 +222,5 @@
     renderInventoryTools();
     renderInventoryAvatar();
     window.setInventoryOpen = setInventoryOpen;
-    inventoryDrawerController=window.KeynlockEquipmentDrawers.create({root:'#inventoryDrawer',toggle:'#inventoryToggle',bodyClass:'inventory-open',openLabel:'Открыть инвентарь',closeLabel:'Закрыть инвентарь',approachVar:'--inv-approach',approachLift:false,hitTest:(x,y)=>window.inventoryToolAtPoint?.(x,y)});
+    inventoryDrawerController=window.KeynlockEquipmentDrawers.create({root:'#inventoryDrawer',toggle:'#inventoryToggle',bodyClass:'inventory-open',openLabel:'Открыть инвентарь',closeLabel:'Закрыть инвентарь',approachVar:'--inv-approach',itemSelector:'.inventoryTool:not(.hidden-slot):not(.breaking-out):not(:disabled)',hitTest:(x,y)=>window.inventoryToolAtPoint?.(x,y)});
   }

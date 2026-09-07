@@ -13,7 +13,7 @@ function bioZones(stage){
   const c=BIO_STAGE_CFG[Math.max(0,Math.min(BIO_STAGES-1,stage))];
   let blocks=[];
   for(let i=0;i<c.redCount;i++) blocks.push({t:'red',w:c.redW});
-  for(let i=0;i<c.greenCount;i++) blocks.push({t:'green',w:c.greenW});
+  for(let i=0;i<c.greenCount;i++) blocks.push({t:'green',w:c.greenW*(window.KeynlockCampaign?.balance?.('bioshock2')?1.35:1)});
   blocks=shuffle([...blocks]);
   for(let tries=0;tries<12;tries++){
     let bad=false;

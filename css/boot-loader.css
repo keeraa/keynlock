@@ -102,24 +102,16 @@
 }
 
 .mainMenu{width:100%;display:flex;flex-direction:column;gap:7px;}
-.mainMenu[hidden],.mainMenuPanel[hidden]{display:none!important;}
-.mainMenuButton{
+.mainMenu[hidden],.mainMenuPanel[hidden]{display:none!important;}.mainMenuButton{
   width:100%;
   min-width:0;
   min-height:39px;
   padding:9px 18px;
-  border:1px solid rgba(113,75,37,.58);
-  border-radius:8px;
-  color:#f7ead5;
-  background:linear-gradient(180deg,rgba(91,58,29,.94),rgba(48,30,17,.96));
-  box-shadow:0 7px 18px rgba(58,34,15,.16);
   font:700 14px/1 var(--title-font,Georgia,serif);
   letter-spacing:.075em;
   text-transform:uppercase;
-  cursor:pointer;
-  transition:transform .7s cubic-bezier(.2,.7,.2,1),filter .7s ease,box-shadow .7s ease;
 }
-.mainMenuPrimary{border-color:#b9823f;background:linear-gradient(180deg,#a36f32,#68431f);animation:bootPlayBreathe 4.8s ease-in-out infinite;}
+.mainMenuPrimary{animation:bootPlayBreathe 4.8s ease-in-out infinite;}
 .mainMenuButton:hover:not(:disabled){filter:brightness(1.12);transform:translateY(-1px);box-shadow:0 10px 24px rgba(82,50,19,.25);}
 .mainMenuButton:focus-visible,.mainMenuPanel button:focus-visible,.mainMenuPanel input:focus-visible{outline:3px solid rgba(159,109,49,.35);outline-offset:3px;}
 .mainMenuButton:disabled{opacity:.42;cursor:default;filter:saturate(.5);}
@@ -149,8 +141,7 @@ body.assets-loading .app{
 
 @media (max-width:900px){
   .bootLoaderStage{width:100%;height:auto;max-height:100%;}
-  .bootLoaderControls{left:24%;top:55%;width:15%;min-width:130px;}
-  .mainMenuButton{min-height:38px;font-size:13px;}
+  .bootLoaderControls{left:24%;top:55%;width:15%;min-width:130px;}.mainMenuButton{min-height:38px;font-size:13px;}
 }
 
 /* On narrow portrait screens the menu is a vertical composition: branding

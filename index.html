@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="css/modes-07-oblivion.css">
 <link rel="stylesheet" href="css/modes-08-watchmen.css">
 <link rel="stylesheet" href="css/modes-09-museum.css">
+<link rel="stylesheet" href="css/silhouettes.css">
 <link rel="stylesheet" href="css/modes-10-mass2.css">
 <link rel="stylesheet" href="css/modes-11-pipeline.css">
 <link rel="stylesheet" href="css/modes-12-wharf.css">
@@ -54,6 +55,7 @@
 <link rel="stylesheet" href="css/campaign.css">
 <link rel="stylesheet" href="css/story-dialogs.css">
 <link rel="stylesheet" href="css/onboarding.css">
+<link rel="stylesheet" href="css/restoration-guide.css">
 
 
 
@@ -71,11 +73,11 @@
   <div class="bootLoaderControls">
     <div class="bootLoaderBar"><span id="bootLoaderProgress"></span></div>
     <nav class="mainMenu" id="mainMenu" aria-label="Главное меню" hidden>
-      <button class="mainMenuButton mainMenuPrimary" id="mainMenuNew" type="button">Новая игра</button>
-      <button class="mainMenuButton" id="mainMenuContinue" type="button">Продолжить</button>
-      <button class="mainMenuButton" id="mainMenuSave" type="button">Сохранить игру</button>
-      <button class="mainMenuButton" id="mainMenuLoad" type="button">Загрузить игру</button>
-      <button class="mainMenuButton" id="mainMenuSettings" type="button">Настройки</button>
+      <button class="mainMenuButton mainMenuPrimary uiButton" id="mainMenuNew" type="button">Новая игра</button>
+      <button class="mainMenuButton uiButton" id="mainMenuContinue" type="button">Продолжить</button>
+      <button class="mainMenuButton uiButton" id="mainMenuSave" type="button">Сохранить игру</button>
+      <button class="mainMenuButton uiButton" id="mainMenuLoad" type="button">Загрузить игру</button>
+      <button class="mainMenuButton uiButton" id="mainMenuSettings" type="button">Настройки</button>
     </nav>
     <section class="mainMenuPanel" id="mainMenuSlots" hidden aria-label="Слоты сохранений">
       <div class="mainMenuPanelHeader"><strong id="mainMenuSlotsTitle">Сохранить игру</strong><button type="button" data-main-menu-back aria-label="Назад">×</button></div>
@@ -84,6 +86,8 @@
     <section class="mainMenuPanel mainMenuSettings" id="mainMenuSettingsPanel" hidden aria-label="Настройки">
       <div class="mainMenuPanelHeader"><strong>Настройки</strong><button type="button" data-main-menu-back aria-label="Назад">×</button></div>
       <label><span>Громкость музыки</span><input id="mainMenuMusicVolume" type="range" min="0" max="100" step="1" value="28"><output id="mainMenuMusicVolumeValue">28%</output></label>
+      <label class="mainMenuCheck"><input id="mainMenuTraining" type="checkbox"><span>Режим обучения</span></label>
+      <label class="mainMenuCheck"><input data-hide-hints type="checkbox"><span>Не показывать подсказки</span></label>
       <label class="mainMenuCheck"><input id="mainMenuReduceMotion" type="checkbox"><span>Уменьшить анимацию</span></label>
     </section>
   </div>
@@ -108,11 +112,6 @@
   </button>
   <div class="assetNameHud" id="assetNameHud" aria-live="polite">
     <div class="assetNameGame" id="assetNameGame">Игра: —</div>
-    <div class="assetNameBuild" id="assetNameBuild">Коммит: —</div>
-    <div id="assetNameLock">lock: —</div>
-    <div id="assetNameShackle">shackle: —</div>
-    <div id="assetNamePlate">plate: —</div>
-    <div id="assetNamePin">pin: —</div>
   </div>
 </div>
 
@@ -186,7 +185,7 @@
         <p>Общие возможности механик. Изменения применяются сразу и сохраняются в этом браузере.</p>
       </div>
       <div class="gameSettingsHeaderActions">
-        <button class="gameSettingsClose" id="gameSettingsClose" type="button" aria-label="Закрыть настройки">×</button>
+        <button class="gameSettingsClose uiClose" id="gameSettingsClose" type="button" aria-label="Закрыть настройки">×</button>
       </div>
     </div>
     <div class="gameSettingsToolbar">
@@ -203,7 +202,7 @@
 </section>
 
 <section class="worldMapScreen" id="worldMapScreen" hidden aria-label="Карта города">
-  <button class="worldMapClose" id="worldMapClose" type="button" aria-label="Закрыть карту">×</button>
+  <button class="worldMapClose uiClose" id="worldMapClose" type="button" aria-label="Закрыть карту">×</button>
   <div class="worldMapDialog" role="dialog" aria-modal="true" aria-label="Карта города">
   <div class="worldMapCanvas" id="worldMapCanvas">
     <div class="worldMapCurrent worldMapCurrentOverlay">Сейчас: <strong id="mapCurrentName">Логово</strong></div>
@@ -246,7 +245,6 @@
   <div class="lairScene">
     <div class="lairSceneTop">
       <div>
-        <div class="lairSceneKicker">БАЗА КОМАНДЫ</div>
         <div class="lairSceneTitle">Логово</div>
       </div>
     </div>
@@ -269,13 +267,13 @@
     </button>
 
     <button class="lairHotspot lairHotspotMissions" type="button" data-lair-action="missions">
-      <img class="lairHotspotIcon" src="assets/lair/icons/missions.png" alt="">
-      <span>Миссии</span>
+      <img class="lairHotspotIcon" src="assets/ui/map-ico.png" alt="">
+      <span>Карта города</span>
     </button>
 
     <button class="lairHotspot lairHotspotTeam" type="button" data-lair-open="team">
-      <img class="lairActiveCharacterPortrait" id="lairActiveCharacterPortrait" src="assets/characters/portraits/kai.png" alt="Кай">
-      <span class="lairActiveCharacterBadge" id="lairActiveCharacterName" aria-hidden="true">Кай</span>
+      <img class="lairActiveCharacterPortrait" id="lairActiveCharacterPortrait" src="assets/characters/portraits/sai.png" alt="Сай">
+      <span class="lairActiveCharacterBadge" id="lairActiveCharacterName" aria-hidden="true">Сай</span>
     </button>
 
     <button class="lairHotspot lairHotspotCollection" type="button" data-lair-open="collection">
@@ -296,9 +294,7 @@
     <div class="lairWorkbenchModal" id="lairWorkbenchModal" hidden aria-label="Верстак">
       <div class="lairWorkbenchDialog" role="dialog" aria-modal="true" aria-label="Верстак и чертежи">
         <img class="lairWorkbenchImage" src="assets/lair/workbench.jpg" alt="Верстак с чертежами замков и инструментами">
-        <section class="workbenchCraftPanel" aria-label="Изготовление">
-          <h2>Верстак</h2>
-          <div class="workbenchResources"><span>Отмычки <b id="resourcePicksWorkbench"></b></span><span>Детали <b id="resourcePartsWorkbench"></b></span></div>
+        <section class="workbenchCraftPanel uiPanel" aria-label="Изготовление">
           <div class="resourceComponents" id="resourceComponents" aria-label="Цветные алхимические компоненты"></div>
           <button id="salvagePickButton" type="button" hidden>Разобрать старые заготовки <small>Бесплатно · 6 деталей на 3 отмычки, если нечем продолжать</small></button>
           <button id="craftPickButton" type="button">Создать отмычку <small>2 детали</small></button>
@@ -306,12 +302,9 @@
           <button id="buyPickButton" type="button">Купить отмычку <small>30 монет</small></button>
           <button id="craftOilButton" type="button">Приготовить масло <small>оранжевый + жёлтый</small></button>
           <button id="upgradePickCaseButton" type="button"></button>
-          <details class="lootTablePreview">
-            <summary>Таблица добычи</summary>
-            <div id="lootTablePreview"></div>
-          </details>
+
         </section>
-        <button class="lairWorkbenchClose" id="lairWorkbenchClose" type="button" aria-label="Закрыть">×</button>
+        <div class="screenTopHud workbenchTopHud"><button class="screenTopHudClose" id="lairWorkbenchClose" type="button" aria-label="Закрыть верстак">×</button><div class="screenTopHudTitle">Верстак</div></div>
       </div>
     </div>
 
@@ -320,14 +313,14 @@
       <button class="alchemyGuideViewerBackdrop" type="button" aria-label="Закрыть просмотр" onclick="this.closest('.alchemyGuideViewer').hidden=true"></button>
       <div class="alchemyGuideViewerDialog">
         <img src="assets/alchemy/mixing-guide.jpg" alt="Инструкция по смешению реагентов">
-        <button class="alchemyGuideViewerClose" type="button" aria-label="Закрыть просмотр" onclick="this.closest('.alchemyGuideViewer').hidden=true">×</button>
+        <button class="alchemyGuideViewerClose uiClose" type="button" aria-label="Закрыть просмотр" onclick="this.closest('.alchemyGuideViewer').hidden=true">×</button>
       </div>
     </div>
 
-    <div class="lairModuleWindow" id="lairModuleWindow" hidden role="dialog" aria-modal="true" aria-labelledby="lairModuleTitle">
+    <div class="lairModuleWindow uiPanel" id="lairModuleWindow" hidden role="dialog" aria-modal="true" aria-labelledby="lairModuleTitle">
       <div class="lairModuleHeader">
         <div class="lairModuleTitle" id="lairModuleTitle">Логово</div>
-        <button class="lairModuleClose" id="lairModuleClose" type="button" aria-label="Закрыть">×</button>
+        <button class="lairModuleClose uiClose" id="lairModuleClose" type="button" aria-label="Закрыть">×</button>
       </div>
 
       <div class="lairModuleBody">
@@ -360,9 +353,9 @@
               <button class="ctl" id="pigmentNew" type="button">Новый образец</button>
             </div>
             <div class="pigmentMixBoard">
-              <div class="pigmentTargetCard"><span>Цвет заказа</span><i id="pigmentTarget"></i><strong id="pigmentTargetName">—</strong></div>
+              <div class="pigmentTargetCard uiPanel"><span>Цвет заказа</span><i id="pigmentTarget"></i><strong id="pigmentTargetName">—</strong></div>
               <div class="pigmentEquation" id="pigmentSlots" aria-label="Состав смеси"></div>
-              <div class="pigmentResultCard"><span>Текущая смесь</span><i id="pigmentResult"></i><strong id="pigmentResultName">Добавь пигменты</strong></div>
+              <div class="pigmentResultCard uiPanel"><span>Текущая смесь</span><i id="pigmentResult"></i><strong id="pigmentResultName">Добавь пигменты</strong></div>
             </div>
             <div class="pigmentPaletteWrap">
               <div class="pigmentPaletteHead"><span>Доступные цвета</span><small>Запасы из твоих ресурсов</small></div>
@@ -422,13 +415,13 @@
         <section class="lairPanel" data-lair-panel="restoration">
           <div class="restorationRoot" id="restorationRoot">
             <div class="restorationWorkspace">
-              <figure class="restorationPanel"><figcaption>Оригинал</figcaption><div class="restorationArtwork" data-restoration-art="original"><img id="restorationOriginal" alt=""><span class="restorationLens" aria-hidden="true"><i></i></span></div></figure>
-              <figure class="restorationPanel"><figcaption>Повреждённая картина</figcaption><div class="restorationArtwork" data-restoration-art="damaged"><img id="restorationDamaged" alt=""><canvas class="restorationSurface restorationDirtSurface" id="restorationDirtSurface"></canvas><canvas class="restorationSurface restorationRepairSurface" id="restorationRepairSurface"></canvas><canvas class="restorationSurface restorationOverpaintSurface" id="restorationOverpaintSurface"></canvas><canvas class="restorationSurface restorationUvSurface" id="restorationUvSurface"></canvas><canvas class="restorationSurface restorationScanSurface" id="restorationScanSurface"></canvas><img class="restorationToolEffect" id="restorationToolEffect" alt="" aria-hidden="true"><img class="restorationActiveTool" id="restorationActiveTool" alt="" aria-hidden="true"><span class="restorationLens" aria-hidden="true"><i></i></span></div></figure>
+              <figure class="restorationPanel uiPanel"><figcaption>Оригинал</figcaption><div class="restorationArtwork" data-restoration-art="original"><img id="restorationOriginal" alt=""><span class="restorationLens" aria-hidden="true"><i></i></span></div></figure>
+              <figure class="restorationPanel uiPanel"><figcaption>Повреждённая картина</figcaption><div class="restorationArtwork" data-restoration-art="damaged"><img id="restorationDamaged" alt=""><canvas class="restorationSurface restorationDirtSurface" id="restorationDirtSurface"></canvas><canvas class="restorationSurface restorationRepairSurface" id="restorationRepairSurface"></canvas><canvas class="restorationSurface restorationOverpaintSurface" id="restorationOverpaintSurface"></canvas><canvas class="restorationSurface restorationUvSurface" id="restorationUvSurface"></canvas><canvas class="restorationSurface restorationScanSurface" id="restorationScanSurface"></canvas><img class="restorationToolEffect" id="restorationToolEffect" alt="" aria-hidden="true"><img class="restorationActiveTool" id="restorationActiveTool" alt="" aria-hidden="true"><span class="restorationLens" aria-hidden="true"><i></i></span></div></figure>
             </div>
             <div class="restorationControls">
               <div class="restorationToolbar">
                 <div class="restorationOrderPicker">
-                  <button class="restorationOrderButton" id="restorationOrderButton" type="button" aria-expanded="false"><span>Заказ</span><span class="restorationOrderCopy"><b id="restorationOrderName">Выбрать картину</b><small id="restorationOrderArtist">Автор не выбран</small></span></button>
+                  <button class="restorationOrderButton uiButton" id="restorationOrderButton" type="button" aria-expanded="false"><span>Заказ</span><span class="restorationOrderCopy"><b id="restorationOrderName">Выбрать картину</b><small id="restorationOrderArtist">Автор не выбран</small></span></button>
                   <div class="restorationOrderGrid" id="restorationOrderGrid" hidden></div>
                 </div>
               </div>
@@ -437,10 +430,10 @@
                 <label><span>Насыщенность <b id="restorationSatValue">100%</b></span><input id="restorationSat" type="range" min="50" max="150" step="1" value="100"></label>
                 <label><span>Яркость <b id="restorationLightValue">100%</b></span><input id="restorationLight" type="range" min="50" max="150" step="1" value="100"></label>
               </div>
-              <aside class="restorationCheckPanel">
+              <aside class="restorationCheckPanel uiPanel">
                 <div class="restorationMetrics"><span>Подбор света <b id="restorationLightMatch">0%</b></span><span>Очищено <b id="restorationCleanliness">0%</b></span></div>
-                <button class="restorationNewDamageButton" id="restorationNewDamage" type="button" aria-label="Создать новое повреждение" title="Новое повреждение"><span aria-hidden="true">↻</span></button>
-                <button class="restorationCheckButton" id="restorationCheck" type="button">Проверить</button>
+                <button class="restorationNewDamageButton uiButton" id="restorationNewDamage" type="button" aria-label="Создать новое повреждение" title="Новое повреждение"><span aria-hidden="true">↻</span></button>
+                <button class="restorationCheckButton uiButton" id="restorationCheck" type="button">Проверить</button>
                 <strong class="restorationScore" id="restorationScore">—</strong>
                 <p id="restorationHint">Добейся совпадения не ниже 88%.</p>
                 <div class="restorationReward" id="restorationReward" hidden></div>
@@ -481,12 +474,13 @@
   </div>
 </section>
 <section class="gameDefeatOverlay" id="gameDefeatOverlay" hidden aria-labelledby="gameDefeatTitle" aria-describedby="gameDefeatText">
-  <div class="gameDefeatCard" role="alertdialog" aria-modal="true">
-    <img class="gameDefeatGuard" src="assets/guards/guard_01.png" alt="Стражник">
+  <div class="gameDefeatCard uiPanel" role="alertdialog" aria-modal="true">
+    <div class="gameDefeatGuard"><img src="assets/guards/guard_01.png" alt="Стражник"></div>
     <div class="gameDefeatKicker">ПОРАЖЕНИЕ</div>
     <h2 class="gameDefeatTitle" id="gameDefeatTitle">Попытка провалена</h2>
     <p class="gameDefeatText" id="gameDefeatText"></p>
-    <button class="gameDefeatRestart" id="gameDefeatRestart" type="button">Пройти заново</button>
+    <div class="gameDefeatLoss" id="gameDefeatLoss" hidden><span class="coinIcon gameResourceIcon" aria-hidden="true"></span><span id="gameDefeatLossValue"></span></div>
+    <button class="gameDefeatRestart uiButton" id="gameDefeatRestart" type="button">Пройти заново</button>
   </div>
 </section>
 <main class="main">
@@ -536,10 +530,11 @@
 <img class="wfLockerLip wmLockerLip" src="assets/lock-shell/locker-up-01.png" alt="" aria-hidden="true"/>
 <div class="wmTimeBar"><span id="wmTimerBar"></span></div>
 <div class="wmHelp" id="wmHelp"></div>
-<button class="digitalBtn primary wmOpenBtn" id="wmOpenBtn" type="button" disabled>Открыть замок</button>
+<button class="digitalBtn primary wmOpenBtn uiButton" id="wmOpenBtn" type="button" disabled>Открыть замок</button>
 </div></div>
 </div>
 <!-- MODE: MUSEUM -->
+<div class="modePanel silhouettesMode" data-mode="silhouettes" id="silhouettesMode" hidden><section class="silhouetteBoard" aria-label="Четыре печати"><div class="silhouetteRows"></div><p role="status" aria-live="polite"></p><button type="button" class="uiButton silhouetteCheck">Совместить</button></section></div>
 <div class="modePanel hmMode" data-mode="museum" hidden="" id="museumMode">
 <div class="hmLockWrap"><div class="hmLock" id="hmLock"></div></div>
 <div class="hmHelp" id="hmHelp"></div>
@@ -585,7 +580,7 @@
 <div class="kcdMeter"><div class="kcdMeterHead"><span>Поворот</span><span id="kcdProgressText">0%</span></div><div class="kcdBar"><span id="kcdProgressBar"></span></div></div>
 <div class="kcdMeter"><div class="kcdMeterHead"><span>Напряжение</span><span id="kcdStressText">0%</span></div><div class="kcdBar"><span id="kcdStressBar"></span></div></div>
 </div>
-<button class="digitalBtn kcdTurnBtn" id="kcdTurnBtn" type="button">Удерживать вращение · Space</button>
+<button class="digitalBtn kcdTurnBtn uiButton" id="kcdTurnBtn" type="button">Удерживать вращение · Space</button>
 <div class="kcdHelp" id="kcdHelp"></div>
 </div>
 <!-- MODE: THIEF 1/2 -->
@@ -621,8 +616,8 @@
 <div class="sfMeter"><div class="sfMeterHead"><span>Износ отмычки</span><span id="sfWearText">0%</span></div><div class="sfBar"><span id="sfWearBar"></span></div></div>
 </div>
 <div class="sfTorqueRow">
-<button class="digitalBtn sfTorqueBtn" id="sfTorqueLeft" type="button">← Повернуть · A</button>
-<button class="digitalBtn sfTorqueBtn" id="sfTorqueRight" type="button">Повернуть · D →</button>
+<button class="digitalBtn sfTorqueBtn uiButton" id="sfTorqueLeft" type="button">← Повернуть · A</button>
+<button class="digitalBtn sfTorqueBtn uiButton" id="sfTorqueRight" type="button">Повернуть · D →</button>
 </div>
 <div class="sfHelp" id="sfHelp"></div>
 </div>
@@ -643,9 +638,9 @@
 </div></div>
 <div class="ptgDurWrap"><span class="ptgDur" id="ptgDur"></span></div>
 <div class="ptgControls">
-<button class="digitalBtn" id="ptgHitLeft" type="button">Левый удар · A</button>
-<button class="digitalBtn" id="ptgConfirmBtn" type="button">Зафиксировать · Space</button>
-<button class="digitalBtn" id="ptgHitRight" type="button">Правый удар · D</button>
+<button class="digitalBtn uiButton" id="ptgHitLeft" type="button">Левый удар · A</button>
+<button class="digitalBtn uiButton" id="ptgConfirmBtn" type="button">Зафиксировать · Space</button>
+<button class="digitalBtn uiButton" id="ptgHitRight" type="button">Правый удар · D</button>
 </div>
 <div class="ptgHelp" id="ptgHelp"></div>
 </div>
@@ -657,7 +652,7 @@
 <div class="bioMeta"><span id="bioStage"></span><span id="bioPasses"></span></div>
 </div>
 </div>
-<div class="bioControls"><button class="digitalBtn" id="bioStopBtn" type="button">Стоп · Space</button></div>
+<div class="bioControls"><button class="digitalBtn uiButton" id="bioStopBtn" type="button">Стоп · Space</button></div>
 <div class="bioHelp" id="bioHelp"></div>
 </div>
 <!-- MODE: ALPHA PROTOCOL -->
@@ -851,13 +846,13 @@
 
 <!-- MODE: DRUM CLICKS DIGITAL LOCK -->
 <div class="modePanel digitalMode drumMode" data-mode="drum" hidden id="drumMode">
-  <div class="digitalCard">
+  <div class="digitalCard uiPanel">
     <div class="digitalHead">
       <div><div class="digitalKicker">КОДОВЫЙ БАРАБАН</div><div class="digitalTitle">Щелчки барабана</div><div class="digitalSub">Прокручивай каждый барабан. Чем ближе цифра к правильной, тем сильнее отклик механизма. Точная цифра даёт резкий двойной щелчок.</div></div>
-      <button class="digitalMiniBtn" id="drumSound" type="button">Звук: вкл</button>
+      <button class="digitalMiniBtn uiButton" id="drumSound" type="button">Звук: вкл</button>
     </div>
     <div class="drumWheels" id="drumWheels"></div>
-    <div class="digitalControls"><button class="digitalBtn primary" id="drumCheck" type="button">Проверить код</button><button class="digitalBtn" id="drumNew" type="button">Новый замок</button></div>
+    <div class="digitalControls"><button class="digitalBtn primary uiButton" id="drumCheck" type="button">Проверить код</button><button class="digitalBtn uiButton" id="drumNew" type="button">Новый замок</button></div>
     <div class="digitalResult" id="drumResult"></div>
     <div class="drumHint">Отклик считается по расстоянию по кругу: 9 находится рядом с 0. Ищи самый сильный резонанс каждого барабана.</div>
   </div>
@@ -865,7 +860,7 @@
 
 <!-- MODE: OSCILLOSCOPE DIGITAL LOCK -->
 <div class="modePanel digitalMode scopeMode" data-mode="scope" hidden id="scopeMode">
-  <div class="digitalCard">
+  <div class="digitalCard uiPanel">
     <div class="scopeFrame"><canvas id="scopeCanvas" width="860" height="250"></canvas><div class="scopeLegend"><span><i class="scopeDot ref"></i>эталон</span><span><i class="scopeDot cur"></i>текущий сигнал</span></div></div>
     <div class="scopeWheels" id="scopeWheels"></div>
     <div class="scopeScore">Совпадение: <b id="scopeScore">0%</b></div><div class="scopeBar"><i id="scopeBar"></i></div>
@@ -875,10 +870,10 @@
 
 </div><!-- /puzzleArea -->
 <div class="solvedPuzzleOverlay" id="solvedPuzzleOverlay" aria-live="polite" aria-atomic="true">
-  <div class="solvedPuzzleCard">
+  <div class="solvedPuzzleCard uiPanel">
     <div class="solvedPuzzleTitle">Замок открыт</div>
     <div class="solvedPuzzleLoot" id="solvedPuzzleLoot"></div>
-    <button class="solvedPuzzleButton" id="newPuzzleButton" type="button">Новая головоломка</button>
+    <button class="solvedPuzzleButton uiButton" id="newPuzzleButton" type="button">Вернуться в логово</button>
   </div>
 </div>
 </div><!-- /scene -->
@@ -919,6 +914,7 @@
 <script src="js/modes/oblivion.js"></script>
 <script src="js/modes/watchmen.js"></script>
 <script src="js/modes/museum.js"></script>
+<script src="js/modes/silhouettes.js"></script>
 <script src="js/modes/mass2.js"></script>
 <script src="js/modes/pipeline.js"></script>
 <script src="js/modes/wharf.js"></script>
@@ -947,6 +943,7 @@
 <script src="js/core/campaign-route.js"></script>
 <script src="js/world/campaign.js"></script>
 <script src="js/world/onboarding.js"></script>
+<script src="js/world/mission-lessons.js"></script>
 <script src="js/core/init.js"></script>
 <script src="js/core/inventory-hit-testing.js"></script>
 <script src="js/core/tooltips.js"></script>

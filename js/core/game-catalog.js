@@ -6,6 +6,7 @@
  * lockpicks, which ambient systems run there, and whether opening is explicit.
  */
 const GAME_DEFINITIONS={
+  silhouettes:{title:'Четыре печати',description:'Переключай верхнюю и нижнюю составляющие, чтобы их наложение совпало с образцом посередине. Открой четыре печати слева направо за 30 секунд. Отмычки не расходуются.',objective:'СОБЕРИ ЧЕТЫРЕ СИЛУЭТА',kind:'native',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
   classic:{title:'Классика',kind:'native',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:true,noiseSensor:true,guards:true,birds:true}},
   sequence:{title:'Альтернатива 2',kind:'native',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:true,noiseSensor:true,guards:true,birds:true}},
   special:{title:'Особые замки',kind:'native',lock:{present:true,manualOpen:true,specialTool:true},world:{noise:true,noiseSensor:true,guards:true,birds:true}},
@@ -21,7 +22,7 @@ const GAME_DEFINITIONS={
   scope:{title:'Осциллограф',description:'Настрой четыре гармоники так, чтобы текущая форма сигнала полностью совпала с эталоном.',objective:'СОВМЕСТИТЬ ТЕКУЩИЙ СИГНАЛ С ЭТАЛОНОМ',kind:'native',lock:{present:false,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
   oblivion:{title:'Штифтовый замок',description:'Подбрасывай штифты и фиксируй каждый точно в момент совпадения с верхней прорезью.',objective:'ПОДНЯТЬ И ЗАФИКСИРОВАТЬ ВСЕ ШТИФТЫ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false},difficulty:{levels:[1]}},
   watchmen:{title:'Подпружиненные тумблеры',description:'Выставляй высоту связанных тумблеров и фиксируй их в целевых зонах до окончания времени.',objective:'ВЫСТАВИТЬ И ЗАФИКСИРОВАТЬ ВСЕ ТУМБЛЕРЫ ДО ИСТЕЧЕНИЯ ВРЕМЕНИ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
-  museum:{title:'Подбор формы отмычки',description:'Сопоставляй профиль текущего тумблера с формой в нижнем наборе. Частично закрытый профиль нужно узнать по видимой половине, а заклинивший — выбрать повторно.',objective:'ПОДОБРАТЬ ПРОФИЛЬ ОТМЫЧКИ ДЛЯ КАЖДОГО ТУМБЛЕРА',kind:'native',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
+  museum:{title:'Символьный замок',description:'Сопоставляй профиль текущего тумблера с формой в нижнем наборе. Частично закрытый профиль нужно узнать по видимой половине, а заклинивший — выбрать повторно.',objective:'ПОДОБРАТЬ ПРОФИЛЬ ОТМЫЧКИ ДЛЯ КАЖДОГО ТУМБЛЕРА',kind:'native',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
   mass2:{title:'Парные узлы',description:'Открывай узлы попарно, запоминай символы и найди все совпадения до окончания времени.',objective:'НАЙТИ ВСЕ ПАРЫ УЗЛОВ ДО ИСТЕЧЕНИЯ ВРЕМЕНИ',kind:'native',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
   pipeline:{title:'Трубопровод',description:'Раскрой и поверни плитки, чтобы собрать непрерывный маршрут от входа до выхода до запуска потока.',objective:'СОБРАТЬ МАРШРУТ ОТ ВХОДА ДО ВЫХОДА ДО ЗАПУСКА ПОТОКА',kind:'native',lock:{present:false,manualOpen:false},world:{noise:false,guards:false,birds:false}},
   wharf:{title:'Risen 2 — набережная',description:'Открывай задвижки в скрытом порядке; ошибочный выбор сбрасывает последовательность.',objective:'ОТКРЫТЬ ЗАДВИЖКИ ПО ПОРЯДКУ',kind:'native',lock:{present:true,manualOpen:true},world:{noise:false,guards:false,birds:false}},
@@ -38,6 +39,7 @@ const GAME_DEFINITIONS={
 // Scene art belongs to the game catalogue rather than individual mechanics,
 // so changing a location never requires editing puzzle code.
 const GAME_LOCATIONS={
+  silhouettes:'bg-house-03.jpg',
   classic:'bg-church-01.jpg',sequence:'bg-church-01.jpg',special:'bg-church-01.jpg',
   hillsfar:'bg-street-01.jpg',skyrim:'bg-street-01.jpg',thiefds:'bg-street-01.jpg',
   g1:'bg-basement-01.jpg',oblivion:'bg-basement-01.jpg',thief12:'bg-basement-01.jpg',
@@ -169,7 +171,7 @@ const GameActions=(()=>{
       return false;
     }
     const result=handler(context);
-    const failedPlayerAttempt=!solved && !solvedBefore && playerAttempt;
+    const failedPlayerAttempt=result!=='pending' && !solved && !solvedBefore && playerAttempt;
     if(game.lock.requiresPick&&failedPlayerAttempt&&Number(picks)===picksBefore)window.forceBreakOnePick?.();
     window.dispatchEvent(new CustomEvent('keynlock-game-action',{detail:{action:'open',modeId,source,solvedBefore,solvedAfter:!!solved}}));
     return result;

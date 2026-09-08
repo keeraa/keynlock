@@ -284,13 +284,23 @@
       const handle = railCollection().handles.find(h => h.id === handleId);
       if(handle && getInventoryRail(pickProgress.capacity).some(h=>h.id===handle.id)) equipHandle(handle);
     },
-    awardMissionHandle(missionId){
-      if(!missionId)return null;
-      const rewarded=STORE.getJSON('keynlockHandleRewardedMissions',{});
-      if(rewarded[missionId])return null;
-      const reward=this.unlockRandomHandle();
-      rewarded[missionId]=true;STORE.setJSON('keynlockHandleRewardedMissions',rewarded);
+    awardMissionHandle(missionId,tier=1){
+      if(!missionId||!PICK_COLLECTIONS.some(col=>!collectionReady(col)))return null;
+      const saved=STORE.getJSON('keynlockHandleDropProgress',{});
+      const claimed=saved.claimed||STORE.getJSON('keynlockHandleRewardedMissions',{});
+      const misses=Math.max(0,Number(saved.misses)||0);
+      const decision=window.KeynlockRewardPolicy.handleDrop({id:missionId,misses,claimed,chance:window.KeynlockContent.economy.lockLoot[tier].handleChance,roll:Math.random()});
+      const reward=decision.drop?this.unlockRandomHandle():null;
+      if(reward&&decision.milestone)claimed[missionId]=true;
+      STORE.setJSON('keynlockHandleDropProgress',{claimed,misses:reward?0:misses+1});
       return reward;
+    },
+    handleRewardHint(missionId,tier=1){
+      if(!PICK_COLLECTIONS.some(col=>!collectionReady(col)))return 'Все рукоятки собраны';
+      const saved=STORE.getJSON('keynlockHandleDropProgress',{}),claimed=saved.claimed||STORE.getJSON('keynlockHandleRewardedMissions',{});
+      if(window.KeynlockRewardPolicy.isMilestone(missionId)&&!claimed[missionId])return 'Гарантированная рукоятка';
+      const left=Math.max(1,window.KeynlockContent.economy.handlePity-(saved.misses||0));
+      return `Шанс рукоятки ${Math.round(window.KeynlockContent.economy.lockLoot[tier].handleChance*100)}% · гарантия не позже чем через ${window.KeynlockCampaignRoute.quantity(left,['победу','победы','побед'])}`;
     },
     unlockRandomHandle(){
       const collection=PICK_COLLECTIONS.find(col=>!collectionReady(col));

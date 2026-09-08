@@ -338,3 +338,25 @@ for(const [roll,coins,expectedCoins,expectedPicks] of [[0,101,101,0],[.4,101,50,
   if(roll>0)assert(saved.lockpickBalance===String(expectedCoins),'Guard coin penalty was not persisted.');
 }
 console.log('Guard encounters OK — three outcomes, zero coins, odd rounding, single charge and return home.');
+
+const progressionRewardContext={window:{KeynlockContent:content}};
+runInNewContext(source('js/core/reward-policy.js'),progressionRewardContext);
+const policy=progressionRewardContext.window.KeynlockRewardPolicy;
+const openingModes=['wharf','hillsfar','mass2','museum','classic','sequence','special','pipeline','bioshock2','composite'];
+let milestones=0,bonuses=0;const claimed={};
+for(const mode of openingModes){
+  const id=`${mode}-1`;
+  const bonus=policy.firstClearBonus(id,claimed);bonuses+=bonus;
+  if(policy.handleDrop({id,misses:0,claimed,chance:.04,roll:.99}).milestone)milestones++;
+  claimed[id]=true;
+  assert(policy.firstClearBonus(id,claimed)===0,'Repeated first-clear bonus.');
+  assert(!policy.handleDrop({id,misses:0,claimed,chance:.04,roll:.99}).drop,'Repeated milestone handle.');
+}
+assert(milestones===8&&bonuses===1350,'Opening rewards must fund eight handles and the case milestone.');
+assert(!policy.handleDrop({id:'scope-1',misses:3,claimed,chance:.04,roll:.99}).drop,'Pity triggered too early.');
+assert(policy.handleDrop({id:'scope-1',misses:4,claimed,chance:.04,roll:.99}).drop,'Fifth victory must break a dry streak.');
+assert(policy.handleDrop({id:'scope-1',misses:0,claimed,chance:.04,roll:.039}).drop,'Random chance disabled.');
+assert(!policy.handleDrop({id:'scope-1',misses:0,claimed,chance:.04,roll:.04}).drop,'Chance boundary incorrect.');
+console.log('Progression rewards OK — eight milestones, one-time coin bonuses, random drops and five-win pity.');
+
+await import("./story-check.mjs");

@@ -24,13 +24,14 @@
   function describe(order,step){
     const game=window.GameCatalog.get(step.mode);
     const brief=briefs.find(b=>b.mode===step.mode);
+    const narrative=window.KeynlockContent.chapterStory.orders[order.id];
     const place=window.KeynlockContent.world.missionPlaces.find(p=>p.mode===step.mode);
     const story=game.description||window.PuzzleModes.objective(step.mode)||'Выставь механизм в правильное положение и открой замок.';
     return {
-      title:order.title||briefs.find(b=>b.mode===order.mode)?.title||window.GameCatalog.get(order.mode).title,
+      title:order.title||narrative?.title||briefs.find(b=>b.mode===order.mode)?.title||window.GameCatalog.get(order.mode).title,
       place:window.KeynlockContent.world.districts[place.district].name,
       mechanic:brief?.mechanic||game.title,
-      story:step.tier===1&&brief?brief.story:story,
+      story:narrative?.brief||(step.tier===1&&brief?brief.story:story),
       hint:step.tier===1?(brief?.hint||window.KeynlockMissionLessons?.hint(step.mode)||story):story,
       risk:step.tier===1&&brief?brief.risk:game.lock.requiresPick?'Береги отмычки. Пополнить запас можно на верстаке.':'Эта головоломка не расходует отмычки.',
       tool:game.lock.requiresPick?'Нужна отмычка':'Без отмычек',
@@ -59,7 +60,7 @@
         <div class="campaignArtwork"><img id="campaignImage" alt=""><span id="campaignStamp"></span><span id="campaignNumber"></span></div>
         <div class="campaignBrief"><p id="campaignPlace" class="campaignEyebrow"></p><h2 id="campaignTask"></h2><p id="campaignMechanic"></p>
           <p id="campaignPart"></p><p id="campaignStory"></p>
-          <dl class="campaignFacts"><div><dt>Сложность</dt><dd id="campaignTime"></dd></div><div><dt>Инструмент</dt><dd id="campaignTool"></dd></div><div><dt>Добыча</dt><dd>Монеты и материалы</dd></div></dl>
+          <dl class="campaignFacts"><div><dt>Сложность</dt><dd id="campaignTime"></dd></div><div><dt>Инструмент</dt><dd id="campaignTool"></dd></div><div><dt>Добыча</dt><dd id="campaignLoot">Монеты и материалы</dd></div></dl>
           <details id="campaignHelp"><summary>Заметки о механизме <span aria-hidden="true">+</span></summary><p id="campaignHint"></p><p id="campaignRisk"></p></details>
         </div>
         <footer class="campaignFooter"><p id="campaignPreparation" role="status"></p><div class="campaignActions uiActions"><button id="campaignStart" class="uiButton uiButton--primary" type="button"></button><button id="campaignWorkbench" class="uiButton" type="button">К верстаку</button><button id="campaignCollection" class="uiButton" type="button" hidden>Коллекция</button></div></footer>
@@ -113,6 +114,9 @@
     el('campaignRisk').textContent=stage.risk;el('campaignHint').textContent=stage.hint;
     el('campaignPart').hidden=order.steps.length===1;
     el('campaignPart').textContent=`Головоломка ${order.steps.indexOf(step)+1} из ${order.steps.length}`;
+    const rewardId=`${step.mode}-${step.tier}`;
+    const bonus=window.KeynlockRewardPolicy.firstClearBonus(rewardId,store.getJSON('keynlockFirstClearBonuses',store.getJSON('lockpickMissions',{})));
+    el('campaignLoot').textContent=[bonus?`+${bonus} монет за первое прохождение`:'Монеты и материалы',window.KeynlockCollection?.handleRewardHint(rewardId,step.tier)].filter(Boolean).join(' · ');
     const resources=window.KeynlockResources.state;
     const missing=window.GameCatalog.feature(step.mode,'lock.requiresPick')&&resources.picks===0;
     const resume=resuming(order,step);
@@ -180,7 +184,7 @@
     if(resuming(order,step)){close();window.KeynlockMissions.resume();return;}
     if(!progress.allowed(order))return;
     if(progress.done(order))progress.beginReplay(order);
-    close();window.KeynlockMissions.start(step.mode,step.tier,{guided:true,orderId:order.id,stepId:step.id});
+    close();window.KeynlockChapterStory.before({mode:step.mode,tier:step.tier,orderId:order.id,stepId:step.id});
   });
   el('campaignWorkbench').addEventListener('click',()=>{close();window.KeynlockLair.workbench();});
   el('campaignCollection').addEventListener('click',()=>{close();window.KeynlockLair.module('collection');});

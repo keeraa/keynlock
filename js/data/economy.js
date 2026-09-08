@@ -17,5 +17,5 @@
   });
 
   window.KeynlockContent=window.KeynlockContent||{};
-  window.KeynlockContent.economy=Object.freeze({components,lockLoot});
+  window.KeynlockContent.economy=Object.freeze({components,lockLoot,handlePity:5,caseUpgradePrice:2500});
 })();

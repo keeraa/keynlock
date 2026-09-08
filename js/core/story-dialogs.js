@@ -26,7 +26,26 @@
     if(event.key==='Escape'){event.preventDefault();if(!dialog.classList.contains('storyIntro'))close(false);}
   },true);
   dialog.addEventListener('cancel',event=>{event.preventDefault();if(!dialog.classList.contains('storyIntro'))close(false);});
+  const speakers={sai:'Сай',tik:'Тик',kai:'Кай'};
+  function portrait(speaker){
+    const img=dialog.querySelector('.storyPortrait img');
+    img.src=`assets/characters/portraits/${speaker}.png`;img.alt=speakers[speaker];
+  }
   window.KeynlockDialogs={
+    scene({heading,lines,page=0,onPage=()=>{},done=()=>{},action='Продолжить'}){
+      if(dialog.open)return false;
+      page=Math.min(lines.length-1,Math.max(0,Number(page)||0));
+      function render(){
+        const [speaker,line]=lines[page];portrait(speaker);
+        label.textContent=`${speakers[speaker].toLocaleUpperCase('ru-RU')} · ${page+1} / ${lines.length}`;
+        text.textContent=line;next.textContent=page===lines.length-1?action:'Далее';onPage(page);
+      }
+      function finish(){close(true);done();}
+      dialog.classList.add('storyIntro');title.textContent=heading;
+      cancel.textContent='Пропустить';cancel.onclick=finish;
+      next.onclick=()=>{if(page===lines.length-1)finish();else{page++;render();}};
+      render();show();next.focus();return true;
+    },
     confirm(heading,message,action='Начать заново'){
       if(dialog.open)return Promise.resolve(false);
       dialog.classList.remove('storyIntro');
@@ -49,7 +68,7 @@
       let page=Math.min(lines.length-1,Math.max(0,Number(saved.page)||0));
       function render(){label.textContent=`САЙ · РЕСТАВРАТОР   /   ${page+1} ИЗ ${lines.length}`;text.textContent=lines[page];next.textContent=page===lines.length-1?'Открыть заказы':'Далее';store.setJSON('keynlockIntro',{page,done:false});}
       function finish(){store.setJSON('keynlockIntro',{done:true});close(true);done();}
-      dialog.classList.add('storyIntro');title.textContent='Искусство стоит спасти';cancel.textContent='Пропустить';cancel.onclick=finish;
+      portrait('sai');dialog.classList.add('storyIntro');title.textContent='Искусство стоит спасти';cancel.textContent='Пропустить';cancel.onclick=finish;
       next.onclick=()=>{if(page===lines.length-1)finish();else{page++;render();}};
       render();show();next.focus();
     }

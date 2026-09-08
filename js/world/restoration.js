@@ -421,7 +421,7 @@
     completed[painting.id]={score:value,lesson:state.lesson,completedAt:new Date().toISOString()};
     STORE.setJSON(STORAGE_KEY,completed);
     const result=window.KeynlockResources?.awardRestoration?.({coins:50,componentCount:2,preferredColors:painting.colors})||{coins:50,components:{}};
-    elements.hint.textContent='Картина восстановлена и возвращена заказчику.';
+    elements.hint.textContent='Картина восстановлена. Работа завершена.';
     elements.reward.innerHTML=rewardMarkup(result);
     elements.reward.hidden=false;
     renderOrders();

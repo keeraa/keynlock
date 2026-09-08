@@ -110,11 +110,13 @@
     window.Alchemy?.stop();
     pauseLairPortraitVideos();
     if(!$lairModuleWindow) return;
+    const wasOpen=!$lairModuleWindow.hidden;
     $lairModuleWindow.classList.remove('open');
     $lairModuleWindow.hidden=true;
     setLairBackgroundInert(null);
     if(restoreFocus&&lairReturnFocus?.isConnected) lairReturnFocus.focus({preventScroll:true});
     lairReturnFocus=null;
+    if(wasOpen)window.dispatchEvent(new Event('keynlock-lair-opened'));
   }
 
   function openLairWorkbench(){
@@ -135,6 +137,7 @@
     setLairBackgroundInert(null);
     if(restoreFocus&&workbenchReturnFocus?.isConnected) workbenchReturnFocus.focus({preventScroll:true});
     workbenchReturnFocus=null;
+    window.dispatchEvent(new Event('keynlock-lair-opened'));
   }
 
   document.addEventListener('keydown',event=>{
@@ -300,6 +303,7 @@
     // and on the next frame if it is not — waiting for a frame unconditionally
     // let a fast first touch get overwritten.
     if(!window.resetLairPan?.()) requestAnimationFrame(() => window.resetLairPan?.());
+    window.dispatchEvent(new Event('keynlock-lair-opened'));
   }
 
   function closeLair(){

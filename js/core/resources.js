@@ -45,7 +45,7 @@
     const upgrade=document.querySelector('#upgradePickCaseButton');
     if(upgrade){
       const next=resourceCaseCapacity()===3?5:7;
-      const price=2500;
+      const price=window.KeynlockContent.economy.caseUpgradePrice;
       upgrade.hidden=resourceCaseCapacity()>=7;
       upgrade.disabled=balance<price;
       upgrade.innerHTML=`Расширить футляр до ${next} <small>${price} монет</small>`;
@@ -65,7 +65,11 @@
   function awardKeynlockResources({tier=1,baseCoins=0}={}){
     const level=clamp(Number(tier)||1,1,3);
     const table=KEYNLOCK_LOCK_LOOT_TABLE[level];
-    const coins=Math.round(Math.max(0,baseCoins)*table.coinMultiplier);
+    const run=window.KeynlockMissions?.active;
+    const claimed=STORE.getJSON('keynlockFirstClearBonuses',STORE.getJSON('lockpickMissions',{}));
+    const firstClearBonus=run?window.KeynlockRewardPolicy.firstClearBonus(run.id,claimed):0;
+    if(firstClearBonus){claimed[run.id]=true;STORE.setJSON('keynlockFirstClearBonuses',claimed);}
+    const coins=Math.round(Math.max(0,baseCoins)*table.coinMultiplier)+firstClearBonus;
     const parts=window.KeynlockCampaign?.balance?.(mode)?2:rand(table.parts[0],table.parts[1]);
     const componentCount=rand(table.components[0],table.components[1]);
     const componentDrops={};
@@ -75,12 +79,9 @@
       keynlockResources.components[component.id]++;
       componentDrops[component.id]=(componentDrops[component.id]||0)+1;
     }
-    // A failed roll leaves the mission eligible for a later handle discovery.
-    const handle=Math.random()<table.handleChance
-      ?window.KeynlockCollection?.awardMissionHandle?.(window.KeynlockMissions?.active?.id)||null
-      :null;
+    const handle=window.KeynlockCollection?.awardMissionHandle?.(run?.id,level)||null;
     saveKeynlockResources();
-    return {tier:level,coins,parts,components:componentDrops,handle,table};
+    return {tier:level,coins,firstClearBonus,parts,components:componentDrops,handle,table};
   }
   function awardRestoration({coins=50,componentCount=2,preferredColors=[]}={}){
     const palette=preferredColors.filter(id=>KEYNLOCK_COMPONENTS.some(item=>item.id===id));
@@ -142,7 +143,7 @@
   function upgradeKeynlockCase(){
     const current=resourceCaseCapacity();
     const next=current===3?5:current===5?7:null;
-    const price=next?2500:Infinity;
+    const price=next?window.KeynlockContent.economy.caseUpgradePrice:Infinity;
     if(!next||balance<price)return false;
     balance-=price;
     STORE.setItem('lockpickBalance',String(balance));

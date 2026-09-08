@@ -121,46 +121,13 @@ body.importedMode .drumMode .digitalCard{border:0!important;background:none!impo
 body.importedMode .drumMode .digitalHead{justify-content:flex-end!important;margin-bottom:8px!important;}
 body.importedMode .drumMode .digitalHead>div,body.importedMode .drumMode .drumHint{display:none!important;}
 body.importedMode .drumMode .digitalResult{margin-top:6px!important;}
-.worldMapInfo{width:min(1240px,100%) !important;}
-.worldMapCanvas{width:min(1240px,100%) !important;aspect-ratio:1648/928 !important;min-height:0 !important;border:1px solid rgba(118,86,45,.42) !important;border-radius:14px !important;background:#c8a96f !important;box-shadow:0 20px 60px rgba(0,0,0,.34) !important;}
-.worldMapArtwork{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;pointer-events:none;user-select:none;}
-.worldMapCanvas::before{display:none !important;content:none !important;}
-.worldMapRoads,.mapWater,.mapWall{display:none !important;}
-.worldMapCanvas .mapNode{z-index:8 !important;color:#493923 !important;text-shadow:0 1px 1px rgba(239,215,166,.78),0 1px 5px rgba(0,0,0,.20) !important;}
-.worldMapCanvas .mapNode.accessible{color:#3e2d19 !important;}
-.worldMapCanvas .mapNodeLock,.worldMapCanvas .mapNodeMissionType{color:#5f4728 !important;}
-.worldMapCanvas .mapNodeDot{background:#2c2117 !important;border-color:#d0a258 !important;box-shadow:0 0 0 3px rgba(244,215,147,.34),0 3px 9px rgba(0,0,0,.40) !important;}
-.worldMapCanvas .mapNode.current .mapNodeDot{background:#a66c29 !important;border-color:#ffe09a !important;}
-.worldMapCanvas .mapPlayer{z-index:12 !important;}
-@media (max-width:900px){
-.worldMapCanvas{width:100% !important;aspect-ratio:1648/928 !important;}
-}
-.worldMapScreen{position:fixed !important;inset:0 !important;z-index:1200 !important;display:flex !important;align-items:center !important;justify-content:center !important;overflow:auto !important;background:rgba(4,3,3,.72) !important;backdrop-filter:blur(5px) !important;-webkit-backdrop-filter:blur(5px) !important;}
-.worldMapScreen[hidden]{display:none !important;}
-.worldMapDialog{display:flex;flex-direction:column;border:1px solid rgba(157,118,59,.72);border-radius:18px;background:linear-gradient(180deg,rgba(31,25,20,.97),rgba(12,10,8,.98));box-shadow:0 34px 100px rgba(0,0,0,.64),inset 0 0 0 1px rgba(255,226,166,.035);}
-.worldMapDialog .worldMapCanvas,.worldMapDialog .worldMapInfo{width:100% !important;max-width:none !important;}
-.worldMapDialog .worldMapCanvas{flex:0 0 auto;}
+
+
 body.map-open{overflow:hidden !important;}
 .lairScene{background-image:linear-gradient(rgba(10,7,4,.14),rgba(10,7,4,.22)),url("../assets/lair/lair-room-bg-01.jpg") !important;background-size:100% 100%,cover !important;background-position:center center,calc(50% + var(--lair-pan,0px)) center !important;background-repeat:no-repeat !important;}
-@media (max-width:760px){
-.worldMapDialog{gap:10px;}
-}
-.worldMapDialog{gap:0 !important;}
-.worldMapCanvas{position:relative !important;}
-.worldMapCurrentOverlay{position:absolute !important;top:18px !important;right:20px !important;z-index:30 !important;padding:9px 13px !important;border:1px solid rgba(116,84,44,.52) !important;border-radius:10px !important;background:rgba(27,21,15,.82) !important;color:#c8b28a !important;box-shadow:0 8px 20px rgba(0,0,0,.22) !important;backdrop-filter:blur(4px) !important;pointer-events:none !important;}
-.worldMapCurrentOverlay strong{color:#efd08b !important;}
-.worldMapInfoOverlay{position:absolute !important;left:20px !important;bottom:18px !important;z-index:30 !important;width:min(430px,calc(100% - 40px)) !important;min-height:0 !important;margin:0 !important;padding:12px 14px !important;border:1px solid rgba(116,84,44,.52) !important;border-radius:11px !important;background:rgba(27,21,15,.84) !important;box-shadow:0 10px 24px rgba(0,0,0,.24) !important;backdrop-filter:blur(4px) !important;pointer-events:none !important;}
-.worldMapInfoOverlay .worldMapAction{display:none !important;}
-.worldMapInfoOverlay .worldMapInfoTitle{color:#efd08b !important;}
-.worldMapInfoOverlay .worldMapInfoText{color:#c0ad8b !important;}
-@media (max-width:760px){
-.worldMapCurrentOverlay{top:10px !important;right:10px !important;padding:7px 9px !important;font-size:11px !important;}
-.worldMapInfoOverlay{left:10px !important;bottom:10px !important;width:calc(100% - 20px) !important;padding:10px 11px !important;}
-}
-.worldMapScreen{padding:10px !important;}
-.worldMapDialog{width:min(1480px,calc(100vw - 20px)) !important;max-height:calc(100vh - 20px) !important;padding:10px !important;overflow:hidden !important;}
-.worldMapDialog .worldMapCanvas{width:100% !important;max-height:calc(100vh - 40px) !important;aspect-ratio:1648/928 !important;}
-.worldMapArtwork{object-fit:contain !important;}
+
+
+
 .lairSceneTop{justify-content:flex-start;}
 .lairSceneTop > div:first-child{text-align:left;}
 .lairSceneCharacters,.lairSceneCharacter{pointer-events:none !important;}
@@ -170,14 +137,8 @@ body.map-open{overflow:hidden !important;}
 .lairPanel[data-lair-panel="team"] .lairPanelHead{display:none!important;}
 .lairPersonThumb img{object-position:center top!important;}
 .lairPortraitInner{place-items:start center!important;padding-top:10px!important;}
-.lairPortraitArt{height:122%!important;object-fit:contain!important;object-position:center top!important;transform:translateY(-2%)!important;}.worldMapClose{position:fixed !important;top:18px !important;right:18px !important;z-index:1320 !important;width:44px !important;height:44px !important;display:grid !important;place-items:center !important;padding:0 !important;font:700 27px/1 Arial,sans-serif !important;}
-.worldMapClose:hover{filter:brightness(1.16) !important;}
-@media (max-width:760px){
-.worldMapScreen{padding:0 !important;align-items:stretch !important;justify-content:flex-start !important;overflow:hidden !important;}
-.worldMapDialog{width:100vw !important;height:100dvh !important;max-height:none !important;padding:0 !important;border:0 !important;border-radius:0 !important;overflow-x:auto !important;overflow-y:hidden !important;display:block !important;-webkit-overflow-scrolling:touch !important;scrollbar-width:thin !important;}
-.worldMapDialog .worldMapCanvas{height:100dvh !important;width:calc(100dvh * 1.775862) !important;min-width:calc(100dvh * 1.775862) !important;max-width:none !important;max-height:none !important;aspect-ratio:1648/928 !important;border:0 !important;border-radius:0 !important;margin:0 !important;}
-.worldMapArtwork{width:100% !important;height:100% !important;object-fit:contain !important;}.worldMapClose{top:10px !important;right:10px !important;width:42px !important;height:42px !important;}
-}
+.lairPortraitArt{height:122%!important;object-fit:contain!important;object-position:center top!important;transform:translateY(-2%)!important;}
+
 body.importedMode .g1ProgressWrap{position:absolute !important;left:50% !important;top:48% !important;bottom:auto !important;width:auto !important;margin:0 !important;transform:translateX(-50%) !important;z-index:30 !important;}
 body.importedMode .g1ProgressRow{display:flex !important;flex-wrap:nowrap !important;align-items:center !important;justify-content:center !important;gap:12px !important;min-height:74px !important;}
 body.importedMode .g1Slot,body.importedMode .g1Slot.empty,body.importedMode .g1Slot.left,body.importedMode .g1Slot.right{flex:0 0 74px !important;width:74px !important;height:74px !important;margin:0 !important;top:auto !important;bottom:auto !important;transform:none !important;position:relative !important;}

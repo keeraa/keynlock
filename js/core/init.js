@@ -275,7 +275,7 @@
   $worldMapScreen?.addEventListener('pointerdown',e=>{
     if(e.target===$worldMapScreen) closeMap(true);
   });
-  $worldMapCanvas?.querySelectorAll('.mapNode').forEach(node=>{
+  $worldMapCanvas?.querySelectorAll('.mapNode:not(.missionNode)').forEach(node=>{
     node.addEventListener('click',()=>travelToMapLocation(node.dataset.location));
   });
   document.querySelectorAll('.lairHotspot').forEach(btn=>{

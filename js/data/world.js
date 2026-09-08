@@ -12,21 +12,21 @@
   });
 
   const missionPlaces=Object.freeze([
-    {mode:'classic',x:28,y:62,district:'old'}, {mode:'sequence',x:38,y:30,district:'old'},
-    {mode:'special',x:34,y:47,district:'old'}, {mode:'hillsfar',x:26,y:28,district:'old'},
-    {mode:'wharf',x:11,y:61,district:'port'}, {mode:'pipeline',x:14,y:40,district:'port'},
-    {mode:'bioshock2',x:17,y:23,district:'port'}, {mode:'mass2',x:76,y:82,district:'port'},
-    {mode:'museum',x:25,y:82,district:'arts'}, {mode:'composite',x:72,y:52,district:'arts'},
-    {mode:'scope',x:56,y:80,district:'arts'}, {mode:'g1',x:44,y:44,district:'arts'},
-    {mode:'drum',x:65,y:72,district:'bohemian'}, {mode:'resonance',x:70,y:28,district:'bohemian'},
-    {mode:'anach',x:50,y:72,district:'bohemian'}, {mode:'tension',x:62,y:33,district:'bohemian'},
-    {mode:'fallout',x:88,y:70,district:'industrial'}, {mode:'masshack',x:96,y:59,district:'industrial'},
-    {mode:'alphaprotocol',x:31,y:17,district:'industrial'}, {mode:'watchmen',x:86,y:34,district:'industrial'},
-    {mode:'skyrim',x:44,y:64,district:'upper'}, {mode:'deduction',x:78,y:38,district:'upper'},
-    {mode:'kingdomcome',x:64,y:16,district:'upper'}, {mode:'thiefds',x:48,y:15,district:'upper'},
-    {mode:'thief12',x:88,y:49,district:'palace'}, {mode:'pathologic',x:40,y:82,district:'palace'},
-    {mode:'oblivion',x:79,y:20,district:'palace'},
-    {mode:'silhouettes',x:56,y:51,district:'arts'}
+    {mode:'classic',x:35,y:48,district:'old',icon:'assets/map/mission-icons/mission_ico_03.png'}, {mode:'sequence',x:43,y:37,district:'old',icon:'assets/map/mission-icons/mission_ico_10.png'},
+    {mode:'special',x:44,y:51,district:'old',icon:'assets/map/mission-icons/mission_ico_16.png'}, {mode:'hillsfar',x:28,y:52,district:'old',icon:'assets/map/mission-icons/mission_ico_11.png'},
+    {mode:'wharf',x:25,y:70,district:'port',icon:'assets/map/mission-icons/mission_ico_08.png'}, {mode:'pipeline',x:56,y:77,district:'port',icon:'assets/map/mission-icons/mission_ico_13.png'},
+    {mode:'bioshock2',x:76,y:80,district:'port',icon:'assets/map/mission-icons/mission_ico_05.png'}, {mode:'mass2',x:40,y:74,district:'port',icon:'assets/map/mission-icons/mission_ico_24.png'},
+    {mode:'museum',x:77,y:44,district:'arts',icon:'assets/map/mission-icons/mission_ico_23.png'}, {mode:'composite',x:67,y:48,district:'arts',icon:'assets/map/mission-icons/mission_ico_25.png'},
+    {mode:'scope',x:82,y:55,district:'arts',icon:'assets/map/mission-icons/mission_ico_26.png'}, {mode:'g1',x:65,y:59,district:'arts',icon:'assets/map/mission-icons/mission_ico_15.png'},
+    {mode:'drum',x:51,y:47,district:'bohemian',icon:'assets/map/mission-icons/mission_ico_20.png'}, {mode:'resonance',x:49,y:29,district:'bohemian',icon:'assets/map/mission-icons/mission_ico_04.png'},
+    {mode:'anach',x:39,y:57,district:'bohemian',icon:'assets/map/mission-icons/mission_ico_22.png'}, {mode:'tension',x:54,y:36,district:'bohemian',icon:'assets/map/mission-icons/mission_ico_28.png'},
+    {mode:'fallout',x:11,y:17,district:'industrial',icon:'assets/map/mission-icons/mission_ico_14.png'}, {mode:'masshack',x:28,y:22,district:'industrial',icon:'assets/map/mission-icons/mission_ico_12.png'},
+    {mode:'alphaprotocol',x:17,y:11,district:'industrial',icon:'assets/map/mission-icons/mission_ico_27.png'}, {mode:'watchmen',x:11,y:29,district:'industrial',icon:'assets/map/mission-icons/mission_ico_35.png'},
+    {mode:'skyrim',x:59,y:31,district:'upper',icon:'assets/map/mission-icons/mission_ico_07.png'}, {mode:'deduction',x:73,y:34,district:'upper',icon:'assets/map/mission-icons/mission_ico_29.png'},
+    {mode:'kingdomcome',x:85,y:26,district:'upper',icon:'assets/map/mission-icons/mission_ico_32.png'}, {mode:'thiefds',x:90,y:32,district:'upper',icon:'assets/map/mission-icons/mission_ico_33.png'},
+    {mode:'thief12',x:66,y:12,district:'palace',icon:'assets/map/mission-icons/mission_ico_18.png'}, {mode:'pathologic',x:56,y:16,district:'palace',icon:'assets/map/mission-icons/mission_ico_06.png'},
+    {mode:'oblivion',x:78,y:17,district:'palace',icon:'assets/map/mission-icons/mission_ico_30.png'},
+    {mode:'silhouettes',x:59,y:54,district:'arts',icon:'assets/map/mission-icons/mission_ico_34.png'}
   ].map(Object.freeze));
 
   window.KeynlockContent=window.KeynlockContent||{};

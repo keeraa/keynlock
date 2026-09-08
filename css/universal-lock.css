@@ -109,9 +109,7 @@ body.importedMode .cpTarget,body.importedMode .cpBuild{padding-inline:6px!import
 body.importedMode .cpBuildCanvas{width:96%!important;}
 body.importedMode .cpParts{justify-content:flex-start!important;overflow-x:auto!important;overflow-y:hidden!important;gap:5px!important;padding-bottom:5px!important;-webkit-overflow-scrolling:touch;}
 body.importedMode .cpPart{min-width:82px!important;}
-.worldMapScreen{padding:calc(var(--mobile-safe-top) + 14px) 10px calc(var(--mobile-safe-bottom) + 14px)!important;gap:10px!important;}
-.worldMapCurrent{font-size:10px!important;text-align:right!important;}
-.worldMapCanvas{min-height:min(56dvh,420px)!important;border-radius:12px!important;}
+
 .worldMapInfo{padding:12px!important;border-radius:11px!important;}
 .worldMapInfoText{font-size:11px!important;line-height:1.35!important;}
 .worldMapAction{min-height:44px!important;}

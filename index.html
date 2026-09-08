@@ -202,43 +202,40 @@
 </section>
 
 <section class="worldMapScreen" id="worldMapScreen" hidden aria-label="Карта города">
-  <button class="worldMapClose uiClose" id="worldMapClose" type="button" aria-label="Закрыть карту">×</button>
+  <div class="screenTopHud mapTopHud"><button class="screenTopHudClose" id="worldMapClose" type="button" aria-label="Закрыть карту">×</button></div>
   <div class="worldMapDialog" role="dialog" aria-modal="true" aria-label="Карта города">
   <div class="worldMapCanvas" id="worldMapCanvas">
-    <div class="worldMapCurrent worldMapCurrentOverlay">Сейчас: <strong id="mapCurrentName">Логово</strong></div>
-    <img class="worldMapArtwork" src="assets/map/city-map.jpg" alt="Карта Кийенока">
-    <svg class="worldMapRoads" viewBox="0 0 900 520" aria-hidden="true">
-      <path class="mapDistrictShape d1" d="M52 345 C112 250 187 230 267 262 C319 282 337 353 294 421 C220 481 115 457 52 345Z"></path>
-      <path class="mapDistrictShape d2" d="M293 193 C352 126 469 112 554 163 C601 193 607 271 558 315 C464 342 356 319 293 193Z"></path>
-      <path class="mapDistrictShape d3" d="M559 82 C649 42 770 64 829 145 C842 216 799 267 719 275 C637 260 588 199 559 82Z"></path>
-      <path class="mapDistrictShape d4" d="M570 323 C658 282 787 309 847 387 C817 464 734 489 632 461 C584 431 565 382 570 323Z"></path>
-
-      <path class="mapRoad active" d="M165 384 C281 338 408 283 552 224"></path>
-      <path class="mapRoad missionRoad" d="M165 384 C238 357 288 330 352 302"></path>
-    </svg>
-
-    <div class="mapWater"></div>
-    <div class="mapWall mapWallA"></div>
-    <div class="mapWall mapWallB"></div>
-
-    <button class="mapNode mapPreviewNode accessible current" type="button" data-location="lair" style="--mx:20%;--my:68%;">
-      <span class="mapMissionPreview"><img src="assets/lair/lair-room-bg-01.jpg" alt="" loading="lazy"></span>
-      <span class="mapNodeLabel">ЛОГОВО</span>
+    <img class="worldMapArtwork" src="assets/map/city-map.jpg" alt="Карта Кийенлока">
+    <button class="mapNode mapIconNode accessible current" type="button" data-location="lair" style="--mx:33%;--my:60%;" aria-label="Логово">
+      <img class="mapMissionIcon" src="assets/map/mission-icons/mission_ico_logovo_01.png" alt="" draggable="false"><span class="mapNodeLabel">Логово</span>
     </button>
 
-    <div class="mapPlayer" id="mapPlayer" style="--mx:20%;--my:68%;" aria-hidden="true">
+    <div class="mapPlayer" id="mapPlayer" style="--mx:33%;--my:60%;" aria-hidden="true">
       <span class="mapPlayerCore"></span>
     </div>
 
-    <div class="worldMapInfo worldMapInfoOverlay">
-      <div>
-        <div class="worldMapInfoTitle" id="mapInfoTitle">Логово</div>
-        <div class="worldMapInfoText" id="mapInfoText">Точка старта. Здесь находится база команды.</div>
-      </div>
-      <button class="worldMapAction" id="mapLocationAction" type="button" hidden>Войти</button>
+  </div>
+  </div>
+  <nav class="mapPanControls" id="mapPanControls" aria-label="Переместить карту" hidden>
+    <button class="uiButton" type="button" data-map-pan="left" aria-label="Карта левее" title="Карта левее">←</button>
+    <button class="uiButton" type="button" data-map-pan="up" aria-label="Карта выше" title="Карта выше">↑</button>
+    <button class="uiButton" type="button" data-map-pan="down" aria-label="Карта ниже" title="Карта ниже">↓</button>
+    <button class="uiButton" type="button" data-map-pan="right" aria-label="Карта правее" title="Карта правее">→</button>
+  </nav>
+  <aside class="mapMissionCard uiPanel" id="mapMissionCard" aria-labelledby="mapInfoTitle" hidden>
+    <button class="mapCardClose uiButton" id="mapCardClose" type="button" aria-label="Закрыть описание миссии">×</button>
+    <img class="mapCardArtwork" id="mapCardArtwork" alt="">
+    <div class="mapCardBody">
+      <p class="mapCardDistrict" id="mapCardDistrict"></p>
+      <h2 class="worldMapInfoTitle" id="mapInfoTitle"></h2>
+      <p class="worldMapInfoText" id="mapInfoText"></p>
+      <figure class="mapPuzzlePreview"><img id="mapPuzzlePreview" alt="" loading="lazy"><figcaption>Головоломка</figcaption></figure>
+      <div class="mapCardLoot lootResources" id="mapCardLoot" aria-label="Возможная добыча"></div>
+      <p class="mapCardReward" id="mapCardReward"></p>
+      <p class="mapCardStatus" id="mapCardStatus" role="status"></p>
+      <button class="uiButton uiButton--primary" id="mapLocationAction" type="button">Начать взлом</button>
     </div>
-  </div>
-  </div>
+  </aside>
 </section>
 
 <section class="lairOverlay" id="lairOverlay" hidden aria-label="Логово">

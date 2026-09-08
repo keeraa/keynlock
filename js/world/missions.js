@@ -1,8 +1,5 @@
-  // ===== MAP MISSIONS =====
-  // One node per lock game, difficulty as a chapter: chapter 1 plays every place
-  // at difficulty 1, chapter 2 replays the same places at 2, and so on. Keeping
-  // the map to one node per game is what makes 18 games x 3 difficulties fit on
-  // a single drawing at all.
+  // One medallion per mission. Artwork coordinates and icons live in world.js;
+  // difficulty and completion stay shared with the order progression.
 
   // Open everything while the game is being built. Flip this off to let the
   // chapter gate below decide.
@@ -15,7 +12,7 @@
 
   function missionNodeId(mode) { return `mission-${mode}`; }
   function missionRunId(mode, tier) { return `${mode}-${tier}`; }
-  function missionLabel(place) { return GameCatalog.get(place.mode)?.title || place.mode; }
+  function missionLabel(place) { return window.KeynlockContent.chapterStory?.orders?.[`${place.mode}-1`]?.title || GameCatalog.get(place.mode)?.title || place.mode; }
   function gameSupportsTier(mode,tier){ return GameCatalog.get(mode)?.difficulty.levels.includes(tier)??false; }
 
   function preloadMapMission(mode,tier=mapChapter){
@@ -67,17 +64,6 @@
     return MISSIONS_UNLOCK_ALL || tier === 1 || chapterCleared(tier - 1);
   }
   function missionUnlocked() { return MISSIONS_UNLOCK_ALL || chapterUnlocked(mapChapter); }
-
-  function setMapChapter(tier) {
-    if (!MISSION_TIERS.includes(tier) || !chapterUnlocked(tier)) {
-      if (!chapterUnlocked(tier)) toast('Эта глава ещё закрыта');
-      return;
-    }
-    mapChapter = tier;
-    STORE.setItem(CHAPTER_STORAGE_KEY, String(tier));
-    renderMissionNodes();
-    renderWorldMap();
-  }
 
   // Register every place as a map location so travel, the player dot and the
   // info panel all keep working unchanged.
@@ -160,124 +146,168 @@
     if(activeMissionRun && activeMissionRun.roundId !== roundId) activeMissionRun=null;
   };
 
+  let selectedMapMission=null;
+
   function renderMissionNodes() {
     const canvas = document.querySelector('#worldMapCanvas');
     if (!canvas) return;
-    canvas.querySelectorAll('.mapNode.missionNode').forEach(n => n.remove());
-    const player = canvas.querySelector('#mapPlayer');
-
+    canvas.querySelectorAll('.missionNode').forEach(n => n.remove());
+    const fragment=document.createDocumentFragment();
     for (const place of MISSION_PLACES) {
-      const id = missionNodeId(place.mode);
-      const supported=gameSupportsTier(place.mode,mapChapter);
-      const missingPicks=missionRequiresPicks(place.mode)&&!playerHasPicks();
-      const open = missionUnlocked()&&supported&&!missingPicks;
-      const node = document.createElement('button');
-      node.type = 'button';
-      node.className = 'mapNode mapPreviewNode missionNode mission ' + (open ? 'accessible' : 'locked');
-      const district=DISTRICTS[place.district];
-      node.classList.add(`district-${place.district}`);
-      node.classList.toggle('no-picks',missingPicks);
-      node.style.setProperty('--district-color',district.hex);
-      node.dataset.location = id;
-      node.disabled=!open;
-      node.setAttribute('aria-disabled', open?'false':'true');
-      node.style.setProperty('--mx', `${place.x}%`);
-      node.style.setProperty('--my', `${place.y}%`);
+      const id=missionNodeId(place.mode);
+      const open=missionUnlocked()&&gameSupportsTier(place.mode,mapChapter);
+      const node=document.createElement('button');
+      node.type='button';
+      node.className='mapNode mapIconNode missionNode';
+      node.classList.toggle('locked',!open);
+      node.classList.toggle('no-picks',missionRequiresPicks(place.mode)&&!playerHasPicks());
+      node.classList.toggle('selected',id===selectedMapMission);
+      node.dataset.location=id;
+      node.setAttribute('aria-label',missionLabel(place));
+      node.setAttribute('aria-expanded',String(id===selectedMapMission));
+      node.setAttribute('aria-controls','mapMissionCard');
+      node.style.setProperty('--mx',`${place.x}%`);
+      node.style.setProperty('--my',`${place.y}%`);
+      const icon=document.createElement('img');
+      icon.className='mapMissionIcon';
+      icon.src=place.icon;
+      icon.alt='';
+      icon.draggable=false;
+      const label=document.createElement('span');
+      label.className='mapNodeLabel';
+      label.textContent=missionLabel(place);
+      const tiers=document.createElement('span');
+      tiers.className='mapNodeTiers';
+      for(const tier of MISSION_TIERS){
+        const pip=document.createElement('i');
+        const supported=gameSupportsTier(place.mode,tier),done=missionCleared(place.mode,tier);
+        pip.className='mapTierPip'+(!supported?' unsupported':done?' done':'')+(supported&&tier===mapChapter?' current':'');
+        pip.textContent=supported&&done?'✓':'';
+        pip.title=`Уровень ${tier}${!supported?' · ещё не готов':done?' · пройден':''}`;
+        pip.setAttribute('aria-label',pip.title);
+        tiers.append(pip);
+      }
+      node.append(icon,label,tiers);
+      fragment.append(node);
+    }
+    canvas.append(fragment);
+    if(mapOpen)renderWorldMap();
+  }
 
-      const preview=document.createElement('span');
-      preview.className='mapMissionPreview';
-      const previewImage=document.createElement('img');
-      previewImage.src=place.mode==='silhouettes'?'assets/map/mechanics/silhouettes.svg':`assets/map/mechanics/${place.mode}.png`;
-      previewImage.addEventListener('error',()=>{
-        previewImage.src=GameCatalog.get(place.mode).location;
-      },{once:true});
-      previewImage.alt='';
-      previewImage.loading='lazy';
-      const readiness=document.createElement('span');
-      readiness.className='mapMissionReadiness';
-      readiness.textContent=String(GameCatalog.get(place.mode).readiness);
-      readiness.title='Готовность игры';
-      preview.append(previewImage,readiness);
-      if(missingPicks){
-        const unavailable=document.createElement('span');
-        unavailable.className='mapMissionUnavailable';
-        unavailable.textContent='Нет отмычек';
-        preview.appendChild(unavailable);
-        node.title='Для этой головоломки нужна отмычка. Вернись в логово и подготовь новые.';
-      }
-      const label = document.createElement('span');
-      label.className = 'mapNodeLabel';
-      label.textContent = missionLabel(place).toLocaleUpperCase('ru-RU');
-      const districtLabel=document.createElement('span');
-      districtLabel.className='mapMissionDistrict';
-      districtLabel.textContent=district.name;
-      const tiers = document.createElement('span');
-      tiers.className = 'mapNodeTiers';
-      for (const tier of MISSION_TIERS) {
-        const pip = document.createElement('i');
-        const tierSupported=gameSupportsTier(place.mode,tier);
-        pip.className = 'mapTierPip' + (!tierSupported?' unsupported':missionCleared(place.mode,tier) ? ' done' : '')
-          + (tierSupported&&tier === mapChapter ? ' current' : '');
-        pip.textContent=tierSupported&&missionCleared(place.mode,tier)?'✓':'';
-        pip.setAttribute('aria-label',`Уровень ${tier}${missionCleared(place.mode,tier)?' пройден':''}`);
-        pip.title=tierSupported?`Уровень ${tier}${missionCleared(place.mode,tier)?' · пройден':''}`:`Уровень ${tier} не готов`;
-        tiers.appendChild(pip);
-      }
-      preview.appendChild(tiers);
-      node.append(preview,label,districtLabel);
-      canvas.insertBefore(node, player || null);
+  function selectMapMission(id){
+    selectedMapMission=id;
+    renderWorldMap();
+    if(id){
+      const node=document.querySelector(`.missionNode[data-location="${id}"]`);
+      node?.scrollIntoView({block:'nearest',inline:'nearest'});
+      document.querySelector('#mapMissionCard').scrollTop=0;
     }
   }
 
-  function renderChapterPicker() {
-    const canvas = document.querySelector('#worldMapCanvas');
-    if (!canvas || canvas.querySelector('.mapChapterPicker')) return;
-    const box = document.createElement('div');
-    box.className = 'mapChapterPicker';
-    const caption = document.createElement('span');
-    caption.className = 'mapChapterCaption';
-    caption.textContent = 'Глава';
-    box.appendChild(caption);
-    for (const tier of MISSION_TIERS) {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'mapChapterBtn';
-      btn.dataset.chapter = String(tier);
-      btn.textContent = String(tier);
-      btn.addEventListener('click', () => setMapChapter(tier));
-      box.appendChild(btn);
+  function renderMapLoot(loc,bonus){
+    const table=window.KeynlockContent.economy.lockLoot[mapChapter];
+    const range=([min,max])=>min===max?String(min):`${min}–${max}`;
+    const owned=window.KeynlockPaintingRewards.ownedIds();
+    const available=window.KeynlockRestoration.paintings.some(p=>p.district===loc.district&&!owned.includes(p.id));
+    const firstClear=!missionCleared(loc.mode,mapChapter);
+    const paintingChance=available?(firstClear?100:Math.round(table.paintingChance*100)):0;
+    const maxCoins=Math.round(125*table.coinMultiplier)+bonus;
+    const root=document.querySelector('#mapCardLoot');
+    root.replaceChildren();
+    function block(image,value,label,tip){
+      const item=document.createElement('div');
+      item.className='lootRow mapLootItem';item.tabIndex=0;
+      item.dataset.tip=tip;item.title=tip;item.setAttribute('aria-label',`${label}: ${value}. ${tip}`);
+      const icon=document.createElement('img');icon.className='lootResourceIcon';icon.src=image;icon.alt='';
+      const copy=document.createElement('span'),amount=document.createElement('b'),caption=document.createElement('small');
+      amount.textContent=value;caption.textContent=label;copy.append(amount,caption);item.append(icon,copy);root.append(item);
     }
-    canvas.appendChild(box);
+    block('assets/ui/money-ico.png',`до ${maxCoins}`,'Монеты',`Сумма зависит от числа действий. Максимум включает 25 монет за взлом без поломок с множителем уровня.${bonus?` Премия за первое прохождение: ${bonus} монет.`:''}`);
+    block('assets/ui/details-ico.png',range(table.parts),'Детали','Из двух деталей можно создать одну отмычку.');
+    block('assets/ui/portrait-ico.png',`${paintingChance}%`,'Картина',!available?'Все картины этого района уже найдены.':firstClear?'При первом прохождении гарантирована новая картина из этого района.':'Шанс найти новую картину при повторном прохождении.');
+    const colors=document.createElement('div');colors.className='mapLootColors';
+    const caption=document.createElement('span');caption.textContent=`Компоненты: ${range(table.components)} · случайный цвет`;
+    const palette=document.createElement('span');palette.className='mapLootPalette';
+    for(const color of window.KeynlockContent.economy.components){
+      const dot=document.createElement('i');dot.className='lootColor';dot.style.setProperty('--loot-color',color.color);
+      dot.tabIndex=0;dot.title=`${color.name} компонент`;dot.dataset.tip=dot.title;dot.setAttribute('aria-label',dot.title);palette.append(dot);
+    }
+    colors.append(caption,palette);root.append(colors);
   }
 
-  function syncChapterPicker() {
-    document.querySelectorAll('.mapChapterBtn').forEach(btn => {
-      const tier = Number(btn.dataset.chapter);
-      btn.classList.toggle('active', tier === mapChapter);
-      btn.classList.toggle('locked', !chapterUnlocked(tier));
+  function syncMapPanControls(){
+    const viewport=document.querySelector('.worldMapDialog');
+    const controls=document.querySelector('#mapPanControls');
+    if(!viewport||!controls)return;
+    const maxX=viewport.scrollWidth-viewport.clientWidth,maxY=viewport.scrollHeight-viewport.clientHeight;
+    controls.hidden=!mapOpen||(maxX<2&&maxY<2);
+    const blocked={left:viewport.scrollLeft<2,right:viewport.scrollLeft>=maxX-2,up:viewport.scrollTop<2,down:viewport.scrollTop>=maxY-2};
+    controls.querySelectorAll('[data-map-pan]').forEach(button=>{
+      const horizontal=['left','right'].includes(button.dataset.mapPan);
+      button.hidden=horizontal?maxX<2:maxY<2;
+      button.disabled=blocked[button.dataset.mapPan];
     });
   }
+  document.querySelector('#mapPanControls')?.addEventListener('click',event=>{
+    const direction=event.target.closest('[data-map-pan]')?.dataset.mapPan;
+    if(!direction)return;
+    const viewport=document.querySelector('.worldMapDialog');
+    viewport.scrollBy({left:({left:-1,right:1}[direction]||0)*viewport.clientWidth*.6,top:({up:-1,down:1}[direction]||0)*viewport.clientHeight*.6});
+    syncMapPanControls();
+  });
+  document.querySelector('.worldMapDialog')?.addEventListener('scroll',syncMapPanControls,{passive:true});
+  window.addEventListener('resize',syncMapPanControls);
 
-  // Nodes are built after init.js binds its handlers, so the map delegates.
-  document.querySelector('#worldMapCanvas')?.addEventListener('click', e => {
-    const node = e.target.closest?.('.mapNode.missionNode');
-    if (node) travelToMapLocation(node.dataset.location);
+  document.querySelector('#worldMapCanvas')?.addEventListener('click',event=>{
+    const node=event.target.closest?.('.missionNode');
+    if(node)selectMapMission(node.dataset.location);
+    else if(!event.target.closest?.('.mapNode'))selectMapMission(null);
+  });
+  document.querySelector('#mapCardClose')?.addEventListener('click',()=>{
+    const id=selectedMapMission;
+    selectMapMission(null);
+    document.querySelector(`.missionNode[data-location="${id}"]`)?.focus();
+  });
+  document.querySelector('#mapLocationAction')?.addEventListener('click',()=>{
+    if(selectedMapMission)startMapMission(selectedMapMission);
   });
 
-  const baseRenderWorldMap = renderWorldMap;
-  renderWorldMap = function () {
+  const baseRenderWorldMap=renderWorldMap;
+  renderWorldMap=function(){
     baseRenderWorldMap();
-    const loc = MAP_LOCATIONS[mapLocation];
-    if (loc?.action === 'mission' && $mapInfoText) {
-      const supported=gameSupportsTier(loc.mode,mapChapter);
-      const cleared = missionCleared(loc.mode, mapChapter);
-      const description=GameCatalog.get(loc.mode)?.description;
-      const district=DISTRICTS[loc.district];
-      $mapInfoText.textContent = supported?`${district?.name||'Район'} · ${description||'Головоломка с замком.'} Сложность ${mapChapter}. `
-        + (cleared ? 'Уже пройден в этой главе. ' : '')
-        + 'Нажми на точку ещё раз, чтобы начать.':`Уровень ${mapChapter} для этой игры ещё не готов.`;
-    }
-    syncChapterPicker();
+    const card=document.querySelector('#mapMissionCard');
+    const loc=MAP_LOCATIONS[selectedMapMission];
+    card.hidden=!loc;
+    $worldMapScreen.classList.toggle('has-mission',!!loc);
+    syncMapPanControls();
+    document.querySelectorAll('.missionNode').forEach(node=>{
+      const selected=node.dataset.location===selectedMapMission;
+      const name=missionLabel(MAP_LOCATIONS[node.dataset.location]);
+      node.querySelector('.mapNodeLabel').textContent=name;
+      node.setAttribute('aria-label',name);
+      node.classList.toggle('selected',selected);
+      node.setAttribute('aria-expanded',String(selected));
+    });
+    if(!loc)return;
+    const game=GameCatalog.get(loc.mode);
+    const supported=gameSupportsTier(loc.mode,mapChapter);
+    const missingPicks=missionRequiresPicks(loc.mode)&&!playerHasPicks();
+    const rewardId=missionRunId(loc.mode,mapChapter);
+    const bonus=window.KeynlockRewardPolicy.firstClearBonus(rewardId,STORE.getJSON('keynlockFirstClearBonuses',STORE.getJSON('lockpickMissions',{})));
+    const artwork=document.querySelector('#mapCardArtwork');
+    if(artwork.getAttribute('src')!==game.location)artwork.src=game.location;
+    document.querySelector('#mapCardDistrict').textContent=`${DISTRICTS[loc.district].name} · Уровень ${mapChapter}`;
+    $mapInfoTitle.textContent=missionLabel(loc);
+    $mapInfoText.textContent=game.description;
+    const preview=document.querySelector('#mapPuzzlePreview');
+    const previewSource=`assets/map/mechanics/${loc.mode}.${loc.mode==='silhouettes'?'svg':'png'}`;
+    if(preview.getAttribute('src')!==previewSource)preview.src=previewSource;
+    preview.alt=`Превью головоломки «${game.title}»`;
+    renderMapLoot(loc,bonus);
+    document.querySelector('#mapCardReward').textContent=window.KeynlockCollection?.handleRewardHint(rewardId,mapChapter)||'';
+    document.querySelector('#mapCardStatus').textContent=!supported?'Этот уровень ещё не готов.':!missionUnlocked()?'Этот уровень пока закрыт.':missingPicks?'Нужна отмычка. Подготовь её на верстаке в логове.':missionCleared(loc.mode,mapChapter)?'✓ Уровень пройден. Можно сыграть снова.':missionRequiresPicks(loc.mode)?'Для взлома нужна отмычка.':'Отмычка не требуется.';
+    $mapLocationAction.hidden=false;
+    $mapLocationAction.disabled=!supported||!missionUnlocked()||missingPicks;
   };
 
   // Banking a mission happens on the solve, which every game funnels through.
@@ -295,7 +325,6 @@
     mapLocation = savedLocation;
   }
 
-  renderChapterPicker();
   renderMissionNodes();
   window.addEventListener('keynlock-game-catalog-change',event=>{
     if(event.detail?.path==='readiness'||event.detail?.path==='reset')renderMissionNodes();

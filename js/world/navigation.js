@@ -3,7 +3,6 @@
     const loc=MAP_LOCATIONS[mapLocation]||MAP_LOCATIONS.lair;
     $mapPlayer.style.setProperty('--mx',`${loc.x}%`);
     $mapPlayer.style.setProperty('--my',`${loc.y}%`);
-    $mapCurrentName.textContent=loc.name;
     $mapInfoTitle.textContent=loc.name;
     $mapInfoText.textContent=loc.text
       + (loc.action==='mission'?' Нажми на точку ещё раз, чтобы начать.':'');
@@ -23,7 +22,7 @@
     document.body.classList.add('map-open');
     $worldMapScreen.hidden=false;
     $mapTab?.classList.add('active');
-    renderWorldMap();
+    selectMapMission(null);
   }
 
   let mapTravelId=0;

@@ -403,16 +403,29 @@
       };
     }
 
-    // --- the city map ---
-    const canvas = document.querySelector('#worldMapCanvas');
-    if(canvas){
-      const mapRange = () => {
-        const shown = canvas.parentElement ? canvas.parentElement.clientWidth : 0;
-        return Math.max(0, (canvas.clientWidth - shown) / 2);
+    // Native scrolling clamps touch panning to the artwork edges. Mouse drag
+    // uses the same scroll offsets, so it cannot reveal empty side bands.
+    const mapViewport=document.querySelector('.worldMapDialog');
+    if(mapViewport){
+      let drag=null;
+      mapViewport.addEventListener('pointerdown',event=>{
+        if(event.pointerType!=='mouse'||event.button!==0||event.target.closest('button'))return;
+        drag={id:event.pointerId,x:event.clientX,y:event.clientY,left:mapViewport.scrollLeft,top:mapViewport.scrollTop,moved:false};
+      });
+      mapViewport.addEventListener('pointermove',event=>{
+        if(!drag||drag.id!==event.pointerId)return;
+        const dx=event.clientX-drag.x,dy=event.clientY-drag.y;
+        if(!drag.moved&&Math.hypot(dx,dy)<DRAG_SLOP)return;
+        drag.moved=true;event.preventDefault();mapViewport.setPointerCapture(event.pointerId);
+        mapViewport.classList.add('is-panning');
+        mapViewport.scrollLeft=drag.left-dx;mapViewport.scrollTop=drag.top-dy;
+      });
+      const endPan=event=>{
+        if(!drag||drag.id!==event.pointerId)return;
+        drag=null;mapViewport.classList.remove('is-panning');
+        if(mapViewport.hasPointerCapture(event.pointerId))mapViewport.releasePointerCapture(event.pointerId);
       };
-      enablePan(canvas, v => {
-        canvas.style.transform = `translateX(${v.toFixed(0)}px)`;
-      }, mapRange);
+      ['pointerup','pointercancel','lostpointercapture'].forEach(type=>mapViewport.addEventListener(type,endPan));
     }
   })();
 

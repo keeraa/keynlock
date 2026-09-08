@@ -298,7 +298,12 @@
     if(artwork.getAttribute('src')!==game.location)artwork.src=game.location;
     document.querySelector('#mapCardDistrict').textContent=`${DISTRICTS[loc.district].name} · Уровень ${mapChapter}`;
     $mapInfoTitle.textContent=missionLabel(loc);
-    $mapInfoText.textContent=game.description;
+    const narrative=window.KeynlockContent.chapterStory?.orders?.[rewardId];
+    const description=game.description||'Открой механизм, используя подсказки на замке.';
+    $mapInfoText.textContent=narrative?.brief||description;
+    const mechanic=document.querySelector('#mapCardMechanic');
+    mechanic.hidden=!narrative?.brief;
+    mechanic.textContent=narrative?.brief?description:'';
     const preview=document.querySelector('#mapPuzzlePreview');
     const previewSource=`assets/map/mechanics/${loc.mode}.${loc.mode==='silhouettes'?'svg':'png'}`;
     if(preview.getAttribute('src')!==previewSource)preview.src=previewSource;

@@ -139,3 +139,5 @@
 .mapPanControls .uiButton:disabled{opacity:.65;}
 .mapPanControls .uiButton[hidden]{display:none;}
 @media(max-width:760px){.has-mission .mapPanControls{left:50%;bottom:calc(58dvh + 10px);}}
+
+.mapCardMechanic{margin:12px 0;color:var(--color-text-muted);font:13px/1.5 var(--ui-font);}

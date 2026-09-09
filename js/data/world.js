@@ -13,19 +13,19 @@
 
   const missionPlaces=Object.freeze([
     {mode:'classic',x:35,y:48,district:'old',icon:'assets/map/mission-icons/mission_ico_03.png'}, {mode:'sequence',x:43,y:37,district:'old',icon:'assets/map/mission-icons/mission_ico_10.png'},
-    {mode:'special',x:44,y:51,district:'old',icon:'assets/map/mission-icons/mission_ico_16.png'}, {mode:'hillsfar',x:28,y:52,district:'old',icon:'assets/map/mission-icons/mission_ico_11.png'},
+    {mode:'special',x:44,y:51,district:'old',icon:'assets/map/mission-icons/mission_ico_16.png'}, {mode:'keyprofile',x:28,y:52,district:'old',icon:'assets/map/mission-icons/mission_ico_11.png'},
     {mode:'wharf',x:25,y:70,district:'port',icon:'assets/map/mission-icons/mission_ico_08.png'}, {mode:'pipeline',x:56,y:77,district:'port',icon:'assets/map/mission-icons/mission_ico_13.png'},
-    {mode:'bioshock2',x:76,y:80,district:'port',icon:'assets/map/mission-icons/mission_ico_05.png'}, {mode:'mass2',x:40,y:74,district:'port',icon:'assets/map/mission-icons/mission_ico_24.png'},
+    {mode:'timingneedle',x:76,y:80,district:'port',icon:'assets/map/mission-icons/mission_ico_05.png'}, {mode:'pairednodes',x:40,y:74,district:'port',icon:'assets/map/mission-icons/mission_ico_24.png'},
     {mode:'museum',x:77,y:44,district:'arts',icon:'assets/map/mission-icons/mission_ico_23.png'}, {mode:'composite',x:67,y:48,district:'arts',icon:'assets/map/mission-icons/mission_ico_25.png'},
-    {mode:'scope',x:82,y:55,district:'arts',icon:'assets/map/mission-icons/mission_ico_26.png'}, {mode:'g1',x:65,y:59,district:'arts',icon:'assets/map/mission-icons/mission_ico_15.png'},
+    {mode:'scope',x:82,y:55,district:'arts',icon:'assets/map/mission-icons/mission_ico_26.png'}, {mode:'turnmemory',x:65,y:59,district:'arts',icon:'assets/map/mission-icons/mission_ico_15.png'},
     {mode:'drum',x:51,y:47,district:'bohemian',icon:'assets/map/mission-icons/mission_ico_20.png'}, {mode:'resonance',x:49,y:29,district:'bohemian',icon:'assets/map/mission-icons/mission_ico_04.png'},
-    {mode:'anach',x:39,y:57,district:'bohemian',icon:'assets/map/mission-icons/mission_ico_22.png'}, {mode:'tension',x:54,y:36,district:'bohemian',icon:'assets/map/mission-icons/mission_ico_28.png'},
-    {mode:'fallout',x:11,y:17,district:'industrial',icon:'assets/map/mission-icons/mission_ico_14.png'}, {mode:'masshack',x:28,y:22,district:'industrial',icon:'assets/map/mission-icons/mission_ico_12.png'},
-    {mode:'alphaprotocol',x:17,y:11,district:'industrial',icon:'assets/map/mission-icons/mission_ico_27.png'}, {mode:'watchmen',x:11,y:29,district:'industrial',icon:'assets/map/mission-icons/mission_ico_35.png'},
-    {mode:'skyrim',x:59,y:31,district:'upper',icon:'assets/map/mission-icons/mission_ico_07.png'}, {mode:'deduction',x:73,y:34,district:'upper',icon:'assets/map/mission-icons/mission_ico_29.png'},
-    {mode:'kingdomcome',x:85,y:26,district:'upper',icon:'assets/map/mission-icons/mission_ico_32.png'}, {mode:'thiefds',x:90,y:32,district:'upper',icon:'assets/map/mission-icons/mission_ico_33.png'},
-    {mode:'thief12',x:66,y:12,district:'palace',icon:'assets/map/mission-icons/mission_ico_18.png'}, {mode:'pathologic',x:56,y:16,district:'palace',icon:'assets/map/mission-icons/mission_ico_06.png'},
-    {mode:'oblivion',x:78,y:17,district:'palace',icon:'assets/map/mission-icons/mission_ico_30.png'},
+    {mode:'signalbalance',x:39,y:57,district:'bohemian',icon:'assets/map/mission-icons/mission_ico_22.png'}, {mode:'tension',x:54,y:36,district:'bohemian',icon:'assets/map/mission-icons/mission_ico_28.png'},
+    {mode:'torqueangle',x:11,y:17,district:'industrial',icon:'assets/map/mission-icons/mission_ico_14.png'}, {mode:'ringpassage',x:28,y:22,district:'industrial',icon:'assets/map/mission-icons/mission_ico_12.png'},
+    {mode:'symbolpins',x:17,y:11,district:'industrial',icon:'assets/map/mission-icons/mission_ico_27.png'}, {mode:'springtumblers',x:11,y:29,district:'industrial',icon:'assets/map/mission-icons/mission_ico_35.png'},
+    {mode:'workingangle',x:59,y:31,district:'upper',icon:'assets/map/mission-icons/mission_ico_07.png'}, {mode:'deduction',x:73,y:34,district:'upper',icon:'assets/map/mission-icons/mission_ico_29.png'},
+    {mode:'cylinderpath',x:85,y:26,district:'upper',icon:'assets/map/mission-icons/mission_ico_32.png'}, {mode:'ringsecret',x:90,y:32,district:'upper',icon:'assets/map/mission-icons/mission_ico_33.png'},
+    {mode:'soundlatch',x:66,y:12,district:'palace',icon:'assets/map/mission-icons/mission_ico_18.png'}, {mode:'twinbalance',x:56,y:16,district:'palace',icon:'assets/map/mission-icons/mission_ico_06.png'},
+    {mode:'pinflight',x:78,y:17,district:'palace',icon:'assets/map/mission-icons/mission_ico_30.png'},
     {mode:'silhouettes',x:59,y:54,district:'arts',icon:'assets/map/mission-icons/mission_ico_34.png'}
   ].map(Object.freeze));
 
@@ -34,6 +34,7 @@
     districts,
     missionPlaces,
     missionTiers:Object.freeze([1,2,3]),
-    missionsUnlockedForTesting:true
+    // The city map is a free-play catalogue; the journal owns story order.
+    missionAccess:'free'
   });
 })();

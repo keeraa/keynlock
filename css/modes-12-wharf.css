@@ -1,4 +1,4 @@
-/* Risen 2 — верфь (wharf) — a row of bolts raised in a hidden,
+/* wharf — верфь (wharf) — a row of bolts raised in a hidden,
    spatially clustered order. The native port is isolated in the .wf*
    namespace so it cannot collide with other puzzle mechanics. */
 .wfMode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:16px;background:rgba(17,13,9,.985);overflow:auto;}

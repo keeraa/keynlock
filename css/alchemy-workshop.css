@@ -40,10 +40,6 @@
   transform: none !important;
 }
 /* --- the window is the frame --- */
-#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) {
-  display: flex;
-  flex-direction: column;
-}
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active)
   .lairModuleBody {
   display: flex;
@@ -53,12 +49,6 @@
   overflow: hidden;
 }
 
-#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) {
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-  background: none;
-}
 
 .alchemyFullBlur {
   position: absolute;
@@ -70,10 +60,6 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   transition: opacity 0.18s ease;
-}
-body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
-  .alchemyFullBlur {
-  opacity: 1;
 }
 /* The room remains visible as the backdrop, but it must not remain an input
    surface behind the alchemy station. In particular the invisible workbench
@@ -1011,10 +997,6 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
 
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active) {
   overflow: visible !important;
-}
-#lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active)
-  .lairModuleHeader {
-  display: none !important;
 }
 #lairModuleWindow:has(.lairPanel[data-lair-panel="alchemy"].active)
   .lairModuleBody {

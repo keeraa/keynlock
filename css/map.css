@@ -78,7 +78,7 @@
 .lairPortraitArt{display:block;width:auto;max-width:none;filter:drop-shadow(0 10px 18px rgba(0,0,0,.32));}
 .lairPersonThumb{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:50%;border:1px solid #695437;background:#120f0c;font:16px/1 Georgia,serif;overflow:hidden;position:relative;}
 .lairPersonThumb img{position:absolute;left:50%;bottom:-3px;width:auto;height:120%;transform:translateX(-50%);object-fit:contain;}
-.lairOverlay{--lair-bg:url("../assets/lair/lair-room-bg-01.jpg");padding:0!important;background:linear-gradient(rgba(6,5,4,.12),rgba(6,5,4,.24)),
+.lairOverlay{--lair-bg:url("../assets/lair/room/logovo_bg.png");padding:0!important;background:linear-gradient(rgba(6,5,4,.12),rgba(6,5,4,.24)),
     var(--lair-bg, none) center center/cover no-repeat!important;overflow:hidden;}
 
 /* Mission medallions and their details share the game's controls and tokens. */
@@ -100,13 +100,15 @@
 .worldMapScreen.has-mission .worldMapDialog{width:calc(100% - var(--map-sidebar));}
 .mapMissionCard{position:absolute;right:12px;top:12px;width:356px;max-height:calc(100dvh - 24px);overflow:auto;z-index:30;box-shadow:var(--shadow-dialog);background:var(--surface-panel);border-radius:var(--radius-panel);}
 .mapMissionCard[hidden]{display:none;}
-.mapCardClose{position:absolute;right:10px;top:10px;width:36px;height:36px;padding:0;display:grid;place-items:center;font-size:24px;background:var(--color-surface);z-index:1;}
-.mapCardArtwork{display:block;width:100%;height:150px;object-fit:cover;}
+.mapCardClose{position:absolute;right:10px;top:10px;width:36px;height:36px;padding:0;display:grid;place-items:center;font-size:24px;background:var(--color-surface);z-index:2;}
+.mapCardHeader{position:relative;display:grid;align-items:end;min-height:210px;isolation:isolate;overflow:hidden;}
+.mapCardArtwork{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;z-index:-2;}
+.mapCardHeader::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(transparent 20%,rgba(12,9,6,.45) 50%,rgba(12,9,6,.92));pointer-events:none;}
+.mapCardHeading{padding:64px 20px 20px;text-shadow:0 2px 5px rgba(0,0,0,.7);}
 .mapCardBody{padding:20px;}
 .mapCardDistrict{margin:0 0 8px;color:var(--color-gold-soft);font-size:12px;}
 .mapMissionCard .worldMapInfoTitle{margin:0;color:var(--color-text-strong);font:32px/1.05 var(--title-font);}
 .mapMissionCard .worldMapInfoText{margin:15px 0;font:14px/1.5 var(--ui-font);color:var(--color-text);}
-.mapCardReward{padding-top:14px;border-top:1px solid var(--color-border-soft);font-size:12px;line-height:1.5;color:var(--color-gold-pale);}
 .mapCardStatus{font-size:12px;line-height:1.4;color:var(--color-text-muted);}
 #mapLocationAction{width:100%;margin-top:8px;}
 @media(max-width:760px){
@@ -114,23 +116,28 @@
   .mapMissionIcon{height:54px;}
   .worldMapScreen.has-mission .worldMapDialog{width:100%;height:42dvh;}
   .mapMissionCard{top:calc(42dvh + 8px);bottom:8px;right:8px;width:calc(100% - 16px);max-height:none;}
-  .mapCardArtwork{height:100px;}
+  .mapCardHeader{min-height:180px;}
+  .mapCardHeading{padding:56px 14px 14px;}
   .mapCardBody{padding:14px;}
 }
 @media(prefers-reduced-motion:reduce){.mapMissionIcon,.mapPlayer,#worldMapCanvas .mapNodeLabel{transition:none;}}
 
-.mapPuzzlePreview{position:relative;margin:16px 0;overflow:hidden;border:1px solid var(--color-border-soft);border-radius:var(--radius-control);background:var(--color-surface-deep);}
-.mapPuzzlePreview img{display:block;width:100%;height:150px;object-fit:contain;}
-.mapPuzzlePreview figcaption{padding:6px 10px;color:var(--color-text-muted);font-size:11px;}
-.mapCardLoot.lootResources{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
-.mapCardLoot.lootResources .mapLootItem{justify-content:flex-start;padding:10px;gap:8px;min-width:0;}
+.mapPuzzlePreview{position:relative;margin:16px 0;aspect-ratio:16/9;overflow:hidden;border-radius:var(--radius-control);}
+/* Keep the central 60% of each screenshot, cropping 20% from every edge. */
+.mapPuzzlePreview img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;transform:scale(1.666667);}
+.mapCardLoot.lootResources{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+.mapCardLoot.lootResources .mapLootItem{flex-direction:column;justify-content:center;padding:12px 4px;gap:8px;min-width:0;}
 .mapCardLoot .mapLootItem b{display:block;font:700 18px/1.2 var(--ui-font);white-space:nowrap;}
-.mapCardLoot .mapLootItem small{display:block;margin-top:4px;font:11px/1.2 var(--ui-font);color:var(--color-text-muted);}
 .mapCardLoot.lootResources .lootResourceIcon{width:30px;height:36px;flex-shrink:0;}
-.mapCardLoot .mapLootItem:nth-child(3){grid-column:1/-1;}
 .mapLootColors{grid-column:1/-1;padding:12px;border:1px solid var(--color-border-soft);border-radius:var(--radius-control);font:12px/1.4 var(--ui-font);color:var(--color-text);}
-.mapLootPalette{display:flex;gap:12px;margin-top:10px;}
-.mapCardLoot .mapLootPalette .lootColor{display:block;width:22px;height:22px;}
+.mapLootPalette{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;width:100%;margin-top:10px;}
+.mapCardLoot .mapLootPalette .componentIcon{width:100%;height:38px;}
+.mapLootHandle{grid-column:1/-1;display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--color-border-soft);border-radius:var(--radius-control);background:var(--color-surface);}
+.mapLootHandle .lootHandleArt{position:relative;display:block;width:128px;height:48px;flex:0 0 128px;overflow:hidden;}
+.mapLootHandle .lootHandleArt img{width:36px;height:120px;}
+.mapLootHandle b{font:700 13px/1.4 var(--ui-font);color:var(--color-gold-pale);}
+.mapLootHandle small{display:block;margin-top:4px;font:11px/1.4 var(--ui-font);color:var(--color-text-muted);}
+.mapLootHandle:focus-visible,.mapLootItem:focus-visible{outline:2px solid var(--color-gold);outline-offset:2px;}
 
 .mapPanControls{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:6px;z-index:25;}
 .mapPanControls[hidden]{display:none;}

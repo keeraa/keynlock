@@ -13,7 +13,7 @@ Snapshot: 2026-08-30, version 0.370.0.
 
 1. The primary risk is cascade layering, not file count. `overrides-03-lair.css`, `overrides-04-universal-lock.css`, `overrides-06-digital.css`, and `mobile.css` repeatedly redefine the same layout selectors.
 2. The HUD is distributed across `base.css`, `global-top-hud.css`, `overrides-03-lair.css`, `overrides-04-universal-lock.css`, `overrides-05-inventory.css`, and `mobile.css`. `.topRightHud` has 12 definitions and `.topRightHud .economyHud` has 10.
-3. Hillsfar has the densest mode-specific cascade. Several selectors are defined 10–20 times across its mode file and shared override files.
+3. Слепок скважины has the densest mode-specific cascade. Several selectors are defined 10–20 times across its mode file and shared override files.
 4. Universal lock sizing is spread between three root-variable blocks plus mobile overrides. These are intentional breakpoint values, but ownership is unclear.
 5. Alchemy contains its own internal design system and responsive layout. It should remain isolated until its visual regression coverage exists.
 6. Repeated gold, parchment, dark-surface, radius, shadow, font, and motion values are suitable for safe tokenization.
@@ -30,5 +30,5 @@ Snapshot: 2026-08-30, version 0.370.0.
 
 1. Consolidate HUD ownership into `global-top-hud.css`.
 2. Consolidate universal-lock geometry into one file with explicit desktop/tablet/mobile sections.
-3. Fold Hillsfar corrections back into `modes-01-hillsfar.css`.
+3. Fold Слепок скважины corrections back into `modes-01-keyprofile.css`.
 4. Audit Alchemy independently, with screenshots for each station and breakpoint.

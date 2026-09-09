@@ -31,7 +31,7 @@
     if(partsEl)partsEl.textContent=String(keynlockResources.parts);
     if(oilEl)oilEl.textContent=`${keynlockResources.oil}/${keynlockResources.oilerCapacity}`;
     const colors=document.querySelector('#resourceComponents');
-    if(colors)colors.innerHTML=KEYNLOCK_COMPONENTS.map(item=>`<span class="resourceColor" style="--resource-color:${item.color}" title="${item.name}"><i></i><b>${keynlockResources.components[item.id]}</b></span>`).join('');
+    if(colors)colors.innerHTML=KEYNLOCK_COMPONENTS.map(item=>`<span class="resourceColor" tabindex="0" data-tip="${item.material} · ${item.name} компонент"><img class="componentIcon" src="${item.image}" alt="" draggable="false"><b>${keynlockResources.components[item.id]}</b></span>`).join('');
     const salvage=document.querySelector('#salvagePickButton');
     if(salvage)salvage.hidden=!(keynlockResources.picks===0&&keynlockResources.parts<2&&balance<30);
     const craftPick=document.querySelector('#craftPickButton');

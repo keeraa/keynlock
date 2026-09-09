@@ -4,7 +4,6 @@
    vary per game-mode theme file; this screen doesn't need to). */
 
 
-body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active) #alchemyFullBlur{opacity:1;}
 body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active) :is(.lairHotspot,.lairWorkbenchHotspot){pointer-events:none!important;}
 
 .lairPanel[data-lair-panel="collection"].active{
@@ -14,12 +13,6 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   min-width:0;
 }
 #lairModuleWindow:has(.lairPanel[data-lair-panel="collection"].active){
-  display:flex;
-  flex-direction:column;
-  border:none;
-  border-radius:0;
-  box-shadow:none;
-  background:none;
   /* Not visible: alchemy uses visible because nothing inside it needs to
      scroll. This screen's own collections column does (six collections
      no longer fit in 90vh) — overflow:visible here left it nothing to
@@ -30,9 +23,6 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="collection"].active)
   height:96vh;
   max-height:96vh;
   width:min(1180px,96vw);
-}
-#lairModuleWindow:has(.lairPanel[data-lair-panel="collection"].active) .lairModuleHeader{
-  display:none!important;
 }
 #lairModuleWindow:has(.lairPanel[data-lair-panel="collection"].active) .lairModuleBody{
   display:flex;

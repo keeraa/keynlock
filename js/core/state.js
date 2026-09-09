@@ -50,7 +50,7 @@
   const LAIR_CHARACTERS={
     kai:{name:'Кай',role:'Взломщик',desc:'Работает аккуратно и предпочитает понятные цели. Хорош как основной персонаж для первых вылазок.',portrait:'assets/characters/portraits/kai.png',portraitVideo:'assets/characters/portraits/kai.mp4',full:'assets/characters/full/kai.png'},
     sai:{name:'Сай',role:'Разведчик',desc:'Собирает слухи, замечает связи между районами и помогает оценивать риск до выхода в город.',portrait:'assets/characters/portraits/sai.png',portraitVideo:'assets/characters/portraits/sai.mp4',full:'assets/characters/full/sai.png'},
-    tik:{name:'Тик',role:'Механик',desc:'Разбирается в инструментах и конструкциях замков. Полезен при подготовке снаряжения.',portrait:'assets/characters/portraits/tik.png',portraitVideo:'assets/characters/portraits/tik.mp4',full:'assets/characters/full/tik.png'}
+    tik:{name:'Тик',role:'Механик',desc:'Разбирается в инструментах и конструкциях замков. Полезен при подготовке снаряжения.',portrait:'assets/characters/portraits/tik.png',full:'assets/characters/full/tik.png'}
   };
   let lairCharacter=LAIR_CHARACTERS[STORE.getItem('lockpickLairCharacter')]?STORE.getItem('lockpickLairCharacter'):'sai';
   let lairTab='team';
@@ -104,8 +104,8 @@
         $coinBalance=document.querySelector('#coinBalance'), $runReward=document.querySelector('#runReward'), $rewardBox=document.querySelector('#rewardBox'),
         $worldMapScreen=document.querySelector('#worldMapScreen'), $worldMapCanvas=document.querySelector('#worldMapCanvas'), $mapPlayer=document.querySelector('#mapPlayer'), $mapInfoTitle=document.querySelector('#mapInfoTitle'), $mapInfoText=document.querySelector('#mapInfoText'), $mapLocationAction=document.querySelector('#mapLocationAction'),
         $lairOverlay=document.querySelector('#lairOverlay'), $lairSceneCharacters=document.querySelector('#lairSceneCharacters'), $lairModuleWindow=document.querySelector('#lairModuleWindow'), $lairModuleTitle=document.querySelector('#lairModuleTitle'), $lairModuleClose=document.querySelector('#lairModuleClose'), $lairCharacters=document.querySelector('#lairCharacters'), $lairDialoguePeople=document.querySelector('#lairDialoguePeople'), $lairDialogueSpeaker=document.querySelector('#lairDialogueSpeaker'), $lairDialogueText=document.querySelector('#lairDialogueText'), $lairDialogueTopics=document.querySelector('#lairDialogueTopics'), $lairIntelGrid=document.querySelector('#lairIntelGrid'), $lairIntelDetail=document.querySelector('#lairIntelDetail'),
-        $hillsfarMode=document.querySelector('#hillsfarMode'), $hfTryArea=document.querySelector('#hfTryArea'), $hfLockCut=document.querySelector('#hfLockCut'), $hfCandidates=document.querySelector('#hfCandidates'),
-        $g1Mode=document.querySelector('#g1Mode'), $g1ProgressRow=document.querySelector('#g1ProgressRow'),
+        $keyprofileMode=document.querySelector('#keyprofileMode'), $hfTryArea=document.querySelector('#hfTryArea'), $hfLockCut=document.querySelector('#hfLockCut'), $hfCandidates=document.querySelector('#hfCandidates'),
+        $turnmemoryMode=document.querySelector('#turnmemoryMode'), $turnmemoryProgressRow=document.querySelector('#turnmemoryProgressRow'),
         $skMode=document.querySelector('#skMode'), $skBoard=document.querySelector('#skBoard'), $skTorqueButton=document.querySelector('#skTorqueButton'), $skFeedbackText=document.querySelector('#skFeedbackText'),
         $anMode=document.querySelector('#anMode'), $anUnlock=document.querySelector('#anUnlock'), $anReadout=document.querySelector('#anReadout'), $anActionLabel=document.querySelector('#anActionLabel'), $anSelectedHint=document.querySelector('#anSelectedHint'),
         $tensionMode=document.querySelector('#tensionMode'), $tnGauge=document.querySelector('#tnGauge'), $tnBand=document.querySelector('#tnBand'), $tnNeedle=document.querySelector('#tnNeedle'), $tnPins=document.querySelector('#tnPins'), $tnMessage=document.querySelector('#tnMessage'),
@@ -117,50 +117,50 @@
         $obMode=document.querySelector('#obMode'), $obLock=document.querySelector('#obLock'), $obMessage=document.querySelector('#obMessage'),
         $wmMode=document.querySelector('#wmMode'), $wmLock=document.querySelector('#wmLock'), $wmHelp=document.querySelector('#wmHelp'), $wmTimerBar=document.querySelector('#wmTimerBar'), $wmOpenBtn=document.querySelector('#wmOpenBtn'),
         $museumMode=document.querySelector('#museumMode'), $hmLock=document.querySelector('#hmLock'), $hmPicks=document.querySelector('#hmPicks'), $hmHelp=document.querySelector('#hmHelp'),
-        $mass2Mode=document.querySelector('#mass2Mode'), $m2Board=document.querySelector('#m2Board'), $m2Help=document.querySelector('#m2Help'),
+        $pairednodesMode=document.querySelector('#pairednodesMode'), $m2Board=document.querySelector('#m2Board'), $m2Help=document.querySelector('#m2Help'),
         $pipelineMode=document.querySelector('#pipelineMode'), $plGridWrap=document.querySelector('#plGridWrap'), $plStartPort=document.querySelector('#plStartPort'), $plExitPort=document.querySelector('#plExitPort'), $plGrid=document.querySelector('#plGrid'), $plHelp=document.querySelector('#plHelp'),
         $wharfMode=document.querySelector('#wharfMode'), $wfLock=document.querySelector('#wfLock'), $wfHelp=document.querySelector('#wfHelp'),
-        $thiefdsMode=document.querySelector('#thiefdsMode'), $tdsLock=document.querySelector('#tdsLock'), $tdsProbe=document.querySelector('#tdsProbe'), $tdsTip=document.querySelector('#tdsTip'), $tdsSequence=document.querySelector('#tdsSequence'), $tdsHelp=document.querySelector('#tdsHelp'),
-        $kingdomcomeMode=document.querySelector('#kingdomcomeMode'), $kcdLock=document.querySelector('#kcdLock'), $kcdTurnBtn=document.querySelector('#kcdTurnBtn'), $kcdProgressBar=document.querySelector('#kcdProgressBar'), $kcdStressBar=document.querySelector('#kcdStressBar'), $kcdProgressText=document.querySelector('#kcdProgressText'), $kcdStressText=document.querySelector('#kcdStressText'), $kcdHelp=document.querySelector('#kcdHelp'),
-        $thief12Mode=document.querySelector('#thief12Mode'), $th12Door=document.querySelector('#th12Door'), $th12Stages=document.querySelector('#th12Stages'), $th12Help=document.querySelector('#th12Help'),
-        $falloutMode=document.querySelector('#falloutMode'), $sfLock=document.querySelector('#sfLock'), $sfCylinder=document.querySelector('#sfCylinder'), $sfTurnBar=document.querySelector('#sfTurnBar'), $sfTurnText=document.querySelector('#sfTurnText'), $sfWearBar=document.querySelector('#sfWearBar'), $sfWearText=document.querySelector('#sfWearText'), $sfTorqueLeft=document.querySelector('#sfTorqueLeft'), $sfTorqueRight=document.querySelector('#sfTorqueRight'), $sfHelp=document.querySelector('#sfHelp'),
-        $masshackMode=document.querySelector('#masshackMode'), $hackArena=document.querySelector('#hackArena'), $hackCore=document.querySelector('#hackCore'), $hackPlayer=document.querySelector('#hackPlayer'), $hackHelp=document.querySelector('#hackHelp'),
-        $pathologicMode=document.querySelector('#pathologicMode'), $ptgColL=document.querySelector('#ptgColL'), $ptgColR=document.querySelector('#ptgColR'), $ptgDur=document.querySelector('#ptgDur'), $ptgHelp=document.querySelector('#ptgHelp'),
-        $bioshock2Mode=document.querySelector('#bioshock2Mode'), $bioTrack=document.querySelector('#bioTrack'), $bioNeedle=document.querySelector('#bioNeedle'), $bioBot=document.querySelector('#bioBot'), $bioStageText=document.querySelector('#bioStage'), $bioPassesText=document.querySelector('#bioPasses'), $bioHelp=document.querySelector('#bioHelp'),
-        $alphaprotocolMode=document.querySelector('#alphaprotocolMode'), $apLock=document.querySelector('#apLock'), $apBeamFill=document.querySelector('#apBeamFill'), $apSequence=document.querySelector('#apSequence');
+        $ringsecretMode=document.querySelector('#ringsecretMode'), $tdsLock=document.querySelector('#tdsLock'), $tdsProbe=document.querySelector('#tdsProbe'), $tdsTip=document.querySelector('#tdsTip'), $tdsSequence=document.querySelector('#tdsSequence'), $tdsHelp=document.querySelector('#tdsHelp'),
+        $cylinderpathMode=document.querySelector('#cylinderpathMode'), $kcdLock=document.querySelector('#kcdLock'), $kcdTurnBtn=document.querySelector('#kcdTurnBtn'), $kcdProgressBar=document.querySelector('#kcdProgressBar'), $kcdStressBar=document.querySelector('#kcdStressBar'), $kcdProgressText=document.querySelector('#kcdProgressText'), $kcdStressText=document.querySelector('#kcdStressText'), $kcdHelp=document.querySelector('#kcdHelp'),
+        $soundlatchMode=document.querySelector('#soundlatchMode'), $th12Door=document.querySelector('#th12Door'), $th12Stages=document.querySelector('#th12Stages'), $th12Help=document.querySelector('#th12Help'),
+        $torqueangleMode=document.querySelector('#torqueangleMode'), $sfLock=document.querySelector('#sfLock'), $sfCylinder=document.querySelector('#sfCylinder'), $sfTurnBar=document.querySelector('#sfTurnBar'), $sfTurnText=document.querySelector('#sfTurnText'), $sfWearBar=document.querySelector('#sfWearBar'), $sfWearText=document.querySelector('#sfWearText'), $sfTorqueLeft=document.querySelector('#sfTorqueLeft'), $sfTorqueRight=document.querySelector('#sfTorqueRight'), $sfHelp=document.querySelector('#sfHelp'),
+        $ringpassageMode=document.querySelector('#ringpassageMode'), $hackArena=document.querySelector('#hackArena'), $hackCore=document.querySelector('#hackCore'), $hackPlayer=document.querySelector('#hackPlayer'), $hackHelp=document.querySelector('#hackHelp'),
+        $twinbalanceMode=document.querySelector('#twinbalanceMode'), $ptgColL=document.querySelector('#ptgColL'), $ptgColR=document.querySelector('#ptgColR'), $ptgDur=document.querySelector('#ptgDur'), $ptgHelp=document.querySelector('#ptgHelp'),
+        $timingneedleMode=document.querySelector('#timingneedleMode'), $bioTrack=document.querySelector('#bioTrack'), $bioNeedle=document.querySelector('#bioNeedle'), $bioBot=document.querySelector('#bioBot'), $bioStageText=document.querySelector('#bioStage'), $bioPassesText=document.querySelector('#bioPasses'), $bioHelp=document.querySelector('#bioHelp'),
+        $symbolpinsMode=document.querySelector('#symbolpinsMode'), $apLock=document.querySelector('#apLock'), $apBeamFill=document.querySelector('#apBeamFill'), $apSequence=document.querySelector('#apSequence');
 
   const MODE_PANELS=Object.freeze({
     silhouettes:document.querySelector('#silhouettesMode'),
-    hillsfar:$hillsfarMode,
-    g1:$g1Mode,
-    skyrim:$skMode,
-    anach:$anMode,
+    keyprofile:$keyprofileMode,
+    turnmemory:$turnmemoryMode,
+    workingangle:$skMode,
+    signalbalance:$anMode,
     tension:$tensionMode,
     resonance:$resonanceMode,
     deduction:$deductionMode,
     composite:$compositeMode,
     drum:$drumMode,
     scope:$scopeMode,
-    oblivion:$obMode,
-    watchmen:$wmMode,
+    pinflight:$obMode,
+    springtumblers:$wmMode,
     museum:$museumMode,
-    mass2:$mass2Mode,
+    pairednodes:$pairednodesMode,
     pipeline:$pipelineMode,
     wharf:$wharfMode,
-    thiefds:$thiefdsMode,
-    kingdomcome:$kingdomcomeMode,
-    thief12:$thief12Mode,
-    fallout:$falloutMode,
-    masshack:$masshackMode,
-    pathologic:$pathologicMode,
-    bioshock2:$bioshock2Mode,
-    alphaprotocol:$alphaprotocolMode
+    ringsecret:$ringsecretMode,
+    cylinderpath:$cylinderpathMode,
+    soundlatch:$soundlatchMode,
+    torqueangle:$torqueangleMode,
+    ringpassage:$ringpassageMode,
+    twinbalance:$twinbalanceMode,
+    timingneedle:$timingneedleMode,
+    symbolpins:$symbolpinsMode
   });
   const IMPORTED_MODES=new Set(Object.keys(MODE_PANELS));
   const ALL_MODES=new Set(GameCatalog.nativeIds);
 
   const DIFFICULTY_STORAGE_KEY='lockpickModeDifficulty';
-  const DEFAULT_MODE_DIFFICULTY=Object.freeze({silhouettes:1,classic:1,sequence:1,special:1,hillsfar:1,g1:1,skyrim:1,anach:1,tension:1,resonance:1,deduction:1,composite:1,drum:1,scope:1,oblivion:1,watchmen:1,museum:1,mass2:1,pipeline:1,wharf:1,thiefds:1,kingdomcome:1,thief12:1,fallout:1,masshack:1,pathologic:1,bioshock2:1,alphaprotocol:1});
+  const DEFAULT_MODE_DIFFICULTY=Object.freeze({silhouettes:1,classic:1,sequence:1,special:1,keyprofile:1,turnmemory:1,workingangle:1,signalbalance:1,tension:1,resonance:1,deduction:1,composite:1,drum:1,scope:1,pinflight:1,springtumblers:1,museum:1,pairednodes:1,pipeline:1,wharf:1,ringsecret:1,cylinderpath:1,soundlatch:1,torqueangle:1,ringpassage:1,twinbalance:1,timingneedle:1,symbolpins:1});
   function loadModeDifficulty(){
     try{
       const saved=STORE.getJSON(DIFFICULTY_STORAGE_KEY,{});
@@ -251,7 +251,7 @@
     'assets/pins/location/pin_05.png'
   ];
   const GAME_PIN_SKIN_NAMES=['pin_01.png','pin_02.png','pin_03.png','pin_04.png','pin_05.png'];
-  const GAME_PIN_MODES=new Set(['deduction','oblivion','watchmen','wharf','alphaprotocol']);
+  const GAME_PIN_MODES=new Set(['deduction','pinflight','springtumblers','wharf','symbolpins']);
   const TENSION_SKINS=[null,
     'assets/tensions/tension_01.webp',
     'assets/tensions/tension_02.webp',

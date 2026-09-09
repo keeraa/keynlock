@@ -1,0 +1,68 @@
+/* pairednodes (pairednodes) — 16-node memory match, symbols hidden until
+   hovered/held. Markup/CSS ported from the old prototype scene
+   (prototypes/lockpicking-mechanics-v63.html, .me2-*) with classes renamed
+   to .m2Board/.m2Node/etc so they don't collide with the same-named
+   classes still used by other prototype scenes. */
+.m2Mode{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:12px;background:rgba(17,13,9,.985);overflow:auto;}
+
+body.importedMode .puzzleArea>.modePanel.m2Mode:not([hidden]){padding-bottom:calc(12px + var(--reward-clear,0px))!important;}
+.m2Mode[hidden]{display:none!important;}
+
+
+.m2BoardWrap{
+  flex:1 1 auto;
+  min-height:0;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.m2Board{
+  height:100%;
+  width:auto;
+  max-width:min(356px,100%);
+  aspect-ratio:1;
+  container-type:inline-size;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  grid-template-rows:repeat(4,1fr);
+  gap:4%;
+}
+.m2Node{
+  width:100%;
+  height:100%;
+  aspect-ratio:1;
+  justify-self:center;
+  align-self:center;
+  border:1px solid #3a6577;
+  border-radius:50%;
+  background:#102632;
+  color:rgba(188,234,250,0);
+  cursor:pointer;
+  font-size:min(8cqw,27px);
+  display:grid;
+  place-items:center;
+  transition:color 1.3s ease,background 1.3s ease,border-color .25s ease,box-shadow .25s ease;
+  touch-action:none;
+  -webkit-user-select:none;
+  user-select:none;
+}
+.m2Node:hover,.m2Node.reveal,.m2Node.matched{
+  color:rgba(188,234,250,1);
+  background:#173848;
+}
+.m2Node.selected{outline:2px solid #d8b871;}
+.m2Node.matched{
+  border-color:#71b67d;
+  box-shadow:0 0 12px rgba(113,182,125,.28);
+}
+.m2Node.kbFocus{outline:2px solid #d8b871!important;outline-offset:2px!important;}
+
+.m2Help{
+  flex:none;
+  color:#bcb39a;
+  text-align:center;
+  font:14px/1.35 Arial,sans-serif;
+  max-width:560px;
+}
+.m2Help:empty{display:none;}

@@ -8,7 +8,7 @@
 .workbenchResources b{color:#edcf91;}
 .resourceComponents{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:10px 0 14px;}
 .resourceColor{display:grid;justify-items:center;gap:3px;color:#c6b38f;font:700 10px/1 var(--ui-font);}
-.resourceColor i{width:19px;height:19px;border:2px solid rgba(255,255,255,.24);border-radius:50%;background:var(--resource-color);box-shadow:inset 0 0 7px rgba(0,0,0,.38),0 2px 6px rgba(0,0,0,.34);}.workbenchCraftPanel button{width:100%;margin-top:7px;padding:10px;font:700 12px/1.15 var(--ui-font);}
+.resourceColor .componentIcon{width:100%;height:32px;}.workbenchCraftPanel button{width:100%;margin-top:7px;padding:10px;font:700 12px/1.15 var(--ui-font);}
 .workbenchCraftPanel button small{display:block;margin-top:3px;color:#98866d;font-size:9px;}
 .workbenchCraftPanel button:disabled{opacity:.42;cursor:not-allowed;}
 .lootTablePreview{margin-top:10px;border-top:1px solid rgba(128,99,57,.45);padding-top:8px;}

@@ -1,5 +1,5 @@
 #lock.universalLockBlock,body:not(.importedMode) #lock.universalLockBlock,body.importedMode #lock.universalLockBlock,.scene.hideBase #lock.universalLockBlock{display:block!important;visibility:visible!important;opacity:1!important;position:absolute!important;left:50%!important;top:var(--template-lock-top)!important;bottom:auto!important;width:540px!important;height:266px!important;min-width:540px!important;min-height:266px!important;transform-origin:top center!important;z-index:60!important;pointer-events:none!important;}
-body.mode-skyrim #lock.universalLockBlock{display:none!important;}
+body.mode-workingangle #lock.universalLockBlock{display:none!important;}
 #lock.universalLockBlock>.mechanismZone,body:not(.importedMode) #lock.universalLockBlock>.mechanismZone,body.importedMode #lock.universalLockBlock>.mechanismZone{position:absolute!important;left:50%!important;top:0!important;bottom:auto!important;width:540px!important;height:266px!important;transform:translate3d(calc(-50% + (var(--px) * -.14)),calc(var(--py) * -.08),0)!important;transform-origin:top center!important;z-index:1!important;pointer-events:none!important;}
 .sharedModeLockArt{display:none!important;}
 .puzzleArea{position:absolute!important;left:0!important;right:0!important;top:var(--template-puzzle-top)!important;bottom:var(--template-puzzle-bottom)!important;width:100%!important;min-height:0!important;overflow:visible!important;z-index:20!important;}
@@ -8,12 +8,12 @@ body:not(.importedMode) .puzzleArea>.platesZone{z-index:58!important;}
 .puzzleArea>.platesZone{position:absolute!important;left:50%!important;top:0!important;bottom:auto!important;width:590px!important;height:455px!important;transform:translateX(-50%)!important;z-index:2!important;}
 body.importedMode .puzzleArea>.platesZone,body.importedMode .puzzleArea>#status{display:none!important;}
 body:not(.importedMode) .puzzleArea>.platesZone{display:block!important;}
-body.importedMode .puzzleArea>.modePanel:not([hidden]),body.mode-hillsfar .puzzleArea>.hillsfarMode:not([hidden]){position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;max-width:none!important;margin:0!important;padding:8px 20px 12px!important;display:flex!important;visibility:visible!important;opacity:1!important;align-items:center!important;justify-content:flex-start!important;flex-direction:column!important;overflow:auto!important;background:transparent!important;background-image:none!important;box-shadow:none!important;filter:none!important;z-index:5!important;}
+body.importedMode .puzzleArea>.modePanel:not([hidden]),body.mode-keyprofile .puzzleArea>.keyprofileMode:not([hidden]){position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;max-width:none!important;margin:0!important;padding:8px 20px 12px!important;display:flex!important;visibility:visible!important;opacity:1!important;align-items:center!important;justify-content:flex-start!important;flex-direction:column!important;overflow:auto!important;background:transparent!important;background-image:none!important;box-shadow:none!important;filter:none!important;z-index:5!important;}
 body.importedMode .puzzleArea>.skMode:not([hidden]){overflow:visible!important;}
-body.importedMode .g1Mode,body.importedMode .hillsfarMode,body.importedMode .skMode,body.importedMode .anMode,body.importedMode .tnMode,body.importedMode .rsMode,body.importedMode .kdMode,body.importedMode .cpMode{top:0!important;right:0!important;bottom:0!important;left:0!important;inset:0!important;}
-body.mode-hillsfar .hfLockBox{margin-top:0!important;}
-body.mode-hillsfar .hfCandidates{margin-top:18px!important;}
-body.importedMode .g1ProgressWrap{margin-top:54px!important;}
+body.importedMode .turnmemoryMode,body.importedMode .keyprofileMode,body.importedMode .skMode,body.importedMode .anMode,body.importedMode .tnMode,body.importedMode .rsMode,body.importedMode .kdMode,body.importedMode .cpMode{top:0!important;right:0!important;bottom:0!important;left:0!important;inset:0!important;}
+body.mode-keyprofile .hfLockBox{margin-top:0!important;}
+body.mode-keyprofile .hfCandidates{margin-top:18px!important;}
+body.importedMode .turnmemoryProgressWrap{margin-top:54px!important;}
 body.importedMode .r2Lock{margin-top:0!important;}
 body.importedMode .massBoard{margin-top:42px!important;margin-bottom:0!important;}
 body.importedMode .skBoardViewport{margin-top:0!important;}
@@ -27,8 +27,8 @@ body.importedMode .tnPanel,body.importedMode .rsBoard,body.importedMode .kdPanel
 body.importedMode .puzzleArea>.modePanel:not([hidden]){padding:6px 12px 10px!important;}
 }
 body.importedMode .app{grid-template-rows:minmax(0,1fr)!important;}
-body.importedMode .main,body.mode-hillsfar .main{grid-row:1!important;width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;display:grid!important;place-items:center!important;overflow:visible!important;}
-body.importedMode .scene,body.mode-hillsfar .scene{position:relative!important;width:min(1180px,100vw)!important;height:100vh!important;min-height:0!important;max-height:none!important;margin:0!important;overflow:visible!important;}
+body.importedMode .main,body.mode-keyprofile .main{grid-row:1!important;width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;display:grid!important;place-items:center!important;overflow:visible!important;}
+body.importedMode .scene,body.mode-keyprofile .scene{position:relative!important;width:min(1180px,100vw)!important;height:100vh!important;min-height:0!important;max-height:none!important;margin:0!important;overflow:visible!important;}
 .topRightHud .hudNavBtn{width:var(--ui-corner-icon-size)!important;min-width:var(--ui-corner-icon-size)!important;max-width:var(--ui-corner-icon-size)!important;height:var(--ui-corner-icon-size)!important;min-height:var(--ui-corner-icon-size)!important;max-height:var(--ui-corner-icon-size)!important;flex:0 0 var(--ui-corner-icon-size)!important;display:grid!important;place-items:center!important;padding:0!important;border:1px solid rgba(161,121,59,.76)!important;border-radius:14px!important;background:linear-gradient(180deg,rgba(43,33,23,.94),rgba(19,15,12,.96))!important;color:var(--color-gold-soft)!important;box-shadow:0 8px 24px rgba(0,0,0,.30),inset 0 0 0 1px rgba(255,229,176,.04)!important;cursor:pointer!important;pointer-events:auto!important;transition:transform .16s ease,filter .16s ease,border-color .16s ease!important;}
 .topRightHud .hudNavBtn:hover{transform:translateY(-2px)!important;filter:brightness(1.12)!important;border-color:#c79648!important;}
 .topRightHud .hudNavBtn:active{transform:scale(.97)!important;}
@@ -76,18 +76,18 @@ button,.tab{touch-action:manipulation;}
 #lock.universalLockBlock,body.importedMode #lock.universalLockBlock{top:var(--template-lock-top)!important;transform:translateX(-50%) scale(var(--template-lock-scale))!important;}
 .puzzleArea{top:var(--template-puzzle-top)!important;bottom:var(--template-puzzle-bottom)!important;overflow:hidden!important;}
 .puzzleArea>.platesZone{left:50%!important;top:0!important;transform:translateX(-50%) scale(.63)!important;transform-origin:top center!important;}
-body.importedMode .puzzleArea>.modePanel:not([hidden]),body.mode-hillsfar .puzzleArea>.hillsfarMode:not([hidden]){padding:4px 8px 8px!important;overflow-x:hidden!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch;}
+body.importedMode .puzzleArea>.modePanel:not([hidden]),body.mode-keyprofile .puzzleArea>.keyprofileMode:not([hidden]){padding:4px 8px 8px!important;overflow-x:hidden!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch;}
 #objectiveLine.difficulty{left:8px!important;right:8px!important;bottom:calc(var(--mobile-safe-bottom) + 6px)!important;width:auto!important;max-width:none!important;min-height:34px!important;padding:7px 9px!important;transform:none!important;border-radius:9px!important;font-size:13.5px!important;line-height:1.25!important;letter-spacing:.035em!important;}
 #objectiveLine .objectiveDiff{white-space:nowrap;}
-body.mode-hillsfar .hfLockBox,body.mode-hillsfar .hfTryArea,body.mode-hillsfar .hfLockCut{width:min(94vw,420px)!important;}
-body.mode-hillsfar .hfTryArea,body.mode-hillsfar .hfLockCut{height:118px!important;}
-body.mode-hillsfar .hfCandidates{width:min(94vw,420px)!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important;margin-top:10px!important;}
-body.mode-hillsfar .hfCandidate{min-height:72px!important;}
-body.mode-hillsfar .hfCandidate svg{max-width:125px!important;max-height:72px!important;}
+body.mode-keyprofile .hfLockBox,body.mode-keyprofile .hfTryArea,body.mode-keyprofile .hfLockCut{width:min(94vw,420px)!important;}
+body.mode-keyprofile .hfTryArea,body.mode-keyprofile .hfLockCut{height:118px!important;}
+body.mode-keyprofile .hfCandidates{width:min(94vw,420px)!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important;margin-top:10px!important;}
+body.mode-keyprofile .hfCandidate{min-height:72px!important;}
+body.mode-keyprofile .hfCandidate svg{max-width:125px!important;max-height:72px!important;}
 body.importedMode .massBoard{width:min(82vw,300px)!important;height:min(82vw,300px)!important;flex:0 0 auto!important;}
-body.importedMode .g1ProgressWrap{position:relative!important;top:0!important;width:100%!important;margin:8px auto 0!important;transform:none!important;}
-body.importedMode .g1ProgressRow{gap:7px!important;flex-wrap:wrap!important;justify-content:center!important;}
-body.importedMode .g1Slot{width:52px!important;height:52px!important;}
+body.importedMode .turnmemoryProgressWrap{position:relative!important;top:0!important;width:100%!important;margin:8px auto 0!important;transform:none!important;}
+body.importedMode .turnmemoryProgressRow{gap:7px!important;flex-wrap:wrap!important;justify-content:center!important;}
+body.importedMode .turnmemorySlot{width:52px!important;height:52px!important;}
 body.importedMode .skBoardViewport{width:382px!important;height:382px!important;flex:0 0 382px!important;max-width:96vw!important;margin-bottom:-76px!important;}
 body.importedMode .skBoardViewport .skBoard{transform:translateX(-50%) scale(.552)!important;}
 body.importedMode .skFeedback{max-width:92vw!important;font-size:11px!important;}
@@ -119,14 +119,13 @@ body.importedMode .cpPart{min-width:82px!important;}
 .lairSceneKicker{font-size:8px!important;}
 .lairSceneTitle{font-size:22px!important;}
 .lairSceneActive{display:none!important;}
-.lairSceneCharacter.kai{left:-2%!important;height:63%!important;}
 .lairSceneCharacter.sai{left:29%!important;height:69%!important;}
-.lairSceneCharacter.tik{right:-1%!important;height:61.5%!important;}
+.lairSceneCharacter.tik{left:-4%!important;right:auto!important;height:61.5%!important;}
 .lairHotspot{min-width:94px!important;padding:28px 7px 7px!important;font-size:9px!important;}
 .lairHotspotDot{width:15px!important;height:15px!important;top:8px!important;}
 .lairHotspotCity{left:17%!important;top:43%!important;}
 .lairHotspotDialogue{left:36%!important;top:70%!important;}
-.lairHotspotTeam{left:68%!important;top:47%!important;}.lairModuleWindow{width:calc(100vw - 16px)!important;max-height:calc(100dvh - var(--mobile-safe-top) - var(--mobile-safe-bottom) - 16px)!important;}
+.lairHotspotTeam{left:auto!important;right:10px!important;top:auto!important;bottom:10px!important;min-width:var(--ui-corner-icon-size)!important;padding:0!important;}.lairModuleWindow{width:calc(100vw - 16px)!important;max-height:calc(100dvh - var(--mobile-safe-top) - var(--mobile-safe-bottom) - 16px)!important;}
 .lairModuleBody{max-height:calc(100dvh - var(--mobile-safe-top) - var(--mobile-safe-bottom) - 70px)!important;padding:12px!important;}
 .lairCharacters{grid-template-columns:1fr!important;}
 .lairCharacter{min-height:210px!important;}
@@ -161,10 +160,9 @@ body.importedMode .r2Lock{margin-bottom:-294px!important;transform:scale(.30)!im
 body.importedMode .skBoardViewport{width:246px!important;height:246px!important;flex-basis:246px!important;margin-bottom:-49px!important;}
 body.importedMode .skBoardViewport .skBoard{transform:translateX(-50%) scale(.3564)!important;}
 body.importedMode .anBoard{margin-bottom:-286px!important;transform:scale(.285)!important;}
-body.mode-hillsfar .hfTryArea,body.mode-hillsfar .hfLockCut{height:82px!important;}
-body.mode-hillsfar .hfCandidates{grid-template-columns:repeat(3,minmax(0,1fr))!important;max-width:520px!important;}
-body.mode-hillsfar .hfCandidate{min-height:56px!important;}
-.lairSceneCharacter.kai{height:72%!important;}
+body.mode-keyprofile .hfTryArea,body.mode-keyprofile .hfLockCut{height:82px!important;}
+body.mode-keyprofile .hfCandidates{grid-template-columns:repeat(3,minmax(0,1fr))!important;max-width:520px!important;}
+body.mode-keyprofile .hfCandidate{min-height:56px!important;}
 .lairSceneCharacter.sai{height:78%!important;}
 .lairSceneCharacter.tik{height:70.5%!important;}
 .lairHotspotDialogue{top:62%!important;}
@@ -286,6 +284,6 @@ body.lair-open .topRightHud .assetNameHud{display:none!important;}
   .guardWatch{width:78px;height:78px;top:calc(50% - 170px);}
 }
 
-/* Skyrim deliberately lifts the enlarged dial above the panel's content box. */
-body.mode-skyrim .puzzleArea,
-body.mode-skyrim .puzzleArea>.skMode:not([hidden]){overflow:visible!important;}
+/* workingangle deliberately lifts the enlarged dial above the panel's content box. */
+body.mode-workingangle .puzzleArea,
+body.mode-workingangle .puzzleArea>.skMode:not([hidden]){overflow:visible!important;}

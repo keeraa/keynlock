@@ -1,0 +1,32 @@
+{
+  "date": "2026-09-09",
+  "baseCommit": "2eee0d322db176ad216763bbb3d00ba497db967f",
+  "workingTreeDirty": true,
+  "sourceFileCount": 739,
+  "sourceSha256": "469ebc60cbe756b582ba88d3261c4c28b4dd7d65e4ddecf1f2399ddcc7290b47",
+  "hashMethod": "Sorted relative file path + NUL + SHA256 digest bytes; js/, css/, assets/, scripts/, index.html, package.json, vercel.json",
+  "browser": "agent-browser isolated Chromium session release-audit, muted audio",
+  "viewportLaunchSweep": "1280x720",
+  "orders": 70,
+  "tiers": [
+    28,
+    21,
+    21
+  ],
+  "storyOrders": 10,
+  "bootImages": 337,
+  "bootImageMiB": 38.2,
+  "checks": {
+    "npm test": "pass",
+    "npm run build": "pass",
+    "npm run smoke": "pass",
+    "mission initialization": "70/70, not solved"
+  },
+  "limits": [
+    "No full human playthrough",
+    "No Safari/Firefox check",
+    "No deployed preview check",
+    "No mobile acceptance",
+    "No slow-network measurement"
+  ]
+}

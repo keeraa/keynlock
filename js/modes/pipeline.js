@@ -14,7 +14,7 @@
   // hazard tile, a dead end, a disconnect, a loop, or the grid edge fails
   // the attempt and consumes all remaining picks. Ported from the old
   // prototype scene (prototypes/lockpicking-mechanics-v63.html, "Portable
-  // game module: bioshock-1") into a fully native mode: the path-generation
+  // game module: pipeline") into a fully native mode: the path-generation
   // and flow-trace algorithms are carried over faithfully, wired through
   // the shared economy (damagePick/registerMove) instead of the
   // prototype's own LockRuntime/GameHub shims and hard pick-loss counter.

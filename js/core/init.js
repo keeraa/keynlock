@@ -76,7 +76,7 @@
     else if(k==='n')restartCurrentRound();
   }
 
-  // The 5 fluid-sized custom panels (oblivion/watchmen/museum/mass2/pipeline)
+  // The 5 fluid-sized custom panels (pinflight/springtumblers/museum/pairednodes/pipeline)
   // fill 100% of #puzzleArea's height by design, but .challengeStatus (the
   // "ЗА ЗАМОК / ВРЕМЯ" reward+timer HUD) is a viewport-fixed overlay that
   // sits inside the *bottom* of that same box on most non-phone breakpoints
@@ -86,7 +86,7 @@
   // shortfall as --reward-clear (consumed as extra padding-bottom by each
   // panel's own CSS) keeps their content from rendering underneath it,
   // without hardcoding a value per breakpoint.
-  const FLUID_PANEL_MODES=new Set(['oblivion','watchmen','museum','mass2','pipeline','wharf','thiefds','kingdomcome','thief12','fallout','masshack','pathologic','bioshock2','alphaprotocol']);
+  const FLUID_PANEL_MODES=new Set(['pinflight','springtumblers','museum','pairednodes','pipeline','wharf','ringsecret','cylinderpath','soundlatch','torqueangle','ringpassage','twinbalance','timingneedle','symbolpins']);
   function syncPuzzleRewardClearance(){
     if(!FLUID_PANEL_MODES.has(mode)) return;
     const status=document.querySelector('.challengeStatus');
@@ -250,10 +250,10 @@
   })();
 
   $lockHitArea.addEventListener('click',handleUniversalLockClick);
-  $skTorqueButton.addEventListener('click',()=>GameActions.attemptOpen({modeId:'skyrim',source:'puzzle-control'}));
-  $anUnlock.addEventListener('click',e=>{ if(e.target.closest('.anBtn')) return; GameActions.attemptOpen({modeId:'anach',source:'puzzle-control'}); });
-  $anUnlock.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&!e.target.closest('.anBtn')){ e.preventDefault(); GameActions.attemptOpen({modeId:'anach',source:'keyboard'}); } });
-  $wmOpenBtn?.addEventListener('click',()=>GameActions.attemptOpen({modeId:'watchmen',source:'puzzle-control'}));
+  $skTorqueButton.addEventListener('click',()=>GameActions.attemptOpen({modeId:'workingangle',source:'puzzle-control'}));
+  $anUnlock.addEventListener('click',e=>{ if(e.target.closest('.anBtn')) return; GameActions.attemptOpen({modeId:'signalbalance',source:'puzzle-control'}); });
+  $anUnlock.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&!e.target.closest('.anBtn')){ e.preventDefault(); GameActions.attemptOpen({modeId:'signalbalance',source:'keyboard'}); } });
+  $wmOpenBtn?.addEventListener('click',()=>GameActions.attemptOpen({modeId:'springtumblers',source:'puzzle-control'}));
   addEventListener('keydown',e=>{if(!gameplayInputBlocked()&&e.code==='Space'&&PuzzleModes.action(mode,'primary')) e.preventDefault();});
   addEventListener('keydown',e=>{
     if(!gameplayInputBlocked()&&e.code==='Space'&&!e.repeat&&PuzzleModes.action(mode,'primaryStart')) e.preventDefault();
@@ -278,7 +278,7 @@
   $worldMapCanvas?.querySelectorAll('.mapNode:not(.missionNode)').forEach(node=>{
     node.addEventListener('click',()=>travelToMapLocation(node.dataset.location));
   });
-  document.querySelectorAll('.lairHotspot').forEach(btn=>{
+  document.querySelectorAll('.lairScene [data-lair-open],.lairScene [data-lair-action]').forEach(btn=>{
     btn.addEventListener('click',()=>{
       if(btn.dataset.lairAction==='missions'){
         // openMap remembers that it was opened from the lair and performs the

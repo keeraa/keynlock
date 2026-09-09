@@ -3,7 +3,7 @@
 v254 preserves the v253 cascade while splitting large stylesheets into contiguous chronological fragments. File order in index.html is significant.
 
 - base.css — foundation, HUD and classic-lock base styles
-- modes-01 … modes-06 — Hillsfar, Gothic 1, Skyrim and Anachronox base sections
+- modes-01 … modes-06 — keyprofile, turnmemory, workingangle and signalbalance base sections
 - world-01-shared.css — shared early imported-mode overrides
 - `tools-shared.css`, `map.css`, `lair.css`, `universal-lock.css`,
   `inventory.css`, `digital.css` and `workbench.css` — thematic interaction

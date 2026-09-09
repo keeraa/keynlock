@@ -4,6 +4,8 @@
   flex-direction:column;
   gap:14px;
   min-height:0;
+  margin-top:0;
+  max-height:calc(100dvh - 160px);
   padding:clamp(12px,2vw,22px);
   overflow:auto;
   border:1px solid rgba(120,94,52,.34);
@@ -18,14 +20,16 @@
 .pigmentMixHeader strong{color:#ead8b3;font:600 clamp(18px,2.2vw,25px)/1.1 Georgia,serif;}
 .pigmentMixBoard{display:grid;grid-template-columns:minmax(112px,.7fr) minmax(300px,2fr) minmax(112px,.7fr);align-items:center;gap:14px;margin-top:-16px;}.pigmentTargetCard,.pigmentResultCard{display:grid;justify-items:center;gap:7px;min-height:166px;padding:13px 10px;}
 .pigmentTargetCard>span,.pigmentResultCard>span{color:#a99675;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;}
-.pigmentTargetCard>i,.pigmentResultCard>i{display:block;width:86px;height:86px;border:3px solid #76532d;border-radius:50%;background:#302a22;box-shadow:inset 8px 10px 18px rgba(255,255,255,.12),inset -9px -10px 20px rgba(0,0,0,.32),0 7px 18px rgba(0,0,0,.3);transition:background-color .38s ease,box-shadow .38s ease;}
+.pigmentSample{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-width:0;height:98px;border-radius:8px;}
+.pigmentSample .componentIcon{width:calc(100% - 28px);max-width:116px;height:94px;}
+.pigmentExactSwatch{display:block;flex:0 0 20px;width:20px;height:20px;border:1px solid #d0b27b;border-radius:50%;}
+.pigmentSampleEmpty{color:#937e5e;font:32px/1 Georgia,serif;}
 .pigmentTargetCard>strong,.pigmentResultCard>strong{min-height:2.2em;color:#e1c995;font-size:12px;line-height:1.1;text-align:center;}
 .pigmentEquation{display:grid;grid-template-columns:repeat(3,minmax(72px,1fr));gap:clamp(8px,1.4vw,14px);}
 .pigmentSlot{position:relative;display:grid;place-items:center;min-height:142px;padding:8px;border:1px dashed rgba(192,149,85,.5);border-radius:18px;background:rgba(31,23,17,.72);color:#937e5e;cursor:pointer;overflow:hidden;touch-action:none;transition:transform .22s ease,border-color .22s ease,filter .22s ease,box-shadow .22s ease;}
 .pigmentSlot:not(.filled)::after{content:"+";font:300 34px/1 Georgia,serif;}
-.pigmentSlot::before{content:"";position:absolute;inset:16px 12px 30px;border-radius:50% 50% 44% 46%;background:var(--pigment-color,transparent);box-shadow:inset 8px 10px 15px rgba(255,255,255,.12),inset -8px -10px 18px rgba(0,0,0,.25);transform:scale(.86);opacity:0;transition:transform .28s ease,opacity .28s ease,background-color .35s ease;}
 .pigmentSlot.filled{border-style:solid;border-color:#a97838;}
-.pigmentSlot.filled::before{opacity:1;transform:scale(1);}
+.pigmentSlot .componentIcon{width:calc(100% - 16px);height:90px;margin-bottom:18px;}
 .pigmentSlot span{position:absolute;right:6px;bottom:7px;left:6px;z-index:1;color:#fff0ce;font-size:11px;font-weight:700;text-align:center;text-shadow:0 2px 5px #000;}
 .pigmentSlot:hover{transform:translateY(-3px) scale(1.025);border-color:#d5a85d;}
 .pigmentSlot.dropReady{border-color:#b78848;background:rgba(62,43,25,.78);}.pigmentSlot.dragOver{transform:translateY(-5px) scale(1.045);border-color:#f0c875;box-shadow:0 0 0 3px rgba(217,167,76,.18),0 12px 24px rgba(0,0,0,.35);}
@@ -33,9 +37,15 @@
 .pigmentPaletteHead{margin-bottom:10px;}.pigmentPaletteHead small{color:#8f806b;font-size:10px;}
 .pigmentPalette{display:grid;grid-template-columns:repeat(7,minmax(58px,1fr));gap:8px;}
 .pigmentColor{display:grid;justify-items:center;gap:6px;min-width:0;padding:8px 4px;border:1px solid rgba(131,99,57,.4);border-radius:12px;background:#211a14;color:#cdbb98;cursor:grab;touch-action:none;transition:transform .22s ease,border-color .22s ease,filter .22s ease;}
-.pigmentColor i{display:block;width:42px;height:42px;border:2px solid rgba(232,204,150,.38);border-radius:50%;background:var(--pigment-color);box-shadow:inset 5px 6px 9px rgba(255,255,255,.12),inset -5px -6px 10px rgba(0,0,0,.24);}
+.pigmentColor .componentIcon{width:58px;height:48px;}
 .pigmentColor span{max-width:100%;overflow:hidden;font-size:10px;font-weight:700;text-overflow:ellipsis;white-space:nowrap;}.pigmentColor b{color:#d7b66f;font-size:10px;}
 .pigmentColor:hover:not(:disabled),.pigmentColor.selected{transform:translateY(-3px) scale(1.04);border-color:var(--color-gold);filter:brightness(1.12);}.pigmentColor:disabled{filter:grayscale(.75) brightness(.55);cursor:not-allowed;}
-.pigmentDragGhost{position:fixed;z-index:100200;display:grid;justify-items:center;gap:5px;width:76px;padding:8px;border:1px solid var(--color-gold);border-radius:13px;background:rgba(27,20,14,.94);color:#f3ddb0;font-size:10px;font-weight:700;pointer-events:none;transform:translate(-50%,-50%) rotate(-3deg) scale(1.08);box-shadow:0 15px 34px rgba(0,0,0,.58);}.pigmentDragGhost i{display:block;width:44px;height:44px;border:2px solid #d9bd83;border-radius:50%;background:var(--pigment-color);box-shadow:inset 5px 6px 9px rgba(255,255,255,.14),inset -5px -6px 10px rgba(0,0,0,.25);}
+.pigmentDragGhost{position:fixed;z-index:100200;display:grid;justify-items:center;gap:5px;width:76px;padding:8px;border:1px solid var(--color-gold);border-radius:13px;background:rgba(27,20,14,.94);color:#f3ddb0;font-size:10px;font-weight:700;pointer-events:none;transform:translate(-50%,-50%) rotate(-3deg) scale(1.08);box-shadow:0 15px 34px rgba(0,0,0,.58);}.pigmentDragGhost .componentIcon{width:60px;height:48px;}
 .pigmentMixFooter{margin-top:auto;justify-content:flex-end;}.pigmentMixFooter p{min-height:18px;margin:0 auto 0 0;color:#a9997f;font-size:12px;}.pigmentMixFooter p.good{color:#9fc28a}.pigmentMixFooter p.bad{color:#cf856b}
-@media(max-width:720px){.alchemyRoot .pigmentMixScene.active{padding:10px}.pigmentMixBoard{grid-template-columns:1fr 1fr}.pigmentEquation{grid-column:1/-1;grid-row:2}.pigmentTargetCard,.pigmentResultCard{min-height:126px}.pigmentTargetCard>i,.pigmentResultCard>i{width:62px;height:62px}.pigmentSlot{min-height:96px}.pigmentPalette{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:720px){.alchemyRoot .pigmentMixScene.active{padding:10px}.pigmentMixBoard{grid-template-columns:1fr 1fr}.pigmentEquation{grid-column:1/-1;grid-row:2}.pigmentTargetCard,.pigmentResultCard{min-height:126px}.pigmentSample{height:78px}.pigmentSample .componentIcon{height:74px}.pigmentSlot{min-height:96px}.pigmentPalette{grid-template-columns:repeat(4,1fr)}}
+
+/* Pigments use their own palette; the metal rack belongs to the other stations. */
+body:has(.pigmentMixScene.active) #alchemyRackDrawer{visibility:hidden;pointer-events:none;}
+.alchemyRoot .pigmentMixScene.active > *{flex-shrink:0;}
+.pigmentMixFooter{flex-wrap:wrap;}
+.pigmentMixFooter p{flex:1 1 220px;}

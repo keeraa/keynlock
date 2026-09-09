@@ -24,7 +24,7 @@ const storage=memoryStorage({
 const saveContext={window:{localStorage:storage}};
 runInNewContext(source('js/core/save-store.js'),saveContext,{filename:'save-store.js'});
 const store=saveContext.window.KeynlockSaveStore;
-assert(store.schemaVersion===1,'SaveStore schema version must be 1.');
+assert(store.schemaVersion===2,'SaveStore schema version must be 2.');
 assert(store.getJSON('keynlockResources').picks===0,'SaveStore must preserve zero picks.');
 assert(store.getJSON('keynlockResources').components&&typeof store.getJSON('keynlockResources').components==='object','Migration must add the components object.');
 store.setJSON('scenario',{ok:true});
@@ -53,12 +53,12 @@ assert(gameCatalog.feature('drum','lock.requiresPick')===false,'Saved display ov
 // Deferred opening owns its outcome; starting or repeating it is not a failed attempt.
 gameCatalogContext.solved=false;
 gameCatalogContext.picks=3;
-gameCatalogContext.mode='hillsfar';
+gameCatalogContext.mode='keyprofile';
 let deferredBreaks=0;
 gameCatalogContext.window.forceBreakOnePick=()=>{deferredBreaks++;};
-runInNewContext("GameActions.registerOpen('hillsfar',()=> 'pending'); GameActions.attemptOpen(); GameActions.attemptOpen();",gameCatalogContext);
+runInNewContext("GameActions.registerOpen('keyprofile',()=> 'pending'); GameActions.attemptOpen(); GameActions.attemptOpen();",gameCatalogContext);
 assert(deferredBreaks===0,'An inserting key must not consume picks before its result.');
-runInNewContext("GameActions.registerOpen('hillsfar',()=>undefined); GameActions.attemptOpen();",gameCatalogContext);
+runInNewContext("GameActions.registerOpen('keyprofile',()=>undefined); GameActions.attemptOpen();",gameCatalogContext);
 assert(deferredBreaks===1,'An immediate failed opening must still consume one pick.');
 
 const contentContext={window:{}};
@@ -137,7 +137,7 @@ assert(gameCatalogSource.includes('game.lock.requiresPick&&failedPlayerAttempt')
 const defeat=source('js/core/game-defeat.js');
 assert(defeat.includes("reason==='picks'"),'Out-of-picks defeat must have a dedicated return-to-lair flow.');
 const inventoryGuard=source('js/core/inventory-hit-testing.js');
-for(const mode of ['classic','sequence','special','g1'])assert(inventoryGuard.includes(`'${mode}'`),`Typed tension guard is missing ${mode}.`);
+for(const mode of ['classic','sequence','special','turnmemory'])assert(inventoryGuard.includes(`'${mode}'`),`Typed tension guard is missing ${mode}.`);
 const pigmentMixing=source('js/world/alchemy-pigments.js');
 assert(pigmentMixing.includes('KeynlockResources?.components'),'Pigment mixing must use the shared color resource catalogue.');
 assert(pigmentMixing.includes('KeynlockResources?.state?.components'),'Pigment mixing must respect the player color inventory.');
@@ -202,21 +202,21 @@ const missionContext={
 };
 runInNewContext(source('js/world/missions.js'),missionContext);
 const missionService=missionContext.window.KeynlockMissions;
-assert(missionService.start('hillsfar',1,{guided:true,orderId:'hillsfar-1',stepId:'main'})===true,'Guided mission must launch.');
+assert(missionService.start('keyprofile',1,{guided:true,orderId:'keyprofile-1',stepId:'main'})===true,'Guided mission must launch.');
 const firstRound=missionService.active.roundId;
 assert(missionService.retry()&&missionService.active.roundId>firstRound&&missionService.active.guided,'Retry must preserve the guided mission and create a new round.');
-assert(missionService.active.orderId==='hillsfar-1'&&missionService.active.stepId==='main','Retry must preserve the order and puzzle identity.');
+assert(missionService.active.orderId==='keyprofile-1'&&missionService.active.stepId==='main','Retry must preserve the order and puzzle identity.');
 missionContext.solved=true;missionContext.inactive=true;
 missionContext.window.markMissionCleared();
-assert(missionWrites.get('lockpickMissions')['hillsfar-1'],'A retried mission must be credited.');
+assert(missionWrites.get('lockpickMissions')['keyprofile-1'],'A retried mission must be credited.');
 missionContext.window.markMissionCleared();
 assert(missionEvents.filter(e=>e.type==='keynlock-mission-cleared').length===1,'A mission completion must only be emitted once.');
 missionService.start('museum',1,{guided:true});
-missionContext.mode='mass2';missionContext.solved=true;
+missionContext.mode='pairednodes';missionContext.solved=true;
 missionContext.window.markMissionCleared();
 assert(!missionWrites.get('lockpickMissions')['museum-1'],'Winning another mode must not credit the abandoned mission.');
 missionContext.window.KeynlockResources.state.picks=0;
-assert(!missionService.start('hillsfar',1),'Physical missions must reject zero picks.');
+assert(!missionService.start('keyprofile',1),'Physical missions must reject zero picks.');
 assert(missionService.start('museum',1)===true,'Logic missions must remain playable with zero picks.');
 console.log('Mission lifecycle OK — guided retry, single credit, stale-round rejection and zero-pick access.');
 
@@ -248,19 +248,19 @@ for(const order of routeOrders){
 }
 assert(routeProgress.next()===null&&routeProgress.completed.length===routeOrders.length,'The entire route must be completable.');
 const migrated=route.createProgress(routeOrders,{introduced:true,completed:['museum','wharf']});
-assert(migrated.done(routeOrders[0])&&migrated.next().id==='hillsfar-1','Old journal progress must migrate by mode, without unlocking tier two.');
+assert(migrated.done(routeOrders[0])&&migrated.next().id==='keyprofile-1','Old journal progress must migrate by mode, without unlocking tier two.');
 assert(!migrated.allowed(tierTwo),'Legacy completion must not unlock tier two.');
 const flexible=route.buildOrders({catalog:gameCatalog,places:content.world.missionPlaces,overrides:{
-  'wharf-1':{steps:[{id:'main',mode:'wharf',tier:1},{id:'inner',mode:'hillsfar',tier:1},{id:'last',mode:'wharf',tier:1}]}
+  'wharf-1':{steps:[{id:'main',mode:'wharf',tier:1},{id:'inner',mode:'keyprofile',tier:1},{id:'last',mode:'wharf',tier:1}]}
 }});
 let flexibleProgress=route.createProgress(flexible);
 assert(!flexibleProgress.complete('wharf-1','last','wharf',1),'A later puzzle in the same job must remain locked.');
 assert(flexibleProgress.complete('wharf-1','main','wharf',1),'First puzzle should be credited.');
 flexibleProgress=route.createProgress(flexible,flexibleProgress.snapshot());
 assert(flexibleProgress.step(flexible[0]).id==='inner'&&!flexibleProgress.done(flexible[0]),'Reload must preserve partial job completion.');
-assert(flexibleProgress.complete('wharf-1','inner','hillsfar',1),'Second puzzle should be credited.');
+assert(flexibleProgress.complete('wharf-1','inner','keyprofile',1),'Second puzzle should be credited.');
 assert(flexibleProgress.complete('wharf-1','last','wharf',1),'Repeated mode with a different step ID should be credited.');
-assert(flexibleProgress.next().id==='hillsfar-1','Only all three puzzles complete the job.');
+assert(flexibleProgress.next().id==='keyprofile-1','Only all three puzzles complete the job.');
 for(const [n,word] of [[0,'отмычек'],[1,'отмычка'],[2,'отмычки'],[3,'отмычки'],[5,'отмычек'],[11,'отмычек'],[21,'отмычка'],[22,'отмычки']]){
   assert(route.quantity(n,['отмычка','отмычки','отмычек'])===`${n} ${word}`,'Russian tool quantity is incorrect.');
 }
@@ -270,7 +270,7 @@ console.log(`Campaign route OK — ${routeOrders.length} orders, tier gates, leg
 flexibleProgress.beginReplay(flexible[0]);
 assert(flexibleProgress.complete('wharf-1','main','wharf',1),'A completed job can be replayed.');
 assert(flexibleProgress.step(flexible[0]).id==='inner','Replay must continue to its second puzzle.');
-assert(flexibleProgress.complete('wharf-1','inner','hillsfar',1)&&flexibleProgress.complete('wharf-1','last','wharf',1),'Replay must allow all three puzzles.');
+assert(flexibleProgress.complete('wharf-1','inner','keyprofile',1)&&flexibleProgress.complete('wharf-1','last','wharf',1),'Replay must allow all three puzzles.');
 assert(flexibleProgress.replayOrder===null&&flexibleProgress.done(flexible[0]),'Finishing a replay must preserve original completion.');
 
 // Repeated HUD ticks must not mutate the DOM when their displayed values match.
@@ -342,7 +342,7 @@ console.log('Guard encounters OK — three outcomes, zero coins, odd rounding, s
 const progressionRewardContext={window:{KeynlockContent:content}};
 runInNewContext(source('js/core/reward-policy.js'),progressionRewardContext);
 const policy=progressionRewardContext.window.KeynlockRewardPolicy;
-const openingModes=['wharf','hillsfar','mass2','museum','classic','sequence','special','pipeline','bioshock2','composite'];
+const openingModes=['wharf','keyprofile','pairednodes','museum','classic','sequence','special','pipeline','timingneedle','composite'];
 let milestones=0,bonuses=0;const claimed={};
 for(const mode of openingModes){
   const id=`${mode}-1`;
@@ -360,3 +360,7 @@ assert(!policy.handleDrop({id:'scope-1',misses:0,claimed,chance:.04,roll:.04}).d
 console.log('Progression rewards OK — eight milestones, one-time coin bonuses, random drops and five-win pity.');
 
 await import("./story-check.mjs");
+
+await import("./audio-check.mjs");
+
+await import("./release-fixes-check.mjs");

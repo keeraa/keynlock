@@ -1,6 +1,6 @@
 /* Pure reward decisions shared by gameplay, previews and scenario checks. */
 (() => {
-  const opening=['wharf','hillsfar','mass2','museum','classic','sequence','special','pipeline','bioshock2','composite'];
+  const opening=['wharf','keyprofile','pairednodes','museum','classic','sequence','special','pipeline','timingneedle','composite'];
   const guaranteed=new Set([0,1,2,3,4,5,7,9].map(i=>`${opening[i]}-1`));
   function firstClearBonus(id,claimed){
     if(claimed[id])return 0;

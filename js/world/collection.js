@@ -272,6 +272,25 @@
     // re-render lands.
     return typeof cached === 'string' ? cached : null;
   }
+  function pendingHandleRewards(){
+    const collection=PICK_COLLECTIONS.find(col=>!collectionReady(col));
+    return collection?collection.handles.filter(handle=>!isUnlocked(handle)).map(handle=>({collection,handle})):[];
+  }
+  function handleRewardPreview(missionId,tier=1){
+    const candidates=pendingHandleRewards();
+    if(!candidates.length)return {complete:true,chance:0,tip:'Все рукоятки собраны.'};
+    const saved=STORE.getJSON('keynlockHandleDropProgress',{});
+    const claimed=saved.claimed||STORE.getJSON('keynlockHandleRewardedMissions',{});
+    const misses=Math.max(0,Number(saved.misses)||0);
+    const baseChance=window.KeynlockContent.economy.lockLoot[tier].handleChance;
+    const guaranteed=window.KeynlockRewardPolicy.handleDrop({id:missionId,misses,claimed,chance:baseChance,roll:1});
+    const left=Math.max(1,window.KeynlockContent.economy.handlePity-misses);
+    const {collection,handle}=candidates[0];
+    const guarantee=guaranteed.milestone?'За это сюжетное задание рукоятка гарантирована при следующей победе.':left===1?'Следующая победа гарантированно принесёт рукоятку.':`Если рукоятка не выпадет раньше, она гарантированно выпадет через ${window.KeynlockCampaignRoute.quantity(left,['победу','победы','побед'])}, включая победу в этой миссии.`;
+    return {complete:false,chance:guaranteed.drop?100:Math.round(baseChance*100),left,
+      image:handle.image,name:`${collection.name} · ${handle.id.split('-').at(-1)}`,collection:collection.name,count:candidates.length,
+      tip:`${guarantee} Учитываются победы во всех миссиях, включая повторные. После выпадения счётчик сбрасывается; максимум — ${window.KeynlockContent.economy.handlePity} побед между рукоятками. На изображении один из возможных вариантов: ${collection.name}. Выпадает случайная ненайденная рукоятка из этой коллекции, без повторов. Район на выбор не влияет.`};
+  }
   window.KeynlockCollection = {
     getInventoryRail(count){
       // Keep every available slot visible while the shaft+handle composite
@@ -295,16 +314,15 @@
       STORE.setJSON('keynlockHandleDropProgress',{claimed,misses:reward?0:misses+1});
       return reward;
     },
+    handleRewardPreview,
     handleRewardHint(missionId,tier=1){
-      if(!PICK_COLLECTIONS.some(col=>!collectionReady(col)))return 'Все рукоятки собраны';
-      const saved=STORE.getJSON('keynlockHandleDropProgress',{}),claimed=saved.claimed||STORE.getJSON('keynlockHandleRewardedMissions',{});
-      if(window.KeynlockRewardPolicy.isMilestone(missionId)&&!claimed[missionId])return 'Гарантированная рукоятка';
-      const left=Math.max(1,window.KeynlockContent.economy.handlePity-(saved.misses||0));
-      return `Шанс рукоятки ${Math.round(window.KeynlockContent.economy.lockLoot[tier].handleChance*100)}% · гарантия не позже чем через ${window.KeynlockCampaignRoute.quantity(left,['победу','победы','побед'])}`;
+      const preview=handleRewardPreview(missionId,tier);
+      if(preview.complete)return 'Все рукоятки собраны';
+      if(preview.chance===100)return 'Гарантированная рукоятка';
+      return `Шанс рукоятки ${preview.chance}% · гарантия не позже чем через ${window.KeynlockCampaignRoute.quantity(preview.left,['победу','победы','побед'])}`;
     },
     unlockRandomHandle(){
-      const collection=PICK_COLLECTIONS.find(col=>!collectionReady(col));
-      const locked=collection?collection.handles.filter(handle=>!isUnlocked(handle)).map(handle=>({collection,handle})):[];
+      const locked=pendingHandleRewards();
       if(!locked.length)return null;
       const reward=locked[Math.floor(Math.random()*locked.length)];
       unlockedOverrides[reward.handle.id]=true;

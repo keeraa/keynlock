@@ -34,7 +34,7 @@
 /* Legacy game styles used to scale their own header. The shared HUD is now
    the only header owner and must always retain viewport geometry. */
 body.importedMode .globalTopHud,
-body.mode-hillsfar .globalTopHud{
+body.mode-keyprofile .globalTopHud{
   padding:0!important;
   margin:0!important;
   transform:none!important;

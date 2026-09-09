@@ -1,5 +1,5 @@
 (function(){
-  // ===== RISEN 2 — ВЕРФЬ (wharf) =====
+  // ===== wharf — ВЕРФЬ (wharf) =====
   let wfSequence=[], wfStep=0, wfPos=0, wfWrong=-1, wfStress=0, wfBarEls=[], wfBarCount=6;
   // A row of bolts ("задвижки") must be raised in a hidden order. The order
   // isn't a flat shuffle — wfMakeSequence walks it so each next bolt tends to
@@ -7,7 +7,7 @@
   // adjacent latches. Raising the right bolt advances the sequence; raising
   // the wrong one resets it to the start. Ported from the old prototype scene
   // (prototypes/lockpicking-mechanics-v63.html, "Portable game module:
-  // risen-2", data-name="Risen 2") into a fully native mode.
+  // wharf", data-name="wharf") into a fully native mode.
   //
   // Everything here uses a "wf" prefix to keep the mode isolated in the
   // shared module scope.

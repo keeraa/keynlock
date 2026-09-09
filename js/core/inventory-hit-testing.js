@@ -296,7 +296,7 @@
   const tensionLabels=[null,'Bar','Hook','Kink','Wave','Angle'];
   const typeOrder=['bar','hook','kink','wave','angle'];
   const typeBySkin={1:'bar',2:'hook',3:'kink',4:'wave',5:'angle'};
-  const typedTensionModes=new Set(['classic','sequence','special','g1']);
+  const typedTensionModes=new Set(['classic','sequence','special','turnmemory']);
 
   TENSION_SKINS.splice(0,TENSION_SKINS.length,...tensionSkins);
   TENSION_SKIN_LABELS.splice(0,TENSION_SKIN_LABELS.length,...tensionLabels);
@@ -394,8 +394,8 @@
     nudgeTools();
     SFX.wrongLock();
 
-    if(mode==='skyrim'){
-      PuzzleModes.action('skyrim','wrongTool');
+    if(mode==='workingangle'){
+      PuzzleModes.action('workingangle','wrongTool');
     }else{
       shakeUniversalLock?.();
     }
@@ -426,7 +426,7 @@
   ['classic','sequence','special'].forEach(modeId=>{
     GameActions.registerOpenGuard(modeId,()=>!forceWrongTensionBreak());
   });
-  GameActions.registerOpenGuard('g1',()=>!forceWrongTensionBreak());
+  GameActions.registerOpenGuard('turnmemory',()=>!forceWrongTensionBreak());
 
   // init.js bound these two handlers by function reference before this patch runs.
   // Capture them so the same guard still applies to their dedicated controls.

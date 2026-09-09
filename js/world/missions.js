@@ -1,9 +1,8 @@
   // One medallion per mission. Artwork coordinates and icons live in world.js;
   // difficulty and completion stay shared with the order progression.
 
-  // Open everything while the game is being built. Flip this off to let the
-  // chapter gate below decide.
-  const MISSIONS_UNLOCK_ALL=window.KeynlockContent.world.missionsUnlockedForTesting;
+  // Free exploration is a game rule, independent of the guided journal.
+  const FREE_MISSION_ACCESS=window.KeynlockContent.world.missionAccess==='free';
   const MISSION_TIERS=window.KeynlockContent.world.missionTiers;
   const MISSION_PLACES=window.KeynlockContent.world.missionPlaces;
 
@@ -58,12 +57,12 @@
   function missionRequiresPicks(mode){return !!GameCatalog.feature(mode,'lock.requiresPick');}
   function playerHasPicks(){return Number(window.KeynlockResources?.state?.picks)>0;}
   function chapterCleared(tier) { return MISSION_PLACES.filter(p=>gameSupportsTier(p.mode,tier)).every(p => missionCleared(p.mode, tier)); }
-  // A chapter opens once the one before it is finished. With the dev flag on,
-  // every chapter and every place is reachable from the start.
+  // Ordered map variants open a difficulty after the previous one is cleared.
+  // The free-play map exposes every supported difficulty from the start.
   function chapterUnlocked(tier) {
-    return MISSIONS_UNLOCK_ALL || tier === 1 || chapterCleared(tier - 1);
+    return FREE_MISSION_ACCESS || tier === 1 || chapterCleared(tier - 1);
   }
-  function missionUnlocked() { return MISSIONS_UNLOCK_ALL || chapterUnlocked(mapChapter); }
+  function missionUnlocked() { return FREE_MISSION_ACCESS || chapterUnlocked(mapChapter); }
 
   // Register every place as a map location so travel, the player dot and the
   // info panel all keep working unchanged.
@@ -95,7 +94,7 @@
       if(!MISSION_TIERS.includes(options.tier)||!chapterUnlocked(options.tier))return false;
       mapChapter=options.tier;
     }
-    if (!missionUnlocked()) { toast('Эта глава ещё закрыта'); return; }
+    if (!missionUnlocked()) { toast('Этот уровень пока закрыт'); return; }
     if(!gameSupportsTier(loc.mode,mapChapter)){toast(`${loc.name}: уровень ${mapChapter} ещё не готов`);return;}
     if(missionRequiresPicks(loc.mode)&&!playerHasPicks()){toast('Нет отмычек · вернись в логово и подготовь новые');return;}
 
@@ -120,7 +119,7 @@
     newLock(false);
     activeMissionRun = { id: missionRunId(loc.mode, mapChapter), mode: loc.mode, tier: mapChapter, roundId: activeRoundId, guided:options.guided===true, orderId:options.orderId||null, stepId:options.stepId||null };
     window.dispatchEvent(new CustomEvent('keynlock-mission-started',{detail:{...activeMissionRun}}));
-    toast(`${loc.name} · глава ${mapChapter}`);
+    toast(`${loc.name} · уровень ${mapChapter}`);
     return true;
   }
   window.startMapMission = startMapMission;
@@ -217,20 +216,32 @@
     function block(image,value,label,tip){
       const item=document.createElement('div');
       item.className='lootRow mapLootItem';item.tabIndex=0;
-      item.dataset.tip=tip;item.title=tip;item.setAttribute('aria-label',`${label}: ${value}. ${tip}`);
+      item.dataset.tip=`${label}. ${tip}`;item.setAttribute('aria-label',`${label}: ${value}. ${tip}`);
       const icon=document.createElement('img');icon.className='lootResourceIcon';icon.src=image;icon.alt='';
-      const copy=document.createElement('span'),amount=document.createElement('b'),caption=document.createElement('small');
-      amount.textContent=value;caption.textContent=label;copy.append(amount,caption);item.append(icon,copy);root.append(item);
+      const amount=document.createElement('b');
+      amount.textContent=value;item.append(icon,amount);root.append(item);
     }
     block('assets/ui/money-ico.png',`до ${maxCoins}`,'Монеты',`Сумма зависит от числа действий. Максимум включает 25 монет за взлом без поломок с множителем уровня.${bonus?` Премия за первое прохождение: ${bonus} монет.`:''}`);
     block('assets/ui/details-ico.png',range(table.parts),'Детали','Из двух деталей можно создать одну отмычку.');
     block('assets/ui/portrait-ico.png',`${paintingChance}%`,'Картина',!available?'Все картины этого района уже найдены.':firstClear?'При первом прохождении гарантирована новая картина из этого района.':'Шанс найти новую картину при повторном прохождении.');
+    const reward=window.KeynlockCollection.handleRewardPreview(missionRunId(loc.mode,mapChapter),mapChapter);
+    const handleBlock=document.createElement('div');handleBlock.className='mapLootHandle';handleBlock.tabIndex=0;handleBlock.dataset.tip=reward.tip;
+    const handleCopy=document.createElement('span'),handleChance=document.createElement('b');
+    handleChance.textContent=reward.complete?'Все рукоятки собраны':`Шанс рукоятки ${reward.chance}%`;
+    handleCopy.append(handleChance);
+    if(!reward.complete){
+      const art=document.createElement('span');art.className='lootHandleArt';
+      const image=document.createElement('img');image.src=reward.image;image.alt=`Возможная рукоятка: ${reward.name}`;
+      art.append(image);handleBlock.append(art);
+      const pool=document.createElement('small');pool.textContent=`${reward.collection} · одна из ${reward.count}`;handleCopy.append(pool);
+    }
+    handleBlock.append(handleCopy);root.append(handleBlock);
     const colors=document.createElement('div');colors.className='mapLootColors';
     const caption=document.createElement('span');caption.textContent=`Компоненты: ${range(table.components)} · случайный цвет`;
     const palette=document.createElement('span');palette.className='mapLootPalette';
     for(const color of window.KeynlockContent.economy.components){
-      const dot=document.createElement('i');dot.className='lootColor';dot.style.setProperty('--loot-color',color.color);
-      dot.tabIndex=0;dot.title=`${color.name} компонент`;dot.dataset.tip=dot.title;dot.setAttribute('aria-label',dot.title);palette.append(dot);
+      const dot=document.createElement('img');dot.className='componentIcon';dot.src=color.image;dot.alt='';dot.draggable=false;
+      dot.tabIndex=0;dot.title=`${color.material} · ${color.name} компонент`;dot.dataset.tip=dot.title;dot.setAttribute('aria-label',dot.title);palette.append(dot);
     }
     colors.append(caption,palette);root.append(colors);
   }
@@ -309,8 +320,10 @@
     if(preview.getAttribute('src')!==previewSource)preview.src=previewSource;
     preview.alt=`Превью головоломки «${game.title}»`;
     renderMapLoot(loc,bonus);
-    document.querySelector('#mapCardReward').textContent=window.KeynlockCollection?.handleRewardHint(rewardId,mapChapter)||'';
-    document.querySelector('#mapCardStatus').textContent=!supported?'Этот уровень ещё не готов.':!missionUnlocked()?'Этот уровень пока закрыт.':missingPicks?'Нужна отмычка. Подготовь её на верстаке в логове.':missionCleared(loc.mode,mapChapter)?'✓ Уровень пройден. Можно сыграть снова.':missionRequiresPicks(loc.mode)?'Для взлома нужна отмычка.':'Отмычка не требуется.';
+    const status=document.querySelector('#mapCardStatus');
+    status.textContent=!supported?'Этот уровень ещё не готов.':!missionUnlocked()?'Этот уровень пока закрыт.':missingPicks?'':missionCleared(loc.mode,mapChapter)?'✓ Уровень пройден. Можно сыграть снова.':missionRequiresPicks(loc.mode)?'Для взлома нужна отмычка.':'Отмычка не требуется.';
+    status.hidden=!status.textContent;
+    $mapLocationAction.textContent=missingPicks?'Нет отмычек. Подготовь их на верстаке':'Начать взлом';
     $mapLocationAction.hidden=false;
     $mapLocationAction.disabled=!supported||!missionUnlocked()||missingPicks;
   };

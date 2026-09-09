@@ -8,21 +8,28 @@
   const state=saved||{seen:{},pending:[],active:null,firstPaintingId:null,restored:false};
   // Existing players keep their progress without receiving a backlog of scenes.
   if(!saved)for(const id of window.KeynlockCampaign.progress.completed){state.seen[`${id}:before`]=true;state.seen[`${id}:after`]=true;}
+  const storyIds=Object.keys(chapter.orders);
+  const finalId=storyIds.at(-1);
+  const complete=()=>storyIds.every(id=>window.KeynlockCampaign.progress.completed.includes(id));
+  // Old completed saves get the permanent journal summary, not a surprise scene.
+  if(state.endingSeen===undefined)state.endingSeen=complete()&&!state.pending.length&&!state.active;
   function persist(){store.setJSON(key,state);}
   persist();
   let showing=false;
   function launch(run){window.KeynlockMissions.start(run.mode,run.tier,{guided:true,orderId:run.orderId,stepId:run.stepId});}
   function play(scene,done){
     if(showing)return;
-    const entry=chapter.orders[scene.id];
+    const ending=scene.phase==='ending';
+    const entry=ending?chapter.ending:chapter.orders[scene.id];
     if(!entry)return;
     showing=true;
     const opened=window.KeynlockDialogs.scene({
-      heading:`${chapter.title} · ${entry.title}`,lines:entry[scene.phase],page:scene.page,
-      action:scene.phase==='before'?'К заказу':'В логово',
+      heading:ending?entry.title:`${chapter.title} · ${entry.title}`,lines:ending?entry.lines:entry[scene.phase],page:scene.page,
+      action:scene.phase==='before'?'К заказу':'Вернуться в логово',
       onPage(page){state.active={...scene,page};persist();},
       done(){
-        state.seen[`${scene.id}:${scene.phase}`]=true;
+        if(ending)state.endingSeen=true;
+        else state.seen[`${scene.id}:${scene.phase}`]=true;
         if(scene.phase==='after')state.pending=state.pending.filter(id=>id!==scene.id);
         state.active=null;persist();showing=false;done?.();
       }
@@ -38,8 +45,10 @@
     }
     const id=state.pending.find(id=>id!=='wharf-1'||state.restored);
     if(id)play({id,phase:'after',page:0},flush);
+    else if(complete()&&!state.endingSeen&&state.seen[`${finalId}:after`])play({phase:'ending',page:0},flush);
   }
   window.KeynlockChapterStory={
+    ending(){if(!complete()||showing)return false;play({phase:'ending',page:0},flush);return showing;},
     before(run){
       const id=run.orderId;
       if(!chapter.orders[id]||state.seen[`${id}:before`]){launch(run);return;}
@@ -58,7 +67,7 @@
   });
   window.addEventListener('keynlock-lair-opened',()=>queueMicrotask(flush));
   window.addEventListener('keynlock:play',()=>{
-    if(state.active||state.pending.some(id=>id!=='wharf-1'||state.restored)){
+    if(state.active||state.pending.some(id=>id!=='wharf-1'||state.restored)||(complete()&&!state.endingSeen)){
       if(!document.body.classList.contains('solved-notice-visible'))window.KeynlockLair.open();
       queueMicrotask(flush);
     }

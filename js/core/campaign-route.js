@@ -2,7 +2,7 @@
    puzzles does not require changing the journal or its save format. */
 (() => {
   'use strict';
-  function buildOrders({catalog,places,tiers=[1,2,3],first=['wharf','hillsfar','mass2','museum'],overrides={}}){
+  function buildOrders({catalog,places,tiers=[1,2,3],first=['wharf','keyprofile','pairednodes','museum'],overrides={}}){
     const modes=[...new Set([...first,...places.map(p=>p.mode)])].filter(id=>places.some(p=>p.mode===id));
     const orders=[];
     for(const tier of tiers)for(const mode of modes){

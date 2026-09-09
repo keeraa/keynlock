@@ -147,8 +147,8 @@ body.importedMode .pinTopLayer{display:none!important;}
   }
   .plate{touch-action:none!important;}
 
-  /* Gothic 1 was sitting too close to the bottom controls. */
-  body.importedMode .g1ProgressWrap{
+  /* turnmemory was sitting too close to the bottom controls. */
+  body.importedMode .turnmemoryProgressWrap{
     margin-top:-24px!important;
     top:38%!important;
     left:0!important;
@@ -156,7 +156,7 @@ body.importedMode .pinTopLayer{display:none!important;}
     width:100%!important;
     transform:none!important;
   }
-  body.importedMode .g1ProgressRow{
+  body.importedMode .turnmemoryProgressRow{
     display:grid!important;
     grid-template-columns:repeat(4,52px)!important;
     width:max-content!important;
@@ -165,7 +165,7 @@ body.importedMode .pinTopLayer{display:none!important;}
     justify-content:center!important;
   }
 
-  /* Anachronox: remove the oversized 760px transformed layout that could
+  /* signalbalance: remove the oversized 760px transformed layout that could
      shift outside the viewport and size the console directly for mobile. */
   body.importedMode .anMode{padding-top:0!important;overflow-x:hidden!important;}
   body.importedMode .anBoard{
@@ -208,21 +208,21 @@ body.importedMode .pinTopLayer{display:none!important;}
   body.importedMode .anBtn{width:38px!important;height:38px!important;}
   body.importedMode .anValue{font-size:16px!important;}
 
-  /* Hillsfar: six candidate keys are larger and begin lower so they do not
+  /* keyprofile: six candidate keys are larger and begin lower so they do not
      visually collide with the lock-cut pattern above them. */
-  body.mode-hillsfar .hfCandidates{
+  body.mode-keyprofile .hfCandidates{
     width:min(396px,96vw)!important;
     grid-template-columns:repeat(2,minmax(0,1fr))!important;
     gap:14px 10px!important;
     margin-top:28px!important;
   }
-  body.mode-hillsfar .hfCandidate{
+  body.mode-keyprofile .hfCandidate{
     width:100%!important;
     max-width:none!important;
     min-height:84px!important;
     height:84px!important;
   }
-  body.mode-hillsfar .hfCandidate svg{
+  body.mode-keyprofile .hfCandidate svg{
     width:100%!important;
     max-width:176px!important;
     height:80px!important;

@@ -152,7 +152,7 @@
     if(speed<NOISE_MOUSE_SPEED||now-noisePointerBurstAt<NOISE_MOUSE_COOLDOWN)return;
     noisePointerBurstAt=now;
     const strength=Math.min(1,(speed-NOISE_MOUSE_SPEED)/2.5);
-    const gameScale=noiseGameId()==='prototype:fallout' ? .18 : 1;
+    const gameScale=noiseGameId()==='prototype:torqueangle' ? .18 : 1;
     addNoise((.032+strength*.100)*gameScale);
   }
   window.addEventListener('pointermove',trackPointerNoise,{passive:true});

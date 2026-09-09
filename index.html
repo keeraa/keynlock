@@ -11,25 +11,25 @@
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/components.css">
 <link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/modes-01-hillsfar.css">
-<link rel="stylesheet" href="css/modes-03-gothic1.css">
-<link rel="stylesheet" href="css/modes-05-skyrim.css">
-<link rel="stylesheet" href="css/modes-06-anachronox.css">
-<link rel="stylesheet" href="css/modes-07-oblivion.css">
-<link rel="stylesheet" href="css/modes-08-watchmen.css">
+<link rel="stylesheet" href="css/modes-01-keyprofile.css">
+<link rel="stylesheet" href="css/modes-03-turnmemory.css">
+<link rel="stylesheet" href="css/modes-05-workingangle.css">
+<link rel="stylesheet" href="css/modes-06-signalbalance.css">
+<link rel="stylesheet" href="css/modes-07-pinflight.css">
+<link rel="stylesheet" href="css/modes-08-springtumblers.css">
 <link rel="stylesheet" href="css/modes-09-museum.css">
 <link rel="stylesheet" href="css/silhouettes.css">
-<link rel="stylesheet" href="css/modes-10-mass2.css">
+<link rel="stylesheet" href="css/modes-10-pairednodes.css">
 <link rel="stylesheet" href="css/modes-11-pipeline.css">
 <link rel="stylesheet" href="css/modes-12-wharf.css">
-<link rel="stylesheet" href="css/modes-13-thiefds.css">
-<link rel="stylesheet" href="css/modes-14-kingdomcome.css">
-<link rel="stylesheet" href="css/modes-15-thief12.css">
-<link rel="stylesheet" href="css/modes-16-fallout.css">
-<link rel="stylesheet" href="css/modes-18-masshack.css">
-<link rel="stylesheet" href="css/modes-19-pathologic.css">
-<link rel="stylesheet" href="css/modes-20-bioshock2.css">
-<link rel="stylesheet" href="css/modes-21-alphaprotocol.css">
+<link rel="stylesheet" href="css/modes-13-ringsecret.css">
+<link rel="stylesheet" href="css/modes-14-cylinderpath.css">
+<link rel="stylesheet" href="css/modes-15-soundlatch.css">
+<link rel="stylesheet" href="css/modes-16-torqueangle.css">
+<link rel="stylesheet" href="css/modes-18-ringpassage.css">
+<link rel="stylesheet" href="css/modes-19-twinbalance.css">
+<link rel="stylesheet" href="css/modes-20-timingneedle.css">
+<link rel="stylesheet" href="css/modes-21-symbolpins.css">
 <link rel="stylesheet" href="css/world-01-shared.css">
 <link rel="stylesheet" href="css/tools-shared.css">
 <link rel="stylesheet" href="css/map.css">
@@ -57,13 +57,6 @@
 <link rel="stylesheet" href="css/onboarding.css">
 <link rel="stylesheet" href="css/restoration-guide.css">
 
-
-
-
-
-
-
-
 </head>
 <body class="assets-loading">
 <div class="bootLoader" id="bootLoader" aria-label="Загрузка KEYNLOCK">
@@ -73,26 +66,35 @@
   <div class="bootLoaderControls">
     <div class="bootLoaderBar"><span id="bootLoaderProgress"></span></div>
     <nav class="mainMenu" id="mainMenu" aria-label="Главное меню" hidden>
-      <button class="mainMenuButton mainMenuPrimary uiButton" id="mainMenuNew" type="button">Новая игра</button>
       <button class="mainMenuButton uiButton" id="mainMenuContinue" type="button">Продолжить</button>
+      <button class="mainMenuButton mainMenuPrimary uiButton" id="mainMenuNew" type="button">Новая игра</button>
       <button class="mainMenuButton uiButton" id="mainMenuSave" type="button">Сохранить игру</button>
       <button class="mainMenuButton uiButton" id="mainMenuLoad" type="button">Загрузить игру</button>
       <button class="mainMenuButton uiButton" id="mainMenuSettings" type="button">Настройки</button>
     </nav>
     <section class="mainMenuPanel" id="mainMenuSlots" hidden aria-label="Слоты сохранений">
       <div class="mainMenuPanelHeader"><strong id="mainMenuSlotsTitle">Сохранить игру</strong><button type="button" data-main-menu-back aria-label="Назад">×</button></div>
+      <p data-save-slot-status role="status" hidden></p>
       <div class="mainMenuSlotList" id="mainMenuSlotList"></div>
     </section>
     <section class="mainMenuPanel mainMenuSettings" id="mainMenuSettingsPanel" hidden aria-label="Настройки">
       <div class="mainMenuPanelHeader"><strong>Настройки</strong><button type="button" data-main-menu-back aria-label="Назад">×</button></div>
       <label><span>Громкость музыки</span><input id="mainMenuMusicVolume" type="range" min="0" max="100" step="1" value="28"><output id="mainMenuMusicVolumeValue">28%</output></label>
+      <label><span>Громкость звуков</span><input id="mainMenuSoundVolume" type="range" min="0" max="100" step="1" value="100"><output id="mainMenuSoundVolumeValue">100%</output></label>
       <label class="mainMenuCheck"><input id="mainMenuTraining" type="checkbox"><span>Режим обучения</span></label>
       <label class="mainMenuCheck"><input data-hide-hints type="checkbox"><span>Не показывать подсказки</span></label>
       <label class="mainMenuCheck"><input id="mainMenuReduceMotion" type="checkbox"><span>Уменьшить анимацию</span></label>
+      <div class="saveBackupActions"><button class="uiButton" type="button" data-save-backup>Скачать копию</button><button class="uiButton" id="saveBackupImport" type="button">Загрузить копию</button></div>
+      <input id="saveBackupFile" type="file" accept=".json,application/json" hidden>
+      <p id="saveBackupStatus" role="status"></p>
     </section>
   </div>
 </div>
 </div>
+<aside id="saveFailureNotice" class="saveFailureNotice" role="alert" hidden>
+  <p id="saveFailureText">Прогресс не сохраняется в браузере и может пропасть после закрытия игры. Скачай резервную копию.</p>
+  <div><button class="uiButton" type="button" data-save-backup>Скачать копию</button><button class="uiButton" id="saveRetry" type="button">Повторить сохранение</button></div>
+</aside>
 <div class="app" id="app">
 <header class="globalTopHud" id="globalTopHud" aria-label="Верхнее меню игры">
 <div class="topRightHud">
@@ -107,7 +109,7 @@
   <button class="mapCornerBtn hudNavBtn" id="lairHudButton" type="button" aria-label="Логово" title="Логово">
     <img class="hudNavArtwork" src="assets/ui/lair-ico.png" alt="">
   </button>
-  <button class="mapCornerBtn hudNavBtn" id="gameSettingsButton" type="button" aria-label="Главное меню" title="Главное меню">
+  <button class="mapCornerBtn hudNavBtn" id="gameSettingsButton" type="button" aria-label="Настройки" title="Настройки">
     <img class="hudNavArtwork" src="assets/ui/settings-ico.png" alt="">
   </button>
   <div class="assetNameHud" id="assetNameHud" aria-live="polite">
@@ -117,7 +119,7 @@
 
 <div class="screenTopHud alchemyTopHud" id="alchemyTopHud">
   <button class="screenTopHudClose" id="alchemyTopHudClose" type="button" aria-label="Закрыть алхимию">×</button>
-  <div class="screenTopHudTitle">Алхимия</div>
+  <div class="screenTopHudTitle" tabindex="0" data-tip="Практика: компоненты не расходуются, результат не сохраняется в запасах">Алхимия · практика</div>
   <div class="alchemyStations" id="alchemyStations" role="tablist" aria-label="Станции">
     <button class="alchemyStationTab active" type="button" data-station="0">Пигменты</button>
     <button class="alchemyStationTab" type="button" data-station="1">Смешение</button>
@@ -224,15 +226,18 @@
   </nav>
   <aside class="mapMissionCard uiPanel" id="mapMissionCard" aria-labelledby="mapInfoTitle" hidden>
     <button class="mapCardClose uiButton" id="mapCardClose" type="button" aria-label="Закрыть описание миссии">×</button>
-    <img class="mapCardArtwork" id="mapCardArtwork" alt="">
+    <div class="mapCardHeader">
+      <img class="mapCardArtwork" id="mapCardArtwork" alt="">
+      <div class="mapCardHeading">
+        <p class="mapCardDistrict" id="mapCardDistrict"></p>
+        <h2 class="worldMapInfoTitle" id="mapInfoTitle"></h2>
+      </div>
+    </div>
     <div class="mapCardBody">
-      <p class="mapCardDistrict" id="mapCardDistrict"></p>
-      <h2 class="worldMapInfoTitle" id="mapInfoTitle"></h2>
       <p class="worldMapInfoText" id="mapInfoText"></p>
       <p class="mapCardMechanic" id="mapCardMechanic" hidden></p>
-      <figure class="mapPuzzlePreview"><img id="mapPuzzlePreview" alt="" loading="lazy"><figcaption>Головоломка</figcaption></figure>
+      <figure class="mapPuzzlePreview"><img id="mapPuzzlePreview" alt="" loading="lazy"></figure>
       <div class="mapCardLoot lootResources" id="mapCardLoot" aria-label="Возможная добыча"></div>
-      <p class="mapCardReward" id="mapCardReward"></p>
       <p class="mapCardStatus" id="mapCardStatus" role="status"></p>
       <button class="uiButton uiButton--primary" id="mapLocationAction" type="button">Начать взлом</button>
     </div>
@@ -241,6 +246,24 @@
 
 <section class="lairOverlay" id="lairOverlay" hidden aria-label="Логово">
   <div class="lairScene">
+    <div class="lairRoom">
+      <button class="lairRoomObject lairRoomObject--alchemy" type="button" data-lair-open="alchemy" aria-label="Алхимия" data-tip="Алхимия">
+        <img src="assets/lair/room/alchemy.png" alt="" draggable="false">
+        <span class="lairRoomHit" aria-hidden="true"></span>
+      </button>
+      <button class="lairRoomObject lairRoomObject--map" type="button" data-lair-action="missions" aria-label="Карта города" data-tip="Карта города">
+        <img src="assets/lair/room/map.png" alt="" draggable="false">
+        <span class="lairRoomHit" aria-hidden="true"></span>
+      </button>
+      <button class="lairRoomObject lairRoomObject--table" type="button" data-lair-open="restoration" aria-label="Мастерская" data-tip="Мастерская">
+        <img src="assets/lair/room/table.png" alt="" draggable="false">
+        <span class="lairRoomHit" aria-hidden="true"></span>
+      </button>
+      <button class="lairRoomObject lairRoomObject--verstak" type="button" data-lair-action="workbench" aria-label="Верстак" data-tip="Верстак">
+        <img src="assets/lair/room/verstak.png" alt="" draggable="false">
+        <span class="lairRoomHit" aria-hidden="true"></span>
+      </button>
+    </div>
     <div class="lairSceneTop">
       <div>
         <div class="lairSceneTitle">Логово</div>
@@ -249,47 +272,24 @@
 
     <div class="lairSceneCharacters" id="lairSceneCharacters" aria-hidden="true"></div>
 
+    <button class="lairHotspot lairHotspotTeam" type="button" data-lair-open="team">
+      <img class="lairActiveCharacterPortrait" id="lairActiveCharacterPortrait" src="assets/characters/portraits/sai.png" alt="Сай">
+    </button>
+
     <button class="lairHotspot lairHotspotCity" type="button" data-lair-open="city">
       <img class="lairHotspotIcon" src="assets/lair/icons/research.png" alt="">
       <span>Анализ города</span>
     </button>
-
     <button class="lairHotspot lairHotspotDialogue" type="button" data-lair-open="dialogue">
       <img class="lairHotspotIcon" src="assets/lair/icons/dialogues.png" alt="">
       <span>Диалоги</span>
     </button>
-
-    <button class="lairHotspot lairHotspotAlchemy" type="button" data-lair-open="alchemy">
-      <img class="lairHotspotIcon" src="assets/lair/icons/alchemy.png" alt="">
-      <span class="lairHotspotLabel">Алхимия</span>
-    </button>
-
-    <button class="lairHotspot lairHotspotMissions" type="button" data-lair-action="missions">
-      <img class="lairHotspotIcon" src="assets/ui/map-ico.png" alt="">
-      <span>Карта города</span>
-    </button>
-
-    <button class="lairHotspot lairHotspotTeam" type="button" data-lair-open="team">
-      <img class="lairActiveCharacterPortrait" id="lairActiveCharacterPortrait" src="assets/characters/portraits/sai.png" alt="Сай">
-      <span class="lairActiveCharacterBadge" id="lairActiveCharacterName" aria-hidden="true">Сай</span>
-    </button>
-
     <button class="lairHotspot lairHotspotCollection" type="button" data-lair-open="collection">
       <img class="lairHotspotIcon" src="assets/lair/icons/collection.png" alt="">
       <span>Коллекция</span>
     </button>
 
-    <button class="lairHotspot lairHotspotRestoration" type="button" data-lair-open="restoration">
-      <img class="lairHotspotIcon" src="assets/map/mechanics/museum.png" alt="">
-      <span>Мастерская</span>
-    </button>
-
-    <button class="lairHotspot lairWorkbenchHotspot" type="button" data-lair-action="workbench">
-      <img class="lairHotspotIcon" src="assets/lair/workbench.jpg" alt="">
-      <span>Верстак</span>
-    </button>
-
-    <div class="lairWorkbenchModal" id="lairWorkbenchModal" hidden aria-label="Верстак">
+    <div class="lairWorkbenchModal lairWorkspace" id="lairWorkbenchModal" hidden aria-label="Верстак">
       <div class="lairWorkbenchDialog" role="dialog" aria-modal="true" aria-label="Верстак и чертежи">
         <img class="lairWorkbenchImage" src="assets/lair/workbench.jpg" alt="Верстак с чертежами замков и инструментами">
         <section class="workbenchCraftPanel uiPanel" aria-label="Изготовление">
@@ -351,9 +351,9 @@
               <button class="ctl" id="pigmentNew" type="button">Новый образец</button>
             </div>
             <div class="pigmentMixBoard">
-              <div class="pigmentTargetCard uiPanel"><span>Цвет заказа</span><i id="pigmentTarget"></i><strong id="pigmentTargetName">—</strong></div>
+              <div class="pigmentTargetCard uiPanel"><span>Цвет заказа</span><div id="pigmentTarget" class="pigmentSample" role="img"></div><strong id="pigmentTargetName">—</strong></div>
               <div class="pigmentEquation" id="pigmentSlots" aria-label="Состав смеси"></div>
-              <div class="pigmentResultCard uiPanel"><span>Текущая смесь</span><i id="pigmentResult"></i><strong id="pigmentResultName">Добавь пигменты</strong></div>
+              <div class="pigmentResultCard uiPanel"><span>Текущая смесь</span><div id="pigmentResult" class="pigmentSample" role="img"></div><strong id="pigmentResultName">Добавь пигменты</strong></div>
             </div>
             <div class="pigmentPaletteWrap">
               <div class="pigmentPaletteHead"><span>Доступные цвета</span><small>Запасы из твоих ресурсов</small></div>
@@ -507,21 +507,21 @@
 <div class="plates" id="plates"></div>
 </div>
 <div class="status" id="status"></div>
-<!-- MODE: GOTHIC 1 -->
-<div class="modePanel g1Mode" data-mode="g1" hidden="" id="g1Mode">
-<div class="g1ProgressWrap">
-<div class="g1ProgressTitle">Введено</div>
-<div class="g1ProgressRow" id="g1ProgressRow"></div>
+<!-- MODE: turnmemory -->
+<div class="modePanel turnmemoryMode" data-mode="turnmemory" hidden="" id="turnmemoryMode">
+<div class="turnmemoryProgressWrap">
+<div class="turnmemoryProgressTitle">Введено</div>
+<div class="turnmemoryProgressRow" id="turnmemoryProgressRow"></div>
 </div>
 
 </div>
-<!-- MODE: OBLIVION -->
-<div class="modePanel obMode" data-mode="oblivion" hidden="" id="obMode">
+<!-- MODE: pinflight -->
+<div class="modePanel obMode" data-mode="pinflight" hidden="" id="obMode">
 <div class="obLock" id="obLock"></div>
 <div class="obStatus" id="obMessage">Лови точное совпадение с верхней прорезью</div>
 </div>
-<!-- MODE: WATCHMEN -->
-<div class="modePanel wmMode" data-mode="watchmen" hidden="" id="wmMode">
+<!-- MODE: springtumblers -->
+<div class="modePanel wmMode" data-mode="springtumblers" hidden="" id="wmMode">
 <div class="wmLockWrap"><div class="wmLock lockShellPuzzleBlock" id="wmLock">
 <div class="wfLockerUp wmLockerUp" aria-hidden="true"><span class="wfLockerCell"></span><span class="wfLockerCell"></span><span class="wfLockerCell"></span><span class="wfLockerCell"></span><span class="wfLockerCell"></span></div>
 <div class="wmChannels"></div>
@@ -538,8 +538,8 @@
 <div class="hmHelp" id="hmHelp"></div>
 <div class="hmPicksWrap"><div class="hmPicks" id="hmPicks"></div></div>
 </div>
-<!-- MODE: MASS2 -->
-<div class="modePanel m2Mode" data-mode="mass2" hidden="" id="mass2Mode">
+<!-- MODE: PAIREDNODES -->
+<div class="modePanel m2Mode" data-mode="pairednodes" hidden="" id="pairednodesMode">
 <div class="m2BoardWrap"><div class="m2Board" id="m2Board"></div></div>
 <div class="m2Help" id="m2Help"></div>
 </div>
@@ -557,8 +557,8 @@
 <div class="wfLockWrap"><div class="wfLock lockShellPuzzleBlock" id="wfLock"></div></div>
 <div class="wfHelp" id="wfHelp"></div>
 </div>
-<!-- MODE: THIEF DS -->
-<div class="modePanel tdsMode" data-mode="thiefds" hidden="" id="thiefdsMode">
+<!-- MODE: ringsecret -->
+<div class="modePanel tdsMode" data-mode="ringsecret" hidden="" id="ringsecretMode">
 <div class="tdsSequence" id="tdsSequence"></div>
 <div class="tdsLockWrap"><div class="tdsLock" id="tdsLock">
 <div class="tdsProbe" id="tdsProbe"></div>
@@ -566,8 +566,8 @@
 </div></div>
 <div class="tdsHelp" id="tdsHelp"></div>
 </div>
-<!-- MODE: KINGDOM COME -->
-<div class="modePanel kcdMode" data-mode="kingdomcome" hidden="" id="kingdomcomeMode">
+<!-- MODE: cylinderpath -->
+<div class="modePanel kcdMode" data-mode="cylinderpath" hidden="" id="cylinderpathMode">
 <div class="kcdLockWrap"><div class="kcdLock" id="kcdLock">
 <div class="kcdRotor"></div>
 <div class="kcdKeyway"></div>
@@ -581,8 +581,8 @@
 <button class="digitalBtn kcdTurnBtn uiButton" id="kcdTurnBtn" type="button">Удерживать вращение · Space</button>
 <div class="kcdHelp" id="kcdHelp"></div>
 </div>
-<!-- MODE: THIEF 1/2 -->
-<div class="modePanel th12Mode" data-mode="thief12" hidden="" id="thief12Mode">
+<!-- MODE: soundlatch -->
+<div class="modePanel th12Mode" data-mode="soundlatch" hidden="" id="soundlatchMode">
 <div class="th12DoorWrap"><div class="th12Door" id="th12Door">
 <div class="th12Keyhole"></div>
 <div class="th12Stages" id="th12Stages">
@@ -602,8 +602,8 @@
 </div>
 <div class="th12Help" id="th12Help"></div>
 </div>
-<!-- MODE: FALLOUT -->
-<div class="modePanel sfMode" data-mode="fallout" hidden="" id="falloutMode">
+<!-- MODE: torqueangle -->
+<div class="modePanel sfMode" data-mode="torqueangle" hidden="" id="torqueangleMode">
 <div class="sfLockWrap"><div class="sfLock" id="sfLock">
 <div class="sfCylinder" id="sfCylinder"></div>
 <div class="sfWrench"></div>
@@ -619,16 +619,16 @@
 </div>
 <div class="sfHelp" id="sfHelp"></div>
 </div>
-<!-- MODE: MASS EFFECT — УЗЕЛ -->
-<div class="modePanel hackMode" data-mode="masshack" hidden="" id="masshackMode">
+<!-- MODE: ringpassage -->
+<div class="modePanel hackMode" data-mode="ringpassage" hidden="" id="ringpassageMode">
 <div class="hackArenaWrap"><div class="hackArena" id="hackArena">
 <button class="hackCore" id="hackCore" type="button" aria-label="Подтвердить ядро"></button>
 <div class="hackPlayer" id="hackPlayer"></div>
 </div></div>
 <div class="hackHelp" id="hackHelp"></div>
 </div>
-<!-- MODE: PATHOLOGIC 2 -->
-<div class="modePanel ptgMode" data-mode="pathologic" hidden="" id="pathologicMode">
+<!-- MODE: twinbalance -->
+<div class="modePanel ptgMode" data-mode="twinbalance" hidden="" id="twinbalanceMode">
 <div class="ptgLockWrap"><div class="ptgLock" id="ptgLock">
 <div class="ptgShear"></div>
 <div class="ptgCol" id="ptgColL"><div class="ptgTooth"><div class="ptgTarget"></div></div></div>
@@ -642,8 +642,8 @@
 </div>
 <div class="ptgHelp" id="ptgHelp"></div>
 </div>
-<!-- MODE: BIOSHOCK 2 -->
-<div class="modePanel bioMode" data-mode="bioshock2" hidden="" id="bioshock2Mode">
+<!-- MODE: timingneedle -->
+<div class="modePanel bioMode" data-mode="timingneedle" hidden="" id="timingneedleMode">
 <div class="bioTopWrap">
 <div class="bioBot" id="bioBot"><div class="bioEye"></div></div>
 <div class="bioPanel"><div class="bioTrack" id="bioTrack"><div class="bioNeedle" id="bioNeedle"></div></div>
@@ -653,8 +653,8 @@
 <div class="bioControls"><button class="digitalBtn uiButton" id="bioStopBtn" type="button">Стоп · Space</button></div>
 <div class="bioHelp" id="bioHelp"></div>
 </div>
-<!-- MODE: ALPHA PROTOCOL -->
-<div class="modePanel apMode" data-mode="alphaprotocol" hidden="" id="alphaprotocolMode">
+<!-- MODE: symbolpins -->
+<div class="modePanel apMode" data-mode="symbolpins" hidden="" id="symbolpinsMode">
 <div class="apLockWrap"><div class="apLock lockShellPuzzleBlock" id="apLock">
 <div class="wfLockerUp apLockerUp" aria-hidden="true"><span class="wfLockerCell"></span><span class="wfLockerCell"></span><span class="wfLockerCell"></span><span class="wfLockerCell"></span><span class="wfLockerCell"></span></div>
 <img class="wfLockerLip apLockerLip" src="assets/lock-shell/locker-up-01.png" alt="" aria-hidden="true">
@@ -667,8 +667,8 @@
 <div class="apSequence" id="apSequence"></div>
 </div></div>
 </div>
-<!-- MODE: HILLSFAR -->
-<div class="modePanel hillsfarMode" data-mode="hillsfar" hidden="" id="hillsfarMode">
+<!-- MODE: keyprofile -->
+<div class="modePanel keyprofileMode" data-mode="keyprofile" hidden="" id="keyprofileMode">
 <div class="hfLockBox">
 <div class="hfTryArea" id="hfTryArea">
 <div class="hfLockCut" id="hfLockCut"></div>
@@ -677,8 +677,8 @@
 
 <div class="hfCandidates" id="hfCandidates"></div>
 </div>
-<!-- MODE: SKYRIM -->
-<div class="modePanel skMode" data-mode="skyrim" hidden="" id="skMode">
+<!-- MODE: workingangle -->
+<div class="modePanel skMode" data-mode="workingangle" hidden="" id="skMode">
 <div class="skBoardViewport">
 <div class="skBoard" id="skBoard">
 <div class="skOuterRing">
@@ -714,8 +714,8 @@
 
 </div>
 
-<!-- MODE: ANACHRONOX -->
-<div class="modePanel anMode" data-mode="anach" hidden="" id="anMode">
+<!-- MODE: signalbalance -->
+<div class="modePanel anMode" data-mode="signalbalance" hidden="" id="anMode">
 <div class="anInstructions">
   <strong>КАК ИГРАТЬ</strong>
   <span>A / D — выбрать канал · W / S — менять уровень · следи за числом: оно должно расти до 100.0</span>
@@ -838,9 +838,7 @@
     </section>
   </div>
 
-
 </div>
-
 
 <!-- MODE: DRUM CLICKS DIGITAL LOCK -->
 <div class="modePanel digitalMode drumMode" data-mode="drum" hidden id="drumMode">
@@ -885,6 +883,7 @@
 <script src="js/data/paintings.js"></script>
 <script src="js/core/story-dialogs.js"></script>
 <script src="js/core/main-menu.js"></script>
+<script src="js/core/save-recovery.js"></script>
 <script src="js/core/reward-policy.js"></script>
 <script src="js/core/game-catalog.js"></script>
 <script src="js/core/challenge-hud.js"></script>
@@ -902,29 +901,29 @@
 <script src="js/modes/drum.js"></script>
 <script src="js/modes/oscilloscope.js"></script>
 <script src="js/core/game.js"></script>
-<script src="js/modes/anachronox.js"></script>
+<script src="js/modes/signalbalance.js"></script>
 <script src="js/modes/composite.js"></script>
 <script src="js/modes/tension.js"></script>
 <script src="js/modes/resonance.js"></script>
 <script src="js/modes/deduction.js"></script>
-<script src="js/modes/skyrim.js"></script>
-<script src="js/modes/gothic1.js"></script>
-<script src="js/modes/hillsfar.js"></script>
-<script src="js/modes/oblivion.js"></script>
-<script src="js/modes/watchmen.js"></script>
+<script src="js/modes/workingangle.js"></script>
+<script src="js/modes/turnmemory.js"></script>
+<script src="js/modes/keyprofile.js"></script>
+<script src="js/modes/pinflight.js"></script>
+<script src="js/modes/springtumblers.js"></script>
 <script src="js/modes/museum.js"></script>
 <script src="js/modes/silhouettes.js"></script>
-<script src="js/modes/mass2.js"></script>
+<script src="js/modes/pairednodes.js"></script>
 <script src="js/modes/pipeline.js"></script>
 <script src="js/modes/wharf.js"></script>
-<script src="js/modes/thiefds.js"></script>
-<script src="js/modes/kingdomcome.js"></script>
-<script src="js/modes/thief12.js"></script>
-<script src="js/modes/fallout.js"></script>
-<script src="js/modes/masshack.js"></script>
-<script src="js/modes/pathologic.js"></script>
-<script src="js/modes/bioshock2.js"></script>
-<script src="js/modes/alphaprotocol.js"></script>
+<script src="js/modes/ringsecret.js"></script>
+<script src="js/modes/cylinderpath.js"></script>
+<script src="js/modes/soundlatch.js"></script>
+<script src="js/modes/torqueangle.js"></script>
+<script src="js/modes/ringpassage.js"></script>
+<script src="js/modes/twinbalance.js"></script>
+<script src="js/modes/timingneedle.js"></script>
+<script src="js/modes/symbolpins.js"></script>
 <script src="js/modes/base-locks.js"></script>
 <script src="js/world/alchemy-engine.js"></script>
 <script src="js/world/alchemy-distillation.js"></script>
@@ -948,7 +947,6 @@
 <script src="js/core/init.js"></script>
 <script src="js/core/inventory-hit-testing.js"></script>
 <script src="js/core/tooltips.js"></script>
-
 
 </body>
 </html>

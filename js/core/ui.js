@@ -67,7 +67,7 @@
     if(loot&&resources){
       const componentRows=Object.entries(resources.components).map(([id,count])=>{
         const component=window.KeynlockResources.components.find(item=>item.id===id);
-        return `<span class="lootRow" tabindex="0" data-tip="${component?.name||id} компонент: +${count}. Используется в алхимии." aria-label="${component?.name||id} компонент: +${count}"><i class="lootColor" style="--loot-color:${component?.color||'#888'}"></i><b>+${count}</b></span>`;
+        return `<span class="lootRow" tabindex="0" data-tip="${component?.material||id} · ${component?.name||id} компонент: +${count}. Используется в алхимии." aria-label="${component?.name||id} компонент: +${count}"><img class="componentIcon" src="${component.image}" alt="" draggable="false"><b>+${count}</b></span>`;
       }).join('');
       loot.innerHTML=`
         <div class="lootResources"><span class="lootRow lootCoins" tabindex="0" data-tip="Монеты: +${earned}.${resources.firstClearBonus?` Включая премию за первое прохождение: ${resources.firstClearBonus}.`:""} Нужны для покупки отмычек и улучшений." aria-label="Монеты: +${earned}"><img class="lootResourceIcon" src="assets/ui/money-ico.png" alt=""><b>+${earned}</b></span>

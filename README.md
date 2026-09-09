@@ -2,6 +2,10 @@
 
 Browser lockpicking puzzle game. v372 expands the journal to every supported mission, ordered by difficulty (27 / 21 / 21), with configurable multi-puzzle jobs and recovery of three starter picks. See [campaign notes](docs/first-chapter.md) for configuration, saves and validation.
 
+Release planning: [first episode roadmap and acceptance criteria](docs/release-roadmap.md).
+Latest audit: [release readiness, reproduced defects and all 70 mission launches](docs/qa/release-readiness-2026-09-09.md).
+Current implemented story: [«Чужие подписи»](docs/narrative/chapter-one-proposal.md).
+
 - `index.html` — KEYNLOCK entry point
 - `css/` — modular CSS
 - `js/core/` — shared runtime

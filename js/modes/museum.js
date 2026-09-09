@@ -1,5 +1,5 @@
 (function(){
-  // ===== MUSEUM (Hillsfar — музей: подбор формы отмычки) =====
+  // ===== MUSEUM (keyprofile — музей: подбор формы отмычки) =====
   const HM_SYMBOLS=['△','◇','○','⌒','⊥','≋','∩','▽','◁','▷','◊','◌','⌣','◠','☉','☽','☿','♀','♂','♃','♄'];
   let hmSeq=[], hmJam=[], hmCover=[], hmStep=0, hmKb=0, hmTimeLeft=28, hmTimeMax=28, hmTumbEls=[], hmPickEls=[];
   // Six tumblers, each hiding a target pick-shape symbol. The player clicks
@@ -7,7 +7,7 @@
   // occluded (harder to read) and some are "jammed" (need the right symbol
   // clicked twice in a row). A countdown adds pressure on top of the shared
   // pick economy. Ported from the old prototype scene
-  // (prototypes/lockpicking-mechanics-v63.html, "// Hillsfar") into a fully
+  // (prototypes/lockpicking-mechanics-v63.html, "// keyprofile") into a fully
   // native mode, wired through the shared economy (damagePick/registerMove)
   // instead of the prototype's own LockRuntime/GameHub shims.
 

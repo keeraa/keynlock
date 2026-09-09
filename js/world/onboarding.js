@@ -5,7 +5,7 @@
   const panel=document.createElement('aside');panel.id='lairTraining';panel.className='uiPanel';panel.hidden=true;panel.setAttribute('aria-label','Обучение в логове');
   panel.innerHTML='<small id="trainingCount"></small><strong id="trainingTitle"></strong><p id="trainingText" aria-live="polite"></p><button type="button" id="trainingAction" class="uiButton uiButton--primary"></button><label class="tutorialPreference"><input type="checkbox" data-hide-hints> Не показывать подсказки</label>';
   document.body.append(panel);
-  const help=document.createElement('button');help.id='trainingHelp';help.type='button';help.textContent='?';help.setAttribute('aria-label','Показать или скрыть обучение');help.setAttribute('aria-controls','lairTraining');document.body.append(help);
+  const help=document.createElement('button');help.id='trainingHelp';help.className='uiButton hudHelpButton';help.type='button';help.textContent='?';help.setAttribute('aria-label','Показать или скрыть обучение');help.setAttribute('aria-controls','lairTraining');document.body.append(help);
   let helpOpen=false,lastView='';
   help.addEventListener('click',()=>{if(lastView==='restoration'){window.KeynlockRestoration.toggleGuide();return;}helpOpen=!helpOpen;render();});
   const stages={

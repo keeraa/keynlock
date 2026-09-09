@@ -16,10 +16,21 @@
     red:'#EF3B3B',orange:'#FF8A1F',yellow:'#FFD31A',green:'#45BF58',
     cyan:'#32C7D9',blue:'#2F6FF2',violet:'#8B4BE8'
   });
+  const MIX_MATERIALS=Object.freeze({
+    turquoise:['utrennaya_rosa','Утренняя роса'],
+    magenta:['plazmennaya_essencia','Плазменная эссенция'],
+    navy:['glubinnaya_voda','Глубинная вода'],
+    ice:['ledyanoe_maslo','Ледяное масло'],
+    silver:['serebraniy_tuman','Серебряный туман'],
+    white:['beliy_kvartz','Белый кварц'],
+    gray:['gelezniy_poroshok','Железный порошок'],
+    black:['chernaya_smola','Чёрная смола']
+  });
   const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
   const colors=()=>window.KeynlockResources?.components||[];
   const stock=id=>Math.max(0,Number(window.KeynlockResources?.state?.components?.[id])||0);
   const byId=id=>colors().find(color=>color.id===id)||null;
+  const componentArt=id=>`<img class="componentIcon" src="${byId(id).image}" alt="" draggable="false">`;
   const pigmentHex=id=>PIGMENT_HEX[id]||byId(id)?.color||'#888888';
   const hexToRgb=hex=>{const value=hex.replace('#','');return [0,2,4].map(index=>parseInt(value.slice(index,index+2),16));};
   const rgbToHex=rgb=>'#'+rgb.map(value=>clamp(Math.round(value),0,255).toString(16).padStart(2,'0')).join('');
@@ -38,6 +49,43 @@
     const ryb=pigments.map(color=>rgbToRyb(hexToRgb(pigmentHex(color.id))));
     const average=[0,1,2].map(channel=>ryb.reduce((sum,value)=>sum+value[channel],0)/ryb.length);
     return rgbToHex(rybToRgb(average));
+  }
+  // Both cards choose art from the resulting color, so equal shades always
+  // have the same bowl. The adjacent flat swatch preserves the exact mixture.
+  function mixtureArt(hex){
+    const {hue,saturation,light}=rgbToHsl(hexToRgb(hex));
+    let material;
+    if(light<.12)material='black';
+    else if(saturation<.16)material=light>.8?'white':light>.48?'silver':'gray';
+    else if(hue>=190&&hue<260&&light<.35)material='navy';
+    else if(hue>=175&&hue<230&&light>.72)material='ice';
+    else if(hue>=145&&hue<198)material='turquoise';
+    else if(hue>=300&&hue<348)material='magenta';
+    if(material){
+      const [file,name]=MIX_MATERIALS[material];
+      return {image:`assets/alchemy/components/${file}.png`,material:name};
+    }
+    const id=hue<28||hue>=348?'red':hue<45?'orange':hue<92?'yellow':hue<145?'green':hue<220?'cyan':hue<260?'blue':'violet';
+    return byId(id);
+  }
+  function renderSample(element,hex,label){
+    if(!hex){
+      element.innerHTML='<span class="pigmentSampleEmpty" aria-hidden="true">—</span>';
+      element.setAttribute('aria-label',label);
+      element.removeAttribute('data-tip');
+      element.removeAttribute('tabindex');
+      return;
+    }
+    const art=mixtureArt(hex);
+    element.innerHTML=`<img class="componentIcon" src="${art.image}" alt="" draggable="false"><span class="pigmentExactSwatch" style="background-color:${hex}" aria-hidden="true"></span>`;
+    const description=`${art.material} · ${label}. Кружок рядом показывает точный оттенок смеси.`;
+    element.setAttribute('aria-label',description);
+    element.dataset.tip=description;
+    element.tabIndex=0;
+  }
+  function matchesTarget(ids,targetIds){
+    const result=mix(ids),target=mix(targetIds);
+    return !!result&&!!target&&result===target;
   }
   function describe(ids){
     if(!ids.length)return 'Добавь пигменты';
@@ -94,8 +142,7 @@
         const color=byId(id);
         ghost=document.createElement('div');
         ghost.className='pigmentDragGhost';
-        ghost.style.setProperty('--pigment-color',pigmentHex(id));
-        ghost.innerHTML=`<i></i><span>${color?.name||id}</span>`;
+        ghost.innerHTML=`${componentArt(id)}<span>${color?.name||id}</span>`;
         document.body.appendChild(ghost);
         elements.slots.querySelectorAll('.pigmentSlot').forEach(slot=>slot.classList.add('dropReady'));
       }
@@ -131,17 +178,17 @@
     document.addEventListener('pointercancel',cancel);
   }
   function renderSlots(){
-    elements.slots.innerHTML=state.slots.map((id,index)=>`<button class="pigmentSlot${id?' filled':''}" type="button" data-pigment-slot="${index}" style="--pigment-color:${id?pigmentHex(id):'transparent'}" aria-label="${id?(byId(id)?.name||'Пигмент')+', убрать':'Добавить пигмент'}">${id?`<span>${byId(id)?.name||id}</span>`:''}</button>`).join('');
+    elements.slots.innerHTML=state.slots.map((id,index)=>`<button class="pigmentSlot${id?' filled':''}" type="button" data-pigment-slot="${index}" aria-label="${id?(byId(id)?.name||'Пигмент')+', убрать':'Добавить пигмент'}">${id?`${componentArt(id)}<span>${byId(id)?.name||id}</span>`:''}</button>`).join('');
   }
   function renderPalette(){
-    elements.palette.innerHTML=colors().map(color=>`<button class="pigmentColor${state.selected===color.id?' selected':''}" type="button" data-pigment-color="${color.id}" style="--pigment-color:${pigmentHex(color.id)}" ${stock(color.id)?'': 'disabled'}><i></i><span>${color.name}</span><b>×${stock(color.id)}</b></button>`).join('');
+    elements.palette.innerHTML=colors().map(color=>`<button class="pigmentColor${state.selected===color.id?' selected':''}" type="button" data-pigment-color="${color.id}" data-tip="${color.material} · ${color.name} компонент" ${stock(color.id)?'': 'disabled'}>${componentArt(color.id)}<span>${color.name}</span><b>×${stock(color.id)}</b></button>`).join('');
   }
   function render(){
     const used=state.slots.filter(Boolean),target=mix(state.solution),result=mix(used);
-    elements.target.style.backgroundColor=target||'#302a22';
     elements.targetName.textContent=state.solution.length?describe(state.solution):'Нет доступных цветов';
-    elements.result.style.backgroundColor=result||'#302a22';
     elements.resultName.textContent=describe(used);
+    renderSample(elements.target,target,elements.targetName.textContent);
+    renderSample(elements.result,result,elements.resultName.textContent);
     elements.check.disabled=!state.solution.length||!used.length;
     elements.status.textContent=state.solution.length?'Выбери цвет, затем положи его в свободную ячейку.':'Получи цветные компоненты за прохождение замков или реставрацию.';
     elements.status.className='';
@@ -165,7 +212,7 @@
   root.querySelector('#pigmentClear').addEventListener('click',()=>{state.slots=[null,null,null];state.selected=null;render();});
   root.querySelector('#pigmentNew').addEventListener('click',newTask);
   elements.check.addEventListener('click',()=>{
-    const correct=state.slots.filter(Boolean).sort().join('+')===state.solution.join('+');
+    const correct=matchesTarget(state.slots.filter(Boolean),state.solution);
     elements.status.textContent=correct?'Точный оттенок получен.':'Оттенок не совпал с образцом.';
     elements.status.className=correct?'good':'bad';
   });

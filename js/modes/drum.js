@@ -1,6 +1,6 @@
 (function(){
   // Drum clicks
-  let drumSecret=[0,0,0,0], drumState=[0,0,0,0], drumSoundOn=true, drumAudioCtx=null;
+  let drumSecret=[0,0,0,0], drumState=[0,0,0,0], drumSoundOn=true;
   function drumCircDist(a,b){
     const distance=Math.abs(a-b);
     return Math.min(distance,10-distance);
@@ -24,9 +24,8 @@
   function drumPlayClick(distance){
     if(!drumSoundOn)return;
     try{
-      const AudioContextClass=window.AudioContext||window.webkitAudioContext;
-      if(!AudioContextClass)return;
-      drumAudioCtx ||= new AudioContextClass();
+      const drumAudioCtx=window.KeynlockAudio.getEffectsContext();
+      if(!drumAudioCtx)return;
       const now=drumAudioCtx.currentTime;
       const hit=(time,frequency,gainValue,duration=.035)=>{
         const oscillator=drumAudioCtx.createOscillator();
@@ -36,7 +35,7 @@
         gain.gain.setValueAtTime(gainValue,time);
         gain.gain.exponentialRampToValueAtTime(.001,time+duration);
         oscillator.connect(gain);
-        gain.connect(drumAudioCtx.destination);
+        gain.connect(window.KeynlockAudio.getEffectsOutput());
         oscillator.start(time);
         oscillator.stop(time+duration);
       };

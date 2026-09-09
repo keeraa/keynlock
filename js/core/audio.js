@@ -1,11 +1,55 @@
-  let audioCtx=null;
+  let audioCtx=null,effectsGain=null;
   const audioAssets=window.KeynlockAudioAssets||{};
   const audioStore=window.KeynlockSaveStore;
   const activePlayers=new Set();
+  const playerBaseVolumes=new WeakMap();
   let soundtrack=null;
   const MUSIC_VOLUME_KEY='keynlockMusicVolume';
+  const SOUND_VOLUME_KEY='keynlockSoundVolume';
+  const normalizeSoundVolume=value=>Math.max(0,Math.min(1,(value===null?100:Number(value)||0)/100));
+  let soundVolume=normalizeSoundVolume(audioStore.getItem(SOUND_VOLUME_KEY));
   const savedMusicVolume=audioStore.getItem(MUSIC_VOLUME_KEY);
-  let musicVolume=Math.max(0,Math.min(1,(savedMusicVolume===null?28:Number(savedMusicVolume)||0)/100));
+  const normalizeMusicVolume=value=>Math.max(0,Math.min(1,(value===null?28:Number(value)||0)/100));
+  let musicVolume=normalizeMusicVolume(savedMusicVolume);
+  let audioPageHidden=false;
+  let audioWindowFocused=document.hasFocus?.()??true;
+  let soundtrackRequest=0;
+  function audioForeground(){return !document.hidden&&!audioPageHidden&&audioWindowFocused;}
+  function musicAllowed(){return audioForeground()&&musicVolume>0;}
+
+  function pauseSoundtrack(){
+    soundtrackRequest++;
+    if(soundtrack){soundtrack.muted=true;soundtrack.pause();}
+    document.documentElement.dataset.soundtrack=musicVolume===0?'muted':'paused';
+  }
+
+  function pauseBackgroundAudio(){
+    pauseSoundtrack();
+    activePlayers.forEach(player=>{player.muted=true;player.pause();});
+    activePlayers.clear();
+    if(audioCtx?.state==='running')audioCtx.suspend().catch(()=>{});
+  }
+
+  function syncMusicSetting(){
+    musicVolume=normalizeMusicVolume(audioStore.getItem(MUSIC_VOLUME_KEY));
+    if(soundtrack)soundtrack.volume=musicVolume;
+    window.dispatchEvent(new CustomEvent('keynlock-music-volume-change',{detail:{volume:Math.round(musicVolume*100)}}));
+    startSoundtrack();
+  }
+
+  function syncSoundSetting(){
+    soundVolume=normalizeSoundVolume(audioStore.getItem(SOUND_VOLUME_KEY));
+    if(effectsGain)effectsGain.gain.setValueAtTime(soundVolume,audioCtx.currentTime);
+    activePlayers.forEach(player=>{player.volume=(playerBaseVolumes.get(player)||0)*soundVolume;});
+    window.dispatchEvent(new CustomEvent('keynlock-sound-volume-change',{detail:{volume:Math.round(soundVolume*100)}}));
+  }
+
+  function setSoundVolume(value){
+    const volume=Math.round(Math.max(0,Math.min(1,Number(value)||0))*100);
+    audioStore.setItem(SOUND_VOLUME_KEY,String(volume));
+    syncSoundSetting();
+    return volume;
+  }
 
   function assetUrl(key){
     const choices=audioAssets[key]||[];
@@ -13,11 +57,14 @@
   }
 
   function playAsset(key,volume=.55){
+    if(!audioForeground()||soundVolume===0)return false;
     const src=assetUrl(key);
     if(!src) return false;
     const player=new Audio(src);
     player.preload='auto';
-    player.volume=Math.max(0,Math.min(1,volume));
+    const baseVolume=Math.max(0,Math.min(1,volume));
+    playerBaseVolumes.set(player,baseVolume);
+    player.volume=baseVolume*soundVolume;
     activePlayers.add(player);
     const release=()=>activePlayers.delete(player);
     player.addEventListener('ended',release,{once:true});
@@ -27,33 +74,43 @@
   }
 
   function startSoundtrack(){
+    if(!musicAllowed()){pauseSoundtrack();return;}
     if(!soundtrack){
       const src=assetUrl('music');
-      if(!src) return;
+      if(!src)return;
       soundtrack=new Audio(src);
       soundtrack.preload='auto';
       soundtrack.loop=true;
-      soundtrack.volume=musicVolume;
     }
+    soundtrack.volume=musicVolume;
+    soundtrack.muted=false;
+    if(!soundtrack.paused)return;
+    const request=++soundtrackRequest;
     soundtrack.play().then(()=>{
-      document.documentElement.dataset.soundtrack='playing';
+      // A queued play() can resolve after muting, blur or pagehide.
+      if(!musicAllowed()){soundtrack.muted=true;soundtrack.pause();return;}
+      if(request===soundtrackRequest)document.documentElement.dataset.soundtrack='playing';
     }).catch(()=>{
-      document.documentElement.dataset.soundtrack='blocked';
+      if(request===soundtrackRequest)document.documentElement.dataset.soundtrack='blocked';
     });
   }
 
   function setMusicVolume(value){
-    musicVolume=Math.max(0,Math.min(1,Number(value)||0));
-    audioStore.setItem(MUSIC_VOLUME_KEY,String(Math.round(musicVolume*100)));
-    if(soundtrack)soundtrack.volume=musicVolume;
-    return Math.round(musicVolume*100);
+    const volume=Math.round(Math.max(0,Math.min(1,Number(value)||0))*100);
+    audioStore.setItem(MUSIC_VOLUME_KEY,String(volume));
+    syncMusicSetting();
+    return volume;
   }
 
   function ensureAudio(){
+    if(!audioForeground()||soundVolume===0)return null;
     if(!audioCtx){
       const AC=window.AudioContext||window.webkitAudioContext;
       if(!AC) return null;
       audioCtx=new AC();
+      effectsGain=audioCtx.createGain();
+      effectsGain.gain.setValueAtTime(soundVolume,audioCtx.currentTime);
+      effectsGain.connect(audioCtx.destination);
     }
     if(audioCtx.state==='suspended') audioCtx.resume().catch(()=>{});
     return audioCtx;
@@ -71,7 +128,7 @@
     vol.gain.setValueAtTime(.0001,now);
     vol.gain.exponentialRampToValueAtTime(gain,now+.008);
     vol.gain.exponentialRampToValueAtTime(.0001,now+duration);
-    osc.connect(vol).connect(ctx.destination);
+    osc.connect(vol).connect(effectsGain);
     osc.start(now);
     osc.stop(now+duration+.02);
   }
@@ -88,7 +145,7 @@
     src.buffer=buffer;
     vol.gain.setValueAtTime(gain,ctx.currentTime);
     vol.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+duration);
-    src.connect(vol).connect(ctx.destination);
+    src.connect(vol).connect(effectsGain);
     src.start();
   }
 
@@ -180,8 +237,12 @@
     startSoundtrack,
     playAsset,
     setMusicVolume,
+    setSoundVolume,
+    getSoundVolume:()=>Math.round(soundVolume*100),
+    getEffectsContext:ensureAudio,
+    getEffectsOutput:()=>effectsGain,
     getMusicVolume:()=>Math.round(musicVolume*100),
-    getMusicState:()=>({playing:Boolean(soundtrack&&!soundtrack.paused),loop:Boolean(soundtrack?.loop)})
+    getMusicState:()=>({playing:Boolean(soundtrack&&!soundtrack.paused&&!soundtrack.muted&&musicAllowed()),loop:Boolean(soundtrack?.loop)})
   };
   window.addEventListener('keynlock:audio-ready',startSoundtrack);
   window.addEventListener('keynlock:play',startSoundtrack);
@@ -192,4 +253,17 @@
     if(button.closest('#inventoryDrawer,#puzzleArea,.gameDefeatOverlay')) return;
     if(button.matches('[aria-label*="Закрыть"],.lairWorkbenchClose')) SFX.uiBack();
     else SFX.uiClick();
+  });
+
+  document.addEventListener('visibilitychange',()=>{
+    audioWindowFocused=document.hasFocus?.()??true;
+    if(audioForeground()){syncSoundSetting();syncMusicSetting();}else pauseBackgroundAudio();
+  });
+  window.addEventListener('blur',()=>{audioWindowFocused=false;pauseBackgroundAudio();});
+  window.addEventListener('focus',()=>{audioWindowFocused=true;syncSoundSetting();syncMusicSetting();});
+  window.addEventListener('pagehide',()=>{audioPageHidden=true;pauseBackgroundAudio();});
+  window.addEventListener('pageshow',()=>{audioPageHidden=false;audioWindowFocused=document.hasFocus?.()??true;syncSoundSetting();syncMusicSetting();});
+  window.addEventListener('storage',event=>{
+    if(event.key===MUSIC_VOLUME_KEY||event.key===null)syncMusicSetting();
+    if(event.key===SOUND_VOLUME_KEY||event.key===null)syncSoundSetting();
   });

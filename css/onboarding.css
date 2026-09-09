@@ -2,4 +2,4 @@
 
 #lairTraining.trainingAttention{animation:trainingAttention 2s ease-in-out 2}@keyframes trainingAttention{0%,100%{box-shadow:0 8px 35px #0008;border-color:#ad8f5b}50%{box-shadow:0 0 28px #d9af6870,0 8px 35px #0008;border-color:#f2d39b}}@media(prefers-reduced-motion:reduce){#lairTraining.trainingAttention{animation:none}}.reduce-motion #lairTraining.trainingAttention{animation:none}
 
-#trainingHelp{position:fixed;bottom:18px;z-index:1501;width:38px;height:42px;border:1px solid #9d8255;border-radius:4px;background:#211f1a;color:#ebdbbb;font:bold 20px Georgia;cursor:pointer}#trainingHelp[hidden],body.main-menu-open #trainingHelp,body.campaign-open #trainingHelp{display:none}@media(max-width:720px){#trainingHelp{bottom:8px;height:36px}}
+body.main-menu-open #trainingHelp,body.campaign-open #trainingHelp{display:none;}

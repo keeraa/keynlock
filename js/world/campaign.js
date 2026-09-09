@@ -4,9 +4,9 @@
   'use strict';
   const store=window.KeynlockSaveStore;
   const briefs=[
-    {mode:'wharf',title:'Набережная',mechanic:'Risen 2 · последовательность задвижек',place:'Порт',story:'Открой складской механизм. Найди порядок задвижек и повтори найденную последовательность до конца.',hint:'Нажимай на задвижки и запоминай, какие поднимаются. Ошибка сбрасывает цепочку; две ошибки подряд ломают отмычку. Когда поднимешь все четыре задвижки, нажми «Открыть».',time:'Без таймера',tool:'Нужна отмычка',risk:'Две ошибки подряд ломают отмычку. Правильный шаг уменьшает напряжение механизма.',after:'Первый замок открыт. На верстаке можно создать отмычку из двух деталей и подготовиться к следующему заказу.'},
-    {mode:'hillsfar',title:'Ключ от старой лавки',mechanic:'Подбор ключа по слепку',place:'Старый квартал',story:'Найди ключ, точно повторяющий слепок замочной скважины. Сравни каждый зубец, прежде чем провернуть механизм.',hint:'Сравни зубцы слева направо. Выбери ключ в нижнем наборе, затем нажми «Открыть». Неверный ключ ломает отмычку; сам выбор ключа безопасен.',time:'30 секунд',tool:'Нужна отмычка',risk:'Подтверждение неверного ключа расходует отмычку.',after:'Следующий заказ потребует памяти. Для парных узлов отмычки не нужны.'},
-    {mode:'mass2',title:'Архив портового смотрителя',mechanic:'Поиск парных символов',place:'Порт',story:'Восстанови четыре пары архивных меток. Запоминай расположение символов, чтобы открыть все узлы до окончания времени.',hint:'Наведи курсор на узел, чтобы увидеть знак, и выбери два одинаковых. На сенсорном экране удерживай узел около секунды для выбора. Несовпадение закрывает пару; отмычки не расходуются.',time:'75 секунд',tool:'Без отмычек',risk:'Когда время закончится, попытку придётся начать заново.',after:'Архив открыт. Осталось подобрать профили последнего механизма.'},
+    {mode:'wharf',title:'Набережная',mechanic:'Последовательность задвижек',place:'Порт',story:'Открой складской механизм. Найди порядок задвижек и повтори найденную последовательность до конца.',hint:'Нажимай на задвижки и запоминай, какие поднимаются. Ошибка сбрасывает цепочку; две ошибки подряд ломают отмычку. Когда поднимешь все четыре задвижки, нажми «Открыть».',time:'Без таймера',tool:'Нужна отмычка',risk:'Две ошибки подряд ломают отмычку. Правильный шаг уменьшает напряжение механизма.',after:'Первый замок открыт. На верстаке можно создать отмычку из двух деталей и подготовиться к следующему заказу.'},
+    {mode:'keyprofile',title:'Ключ от старой лавки',mechanic:'Подбор ключа по слепку',place:'Старый квартал',story:'Найди ключ, точно повторяющий слепок замочной скважины. Сравни каждый зубец, прежде чем провернуть механизм.',hint:'Сравни зубцы слева направо. Выбери ключ в нижнем наборе, затем нажми «Открыть». Неверный ключ ломает отмычку; сам выбор ключа безопасен.',time:'30 секунд',tool:'Нужна отмычка',risk:'Подтверждение неверного ключа расходует отмычку.',after:'Следующий заказ потребует памяти. Для парных узлов отмычки не нужны.'},
+    {mode:'pairednodes',title:'Архив портового смотрителя',mechanic:'Поиск парных символов',place:'Порт',story:'Восстанови четыре пары архивных меток. Запоминай расположение символов, чтобы открыть все узлы до окончания времени.',hint:'Наведи курсор на узел, чтобы увидеть знак, и выбери два одинаковых. На сенсорном экране удерживай узел около секунды для выбора. Несовпадение закрывает пару; отмычки не расходуются.',time:'75 секунд',tool:'Без отмычек',risk:'Когда время закончится, попытку придётся начать заново.',after:'Архив открыт. Осталось подобрать профили последнего механизма.'},
     {mode:'museum',title:'Заказ переплётчика',mechanic:'Символьный замок',place:'Район искусств',story:'Сопоставь три профиля механизма с формами в наборе инструментов. Здесь можно спокойно поработать без ограничения времени.',hint:'Смотри на выделенный символ сверху. Нажми такую же форму в нижнем наборе. После трёх совпадений механизм откроется сам.',time:'Без таймера',tool:'Без отмычек',risk:'Ошибки не расходуют инструменты. Попробуй другую форму.',after:'Все четыре заказа выполнены. Загляни в коллекцию или выбери новое место на карте.'}
   ];
   const route=window.KeynlockCampaignRoute;
@@ -48,6 +48,7 @@
     <div><p class="campaignEyebrow">КИЙЕНЛОК · ЛИЧНЫЕ ЗАПИСИ</p><h1 id="campaignTitle">Заказы</h1></div>
     <form method="dialog"><button class="campaignClose" aria-label="Закрыть заказы" value="close">×</button></form>
     </header>
+    <div class="campaignStorySummary"><p id="campaignStoryProgress"></p><button id="campaignEnding" class="uiButton" type="button" hidden>Итоги главы</button></div>
     <div class="campaignPages">
       <aside class="campaignIndex" aria-label="Заказы по сложности">
         <div class="campaignChapter"><span id="campaignTierNumber">01</span><div><p class="campaignEyebrow">УРОВЕНЬ СЛОЖНОСТИ</p><h2 id="campaignTierTitle">Первые шаги</h2></div></div>
@@ -78,6 +79,13 @@
     const current=progress.next(),order=selected(),step=progress.step(order),stage=describe(order,step);
     const visible=orders.filter(o=>o.tier===viewTier);
     const active=window.KeynlockMissions?.active;
+    const storyIds=Object.keys(window.KeynlockContent.chapterStory.orders);
+    const storyDone=storyIds.filter(id=>progress.completed.includes(id)).length;
+    const isStory=storyIds.includes(order.id);
+    el('campaignStoryProgress').textContent=storyDone===storyIds.length
+      ?'«Чужие подписи» завершены. Дальше — дополнительные испытания. Продолжение сюжета пока недоступно.'
+      :`«Чужие подписи» · сюжетных заказов выполнено ${storyDone} из ${storyIds.length}. Свободные испытания доступны на карте.`;
+    el('campaignEnding').hidden=storyDone!==storyIds.length;
 
     el('campaignTierNumber').textContent=String(viewTier).padStart(2,'0');
     el('campaignTierTitle').textContent=['Первые шаги','Новые испытания','Сложные механизмы'][viewTier-1];
@@ -102,14 +110,14 @@
       const item=visible[index],row=li.querySelector('button');
       row.setAttribute('aria-pressed',String(item===order));
       row.classList.toggle('done',progress.done(item));row.classList.toggle('upcoming',!progress.allowed(item));
-      row.querySelector('small').textContent=progress.done(item)?'Выполнен':item===current?'Доступен':'Предстоит';
+      row.querySelector('small').textContent=`${storyIds.includes(item.id)?'Сюжет':'Испытание'} · ${progress.done(item)?'Выполнен':item===current?'Доступен':'Предстоит'}`;
     });
     el('campaignImage').src=stage.image;
     el('campaignNumber').textContent=`УРОВЕНЬ ${order.tier} · ЗАКАЗ № ${String(visible.indexOf(order)+1).padStart(2,'0')}`;
     el('campaignStamp').textContent=progress.done(order)?'Выполнен':progress.allowed(order)?'К исполнению':'Предстоит';
     el('campaignStamp').classList.toggle('done',progress.done(order));
     el('campaignPlace').textContent=stage.place;el('campaignTask').textContent=stage.title;
-    el('campaignMechanic').textContent=stage.mechanic;el('campaignStory').textContent=stage.story;
+    el('campaignMechanic').textContent=`${isStory?'Сюжетный заказ':'Дополнительное испытание'} · ${stage.mechanic}`;el('campaignStory').textContent=stage.story;
     el('campaignTime').textContent=`Уровень ${step.tier}`;el('campaignTool').textContent=stage.tool;
     el('campaignRisk').textContent=stage.risk;el('campaignHint').textContent=stage.hint;
     el('campaignPart').hidden=order.steps.length===1;
@@ -186,6 +194,7 @@
     if(progress.done(order))progress.beginReplay(order);
     close();window.KeynlockChapterStory.before({mode:step.mode,tier:step.tier,orderId:order.id,stepId:step.id});
   });
+  el('campaignEnding').addEventListener('click',()=>{close();window.KeynlockLair.open();window.KeynlockChapterStory.ending();});
   el('campaignWorkbench').addEventListener('click',()=>{close();window.KeynlockLair.workbench();});
   el('campaignCollection').addEventListener('click',()=>{close();window.KeynlockLair.module('collection');});
   window.addEventListener('keynlock-mission-started',event=>{

@@ -1,4 +1,4 @@
-.lairScene{position:relative;width:100%;height:100%;min-height:620px;overflow:hidden;}
+.lairScene{position:relative;width:100%;height:100%;min-height:620px;overflow:clip;}
 .lairScene::after{content:"";position:absolute;inset:0;z-index:12;pointer-events:none;background:url("../assets/lair/noise-bg.avif") center/740px 740px repeat;mix-blend-mode:multiply;opacity:.18;}
 .lairSceneTop{position:fixed;left:14px;right:14px;top:14px;height:var(--ui-corner-icon-size);z-index:25;display:flex;align-items:center;pointer-events:none;}
 .lairSceneTopRight{display:flex;align-items:center;gap:12px;pointer-events:auto;}
@@ -34,9 +34,9 @@
    cross-feature override files so the cascade has one source of truth. */
 body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none!important;}
 .lairSceneCharacter{animation:none!important;}
-.lairSceneCharacter.kai{left:13%;bottom:14%;height:58.95%;z-index:2;}
+.lairSceneCharacter.kai{left:55%;bottom:26%;height:54%;z-index:1;}
 .lairSceneCharacter.sai{left:36.5%;height:69%;z-index:3;}
-.lairSceneCharacter.tik{right:11.5%;bottom:12%;height:61.5%;z-index:1;}
+.lairSceneCharacter.tik{left:10%;right:auto;bottom:12%;height:61.5%;z-index:1;}
 .lairHotspotAlchemy{left:57.5%;top:62%;}
 .lairHotspotCity{left:75%;top:44%;}
 .lairHotspotCollection{left:60%;top:45%;}
@@ -51,17 +51,15 @@ body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none!important;
 .lairHotspotTeam[data-character="sai"] .lairActiveCharacterPortrait{height:150%;}
 .lairHotspotTeam[data-character="tik"] .lairActiveCharacterPortrait{height:155%;}
 @media (max-width:760px){
-  .lairSceneCharacter.kai{left:30%;bottom:9%;height:50.1%;}
   .lairSceneCharacter.sai{left:47%;bottom:2%;height:58.65%;}
-  .lairSceneCharacter.tik{right:-13%;bottom:10%;height:52.35%;}
+  .lairSceneCharacter.tik{left:-4%;right:auto;bottom:10%;height:52.35%;}
   .lairHotspot:not(.lairHotspotTeam){min-width:106px;padding:50px 8px 8px;}
   .lairHotspotIcon{top:4px;width:44px;height:44px;}
   .lairHotspotTeam{right:10px;bottom:10px;border-radius:12px;}
 }
 @media (max-height:560px) and (orientation:landscape) and (pointer:coarse){
-  .lairSceneCharacter.kai{left:30%;height:50.1%;}
   .lairSceneCharacter.sai{left:47%;bottom:2%;height:58.65%;}
-  .lairSceneCharacter.tik{right:-13%;height:52.35%;}
+  .lairSceneCharacter.tik{left:-4%;right:auto;height:52.35%;}
 }
 .mapRoad.missionRoad{stroke:#b48643;stroke-width:5;stroke-dasharray:3 8;opacity:.9;}
 .mapNode.mission{color:#edca7e;}
@@ -91,18 +89,18 @@ body.lair-open #objectiveLine,body.lair-open #noiseMeter{display:none!important;
 .hudBadgeValue strong,.topRightHud .hudSquareBadge strong{color:var(--color-gold-pale)!important;font:700 14px/1 var(--ui-font)!important;}
 .topRightHud .coinIcon{font-size:13px;}
 .topRightHud .headerPickIcon{width:14px!important;height:14px!important;transform:scale(.8);}
-#lock::before,body.importedMode .modePanel:not([hidden])::before,body.mode-hillsfar .hillsfarMode::before{content:none!important;display:none!important;background:none!important;border:0!important;box-shadow:none!important;}
-body.importedMode .hillsfarMode,body.importedMode .g1Mode,body.importedMode .skMode,body.importedMode .anMode,body.importedMode .tnMode,body.importedMode .rsMode,body.importedMode .kdMode,body.importedMode .cpMode,body.importedMode .modePanel:not([hidden]),body.mode-hillsfar .hillsfarMode{background:transparent!important;background-image:none!important;box-shadow:none!important;filter:none!important;}
+#lock::before,body.importedMode .modePanel:not([hidden])::before,body.mode-keyprofile .keyprofileMode::before{content:none!important;display:none!important;background:none!important;border:0!important;box-shadow:none!important;}
+body.importedMode .keyprofileMode,body.importedMode .turnmemoryMode,body.importedMode .skMode,body.importedMode .anMode,body.importedMode .tnMode,body.importedMode .rsMode,body.importedMode .kdMode,body.importedMode .cpMode,body.importedMode .modePanel:not([hidden]),body.mode-keyprofile .keyprofileMode{background:transparent!important;background-image:none!important;box-shadow:none!important;filter:none!important;}
 body:not(.importedMode) #lock{left:50%!important;top:0!important;width:900px!important;height:880px!important;transform:translateX(-50%) scale(.80)!important;transform-origin:top center!important;}
 body:not(.importedMode) #lock>.mechanismZone{position:absolute!important;left:50%!important;top:var(--lock-top)!important;bottom:auto!important;width:var(--lock-src-w)!important;height:var(--lock-src-h)!important;transform:translate3d(calc(-50% + (var(--px) * -.14)),calc(var(--py) * -.08),0)!important;transform-origin:top center!important;z-index:8!important;}
 body:not(.importedMode) #lock>.platesZone{position:absolute!important;left:50%!important;top:379px!important;width:590px!important;height:455px!important;transform:translateX(-50%)!important;z-index:2!important;}
-body.importedMode .modePanel:not([hidden]),body.mode-hillsfar .hillsfarMode{padding-top:264px!important;padding-bottom:64px!important;}
+body.importedMode .modePanel:not([hidden]),body.mode-keyprofile .keyprofileMode{padding-top:264px!important;padding-bottom:64px!important;}
 
 body.importedMode .sharedModeLockArt{position:absolute!important;left:50%!important;top:0!important;bottom:auto!important;width:var(--lock-src-w)!important;height:var(--lock-src-h)!important;transform:translateX(-50%) scale(var(--lock-scale))!important;transform-origin:top center!important;overflow:visible!important;background:none!important;box-shadow:none!important;filter:none!important;}
 .mechanismZone::before,.sharedModeLockArt::before{left:50%!important;width:214px!important;height:214px!important;transform:translateX(-50%) translateY(0);box-shadow:none!important;filter:none!important;}
 .mechanismZone .lockPanel,.sharedModeLockArt .lockPanel{left:50%!important;top:66px!important;width:254px!important;height:206px!important;transform:translateX(-50%)!important;}
-.mechanismZone .pick,.sharedModeLockArt .pick,body.mode-hillsfar .mechanismZone .pick{left:var(--pick-left)!important;top:var(--pick-top)!important;width:72px!important;height:360px!important;translate:0 0!important;}
-.mechanismZone .tension,.sharedModeLockArt .tension,body.mode-hillsfar .mechanismZone .tension{left:var(--tension-left)!important;top:var(--tension-top)!important;width:239px!important;height:59px!important;translate:0 0!important;}
+.mechanismZone .pick,.sharedModeLockArt .pick,body.mode-keyprofile .mechanismZone .pick{left:var(--pick-left)!important;top:var(--pick-top)!important;width:72px!important;height:360px!important;translate:0 0!important;}
+.mechanismZone .tension,.sharedModeLockArt .tension,body.mode-keyprofile .mechanismZone .tension{left:var(--tension-left)!important;top:var(--tension-top)!important;width:239px!important;height:59px!important;translate:0 0!important;}
 @media (max-width:900px){
 :root{--top-hud-size:58px;--lock-scale:.68;--lock-visual-w:367px;--lock-visual-h:181px;--lock-top:30px;--objective-bottom:10px;}
 .topRightHud{top:10px!important;right:10px!important;gap:6px!important;}
@@ -112,9 +110,31 @@ body.importedMode .sharedModeLockArt{position:absolute!important;left:50%!import
 #objectiveLine.difficulty{max-width:calc(100vw - 24px)!important;padding:8px 12px!important;font-size:10px!important;}
 body:not(.importedMode) #lock{transform:translateX(-50%) scale(.68)!important;height:900px!important;}
 body:not(.importedMode) #lock>.platesZone{top:379px!important;}
-body.importedMode .modePanel:not([hidden]),body.mode-hillsfar .hillsfarMode{padding-top:242px!important;padding-bottom:54px!important;}
+body.importedMode .modePanel:not([hidden]),body.mode-keyprofile .keyprofileMode{padding-top:242px!important;padding-bottom:54px!important;}
 }
 :root{--template-lock-top:58px;--template-lock-scale:.56;--template-puzzle-top:300px;--template-puzzle-bottom:56px;}
 .app{grid-template-rows:minmax(0,1fr)!important;}
 .main{grid-row:1!important;width:100%!important;height:100%!important;min-height:0!important;display:grid!important;place-items:center!important;}
 .scene{position:relative!important;width:min(1180px,100vw)!important;height:100vh!important;min-height:0!important;overflow:visible!important;}
+
+/* Shared shell for Alchemy, Restoration, Collection and the Workbench.
+   Their contents keep their own sizing and scrolling. */
+.lairWorkspace{box-sizing:border-box;border:0;border-radius:0;background:none;box-shadow:none;}
+.lairModuleWindow.lairWorkspace{display:flex;flex-direction:column;}
+.lairModuleWindow.lairWorkspace .lairModuleHeader{display:none;}
+body:has(.lairModuleWindow.lairWorkspace.open) #alchemyFullBlur{opacity:1;}
+/* These controls belong to the room behind the transparent workspace.
+   Keep their geometry so help positioning stays stable when returning. */
+body:has(.lairWorkspace:not([hidden])) :is(#campaignButton,.hudHelpButton,#lairTraining){visibility:hidden;pointer-events:none;}
+
+/* All room artwork uses the same 1672 × 941 coordinate space. */
+.lairRoom{position:absolute;left:50%;top:50%;width:max(100vw,177.6833dvh);height:max(100dvh,56.2799vw);transform:translate(calc(-50% + var(--lair-pan,0px)),-50%);background:url('../assets/lair/room/logovo_bg.png') center/100% 100% no-repeat;touch-action:none;}
+.lairRoomObject{position:absolute;display:block;min-width:0;min-height:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;outline:0;pointer-events:none;}
+.lairRoomObject img{display:block;width:100%;height:auto;max-width:none;pointer-events:none;transition:filter var(--motion-fast);}
+.lairRoomHit{position:absolute;inset:0;pointer-events:auto;cursor:pointer;clip-path:var(--room-hit,inset(0));}
+.lairRoomObject:is(:hover,:focus-visible) img{filter:brightness(1.12) drop-shadow(0 0 5px var(--color-gold));}
+.lairRoomObject:focus-visible img{filter:brightness(1.16) drop-shadow(0 0 8px var(--color-gold));}
+.lairRoomObject--alchemy{left:84.15%;top:0;width:15.85%;--room-hit:polygon(59% 0,83% 0,100% 18%,100% 100%,0 91%,0 30%,5% 22%,32% 18%,59% 8%);}
+.lairRoomObject--verstak{left:0;top:21.8%;width:18.96%;--room-hit:polygon(0 12%,31% 12%,40% 2%,72% 0,76% 13%,65% 23%,100% 28%,93% 80%,57% 91%,53% 98%,0 100%);}
+.lairRoomObject--map{left:59.4%;top:9.4%;width:24.82%;--room-hit:polygon(15% 4%,45% 0,69% 0,69% 4%,86% 4%,86% 52%,100% 61%,100% 100%,0 100%,0 87%,11% 60%,15% 52%);}
+.lairRoomObject--table{z-index:2;left:19.5%;top:36.4%;width:62.08%;--room-hit:polygon(0 100%,17% 60%,14% 42%,22% 23%,25% 23%,25% 10%,30% 0,35% 0,36% 24%,72% 24%,73% 12%,77% 12%,79% 25%,84% 25%,86% 42%,83% 60%,100% 100%);}

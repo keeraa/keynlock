@@ -104,3 +104,11 @@
 .uiInventory{--inventory-item-lift:9px}.uiInventory .uiInventoryItem.visual-hover{filter:brightness(1.08)}.uiInventory .uiInventoryItem:focus-visible,.uiInventoryToggle:focus-visible{outline:2px solid var(--ui-focus);outline-offset:3px}
 
 .tutorialPreference{display:flex;align-items:center;gap:8px;margin:10px 0;font:13px/1.4 var(--ui-font);color:var(--color-text);}
+
+.hudHelpButton{position:fixed;bottom:18px;z-index:1501;display:grid;place-items:center;box-sizing:border-box;width:var(--ui-corner-icon-size);height:var(--ui-corner-icon-size);padding:0;border-radius:var(--radius-control);background:var(--color-surface);color:var(--color-text-strong);font:30px/1 var(--accent-font);opacity:.55;transition:opacity var(--motion-fast);}
+.hudHelpButton:hover,.hudHelpButton:focus-visible,.hudHelpButton[aria-expanded="true"]{opacity:1;}
+.hudHelpButton[hidden]{display:none;}
+@media(max-width:720px){.hudHelpButton{bottom:8px;}}
+
+/* Shared artwork for the seven collectible alchemy components. */
+.componentIcon{display:block;width:var(--component-icon-size,40px);height:var(--component-icon-size,40px);max-width:100%;object-fit:contain;flex-shrink:0;user-select:none;filter:drop-shadow(0 2px 3px #0005);}

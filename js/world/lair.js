@@ -3,6 +3,7 @@
   }
 
   const LAIR_MODULE_TITLES={team:'Выбор персонажа',dialogue:'Диалоги',city:'Анализ города',alchemy:'Алхимия',collection:'Коллекция',restoration:'Мастерская'};
+  const LAIR_WORKSPACES=new Set(['alchemy','collection','restoration']);
   let lairReturnFocus=null;
   let workbenchReturnFocus=null;
 
@@ -22,6 +23,10 @@
   }
 
   function setLairBackgroundInert(activeDialog){
+    const workspaceOpen=!!activeDialog?.classList.contains('lairWorkspace');
+    document.querySelectorAll('#campaignButton,.hudHelpButton,#lairTraining').forEach(control=>{
+      control.inert=workspaceOpen;
+    });
     const scene=$lairOverlay?.querySelector('.lairScene');
     if(!scene) return;
     [...scene.children].forEach(child=>{
@@ -33,9 +38,19 @@
 
   function trapLairDialogFocus(event,dialog){
     if(event.key!=='Tab'||!dialog||dialog.hidden) return;
-    const items=[...dialog.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')]
-      .filter(el=>el.getClientRects().length);
+    const selector='button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const workspace=dialog.classList.contains('lairWorkspace');
+    const header=workspace&&document.querySelector(`#${dialog.dataset.module}TopHudClose`)?.closest('.screenTopHud');
+    const items=[...(header?.querySelectorAll(selector)||[]),...dialog.querySelectorAll(selector),...document.querySelectorAll('#saveFailureNotice:not([hidden]) button')]
+      .filter(el=>el.getClientRects().length&&!el.closest('[inert]')&&getComputedStyle(el).visibility!=='hidden');
     if(!items.length){ event.preventDefault(); dialog.focus?.(); return; }
+    if(workspace){
+      const index=items.indexOf(document.activeElement);
+      const next=index<0?(event.shiftKey?items.length-1:0):(index+(event.shiftKey?-1:1)+items.length)%items.length;
+      event.preventDefault();
+      items[next].focus({preventScroll:true});
+      return;
+    }
     const first=items[0],last=items.at(-1);
     if(event.shiftKey&&document.activeElement===first){ event.preventDefault(); last.focus(); }
     else if(!event.shiftKey&&document.activeElement===last){ event.preventDefault(); first.focus(); }
@@ -61,12 +76,10 @@
     const activeCharacter=LAIR_CHARACTERS[lairCharacter]||LAIR_CHARACTERS.sai;
     const activePortrait=document.querySelector('#lairActiveCharacterPortrait');
     const teamHotspot=document.querySelector('.lairHotspotTeam');
-    const activeName=document.querySelector('#lairActiveCharacterName');
     if(activePortrait){
       activePortrait.src=activeCharacter.portrait;
       activePortrait.alt=activeCharacter.name;
     }
-    if(activeName)activeName.textContent=activeCharacter.name;
     if(teamHotspot)teamHotspot.dataset.character=lairCharacter;
     teamHotspot?.setAttribute('aria-label',`Выбор персонажа: ${activeCharacter.name}`);
     if(!$lairSceneCharacters.children.length){
@@ -75,7 +88,10 @@
         return `<div class="lairSceneCharacter ${id}" data-lair-character="${id}"><img src="${ch.full}" alt=""></div>`;
       }).join('');
     }
-    $lairSceneCharacters.querySelectorAll('[data-lair-character]').forEach(character=>{
+    // Kai stands behind the restoration table, within the room's layers.
+    const kai=$lairSceneCharacters.querySelector('[data-lair-character="kai"]');
+    if(kai)$lairOverlay.querySelector('.lairRoom').append(kai);
+    $lairOverlay.querySelectorAll('[data-lair-character]').forEach(character=>{
       character.classList.toggle('active',character.dataset.lairCharacter===lairCharacter);
     });
   }
@@ -86,6 +102,7 @@
     lairReturnFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;
     $lairModuleTitle.textContent=LAIR_MODULE_TITLES[next];
     $lairModuleWindow.dataset.module=next;
+    $lairModuleWindow.classList.toggle('lairWorkspace',LAIR_WORKSPACES.has(next));
     $lairModuleWindow.hidden=false;
     $lairModuleWindow.classList.add('open');
     setLairBackgroundInert($lairModuleWindow);
@@ -93,7 +110,8 @@
     // Make the window measurable before booting it; starting while [hidden]
     // produced a zero-size first layout that jumped into place one frame later.
     setLairTab(next);
-    focusLairDialog($lairModuleWindow,$lairModuleClose);
+    focusLairDialog($lairModuleWindow,LAIR_WORKSPACES.has(next)
+      ?document.querySelector(`#${next}TopHudClose`):$lairModuleClose);
     if(next==='alchemy'){
       const stabilize=()=>{
         const moduleBody=$lairModuleWindow.querySelector('.lairModuleBody');
@@ -348,7 +366,7 @@
       };
       const paint = () => { clamp(); apply(pan); };
       surface.addEventListener('pointerdown', e => {
-        if(!panQuery.matches || e.pointerType === 'mouse') return;
+        if(!range())return;
         id = e.pointerId; startX = e.clientX; startPan = pan; dragging = false;
       }, { passive:true });
       surface.addEventListener('pointermove', e => {
@@ -370,14 +388,48 @@
       surface.addEventListener('pointerup', release, { passive:true });
       surface.addEventListener('pointercancel', release, { passive:true });
       addEventListener('resize', paint, { passive:true });
-      return { set(v){ pan = v; paint(); }, paint };
+      return { set(v){ pan = v; paint(); }, shift(v){ const before=pan; pan += v; paint(); return pan!==before; }, paint };
+    }
+
+    // Run only while a mouse is near an overflowing edge. Pressing stops the
+    // camera before pointerup so an object cannot slide out from under a click.
+    function enableEdgePan(surface,available,shift){
+      if(!surface)return;
+      let frame=0,lastTime=0,speed=0,remainder=0;
+      const stop=()=>{cancelAnimationFrame(frame);frame=0;lastTime=0;speed=0;remainder=0;};
+      const tick=time=>{
+        frame=0;
+        if(!available()){stop();return;}
+        const dt=lastTime?Math.min(32,time-lastTime)/1000:0;
+        lastTime=time;
+        const distance=speed*dt+remainder;
+        const pixels=Math.trunc(distance);
+        remainder=distance-pixels;
+        if(pixels&&!shift(pixels)){stop();return;}
+        frame=requestAnimationFrame(tick);
+      };
+      surface.addEventListener('pointermove',event=>{
+        if(event.pointerType!=='mouse'||event.buttons||!available()){stop();return;}
+        const rect=surface.getBoundingClientRect();
+        const edge=Math.min(80,rect.width*.15);
+        const x=event.clientX-rect.left;
+        const strength=x<edge?-(1-x/edge):x>rect.width-edge?1-(rect.width-x)/edge:0;
+        if(!strength){stop();return;}
+        speed=Math.sign(strength)*Math.min(1,Math.abs(strength))**2*420;
+        if(!frame)frame=requestAnimationFrame(tick);
+      },{passive:true});
+      surface.addEventListener('pointerleave',stop);
+      window.addEventListener('pointerdown',stop,{capture:true,passive:true});
+      window.addEventListener('keydown',stop,{capture:true});
+      window.addEventListener('blur',stop);
+      window.addEventListener('resize',stop,{passive:true});
+      document.addEventListener('visibilitychange',stop);
     }
 
     // --- the lair room ---
     const scene = document.querySelector('.lairScene');
     if(scene){
-      const chars = document.querySelector('.lairSceneCharacters');
-      const spots = () => document.querySelectorAll('.lairHotspot:not(.lairHotspotTeam)');
+      const room=scene.querySelector('.lairRoom');
       // How far the cover-fitted backdrop hangs off each side.
       const roomRange = () => {
         const vw = scene.clientWidth, vh = scene.clientHeight;
@@ -385,13 +437,24 @@
         const scale = Math.max(vw / 1672, vh / 941);
         return Math.max(0, (1672 * scale - vw) / 2);
       };
-      const roomPan = enablePan(scene, v => {
+      const roomPan = enablePan(room, v => {
         // Through a custom property: the rule that places this backdrop is
         // !important, so an inline background-position would lose to it.
         scene.style.setProperty('--lair-pan', `${v.toFixed(0)}px`);
-        if(chars) chars.style.transform = `translateX(${v.toFixed(0)}px)`;
-        spots().forEach(s => { s.style.transform = `translateX(${v.toFixed(0)}px)`; });
+        if($lairSceneCharacters)$lairSceneCharacters.style.transform=`translateX(${v.toFixed(0)}px)`;
+        scene.querySelectorAll('.lairHotspot:not(.lairHotspotTeam)').forEach(spot=>{spot.style.transform=`translateX(${v.toFixed(0)}px)`;});
+
       }, roomRange);
+
+      enableEdgePan(scene,()=>lairOpen&&!room.inert&&!document.hidden&&!document.body.classList.contains('main-menu-open')&&roomRange()>1,delta=>roomPan.shift(-delta));
+
+      room?.addEventListener('focusin',event=>{
+        const object=event.target.closest('.lairRoomObject');
+        // Pointer focus must not move the pressed object before its click.
+        if(!object?.matches(':focus-visible'))return;
+        const rect=object.getBoundingClientRect();
+        if(rect.left<0||rect.right>scene.clientWidth)roomPan?.shift(scene.clientWidth/2-(rect.left+rect.width/2));
+      });
 
       // Open with the room shifted a fifth of a screen to the left, which walks
       // the camera right — that half of the room is where the tables and the
@@ -407,6 +470,11 @@
     // uses the same scroll offsets, so it cannot reveal empty side bands.
     const mapViewport=document.querySelector('.worldMapDialog');
     if(mapViewport){
+      enableEdgePan(mapViewport,()=>mapOpen&&!document.hidden&&mapViewport.scrollWidth>mapViewport.clientWidth+1,delta=>{
+        const before=mapViewport.scrollLeft;
+        mapViewport.scrollLeft+=delta;
+        return mapViewport.scrollLeft!==before;
+      });
       let drag=null;
       mapViewport.addEventListener('pointerdown',event=>{
         if(event.pointerType!=='mouse'||event.button!==0||event.target.closest('button'))return;

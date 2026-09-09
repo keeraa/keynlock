@@ -47,8 +47,8 @@ function assertBalancedCss(css,path){
 const htmlPath = resolve(root, 'index.html');
 const html = readFileSync(htmlPath, 'utf8');
 const scripts = localAttributeRefs(html, 'script', 'src');
-const expectedScriptOrder = ["js/core/asset-preload.js","js/core/reward-policy.js","js/core/game-catalog.js","js/core/challenge-hud.js","js/core/tool-motion.js","js/core/game-defeat.js","js/core/state.js","js/core/puzzle-modes.js","js/core/audio.js","js/core/ui.js","js/world/inventory.js","js/world/lair.js","js/world/navigation.js","js/core/digital-helpers.js","js/modes/drum.js","js/modes/oscilloscope.js","js/core/game.js","js/modes/anachronox.js","js/modes/composite.js","js/modes/tension.js","js/modes/resonance.js","js/modes/deduction.js","js/modes/skyrim.js","js/modes/gothic1.js","js/modes/hillsfar.js","js/modes/oblivion.js","js/modes/watchmen.js","js/modes/museum.js","js/modes/silhouettes.js","js/modes/mass2.js","js/modes/pipeline.js","js/modes/wharf.js","js/modes/thiefds.js","js/modes/kingdomcome.js","js/modes/thief12.js","js/modes/fallout.js","js/modes/masshack.js","js/modes/pathologic.js","js/modes/bioshock2.js","js/modes/alphaprotocol.js","js/modes/base-locks.js","js/world/alchemy-stations.js","js/world/alchemy-ui.js","js/world/alchemy-inventory.js","js/world/guards.js","js/world/missions.js","js/world/game-settings.js","js/world/collection.js","js/core/init.js","js/core/inventory-hit-testing.js"];
-expectedScriptOrder.splice(1,0,'js/core/story-dialogs.js','js/core/main-menu.js');
+const expectedScriptOrder = ["js/core/asset-preload.js","js/core/reward-policy.js","js/core/game-catalog.js","js/core/challenge-hud.js","js/core/tool-motion.js","js/core/game-defeat.js","js/core/state.js","js/core/puzzle-modes.js","js/core/audio.js","js/core/ui.js","js/world/inventory.js","js/world/lair.js","js/world/navigation.js","js/core/digital-helpers.js","js/modes/drum.js","js/modes/oscilloscope.js","js/core/game.js","js/modes/signalbalance.js","js/modes/composite.js","js/modes/tension.js","js/modes/resonance.js","js/modes/deduction.js","js/modes/workingangle.js","js/modes/turnmemory.js","js/modes/keyprofile.js","js/modes/pinflight.js","js/modes/springtumblers.js","js/modes/museum.js","js/modes/silhouettes.js","js/modes/pairednodes.js","js/modes/pipeline.js","js/modes/wharf.js","js/modes/ringsecret.js","js/modes/cylinderpath.js","js/modes/soundlatch.js","js/modes/torqueangle.js","js/modes/ringpassage.js","js/modes/twinbalance.js","js/modes/timingneedle.js","js/modes/symbolpins.js","js/modes/base-locks.js","js/world/alchemy-stations.js","js/world/alchemy-ui.js","js/world/alchemy-inventory.js","js/world/guards.js","js/world/missions.js","js/world/game-settings.js","js/world/collection.js","js/core/init.js","js/core/inventory-hit-testing.js"];
+expectedScriptOrder.splice(1,0,'js/core/story-dialogs.js','js/core/main-menu.js','js/core/save-recovery.js');
 expectedScriptOrder.splice(1,0,'js/data/world.js','js/data/economy.js','js/data/restoration.js','js/data/paintings.js');
 expectedScriptOrder.splice(1,0,'js/core/save-store.js');
 expectedScriptOrder.splice(expectedScriptOrder.indexOf('js/core/puzzle-modes.js'),0,'js/core/resources.js');
@@ -186,15 +186,15 @@ const physicalNativeGames = catalogueEntries
   .filter(entry => entry.kind === 'native')
   .filter(entry => new RegExp(`^\\s*${entry.id}:\\{[^\\n]+lock:\\{present:true,manualOpen:true,specialTool:true\\}`,'m').test(catalogueSource))
   .map(entry => entry.id);
-const expectedTypedTensionGames = ['classic','sequence','special','g1'];
+const expectedTypedTensionGames = ['classic','sequence','special','turnmemory'];
 if (JSON.stringify(physicalNativeGames) !== JSON.stringify(expectedTypedTensionGames)) {
   fail('Physical native games and typed-tension catalogue flags are out of sync.');
 }
-if (!tensionGuardSource.includes("const typedTensionModes=new Set(['classic','sequence','special','g1'])")) {
+if (!tensionGuardSource.includes("const typedTensionModes=new Set(['classic','sequence','special','turnmemory'])")) {
   fail('Typed-tension mode list must match games that render typed plates and a tensioner.');
 }
-if (!tensionGuardSource.includes("GameActions.registerOpenGuard('g1',()=>!forceWrongTensionBreak())")) {
-  fail('Gothic 1 opener must enforce the typed tensioner guard.');
+if (!tensionGuardSource.includes("GameActions.registerOpenGuard('turnmemory',()=>!forceWrongTensionBreak())")) {
+  fail('turnmemory opener must enforce the typed tensioner guard.');
 }
 
 const version = readFileSync(resolve(root, 'VERSION'), 'utf8').trim();

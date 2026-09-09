@@ -246,29 +246,6 @@
     colors.append(caption,palette);root.append(colors);
   }
 
-  function syncMapPanControls(){
-    const viewport=document.querySelector('.worldMapDialog');
-    const controls=document.querySelector('#mapPanControls');
-    if(!viewport||!controls)return;
-    const maxX=viewport.scrollWidth-viewport.clientWidth,maxY=viewport.scrollHeight-viewport.clientHeight;
-    controls.hidden=!mapOpen||(maxX<2&&maxY<2);
-    const blocked={left:viewport.scrollLeft<2,right:viewport.scrollLeft>=maxX-2,up:viewport.scrollTop<2,down:viewport.scrollTop>=maxY-2};
-    controls.querySelectorAll('[data-map-pan]').forEach(button=>{
-      const horizontal=['left','right'].includes(button.dataset.mapPan);
-      button.hidden=horizontal?maxX<2:maxY<2;
-      button.disabled=blocked[button.dataset.mapPan];
-    });
-  }
-  document.querySelector('#mapPanControls')?.addEventListener('click',event=>{
-    const direction=event.target.closest('[data-map-pan]')?.dataset.mapPan;
-    if(!direction)return;
-    const viewport=document.querySelector('.worldMapDialog');
-    viewport.scrollBy({left:({left:-1,right:1}[direction]||0)*viewport.clientWidth*.6,top:({up:-1,down:1}[direction]||0)*viewport.clientHeight*.6});
-    syncMapPanControls();
-  });
-  document.querySelector('.worldMapDialog')?.addEventListener('scroll',syncMapPanControls,{passive:true});
-  window.addEventListener('resize',syncMapPanControls);
-
   document.querySelector('#worldMapCanvas')?.addEventListener('click',event=>{
     const node=event.target.closest?.('.missionNode');
     if(node)selectMapMission(node.dataset.location);
@@ -290,7 +267,6 @@
     const loc=MAP_LOCATIONS[selectedMapMission];
     card.hidden=!loc;
     $worldMapScreen.classList.toggle('has-mission',!!loc);
-    syncMapPanControls();
     document.querySelectorAll('.missionNode').forEach(node=>{
       const selected=node.dataset.location===selectedMapMission;
       const name=missionLabel(MAP_LOCATIONS[node.dataset.location]);

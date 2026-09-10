@@ -481,7 +481,8 @@ let plateEls=[], pinTopPlateEls=[];
   let lastFrame=performance.now();
   const ACTIVE_FRAME_MS=24;
   function scheduleAnimationLoop(delay=ACTIVE_FRAME_MS){
-    setTimeout(()=>requestAnimationFrame(animationLoop),delay);
+    if(delay>0)setTimeout(()=>requestAnimationFrame(animationLoop),delay);
+    else requestAnimationFrame(animationLoop);
   }
   let animationLoopParked=false;
   function writeMotionStyle(element,name,value){
@@ -516,7 +517,7 @@ let plateEls=[], pinTopPlateEls=[];
       }
     }
     if(!solved) PuzzleModes.call(mode,'tick',{now,dt});
-    scheduleAnimationLoop(solved ? 160 : ACTIVE_FRAME_MS);
+    scheduleAnimationLoop(solved ? 160 : mode==='resonance' ? 0 : ACTIVE_FRAME_MS);
   }
   window.addEventListener('keynlock-world-pausechange',event=>{
     if(!event.detail?.paused && animationLoopParked){

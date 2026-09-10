@@ -73,12 +73,10 @@ body.mode-keyprofile .globalTopHud{
   filter:brightness(1.12);
 }
 .globalTopHud .hudNavBtn:focus-visible{
-  outline:2px solid var(--color-gold)!important;
-  outline-offset:2px!important;
+  outline:none!important;
 }
 .globalTopHud .alchemyStationTab:focus-visible{
-  outline:2px solid var(--color-gold)!important;
-  outline-offset:2px!important;
+  outline:none!important;
 }
 
 .globalTopHud .topRightHud{
@@ -160,7 +158,12 @@ body.lair-open .globalTopHud #rewardBox{display:none!important;}
     min-height:54px!important;
   }
   .globalTopHud .screenTopHud{height:54px;}
-  .globalTopHud .topRightHud{max-width:min(58vw,260px)!important;}
+  .globalTopHud{grid-template-columns:1fr;grid-template-rows:40px 44px;grid-template-areas:"actions" "context";height:90px;gap:6px}
+  .globalTopHud .topRightHud{display:flex!important;justify-content:flex-end;width:100%!important;max-width:100%!important;gap:6px!important}
+  .globalTopHud #economyHud{zoom:1;gap:6px!important;height:40px!important}
+  .globalTopHud .screenTopHud{height:44px}
+  .globalTopHud .screenTopHudClose{width:40px;height:40px;flex-basis:40px}
+  .globalTopHud .hudNavBtn{flex:0 0 40px;width:40px!important;height:40px!important}
 }
 
 .globalTopHud :is(#coinBalance,#resourcePicks,#resourceParts,#resourceOil){display:inline-block;transform-origin:center;font-variant-numeric:tabular-nums;}

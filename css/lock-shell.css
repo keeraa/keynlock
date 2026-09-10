@@ -142,7 +142,7 @@ body.lock-shell-active:not(.importedMode) #pinTopPlates{
 }
 
 /* Tools and the physical lock meet at the shell's horizontal mechanism axis. */
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"]) #lock.universalLockBlock{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) #lock.universalLockBlock{
   left:50%!important;
   top:var(--lock-shell-top)!important;
   width:var(--lock-shell-size)!important;
@@ -153,7 +153,7 @@ body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-gam
   z-index:60!important;
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"]) #lock.universalLockBlock>.mechanismZone{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) #lock.universalLockBlock>.mechanismZone{
   left:0!important;
   top:0!important;
   width:var(--lock-shell-size)!important;
@@ -162,25 +162,25 @@ body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-gam
   overflow:visible!important;
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"]) .mechanismZone::before{display:none!important;}
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .mechanismZone::before{display:none!important;}
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"]) .lockShellPhysicalLock{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .lockShellPhysicalLock{
   position:absolute;
-  left:558px;
+  left:calc(var(--lock-shell-size) - 52px);
   top:0;
   width:270px;
   height:266px;
   z-index:7;
-  transition:transform .72s cubic-bezier(.2,.78,.2,1),opacity .45s ease;
+  transition:transform .95s cubic-bezier(.2,.78,.2,1),opacity .45s ease;
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"]) .lockShellPhysicalLock .lockPanel{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .lockShellPhysicalLock .lockPanel{
   position:absolute!important;
   inset:0!important;
   display:none!important;
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"]) .lockShellShackle{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .lockShellShackle{
   display:block;
   position:absolute;
   left:auto;
@@ -196,20 +196,20 @@ body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-gam
   transition:filter .18s cubic-bezier(.22,.84,.22,1);
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"]):has(.mechanismZone.opening) .lockShellShackle{
-  animation:lockShellShackleOpen 950ms cubic-bezier(.20,.76,.18,1) forwards;
+/* Every shell profile shares one pull-then-turn animation and final pose. */
+body.lock-shell-active:has(.mechanismZone.opening) .lockShellShackle{
+  animation:lockShellShackleOpen 950ms cubic-bezier(.33,0,.2,1) forwards;
 }
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"]):has(.mechanismZone.opened) .lockShellShackle{
-  transform:translate(42px,-70%) rotate(82deg) scale(.97);
+body.lock-shell-active:has(.mechanismZone.opened) .lockShellShackle{
+  transform:translate(42px,-70%) rotate(72deg) scale(.97);
 }
 @keyframes lockShellShackleOpen{
   0%{transform:translate(0,-50%) rotate(90deg) scale(.97);}
-  58%{transform:translate(27px,-61%) rotate(87deg) scale(.97);}
-  84%{transform:translate(45px,-73%) rotate(81deg) scale(.97);}
-  100%{transform:translate(42px,-70%) rotate(82deg) scale(.97);}
+  45%{transform:translate(42px,-50%) rotate(90deg) scale(.97);}
+  100%{transform:translate(42px,-70%) rotate(72deg) scale(.97);}
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"]) .lockShellPhysicalLock .lockHitArea{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .lockShellPhysicalLock .lockHitArea{
   left:0!important;
   top:0!important;
   width:270px!important;
@@ -217,16 +217,16 @@ body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-gam
   transform:none!important;
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"]) .mechanismZone.opening .lockShellPhysicalLock,
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"]) .mechanismZone.opened .lockShellPhysicalLock{
-  transform:translateX(155px);
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .mechanismZone.opening .lockShellPhysicalLock,
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .mechanismZone.opened .lockShellPhysicalLock{
+  transform:translateX(42px);
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"]) .mechanismZone.opening .lockPanel{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .mechanismZone.opening .lockPanel{
   animation:none!important;
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"]) .lockShellFunnel{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .lockShellFunnel{
   display:block;
   position:absolute;
   left:-12px;
@@ -238,27 +238,27 @@ body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-gam
   filter:drop-shadow(0 5px 7px rgba(0,0,0,.42));
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"]) .lockShellFunnelBack{z-index:3;}
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"]) .lockShellFunnelFront{z-index:6;left:-6px;width:54px;}
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .lockShellFunnelBack{z-index:3;}
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .lockShellFunnelFront{z-index:6;left:-6px;width:54px;}
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"]) .mechanismZone .pick{z-index:6!important;}
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"]) .mechanismZone .tension{z-index:5!important;}
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .mechanismZone .pick{z-index:6!important;}
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .mechanismZone .tension{z-index:5!important;}
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"]) .mechanismZone .pick{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .mechanismZone .pick{
   left:-20px!important;
   top:112px!important;
   transform-origin:50% 6%!important;
   transform:translate(var(--pick-react-x),var(--pick-react-y)) rotate(calc(90deg + var(--pick-rot-drift) + var(--pick-react-rot)))!important;
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"]) .mechanismZone .tension{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .mechanismZone .tension{
   left:-4px!important;
   top:110px!important;
   transform-origin:6% 50%!important;
   transform:translate(var(--tension-react-x),var(--tension-react-y)) rotate(calc(0deg + var(--tension-rot-drift) + var(--tension-react-rot))) scaleX(-1)!important;
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"]) .mechanismZone.nudge .tension{
+body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .mechanismZone.nudge .tension{
   animation:lockShellTensionNudge 242ms ease!important;
 }
 
@@ -272,7 +272,7 @@ body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-gam
 body.lock-shell-active:is([data-game-mode="symbolpins"],[data-game-mode="springtumblers"]) #lock.universalLockBlock{left:50%!important;top:var(--lock-shell-top)!important;width:var(--lock-shell-size)!important;height:266px!important;min-width:var(--lock-shell-size)!important;transform:translate(-50%,-50%) scale(var(--lock-shell-scale))!important;transform-origin:center!important;z-index:60!important;}
 body.lock-shell-active:is([data-game-mode="symbolpins"],[data-game-mode="springtumblers"]) #lock.universalLockBlock>.mechanismZone{left:0!important;top:0!important;width:var(--lock-shell-size)!important;height:266px!important;transform:translate3d(calc(var(--px) * -.04),calc(var(--py) * -.04),0)!important;overflow:visible!important;}
 body.lock-shell-active:is([data-game-mode="symbolpins"],[data-game-mode="springtumblers"]) .mechanismZone::before{display:none!important;}
-body.lock-shell-active:is([data-game-mode="symbolpins"],[data-game-mode="springtumblers"]) .lockShellPhysicalLock{position:absolute;left:558px;top:0;width:270px;height:266px;z-index:7;}
+body.lock-shell-active:is([data-game-mode="symbolpins"],[data-game-mode="springtumblers"]) .lockShellPhysicalLock{position:absolute;left:calc(var(--lock-shell-size) - 52px);top:0;width:270px;height:266px;z-index:7;}
 body.lock-shell-active:is([data-game-mode="symbolpins"],[data-game-mode="springtumblers"]) .lockShellPhysicalLock .lockPanel{display:none!important;}
 body.lock-shell-active:is([data-game-mode="symbolpins"],[data-game-mode="springtumblers"]) .lockShellShackle{display:block;position:absolute;right:-103px;top:50%;width:171px;height:171px;background:var(--locker-image) center/contain no-repeat;filter:drop-shadow(0 9px 12px rgba(0,0,0,.25));transform:translateY(-50%) rotate(90deg) scale(.97);z-index:0;}
 body.lock-shell-active:is([data-game-mode="symbolpins"],[data-game-mode="springtumblers"]) .lockShellPhysicalLock .lockHitArea{left:0!important;top:0!important;width:270px!important;height:266px!important;transform:none!important;}
@@ -326,3 +326,71 @@ body.lock-shell-active.mode-keyprofile #hfLockCut{overflow:visible;}
 .hfInsertedKey{position:absolute;inset:0;pointer-events:none;}
 body.lock-shell-active.mode-keyprofile #hfLockCut>.hfTargetProfile{z-index:2;}
 .hfCandidate.inserting>svg{visibility:hidden;}
+
+/* Resonance uses the same metal body, tool axis and inset as Wharf. */
+body.lock-shell-active[data-game-mode="resonance"]{--lock-shell-size:var(--resonance-shell-size,366px);--lock-shell-height:470px;}
+body.lock-shell-active[data-game-mode="resonance"] .puzzleArea>#resonanceMode{overflow:visible!important;padding:0!important;}
+body.lock-shell-active #resonanceMode .rsBoard{
+  position:absolute;left:50%;top:var(--lock-shell-top);
+  width:var(--lock-shell-size)!important;height:var(--lock-shell-height)!important;
+  min-height:0!important;max-width:none!important;margin:0!important;
+  transform:translate(-50%,-50%) scale(var(--lock-shell-scale));
+  border:0;border-radius:0;background:none;box-shadow:none;
+}
+body.lock-shell-active #resonanceMode .rsLanes{inset:35px 26.4px!important;gap:10.8px!important;}
+body.lock-shell-active #resonanceMode .rsLane{flex:0 0 70.2px;width:70.2px;min-width:0;}
+body.lock-shell-active #resonanceMode .rsOrb{top:0!important;width:32px!important;height:32px!important;transition:none;}
+body.lock-shell-active #resonanceMode .rsLine{left:15px;right:15px;z-index:1;pointer-events:none;}
+
+@media(prefers-reduced-motion:reduce){body.lock-shell-active:has(.mechanismZone.opening) .lockShellShackle{animation-duration:1ms;}}
+
+/* The key profile, trial action and feedback live inside one lock body. */
+body.lock-shell-active[data-game-mode="deduction"]{--lock-shell-height:470px;}
+body.lock-shell-active[data-game-mode="deduction"] .puzzleArea{inset:0!important;height:100%!important;}
+body.lock-shell-active[data-game-mode="deduction"] .puzzleArea>#deductionMode{padding:0!important;overflow:visible!important;}
+body.lock-shell-active #deductionMode .kdPanel{
+  position:absolute;left:50%;top:var(--lock-shell-top);
+  width:var(--lock-shell-size)!important;height:var(--lock-shell-height)!important;
+  max-width:none!important;min-height:0!important;margin:0!important;padding:0!important;
+  transform:translate(-50%,-50%) scale(var(--lock-shell-scale));
+  border:0!important;border-radius:0;background:none;box-shadow:none!important;
+}
+body.lock-shell-active #deductionMode .kdKey{position:absolute;left:38px;right:38px;top:32px;width:auto;height:calc(50% - 32px)!important;margin:0!important;gap:12px!important;border-bottom-width:8px;}
+body.lock-shell-active #deductionMode .kdTooth{flex:0 0 72px;width:72px!important;height:185px!important;}
+body.lock-shell-active #deductionMode .kdNum{font-size:18px;}
+body.lock-shell-active #deductionMode .kdBar{height:148px!important;}
+body.lock-shell-active #deductionMode .kdPinImg{height:144px!important;bottom:calc((var(--h) - 4) * 28px)!important;}
+body.lock-shell-active #deductionMode .kdMini{width:32px;height:32px;font-size:20px;}
+body.lock-shell-active #deductionMode .kdControls{bottom:14px;gap:5px;}
+body.lock-shell-active #deductionMode .kdCheck{position:absolute;left:50%;top:calc(50% + 12px);transform:translateX(-50%);min-width:240px;min-height:42px;margin:0;font-size:18px;}
+body.lock-shell-active #deductionMode .kdFeedback{position:absolute;left:28px;right:28px;top:calc(50% + 64px);max-height:calc(50% - 112px);overflow:auto;box-sizing:border-box;margin:0;padding:8px 12px;font:16px/1.4 var(--ui-font);}
+body.lock-shell-active #deductionMode .kdHistory{position:absolute;left:28px;right:28px;bottom:24px;margin:0;font:14px/1.3 var(--ui-font);}
+
+/* The turn-memory shell grows with the number of fixed-size sequence cells. */
+body.lock-shell-active[data-game-mode="turnmemory"]{--lock-shell-size:var(--turnmemory-shell-size,422px);--lock-shell-height:420px;}
+body.lock-shell-active[data-game-mode="turnmemory"] .puzzleArea>#turnmemoryMode{padding:0!important;overflow:visible!important;}
+body.lock-shell-active #turnmemoryMode .turnmemoryProgressWrap{
+  position:absolute!important;left:50%!important;right:auto!important;top:var(--lock-shell-top)!important;
+  width:var(--lock-shell-size)!important;height:var(--lock-shell-height)!important;
+  max-width:none!important;margin:0!important;padding:0!important;
+  transform:translate(-50%,-50%) scale(var(--lock-shell-scale))!important;
+}
+body.lock-shell-active #turnmemoryMode .turnmemoryProgressTitle{position:absolute;top:46px;font-size:18px;}
+body.lock-shell-active #turnmemoryMode .turnmemoryProgressRow{position:absolute;left:28px;right:28px;top:90px;width:auto!important;max-width:none!important;min-height:84px!important;gap:10px!important;flex-wrap:nowrap!important;}
+body.lock-shell-active #turnmemoryMode .turnmemorySlot{flex:0 0 84px!important;width:84px!important;height:84px!important;}
+
+@media(max-width:640px){body.lock-shell-active[data-game-mode="turnmemory"]{--lock-shell-scale:.55;}}
+
+/* Tension: fixed-size pins above the bolt, gauge and feedback below it. */
+body.lock-shell-active[data-game-mode="tension"]{--lock-shell-size:var(--tension-shell-size,430px);--lock-shell-height:420px;}
+body.lock-shell-active[data-game-mode="tension"] .puzzleArea>#tensionMode{padding:0!important;overflow:visible!important;}
+.tnPanel{padding:0;border:0;background:none;box-shadow:none;}
+.tnPins{position:absolute;left:35px;right:35px;top:32px;display:flex;justify-content:center;gap:18px;}
+.tnPin{position:relative;flex:0 0 72px;width:72px;height:152px;padding:0;border:1px solid #655538;border-radius:12px;background:#100e0b80;overflow:hidden;cursor:pointer;transition:background .25s,box-shadow .25s;}
+.tnPin.active{background:#a47b2730;box-shadow:inset 0 0 0 1px #d8ae5a75,0 0 16px #cc9d4926;}
+.tnPin:disabled{opacity:1;cursor:default;}
+.tnPinImg{position:absolute;left:50%;top:29px;width:46px;height:120px;object-fit:contain;transform:translateX(-50%);transition:transform .38s ease,filter .25s;pointer-events:none;}
+.tnPin.set .tnPinImg{transform:translate(-50%,-23px);filter:brightness(1.2) drop-shadow(0 0 5px #bddb7770);}
+.tnPanel .tnGauge{position:absolute;left:32px;right:32px;top:252px;height:36px;touch-action:none;}
+.tnPanel .tnGaugeLabels{position:absolute;left:32px;right:32px;top:297px;margin:0;color:#dbcba9;}
+.tnPanel .tnMessage{position:absolute;left:28px;right:28px;bottom:28px;margin:0;font:14px/1.4 var(--ui-font);}

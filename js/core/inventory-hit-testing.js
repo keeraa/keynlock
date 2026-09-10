@@ -7,7 +7,8 @@
   // hover flickers on and off as it bounces back.
   function restingBox(btn,img){
     const b=img.getBoundingClientRect();
-    const lift=parseFloat(getComputedStyle(btn).getPropertyValue('--tool-lift'))||0;
+    const transform=getComputedStyle(img).transform;
+    const lift=transform==='none'?0:-new DOMMatrixReadOnly(transform).m42;
     return {left:b.left, right:b.right, top:b.top+lift, bottom:b.bottom+lift};
   }
   function candidates(x,y){
@@ -174,8 +175,9 @@
   };
 
   document.addEventListener('animationend',e=>{
-    if(e.animationName!=='keynlockShackleOpenFast') return;
-    const lockArt=e.target?.closest?.('.mechanismZone,.sharedModeLockArt,.skCenterLock') || e.target;
+    const shellOpening=e.animationName==='lockShellShackleOpen';
+    if(!shellOpening&&e.animationName!=='keynlockShackleOpenFast') return;
+    const lockArt=shellOpening?document.querySelector('#lock .mechanismZone'):(e.target?.closest?.('.mechanismZone,.sharedModeLockArt,.skCenterLock') || e.target);
     if(!lockArt?.classList?.contains('opening')) return;
 
     lockArt.classList.remove('opening');

@@ -1,5 +1,5 @@
-/* Full-screen boot loader: shows the game logo while every image asset
-   preloads, and blurs the (already-rendered but not-yet-usable) app
+/* Full-screen boot loader: shows the game logo while all game images and sounds
+   load, and blurs the (already-rendered but not-yet-usable) app
    underneath so nothing half-loaded is visible or clickable. */
 .bootLoader{
   position:fixed;
@@ -195,3 +195,7 @@ html.reduce-motion *,html.reduce-motion *::before,html.reduce-motion *::after{an
 
 .mainMenuSettings{max-height:calc(45dvh - 24px);overflow:auto;}
 @media (max-width:700px) and (orientation:portrait),(max-aspect-ratio:4/5){.mainMenuSettings{max-height:calc(81dvh - 24px);}}
+
+.bootLoaderStatus{margin:10px 0;color:#3a2d21;font:13px/1.4 var(--ui-font);}
+.bootLoaderRetry{margin-top:8px;width:100%;}
+.bootLoaderRetry[hidden],.assets-ready .bootLoaderStatus{display:none;}

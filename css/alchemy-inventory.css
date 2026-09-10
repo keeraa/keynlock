@@ -43,7 +43,7 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
 }
 body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   .alchemyRackDrawer.open {
-  transform: translate(-50%, var(--rack-open-y));
+  transform: translate(-50%, calc(var(--rack-open-y) - (100% - var(--rack-peek) - var(--rack-open-y)) * .2));
 }
 
 
@@ -124,9 +124,9 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   cursor: pointer;
   filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.4));
   transition:
-    transform 0.16s ease,
-    filter 0.16s ease,
-    opacity 0.16s ease;
+    transform .42s cubic-bezier(.25,.1,.25,1),
+    filter .32s ease,
+    opacity .28s ease;
   /* Without this a touch-drag toward an element cell reads as a page
      scroll to the browser before the pointermove handler (js/world/
      alchemy.js) ever gets to call it a drag. */
@@ -137,10 +137,11 @@ body:has(#lairModuleWindow.open .lairPanel[data-lair-panel="alchemy"].active)
   width: 100%;
   height: 100%;
   object-fit: contain;
+  transition:transform .42s cubic-bezier(.25,.1,.25,1);
   pointer-events: none;
 }
-.alchemyRackDrawerBottle:is(:hover,.visual-hover) {
-  transform: translateX(-50%) translateY(calc(-1 * var(--inventory-item-lift)));
+.alchemyRackDrawerBottle:is(:hover,.visual-hover) img {
+  transform: translateY(calc(-1 * var(--inventory-item-lift)));
 }
 
 .alchemyRackDrawerBottle.selected {

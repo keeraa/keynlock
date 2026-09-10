@@ -58,10 +58,6 @@ body.importedMode .anSlot::before{inset:5px!important;border-radius:10px 10px 6p
 body.importedMode .anBtn{width:28px!important;height:28px!important;}
 body.importedMode .anBtn .ti-svg{width:14px!important;height:14px!important;}
 body.importedMode .anValue{font:500 16px/1 Georgia,"Times New Roman",serif!important;}
-body.importedMode .tnPanel{width:min(760px,88vw)!important;}
-body.importedMode .tnPins{grid-template-columns:repeat(6,minmax(0,92px))!important;justify-content:center!important;gap:8px!important;margin:18px 0 10px!important;}
-body.importedMode .tnPin{height:104px!important;}
-body.importedMode .tnPinImg{width:34px!important;max-height:96px!important;}
 body.importedMode .tnMessage{white-space:normal!important;}
 body.importedMode .kdPanel{border:0!important;box-shadow:none!important;}
 body.importedMode .kdKey{overflow:hidden!important;}
@@ -71,8 +67,6 @@ body.importedMode .kdPinImg{left:50%!important;bottom:calc((var(--h) - 4) * 21px
 body.importedMode .kdControls{bottom:8px!important;}
 body.importedMode .kdFeedback{white-space:normal!important;}
 @media (max-width:900px){
-body.importedMode .tnPins{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:6px!important;}
-body.importedMode .tnPinImg{width:30px!important;max-height:84px!important;}
 body.importedMode .kdKey{margin-inline:2px!important;}
 }
 body.importedMode .anTracks{align-items:flex-start!important;}
@@ -105,7 +99,8 @@ body.importedMode .cpPin{width:10px!important;height:22px!important;}
 body.importedMode .cpPins{height:38px!important;}
 body.importedMode .cpBuildCanvas{height:50px!important;}
 body.importedMode .kdPanel{width:min(620px,78vw)!important;padding:16px 18px 18px!important;}
-body.importedMode .kdCheck,body.importedMode .kdFeedback{display:none!important;}
+body.importedMode .kdCheck,body.importedMode .kdFeedback{display:block;}
+body.importedMode .kdFeedback{padding:10px 12px;border-radius:8px;background:rgba(12,9,6,.8);color:#ead7b6;}
 body.importedMode .kdKey{height:176px!important;gap:8px!important;margin:0 auto!important;justify-content:center!important;}
 body.importedMode .kdTooth{width:58px!important;}
 body.importedMode .kdBar{width:32px!important;}
@@ -138,19 +133,12 @@ body.map-open{overflow:hidden !important;}
 .lairPortraitInner{place-items:start center!important;padding-top:10px!important;}
 .lairPortraitArt{height:122%!important;object-fit:contain!important;object-position:center top!important;transform:translateY(-2%)!important;}
 
-body.importedMode .turnmemoryProgressWrap{position:absolute !important;left:50% !important;top:48% !important;bottom:auto !important;width:auto !important;margin:0 !important;transform:translateX(-50%) !important;z-index:30 !important;}
-body.importedMode .turnmemoryProgressRow{display:flex !important;flex-wrap:nowrap !important;align-items:center !important;justify-content:center !important;gap:12px !important;min-height:74px !important;}
-body.importedMode .turnmemorySlot,body.importedMode .turnmemorySlot.empty,body.importedMode .turnmemorySlot.left,body.importedMode .turnmemorySlot.right{flex:0 0 74px !important;width:74px !important;height:74px !important;margin:0 !important;top:auto !important;bottom:auto !important;transform:none !important;position:relative !important;}
-body.importedMode .turnmemorySlot.left::before,body.importedMode .turnmemorySlot.right::before{top:50% !important;transform:translate(-50%,-50%) !important;}
 body.importedMode .anBoard{position:relative !important;width:440px !important;max-width:90vw !important;height:320px !important;min-height:320px !important;margin:0 auto !important;display:flex !important;align-items:flex-start !important;justify-content:center !important;}
 body.importedMode .anConsole{position:relative !important;width:420px !important;max-width:90vw !important;height:310px !important;margin:0 auto !important;flex:0 0 auto !important;}
 body.importedMode .anTracks{position:absolute !important;left:50% !important;right:auto !important;top:0 !important;width:300px !important;height:220px !important;transform:translateX(-50%) !important;justify-content:center !important;gap:18px !important;}
 body.importedMode .anReadout{position:absolute !important;left:50% !important;top:246px !important;width:220px !important;transform:translateX(-50%) !important;text-align:center !important;font:500 54px/.95 Georgia,"Times New Roman",serif !important;}
 body.importedMode .anReadout::after{margin-left:auto !important;margin-right:auto !important;}
 @media (max-width:760px){
-body.importedMode .turnmemoryProgressWrap{top:38% !important;bottom:auto !important;}
-body.importedMode .turnmemoryProgressRow{gap:8px !important;min-height:60px !important;}
-body.importedMode .turnmemorySlot,body.importedMode .turnmemorySlot.empty,body.importedMode .turnmemorySlot.left,body.importedMode .turnmemorySlot.right{flex-basis:60px !important;width:60px !important;height:60px !important;}
 body.importedMode .anBoard{width:360px !important;height:292px !important;min-height:292px !important;}
 body.importedMode .anConsole{width:350px !important;height:282px !important;}
 body.importedMode .anTracks{width:260px !important;gap:10px !important;}
@@ -220,3 +208,5 @@ body.importedMode .anReadout{top:232px !important;font-size:44px !important;}
   .lairPortrait{height:170px !important;}
   .lairCharacters{width:100% !important;grid-template-columns:1fr !important;}
 }
+
+.kdHistory:empty{display:none;}

@@ -73,11 +73,57 @@
         <div class="lootResources"><span class="lootRow lootCoins" tabindex="0" data-tip="Монеты: +${earned}.${resources.firstClearBonus?` Включая премию за первое прохождение: ${resources.firstClearBonus}.`:""} Нужны для покупки отмычек и улучшений." aria-label="Монеты: +${earned}"><img class="lootResourceIcon" src="assets/ui/money-ico.png" alt=""><b>+${earned}</b></span>
         <span class="lootRow" tabindex="0" data-tip="Детали замков: +${resources.parts}. Из двух деталей можно создать одну отмычку." aria-label="Детали замков: +${resources.parts}"><img class="lootResourceIcon" src="assets/ui/details-ico.png" alt=""><b>+${resources.parts}</b></span>
         <span class="lootComponents" tabindex="0" data-tip="Цветные компоненты нужны для алхимии и изготовления материалов.">${componentRows||'<span class="lootRow" tabindex="0" data-tip="Компоненты не найдены" aria-label="Компоненты не найдены">0</span>'}</span></div>
-        ${painting?`<span class="lootPainting"><img src="${painting.image}" alt=""><span><small><img class="lootResourceIcon" src="assets/ui/portrait-ico.png" alt="">Найдена картина</small><b>${painting.title} (${painting.year})</b><em>${painting.artist}</em></span></span>`:''}
+        ${painting?`<div class="lootPainting lootPaintingQuiz"><img src="${painting.image}" alt="Найденная картина"><span><small>Найдена картина</small><b class="paintingQuizResult">Как называется эта картина? Верный ответ: +50 монет</b><em></em></span></div><div class="paintingQuiz" role="group" aria-label="Выбери название картины"></div>`:''}
         ${resources.handle?`<span class="lootPainting lootHandle"><span class="lootHandleArt"><img src="${resources.handle.image}" alt="Найденная рукоятка"></span><span><small>Найдена рукоятка</small><b>${resources.handle.name}</b></span></span>`:''}`;
     }
+    if(loot&&resources&&painting)mountPaintingQuiz(loot,painting,earned,activeRoundId);
     updateEconomyUI();
     return {earned, cleanBonus};
+  }
+  function mountPaintingQuiz(loot,painting,earned,roundId){
+    const quiz=window.KeynlockPaintingRewards.createQuiz(painting,window.KeynlockContent.paintings);
+    const choices=loot.querySelector('.paintingQuiz');
+    const result=loot.querySelector('.paintingQuizResult');
+    result.setAttribute('role','status');
+    for(const choice of quiz.choices){
+      const button=document.createElement('button');
+      button.type='button';button.className='digitalBtn';button.textContent=choice.title;
+      button.dataset.paintingId=choice.id;
+      button.addEventListener('click',()=>{
+        if(roundId!==activeRoundId||!choices.isConnected||!solved)return;
+        const answer=quiz.answer(choice.id);
+        if(!answer)return;
+        choices.querySelectorAll('button').forEach(option=>{
+          option.disabled=true;
+          option.classList.toggle('correct',option.dataset.paintingId===painting.id);
+          option.classList.toggle('wrong',option===button&&!answer.correct);
+        });
+        result.textContent=`${answer.correct?'Верно! +50 монет.':'Правильный ответ:'} ${painting.title} (${painting.year})`;
+        result.nextElementSibling.textContent=painting.artist;
+        if(!answer.coins)return;
+        balance+=answer.coins;
+        STORE.setItem('lockpickBalance',String(balance));
+        updateEconomyUI();
+        window.KeynlockResources?.render();
+        const coins=loot.querySelector('.lootCoins');
+        const value=coins.querySelector('b');
+        coins.setAttribute('aria-label',`Монеты: +${earned+answer.coins}`);
+        coins.dataset.tip=`Монеты: +${earned+answer.coins}, включая +50 за название картины.`;
+        const bonus=document.createElement('span');
+        bonus.className='lootCoinBonus';bonus.textContent='+50';bonus.setAttribute('aria-hidden','true');coins.appendChild(bonus);
+        bonus.animate([{opacity:0,transform:'translateY(10px)'},{opacity:1,offset:.2},{opacity:0,transform:'translateY(-30px)'}],{duration:1000}).onfinish=()=>bonus.remove();
+        value.animate([{color:'#7fe39d',transform:'scale(1.2)'},{color:'#7fe39d',offset:.7},{color:'#edd19a',transform:'scale(1)'}],{duration:1100});
+        const started=performance.now();
+        const count=now=>{
+          if(roundId!==activeRoundId||!value.isConnected)return;
+          const progress=Math.min(1,(now-started)/700);
+          value.textContent=`+${earned+Math.round(answer.coins*(1-(1-progress)**3))}`;
+          if(progress<1)requestAnimationFrame(count);
+        };
+        requestAnimationFrame(count);
+      });
+      choices.appendChild(button);
+    }
   }
 function setGlobalTimer(active=false, timeLeft=0, timeMax=1, label='ТАЙМЕР'){
     challengeHud.setTimer({active,timeLeft,timeMax,label});
@@ -93,6 +139,13 @@ renderInventoryTools();
       if(renderState)renderState();
       toast(surviveText);
       return {broke:false,kept:true,depleted:false};
+    }
+    if(picks===1&&window.KeynlockMissions?.protectsLastPick?.()){
+      if(resetProgress)resetProgress();
+      if(renderState)renderState();
+      SFX.survive();
+      toast('До первой победы последняя отмычка не ломается · попробуй ещё раз');
+      return {broke:false,kept:false,depleted:false,protected:true};
     }
     const info=PICK_TYPES[pickType];
     const breaks=forceBreak || Math.random()<info.breakChance;
@@ -125,6 +178,11 @@ renderInventoryTools();
 
   function forceBreakOnePick(message='Замок ещё не готов · отмычка сломалась'){
     if(solved || picks<=0)return false;
+    if(picks===1&&window.KeynlockMissions?.protectsLastPick?.()){
+      SFX.survive();
+      toast('До первой победы последняя отмычка не ломается · попробуй ещё раз');
+      return false;
+    }
     const previousVisiblePicks=Math.max(0,Math.min(pickCapacity,picks));
     picks=Math.max(0,picks-1);
     window.KeynlockResources?.consumePicks?.(1);

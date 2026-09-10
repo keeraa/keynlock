@@ -41,13 +41,15 @@
       return true;
     }
     resolveGuardEncounter(){
-      const outcome=Math.floor(Math.random()*3);
+      const outcome=balance>0?Math.floor(Math.random()*3):0;
       let text;
       if(outcome===0){
         const lost=window.KeynlockResources.consumePicks(window.KeynlockResources.state.picks);
-        picks=0;
+        picks=Math.min(picks,window.KeynlockResources.state.picks);
         updatePickUI();
-        text=`Вы сбежали, но обронили все ваши инструменты. Потеряно отмычек: ${lost}.`;
+        text=window.KeynlockResources.state.picks>0
+          ? `Вы сбежали и сохранили последнюю отмычку. До первой победы она останется с вами.${lost>0?` Потеряно отмычек: ${lost}.`:''}`
+          : `Вы сбежали, но обронили все ваши инструменты. Потеряно отмычек: ${lost}.`;
       }else{
         // Coins are indivisible: round an odd balance's half up.
         const lost=outcome===1?Math.ceil(balance/2):balance;

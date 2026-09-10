@@ -36,7 +36,7 @@
     moves=0;
     brokenPicks=0;
     runReward=100;
-    wfBarCount=window.KeynlockCampaign?.training('wharf')?4:diffStep(5,6,7,'wharf');
+    wfBarCount=diffStep(4,6,7,'wharf');
     wfPos=0;
     wfStep=0;
     wfWrong=-1;
@@ -50,7 +50,7 @@
 
   function renderWharf(){
     if(!$wfLock) return;
-    // Keep the five-channel level at its approved size. Extra channels need
+    // Keep the first level at its approved size. Extra channels need
     // genuinely smaller mechanisms, not only tighter spacing, so the pin and
     // both spring states scale together around the same channel centre.
     const mechanismScale=diffStep(1,0.84,0.72,'wharf');

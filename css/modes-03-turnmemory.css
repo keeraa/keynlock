@@ -1,28 +1,15 @@
-.turnmemoryMode{position:absolute;z-index:8;display:flex;flex-direction:column;align-items:center;}
 .turnmemoryProgressWrap{display:flex;flex-direction:column;align-items:center;}
 .turnmemoryProgressTitle{font:700 18px/1 Arial,sans-serif;color:#e6ce9a;text-transform:uppercase;}
 .turnmemoryProgressRow{display:flex;justify-content:center;align-items:center;}
 .turnmemorySlot{background:linear-gradient(#cfb04d,#bb972e);border:0;position:relative;}
 .turnmemorySymbolFrame{position:absolute;inset:-2px;width:calc(100% + 4px);height:calc(100% + 4px);overflow:visible;pointer-events:none;fill:none;stroke:#6d4c16;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 1px 0 rgba(255,235,166,.38));}
 .turnmemorySlot.empty{opacity:.45;}
-.turnmemorySlot.left::before{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:0;height:0;}
-.turnmemorySlot.right::before{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:0;height:0;}
-.turnmemorySlot.left::before{border-top:16px solid transparent;border-bottom:16px solid transparent;border-right:24px solid #47360f;}
-.turnmemorySlot.right::before{border-top:16px solid transparent;border-bottom:16px solid transparent;border-left:24px solid #47360f;}
-.turnmemoryMode{gap:14px;justify-content:flex-start;padding:18px 22px 14px;overflow:auto;color:#d8be85;}
-.turnmemoryProgressWrap{gap:8px;position:relative;top:-34vh;width:100%;margin-inline:auto;}
+.turnmemorySlot.is-left::before{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:0;height:0;}
+.turnmemorySlot.is-right::before{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:0;height:0;}
+.turnmemorySlot.is-left::before{border-top:16px solid transparent;border-bottom:16px solid transparent;border-right:24px solid #47360f;}
+.turnmemorySlot.is-right::before{border-top:16px solid transparent;border-bottom:16px solid transparent;border-left:24px solid #47360f;}
 .turnmemoryProgressTitle{font-size:13px;letter-spacing:.14em;}
-.turnmemoryProgressRow{gap:12px;}
 .turnmemorySlot{width:74px;height:74px;border-radius:2px;box-shadow:inset 0 0 0 1px rgba(248,231,175,.32), 0 4px 10px rgba(0,0,0,.22);}
-.turnmemorySlot.left::before{border-top-width:15px;border-bottom-width:15px;border-right-width:26px;margin-left:-5px;}
-.turnmemorySlot.right::before{border-top-width:15px;border-bottom-width:15px;border-left-width:26px;margin-left:5px;}
-.turnmemoryMode{inset:0;background:rgba(16,12,9,.985);}
-body.importedMode .turnmemoryMode{border-radius:0;padding:18px 24px 20px;padding-inline:24px;}
-body.importedMode .turnmemoryProgressWrap{max-width:none;}
-@media (max-width: 900px){
-body.importedMode .turnmemoryMode{inset:0;padding:14px 14px 16px;}
-.turnmemoryProgressWrap{top:-24vh;left:0!important;right:0!important;transform:none!important;}
-.turnmemoryProgressRow{width:230px;max-width:230px;margin-inline:auto;flex-wrap:wrap;}
-}
+.turnmemorySlot.is-left::before{border-top-width:15px;border-bottom-width:15px;border-right-width:26px;margin-left:-5px;}
+.turnmemorySlot.is-right::before{border-top-width:15px;border-bottom-width:15px;border-left-width:26px;margin-left:5px;}
 .turnmemoryMode[hidden]{display:none!important;}
-body.importedMode .turnmemoryMode{inset:0!important;width:100%!important;height:100%!important;min-height:0!important;max-width:none!important;z-index:20!important;}

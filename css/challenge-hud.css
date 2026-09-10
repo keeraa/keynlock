@@ -27,3 +27,10 @@ body.game-inactive .challengeHud{filter:brightness(.58) saturate(.62);}
   .challengeMetricLabel{font-size:8px;}
   .challengeMetricValue{font-size:17px;}
 }
+
+.gameDifficultySwitch{position:absolute;left:22px;top:76px;display:flex;gap:7px;pointer-events:auto;}
+.gameDifficultySwitch .uiButton{width:38px;height:38px;padding:0;border-radius:8px;background:var(--surface-panel);font:600 19px/1 var(--title-font);}
+.gameDifficultySwitch .uiButton[aria-pressed="true"]{background:#785a2b;color:#fff0c5;border-color:#e6bf70;}
+.gameDifficultySwitch .uiButton:disabled{opacity:.3;}
+body:is(.lair-open,.map-open,.main-menu-open,.campaign-open,.game-settings-open,.game-dialog-open,.prototype-mechanic-open,.game-defeat) .gameDifficultySwitch{display:none;}
+@media(max-width:760px){.gameDifficultySwitch{left:10px;top:112px;gap:5px;}.gameDifficultySwitch .uiButton{width:34px;height:34px;font-size:17px;}}

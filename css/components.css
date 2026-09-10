@@ -101,7 +101,7 @@
 .digitalBtn.primary,.restorationCheckButton,.gameDefeatRestart,.mainMenuPrimary,.solvedPuzzleButton{background:var(--surface-dialog);color:var(--color-text-strong);border-color:var(--color-gold)}
 :is(.digitalBtn,.digitalMiniBtn,.solvedPuzzleButton,.gameDefeatRestart,.restorationCheckButton,.restorationNewDamageButton,.restorationOrderButton,.gameLaunchButton,.mainMenuButton,.mapChapterBtn,.workbenchCraftPanel button,.digitalWheel button,.gameSettingsClose,.lairModuleClose,.globalTopHudClose,.lairWorkbenchClose,.worldMapClose,.alchemyGuideViewerClose):focus-visible{outline:2px solid var(--ui-focus);outline-offset:3px}
 
-.uiInventory{--inventory-item-lift:9px}.uiInventory .uiInventoryItem.visual-hover{filter:brightness(1.08)}.uiInventory .uiInventoryItem:focus-visible,.uiInventoryToggle:focus-visible{outline:2px solid var(--ui-focus);outline-offset:3px}
+.uiInventory{--inventory-item-lift:9px}.uiInventoryItem{transition:filter .28s ease,opacity .28s ease}.uiInventory .uiInventoryItem.visual-hover{filter:brightness(1.08)}.uiInventory .uiInventoryItem:focus-visible,.uiInventoryToggle:focus-visible{outline:2px solid var(--ui-focus);outline-offset:3px}
 
 .tutorialPreference{display:flex;align-items:center;gap:8px;margin:10px 0;font:13px/1.4 var(--ui-font);color:var(--color-text);}
 
@@ -112,3 +112,13 @@
 
 /* Shared artwork for the seven collectible alchemy components. */
 .componentIcon{display:block;width:var(--component-icon-size,40px);height:var(--component-icon-size,40px);max-width:100%;object-fit:contain;flex-shrink:0;user-select:none;filter:drop-shadow(0 2px 3px #0005);}
+
+/* Notification surfaces share a borderless frame, including legacy markup. */
+body :is(.gameDefeatCard,.solvedPuzzleCard,.toast,.storyDialog,.saveFailureNotice,.restorationCheckPanel),
+#lairTraining.uiPanel{border:0;box-shadow:0 14px 34px rgba(0,0,0,.46);}
+
+/* Game controls keep their own visual states without external focus rings. */
+body{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+input:not([type="range"]),textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:text}
+img{-webkit-user-drag:none}
+:focus,:focus-visible,.gameSettingToggle input:focus-visible+span{outline:none!important}

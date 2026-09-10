@@ -23,6 +23,7 @@
     if(view!==lastView){lastView=view;helpOpen=false;}
     const available=!!state.step&&!state.finished&&state.step!=='loot';
     help.hidden=!available&&view!=='restoration';
+    help.disabled=view==='restoration'&&Boolean(window.KeynlockRestoration?.finished);
     const journal=document.querySelector('#campaignButton');
     if(journal)help.style.left=`${journal.offsetLeft+journal.offsetWidth+8}px`;
     panel.hidden=!available||(!helpOpen&&(!window.KeynlockTutorialPreferences.enabled||!window.KeynlockTutorialPreferences.hints))||view==='restoration'||(!!view&&!helpOpen);

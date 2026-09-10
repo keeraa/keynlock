@@ -37,8 +37,6 @@ body{background-size:100% 100%, auto 105%!important;}
 }
 .plate,.plateFace{background-size:contain!important;background-position:center!important;background-repeat:no-repeat!important;border-radius:0!important;}
 .pin{width:60.64px!important;height:113px!important;z-index:14!important;background-size:contain!important;background-repeat:no-repeat!important;background-position:center bottom!important;transform-origin:50% 88%!important;}
-.tnPinStem,.tnPinHead{opacity:0!important;}
-.tnPinImg{width:42px!important;max-height:104px!important;object-fit:contain!important;}
 .cpPinImg{width:38px!important;max-height:110px!important;object-fit:contain!important;}
 .sharedModeLockArt,.sharedModeLockArt .lockPanel{visibility:visible!important;opacity:1!important;}
 body.importedMode .skMode .skPickArm::before{left:-35px!important;bottom:15px!important;width:70px!important;height:500px!important;background:var(--pick-skin-image) center bottom/contain no-repeat!important;transform:scaleY(-1)!important;transform-origin:50% 50%!important;}

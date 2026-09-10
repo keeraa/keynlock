@@ -59,6 +59,7 @@
       : 0;
     guardFace.style.setProperty('--guard-alert', Math.min(1, alert).toFixed(3));
     guardFace.classList.toggle('watching', alert > 0);
+    guardFace.classList.toggle('caught', guardsActive()&&gameDefeat.isActive()&&gameDefeat.reason==='noise');
   }
 
   function buildNoiseMeter(){
@@ -188,6 +189,8 @@
   window.addEventListener('keynlock-game-catalog-change',event=>{
     if(!event.detail?.id || event.detail.id===noiseGameId())renderNoise();
   });
+  window.addEventListener('keynlock-world-pausechange',renderNoise);
+  window.addEventListener('keynlock-lair-opened',renderNoise);
   addEventListener('resize', placeNoiseMeter, { passive:true });
   requestAnimationFrame(noiseTick);
 
@@ -236,6 +239,12 @@
     document.body.appendChild(birdShadow);
   }
 
+  function placeBird(){
+    if(!birdEl)return;
+    const hudBottom=document.querySelector('.globalTopHud')?.getBoundingClientRect().bottom||0;
+    birdEl.style.setProperty('--bird-sky-top',`${Math.max(24,hudBottom+12)}px`);
+  }
+
   function birdsActive(){
     return !!GameCatalog.feature(mode,'world.birds') && noiseActive() && !solved && !guardsCalled;
   }
@@ -252,6 +261,7 @@
   function sendBird(){
     if(isWorldPaused()){ scheduleBird(); return; }
     if(!birdsActive()){ scheduleBird(); return; }
+    placeBird();
     birdState = 'warning';
     birdWatchedMs = 0;
     birdHovered = false;
@@ -380,4 +390,6 @@
   });
 
   buildBird();
+  placeBird();
+  window.addEventListener('resize',placeBird,{passive:true});
   scheduleBird();

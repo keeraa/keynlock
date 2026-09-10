@@ -33,7 +33,9 @@
   function loadPickProgress(){
     try{
       const saved=STORE.getJSON('lockpickProgress',{});
-      return {capacity:[3,5,7].includes(saved.capacity)?saved.capacity:3,equipped:'standard'};
+      // Older saves may have the retired seven-slot upgrade. Keep it upgraded.
+      const capacity=saved.capacity===7?6:saved.capacity;
+      return {capacity:[3,4,5,6].includes(capacity)?capacity:3,equipped:'standard'};
     }catch{ return {capacity:3,equipped:'standard'}; }
   }
   let pickProgress=loadPickProgress();
@@ -97,7 +99,7 @@
         $lock=document.querySelector('#lock'),
         challengeHud=new GameChallengeHud(document.querySelector('#challengeHud')),
         toolMotionController=new ToolMotionController(document.documentElement),
-        gameDefeat=new GameDefeat(document.querySelector('#gameDefeatOverlay'),{onRestart:()=>restartCurrentRound(),onReturnToLair:()=>{solved=false;setGameInactive(false);openLairFromHud();}}),
+        gameDefeat=new GameDefeat(document.querySelector('#gameDefeatOverlay'),{onRestart:()=>restartCurrentRound(),onReturnToLair:()=>openLairFromHud()}),
         $toast=document.querySelector('#toast'), $toastText=document.querySelector('#toastText'), $toastAction=document.querySelector('#toastAction'), $scene=document.querySelector('.scene'), $mechanism=document.querySelector('.mechanismZone'), $lockHitArea=document.querySelector('#lockHitArea'),
         $objectiveLine=document.querySelector('#objectiveLine'),
         $mapTab=document.querySelector('#mapTab'),
@@ -251,7 +253,7 @@
     'assets/pins/location/pin_05.png'
   ];
   const GAME_PIN_SKIN_NAMES=['pin_01.png','pin_02.png','pin_03.png','pin_04.png','pin_05.png'];
-  const GAME_PIN_MODES=new Set(['deduction','pinflight','springtumblers','wharf','symbolpins']);
+  const GAME_PIN_MODES=new Set(['tension','deduction','pinflight','springtumblers','wharf','symbolpins']);
   const TENSION_SKINS=[null,
     'assets/tensions/tension_01.webp',
     'assets/tensions/tension_02.webp',

@@ -313,7 +313,7 @@
   });
 
   // The game doesn't actually start (first puzzle generated, lair shown)
-  // until every image asset has preloaded — js/core/asset-preload.js drives
+  // after all image/audio downloads and scripts are ready — js/core/asset-preload.js drives
   // the #bootLoader overlay covering/blurring everything until then.
   function bootGame(){
     applyTensionSkin();

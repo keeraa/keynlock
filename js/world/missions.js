@@ -326,6 +326,10 @@
   window.addEventListener('keynlock-resources-change',renderMissionNodes);
 
   window.KeynlockMissions={
+    protectsLastPick(){
+      const run=activeMissionRun;
+      return !!run&&run.id==='wharf-1'&&run.roundId===activeRoundId&&mode==='wharf'&&getModeDifficulty(mode)===1&&!missionCleared('wharf',1);
+    },
     start:(mode,tier=1,options={})=>startMapMission(missionNodeId(mode),{...options,tier}),
     resume(){if(!activeMissionRun)return false;if(gameDefeat.isActive()||solved||(missionRequiresPicks(activeMissionRun.mode)&&picks<=0))return this.retry();if(lairOpen)closeLair();if(mapOpen)closeMap(false);return true;},
     retry(){const run=activeMissionRun;return run?startMapMission(missionNodeId(run.mode),{tier:run.tier,guided:run.guided,orderId:run.orderId,stepId:run.stepId}):false;},

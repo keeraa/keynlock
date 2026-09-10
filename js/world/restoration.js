@@ -23,6 +23,10 @@
     score:root.querySelector('#restorationScore'),hint:root.querySelector('#restorationHint'),reward:root.querySelector('#restorationReward'),lightMatch:root.querySelector('#restorationLightMatch'),cleanliness:root.querySelector('#restorationCleanliness'),
     damagedArea:root.querySelector('[data-restoration-art="damaged"]'),dirt:root.querySelector('#restorationDirtSurface'),repair:root.querySelector('#restorationRepairSurface'),overpaint:root.querySelector('#restorationOverpaintSurface'),uv:root.querySelector('#restorationUvSurface'),scan:root.querySelector('#restorationScanSurface'),activeTool:root.querySelector('#restorationActiveTool'),toolEffect:root.querySelector('#restorationToolEffect'),drawer:document.querySelector('#restorationInventoryDrawer'),drawerToggle:document.querySelector('#restorationInventoryToggle'),tools:[...document.querySelectorAll('#restorationInventoryDrawer [data-restoration-tool]')]
   };
+  const hintButton=root.querySelector('.restorationHintButton');
+  const syncHint=()=>{if(hintButton.disabled)delete hintButton.dataset.keynlockTooltip;else hintButton.dataset.keynlockTooltip=elements.hint.textContent;};
+  new MutationObserver(syncHint).observe(elements.hint,{childList:true,characterData:true,subtree:true});
+  syncHint();
   let completed={};
   completed=STORE.getJSON(STORAGE_KEY,{})||{};
   function ownedPaintingIds(){
@@ -31,19 +35,23 @@
       return new Set(Array.isArray(ids)?ids:[]);
     }catch(_){return new Set();}
   }
-  const state={painting:0,hue:0,sat:100,light:100,damage:{hue:34,sat:.72,light:1.18},tool:'loupe',loupe:true,working:false,toolActing:false,lastPoint:null,lastMetricAt:0,damageReady:false,initialDirt:1,initialContamination:1,layerRefresh:0,layerImages:{dirt:'',repair:'',overpaint:'',scan:''},checked:false,started:false,focus:{x:50,y:50,pinned:false}};
+  const state={painting:0,hue:0,sat:100,light:100,damage:{hue:34,sat:.72,light:1.18},tool:'loupe',loupe:true,working:false,toolActing:false,lastPoint:null,lastMetricAt:0,damageReady:false,initialDirt:1,initialContamination:1,layerRefresh:0,layerImages:{dirt:'',repair:'',overpaint:'',scan:''},checked:false,started:false,finished:false,focus:{x:50,y:50,pinned:false}};
   function restorationItemAt(x,y){
     let nearest=null;
-    elements.tools.filter(item=>!item.disabled).forEach(item=>{
-      const rect=item.getBoundingClientRect(),isUv=item.dataset.restorationTool==='uv';
-      const top=rect.top-(isUv?Math.max(55,rect.height*.8):0),side=isUv?Math.max(12,rect.width*.35):0;
-      if(x<rect.left-side||x>rect.right+side||y<top||y>rect.bottom)return;
-      const distance=(x-(rect.left+rect.right)/2)**2+(y-(top+rect.bottom)/2)**2;
+    elements.tools.filter(item=>!item.hidden).forEach(item=>{
+      const rect=item.getBoundingClientRect(),image=item.querySelector('img'),art=image.getBoundingClientRect(),style=getComputedStyle(image);
+      const shift=style.transform==='none'?0:new DOMMatrixReadOnly(style.transform).m42*(parseFloat(style.scale)||1);
+      // Include the visible handle above its pocket, but keep the hit region
+      // fixed while the image lifts so hover cannot switch itself off.
+      const top=Math.min(rect.top,art.top-shift),bottom=Math.max(rect.bottom,art.bottom-shift);
+      const side=12;
+      if(x<rect.left-side||x>rect.right+side||y<top||y>bottom)return;
+      const distance=(x-(rect.left+rect.right)/2)**2+(y-(top+bottom)/2)**2;
       if(!nearest||distance<nearest.distance)nearest={item,distance};
     });
     return nearest?.item||null;
   }
-  const drawerController=window.KeynlockEquipmentDrawers?.create({root:'#restorationInventoryDrawer',toggle:'#restorationInventoryToggle',bodyClass:'restoration-inventory-open',openLabel:'Открыть инвентарь реставратора',closeLabel:'Закрыть инвентарь реставратора',approachVar:'--equipment-approach',itemSelector:'.equipmentInventoryItem:not(:disabled)',routeVisualItems:true,hitTest:restorationItemAt,ignoreApproach:event=>Boolean(event.target.closest?.('.restorationArtwork,.restorationSliders'))});
+  const drawerController=window.KeynlockEquipmentDrawers?.create({root:'#restorationInventoryDrawer',toggle:'#restorationInventoryToggle',bodyClass:'restoration-inventory-open',openLabel:'Открыть инвентарь реставратора',closeLabel:'Закрыть инвентарь реставратора',approachVar:'--equipment-approach',itemSelector:'.equipmentInventoryItem:not([hidden])',routeVisualItems:true,hitTest:restorationItemAt,ignoreApproach:event=>event.buttons>0&&Boolean(event.target.closest?.('.restorationSliders'))});
   const TOOL_IMAGES={
     brush:{idle:'assets/restoration/tools/brush.png',active:'assets/restoration/tools/brush-active.png'},
     paint:{idle:'assets/restoration/tools/retouch-brush.png',active:'assets/restoration/tools/retouch-brush-active.png'},
@@ -101,7 +109,8 @@
   let lastGuideKey='',lastGuideTarget=null;
   function renderGuide(){
     const active=root.closest('.lairPanel')?.classList.contains('active')&&!document.querySelector('#lairModuleWindow')?.hidden;
-    guide.hidden=!guideVisible||!active;
+    guide.hidden=state.finished||!guideVisible||!active;
+    if(active)document.querySelector('#trainingHelp')?.toggleAttribute('disabled',state.finished);
     if(active)document.querySelector('#trainingHelp')?.setAttribute('aria-expanded',String(!guide.hidden));
     if(guide.hidden||!guideSteps.length){if(lastGuideKey){clearGuideHighlight();lastGuideKey='';lastGuideTarget=null;}return;}
     if(state.damageReady)while(guideStep<guideSteps.length-1&&guideSteps[guideStep][2]())guideStep++;
@@ -121,7 +130,7 @@
   }
   function startGuide(){guideSteps=lessonSteps[state.lesson];guideStep=0;guideVisible=!guideSeen[state.lesson]&&window.KeynlockTutorialPreferences.enabled&&window.KeynlockTutorialPreferences.hints;renderGuide();}
   window.addEventListener('keynlock-tutorial-preferences',()=>{if(!window.KeynlockTutorialPreferences.enabled||!window.KeynlockTutorialPreferences.hints){guideVisible=false;renderGuide();}});
-  function toggleGuide(){guide.querySelector('[data-hide-hints]').checked=!window.KeynlockTutorialPreferences.hints;guideVisible=!guideVisible;renderGuide();requestAnimationFrame(sizePaintings);return guideVisible;}
+  function toggleGuide(){if(state.finished)return false;guide.querySelector('[data-hide-hints]').checked=!window.KeynlockTutorialPreferences.hints;guideVisible=!guideVisible;renderGuide();requestAnimationFrame(sizePaintings);return guideVisible;}
   guide.querySelector('button').addEventListener('click',()=>{guideVisible=false;renderGuide();requestAnimationFrame(sizePaintings);});
   new MutationObserver(renderGuide).observe(document.querySelector('#lairModuleWindow'),{attributes:true,attributeFilter:['hidden','data-module']});
   elements.drawerToggle.addEventListener('click',()=>requestAnimationFrame(renderGuide));
@@ -133,7 +142,7 @@
     const hueScore=Math.max(0,1-Math.abs(state.damage.hue+state.hue)/60);
     const satScore=Math.max(0,1-Math.abs(state.damage.sat*state.sat/100-1)/.6);
     const lightScore=Math.max(0,1-Math.abs(state.damage.light*state.light/100-1)/.5);
-    return Math.max(0,Math.min(100,Math.round((hueScore*.38+satScore*.31+lightScore*.31)*100)));
+    return Math.max(0,Math.min(100,Math.round((hueScore*.38+satScore*.31+lightScore*.31)*100)+2));
   }
   const alphaCache=new WeakMap();
   function alphaTotal(canvas){
@@ -149,12 +158,22 @@
   function dirtReady(){return state.damageReady&&dirtCleanliness()>=99;}
   function uvSearchComplete(){const hidden=alphaTotal(elements.uv);return hidden<25||alphaTotal(elements.scan)>=hidden*.96;}
   function toolUnlocked(tool){return tool==='loupe'||(tool==='brush'&&state.lesson>=2)||(tool==='paint'&&state.lesson>=3)||(['uv','reagent'].includes(tool)&&state.lesson>=4);}
+  const toolDescriptions=new Map(elements.tools.map(button=>[button,button.querySelector('.equipmentTooltip').textContent]));
   function renderMetrics(){
+    hintButton.disabled=state.finished;syncHint();
     elements.lightMatch.textContent=`${score()}%`;elements.cleanliness.textContent=`${cleanliness()}%`;
     root.classList.toggle('show-check-result',state.checked);
     renderGuide();
     const ready=dirtReady();
-    elements.tools.forEach(button=>{const tool=button.dataset.restorationTool;button.hidden=!toolUnlocked(tool);button.disabled=!toolUnlocked(tool)||(['paint','uv','reagent'].includes(tool)&&!ready);});
+    elements.tools.forEach(button=>{
+      const tool=button.dataset.restorationTool;
+      const reason=!toolUnlocked(tool)?'Откроется на следующем этапе обучения.':(['paint','uv','reagent'].includes(tool)&&!ready)?(state.damageReady?'Сначала полностью очисти картину щёткой.':'Подожди, пока картина подготовится.') : '';
+      button.hidden=!toolUnlocked(tool);button.disabled=Boolean(reason);
+      const description=reason?`${button.getAttribute('aria-label')} · ${reason}`:toolDescriptions.get(button);
+      const tooltip=button.querySelector('.equipmentTooltip');
+      if(tooltip.textContent!==description)tooltip.textContent=description;
+      button.setAttribute('aria-description',description);
+    });
   }
   function resetControls(){
     state.hue=0;state.sat=100;state.light=100;state.checked=false;
@@ -166,6 +185,7 @@
     damageFrame=requestAnimationFrame(()=>{damageFrame=0;initDamageSurfaces();});
   }
   function newDamage(){
+    state.finished=false;
     damageRevision++;
     state.lesson=completed[current().id]?.lesson||Math.min(4,Object.keys(completed).length+1);
     state.tool='';state.loupe=false;root.dataset.activeTool='';
@@ -198,19 +218,33 @@
         <small>${painting.artist}</small>
       </button>`).join('')+skeletons;
   }
+  function openOrders(){
+    setDrawerOpen(false);
+    renderOrders();elements.orderGrid.hidden=false;
+    elements.orderButton.setAttribute('aria-expanded','true');
+  }
   function closeOrders(){
     elements.orderGrid.hidden=true;
     elements.orderButton.setAttribute('aria-expanded','false');
   }
-  function showOriginalActionDenied(){
-    const originalArea=elements.original.closest('[data-restoration-art="original"]');
-    originalArea.classList.remove('action-denied');
-    void originalArea.offsetWidth;
-    originalArea.classList.add('action-denied');
-    clearTimeout(showOriginalActionDenied.timer);
-    showOriginalActionDenied.timer=setTimeout(()=>originalArea.classList.remove('action-denied'),360);
+  function setArtworkView(view){
+    const original=view==='original';
+    const toggle=root.querySelector('#restorationViewToggle');
+    toggle.setAttribute('aria-pressed',String(original));
+    toggle.dataset.keynlockTooltip=original?'Сейчас показан оригинал':'Сейчас показана копия';
+    root.querySelectorAll('.restorationPanel').forEach(panel=>{
+      const selected=(panel.id==='restorationOriginalPanel')===original;
+      panel.classList.toggle('is-active',selected);panel.inert=!selected;
+      panel.setAttribute('aria-hidden',String(!selected));
+    });
+    state.working=false;state.lastPoint=null;setToolActing(false,true);
+    root.classList.remove('original-tool-blocked');elements.damagedArea.classList.remove('working');
+    elements.activeTool.classList.remove('visible');elements.toolEffect.classList.remove('visible');
+    hideLenses();
+    if(state.focus.pinned)placePinnedLenses();
   }
   function renderPainting(){
+    setArtworkView('damaged');
     const painting=current(),revision=damageRevision;
     const applyRatio=()=>{
       if(revision!==damageRevision||painting!==current())return;
@@ -235,13 +269,37 @@
     const workspace=root.querySelector('.restorationWorkspace');
     const controls=root.querySelector('.restorationControls');
     const gap=7;
-    const columnWidth=Math.max(180,(root.clientWidth-gap)/2-16);
-    const availableHeight=Math.max(180,root.clientHeight-(controls?.offsetHeight||112)-(guide.hidden?0:guide.offsetHeight+gap)-gap-38);
-    const heightBudget=root.dataset.orientation==='portrait'?availableHeight*.9:availableHeight;
-    const width=Math.floor(Math.min(columnWidth,heightBudget*ratio));
+    if(!root.clientWidth)return;
+    // Reserve the maximum hover lift, independently of the current pointer position.
+    const inventoryReserve=78+50.4+8;
+    const bottom=Math.min(root.getBoundingClientRect().bottom,innerHeight-inventoryReserve);
+    const columnWidth=Math.max(80,root.clientWidth-16);
+    const heightBudget=bottom-root.getBoundingClientRect().top-(guide.hidden?0:guide.offsetHeight+gap)-gap-16;
+    const portrait=root.dataset.orientation==='portrait';
+    const fitControls=width=>{
+      // Keep portrait controls centred, with half the former flexible slider
+      // width. Small screens retain the full available width for touch input.
+      const composition=portrait?Math.min(root.clientWidth,414+Math.max(280,(root.clientWidth-414)/2)):width+14;
+      root.style.setProperty('--composition-width',`${composition}px`);
+      controls.dataset.layout=composition<380?'stack':composition<620?'compact':'wide';
+      return controls.offsetHeight;
+    };
+    // Account for control wrapping at the same width as the artwork.
+    let low=80,high=columnWidth;
+    for(let i=0;i<12;i++){
+      const candidate=(low+high)/2;
+      if(candidate/ratio+fitControls(candidate)<=heightBudget)low=candidate;
+      else high=candidate;
+    }
+    const width=Math.floor(low);
+    fitControls(width);
     workspace.style.setProperty('--painting-width',`${width}px`);
-    root.style.setProperty('--composition-width',`${Math.min(root.clientWidth,width*2+35)}px`);
+
   }
+  const layoutObserver=new ResizeObserver(()=>requestAnimationFrame(sizePaintings));
+  layoutObserver.observe(root.querySelector('.restorationControls'));
+  layoutObserver.observe(guide);
+
   function prepareCanvas(canvas){
     alphaCache.delete(canvas);
     const width=Math.max(1,Math.round(elements.damagedArea.clientWidth));
@@ -266,7 +324,7 @@
     if(revision!==damageRevision)return;
     for(let i=0;i<count&&images.length;i++){
       const image=pick(images),scale=minScale+Math.random()*(maxScale-minScale);
-      const drawW=w*scale,drawH=drawW*image.naturalHeight/image.naturalWidth;
+      const drawW=w*scale*2,drawH=drawW*image.naturalHeight/image.naturalWidth;
       const x=Math.random()*w,y=Math.random()*h;
       ctx.save();ctx.translate(x,y);ctx.rotate((Math.random()-.5)*1.4);ctx.globalAlpha=.72+Math.random()*.25;ctx.drawImage(image,-drawW/2,-drawH/2,drawW,drawH);ctx.restore();
     }
@@ -283,33 +341,82 @@
     state.initialDirt=Math.max(1,alphaTotal(elements.dirt));state.initialContamination=Math.max(1,contamination());state.damageReady=true;refreshLayerImages();renderMetrics();
   }
   function canvasPoint(event){
-    const rect=elements.damagedArea.getBoundingClientRect();
+    const rect=elements.dirt.getBoundingClientRect();
     return {x:(event.clientX-rect.left)/rect.width*elements.dirt.width,y:(event.clientY-rect.top)/rect.height*elements.dirt.height};
   }
-  function softEraseAt(canvas,point,radius){
+  let brushMask;
+  function cleaningBrushMask(){
+    if(brushMask)return brushMask;
+    brushMask=document.createElement('canvas');brushMask.width=brushMask.height=128;
+    const ctx=brushMask.getContext('2d'),image=ctx.createImageData(128,128);
+    for(let y=0;y<128;y++)for(let x=0;x<128;x++){
+      const dx=(x-63.5)/64,dy=(y-63.5)/64,angle=Math.atan2(dy,dx);
+      // Uneven bristle tips with a broad feathered edge; keep the centre effective.
+      const edge=.84+.075*Math.sin(angle*5)+.045*Math.sin(angle*9+1.2)+.025*Math.cos(angle*17);
+      const distance=Math.hypot(dx,dy)/edge;
+      const fade=Math.max(0,Math.min(1,(distance-.12)/.88));
+      image.data[(y*128+x)*4+3]=Math.round(210*(1-fade*fade*(3-2*fade)));
+    }
+    ctx.putImageData(image,0,0);return brushMask;
+  }
+  function softEraseAt(canvas,point,radius,brush=false){
+    if(brush){
+      alphaCache.delete(canvas);
+      const ctx=canvas.getContext('2d');
+      ctx.save();ctx.globalCompositeOperation='destination-out';
+      ctx.drawImage(cleaningBrushMask(),point.x-radius,point.y-radius,radius*2,radius*2);
+      ctx.restore();return;
+    }
     alphaCache.delete(canvas);
     const ctx=canvas.getContext('2d'),gradient=ctx.createRadialGradient(point.x,point.y,0,point.x,point.y,radius);
     gradient.addColorStop(0,'rgba(0,0,0,.9)');gradient.addColorStop(.62,'rgba(0,0,0,.58)');gradient.addColorStop(1,'rgba(0,0,0,0)');
     ctx.save();ctx.globalCompositeOperation='destination-out';ctx.fillStyle=gradient;ctx.beginPath();ctx.arc(point.x,point.y,radius,0,Math.PI*2);ctx.fill();ctx.restore();
   }
-  function softStroke(canvas,from,to,radius){
-    const distance=Math.hypot(to.x-from.x,to.y-from.y),steps=Math.max(1,Math.ceil(distance/(radius*.22)));
-    for(let i=0;i<=steps;i++)softEraseAt(canvas,{x:from.x+(to.x-from.x)*i/steps,y:from.y+(to.y-from.y)*i/steps},radius);
+  function softStroke(canvas,from,to,radius,brush=false){
+    const distance=Math.hypot(to.x-from.x,to.y-from.y),steps=Math.max(1,Math.ceil(distance/(radius*(brush?.32:.22))));
+    for(let i=0;i<=steps;i++)softEraseAt(canvas,{x:from.x+(to.x-from.x)*i/steps,y:from.y+(to.y-from.y)*i/steps},radius,brush);
+  }
+  let retouchMask;
+  function retouchStroke(canvas,from,to){
+    if(!retouchMask){
+      retouchMask=document.createElement('canvas');retouchMask.width=retouchMask.height=128;
+      const context=retouchMask.getContext('2d'),pixels=context.createImageData(128,128);
+      for(let y=0;y<128;y++)for(let x=0;x<128;x++){
+        const dx=(x-63.5)/64,dy=(y-63.5)/64;
+        const edge=.82+.055*Math.sin(x*.71)+.045*Math.sin(x*1.93+y*.09);
+        const rim=Math.max(Math.abs(dx)/(.9+.05*Math.sin(y*1.7)),Math.abs(dy)/edge);
+        const fade=Math.max(0,Math.min(1,(rim-.58)/.42));
+        const bristle=.9+.1*Math.sin(y*2.1+x*.04)**2;
+        pixels.data[(y*128+x)*4+3]=Math.round(255*bristle*(1-fade*fade*(3-2*fade)));
+      }
+      context.putImageData(pixels,0,0);
+    }
+    alphaCache.delete(canvas);
+    const dx=to.x-from.x,dy=to.y-from.y,distance=Math.hypot(dx,dy);
+    const angle=distance?Math.atan2(dy,dx):0,steps=Math.max(1,Math.ceil(distance/5));
+    const ctx=canvas.getContext('2d');ctx.save();ctx.globalCompositeOperation='destination-out';
+    for(let i=0;i<=steps;i++){
+      ctx.save();ctx.translate(from.x+dx*i/steps,from.y+dy*i/steps);ctx.rotate(angle);
+      // Reveal the existing painting through the loss mask, preserving its exact colours and texture.
+      ctx.drawImage(retouchMask,-22,-15,44,30);ctx.restore();
+    }
+    ctx.restore();
   }
   function useActiveTool(event){
     if(event.currentTarget!==elements.damagedArea)return;
     const point=canvasPoint(event),from=state.lastPoint||point;
     state.checked=false;
     if(state.tool==='brush'){
-      softStroke(elements.dirt,from,point,28);softStroke(elements.overpaint,from,point,28);
+      softStroke(elements.dirt,from,point,28,true);softStroke(elements.overpaint,from,point,28,true);
       elements.hint.textContent=dirtCleanliness()<99?'Продолжай очищать видимую грязь по всему полотну.':(alphaTotal(elements.overpaint)>25?'Видимая грязь удалена. Теперь счисти участки, проявленные реагентом.':'Очистка завершена. Можно перейти к УФ-диагностике или восстановлению утрат.');
     }
-    if(state.tool==='paint')softStroke(elements.repair,from,point,20);
+    if(state.tool==='paint')retouchStroke(elements.repair,from,point);
     state.lastPoint=point;
     if(performance.now()-state.lastMetricAt>120){state.lastMetricAt=performance.now();renderMetrics();}
   }
   function selectTool(tool){
     if(!toolUnlocked(tool))return;
+    setToolActing(false,true);
     if(state.tool===tool){
       state.tool='';state.loupe=false;state.working=false;state.toolActing=false;state.lastPoint=null;state.focus.pinned=false;root.dataset.activeTool='';
       root.classList.remove('original-tool-blocked');
@@ -337,14 +444,27 @@
     const images=TOOL_IMAGES[state.tool];
     if(!images){elements.activeTool.classList.remove('visible','acting');elements.toolEffect.classList.remove('visible');return;}
     const active=state.toolActing||state.tool==='uv';
-    elements.activeTool.src=active?images.active:images.idle;elements.activeTool.classList.toggle('acting',active);
+    const source=active?images.active:images.idle;
+    if(elements.activeTool.getAttribute('src')!==source)elements.activeTool.src=source;
+    elements.activeTool.classList.toggle('acting',active);
     if(state.tool==='uv'){elements.toolEffect.src='assets/restoration/effects/effect_uv_spot.png';elements.toolEffect.classList.add('visible');}
     else if(state.tool==='brush'&&state.toolActing){elements.toolEffect.src='assets/restoration/effects/effect_brush_dust.png';elements.toolEffect.classList.add('visible');}
     else elements.toolEffect.classList.remove('visible');
   }
-  function setToolActing(active){state.toolActing=active;updateToolVisual();}
+  let toolMotionStarted=0,toolMotionTimer=0;
+  function setToolActing(active,immediate=false){
+    clearTimeout(toolMotionTimer);
+    if(active&&!state.toolActing)toolMotionStarted=performance.now();
+    const remaining=760-(performance.now()-toolMotionStarted);
+    if(!active&&!immediate&&state.toolActing&&['brush','paint'].includes(state.tool)&&remaining>0){
+      // A tap must show a complete swing, while applying paint only during the actual stroke.
+      toolMotionTimer=setTimeout(()=>{state.toolActing=false;updateToolVisual();},remaining);
+      return;
+    }
+    state.toolActing=active;updateToolVisual();
+  }
   function moveActiveTool(event){
-    if(!TOOL_IMAGES[state.tool]){elements.activeTool.classList.remove('visible');elements.toolEffect.classList.remove('visible');return;}
+    if(!TOOL_IMAGES[state.tool]||event.target.closest?.('[data-restoration-art]')!==elements.damagedArea){elements.activeTool.classList.remove('visible');elements.toolEffect.classList.remove('visible');return;}
     const rect=elements.damagedArea.getBoundingClientRect();
     const left=`${event.clientX-rect.left}px`,top=`${event.clientY-rect.top}px`;
     elements.activeTool.style.left=left;elements.activeTool.style.top=top;elements.toolEffect.style.left=left;elements.toolEffect.style.top=top;elements.activeTool.classList.add('visible');updateToolVisual();
@@ -358,10 +478,30 @@
     renderGuide();
     if(performance.now()-state.lastMetricAt>180){state.lastMetricAt=performance.now();elements.hint.textContent=uvSearchComplete()?'Все скрытые следы обнаружены. Выбери реагент и прояви подсвеченные участки.':'Продолжай вести УФ-фонарём по неисследованным участкам полотна.';}
   }
+  // Search only already discovered UV pixels, within eight on-screen pixels
+  // of the dropper tip; never activate an undiscovered or distant stain.
+  function reagentPoint(event){
+    const canvas=elements.scan,rect=canvas.getBoundingClientRect();
+    if(!rect.width||!rect.height)return null;
+    const x=(event.clientX-rect.left)/rect.width*canvas.width,y=(event.clientY-rect.top)/rect.height*canvas.height;
+    const rx=8*canvas.width/rect.width,ry=8*canvas.height/rect.height;
+    const left=Math.max(0,Math.floor(x-rx)),top=Math.max(0,Math.floor(y-ry));
+    const width=Math.min(canvas.width,Math.ceil(x+rx)+1)-left,height=Math.min(canvas.height,Math.ceil(y+ry)+1)-top;
+    if(width<=0||height<=0)return null;
+    const pixels=canvas.getContext('2d').getImageData(left,top,width,height).data;
+    let nearest=null,distance=Infinity;
+    for(let row=0;row<height;row++)for(let col=0;col<width;col++){
+      if(pixels[(row*width+col)*4+3]<=25)continue;
+      const d=((left+col-x)/rx)**2+((top+row-y)/ry)**2;
+      if(d<=1&&d<distance){distance=d;nearest={x:left+col,y:top+row};}
+    }
+    return nearest;
+  }
   function applyDiagnosticReagent(event){
     if(state.tool!=='reagent'||event.currentTarget!==elements.damagedArea)return;
-    const {x,y}=canvasPoint(event),pixel=elements.scan.getContext('2d').getImageData(Math.round(x),Math.round(y),1,1).data;
-    if(pixel[3]<=25){elements.hint.textContent=alphaTotal(elements.scan)>25?'На этом участке нет УФ-следа. Выбери видимое подсвеченное пятно.':'Сначала найди скрытые пятна УФ-фонарём — реагент пока наносить не на что.';return;}
+    const point=reagentPoint(event);
+    if(!point){elements.hint.textContent=alphaTotal(elements.scan)>25?'На этом участке нет УФ-следа. Выбери видимое подсвеченное пятно.':'Сначала найди скрытые пятна УФ-фонарём — реагент пока наносить не на что.';return;}
+    const {x,y}=point;
     [elements.uv,elements.scan,elements.overpaint].forEach(canvas=>alphaCache.delete(canvas));
     state.checked=false;setToolActing(true);setTimeout(()=>{if(state.tool==='reagent')setToolActing(false);},260);
     const radius=46,source=elements.uv.getContext('2d'),scan=elements.scan.getContext('2d'),target=elements.overpaint.getContext('2d');
@@ -390,12 +530,31 @@
     }
     syncLenses();
   }
-  function rewardMarkup(result){
-    const rows=Object.entries(result.components).map(([id,count])=>{
-      const component=window.KeynlockResources.components.find(item=>item.id===id);
-      return `<span><i style="--reward-color:${component?.color||'#888'}"></i>+${count} ${component?.name||id}</span>`;
-    }).join('');
-    return `<b>Награда</b><span>+${result.coins} монет</span>${rows}`;
+  const rewardDialog=document.createElement('dialog');
+  rewardDialog.className='restorationVictory';rewardDialog.setAttribute('aria-labelledby','restorationVictoryTitle');
+  rewardDialog.innerHTML='<div class="solvedPuzzleCard uiPanel"><h2 class="solvedPuzzleTitle" id="restorationVictoryTitle">Картина восстановлена</h2><div class="restorationVictoryMetrics"><span>Подбор света <b data-restoration-result="light"></b></span><span>Восстановлено <b data-restoration-result="clean"></b></span></div><div class="solvedPuzzleLoot"></div><button class="solvedPuzzleButton uiButton" type="button">Вернуться в логово</button></div>';
+  document.body.append(rewardDialog);
+  let restoredPaintingId=null;
+  rewardDialog.querySelector('button').addEventListener('click',()=>rewardDialog.close());
+  rewardDialog.addEventListener('close',()=>{
+    const id=restoredPaintingId;restoredPaintingId=null;
+    if(id)window.dispatchEvent(new CustomEvent('keynlock-restored',{detail:{id}}));
+    window.KeynlockLair.open();
+  });
+  function showRestorationReward(result){
+    rewardDialog.querySelector('[data-restoration-result="light"]').textContent=`${score()}%`;
+    rewardDialog.querySelector('[data-restoration-result="clean"]').textContent=`${cleanliness()}%`;
+    restoredPaintingId=current().id;
+    const loot=rewardDialog.querySelector('.solvedPuzzleLoot');
+    if(result){
+      const components=Object.entries(result.components).map(([id,count])=>{
+        const component=window.KeynlockResources.components.find(item=>item.id===id);
+        return `<span class="lootRow" aria-label="${component?.name||id}: +${count}"><img class="componentIcon" src="${component.image}" alt=""><b>+${count}</b></span>`;
+      }).join('');
+      loot.innerHTML=`<div class="lootResources"><span class="lootRow lootCoins" aria-label="Монеты: +${result.coins}"><img class="lootResourceIcon" src="assets/ui/money-ico.png" alt=""><b>+${result.coins}</b></span>${components}</div>`;
+    }else loot.textContent='Тренировка завершена. Награда за эту картину уже получена.';
+    state.working=false;setToolActing(false,true);elements.activeTool.classList.remove('visible');
+    rewardDialog.showModal();
   }
   function checkRestoration(){
     if(!state.damageReady){elements.hint.textContent='Картина подготавливается. Подожди немного.';return;}
@@ -410,11 +569,12 @@
       elements.hint.textContent=value<TARGET_SCORE&&clean<100?'Нужно точнее подобрать цвет и полностью очистить картину.':(value<TARGET_SCORE?'Цвет всё ещё отличается от оригинала.':`Очистка не завершена: ${clean}%. Удали загрязнения и восстанови утраченные участки кистью.`);
       elements.reward.hidden=true;return;
     }
+    state.finished=true;renderMetrics();
     const painting=current();
     guideSeen[state.lesson]=true;STORE.setJSON('keynlockRestorationLessons',guideSeen);guideVisible=false;renderGuide();
     if(completed[painting.id]){
       elements.hint.textContent='Картина уже была восстановлена. Это тренировочная попытка.';
-      window.dispatchEvent(new CustomEvent('keynlock-restored',{detail:{id:painting.id}}));
+      showRestorationReward(null);
       elements.reward.hidden=true;
       return;
     }
@@ -422,10 +582,9 @@
     STORE.setJSON(STORAGE_KEY,completed);
     const result=window.KeynlockResources?.awardRestoration?.({coins:50,componentCount:2,preferredColors:painting.colors})||{coins:50,components:{}};
     elements.hint.textContent='Картина восстановлена. Работа завершена.';
-    elements.reward.innerHTML=rewardMarkup(result);
-    elements.reward.hidden=false;
+    elements.reward.hidden=true;
     renderOrders();
-    window.dispatchEvent(new CustomEvent('keynlock-restored',{detail:{id:painting.id}}));
+    showRestorationReward(result);
   }
   function syncLenses(){
     root.querySelectorAll('.restorationLens').forEach(lens=>lens.classList.toggle('enabled',state.loupe));
@@ -446,6 +605,7 @@
     placeLenses(false);
   }
   function placeLenses(pinned){
+    root.classList.toggle('lens-pinned',pinned);
     root.querySelectorAll('.restorationArtwork').forEach(target=>{
       const lens=target.querySelector('.restorationLens');
       const lensImage=lens.querySelector('i');
@@ -476,9 +636,10 @@
     state.focus.pinned=true;
     placePinnedLenses();
   }
-  function hideLenses(){if(state.focus.pinned)return;root.querySelectorAll('.restorationLens').forEach(lens=>lens.classList.remove('visible','pinned'));}
+  function hideLenses(){if(state.focus.pinned)return;root.classList.remove('lens-pinned');root.querySelectorAll('.restorationLens').forEach(lens=>lens.classList.remove('visible','pinned'));}
   function start(){
     const target=window.KeynlockOnboarding?.paintingId;
+    if(state.finished){setDrawerOpen(false);openOrders();requestAnimationFrame(sizePaintings);return;}
     if(state.started&&(!target||current().id===target)){requestAnimationFrame(sizePaintings);return;}
     setDrawerOpen(false);
     state.started=true;
@@ -487,16 +648,27 @@
     const training=PAINTINGS.findIndex(p=>p.id===window.KeynlockOnboarding?.paintingId);
     if(training>=0)state.painting=training;
     closeOrders();renderOrders();newDamage();renderPainting();
+    if(!target&&Object.keys(completed).length)openOrders();
     requestAnimationFrame(sizePaintings);
   }
 
+  const viewToggle=root.querySelector('#restorationViewToggle');
+  const toggleArtworkView=()=>setArtworkView(viewToggle.getAttribute('aria-pressed')==='true'?'damaged':'original');
+  viewToggle.addEventListener('click',toggleArtworkView);
+  document.addEventListener('keydown',event=>{
+    if(rewardDialog.open||event.code!=='Space'||!root.closest('.lairPanel.active')||!root.closest('#lairModuleWindow.open')||document.body.classList.contains('main-menu-open'))return;
+    if(event.target.closest?.('textarea,select,[contenteditable="true"],input:not([type="range"])'))return;
+    event.preventDefault();event.stopImmediatePropagation();
+    if(!event.repeat)toggleArtworkView();
+  },true);
+
   [['hue','hue'],['sat','sat'],['light','light']].forEach(([element,key])=>elements[element].addEventListener('input',event=>{state[key]=Number(event.target.value);state.checked=false;renderLive();}));
-  elements.orderButton.addEventListener('click',()=>{const open=elements.orderGrid.hidden;elements.orderGrid.hidden=!open;elements.orderButton.setAttribute('aria-expanded',String(open));});
+  elements.orderButton.addEventListener('click',()=>{if(elements.orderGrid.hidden)openOrders();else closeOrders();});
   elements.orderGrid.addEventListener('click',event=>{const category=event.target.closest('[data-order-category]');if(category){orderCategory=category.dataset.orderCategory;renderOrders();return;}const card=event.target.closest('[data-painting]');if(!card)return;state.painting=Number(card.dataset.painting)||0;closeOrders();newDamage();renderPainting();renderOrders();});
   elements.newDamage.addEventListener('click',newDamage);
   elements.check.addEventListener('click',checkRestoration);
   elements.tools.forEach(button=>button.addEventListener('click',()=>selectTool(button.dataset.restorationTool)));
-  root.querySelectorAll('.restorationArtwork').forEach(area=>{area.addEventListener('pointerenter',event=>{root.classList.toggle('original-tool-blocked',area.dataset.restorationArt==='original'&&Boolean(state.tool)&&state.tool!=='loupe');moveLenses(event);moveActiveTool(event);});area.addEventListener('pointermove',event=>{moveLenses(event);scanUltraviolet(event);if(state.working)useActiveTool(event);});area.addEventListener('pointerleave',()=>{root.classList.remove('original-tool-blocked');hideLenses();state.working=false;state.toolActing=false;state.lastPoint=null;elements.damagedArea.classList.remove('working');});area.addEventListener('click',event=>{if(area.dataset.restorationArt==='original'&&state.tool&&state.tool!=='loupe'){showOriginalActionDenied();return;}togglePinnedLens(event);applyDiagnosticReagent(event);});});
+  root.querySelectorAll('.restorationArtwork').forEach(area=>{area.addEventListener('pointerenter',event=>{moveLenses(event);moveActiveTool(event);});area.addEventListener('pointermove',event=>{moveLenses(event);scanUltraviolet(event);if(state.working)useActiveTool(event);});area.addEventListener('pointerleave',()=>{elements.activeTool.classList.remove('visible');elements.toolEffect.classList.remove('visible');root.classList.remove('original-tool-blocked');hideLenses();state.working=false;state.toolActing=false;state.lastPoint=null;elements.damagedArea.classList.remove('working');});area.addEventListener('click',event=>{if(area.dataset.restorationArt==='original'&&state.tool&&state.tool!=='loupe'){return;}togglePinnedLens(event);applyDiagnosticReagent(event);});});
   elements.damagedArea.addEventListener('pointerdown',event=>{if(!['brush','paint'].includes(state.tool))return;state.working=true;state.lastPoint=null;setToolActing(true);elements.damagedArea.classList.add('working');elements.damagedArea.setPointerCapture?.(event.pointerId);useActiveTool(event);});
   const finishStroke=()=>{state.working=false;state.lastPoint=null;setToolActing(false);elements.damagedArea.classList.remove('working');refreshLayerImages();renderMetrics();};
   elements.damagedArea.addEventListener('pointerup',finishStroke);elements.damagedArea.addEventListener('pointercancel',finishStroke);
@@ -504,5 +676,5 @@
   document.addEventListener('pointerdown',event=>{if(elements.orderGrid.hidden||event.target.closest('#restorationOrderGrid,#restorationOrderButton'))return;closeOrders();});
   window.addEventListener('resize',()=>{sizePaintings();if(!elements.orderGrid.hidden)renderOrders();});
 
-  window.KeynlockRestoration=Object.freeze({start,toggleGuide,get guideVisible(){return guideVisible;},paintings:PAINTINGS});
+  window.KeynlockRestoration=Object.freeze({start,toggleGuide,get guideVisible(){return guideVisible;},get finished(){return state.finished;},paintings:PAINTINGS});
 })();

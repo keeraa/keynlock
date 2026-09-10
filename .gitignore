@@ -2,3 +2,4 @@ build-info.json
 asset-manifest.json
 .vercel
 .env*
+.DS_Store

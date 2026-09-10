@@ -36,26 +36,28 @@
         if(root.contains(event.target)||itemAt(event.clientX,event.clientY))return;
         setOpen(false);
       },true);
-      if(options.routeVisualItems)document.addEventListener('pointerdown',event=>{
-        if(!root.contains(event.target)||event.target.closest?.(options.itemSelector||'.equipmentInventoryItem'))return;
+      // Route the final click once. Selecting a tool must not also toggle the
+      // case when its artwork sits above the closed drawer's grab strip.
+      if(options.routeVisualItems)root.addEventListener('click',event=>{
+        if(event.target.closest?.(options.itemSelector||'.equipmentInventoryItem'))return;
         const item=itemAt(event.clientX,event.clientY);if(!item)return;
-        event.preventDefault();event.stopPropagation();suppressClick=true;item.click();if(!root.classList.contains('open'))setOpen(true);setTimeout(()=>{suppressClick=false;},0);
+        event.preventDefault();event.stopImmediatePropagation();item.click();
       },true);
       let pointerFrame=0,lastPointer=null;
       function updatePointer(event){
-        setHovered(root.classList.contains('open')?itemAt(event.clientX,event.clientY):null);
+        if(!root.getClientRects().length||getComputedStyle(root).visibility==='hidden'||getComputedStyle(root).pointerEvents==='none'){setHovered(null);root.style.setProperty(approachVar,'0px');return;}
+        setHovered(event.pointerType==='touch'?null:itemAt(event.clientX,event.clientY));
         if(event.pointerType==='touch'||root.classList.contains('open'))return;
-        if(!root.getClientRects().length||getComputedStyle(root).visibility==='hidden'||getComputedStyle(root).pointerEvents==='none'){root.style.setProperty(approachVar,'0px');return;}
         if(options.ignoreApproach?.(event)){root.style.setProperty(approachVar,'0px');return;}
         const rect=root.getBoundingClientRect(),horizontal=event.clientX>=rect.left-80&&event.clientX<=rect.right+80;
-        const distance=innerHeight-event.clientY,depth=180,lift=42,amount=horizontal?lift*Math.max(0,Math.min(1,(depth-distance)/depth)):0;
+        const distance=innerHeight-event.clientY,depth=180,lift=50.4,amount=horizontal?lift*Math.max(0,Math.min(1,(depth-distance)/depth)):0;
         root.style.setProperty(approachVar,`${amount.toFixed(1)}px`);
         if(root.id==='inventoryDrawer')document.querySelector('#challengeHud')?.style.setProperty('--challenge-inventory-lift',`${amount.toFixed(1)}px`);
       }
       document.addEventListener('pointermove',event=>{
         lastPointer=event;
         if(!pointerFrame)pointerFrame=requestAnimationFrame(()=>{pointerFrame=0;updatePointer(lastPointer);lastPointer=null;});
-      },{passive:true});
+      },{passive:true,capture:true});
       const resetPointer=()=>{cancelAnimationFrame(pointerFrame);pointerFrame=0;lastPointer=null;setHovered(null);root.style.setProperty(approachVar,'0px');};
       document.addEventListener('pointerleave',resetPointer,{passive:true});window.addEventListener('blur',resetPointer);
       root.addEventListener('focusin',event=>{if(event.target.matches('.uiInventoryItem'))setHovered(event.target);});
@@ -80,7 +82,7 @@
 
   function triggerInventoryBreakAnimation(slot){
     triggerPickBreakVisual();
-    inventoryBrokenSlot = Math.max(0, Math.min(7, Number(slot)||0));
+    inventoryBrokenSlot = Math.max(0, Math.min(6, Number(slot)||0));
     if(inventoryBreakTimer) clearTimeout(inventoryBreakTimer);
     inventoryBreakTimer = setTimeout(()=>{
       inventoryBrokenSlot = 0;
@@ -143,46 +145,50 @@
       : `<span>${(ch?.name||'К')[0]}</span>`;
   }
 
+  const inventoryToolNodes=new Map();
   function inventoryTool(kind,index,src,label,options={}){
-    const btn=document.createElement('button');
-    btn.type='button';
-    const active=options.active!==undefined ? options.active : (kind==='pick' ? pickSkin===index : tensionSkin===index);
-    btn.className=`inventoryTool inventoryTool-${kind}${active?' selected':''}`;
-    if(options.hidden) btn.classList.add('hidden-slot');
-    if(options.breaking) btn.classList.add('breaking-out');
-    if(options.hidden || options.breaking) btn.disabled = true;
-    btn.title=label;
-    btn.setAttribute('aria-label',label);
-    if(src){
-      const img=document.createElement('img');
-      img.src=src;
-      img.alt='';
-      btn.appendChild(img);
+    const key=`${kind}:${index}`;
+    let btn=inventoryToolNodes.get(key);
+    if(!btn){
+      btn=document.createElement('button');
+      btn.type='button';
+      btn.className=`inventoryTool inventoryTool-${kind}`;
+      btn.addEventListener('click',e=>{
+        e.stopPropagation();
+        if(btn.disabled)return;
+        if(btn.inventoryOptions.onClick)btn.inventoryOptions.onClick();
+        else if(kind==='pick')selectPickSkin(index);
+        else selectTensionSkin(index);
+        if(kind==='pick')SFX.pickDraw?.();else SFX.tensionDraw?.();
+      });
+      inventoryToolNodes.set(key,btn);
     }
-    if(!(options.hidden || options.breaking)) btn.addEventListener('click',e=>{
-      e.stopPropagation();
-      if(options.onClick) options.onClick();
-      else if(kind==='pick') selectPickSkin(index);
-      else selectTensionSkin(index);
-      if(kind==='pick') SFX.pickDraw?.();
-      else SFX.tensionDraw?.();
-    });
+    btn.inventoryOptions=options;
+    const active=options.active!==undefined?options.active:(kind==='pick'?pickSkin===index:tensionSkin===index);
+    btn.classList.toggle('selected',active);
+    btn.classList.toggle('hidden-slot',Boolean(options.hidden));
+    btn.classList.toggle('breaking-out',Boolean(options.breaking));
+    btn.disabled=Boolean(options.hidden||options.breaking);
+    btn.title=label;btn.setAttribute('aria-label',label);
+    let img=btn.querySelector('img');
+    if(src){
+      if(!img){img=document.createElement('img');img.alt='';btn.appendChild(img);}
+      if(img.getAttribute('src')!==src)img.src=src;
+    }else img?.remove();
     return btn;
   }
 
   function renderInventoryTools(){
     const {pickRail,tensionRail}=inventoryEls();
     if(!pickRail || !tensionRail) return;
-    pickRail.replaceChildren();
-    tensionRail.replaceChildren();
 
     const visiblePicks=Math.max(0, Math.min(pickCapacity, picks));
     const caseSlots=pickProgress.capacity;
+    [...pickRail.children].filter(node=>Number(node.dataset.slot)>caseSlots).forEach(node=>node.remove());
     pickRail.dataset.slots=String(caseSlots);
-    // The artwork always contains seven fixed pockets. Capacity controls how
-    // many of those pockets are usable, not how widely the visible picks are
-    // spread across the rail.
-    pickRail.style.gridTemplateColumns = 'repeat(7,1fr)';
+    // Match the six pockets in the artwork at every upgrade level.
+    // Empty pockets keep their space when tools are used or broken.
+    pickRail.style.gridTemplateColumns = '72fr 64fr 63fr 59fr 61fr 53fr';
     pickRail.style.opacity = pickCapacity > 0 ? '1' : '.45';
 
     // The rail shows the player's own Коллекция picks when that screen
@@ -208,12 +214,13 @@
       });
       btn.dataset.pickIndex=String(pickIndex);
       btn.dataset.slot=String(i);
-      pickRail.appendChild(btn);
+      if(btn.parentElement!==pickRail)pickRail.appendChild(btn);
     }
 
     tensionRail.style.gridTemplateColumns = 'repeat(5,1fr)';
     for(let i=1;i<=5;i++){
-      tensionRail.appendChild(inventoryTool('tension',i,TENSION_SKINS[i],`Натяжитель · ${TENSION_SKIN_LABELS[i]||`Вариант ${i}`}`));
+      const btn=inventoryTool('tension',i,TENSION_SKINS[i],`Натяжитель · ${TENSION_SKIN_LABELS[i]||`Вариант ${i}`}`);
+      if(btn.parentElement!==tensionRail)tensionRail.appendChild(btn);
     }
   }
 

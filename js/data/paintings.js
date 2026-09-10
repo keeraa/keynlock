@@ -79,7 +79,6 @@ const PAINTINGS=Object.freeze([
   {id:'rococo-mezzetin',title:'Меццетен',artist:'Антуан Ватто',year:'ок. 1718–1720',image:'assets/restoration/rococo/mezzetin.jpg',colors:['red','blue','yellow'],category:'rococo'},
   {id:'rococo-rinaldo-armida',title:'Ринальдо и Армида',artist:'Франсуа Буше',year:'1734',image:'assets/restoration/rococo/rinaldo-armida.jpg',colors:['red','blue','yellow'],category:'rococo'},
   {id:'adele-bloch-bauer',title:'Портрет Адели Блох-Бауэр I',artist:'Густав Климт',year:'1907',image:'assets/restoration/modern/adele-bloch-bauer.jpg',colors:['yellow','orange','green'],category:'modern'},
-  {id:'judith-i',title:'Юдифь I',artist:'Густав Климт',year:'1901',image:'assets/restoration/modern/judith-i.jpg',colors:['yellow','green','violet'],category:'modern'},
   {id:'mucha-dance',title:'Танец',artist:'Альфонс Муха',year:'1898',image:'assets/restoration/modern/mucha-dance.jpg',colors:['red','orange','green'],category:'modern'},
   {id:'munch-madonna',title:'Мадонна',artist:'Эдвард Мунк',year:'1894–1895',image:'assets/restoration/modern/munch-madonna.jpg',colors:['red','blue','violet'],category:'modern'},
   {id:'composition-vii',title:'Композиция VII',artist:'Василий Кандинский',year:'1913',image:'assets/restoration/modern/composition-vii.jpg',colors:['red','blue','yellow'],category:'modern'},

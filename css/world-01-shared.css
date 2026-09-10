@@ -70,20 +70,11 @@ body .modePanel:not([hidden]){visibility:visible!important;opacity:1!important;}
 body.importedMode .tnMode,body.importedMode .rsMode,body.importedMode .kdMode{background:radial-gradient(circle at 22% 10%, rgba(106,74,40,.22) 0%, rgba(106,74,40,.09) 15%, transparent 36%),
     radial-gradient(circle at 82% 18%, rgba(72,50,30,.15) 0%, transparent 30%),
     linear-gradient(180deg, rgba(53,37,24,.54), rgba(20,15,11,.18) 36%, rgba(0,0,0,0) 68%)!important;padding:12px 24px 18px!important;overflow:auto!important;gap:12px!important;}
-.tnPanel{width:min(720px,88vw);padding:22px 26px 18px;border:1px solid rgba(128,100,56,.72);border-radius:16px;background:linear-gradient(180deg,rgba(29,22,16,.76),rgba(10,8,6,.48));box-shadow:0 20px 60px rgba(0,0,0,.34);}
 .tnGauge{position:relative;height:58px;overflow:hidden;border:1px solid #5f4a2f;border-radius:30px;background:rgba(8,7,6,.92);cursor:ew-resize;}
 .tnTicks{position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 calc(10% - 1px),rgba(255,255,255,.08) calc(10% - 1px) 10%);}
 .tnBand{position:absolute;top:7px;bottom:7px;border-radius:24px;background:linear-gradient(180deg,#b6cf79,#708c45);box-shadow:0 0 18px rgba(164,203,99,.24);transition:left .28s,width .28s;}
 .tnNeedle{position:absolute;top:3px;bottom:3px;width:7px;transform:translateX(-50%);border-radius:5px;background:linear-gradient(180deg,#ffe8a4,#c68e32);box-shadow:0 0 12px rgba(224,173,75,.66);}
 .tnGaugeLabels{display:flex;justify-content:space-between;margin-top:6px;color:#8f806c;font:11px/1 Arial,sans-serif;letter-spacing:.08em;}
-.tnPins{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:20px 0 12px;}
-.tnPin{position:relative;height:112px;border:1px solid rgba(78,62,43,.7);border-radius:10px;background:rgba(8,7,6,.64);overflow:hidden;}
-.tnPinStem{position:absolute;left:50%;bottom:8px;width:11px;height:52px;transform:translateX(-50%);border-radius:6px;background:linear-gradient(90deg,#69462e,#d2a06a,#714a31);transition:height .22s ease;}
-.tnPinHead{position:absolute;left:50%;bottom:50px;width:42px;height:43px;transform:translateX(-50%);border-radius:7px;background:linear-gradient(90deg,#6d482f,#d6a26d 48%,#714b33);transition:bottom .22s ease,filter .18s ease;}
-.tnPin.active{box-shadow:inset 0 0 0 1px rgba(216,174,90,.46),0 0 16px rgba(204,157,73,.15);}
-.tnPin.set{opacity:.58;}
-.tnPin.set .tnPinStem{height:78px;}
-.tnPin.set .tnPinHead{bottom:76px;filter:brightness(1.14);}
 .tnMessage,.kdFeedback{min-height:21px;margin-top:9px;text-align:center;color:#c1ad8d;font:13px/1.35 Arial,sans-serif;}
 .rsBoard{position:relative;width:min(760px,90vw);height:min(390px,52vh);min-height:320px;overflow:hidden;border:0;border-radius:16px;background:linear-gradient(180deg,rgba(29,22,16,.74),rgba(8,7,6,.48));box-shadow:0 20px 60px rgba(0,0,0,.34);}
 .rsLine{position:absolute;left:5%;right:5%;top:50%;height:3px;transform:translateY(-50%);background:linear-gradient(90deg,transparent,#e3c271 14% 86%,transparent);box-shadow:0 0 15px rgba(227,194,113,.36);}
@@ -107,8 +98,6 @@ body.importedMode .tnMode,body.importedMode .rsMode,body.importedMode .kdMode{ba
 .kdPanel.ready .kdBar{box-shadow:0 0 16px rgba(186,219,123,.34);}
 @media (max-width:760px){
 .tnPanel,.kdPanel{width:min(94vw,620px);padding:14px;}
-.tnPins{gap:6px;}
-.tnPin{height:96px;}
 .rsBoard{width:94vw;min-height:290px;}
 .rsLanes{inset:46px 20px;gap:9px;}
 .rsOrb{width:32px;height:32px;}

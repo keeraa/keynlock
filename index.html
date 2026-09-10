@@ -61,10 +61,12 @@
 <body class="assets-loading">
 <div class="bootLoader" id="bootLoader" aria-label="Загрузка KEYNLOCK">
 <div class="bootLoaderStage">
-  <img class="bootLoaderHero" src="assets/branding/main-say.png" alt="">
-  <img class="bootLoaderLogo" src="assets/branding/logo-01.png" alt="KEYNLOCK">
+  <img class="bootLoaderHero" fetchpriority="high" src="assets/branding/main-say.png" alt="">
+  <img class="bootLoaderLogo" fetchpriority="high" src="assets/branding/logo-01.png" alt="KEYNLOCK">
   <div class="bootLoaderControls">
     <div class="bootLoaderBar"><span id="bootLoaderProgress"></span></div>
+    <p class="bootLoaderStatus" id="bootLoaderStatus" role="status"></p>
+    <button class="uiButton bootLoaderRetry" id="bootLoaderRetry" type="button" hidden>Повторить загрузку</button>
     <nav class="mainMenu" id="mainMenu" aria-label="Главное меню" hidden>
       <button class="mainMenuButton uiButton" id="mainMenuContinue" type="button">Продолжить</button>
       <button class="mainMenuButton mainMenuPrimary uiButton" id="mainMenuNew" type="button">Новая игра</button>
@@ -241,6 +243,16 @@
 <section class="lairOverlay" id="lairOverlay" hidden aria-label="Логово">
   <div class="lairScene">
     <div class="lairRoom">
+      <div class="lairWindow" aria-hidden="true">
+        <img class="lairWindowView" src="assets/lair/room/window-view.png" alt="" draggable="false">
+        <canvas class="lairWindowRain"></canvas>
+      </div>
+      <img class="lairRoomBackdrop" src="assets/lair/room/logovo_bg.png" alt="" draggable="false" aria-hidden="true">
+      <img class="lairWindowFrame" src="assets/lair/room/window-frame.png" alt="" draggable="false" aria-hidden="true">
+    <button class="lairHotspot lairHotspotCollection" type="button" data-lair-open="collection">
+      <img class="lairHotspotIcon" src="assets/lair/icons/collection.png" alt="">
+      <span>Коллекция</span>
+    </button>
       <button class="lairRoomObject lairRoomObject--alchemy" type="button" data-lair-open="alchemy" aria-label="Алхимия" data-tip="Алхимия">
         <img src="assets/lair/room/alchemy.png" alt="" draggable="false">
         <span class="lairRoomHit" aria-hidden="true"></span>
@@ -270,18 +282,15 @@
       <img class="lairActiveCharacterPortrait" id="lairActiveCharacterPortrait" src="assets/characters/portraits/sai.png" alt="Сай">
     </button>
 
-    <button class="lairHotspot lairHotspotCity" type="button" data-lair-open="city">
+    <button class="lairHotspot lairHotspotCity" hidden type="button" data-lair-open="city">
       <img class="lairHotspotIcon" src="assets/lair/icons/research.png" alt="">
       <span>Анализ города</span>
     </button>
-    <button class="lairHotspot lairHotspotDialogue" type="button" data-lair-open="dialogue">
+    <button class="lairHotspot lairHotspotDialogue" hidden type="button" data-lair-open="dialogue">
       <img class="lairHotspotIcon" src="assets/lair/icons/dialogues.png" alt="">
       <span>Диалоги</span>
     </button>
-    <button class="lairHotspot lairHotspotCollection" type="button" data-lair-open="collection">
-      <img class="lairHotspotIcon" src="assets/lair/icons/collection.png" alt="">
-      <span>Коллекция</span>
-    </button>
+
 
     <div class="lairWorkbenchModal lairWorkspace" id="lairWorkbenchModal" hidden aria-label="Верстак">
       <div class="lairWorkbenchDialog" role="dialog" aria-modal="true" aria-label="Верстак и чертежи">
@@ -300,6 +309,7 @@
       </div>
     </div>
 
+    <div class="restorationBackdrop" aria-hidden="true"><img src="assets/restoration/gallery-wall.png" alt="" draggable="false"><img src="assets/restoration/gallery-wall.png" alt="" draggable="false"></div>
     <div class="alchemyFullBlur" id="alchemyFullBlur" aria-hidden="true"></div>
     <div class="alchemyGuideViewer" id="alchemyGuideViewer" hidden role="dialog" aria-modal="true" aria-label="Инструкция по смешению">
       <button class="alchemyGuideViewerBackdrop" type="button" aria-label="Закрыть просмотр" onclick="this.closest('.alchemyGuideViewer').hidden=true"></button>
@@ -407,13 +417,13 @@
         <section class="lairPanel" data-lair-panel="restoration">
           <div class="restorationRoot" id="restorationRoot">
             <div class="restorationWorkspace">
-              <figure class="restorationPanel uiPanel"><figcaption>Оригинал</figcaption><div class="restorationArtwork" data-restoration-art="original"><img id="restorationOriginal" alt=""><span class="restorationLens" aria-hidden="true"><i></i></span></div></figure>
-              <figure class="restorationPanel uiPanel"><figcaption>Повреждённая картина</figcaption><div class="restorationArtwork" data-restoration-art="damaged"><img id="restorationDamaged" alt=""><canvas class="restorationSurface restorationDirtSurface" id="restorationDirtSurface"></canvas><canvas class="restorationSurface restorationRepairSurface" id="restorationRepairSurface"></canvas><canvas class="restorationSurface restorationOverpaintSurface" id="restorationOverpaintSurface"></canvas><canvas class="restorationSurface restorationUvSurface" id="restorationUvSurface"></canvas><canvas class="restorationSurface restorationScanSurface" id="restorationScanSurface"></canvas><img class="restorationToolEffect" id="restorationToolEffect" alt="" aria-hidden="true"><img class="restorationActiveTool" id="restorationActiveTool" alt="" aria-hidden="true"><span class="restorationLens" aria-hidden="true"><i></i></span></div></figure>
+              <figure class="restorationPanel uiPanel" id="restorationOriginalPanel" role="group" aria-label="Оригинал" aria-hidden="true" inert><div class="restorationArtwork" data-restoration-art="original"><img id="restorationOriginal" alt=""><span class="restorationLens" aria-hidden="true"><i></i></span></div></figure>
+              <figure class="restorationPanel uiPanel is-active" id="restorationCopyPanel" role="group" aria-label="Копия" aria-hidden="false"><div class="restorationArtwork" data-restoration-art="damaged"><img id="restorationDamaged" alt=""><canvas class="restorationSurface restorationDirtSurface" id="restorationDirtSurface"></canvas><canvas class="restorationSurface restorationRepairSurface" id="restorationRepairSurface"></canvas><canvas class="restorationSurface restorationOverpaintSurface" id="restorationOverpaintSurface"></canvas><canvas class="restorationSurface restorationUvSurface" id="restorationUvSurface"></canvas><canvas class="restorationSurface restorationScanSurface" id="restorationScanSurface"></canvas><img class="restorationToolEffect" id="restorationToolEffect" alt="" aria-hidden="true"><img class="restorationActiveTool" id="restorationActiveTool" alt="" aria-hidden="true"><span class="restorationLens" aria-hidden="true"><i></i></span></div></figure>
             </div>
             <div class="restorationControls">
               <div class="restorationToolbar">
                 <div class="restorationOrderPicker">
-                  <button class="restorationOrderButton uiButton" id="restorationOrderButton" type="button" aria-expanded="false"><span>Заказ</span><span class="restorationOrderCopy"><b id="restorationOrderName">Выбрать картину</b><small id="restorationOrderArtist">Автор не выбран</small></span></button>
+                  <button class="restorationOrderButton uiButton" id="restorationOrderButton" type="button" aria-expanded="false"><span class="restorationOrderCopy"><b id="restorationOrderName">Выбрать картину</b><small id="restorationOrderArtist">Автор не выбран</small></span></button>
                   <div class="restorationOrderGrid" id="restorationOrderGrid" hidden></div>
                 </div>
               </div>
@@ -423,11 +433,13 @@
                 <label><span>Яркость <b id="restorationLightValue">100%</b></span><input id="restorationLight" type="range" min="50" max="150" step="1" value="100"></label>
               </div>
               <aside class="restorationCheckPanel uiPanel">
+                <button class="restorationViewToggle" id="restorationViewToggle" type="button" aria-controls="restorationOriginalPanel restorationCopyPanel" aria-pressed="false" aria-keyshortcuts="Space" data-tip="Сейчас показана копия">Оригинал/Копия (пробел)</button>
                 <div class="restorationMetrics"><span>Подбор света <b id="restorationLightMatch">0%</b></span><span>Очищено <b id="restorationCleanliness">0%</b></span></div>
                 <button class="restorationNewDamageButton uiButton" id="restorationNewDamage" type="button" aria-label="Создать новое повреждение" title="Новое повреждение"><span aria-hidden="true">↻</span></button>
                 <button class="restorationCheckButton uiButton" id="restorationCheck" type="button">Проверить</button>
                 <strong class="restorationScore" id="restorationScore">—</strong>
-                <p id="restorationHint">Добейся совпадения не ниже 88%.</p>
+                <button class="restorationHintButton uiButton" type="button" aria-label="Подсказка по реставрации" data-tip="Добейся совпадения не ниже 88%.">?</button>
+                <p id="restorationHint" role="status">Добейся совпадения не ниже 88%.</p>
                 <div class="restorationReward" id="restorationReward" hidden></div>
               </aside>
             </div>
@@ -451,6 +463,11 @@
   </div>
 </section>
 <section class="challengeHud" id="challengeHud" aria-label="Условия текущей головоломки">
+  <nav class="gameDifficultySwitch" id="gameDifficultySwitch" aria-label="Уровень сложности">
+    <button class="uiButton" type="button" data-game-tier="1" aria-label="Уровень I" aria-pressed="true">I</button>
+    <button class="uiButton" type="button" data-game-tier="2" aria-label="Уровень II" aria-pressed="false">II</button>
+    <button class="uiButton" type="button" data-game-tier="3" aria-label="Уровень III" aria-pressed="false">III</button>
+  </nav>
   <div class="challengeObjective difficulty" id="objectiveLine">ЦЕЛЬ: <b>ПОДНЯТЬ ВСЕ ШТИФТЫ</b></div>
   <div class="challengeStatus" id="challengeStatus">
     <div class="rewardBox challengeMetric challengeReward" id="rewardBox">
@@ -503,9 +520,10 @@
 <div class="status" id="status"></div>
 <!-- MODE: turnmemory -->
 <div class="modePanel turnmemoryMode" data-mode="turnmemory" hidden="" id="turnmemoryMode">
-<div class="turnmemoryProgressWrap">
+<div class="turnmemoryProgressWrap lockShellPuzzleBlock">
 <div class="turnmemoryProgressTitle">Введено</div>
-<div class="turnmemoryProgressRow" id="turnmemoryProgressRow"></div>
+<div class="turnmemoryProgressRow" id="turnmemoryProgressRow" aria-label="Последовательность поворотов"></div>
+
 </div>
 
 </div>
@@ -746,7 +764,7 @@
 
 <!-- MODE: TENSION CONTROL -->
 <div class="modePanel tnMode" data-mode="tension" hidden id="tensionMode">
-  <div class="tnPanel">
+  <div class="tnPanel lockShellPuzzleBlock">
     <div class="tnGauge" id="tnGauge">
       <div class="tnTicks"></div>
       <div class="tnBand" id="tnBand"></div>
@@ -761,7 +779,7 @@
 
 <!-- MODE: RESONANCE -->
 <div class="modePanel rsMode" data-mode="resonance" hidden id="resonanceMode">
-  <div class="rsBoard">
+  <div class="rsBoard lockShellPuzzleBlock">
     <div class="rsLine"></div>
     <div class="rsLanes" id="rsLanes"></div>
   </div>
@@ -770,10 +788,10 @@
 
 <!-- MODE: KEY DEDUCTION -->
 <div class="modePanel kdMode" data-mode="deduction" hidden id="deductionMode">
-  <div class="kdPanel" id="kdPanel">
+  <div class="kdPanel lockShellPuzzleBlock" id="kdPanel">
     <div class="kdKey" id="kdKey"></div>
     <button class="kdCheck" id="kdCheck" type="button">Проверить ключ</button>
-    <div class="kdFeedback" id="kdFeedback">A / D — выбрать зубец · W / S — изменить высоту. Проверка сообщает только о первом неправильном зубце.</div>
+    <div class="kdFeedback" id="kdFeedback" role="status" aria-live="polite">Нажми «Проверить ключ», чтобы узнать, какой штифт нужно поднять или опустить.</div>
     <div class="kdHistory" id="kdHistory"></div>
   </div>
 

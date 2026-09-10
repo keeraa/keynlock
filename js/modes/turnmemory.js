@@ -30,15 +30,20 @@
     for(let i=0;i<size;i++){
       const slot=document.createElement('div');
       const val = arr[i];
-      slot.className = 'turnmemorySlot ' + (val==null ? 'empty' : (val < 0 ? 'left' : 'right'));
+      slot.className = 'turnmemorySlot ' + (val==null ? 'empty' : (val < 0 ? 'is-left' : 'is-right'));
+      slot.setAttribute('aria-label', `Шаг ${i+1}: ${val==null?'не введён':val<0?'влево':'вправо'}`);
       slot.insertAdjacentHTML('beforeend',turnmemorySymbolFrame(symbolType));
       container.appendChild(slot);
     }
   }
 
   function renderTURNMEMORY(){
+    document.body.style.setProperty('--turnmemory-shell-size',`${56+turnmemoryLength*84+(turnmemoryLength-1)*10}px`);
     renderTURNMEMORYRow($turnmemoryProgressRow, turnmemoryInput, turnmemoryLength);
     const ready = turnmemoryInput.length === turnmemoryLength && turnmemoryInput.every((v,i)=>v===turnmemorySequence[i]);
+    $mechanism.classList.toggle('ready',ready&&!solved);
+    document.querySelector('#turnmemoryMode .turnmemoryProgressTitle').textContent=`Введено ${turnmemoryInput.length} из ${turnmemoryLength}`;
+
   }
 
   function startTURNMEMORYRound(){
@@ -59,7 +64,7 @@
   }
 
   function turnmemoryPress(dir){
-    if(solved) return;
+    if(solved||turnmemoryInput.length===turnmemoryLength) return;
     const expected = turnmemorySequence[turnmemoryInput.length];
     registerMove();
     if(dir === expected){
@@ -92,7 +97,8 @@
     $lock.classList.add('win');
     SFX.open();
     renderTURNMEMORY();
-    setTimeout(()=>celebrate(), 420);
+    $mechanism.classList.add('opening');
+    scheduleRoundAction(()=>celebrate(),1000);
   }
 
   PuzzleModes.register({

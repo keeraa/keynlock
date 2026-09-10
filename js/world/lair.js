@@ -349,6 +349,82 @@
   }
 
 
+  // Only the distant view moves. The room masks both scenery and rain so they
+  // cannot leak over the sill, even while the whole room is panned on mobile.
+  (function bindWindowWeather(){
+    const scene=document.querySelector('.lairScene');
+    const room=scene?.querySelector('.lairRoom');
+    const viewport=room?.querySelector('.lairWindow');
+    const view=viewport?.querySelector('.lairWindowView');
+    const canvas=viewport?.querySelector('canvas');
+    const ctx=canvas?.getContext('2d');
+    if(!ctx||!view)return;
+    const motionQuery=window.matchMedia('(prefers-reduced-motion: reduce)');
+    const drops=Array.from({length:130},()=>({
+      x:Math.random(),y:Math.random(),speed:.65+Math.random()*.7,
+      length:.025+Math.random()*.045,alpha:.24+Math.random()*.30
+    }));
+    let width=0,height=0,frame=0,last=0,x=0,y=0,targetX=0,targetY=0;
+    // Reduced motion softens the requested weather rather than removing it.
+    const reduced=()=>motionQuery.matches||document.documentElement.classList.contains('reduce-motion');
+    const visible=()=>lairOpen&&!$lairOverlay.hidden&&!room.inert&&!document.hidden&&!document.body.classList.contains('main-menu-open');
+
+    function paintRain(dt){
+      ctx.clearRect(0,0,width,height);
+      ctx.lineWidth=1.15;
+      for(const drop of drops){
+        drop.y+=dt*drop.speed;
+        drop.x-=dt*drop.speed*.13;
+        if(drop.y>1.08){drop.y=-.08;drop.x=Math.random();}
+        if(drop.x<-.03)drop.x=1.03;
+        ctx.strokeStyle=`rgba(183,216,242,${drop.alpha})`;
+        ctx.beginPath();
+        ctx.moveTo(drop.x*width,drop.y*height);
+        ctx.lineTo((drop.x+.13*drop.length)*width,(drop.y-drop.length)*height);
+        ctx.stroke();
+      }
+    }
+    function tick(now){
+      frame=0;
+      if(!visible()){last=0;return;}
+      const dt=last?Math.min((now-last)/1000,.05):0;
+      last=now;
+      const gentle=reduced();
+      const ease=1-Math.exp(-dt*(gentle?4:7));
+      x+=(targetX-x)*ease;y+=(targetY-y)*ease;
+      const distance=gentle?.6:1;
+      view.style.transform=`translate3d(${x*width*.032*distance}px,${y*height*.024*distance}px,0)`;
+      paintRain(dt*(gentle?.55:1));
+      frame=requestAnimationFrame(tick);
+    }
+    function refresh(){
+      if(frame)cancelAnimationFrame(frame);
+      frame=0;last=0;
+      if(visible())frame=requestAnimationFrame(tick);
+    }
+    new ResizeObserver(()=>{
+      width=viewport.clientWidth;height=viewport.clientHeight;
+      const dpr=Math.min(window.devicePixelRatio||1,1.5);
+      canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      refresh();
+    }).observe(viewport);
+    scene.addEventListener('pointermove',event=>{
+      if(event.pointerType==='touch'||!visible())return;
+      targetX=1-2*Math.max(0,Math.min(1,event.clientX/window.innerWidth));
+      targetY=1-2*Math.max(0,Math.min(1,event.clientY/window.innerHeight));
+    },{passive:true});
+    scene.addEventListener('pointerleave',()=>{targetX=targetY=0;});
+    window.addEventListener('keynlock-lair-opened',refresh);
+    document.addEventListener('visibilitychange',refresh);
+    motionQuery.addEventListener('change',refresh);
+    const observer=new MutationObserver(refresh);
+    observer.observe(room,{attributes:true,attributeFilter:['inert']});
+    observer.observe($lairOverlay,{attributes:true,attributeFilter:['hidden']});
+    observer.observe(document.body,{attributes:true,attributeFilter:['class']});
+    observer.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
+  })();
+
   // ===== DRAG TO PAN =====
   // A phone crops both the lair room and the city map hard: the room renders
   // about 1440px wide inside a 375px screen, so most of it is simply unreachable
@@ -442,7 +518,9 @@
         // !important, so an inline background-position would lose to it.
         scene.style.setProperty('--lair-pan', `${v.toFixed(0)}px`);
         if($lairSceneCharacters)$lairSceneCharacters.style.transform=`translateX(${v.toFixed(0)}px)`;
-        scene.querySelectorAll('.lairHotspot:not(.lairHotspotTeam)').forEach(spot=>{spot.style.transform=`translateX(${v.toFixed(0)}px)`;});
+        // Room children already inherit its camera movement. Only scene-level
+        // hotspots need an additional translation.
+        scene.querySelectorAll(':scope > .lairHotspot:not(.lairHotspotTeam)').forEach(spot=>{spot.style.transform=`translateX(${v.toFixed(0)}px)`;});
 
       }, roomRange);
 

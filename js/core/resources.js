@@ -44,9 +44,9 @@
     if(craftOil)craftOil.disabled=keynlockResources.components.orange<1||keynlockResources.components.yellow<1||keynlockResources.oil>=keynlockResources.oilerCapacity;
     const upgrade=document.querySelector('#upgradePickCaseButton');
     if(upgrade){
-      const next=resourceCaseCapacity()===3?5:7;
+      const next=Math.min(6,resourceCaseCapacity()+1);
       const price=window.KeynlockContent.economy.caseUpgradePrice;
-      upgrade.hidden=resourceCaseCapacity()>=7;
+      upgrade.hidden=resourceCaseCapacity()>=6;
       upgrade.disabled=balance<price;
       upgrade.innerHTML=`Расширить футляр до ${next} <small>${price} монет</small>`;
     }
@@ -57,7 +57,8 @@
     return {picks:Math.min(resourceCaseCapacity(),keynlockResources.picks)};
   }
   function consumeKeynlockPicks(count=1){
-    const spent=Math.min(keynlockResources.picks,Math.max(0,count));
+    const reserve=window.KeynlockMissions?.protectsLastPick?.()?1:0;
+    const spent=Math.min(Math.max(0,keynlockResources.picks-reserve),Math.max(0,count));
     keynlockResources.picks-=spent;
     saveKeynlockResources();
     return spent;
@@ -142,7 +143,7 @@
   }
   function upgradeKeynlockCase(){
     const current=resourceCaseCapacity();
-    const next=current===3?5:current===5?7:null;
+    const next=current>=3&&current<6?current+1:null;
     const price=next?window.KeynlockContent.economy.caseUpgradePrice:Infinity;
     if(!next||balance<price)return false;
     balance-=price;

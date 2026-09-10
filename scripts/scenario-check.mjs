@@ -46,6 +46,9 @@ const gameCatalogContext={
 };
 runInNewContext(source('js/core/game-catalog.js'),gameCatalogContext,{filename:'game-catalog.js'});
 const gameCatalog=gameCatalogContext.window.GameCatalog;
+for(const feature of ['noise','noiseSensor','guards','birds']){
+  assert(gameCatalog.feature('wharf',`world.${feature}`)===true,`The first waterfront mission must enable ${feature}.`);
+}
 assert(gameCatalog.feature('classic','lock.requiresPick')===true,'Physical locks must require a pick.');
 assert(gameCatalog.feature('drum','lock.present')===true,'Saved lock visibility must remain editable.');
 assert(gameCatalog.feature('drum','lock.requiresPick')===false,'Saved display overrides must not make a logic puzzle require picks.');
@@ -68,12 +71,12 @@ for(const file of ['js/data/world.js','js/data/economy.js','js/data/restoration.
 const content=contentContext.window.KeynlockContent;
 assert(Object.keys(content.world.districts).length===7,'The world must contain seven districts.');
 assert(content.world.missionPlaces.length===28,'Mission catalogue size changed unexpectedly.');
-assert(content.paintings.length===180,'Painting catalogue size changed unexpectedly.');
+assert(content.paintings.length===179,'Painting catalogue size changed unexpectedly.');
 assert(content.restoration.targetScore===88,'Restoration target changed unexpectedly.');
 
 globalThis.window=contentContext.window;
 const catalogModule=await import('../js/modules/content-catalog.mjs');
-assert(catalogModule.getPaintings().length===180,'Content module must expose every painting.');
+assert(catalogModule.getPaintings().length===179,'Content module must expose every painting.');
 assert(catalogModule.getDistricts().length===7,'Content module must expose every district.');
 assert(catalogModule.getMissions().length===28,'Content module must expose every mission.');
 assert(Object.keys(catalogModule.getComponents()).length>0,'Content module must expose components.');
@@ -117,6 +120,29 @@ assert(rewards.award(rewardOptions)?.id==='p1','First mission clear must award a
 assert(rewards.ownedIds()[0]==='p1','Awarded painting must be persisted as owned.');
 assert(rewards.award(rewardOptions)===null,'An owned painting must not be awarded twice.');
 assert(rewards.award({...rewardOptions,currentRoundId:8})===null,'A stale mission round must not award a painting.');
+const quizPainting=rewardOptions.paintings[0];
+const quizPool=[quizPainting,{id:'duplicate-title',title:'One'},...['Two','Three','Four','Five'].map((title,index)=>({id:`quiz-${index}`,title}))];
+const correctQuiz=rewards.createQuiz(quizPainting,quizPool,{random:()=>.4});
+assert(correctQuiz.choices.length===4&&new Set(correctQuiz.choices.map(item=>item.title)).size===4,'Painting quiz must offer four different titles.');
+assert(correctQuiz.choices.some(item=>item.id===quizPainting.id),'Painting quiz must include the correct title.');
+assert(correctQuiz.answer('missing')===null,'Unknown quiz options must not consume the attempt.');
+assert(correctQuiz.answer(quizPainting.id)?.coins===50,'A correct painting title must award 50 coins.');
+assert(correctQuiz.answer(quizPainting.id)===null,'Repeated clicks must not award another painting bonus.');
+const wrongQuiz=rewards.createQuiz(quizPainting,quizPool);
+assert(wrongQuiz.answer(wrongQuiz.choices.find(item=>item.id!==quizPainting.id).id)?.coins===0,'A wrong title must award no coins.');
+assert(wrongQuiz.answer(quizPainting.id)===null,'A wrong answer must not allow guessing again.');
+let wharfTier=1,wharfMode;
+const wharfContext={
+  window:{},PuzzleModes:{register:definition=>{wharfMode=definition;}},
+  chooseGamePinSkin(){},diffStep:(...counts)=>counts[wharfTier-1],
+  $lock:{classList:{remove(){}}},$mechanism:{classList:{remove(){}}},
+  $wfLock:null,pickCapacity:3,updateEconomyUI(){}
+};
+runInNewContext(source('js/modes/wharf.js'),wharfContext,{filename:'wharf.js'});
+for(const [tier,count] of [[1,4],[2,6],[3,7],[1,4],[2,6],[1,4]]){
+  wharfTier=tier;wharfMode.start();
+  assert(wharfContext.generatedDistance===count,`Waterfront tier ${tier} must consistently create ${count} pins after switching tiers.`);
+}
 globalThis.window=rewardContext.window;
 const rewardModule=await import('../js/modules/painting-rewards.mjs');
 assert(rewardModule.getOwnedPaintingIds()[0]==='p1','Painting reward module must expose owned paintings.');
@@ -136,6 +162,24 @@ const gameCatalogSource=source('js/core/game-catalog.js');
 assert(gameCatalogSource.includes('game.lock.requiresPick&&failedPlayerAttempt'),'Failed pickless puzzles must not consume a pick.');
 const defeat=source('js/core/game-defeat.js');
 assert(defeat.includes("reason==='picks'"),'Out-of-picks defeat must have a dedicated return-to-lair flow.');
+// Case upgrades preserve older saves and never allow more than six tools.
+const pickStateSource=source('js/core/state.js');
+const loadCaseSource=pickStateSource.slice(pickStateSource.indexOf('function loadPickProgress(){'),pickStateSource.indexOf('let pickProgress='));
+for(const [saved,expected] of [[3,3],[4,4],[5,5],[6,6],[7,6],[undefined,3]]){
+  const loaded=runInNewContext(`${loadCaseSource};loadPickProgress()`,{STORE:{getJSON:()=>({capacity:saved})}});
+  assert(loaded.capacity===expected,`Saved case ${saved} must load with ${expected} slots.`);
+}
+const caseResourceSource=source('js/core/resources.js');
+const upgradeCaseSource=caseResourceSource.slice(caseResourceSource.indexOf('function upgradeKeynlockCase(){'),caseResourceSource.indexOf('window.KeynlockResources='));
+const caseContext={pickProgress:{capacity:3},balance:10000,window:{KeynlockContent:{economy:{caseUpgradePrice:2500}}},STORE:{setItem(){},setJSON(){}},updateEconomyUI(){},saveKeynlockResources(){},renderInventoryTools(){},toast(){}};
+caseContext.resourceCaseCapacity=()=>caseContext.pickProgress.capacity;
+for(const expected of [4,5,6]){
+  assert(runInNewContext(`${upgradeCaseSource};upgradeKeynlockCase()`,caseContext)===true,'Case upgrade must succeed.');
+  assert(caseContext.pickProgress.capacity===expected,`Case must upgrade to ${expected} slots.`);
+}
+assert(runInNewContext(`${upgradeCaseSource};upgradeKeynlockCase()`,caseContext)===false,'A six-slot case cannot be upgraded again.');
+assert(caseContext.balance===2500,'Only the three valid upgrades may charge coins.');
+
 const inventoryGuard=source('js/core/inventory-hit-testing.js');
 for(const mode of ['classic','sequence','special','turnmemory'])assert(inventoryGuard.includes(`'${mode}'`),`Typed tension guard is missing ${mode}.`);
 const pigmentMixing=source('js/world/alchemy-pigments.js');
@@ -154,6 +198,21 @@ const damageContext={
 runInNewContext(`function damagePick(${damageSource}\nthis.damagePick=damagePick;`,damageContext);
 const harmless=damageContext.damagePick({resetProgress:()=>resetCount++,renderState:()=>renderCount++});
 assert(!harmless.depleted&&consumed===0&&resetCount===1&&renderCount===1,'Logic failure must preserve picks and execute feedback/reset.');
+
+// First-mission protection applies to both random and forced break paths.
+const protectedDamageContext={...damageContext,mode:'wharf',picks:1,solved:false,
+  GameCatalog:{feature:()=>true},SFX:{survive(){}},
+  window:{KeynlockMissions:{protectsLastPick:()=>true},KeynlockResources:{consumePicks(){throw new Error('Protected pick was consumed');}}}
+};
+const forceSource=source('js/core/ui.js').split('  function forceBreakOnePick(')[1].split('  window.forceBreakOnePick')[0];
+runInNewContext(`function damagePick(${damageSource}\nfunction forceBreakOnePick(${forceSource}\nthis.damagePick=damagePick;this.forceBreakOnePick=forceBreakOnePick;`,protectedDamageContext);
+let protectedResets=0,protectedRenders=0;
+for(let attempt=0;attempt<10;attempt++){
+  const result=protectedDamageContext.damagePick({forceBreak:true,resetProgress:()=>protectedResets++,renderState:()=>protectedRenders++});
+  assert(result.protected&&!result.broke&&!result.depleted,'The first mission must preserve the last pick even on forced damage.');
+  assert(protectedDamageContext.forceBreakOnePick()===false,'Premature opening cannot break the protected pick.');
+}
+assert(protectedDamageContext.picks===1&&protectedResets===10&&protectedRenders===10,'Protected mistakes must still reset and render the puzzle.');
 
 // Resource recovery is available only when all normal ways of buying/crafting
 // are exhausted, and cannot be repeatedly claimed while parts remain.
@@ -184,6 +243,12 @@ assert(recoveryResources.parts===0,'Recovery must be unavailable when a pick can
 recoveryContext.balance=0;recoveryContext.lairOpen=false;
 resourceClick('#salvagePickButton');
 assert(recoveryResources.parts===0,'Recovery must only work in the lair.');
+recoveryContext.window.KeynlockMissions={protectsLastPick:()=>true};
+recoveryResources.picks=3;
+assert(recoveryContext.window.KeynlockResources.consumePicks(3)===2&&recoveryResources.picks===1,'Mass tool loss must preserve one tutorial pick.');
+assert(recoveryContext.window.KeynlockResources.consumePicks(1)===0&&recoveryResources.picks===1,'Repeated loss must preserve the last tutorial pick.');
+recoveryContext.window.KeynlockMissions.protectsLastPick=()=>false;
+assert(recoveryContext.window.KeynlockResources.consumePicks(1)===1&&recoveryResources.picks===0,'Ordinary play must still consume the last pick.');
 console.log('Chapter safety OK — pickless damage and exhausted-player recovery.');
 
 // Exercise launch/retry/credit with the real mission controller, including
@@ -202,6 +267,31 @@ const missionContext={
 };
 runInNewContext(source('js/world/missions.js'),missionContext);
 const missionService=missionContext.window.KeynlockMissions;
+// Returning home must preserve the terminal round state, so Continue retries it.
+missionService.start('wharf',1,{guided:true,orderId:'wharf-1',stepId:'main'});
+const defeatedRound=missionService.active.roundId;
+missionContext.solved=true;missionContext.inactive=true;
+missionContext.openLairFromHud=()=>{missionContext.lairOpen=true;};
+missionContext.closeLair=()=>{missionContext.lairOpen=false;};
+missionContext.setGameInactive=value=>{missionContext.inactive=value;};
+const returnHomeCallback=source('js/core/state.js').match(/onReturnToLair:(.*?)\}\),/)[1];
+runInNewContext(`(${returnHomeCallback})()`,missionContext);
+assert(missionContext.solved&&missionContext.lairOpen,'Returning home after defeat must keep the round finished.');
+assert(missionService.resume()&&missionService.active.roundId>defeatedRound&&!missionContext.solved,'Continue after defeat must start a fresh round.');
+assert(missionService.active.guided&&missionService.active.orderId==='wharf-1','Retry must retain the active order.');
+
+assert(missionService.start('wharf',1)===true&&missionService.protectsLastPick(),'First waterfront mission must protect the last pick without requiring guidance.');
+assert(missionService.retry()&&missionService.protectsLastPick(),'Protection must survive a retry.');
+missionContext.mode='museum';
+assert(!missionService.protectsLastPick(),'A stale first-mission run must not protect other games.');
+missionService.start('wharf',2);
+assert(!missionService.protectsLastPick(),'Higher waterfront levels must not get tutorial protection.');
+missionService.start('wharf',1);missionContext.solved=true;missionContext.inactive=true;
+missionContext.window.markMissionCleared();
+assert(missionWrites.get('lockpickMissions')['wharf-1'],'First victory must persist completion.');
+missionService.start('wharf',1);
+assert(!missionService.protectsLastPick(),'Replaying a completed first mission must use normal break rules.');
+missionEvents.length=0;
 assert(missionService.start('keyprofile',1,{guided:true,orderId:'keyprofile-1',stepId:'main'})===true,'Guided mission must launch.');
 const firstRound=missionService.active.roundId;
 assert(missionService.retry()&&missionService.active.roundId>firstRound&&missionService.active.guided,'Retry must preserve the guided mission and create a new round.');
@@ -322,8 +412,8 @@ assert(pipeFailureContext.picks===0&&pipeFailureContext.spent===3&&pipeFailureCo
 assert(pipeFailureContext.slots.join() === '3,2,1'&&pipeFailureContext.failure.reason==='picks','Pipe failure must animate every carried pick and return the player to the lair.');
 
 // Guard penalties are applied once per defeat, persist, and always lead home.
-for(const [roll,coins,expectedCoins,expectedPicks] of [[0,101,101,0],[.4,101,50,7],[.9,101,0,7],[.4,0,0,7]]){
-  const elements=Object.fromEntries(['Title','Text','Restart'].map(name=>['#gameDefeat'+name,{textContent:'',addEventListener(type,fn){this.click=fn;},focus(){}}]));
+for(const [roll,coins,expectedCoins,expectedPicks] of [[0,101,101,0],[.4,101,50,7],[.9,101,0,7],[0,0,0,0],[.4,0,0,0],[.9,0,0,0]]){
+  const elements=Object.fromEntries(['Title','Text','Restart','Loss','LossValue'].map(name=>['#gameDefeat'+name,{textContent:'',hidden:false,setAttribute(){},addEventListener(type,fn){this.click=fn;},focus(){}}]));
   const resourceState={picks:7};const saved={};let home=0;
   const context={Math:Object.assign(Object.create(Math),{random:()=>roll}),balance:coins,picks:3,
     STORE:{setItem:(key,value)=>saved[key]=value},updatePickUI(){},updateEconomyUI(){},
@@ -335,9 +425,32 @@ for(const [roll,coins,expectedCoins,expectedPicks] of [[0,101,101,0],[.4,101,50,
   assert(elements['#gameDefeatText'].textContent.startsWith('Вы привлекли внимание шумным взломом.'),'Guard introduction missing.');
   assert(elements['#gameDefeatRestart'].textContent==='Вернуться в логово','Guard action must lead home.');
   elements['#gameDefeatRestart'].click();assert(home===1,'Guard defeat did not return home.');
-  if(roll>0)assert(saved.lockpickBalance===String(expectedCoins),'Guard coin penalty was not persisted.');
+  if(roll>0&&coins>0)assert(saved.lockpickBalance===String(expectedCoins),'Guard coin penalty was not persisted.');
+  if(coins===0){
+    assert(elements['#gameDefeatText'].textContent.includes('Вы сбежали'),'A penniless player must escape with lost tools.');
+    assert(elements['#gameDefeatLoss'].hidden,'A penniless player must not see a zero-coin loss.');
+  }
 }
 console.log('Guard encounters OK — three outcomes, zero coins, odd rounding, single charge and return home.');
+
+// Resonance charges only misses, forces a break and never makes rewards negative.
+const resonanceSource=source('js/modes/resonance.js');
+const resonanceHit=resonanceSource.slice(resonanceSource.indexOf('function hitResonance(){'),resonanceSource.indexOf('function tickResonance('));
+const resonanceContext={solved:false,rsReady:false,rsIndex:0,rsPinCount:4,moves:0,runReward:100,position:50,broken:0,toolMotionController:{impulse(){}},SFX:{move(){},ready(){},wrongLock(){}},diffStep:()=>5,renderResonance(){},animateRewardDrop(){},updateEconomyUI(){}};
+resonanceContext.rsPos=()=>resonanceContext.position;
+resonanceContext.damagePick=options=>{assert(options.forceBreak===true,'A resonance miss must always break a pick.');resonanceContext.broken++;options.resetProgress();options.renderState();};
+runInNewContext(resonanceHit+';this.hit=hitResonance;this.open=tryOpenResonance;',resonanceContext);
+resonanceContext.hit();
+assert(resonanceContext.runReward===100&&resonanceContext.broken===0,'Correct resonance hits must not reduce rewards or break picks.');
+resonanceContext.position=80;resonanceContext.hit();
+assert(resonanceContext.runReward===80&&resonanceContext.broken===1,'One resonance miss must cost exactly 20 reward coins and one pick.');
+resonanceContext.position=50;resonanceContext.hit();
+assert(resonanceContext.runReward===80,'Correct hits must not restore an earlier penalty.');
+resonanceContext.position=80;for(let i=0;i<6;i++)resonanceContext.hit();
+assert(resonanceContext.runReward===0,'Resonance reward cannot fall below zero.');
+resonanceContext.runReward=100;const beforeEarlyOpen=resonanceContext.broken;resonanceContext.open();
+assert(resonanceContext.runReward===80&&resonanceContext.broken===beforeEarlyOpen+1,'Opening an unfinished resonance lock must apply one miss penalty.');
+
 
 const progressionRewardContext={window:{KeynlockContent:content}};
 runInNewContext(source('js/core/reward-policy.js'),progressionRewardContext);
@@ -364,3 +477,36 @@ await import("./story-check.mjs");
 await import("./audio-check.mjs");
 
 await import("./release-fixes-check.mjs");
+await import("./asset-preload-check.mjs");
+
+// Guard artwork follows the current encounter, never a stale caught class.
+const guardClasses=new Set(['caught','watching']);
+const guardVisualContext={guardFace:{style:{setProperty(){}},classList:{toggle(name,on){if(on)guardClasses.add(name);else guardClasses.delete(name);}}},
+  guardsActive:()=>true,solved:true,noiseLevel:1,NOISE_WARN:.68,gameDefeat:{isActive:()=>false,reason:'noise'}};
+const guardRenderSource=source('js/world/guards.js').split('  function renderGuardFace(){')[1].split('  function buildNoiseMeter')[0];
+runInNewContext(`function renderGuardFace(){${guardRenderSource};this.renderGuardFace=renderGuardFace;`,guardVisualContext);
+guardVisualContext.renderGuardFace();
+assert(guardClasses.size===0,'Guard portrait must disappear after a completed encounter and on victory.');
+guardVisualContext.gameDefeat.isActive=()=>true;
+guardVisualContext.renderGuardFace();
+assert(guardClasses.has('caught'),'An active guard defeat may show the guard portrait.');
+guardVisualContext.guardsActive=()=>false;
+guardVisualContext.renderGuardFace();
+assert(guardClasses.size===0,'The lair must hide the guard portrait even before a retry.');
+console.log('Guard retry lifecycle OK — finished round, fresh retry and portrait cleanup.');
+
+// Reagent hit testing uses a small screen-space tolerance around discovered UV
+// pixels, including transparent holes, resized canvases and painting edges.
+const reagentSource=source('js/world/restoration.js').split('  function reagentPoint(event){')[1].split('  function applyDiagnosticReagent')[0];
+for(const scale of [.5,1,2]){
+  const marks=new Map([['20,20',255],['0,0',255],['40,40',20]]);
+  const scan={width:80,height:100,getBoundingClientRect:()=>({left:100,top:200,width:80*scale,height:100*scale}),getContext:()=>({getImageData(left,top,w,h){const data=new Uint8ClampedArray(w*h*4);for(let y=0;y<h;y++)for(let x=0;x<w;x++)data[(y*w+x)*4+3]=marks.get(`${left+x},${top+y}`)||0;return {data};}})};
+  const ctx={elements:{scan}};
+  runInNewContext(`function reagentPoint(event){${reagentSource};this.hit=reagentPoint;`,ctx);
+  const hit=ctx.hit({clientX:100+20*scale+6,clientY:200+20*scale});
+  assert(hit?.x===20&&hit?.y===20,'A six-pixel miss beside a discovered stain must still hit at every scale.');
+  assert(ctx.hit({clientX:100+20*scale+9,clientY:200+20*scale})===null,'Distant clicks must not activate stains.');
+  assert(ctx.hit({clientX:100,clientY:200})?.x===0,'Stains on canvas edges must remain clickable.');
+  assert(ctx.hit({clientX:100+40*scale,clientY:200+40*scale})===null,'Unrevealed or transparent pixels cannot be activated.');
+}
+console.log('Reagent precision OK — nearby discovered stains, scaling, edges and rejected empty clicks.');

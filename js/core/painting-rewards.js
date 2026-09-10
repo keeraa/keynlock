@@ -14,6 +14,30 @@
     return [...owned];
   }
 
+  function createQuiz(painting,paintings,{random=Math.random}={}){
+    const titles=new Set([painting.title]);
+    const others=paintings.filter(item=>{
+      if(titles.has(item.title))return false;
+      titles.add(item.title);return true;
+    });
+    const shuffle=items=>{
+      for(let i=items.length-1;i>0;i--){
+        const j=Math.floor(random()*(i+1));
+        [items[i],items[j]]=[items[j],items[i]];
+      }
+      return items;
+    };
+    const choices=shuffle([painting,...shuffle(others).slice(0,3)])
+      .map(({id,title})=>({id,title}));
+    let answered=false;
+    return {choices,answer(id){
+      if(answered||!choices.some(item=>item.id===id))return null;
+      answered=true;
+      const correct=id===painting.id;
+      return {correct,coins:correct?50:0};
+    }};
+  }
+
   function award({run,currentRoundId,currentMode,missionsDone,missionPlaces,paintings,lootTable,random=Math.random}={}){
     if(!run||run.roundId!==currentRoundId||currentMode!==run.mode)return null;
     const place=missionPlaces.find(item=>item.mode===run.mode);
@@ -30,5 +54,5 @@
   }
 
   load();
-  window.KeynlockPaintingRewards=Object.freeze({award,ownedIds,reload:load});
+  window.KeynlockPaintingRewards=Object.freeze({award,ownedIds,createQuiz,reload:load});
 })();

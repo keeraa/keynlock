@@ -1,7 +1,27 @@
+  function syncGameDifficultySwitch(){
+    const supported=GameCatalog.get(mode)?.difficulty.levels||[];
+    const current=getModeDifficulty(mode);
+    document.querySelectorAll('#gameDifficultySwitch button').forEach(button=>{
+      const tier=Number(button.dataset.gameTier);
+      button.disabled=!supported.includes(tier);
+      button.setAttribute('aria-pressed',String(tier===current&&supported.includes(tier)));
+      button.dataset.tip=button.disabled?'Этот уровень недоступен':`Уровень ${button.textContent}`;
+    });
+  }
+  document.querySelector('#gameDifficultySwitch')?.addEventListener('click',event=>{
+    const button=event.target.closest('button[data-game-tier]');
+    if(!button||button.disabled||isWorldPaused())return;
+    const tier=Number(button.dataset.gameTier);
+    if(tier===getModeDifficulty(mode)||!GameCatalog.get(mode)?.difficulty.levels.includes(tier))return;
+    if(window.KeynlockMissions?.active)window.KeynlockMissions.start(mode,tier);
+    else setModeDifficulty(tier,mode);
+  });
+
   function updateModeUI(){
     if($mapTab) $mapTab.classList.toggle('active',mapOpen);
 
     syncModePanels(mode);
+    syncGameDifficultySwitch();
     const isImported=IMPORTED_MODES.has(mode);
     $scene.classList.toggle('hideBase',isImported);
     document.body.classList.toggle('importedMode',isImported);

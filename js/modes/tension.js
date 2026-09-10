@@ -7,20 +7,36 @@
     $tnNeedle.style.left=`${tnTension}%`;
     $tnBand.style.left=`${tnTarget-tnWidth/2}%`;
     $tnBand.style.width=`${tnWidth}%`;
-    const pinSkin=currentPinSkin();
-    const frag=document.createDocumentFragment();
-    for(let i=0;i<tnPinCount;i++){
-      const p=document.createElement('div');
-      p.className='tnPin'+(i===tnIndex&&!tnReady?' active':'')+(i<tnIndex?' set':'');
-      p.innerHTML=`<div class="tnPinStem"></div><div class="tnPinHead"></div><img class="tnPinImg" src="${pinSkin}" alt="">`;
-      frag.appendChild(p);
+    document.body.style.setProperty('--tension-shell-size',`${430+(tnPinCount-4)*90}px`);
+    if($tnPins.children.length!==tnPinCount){
+      const frag=document.createDocumentFragment();
+      for(let i=0;i<tnPinCount;i++){
+        const p=document.createElement('button');
+        p.type='button';p.className='tnPin';
+        p.innerHTML='<img class="tnPinImg" alt="" draggable="false">';
+        p.addEventListener('click',()=>{if(i===tnIndex)setTensionPin();});
+        frag.appendChild(p);
+      }
+      $tnPins.replaceChildren(frag);
     }
-    $tnPins.replaceChildren(frag);
+    [...$tnPins.children].forEach((pin,i)=>{
+      pin.classList.toggle('active',i===tnIndex&&!tnReady);
+      pin.classList.toggle('set',i<tnIndex);
+      pin.disabled=solved||tnReady||i!==tnIndex;
+      pin.setAttribute('aria-label',`Штифт ${i+1}: ${i<tnIndex?'зафиксирован':i===tnIndex?'зафиксировать':'ожидает очереди'}`);
+      const img=pin.firstElementChild;
+      if(img.getAttribute('src')!==currentGamePinSkin())img.src=currentGamePinSkin();
+    });
+    $mechanism.classList.toggle('ready',tnReady&&!solved);
     if(solved) $tnMessage.textContent='Замок открыт';
     else if(tnReady) $tnMessage.textContent='Все штифты выставлены — нажми на замок';
-    else $tnMessage.textContent=tnInBand()?'Натяжение в рабочей зоне · W / ↑ / Space — поставить штифт':'A / D — удерживай натяжение в зелёной зоне';
+    else $tnMessage.textContent=tnInBand()?'Нажми на подсвеченный штифт или пробел':'A / D или перетаскивание — натяжение в зелёную зону';
   }
   function startTensionRound(){
+    chooseGamePinSkin();
+    tnDragging=false;
+    $lock.classList.remove('win');
+    $mechanism.classList.remove('ready','opening','opened');
     solved=false; picks=pickCapacity; moves=0; brokenPicks=0; runReward=100;
     tnPinCount=diffStep(4,5,6,'tension');
     tnTension=rand(28,60); tnTarget=rand(25,75); tnWidth=rand(diffStep(22,14,10,'tension'),diffStep(32,22,16,'tension')); tnIndex=0; tnReady=false;
@@ -34,6 +50,7 @@
   }
   function setTensionPin(){
     if(solved||tnReady) return;
+    nudgeTools();
     registerMove();
     if(tnInBand()){
       tnIndex++; SFX.move();
@@ -53,14 +70,23 @@
   function tryOpenTension(){
     if(solved) return;
     if(!tnReady){ SFX.wrongLock(); toast('Сначала выставь все штифты'); return; }
-    solved=true; SFX.open(); renderTension(); setTimeout(()=>celebrate(),420);
+    solved=true; tnDragging=false; SFX.open(); renderTension();
+    $lock.classList.add('win');
+    $mechanism.classList.add('opening');
+    scheduleRoundAction(()=>{
+      $mechanism.classList.remove('opening');
+      $mechanism.classList.add('opened');
+      celebrate();
+    },1000);
   }
 
   function tickTension({dt}){
     if(solved||tnReady) return;
+    const wasInBand=tnInBand();
     tnTension+=tnDrift*(dt/16.67);
     if(tnTension<2){tnTension=2;tnDrift=Math.abs(tnDrift);}
     if(tnTension>98){tnTension=98;tnDrift=-Math.abs(tnDrift);}
+    if(wasInBand!==tnInBand())renderTension();
     if($tnNeedle) $tnNeedle.style.left=`${tnTension}%`;
   }
 
@@ -73,10 +99,10 @@
     renderTension();
   });
   $tnGauge?.addEventListener('pointermove',e=>{
-    if(!tnDragging||mode!=='tension') return;
+    if(!tnDragging||mode!=='tension'||solved||tnReady) return;
     const r=$tnGauge.getBoundingClientRect();
     tnTension=clamp((e.clientX-r.left)/r.width*100,0,100);
-    if($tnNeedle) $tnNeedle.style.left=`${tnTension}%`;
+    renderTension();
   });
   $tnGauge?.addEventListener('pointerup',()=>{tnDragging=false;});
   $tnGauge?.addEventListener('pointercancel',()=>{tnDragging=false;});

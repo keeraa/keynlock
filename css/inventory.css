@@ -1,6 +1,6 @@
-.inventoryDrawer{--inv-peek:56px;--inv-shift-x:10%;--inv-open-y:20%;--case-body-center-x:40.5%;--pick-rail-left:calc(3.368% - 5px - 0.414%);--pick-rail-width:21.50571264%;--tension-rail-left:53.8%;--tension-rail-width:22.902672%;--avatar-left:25.7%;--avatar-top:10.5%;--avatar-width:35.5%;--avatar-height:82.8%;position:fixed;left:50%;bottom:0;width:min(1180px,calc(100vw - 48px));max-width:calc(100vw - 48px);aspect-ratio:1436 / 344;z-index:215;overflow:visible;user-select:none;transform:translate(calc(-50% + var(--inv-shift-x)),calc(100% - var(--inv-peek) - var(--inv-approach, 0px)));transition:transform .34s cubic-bezier(.22,.78,.22,1),opacity .18s ease,filter .18s ease;}
+.inventoryDrawer{--inv-peek:56px;--inv-shift-x:10%;--inv-open-y:20%;--case-body-center-x:40.5%;--pick-rail-left:2.0195%;--pick-rail-width:25.9053%;--tension-rail-left:53.8%;--tension-rail-width:22.902672%;--avatar-left:25.7%;--avatar-top:10.5%;--avatar-width:35.5%;--avatar-height:82.8%;position:fixed;left:50%;bottom:0;width:min(1180px,calc(100vw - 48px));max-width:calc(100vw - 48px);aspect-ratio:1436 / 344;z-index:215;overflow:visible;user-select:none;transform:translate(calc(-50% + var(--inv-shift-x)),calc(100% - var(--inv-peek) - var(--inv-approach, 0px)));transition:transform .34s cubic-bezier(.22,.78,.22,1),opacity .18s ease,filter .18s ease;}
 .inventoryDrawer:not(.open){transition:transform .16s cubic-bezier(.22,.78,.22,1),opacity .18s ease,filter .18s ease;}
-.inventoryDrawer.open{transform:translate(calc(-50% + var(--inv-shift-x)),var(--inv-open-y));}
+.inventoryDrawer.open{transform:translate(calc(-50% + var(--inv-shift-x)),calc(var(--inv-open-y) - (100% - var(--inv-peek) - var(--inv-open-y)) * .2));}
 #objectiveLine.difficulty{z-index:205!important;}
 body.inventory-open #objectiveLine{visibility:hidden!important;opacity:0!important;pointer-events:none!important;}
 .inventoryDrawer:not(.open):hover{filter:brightness(1.05);}
@@ -11,16 +11,16 @@ body.inventory-open #objectiveLine{visibility:hidden!important;opacity:0!importa
 /* Open, the strip sits between the rails instead of across them. It paints above
    the tools, and the tension art reaches up into it, so a wider strip swallowed
    presses aimed at four of the five tensioners and shut the case. Pick art ends
-   at 15.6% and tension art starts at 48.6%, so this band touches neither. */
+   at 27.9% and tension art starts at 48.6%, so this band touches neither. */
 .inventoryDrawer.open .inventoryToggle{left:32%;width:30%;}
 .inventoryCaseBack,.inventoryCaseFront{position:absolute;inset:0;width:100%;height:100%;background-position:center bottom;background-repeat:no-repeat;background-size:100% auto;pointer-events:none;}
 .inventoryCaseBack{z-index:1;background-image:url("../assets/inventory/lockpick-case-back.png");filter:drop-shadow(0 -8px 18px rgba(0,0,0,.26));}
 .inventoryCaseFront{z-index:3;background-size:100% auto;background-position:center bottom;background-image:url("../assets/inventory/lockpick-case-front.png");}
-.inventoryContents{position:absolute;inset:0;z-index:2;overflow:visible;pointer-events:none;opacity:1;transition:opacity .16s ease;}
+.inventoryContents{position:absolute;inset:0;z-index:2;overflow:visible;clip-path:inset(-150% -50% 10% -50%);pointer-events:none;opacity:1;transition:opacity .16s ease;}
 .inventoryTools{position:absolute;top:31%;bottom:6.5%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));column-gap:0.393700787%;align-items:end;overflow:visible;opacity:1;z-index:2;pointer-events:auto;}
-.inventoryToolsPick{left:var(--pick-rail-left);width:var(--pick-rail-width);}
+.inventoryToolsPick{left:var(--pick-rail-left);width:var(--pick-rail-width);column-gap:0;}
 .inventoryToolsTension{left:var(--tension-rail-left);width:var(--tension-rail-width);}
-.inventoryTool{position:relative;width:100%;height:100%;min-width:0;padding:0;border:0;outline:0;background:transparent;display:flex;justify-content:center;align-items:flex-end;overflow:visible;cursor:pointer;pointer-events:auto;transition:transform .17s ease,filter .17s ease,opacity .28s ease;}
+.inventoryTool{position:relative;width:100%;height:100%;min-width:0;padding:0;border:0;outline:0;background:transparent;display:flex;justify-content:center;align-items:flex-end;overflow:visible;cursor:pointer;pointer-events:auto;transition:transform .42s cubic-bezier(.25,.1,.25,1),filter .32s ease,opacity .28s ease;}
 .inventoryTool.hidden-slot{opacity:0;pointer-events:none;filter:none;}
 .inventoryTool.breaking-out{opacity:0;pointer-events:none;transform:translateY(-18px) scale(.92);}
 .inventoryTool.breaking-out img{filter:drop-shadow(0 7px 8px rgba(0,0,0,.30));}
@@ -35,7 +35,7 @@ body.pick-reforming .mechanismZone .pick,body.pick-reforming .sharedModeLockArt 
    by exactly half of the old height, keeping the computed top edge unchanged:
    100 - 27.2312 - 126.1596 = 100 - (-35.8486) - 189.2394. */
 .inventoryTool-pick img{left:50%;bottom:-35.8486%;width:185.528825%;height:189.2394%;transform:translateX(-50%) translateY(calc(-1 * var(--tool-lift))) rotate(180deg);transform-origin:50% 50%;}
-.inventoryToolsPick .inventoryTool-pick img{width:138%;}
+.inventoryToolsPick .inventoryTool-pick img{width:100%;}
 .inventoryTool-tension img{left:50%;bottom:34%;width:294.117647%;height:100%;transform:translateX(-50%) translateY(calc(-1 * var(--tool-lift))) rotate(90deg);transform-origin:50% 50%;}
 /* The lift is folded into each image's own transform, never applied to the
    button: lifting the button moved it out from under the pointer, which dropped
@@ -45,7 +45,7 @@ body.pick-reforming .mechanismZone .pick,body.pick-reforming .sharedModeLockArt 
 .inventoryTool{--tool-lift:0px;}
 .inventoryTool.visual-hover,.inventoryTool.selected{--tool-lift:var(--inventory-item-lift);z-index:8;}
 .inventoryToolsTension .inventoryTool.selected{--tool-lift:20px;}
-.inventoryTool img{transition:transform .17s ease,filter .17s ease;}
+.inventoryTool img{transition:transform .42s cubic-bezier(.25,.1,.25,1),filter .32s ease;}
 .inventoryTool.visual-hover{filter:brightness(1.08);}
 .inventoryTool.selected img{filter:drop-shadow(0 8px 10px rgba(0,0,0,.46)) drop-shadow(0 0 10px rgba(226,188,101,.34));}
 .inventoryDrawer,.inventoryContents,.inventoryToggle,.inventoryTool{-webkit-tap-highlight-color:transparent;}
@@ -65,7 +65,7 @@ body.game-inactive .inventoryDrawer{filter:saturate(.6) brightness(.76);pointer-
 body:not(.inventory-open) #objectiveLine.difficulty{bottom:42px!important;}
 }
 @media (max-width:760px){
-.inventoryDrawer{--inv-peek:42px;--inv-open-y:18%;--pick-rail-left:calc(3.368% + 3px - 0.414%);width:min(96vw,calc(100vw - 16px));max-width:calc(100vw - 16px);}
+.inventoryDrawer{--inv-peek:42px;--inv-open-y:18%;width:min(96vw,calc(100vw - 16px));max-width:calc(100vw - 16px);}
 .inventoryAvatar{top:10%;height:80.4%;}
 .inventoryAvatar img{height:228%;transform:translateY(6%);}
 body:not(.inventory-open) #objectiveLine.difficulty{bottom:38px!important;}
@@ -90,9 +90,8 @@ body.game-inactive.solved-notice-visible .solvedPuzzleOverlay{opacity:1;visibili
 .lootRow{display:flex;align-items:center;justify-content:center;gap:5px;}
 .lootRow b{color:#edd19a;}
 .lootResourceIcon{width:20px;height:20px;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6));}
-.lootRare{margin-top:4px;color:#d8b365;text-shadow:0 0 10px rgba(216,179,101,.24);}
 .lootPainting{display:grid;grid-template-columns:100px minmax(0,1fr);gap:9px;align-items:center;margin-top:5px;padding:7px 9px;border:1px solid rgba(210,166,93,.5);border-radius:9px;background:rgba(83,57,27,.35);text-align:left;}
-.lootPainting>img{width:100px;height:76px;border-radius:4px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.5);}
+.lootPainting>img{width:100%;height:180px;border-radius:4px;object-fit:contain;}
 .lootPainting span{display:grid;gap:2px;min-width:0;}.lootPainting small{color:#aa8a54;font:700 10.4px/1 var(--ui-font);letter-spacing:.12em;text-transform:uppercase;}.lootPainting b{overflow:hidden;color:#efd49d;font:700 14.3px/1.2 var(--ui-font);text-overflow:ellipsis;white-space:normal;}.lootPainting em{color:#a99573;font:normal 11.7px/1.2 var(--ui-font);}
 .lootPainting small{display:flex;align-items:center;gap:5px;}.lootPainting small .lootResourceIcon{width:18px;height:18px;}.solvedPuzzleButton{margin-top:7px;min-width:220px;min-height:44px;padding:10px 18px;font:700 13px/1 var(--ui-font);letter-spacing:.05em;pointer-events:auto;}
 .solvedPuzzleButton:hover{filter:brightness(1.18);border-color:#d2a75d;transform:translateY(-1px);}
@@ -102,8 +101,8 @@ body.game-inactive.solved-notice-visible .solvedPuzzleOverlay{opacity:1;visibili
 @media (max-width:760px){
   .inventoryDrawer.inventoryDrawer{
     --inv-shift-x:0%;
-    --pick-rail-left:5.01%;
-    --pick-rail-width:36.45%;
+    --pick-rail-left:3.4226%;
+    --pick-rail-width:43.9038%;
     --tension-rail-left:52.20%;
     --tension-rail-width:38.82%;
     --inv-peek:58px!important;
@@ -122,8 +121,8 @@ body.game-inactive.solved-notice-visible .solvedPuzzleOverlay{opacity:1;visibili
   .inventoryCaseBack::after{right:0;width:50.85%;background-image:url("../assets/inventory/lockpick-case-back.png");background-size:333.3% 100%;background-position:74.29% top;}
   .inventoryCaseFront::before{left:0;width:49.15%;background-image:url("../assets/inventory/lockpick-case-front.png");background-size:344.8% auto;background-position:0.00% bottom;}
   .inventoryCaseFront::after{right:0;width:50.85%;background-image:url("../assets/inventory/lockpick-case-front.png");background-size:333.3% auto;background-position:74.29% bottom;}
-  /* Rails land at 5.0-41.5% and 52.2-91.0%, so the strip goes between them. */
-  .inventoryDrawer.open .inventoryToggle{left:42%;width:9%;transform:none;}
+  /* Keep the toggle in the gap between the two tool rails. */
+  .inventoryDrawer.open .inventoryToggle{left:47.5%;width:4.5%;transform:none;}
 }
 
 @media (max-width:760px),(max-height:560px) and (orientation:landscape){
@@ -143,3 +142,13 @@ body.game-inactive.solved-notice-visible .solvedPuzzleOverlay{position:fixed;ins
 .lootHandle .lootHandleArt{position:relative;display:block;width:180px;height:58px;overflow:hidden;}
 .lootHandleArt img{position:absolute;left:50%;top:50%;width:44px;height:166px;object-fit:contain;transform:translate(-50%,-50%) rotate(90deg);filter:drop-shadow(3px 2px 3px rgba(0,0,0,.5));}
 @media(max-width:480px){.lootHandle{grid-template-columns:minmax(0,1fr);}.lootHandle .lootHandleArt{justify-self:center;}}
+
+.solvedPuzzleCard:has(.paintingQuiz){width:min(740px,calc(100vw - 36px));box-sizing:border-box}
+.lootPaintingQuiz{grid-template-columns:1fr;text-align:center}
+.lootPaintingQuiz small{justify-content:center}
+.paintingQuiz{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.paintingQuiz button{min-width:0;min-height:48px;padding:8px 4px;font:600 clamp(10px,1.1vw,14px)/1.25 var(--ui-font);overflow-wrap:anywhere;white-space:normal}
+.paintingQuiz button.correct:disabled{opacity:1;color:#7fe39d;border-color:#7fe39d;background:#213a26}
+.paintingQuiz button.wrong:disabled{opacity:.8;color:#ee9483}
+.lootCoins{position:relative}
+.lootCoinBonus{position:absolute;right:8px;top:0;color:#7fe39d;font-weight:700;pointer-events:none}

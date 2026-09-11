@@ -235,7 +235,14 @@
     }
     plTileEls=[];
     const tiles=plBuildBoard();
-    plTiles=tiles;
+    plTiles=tiles.map(tile=>{
+      tile.type=plCanonical(tile.type);
+      const family=plPipeFamily(tile.type);
+      const variant=1+Math.floor(Math.random()*(family==='X'?2:4));
+      const base=family==='corner'?'NW':'EW';
+      return {...tile,variant,cover:1+Math.floor(Math.random()*2),angle:tile.type==='X'?0:plRotationTo(base,tile.type)*90};
+    });
+    plSizeShell();
     plRevealed=new Set();
     plCursor=plIndex(PL_START.r,PL_START.c);
     plPausedAt=null;
@@ -246,31 +253,26 @@
     renderPipeline();
   }
 
-  function plPipeHtml(type){
-    if(type==='X') return '';
-    return `<div class="plPipe">${type.split('').map(d=>`<span class="plSeg ${d}"></span>`).join('')}<span class="plHub"></span></div>`;
+  // Corner artwork has its joint near the lower-right: map each port centre
+  // to the cell's centreline before rotating the entire square cell. Corners
+  // extend 10% past both connecting edges while keeping their joint centred.
+  const PL_CORNER_SIZE=[[175,171,140,134],[176,171,141,134],[173,176,136,142],[178,176,142,137.5]];
+  function plArt(tile,revealed){
+    const family=revealed?plPipeFamily(tile.type):'X';
+    const variant=revealed?tile.variant:tile.cover;
+    const prefix=family==='corner'?'ugol':family==='straight'?'priyamoy':'tupic';
+    return {family,variant,src:`assets/pipeline/${prefix}_0${variant}.png`};
   }
-
+  function plSizeShell(){
+    const width=PL_COLS*76+40,height=PL_ROWS*76+40;
+    document.body.style.setProperty('--pipeline-shell-width',`${width}px`);
+    document.body.style.setProperty('--pipeline-shell-scale',Math.max(.2,Math.min(.85,(window.innerWidth-110)/width,(window.innerHeight-240)/height)));
+    plAlignPorts();
+  }
   function plAlignPorts(){
-    if(!$plGridWrap || !$plStartPort || !$plExitPort || !$plGrid) return;
-    const tiles=$plGrid.children;
-    const startTile=tiles[plIndex(PL_START.r,PL_START.c)], exitTile=tiles[plIndex(PL_EXIT.r,PL_EXIT.c)];
-    if(!startTile||!exitTile) return;
-    const wr=$plGridWrap.getBoundingClientRect();
-    const gr=$plGrid.getBoundingClientRect();
-    // plGridWrap is a wide centering flex box (needed so plGrid can size
-    // itself off height via aspect-ratio); plGrid is often narrower than
-    // the wrap and centered within it, so the ports must be pinned to
-    // plGrid's actual edges, not the wrap's — plain CSS left:0/right:0
-    // would sit at the wrap's edges and float away from the grid. They
-    // sit just outside the grid (flush against its edge, not overlapping
-    // into the first/last tile) like a pipe stub plugged into the socket.
-    $plStartPort.style.left=`${gr.left-wr.left-$plStartPort.offsetWidth}px`;
-    $plExitPort.style.right=`${wr.right-gr.right-$plExitPort.offsetWidth}px`;
-    [[$plStartPort,startTile],[$plExitPort,exitTile]].forEach(([port,tile])=>{
-      const tr=tile.getBoundingClientRect();
-      port.style.top=`${tr.top-wr.top+(tr.height-port.offsetHeight)/2}px`;
-    });
+    // Use the shell's unscaled grid geometry, including before the mode is visible.
+    if($plStartPort)$plStartPort.style.top=`${20+(PL_START.r+.5)*76}px`;
+    if($plExitPort)$plExitPort.style.top=`${20+(PL_EXIT.r+.5)*76}px`;
   }
 
   function renderPipeline(){
@@ -284,6 +286,7 @@
         const b=document.createElement('button');
         b.type='button';
         b.className='plTile';
+        b.innerHTML='<span class="plPipe"><img class="plPiece" alt="" draggable="false"></span>';
         b.addEventListener('click',()=>plClick(i));
         frag.appendChild(b);
         plTileEls.push(b);
@@ -301,7 +304,24 @@
         +(plVisited.has(i)?' done':'')
         +(plPos && plIndex(plPos.r,plPos.c)===i && plState==='flow' ? ' flow' : '')
         +(waterLocked?' waterLocked':'');
-      el.innerHTML=revealed?plPipeHtml(t.type):'';
+      const art=plArt(t,revealed),piece=el.querySelector('.plPiece'),rotor=el.firstElementChild;
+      if(piece.getAttribute('src')!==art.src)piece.src=art.src;
+      rotor.style.transform=`rotate(${revealed?t.angle:0}deg)`;
+      piece.classList.toggle('corner',art.family==='corner');
+      el.dataset.family=revealed?art.family:'';
+      if(art.family==='corner'){
+        const [w,h,x,y]=PL_CORNER_SIZE[art.variant-1];
+        piece.style.width=`${w/x*60}%`;piece.style.height=`${h/y*60}%`;
+        piece.style.left='-10%';piece.style.setProperty('--pl-axis','0%');
+      }else {
+        const geometry=art.family==='straight'?[[252,127,11,242,62],[256,123,8,253,66],[247,141,4,247,79],[251,108,4,247,55]][art.variant-1]:null;
+        piece.style.height='';
+        piece.style.width=geometry?`${geometry[0]/(geometry[3]-geometry[2])*100}%`:'';
+        piece.style.left=geometry?`${-geometry[2]/(geometry[3]-geometry[2])*100}%`:'';
+        piece.style.setProperty('--pl-axis',geometry?`${geometry[4]/geometry[1]*100}%`:'50%');
+      }
+      el.setAttribute('aria-label',`Секция ${Math.floor(i/PL_COLS)+1}, ${i%PL_COLS+1}: ${!revealed?'раскрыть':t.type==='X'?'тупик':'повернуть'}`);
+      el.dataset.connections=revealed?t.type:'';
     });
     if($plHelp) $plHelp.textContent='';
     renderPipelineHud();
@@ -328,6 +348,7 @@
     if(solved || plState==='won' || !plRevealed.has(i) || plTiles[i].type==='X' || plWaterLocked(i)) return;
     registerMove();
     plTiles[i].type=plRotateType(plTiles[i].type,1);
+    plTiles[i].angle+=90;
     SFX.move();
     renderPipeline();
   }
@@ -444,7 +465,12 @@
     $lock.classList.add('win');
     SFX.open();
     renderPipeline();
-    setTimeout(()=>celebrate(),420);
+    $mechanism.classList.add('opening');
+    scheduleRoundAction(()=>{
+      $mechanism.classList.remove('opening');
+      $mechanism.classList.add('opened');
+      celebrate();
+    },1000);
   }
 
   PuzzleModes.register({
@@ -452,7 +478,7 @@
     start:startPipelineRound,
     render:renderPipeline,
     tick:({now})=>plTick(now),
-    resize:plAlignPorts,
+    resize:plSizeShell,
     syncHud:renderPipelineHud,
     objective:()=>GameCatalog.get('pipeline')?.objective,
     restartMessage:'Новая схема трубопровода',

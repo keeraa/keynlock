@@ -25,7 +25,7 @@
   }
 
   function noiseActive(){
-    return !!GameCatalog.feature(noiseGameId(),'world.noise') && !lairOpen && !mapOpen;
+    return !!GameCatalog.feature(noiseGameId(),'world.noise') && !isWorldPaused('prototype-mechanic-open') && !lairOpen && !mapOpen;
   }
 
   function guardsActive(){
@@ -168,7 +168,7 @@
   let noiseLast = performance.now();
   let noiseWasShowing = null;
   function noiseTick(now){
-    const paused=isWorldPaused()&&!document.body.classList.contains('prototype-mechanic-open');
+    const paused=isWorldPaused('prototype-mechanic-open');
     if(paused){noiseLast=now;setTimeout(()=>requestAnimationFrame(noiseTick),100);return;}
     const dt = Math.min(200, now - noiseLast);
     noiseLast = now;
@@ -246,7 +246,7 @@
   }
 
   function birdsActive(){
-    return !!GameCatalog.feature(mode,'world.birds') && noiseActive() && !solved && !guardsCalled;
+    return !isWorldPaused() && !!GameCatalog.feature(mode,'world.birds') && noiseActive() && !solved && !guardsCalled;
   }
 
   function scheduleBird(){

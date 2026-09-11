@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { runInNewContext } from 'node:vm';
 
@@ -143,6 +143,47 @@ for(const [tier,count] of [[1,4],[2,6],[3,7],[1,4],[2,6],[1,4]]){
   wharfTier=tier;wharfMode.start();
   assert(wharfContext.generatedDistance===count,`Waterfront tier ${tier} must consistently create ${count} pins after switching tiers.`);
 }
+// Every artwork rotation must describe the same ports as the route solver.
+let pipeTier=1,pipeMode;
+const pipeContext={window:{innerWidth:1440,innerHeight:1050,addEventListener(){}},
+  document:{body:{style:{setProperty(){}}}},performance:{now:()=>0},
+  PuzzleModes:{register:definition=>{pipeMode=definition;}},diffStep:(...values)=>values[pipeTier-1],
+  $lock:{classList:{remove(){}}},$mechanism:{classList:{remove(){}}},
+  $plGrid:null,$plGridWrap:null,$plStartPort:null,$plExitPort:null,pickCapacity:3,updateEconomyUI(){}};
+const pipeSource=source('js/modes/pipeline.js').replace('  PuzzleModes.register({',
+  '  window.pipeProbe={tiles:()=>plTiles,paths:()=>plPaths,required:()=>plRequiredPaths,cols:()=>PL_COLS,rotate:plRotateType,turns:plRotationTo,trace:plTraceTiles,family:plPipeFamily,art:plArt};\n  PuzzleModes.register({');
+runInNewContext(pipeSource,pipeContext,{filename:'pipeline.js'});
+const pipe=pipeContext.window.pipeProbe;
+for(const tier of [1,2,3])for(let round=0;round<15;round++){
+  pipeTier=tier;pipeMode.start();
+  assert(pipe.tiles().length===6*[6,8,10][tier-1],'Pipeline grid must follow difficulty.');
+  for(const tile of pipe.tiles()){
+    const family=pipe.family(tile.type),base=family==='corner'?'NW':'EW';
+    if(family!=='X')assert(pipe.rotate(base,tile.angle/90)===tile.type,'Pipeline artwork rotation must match its logical ports.');
+    assert(existsSync(resolve(pipe.art(tile,true).src))&&existsSync(resolve(pipe.art(tile,false).src)),'Pipeline artwork must exist, including hidden covers.');
+  }
+  pipe.paths().forEach((path,index)=>{
+    const tiles=pipe.tiles().map(t=>({...t}));
+    path.forEach(([r,c],j)=>{
+      const tile=tiles[r*pipe.cols()+c],target=pipe.required()[index][j],turns=pipe.turns(tile.type,target);
+      assert(turns>=0,'Generated pipeline route must be orientable.');tile.type=pipe.rotate(tile.type,turns);
+    });
+    assert(pipe.trace(tiles).ok,'Generated pipeline route must connect start and finish.');
+  });
+}
+let flightTier=1,flightMode;
+const flightContext={
+  window:{innerWidth:1440,addEventListener(){}},document:{body:{style:{setProperty(){}}}},
+  PuzzleModes:{register:definition=>{flightMode=definition;}},
+  chooseGamePinSkin(){},diffStep:(...counts)=>counts[flightTier-1],
+  $lock:{classList:{remove(){}}},$mechanism:{classList:{remove(){}}},
+  $obLock:null,pickCapacity:3,updateEconomyUI(){}
+};
+runInNewContext(source('js/modes/pinflight.js'),flightContext,{filename:'pinflight.js'});
+for(const [tier,count] of [[1,5],[2,6],[3,7],[1,5]]){
+  flightTier=tier;flightMode.start();
+  assert(flightContext.generatedDistance===count,`Pinflight tier ${tier} must restore its own pin count.`);
+}
 globalThis.window=rewardContext.window;
 const rewardModule=await import('../js/modules/painting-rewards.mjs');
 assert(rewardModule.getOwnedPaintingIds()[0]==='p1','Painting reward module must expose owned paintings.');
@@ -253,7 +294,7 @@ console.log('Chapter safety OK — pickless damage and exhausted-player recovery
 
 // Exercise launch/retry/credit with the real mission controller, including
 // stale rounds and a repeated completion callback.
-const missionWrites=new Map(),missionEvents=[];
+const missionWrites=new Map(),missionEvents=[],missionDifficulties={};
 const missionContext={
   window:{KeynlockContent:content,KeynlockResources:{state:{picks:3}},dispatchEvent:event=>missionEvents.push(event),addEventListener:()=>{}},
   STORE:{getJSON:()=>null,getItem:()=>null,setJSON:(k,v)=>missionWrites.set(k,JSON.parse(JSON.stringify(v))),setItem:()=>{}},
@@ -262,11 +303,23 @@ const missionContext={
   GameCatalog:gameCatalog,MAP_LOCATIONS:{lair:{}},MAP_CONNECTIONS:{},DISTRICTS:content.world.districts,
   gameDefeat:{isActive:()=>false},mapLocation:'lair',mapOpen:false,lairOpen:false,mode:'museum',solved:false,activeRoundId:0,inactive:false,
   toast:()=>{},renderWorldMap:()=>{},celebrate:()=>{missionContext.inactive=true;},
-  syncModePanels:()=>{},updateModeUI:()=>{},setModeDifficulty:()=>{},getModeDifficulty:()=>1,
+  syncModePanels:()=>{},updateModeUI:()=>{},setModeDifficulty:(tier,id)=>{missionDifficulties[id]=tier;},getModeDifficulty:id=>missionDifficulties[id]||1,
   newLock:()=>{missionContext.activeRoundId++;missionContext.solved=false;missionContext.inactive=false;missionContext.window.onKeynlockRoundStarted?.(missionContext.activeRoundId);}
 };
 runInNewContext(source('js/world/missions.js'),missionContext);
 const missionService=missionContext.window.KeynlockMissions;
+// Selecting one mission's tier must not change another mission or its default.
+missionService.start('pipeline',3);
+missionContext.startMapMission('mission-wharf');
+assert(missionService.active.tier===1&&missionDifficulties.pipeline===3,'Opening another map game must keep its own difficulty.');
+missionService.start('wharf',2);
+missionContext.startMapMission('mission-pipeline');
+assert(missionService.active.tier===3&&missionDifficulties.wharf===2,'Returning from the map must restore that game’s selected difficulty.');
+missionService.start('wharf');
+assert(missionService.active.tier===2,'Launching without an explicit tier must reuse the selected game’s difficulty.');
+missionContext.startMapMission('mission-silhouettes');
+assert(missionService.active.tier===1,'A single-level game must remain playable after a tier-three mission.');
+assert(missionService.start('silhouettes',3)===false&&missionDifficulties.pipeline===3,'Unsupported difficulty must not affect other games.');
 // Returning home must preserve the terminal round state, so Continue retries it.
 missionService.start('wharf',1,{guided:true,orderId:'wharf-1',stepId:'main'});
 const defeatedRound=missionService.active.roundId;
@@ -478,6 +531,39 @@ await import("./audio-check.mjs");
 
 await import("./release-fixes-check.mjs");
 await import("./asset-preload-check.mjs");
+
+// Loading and menus pause hazards, including a strike callback already queued.
+const hazardClasses=new Set(['assets-loading']);
+const hazardEffects=[];
+const hazardContext={document:{hidden:false,body:{dataset:{},classList:{contains:name=>hazardClasses.has(name),remove(){},add(){hazardEffects.push('flash');}}}},
+  mode:'classic',lairOpen:false,mapOpen:false,solved:false,guardsCalled:false,
+  GameCatalog:{feature:()=>true},clearTimeout(){},setTimeout(){hazardEffects.push('timer');return 1;},
+  BIRD_GAP_MIN:14000,BIRD_GAP_MAX:26000,BIRD_NOISE_MIN:.5,BIRD_NOISE_MAX:.8,birdTimer:0,birdState:'warning',
+  sendBird(){},endBird(){hazardContext.birdState='idle';},flashHitFromAbove(){hazardEffects.push('hit');},
+  SFX:{birdHit(){hazardEffects.push('sound');}},toast(){},addNoise(){hazardEffects.push('noise');}};
+const pauseSource=source('js/core/state.js').split('  function syncWorldPauseState(){')[0];
+const hazardSource=source('js/world/guards.js');
+runInNewContext(pauseSource+
+  hazardSource.slice(hazardSource.indexOf('  function noiseGameId(){'),hazardSource.indexOf('  let guardFace'))+
+  hazardSource.slice(hazardSource.indexOf('  function birdsActive(){'),hazardSource.indexOf('  let birdHovered'))+
+  hazardSource.slice(hazardSource.indexOf('  function birdStrike(){'),hazardSource.indexOf('  // Looking up is the same gesture')),hazardContext);
+for(const blocked of ['assets-loading','main-menu-open','game-settings-open','game-defeat']){
+  hazardClasses.clear();hazardClasses.add(blocked);
+  assert(hazardContext.isWorldPaused()&&!hazardContext.noiseActive()&&!hazardContext.birdsActive(),`Hazards must pause during ${blocked}.`);
+  hazardContext.scheduleBird();hazardContext.birdState='warning';hazardContext.birdStrike();
+  assert(hazardEffects.length===0,`No bird timer, hit, sound, shake or noise during ${blocked}.`);
+}
+hazardClasses.clear();
+assert(hazardContext.noiseActive()&&hazardContext.birdsActive(),'Hazards must resume in active gameplay.');
+hazardContext.scheduleBird();hazardContext.birdState='warning';hazardContext.birdStrike();
+assert(hazardEffects.join(',')==='timer,hit,sound,flash,noise','Active gameplay must retain the bird encounter.');
+hazardClasses.add('prototype-mechanic-open');
+assert(hazardContext.noiseActive()&&!hazardContext.birdsActive(),'Prototype gameplay keeps noise but suppresses native birds.');
+hazardClasses.add('assets-loading');
+assert(!hazardContext.noiseActive(),'Loading must also pause a prototype mechanic.');
+hazardClasses.clear();hazardContext.document.hidden=true;
+assert(!hazardContext.noiseActive()&&!hazardContext.birdsActive(),'A background tab must pause hazards.');
+console.log('Startup hazards OK — loading, menus, queued strikes, active play and prototype pause.');
 
 // Guard artwork follows the current encounter, never a stale caught class.
 const guardClasses=new Set(['caught','watching']);

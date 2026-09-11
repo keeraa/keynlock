@@ -2,20 +2,14 @@
   // ===== pinflight (pinflight) =====
   let obPins=[], obSelected=0, obPinEls=[];
   const OB_READY_MIN=76, OB_READY_MAX=112;
-  // Five independent pins. Each one springs upward on its own timer, pauses
-  // briefly right at its own apex height, then falls back down if nothing
-  // happens — clicking/selecting it during that pause sets it in place.
-  // Ported from the old prototype scene (prototypes/lockpicking-mechanics-v63.html,
-  // "Portable game module: pinflight") into a fully native mode: same rise/
-  // pause/fall physics and timing windows, wired through the shared economy
-  // (damagePick/registerMove/diffStep) instead of the prototype's own
-  // LockRuntime/GameHub shims.
 
   function obApex(i){
     const s=obPinEls[i];
     const pin=s?.querySelector('.obPin');
     if(!s||!pin||!s.clientHeight) return 116;
-    return Math.max(58,s.clientHeight-19-pin.offsetHeight-12);
+    const seat=parseFloat(getComputedStyle(s).getPropertyValue('--ob-seat-y'));
+    const height=parseFloat(getComputedStyle(pin).height);
+    return Math.max(0,s.clientHeight-19-height-seat);
   }
 
   function obStartPin(p,i){
@@ -47,18 +41,26 @@
     brokenPicks=0;
     runReward=100;
     obSelected=0;
-    const tiers=[420,520,640,780,930].map(v=>v*.8*(.94+Math.random()*.12));
+    const count=diffStep(5,6,7,'pinflight');
+    const tiers=Array.from({length:count},(_,i)=>420+510*i/(count-1)).map(v=>v*.8*(.94+Math.random()*.12));
     for(let i=tiers.length-1;i>0;i--){
       const j=Math.floor(Math.random()*(i+1));
       [tiers[i],tiers[j]]=[tiers[j],tiers[i]];
     }
-    obPins=Array.from({length:5},(_,i)=>({
+    obPins=Array.from({length:count},(_,i)=>({
       rise:0, state:'idle', phase:0, speed:0, pause:0, set:false,
-      baseSpeed:tiers[i], pinH:(108+Math.random()*52)*.8, apex:116
+      baseSpeed:tiers[i], pinH:(108+Math.random()*52)*.8*1.3, apex:116
     }));
-    generatedDistance=5;
+    generatedDistance=count;
+    sizePinflightShell();
     updateEconomyUI();
     renderPinflight();
+  }
+
+  function sizePinflightShell(){
+    const width=70+obPins.length*77;
+    document.body.style.setProperty('--pinflight-shell-size',`${width}px`);
+    document.body.style.setProperty('--pinflight-mobile-scale',Math.min(.612,(window.innerWidth-48)/(width+110)));
   }
 
   function renderPinflight(){
@@ -67,8 +69,10 @@
       const frag=document.createDocumentFragment();
       obPinEls=[];
       obPins.forEach((p,i)=>{
-        const s=document.createElement('div');
+        const s=document.createElement('button');
+        s.type='button';
         s.className='obSlot';
+        s.setAttribute('aria-label',`Штифт ${i+1}`);
         s.dataset.i=i;
         s.innerHTML=`<img class="obPin" src="${currentGamePinSkin()}" alt="">`;
         s.querySelector('.obPin').style.setProperty('--ob-pin-h',p.pinH.toFixed(1)+'px');
@@ -82,9 +86,21 @@
         frag.appendChild(s);
         obPinEls.push(s);
       });
-      $obLock.replaceChildren(frag);
+      const locker=document.createElement('div');
+      locker.className='wfLockerUp obLockerUp';
+      locker.style.setProperty('--wf-bars',obPins.length);
+      locker.setAttribute('aria-hidden','true');
+      obPins.forEach(()=>{
+        const cell=document.createElement('span');
+        cell.className='wfLockerCell';
+        locker.appendChild(cell);
+      });
+      const lip=document.createElement('img');
+      lip.className='wfLockerLip obLockerLip';
+      lip.src='assets/lock-shell/locker-up-01.png';
+      lip.alt='';
+      $obLock.replaceChildren(locker,frag,lip);
     }
-    let selectedReady=false;
     obPins.forEach((p,i)=>{
       const s=obPinEls[i];
       if(!s) return;
@@ -95,14 +111,10 @@
       s.classList.toggle('set',p.set);
       s.classList.toggle('ready',ready);
       s.classList.toggle('selected',i===obSelected);
-      if(i===obSelected) selectedReady=ready;
+      s.disabled=solved||p.set;
+      s.setAttribute('aria-label',`Штифт ${i+1}${p.set?': зафиксирован':ready?': фиксировать':''}`);
       pin?.style.setProperty('--rise',p.rise.toFixed(1));
     });
-    if(!$obMessage) return;
-    const n=obPins.filter(p=>p.set).length;
-    if(solved) $obMessage.textContent='Замок открыт — все штифты выставлены';
-    else if(selectedReady) $obMessage.textContent='Совпадение — фиксируй сейчас';
-    else $obMessage.textContent=`${n} / 5 · лови точное совпадение с верхней прорезью`;
   }
 
   function obMove(dir){
@@ -187,13 +199,19 @@
     $lock.classList.add('win');
     SFX.open();
     renderPinflight();
-    setTimeout(()=>celebrate(),420);
+    $mechanism.classList.add('opening');
+    scheduleRoundAction(()=>{
+      $mechanism.classList.remove('opening');
+      $mechanism.classList.add('opened');
+      celebrate();
+    },1000);
   }
 
   PuzzleModes.register({
     id:'pinflight',
     start:startPinflightRound,
     render:renderPinflight,
+    resize:sizePinflightShell,
     tick:({dt})=>obTick(Math.min(.035,dt/1000)),
     objective:()=>GameCatalog.get('pinflight')?.objective,
     restartMessage:'Новая попытка: «Штифтовый замок»',

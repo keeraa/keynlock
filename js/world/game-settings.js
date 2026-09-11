@@ -171,7 +171,7 @@
       renderSortIndicators();
     }
 
-    function launchGame(id,level=1){
+    function launchGame(id,level=getModeDifficulty(id)){
       const game=GameCatalog.get(id);
       if(!game?.difficulty.levels.includes(level)){
         toast(`${game?.title||id}: уровень ${level} ещё не готов`);

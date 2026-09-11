@@ -142,7 +142,7 @@ body.lock-shell-active:not(.importedMode) #pinTopPlates{
 }
 
 /* Tools and the physical lock meet at the shell's horizontal mechanism axis. */
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) #lock.universalLockBlock{
+body.lock-shell-active:not([data-game-mode="springtumblers"],[data-game-mode="symbolpins"]) #lock.universalLockBlock{
   left:50%!important;
   top:var(--lock-shell-top)!important;
   width:var(--lock-shell-size)!important;
@@ -153,7 +153,7 @@ body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-gam
   z-index:60!important;
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) #lock.universalLockBlock>.mechanismZone{
+body.lock-shell-active:not([data-game-mode="springtumblers"],[data-game-mode="symbolpins"]) #lock.universalLockBlock>.mechanismZone{
   left:0!important;
   top:0!important;
   width:var(--lock-shell-size)!important;
@@ -162,9 +162,9 @@ body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-gam
   overflow:visible!important;
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .mechanismZone::before{display:none!important;}
+body.lock-shell-active:not([data-game-mode="springtumblers"],[data-game-mode="symbolpins"]) .mechanismZone::before{display:none!important;}
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .lockShellPhysicalLock{
+body.lock-shell-active:not([data-game-mode="springtumblers"],[data-game-mode="symbolpins"]) .lockShellPhysicalLock{
   position:absolute;
   left:calc(var(--lock-shell-size) - 52px);
   top:0;
@@ -174,13 +174,13 @@ body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-gam
   transition:transform .95s cubic-bezier(.2,.78,.2,1),opacity .45s ease;
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .lockShellPhysicalLock .lockPanel{
+body.lock-shell-active:not([data-game-mode="springtumblers"],[data-game-mode="symbolpins"]) .lockShellPhysicalLock .lockPanel{
   position:absolute!important;
   inset:0!important;
   display:none!important;
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .lockShellShackle{
+body.lock-shell-active:not([data-game-mode="springtumblers"],[data-game-mode="symbolpins"]) .lockShellShackle{
   display:block;
   position:absolute;
   left:auto;
@@ -209,7 +209,7 @@ body.lock-shell-active:has(.mechanismZone.opened) .lockShellShackle{
   100%{transform:translate(42px,-70%) rotate(72deg) scale(.97);}
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .lockShellPhysicalLock .lockHitArea{
+body.lock-shell-active:not([data-game-mode="springtumblers"],[data-game-mode="symbolpins"]) .lockShellPhysicalLock .lockHitArea{
   left:0!important;
   top:0!important;
   width:270px!important;
@@ -217,16 +217,16 @@ body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-gam
   transform:none!important;
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .mechanismZone.opening .lockShellPhysicalLock,
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .mechanismZone.opened .lockShellPhysicalLock{
+body.lock-shell-active:not([data-game-mode="springtumblers"],[data-game-mode="symbolpins"]) .mechanismZone.opening .lockShellPhysicalLock,
+body.lock-shell-active:not([data-game-mode="springtumblers"],[data-game-mode="symbolpins"]) .mechanismZone.opened .lockShellPhysicalLock{
   transform:translateX(42px);
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .mechanismZone.opening .lockPanel{
+body.lock-shell-active:not([data-game-mode="springtumblers"],[data-game-mode="symbolpins"]) .mechanismZone.opening .lockPanel{
   animation:none!important;
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .lockShellFunnel{
+body.lock-shell-active:not([data-game-mode="springtumblers"],[data-game-mode="symbolpins"]) .lockShellFunnel{
   display:block;
   position:absolute;
   left:-12px;
@@ -238,27 +238,27 @@ body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-gam
   filter:drop-shadow(0 5px 7px rgba(0,0,0,.42));
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .lockShellFunnelBack{z-index:3;}
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .lockShellFunnelFront{z-index:6;left:-6px;width:54px;}
+body.lock-shell-active:not([data-game-mode="springtumblers"],[data-game-mode="symbolpins"]) .lockShellFunnelBack{z-index:3;}
+body.lock-shell-active:not([data-game-mode="springtumblers"],[data-game-mode="symbolpins"]) .lockShellFunnelFront{z-index:6;left:-6px;width:54px;}
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .mechanismZone .pick{z-index:6!important;}
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .mechanismZone .tension{z-index:5!important;}
+body.lock-shell-active:not([data-game-mode="springtumblers"],[data-game-mode="symbolpins"]) .mechanismZone .pick{z-index:6!important;}
+body.lock-shell-active:not([data-game-mode="springtumblers"],[data-game-mode="symbolpins"]) .mechanismZone .tension{z-index:5!important;}
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .mechanismZone .pick{
+body.lock-shell-active:not([data-game-mode="springtumblers"],[data-game-mode="symbolpins"]) .mechanismZone .pick{
   left:-20px!important;
   top:112px!important;
   transform-origin:50% 6%!important;
   transform:translate(var(--pick-react-x),var(--pick-react-y)) rotate(calc(90deg + var(--pick-rot-drift) + var(--pick-react-rot)))!important;
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .mechanismZone .tension{
+body.lock-shell-active:not([data-game-mode="springtumblers"],[data-game-mode="symbolpins"]) .mechanismZone .tension{
   left:-4px!important;
   top:110px!important;
   transform-origin:6% 50%!important;
   transform:translate(var(--tension-react-x),var(--tension-react-y)) rotate(calc(0deg + var(--tension-rot-drift) + var(--tension-react-rot))) scaleX(-1)!important;
 }
 
-body.lock-shell-active:is(:not(.importedMode),[data-game-mode="wharf"],[data-game-mode="keyprofile"],[data-game-mode="resonance"],[data-game-mode="deduction"],[data-game-mode="turnmemory"],[data-game-mode="tension"]) .mechanismZone.nudge .tension{
+body.lock-shell-active:not([data-game-mode="springtumblers"],[data-game-mode="symbolpins"]) .mechanismZone.nudge .tension{
   animation:lockShellTensionNudge 242ms ease!important;
 }
 

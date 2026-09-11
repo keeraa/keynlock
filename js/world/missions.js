@@ -7,14 +7,13 @@
   const MISSION_PLACES=window.KeynlockContent.world.missionPlaces;
 
   const MISSION_STORAGE_KEY = 'lockpickMissions';
-  const CHAPTER_STORAGE_KEY = 'lockpickChapter';
 
   function missionNodeId(mode) { return `mission-${mode}`; }
   function missionRunId(mode, tier) { return `${mode}-${tier}`; }
   function missionLabel(place) { return window.KeynlockContent.chapterStory?.orders?.[`${place.mode}-1`]?.title || GameCatalog.get(place.mode)?.title || place.mode; }
   function gameSupportsTier(mode,tier){ return GameCatalog.get(mode)?.difficulty.levels.includes(tier)??false; }
 
-  function preloadMapMission(mode,tier=mapChapter){
+  function preloadMapMission(mode,tier=getModeDifficulty(mode)){
     const game=GameCatalog.get(mode);
     if(!game || typeof window.KeynlockPreloadImages!=='function') return Promise.resolve([]);
     const panel=MODE_PANELS[mode];
@@ -50,9 +49,6 @@
     });
   }
 
-  let mapChapter = Number(STORE.getItem(CHAPTER_STORAGE_KEY)) || 1;
-  if (!MISSION_TIERS.includes(mapChapter)) mapChapter = 1;
-
   function missionCleared(mode, tier) { return !!missionsDone[missionRunId(mode, tier)]; }
   function missionRequiresPicks(mode){return !!GameCatalog.feature(mode,'lock.requiresPick');}
   function playerHasPicks(){return Number(window.KeynlockResources?.state?.picks)>0;}
@@ -62,7 +58,7 @@
   function chapterUnlocked(tier) {
     return FREE_MISSION_ACCESS || tier === 1 || chapterCleared(tier - 1);
   }
-  function missionUnlocked() { return FREE_MISSION_ACCESS || chapterUnlocked(mapChapter); }
+  function missionUnlocked(tier) { return FREE_MISSION_ACCESS || chapterUnlocked(tier); }
 
   // Register every place as a map location so travel, the player dot and the
   // info panel all keep working unchanged.
@@ -90,12 +86,9 @@
     if(options.guided&&window.KeynlockOnboarding?.active){toast('Сначала заверши обучение в логове. Продолжить его можно в «Заказах».');return false;}
     const loc = MAP_LOCATIONS[id];
     if (!loc || loc.action !== 'mission') return;
-    if(options.tier!==undefined){
-      if(!MISSION_TIERS.includes(options.tier)||!chapterUnlocked(options.tier))return false;
-      mapChapter=options.tier;
-    }
-    if (!missionUnlocked()) { toast('Этот уровень пока закрыт'); return; }
-    if(!gameSupportsTier(loc.mode,mapChapter)){toast(`${loc.name}: уровень ${mapChapter} ещё не готов`);return;}
+    const tier=options.tier??getModeDifficulty(loc.mode);
+    if(!MISSION_TIERS.includes(tier)||!missionUnlocked(tier)){toast('Этот уровень пока закрыт');return false;}
+    if(!gameSupportsTier(loc.mode,tier)){toast(`${loc.name}: уровень ${tier} ещё не готов`);return false;}
     if(missionRequiresPicks(loc.mode)&&!playerHasPicks()){toast('Нет отмычек · вернись в логово и подготовь новые');return;}
 
     if (lairOpen) closeLair();
@@ -108,18 +101,17 @@
     mapLocation=id;
     STORE.setItem('lockpickMapLocation',id);
     STORE.setItem('lockpickCurrentMode',loc.mode);
-    STORE.setItem(CHAPTER_STORAGE_KEY,String(mapChapter));
     // Build the mission round directly. Clicking the active tab is intentionally
     // a no-op during play, so it cannot be used as a reliable round launcher.
-    setModeDifficulty(mapChapter, loc.mode, false);
+    setModeDifficulty(tier, loc.mode, false);
     mode=loc.mode;
     syncModePanels(mode);
     updateModeUI();
-    window.KeynlockCampaign?.prepare(loc.mode,options.guided===true,mapChapter);
+    window.KeynlockCampaign?.prepare(loc.mode,options.guided===true,tier);
     newLock(false);
-    activeMissionRun = { id: missionRunId(loc.mode, mapChapter), mode: loc.mode, tier: mapChapter, roundId: activeRoundId, guided:options.guided===true, orderId:options.orderId||null, stepId:options.stepId||null };
+    activeMissionRun = { id: missionRunId(loc.mode, tier), mode: loc.mode, tier: tier, roundId: activeRoundId, guided:options.guided===true, orderId:options.orderId||null, stepId:options.stepId||null };
     window.dispatchEvent(new CustomEvent('keynlock-mission-started',{detail:{...activeMissionRun}}));
-    toast(`${loc.name} · уровень ${mapChapter}`);
+    toast(`${loc.name} · уровень ${tier}`);
     return true;
   }
   window.startMapMission = startMapMission;
@@ -154,7 +146,8 @@
     const fragment=document.createDocumentFragment();
     for (const place of MISSION_PLACES) {
       const id=missionNodeId(place.mode);
-      const open=missionUnlocked()&&gameSupportsTier(place.mode,mapChapter);
+      const selectedTier=getModeDifficulty(place.mode);
+      const open=missionUnlocked(selectedTier)&&gameSupportsTier(place.mode,selectedTier);
       const node=document.createElement('button');
       node.type='button';
       node.className='mapNode mapIconNode missionNode';
@@ -180,7 +173,7 @@
       for(const tier of MISSION_TIERS){
         const pip=document.createElement('i');
         const supported=gameSupportsTier(place.mode,tier),done=missionCleared(place.mode,tier);
-        pip.className='mapTierPip'+(!supported?' unsupported':done?' done':'')+(supported&&tier===mapChapter?' current':'');
+        pip.className='mapTierPip'+(!supported?' unsupported':done?' done':'')+(supported&&tier===selectedTier?' current':'');
         pip.textContent=supported&&done?'✓':'';
         pip.title=`Уровень ${tier}${!supported?' · ещё не готов':done?' · пройден':''}`;
         pip.setAttribute('aria-label',pip.title);
@@ -204,11 +197,12 @@
   }
 
   function renderMapLoot(loc,bonus){
-    const table=window.KeynlockContent.economy.lockLoot[mapChapter];
+    const tier=getModeDifficulty(loc.mode);
+    const table=window.KeynlockContent.economy.lockLoot[tier];
     const range=([min,max])=>min===max?String(min):`${min}–${max}`;
     const owned=window.KeynlockPaintingRewards.ownedIds();
     const available=window.KeynlockRestoration.paintings.some(p=>p.district===loc.district&&!owned.includes(p.id));
-    const firstClear=!missionCleared(loc.mode,mapChapter);
+    const firstClear=!missionCleared(loc.mode,tier);
     const paintingChance=available?(firstClear?100:Math.round(table.paintingChance*100)):0;
     const maxCoins=Math.round(125*table.coinMultiplier)+bonus;
     const root=document.querySelector('#mapCardLoot');
@@ -224,7 +218,7 @@
     block('assets/ui/money-ico.png',`до ${maxCoins}`,'Монеты',`Сумма зависит от числа действий. Максимум включает 25 монет за взлом без поломок с множителем уровня.${bonus?` Премия за первое прохождение: ${bonus} монет.`:''}`);
     block('assets/ui/details-ico.png',range(table.parts),'Детали','Из двух деталей можно создать одну отмычку.');
     block('assets/ui/portrait-ico.png',`${paintingChance}%`,'Картина',!available?'Все картины этого района уже найдены.':firstClear?'При первом прохождении гарантирована новая картина из этого района.':'Шанс найти новую картину при повторном прохождении.');
-    const reward=window.KeynlockCollection.handleRewardPreview(missionRunId(loc.mode,mapChapter),mapChapter);
+    const reward=window.KeynlockCollection.handleRewardPreview(missionRunId(loc.mode,tier),tier);
     const handleBlock=document.createElement('div');handleBlock.className='mapLootHandle';handleBlock.tabIndex=0;handleBlock.dataset.tip=reward.tip;
     const handleCopy=document.createElement('span'),handleChance=document.createElement('b');
     handleChance.textContent=reward.complete?'Все рукоятки собраны':`Шанс рукоятки ${reward.chance}%`;
@@ -269,21 +263,26 @@
     $worldMapScreen.classList.toggle('has-mission',!!loc);
     document.querySelectorAll('.missionNode').forEach(node=>{
       const selected=node.dataset.location===selectedMapMission;
-      const name=missionLabel(MAP_LOCATIONS[node.dataset.location]);
+      const place=MAP_LOCATIONS[node.dataset.location];
+      const name=missionLabel(place);
+      const selectedTier=getModeDifficulty(place.mode);
+      node.querySelectorAll('.mapTierPip').forEach((pip,index)=>pip.classList.toggle('current',MISSION_TIERS[index]===selectedTier&&gameSupportsTier(place.mode,selectedTier)));
+      node.classList.toggle('locked',!missionUnlocked(selectedTier)||!gameSupportsTier(place.mode,selectedTier));
       node.querySelector('.mapNodeLabel').textContent=name;
       node.setAttribute('aria-label',name);
       node.classList.toggle('selected',selected);
       node.setAttribute('aria-expanded',String(selected));
     });
     if(!loc)return;
+    const tier=getModeDifficulty(loc.mode);
     const game=GameCatalog.get(loc.mode);
-    const supported=gameSupportsTier(loc.mode,mapChapter);
+    const supported=gameSupportsTier(loc.mode,tier);
     const missingPicks=missionRequiresPicks(loc.mode)&&!playerHasPicks();
-    const rewardId=missionRunId(loc.mode,mapChapter);
+    const rewardId=missionRunId(loc.mode,tier);
     const bonus=window.KeynlockRewardPolicy.firstClearBonus(rewardId,STORE.getJSON('keynlockFirstClearBonuses',STORE.getJSON('lockpickMissions',{})));
     const artwork=document.querySelector('#mapCardArtwork');
     if(artwork.getAttribute('src')!==game.location)artwork.src=game.location;
-    document.querySelector('#mapCardDistrict').textContent=`${DISTRICTS[loc.district].name} · Уровень ${mapChapter}`;
+    document.querySelector('#mapCardDistrict').textContent=`${DISTRICTS[loc.district].name} · Уровень ${tier}`;
     $mapInfoTitle.textContent=missionLabel(loc);
     const narrative=window.KeynlockContent.chapterStory?.orders?.[rewardId];
     const description=game.description||'Открой механизм, используя подсказки на замке.';
@@ -297,11 +296,11 @@
     preview.alt=`Превью головоломки «${game.title}»`;
     renderMapLoot(loc,bonus);
     const status=document.querySelector('#mapCardStatus');
-    status.textContent=!supported?'Этот уровень ещё не готов.':!missionUnlocked()?'Этот уровень пока закрыт.':missingPicks?'':missionCleared(loc.mode,mapChapter)?'✓ Уровень пройден. Можно сыграть снова.':missionRequiresPicks(loc.mode)?'Для взлома нужна отмычка.':'Отмычка не требуется.';
+    status.textContent=!supported?'Этот уровень ещё не готов.':!missionUnlocked(tier)?'Этот уровень пока закрыт.':missingPicks?'':missionCleared(loc.mode,tier)?'✓ Уровень пройден. Можно сыграть снова.':missionRequiresPicks(loc.mode)?'Для взлома нужна отмычка.':'Отмычка не требуется.';
     status.hidden=!status.textContent;
     $mapLocationAction.textContent=missingPicks?'Нет отмычек. Подготовь их на верстаке':'Начать взлом';
     $mapLocationAction.hidden=false;
-    $mapLocationAction.disabled=!supported||!missionUnlocked()||missingPicks;
+    $mapLocationAction.disabled=!supported||!missionUnlocked(tier)||missingPicks;
   };
 
   // Banking a mission happens on the solve, which every game funnels through.
@@ -330,7 +329,7 @@
       const run=activeMissionRun;
       return !!run&&run.id==='wharf-1'&&run.roundId===activeRoundId&&mode==='wharf'&&getModeDifficulty(mode)===1&&!missionCleared('wharf',1);
     },
-    start:(mode,tier=1,options={})=>startMapMission(missionNodeId(mode),{...options,tier}),
+    start:(mode,tier=getModeDifficulty(mode),options={})=>startMapMission(missionNodeId(mode),{...options,tier}),
     resume(){if(!activeMissionRun)return false;if(gameDefeat.isActive()||solved||(missionRequiresPicks(activeMissionRun.mode)&&picks<=0))return this.retry();if(lairOpen)closeLair();if(mapOpen)closeMap(false);return true;},
     retry(){const run=activeMissionRun;return run?startMapMission(missionNodeId(run.mode),{tier:run.tier,guided:run.guided,orderId:run.orderId,stepId:run.stepId}):false;},
     get active(){return activeMissionRun?{...activeMissionRun}:null;}

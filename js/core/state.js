@@ -1,9 +1,9 @@
   const GOAL=4, MIN=1, MAX=7;
   function clamp(value,min,max){ return Math.max(min,Math.min(max,value)); }
-  const WORLD_PAUSE_CLASSES=['lair-open','map-open','prototype-mechanic-open','game-settings-open','game-defeat','main-menu-open','campaign-open','game-dialog-open'];
+  const WORLD_PAUSE_CLASSES=['assets-loading','lair-open','map-open','prototype-mechanic-open','game-settings-open','game-defeat','main-menu-open','campaign-open','game-dialog-open'];
   let worldPauseState=null;
-  function isWorldPaused(){
-    return document.hidden || WORLD_PAUSE_CLASSES.some(name=>document.body.classList.contains(name));
+  function isWorldPaused(exceptClass){
+    return document.hidden || WORLD_PAUSE_CLASSES.some(name=>name!==exceptClass&&document.body.classList.contains(name));
   }
   function syncWorldPauseState(){
     const paused=isWorldPaused();
@@ -116,7 +116,7 @@
         $compositeMode=document.querySelector('#compositeMode'), $cpPins=document.querySelector('#cpPins'), $cpBuildPins=document.querySelector('#cpBuildPins'), $cpTargetShadow=document.querySelector('#cpTargetShadow'), $cpTargetFill=document.querySelector('#cpTargetFill'), $cpTargetTopLine=document.querySelector('#cpTargetTopLine'), $cpTargetBevel=document.querySelector('#cpTargetBevel'), $cpTargetPath=document.querySelector('#cpTargetPath'), $cpTargetGlow=document.querySelector('#cpTargetGlow'), $cpBuildShadow=document.querySelector('#cpBuildShadow'), $cpBuildFill=document.querySelector('#cpBuildFill'), $cpBuildTopLine=document.querySelector('#cpBuildTopLine'), $cpBuildBevel=document.querySelector('#cpBuildBevel'), $cpBuildPath=document.querySelector('#cpBuildPath'), $cpBuildGlow=document.querySelector('#cpBuildGlow'), $cpBuildJoints=document.querySelector('#cpBuildJoints'), $cpParts=document.querySelector('#cpParts'), $cpState=document.querySelector('#cpState'),
         $drumMode=document.querySelector('#drumMode'), $drumWheels=document.querySelector('#drumWheels'), $drumCheck=document.querySelector('#drumCheck'), $drumResult=document.querySelector('#drumResult'), $drumSound=document.querySelector('#drumSound'), $drumNew=document.querySelector('#drumNew'),
         $scopeMode=document.querySelector('#scopeMode'), $scopeCanvas=document.querySelector('#scopeCanvas'), $scopeWheels=document.querySelector('#scopeWheels'), $scopeScore=document.querySelector('#scopeScore'), $scopeBar=document.querySelector('#scopeBar'), $scopeCheck=document.querySelector('#scopeCheck'), $scopeResult=document.querySelector('#scopeResult'), $scopeNew=document.querySelector('#scopeNew'),
-        $obMode=document.querySelector('#obMode'), $obLock=document.querySelector('#obLock'), $obMessage=document.querySelector('#obMessage'),
+        $obMode=document.querySelector('#obMode'), $obLock=document.querySelector('#obLock'),
         $wmMode=document.querySelector('#wmMode'), $wmLock=document.querySelector('#wmLock'), $wmHelp=document.querySelector('#wmHelp'), $wmTimerBar=document.querySelector('#wmTimerBar'), $wmOpenBtn=document.querySelector('#wmOpenBtn'),
         $museumMode=document.querySelector('#museumMode'), $hmLock=document.querySelector('#hmLock'), $hmPicks=document.querySelector('#hmPicks'), $hmHelp=document.querySelector('#hmHelp'),
         $pairednodesMode=document.querySelector('#pairednodesMode'), $m2Board=document.querySelector('#m2Board'), $m2Help=document.querySelector('#m2Help'),
@@ -318,38 +318,41 @@
   ]
 };
 
-const LOCKER_SKINS_BY_LEVEL={
-  1:[
-    {name:"iron_locker_01.png",data:"assets/shackles/level1/iron_locker_01.png"},
-    {name:"iron_locker_02.png",data:"assets/shackles/level1/iron_locker_02.png"},
-    {name:"iron_locker_03.png",data:"assets/shackles/level1/iron_locker_03.png"},
-    {name:"iron_locker_04.png",data:"assets/shackles/level1/iron_locker_04.png"},
-    {name:"iron_locker_05.png",data:"assets/shackles/level1/iron_locker_05.png"},
-    {name:"iron_locker_06.png",data:"assets/shackles/level1/iron_locker_06.png"},
-    {name:"iron_locker_07.png",data:"assets/shackles/level1/iron_locker_07.png"},
-  ],
-  2:[
-    {name:"locker_03.png",data:"assets/shackles/level2/locker_03.png"},
-    {name:"gold_locker_02.png",data:"assets/shackles/level2/gold_locker_02.png"},
-    {name:"gold_locker_03.png",data:"assets/shackles/level2/gold_locker_03.png"},
-    {name:"gold_locker_04.png",data:"assets/shackles/level2/gold_locker_04.png"},
-    {name:"gold_locker_05.png",data:"assets/shackles/level2/gold_locker_05.png"}
-  ],
-  3:[
-    {name:"premium_locker_08.png",data:"assets/shackles/level3/premium_locker_08.png"}
-  ]
-};
-
-const REMOVED_SHACKLE_NAMES = new Set([
-  "iron_shackle_08.png",
-  "iron_shackle_09.png",
-  "gold_shackle_01.png",
-  "locker_01.png",
-  "iron_locker_09.png"
-]);
-Object.keys(LOCKER_SKINS_BY_LEVEL).forEach(level=>{
-  LOCKER_SKINS_BY_LEVEL[level] = (LOCKER_SKINS_BY_LEVEL[level] || []).filter(item=>!REMOVED_SHACKLE_NAMES.has(item.name));
-});
+const IRON_SHACKLE_SKINS=[
+  {name:"lockers_01.png",data:"assets/shackles/level1/lockers_01.png"},
+  {name:"lockers_03.png",data:"assets/shackles/level1/lockers_03.png"},
+  {name:"lockers_05.png",data:"assets/shackles/level1/lockers_05.png"},
+  {name:"lockers_07.png",data:"assets/shackles/level1/lockers_07.png"},
+  {name:"lockers_09.png",data:"assets/shackles/level1/lockers_09.png"},
+  {name:"lockers_11.png",data:"assets/shackles/level1/lockers_11.png"},
+  {name:"lockers_13.png",data:"assets/shackles/level1/lockers_13.png"},
+  {name:"lockers_15.png",data:"assets/shackles/level1/lockers_15.png"},
+  {name:"lockers_16.png",data:"assets/shackles/level1/lockers_16.png"},
+  {name:"lockers_18.png",data:"assets/shackles/level1/lockers_18.png"},
+  {name:"lockers_19.png",data:"assets/shackles/level1/lockers_19.png"},
+  {name:"lockers_22.png",data:"assets/shackles/level1/lockers_22.png"},
+  {name:"lockers_24.png",data:"assets/shackles/level1/lockers_24.png"},
+  {name:"lockers_26.png",data:"assets/shackles/level1/lockers_26.png"},
+  {name:"lockers_28.png",data:"assets/shackles/level1/lockers_28.png"},
+  {name:"lockers_30.png",data:"assets/shackles/level1/lockers_30.png"},
+];
+const GOLD_SHACKLE_SKINS=[
+  {name:"lockers_02.png",data:"assets/shackles/level2/lockers_02.png"},
+  {name:"lockers_04.png",data:"assets/shackles/level2/lockers_04.png"},
+  {name:"lockers_06.png",data:"assets/shackles/level2/lockers_06.png"},
+  {name:"lockers_08.png",data:"assets/shackles/level2/lockers_08.png"},
+  {name:"lockers_10.png",data:"assets/shackles/level2/lockers_10.png"},
+  {name:"lockers_12.png",data:"assets/shackles/level2/lockers_12.png"},
+  {name:"lockers_14.png",data:"assets/shackles/level2/lockers_14.png"},
+  {name:"lockers_17.png",data:"assets/shackles/level2/lockers_17.png"},
+  {name:"lockers_20.png",data:"assets/shackles/level2/lockers_20.png"},
+  {name:"lockers_21.png",data:"assets/shackles/level2/lockers_21.png"},
+  {name:"lockers_23.png",data:"assets/shackles/level2/lockers_23.png"},
+  {name:"lockers_25.png",data:"assets/shackles/level2/lockers_25.png"},
+  {name:"lockers_27.png",data:"assets/shackles/level2/lockers_27.png"},
+  {name:"lockers_29.png",data:"assets/shackles/level2/lockers_29.png"},
+];
+const LOCKER_SKINS_BY_LEVEL={1:IRON_SHACKLE_SKINS,2:GOLD_SHACKLE_SKINS,3:GOLD_SHACKLE_SKINS};
 
 let roundLockBodySkin=0, roundLockerSkin=0;
 let currentMechanismLevel=1;

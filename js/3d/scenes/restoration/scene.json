@@ -5,7 +5,7 @@
   "threeVersion": "0.187.0",
   "status": "standalone",
   "source": "ChatGPT Sites",
-  "sourceCommit": "ffc6c0fe74e613e7a7524930bb79ba631ac732d8",
+  "sourceCommit": "154421ebf25945cf55d5e835c70d41aa8f9f2642",
   "savedOn": "2026-11-16",
   "liveUrl": "https://atelier-restoration-1115.k1r11111.chatgpt.site",
   "entry": "index.html",
@@ -15,14 +15,18 @@
   "gallery": {
     "placement": "high_wall_above_easels",
     "capacity": 30,
-    "layout": "aspect-aware-packed-top-down",
+    "layout": "12-category-labeled-rows-preserve-aspect",
     "selection": "fully_restored_favorites",
     "persistence": "localStorage",
     "demo": {
       "enabledByDefault": true,
       "randomCount": 30,
-      "mutatesProgress": false
-    }
+      "mutatesProgress": false,
+      "representAllRows": true
+    },
+    "rowCount": 12,
+    "wallHeightReductionPercent": 30,
+    "framesDistanceFromWallMeters": 0.045
   },
   "integration": {
     "target": "KEYNLOCK",

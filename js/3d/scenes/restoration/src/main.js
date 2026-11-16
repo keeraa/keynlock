@@ -231,10 +231,11 @@ function handleWallChange({ mode, art }) {
   $('wall-art-back').hidden = mode !== 'art';
   $('wall-art-hover').hidden = true;
   $('wall-gallery-title').textContent = mode === 'art' ? art.title : 'Стена восстановленных картин';
-  $('wall-gallery-caption').textContent = mode === 'art' ? `${art.artist} · ${art.year}${showingDemoWall ? ' · демо' : ''}`
-    : showingDemoWall ? 'Демо-экспозиция: 30 случайных произведений · прогресс реставрации не меняется'
-    : playerProgress.getWallIds().length ? 'Выберите картину на стене — камера приблизится к ней'
-      : 'Очистите полотно и восстановите цвет — готовая работа появится здесь';
+  $('wall-gallery-caption').textContent = mode === 'art'
+    ? `${art.rowLabel} · ${art.artist} · ${art.year}${showingDemoWall ? ' · демо' : ''}`
+    : showingDemoWall ? '12 направлений · 30 случайных работ для проверки расположения'
+    : playerProgress.getWallIds().length ? '12 направлений · выберите картину для приближения'
+      : '12 тематических рядов ждут ваших отреставрированных картин';
   if (mode === 'art') void wallGallery.showHighResolution(art.id);
   else wallGallery.clearFocus();
   if (active && wasWorkbenchVisible === null) {
@@ -285,7 +286,7 @@ restorationInput = createRestorationInput({
       element.hidden = true;
       return;
     }
-    element.textContent = art.title;
+    element.textContent = `${art.rowLabel} · ${art.title}`;
     element.hidden = false;
     const bounds = stage.getBoundingClientRect();
     element.style.left = `${Math.min(bounds.width - 180, Math.max(16, event.clientX - bounds.left + 17))}px`;

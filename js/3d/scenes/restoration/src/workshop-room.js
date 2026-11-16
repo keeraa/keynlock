@@ -52,7 +52,7 @@ export function createWorkshopRoom({ THREE, scene, mats }) {
     sun.shadow.camera.far = 24;
     sun.shadow.camera.left = -12;
     sun.shadow.camera.right = 12;
-    sun.shadow.camera.top = 19;
+    sun.shadow.camera.top = 14;
     sun.shadow.camera.bottom = -6;
     sun.shadow.bias = -.00015;
     sun.shadow.normalBias = .025;
@@ -65,9 +65,9 @@ export function createWorkshopRoom({ THREE, scene, mats }) {
     wallpaperMaterial = new THREE.MeshStandardMaterial({ color: '#bdac98', roughness: 1 });
     // The gallery rises well above the easels; its top is deliberately out of
     // frame in the normal workshop view and revealed by the traveling camera.
-    const wall = box(32, 20.3, .2, wallpaperMaterial, 0, 8.6, -4.7);
+    const wall = box(32, 14.21, .2, wallpaperMaterial, 0, 5.555, -4.7);
     wall.castShadow = false;
-    box(16.5, .12, .18, mats.roomWood, 0, 18.20, -4.47);
+    box(16.5, .12, .18, mats.roomWood, 0, 12.35, -4.47);
     box(32, .26, .31, mats.roomWood, 0, 1.24, -4.48);
     box(32, 1.22, .15, new THREE.MeshStandardMaterial({ color: '#69513e', roughness: .92 }), 0, .58, -4.53);
     for (let i = -13; i <= 13; i++) box(.033, 1.16, .03, mats.roomWood, i * 1.12, .59, -4.43);

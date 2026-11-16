@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { chooseDemoWallPaintings } from '../src/wall-demo.js';
-import { keynlockPaintings } from '../src/painting-catalog.js';
+import { keynlockPaintings, paintingCategory } from '../src/painting-catalog.js';
+import { WALL_ROWS } from '../src/wall-layout.js';
 
 function rng(initial) {
   let seed = initial;
@@ -14,6 +15,8 @@ test('demo samples 30 unique real reproductions without altering the source coll
   assert.equal(sample.length, 30);
   assert.equal(new Set(sample.map((art) => art.id)).size, 30);
   assert.ok(sample.every((art) => art.image && art.title));
+  assert.deepEqual(new Set(sample.map(paintingCategory)), new Set(WALL_ROWS.map((row) => row.id)),
+    'all 12 styles must be represented in the test exhibition');
   assert.deepEqual(keynlockPaintings.map((art) => art.id), before);
 });
 

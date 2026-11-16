@@ -1,12 +1,44 @@
 import { createFrameGeometry } from './frame-geometry.js';
-import { layoutWallPaintings, WALL_CAPACITY } from './wall-layout.js';
+import { layoutWallPaintings, WALL_CAPACITY, WALL_HEIGHT, WALL_TOP,
+  WALL_WIDTH, WALL_ROWS, WALL_LABEL_WIDTH } from './wall-layout.js';
 
 /** A compact, high-mounted salon wall. Preview textures are separate from the easel LRU. */
 export function createWallGallery({ THREE, scene, camera, renderer, frameWood, onLayout = () => {} }) {
   const root = new THREE.Group();
   root.name = 'rear-wall-paintings';
-  root.position.z = -4.42;
+  // Wallpaper's front face is z=-4.6. The canvas backs are only 4–5 cm away.
+  root.position.z = -4.555;
   scene.add(root);
+
+  const paintingsRoot = new THREE.Group();
+  paintingsRoot.name = 'restored-frames';
+  root.add(paintingsRoot);
+  const labelCanvas = document.createElement('canvas');
+  labelCanvas.width = 512;
+  labelCanvas.height = 2048;
+  const labelContext = labelCanvas.getContext('2d');
+  const labelStep = labelCanvas.height / WALL_ROWS.length;
+  for (const [index, row] of WALL_ROWS.entries()) {
+    const center = (index + .5) * labelStep;
+    labelContext.fillStyle = '#f0dcb6';
+    labelContext.font = '600 36px Manrope, sans-serif';
+    labelContext.textAlign = 'left';
+    labelContext.textBaseline = 'middle';
+    labelContext.fillText?.(row.label.toUpperCase(), 16, center - 5, 482);
+    labelContext.fillStyle = 'rgba(240,220,182,.36)';
+    labelContext.fillRect(16, center + 35, 330, 1);
+  }
+  const labelTexture = new THREE.CanvasTexture(labelCanvas);
+  labelTexture.colorSpace = THREE.SRGBColorSpace;
+  const labelStrip = new THREE.Mesh(
+    new THREE.PlaneGeometry(WALL_LABEL_WIDTH - .14, WALL_HEIGHT),
+    new THREE.MeshBasicMaterial({ map: labelTexture, transparent: true, depthWrite: false,
+      toneMapped: false }),
+  );
+  labelStrip.name = 'twelve-art-history-labels';
+  labelStrip.position.set(-WALL_WIDTH / 2 + WALL_LABEL_WIDTH / 2 - .06,
+    WALL_TOP - WALL_HEIGHT / 2, .035);
+  root.add(labelStrip);
 
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -99,12 +131,12 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood, o
 
   function clearFrames() {
     clearFocus();
-    root.traverse((part) => { if (part.isMesh) part.geometry.dispose(); });
+    paintingsRoot.traverse((part) => { if (part.isMesh) part.geometry.dispose(); });
     for (const material of imageMaterials) material.dispose();
     imageMaterials.clear();
     imageMeshes.length = 0;
     artworks.clear();
-    root.clear();
+    paintingsRoot.clear();
   }
 
   async function setPaintings(paintings) {
@@ -119,11 +151,11 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood, o
       const mount = new THREE.Group();
       mount.name = `restored-${placement.id}`;
       mount.position.set(placement.x, placement.y, 0);
-      root.add(mount);
+      paintingsRoot.add(mount);
 
       // A real canvas backing casts the painting's complete rectangular shadow.
-      const backing = new THREE.Mesh(new THREE.BoxGeometry(placement.outerWidth, placement.outerHeight, .045), backingMaterial);
-      backing.position.z = .025;
+      const backing = new THREE.Mesh(new THREE.BoxGeometry(placement.outerWidth, placement.outerHeight, .022), backingMaterial);
+      backing.position.z = .012;
       backing.castShadow = true;
       backing.receiveShadow = true;
       mount.add(backing);
@@ -131,13 +163,13 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood, o
       const material = new THREE.MeshStandardMaterial({ map: source.texture, roughness: 1 });
       imageMaterials.add(material);
       const image = new THREE.Mesh(new THREE.PlaneGeometry(placement.width, placement.height), material);
-      image.position.z = .108;
+      image.position.z = .058;
       image.userData.galleryId = placement.id;
       mount.add(image);
       imageMeshes.push(image);
 
-      const frame = new THREE.Mesh(createFrameGeometry(THREE, placement.width, placement.height, placement.frameWidth, .082), frameWood);
-      frame.position.z = .06;
+      const frame = new THREE.Mesh(createFrameGeometry(THREE, placement.width, placement.height, placement.frameWidth, .044), frameWood);
+      frame.position.z = .028;
       frame.castShadow = true;
       frame.receiveShadow = true;
       mount.add(frame);
@@ -165,7 +197,7 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood, o
   }
 
   return {
-    root, setPaintings, hitTest, showHighResolution, clearFocus,
+    root, paintingsRoot, setPaintings, hitTest, showHighResolution, clearFocus,
     getPlacement: (id) => artworks.get(id)?.placement || null,
     getLayout: () => layout,
     clear() { revision++; clearFrames(); },

@@ -278,8 +278,9 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
     if (!wallMode) return;
     if (wallFocusedId) { leaveWallArt(); return; }
     const current = controls.target.y;
-    const wanted = THREE.MathUtils.clamp(current + direction * 2.5,
-      Math.min(7, wallBounds.minY), wallBounds.maxY);
+    const twoRows = (wallBounds.maxY - wallBounds.minY) / 6;
+    const wanted = THREE.MathUtils.clamp(current + direction * twoRows,
+      wallBounds.minY, wallBounds.maxY);
     if (Math.abs(wanted - current) < .01) return;
     const delta = wanted - current;
     wallOverviewPose = {

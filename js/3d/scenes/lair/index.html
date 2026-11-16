@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#141715" />
+    <title>KEYNLOCK · Логово команды</title>
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="scene" aria-label="Интерактивное трёхмерное логово команды Keynlock"></canvas>
+      <div class="vignette" aria-hidden="true"></div>
+      <div class="grain" aria-hidden="true"></div>
+
+      <header class="topbar">
+        <div class="brand" aria-label="KEYNLOCK — Логово">
+          <div class="brand-mark">K<span>·</span></div>
+          <div class="brand-text"><strong>KEYNLOCK</strong><small>ЛОГОВО КОМАНДЫ</small></div>
+        </div>
+        <div class="location"><span class="gold-line"></span> СТАРЫЙ КВАРТАЛ <span class="gold-line"></span></div>
+        <div class="top-actions">
+          <div class="stats" aria-label="Производительность"><span><b id="fps">—</b> FPS</span><i></i><span><b id="triangles">—</b> ТРЕУГ.</span></div>
+          <span class="release">THREE.JS <b>r187</b></span>
+          <button id="sound-toggle" class="icon-button" type="button" aria-label="Звуковое окружение" aria-pressed="false" title="Звуковое окружение">♪</button>
+        </div>
+      </header>
+
+      <div class="chapter-caption"><span class="eyebrow">ГЛАВА I · МЕСТО, ГДЕ СОХРАНЯЮТ ИСКУССТВО</span><h1>Тихое убежище</h1><p>Вещи обретают вторую жизнь. У каждой находки здесь своя история.</p></div>
+
+      <div id="scene-hotspots" class="scene-hotspots" aria-label="Интерактивные зоны комнаты">
+        <button type="button" class="hotspot" data-zone="restoration"><span class="pulse"></span><span>Реставрация</span></button>
+        <button type="button" class="hotspot" data-zone="planning"><span class="pulse"></span><span>Карта и дела</span></button>
+        <button type="button" class="hotspot" data-zone="workbench"><span class="pulse"></span><span>Верстак</span></button>
+        <button type="button" class="hotspot" data-zone="alchemy"><span class="pulse"></span><span>Алхимия</span></button>
+        <button type="button" class="hotspot" data-zone="gramophone"><span class="pulse"></span><span>Граммофон</span></button>
+      </div>
+
+      <aside id="zone-panel" class="zone-panel" hidden aria-live="polite">
+        <button id="close-panel" class="panel-close" type="button" aria-label="Закрыть">×</button>
+        <div class="panel-kicker" id="panel-kicker">МАСТЕРСКАЯ</div>
+        <h2 id="panel-title">Реставрация</h2>
+        <p id="panel-description"></p>
+        <div class="panel-rule"></div>
+        <p id="panel-status" class="panel-status"></p>
+        <a id="panel-link" class="panel-link" href="#" target="_blank" rel="noopener" hidden>Открыть мастерскую <span>↗</span></a>
+      </aside>
+
+      <div class="bottom-ui">
+        <div class="interaction-hint"><span class="mouse-icon">◌</span> ПЕРЕТАСКИВАЙ — ОСМОТР <span class="dot">·</span> КОЛЕСО — МАСШТАБ <span class="dot">·</span> КЛИК — ВЗАИМОДЕЙСТВИЕ</div>
+        <nav class="zone-nav" aria-label="Локации логова">
+          <button type="button" data-zone="restoration"><span class="zone-number">01</span><span>Реставрация</span></button>
+          <button type="button" data-zone="planning"><span class="zone-number">02</span><span>Штаб</span></button>
+          <button type="button" data-zone="workbench"><span class="zone-number">03</span><span>Верстак</span></button>
+          <button type="button" data-zone="alchemy"><span class="zone-number">04</span><span>Алхимия</span></button>
+          <button type="button" data-zone="gramophone"><span class="zone-number">05</span><span>Музыка</span></button>
+        </nav>
+        <button id="reset-camera" class="reset-camera" type="button">↺ <span>ОБЩИЙ ВИД</span></button>
+      </div>
+      <div id="loading" class="loading"><div class="loading-symbol">K<span>·</span></div><div class="loading-line"><i></i></div><small>ОТКРЫВАЕМ МАСТЕРСКУЮ</small></div>
+      <div id="fallback" class="fallback" hidden>Для Логова необходим WebGL. Открой сцену в браузере с поддержкой 3D.</div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

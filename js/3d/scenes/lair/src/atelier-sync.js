@@ -8,7 +8,7 @@ export function connectAtelier(room,{onStatus=()=>{}}={}) {
   iframe.tabIndex=-1;
   iframe.setAttribute('aria-hidden','true');
   iframe.style.cssText='position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none';
-  iframe.sandbox='allow-scripts allow-same-origin';
+  iframe.setAttribute('sandbox','allow-scripts allow-same-origin');
   iframe.src=`${ATELIER_ORIGIN}/bridge.html`;
   let connected=false;
   let disconnectedTimer=setTimeout(()=>{

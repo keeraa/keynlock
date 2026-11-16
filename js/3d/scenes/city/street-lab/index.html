@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#17282d" />
+  <meta name="description" content="Лаборатория KEYNLOCK: генератор исторических улиц и кварталов по архитектурным правилам семи районов." />
+  <title>Лаборатория квартала · KEYNLOCK</title>
+  <link rel="stylesheet" href="./style.css" />
+  <script type="importmap">{"imports":{"three":"../vendor/three.js","three/core":"../vendor/three-core.js"}}</script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="../" aria-label="Вернуться к карте города">
+        <span class="brand-monogram">K<span>✦</span>L</span>
+        <span class="brand-name"><b>KEYNLOCK</b><small>ГОРОДСКАЯ МАСТЕРСКАЯ</small></span>
+      </a>
+      <div class="breadcrumb">ПРОТОТИП ГОРОДА <span>/</span> <b id="breadcrumbMode">ТЕСТОВЫЙ КВАРТАЛ</b></div>
+      <div class="top-metrics"><span><small>FPS</small><strong id="fpsValue">—</strong></span><span><small>ТРЕУГОЛЬНИКИ</small><strong id="triangleValue">—</strong></span><span><small>ВЫЗОВЫ GPU</small><strong id="drawCallsValue">—</strong></span></div>
+      <nav class="top-links"><a href="../landmark-lab/">Особые здания</a><a href="../house-builder/">Конструктор домов</a><a class="back-link" href="../">← На карту</a></nav>
+    </header>
+
+    <main class="layout">
+      <aside class="controls" aria-label="Параметры генерации улицы">
+        <div class="intro"><div class="micro">✦ &nbsp; КИЙЕНЛОК · ЭКСПЕРИМЕНТ 02</div><h1>Лаборатория<br />города</h1><p>Проверка автоматического строительства дорог, кварталов и домов по правилам семи районов.</p><div class="layout-mode" role="group" aria-label="Масштаб генерации"><button type="button" data-layout-mode="street">Одна улица</button><button type="button" data-layout-mode="quarter" class="active">Квартал</button></div></div>
+        <section class="control-section"><h2><span>01</span> Район города</h2><div id="districtList" class="district-list" role="group" aria-label="Выбор района"></div><p id="districtCharacter" class="district-character"></p></section>
+        <section class="control-section">
+          <div class="section-head"><h2><span>02</span> Архитектура</h2><small>РАМКИ ГЕНЕРАЦИИ</small></div>
+          <div class="double-field"><label>Этажность от<select id="minFloor" data-override="minFloor"><option>1</option><option>2</option><option>3</option><option>4</option></select></label><label>до<select id="maxFloor" data-override="maxFloor"><option>1</option><option>2</option><option>3</option><option>4</option></select></label></div>
+          <div class="double-field"><label>Фасад от, м<select id="minWidth" data-override="minWidth"></select></label><label>до, м<select id="maxWidth" data-override="maxWidth"></select></label></div>
+          <div class="field-caption">Допустимые формы крыш</div><div id="roofOptions" class="roof-options"><label><input type="checkbox" data-roof="gable" /><span class="roof-icon roof-gable"></span>Двускатная</label><label><input type="checkbox" data-roof="hip" /><span class="roof-icon roof-hip"></span>Вальмовая</label><label><input type="checkbox" data-roof="flat" /><span class="roof-icon roof-flat"></span>Плоская</label></div>
+          <div class="field-caption palette-caption">Цвета стен <small>НАЖАТИЕ — ВКЛ/ВЫКЛ</small></div><div class="palette-line"><div id="wallPalette" class="swatches"></div><label class="add-color" title="Добавить цвет стен"><input type="color" id="wallAdd" value="#e3c9aa" /><span>+</span></label></div>
+          <div class="field-caption palette-caption">Цвета кровли</div><div class="palette-line"><div id="roofPalette" class="swatches"></div><label class="add-color" title="Добавить цвет кровли"><input type="color" id="roofAdd" value="#a85d49" /><span>+</span></label></div>
+        </section>
+        <section class="control-section">
+          <h2><span>03</span> Улица и освещение</h2>
+          <div class="range-row"><div><label for="roadWidth">Ширина дороги</label><output id="roadWidthValue">6,3 м</output></div><input type="range" id="roadWidth" data-override="roadWidth" min="5" max="13" step=".1" /></div>
+          <div class="range-row"><div><label for="sidewalkWidth">Ширина тротуара</label><output id="sidewalkWidthValue">1,5 м</output></div><input type="range" id="sidewalkWidth" data-override="sidewalkWidth" min="1" max="4" step=".1" /></div>
+          <div class="range-row"><div><label for="gapScale">Расстояние между домами</label><output id="gapScaleValue">×1</output></div><input type="range" id="gapScale" data-override="gapScale" min=".6" max="2" step=".1" /></div>
+          <div class="double-field street-fields"><label>Тип фонарей<select id="lampStyle" data-override="lampStyle"><option value="gas">Газовые</option><option value="ornate">Фигурные</option><option value="industrial">Промышленные</option></select></label><label>Шаг, м<input type="number" id="lampSpacing" data-override="lampSpacing" min="10" max="28" step="1" /></label></div>
+          <label class="toggle"><span><b>Вечерний свет</b><small>Проверка освещения фонарей</small></span><input id="nightMode" type="checkbox" /><i></i></label>
+        </section>
+        <div class="form-actions"><button id="newStreet" class="generate-button" type="button">↻ &nbsp; Новый квартал</button><div class="secondary-actions"><button id="resetDistrict" type="button">Сброс района</button><button id="exportStreet" type="button">↓ Экспорт JSON</button></div><p>Изменения сохраняются отдельно для каждого района.</p></div>
+      </aside>
+
+      <section class="stage" aria-label="Генерируемые исторические улицы и кварталы">
+        <canvas id="streetCanvas" aria-label="Обзор созданной улицы, дома можно выбирать"></canvas>
+        <div class="stage-grain" aria-hidden="true"></div>
+        <div class="stage-top"><div class="stage-number">ГЕНЕРАЦИЯ <b id="seedValue">001129</b></div><div class="live-indicator"><i></i> <span id="renderMode">3D СЦЕНА</span></div></div>
+        <div class="stage-title"><div class="eyebrow" id="stageEyebrow">РАЙОН 01 / 07</div><h2 id="streetTitle">Старый квартал</h2><p id="streetDescription">Плотная старинная застройка, красные крыши, фахверк</p></div>
+        <div class="stage-foot"><div id="viewButtons" class="view-buttons" role="group" aria-label="Ракурс камеры"><button type="button" data-view="three-quarter" class="active">¾ Вид</button><button type="button" data-view="street">Вдоль улицы</button><button type="button" data-view="aerial">Сверху</button><button type="button" data-view="walk">Пешеход</button></div><div class="camera-note" id="cameraNote">ПОВЕРНИ МЫШЬЮ · КОЛЕСО — МАСШТАБ · НАЖМИ НА ДОМ</div></div>
+      </section>
+
+      <aside class="inspector" aria-label="Паспорт застройки">
+        <div class="inspector-head"><div class="micro">ПАСПОРТ ГЕНЕРАЦИИ</div><h3 id="inspectorTitle">Образ квартала</h3><p>Характер застройки в границах выбранного района.</p></div>
+        <div class="inspector-stats"><div><strong id="houseCount">10</strong><small>зданий</small></div><div><strong id="lampCount">08</strong><small>фонарей</small></div></div>
+        <div class="data-list">
+          <div><span>Улиц</span><strong id="streetCount">1</strong></div>
+          <div><span>Перекрёстков</span><strong id="junctionCount">0</strong></div>
+          <div><span>Пешеходных дорожек</span><strong id="walkwayCount">0</strong></div>
+          <div><span>Внутренний двор</span><strong id="courtyardStat">—</strong></div>
+          <div><span>Могут проживать</span><strong id="residentCapacity" title="Примерное число жителей по площади, этажности и доле жилой застройки района">—</strong></div>
+          <div><span>Диапазон этажей</span><strong id="rangeFloors">2–3</strong></div>
+          <div><span>Ширина фасадов</span><strong id="rangeWidth">6–8,5 м</strong></div>
+          <div><span>Тип мостовой</span><strong id="surfaceType">Булыжная</strong></div>
+          <div><span>Главная улица</span><strong id="streetLength">—</strong></div>
+          <div><span>Тротуар</span><strong id="sidewalkStat">—</strong></div>
+          <div><span>Детали домов после сборки</span><strong id="meshCount">—</strong></div>
+          <div><span>LOD (ближ. / сред. / дальн.)</span><strong id="lodValue">—</strong></div>
+        </div>
+        <div class="inspector-divider"></div>
+        <div class="inspector-subhead">АРХИТЕКТУРНАЯ ПАЛИТРА</div><div class="inspector-palettes"><div><small>Фасады</small><div id="previewWalls" class="mini-swatches"></div></div><div><small>Кровля</small><div id="previewRoofs" class="mini-swatches"></div></div></div>
+        <div class="inspector-divider"></div>
+        <div class="inspector-subhead">ВЫБРАННОЕ ЗДАНИЕ</div><div id="pickedHouse" class="picked-house"><p>Нажми на дом, чтобы увидеть параметры генерации.</p></div>
+        <div class="inspector-bottom" id="inspectorFoot">Квартал для испытаний. Основная карта города пока не меняется.</div>
+      </aside>
+    </main>
+  </div>
+  <script type="module" src="../js/street/street-editor.js"></script>
+</body>
+</html>

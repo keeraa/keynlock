@@ -1,4 +1,5 @@
 import * as THREE from './vendor/three-core.js';
+import { PAINTED_FINISHES, createPaintedTextureSurface } from '../../../core/rendering/painted-texture.js';
 
 // Same original painted-metal WebP assets and image processing as KEYNLOCK's lock lab.
 export const VISUAL_DEFAULTS = Object.freeze({
@@ -9,7 +10,7 @@ export const VISUAL_DEFAULTS = Object.freeze({
 });
 
 const FINISH_URLS = Object.freeze(Object.fromEntries(
-  ['steel', 'graphite', 'enamel', 'brass', 'copper'].map(name => [name, `./assets/painted-${name}.webp`])
+  PAINTED_FINISHES.map(name => [name, `./assets/painted-${name}.webp`])
 ));
 // Distinct painted pigment ranges. The old conversion drove every swatch
 // towards white and nearly erased the difference between frame finishes.
@@ -224,19 +225,12 @@ export function createVisualSystem(scene, renderer, metals, documentRef, texture
     const entry = { texture: null, pixels: null, ready: false };
     paintTextures.set(name, entry);
     textureLoader.load(FINISH_URLS[name], image => {
-      const surface = documentRef.createElement('canvas');
-      surface.width = surface.height = 512;
-      const context = surface.getContext('2d', { willReadFrequently: true });
-      if (!context) return;
-      context.drawImage(image.image, 0, 0, 512, 512);
-      entry.canvas = surface;
-      entry.context = context;
-      entry.pixels = context.getImageData(0, 0, 512, 512).data.slice();
-      const texture = new THREE.CanvasTexture(surface);
-      texture.colorSpace = THREE.SRGBColorSpace;
-      texture.wrapS = texture.wrapT = THREE.MirroredRepeatWrapping;
-      texture.anisotropy = 4;
-      entry.texture = texture;
+      const surface = createPaintedTextureSurface({ THREE, document: documentRef, image: image.image });
+      if (!surface) return;
+      entry.canvas = surface.canvas;
+      entry.context = surface.context;
+      entry.pixels = surface.originalPixels.slice();
+      entry.texture = surface.texture;
       refreshPaintTexture(name);
       entry.ready = true;
       syncPaint();

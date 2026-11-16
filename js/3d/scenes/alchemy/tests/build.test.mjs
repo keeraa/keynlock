@@ -16,11 +16,13 @@ function allFiles(dir, prefix = '') {
   }).sort();
 }
 
-test('modular build reproduces the complete version-28 snapshot', () => {
-  assert.deepEqual(allFiles(dist), allFiles(lab));
+test('modular build preserves every version-28 resource except its rendering integration', () => {
+  assert.deepEqual(allFiles(dist).filter(path => path !== 'shared/painted-texture.js'), allFiles(lab));
   for (const path of allFiles(lab)) {
+    if (path === 'visuals.js') continue;
     assert.deepEqual(readFileSync(join(dist, path)), readFileSync(join(lab, path)), path);
   }
+  assert.ok(readFileSync(join(dist, 'visuals.js'), 'utf8').includes("'./shared/painted-texture.js'"));
 });
 
 test('shared metal textures are the only common source', () => {

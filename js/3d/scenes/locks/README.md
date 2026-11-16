@@ -23,3 +23,7 @@ npm run serve
 
 Для локальной проверки исходников — `dist/index.html` через сервер. Существующая
 2D-игра KEYNLOCK не импортирует лабораторию автоматически.
+# Shared drawing infrastructure
+
+`src/js/effects/painted-assets.js` uses `js/3d/core/rendering/painted-texture.js` for canvas texture preparation. Lock-specific pigment, pin finishes and screen-space outlines remain unchanged. The release bundle includes shared code through esbuild.
+

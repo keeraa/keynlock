@@ -13,3 +13,7 @@ This directory contains the modular source and a standalone snapshot of the publ
 Run `npm run release:check` here to build and verify `dist/`. Serve `dist/` with a static HTTP server. Both `dist/` and `lab/` are standalone and require no network imports.
 
 The module source was recovered from the live deployment; its existing ES modules remain separate so runtime behavior and visuals are preserved. The project is isolated from the existing 2D alchemy gameplay and prototypes.
+# Shared drawing infrastructure
+
+The shared `js/3d/core/rendering/painted-texture.js` prepares the painting canvas and texture. The alchemy-specific pigment palette, toon effect and geometric outlines remain in `src/visuals.js`. The build includes an independent copy at `dist/shared/painted-texture.js` for standalone hosting.
+

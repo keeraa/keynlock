@@ -1,4 +1,5 @@
 import { createPigmentBasis, PIN_PAINT_CONTRAST } from './painted-pigment.js';
+import { createPaintedTextureSurface } from '../../../../../core/rendering/painted-texture.js';
 
 export const PAINTED_SURFACES = Object.freeze({
   case: 'steel', edge: 'steel', dark: 'steel', inner: 'steel',
@@ -45,19 +46,12 @@ export function createPaintedAssetCache({ THREE, document, textureLoader, onRead
         if (disposed) { loaded.dispose(); return; }
         let record = null;
         try {
-          const canvas = document.createElement('canvas');
-          canvas.width = canvas.height = 512;
-          const context = canvas.getContext('2d', { willReadFrequently: true });
-          if (!context) {
+          const surface = createPaintedTextureSurface({ THREE, document, image: loaded.image });
+          if (!surface) {
             requested.delete(variant);
             return;
           }
-          context.drawImage(loaded.image, 0, 0, 512, 512);
-          const originalPixels = context.getImageData(0, 0, 512, 512).data;
-          const texture = new THREE.CanvasTexture(canvas);
-          texture.colorSpace = THREE.SRGBColorSpace;
-          texture.wrapS = texture.wrapT = THREE.MirroredRepeatWrapping;
-          texture.anisotropy = 4;
+          const { canvas, context, originalPixels, texture } = surface;
           const contrast = variant === 'pin' ? PIN_PAINT_CONTRAST :
             variant === 'copper' ? .84 : 1;
           record = { canvas, context, originalPixels, texture, variant, contrast,

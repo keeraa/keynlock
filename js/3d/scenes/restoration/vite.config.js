@@ -1,8 +1,13 @@
 import { defineConfig } from 'vite';
+import { resolve } from 'node:path';
 
 export default defineConfig({
   build: {
     rollupOptions: {
+      input: {
+        main: resolve(import.meta.dirname, 'index.html'),
+        bridge: resolve(import.meta.dirname, 'bridge.html'),
+      },
       output: {
         // Separately cache the stable Three.js runtime and painting catalog.
         // Workshop-only edits then transfer only the smaller application chunk.

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { canvasTexture, makeCityWindowTexture, makeCityDepthTexture, makeCurtainLinenTexture, makeMapTexture } from './materials.js';
 import { createAmbientParticles } from './engine/ambient-particles.js';
+import { createAtelierWall } from './atelier-wall.js';
 
 /** A single continuous room, using the proportions and gouache materials of the existing ateliers. */
 export function buildLair(scene, m) {
@@ -11,6 +12,8 @@ export function buildLair(scene, m) {
   const artTextures = new Map();
   let rightWallFinish = null;
   let ambientParticles = null;
+  let atelierWall = null;
+  let restorationCanvases = null;
   const staticGroup = new THREE.Group();
   scene.add(staticGroup);
   const shadow = mesh => { mesh.castShadow = true; mesh.receiveShadow = true; return mesh; };
@@ -89,10 +92,16 @@ export function buildLair(scene, m) {
 
   function buildShell() {
     scene.background = new THREE.Color('#2f3834');
-    scene.fog = new THREE.Fog('#514d40', 25, 48);
-    const floorBase = box(staticGroup, 17.3, .22, 13.8, m.darkWood, 0, -.14, .4);
+    scene.fog = new THREE.Fog('#514d40', 39, 94);
+    // Thirty metres of exhibition space on the left, with a matching full-
+    // length workshop wing on the right. The arched window stays on the far end.
+    const longRoomStart = -5.72;
+    const longRoomEnd = 26.42;
+    const longRoomLength = longRoomEnd - longRoomStart;
+    const longRoomCenter = (longRoomEnd + longRoomStart) / 2;
+    const floorBase = box(staticGroup, 17.3, .22, longRoomLength + .3, m.darkWood, 0, -.14, longRoomCenter);
     floorBase.castShadow = false;
-    for (let i = 0; i < 38; i++) {
+    for (let i = 0; i < 99; i++) {
       const z = -5.64 + i * .325;
       const plank = box(staticGroup, 17.1, .047, .312, i % 6 === 0 ? m.floorAlternate : m.floor, 0, .015, z);
       plank.castShadow = false;
@@ -134,16 +143,16 @@ export function buildLair(scene, m) {
     backWall.position.z = -5.755;
     backWall.receiveShadow = true;
     staticGroup.add(backWall);
-    box(staticGroup, .27, 13.8, 13.0, m.plaster, -8.55, 6.76, .75).castShadow = false;
-    box(staticGroup, .27, 13.8, 13.0, m.plaster, 8.55, 6.76, .75).castShadow = false;
-    box(staticGroup, 17.5, .20, 13.5, m.darkWood, 0, 13.62, .65).castShadow = false;
+    box(staticGroup, .27, 13.8, longRoomLength, m.plaster, -8.55, 6.76, longRoomCenter).castShadow = false;
+    box(staticGroup, .27, 13.8, longRoomLength, m.plaster, 8.55, 6.76, longRoomCenter).castShadow = false;
+    box(staticGroup, 17.5, .20, longRoomLength, m.darkWood, 0, 13.62, longRoomCenter).castShadow = false;
     // The left wall keeps the exact ochre gouache wallpaper from the atelier.
-    const leftFinish = plane(staticGroup, 12.88, 13.55, m.restorationWall, -8.391, 6.72, .75);
+    const leftFinish = plane(staticGroup, longRoomLength - .12, 13.55, m.restorationWall, -8.391, 6.72, longRoomCenter);
     leftFinish.rotation.y = Math.PI / 2;
     leftFinish.name = 'restoration-left-wall';
     // One continuous sage-green tiled finish covers the entire right wall.
     // It sits just in front of the plaster, from the floor to the ceiling.
-    const rightFinish = plane(staticGroup, 13.0, 13.54, m.alchemyTile, 8.392, 6.77, .75);
+    const rightFinish = plane(staticGroup, longRoomLength - .08, 13.54, m.alchemyTile, 8.392, 6.77, longRoomCenter);
     rightFinish.rotation.y = -Math.PI / 2;
     rightFinish.castShadow = false;
     rightFinish.name = 'alchemy-right-wall';
@@ -158,23 +167,23 @@ export function buildLair(scene, m) {
       if (i < 7) box(staticGroup, .92, .04, .045, m.oldBrass, i * 1.18 + .59, 1.49, -5.23);
     }
     // The restoration side retains its wood wainscot. Keep the tiled side clear.
-    box(staticGroup, .08, 1.66, 12.9, m.agedWood, -8.35, .88, .75);
-    box(staticGroup, .19, .15, 12.9, m.darkWood, -8.23, 1.77, .75);
-    box(staticGroup, .22, .20, 12.9, m.walnut, -8.20, .17, .75);
+    box(staticGroup, .08, 1.66, longRoomLength - .1, m.agedWood, -8.35, .88, longRoomCenter);
+    box(staticGroup, .19, .15, longRoomLength - .1, m.darkWood, -8.23, 1.77, longRoomCenter);
+    box(staticGroup, .22, .20, longRoomLength - .1, m.walnut, -8.20, .17, longRoomCenter);
     // No timber line across the middle of the double-height room.
-    for (const side of [-1, 1]) box(staticGroup, .22, .20, 12.9, m.walnut, side * 8.29, 13.30, .75);
+    for (const side of [-1, 1]) box(staticGroup, .22, .20, longRoomLength - .1, m.walnut, side * 8.29, 13.30, longRoomCenter);
     // Leave the centre of the back wall open for the enlarged arched window.
     for (const x of [-8.25, -4.68, 4.68, 8.25]) {
       box(staticGroup, .31, 13.35, .32, m.darkWood, x, 6.64, -5.32);
       box(staticGroup, .45, .22, .48, m.walnut, x, 12.70, -5.31);
     }
-    for (const z of [-4.8, -1.7, 1.4, 4.5]) {
+    for (let z = -4.8; z < longRoomEnd; z += 3.1) {
       box(staticGroup, 17.15, .30, .34, m.darkWood, 0, 13.37, z);
       for (const x of [-8.15, 8.15]) box(staticGroup, .42, .44, .52, m.walnut, x, 13.22, z);
     }
     box(staticGroup, 17.22, .25, .32, m.walnut, 0, 13.24, -5.29);
     // Small warm chandeliers make the extra storey visually legible.
-    for (const z of [-2.6, 2.7]) {
+    for (const z of [-2.6, 4.2, 11.8, 19.8]) {
       cylinder(staticGroup, .042, .042, 1.25, m.oldBrass, 0, 12.54, z, 10);
       cylinder(staticGroup, .34, .27, .15, m.oldBrass, 0, 11.89, z, 16);
       const globe = sphere(staticGroup, .25, new THREE.MeshBasicMaterial({ color: '#ffdfaa' }), 0, 11.75, z);
@@ -209,6 +218,7 @@ export function buildLair(scene, m) {
     const art = artTextures.get(artName);
     const artwork = new THREE.Mesh(new THREE.PlaneGeometry(width - .09, height - .09), new THREE.MeshStandardMaterial({ map: art, roughness: 1 }));
     artwork.position.z = .063; group.add(artwork);
+    let patina = null;
     if (options.weathered) {
       // The restoration canvas carries a translucent, irregular painted patina.
       const washMap = canvasTexture((ctx, w, h) => {
@@ -220,7 +230,7 @@ export function buildLair(scene, m) {
           ctx.fillRect(random() * w, random() * h, 4 + random() * 48, 1 + random() * 19);
         }
       }, 512, 512);
-      const patina = new THREE.Mesh(new THREE.PlaneGeometry(width - .09, height - .09), new THREE.MeshBasicMaterial({ map: washMap, transparent: true, opacity: .81, depthWrite: false }));
+      patina = new THREE.Mesh(new THREE.PlaneGeometry(width - .09, height - .09), new THREE.MeshBasicMaterial({ map: washMap, transparent: true, opacity: .81, depthWrite: false }));
       patina.name = 'restoration-weathered-patina';
       patina.position.z = .071;
       group.add(patina);
@@ -231,7 +241,7 @@ export function buildLair(scene, m) {
       box(group, .016, height + .09, .05, innerFrame, side * (width / 2 - .025), 0, .17);
       box(group, width + .09, .016, .05, innerFrame, 0, side * (height / 2 - .025), .17);
     }
-    return group;
+    return { group, artwork, patina };
   }
 
   function buildWindow() {
@@ -403,12 +413,7 @@ export function buildLair(scene, m) {
   }
 
   function buildRestoration() {
-    // A straight-on recreation of the original Atelier de Couleur restoration wall.
-    framedPainting(staticGroup, 1.62, 1.96, 'girl-pearl.jpg', -8.28, 5.59, -4.18, Math.PI / 2);
-    framedPainting(staticGroup, 1.76, 1.22, 'great-wave.jpg', -8.28, 5.77, -.92, Math.PI / 2);
-    framedPainting(staticGroup, 1.32, 1.45, 'starry-night.jpg', -8.28, 5.61, 3.35, Math.PI / 2);
-    const sign = label(staticGroup, 'ATELIER DE COULEUR', -8.27, 4.52, -1.18, 2.35, .32);
-    sign.rotation.y = Math.PI / 2;
+    // Exact thirty-metre salon gallery from the original restoration atelier.
 
     const easelCaption = (parent, caption, right) => {
       const titleMap = canvasTexture((ctx, w, h) => {
@@ -419,7 +424,7 @@ export function buildLair(scene, m) {
         ctx.fillText(right ? `${caption} ↙` : `${caption} ↘`, w / 2, h / 2);
       }, 1024, 150);
       const title = plane(parent, right ? 2.55 : 1.65, .29,
-        new THREE.MeshBasicMaterial({ map: titleMap, transparent: true, depthWrite: false, side: THREE.DoubleSide }), 0, 3.54, .61);
+        new THREE.MeshBasicMaterial({ map: titleMap, transparent: true, depthWrite: false, side: THREE.DoubleSide }), 0, 4.02, .61);
       title.name = right ? 'restoration-caption-work' : 'restoration-caption-reference';
       title.receiveShadow = false;
     };
@@ -436,14 +441,16 @@ export function buildLair(scene, m) {
       box(easel, 2.21, .11, .27, m.darkWood, 0, 1.36, .34);
       box(easel, 2.21, .072, .07, m.walnut, 0, 1.43, .49);
       box(easel, .31, .12, .18, m.darkWood, 0, 3.20, .45);
-      framedPainting(easel, 2.17, 1.74, 'starry-night.jpg', 0, 2.33, .44, 0,
+      const canvas = framedPainting(easel, 2.17, 1.74, 'starry-night.jpg', 0, 2.33, .44, 0,
         { frameMaterial: m.ash, backingMaterial: m.ash, innerFrameMaterial: m.oak, weathered: isWork });
       easelCaption(easel, caption, isWork);
-      return easel;
+      return { easel, canvas };
     };
     // In a perpendicular view the reference is on the left and work on the right.
-    makeEasel(-7.10, .30, 'ЭТАЛОН', false);
-    makeEasel(-7.10, -2.51, 'ВАША РЕСТАВРАЦИЯ', true);
+    const reference = makeEasel(-7.10, 13.50, 'ЭТАЛОН', false);
+    const work = makeEasel(-7.10, 10.69, 'ВАША РЕСТАВРАЦИЯ', true);
+    restorationCanvases = { reference: reference.canvas, work: work.canvas };
+    atelierWall = createAtelierWall({ THREE, parent: staticGroup, materials: m, canvases: restorationCanvases });
 
     const rugMap = canvasTexture((ctx, w, h) => {
       ctx.fillStyle = '#b6a17b'; ctx.fillRect(0, 0, w, h);
@@ -459,19 +466,19 @@ export function buildLair(scene, m) {
     const rug = new THREE.Mesh(new THREE.PlaneGeometry(3.3, 6.0),
       new THREE.MeshStandardMaterial({ map: rugMap, roughness: 1 }));
     rug.name = 'restoration-rug';
-    rug.rotation.x = -Math.PI / 2; rug.position.set(-6.45, .057, -1.10);
+    rug.rotation.x = -Math.PI / 2; rug.position.set(-6.45, .057, 12.10);
     rug.receiveShadow = true; staticGroup.add(rug);
 
     const pigmentColors = [m.ruby, m.green, m.slate, m.liquidAmber, m.paperDark];
     // Paint shelves are actually attached to the left wall, including supports.
     for (const y of [2.55, 3.48, 4.41]) {
-      box(staticGroup, .49, .11, 2.27, m.walnut, -8.09, y, 4.37, .021);
-      for (const z of [3.48, 5.27]) box(staticGroup, .36, .38, .07, m.darkWood, -8.23, y - .23, z);
+      box(staticGroup, .49, .11, 2.27, m.walnut, -8.09, y, 22.37, .021);
+      for (const z of [21.48, 23.27]) box(staticGroup, .36, .38, .07, m.darkWood, -8.23, y - .23, z);
     }
     for (let i = 0; i < 12; i++) bottle(staticGroup, -8.02, 2.81 + Math.floor(i / 4) * .93,
-      3.49 + (i % 4) * .58, pigmentColors[i % pigmentColors.length], .25 + (i % 2) * .07, .105);
+      21.49 + (i % 4) * .58, pigmentColors[i % pigmentColors.length], .25 + (i % 2) * .07, .105);
 
-    const table = makeTable(staticGroup, 2.11, .97, -6.60, -4.39, 1.04);
+    const table = makeTable(staticGroup, 2.11, .97, -6.60, 7.85, 1.04);
     table.name = 'restoration-paint-table';
     table.rotation.y = Math.PI / 2;
     table.scale.setScalar(.84);
@@ -486,12 +493,12 @@ export function buildLair(scene, m) {
     cylinder(table, .12, .12, .016, m.glassBlue, .84, 1.104, -.20, 24);
     rod(table, [.86, 1.1, -.09], [1.03, 1.11, .12], .023, m.walnut);
 
-    const stool = new THREE.Group(); stool.position.set(-5.41, 0, -4.33); staticGroup.add(stool);
+    const stool = new THREE.Group(); stool.position.set(-5.41, 0, 7.80); staticGroup.add(stool);
     cylinder(stool, .43, .40, .14, m.ash, 0, .57, 0, 24);
     for (const xx of [-.26, .26]) for (const zz of [-.25, .25]) rod(stool, [xx, .09, zz], [xx * .75, .55, zz * .75], .052, m.walnut);
     for (let i = 0; i < 3; i++) {
       const blank = new THREE.Group();
-      blank.position.set(-8.0 + i * .045, .0, -4.65 + i * .20);
+      blank.position.set(-8.0 + i * .045, .0, 6.65 + i * .20);
       blank.rotation.y = Math.PI / 2;
       blank.rotation.z = -.07 - i * .035;
       staticGroup.add(blank);
@@ -501,7 +508,7 @@ export function buildLair(scene, m) {
         box(blank, 1.06 + i * .11, .045, .07, m.ash, 0, .76 + i * .04 + side * (.63 + i * .065), .025);
       }
     }
-    station('restoration', [-6.93, 2.28, -1.06], [3.28, 4.9, 6.90]);
+    station('restoration', [-6.93, 2.28, 12.10], [3.28, 4.9, 7.20]);
   }
 
   function makePaper(parent, x, y, z, rotation = 0, size = [.53, .76]) {
@@ -561,7 +568,7 @@ export function buildLair(scene, m) {
 
   function toolPegboard() {
     // The tool wall belongs to the workbench along the right-hand tiled wall.
-    const pegboard = new THREE.Group(); pegboard.position.set(8.18, 3.22, 4.27);
+    const pegboard = new THREE.Group(); pegboard.position.set(8.18, 3.22, 20.07);
     pegboard.rotation.y = -Math.PI / 2;
     pegboard.name = 'workbench-tool-wall';
     staticGroup.add(pegboard);
@@ -589,7 +596,7 @@ export function buildLair(scene, m) {
 
   function buildWorkbench() {
     toolPegboard();
-    const work = makeTable(staticGroup, 3.25, 1.32, 7.45, 4.27, 1.0);
+    const work = makeTable(staticGroup, 3.25, 1.32, 7.45, 20.07, 1.0);
     work.name = 'workbench-right-of-alchemy';
     work.rotation.y = -Math.PI / 2;
     box(work, 3.35, .12, 1.39, m.ash, 0, 1.14, 0, .03);
@@ -617,7 +624,7 @@ export function buildLair(scene, m) {
       box(work, .13, .13, .12, m.iron, 1.14 + Math.cos(a) * .29, 1.29 + Math.sin(a) * .29, -.20);
     }
     bottle(work, 1.40, 1.39, .35, m.liquidAmber, .31, .13);
-    station('workbench', [7.17, 1.58, 4.27], [2.25, 2.9, 3.65]);
+    station('workbench', [7.17, 1.58, 20.07], [2.25, 2.9, 3.65]);
   }
 
   function flask(parent, x, y, z, liquid, scale = 1) {
@@ -634,7 +641,7 @@ export function buildLair(scene, m) {
     // The entire laboratory is turned 90 degrees. Its FRONT faces the room,
     // with its back and tabletop against the fully sage-tiled RIGHT wall.
     const alcove = new THREE.Group();
-    alcove.position.set(6.50, 0, -2.10);
+    alcove.position.set(6.50, 0, 10.10);
     alcove.rotation.y = -Math.PI / 2;
     staticGroup.add(alcove);
 
@@ -744,7 +751,7 @@ export function buildLair(scene, m) {
       ctx.fillStyle='#36443c';ctx.beginPath();ctx.arc(512,512,27,0,Math.PI*2);ctx.fill();
     });
     plane(clockBox, .48, .54, new THREE.MeshBasicMaterial({ map: dial }), 0, 0, .098);
-    station('alchemy', [6.86, 2.34, -2.10], [3.05, 5.8, 5.22]);
+    station('alchemy', [6.86, 2.34, 10.10], [3.05, 5.8, 5.22]);
   }
 
   function buildGramophone() {
@@ -773,8 +780,8 @@ export function buildLair(scene, m) {
   function buildDetails() {
     // Keep the tall window wall free from pictures and the former upper gallery.
     // Column lamps create pools of warm light around the room.
-    for (const x of [-7.98, 7.98]) {
-      const lamp = new THREE.Group(); lamp.position.set(x, 3.10, -1.10); staticGroup.add(lamp);
+    for (const x of [-7.98, 7.98]) for (const z of [-1.10, 8.15, 17.35, 24.65]) {
+      const lamp = new THREE.Group(); lamp.position.set(x, 3.10, z); staticGroup.add(lamp);
       box(lamp, .14, .65, .22, m.oldBrass);
       sphere(lamp, .22, new THREE.MeshBasicMaterial({ color: '#f0c591', transparent: true, opacity: .65 }), 0, 0, .19);
       const light = new THREE.PointLight('#ffc183', 3.5, 5.5, 2); light.position.set(0, 0, .35); lamp.add(light);
@@ -791,7 +798,7 @@ export function buildLair(scene, m) {
     damask: m.wallpaperDamask,
   };
   return {
-    anchors, hitTargets, animated, ambientParticles,
+    anchors, hitTargets, animated, ambientParticles, atelierWall,
     setRightWallpaper(name) {
       if (!Object.hasOwn(wallpapers, name) || !rightWallFinish) return false;
       rightWallFinish.material = wallpapers[name];

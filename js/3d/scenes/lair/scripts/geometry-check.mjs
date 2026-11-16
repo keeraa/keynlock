@@ -36,6 +36,18 @@ const workbench = bounds('workbench-right-of-alchemy');
 
 assert.ok(restWall.max.y > 13.4, 'left wall reaches the double-height ceiling');
 assert.ok(restWall.max.x < -8.3, 'ochre plaster lies on left wall');
+assert.ok(restWall.max.z - restWall.min.z > 31.9, 'restoration gallery wing spans original 30m wall');
+assert.ok(alchemyWall.max.z - alchemyWall.min.z > 31.9, 'opposite work wing grows symmetrically');
+assert.ok(Math.abs((restWall.max.z-restWall.min.z)-(alchemyWall.max.z-alchemyWall.min.z))<.1,
+  'left and right wing have matching depth');
+const salonWall = unique('atelier-original-salon-wall');
+assert.ok(Math.abs(salonWall.rotation.y-Math.PI/2)<1e-6,'original gallery turns ninety degrees onto left wall');
+assert.ok(salonWall.position.x < -8.2 && salonWall.position.z > 9,
+  'original 30m exhibition occupies expanded left wing');
+assert.equal(unique('twelve-art-history-column-headings').geometry.type,'PlaneGeometry',
+  'the source gallery column strip is present');
+assert.ok(world.atelierWall && world.atelierWall.getArtCount()===0,
+  "the salon gallery accepts the player's real paintings from the bridge");
 assert.ok(alchemyWall.min.x > 8.25 && alchemyWall.max.x < 8.45, 'sage tiles lie against right wall');
 assert.ok(alchemyWall.max.y > 13.4 && alchemyWall.min.y < .1, 'tiles cover the entire wall height');
 assert.ok(alchemyWall.min.z < -5.6 && alchemyWall.max.z > 7.1, 'tiles cover the entire wall width');

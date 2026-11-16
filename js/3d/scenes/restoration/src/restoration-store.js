@@ -55,6 +55,10 @@ export function createRestorationStore({ adapter = createIndexedDBAdapter(), onE
         const saved = await adapter.put(id, snapshot);
         if (saved !== true) throw new Error('IndexedDB is unavailable or full');
         surface.markSaved(revision);
+        // Notify the lair's same-origin bridge only after all painted layers
+        // have been committed; no partial strokes are ever broadcast.
+        try { localStorage.setItem('atelier-restoration:surface-revision',
+          JSON.stringify({ id, revision, at: Date.now() })); } catch { /* optional sync */ }
         return true;
       } catch (error) {
         onError('Не удалось сохранить реставрацию:', error);

@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createMaterials } from './materials.js';
 import { buildLair } from './room.js';
 import { createRoomOutlines, mountVisualSettings } from './visual-settings.js';
+import { connectAtelier } from './atelier-sync.js';
 import './style.css';
 import './visual.css';
 
@@ -15,10 +16,10 @@ const panel = document.querySelector('#zone-panel');
 const zones = {
   restoration: {
     number: '01', kicker: 'АТЕЛЬЕ САЙ', title: 'Реставрация',
-    description: 'У охристой левой стены стоят два мольберта — эталон и ваша реставрация «Звёздной ночи». Рядом краски, кисти, палитра и коллекция спасённых полотен.',
-    status: '3D-мастерская уже существует как отдельная сцена.',
+    description: 'Тридцатиметровая стена цитирует оригинальное Ателье цвета: 12 художественных направлений, до 30 рам. Картины и слои реставрации обновляются из вашей мастерской.',
+    status: 'Подключаем живую коллекцию картин…',
     link: 'https://atelier-restoration-1115.k1r11111.chatgpt.site/',
-    camera: [1.56, 3.22, -1.08], target: [-7.05, 2.48, -1.08],
+    camera: [1.56, 3.22, 12.10], target: [-7.05, 2.48, 12.10],
   },
   planning: {
     number: '02', kicker: 'БАЗА КОМАНДЫ', title: 'Карта и дела',
@@ -31,14 +32,14 @@ const zones = {
     description: 'Справа от алхимического стола, вдоль зелёной стены, стоит отдельный верстак с тисками, заготовками, замочными цилиндрами и инструментальной доской.',
     status: 'Выпиливание ключа предварительно готово; остальные режимы развиваются.',
     link: 'https://keynlock-workbench-1116.k1r11111.chatgpt.site/',
-    camera: [1.22, 3.15, 4.27], target: [7.40, 1.68, 4.27],
+    camera: [1.22, 3.15, 20.07], target: [7.40, 1.68, 20.07],
   },
   alchemy: {
     number: '04', kicker: 'СОСТАВЫ И РЕАГЕНТЫ', title: 'Алхимия',
     description: 'Вся правая стена от пола до потолка покрыта зелёной гуашевой плиткой. У стены стоит алхимический стол с двумя ярусами, семью реагентами, пигментами, стеклом и свечами; над ним рецепт и часы.',
     status: 'Модульная 3D-лаборатория сохранена отдельно.',
     link: 'https://keynlock-alchemy-lab-1115.k1r11111.chatgpt.site/',
-    camera: [1.12, 4.16, -1.24], target: [7.10, 2.54, -2.10],
+    camera: [1.12, 4.16, 10.10], target: [7.10, 2.54, 10.10],
   },
   gramophone: {
     number: '05', kicker: 'СКРЫТАЯ КОЛЛЕКЦИЯ', title: 'Музыка в Логове',
@@ -56,8 +57,8 @@ let desiredTarget = new THREE.Vector3();
 let currentZone = null;
 let startPointer = null;
 let hoveredZone = null;
-const homePosition = new THREE.Vector3(.25, 6.48, 16.2);
-const homeTarget = new THREE.Vector3(0, 4.12, -1.60);
+const homePosition = new THREE.Vector3(.25, 8.35, 31.2);
+const homeTarget = new THREE.Vector3(0, 4.70, 9.60);
 const clock = new THREE.Clock();
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
@@ -79,7 +80,7 @@ function setup() {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
   scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(47, 1, .06, 80);
+  camera = new THREE.PerspectiveCamera(47, 1, .06, 115);
   camera.position.copy(homePosition);
   controls = new OrbitControls(camera, canvas);
   controls.target.copy(homeTarget);
@@ -90,7 +91,7 @@ function setup() {
   controls.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
   controls.panSpeed = .72;
   controls.minDistance = 3.0;
-  controls.maxDistance = 21;
+  controls.maxDistance = 44;
   controls.minPolarAngle = .72;
   controls.maxPolarAngle = 1.65;
   controls.minAzimuthAngle = -1.7;
@@ -105,7 +106,7 @@ function setup() {
   sun.position.set(-3.5, 15.7, 6.4);
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
-  sun.shadow.camera.near = .4; sun.shadow.camera.far = 35;
+  sun.shadow.camera.near = .4; sun.shadow.camera.far = 54;
   sun.shadow.camera.left = -13; sun.shadow.camera.right = 13;
   sun.shadow.camera.top = 17; sun.shadow.camera.bottom = -12;
   sun.shadow.bias = -.00022; sun.shadow.normalBias = .02;
@@ -116,6 +117,12 @@ function setup() {
   leftLight.position.set(-5.8, 3.65, .3); scene.add(leftLight);
   const { materials, visual } = createMaterials();
   room = buildLair(scene, materials);
+  connectAtelier(room,{
+    onStatus(status){
+      zones.restoration.status=status;
+      if(currentZone==='restoration') document.querySelector('#panel-status').textContent=status;
+    },
+  });
   const outlines = createRoomOutlines(scene);
   visualUI = mountVisualSettings({ visual, room, outlines, grain: document.querySelector('.grain'), onOpen: closePanel });
 

@@ -29,7 +29,7 @@ export function createMaterials() {
   const damaskMap = makeWallpaperTexture('damask');
   for (const texture of [botanicalMap, damaskMap]) {
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(5, 5.4);
+    texture.repeat.set(12.4, 5.4);
     texture.anisotropy = 4;
   }
   const materials = {
@@ -40,7 +40,8 @@ export function createMaterials() {
     oak: new THREE.MeshStandardMaterial({ map: oakMap, color: '#ffffff', roughness: .96 }),
     plaster: new THREE.MeshStandardMaterial({ map: plasterMap, color: '#e0d8d0', roughness: 1 }),
     restorationWall: new THREE.MeshStandardMaterial({ map: restorationPlasterMap, color: '#f9cbaa', roughness: 1, side: THREE.DoubleSide }),
-    alchemyTile: new THREE.MeshStandardMaterial({ map: makeAlchemyTileTexture(THREE, { width: 42.5, height: 29, textureWidth: 960, textureHeight: 1024 }), roughness: 1, metalness: 0, side: THREE.DoubleSide }),
+    // Preserve the tile's physical size after mirroring the 30m gallery wing.
+    alchemyTile: new THREE.MeshStandardMaterial({ map: makeAlchemyTileTexture(THREE, { width: 105, height: 29, textureWidth: 2048, textureHeight: 1024 }), roughness: 1, metalness: 0, side: THREE.DoubleSide }),
     wallpaperBotanical: new THREE.MeshStandardMaterial({ map: botanicalMap, color: '#e8e6d8', roughness: .99, side: THREE.DoubleSide }),
     wallpaperDamask: new THREE.MeshStandardMaterial({ map: damaskMap, color: '#f1e9d6', roughness: .99, side: THREE.DoubleSide }),
     floor: new THREE.MeshStandardMaterial({ map: floorMap, color: '#fff4e8', roughness: 1 }),

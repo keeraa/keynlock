@@ -7,6 +7,7 @@ Latest audit: [release readiness, reproduced defects and all 70 mission launches
 Current implemented story: [«Чужие подписи»](docs/narrative/chapter-one-proposal.md).
 Worldbuilding: [официальный флаг Киенлока и его символика](docs/lore/flag.md).
 Логово и музыка: [мастерские, галерея и саундтрек Шопена](docs/lore/lair-and-soundtrack.md).
+Сюжетные печати: [семь районов, алхимических металлов и планет](docs/lore/seven-seals.md).
 
 - `index.html` — KEYNLOCK entry point
 - `css/` — modular CSS

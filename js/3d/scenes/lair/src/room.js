@@ -7,6 +7,7 @@ export function buildLair(scene, m) {
   const anchors = {};
   const hitTargets = [];
   const animated = [];
+  const artTextures = new Map();
   const staticGroup = new THREE.Group();
   scene.add(staticGroup);
   const shadow = mesh => { mesh.castShadow = true; mesh.receiveShadow = true; return mesh; };
@@ -39,7 +40,8 @@ export function buildLair(scene, m) {
     const texture = canvasTexture((ctx, w, h) => {
       ctx.fillStyle = '#c4aa79'; ctx.fillRect(0, 0, w, h);
       ctx.strokeStyle = '#695335'; ctx.lineWidth = 14; ctx.strokeRect(13, 13, w - 26, h - 26);
-      ctx.fillStyle = '#382d20'; ctx.font = 'bold 88px Georgia'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, w / 2, h / 2 + 2);
+      ctx.fillStyle = '#382d20'; ctx.font = `bold ${Math.min(88, Math.floor(1420 / text.length))}px Georgia`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, w / 2, h / 2 + 2);
     }, 1024, 180);
     return plane(parent, width, height, new THREE.MeshStandardMaterial({ map: texture, roughness: 1 }), x, y, z);
   };
@@ -53,7 +55,7 @@ export function buildLair(scene, m) {
 
   function buildShell() {
     scene.background = new THREE.Color('#2f3834');
-    scene.fog = new THREE.Fog('#514d40', 22, 43);
+    scene.fog = new THREE.Fog('#514d40', 25, 48);
     const floorBase = box(staticGroup, 17.3, .22, 13.8, m.darkWood, 0, -.14, .4);
     floorBase.castShadow = false;
     for (let i = 0; i < 38; i++) {
@@ -62,10 +64,15 @@ export function buildLair(scene, m) {
       plank.castShadow = false;
       if (i % 5 === 0) box(staticGroup, 17.1, .006, .009, m.darkWood, 0, .045, z - .155).castShadow = false;
     }
-    box(staticGroup, 17.4, 6.9, .27, m.plaster, 0, 3.31, -5.62).castShadow = false;
-    box(staticGroup, .27, 6.9, 13.0, m.plaster, -8.55, 3.31, .75).castShadow = false;
-    box(staticGroup, .27, 6.9, 13.0, m.plaster, 8.55, 3.31, .75).castShadow = false;
-    box(staticGroup, 17.5, .2, 13.5, m.darkWood, 0, 6.71, .65).castShadow = false;
+    // Double-height room, measured from the same floor datum as the original.
+    box(staticGroup, 17.4, 13.8, .27, m.plaster, 0, 6.76, -5.62).castShadow = false;
+    box(staticGroup, .27, 13.8, 13.0, m.plaster, -8.55, 6.76, .75).castShadow = false;
+    box(staticGroup, .27, 13.8, 13.0, m.plaster, 8.55, 6.76, .75).castShadow = false;
+    box(staticGroup, 17.5, .20, 13.5, m.darkWood, 0, 13.62, .65).castShadow = false;
+    // The left wall keeps the exact ochre gouache wallpaper from the atelier.
+    const leftFinish = plane(staticGroup, 12.88, 13.55, m.restorationWall, -8.391, 6.72, .75);
+    leftFinish.rotation.y = Math.PI / 2;
+    leftFinish.name = 'restoration-left-wall';
 
     // Wainscot panels, framed with dark timber; the left wall is kept free for the restoration easel.
     box(staticGroup, 17.25, 1.65, .08, m.agedWood, 0, .9, -5.39);
@@ -76,17 +83,35 @@ export function buildLair(scene, m) {
       if (i < 7) box(staticGroup, .92, .04, .045, m.oldBrass, i * 1.18 + .59, 1.49, -5.23);
     }
     for (const side of [-1, 1]) {
-      box(staticGroup, .08, 1.66, 12.9, m.agedWood, side * 8.35, .88, .75);
-      box(staticGroup, .19, .15, 12.9, m.darkWood, side * 8.23, 1.77, .75);
-      box(staticGroup, .22, .2, 12.9, m.walnut, side * 8.2, .17, .75);
+      // Leave the right-hand alcove tiled down to the floor as in Alchemy.
+      const strips = side < 0 ? [[.75, 12.9]] : [[4.08, 6.33], [-5.20, .72]];
+      for (const [z, length] of strips) {
+        box(staticGroup, .08, 1.66, length, m.agedWood, side * 8.35, .88, z);
+        box(staticGroup, .19, .15, length, m.darkWood, side * 8.23, 1.77, z);
+        box(staticGroup, .22, .20, length, m.walnut, side * 8.20, .17, z);
+      }
+      if (side < 0) box(staticGroup, .17, .20, 12.9, m.darkWood, side * 8.30, 6.85, .75);
+      else box(staticGroup, .17, .20, 6.33, m.darkWood, side * 8.30, 6.85, 4.08);
+      box(staticGroup, .22, .20, 12.9, m.walnut, side * 8.29, 13.30, .75);
     }
     for (const x of [-8.25, -4.25, 0, 4.25, 8.25]) {
-      box(staticGroup, .31, 6.6, .32, m.darkWood, x, 3.29, -5.32);
-      box(staticGroup, .45, .22, .48, m.walnut, x, 5.76, -5.31);
+      box(staticGroup, .31, 13.35, .32, m.darkWood, x, 6.64, -5.32);
+      box(staticGroup, .45, .22, .48, m.walnut, x, 12.70, -5.31);
     }
     for (const z of [-4.8, -1.7, 1.4, 4.5]) {
-      box(staticGroup, 17.15, .28, .3, m.darkWood, 0, 6.5, z);
-      for (const x of [-8.15, 8.15]) box(staticGroup, .42, .44, .52, m.walnut, x, 6.38, z);
+      box(staticGroup, 17.15, .30, .34, m.darkWood, 0, 13.37, z);
+      for (const x of [-8.15, 8.15]) box(staticGroup, .42, .44, .52, m.walnut, x, 13.22, z);
+    }
+    box(staticGroup, 17.22, .22, .23, m.darkWood, 0, 6.85, -5.27);
+    box(staticGroup, 17.22, .25, .32, m.walnut, 0, 13.24, -5.29);
+    // Small warm chandeliers make the extra storey visually legible.
+    for (const z of [-2.6, 2.7]) {
+      cylinder(staticGroup, .042, .042, 1.25, m.oldBrass, 0, 12.54, z, 10);
+      cylinder(staticGroup, .34, .27, .15, m.oldBrass, 0, 11.89, z, 16);
+      const globe = sphere(staticGroup, .25, new THREE.MeshBasicMaterial({ color: '#ffdfaa' }), 0, 11.75, z);
+      globe.castShadow = false;
+      const light = new THREE.PointLight('#ffd6a3', 6, 9, 2);
+      light.position.set(0, 11.75, z); staticGroup.add(light);
     }
     // A worn, woven carpet beneath the central table.
     const rugTex = canvasTexture((ctx, w, h) => {
@@ -105,8 +130,12 @@ export function buildLair(scene, m) {
   function framedPainting(parent, width, height, artName, x, y, z, yaw = 0) {
     const group = new THREE.Group(); group.position.set(x, y, z); group.rotation.y = yaw; parent.add(group);
     box(group, width + .13, height + .13, .1, m.darkWood, 0, 0, 0);
-    const art = new THREE.TextureLoader().load(`/assets/${artName}`);
-    art.colorSpace = THREE.SRGBColorSpace;
+    if (!artTextures.has(artName)) {
+      const image = new THREE.TextureLoader().load(`/assets/${artName}`);
+      image.colorSpace = THREE.SRGBColorSpace;
+      artTextures.set(artName, image);
+    }
+    const art = artTextures.get(artName);
     const artwork = new THREE.Mesh(new THREE.PlaneGeometry(width - .09, height - .09), new THREE.MeshStandardMaterial({ map: art, roughness: 1 }));
     artwork.position.z = .063; group.add(artwork);
     for (const side of [-1, 1]) {
@@ -171,51 +200,67 @@ export function buildLair(scene, m) {
   }
 
   function buildRestoration() {
-    const root = new THREE.Group(); root.position.set(-5.48, 0, -2.65); root.rotation.y = -.18; staticGroup.add(root);
-    // Tall, three-legged easel supporting a real painting from the existing restoration module.
-    rod(root, [-.66, .06, .36], [-.10, 3.65, -.12], .077, m.agedWood);
-    rod(root, [.66, .06, .36], [.10, 3.65, -.12], .077, m.agedWood);
-    rod(root, [0, .06, -.87], [0, 3.15, -.27], .058, m.darkWood);
-    box(root, .2, 3.35, .19, m.walnut, 0, 2.16, -.13);
-    box(root, 1.72, .12, .41, m.darkWood, 0, 1.08, .23);
-    box(root, .32, .11, .21, m.oldBrass, 0, 3.40, .36);
-    framedPainting(root, 1.63, 2.06, 'girl-pearl.jpg', 0, 2.33, .36, 0);
-    label(staticGroup, 'RESTAURATIO', -5.58, 4.92, -5.14, 2.1, .3);
+    // The orange wall, wood baseboards and collection are continuous with the
+    // existing "Ателье цвета" scene. Both easels face into the room from the left.
+    framedPainting(staticGroup, 1.62, 1.96, 'girl-pearl.jpg', -8.28, 7.72, -4.12, Math.PI / 2);
+    framedPainting(staticGroup, 1.76, 1.22, 'great-wave.jpg', -8.28, 8.28, -.45, Math.PI / 2);
+    framedPainting(staticGroup, 1.32, 1.45, 'starry-night.jpg', -8.28, 7.62, 3.38, Math.PI / 2);
+    const sign = label(staticGroup, 'ATELIER DE COULEUR', -8.27, 5.65, -2.0, 2.45, .34);
+    sign.rotation.y = Math.PI / 2;
 
-    const table = makeTable(staticGroup, 2.65, 1.13, -6.15, .63, .91);
-    box(table, 1.02, .025, .7, m.linen, -.38, 1.055, -.07);
+    const makeEasel = (x, z, yaw, caption) => {
+      const easel = new THREE.Group();
+      easel.name = caption === 'ЭТАЛОН' ? 'restoration-easel-reference' : 'restoration-easel-work';
+      easel.position.set(x, 0, z); easel.rotation.y = yaw; staticGroup.add(easel);
+      rod(easel, [-.71, .05, .34], [-.09, 3.75, -.10], .073, m.walnut);
+      rod(easel, [.71, .05, .34], [.09, 3.75, -.10], .073, m.walnut);
+      rod(easel, [0, .05, -1.00], [0, 3.12, -.22], .062, m.walnut);
+      for (const xx of [-.71, .71]) box(easel, .21, .08, .35, m.darkWood, xx, .055, .33);
+      box(easel, .22, .08, .35, m.darkWood, 0, .055, -1.00);
+      box(easel, .14, 2.93, .15, m.walnut, 0, 2.28, -.13);
+      box(easel, 1.88, .11, .27, m.darkWood, 0, 1.46, .34);
+      box(easel, 1.88, .072, .07, m.walnut, 0, 1.53, .49);
+      box(easel, .31, .12, .18, m.darkWood, 0, 3.20, .45);
+      framedPainting(easel, 1.86, 1.54, 'sardanapalus.jpg', 0, 2.35, .44);
+      // Small brass tag below the actual canvas: standard / restoration.
+      const tag = label(easel, caption, 0, 1.30, .50, 1.35, .19);
+      tag.castShadow = false;
+      return easel;
+    };
+    makeEasel(-6.83, -2.71, 1.14, 'ЭТАЛОН');
+    makeEasel(-6.49, .52, 1.04, 'РЕСТАВРАЦИЯ');
+
     const pigmentColors = [m.ruby, m.green, m.slate, m.liquidAmber, m.paperDark];
-    for (let i = 0; i < 5; i++) bottle(table, -.95 + i * .33, 1.23, -.30, pigmentColors[i], .30, .105);
-    for (let i = 0; i < 6; i++) brush(table, -.82 + i * .18, 1.057, .27, -.1 + .08 * i);
-    // Artist's palette and scattered swatches.
-    const palette = cylinder(table, .31, .33, .025, m.ash, .65, 1.065, .06, 24);
-    palette.scale.z = .73;
-    for (let i = 0; i < 5; i++) {
-      const dot = sphere(table, .045, pigmentColors[i], .47 + .12 * (i % 3), 1.088, -.01 + .12 * Math.floor(i / 3), 10);
-      dot.scale.y = .23;
+    // Paint shelves are actually attached to the left wall, including supports.
+    for (const y of [2.55, 3.48, 4.41]) {
+      box(staticGroup, .49, .11, 2.27, m.walnut, -8.09, y, 4.37, .021);
+      for (const z of [3.48, 5.27]) box(staticGroup, .36, .38, .07, m.darkWood, -8.23, y - .23, z);
     }
-    // Folded cloth and a magnifying glass, resting firmly on the work surface.
-    box(table, .51, .05, .38, m.canvas, .05, 1.07, .13, .012);
-    const lens = cylinder(table, .15, .15, .017, m.glassBlue, 1.04, 1.087, .19, 24);
-    cylinder(table, .165, .165, .026, m.oldBrass, 1.04, 1.075, .19, 24);
-    lens.position.y = 1.102;
-    rod(table, [1.06, 1.087, .31], [1.21, 1.09, .49], .028, m.darkWood);
-    // The wall shelves occupy the left edge, leaving a long expanse of empty plaster.
-    for (const y of [2.24, 3.30, 4.36]) {
-      box(staticGroup, 2.10, .10, .46, m.walnut, -7.18, y, -4.66, .025);
-      for (const x of [-7.96, -6.41]) box(staticGroup, .07, .42, .30, m.darkWood, x, y - .24, -4.75);
-    }
-    for (let i = 0; i < 9; i++) bottle(staticGroup, -8.02 + (i % 3) * .41, 2.48 + Math.floor(i / 3) * 1.06, -4.51,
-      pigmentColors[i % 5], .23 + (i % 2) * .08, .09);
-    const stool = new THREE.Group(); stool.position.set(-7.22, 0, 2.26); staticGroup.add(stool);
-    cylinder(stool, .45, .40, .14, m.ash, 0, .59, 0, 24);
-    for (const x of [-.26, .26]) for (const z of [-.25, .25]) rod(stool, [x, .12, z], [x * .75, .57, z * .75], .052, m.agedWood);
-    // Rolled canvas tubes along the skirting board.
+    for (let i = 0; i < 12; i++) bottle(staticGroup, -8.02, 2.81 + Math.floor(i / 4) * .93,
+      3.49 + (i % 4) * .58, pigmentColors[i % pigmentColors.length], .25 + (i % 2) * .07, .105);
+
+    const table = makeTable(staticGroup, 2.11, .97, -6.87, 3.77, .91);
+    table.rotation.y = Math.PI / 2;
+    box(table, .95, .025, .62, m.linen, -.43, 1.035, -.09);
+    for (let i = 0; i < 6; i++) brush(table, -.93 + i * .19, 1.047, .30, -.1 + i * .11);
+    for (let i = 0; i < 5; i++) bottle(table, -.87 + i * .30, 1.22, -.29, pigmentColors[i], .29, .095);
+    const palette = cylinder(table, .30, .32, .03, m.ash, .56, 1.055, .08, 24);
+    palette.scale.z = .76;
+    for (let i = 0; i < 5; i++) sphere(table, .045, pigmentColors[i], .46 + .11 * (i % 3), 1.080, -.01 + .10 * Math.floor(i / 3), 10).scale.y = .22;
+    box(table, .41, .045, .32, m.canvas, .13, 1.075, -.18);
+    cylinder(table, .14, .14, .023, m.oldBrass, .84, 1.085, -.20, 24);
+    cylinder(table, .12, .12, .016, m.glassBlue, .84, 1.104, -.20, 24);
+    rod(table, [.86, 1.1, -.09], [1.03, 1.11, .12], .023, m.walnut);
+
+    const stool = new THREE.Group(); stool.position.set(-5.62, 0, 4.50); staticGroup.add(stool);
+    cylinder(stool, .43, .40, .14, m.ash, 0, .57, 0, 24);
+    for (const xx of [-.26, .26]) for (const zz of [-.25, .25]) rod(stool, [xx, .09, zz], [xx * .75, .55, zz * .75], .052, m.walnut);
     for (let i = 0; i < 3; i++) {
-      const roll = cylinder(staticGroup, .105, .105, 1.7 + .35 * i, m.canvas, -7.75 + i * .30, 1.02 + i * .15, -3.82 + i * .16, 16);
-      roll.rotation.z = -.17 - i * .10;
+      const roll = cylinder(staticGroup, .095, .095, 1.30 + i * .19, m.canvas,
+        -8.07 + i * .14, .76 + i * .08, 5.80 + i * .18, 14);
+      roll.rotation.z = -.15 - i * .08;
     }
-    station('restoration', [-5.48, 2.20, -2.35], [3.75, 4.9, 3.25]);
+    station('restoration', [-6.39, 2.28, -1.06], [3.28, 4.9, 6.90]);
   }
 
   function makePaper(parent, x, y, z, rotation = 0, size = [.53, .76]) {
@@ -338,35 +383,126 @@ export function buildLair(scene, m) {
   }
 
   function buildAlchemy() {
-    // A complete but compact alcove: glass, still, burners, tile and wooden racks.
-    const alcove = new THREE.Group(); alcove.position.set(6.85, 0, -3.15); staticGroup.add(alcove);
-    const tile = new THREE.MeshStandardMaterial({ color: '#879086', roughness: .99 });
-    for (let r = 0; r < 9; r++) for (let c = 0; c < 5; c++) {
-      const t = box(alcove, .36, .35, .045, (r + c) % 4 === 0 ? m.ash : tile, -1.28 + c * .37, 2.10 + r * .36, -2.29);
-      t.castShadow = false;
+    // The entire laboratory is turned 90 degrees. Its FRONT faces the room,
+    // with its back, sage-tiled wall and tabletop against the RIGHT wall.
+    const alcove = new THREE.Group();
+    alcove.position.set(6.50, 0, -2.10);
+    alcove.rotation.y = -Math.PI / 2;
+    staticGroup.add(alcove);
+    const tileWall = plane(alcove, 5.45, 11.32, m.alchemyTile, 0, 5.66, -1.88);
+    tileWall.castShadow = false;
+    tileWall.name = 'alchemy-right-wall';
+    box(alcove, 5.64, .19, .14, m.darkWood, 0, 11.42, -1.80);
+    for (const xx of [-2.74, 2.74]) box(alcove, .13, 11.1, .14, m.darkWood, xx, 5.56, -1.78);
+    box(alcove, 5.62, .18, .19, m.walnut, 0, .20, -1.78);
+
+    const counter = makeTable(alcove, 4.75, 1.74, 0, -.86, .97);
+    counter.name = 'alchemy-facing-wall-table';
+    box(counter, 4.81, .14, 1.78, m.walnut, 0, 1.13, 0, .024);
+    // The lower, forward tier holds seven labelled metal reagents.
+    box(counter, 4.83, .19, .67, m.walnut, 0, .76, 1.12, .023);
+    box(counter, 4.88, .07, .13, m.oldBrass, 0, .68, 1.49);
+    for (const xx of [-2.06, 2.06]) box(counter, .16, .70, .16, m.darkWood, xx, .42, 1.27);
+
+    const reagentLabels = ['aurum', 'argentum', 'ferrum', 'cuprum', 'stannum', 'plumbum', 'hydrargyrum'];
+    const fluids = [m.liquidAmber, m.slate, m.green, m.ruby, m.liquidBlue, m.paperDark, m.liquidGreen];
+    const metalLabels = new THREE.TextureLoader();
+    for (let i = 0; i < 7; i++) {
+      const vial = new THREE.Group(); vial.position.set(-1.91 + i * .635, .88, 1.11); counter.add(vial);
+      cylinder(vial, .195, .20, .055, m.oldBrass, 0, .035, 0, 16);
+      cylinder(vial, .170, .176, .48, m.glassBlue, 0, .30, 0, 18);
+      cylinder(vial, .148, .15, .23, fluids[i], 0, .19, 0, 16).castShadow = false;
+      cylinder(vial, .087, .107, .105, m.agedWood, 0, .59, 0, 12);
+      const labelTex = metalLabels.load(`/assets/label-${reagentLabels[i]}.png`);
+      labelTex.colorSpace = THREE.SRGBColorSpace;
+      const tag = plane(vial, .266, .24,
+        new THREE.MeshBasicMaterial({ map: labelTex, transparent: true, depthWrite: false, side: THREE.DoubleSide }),
+        0, .29, .178);
+      tag.castShadow = false;
     }
-    const counter = makeTable(alcove, 2.27, 1.05, -.34, .02, .96);
-    box(counter, 2.34, .08, 1.12, m.ash, 0, 1.10, 0, .025);
-    for (const y of [2.5, 3.95]) {
-      box(alcove, 2.40, .12, .51, m.walnut, -.37, y, -1.96);
-      for (const x of [-1.43,.73]) box(alcove, .09, .38, .39, m.darkWood, x, y - .20, -1.98);
+
+    // The raised sample rack and its four coloured pigments match the laboratory.
+    const rack = new THREE.Group(); rack.position.set(0, 0, -.27); counter.add(rack);
+    box(rack, 1.68, .16, .54, m.walnut, 0, 1.28, 0);
+    for (const xx of [-.75, .75]) {
+      box(rack, .10, .94, .10, m.darkWood, xx, 1.72, 0);
+      cylinder(rack, .070, .070, .060, m.oldBrass, xx, 2.20, 0, 12);
     }
-    for (let i = 0; i < 10; i++) bottle(alcove, -1.36 + (i % 5) * .46, 2.75 + Math.floor(i / 5) * 1.46, -1.96,
-      [m.liquidGreen,m.liquidAmber,m.liquidBlue,m.ruby,m.paperDark][i % 5], .28 + (i % 3) * .06, .10);
-    const mainFlask = flask(counter, -.56, 1.18, -.15, m.liquidGreen, .72);
-    const smallFlask = flask(counter, .38, 1.16, .12, m.liquidAmber, .49);
-    const stand = new THREE.Group(); stand.position.set(.46, 0, -.28); counter.add(stand);
-    cylinder(stand, .31, .31, .04, m.iron, 0, 1.20, 0);
-    rod(stand, [0, 1.20, 0], [0, 2.27, 0], .035, m.iron);
-    rod(stand, [0, 2.05, 0], [-.85, 2.05, 0], .024, m.iron);
-    cylinder(stand, .13, .13, .035, m.brass, -.83, 2.05, 0).rotation.z = Math.PI / 2;
-    // A warm blue flame beneath the flask.
-    const flameMat = new THREE.MeshBasicMaterial({ color: '#88c9ce', transparent: true, opacity: .72, blending: THREE.AdditiveBlending, depthWrite: false });
-    const flame = new THREE.Mesh(new THREE.ConeGeometry(.11, .28, 12), flameMat);
-    flame.position.set(-.56, 1.23, -.15); counter.add(flame);
-    animated.push(t => { flame.scale.set(.86 + Math.sin(t * 7) * .10, .9 + Math.sin(t * 10) * .15, .9); mainFlask.rotation.z = Math.sin(t * .6) * .006; smallFlask.rotation.z = Math.sin(t * .8) * .008; });
-    label(staticGroup, 'ALCHEMIA', 6.46, 5.27, -5.11, 1.82, .28);
-    station('alchemy', [6.36, 2.26, -3.35], [2.95, 4.55, 2.60]);
+    box(rack, 1.78, .14, .55, m.walnut, 0, 2.16, -.03);
+    const pigments = [m.ruby, m.liquidBlue, m.liquidAmber, m.paper];
+    for (let i = 0; i < 4; i++) {
+      const xx = -.55 + i * .37;
+      cylinder(rack, .114, .114, .65, m.glassBlue, xx, 1.78, 0, 12);
+      cylinder(rack, .100, .10, .59, pigments[i], xx, 1.74, 0, 12).castShadow = false;
+      cylinder(rack, .124, .124, .042, m.oldBrass, xx, 2.20, 0, 12);
+    }
+
+    const makeGlassStand = (x, height) => {
+      const g = new THREE.Group(); g.position.set(x, 0, -.38); counter.add(g);
+      cylinder(g, .30, .32, .05, m.iron, 0, 1.20, 0, 22);
+      for (const side of [-1, 1]) rod(g, [side * .205, 1.22, 0], [side * .205, 1.20 + height, 0], .022, m.oldBrass);
+      for (const y of [1.34, 1.65, 1.94].filter(y => y < 1.17 + height)) {
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(.215, .013, 7, 30), m.oldBrass);
+        ring.rotation.x = Math.PI / 2; ring.position.set(0, y, 0); g.add(ring);
+      }
+      cylinder(g, .158, .166, height * .66, m.glassBlue, 0, 1.22 + height * .34, 0, 18).castShadow = false;
+      cylinder(g, .16, .16, .024, m.oldBrass, 0, 1.23 + height, 0, 18);
+    };
+    makeGlassStand(-1.58, .96);
+    makeGlassStand(1.62, 1.42);
+    // Mortar, pestle, stoppered jars and a little working burner.
+    cylinder(counter, .22, .24, .15, m.darkWood, -1.03, 1.26, -.14, 20);
+    sphere(counter, .18, m.charcoal, -1.03, 1.34, -.14).scale.y = .12;
+    rod(counter, [-1.03, 1.33, -.15], [-.70, 1.64, -.28], .052, m.ash);
+    bottle(counter, 1.25, 1.34, .16, m.liquidGreen, .25, .082);
+    bottle(counter, 1.56, 1.34, .18, m.liquidAmber, .23, .079);
+    const mixingFlask = flask(counter, .65, 1.23, .02, m.liquidBlue, .47);
+    const flameMat = new THREE.MeshBasicMaterial({ color: '#90dce2', transparent: true, opacity: .74, blending: THREE.AdditiveBlending, depthWrite: false });
+    const flame = new THREE.Mesh(new THREE.ConeGeometry(.095, .25, 12), flameMat);
+    flame.position.set(.65, 1.25, .02); counter.add(flame);
+    animated.push(t => {
+      flame.scale.set(.9 + Math.sin(t * 7) * .1, 1 + Math.sin(t * 9) * .14, .9);
+      mixingFlask.rotation.z = Math.sin(t * .65) * .006;
+    });
+    candle(counter, -2.12, 1.19, -.35);
+    candle(counter, 2.12, 1.19, -.35);
+
+    // Deep shelf, parchment recipe, antique clock and small jars on tile.
+    box(alcove, 5.38, .14, .39, m.walnut, 0, 3.25, -1.52);
+    for (const xx of [-2.2, 2.2]) box(alcove, .12, .35, .23, m.darkWood, xx, 3.02, -1.61);
+    for (const xx of [-2.40, -1.94, -1.47, 1.45, 1.91, 2.38]) {
+      cylinder(alcove, .10, .105, .29, m.glassBlue, xx, 3.45, -1.56, 14).castShadow = false;
+      cylinder(alcove, .085, .087, .14, m.liquidGreen, xx, 3.38, -1.56, 14).castShadow = false;
+      cylinder(alcove, .11, .10, .05, m.agedWood, xx, 3.62, -1.56, 12);
+    }
+    const recipe = canvasTexture((ctx, w, h) => {
+      ctx.fillStyle = '#bcad86'; ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = '#514b36'; ctx.lineWidth = 19; ctx.strokeRect(24, 24, w - 48, h - 48);
+      ctx.strokeStyle = 'rgba(70,61,43,.52)'; ctx.lineWidth = 3; ctx.strokeRect(47, 49, w - 94, h - 100);
+      ctx.fillStyle = '#393a30'; ctx.textAlign = 'center';
+      ctx.font = '32px Georgia'; ctx.fillText('ALCHEMIA · VII', w / 2, 123);
+      ctx.font = 'bold 56px Georgia'; ctx.fillText('РЕЦЕПТ ЗЕЛЬЯ', w / 2, 202);
+      ctx.font = '29px Georgia'; ctx.fillText('ЛИСТЪ № 183 · НАСТОЙКА', w / 2, 255);
+      ctx.font = 'bold 123px Georgia'; ctx.fillText('2● + 3♄ + 2△', w / 2, 417);
+      ctx.font = '29px Georgia'; ctx.fillText('НИКТО НЕ ЗНАЕТЪ СЕКРЕТА', w / 2, 576);
+    }, 1024, 650);
+    const recipeFrame = new THREE.Group(); recipeFrame.position.set(-.34, 4.46, -1.67); alcove.add(recipeFrame);
+    box(recipeFrame, 1.94, 1.44, .09, m.darkWood);
+    plane(recipeFrame, 1.77, 1.28, new THREE.MeshStandardMaterial({ map: recipe, roughness: 1 }), 0, 0, .065);
+    const clockBox = new THREE.Group(); clockBox.position.set(1.48, 4.37, -1.64); alcove.add(clockBox);
+    box(clockBox, .64, .78, .12, m.darkWood);
+    box(clockBox, .54, .66, .025, m.oldBrass, 0, 0, .079);
+    const dial = canvasTexture((ctx,w,h) => {
+      ctx.fillStyle = '#d0c7a5'; ctx.fillRect(0,0,w,h);
+      ctx.strokeStyle = '#3c483d'; ctx.lineWidth = 27; ctx.beginPath(); ctx.arc(w/2,h/2,420,0,Math.PI*2); ctx.stroke();
+      for(let i=0;i<12;i++) {const a=i*Math.PI/6; const r0=i%3===0?305:348; ctx.lineWidth=i%3===0?14:7;
+        ctx.beginPath();ctx.moveTo(512+Math.sin(a)*r0,512-Math.cos(a)*r0);ctx.lineTo(512+Math.sin(a)*390,512-Math.cos(a)*390);ctx.stroke();}
+      ctx.lineWidth=15;ctx.beginPath();ctx.moveTo(512,512);ctx.lineTo(512,250);ctx.stroke();
+      ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(512,512);ctx.lineTo(695,535);ctx.stroke();
+      ctx.fillStyle='#36443c';ctx.beginPath();ctx.arc(512,512,27,0,Math.PI*2);ctx.fill();
+    });
+    plane(clockBox, .48, .54, new THREE.MeshBasicMaterial({ map: dial }), 0, 0, .098);
+    station('alchemy', [6.86, 2.34, -2.10], [3.05, 5.8, 5.22]);
   }
 
   function buildGramophone() {
@@ -395,6 +531,11 @@ export function buildLair(scene, m) {
     // Small old painting on the wall, collected trophies and carefully spaced frames.
     framedPainting(staticGroup, 1.20, .85, 'great-wave.jpg', -2.75, 4.22, -5.09);
     framedPainting(staticGroup, 1.03, .86, 'starry-night.jpg', 7.69, 4.45, -5.12);
+    // The new second storey reads as a portrait gallery above the working stations.
+    framedPainting(staticGroup, 1.40, 1.72, 'girl-pearl.jpg', -6.32, 9.42, -5.12);
+    framedPainting(staticGroup, 1.68, 1.24, 'sardanapalus.jpg', -2.65, 9.70, -5.12);
+    framedPainting(staticGroup, 1.68, 1.28, 'great-wave.jpg', 2.61, 9.71, -5.12);
+    framedPainting(staticGroup, 1.41, 1.69, 'starry-night.jpg', 6.41, 9.41, -5.12);
     // Column lamps create pools of warm light around the room.
     for (const x of [-7.98, 7.98]) {
       const lamp = new THREE.Group(); lamp.position.set(x, 3.10, -1.10); staticGroup.add(lamp);
@@ -405,11 +546,11 @@ export function buildLair(scene, m) {
     // Real dust motes drift through the sunlight.
     let seed = 42; const rng = () => ((seed = (1664525 * seed + 1013904223) >>> 0) / 4294967296);
     const count = 185, positions = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) { positions[i * 3] = (rng() - .5) * 15; positions[i * 3 + 1] = rng() * 5.6 + .35; positions[i * 3 + 2] = rng() * 10 - 4.9; }
+    for (let i = 0; i < count; i++) { positions[i * 3] = (rng() - .5) * 15; positions[i * 3 + 1] = rng() * 12.9 + .35; positions[i * 3 + 2] = rng() * 10 - 4.9; }
     const geom = new THREE.BufferGeometry(); geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     const dust = new THREE.Points(geom, new THREE.PointsMaterial({ color: '#ffe8bc', size: .019, transparent: true, opacity: .42, depthWrite: false }));
     staticGroup.add(dust);
-    animated.push(t => { dust.rotation.y = Math.sin(t * .075) * .004; const att = geom.getAttribute('position'); for (let i = 1; i < att.count * 3; i += 3) { att.array[i] += .0005; if (att.array[i] > 6.2) att.array[i] = .2; } att.needsUpdate = true; });
+    animated.push(t => { dust.rotation.y = Math.sin(t * .075) * .004; const att = geom.getAttribute('position'); for (let i = 1; i < att.count * 3; i += 3) { att.array[i] += .0005; if (att.array[i] > 13.25) att.array[i] = .2; } att.needsUpdate = true; });
   }
 
   buildShell(); buildWindow(); buildRestoration(); buildPlanning(); buildWorkbench(); buildAlchemy(); buildGramophone(); buildDetails();

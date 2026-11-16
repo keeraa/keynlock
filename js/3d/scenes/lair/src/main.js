@@ -13,16 +13,16 @@ const panel = document.querySelector('#zone-panel');
 const zones = {
   restoration: {
     number: '01', kicker: 'АТЕЛЬЕ САЙ', title: 'Реставрация',
-    description: 'Здесь Сай очищает спасённые картины, восстанавливает красочный слой и изучает надписи, скрытые под старым лаком. Мольберт стоит у левой стены рядом с красками и инструментами.',
+    description: 'У охристой левой стены стоят два мольберта — эталон и реставрация «Смерти Сарданапала». Рядом краски, кисти, палитра и коллекция спасённых полотен.',
     status: '3D-мастерская уже существует как отдельная сцена.',
     link: 'https://atelier-restoration-1115.k1r11111.chatgpt.site/',
-    camera: [-5.25, 3.08, 5.3], target: [-5.44, 2.13, -2.46],
+    camera: [-.15, 4.44, 2.55], target: [-6.45, 2.42, -1.12],
   },
   planning: {
     number: '02', kicker: 'БАЗА КОМАНДЫ', title: 'Карта и дела',
     description: 'Карта каналов и кварталов Киенлока, заметки о заказах и стол, за которым Кай, Сай и Тик готовят очередную вылазку. Сюда команда возвращается с добычей.',
     status: 'Штаб связывает мастерские, коллекцию и будущие сюжетные задания.',
-    link: null, camera: [.15, 3.35, 7.5], target: [0, 1.75, -.7],
+    link: null, camera: [.15, 3.80, 7.75], target: [0, 1.75, -.7],
   },
   workbench: {
     number: '03', kicker: 'МАСТЕРСКАЯ ТИКА', title: 'Верстак',
@@ -33,10 +33,10 @@ const zones = {
   },
   alchemy: {
     number: '04', kicker: 'СОСТАВЫ И РЕАГЕНТЫ', title: 'Алхимия',
-    description: 'В правом углу стоят колбы, реторты, горелка и стеллаж с пигментами. Команда смешивает растворы, экспериментирует с металлами и готовит составы для сложной реставрации.',
+    description: 'Алхимический стол теперь обращён к правой стене с зелёной гуашевой плиткой. На нём два яруса, семь реагентов с этикетками, цветные пигменты, стекло и свечи; над столом рецепт и часы.',
     status: 'Модульная 3D-лаборатория сохранена отдельно.',
     link: 'https://keynlock-alchemy-lab-1115.k1r11111.chatgpt.site/',
-    camera: [6.30, 3.22, 3.65], target: [6.42, 2.15, -3.26],
+    camera: [1.12, 4.16, -1.24], target: [7.10, 2.54, -2.10],
   },
   gramophone: {
     number: '05', kicker: 'СКРЫТАЯ КОЛЛЕКЦИЯ', title: 'Музыка в Логове',
@@ -53,8 +53,8 @@ let desiredTarget = new THREE.Vector3();
 let currentZone = null;
 let startPointer = null;
 let hoveredZone = null;
-const homePosition = new THREE.Vector3(.25, 3.82, 13.7);
-const homeTarget = new THREE.Vector3(0, 2.2, -1.64);
+const homePosition = new THREE.Vector3(.25, 6.48, 16.2);
+const homeTarget = new THREE.Vector3(0, 4.12, -1.60);
 const clock = new THREE.Clock();
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
@@ -87,8 +87,8 @@ function setup() {
   controls.maxDistance = 21;
   controls.minPolarAngle = .72;
   controls.maxPolarAngle = 1.65;
-  controls.minAzimuthAngle = -.76;
-  controls.maxAzimuthAngle = .76;
+  controls.minAzimuthAngle = -1.7;
+  controls.maxAzimuthAngle = 1.7;
   controls.rotateSpeed = .55;
   controls.zoomSpeed = .70;
   controls.addEventListener('start', () => { transitioning = false; });
@@ -96,12 +96,12 @@ function setup() {
   scene.add(new THREE.HemisphereLight('#ffe5bb', '#36453f', 2.0));
   scene.add(new THREE.AmbientLight('#d4bb9b', .36));
   const sun = new THREE.DirectionalLight('#ffdbac', 3.2);
-  sun.position.set(-3.5, 8.3, 5.4);
+  sun.position.set(-3.5, 15.7, 6.4);
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
   sun.shadow.camera.near = .4; sun.shadow.camera.far = 35;
   sun.shadow.camera.left = -13; sun.shadow.camera.right = 13;
-  sun.shadow.camera.top = 11; sun.shadow.camera.bottom = -10;
+  sun.shadow.camera.top = 17; sun.shadow.camera.bottom = -12;
   sun.shadow.bias = -.00022; sun.shadow.normalBias = .02;
   scene.add(sun);
   const windowLight = new THREE.PointLight('#e9c090', 25, 11, 2);
@@ -142,8 +142,8 @@ function focus(position, target) {
   desiredPosition.set(...position);
   desiredTarget.set(...target);
   transitioning = true;
-  controls.minAzimuthAngle = -.90;
-  controls.maxAzimuthAngle = .90;
+  controls.minAzimuthAngle = -1.7;
+  controls.maxAzimuthAngle = 1.7;
 }
 
 function openZone(id) {

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { makeAlchemyTileTexture } from './wall-tiles.js';
 
 export function createMaterials() {
   const textureLoader = new THREE.TextureLoader();
@@ -11,19 +12,30 @@ export function createMaterials() {
     return texture;
   };
   const mat = (color, roughness = .9, metalness = 0) => new THREE.MeshStandardMaterial({ color, roughness, metalness });
-  const walnutMap = load('wood-walnut-gouache-v2.webp');
-  const ashMap = load('wood-ash-gouache-v2.webp');
-  const oakMap = load('wood-oak-gouache-v2.webp');
-  const plasterMap = load('atelier-wallpaper-gouache.webp', 1.5, 1.2);
+  // These are the painted wood finishes already used in the alchemy scene.
+  // Their broad brushwork is deliberately quieter than the earlier swirled grain.
+  const walnutMap = load('wood-gouache-walnut.webp');
+  const ashMap = load('wood-gouache-ash.webp');
+  const oakMap = load('wood-gouache-oak.webp');
+  const plasterMap = load('atelier-wallpaper-gouache.webp', 1.3, 2.15);
+  const restorationPlasterMap = load('atelier-wallpaper-gouache.webp', 1.0, 1.8);
+  const floorMap = walnutMap.clone();
+  floorMap.repeat.set(5.2, .68);
+  floorMap.needsUpdate = true;
+  const floorAlternateMap = floorMap.clone();
+  floorAlternateMap.offset.set(.17, .14);
+  floorAlternateMap.needsUpdate = true;
   const materials = {
-    walnut: new THREE.MeshStandardMaterial({ map: walnutMap, color: '#a08a6e', roughness: .93 }),
-    agedWood: new THREE.MeshStandardMaterial({ map: walnutMap, color: '#766048', roughness: .92 }),
-    darkWood: new THREE.MeshStandardMaterial({ map: walnutMap, color: '#514330', roughness: .94 }),
-    ash: new THREE.MeshStandardMaterial({ map: ashMap, color: '#bba88e', roughness: .94 }),
-    oak: new THREE.MeshStandardMaterial({ map: oakMap, color: '#aa916c', roughness: .94 }),
-    plaster: new THREE.MeshStandardMaterial({ map: plasterMap, color: '#c7b8a5', roughness: 1 }),
-    floor: new THREE.MeshStandardMaterial({ map: walnutMap, color: '#9b7857', roughness: .89 }),
-    floorAlternate: new THREE.MeshStandardMaterial({ map: walnutMap, color: '#80674c', roughness: .9 }),
+    walnut: new THREE.MeshStandardMaterial({ map: walnutMap, color: '#ffffff', roughness: .96 }),
+    agedWood: new THREE.MeshStandardMaterial({ map: walnutMap, color: '#d0b8a5', roughness: .96 }),
+    darkWood: new THREE.MeshStandardMaterial({ map: walnutMap, color: '#917c6e', roughness: .98 }),
+    ash: new THREE.MeshStandardMaterial({ map: ashMap, color: '#ffffff', roughness: .95 }),
+    oak: new THREE.MeshStandardMaterial({ map: oakMap, color: '#ffffff', roughness: .96 }),
+    plaster: new THREE.MeshStandardMaterial({ map: plasterMap, color: '#e0d8d0', roughness: 1 }),
+    restorationWall: new THREE.MeshStandardMaterial({ map: restorationPlasterMap, color: '#f9cbaa', roughness: 1, side: THREE.DoubleSide }),
+    alchemyTile: new THREE.MeshStandardMaterial({ map: makeAlchemyTileTexture(THREE, { width: 18, height: 24 }), roughness: 1, metalness: 0, side: THREE.DoubleSide }),
+    floor: new THREE.MeshStandardMaterial({ map: floorMap, color: '#fff4e8', roughness: 1 }),
+    floorAlternate: new THREE.MeshStandardMaterial({ map: floorAlternateMap, color: '#e0c5b7', roughness: 1 }),
     brass: mat('#b49459', .36, .63),
     oldBrass: mat('#806e4d', .56, .52),
     copper: mat('#986547', .46, .64),

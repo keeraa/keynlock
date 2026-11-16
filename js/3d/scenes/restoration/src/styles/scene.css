@@ -65,37 +65,44 @@
   margin: 0;
 }
 
+.artwork-heading #art-author {
+  font-size: 14px;
+  line-height: 1.55;
+}
+
 .artwork-heading .art-description {
   margin-top: 12px;
-  font: 400 11px/1.5 Manrope,sans-serif;
-  color: #eaddc3;
+  font: 500 14px/1.55 Manrope,sans-serif;
+  color: #fff0d7;
   max-width: 290px;
 }
 
 .art-ban-notice {
   margin-top: 12px;
-  padding: 9px 11px;
-  background: #241b16bc;
-  border-left: 2px solid #c77f5c;
+  padding: 11px 13px;
+  background: #7f2a28ef;
+  border: 1px solid #d57965;
+  border-left: 3px solid #efa088;
   max-width: 282px;
+  box-shadow: 0 6px 20px #260b0a87;
   text-shadow: none;
 }
 .art-ban-notice span {
   display: block;
   font: 700 9px/1.2 Manrope,sans-serif;
   letter-spacing: .12em;
-  color: #e5aa8a;
+  color: #ffc3b2;
 }
 .art-ban-notice p {
   margin-top: 5px;
-  font: 500 10px/1.45 Manrope,sans-serif;
-  color: #f5e7d3;
+  font: 600 12px/1.5 Manrope,sans-serif;
+  color: #fff1e8;
 }
 .art-ban-notice small {
   display: block;
   margin-top: 8px;
   font: 700 9px/1.35 Manrope,sans-serif;
-  color: #d9ad7f;
+  color: #ffccaf;
   letter-spacing: .02em;
 }
 

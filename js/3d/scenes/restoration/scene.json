@@ -5,7 +5,7 @@
   "threeVersion": "0.187.0",
   "status": "standalone",
   "source": "ChatGPT Sites",
-  "sourceCommit": "bcd94d699f875553f74c8c402098b18e9092dea1",
+  "sourceCommit": "2d426f82723fbc278cdeb8281afb224f9d21832f",
   "savedOn": "2026-11-16",
   "liveUrl": "https://atelier-restoration-1115.k1r11111.chatgpt.site",
   "entry": "index.html",
@@ -48,7 +48,15 @@
       "policy": "Мы сделаем вас счастливыми",
       "agency": "Палата Образов",
       "displayLayout": "under-artwork-title-left",
-      "specificBansRevised": 9
+      "specificBansRevised": 9,
+      "typography": {
+        "description": "larger-unframed-text",
+        "artistYear": "enlarged",
+        "ban": "red-plaque"
+      },
+      "revisedPaintings": [
+        "mucha-dance"
+      ]
     }
   },
   "integration": {
@@ -63,7 +71,7 @@
       "navigation/easel-overlay.js"
     ],
     "stylesheets": 8,
-    "tests": 36,
+    "tests": 37,
     "mainFileLines": 314,
     "backgroundBlur": "half-resolution two-pass depth-aware Gaussian; radius 6.5px; strength 72%",
     "foregroundOnlyOutlines": true,

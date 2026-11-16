@@ -22,6 +22,7 @@ test('censorship allegations match the four agreed examples', () => {
   assert.equal(getPaintingLore('rokeby-venus').banReason, 'Пропаганда самолюбования.');
   assert.equal(getPaintingLore('creation-of-adam').banReason, 'Пропаганда эротики.');
   assert.equal(getPaintingLore('galaxy-musicians').banReason, 'Пропаганда праздности.');
+  assert.equal(getPaintingLore('mucha-dance').banReason, 'Пропаганда оргий и эротики. Танец перед групповым соитием.');
 });
 
 test('locale API retains Russian fallback and localized UI badge labels', () => {
@@ -56,4 +57,14 @@ test('gallery keeps artwork lore below the left-side painting heading', () => {
   assert.ok(headingStart >= 0 && titleIndex > headingStart && captionIndex > titleIndex);
   assert.ok(loreIndex > captionIndex && toolbarActionsIndex > loreIndex);
   assert.equal(html.match(/id="wall-art-lore"/g)?.length, 1);
+});
+
+test('focused wall artwork uses plain large captions and a distinct red prohibition plaque', () => {
+  const css = readFileSync(new URL('../src/styles/wall-gallery.css', import.meta.url), 'utf8');
+  const loreStyles = css.slice(css.indexOf('.wall-art-lore {'), css.indexOf('.stage.wall-gallery-active'));
+  assert.match(loreStyles, /background:\s*transparent/);
+  assert.match(loreStyles, /border:\s*0/);
+  assert.match(loreStyles, /font:\s*500 15px\/1\.6/);
+  assert.match(loreStyles, /\.wall-art-ban\s*\{[^}]*background:\s*#7f2a28ef/);
+  assert.match(css, /\.wall-gallery-heading > small\s*\{[^}]*14px/);
 });

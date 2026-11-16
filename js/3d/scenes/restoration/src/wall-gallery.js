@@ -1,4 +1,6 @@
 import { createFrameGeometry } from './frame-geometry.js';
+import { createWallArtworkPicker } from './wall-artwork-picker.js';
+import { createWallPreviewCache } from './wall-preview-cache.js';
 import { layoutWallPaintings, WALL_CAPACITY, WALL_TOP,
   WALL_WIDTH, WALL_COLUMNS } from './wall-layout.js';
 
@@ -44,11 +46,10 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood, o
   labelStrip.position.set(0, WALL_TOP - .42, .035);
   root.add(labelStrip);
 
-  const raycaster = new THREE.Raycaster();
-  const pointer = new THREE.Vector2();
-  const previewCache = new Map();
+  const previewCache = createWallPreviewCache({ THREE, renderer });
   const artworks = new Map();
   const imageMeshes = [];
+  const selection = createWallArtworkPicker({ THREE, camera, renderer, artworks, imageMeshes });
   const imageLoader = new THREE.TextureLoader();
   const backingMaterial = new THREE.MeshStandardMaterial({ color: '#b29e7d', roughness: 1 });
   const imageMaterials = new Set();
@@ -57,50 +58,6 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood, o
   let fullTexture = null;
   let focusRequest = 0;
   let layout = layoutWallPaintings([]);
-
-  async function previewFor(art) {
-    if (previewCache.has(art.id)) return previewCache.get(art.id);
-    const promise = (async () => {
-      let picture;
-      try {
-        picture = await new Promise((resolve, reject) => {
-          const image = new Image();
-          image.crossOrigin = 'anonymous';
-          const timer = setTimeout(() => {
-            image.onload = image.onerror = null;
-            image.src = '';
-            reject(new Error(`Painting timed out: ${art.id}`));
-          }, 12000);
-          image.onload = () => { clearTimeout(timer); resolve(image); };
-          image.onerror = () => { clearTimeout(timer); reject(new Error(`Painting unavailable: ${art.id}`)); };
-          image.src = art.image;
-        });
-      } catch (error) { console.warn('Не удалось загрузить миниатюру на стену', error); }
-      const aspect = picture ? picture.naturalWidth / picture.naturalHeight : 1;
-      const canvas = document.createElement('canvas');
-      const maxSize = 480;
-      canvas.width = Math.max(1, Math.round(Math.min(maxSize, maxSize * aspect)));
-      canvas.height = Math.max(1, Math.round(Math.min(maxSize, maxSize / aspect)));
-      const context = canvas.getContext('2d');
-      context.fillStyle = '#b7a78e';
-      context.fillRect(0, 0, canvas.width, canvas.height);
-      if (picture) {
-        try { context.drawImage(picture, 0, 0, canvas.width, canvas.height); }
-        catch { context.fillStyle = '#71634d'; context.fillRect(7, 7, canvas.width - 14, canvas.height - 14); }
-      } else {
-        context.fillStyle = '#685c49';
-        context.font = 'bold 12px sans-serif';
-        context.textAlign = 'center';
-        context.fillText?.('РЕПРОДУКЦИЯ', canvas.width / 2, canvas.height / 2);
-      }
-      const texture = new THREE.CanvasTexture(canvas);
-      texture.colorSpace = THREE.SRGBColorSpace;
-      texture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
-      return { texture, aspect };
-    })();
-    previewCache.set(art.id, promise);
-    return promise;
-  }
 
   function clearFocus() {
     focusRequest++;
@@ -146,12 +103,13 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood, o
   async function setPaintings(paintings) {
     const request = ++revision;
     const selected = paintings.slice(0, WALL_CAPACITY);
-    const resolved = await Promise.all(selected.map(async (art) => ({ ...art, ...await previewFor(art) })));
+    const resolved = await Promise.all(selected.map(async (art) => ({ ...art, ...await previewCache.previewFor(art) })));
     if (request !== revision) return layout;
     clearFrames();
     layout = layoutWallPaintings(resolved);
+    const sourceById = new Map(resolved.map((art) => [art.id, art]));
     for (const placement of layout.placements) {
-      const source = resolved.find((item) => item.id === placement.id);
+      const source = sourceById.get(placement.id);
       const mount = new THREE.Group();
       mount.name = `restored-${placement.id}`;
       mount.position.set(placement.x, placement.y, 0);
@@ -179,82 +137,16 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood, o
       mount.add(frame);
       artworks.set(placement.id, { image, preview: source.texture, art: source, placement });
     }
-    const keep = new Set(selected.map((art) => art.id));
-    for (const [id, promise] of previewCache) {
-      if (keep.has(id)) continue;
-      previewCache.delete(id);
-      void promise.then(({ texture }) => texture.dispose());
-    }
+    previewCache.retain(selected.map((art) => art.id));
     renderer.shadowMap.needsUpdate = true;
     onLayout(layout);
     return layout;
   }
 
-  function hitTest(event) {
-    if (!imageMeshes.length) return null;
-    const bounds = renderer.domElement.getBoundingClientRect();
-    pointer.set((event.clientX - bounds.left) / bounds.width * 2 - 1,
-      -(event.clientY - bounds.top) / bounds.height * 2 + 1);
-    raycaster.setFromCamera(pointer, camera);
-    const hit = raycaster.intersectObjects(imageMeshes, false)[0];
-    return hit ? artworks.get(hit.object.userData.galleryId)?.placement || null : null;
-  }
-
-  /** Pick the artwork with the strongest screen presence, even without a pointer hit. */
-  function getProminentPainting(previousId = null) {
-    if (!artworks.size) return null;
-    camera.updateMatrixWorld();
-    root.updateWorldMatrix(true, false);
-    const corner = new THREE.Vector3();
-    const viewCenter = new THREE.Vector3();
-    const scores = new Map();
-    let winner = null;
-    let bestScore = 0;
-
-    for (const { placement } of artworks.values()) {
-      viewCenter.set(placement.x, placement.y, .058).applyMatrix4(root.matrixWorld)
-        .applyMatrix4(camera.matrixWorldInverse);
-      if (viewCenter.z >= -camera.near) continue;
-
-      const halfWidth = placement.width / 2;
-      const halfHeight = placement.height / 2;
-      let left = Infinity, right = -Infinity, bottom = Infinity, top = -Infinity;
-      for (const x of [-halfWidth, halfWidth]) {
-        for (const y of [-halfHeight, halfHeight]) {
-          corner.set(placement.x + x, placement.y + y, .058)
-            .applyMatrix4(root.matrixWorld).project(camera);
-          left = Math.min(left, corner.x);
-          right = Math.max(right, corner.x);
-          bottom = Math.min(bottom, corner.y);
-          top = Math.max(top, corner.y);
-        }
-      }
-      left = Math.max(-1, left);
-      right = Math.min(1, right);
-      bottom = Math.max(-1, bottom);
-      top = Math.min(1, top);
-      if (left >= right || bottom >= top) continue;
-
-      const visibleArea = (right - left) * (top - bottom);
-      const dx = left > 0 ? left : right < 0 ? right : 0;
-      const dy = bottom > 0 ? bottom : top < 0 ? top : 0;
-      const score = visibleArea / (1 + 8 * (dx * dx + dy * dy));
-      scores.set(placement.id, score);
-      if (score > bestScore) { winner = placement; bestScore = score; }
-    }
-    // Prevent rapid title switching when two frames are similarly prominent.
-    if (previousId && winner?.id !== previousId &&
-        (scores.get(previousId) || 0) * 1.12 >= bestScore) {
-      return artworks.get(previousId)?.placement || winner;
-    }
-    return bestScore > .002 ? winner : null;
-  }
-
   return {
-    root, paintingsRoot, setPaintings, hitTest, showHighResolution, clearFocus,
-    getProminentPainting,
+    root, paintingsRoot, setPaintings, ...selection, showHighResolution, clearFocus,
     getPlacement: (id) => artworks.get(id)?.placement || null,
     getLayout: () => layout,
-    clear() { revision++; clearFrames(); },
+    clear() { revision++; clearFrames(); previewCache.clear(); },
   };
 }

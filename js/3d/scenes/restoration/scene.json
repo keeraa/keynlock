@@ -5,7 +5,7 @@
   "threeVersion": "0.187.0",
   "status": "standalone",
   "source": "ChatGPT Sites",
-  "sourceCommit": "b5abd11ef59a1e6a4739cc2ae42689403b3bf5c9",
+  "sourceCommit": "02569766969b481ea3f519c06bdb574840b91370",
   "savedOn": "2026-11-16",
   "liveUrl": "https://atelier-restoration-1115.k1r11111.chatgpt.site",
   "entry": "index.html",
@@ -66,7 +66,8 @@
       "enabled": true,
       "method": "screen-space-visible-area-weighted-by-center-proximity",
       "updateThrottleMs": 90,
-      "manualFocusPreserved": true
+      "manualFocusPreserved": true,
+      "textureMemory": "shared-wall-preview-cache-with-eviction-disposal"
     }
   },
   "integration": {
@@ -81,10 +82,17 @@
       "navigation/easel-overlay.js"
     ],
     "stylesheets": 8,
-    "tests": 38,
+    "tests": 40,
     "mainFileLines": 314,
     "backgroundBlur": "half-resolution two-pass depth-aware Gaussian; radius 6.5px; strength 72%",
     "foregroundOnlyOutlines": true,
-    "loreModule": "src/lore/painting-lore.js"
+    "loreModule": "src/lore/painting-lore.js",
+    "galleryModules": [
+      "src/wall-gallery.js",
+      "src/wall-artwork-picker.js",
+      "src/wall-preview-cache.js",
+      "src/wall-artwork-info.js",
+      "src/wall-exhibition-controller.js"
+    ]
   }
 }

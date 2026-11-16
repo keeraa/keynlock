@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "strict": true,
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM"],
+    "skipLibCheck": true,
+    "types": []
+  },
+  "include": [
+    "src/js/types/contracts.d.ts",
+    "src/js/gameplay/commands.js",
+    "src/js/gameplay/actions.js",
+    "src/js/ui/keymap.js",
+    "src/js/ui/appearance-actions.js",
+    "src/js/mechanisms/registry.js",
+    "tests/types.test.ts"
+  ]
+}

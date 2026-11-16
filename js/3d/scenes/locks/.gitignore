@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.tmp-site-build/
+reports/browser-benchmark.json
+reports/browser-*.png
+reports/visual/

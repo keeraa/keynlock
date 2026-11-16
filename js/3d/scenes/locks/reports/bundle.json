@@ -1,0 +1,9 @@
+{
+  "bundler": "esbuild",
+  "treeShaking": true,
+  "minified": true,
+  "sourceBytes": 2535636,
+  "outputBundleBytes": 1020045,
+  "reductionPercent": 60,
+  "inputs": 79
+}

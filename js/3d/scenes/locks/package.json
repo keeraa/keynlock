@@ -1,0 +1,23 @@
+{
+  "name": "keynlock-pin-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check": "npm run typecheck && node --check src/js/main.js && node --check tests/browser-smoke.mjs && node --check tests/browser-visual.mjs && node --check scripts/serve.mjs && node --test tests/*.test.mjs",
+    "typecheck": "tsc --project tsconfig.json",
+    "release:check": "npm run build && npm run check",
+    "serve": "node scripts/serve.mjs",
+    "test:browser": "node tests/browser-smoke.mjs",
+    "test:visual": "node tests/browser-visual.mjs",
+    "visual:baseline": "KEYNLOCK_VISUAL_MODE=update node tests/browser-visual.mjs",
+    "visual:verify": "KEYNLOCK_VISUAL_MODE=compare node tests/browser-visual.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "playwright-core": "^1.65.1",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,14 +1,25 @@
-# KEYNLOCK — 3D lock mechanisms
+# KEYNLOCK — 3D-механизмы замков
 
-The `lab/` directory contains a self-contained, deployable snapshot of the
-**Keynlock — 3D замки** laboratory, version **51** (2026-11-16).
+Исходники лаборатории Three.js r187 из версии **51** (2026-11-16).
+Исходный коммит лаборатории: `5f679e5e03ea904b12112978257981390100625d`.
 
-Source deployment: https://keynlock-pin-lab-1114.k1r11111.chatgpt.site
+- `src/js/` — модульные механизмы, геометрия, физика, игровые правила, эффекты, UI и управление.
+- `src/assets/` — исходные текстуры.
+- `tests/` — модульные, механические, браузерные и визуальные проверки.
+- `docs/` — архитектура, механики и требования к качеству.
+- `art/` — оригинал росписи рукояти.
+- `lab/` — точный снимок опубликованной собранной версии, запускаемый самостоятельно.
+- `dist/` — генерируется при сборке, в Git не сохраняется.
 
-Open `lab/index.html` through the repository's static HTTP server. All required
-assets are stored locally in `lab/`; the laboratory is isolated from the existing
-2D game until an integration is explicitly implemented.
+Лаборатория: https://keynlock-pin-lab-1114.k1r11111.chatgpt.site
 
-`lab/app.js` is the published minified Three.js application bundle. It preserves
-the working scene but is **not** the original modular authoring source; future
-refactoring should start from the original source repository where available.
+Команды из этого каталога:
+
+```bash
+npm ci
+npm run release:check
+npm run serve
+```
+
+Для локальной проверки исходников — `dist/index.html` через сервер. Существующая
+2D-игра KEYNLOCK не импортирует лабораторию автоматически.

@@ -94,7 +94,10 @@ for (const ref of [...scripts, ...links]) {
 
 // Standalone 3D laboratories have their own entry points and storage lifecycle.
 const jsFiles = walk(resolve(root, 'js'), f => f.endsWith('.js') && !posix(relative(root, f)).startsWith('js/3d/'));
-const labFiles = walk(resolve(root, 'js/3d'), f => f.endsWith('.js'));
+const labFiles = [
+  ...walk(resolve(root, 'js/3d/scenes/locks/src/js'), f => f.endsWith('.js')),
+  ...walk(resolve(root, 'js/3d/scenes/locks/lab'), f => f.endsWith('.js')),
+];
 for (const file of labFiles) {
   const result = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
   if (result.status !== 0) fail(`3D lab JS syntax failed: ${posix(relative(root, file))}\n${result.stderr}`);

@@ -1,0 +1,15 @@
+{
+  "id": "japanese",
+  "name": "Японская коллекция",
+  "type": "pick-handle-paintings",
+  "items": [
+    {
+      "id": "geisha-red-fan",
+      "name": "Гейша и золотой веер",
+      "texture": "geisha-red-fan.webp",
+      "source": "art/handles/japanese/geisha-red-fan-original.png",
+      "finish": "красный лак",
+      "sides": 2
+    }
+  ]
+}

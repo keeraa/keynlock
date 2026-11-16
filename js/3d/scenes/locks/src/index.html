@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#09151d" />
+  <title>SIKISI — Anatomy of a Lock · Three.js r187</title>
+  <link rel="stylesheet" href="./styles/app.css" />
+  <script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.js",
+    "three/addons/controls/OrbitControls.js": "./vendor/OrbitControls.js",
+    "three/addons/geometries/RoundedBoxGeometry.js": "./vendor/RoundedBoxGeometry.js",
+    "three/core": "./vendor/three-core.js"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app">
+  <canvas id="viewport" aria-label="Интерактивная 3D-модель механического замка"></canvas>
+  <header class="brand ui">
+    <div class="mark">S</div>
+    <div><div class="brand-name">SIKISI</div><div class="brand-sub">MECHANICAL STUDIES</div></div>
+  </header>
+  <section class="wrench-picker ui" id="wrenchPicker" aria-label="Выбор натяжного инструмента">
+    <button class="wrench-choice" data-wrench="4" aria-pressed="false" aria-label="Прямой тонкий" title="Прямой тонкий"></button>
+    <button class="wrench-choice active" data-wrench="2" aria-pressed="true" aria-label="Двойной изгиб" title="Двойной изгиб"></button>
+    <button class="wrench-choice" data-wrench="0" aria-pressed="false" aria-label="Прямой Г-образный" title="Прямой Г-образный"></button>
+    <button class="wrench-choice" data-wrench="3" aria-pressed="false" aria-label="Крючковый" title="Крючковый"></button>
+    <button class="wrench-choice" data-wrench="1" aria-pressed="false" aria-label="Волнистый" title="Волнистый"></button>
+  </section>
+  <div class="specs ui" aria-label="Статистика сцены">
+    <div><div class="value">4</div><div class="key">МЕХАНИЗМА</div></div>
+    <div><div class="value">360°</div><div class="key">ОБЗОР</div></div>
+    <div><div class="value">r187</div><div class="key">THREE.JS</div></div>
+    <div><div class="value" id="polygonCount">—</div><div class="key">ПОЛИГОНОВ</div></div>
+    <div><div class="value" id="fpsCount">—</div><div class="key">FPS</div></div>
+  </div>
+  <div class="hint ui"><span class="mouse"></span> Вращение — ЛКМ · Сдвиг камеры — ⌘ + ЛКМ · Масштаб — колесо</div>
+  <span class="screen-reader-only" id="status" role="status" aria-live="polite"></span>
+  <button id="oilToolButton" class="oil-tool ui" type="button" aria-label="Маслёнка: выбрать инструмент для смазки" aria-pressed="false" title="Выбери маслёнку и удерживай ЛКМ на детали для смазывания">
+    <span class="oil-tool-state"></span>
+  </button>
+  <aside class="right-rail ui" aria-label="Панель управления замком">
+    <nav class="settings-tabs" role="tablist" aria-label="Разделы настроек">
+      <button type="button" id="tabLock" class="settings-tab active" data-settings-tab="lock" aria-controls="settingsLock" aria-selected="true" role="tab">Замок</button>
+      <button type="button" id="tabVisual" class="settings-tab" data-settings-tab="visual" aria-controls="settingsVisual" aria-selected="false" role="tab">Визуал</button>
+      <button type="button" id="tabStory" class="settings-tab" data-settings-tab="story" aria-controls="settingsStory" aria-selected="false" role="tab">Задания</button>
+    </nav>
+    <div class="settings-page" id="settingsLock" role="tabpanel" aria-labelledby="tabLock">
+    <section class="section">
+      <div class="panel-title" id="modeTitle">Штифтовый</div>
+      <p class="panel-desc" id="modeDescription">4 цельных штифта, пружины, поворотная сердцевина и подвижный привод дужки.</p>
+      <div class="seg" id="modeButtons">
+        <button class="active" data-mode="pin" aria-pressed="true">Штифтовый</button>
+        <button data-mode="disc" aria-pressed="false">Дисковый</button>
+        <button data-mode="code" aria-pressed="false">Кодовый</button>
+        <button data-mode="plate" aria-pressed="false">Пластинчатый</button>
+      </div>
+    </section>
+    <section class="section pin-puzzles" id="pinGamesSection">
+      <div class="range-head"><label class="range-name" for="pinPuzzleSelect">Игровая механика</label><span class="range-value">8 РЕЖИМОВ</span></div>
+      <select class="pin-puzzle-select" id="pinPuzzleSelect" aria-label="Выбор механики со штифтами">
+        <option value="free">Свободный механизм</option>
+        <option value="classic">01 · Классика</option>
+        <option value="sequence">02 · Альтернатива 2</option>
+        <option value="special">03 · Особые замки</option>
+        <option value="tension">08 · Натяжение</option>
+        <option value="resonance">09 · Резонанс</option>
+        <option value="pinflight">14 · Штифтовый замок</option>
+        <option value="springtumblers">15 · Подпружиненные тумблеры</option>
+        <option value="symbolpins">27 · Символьные штифты</option>
+      </select>
+      <div class="pin-puzzle-levels" id="pinPuzzleLevels"><span>СЛОЖНОСТЬ</span>
+        <button type="button" data-level="1" class="active" aria-pressed="true">I</button>
+        <button type="button" data-level="2" aria-pressed="false">II</button>
+        <button type="button" data-level="3" aria-pressed="false">III</button>
+      </div>
+      <div class="pin-puzzle-play">
+        <p class="pin-puzzle-rule" id="pinPuzzleRule"></p>
+        <div class="pin-puzzle-stats" id="pinPuzzleStats" aria-live="polite"></div>
+      </div>
+    </section>
+    <section class="section plate-puzzle" id="plateSection" style="display:none">
+      <div class="range-head"><span class="range-name">Механика · Классика</span><span class="range-value" id="plateProgress">0/4 выставлены</span></div>
+      <p class="plate-rule">Подбери натяжитель по знаку. Сдвиг пластины перемещает и связанную с ней соседнюю. Совмести все штифты на <strong>4 из 7</strong>.</p>
+      <div class="range-head"><span class="range-name">Количество пластин</span><span class="range-value" id="plateCountValue">4</span></div>
+      <div class="plate-count-picker" id="plateCountPicker" role="group" aria-label="Пластин: 4, 5 или 6">
+        <button data-plate-count="4" aria-pressed="true" class="active">4</button>
+        <button data-plate-count="5" aria-pressed="false">5</button>
+        <button data-plate-count="6" aria-pressed="false">6</button>
+      </div>
+      <div class="plate-rows" id="plateRows" role="group" aria-label="Пластины замка"></div>
+      <button class="button primary plate-open" type="button" id="plateOpenButton" disabled>Выставь все 4 пластины</button>
+      <button class="plate-reset" type="button" id="plateResetButton">Перемешать пластины</button>
+      <p class="plate-feedback" id="plateFeedback" role="status"></p>
+      <p class="range-note">W/S — пластина · A/D — сдвиг · 1–5 — натяжитель внизу экрана · Пробел — открыть. Русская раскладка поддерживается.</p>
+    </section>
+    <section class="section" id="lockActionsSection">
+      <div class="button-row"><button class="button primary" id="insertButton">Вставить ключ</button><button class="button" id="turnButton" disabled>Повернуть</button></div>
+      <div class="button-row"><button class="button" id="toolButton">Инструмент: ключ</button><button class="button" id="pickButton" disabled>Поднять штифт</button></div>
+      <div class="button-row"><button class="button" id="wrongButton">Неверный ключ</button><button class="button" id="resetButton">Сброс</button></div>
+    </section>
+    <footer class="foot" id="lockFootnote">Клик по дужке или пробел — попытка открыть замок. ЛКМ — вращение · ПКМ — сдвиг · Колесо — масштаб.</footer>
+    </div>
+    <div class="settings-page" id="settingsVisual" role="tabpanel" aria-labelledby="tabVisual" hidden>
+    <section class="section">
+      <div class="range-head"><span class="range-name">Прозрачность стенки</span><span class="range-value" id="opacityValue">100%</span></div>
+      <input id="opacitySlider" type="range" min="0" max="100" value="100" aria-label="Прозрачность передней стенки" />
+      <div class="toggle-row">Автопрозрачность при вращении <button id="autoXray" class="toggle" aria-label="Автопрозрачность" aria-pressed="false" title="Спереди стенка скрыта, при повороте камеры сбоку становится видимой"><span></span></button></div>
+      <div class="toggle-row">Рентген · схема <button id="schematicXray" class="toggle" type="button" aria-label="Рентгеновский вид внутренних деталей" aria-pressed="false" title="Просвечивает стенку и показывает контуры механизма"><span></span></button></div>
+      <p class="range-note" id="opacityHelp">100% — стенка скрыта. 0% — видна полностью.</p>
+    </section>
+    <section class="section">
+      <div class="range-head"><span class="range-name">Разнести детали</span><span class="range-value" id="explodeValue">0%</span></div>
+      <input id="explodeSlider" type="range" min="0" max="200" value="0" aria-label="Степень разборки" />
+      <button class="button" id="explodeButton" style="width:100%;margin-top:12px">Разобрать</button>
+    </section>
+    <section class="section" id="cartoonSection">
+      <div class="toggle-row drawing-master">
+        <span>Мультяшная рисовка <small>2 эффекта</small></span>
+        <button id="cartoonToggle" class="toggle on" type="button" aria-label="Включить или выключить оба эффекта рисовки" aria-pressed="true" title="Включить оба эффекта одновременно"><span></span></button>
+      </div>
+      <div class="drawing-card">
+        <div class="toggle-row drawing-card-title">
+          <span>01 · Мультяшный свет</span>
+          <button id="toonToggle" class="toggle" type="button" aria-label="Мультяшный свет" aria-pressed="false"><span></span></button>
+        </div>
+        <div class="range-head"><label class="range-name" for="toonStrengthSlider">Сила эффекта</label><output class="range-value" id="toonStrengthValue">80%</output></div>
+        <input id="toonStrengthSlider" type="range" min="0" max="100" step="1" value="80" disabled />
+        <div class="range-head"><label class="range-name" for="toonBandsSlider">Ступени света</label><output class="range-value" id="toonBandsValue">4 ступ.</output></div>
+        <input id="toonBandsSlider" type="range" min="2" max="7" step="1" value="4" disabled />
+      </div>
+      <div class="drawing-card">
+        <div class="toggle-row drawing-card-title">
+          <span>02 · Контурная обводка</span>
+          <button id="outlineToggle" class="toggle on" type="button" aria-label="Контурная обводка" aria-pressed="true"><span></span></button>
+        </div>
+        <div class="range-head"><label class="range-name" for="cartoonOutlineSlider">Насыщенность</label><output class="range-value" id="cartoonOutlineValue">70%</output></div>
+        <input id="cartoonOutlineSlider" type="range" min="0" max="100" step="1" value="70" />
+        <div class="range-head"><label class="range-name" for="outlineWidthSlider">Толщина линии</label><output class="range-value" id="outlineWidthValue">1 px</output></div>
+        <input id="outlineWidthSlider" type="range" min="1" max="4" step="0.5" value="1" />
+      </div>
+      <p class="range-note drawing-hint">Включай эффекты по одному или совмещай.</p>
+    </section>
+    <section class="section" id="paintedMaterialsSection">
+      <div class="toggle-row drawing-master">
+        <span>Рисованные материалы <small>5 вариантов</small></span>
+        <button id="paintedMaterialsToggle" class="toggle on" type="button" aria-label="Включить рисованные материалы" aria-pressed="true"><span></span></button>
+      </div>
+      <div class="range-head painted-group-title"><span class="range-name">Корпус и сталь</span></div>
+      <div class="painted-swatches" aria-label="Фактура стальных деталей">
+        <button type="button" class="painted-swatch paint-variant active" data-group="steel" data-variant="steel" aria-pressed="true"><img src="./assets/painted-steel.webp" alt="" loading="lazy" />Сталь</button>
+        <button type="button" class="painted-swatch paint-variant" data-group="steel" data-variant="graphite" aria-pressed="false"><img src="./assets/painted-graphite.webp" alt="" loading="lazy" />Графит</button>
+        <button type="button" class="painted-swatch paint-variant" data-group="steel" data-variant="enamel" aria-pressed="false"><img src="./assets/painted-enamel.webp" alt="" loading="lazy" />Эмаль</button>
+      </div>
+      <div class="range-head painted-group-title"><span class="range-name">Ключ и латунные детали</span></div>
+      <div class="painted-swatches painted-swatches-warm" aria-label="Фактура тёплого металла">
+        <button type="button" class="painted-swatch paint-variant active" data-group="brass" data-variant="brass" aria-pressed="true"><img src="./assets/painted-brass.webp" alt="" loading="lazy" />Латунь</button>
+        <button type="button" class="painted-swatch paint-variant" data-group="brass" data-variant="copper" aria-pressed="false"><img src="./assets/painted-copper.webp" alt="" loading="lazy" />Медь</button>
+      </div>
+      <div class="drawing-card">
+        <div class="range-head"><label class="range-name" for="paintStrengthSlider">Выразительность мазков</label><output class="range-value" id="paintStrengthValue">95%</output></div>
+        <input id="paintStrengthSlider" type="range" min="0" max="100" value="95" />
+        <div class="range-head"><label class="range-name" for="paintMaterialSlider">Мультяшный материал</label><output class="range-value" id="paintMaterialValue">90%</output></div>
+        <input id="paintMaterialSlider" type="range" min="0" max="100" value="90" />
+        <div class="range-head"><label class="range-name" for="paintDetailSlider">Детализация мазков</label><output class="range-value" id="paintDetailValue">2%</output></div>
+        <input id="paintDetailSlider" type="range" min="0" max="100" value="2" />
+      </div>
+      <p class="range-note drawing-hint">Гуашевая фактура на корпусе, ключе, пружинах и других металлических деталях. Отключение возвращает исходные материалы.</p>
+    </section>
+    <section class="section">
+      <div class="swatches" id="swatches">
+        <button class="swatch active" style="background:linear-gradient(135deg,#9dacac,#354a56)" data-color="titanium" aria-label="Титан" title="Титан"></button>
+        <button class="swatch" style="background:linear-gradient(135deg,#5e6772,#14191f)" data-color="graphite" aria-label="Графит" title="Графит"></button>
+        <button class="swatch" style="background:linear-gradient(135deg,#dcaa5b,#6b422b)" data-color="bronze" aria-label="Бронза" title="Бронза"></button>
+        <button class="swatch" style="background:linear-gradient(135deg,#6b929c,#1f364d)" data-color="navy" aria-label="Синий металл" title="Синий металл"></button>
+      </div>
+      <div class="pin-finishes" id="pinFinishControls">
+        <div class="range-head"><span class="range-name">Цвет штифтов</span><span class="range-value" id="pinFinishValue">Старая латунь</span></div>
+        <div class="pin-finish-swatches" id="pinFinishSwatches" aria-label="Покрытие всех штифтов"></div>
+      </div>
+    </section>
+    </div>
+    <div class="settings-page" id="settingsStory" role="tabpanel" aria-labelledby="tabStory" hidden>
+      <section class="section">
+        <div class="world-eyebrow">KEYNLOCK · ГЛАВА I</div>
+        <div class="panel-title">Чужие подписи</div>
+        <p class="panel-desc">Четыре первых задания оригинальной кампании, перенесённые в Three.js.</p>
+        <div class="world-currency">
+          <span>Монеты <b id="worldCoins">0</b></span>
+          <span>Пройдено <b id="worldCompleted">0</b></span>
+        </div>
+        <div class="range-head"><span class="range-name">Сложность</span><span class="range-value">I · II · III</span></div>
+        <div class="pin-puzzle-levels world-levels" role="group" aria-label="Сложность сюжетных заданий">
+          <button type="button" data-world-level="1" class="active" aria-pressed="true">I</button>
+          <button type="button" data-world-level="2" aria-pressed="false">II</button>
+          <button type="button" data-world-level="3" aria-pressed="false">III</button>
+        </div>
+        <div id="worldMissionList" class="world-mission-list" aria-label="Сюжетные задания"></div>
+        <p id="worldEmptyInfo" class="world-empty-info">Выбери задание: на столе появится его настоящий 3D-механизм.</p>
+      </section>
+      <section class="section world-run" id="worldRun" hidden>
+        <div class="world-eyebrow">МЕХАНИЗМ НА СТОЛЕ</div>
+        <h3 id="worldTitle">Задание</h3>
+        <p id="worldObjective" class="panel-desc"></p>
+        <div class="world-metrics">
+          <span>Отмычки <strong id="worldPicks">3</strong></span>
+          <span>Ходы <strong id="worldMoves">0</strong></span>
+          <span id="worldTimeStat">Время <strong id="worldTimer">0 с</strong></span>
+        </div>
+        <div class="range-head"><span class="range-name">Прогресс</span><span class="range-value" id="worldProgress">0/4</span></div>
+        <p id="worldInstruction" class="world-instruction"></p>
+        <div class="world-choices" id="worldChoices" aria-label="Управление головоломкой"></div>
+        <p id="worldFeedback" class="world-feedback" role="status" aria-live="polite"></p>
+        <p id="worldReward" class="world-reward" hidden></p>
+        <button type="button" id="worldConfirm" class="button primary world-wide">Открыть</button>
+        <button type="button" id="worldNext" class="button primary world-wide" hidden>Следующее задание</button>
+        <div class="world-actions">
+          <button type="button" id="worldRestart" class="button">Новая попытка</button>
+          <button type="button" id="worldQuit" class="button">Вернуться к замкам</button>
+        </div>
+        <p class="range-note">ЛКМ по деталям · Колесо — масштаб · R — заново · Esc — выход. Русская раскладка поддерживается.</p>
+      </section>
+    </div>
+  </aside>
+  <p id="pinPuzzleFeedback" class="game-feedback ui" role="status" aria-live="polite"></p>
+  <div id="tooltip" role="tooltip"></div>
+  <div id="loading"><div><b>SIKISI</b><small>ПОДГОТОВКА МЕХАНИЗМА · THREE.JS R187</small></div></div>
+  <div id="fallback"><div>Не удалось запустить 3D-сцену.<p id="errorReason" style="font-size:12px;color:#9fb4c0"></p></div></div>
+</div>
+<script type="module" src="./js/main.js"></script>
+<script src="./js/startup.js"></script>
+</body>
+</html>

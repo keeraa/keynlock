@@ -34,6 +34,12 @@ export const drawingFragmentShader = `
     return smoothstep(1.1, 2.7, distance - uFocus);
   }
 
+  float outlineForeground(float distance) {
+    // Contours belong to the easels and nearby tools, never the wall or the
+    // hanging gallery. Fade them before the room starts to defocus.
+    return 1.0 - smoothstep(.35, 1.35, distance - uFocus);
+  }
+
   float inkLuma(vec3 c) {
     return dot(c, vec3(.2126, .7152, .0722));
   }
@@ -107,7 +113,7 @@ export const drawingFragmentShader = `
     }
 
     float edge = 0.0;
-    if (uOutline > 0.0) edge = inkEdge(vUv) * uOutline;
+    if (uOutline > 0.0) edge = inkEdge(vUv) * uOutline * outlineForeground(eyeDepth(vUv));
     vec3 ink = vec3(.018, .030, .035);
     gl_FragColor = vec4(mix(clamp(paint, 0.0, 1.0), ink, edge * .96),
       max(center.a, edge * .95));

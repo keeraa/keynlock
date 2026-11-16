@@ -38,8 +38,8 @@ test('background blur uses two half-resolution passes even without toon or outli
   assert.equal(passes[1].target.height, 480);
   assert.equal(passes[2].source, passes[1].target.texture);
   assert.equal(passes[3].uniforms.tBlur.value, passes[2].target.texture);
-  assert.equal(passes[3].uniforms.uBackgroundBlur.value, .92);
-  assert.equal(passes[1].uniforms.uBlurRadius.value, 20, 'radius scales with pixel ratio');
+  assert.equal(passes[3].uniforms.uBackgroundBlur.value, .72);
+  assert.equal(passes[1].uniforms.uBlurRadius.value, 13, 'radius scales with pixel ratio');
   assert.equal(passes[3].uniforms.uFocus.value, 7.65);
   assert.equal(passes[1].uniforms.uFocus.value, 7.65);
 
@@ -59,4 +59,10 @@ test('Gaussian blur rejects foreground colors and composites without depth-edge 
   assert.match(drawingFragmentShader, /backgroundMask\(centerDepth\)/);
   assert.match(drawingFragmentShader, /soft\.rgb \/ soft\.a/);
   assert.doesNotMatch(drawingFragmentShader, /vec2 offset|for \(int i = 0; i < 8/);
+});
+
+test('outline falls off before the wall and gallery so only foreground objects keep ink', () => {
+  assert.match(drawingFragmentShader, /float outlineForeground\(float distance\)/);
+  assert.match(drawingFragmentShader, /1\.0 - smoothstep\(\.35, 1\.35, distance - uFocus\)/);
+  assert.match(drawingFragmentShader, /inkEdge\(vUv\) \* uOutline \* outlineForeground\(eyeDepth\(vUv\)\)/);
 });

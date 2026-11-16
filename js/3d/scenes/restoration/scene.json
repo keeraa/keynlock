@@ -5,7 +5,7 @@
   "threeVersion": "0.187.0",
   "status": "standalone",
   "source": "ChatGPT Sites",
-  "sourceCommit": "39a8797401da2d3ee946576464cc39192a69a9a1",
+  "sourceCommit": "fcf7ed32b948cb0f4e93d684470efa96f1150fb4",
   "savedOn": "2026-11-16",
   "liveUrl": "https://atelier-restoration-1115.k1r11111.chatgpt.site",
   "entry": "index.html",
@@ -44,8 +44,9 @@
       "navigation/easel-overlay.js"
     ],
     "stylesheets": 8,
-    "tests": 30,
+    "tests": 31,
     "mainFileLines": 314,
-    "backgroundBlur": "two-pass-half-resolution-depth-aware-Gaussian"
+    "backgroundBlur": "half-resolution two-pass depth-aware Gaussian; radius 6.5px; strength 72%",
+    "foregroundOnlyOutlines": true
   }
 }

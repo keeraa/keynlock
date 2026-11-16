@@ -7,7 +7,7 @@ export function createCartoonFilter({ THREE, renderer, scene, camera }) {
     toon: false, toonStrength: .8, bands: 4,
     outline: false, outlineStrength: .7, outlineWidth: 1,
     // Soft, continuous defocus behind the easels; radius is in CSS pixels.
-    backgroundBlur: .92, backgroundRadius: 10, focus: 7.15,
+    backgroundBlur: .72, backgroundRadius: 6.5, focus: 7.15,
   };
   let width = 1, height = 1, resources = null;
   let normalTarget = null, normalMaterial = null, inkMaskMaterial = null;

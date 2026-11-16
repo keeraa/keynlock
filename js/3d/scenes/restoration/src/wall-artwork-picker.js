@@ -54,12 +54,12 @@ export function createWallArtworkPicker({ THREE, camera, renderer, artworks, ima
       const centerGapSquared = dx * dx + dy * dy;
       // A painting near the screen center can be smaller than one at the edge.
       // Large peripheral paintings should never steal its description.
-      if (centerGapSquared > .12) continue;
+      if (centerGapSquared > .06) continue;
       const requiredFraction = minFrameFraction * (centerGapSquared < .025 ? .6 : 1)
         * (placement.id === previousId ? .9 : 1);
       if (frameFraction < requiredFraction) continue;
 
-      const score = 1 / (1 + 60 * centerGapSquared) + visibleArea * .015;
+      const score = 1 / (1 + 90 * centerGapSquared) + visibleArea * .008;
       candidates.set(placement.id, { placement, score });
       if (placement.id === previousId) previousScore = score;
       if (score > bestScore) { winner = placement; bestScore = score; }
@@ -72,7 +72,7 @@ export function createWallArtworkPicker({ THREE, camera, renderer, artworks, ima
     if (centerHit) return candidates.get(centerHit.object.userData.galleryId)?.placement || null;
     if (!winner) return null;
     // A small hysteresis prevents the information plaque flickering between frames.
-    if (previousId && previousId !== winner?.id && previousScore * 1.12 >= bestScore) {
+    if (previousId && previousId !== winner?.id && previousScore * 1.06 >= bestScore) {
       return artworks.get(previousId)?.placement || winner;
     }
     return winner;

@@ -1,6 +1,9 @@
 /** Small wall thumbnails are independent of the easel texture cache. */
-export function createWallPreviewCache({ THREE, renderer }) {
+export function createWallPreviewCache({ THREE, renderer, maxConcurrent = 5 }) {
   const previews = new Map();
+  const waiting = [];
+  const concurrency = Math.max(1, Math.floor(maxConcurrent));
+  let active = 0;
 
   async function load(art) {
     let picture;
@@ -42,19 +45,59 @@ export function createWallPreviewCache({ THREE, renderer }) {
     return { texture, aspect };
   }
 
+  function pump() {
+    while (active < concurrency && waiting.length) {
+      const entry = waiting.shift();
+      if (entry.evicted) continue;
+      entry.started = true;
+      active++;
+      void load(entry.art).then((value) => {
+        if (entry.evicted) value.texture.dispose();
+        else entry.value = value;
+        entry.resolve(value);
+      }).catch((error) => {
+        console.warn('Не удалось подготовить миниатюру на стену', error);
+        entry.resolve(null);
+      }).finally(() => { active--; pump(); });
+    }
+  }
+
+  function evict(entry) {
+    entry.evicted = true;
+    if (!entry.started) entry.resolve(null);
+    else if (entry.value) entry.value.texture.dispose();
+  }
+
   function previewFor(art) {
-    if (!previews.has(art.id)) previews.set(art.id, load(art));
-    return previews.get(art.id);
+    let entry = previews.get(art.id);
+    if (entry && entry.art.image !== art.image) {
+      previews.delete(art.id);
+      evict(entry);
+      entry = null;
+    }
+    if (!entry) {
+      entry = { art, started: false, evicted: false, value: null, resolve: null, promise: null };
+      entry.promise = new Promise((resolve) => { entry.resolve = resolve; });
+      previews.set(art.id, entry);
+      waiting.push(entry);
+      pump();
+    }
+    return entry.promise;
+  }
+
+  function getReady(art) {
+    const entry = previews.get(art.id);
+    return entry?.art.image === art.image ? entry.value : null;
   }
 
   function retain(ids) {
     const keep = new Set(ids);
-    for (const [id, promise] of previews) {
+    for (const [id, entry] of previews) {
       if (keep.has(id)) continue;
       previews.delete(id);
-      void promise.then(({ texture }) => texture.dispose());
+      evict(entry);
     }
   }
 
-  return { previewFor, retain, clear: () => retain([]) };
+  return { previewFor, getReady, retain, clear: () => retain([]) };
 }

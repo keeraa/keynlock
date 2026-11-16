@@ -131,14 +131,18 @@ test('gallery camera follows the horizontal columns, focuses artwork and returns
     nav.resize();
     const start = camera.position.clone();
     const now = performance.now();
-    nav.enterWallGallery({ minX: -15, maxX: 15, minY: 3.695, maxY: 11.85,
-      width: 30, columnWidth: 2.5 });
+    const galleryBounds = { minX: -15, maxX: 15, minY: 3.695, maxY: 11.85,
+      width: 30, columnWidth: 2.5 };
+    nav.enterWallGallery(galleryBounds);
     assert.ok(stage.classList.contains('wall-gallery-active'), 'easel overlays hide on the real stage');
     assert.ok(camera.position.distanceTo(start) < 1e-6, 'begin ascent without a snap');
     nav.animate(now + 1800);
     assert.ok(camera.position.y > 7, 'camera rises above the easels');
     assert.ok(camera.position.x < -6, 'gallery initially shows large artworks in the first columns');
     assert.equal(nav.isWallGallery(), true);
+    nav.updateWallLayout({ bounds: galleryBounds, placements: [] });
+    assert.equal(nav.isTraveling(), false,
+      'loading thumbnails on an unchanged wall must not restart the camera flight');
     const firstX = controls.target.x;
     const firstY = controls.target.y;
     nav.moveAlongWall(1);
@@ -151,6 +155,13 @@ test('gallery camera follows the horizontal columns, focuses artwork and returns
     assert.equal(nav.focusedWallId(), art.id);
     assert.ok(Math.abs(controls.target.y - art.y) < 1e-6);
     assert.ok(Math.abs(camera.position.x - art.x) < 1e-6);
+    nav.updateWallLayout({ bounds: galleryBounds, placements: [art] });
+    assert.equal(nav.isTraveling(), false, 'an unchanged focused frame does not restart travel');
+    nav.updateWallLayout({ bounds: galleryBounds,
+      placements: [{ ...art, y: art.y + .3 }] });
+    assert.equal(nav.isTraveling(), true, 'the focused view tracks frame reflow');
+    nav.animate(now + 5300);
+    assert.ok(Math.abs(controls.target.y - (art.y + .3)) < 1e-6);
     nav.leaveWallArt();
     nav.animate(now + 5600);
     assert.equal(nav.focusedWallId(), null);

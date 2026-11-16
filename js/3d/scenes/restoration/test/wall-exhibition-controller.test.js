@@ -71,6 +71,7 @@ test('gallery shows general info until a particular painting is zoomed in', () =
   exhibition.updateViewedArtwork(600);
   assert.equal($('wall-gallery-title').textContent, 'Ночной дозор',
     'looking at a different artwork updates the description even after a click');
+  assert.equal(focusedLoads, 2, 'the high-resolution texture follows the newly centered work');
 
   zoomedIn = false;
   exhibition.updateViewedArtwork(700);

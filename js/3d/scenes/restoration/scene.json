@@ -5,7 +5,7 @@
   "threeVersion": "0.187.0",
   "status": "standalone",
   "source": "ChatGPT Sites",
-  "sourceCommit": "91193eb33c4e8f060c4567e2533a151ab8cd368e",
+  "sourceCommit": "e5e20595ec131a4859b44a8711850f167f2bdc9d",
   "savedOn": "2026-11-16",
   "liveUrl": "https://atelier-restoration-1115.k1r11111.chatgpt.site",
   "entry": "index.html",
@@ -64,7 +64,7 @@
     },
     "autoArtworkDescription": {
       "enabled": true,
-      "method": "center-ray-hit-priority-then-nearest-visible-artwork",
+      "method": "center-ray-priority-then-nearest-centered-visible-artwork",
       "updateThrottleMs": 90,
       "manualFocusPreserved": true,
       "textureMemory": "shared-wall-preview-cache-with-eviction-disposal",
@@ -78,8 +78,16 @@
       "maxCameraDistanceFractionOfOverview": 0.82,
       "hideWhenZoomedOut": true,
       "minFrameFractionNearCenterMultiplier": 0.6,
-      "ignoresPeripheralLargePaintings": true
-    }
+      "ignoresPeripheralLargePaintings": true,
+      "highResolutionFollowsCenteredArtwork": true
+    },
+    "previewLoading": {
+      "mode": "progressive",
+      "maxConcurrent": 5,
+      "perColumnAspectReflow": true
+    },
+    "meshUpdates": "reuse-existing-frames-and-materials-on-shuffle-and-preview-reflow",
+    "navigationRetargetOnFrameReflow": true
   },
   "integration": {
     "target": "KEYNLOCK",
@@ -93,7 +101,7 @@
       "navigation/easel-overlay.js"
     ],
     "stylesheets": 8,
-    "tests": 41,
+    "tests": 44,
     "mainFileLines": 314,
     "backgroundBlur": "half-resolution two-pass depth-aware Gaussian; radius 6.5px; strength 72%",
     "foregroundOnlyOutlines": true,

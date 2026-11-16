@@ -62,3 +62,31 @@ test('a centered close-up wins over a bigger peripheral artwork', () => {
   assert.equal(picker.getProminentPainting('large-edge', { minFrameFraction: .48 })?.id, 'center',
     'an earlier selection cannot override a new picture directly under the center');
 });
+
+test('panning to a different artwork switches its title, while centering empty wall clears it', () => {
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(39, .9, .1, 65);
+  const artworks = new Map();
+  const imageMeshes = [];
+  for (const [id, x] of [['left', -3.5], ['right', 0]]) {
+    const image = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.MeshBasicMaterial());
+    image.position.set(x, 0, -4.5);
+    image.userData.galleryId = id;
+    scene.add(image);
+    artworks.set(id, { image, placement: { id, width: 2, height: 2 } });
+    imageMeshes.push(image);
+  }
+  const picker = createWallArtworkPicker({ THREE, camera, artworks, imageMeshes,
+    renderer: { domElement: { getBoundingClientRect: () => ({ left: 0, top: 0, width: 600, height: 800 }) } } });
+  camera.position.set(-3.5, 0, 1);
+  camera.lookAt(-3.5, 0, -4.5);
+  assert.equal(picker.getProminentPainting(null, { minFrameFraction: .48 })?.id, 'left');
+  camera.position.set(0, 0, 1);
+  camera.lookAt(0, 0, -4.5);
+  assert.equal(picker.getProminentPainting('left', { minFrameFraction: .48 })?.id, 'right',
+    'a previous click cannot keep the old title when another painting is centered');
+  camera.position.set(-1.75, 0, 1);
+  camera.lookAt(-1.75, 0, -4.5);
+  assert.equal(picker.getProminentPainting('right', { minFrameFraction: .48 }), null,
+    'the selector abstains if the camera is centered on the wall between two paintings');
+});

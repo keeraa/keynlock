@@ -166,18 +166,28 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
   }
 
   function updateWallLayout(nextLayout) {
+    const previousBounds = wallBounds;
     wallBounds = nextLayout.bounds;
     if (!inWallMode()) return;
     if (wallFocusedId) {
       const moved = nextLayout.placements.find((art) => art.id === wallFocusedId);
       if (!moved) { leaveWallArt(); return; }
+      const previous = wallArtwork;
       wallArtwork = moved;
-      flight.start(framing.galleryArtwork(moved), 820);
+      if (!previous || ['x', 'y', 'width', 'height'].some((key) =>
+        Math.abs(previous[key] - moved[key]) > .001)) {
+        const destination = framing.galleryArtwork(moved);
+        if (flight.isTraveling()) flight.retarget(destination);
+        else flight.start(destination, 820);
+      }
       return;
     }
+    if (previousBounds.minX === wallBounds.minX && previousBounds.maxX === wallBounds.maxX &&
+      previousBounds.minY === wallBounds.minY && previousBounds.maxY === wallBounds.maxY) return;
     wallOverviewPose = framing.galleryOverview(flight.isTraveling()
       ? wallOverviewPose?.target.x : controls.target.x);
-    flight.start(wallOverviewPose, 820);
+    if (flight.isTraveling()) flight.retarget(wallOverviewPose);
+    else flight.start(wallOverviewPose, 820);
   }
 
   function moveAlongWall(direction) {

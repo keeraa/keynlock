@@ -73,6 +73,7 @@ export function createWallExhibitionController({ paintings, playerProgress, wall
     if (prominent.id === viewedId) return;
     viewedId = prominent.id;
     artworkInfo.show(prominent, showingDemo);
+    if (mode === 'art') void wallGallery.showHighResolution(prominent.id);
   }
 
   function handleModeChange({ mode, art }) {

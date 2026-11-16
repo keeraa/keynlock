@@ -159,3 +159,73 @@ test('wall creates real framed meshes and allows selecting a mixed-size image', 
     globalThis.document = originalDocument;
   }
 });
+
+test('wall paints previews progressively, reflows completed columns, and reuses existing frames', async () => {
+  const originalImage = globalThis.Image;
+  const originalDocument = globalThis.document;
+  const requests = new Map();
+  globalThis.Image = class {
+    naturalWidth = 1200;
+    naturalHeight = 800;
+    set src(value) { if (value) requests.set(value, this); }
+  };
+  globalThis.document = { createElement: () => ({
+    width: 480, height: 480,
+    getContext: () => ({ fillRect() {}, drawImage() {}, fillText() {} }),
+  }) };
+  try {
+    const renderer = { shadowMap: { needsUpdate: false },
+      capabilities: { getMaxAnisotropy: () => 8 },
+      domElement: { getBoundingClientRect: () => ({ left: 0, top: 0, width: 800, height: 800 }) },
+    };
+    const wall = createWallGallery({ THREE, scene: new THREE.Scene(),
+      camera: new THREE.PerspectiveCamera(39, 1, .1, 65), renderer,
+      frameWood: new THREE.MeshStandardMaterial() });
+    const originals = [{ id: 'one', image: '/one.jpg', category: 'modern' },
+      { id: 'two', image: '/two.jpg', category: 'modern' }];
+    const loading = wall.setPaintings(originals);
+    assert.equal(wall.paintingsRoot.children.length, 2, 'the whole wall is mounted before any network response');
+    const first = wall.paintingsRoot.getObjectByName('restored-one');
+    const second = wall.paintingsRoot.getObjectByName('restored-two');
+    const firstImage = first.children[1];
+    const secondImage = second.children[1];
+    assert.equal(firstImage.material.map, null);
+    assert.equal(secondImage.material.map, null);
+    assert.equal(requests.size, 2, 'both requests are started without blocking the wall');
+
+    requests.get('/one.jpg').onload();
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.ok(firstImage.material.map?.isTexture, 'the first thumbnail appears independently');
+    assert.equal(secondImage.material.map, null, 'an unfinished neighbor remains a placeholder');
+    assert.equal(wall.getPlacement('one').width / wall.getPlacement('one').height, 1,
+      'a column keeps stable frames until all its dimensions are known');
+
+    requests.get('/two.jpg').naturalWidth = 800;
+    requests.get('/two.jpg').naturalHeight = 1000;
+    requests.get('/two.jpg').onload();
+    await loading;
+    assert.ok(Math.abs(wall.getPlacement('one').width / wall.getPlacement('one').height - 1.5) < .001);
+    assert.ok(Math.abs(wall.getPlacement('two').width / wall.getPlacement('two').height - .8) < .001);
+    assert.strictEqual(wall.paintingsRoot.getObjectByName('restored-one'), first);
+    assert.strictEqual(first.children[1], firstImage, 'preview and reflow do not replace meshes');
+
+    const geometry = firstImage.geometry;
+    const imageTexture = firstImage.material.map;
+    await wall.setPaintings([originals[1], originals[0]]);
+    assert.strictEqual(wall.paintingsRoot.getObjectByName('restored-one'), first);
+    assert.strictEqual(wall.paintingsRoot.getObjectByName('restored-two'), second);
+    assert.strictEqual(firstImage.geometry, geometry, 'unchanged frame dimensions reuse geometry');
+    assert.strictEqual(firstImage.material.map, imageTexture, 'cached textures are reused');
+    assert.equal(requests.size, 2, 'reordering makes no new image requests');
+
+    let disposed = false;
+    geometry.addEventListener('dispose', () => { disposed = true; });
+    await wall.setPaintings([originals[1]]);
+    assert.equal(wall.paintingsRoot.children.length, 1);
+    assert.equal(disposed, true, 'removed frame geometry is disposed');
+    wall.clear();
+  } finally {
+    globalThis.Image = originalImage;
+    globalThis.document = originalDocument;
+  }
+});

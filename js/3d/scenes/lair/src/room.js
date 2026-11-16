@@ -11,8 +11,31 @@ export function buildLair(scene, m) {
   const staticGroup = new THREE.Group();
   scene.add(staticGroup);
   const shadow = mesh => { mesh.castShadow = true; mesh.receiveShadow = true; return mesh; };
+  const paintedWood = new Set([m.walnut, m.agedWood, m.darkWood, m.ash, m.oak]);
+  const woodPeriod = 1.45;
+  // Scale each face by real-world dimensions so narrow rails don't squeeze an
+  // entire gouache texture into a few centimetres of timber.
+  const sizeWoodBoxUV = (geometry, w, h, d) => {
+    const uv = geometry.getAttribute('uv');
+    const index = geometry.getIndex();
+    const faces = [[d, h], [d, h], [w, d], [w, d], [w, h], [w, h]];
+    const visited = new Set();
+    for (let face = 0; face < Math.min(6, geometry.groups.length); face++) {
+      const { start, count } = geometry.groups[face];
+      const [width, height] = faces[face];
+      for (let i = start; i < start + count; i++) {
+        const vertex = index ? index.getX(i) : i;
+        if (visited.has(vertex)) continue;
+        visited.add(vertex);
+        uv.setXY(vertex, uv.getX(vertex) * width / woodPeriod, uv.getY(vertex) * height / woodPeriod);
+      }
+    }
+    uv.needsUpdate = true;
+    geometry.userData.paintedWoodUV = true;
+  };
   const box = (parent, w, h, d, material, x = 0, y = 0, z = 0, bevel = 0) => {
     const geometry = bevel ? new RoundedBoxGeometry(w, h, d, 2, bevel) : new THREE.BoxGeometry(w, h, d);
+    if (paintedWood.has(material)) sizeWoodBoxUV(geometry, w, h, d);
     const mesh = shadow(new THREE.Mesh(geometry, material));
     mesh.position.set(x, y, z); parent.add(mesh); return mesh;
   };
@@ -27,7 +50,15 @@ export function buildLair(scene, m) {
   const rod = (parent, a, b, radius, material, sides = 8) => {
     const start = new THREE.Vector3(...a), end = new THREE.Vector3(...b);
     const direction = end.clone().sub(start);
-    const mesh = shadow(new THREE.Mesh(new THREE.CylinderGeometry(radius * .92, radius, direction.length(), sides), material));
+    const geometry = new THREE.CylinderGeometry(radius * .92, radius, direction.length(), sides);
+    if (paintedWood.has(material)) {
+      const uv = geometry.getAttribute('uv');
+      for (let i = 0; i < uv.count; i++) uv.setXY(i,
+        uv.getX(i) * 2 * Math.PI * radius / woodPeriod,
+        uv.getY(i) * direction.length() / woodPeriod);
+      uv.needsUpdate = true;
+    }
+    const mesh = shadow(new THREE.Mesh(geometry, material));
     mesh.position.copy(start).add(end).multiplyScalar(.5);
     mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize());
     parent.add(mesh); return mesh;
@@ -92,9 +123,10 @@ export function buildLair(scene, m) {
     box(staticGroup, .08, 1.66, 12.9, m.agedWood, -8.35, .88, .75);
     box(staticGroup, .19, .15, 12.9, m.darkWood, -8.23, 1.77, .75);
     box(staticGroup, .22, .20, 12.9, m.walnut, -8.20, .17, .75);
-    box(staticGroup, .17, .20, 12.9, m.darkWood, -8.30, 6.85, .75);
+    // No timber line across the middle of the double-height room.
     for (const side of [-1, 1]) box(staticGroup, .22, .20, 12.9, m.walnut, side * 8.29, 13.30, .75);
-    for (const x of [-8.25, -4.25, 0, 4.25, 8.25]) {
+    // Leave the centre of the back wall open for the enlarged arched window.
+    for (const x of [-8.25, -4.25, 4.25, 8.25]) {
       box(staticGroup, .31, 13.35, .32, m.darkWood, x, 6.64, -5.32);
       box(staticGroup, .45, .22, .48, m.walnut, x, 12.70, -5.31);
     }
@@ -102,7 +134,6 @@ export function buildLair(scene, m) {
       box(staticGroup, 17.15, .30, .34, m.darkWood, 0, 13.37, z);
       for (const x of [-8.15, 8.15]) box(staticGroup, .42, .44, .52, m.walnut, x, 13.22, z);
     }
-    box(staticGroup, 17.22, .22, .23, m.darkWood, 0, 6.85, -5.27);
     box(staticGroup, 17.22, .25, .32, m.walnut, 0, 13.24, -5.29);
     // Small warm chandeliers make the extra storey visually legible.
     for (const z of [-2.6, 2.7]) {
@@ -166,28 +197,85 @@ export function buildLair(scene, m) {
   }
 
   function buildWindow() {
-    box(staticGroup, 4.15, 3.65, .16, m.darkWood, -.05, 4.22, -5.21, .09);
-    const outer = box(staticGroup, 3.86, 3.39, .11, m.oldBrass, -.05, 4.22, -5.11);
-    outer.castShadow = false;
+    // Twice the former width and height, with a real elliptical arched outline.
+    const window = new THREE.Group();
+    window.name = 'main-arched-window';
+    window.position.set(-.05, 2.23, -5.12);
+    staticGroup.add(window);
+    const halfWidth = 4.15, straightHeight = 5.20, archRise = 2.10;
+    const archProfile = (half, spring, rise, base = 0) => {
+      const shape = new THREE.Shape();
+      shape.moveTo(-half, base);
+      shape.lineTo(half, base);
+      shape.lineTo(half, spring);
+      for (let i = 1; i <= 64; i++) {
+        const a = i * Math.PI / 64;
+        shape.lineTo(half * Math.cos(a), spring + rise * Math.sin(a));
+      }
+      shape.closePath();
+      return shape;
+    };
     const cityTex = makeCityWindowTexture();
-    plane(staticGroup, 3.66, 3.19, new THREE.MeshBasicMaterial({ map: cityTex, toneMapped: false }), -.05, 4.22, -5.035);
-    for (const x of [-1.90, -.05, 1.80]) box(staticGroup, .105, 3.36, .14, m.darkWood, x, 4.22, -4.96);
-    for (const y of [2.56, 4.10, 5.84]) box(staticGroup, 3.89, .095, .14, m.darkWood, -.05, y, -4.96);
-    for (const x of [-1.96, 1.86]) box(staticGroup, .18, 3.62, .2, m.walnut, x, 4.22, -4.90);
-    box(staticGroup, 4.34, .19, .47, m.walnut, -.05, 2.34, -4.72, .035);
-    // Curtains fall in loose, wide vertical folds.
+    const glassShape = archProfile(halfWidth - .18, straightHeight - .05, archRise - .16, .08);
+    const glassGeometry = new THREE.ShapeGeometry(glassShape, 64);
+    const glassPositions = glassGeometry.getAttribute('position');
+    const uv = glassGeometry.getAttribute('uv');
+    for (let i = 0; i < uv.count; i++) uv.setXY(i,
+      (glassPositions.getX(i) + halfWidth) / (halfWidth * 2),
+      glassPositions.getY(i) / (straightHeight + archRise));
+    const glass = new THREE.Mesh(glassGeometry,
+      new THREE.MeshBasicMaterial({ map: cityTex, toneMapped: false, side: THREE.DoubleSide }));
+    glass.name = 'main-arched-window-glass';
+    glass.position.z = .06;
+    glass.receiveShadow = true;
+    window.add(glass);
+
+    const makeArchTrim = (half, spring, rise, radius, material, z) => {
+      const points = [];
+      for (let i = 0; i <= 48; i++) {
+        const a = i * Math.PI / 48;
+        points.push(new THREE.Vector3(half * Math.cos(a), spring + rise * Math.sin(a), z));
+      }
+      const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
+      const geometry = new THREE.TubeGeometry(curve, 80, radius, 8, false);
+      if (paintedWood.has(material)) {
+        const uv = geometry.getAttribute('uv');
+        for (let i = 0; i < uv.count; i++) uv.setXY(i,
+          uv.getX(i) * curve.getLength() / woodPeriod,
+          uv.getY(i) * 2 * Math.PI * radius / woodPeriod);
+        uv.needsUpdate = true;
+      }
+      const trim = shadow(new THREE.Mesh(geometry, material));
+      window.add(trim);
+      return trim;
+    };
+    for (const side of [-1, 1]) {
+      box(window, .25, straightHeight, .27, m.walnut, side * (halfWidth - .05), straightHeight / 2, .19, .045);
+      box(window, .045, straightHeight, .065, m.oldBrass, side * (halfWidth - .22), straightHeight / 2, .32);
+    }
+    makeArchTrim(halfWidth - .05, straightHeight, archRise, .15, m.walnut, .19).name = 'main-arched-window-frame';
+    makeArchTrim(halfWidth - .22, straightHeight - .05, archRise - .16, .048, m.oldBrass, .32);
+    box(window, 8.65, .22, .48, m.walnut, 0, -.02, .37, .035).name = 'main-arched-window-sill';
+    box(window, 8.01, .085, .13, m.oldBrass, 0, .13, .35);
+    // All mullions meet the arched glazing: no floating rectangular top rail.
+    for (const x of [-2.02, 0, 2.02]) {
+      const roof = straightHeight - .05 + (archRise - .16) * Math.sqrt(1 - (x / (halfWidth - .18)) ** 2);
+      box(window, .115, roof - .08, .13, m.darkWood, x, (roof + .08) / 2, .25);
+    }
+    for (const y of [2.68, straightHeight - .04]) box(window, 7.94, .11, .14, m.darkWood, 0, y, .24);
+    // Curtain folds follow the tall straight jambs, leaving the arch exposed.
     for (const sign of [-1, 1]) {
-      const curtain = new THREE.Group(); curtain.position.set(sign * 1.91, 4.2, -4.68); staticGroup.add(curtain);
+      const curtain = new THREE.Group(); curtain.position.set(sign * 4.01, 2.69, .47); window.add(curtain);
       for (let i = 0; i < 5; i++) {
-        const strip = box(curtain, .16, 3.13 + Math.sin(i * 1.8) * .06, .09, m.slate, sign * (i * .105), 0, Math.sin(i * 2) * .08);
+        const strip = box(curtain, .15, 5.27 + Math.sin(i * 1.8) * .07, .10, m.slate, sign * (i * .09), 0, Math.sin(i * 2) * .08);
         strip.rotation.z = sign * .02 * i;
       }
-      sphere(staticGroup, .115, m.oldBrass, sign * 1.93, 4.36, -4.52);
+      sphere(window, .115, m.oldBrass, sign * 4.03, 2.26, .67);
     }
     // Broad translucent sunlight falls across the central table.
     const beamMat = new THREE.MeshBasicMaterial({ color: '#f7d3a0', transparent: true, opacity: .036, depthWrite: false, side: THREE.DoubleSide });
-    const beam = new THREE.Mesh(new THREE.ConeGeometry(3.4, 7.2, 4, 1, true), beamMat);
-    beam.rotation.x = -.55; beam.position.set(-.25, 3.35, -2.5); staticGroup.add(beam);
+    const beam = new THREE.Mesh(new THREE.ConeGeometry(4.4, 8.4, 4, 1, true), beamMat);
+    beam.rotation.x = -.55; beam.position.set(-.25, 3.85, -2.5); staticGroup.add(beam);
   }
 
   function makeTable(parent, w, d, x, z, topY = .94) {
@@ -257,8 +345,8 @@ export function buildLair(scene, m) {
       return easel;
     };
     // In a perpendicular view the reference is on the left and work on the right.
-    makeEasel(-6.56, .30, 'ЭТАЛОН', false);
-    makeEasel(-6.56, -2.51, 'ВАША РЕСТАВРАЦИЯ', true);
+    makeEasel(-7.10, .30, 'ЭТАЛОН', false);
+    makeEasel(-7.10, -2.51, 'ВАША РЕСТАВРАЦИЯ', true);
 
     const rugMap = canvasTexture((ctx, w, h) => {
       ctx.fillStyle = '#b6a17b'; ctx.fillRect(0, 0, w, h);
@@ -274,7 +362,7 @@ export function buildLair(scene, m) {
     const rug = new THREE.Mesh(new THREE.PlaneGeometry(3.3, 6.0),
       new THREE.MeshStandardMaterial({ map: rugMap, roughness: 1 }));
     rug.name = 'restoration-rug';
-    rug.rotation.x = -Math.PI / 2; rug.position.set(-5.91, .057, -1.10);
+    rug.rotation.x = -Math.PI / 2; rug.position.set(-6.45, .057, -1.10);
     rug.receiveShadow = true; staticGroup.add(rug);
 
     const pigmentColors = [m.ruby, m.green, m.slate, m.liquidAmber, m.paperDark];
@@ -286,7 +374,7 @@ export function buildLair(scene, m) {
     for (let i = 0; i < 12; i++) bottle(staticGroup, -8.02, 2.81 + Math.floor(i / 4) * .93,
       3.49 + (i % 4) * .58, pigmentColors[i % pigmentColors.length], .25 + (i % 2) * .07, .105);
 
-    const table = makeTable(staticGroup, 2.11, .97, -6.06, -4.39, 1.04);
+    const table = makeTable(staticGroup, 2.11, .97, -6.60, -4.39, 1.04);
     table.rotation.y = Math.PI / 2;
     table.scale.setScalar(.84);
     box(table, .95, .025, .62, m.linen, -.43, 1.035, -.09);
@@ -300,7 +388,7 @@ export function buildLair(scene, m) {
     cylinder(table, .12, .12, .016, m.glassBlue, .84, 1.104, -.20, 24);
     rod(table, [.86, 1.1, -.09], [1.03, 1.11, .12], .023, m.walnut);
 
-    const stool = new THREE.Group(); stool.position.set(-4.87, 0, -4.33); staticGroup.add(stool);
+    const stool = new THREE.Group(); stool.position.set(-5.41, 0, -4.33); staticGroup.add(stool);
     cylinder(stool, .43, .40, .14, m.ash, 0, .57, 0, 24);
     for (const xx of [-.26, .26]) for (const zz of [-.25, .25]) rod(stool, [xx, .09, zz], [xx * .75, .55, zz * .75], .052, m.walnut);
     for (let i = 0; i < 3; i++) {
@@ -315,7 +403,7 @@ export function buildLair(scene, m) {
         box(blank, 1.06 + i * .11, .045, .07, m.ash, 0, .76 + i * .04 + side * (.63 + i * .065), .025);
       }
     }
-    station('restoration', [-6.39, 2.28, -1.06], [3.28, 4.9, 6.90]);
+    station('restoration', [-6.93, 2.28, -1.06], [3.28, 4.9, 6.90]);
   }
 
   function makePaper(parent, x, y, z, rotation = 0, size = [.53, .76]) {
@@ -357,8 +445,8 @@ export function buildLair(scene, m) {
     for (const x of [-.3, .3]) for (const z of [-.25, .25]) rod(chair, [x, .05, z], [x, .58, z], .06, m.darkWood);
     box(chair, .85, .82, .14, m.agedWood, 0, 1.13, .32, .045);
     for (const y of [.83, 1.1, 1.36]) box(chair, .68, .04, .08, m.oldBrass, 0, y, .42);
-    // Compact planning board to the right of the central window.
-    const board = new THREE.Group(); board.position.set(3.23, 3.37, -5.17); staticGroup.add(board);
+    // The enlarged window leaves a narrow wall bay for the planning board.
+    const board = new THREE.Group(); board.position.set(5.55, 3.37, -5.17); staticGroup.add(board);
     box(board, 2.27, 1.75, .10, m.darkWood);
     const map = makeMapTexture();
     plane(board, 2.05, 1.50, new THREE.MeshStandardMaterial({ map, roughness: 1 }), 0, 0, .072);
@@ -366,14 +454,18 @@ export function buildLair(scene, m) {
       sphere(board, .064, m.ruby, x, y, .12, 9);
       cylinder(board, .022, .027, .095, m.oldBrass, x, y, .12, 10).rotation.x = Math.PI / 2;
     }
-    const shelf = box(staticGroup, 1.9, .12, .52, m.walnut, 2.84, 1.98, -4.96);
+    const shelf = box(staticGroup, 1.9, .12, .52, m.walnut, 5.45, 1.98, -4.96);
     shelf.castShadow = false;
-    for (let i = 0; i < 5; i++) box(staticGroup, .15 + i * .022, .54 + (i % 2) * .16, .3, i % 2 ? m.ruby : m.leather, 2.1 + i * .24, 2.32 + (i % 2) * .08, -4.90);
+    for (let i = 0; i < 5; i++) box(staticGroup, .15 + i * .022, .54 + (i % 2) * .16, .3, i % 2 ? m.ruby : m.leather, 4.71 + i * .24, 2.32 + (i % 2) * .08, -4.90);
     station('planning', [0, 1.42, 1.28], [3.4, 2.8, 2.6]);
   }
 
   function toolPegboard() {
-    const pegboard = new THREE.Group(); pegboard.position.set(5.29, 3.22, -5.16); staticGroup.add(pegboard);
+    // The tool wall belongs to the workbench along the right-hand tiled wall.
+    const pegboard = new THREE.Group(); pegboard.position.set(8.18, 3.22, 4.27);
+    pegboard.rotation.y = -Math.PI / 2;
+    pegboard.name = 'workbench-tool-wall';
+    staticGroup.add(pegboard);
     box(pegboard, 2.3, 1.26, .12, m.agedWood);
     for (let x = -1; x <= 1; x += .22) for (let y = -.48; y <= .48; y += .22) {
       cylinder(pegboard, .012, .012, .03, m.darkWood, x, y, .075, 8).rotation.x = Math.PI / 2;
@@ -383,7 +475,7 @@ export function buildLair(scene, m) {
       rod(pegboard, [x, .30, .15], [x + (i % 2) * .07, -.33, .15], .018, m.iron);
       sphere(pegboard, .065, m.oldBrass, x + (i % 2) * .07, -.34, .15);
     }
-    label(staticGroup, 'MECHANICA', 5.35, 4.54, -5.10, 1.76, .26);
+    label(pegboard, 'MECHANICA', 0, 1.32, .15, 1.76, .26);
   }
 
   function makeKey(parent, x, y, z, size = .48) {
@@ -398,7 +490,9 @@ export function buildLair(scene, m) {
 
   function buildWorkbench() {
     toolPegboard();
-    const work = makeTable(staticGroup, 3.25, 1.32, 4.30, .28, 1.0);
+    const work = makeTable(staticGroup, 3.25, 1.32, 7.45, 4.27, 1.0);
+    work.name = 'workbench-right-of-alchemy';
+    work.rotation.y = -Math.PI / 2;
     box(work, 3.35, .12, 1.39, m.ash, 0, 1.14, 0, .03);
     box(work, 1.5, .4, .09, m.darkWood, .4, .69, .59);
     for (const x of [-.45,.42]) box(work, .055, .32, .11, m.oldBrass, x, .70, .65);
@@ -424,7 +518,7 @@ export function buildLair(scene, m) {
       box(work, .13, .13, .12, m.iron, 1.14 + Math.cos(a) * .29, 1.29 + Math.sin(a) * .29, -.20);
     }
     bottle(work, 1.40, 1.39, .35, m.liquidAmber, .31, .13);
-    station('workbench', [4.24, 1.58, .13], [3.55, 2.9, 2.2]);
+    station('workbench', [7.17, 1.58, 4.27], [2.25, 2.9, 3.65]);
   }
 
   function flask(parent, x, y, z, liquid, scale = 1) {
@@ -577,14 +671,7 @@ export function buildLair(scene, m) {
   }
 
   function buildDetails() {
-    // Small old painting on the wall, collected trophies and carefully spaced frames.
-    framedPainting(staticGroup, 1.20, .85, 'great-wave.jpg', -2.75, 4.22, -5.09);
-    framedPainting(staticGroup, 1.03, .86, 'starry-night.jpg', 7.69, 4.45, -5.12);
-    // The new second storey reads as a portrait gallery above the working stations.
-    framedPainting(staticGroup, 1.40, 1.72, 'girl-pearl.jpg', -6.32, 9.42, -5.12);
-    framedPainting(staticGroup, 1.68, 1.24, 'sardanapalus.jpg', -2.65, 9.70, -5.12);
-    framedPainting(staticGroup, 1.68, 1.28, 'great-wave.jpg', 2.61, 9.71, -5.12);
-    framedPainting(staticGroup, 1.41, 1.69, 'starry-night.jpg', 6.41, 9.41, -5.12);
+    // Keep the tall window wall free from pictures and the former upper gallery.
     // Column lamps create pools of warm light around the room.
     for (const x of [-7.98, 7.98]) {
       const lamp = new THREE.Group(); lamp.position.set(x, 3.10, -1.10); staticGroup.add(lamp);

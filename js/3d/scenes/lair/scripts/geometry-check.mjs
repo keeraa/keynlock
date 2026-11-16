@@ -30,6 +30,8 @@ const bounds = name => new THREE.Box3().setFromObject(unique(name));
 const restWall = bounds('restoration-left-wall');
 const alchemyWall = bounds('alchemy-right-wall');
 const alchemyTable = bounds('alchemy-facing-wall-table');
+const archedWindow = bounds('main-arched-window');
+const workbench = bounds('workbench-right-of-alchemy');
 
 assert.ok(restWall.max.y > 13.4, 'left wall reaches the double-height ceiling');
 assert.ok(restWall.max.x < -8.3, 'ochre plaster lies on left wall');
@@ -39,8 +41,16 @@ assert.ok(alchemyWall.min.z < -5.6 && alchemyWall.max.z > 7.1, 'tiles cover the 
 assert.ok(alchemyTable.max.x < alchemyWall.min.x, 'alchemy tabletop sits in front of tile wall');
 assert.ok(alchemyTable.max.x > 8.0, 'alchemy tabletop is close to tile wall');
 assert.ok(alchemyTable.min.x > 5.7, 'alchemy tabletop does not cross the room');
-assert.ok(unique('restoration-easel-reference').position.x < -6.0);
-assert.ok(unique('restoration-easel-work').position.x < -6.0);
+assert.ok(archedWindow.max.x - archedWindow.min.x > 8.20, 'new window is twice as wide');
+assert.ok(archedWindow.max.y - archedWindow.min.y > 7.20, 'new window is twice as tall');
+assert.ok(unique('main-arched-window-frame').geometry.type === 'TubeGeometry', 'arched frame follows the curved upper edge');
+assert.ok(unique('main-arched-window-glass').geometry.type === 'ShapeGeometry', 'glass fits inside the arch');
+assert.equal(unique('main-arched-window-sill').geometry.userData.paintedWoodUV, true, 'wood uses physical-scale UV mapping');
+assert.ok(workbench.min.z > alchemyTable.max.z + 1.0, 'workbench is separated to the right of alchemy');
+assert.ok(workbench.max.x < alchemyWall.min.x, 'workbench does not enter the tile wall');
+assert.ok(unique('workbench-tool-wall').position.z > 3.5, 'tool wall moved with the workbench');
+assert.ok(unique('restoration-easel-reference').position.x < -7.0);
+assert.ok(unique('restoration-easel-work').position.x < -7.0);
 const reference = unique('restoration-easel-reference');
 const work = unique('restoration-easel-work');
 assert.equal(reference.position.x, work.position.x, 'paintings align at the same wall depth');

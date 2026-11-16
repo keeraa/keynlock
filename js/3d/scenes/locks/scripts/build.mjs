@@ -5,6 +5,7 @@ import { join, resolve, dirname } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
 const source = join(root, 'src');
+const sharedMetals = resolve(root, '../../shared/materials/metals');
 const target = join(root, 'dist');
 const staging = join(root, '.tmp-site-build');
 if (target === root || !target.startsWith(root + '/')) throw Error('Unsafe build directory');
@@ -60,6 +61,10 @@ writeFileSync(join(staging, 'index.html'), output);
 copyFileSync(join(source, 'styles/app.css'), join(staging, 'app.css'));
 copyFileSync(join(source, 'js/startup.js'), join(staging, 'startup.js'));
 cpSync(join(source, 'assets'), join(staging, 'assets'), { recursive: true });
+for (const name of ['brass', 'copper', 'enamel', 'graphite', 'steel']) {
+  copyFileSync(join(sharedMetals, `painted-${name}.webp`),
+    join(staging, 'assets', `painted-${name}.webp`));
+}
 
 const inputBytes = Object.values(result.metafile.inputs).reduce((sum, entry) => sum + entry.bytes, 0);
 const bundleBytes = statSync(join(staging, 'app.js')).size;

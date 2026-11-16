@@ -12,7 +12,10 @@ test('all eight hand-painted source textures are bundled as real image assets', 
     'painted-graphite.webp', 'painted-copper.webp', 'painted-enamel.webp',
     'painted-gear.webp', 'painted-pin.webp', 'painted-manifold.webp',
   ]) {
-    const file = new URL(`../src/assets/${name}`, import.meta.url);
+    const file = ['painted-steel.webp', 'painted-brass.webp',
+      'painted-graphite.webp', 'painted-copper.webp', 'painted-enamel.webp'].includes(name)
+      ? new URL(`../../../shared/materials/metals/${name}`, import.meta.url)
+      : new URL(`../src/assets/${name}`, import.meta.url);
     assert.ok(statSync(file).size > 10_000, `${name} must contain the finished artwork`);
   }
 });

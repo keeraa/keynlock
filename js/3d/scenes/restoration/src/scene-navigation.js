@@ -6,6 +6,7 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
   let lastFocusedSide = 'copy';
   let overviewPose = null;
   let cameraTravel = null;
+  let stageWidth = 0, stageHeight = 0;
   const originalLabel = document.querySelector('.label-original');
   const copyLabel = document.querySelector('.label-copy');
   const labelProjection = new THREE.Vector3();
@@ -25,21 +26,32 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
     const z = camera.aspect < 1.3 ? 4.75 : 4.43;
     const target = new THREE.Vector3(x, paintingCenterY, .39);
     if (preserveZoom) return { position: target.clone().add(camera.position.clone().sub(controls.target)), target };
-    return { position: new THREE.Vector3(x, 2.02, z), target };
+    // Wide paintings sit higher. Keep the destination inside OrbitControls'
+    // polar limits so re-enabling controls cannot snap the view at arrival.
+    const distanceZ = z - target.z;
+    const lowestY = target.y + distanceZ / Math.tan(controls.maxPolarAngle - .025);
+    const highestY = target.y + distanceZ / Math.tan(controls.minPolarAngle + .025);
+    const y = THREE.MathUtils.clamp(2.02, lowestY, highestY);
+    return { position: new THREE.Vector3(x, y, z), target };
   }
 
   function flyCamera(destination) {
     clearUV();
     damageHint.hidden = true;
-    // Settle any outstanding OrbitControls damping before our own camera path.
-    // Otherwise it is applied in one visible jump when controls are re-enabled.
+    const fromPosition = camera.position.clone();
+    const fromTarget = controls.target.clone();
+    // Drain pending OrbitControls inertia without changing the visible pose.
+    // A disabled-damping update would otherwise cause a jump on click.
     const damping = controls.enableDamping;
     controls.enableDamping = false;
     controls.update();
     controls.enableDamping = damping;
+    camera.position.copy(fromPosition);
+    controls.target.copy(fromTarget);
+    camera.lookAt(fromTarget);
     cameraTravel = {
-      started: performance.now(), duration: 660,
-      fromPosition: camera.position.clone(), fromTarget: controls.target.clone(),
+      started: performance.now(), duration: 780,
+      fromPosition, fromTarget,
       toPosition: destination.position.clone(), toTarget: destination.target.clone(),
     };
     controls.enabled = false;
@@ -142,21 +154,33 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
   function resize() {
     const w = stage.clientWidth, h = stage.clientHeight;
     if (!w || !h) return;
+    if (w === stageWidth && h === stageHeight) return;
+    stageWidth = w;
+    stageHeight = h;
     camera.aspect = w / h;
     camera.fov = camera.aspect < 1.35 ? 44 : 39;
     camera.updateProjectionMatrix();
-    cameraTravel = null;
-    controls.enabled = true;
-    if (activeFocus) {
-      const centerX = activeFocus === 'original' ? -easelX : easelX;
-      const offsetX = centerX - controls.target.x;
-      controls.target.x = centerX;
-      camera.position.x += offsetX;
+    if (cameraTravel) {
+      // ResizeObserver can fire while focus controls change layout. Preserve
+      // the running interpolation and adjust only its destination.
+      if (activeFocus) {
+        const destination = focusDestination(activeFocus);
+        cameraTravel.toPosition.copy(destination.position);
+        cameraTravel.toTarget.copy(destination.target);
+      }
     } else {
-      camera.position.set(0, paintingCenterY + .4, overviewDistance());
-      controls.target.set(0, paintingCenterY, 0);
+      controls.enabled = true;
+      if (activeFocus) {
+        const centerX = activeFocus === 'original' ? -easelX : easelX;
+        const offsetX = centerX - controls.target.x;
+        controls.target.x = centerX;
+        camera.position.x += offsetX;
+      } else {
+        camera.position.set(0, paintingCenterY + .4, overviewDistance());
+        controls.target.set(0, paintingCenterY, 0);
+      }
+      controls.update();
     }
-    controls.update();
     renderer.setSize(w, h);
     cartoonFilter.resize(w, h);
     renderLabels();
@@ -164,8 +188,9 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
 
   function animate(now) {
     if (!cameraTravel) return controls.update();
-    const progress = Math.min(1, (now - cameraTravel.started) / cameraTravel.duration);
-    const eased = 1 - Math.pow(1 - progress, 3);
+    const progress = Math.max(0, Math.min(1, (now - cameraTravel.started) / cameraTravel.duration));
+    // Quintic smoothstep has zero velocity and acceleration at both ends.
+    const eased = progress * progress * progress * (progress * (progress * 6 - 15) + 10);
     camera.position.lerpVectors(cameraTravel.fromPosition, cameraTravel.toPosition, eased);
     controls.target.lerpVectors(cameraTravel.fromTarget, cameraTravel.toTarget, eased);
     camera.lookAt(controls.target);

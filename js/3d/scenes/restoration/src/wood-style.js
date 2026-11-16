@@ -3,7 +3,7 @@ import { gradeWoodTexture, applyWoodTexture } from './wood-materials.js';
 /** Wood finishes, swatches and their texture lifecycle. */
 export function createWoodStyle({ THREE, renderer, loader, mats, wallpaperMaterial,
   floorWoodMaterials, variants }) {
-  const selected = { easel: 1, frame: 1 };
+  const selected = { easel: 1, frame: 2 };
   let textures = [];
 
   function setVariant(target, index) {

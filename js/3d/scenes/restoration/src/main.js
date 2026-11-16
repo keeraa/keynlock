@@ -78,7 +78,7 @@ const mats = {
   deepWood: new THREE.MeshStandardMaterial({ color: '#423021', roughness: 0.9 }),
   roomWood: new THREE.MeshStandardMaterial({ color: '#6e5540', roughness: 1 }),
   roomEdge: new THREE.MeshStandardMaterial({ color: '#9b7b5b', roughness: 1 }),
-  frameWood: new THREE.MeshStandardMaterial({ color: '#765138', roughness: 1 }),
+  frameWood: new THREE.MeshStandardMaterial({ color: '#b7b3ab', roughness: 1 }),
   linen: new THREE.MeshStandardMaterial({ color: '#c6ae89', roughness: 1 }),
   metal: new THREE.MeshStandardMaterial({ color: '#8c7957', metalness: 0.76, roughness: 0.34 }),
 };

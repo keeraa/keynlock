@@ -5,6 +5,7 @@ import { createPaintingTextureCache } from '../src/painting-texture-cache.js';
 import { createArtworkRenderer } from '../src/artwork-renderer.js';
 import { applyWoodTexture, gradeWoodTexture } from '../src/wood-materials.js';
 import { createWorkshopRoom } from '../src/workshop-room.js';
+import { createWoodStyle } from '../src/wood-style.js';
 
 test('painting textures are shared and least-recently-used entries are released', async () => {
   const loaded = [];
@@ -107,7 +108,57 @@ test('workshop factory creates the original room and two compatible easels', () 
     assert.ok(easel.artwork.isGroup);
     assert.ok(easel.shelf.isGroup);
     assert.ok(easel.topClamp.isMesh);
+    const tabletop = new THREE.Box3().setFromObject(scene.getObjectByName('restoration-worktable-top'));
+    const brushPad = new THREE.Box3().setFromObject(scene.getObjectByName('restoration-brush-pad'));
+    const palette = new THREE.Box3().setFromObject(scene.getObjectByName('restoration-palette'));
+    assert.ok(Math.abs(palette.min.y - tabletop.max.y) < .005,
+      'the paint palette rests on the wood surface');
+    for (let index = 1; index <= 7; index++) {
+      for (const segment of ['handle', 'ferrule']) {
+        const brush = scene.getObjectByName(`restoration-brush-${index}-${segment}`);
+        const bounds = new THREE.Box3().setFromObject(brush);
+        assert.ok(Math.abs(bounds.min.y - brushPad.max.y) < .006,
+          `brush ${index} ${segment} should touch the linen pad`);
+      }
+    }
   } finally {
     globalThis.document = priorDocument;
+  }
+});
+
+test('new workshops select the ash finish for picture frames', async () => {
+  const previousDocument = globalThis.document;
+  const buttons = [0, 1, 2].map((wood) => ({
+    dataset: { target: 'frame', wood: String(wood) },
+    classList: { selected: false, toggle(name, selected) { if (name === 'selected') this.selected = selected; } },
+    setAttribute(name, value) { if (name === 'aria-pressed') this.pressed = value; },
+    addEventListener() {},
+  }));
+  globalThis.document = { querySelectorAll(selector) {
+    return selector === '.wood-option' || selector === '.wood-option[data-target="frame"]'
+      ? buttons : [];
+  } };
+  try {
+    const material = () => new THREE.MeshStandardMaterial();
+    const mats = Object.fromEntries(['easel', 'easelEdge', 'deepWood', 'frameWood',
+      'roomWood', 'roomEdge'].map((key) => [key, material()]));
+    const textures = new Map();
+    const woodStyle = createWoodStyle({ THREE, mats,
+      renderer: { capabilities: { getMaxAnisotropy: () => 8 } },
+      loader: { loadAsync: async (path) => {
+        const texture = new THREE.Texture();
+        textures.set(path, texture);
+        return texture;
+      } },
+      wallpaperMaterial: material(), floorWoodMaterials: [],
+      variants: [0, 1, 2].map((index) => ({ image: `/finish-${index}.webp` })),
+    });
+    await woodStyle.initialize();
+    assert.strictEqual(mats.frameWood.map, textures.get('/finish-2.webp'));
+    assert.equal(buttons[2].classList.selected, true);
+    assert.equal(buttons[1].classList.selected, false);
+    assert.equal(buttons[2].pressed, 'true');
+  } finally {
+    globalThis.document = previousDocument;
   }
 });

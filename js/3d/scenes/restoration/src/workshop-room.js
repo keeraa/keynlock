@@ -115,16 +115,26 @@ export function createWorkshopRoom({ THREE, scene, mats }) {
     }
 
     // Work table, scattered brushes, palette and restoration paraphernalia.
-    box(2.75, .13, 1.15, mats.roomWood, 5.17, .91, 1.0);
+    const tabletopY = .91 + .13 / 2;
+    const worktable = box(2.75, .13, 1.15, mats.roomWood, 5.17, .91, 1.0);
+    worktable.name = 'restoration-worktable-top';
     for (const x of [4.07, 6.21]) for (const z of [.59, 1.43]) box(.11, .85, .11, mats.roomEdge, x, .42, z);
-    box(1.1, .06, .72, mats.linen, 5.13, 1.02, 1.03);
+    const brushPad = box(1.1, .06, .72, mats.linen, 5.13, 1.02, 1.03);
+    brushPad.name = 'restoration-brush-pad';
+    const brushPadY = 1.02 + .06 / 2;
     for (let i = 0; i < 7; i++) {
-      const x = 4.67 + i * .17;
-      rod([x, 1.09, .78], [x + .11, 1.13, 1.31], .016, mats.roomWood, scene, 8);
-      rod([x + .11, 1.13, 1.31], [x + .15, 1.15, 1.44], .011, mats.metal, scene, 8);
+      const x = 4.63 + i * .15;
+      const handle = rod([x, brushPadY + .016, .77], [x + .10, brushPadY + .016, 1.21],
+        .016, mats.roomWood, scene, 8);
+      handle.name = `restoration-brush-${i + 1}-handle`;
+      const ferrule = rod([x + .10, brushPadY + .011, 1.21],
+        [x + .12, brushPadY + .011, 1.33], .011, mats.metal, scene, 8);
+      ferrule.name = `restoration-brush-${i + 1}-ferrule`;
     }
     const palette = new THREE.Group();
-    palette.position.set(6, 1.06, 1.08);
+    palette.name = 'restoration-palette';
+    // Extruded bevel extends .012 below the local plane; rest it on the tabletop.
+    palette.position.set(6, tabletopY + .012, 1.08);
     const paletteShape = new THREE.Shape();
     paletteShape.absellipse(0, 0, .42, .3, 0, Math.PI * 2, false, 0);
     const hole = new THREE.Path();
@@ -137,7 +147,8 @@ export function createWorkshopRoom({ THREE, scene, mats }) {
     for (let i = 0; i < 5; i++) {
       const dot = new THREE.Mesh(new THREE.SphereGeometry(.048, 9, 6), new THREE.MeshStandardMaterial({ color: colors[i], roughness: 1 }));
       dot.scale.y = .24;
-      dot.position.set(5.78 + .1 * (i % 3), 1.093, .95 + .11 * Math.floor(i / 3));
+      dot.position.set(5.78 + .1 * (i % 3), tabletopY + .04 + .048 * .24,
+        .95 + .11 * Math.floor(i / 3));
       scene.add(dot);
     }
 

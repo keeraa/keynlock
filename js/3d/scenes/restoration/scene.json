@@ -5,7 +5,7 @@
   "threeVersion": "0.187.0",
   "status": "standalone",
   "source": "ChatGPT Sites",
-  "sourceCommit": "1db00f2e29bdc869fe033a6d9ef7ec593fbc86c3",
+  "sourceCommit": "91193eb33c4e8f060c4567e2533a151ab8cd368e",
   "savedOn": "2026-11-16",
   "liveUrl": "https://atelier-restoration-1115.k1r11111.chatgpt.site",
   "entry": "index.html",
@@ -64,7 +64,7 @@
     },
     "autoArtworkDescription": {
       "enabled": true,
-      "method": "screen-space-visible-area-weighted-by-center-proximity",
+      "method": "center-ray-hit-priority-then-nearest-visible-artwork",
       "updateThrottleMs": 90,
       "manualFocusPreserved": true,
       "textureMemory": "shared-wall-preview-cache-with-eviction-disposal",
@@ -76,7 +76,9 @@
       "displayTrigger": "close-up-only",
       "minFrameFractionOfViewport": 0.48,
       "maxCameraDistanceFractionOfOverview": 0.82,
-      "hideWhenZoomedOut": true
+      "hideWhenZoomedOut": true,
+      "minFrameFractionNearCenterMultiplier": 0.6,
+      "ignoresPeripheralLargePaintings": true
     }
   },
   "integration": {
@@ -91,7 +93,7 @@
       "navigation/easel-overlay.js"
     ],
     "stylesheets": 8,
-    "tests": 40,
+    "tests": 41,
     "mainFileLines": 314,
     "backgroundBlur": "half-resolution two-pass depth-aware Gaussian; radius 6.5px; strength 72%",
     "foregroundOnlyOutlines": true,

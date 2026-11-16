@@ -21,6 +21,7 @@ export function createWallArtworkPicker({ THREE, camera, renderer, artworks, ima
     let winner = null;
     let bestScore = 0;
     let previousScore = 0;
+    const candidates = new Map();
 
     for (const { image, placement } of artworks.values()) {
       image.updateWorldMatrix(true, false);
@@ -46,21 +47,30 @@ export function createWallArtworkPicker({ THREE, camera, renderer, artworks, ima
       top = Math.min(1, top);
       if (left >= right || bottom >= top) continue;
 
-      // On the overview, even the central picture should not acquire a plaque.
-      // In close-up mode at least one image axis must fill much of the viewport.
       const frameFraction = Math.max((right - left) / 2, (top - bottom) / 2);
-      const requiredFraction = placement.id === previousId ? minFrameFraction * .9 : minFrameFraction;
-      if (frameFraction < requiredFraction) continue;
-
       const visibleArea = (right - left) * (top - bottom);
       const dx = left > 0 ? left : right < 0 ? right : 0;
       const dy = bottom > 0 ? bottom : top < 0 ? top : 0;
-      const score = visibleArea / (1 + 8 * (dx * dx + dy * dy));
+      const centerGapSquared = dx * dx + dy * dy;
+      // A painting near the screen center can be smaller than one at the edge.
+      // Large peripheral paintings should never steal its description.
+      if (centerGapSquared > .12) continue;
+      const requiredFraction = minFrameFraction * (centerGapSquared < .025 ? .6 : 1)
+        * (placement.id === previousId ? .9 : 1);
+      if (frameFraction < requiredFraction) continue;
+
+      const score = 1 / (1 + 60 * centerGapSquared) + visibleArea * .015;
+      candidates.set(placement.id, { placement, score });
       if (placement.id === previousId) previousScore = score;
       if (score > bestScore) { winner = placement; bestScore = score; }
     }
 
-    if (bestScore <= .002) return null;
+    // Exact center-ray hit takes priority, even if another painting occupies
+    // more total pixels. Its mesh was already updated in the projection loop.
+    raycaster.setFromCamera(pointer.set(0, 0), camera);
+    const centerHit = raycaster.intersectObjects(imageMeshes, false)[0];
+    if (centerHit) return candidates.get(centerHit.object.userData.galleryId)?.placement || null;
+    if (!winner) return null;
     // A small hysteresis prevents the information plaque flickering between frames.
     if (previousId && previousId !== winner?.id && previousScore * 1.12 >= bestScore) {
       return artworks.get(previousId)?.placement || winner;

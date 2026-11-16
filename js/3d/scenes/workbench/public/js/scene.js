@@ -409,6 +409,7 @@ export function createWorkshopScene(canvas){
     assembly:{position:new THREE.Vector3(1.75,2.15,8.7),target:new THREE.Vector3(.75,-.18,0)}
   };
   let mode='key',lastFrame=performance.now(),frames=0,fps=0,fpsClock=lastFrame;
+  let renderedPolygons=0;
   const cameraInKeySpace=new THREE.Vector3();
   function setMode(next){
     if(next!==mode){
@@ -470,6 +471,9 @@ export function createWorkshopScene(canvas){
       fallenPiece.group.rotation.x=Math.min(.45,t*.35);
     }
     renderer.render(scene,camera);
+    // The renderer counts the triangles actually drawn in this frame,
+    // including the active workbench mode and its visible geometry.
+    renderedPolygons=renderer.info.render.triangles;
     frames++;
     if(now-fpsClock>800){fps=Math.round(frames*1000/(now-fpsClock));frames=0;fpsClock=now;}
     lastFrame=now;
@@ -484,7 +488,8 @@ export function createWorkshopScene(canvas){
     setKeyMethod,setFileOrientation,rotateFile,filingContact,filingPulse,filingChips,
     setFilePointer,setFilePointerActive,fileStrokePixels,
     hitTest,pointerPoint,updateInstalled,setPartGroup,
-    setSelectedPart,movePart,findNearestSocket,startTest,getFps:()=>fps,
+    setSelectedPart,movePart,findNearestSocket,startTest,
+    getFps:()=>fps,getPolygons:()=>renderedPolygons,
     dispose:()=>{stopped=true;sceneListeners.abort();resizeObserver.disconnect();controls.dispose();
       imprintBoard.dispose();shavings.dispose();fileSurface.dispose();bow.dispose();
       disposeSceneResources(scene);

@@ -7,6 +7,17 @@ import {disposeSceneResources} from '../public/js/scene-disposal.js';
 import {shouldRebuildTargetGuide,targetGuideGeometry} from '../public/js/key-guide.js';
 import {zoneSurfaceSamples,createZoneFaceGeometry,createZoneRimGeometry,
   createZoneOutlineGeometry} from '../public/js/key-zone-highlight.js';
+import {readFileSync} from 'node:fs';
+
+test('performance HUD shows rendered polygon count alongside FPS',()=>{
+  const page=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
+  const app=readFileSync(new URL('../public/js/main.js',import.meta.url),'utf8');
+  const render=readFileSync(new URL('../public/js/scene.js',import.meta.url),'utf8');
+  assert.match(page,/id="fps"/);
+  assert.match(page,/id="polygons"/);
+  assert.match(app,/getPolygons\(\)\.toLocaleString\('ru-RU'\)/);
+  assert.match(render,/renderedPolygons=renderer\.info\.render\.triangles/);
+});
 
 test('3D pointer picking selects the intended tooth and refuses a broken blank',()=>{
   const layout=cutLayout(4),cuts=Array(4).fill(0);

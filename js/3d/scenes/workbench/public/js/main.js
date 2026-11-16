@@ -209,7 +209,10 @@ const detachControls=installWorkbenchInput({canvas,state,scene,save,toast,measur
   inspectCurrentKey,selectCut,renderCuts,renderSelection,removePart,placement,
   testMechanism,releaseCapture,inspectKeyButton:$('inspectKey')});
 buildCutRows();selectCut(0);renderCuts();renderAssembly();setMode('key');
-const fpsTimer=setInterval(()=>{$('fps').textContent=String(scene.getFps()||'—');},850);
+const fpsTimer=setInterval(()=>{
+  $('fps').textContent=String(scene.getFps()||'—');
+  $('polygons').textContent=scene.getPolygons().toLocaleString('ru-RU');
+},850);
 window.addEventListener('beforeunload',()=>{
   clearTimeout(toastTimer);clearInterval(fpsTimer);detachControls();scene.dispose();
 },{once:true});

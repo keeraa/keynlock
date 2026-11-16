@@ -5,7 +5,7 @@
   "threeVersion": "0.187.0",
   "status": "standalone",
   "source": "ChatGPT Sites",
-  "sourceCommit": "91fa31e0a68a78ecf2c40b8d6b1d34b635eb9f76",
+  "sourceCommit": "0b17426366a3ff1cd38288ccc9714d4312be604f",
   "savedOn": "2026-11-16",
   "liveUrl": "https://atelier-restoration-1115.k1r11111.chatgpt.site",
   "entry": "index.html",
@@ -102,7 +102,7 @@
     ],
     "stylesheets": 8,
     "tests": 46,
-    "mainFileLines": 314,
+    "mainFileLines": 322,
     "backgroundBlur": "half-resolution two-pass depth-aware Gaussian; radius 6.5px; strength 72%",
     "foregroundOnlyOutlines": true,
     "loreModule": "src/lore/painting-lore.js",
@@ -113,7 +113,11 @@
       "src/wall-artwork-info.js",
       "src/wall-exhibition-controller.js"
     ],
-    "inkExclusion": "explicit-wall-gallery-and-room-architecture-normal-mask"
+    "inkExclusion": "explicit-wall-gallery-and-room-architecture-normal-mask",
+    "sharedStaticGeometries": true,
+    "workshopMeshes": 184,
+    "uniqueWorkshopGeometries": 51,
+    "floorWoodMaterials": 5
   },
   "woodFinishes": {
     "easelDefault": "Орех",
@@ -123,5 +127,11 @@
     "palette": "resting-on-worktable",
     "brushes": "resting-on-linen-pad",
     "contactVerified": true
+  },
+  "release": {
+    "version": "1.0.0",
+    "status": "stable",
+    "testsPassed": 46,
+    "cleanup": "unused textures removed; shared static geometry and materials"
   }
 }

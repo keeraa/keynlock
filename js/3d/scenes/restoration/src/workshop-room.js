@@ -3,7 +3,25 @@ import { createFrameGeometry } from './frame-geometry.js';
 /** Builds the static atelier and exposes its easel factory and wood surfaces. */
 export function createWorkshopRoom({ THREE, scene, mats }) {
   const floorWoodMaterials = [];
+  // Static furniture repeats the same primitives dozens of times. Reuse their
+  // immutable GPU buffers across both easels, planks, shelves and tools.
+  const boxGeometries = new Map();
+  const cylinderGeometries = new Map();
   let wallpaperMaterial;
+
+  function geometry(cache, key, create) {
+    if (!cache.has(key)) cache.set(key, create());
+    return cache.get(key);
+  }
+
+  function boxGeometry(w, h, d) {
+    return geometry(boxGeometries, `${w}/${h}/${d}`, () => new THREE.BoxGeometry(w, h, d));
+  }
+
+  function cylinderGeometry(rTop, rBottom, h, segments) {
+    return geometry(cylinderGeometries, `${rTop}/${rBottom}/${h}/${segments}`,
+      () => new THREE.CylinderGeometry(rTop, rBottom, h, segments));
+  }
 
   const seeded = (seed) => () => {
     seed = (1664525 * seed + 1013904223) | 0;
@@ -11,7 +29,7 @@ export function createWorkshopRoom({ THREE, scene, mats }) {
   };
 
   function box(w, h, d, material, x, y, z, parent = scene) {
-    const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+    const mesh = new THREE.Mesh(boxGeometry(w, h, d), material);
     mesh.position.set(x, y, z);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
@@ -22,7 +40,7 @@ export function createWorkshopRoom({ THREE, scene, mats }) {
   function rod(from, to, radius, material, parent, segments = 8) {
     const a = new THREE.Vector3(...from), b = new THREE.Vector3(...to);
     const dir = new THREE.Vector3().subVectors(b, a);
-    const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius * .91, radius, dir.length(), segments), material);
+    const mesh = new THREE.Mesh(cylinderGeometry(radius * .91, radius, dir.length(), segments), material);
     mesh.position.copy(a).add(b).multiplyScalar(.5);
     mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
     mesh.castShadow = true;
@@ -32,7 +50,7 @@ export function createWorkshopRoom({ THREE, scene, mats }) {
   }
 
   function cylinder(rTop, rBottom, h, material, x, y, z, parent = scene, segments = 14) {
-    const mesh = new THREE.Mesh(new THREE.CylinderGeometry(rTop, rBottom, h, segments), material);
+    const mesh = new THREE.Mesh(cylinderGeometry(rTop, rBottom, h, segments), material);
     mesh.position.set(x, y, z);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
@@ -83,10 +101,12 @@ export function createWorkshopRoom({ THREE, scene, mats }) {
     floor.userData.excludeFromInk = true;
     scene.add(floor);
     const floorColors = ['#f0e3d1', '#d7cab9', '#e7dac7', '#c8b7a3', '#ead2b5'];
+    // Five tones, reused on 38 distinct planks; one shared wood texture below.
+    floorWoodMaterials.push(...floorColors.map((color) =>
+      new THREE.MeshStandardMaterial({ color, roughness: .91 })));
     for (let r = 0; r < 38; r++) {
       const z = -6.1 + r * .38;
-      const material = new THREE.MeshStandardMaterial({ color: floorColors[r % floorColors.length], roughness: .91 });
-      floorWoodMaterials.push(material);
+      const material = floorWoodMaterials[r % floorWoodMaterials.length];
       const plank = box(32, .035, .372, material, 0, -.046, z);
       plank.castShadow = false;
       plank.userData.excludeFromInk = true;
@@ -107,11 +127,12 @@ export function createWorkshopRoom({ THREE, scene, mats }) {
       box(.08, .52, .46, mats.roomEdge, -4.45, y - .28, -4.06);
     }
     const colors = ['#9a5342', '#b68d52', '#6a8477', '#b6a48c', '#4f6570', '#bd8557', '#6b4934', '#7c7763'];
+    const jarGlass = new THREE.MeshPhysicalMaterial({ color: '#d9d3bd', roughness: .18,
+      transmission: .65, transparent: true, opacity: .65, thickness: .08 });
     for (let i = 0; i < 8; i++) {
       const row = Math.floor(i / 4), col = i % 4;
       const x = -6 + col * .5, y = 1.6 + row * 1.03;
-      const glass = new THREE.MeshPhysicalMaterial({ color: '#d9d3bd', roughness: .18, transmission: .65, transparent: true, opacity: .65, thickness: .08 });
-      cylinder(.12, .13, .37, glass, x, y + .04, -3.75);
+      cylinder(.12, .13, .37, jarGlass, x, y + .04, -3.75);
       const pigment = cylinder(.103, .103, .23, new THREE.MeshStandardMaterial({ color: colors[i], roughness: .91 }), x, y - .01, -3.75);
       pigment.userData.excludeFromInk = true;
       pigment.castShadow = false;
@@ -148,8 +169,9 @@ export function createWorkshopRoom({ THREE, scene, mats }) {
     paletteMesh.rotation.x = -Math.PI / 2;
     palette.add(paletteMesh);
     scene.add(palette);
+    const paintDotGeometry = new THREE.SphereGeometry(.048, 9, 6);
     for (let i = 0; i < 5; i++) {
-      const dot = new THREE.Mesh(new THREE.SphereGeometry(.048, 9, 6), new THREE.MeshStandardMaterial({ color: colors[i], roughness: 1 }));
+      const dot = new THREE.Mesh(paintDotGeometry, new THREE.MeshStandardMaterial({ color: colors[i], roughness: 1 }));
       dot.scale.y = .24;
       dot.position.set(5.78 + .1 * (i % 3), tabletopY + .04 + .048 * .24,
         .95 + .11 * Math.floor(i / 3));

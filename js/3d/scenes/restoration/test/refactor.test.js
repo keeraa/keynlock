@@ -101,7 +101,15 @@ test('workshop factory creates the original room and two compatible easels', () 
     ].map(key => [key, material()]));
     const workshop = createWorkshopRoom({ THREE, scene, mats });
     assert.ok(workshop.dust.isPoints);
-    assert.equal(workshop.floorWoodMaterials.length, 38);
+    assert.equal(workshop.floorWoodMaterials.length, 5,
+      'the 38 floor planks should reuse five wood materials');
+    const planks = scene.children.filter((object) => object.isMesh &&
+      workshop.floorWoodMaterials.includes(object.material) && object.position.y === -.046);
+    assert.equal(planks.length, 38);
+    assert.strictEqual(planks[0].geometry, planks[1].geometry,
+      'repeated planks share one immutable box geometry');
+    assert.strictEqual(planks[0].material, planks[5].material,
+      'repeating floor tones do not allocate duplicate materials');
     assert.ok(workshop.wallpaperMaterial.isMeshStandardMaterial);
     const wallpaper = scene.children.find((object) => object.material === workshop.wallpaperMaterial);
     assert.equal(wallpaper.userData.excludeFromInk, true,
@@ -111,6 +119,12 @@ test('workshop factory creates the original room and two compatible easels', () 
     assert.ok(easel.artwork.isGroup);
     assert.ok(easel.shelf.isGroup);
     assert.ok(easel.topClamp.isMesh);
+    const secondEasel = workshop.makeEasel(1.28, -.045);
+    assert.notStrictEqual(easel.root.children[0], secondEasel.root.children[0]);
+    assert.strictEqual(easel.root.children[0].geometry, secondEasel.root.children[0].geometry,
+      'both easels reuse the same support-rod geometry');
+    assert.strictEqual(easel.topClamp.geometry, secondEasel.topClamp.geometry,
+      'both easels reuse the same clamp geometry');
     const tabletop = new THREE.Box3().setFromObject(scene.getObjectByName('restoration-worktable-top'));
     const brushPad = new THREE.Box3().setFromObject(scene.getObjectByName('restoration-brush-pad'));
     const palette = new THREE.Box3().setFromObject(scene.getObjectByName('restoration-palette'));

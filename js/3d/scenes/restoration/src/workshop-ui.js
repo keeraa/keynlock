@@ -61,9 +61,9 @@ export function wireWorkshopUI({ cartoonFilter, navigation, restorationInput, co
         event.preventDefault();
         if (navigation.focusedWallId()) navigation.leaveWallArt();
         else navigation.leaveWallGallery();
-      } else if (['ArrowUp', 'KeyW', 'ArrowDown', 'KeyS'].includes(event.code)) {
+      } else if (['ArrowLeft', 'KeyA', 'ArrowRight', 'KeyD'].includes(event.code)) {
         event.preventDefault();
-        navigation.moveAlongWall(['ArrowUp', 'KeyW'].includes(event.code) ? 1 : -1);
+        navigation.moveAlongWall(['ArrowRight', 'KeyD'].includes(event.code) ? 1 : -1);
       }
       return;
     }

@@ -1,6 +1,6 @@
 import { createFrameGeometry } from './frame-geometry.js';
-import { layoutWallPaintings, WALL_CAPACITY, WALL_HEIGHT, WALL_TOP,
-  WALL_WIDTH, WALL_ROWS, WALL_LABEL_WIDTH } from './wall-layout.js';
+import { layoutWallPaintings, WALL_CAPACITY, WALL_TOP,
+  WALL_WIDTH, WALL_COLUMNS } from './wall-layout.js';
 
 /** A compact, high-mounted salon wall. Preview textures are separate from the easel LRU. */
 export function createWallGallery({ THREE, scene, camera, renderer, frameWood, onLayout = () => {} }) {
@@ -14,30 +14,34 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood, o
   paintingsRoot.name = 'restored-frames';
   root.add(paintingsRoot);
   const labelCanvas = document.createElement('canvas');
-  labelCanvas.width = 512;
-  labelCanvas.height = 2048;
+  labelCanvas.width = 4096;
+  labelCanvas.height = 192;
   const labelContext = labelCanvas.getContext('2d');
-  const labelStep = labelCanvas.height / WALL_ROWS.length;
-  for (const [index, row] of WALL_ROWS.entries()) {
+  const labelStep = labelCanvas.width / WALL_COLUMNS.length;
+  for (const [index, column] of WALL_COLUMNS.entries()) {
     const center = (index + .5) * labelStep;
+    const [name, subtitle] = column.label.toUpperCase().split(' · ');
     labelContext.fillStyle = '#f0dcb6';
-    labelContext.font = '600 36px Manrope, sans-serif';
-    labelContext.textAlign = 'left';
+    labelContext.font = '600 37px Manrope, sans-serif';
+    labelContext.textAlign = 'center';
     labelContext.textBaseline = 'middle';
-    labelContext.fillText?.(row.label.toUpperCase(), 16, center - 5, 482);
-    labelContext.fillStyle = 'rgba(240,220,182,.36)';
-    labelContext.fillRect(16, center + 35, 330, 1);
+    labelContext.fillText?.(name, center, subtitle ? 73 : 90, labelStep - 26);
+    if (subtitle) {
+      labelContext.font = '500 26px Manrope, sans-serif';
+      labelContext.fillText?.(subtitle, center, 116, labelStep - 26);
+    }
+    labelContext.fillStyle = 'rgba(240,220,182,.45)';
+    labelContext.fillRect(center - labelStep * .38, 157, labelStep * .76, 2);
   }
   const labelTexture = new THREE.CanvasTexture(labelCanvas);
   labelTexture.colorSpace = THREE.SRGBColorSpace;
   const labelStrip = new THREE.Mesh(
-    new THREE.PlaneGeometry(WALL_LABEL_WIDTH - .14, WALL_HEIGHT),
+    new THREE.PlaneGeometry(WALL_WIDTH, .81),
     new THREE.MeshBasicMaterial({ map: labelTexture, transparent: true, depthWrite: false,
       toneMapped: false }),
   );
-  labelStrip.name = 'twelve-art-history-labels';
-  labelStrip.position.set(-WALL_WIDTH / 2 + WALL_LABEL_WIDTH / 2 - .06,
-    WALL_TOP - WALL_HEIGHT / 2, .035);
+  labelStrip.name = 'twelve-art-history-column-headings';
+  labelStrip.position.set(0, WALL_TOP - .42, .035);
   root.add(labelStrip);
 
   const raycaster = new THREE.Raycaster();

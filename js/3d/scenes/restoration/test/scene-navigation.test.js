@@ -82,7 +82,7 @@ test('painting focus eases into place without a camera snap, even after a resize
   }
 });
 
-test('gallery camera rises to the wall, focuses a painting and returns without a reset snap', () => {
+test('gallery camera follows the horizontal columns, focuses artwork and returns without a snap', () => {
   const previousDocument = globalThis.document;
   const previousResizeObserver = globalThis.ResizeObserver;
   const nodes = new Map();
@@ -131,24 +131,34 @@ test('gallery camera rises to the wall, focuses a painting and returns without a
     nav.resize();
     const start = camera.position.clone();
     const now = performance.now();
-    nav.enterWallGallery({ minY: 7.2, maxY: 17.25, width: 14.6 });
+    nav.enterWallGallery({ minX: -15, maxX: 15, minY: 3.695, maxY: 11.85,
+      width: 30, columnWidth: 2.5 });
     assert.ok(stage.classList.contains('wall-gallery-active'), 'easel overlays hide on the real stage');
     assert.ok(camera.position.distanceTo(start) < 1e-6, 'begin ascent without a snap');
     nav.animate(now + 1800);
-    assert.ok(camera.position.y > 11, 'camera rises above the easels');
+    assert.ok(camera.position.y > 7, 'camera rises above the easels');
+    assert.ok(camera.position.x < -6, 'gallery initially shows large artworks in the first columns');
     assert.equal(nav.isWallGallery(), true);
-    const art = { id: 'restored-1', x: 2.4, y: 16.3, width: 1.55, height: 2.0 };
+    const firstX = controls.target.x;
+    const firstY = controls.target.y;
+    nav.moveAlongWall(1);
+    nav.animate(now + 2700);
+    assert.ok(controls.target.x > firstX + 5, 'the next button pans horizontally');
+    assert.ok(Math.abs(controls.target.y - firstY) < 1e-6, 'horizontal navigation preserves height');
+    const art = { id: 'restored-1', x: -2.4, y: 9.3, width: 1.55, height: 2.0 };
     nav.focusWallArt(art);
-    nav.animate(now + 3200);
+    nav.animate(now + 4200);
     assert.equal(nav.focusedWallId(), art.id);
     assert.ok(Math.abs(controls.target.y - art.y) < 1e-6);
     assert.ok(Math.abs(camera.position.x - art.x) < 1e-6);
     nav.leaveWallArt();
-    nav.animate(now + 4800);
+    nav.animate(now + 5600);
     assert.equal(nav.focusedWallId(), null);
+    assert.ok(Math.abs(controls.target.x - (firstX + 6)) < .1,
+      'returning from a painting keeps the same column window');
     nav.leaveWallGallery();
     assert.ok(stage.classList.contains('wall-gallery-active'), 'labels stay hidden on the way down');
-    nav.animate(now + 6500);
+    nav.animate(now + 7200);
     assert.equal(stage.classList.contains('wall-gallery-active'), false, 'labels return at the easels');
     assert.ok(camera.position.distanceTo(start) < .03, 'return to original workshop camera');
     assert.equal(controls.minPolarAngle, 1.23);

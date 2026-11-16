@@ -11,7 +11,8 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
   let wallArtwork = null;
   let wallOriginPose = null;
   let wallOverviewPose = null;
-  let wallBounds = { minY: 7, maxY: 17.25, width: 14.6 };
+  let wallBounds = { minX: -15, maxX: 15, minY: 3.695, maxY: 11.85,
+    width: 30, columnWidth: 2.5 };
   let originalControlLimits = null;
   let stageWidth = 0, stageHeight = 0;
   const originalLabel = document.querySelector('.label-original');
@@ -147,16 +148,28 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
     controls.update();
   }
 
-  function wallOverviewDestination() {
+  function visibleWallWidth() {
+    const categoryWidth = wallBounds.columnWidth || wallBounds.width / 12;
+    const columns = camera.aspect < 1 ? 3.2 : camera.aspect < 1.4 ? 4.2 : 5.8;
+    return Math.min(wallBounds.width, columns * categoryWidth);
+  }
+
+  function wallOverviewDestination(centerX = null) {
     const centerY = (wallBounds.minY + wallBounds.maxY) / 2;
+    const minX = wallBounds.minX ?? -wallBounds.width / 2;
+    const maxX = wallBounds.maxX ?? wallBounds.width / 2;
+    const viewWidth = visibleWallWidth();
+    const firstCenter = minX + viewWidth / 2;
+    const lastCenter = maxX - viewWidth / 2;
+    const x = THREE.MathUtils.clamp(centerX ?? firstCenter, firstCenter, lastCenter);
     const fov = THREE.MathUtils.degToRad(camera.fov);
     const horizontalFov = 2 * Math.atan(Math.tan(fov / 2) * camera.aspect);
     const height = Math.max(3, wallBounds.maxY - wallBounds.minY);
-    const distance = Math.max(9.5,
-      height / (2 * Math.tan(fov / 2) * .72),
-      wallBounds.width / (2 * Math.tan(horizontalFov / 2) * .75));
-    const target = new THREE.Vector3(0, centerY, -4.3);
-    return { position: new THREE.Vector3(0, centerY, -4.3 + Math.min(32, distance)), target };
+    const distance = Math.max(10.5,
+      height / (2 * Math.tan(fov / 2) * .82),
+      viewWidth / (2 * Math.tan(horizontalFov / 2) * .80));
+    const target = new THREE.Vector3(x, centerY, -4.3);
+    return { position: new THREE.Vector3(x, centerY, -4.3 + Math.min(32, distance)), target };
   }
 
   function wallArtDestination(art) {
@@ -270,22 +283,24 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
       flyCamera(wallArtDestination(moved), 820);
       return;
     }
-    wallOverviewPose = wallOverviewDestination();
+    wallOverviewPose = wallOverviewDestination(wallOverviewPose?.target.x);
     flyCamera(wallOverviewPose, 820);
   }
 
   function moveAlongWall(direction) {
     if (!wallMode) return;
     if (wallFocusedId) { leaveWallArt(); return; }
-    const current = controls.target.y;
-    const twoRows = (wallBounds.maxY - wallBounds.minY) / 6;
-    const wanted = THREE.MathUtils.clamp(current + direction * twoRows,
-      wallBounds.minY, wallBounds.maxY);
+    const current = controls.target.x;
+    const viewWidth = visibleWallWidth();
+    const minX = (wallBounds.minX ?? -wallBounds.width / 2) + viewWidth / 2;
+    const maxX = (wallBounds.maxX ?? wallBounds.width / 2) - viewWidth / 2;
+    const wanted = THREE.MathUtils.clamp(current + direction * (wallBounds.columnWidth || 2.5) * 2.4,
+      minX, maxX);
     if (Math.abs(wanted - current) < .01) return;
     const delta = wanted - current;
     wallOverviewPose = {
-      position: camera.position.clone().add(new THREE.Vector3(0, delta, 0)),
-      target: controls.target.clone().add(new THREE.Vector3(0, delta, 0)),
+      position: camera.position.clone().add(new THREE.Vector3(delta, 0, 0)),
+      target: controls.target.clone().add(new THREE.Vector3(delta, 0, 0)),
     };
     flyCamera(wallOverviewPose, 690);
   }

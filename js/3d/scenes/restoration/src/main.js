@@ -232,10 +232,10 @@ function handleWallChange({ mode, art }) {
   $('wall-art-hover').hidden = true;
   $('wall-gallery-title').textContent = mode === 'art' ? art.title : 'Стена восстановленных картин';
   $('wall-gallery-caption').textContent = mode === 'art'
-    ? `${art.rowLabel} · ${art.artist} · ${art.year}${showingDemoWall ? ' · демо' : ''}`
-    : showingDemoWall ? '12 направлений · 30 случайных работ для проверки расположения'
-    : playerProgress.getWallIds().length ? '12 направлений · выберите картину для приближения'
-      : '12 тематических рядов ждут ваших отреставрированных картин';
+    ? `${art.columnLabel} · ${art.artist} · ${art.year}${showingDemoWall ? ' · демо' : ''}`
+    : showingDemoWall ? '12 вертикальных колонок · 30 случайных работ · листайте влево и вправо'
+    : playerProgress.getWallIds().length ? '12 направлений · листайте колонки и выбирайте картину'
+      : '12 тематических колонок ждут ваших отреставрированных картин';
   if (mode === 'art') void wallGallery.showHighResolution(art.id);
   else wallGallery.clearFocus();
   if (active && wasWorkbenchVisible === null) {
@@ -286,7 +286,7 @@ restorationInput = createRestorationInput({
       element.hidden = true;
       return;
     }
-    element.textContent = `${art.rowLabel} · ${art.title}`;
+    element.textContent = `${art.columnLabel} · ${art.title}`;
     element.hidden = false;
     const bounds = stage.getBoundingClientRect();
     element.style.left = `${Math.min(bounds.width - 180, Math.max(16, event.clientX - bounds.left + 17))}px`;
@@ -313,8 +313,8 @@ $('wall-gallery-shuffle').addEventListener('click', () => {
   void refreshWallGallery();
 });
 $('wall-art-back').addEventListener('click', () => navigation.leaveWallArt());
-$('wall-gallery-up').addEventListener('click', () => navigation.moveAlongWall(1));
-$('wall-gallery-down').addEventListener('click', () => navigation.moveAlongWall(-1));
+$('wall-gallery-next').addEventListener('click', () => navigation.moveAlongWall(1));
+$('wall-gallery-prev').addEventListener('click', () => navigation.moveAlongWall(-1));
 updateWallCounters();
 window.addEventListener('pagehide', flushSurfaceSave);
 document.addEventListener('visibilitychange', () => {

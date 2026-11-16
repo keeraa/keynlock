@@ -2165,7 +2165,7 @@ body {
 .wall-gallery-actions #wall-gallery-demo { border-color: #d8af6a; color: #f9d89f; }
 .wall-gallery-actions #wall-gallery-shuffle { border-color: #8d8069; }
 .wall-gallery-actions span { margin-left: 6px; color: #d9c399; }
-.wall-gallery-navigation { position: absolute; z-index: 5; right: 3.6%; bottom: 24px; display: flex; flex-direction: column; gap: 8px; }
+.wall-gallery-navigation { position: absolute; z-index: 5; right: 3.6%; bottom: 24px; display: flex; flex-direction: row; gap: 8px; }
 .wall-gallery-navigation button { padding: 10px 17px; font: 24px/1 'Cormorant Garamond',Georgia,serif; }
 .wall-art-back { position: absolute; z-index: 5; left: 3.6%; bottom: 24px; }
 .wall-art-hover { position: absolute; z-index: 6; max-width: 210px; pointer-events: none; background: #21190fee; color: #f1debc; border: 1px solid #b9986c; padding: 8px 12px; font: 11px/1.4 Manrope,sans-serif; }

@@ -65,6 +65,33 @@
   margin: 0;
 }
 
+.artwork-heading .art-description {
+  margin-top: 12px;
+  font: 400 11px/1.5 Manrope,sans-serif;
+  color: #eaddc3;
+  max-width: 290px;
+}
+
+.art-ban-notice {
+  margin-top: 12px;
+  padding: 9px 11px;
+  background: #241b16bc;
+  border-left: 2px solid #c77f5c;
+  max-width: 282px;
+  text-shadow: none;
+}
+.art-ban-notice span {
+  display: block;
+  font: 700 9px/1.2 Manrope,sans-serif;
+  letter-spacing: .12em;
+  color: #e5aa8a;
+}
+.art-ban-notice p {
+  margin-top: 5px;
+  font: 500 10px/1.45 Manrope,sans-serif;
+  color: #f5e7d3;
+}
+
 .stage-side-note {
   position: absolute;
   right: 19px;

@@ -5,7 +5,7 @@
   "threeVersion": "0.187.0",
   "status": "standalone",
   "source": "ChatGPT Sites",
-  "sourceCommit": "fcf7ed32b948cb0f4e93d684470efa96f1150fb4",
+  "sourceCommit": "7e7b4ca5ae03c4637a2f81c9219c718e4e98a9f0",
   "savedOn": "2026-11-16",
   "liveUrl": "https://atelier-restoration-1115.k1r11111.chatgpt.site",
   "entry": "index.html",
@@ -30,7 +30,22 @@
     "wallWidthMeters": 30,
     "columnCount": 12,
     "maxCameraDistance": "viewport-dependent-1.18x-overview",
-    "autoSwitchToEasels": true
+    "autoSwitchToEasels": true,
+    "paintingLore": {
+      "language": "ru",
+      "entries": 180,
+      "source": "src/lore/locales/ru.js",
+      "fields": [
+        "description",
+        "banReason"
+      ],
+      "translationReady": true,
+      "displays": [
+        "collection-cards",
+        "easel-description",
+        "wall-art-focus"
+      ]
+    }
   },
   "integration": {
     "target": "KEYNLOCK",
@@ -44,9 +59,10 @@
       "navigation/easel-overlay.js"
     ],
     "stylesheets": 8,
-    "tests": 31,
+    "tests": 34,
     "mainFileLines": 314,
     "backgroundBlur": "half-resolution two-pass depth-aware Gaussian; radius 6.5px; strength 72%",
-    "foregroundOnlyOutlines": true
+    "foregroundOnlyOutlines": true,
+    "loreModule": "src/lore/painting-lore.js"
   }
 }

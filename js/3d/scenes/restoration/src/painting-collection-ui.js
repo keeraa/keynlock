@@ -1,4 +1,5 @@
 import { collectionCategories, paintingCategory } from './painting-catalog.js';
+import { getPaintingLore, getPaintingLoreLabels } from './lore/painting-lore.js';
 
 export function createPaintingCollectionUI({ paintings, onSelect, isRestored = () => false,
   getWallIds = () => [], onToggleWall = () => {} }) {
@@ -9,6 +10,7 @@ export function createPaintingCollectionUI({ paintings, onSelect, isRestored = (
   const count = document.getElementById('collection-results');
   const more = document.getElementById('collection-more');
   const allCount = document.querySelectorAll('.collection-total');
+  const loreLabels = getPaintingLoreLabels();
   const normalize = (text) => String(text || '').toLocaleLowerCase('ru').replaceAll('ё', 'е');
   let category = 'all';
   let mode = 'all';
@@ -94,6 +96,19 @@ export function createPaintingCollectionUI({ paintings, onSelect, isRestored = (
       artist.textContent = `${art.artist} · ${art.year}`;
       const details = document.createElement('div');
       details.append(title, artist);
+      const lore = getPaintingLore(art.id);
+      if (lore) {
+        const description = document.createElement('p');
+        description.className = 'collection-card-description';
+        description.textContent = lore.description;
+        const banLabel = document.createElement('span');
+        banLabel.className = 'collection-card-ban-label';
+        banLabel.textContent = loreLabels.banned;
+        const banReason = document.createElement('p');
+        banReason.className = 'collection-card-ban-reason';
+        banReason.textContent = lore.banReason;
+        details.append(description, banLabel, banReason);
+      }
       if (mode === 'all' && isRestored(art.id)) {
         const status = document.createElement('span');
         status.className = 'collection-restored';

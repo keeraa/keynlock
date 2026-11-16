@@ -1,4 +1,5 @@
 import { chooseDemoWallPaintings } from './wall-demo.js';
+import { getPaintingLore, getPaintingLoreLabels } from './lore/painting-lore.js';
 
 /** Gallery demo, player favorites, toolbar and easel-panel visibility. */
 export function createWallExhibitionController({ paintings, playerProgress, wallGallery,
@@ -61,6 +62,13 @@ export function createWallExhibitionController({ paintings, playerProgress, wall
       : showingDemo ? '12 вертикальных колонок · 30 случайных работ · листайте влево и вправо'
         : playerProgress.getWallIds().length ? '12 направлений · листайте колонки и выбирайте картину'
           : '12 тематических колонок ждут ваших отреставрированных картин';
+    $('wall-art-lore').hidden = mode !== 'art';
+    if (mode === 'art') {
+      const lore = getPaintingLore(art.id);
+      $('wall-art-description').textContent = lore?.description || '';
+      $('wall-art-ban-label').textContent = getPaintingLoreLabels().banned;
+      $('wall-art-ban-reason').textContent = lore?.banReason || '';
+    }
     if (mode === 'art') void wallGallery.showHighResolution(art.id);
     else wallGallery.clearFocus();
     const workshopUI = getWorkshopUI();

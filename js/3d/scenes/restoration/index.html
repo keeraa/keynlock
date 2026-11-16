@@ -48,6 +48,8 @@
             <span class="small-kicker">ЭКСПОНАТ <span id="art-index">№ 01</span> / <span class="collection-total">…</span></span>
             <h1 id="art-title">Девушка с жемчужной серёжкой</h1>
             <p id="art-author">Ян Вермеер · около 1665</p>
+            <p class="art-description" id="art-description"></p>
+            <div class="art-ban-notice"><span id="art-ban-label">ЗАПРЕЩЕНО В КИЙЕНЛОКЕ</span><p id="art-ban-reason"></p></div>
           </div>
 
           <div class="painting-labels" aria-hidden="true"><span class="painting-label label-original">ЭТАЛОН <b>↘</b></span><span class="painting-label label-copy">ВАША РЕСТАВРАЦИЯ <b>↙</b></span></div>
@@ -69,6 +71,10 @@
           </div>
           <button class="wall-art-back" id="wall-art-back" type="button" hidden>← КО ВСЕЙ СТЕНЕ</button>
           <div class="wall-art-hover" id="wall-art-hover" hidden></div>
+          <section class="wall-art-lore" id="wall-art-lore" aria-label="Описание картины и причина запрета" hidden>
+            <p id="wall-art-description"></p>
+            <div class="wall-art-ban"><span id="wall-art-ban-label">ЗАПРЕЩЕНО В КИЙЕНЛОКЕ</span><strong id="wall-art-ban-reason"></strong></div>
+          </section>
 
           <div class="stage-side-note" aria-hidden="true">MCMXCIX · ATELIER DE COULEUR</div>
 

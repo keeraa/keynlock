@@ -17,6 +17,7 @@ import { createWoodStyle } from './wood-style.js';
 import { createPaintingCollectionUI } from './painting-collection-ui.js';
 import { createPerformanceHUD } from './performance-hud.js';
 import { createRestorationFeedback } from './restoration-feedback.js';
+import { getPaintingLore, getPaintingLoreLabels } from './lore/painting-lore.js';
 import './style.css';
 
 const $ = (id) => document.getElementById(id);
@@ -230,6 +231,11 @@ async function showPainting(index) {
 
     $('art-title').textContent = art.title;
     $('art-author').textContent = `${art.artist} · ${art.year}`;
+    const lore = getPaintingLore(art.id);
+    const loreLabels = getPaintingLoreLabels();
+    $('art-description').textContent = lore?.description || '';
+    $('art-ban-label').textContent = loreLabels.banned;
+    $('art-ban-reason').textContent = lore?.banReason || '';
     $('art-index').textContent = `№ ${String(selected + 1).padStart(2, '0')}`;
     $('top-index').textContent = `${String(selected + 1).padStart(2, '0')} / ${String(paintings.length).padStart(2, '0')}`;
     navigation.updateStepper();

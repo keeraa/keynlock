@@ -19,6 +19,8 @@ The seven district identifiers follow `js/data/world.js` in the main game. Distr
 | --- | --- |
 | `js/main.js` | Renderer, camera, lights, controls and settings |
 | `js/district-labels.js` | Map labels, coordinate projection and label toggle |
+| `js/district-zoning.js` | Seven geographic planning polygons and the river exclusion in reference-image coordinates |
+| `district-zones/` | Interactive geographic zoning map based on the supplied river-and-canals plan |
 | `js/city.js` | Buildings, streets, bridges, landmarks, vegetation and boats |
 | `js/navigation/house-paths.js` | Pathfinding and paved approaches from doors to streets |
 | `js/world-data.js` | District and location identifiers |
@@ -32,6 +34,21 @@ The seven district identifiers follow `js/data/world.js` in the main game. Distr
 | `js/landmarks/landmark-editor.js` | Interactive architectural inspector at `/landmark-lab/` |
 | `js/buildings/house-fallback.js` | Paintable 2D projection if WebGL is unavailable |
 | `tests/` | Scene geometry, optimization and district-label checks |
+
+## District geography plan
+
+The `/district-zones/` planning page uses the provided 1548×1148 city reference as
+the geographic basis for seven named districts. The central river separates the
+northern industrial, palace and upper districts from the port, arts, bohemian and
+old-city areas on the south bank. Each polygon and its anchor are stored in
+`js/district-zoning.js` in image coordinates, with the river explicitly excluded
+from land zone lookups. Boundaries, selections and the source image scale together
+as the player pans or zooms. The main map links to this plan from «Районы».
+
+This is the approved direction for **future city geography**; the current 3D
+prototype's pre-existing coastline, terrain and streets remain intact until they
+are migrated to the new plan. The zoning file is independent of the existing
+`world-data.js` 3D district anchors, so development can proceed in stages.
 
 ## Signature buildings
 

@@ -10,7 +10,7 @@
 | Реставрация | [Мастерская реставрации](https://atelier-restoration-1115.k1r11111.chatgpt.site/) | [`scenes/restoration/`](scenes/restoration/) | Исходники добавлены в `main`; интеграция общих эффектов частичная |
 | Верстак | [Верстак и обработка ключей](https://keynlock-workbench-1116.k1r11111.chatgpt.site/) | [`scenes/workbench/`](scenes/workbench/) | **Выпиливание ключа — предварительно готово**; ключ по слепку, расширенная сборка (18 деталей) и собственный проект цилиндра — прототипы. [Статус и план](../../docs/3d-workbench-roadmap.md). Исходники и тесты перенесены в `main` |
 | Логово | [3D-Логово команды](https://keynlock-lair-1116.k1r11111.chatgpt.site/) | [`scenes/lair/`](scenes/lair/) | Приватный интерактивный прототип: реставрация слева у стены, штаб по центру, верстак, алхимия и граммофон. Мастерские пока открываются как отдельные сцены | 
-| Город | [Карта города](https://keynlock-world-map-1115.k1r11111.chatgpt.site/) · [Особые здания](https://keynlock-world-map-1115.k1r11111.chatgpt.site/landmark-lab/) | [`scenes/city/`](scenes/city/) | Карта, конструктор домов, улицы и кварталы, особые здания, тесты и локальные 3D-ресурсы |
+| Город | [Карта города](https://keynlock-world-map-1115.k1r11111.chatgpt.site/) · [Особые здания](https://keynlock-world-map-1115.k1r11111.chatgpt.site/landmark-lab/) · [Схема районов](https://keynlock-world-map-1115.k1r11111.chatgpt.site/district-zones/) | [`scenes/city/`](scenes/city/) | Карта, географическое зонирование, конструктор домов, улицы и кварталы, особые здания, тесты и локальные 3D-ресурсы |
 
 Общие 3D-модули: [`core/`](core/) и [`shared/`](shared/).
 

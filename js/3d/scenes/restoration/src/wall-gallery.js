@@ -44,6 +44,7 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood, o
       toneMapped: false }),
   );
   labelStrip.name = 'twelve-art-history-column-headings';
+  labelStrip.userData.excludeFromInk = true;
   labelStrip.position.set(0, WALL_TOP - .42, .035);
   root.add(labelStrip);
 
@@ -134,15 +135,18 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood, o
         paintingsRoot.add(mount);
         // The backing is already visible before a network preview is ready.
         const backing = new THREE.Mesh(new THREE.BoxGeometry(placement.outerWidth, placement.outerHeight, .022), backingMaterial);
+        backing.userData.excludeFromInk = true;
         backing.position.z = .012;
         backing.castShadow = backing.receiveShadow = true;
         mount.add(backing);
         const material = new THREE.MeshStandardMaterial({ roughness: 1 });
         const image = new THREE.Mesh(new THREE.PlaneGeometry(placement.width, placement.height), material);
+        image.userData.excludeFromInk = true;
         image.position.z = .058;
         image.userData.galleryId = placement.id;
         mount.add(image);
         const frame = new THREE.Mesh(createFrameGeometry(THREE, placement.width, placement.height, placement.frameWidth, .044), frameWood);
+        frame.userData.excludeFromInk = true;
         frame.position.z = .028;
         frame.castShadow = frame.receiveShadow = true;
         mount.add(frame);

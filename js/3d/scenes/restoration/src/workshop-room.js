@@ -67,10 +67,14 @@ export function createWorkshopRoom({ THREE, scene, mats }) {
     // frame in the normal workshop view and revealed by the traveling camera.
     const wall = box(32, 14.21, .2, wallpaperMaterial, 0, 5.555, -4.7);
     wall.castShadow = false;
-    box(32, .12, .18, mats.roomWood, 0, 12.35, -4.47);
-    box(32, .26, .31, mats.roomWood, 0, 1.24, -4.48);
-    box(32, 1.22, .15, new THREE.MeshStandardMaterial({ color: '#69513e', roughness: .92 }), 0, .58, -4.53);
-    for (let i = -13; i <= 13; i++) box(.033, 1.16, .03, mats.roomWood, i * 1.12, .59, -4.43);
+    // Mask fixed room architecture out of the normal/ink pass. Distance-based
+    // fading alone fails when the camera zooms into the gallery wall.
+    wall.userData.excludeFromInk = true;
+    const noInk = (mesh) => { mesh.userData.excludeFromInk = true; return mesh; };
+    noInk(box(32, .12, .18, mats.roomWood, 0, 12.35, -4.47));
+    noInk(box(32, .26, .31, mats.roomWood, 0, 1.24, -4.48));
+    noInk(box(32, 1.22, .15, new THREE.MeshStandardMaterial({ color: '#69513e', roughness: .92 }), 0, .58, -4.53));
+    for (let i = -13; i <= 13; i++) noInk(box(.033, 1.16, .03, mats.roomWood, i * 1.12, .59, -4.43));
 
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 35), new THREE.MeshStandardMaterial({ color: '#57412f', roughness: .95 }));
     floor.rotation.x = -Math.PI / 2;

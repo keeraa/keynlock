@@ -136,6 +136,10 @@ test('wall creates real framed meshes and allows selecting a mixed-size image', 
     assert.ok(wall.root.position.z > -4.6 && wall.root.position.z < -4.5,
       'canvas backs should hang a few centimeters in front of the wall');
     assert.equal(wall.root.getObjectByName('twelve-art-history-column-headings')?.isMesh, true);
+    assert.equal(wall.root.getObjectByName('twelve-art-history-column-headings').userData.excludeFromInk, true);
+    assert.ok(wall.paintingsRoot.children.every((mount) =>
+      mount.children.every((mesh) => mesh.userData.excludeFromInk)),
+    'gallery frames, reproductions and backings never receive an ink contour');
     assert.equal(renderer.shadowMap.needsUpdate, true);
     const placement = wall.getPlacement('one');
     camera.position.set(placement.x, placement.y, 1);

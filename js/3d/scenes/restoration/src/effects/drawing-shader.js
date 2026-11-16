@@ -35,8 +35,8 @@ export const drawingFragmentShader = `
   }
 
   float outlineForeground(float distance) {
-    // Contours belong to the easels and nearby tools, never the wall or the
-    // hanging gallery. Fade them before the room starts to defocus.
+    // Fade ink on distant workshop objects. The wall and gallery are also
+    // explicitly excluded from the normal buffer when the camera moves there.
     return 1.0 - smoothstep(.35, 1.35, distance - uFocus);
   }
 

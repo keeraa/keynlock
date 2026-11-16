@@ -61,8 +61,45 @@ test('Gaussian blur rejects foreground colors and composites without depth-edge 
   assert.doesNotMatch(drawingFragmentShader, /vec2 offset|for \(int i = 0; i < 8/);
 });
 
-test('outline falls off before the wall and gallery so only foreground objects keep ink', () => {
+test('outline distance fade remains a secondary guard for foreground objects', () => {
   assert.match(drawingFragmentShader, /float outlineForeground\(float distance\)/);
   assert.match(drawingFragmentShader, /1\.0 - smoothstep\(\.35, 1\.35, distance - uFocus\)/);
   assert.match(drawingFragmentShader, /inkEdge\(vUv\) \* uOutline \* outlineForeground\(eyeDepth\(vUv\)\)/);
+});
+
+test('background ink is explicitly masked even when the camera focuses the gallery wall', () => {
+  const camera = new THREE.PerspectiveCamera(39, 1, .1, 65);
+  const scene = new THREE.Scene();
+  const wall = new THREE.Mesh(new THREE.BoxGeometry(10, 10, .1), new THREE.MeshBasicMaterial());
+  wall.userData.excludeFromInk = true;
+  scene.add(wall);
+  const easel = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial());
+  scene.add(easel);
+  let currentTarget = null;
+  let maskedPasses = 0;
+  const renderer = {
+    info: { render: { calls: 1, triangles: 2 } },
+    getPixelRatio: () => 1,
+    getRenderTarget: () => currentTarget,
+    setRenderTarget(target) { currentTarget = target; },
+    getClearColor(color) { color.set('#000000'); return color; },
+    getClearAlpha: () => 1,
+    setClearColor() {},
+    render(renderScene) {
+      if (renderScene === scene && wall.material.isShaderMaterial) {
+        assert.match(wall.material.fragmentShader, /gl_FragColor = vec4\(0\.0\)/);
+        assert.equal(wall.material.depthWrite, true);
+        assert.equal(easel.material.isMeshNormalMaterial, true);
+        maskedPasses++;
+      }
+    },
+  };
+  const filter = createCartoonFilter({ THREE, renderer, scene, camera });
+  filter.resize(640, 480);
+  filter.setOptions({ backgroundBlur: 0, outline: true, toon: false });
+  filter.setFocus(5.5); // The wall itself is at the active camera focus.
+  filter.render();
+  assert.equal(maskedPasses, 1);
+  assert.equal(wall.material.isMeshBasicMaterial, true, 'the original material is restored');
+  filter.dispose();
 });

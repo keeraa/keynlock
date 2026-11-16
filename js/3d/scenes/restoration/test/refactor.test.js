@@ -103,6 +103,9 @@ test('workshop factory creates the original room and two compatible easels', () 
     assert.ok(workshop.dust.isPoints);
     assert.equal(workshop.floorWoodMaterials.length, 38);
     assert.ok(workshop.wallpaperMaterial.isMeshStandardMaterial);
+    const wallpaper = scene.children.find((object) => object.material === workshop.wallpaperMaterial);
+    assert.equal(wallpaper.userData.excludeFromInk, true,
+      'the wallpaper must stay free of contours at any camera zoom');
     const easel = workshop.makeEasel(-1.28, .045);
     assert.ok(easel.root.isGroup);
     assert.ok(easel.artwork.isGroup);

@@ -20,11 +20,18 @@ export const drawingFragmentShader = `
   uniform float uOutlineWidth;
   uniform float uFocus;
   uniform float uBackgroundBlur;
+  uniform float uBlurRadius;
   varying vec2 vUv;
 
   float eyeDepth(vec2 uv) {
     float z = texture2D(tDepth, uv).r * 2.0 - 1.0;
     return (2.0 * uNear * uFar) / (uFar + uNear - z * (uFar - uNear));
+  }
+
+  float backgroundMask(float distance) {
+    // The paintings and their tools remain in focus. Background objects at
+    // different depths may blend together, so shelves and frames also defocus.
+    return smoothstep(1.1, 2.7, distance - uFocus);
   }
 
   float inkLuma(vec3 c) {
@@ -74,21 +81,26 @@ export const drawingFragmentShader = `
   void main() {
     vec4 center = texture2D(tColor, vUv);
     if (uBackgroundBlur > 0.0) {
-      // The background is blurred in screen space. Depth-aware taps avoid
-      // pulling sharp foreground painting pixels into the moving rear wall.
+      // Blur only the room behind the current focus plane. Samples from the
+      // foreground paintings are rejected to keep their silhouettes crisp.
       float centerDepth = eyeDepth(vUv);
-      float distanceBehind = centerDepth - uFocus;
-      float background = smoothstep(1.6, 3.5, distanceBehind) * uBackgroundBlur;
+      float background = backgroundMask(centerDepth) * uBackgroundBlur;
       if (background > 0.001) {
-        vec2 shift = uTexel * 2.4;
-        vec4 soft = center * 4.0;
-        float weight = 4.0;
-        for (int i = 0; i < 4; i++) {
+        vec2 shift = uTexel * uBlurRadius;
+        vec4 soft = center * 1.7;
+        float weight = 1.7;
+        // Eight taps on staggered rings provide a legible soft-focus effect
+        // without the cost of a separate full-screen blur pass.
+        for (int i = 0; i < 8; i++) {
           vec2 offset = i == 0 ? vec2(shift.x, 0.0) :
             i == 1 ? vec2(-shift.x, 0.0) :
-            i == 2 ? vec2(0.0, shift.y) : vec2(0.0, -shift.y);
+            i == 2 ? vec2(0.0, shift.y) :
+            i == 3 ? vec2(0.0, -shift.y) :
+            i == 4 ? shift * vec2(.58, .58) :
+            i == 5 ? shift * vec2(-.58, .58) :
+            i == 6 ? shift * vec2(.58, -.58) : shift * vec2(-.58, -.58);
           vec2 uv = clamp(vUv + offset, vec2(0.0), vec2(1.0));
-          float tap = 1.0 - smoothstep(.12, .65, abs(eyeDepth(uv) - centerDepth));
+          float tap = backgroundMask(eyeDepth(uv));
           soft += texture2D(tColor, uv) * tap;
           weight += tap;
         }

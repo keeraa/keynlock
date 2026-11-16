@@ -5,7 +5,7 @@
   "threeVersion": "0.187.0",
   "status": "standalone",
   "source": "ChatGPT Sites",
-  "sourceCommit": "2d91f8f0860d895f5dae44da769790fdb4b0143a",
+  "sourceCommit": "9748a8ed9c099435f2990c7cdcf33dbf09951e98",
   "savedOn": "2026-11-16",
   "liveUrl": "https://atelier-restoration-1115.k1r11111.chatgpt.site",
   "entry": "index.html",
@@ -44,7 +44,7 @@
       "navigation/easel-overlay.js"
     ],
     "stylesheets": 8,
-    "tests": 28,
+    "tests": 30,
     "mainFileLines": 314
   }
 }

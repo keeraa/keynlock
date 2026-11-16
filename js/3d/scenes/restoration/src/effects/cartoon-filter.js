@@ -5,7 +5,8 @@ export function createCartoonFilter({ THREE, renderer, scene, camera }) {
   const options = {
     toon: false, toonStrength: .8, bands: 4,
     outline: false, outlineStrength: .7, outlineWidth: 1,
-    backgroundBlur: .56, focus: 7.15,
+    // Keep the easels sharp while visibly softening the more distant workshop.
+    backgroundBlur: .95, backgroundRadius: 11, focus: 7.15,
   };
   let width = 1, height = 1, resources = null;
   let normalTarget = null, normalMaterial = null, inkMaskMaterial = null;
@@ -41,6 +42,7 @@ export function createCartoonFilter({ THREE, renderer, scene, camera }) {
       uOutlineWidth: { value: options.outlineWidth },
       uFocus: { value: options.focus },
       uBackgroundBlur: { value: options.backgroundBlur },
+      uBlurRadius: { value: options.backgroundRadius * renderer.getPixelRatio() },
     };
     const material = new THREE.ShaderMaterial({
       uniforms, vertexShader: drawingVertexShader,
@@ -96,6 +98,7 @@ export function createCartoonFilter({ THREE, renderer, scene, camera }) {
     u.uOutline.value = options.outline ? options.outlineStrength : 0;
     u.uOutlineWidth.value = options.outlineWidth;
     u.uBackgroundBlur.value = options.backgroundBlur;
+    u.uBlurRadius.value = options.backgroundRadius * renderer.getPixelRatio();
     u.uFocus.value = options.focus;
   }
 
@@ -175,6 +178,7 @@ export function createCartoonFilter({ THREE, renderer, scene, camera }) {
     if (resources) {
       resources.target.setSize(width, height);
       resources.uniforms.uTexel.value.set(1 / width, 1 / height);
+      resources.uniforms.uBlurRadius.value = options.backgroundRadius * pixelRatio;
     }
     if (normalTarget) normalTarget.setSize(width, height);
   }

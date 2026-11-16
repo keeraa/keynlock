@@ -1,0 +1,20 @@
+{
+  "id": "restoration",
+  "title": "Ателье цвета",
+  "engine": "three",
+  "threeVersion": "0.187.0",
+  "status": "standalone",
+  "source": "ChatGPT Sites",
+  "sourceCommit": "cab8f5e9021f1eed6982f0fdf2b1e3d19dfcc0c3",
+  "savedOn": "2026-11-16",
+  "liveUrl": "https://atelier-restoration-1115.k1r11111.chatgpt.site",
+  "entry": "index.html",
+  "development": "npm run dev",
+  "tests": "npm test",
+  "build": "npm run build",
+  "integration": {
+    "target": "KEYNLOCK",
+    "status": "pending",
+    "host": "js/3d"
+  }
+}

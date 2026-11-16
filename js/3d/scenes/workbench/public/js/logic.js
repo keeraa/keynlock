@@ -205,6 +205,10 @@ export function checkSocket(part, socket) {
   if (!part || !socket) return false;
   return (part.startsWith('pin-') && socket.startsWith('pin-')) ||
     (part.startsWith('spring-') && socket.startsWith('spring-')) ||
+    (part.startsWith('washer-') && socket.startsWith('washer-')) ||
+    (part === 'clip-0' && socket === 'clip-0') ||
+    (part === 'rod-0' && socket === 'rod-0') ||
+    (part === 'bolt-0' && socket === 'bolt-0') ||
     (part === 'gear-0' && socket === 'gear-0') ||
     (part === 'gear-1' && socket === 'gear-1') ||
     (part === 'core-0' && socket === 'core-0') ||

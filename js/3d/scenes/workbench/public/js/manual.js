@@ -3,7 +3,7 @@ import {createSpurGear} from './lock-profiles.js';
 
 // One IKEA-style exploded drawing. Every outline is projected from an actual
 // 3D primitive or gear; there are no shaded meshes or stage-by-stage images.
-export function manualIllustration(pinOrder=[2,0,3,1]){
+export function manualIllustration(pinOrder=[2,0,3,1],{ratio='12:16',hardware=false}={}){
   const root=new THREE.Group(),meshes=[],curves=[],labels=[];
   const mesh=(geometry,x,y,z,rotationZ=0)=>{
     const obj=new THREE.Mesh(geometry);
@@ -40,15 +40,29 @@ export function manualIllustration(pinOrder=[2,0,3,1]){
   });
   box(-1.18,1.40,-.06,3.38,.13,.65);
   arrow(-1.18,1.25,1.10);
-  // The actual 12/16-tooth gear geometries are used for the line drawing.
+  // The actual gears follow the chosen transmission rather than a preset icon.
   const inkMaterial=new THREE.MeshBasicMaterial();
-  const gearA=createSpurGear(THREE,12,.32,.13,inkMaterial);
+  const gearTeeth=ratio==='16:12'?[16,12]:[12,16];
+  const gearA=createSpurGear(THREE,gearTeeth[0],gearTeeth[0]===12?.32:.43,.13,inkMaterial);
   gearA.position.set(1.08,-.46,.19);root.add(gearA);meshes.push(gearA);
-  const gearB=createSpurGear(THREE,16,.43,.13,inkMaterial);
+  const gearB=createSpurGear(THREE,gearTeeth[1],gearTeeth[1]===12?.32:.43,.13,inkMaterial);
   gearB.position.set(1.87,-.46,.19);root.add(gearB);meshes.push(gearB);
   cylinder(1.87,.38,.19,.19,.17,'y');
   arrow(1.87,.17,-.04,.42);
-  labels.push({text:'12',at:[1.08,-.95,.22]},{text:'16',at:[1.87,-1.07,.22]});
+  labels.push({text:String(gearTeeth[0]),at:[1.08,-1.08,.22]},
+    {text:String(gearTeeth[1]),at:[1.87,-1.08,.22]});
+  if(hardware){
+    // The five add-on parts are shown in the same projected exploded view.
+    mesh(new THREE.RingGeometry(.085,.21,28),1.08,.16,.46);
+    mesh(new THREE.RingGeometry(.085,.21,28),1.87,.16,.46);
+    mesh(new THREE.TorusGeometry(.16,.027,8,30,Math.PI*1.76),1.87,.59,.48,.38);
+    box(2.46,-.18,.49,.66,.09,.12);
+    box(2.72,-.52,.42,.63,.20,.20);
+    arrow(1.08,.02,-.23,.50);arrow(1.87,.43,.26,.50);
+    labels.push({text:'×2',at:[1.48,.28,.58]},
+      {text:'СТ',at:[2.18,.69,.50]},{text:'Т',at:[2.48,.01,.52]},
+      {text:'З',at:[2.99,-.63,.46]});
+  }
 
   root.updateMatrixWorld(true);
   const camera=new THREE.OrthographicCamera(-4,4,2.4,-2.4,.1,50);
@@ -94,6 +108,6 @@ export function manualIllustration(pinOrder=[2,0,3,1]){
     <path d="${paths}" fill="none" stroke="#273532" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>
     ${texts}
     <line x1="24" y1="279" x2="536" y2="279" stroke="#a7b4ac"/>
-    <text x="24" y="295" fill="#53605a" font-family="Arial,sans-serif" font-size="11">13 ДЕТАЛЕЙ · ВИД С РАЗНЕСЁННЫМИ ЭЛЕМЕНТАМИ</text>
+    <text x="24" y="295" fill="#53605a" font-family="Arial,sans-serif" font-size="11">${hardware?18:13} ДЕТАЛЕЙ · ПЕРЕДАЧА ${ratio} · РАЗНЕСЁННЫЕ ЭЛЕМЕНТЫ</text>
   </svg>`;
 }

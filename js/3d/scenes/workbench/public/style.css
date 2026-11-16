@@ -54,3 +54,26 @@
 @media(max-width:760px){.manual-card{padding:9px}.manual-illustration{height:155px;margin:6px 0}.manual-card>p{font-size:10px;min-height:0}.assembly-metrics{margin-top:7px}.part-selection{margin-top:5px;padding:5px}.part-selection button{padding:6px}}
 @media(max-width:760px){.difficulty-control{margin:3px 0 8px;padding-bottom:7px}.difficulty-buttons button{padding:5px 8px;min-width:34px}}
 @media(max-width:760px){.file-side-control{margin-bottom:8px}.file-side-buttons button{min-width:54px;padding:5px 7px;font-size:10px}}
+
+/* Three assembly variants share a single physical cylinder and workbench. */
+.assembly-variant-control{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:-12px 0 15px}
+.assembly-variant-control button{padding:10px 3px;border:1px solid rgba(185,164,121,.34);border-radius:6px;background:#17272b;color:#b8c4be;font-size:10px;white-space:nowrap}
+.assembly-variant-control button.active{background:#90683a;border-color:#e8c28c;color:#fff0d3}
+.design-card{padding:13px 12px;margin:0 0 15px;border:1px solid rgba(208,170,112,.34);border-radius:8px;background:linear-gradient(145deg,rgba(114,84,45,.19),rgba(25,44,47,.85))}
+.design-card[hidden]{display:none}
+.design-top{display:flex;justify-content:space-between;gap:7px;font:10px ui-monospace,monospace;letter-spacing:.06em;color:#e3be85}
+.design-top span{color:#99aba8}.design-card>p{margin:10px 0 11px;color:#b8c5be;font-size:11px;line-height:1.55}
+.design-field-label{font:9px ui-monospace,monospace;letter-spacing:.07em;color:#bda780;margin-bottom:7px}
+.design-pins{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-bottom:12px}
+.design-pin{display:grid;gap:4px;color:#a4b5ac;text-align:center;font:10px ui-monospace,monospace}
+.design-pin select,.design-select-row select{width:100%;min-width:0;padding:8px 5px;border-radius:5px;border:1px solid #627570;background:#142c31;color:#f4dbab;font:12px ui-monospace,monospace;cursor:pointer}
+.design-pin select:focus-visible,.design-select-row select:focus-visible{outline:2px solid #e2c18c;outline-offset:2px}
+.design-select-row{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#c6d0c7;font-size:11px;margin-bottom:13px}
+.design-select-row select{width:auto;flex:0 1 170px}
+.design-check{display:flex;align-items:flex-start;gap:9px;color:#c5d1c7;font-size:11px;line-height:1.5;cursor:pointer}
+.design-check input{accent-color:#c6a06c;width:15px;height:15px;flex:none;margin:1px 0 0}
+.design-key-status{font:10px/1.55 ui-monospace,monospace;color:#e4b989;margin:11px 0 8px}
+.design-key-status.ready{color:#9bd1a8}
+.design-key-button{display:flex;justify-content:space-between;gap:10px;width:100%;padding:10px 11px;border:1px solid #c2a479;border-radius:5px;background:rgba(175,132,68,.19);color:#f1dcba;font-size:10px;text-align:left}
+.design-key-button:hover{background:rgba(175,132,68,.32)}
+@media(max-width:760px){.assembly-variant-control{margin:5px 0 9px}.design-card{padding:9px}.design-pin select{padding:5px}.design-key-button{padding:7px}}

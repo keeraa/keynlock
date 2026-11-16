@@ -372,7 +372,7 @@ export function createWorkshopScene(canvas){
 
   const assembly=createAssemblyMechanism({scene,shapes,mat,addMesh,hitObjects,makeTextLabel});
   const assemblyRoot=assembly.root;
-  const {setPartGroup,updateInstalled,setSelectedPart,movePart,
+  const {setPartGroup,setAssemblyDesign,updateInstalled,setSelectedPart,movePart,
     findNearestSocket,startTest,updateTest}=assembly;
 
   const {hitTest,pointerPoint,keyPointer}=createScenePicking({
@@ -489,7 +489,7 @@ export function createWorkshopScene(canvas){
   return {setMode,setBlueprint,setCuts,setWear,setActiveCut,setFiling,
     setKeyMethod,setFileOrientation,rotateFile,filingContact,filingPulse,filingChips,
     setFilePointer,setFilePointerActive,fileStrokePixels,
-    hitTest,pointerPoint,updateInstalled,setPartGroup,
+    hitTest,pointerPoint,updateInstalled,setPartGroup,setAssemblyDesign,
     setSelectedPart,movePart,findNearestSocket,startTest,
     getFps:()=>fps,getPolygons:()=>renderedPolygons,
     dispose:()=>{stopped=true;sceneListeners.abort();resizeObserver.disconnect();controls.dispose();

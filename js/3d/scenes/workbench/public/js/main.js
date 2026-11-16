@@ -1,6 +1,8 @@
-import {inspectAssembly,detachPart,cutLayout} from './logic.js';
+import {detachPart,cutLayout,checkSocket} from './logic.js';
 import {createWorkshopScene} from './scene.js';
-import {effectiveCuts,inspectMachinedKey} from './key-wear.js';
+import {effectiveCuts,inspectMachinedKey,emptyWearProfile} from './key-wear.js';
+import {assemblyStepsFor,requiredAssemblySlots,inspectConfiguredAssembly,
+  targetsForDesign,freeKeySignature} from './assembly-design.js';
 import {loadWorkbenchState,saveWorkbenchState,resetBlankState} from './workbench-state.js';
 import {describeKeyInspection} from './key-inspection.js';
 import {createKeyPanel} from './key-panel.js';
@@ -20,6 +22,7 @@ try{scene=createWorkshopScene(canvas);}catch(error){
 scene.setBlueprint(state.targets);scene.setCuts(state.cuts);
 scene.setWear(state.wear);
 scene.setKeyMethod(state.keyMethod);
+scene.setAssemblyDesign(state.assemblyVariant,state.freeDesign);
 scene.updateInstalled(state.installed);
 
 let toastTimer;
@@ -41,7 +44,19 @@ function inspectCurrentKey(){return inspectMachinedKey(
 const {buildCutRows,selectCut,renderCuts}=createKeyPanel({
   state,scene,inspectCurrentKey,measuredCuts,feedback,$
 });
-const {renderAssembly,renderSelection}=createAssemblyPanel({state,scene,feedback,$});
+const {renderAssembly,renderSelection,renderDesign}=createAssemblyPanel({state,scene,feedback,$,
+  onChange:()=>{
+    if(state.mode==='assembly')$('sceneDescription').textContent=assemblySceneDescription();
+    save();
+  },
+  onCutDesignKey:()=>prepareDesignKey()
+});
+
+function assemblySceneDescription(){
+  if(state.assemblyVariant==='free')return 'Проектируйте код штифтов, передаточное отношение и привод. Соберите свой замок и изготовьте к нему ключ.';
+  if(state.assemblyVariant==='extended')return '18 деталей: две шайбы, стопорное кольцо, тяга и подвижный засов дополняют цилиндр.';
+  return 'Сверяйтесь с одной контурной схемой и собирайте замок в любом порядке.';
+}
 
 function setMode(mode){
   if(state.filing||state.spaceFiling){state.filing=false;state.spaceFiling=false;
@@ -56,9 +71,7 @@ function setMode(mode){
   $('workbenchHint').hidden=mode!=='key';
   $('sceneIndex').textContent=mode==='key'?'01 / 02':'02 / 02';
   $('sceneTitle').textContent=mode==='key'?'Изготовление ключа':'Сборка штифтового механизма';
-  $('sceneDescription').textContent=mode==='key'?
-    keySceneDescription():
-    'Сверяйтесь с одной контурной схемой и собирайте замок в любом порядке.';
+  $('sceneDescription').textContent=mode==='key'?keySceneDescription():assemblySceneDescription();
   renderAssembly();
 }
 document.querySelectorAll('.workspace-tab').forEach(button=>button.addEventListener('click',()=>setMode(button.dataset.mode)));
@@ -128,6 +141,22 @@ function newBlank(difficulty=state.difficulty){
   renderCuts();renderAssembly();save();
   toast(`Новая заготовка № ${state.serial}: ${state.difficulty} пазов, новый профиль.`);
 }
+function prepareDesignKey(){
+  if(state.testing)return;
+  state.targets=targetsForDesign(state.targets,state.freeDesign);
+  state.pinOrder=[...state.freeDesign.order];
+  state.signature=state.targets.map(target=>String(Math.round(target*100))).join('-');
+  state.serial++;
+  state.cuts=Array(state.difficulty).fill(0);
+  state.wear=emptyWearProfile();
+  state.warnedOvercut=Array(state.difficulty).fill(false);
+  state.keyInspection=null;state.blueprint=false;
+  state.freeKeyBlueprint=freeKeySignature(state.freeDesign);
+  scene.setBlueprint(state.targets);scene.setCuts(state.cuts);scene.setWear(state.wear);
+  buildCutRows();selectCut(0);renderCuts();renderAssembly();save();
+  setMode('key');
+  toast('Чертёж вашего замка перенесён на ключ. Выпилите профиль и вернитесь к сборке.');
+}
 $('newBlank').addEventListener('click',()=>newBlank());
 document.querySelectorAll('[data-cuts]').forEach(button=>button.addEventListener('click',()=>{
   const difficulty=Number(button.dataset.cuts);
@@ -153,10 +182,11 @@ function removePart(id){
   const socket=Object.keys(state.installed).find(key=>state.installed[key]===id);
   if(!socket)return false;
   state.installed=detachPart(state.installed,id);
-  const groupIndex=ASSEMBLY_STEPS.findIndex(step=>step.slots.includes(socket));
+  const groupIndex=assemblyStepsFor(state.assemblyVariant,state.freeDesign)
+    .findIndex(step=>step.slots.includes(socket));
   if(groupIndex>=0)state.partGroup=groupIndex;
   state.selectedPart=null;scene.updateInstalled(state.installed);scene.setSelectedPart(null);
-  renderAssembly();save();toast(`Деталь «${partName(id)}» снята и возвращена в лоток.`);
+  renderAssembly();save();toast(`Деталь «${partName(id,state.assemblyVariant==='free'?state.freeDesign.ratio:'12:16')}» снята и возвращена в лоток.`);
   return true;
 }
 $('removeSelected').addEventListener('click',()=>{
@@ -164,7 +194,8 @@ $('removeSelected').addEventListener('click',()=>{
 });
 
 function placement(partId,socketId){
-  if(!checkSocket(partId,socketId)){
+  if(!requiredAssemblySlots(state.assemblyVariant,state.freeDesign).includes(socketId)||
+    !checkSocket(partId,socketId)){
     toast('Деталь не подходит к этому посадочному месту.');return false;
   }
   for(const [socket,id] of Object.entries(state.installed))if(id===partId)delete state.installed[socket];
@@ -176,20 +207,26 @@ function placement(partId,socketId){
 function testMechanism(){
   if(state.testing)return;
   const actual=measuredCuts();
-  const outcome=inspectAssembly(state.installed,actual,state.targets,state.pinOrder);
+  const outcome=inspectConfiguredAssembly(state.installed,actual,state.targets,state.pinOrder,
+    state.assemblyVariant,state.freeDesign,state.freeKeyBlueprint);
   if(outcome.key.accurate&&!inspectCurrentKey().accurate){
     outcome.success=false;outcome.key.accurate=false;
   }
   if(!outcome.complete){
     toast(`Не хватает ${outcome.missing.length} деталей. Закончите сборку.`);return;
   }
-  state.testing=true;$('runTest').disabled=true;
+  if(outcome.keyBlueprintMissing){
+    toast('Спроектируйте и изготовьте ключ для текущего кода штифтов.');return;
+  }
+  state.testing=true;$('runTest').disabled=true;renderDesign();
   feedback('assemblyFeedback','Проверка: ключ поднимает кодовые штифты, пружины сжимаются, привод получает усилие…');
   scene.startTest(outcome.success,actual,state.installed,()=>{
-    state.testing=false;$('runTest').disabled=false;
+    state.testing=false;$('runTest').disabled=false;renderDesign();
     if(outcome.success){
       state.blueprint=true;save();
-      feedback('assemblyFeedback','Успех! Линия среза совпала, шестерни 12:16 передали вращение, засов открылся. Чертёж сохранён.','good');
+      const ratio=state.assemblyVariant==='free'?state.freeDesign.ratio:'12:16';
+      const hardware=requiredAssemblySlots(state.assemblyVariant,state.freeDesign).length>13;
+      feedback('assemblyFeedback',`Успех! Линия среза совпала, передача ${ratio} сработала, ${hardware?'тяга переместила отдельный засов':'засов открылся'}. Чертёж сохранён.`,'good');
       toast('Механизм собран и работает. Чертёж штифтового замка изучен.');
     }else if(!outcome.key.accurate){
       feedback('assemblyFeedback','Ключ не вывел все пары штифтов на линию среза. Исправьте профиль на верстаке.','bad');

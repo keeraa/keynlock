@@ -1,5 +1,7 @@
-import {BREAK_CUT,MAX_CUT,DIFFICULTIES,generateBlueprint,SLOT_TYPES,checkSocket} from './logic.js';
+import {BREAK_CUT,MAX_CUT,DIFFICULTIES,generateBlueprint,checkSocket} from './logic.js';
 import {emptyWearProfile,normalizeWearProfile} from './key-wear.js';
+import {ALL_ASSEMBLY_SLOTS,ASSEMBLY_VARIANTS,normalizeFreeDesign,
+  freeKeySignature,targetsForDesign} from './assembly-design.js';
 
 // Keep the existing key so previously saved blanks and assembly progress load.
 export const STORAGE_KEY='keynlock-workbench-v3';
@@ -34,9 +36,17 @@ export function restoreWorkbenchState(value={}){
     filing:false,spaceFiling:false,cameraDragging:false,
     lastPointerX:0,lastPointerY:0,drag:null,testing:false,
     blueprint:usesStoredBlueprint&&stored.blueprint===true,
-    partGroup:0,warnedOvercut:Array(difficulty).fill(false)
+    partGroup:0,warnedOvercut:Array(difficulty).fill(false),
+    assemblyVariant:ASSEMBLY_VARIANTS.includes(stored.assemblyVariant)?stored.assemblyVariant:'classic',
+    freeDesign:normalizeFreeDesign(stored.freeDesign),
+    freeKeyBlueprint:typeof stored.freeKeyBlueprint==='string'?stored.freeKeyBlueprint:''
   };
-  const validParts=new Set(SLOT_TYPES);
+  // Only accept a claimed custom key blueprint if its actual cut targets match.
+  if(state.freeKeyBlueprint!==freeKeySignature(state.freeDesign)||
+    targetsForDesign(state.targets,state.freeDesign).some((cut,i)=>cut!==state.targets[i])){
+    state.freeKeyBlueprint='';
+  }
+  const validParts=new Set(ALL_ASSEMBLY_SLOTS);
   if(usesStoredBlueprint&&stored.installed&&typeof stored.installed==='object'&&
     !Array.isArray(stored.installed)){
     const used=new Set();
@@ -53,7 +63,9 @@ export function snapshotWorkbenchState(state){
   return {cuts:state.cuts,wear:state.wear,difficulty:state.difficulty,
     targets:state.targets,pinOrder:state.pinOrder,signature:state.signature,
     serial:state.serial,installed:state.installed,blueprint:state.blueprint,
-    keyMethod:state.keyMethod,fileOrientation:state.fileOrientation};
+    keyMethod:state.keyMethod,fileOrientation:state.fileOrientation,
+    assemblyVariant:state.assemblyVariant,freeDesign:state.freeDesign,
+    freeKeyBlueprint:state.freeKeyBlueprint};
 }
 
 export function loadWorkbenchState(storage){
@@ -76,6 +88,7 @@ export function resetBlankState(state,difficulty=state.difficulty){
   state.wear=emptyWearProfile();state.keyInspection=null;
   state.warnedOvercut=Array(state.difficulty).fill(false);
   state.installed={};state.blueprint=false;state.partGroup=0;
+  state.freeKeyBlueprint='';
   state.activeCut=0;state.selectedPart=null;state.drag=null;
   return state;
 }

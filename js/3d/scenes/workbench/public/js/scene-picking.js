@@ -1,4 +1,4 @@
-import {BREAK_CUT,keyPickIndexAt} from './logic.js';
+import {BREAK_CUT,keyPickIndexAt,checkSocket} from './logic.js';
 
 // One raycaster owns the screen-to-scene conversion for both work surfaces.
 // The file and the pointer must resolve against the same key face.
@@ -32,7 +32,7 @@ export function createScenePicking({THREE,canvas,camera,blankRoot,keyRoot,
     const point=projectPointerToKey();
     return point?{point,back:cameraAtKey.z<.055}:null;
   }
-  function hitTest(clientX,clientY,preferSlot=false){
+  function hitTest(clientX,clientY,preferredPart=null){
     normalizedPointer(clientX,clientY);
     if(keyRoot.visible){
       const point=projectPointerToKey();
@@ -42,7 +42,9 @@ export function createScenePicking({THREE,canvas,camera,blankRoot,keyRoot,
     }
     const hits=raycaster.intersectObjects(
       hitObjects.filter(object=>object.visible&&object.parent?.visible!==false),false);
-    const slotHit=preferSlot?hits.find(hit=>hit.object.userData.kind==='slot'):null;
+    const slotHit=preferredPart?hits.find(hit=>
+      hit.object.userData.kind==='slot'&&
+      (typeof preferredPart!=='string'||checkSocket(preferredPart,hit.object.userData.id))):null;
     const hit=slotHit||hits.find(hit=>
       hit.object.userData.kind==='part'||hit.object.userData.kind==='slot');
     return hit?.object.userData||null;

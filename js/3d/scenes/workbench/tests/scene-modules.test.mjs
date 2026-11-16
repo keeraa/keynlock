@@ -64,7 +64,17 @@ test('3D pointer picking selects the intended tooth and refuses a broken blank',
   assemblyRoot.add(part);hitObjects.push(part);
   assemblyRoot.updateMatrixWorld(true);
   assert.deepEqual(picker.hitTest(200,200),{kind:'part',id:'pin-2'});
+  const clip=new THREE.Mesh(new THREE.SphereGeometry(.18),new THREE.MeshBasicMaterial());
+  clip.position.z=.95;clip.userData={kind:'slot',id:'clip-0'};
+  const washer=new THREE.Mesh(new THREE.SphereGeometry(.18),new THREE.MeshBasicMaterial());
+  washer.position.z=.60;washer.userData={kind:'slot',id:'washer-0'};
+  assemblyRoot.add(clip,washer);hitObjects.push(clip,washer);
+  assemblyRoot.updateMatrixWorld(true);
+  assert.deepEqual(picker.hitTest(200,200,'washer-1'),{kind:'slot',id:'washer-0'},
+    'a washer selects its matching socket even behind a closer snap-ring socket');
+  assert.deepEqual(picker.hitTest(200,200,'clip-0'),{kind:'slot',id:'clip-0'});
   part.geometry.dispose();part.material.dispose();
+  clip.geometry.dispose();clip.material.dispose();washer.geometry.dispose();washer.material.dispose();
 });
 
 test('hidden manual guides defer geometry rebuild until guided mode returns',()=>{

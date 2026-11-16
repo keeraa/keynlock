@@ -39,7 +39,7 @@ listen(canvas,'pointerdown',event=>{
     state.cameraDragging=true;return;
   }
   const hit=scene.hitTest(event.clientX,event.clientY,
-    state.mode==='assembly'&&Boolean(state.selectedPart));
+    state.mode==='assembly'?state.selectedPart:null);
   if(state.mode==='key'){
     if(hit?.kind!=='cut'){state.cameraDragging=true;canvas.style.cursor='grabbing';return;}
     if(state.cuts.some(value=>value>=BREAK_CUT)){

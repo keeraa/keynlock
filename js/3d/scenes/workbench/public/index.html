@@ -74,7 +74,24 @@
       <div id="assemblyPanel" class="panel-screen" hidden>
         <div class="eyebrow">СХЕМА · ШТИФТОВЫЙ ЦИЛИНДР</div>
         <h2>Сборка механизма</h2>
-        <p>Соберите замок по единому контурному чертежу. Группы деталей можно выбирать в любом порядке.</p>
+        <p>Соберите замок из отдельных деталей или разработайте собственную конфигурацию.</p>
+        <div class="assembly-variant-control" role="group" aria-label="Режим сборки замка">
+          <button type="button" data-assembly-variant="classic" class="active" aria-pressed="true">13 деталей</button>
+          <button type="button" data-assembly-variant="extended" aria-pressed="false">Расширенная</button>
+          <button type="button" data-assembly-variant="free" aria-pressed="false">Свой проект</button>
+        </div>
+        <section id="freeDesignPanel" class="design-card" aria-label="Конструктор собственного замка" hidden>
+          <div class="design-top">ПРОЕКТ МЕХАНИЗМА <span>4 КАНАЛА · 2 ПЕРЕДАЧИ</span></div>
+          <p>Задайте код каждого канала, отношение шестерён и тип привода.</p>
+          <div class="design-field-label">КОД ШТИФТОВ · СЛЕВА НАПРАВО</div>
+          <div id="designPinRow" class="design-pins"></div>
+          <label class="design-select-row" for="designRatio"><span>Передача</span>
+            <select id="designRatio"><option value="12:16">12 : 16 — тяговая</option><option value="16:12">16 : 12 — быстрая</option></select>
+          </label>
+          <label class="design-check"><input id="designReinforced" type="checkbox" checked><span>Усиленный привод: шайбы, кольцо, тяга, засов</span></label>
+          <div id="designKeyStatus" class="design-key-status"></div>
+          <button id="cutDesignKey" type="button" class="design-key-button">Изготовить ключ по своему чертежу <span>→</span></button>
+        </section>
         <div class="manual-card">
           <div class="manual-top"><span>СХЕМА СБОРКИ · ИЗОМЕТРИЯ</span><b>01 / 01</b></div>
           <div id="manualIllustration" class="manual-illustration" aria-label="Иллюстрация текущего шага сборки"></div>

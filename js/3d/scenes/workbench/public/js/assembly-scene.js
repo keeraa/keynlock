@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {createSpurGear} from './lock-profiles.js';
-import {ASSEMBLY_STEPS,checkSocket} from './logic.js';
+import {checkSocket} from './logic.js';
+import {assemblyStepsFor,hasExtraHardware} from './assembly-design.js';
 
 const PIN_X=[-1.72,-1.11,-.50,.11];
 const PIN_BOTTOM=-.88;
@@ -49,7 +50,8 @@ export function createAssemblyMechanism({scene,shapes,mat,addMesh,hitObjects,mak
     addSocket(`spring-${i}`,[x,.65,.37],.16);
     const label=makeTextLabel(THREE,String(i+1));label.position.set(x,-1.04,.24);assemblyRoot.add(label);
   });
-  const pitchA=.28,teethA=12,teethB=16,pitchB=pitchA*teethB/teethA;
+  let teethA=12,teethB=16;
+  const pitchA=.28,pitchB=pitchA*16/12;
   const gearCenters=[new THREE.Vector3(1.18,-.13,.21),new THREE.Vector3(1.18+pitchA+pitchB,-.13,.21)];
   gearCenters.forEach((v,i)=>{
     shapes.cyl(assemblyRoot,.075,.50,v.x,v.y,-.23,mat.spring,'z',24);
@@ -60,6 +62,11 @@ export function createAssemblyMechanism({scene,shapes,mat,addMesh,hitObjects,mak
   addSocket('cam-0',[gearCenters[1].x,gearCenters[1].y,.68],.20);
   const outputBar=shapes.box(assemblyRoot,.42,.12,.11,2.47,-.12,-.10,mat.spring,.025);
   outputBar.position.x=2.48;
+  addSocket('washer-0',[gearCenters[0].x,gearCenters[0].y,.51],.19);
+  addSocket('washer-1',[gearCenters[1].x,gearCenters[1].y,.51],.19);
+  addSocket('clip-0',[gearCenters[1].x,gearCenters[1].y,.83],.14);
+  addSocket('rod-0',[2.10,-.30,.48],.17);
+  addSocket('bolt-0',[2.40,-.49,.46],.19);
 
   function addPart(id,home,buildHit){
     const group=new THREE.Group();group.position.set(...home);assemblyRoot.add(group);
@@ -89,7 +96,7 @@ export function createAssemblyMechanism({scene,shapes,mat,addMesh,hitObjects,mak
     const hit=addMesh(group,new THREE.CylinderGeometry(.16,.16,.48,12),mat.hit,[0,.22,0]);
     group.userData.springMesh=spring;return hit;
   });
-  const gears=[];
+  const gears=[],gearLabels=[];
   for(let i=0;i<2;i++){
     const teeth=i===0?teethA:teethB,pitch=i===0?pitchA:pitchB;
     const obj=addPart(`gear-${i}`,[1.47+i*.96,-1.28,.71],group=>{
@@ -100,7 +107,11 @@ export function createAssemblyMechanism({scene,shapes,mat,addMesh,hitObjects,mak
       hit.rotation.x=Math.PI/2;return hit;
     });
     obj.group.rotation.z=0;
-    const label=makeTextLabel(THREE,String(teeth));label.position.set(0,-pitch-.17,.13);obj.group.add(label);
+    const labels=[12,16].map(value=>{
+      const label=makeTextLabel(THREE,String(value));
+      label.position.set(0,-.55,.13);obj.group.add(label);return label;
+    });
+    gearLabels[i]=labels;
   }
   addPart('cam-0',[.49,-1.28,.75],group=>{
     shapes.cyl(group,.195,.16,0,0,0,mat.copper,'z',32);
@@ -118,28 +129,78 @@ export function createAssemblyMechanism({scene,shapes,mat,addMesh,hitObjects,mak
     }
     return addMesh(group,new THREE.BoxGeometry(3.15,.25,.70),mat.hit);
   });
+  // Retaining washers and the split snap ring are separate selectable meshes.
+  for(let i=0;i<2;i++)addPart(`washer-${i}`,[-1.25+i*.70,-1.42,.76],group=>{
+    const disc=addMesh(group,new THREE.RingGeometry(.082,.22,44),mat.steel);
+    disc.castShadow=true;
+    const rim=addMesh(group,new THREE.TorusGeometry(.20,.018,8,40),mat.copper,[0,0,.01]);
+    rim.castShadow=true;
+    return addMesh(group,new THREE.CylinderGeometry(.26,.26,.14,28),mat.hit);
+  });
+  addPart('clip-0',[.12,-1.42,.76],group=>{
+    const ring=addMesh(group,new THREE.TorusGeometry(.17,.034,10,36,Math.PI*1.74),mat.steel);
+    ring.rotation.z=.41;
+    for(const x of [-.156,.156])shapes.cyl(group,.035,.044,x,-.01,0,mat.copper,'z',16);
+    return addMesh(group,new THREE.CylinderGeometry(.25,.25,.12,32),mat.hit);
+  });
+  addPart('rod-0',[1.23,-1.42,.76],group=>{
+    shapes.cyl(group,.057,.64,0,0,0,mat.steel,'x',22);
+    for(const x of [-.31,.31]){
+      shapes.cyl(group,.092,.08,x,0,.02,mat.copper,'z',24);
+      shapes.cyl(group,.043,.085,x,0,.075,mat.dark2,'z',18);
+    }
+    return addMesh(group,new THREE.BoxGeometry(.78,.22,.20),mat.hit);
+  });
+  addPart('bolt-0',[2.26,-1.42,.76],group=>{
+    shapes.box(group,.69,.17,.24,0,0,0,mat.steel,.045);
+    shapes.box(group,.16,.23,.26,.16,0,0,mat.copper,.028);
+    return addMesh(group,new THREE.BoxGeometry(.79,.28,.30),mat.hit);
+  });
   const selectionHalo=addMesh(assemblyRoot,new THREE.TorusGeometry(.22,.017,8,48),
     new THREE.MeshBasicMaterial({color:0xffe0a0,transparent:true,opacity:.90,depthTest:false}),[0,0,.87]);
   selectionHalo.visible=false;selectionHalo.renderOrder=12;
-  let partGroup=0;
+  let partGroup=0,variant='classic',design={order:[2,0,3,1],ratio:'12:16',reinforced:true};
+  let currentInstalled={};
   function setPartGroup(index){
-    partGroup=THREE.MathUtils.clamp(index,0,ASSEMBLY_STEPS.length-1);
+    partGroup=THREE.MathUtils.clamp(index,0,assemblyStepsFor(variant,design).length-1);
     refreshPartVisibility();
   }
+  function setAssemblyDesign(nextVariant,nextDesign){
+    variant=nextVariant;design=nextDesign;
+    const nextTeeth=variant==='free'&&design.ratio==='16:12'?[16,12]:[12,16];
+    if(nextTeeth[0]!==teethA||nextTeeth[1]!==teethB){
+      [teethA,teethB]=nextTeeth;
+      for(let i=0;i<2;i++){
+        const pitch=i===0?(teethA===12?pitchA:pitchB):(teethB===12?pitchA:pitchB);
+        const geometry=createSpurGear(THREE,nextTeeth[i],pitch,.12,
+          i===0?mat.brass:mat.steel).geometry;
+        gears[i].geometry.dispose();gears[i].geometry=geometry;
+      }
+    }
+    for(let i=0;i<2;i++)gearLabels[i].forEach((label,j)=>{
+      label.visible=(j===0?12:16)===(i===0?teethA:teethB);
+    });
+    setPartGroup(partGroup);
+    updateInstalled(currentInstalled);
+  }
   function refreshPartVisibility(){
-    const active=new Set(ASSEMBLY_STEPS[partGroup].slots);
+    const steps=assemblyStepsFor(variant,design);
+    const active=new Set(steps[partGroup]?.slots||[]);
+    const available=new Set(steps.flatMap(step=>step.slots));
     for(const [id,obj] of parts){
       const installed=[...installedParts.values()].includes(id);
-      obj.group.visible=installed||active.has(id);
+      obj.group.visible=available.has(id)&&(installed||active.has(id));
       obj.hit.visible=obj.group.visible;
     }
     for(const [id,slot] of Object.entries(slots)){
       slot.marker.visible=active.has(id)&&!installedParts.has(id);
       slot.hit.visible=active.has(id);
     }
+    selectionHalo.visible=selectionHalo.visible&&parts.get(selectionHalo.userData.selected)?.group.visible===true;
   }
 
   function updateInstalled(installed){
+    currentInstalled={...installed};
     latch.position.x=2.38;outputBar.position.x=2.48;
     installedParts.clear();
     for(const [slot,id] of Object.entries(installed))if(id)installedParts.set(slot,id);
@@ -157,6 +218,15 @@ export function createAssemblyMechanism({scene,shapes,mat,addMesh,hitObjects,mak
       }else if(id==='cam-0'){
         obj.group.position.set(gearCenters[1].x,gearCenters[1].y,.48);
         obj.group.rotation.z=0;
+      }else if(id.startsWith('washer-')){
+        obj.group.position.set(gearCenters[slotNumber].x,gearCenters[slotNumber].y,.40);
+      }else if(id==='clip-0'){
+        obj.group.position.set(gearCenters[1].x,gearCenters[1].y,.77);
+      }else if(id==='rod-0'){
+        obj.group.position.set(2.10,-.30,.43);
+        obj.group.rotation.z=-.53;
+      }else if(id==='bolt-0'){
+        obj.group.position.set(2.40,-.49,.39);
       }else if(id.startsWith('pin-')){
         const code=Number(id.split('-')[1]);
         obj.group.position.set(PIN_X[slotNumber],PIN_BOTTOM+PIN_LENGTHS[code]/2,.35);
@@ -187,6 +257,7 @@ export function createAssemblyMechanism({scene,shapes,mat,addMesh,hitObjects,mak
   updateInstalled({});
   function setSelectedPart(id){
     const obj=parts.get(id);selectionHalo.visible=Boolean(obj);
+    selectionHalo.userData.selected=id;
     if(obj){selectionHalo.position.copy(obj.group.position);selectionHalo.position.z+=.24;
       selectionHalo.scale.setScalar(id.startsWith('gear-')?1.75:
         (id==='core-0'||id==='cover-0'?2.15:1));}
@@ -202,9 +273,10 @@ export function createAssemblyMechanism({scene,shapes,mat,addMesh,hitObjects,mak
     setSelectedPart(id);
   }
   function findNearestSocket(id,point,maxDistance=.62){
-    const type=id.split('-')[0];let best=null,bestDistance=maxDistance;
+    let best=null,bestDistance=maxDistance;
     for(const [slot,{position}] of Object.entries(slots)){
-      if(!slot.startsWith(type))continue;
+      if(!checkSocket(id,slot)||!assemblyStepsFor(variant,design)
+        .some(step=>step.slots.includes(slot)))continue;
       const d=Math.hypot(point.x-position.x,point.y-position.y);
       if(d<bestDistance){bestDistance=d;best=slot;}
     }return best;
@@ -214,7 +286,8 @@ export function createAssemblyMechanism({scene,shapes,mat,addMesh,hitObjects,mak
   let test=null;
   function startTest(correct,cuts,installed,onDone){
     if(test)return false;
-    test={start:performance.now(),correct,cuts:[...cuts],installed:{...installed},onDone};
+    test={start:performance.now(),correct,cuts:[...cuts],installed:{...installed},onDone,
+      hardware:hasExtraHardware(variant,design)};
     return true;
   }
   function updateTest(now){
@@ -240,15 +313,41 @@ export function createAssemblyMechanism({scene,shapes,mat,addMesh,hitObjects,mak
     if(test.installed['gear-0'])parts.get(test.installed['gear-0']).group.rotation.z=gearAngle;
     if(test.installed['gear-1'])parts.get(test.installed['gear-1']).group.rotation.z=-gearAngle*(teethA/teethB)+Math.PI/teethB;
     if(test.installed['cam-0'])parts.get(test.installed['cam-0']).group.rotation.z=-gearAngle*(teethA/teethB)+Math.PI/teethB;
+    if(test.hardware){
+      for(let i=0;i<2;i++)if(test.installed[`washer-${i}`])
+        parts.get(test.installed[`washer-${i}`]).group.rotation.z=i===0?gearAngle:
+          -gearAngle*(teethA/teethB)+Math.PI/teethB;
+      if(test.installed['clip-0'])parts.get(test.installed['clip-0']).group.rotation.z=
+        -gearAngle*(teethA/teethB);
+      if(test.installed['rod-0']){
+        const rod=parts.get(test.installed['rod-0']).group;
+        rod.position.x=2.10+(test.correct?.12:0)*turnProgress;
+        rod.rotation.z=-.53+(test.correct?.13:0)*turnProgress;
+      }
+      if(test.installed['bolt-0'])parts.get(test.installed['bolt-0']).group.position.x=
+        2.40+(test.correct?.24:0)*turnProgress;
+    }
     latch.position.x=2.38+(test.correct?.24:0)*turnProgress;
     outputBar.position.x=2.48+(test.correct?.24:0)*turnProgress;
     if(elapsed>2300){
-      const cb=test.onDone,wasCorrect=test.correct;
+      const cb=test.onDone,wasCorrect=test.correct,wasHardware=test.hardware;
       test=null;updateInstalled(Object.fromEntries(installedParts));
       if(wasCorrect){
         parts.get('gear-0').group.rotation.z=1.35;
         parts.get('gear-1').group.rotation.z=-1.35*(teethA/teethB)+Math.PI/teethB;
         parts.get('cam-0').group.rotation.z=-1.35*(teethA/teethB)+Math.PI/teethB;
+        if(wasHardware){
+          for(let i=0;i<2;i++)if(installedParts.get(`washer-${i}`))
+            parts.get(installedParts.get(`washer-${i}`)).group.rotation.z=i===0?1.35:
+              -1.35*(teethA/teethB)+Math.PI/teethB;
+          if(installedParts.get('clip-0'))parts.get(installedParts.get('clip-0')).group.rotation.z=
+            -1.35*(teethA/teethB);
+          if(installedParts.get('rod-0')){
+            const rod=parts.get(installedParts.get('rod-0')).group;
+            rod.position.x+=.12;rod.rotation.z+=.13;
+          }
+          if(installedParts.get('bolt-0'))parts.get(installedParts.get('bolt-0')).group.position.x+=.24;
+        }
         latch.position.x=2.62;outputBar.position.x=2.72;
       }
       cb?.();
@@ -256,6 +355,6 @@ export function createAssemblyMechanism({scene,shapes,mat,addMesh,hitObjects,mak
   }
 
 
-  return {root:assemblyRoot,setPartGroup,updateInstalled,setSelectedPart,movePart,
+  return {root:assemblyRoot,setPartGroup,setAssemblyDesign,updateInstalled,setSelectedPart,movePart,
     findNearestSocket,startTest,updateTest};
 }

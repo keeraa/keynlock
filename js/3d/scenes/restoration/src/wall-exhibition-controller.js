@@ -1,6 +1,8 @@
 import { chooseDemoWallPaintings } from './wall-demo.js';
 import { createWallArtworkInfo } from './wall-artwork-info.js';
 
+const CLOSE_UP_FRAME_FRACTION = .48;
+
 /** Gallery demo, player favorites, toolbar and easel-panel visibility. */
 export function createWallExhibitionController({ paintings, playerProgress, wallGallery,
   collectionUI, getNavigation, getWorkshopUI, showToast, $ }) {
@@ -58,8 +60,17 @@ export function createWallExhibitionController({ paintings, playerProgress, wall
     if ((mode !== 'gallery' && mode !== 'art') || navigation.isTraveling?.()
       || now - lastAutoPickAt < 90) return;
     lastAutoPickAt = now;
-    const prominent = wallGallery.getProminentPainting(viewedId);
-    if (!prominent || prominent.id === viewedId) return;
+    const prominent = navigation.isWallZoomedIn?.()
+      ? wallGallery.getProminentPainting(viewedId, { minFrameFraction: CLOSE_UP_FRAME_FRACTION })
+      : null;
+    if (!prominent) {
+      if (viewedId !== null) {
+        viewedId = null;
+        artworkInfo.showOverview(showingDemo, playerProgress.getWallIds().length > 0);
+      }
+      return;
+    }
+    if (prominent.id === viewedId) return;
     viewedId = prominent.id;
     artworkInfo.show(prominent, showingDemo);
   }
@@ -71,7 +82,7 @@ export function createWallExhibitionController({ paintings, playerProgress, wall
     $('wall-gallery-navigation').hidden = !active || mode === 'art';
     $('wall-art-back').hidden = mode !== 'art';
     $('wall-art-hover').hidden = true;
-    viewedId = null;
+    viewedId = mode === 'art' ? art.id : null;
     lastAutoPickAt = -Infinity;
     if (mode === 'art') {
       artworkInfo.show(art, showingDemo);

@@ -21,6 +21,12 @@ test('camera-facing, visible screen area decides the gallery artwork without poi
   camera.position.set(0, 0, 1);
   camera.lookAt(0, 0, -4.5);
   assert.equal(picker.getProminentPainting()?.id, 'middle');
+  assert.equal(picker.getProminentPainting(null, { minFrameFraction: .48 })?.id, 'middle');
+
+  camera.position.set(0, 0, 9.5);
+  camera.lookAt(0, 0, -4.5);
+  assert.equal(picker.getProminentPainting(null, { minFrameFraction: .48 }), null,
+    'a painting visible in the overall gallery is not yet a close-up');
 
   camera.position.set(2.6, 0, 1);
   camera.lookAt(2.6, 0, -4.5);

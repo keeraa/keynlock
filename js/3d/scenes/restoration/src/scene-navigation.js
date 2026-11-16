@@ -262,5 +262,7 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
     renderLabels: overlay.renderLabels, resize, animate, isTraveling: flight.isTraveling,
     focusedSide: () => activeFocus, lastFocusedSide: () => lastFocusedSide,
     isWallGallery: inWallMode, focusedWallId: () => wallFocusedId,
+    isWallZoomedIn: () => inWallMode()
+      && camera.position.distanceTo(controls.target) < framing.galleryDistance() * .82,
     mode: () => mode };
 }

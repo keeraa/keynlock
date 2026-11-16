@@ -5,7 +5,7 @@
   "threeVersion": "0.187.0",
   "status": "standalone",
   "source": "ChatGPT Sites",
-  "sourceCommit": "19b58dbee11d6dc9af72d11a1f392940abfb53dd",
+  "sourceCommit": "1db00f2e29bdc869fe033a6d9ef7ec593fbc86c3",
   "savedOn": "2026-11-16",
   "liveUrl": "https://atelier-restoration-1115.k1r11111.chatgpt.site",
   "entry": "index.html",
@@ -72,7 +72,11 @@
         "gallery",
         "art"
       ],
-      "keepsClickedArtworkDuringFlight": true
+      "keepsClickedArtworkDuringFlight": true,
+      "displayTrigger": "close-up-only",
+      "minFrameFractionOfViewport": 0.48,
+      "maxCameraDistanceFractionOfOverview": 0.82,
+      "hideWhenZoomedOut": true
     }
   },
   "integration": {

@@ -15,7 +15,7 @@ export function createWallArtworkPicker({ THREE, camera, renderer, artworks, ima
     return hit ? artworks.get(hit.object.userData.galleryId)?.placement || null : null;
   }
 
-  function getProminentPainting(previousId = null) {
+  function getProminentPainting(previousId = null, { minFrameFraction = 0 } = {}) {
     if (!artworks.size) return null;
     camera.updateMatrixWorld();
     let winner = null;
@@ -45,6 +45,12 @@ export function createWallArtworkPicker({ THREE, camera, renderer, artworks, ima
       bottom = Math.max(-1, bottom);
       top = Math.min(1, top);
       if (left >= right || bottom >= top) continue;
+
+      // On the overview, even the central picture should not acquire a plaque.
+      // In close-up mode at least one image axis must fill much of the viewport.
+      const frameFraction = Math.max((right - left) / 2, (top - bottom) / 2);
+      const requiredFraction = placement.id === previousId ? minFrameFraction * .9 : minFrameFraction;
+      if (frameFraction < requiredFraction) continue;
 
       const visibleArea = (right - left) * (top - bottom);
       const dx = left > 0 ? left : right < 0 ? right : 0;

@@ -148,28 +148,34 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
     controls.update();
   }
 
-  function visibleWallWidth() {
-    const categoryWidth = wallBounds.columnWidth || wallBounds.width / 12;
-    const columns = camera.aspect < 1 ? 3.2 : camera.aspect < 1.4 ? 4.2 : 5.8;
-    return Math.min(wallBounds.width, columns * categoryWidth);
+  function wallOverviewDistance() {
+    // Fit the wall's height with a small margin. Fitting several full columns
+    // horizontally made portrait screens fly too far back into the room.
+    const height = Math.max(3, wallBounds.maxY - wallBounds.minY);
+    const verticalFov = THREE.MathUtils.degToRad(camera.fov);
+    return Math.max(8, height * 1.08 / (2 * Math.tan(verticalFov / 2)));
+  }
+
+  function visibleWallWidth(distance = wallOverviewDistance()) {
+    const verticalFov = THREE.MathUtils.degToRad(camera.fov);
+    return Math.min(wallBounds.width,
+      2 * distance * Math.tan(verticalFov / 2) * camera.aspect);
+  }
+
+  function clampWallCenter(x, distance = wallOverviewDistance()) {
+    const minX = wallBounds.minX ?? -wallBounds.width / 2;
+    const maxX = wallBounds.maxX ?? wallBounds.width / 2;
+    const inset = visibleWallWidth(distance) / 2;
+    return THREE.MathUtils.clamp(x, minX + inset, maxX - inset);
   }
 
   function wallOverviewDestination(centerX = null) {
     const centerY = (wallBounds.minY + wallBounds.maxY) / 2;
     const minX = wallBounds.minX ?? -wallBounds.width / 2;
-    const maxX = wallBounds.maxX ?? wallBounds.width / 2;
-    const viewWidth = visibleWallWidth();
-    const firstCenter = minX + viewWidth / 2;
-    const lastCenter = maxX - viewWidth / 2;
-    const x = THREE.MathUtils.clamp(centerX ?? firstCenter, firstCenter, lastCenter);
-    const fov = THREE.MathUtils.degToRad(camera.fov);
-    const horizontalFov = 2 * Math.atan(Math.tan(fov / 2) * camera.aspect);
-    const height = Math.max(3, wallBounds.maxY - wallBounds.minY);
-    const distance = Math.max(10.5,
-      height / (2 * Math.tan(fov / 2) * .82),
-      viewWidth / (2 * Math.tan(horizontalFov / 2) * .80));
+    const distance = wallOverviewDistance();
+    const x = clampWallCenter(centerX ?? minX + visibleWallWidth(distance) / 2, distance);
     const target = new THREE.Vector3(x, centerY, -4.3);
-    return { position: new THREE.Vector3(x, centerY, -4.3 + Math.min(32, distance)), target };
+    return { position: new THREE.Vector3(x, centerY, -4.3 + distance), target };
   }
 
   function wallArtDestination(art) {
@@ -199,7 +205,7 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
     };
     wallMode = true;
     controls.minDistance = 1.35;
-    controls.maxDistance = 36;
+    controls.maxDistance = wallOverviewDistance() * 1.18;
     controls.minPolarAngle = .05;
     controls.maxPolarAngle = Math.PI - .05;
     controls.enableRotate = false;
@@ -283,7 +289,8 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
       flyCamera(wallArtDestination(moved), 820);
       return;
     }
-    wallOverviewPose = wallOverviewDestination(wallOverviewPose?.target.x);
+    wallOverviewPose = wallOverviewDestination(cameraTravel
+      ? wallOverviewPose?.target.x : controls.target.x);
     flyCamera(wallOverviewPose, 820);
   }
 
@@ -291,7 +298,7 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
     if (!wallMode) return;
     if (wallFocusedId) { leaveWallArt(); return; }
     const current = controls.target.x;
-    const viewWidth = visibleWallWidth();
+    const viewWidth = visibleWallWidth(camera.position.distanceTo(controls.target));
     const minX = (wallBounds.minX ?? -wallBounds.width / 2) + viewWidth / 2;
     const maxX = (wallBounds.maxX ?? wallBounds.width / 2) - viewWidth / 2;
     const wanted = THREE.MathUtils.clamp(current + direction * (wallBounds.columnWidth || 2.5) * 2.4,
@@ -366,7 +373,29 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
   }
 
   function animate(now) {
-    if (!cameraTravel) return controls.update();
+    if (!cameraTravel) {
+      const moved = controls.update();
+      if (!wallMode) return moved;
+      // The user can pan down from the exhibition. Recognize the easel area
+      // and restore the workshop UI through the existing smooth return flight.
+      if (controls.target.y < 2.85 && camera.position.y < 4.5) {
+        leaveWallGallery();
+        return true;
+      }
+      const clampedX = clampWallCenter(controls.target.x,
+        camera.position.distanceTo(controls.target));
+      const deltaX = clampedX - controls.target.x;
+      const deltaY = Math.min(0, wallBounds.maxY - .4 - controls.target.y);
+      if (Math.abs(deltaX) > .0001 || deltaY < -.0001) {
+        camera.position.x += deltaX;
+        camera.position.y += deltaY;
+        controls.target.x += deltaX;
+        controls.target.y += deltaY;
+        camera.lookAt(controls.target);
+        return true;
+      }
+      return moved;
+    }
     const progress = Math.max(0, Math.min(1, (now - cameraTravel.started) / cameraTravel.duration));
     // Quintic smoothstep has zero velocity and acceleration at both ends.
     const eased = progress * progress * progress * (progress * (progress * 6 - 15) + 10);

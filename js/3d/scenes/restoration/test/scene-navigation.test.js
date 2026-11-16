@@ -156,6 +156,11 @@ test('gallery camera follows the horizontal columns, focuses artwork and returns
     assert.equal(nav.focusedWallId(), null);
     assert.ok(Math.abs(controls.target.x - (firstX + 6)) < .1,
       'returning from a painting keeps the same column window');
+    camera.position.x -= 100;
+    controls.target.x -= 100;
+    nav.animate(now + 5610);
+    assert.ok(controls.target.x > -8,
+      'dragging sideways cannot leave the exhibition wall outside the frame');
     nav.leaveWallGallery();
     assert.ok(stage.classList.contains('wall-gallery-active'), 'labels stay hidden on the way down');
     nav.animate(now + 7200);
@@ -164,6 +169,84 @@ test('gallery camera follows the horizontal columns, focuses artwork and returns
     assert.equal(controls.minPolarAngle, 1.23);
     assert.equal(controls.mouseButtons.LEFT, THREE.MOUSE.ROTATE);
     assert.deepEqual(changes, ['overview', 'art', 'overview', 'closed']);
+  } finally {
+    globalThis.document = previousDocument;
+    globalThis.ResizeObserver = previousResizeObserver;
+  }
+});
+
+test('manually panning down to the easels automatically and smoothly restores workshop mode', () => {
+  const previousDocument = globalThis.document;
+  const previousResizeObserver = globalThis.ResizeObserver;
+  const nodes = new Map();
+  const node = (id) => {
+    if (!nodes.has(id)) {
+      const classes = new Set();
+      nodes.set(id, { style: {}, hidden: false,
+        classList: {
+          add: (value) => classes.add(value), remove: (value) => classes.delete(value),
+          contains: (value) => classes.has(value),
+        },
+        setAttribute() {}, addEventListener() {},
+      });
+    }
+    return nodes.get(id);
+  };
+  globalThis.document = { querySelector: node };
+  globalThis.ResizeObserver = class { observe() {} };
+  try {
+    const camera = new THREE.PerspectiveCamera(39, 1, .1, 65);
+    camera.position.set(0, 2.3, 7.7);
+    const controls = {
+      target: new THREE.Vector3(0, 1.91, 0), enableDamping: true,
+      enabled: true, enableRotate: true, enablePan: false,
+      minDistance: 5.25, maxDistance: 11.6, minPolarAngle: 1.23, maxPolarAngle: 1.67,
+      mouseButtons: { LEFT: THREE.MOUSE.ROTATE },
+      update() { camera.lookAt(this.target); },
+    };
+    const stage = node('.stage');
+    const sceneHost = node('#scene');
+    sceneHost.clientWidth = 914;
+    sceneHost.clientHeight = 1150;
+    sceneHost.closest = () => stage;
+    const states = [];
+    const nav = createSceneNavigation({ THREE, camera, controls,
+      renderer: { setSize() {} }, stage: sceneHost, easelX: 1.28,
+      cartoonFilter: { resize() {} }, labelLayer: node('.painting-labels'),
+      getTexture: () => ({ image: { width: 1200, height: 900 } }),
+      getTool: () => null, clearUV() {}, damageHint: node('#damage-hint'),
+      onWallChange: (state) => states.push(state.mode), $: node,
+    });
+    nav.resize();
+    const originalPosition = camera.position.clone();
+    const now = performance.now();
+    nav.enterWallGallery({ minX: -15, maxX: 15, minY: 3.695, maxY: 11.85,
+      width: 30, columnWidth: 2.5 });
+    assert.ok(controls.maxDistance < 13.5, 'portrait gallery cannot zoom far away into the room');
+    nav.animate(now + 1600);
+    assert.ok(camera.position.z < 8, 'gallery opens close enough to the pictures');
+
+    // Simulate the user dragging the gallery toward the easels through OrbitControls.
+    let delta = 3.25 - controls.target.y;
+    camera.position.y += delta;
+    controls.target.y += delta;
+    nav.animate(now + 1610);
+    assert.equal(nav.isWallGallery(), true, 'panning near the bottom keeps the gallery active');
+
+    delta = 2.5 - controls.target.y;
+    camera.position.y += delta;
+    controls.target.y += delta;
+    const manualPosition = camera.position.clone();
+    nav.animate(now + 1620);
+    assert.equal(nav.isWallGallery(), false, 'easel mode becomes active automatically');
+    assert.equal(nav.isTraveling(), true);
+    assert.ok(camera.position.distanceTo(manualPosition) < 1e-6,
+      'switching modes does not teleport the camera');
+    nav.animate(now + 3100);
+    assert.ok(camera.position.distanceTo(originalPosition) < .03);
+    assert.equal(stage.classList.contains('wall-gallery-active'), false);
+    assert.equal(controls.maxDistance, 11.6);
+    assert.deepEqual(states, ['overview', 'closed']);
   } finally {
     globalThis.document = previousDocument;
     globalThis.ResizeObserver = previousResizeObserver;

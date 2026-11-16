@@ -5,7 +5,7 @@
   "threeVersion": "0.187.0",
   "status": "standalone",
   "source": "ChatGPT Sites",
-  "sourceCommit": "5e01cf68893e6ff393e47f3fe3792c0230e34615",
+  "sourceCommit": "949920aeb69875ea4615769e2136ebbd824970d2",
   "savedOn": "2026-11-16",
   "liveUrl": "https://atelier-restoration-1115.k1r11111.chatgpt.site",
   "entry": "index.html",
@@ -26,9 +26,11 @@
     },
     "wallHeightReductionPercent": 30,
     "framesDistanceFromWallMeters": 0.045,
-    "navigation": "horizontal-viewports-6-columns-at-once",
+    "navigation": "close-gallery-view-horizontal-bounded-pan-auto-return-to-easels",
     "wallWidthMeters": 30,
-    "columnCount": 12
+    "columnCount": 12,
+    "maxCameraDistance": "viewport-dependent-1.18x-overview",
+    "autoSwitchToEasels": true
   },
   "integration": {
     "target": "KEYNLOCK",

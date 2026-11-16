@@ -5,7 +5,7 @@
   "threeVersion": "0.187.0",
   "status": "standalone",
   "source": "ChatGPT Sites",
-  "sourceCommit": "5c6585a1399b5195715c25fddba067f6032a3baf",
+  "sourceCommit": "b5abd11ef59a1e6a4739cc2ae42689403b3bf5c9",
   "savedOn": "2026-11-16",
   "liveUrl": "https://atelier-restoration-1115.k1r11111.chatgpt.site",
   "entry": "index.html",
@@ -43,12 +43,13 @@
       "displays": [
         "collection-cards",
         "easel-description",
-        "wall-art-focus"
+        "wall-art-focus",
+        "wall-overview-auto-selected"
       ],
       "policy": "Мы сделаем вас счастливыми",
       "agency": "Палата Образов",
       "displayLayout": "under-artwork-title-left",
-      "specificBansRevised": 10,
+      "specificBansRevised": 11,
       "typography": {
         "description": "larger-unframed-text",
         "artistYear": "enlarged",
@@ -56,9 +57,16 @@
       },
       "revisedPaintings": [
         "mucha-dance",
-        "dream-flight-bee"
+        "dream-flight-bee",
+        "dano-day"
       ],
       "descriptionColumnWidthPercentOfPrevious": 70
+    },
+    "autoArtworkDescription": {
+      "enabled": true,
+      "method": "screen-space-visible-area-weighted-by-center-proximity",
+      "updateThrottleMs": 90,
+      "manualFocusPreserved": true
     }
   },
   "integration": {
@@ -73,7 +81,7 @@
       "navigation/easel-overlay.js"
     ],
     "stylesheets": 8,
-    "tests": 37,
+    "tests": 38,
     "mainFileLines": 314,
     "backgroundBlur": "half-resolution two-pass depth-aware Gaussian; radius 6.5px; strength 72%",
     "foregroundOnlyOutlines": true,

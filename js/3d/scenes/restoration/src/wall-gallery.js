@@ -200,8 +200,59 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood, o
     return hit ? artworks.get(hit.object.userData.galleryId)?.placement || null : null;
   }
 
+  /** Pick the artwork with the strongest screen presence, even without a pointer hit. */
+  function getProminentPainting(previousId = null) {
+    if (!artworks.size) return null;
+    camera.updateMatrixWorld();
+    root.updateWorldMatrix(true, false);
+    const corner = new THREE.Vector3();
+    const viewCenter = new THREE.Vector3();
+    const scores = new Map();
+    let winner = null;
+    let bestScore = 0;
+
+    for (const { placement } of artworks.values()) {
+      viewCenter.set(placement.x, placement.y, .058).applyMatrix4(root.matrixWorld)
+        .applyMatrix4(camera.matrixWorldInverse);
+      if (viewCenter.z >= -camera.near) continue;
+
+      const halfWidth = placement.width / 2;
+      const halfHeight = placement.height / 2;
+      let left = Infinity, right = -Infinity, bottom = Infinity, top = -Infinity;
+      for (const x of [-halfWidth, halfWidth]) {
+        for (const y of [-halfHeight, halfHeight]) {
+          corner.set(placement.x + x, placement.y + y, .058)
+            .applyMatrix4(root.matrixWorld).project(camera);
+          left = Math.min(left, corner.x);
+          right = Math.max(right, corner.x);
+          bottom = Math.min(bottom, corner.y);
+          top = Math.max(top, corner.y);
+        }
+      }
+      left = Math.max(-1, left);
+      right = Math.min(1, right);
+      bottom = Math.max(-1, bottom);
+      top = Math.min(1, top);
+      if (left >= right || bottom >= top) continue;
+
+      const visibleArea = (right - left) * (top - bottom);
+      const dx = left > 0 ? left : right < 0 ? right : 0;
+      const dy = bottom > 0 ? bottom : top < 0 ? top : 0;
+      const score = visibleArea / (1 + 8 * (dx * dx + dy * dy));
+      scores.set(placement.id, score);
+      if (score > bestScore) { winner = placement; bestScore = score; }
+    }
+    // Prevent rapid title switching when two frames are similarly prominent.
+    if (previousId && winner?.id !== previousId &&
+        (scores.get(previousId) || 0) * 1.12 >= bestScore) {
+      return artworks.get(previousId)?.placement || winner;
+    }
+    return bestScore > .002 ? winner : null;
+  }
+
   return {
     root, paintingsRoot, setPaintings, hitTest, showHighResolution, clearFocus,
+    getProminentPainting,
     getPlacement: (id) => artworks.get(id)?.placement || null,
     getLayout: () => layout,
     clear() { revision++; clearFrames(); },

@@ -24,6 +24,8 @@ test('censorship allegations match the four agreed examples', () => {
   assert.equal(getPaintingLore('galaxy-musicians').banReason, 'Пропаганда праздности.');
   assert.equal(getPaintingLore('mucha-dance').banReason, 'Пропаганда оргий и эротики. Танец перед групповым соитием.');
   assert.match(getPaintingLore('dream-flight-bee').banReason, /Пропаганда эротики/);
+  assert.equal(getPaintingLore('dano-day').banReason,
+    'Пропаганда эротики, подглядывания и массовых однополых оргий.');
 });
 
 test('locale API retains Russian fallback and localized UI badge labels', () => {

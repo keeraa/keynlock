@@ -280,6 +280,7 @@ function animate(now) {
   const dt = Math.min(0.05, (now - previousTime) / 1000);
   previousTime = now;
   const cameraMoved = navigation.animate(now);
+  exhibition.updateViewedArtwork(now);
   if (!collectionUI.isOpen()) {
     // Floating dust only needs 30 updates per second; this avoids uploading
     // its vertex buffer on every frame on high-refresh displays.

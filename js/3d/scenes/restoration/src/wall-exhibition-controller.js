@@ -8,6 +8,8 @@ export function createWallExhibitionController({ paintings, playerProgress, wall
   let demoArtworks = chooseDemoWallPaintings(paintings);
   let showingDemo = true;
   let priorWorkbenchVisible = null;
+  let viewedId = null;
+  let lastAutoPickAt = -Infinity;
 
   function updateCounters() {
     const count = playerProgress.getWallIds().length;
@@ -49,6 +51,28 @@ export function createWallExhibitionController({ paintings, playerProgress, wall
     collectionUI.refresh();
   }
 
+  function showArtworkDetails(art) {
+    $('wall-gallery-title').textContent = art.title;
+    $('wall-gallery-caption').textContent =
+      `${art.columnLabel} · ${art.artist} · ${art.year}${showingDemo ? ' · демо' : ''}`;
+    const lore = getPaintingLore(art.id);
+    $('wall-art-description').textContent = lore?.description || '';
+    const labels = getPaintingLoreLabels();
+    $('wall-art-ban-label').textContent = labels.banned;
+    $('wall-art-ban-reason').textContent = lore?.banReason || '';
+    $('wall-art-policy').textContent = labels.policy;
+    $('wall-art-lore').hidden = false;
+  }
+
+  function updateViewedArtwork(now) {
+    if (getNavigation().mode() !== 'gallery' || now - lastAutoPickAt < 90) return;
+    lastAutoPickAt = now;
+    const prominent = wallGallery.getProminentPainting(viewedId);
+    if (!prominent || prominent.id === viewedId) return;
+    viewedId = prominent.id;
+    showArtworkDetails(prominent);
+  }
+
   function handleModeChange({ mode, art }) {
     const active = mode !== 'closed';
     $('wall-gallery-open').hidden = active;
@@ -56,20 +80,17 @@ export function createWallExhibitionController({ paintings, playerProgress, wall
     $('wall-gallery-navigation').hidden = !active || mode === 'art';
     $('wall-art-back').hidden = mode !== 'art';
     $('wall-art-hover').hidden = true;
-    $('wall-gallery-title').textContent = mode === 'art' ? art.title : 'Стена восстановленных картин';
-    $('wall-gallery-caption').textContent = mode === 'art'
-      ? `${art.columnLabel} · ${art.artist} · ${art.year}${showingDemo ? ' · демо' : ''}`
-      : showingDemo ? '12 вертикальных колонок · 30 случайных работ · листайте влево и вправо'
+    viewedId = null;
+    lastAutoPickAt = -Infinity;
+    if (mode === 'art') {
+      showArtworkDetails(art);
+    } else {
+      $('wall-gallery-title').textContent = 'Стена восстановленных картин';
+      $('wall-gallery-caption').textContent = showingDemo
+        ? '12 вертикальных колонок · 30 случайных работ · листайте влево и вправо'
         : playerProgress.getWallIds().length ? '12 направлений · листайте колонки и выбирайте картину'
           : '12 тематических колонок ждут ваших отреставрированных картин';
-    $('wall-art-lore').hidden = mode !== 'art';
-    if (mode === 'art') {
-      const lore = getPaintingLore(art.id);
-      $('wall-art-description').textContent = lore?.description || '';
-      const labels = getPaintingLoreLabels();
-      $('wall-art-ban-label').textContent = labels.banned;
-      $('wall-art-ban-reason').textContent = lore?.banReason || '';
-      $('wall-art-policy').textContent = labels.policy;
+      $('wall-art-lore').hidden = true;
     }
     if (mode === 'art') void wallGallery.showHighResolution(art.id);
     else wallGallery.clearFocus();
@@ -110,5 +131,5 @@ export function createWallExhibitionController({ paintings, playerProgress, wall
   }
 
   return { bind, refresh, toggleWall, onNewRestoration,
-    handleModeChange, updateCounters, refreshAfterWallChange };
+    handleModeChange, updateViewedArtwork, updateCounters, refreshAfterWallChange };
 }

@@ -143,8 +143,16 @@ test('wall creates real framed meshes and allows selecting a mixed-size image', 
     scene.updateMatrixWorld(true);
     camera.updateMatrixWorld(true);
     assert.equal(wall.hitTest({ clientX: 400, clientY: 400 })?.id, 'one');
+    assert.equal(wall.getProminentPainting()?.id, 'one',
+      'the picture at the camera center is selected without clicking');
+    const second = wall.getPlacement('two');
+    camera.position.set(second.x, second.y, 1);
+    camera.lookAt(second.x, second.y, -4.3);
+    assert.equal(wall.getProminentPainting()?.id, 'two',
+      'the selected picture follows camera movement rather than a stale click');
     await wall.setPaintings([]);
     assert.equal(wall.paintingsRoot.children.length, 0);
+    assert.equal(wall.getProminentPainting(), null);
     assert.equal(wall.root.children.length, 2, 'category labels remain after removing the art');
   } finally {
     globalThis.Image = originalImage;

@@ -1,0 +1,51 @@
+{
+  "id": "restoration",
+  "title": "Ателье цвета",
+  "engine": "three",
+  "threeVersion": "0.187.0",
+  "status": "standalone",
+  "source": "ChatGPT Sites",
+  "sourceCommit": "2d91f8f0860d895f5dae44da769790fdb4b0143a",
+  "savedOn": "2026-11-16",
+  "liveUrl": "https://atelier-restoration-1115.k1r11111.chatgpt.site",
+  "entry": "index.html",
+  "development": "npm run dev",
+  "tests": "npm test",
+  "build": "npm run build",
+  "gallery": {
+    "placement": "high_wall_above_easels",
+    "capacity": 30,
+    "layout": "12-large-vertical-art-direction-columns",
+    "selection": "fully_restored_favorites",
+    "persistence": "localStorage",
+    "demo": {
+      "enabledByDefault": true,
+      "randomCount": 30,
+      "mutatesProgress": false,
+      "representAllColumns": true
+    },
+    "wallHeightReductionPercent": 30,
+    "framesDistanceFromWallMeters": 0.045,
+    "navigation": "unified-camera-modes-viewport-framing-queued-horizontal-pan-auto-easel-return",
+    "wallWidthMeters": 30,
+    "columnCount": 12,
+    "maxCameraDistance": "viewport-dependent-1.18x-overview",
+    "autoSwitchToEasels": true
+  },
+  "integration": {
+    "target": "KEYNLOCK",
+    "status": "shared-rendering-partial",
+    "sharedModule": "js/3d/core/rendering/background-blur.js",
+    "host": "js/3d"
+  },
+  "architecture": {
+    "cameraModules": [
+      "navigation/camera-framing.js",
+      "navigation/camera-transition.js",
+      "navigation/easel-overlay.js"
+    ],
+    "stylesheets": 8,
+    "tests": 28,
+    "mainFileLines": 314
+  }
+}

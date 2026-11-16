@@ -1,6 +1,7 @@
 // The room is blurred separately, then the entire real scene is captured for
 // a final refractive lens pass. Glass samples what is actually BEHIND it:
 // shelves, supports, other bottles, and liquid, not just the wall texture.
+import { ROOM_BLUR_GLSL } from '../../../core/rendering/background-blur.js';
 export function createBackgroundEffects(THREE, renderer, backgroundScene) {
   const roomTarget = new THREE.WebGLRenderTarget(1, 1, {
     minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,
@@ -29,19 +30,9 @@ export function createBackgroundEffects(THREE, renderer, backgroundScene) {
       uniform vec2 uPixel;
       uniform float uBlur;
       varying vec2 vUv;
+      ${ROOM_BLUR_GLSL}
       void main() {
-        vec4 center = texture2D(tRoom, vUv);
-        vec2 offset = uPixel * (2.15 * uBlur);
-        vec4 softened = center * .32;
-        softened += texture2D(tRoom, vUv + vec2(offset.x, 0.0)) * .12;
-        softened += texture2D(tRoom, vUv - vec2(offset.x, 0.0)) * .12;
-        softened += texture2D(tRoom, vUv + vec2(0.0, offset.y)) * .12;
-        softened += texture2D(tRoom, vUv - vec2(0.0, offset.y)) * .12;
-        softened += texture2D(tRoom, vUv + offset) * .05;
-        softened += texture2D(tRoom, vUv - offset) * .05;
-        softened += texture2D(tRoom, vUv + vec2(offset.x, -offset.y)) * .05;
-        softened += texture2D(tRoom, vUv + vec2(-offset.x, offset.y)) * .05;
-        gl_FragColor = mix(center, softened, .86 * uBlur);
+        gl_FragColor = keynlockRoomBlur(tRoom, vUv, uPixel, uBlur);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }`

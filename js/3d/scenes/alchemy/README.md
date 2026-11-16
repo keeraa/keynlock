@@ -17,3 +17,5 @@ The module source was recovered from the live deployment; its existing ES module
 
 The shared `js/3d/core/rendering/painted-texture.js` prepares the painting canvas and texture. The alchemy-specific pigment palette, toon effect and geometric outlines remain in `src/visuals.js`. The build includes an independent copy at `dist/shared/painted-texture.js` for standalone hosting.
 
+`src/background-effects.js` uses the shared `core/rendering/background-blur.js` room kernel. Its existing static-room render cache and refractive glass shader remain in the scene; the build copies the module into `dist/shared/`.
+

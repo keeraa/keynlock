@@ -8,7 +8,7 @@
 | Замки | [Лаборатория замков](https://keynlock-pin-lab-1114.k1r11111.chatgpt.site/) | [`scenes/locks/`](scenes/locks/) | Модульная сцена и сохранённая версия лаборатории |
 | Алхимия | [Алхимический стол](https://keynlock-alchemy-lab-1115.k1r11111.chatgpt.site/) | [`scenes/alchemy/`](scenes/alchemy/) | Модульная сцена и сохранённая версия лаборатории |
 | Реставрация | [Мастерская реставрации](https://atelier-restoration-1115.k1r11111.chatgpt.site/) | [`scenes/restoration/`](scenes/restoration/) | Исходники добавлены в `main`; интеграция общих эффектов частичная |
-| Верстак | [Верстак и обработка ключей](https://keynlock-workbench-1116.k1r11111.chatgpt.site/) | — | Отдельный опубликованный прототип; исходники пока не внесены в `main` |
+| Верстак | [Верстак и обработка ключей](https://keynlock-workbench-1116.k1r11111.chatgpt.site/) | — | **Выпиливание ключа — предварительно готово**; сборка — прототип. [Статус и план](../../docs/3d-workbench-roadmap.md). Исходники пока не внесены в `main` |
 | Город | [Карта города](https://keynlock-world-map-1115.k1r11111.chatgpt.site/) | — | Отдельный опубликованный прототип; исходники пока не внесены в `main` |
 
 Общие 3D-модули: [`core/`](core/) и [`shared/`](shared/).

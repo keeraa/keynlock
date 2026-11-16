@@ -5,7 +5,7 @@
   "threeVersion": "0.187.0",
   "status": "standalone",
   "source": "ChatGPT Sites",
-  "sourceCommit": "2d426f82723fbc278cdeb8281afb224f9d21832f",
+  "sourceCommit": "5c6585a1399b5195715c25fddba067f6032a3baf",
   "savedOn": "2026-11-16",
   "liveUrl": "https://atelier-restoration-1115.k1r11111.chatgpt.site",
   "entry": "index.html",
@@ -48,15 +48,17 @@
       "policy": "Мы сделаем вас счастливыми",
       "agency": "Палата Образов",
       "displayLayout": "under-artwork-title-left",
-      "specificBansRevised": 9,
+      "specificBansRevised": 10,
       "typography": {
         "description": "larger-unframed-text",
         "artistYear": "enlarged",
         "ban": "red-plaque"
       },
       "revisedPaintings": [
-        "mucha-dance"
-      ]
+        "mucha-dance",
+        "dream-flight-bee"
+      ],
+      "descriptionColumnWidthPercentOfPrevious": 70
     }
   },
   "integration": {

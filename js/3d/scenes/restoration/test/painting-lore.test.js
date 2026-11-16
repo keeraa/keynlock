@@ -23,6 +23,7 @@ test('censorship allegations match the four agreed examples', () => {
   assert.equal(getPaintingLore('creation-of-adam').banReason, 'Пропаганда эротики.');
   assert.equal(getPaintingLore('galaxy-musicians').banReason, 'Пропаганда праздности.');
   assert.equal(getPaintingLore('mucha-dance').banReason, 'Пропаганда оргий и эротики. Танец перед групповым соитием.');
+  assert.match(getPaintingLore('dream-flight-bee').banReason, /Пропаганда эротики/);
 });
 
 test('locale API retains Russian fallback and localized UI badge labels', () => {
@@ -67,4 +68,5 @@ test('focused wall artwork uses plain large captions and a distinct red prohibit
   assert.match(loreStyles, /font:\s*500 15px\/1\.6/);
   assert.match(loreStyles, /\.wall-art-ban\s*\{[^}]*background:\s*#7f2a28ef/);
   assert.match(css, /\.wall-gallery-heading > small\s*\{[^}]*14px/);
+  assert.match(css, /\.wall-gallery-heading\s*\{[^}]*width:\s*min\(294px,\s*25\.9vw\)/);
 });

@@ -45,7 +45,37 @@ assert.ok(archedWindow.max.x - archedWindow.min.x > 8.20, 'new window is twice a
 assert.ok(archedWindow.max.y - archedWindow.min.y > 7.20, 'new window is twice as tall');
 assert.ok(unique('main-arched-window-frame').geometry.type === 'TubeGeometry', 'arched frame follows the curved upper edge');
 assert.ok(unique('main-arched-window-glass').geometry.type === 'ShapeGeometry', 'glass fits inside the arch');
+assert.equal(unique('main-arched-window-glass').material.transparent, true, 'the exterior is visible through the glazing');
 assert.equal(unique('main-arched-window-sill').geometry.userData.paintedWoodUV, true, 'wood uses physical-scale UV mapping');
+const wall = unique('back-wall-arched-cutout');
+assert.equal(wall.geometry.type, 'ExtrudeGeometry', 'the masonry has a dimensional arched reveal');
+const openingRay = new THREE.Raycaster(new THREE.Vector3(0, 5.6, 0), new THREE.Vector3(0, 0, -1));
+assert.equal(openingRay.intersectObject(wall).length, 0, 'the window opening is actually open');
+const masonryRay = new THREE.Raycaster(new THREE.Vector3(6, 5.6, 0), new THREE.Vector3(0, 0, -1));
+assert.ok(masonryRay.intersectObject(wall).length > 0, 'the plaster remains solid beside the window');
+const roomWindow = unique('main-arched-window');
+assert.ok(roomWindow.position.z < -5.55, 'the window frame is recessed into the masonry');
+const distant = unique('city-distant-panorama');
+const middle = unique('city-middle-rooftops');
+const near = unique('city-near-canalside');
+assert.ok(distant.position.z < middle.position.z && middle.position.z < near.position.z, 'three exterior depth planes create real orbit parallax');
+assert.ok(near.position.z < roomWindow.position.z - 2, 'nearest buildings remain outside the room');
+const hangingCloths = [];
+for (const side of ['left', 'right']) {
+  const curtain = unique(`window-curtain-${side}`);
+  assert.ok(curtain.geometry.getAttribute('position').count > 1200, 'linen is a subdivided cloth mesh');
+  assert.ok(curtain.material.isMeshPhysicalMaterial && curtain.material.sheen > 0, 'linen reacts to physical lighting');
+  assert.equal(curtain.userData.windAnimated, true, 'curtain is registered for wind animation');
+  const positions = curtain.geometry.getAttribute('position');
+  const topBefore = positions.getZ(0);
+  const hemBefore = Array.from({ length: 29 }, (_, i) => positions.getZ(positions.count - 29 + i));
+  hangingCloths.push({ positions, topBefore, hemBefore });
+}
+world.animated.forEach(update => update(2.9));
+for (const { positions, topBefore, hemBefore } of hangingCloths) {
+  assert.equal(positions.getZ(0), topBefore, 'the upper seam remains fixed');
+  assert.ok(hemBefore.some((value, i) => Math.abs(positions.getZ(positions.count - 29 + i) - value) > .01), 'wind moves the free hem');
+}
 assert.ok(workbench.min.z > alchemyTable.max.z + 1.0, 'workbench is separated to the right of alchemy');
 assert.ok(workbench.max.x < alchemyWall.min.x, 'workbench does not enter the tile wall');
 assert.ok(unique('workbench-tool-wall').position.z > 3.5, 'tool wall moved with the workbench');

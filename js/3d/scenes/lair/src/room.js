@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { canvasTexture, makeCityWindowTexture, makeMapTexture } from './materials.js';
+import { canvasTexture, makeCityWindowTexture, makeCityDepthTexture, makeCurtainLinenTexture, makeMapTexture } from './materials.js';
 
 /** A single continuous room, using the proportions and gouache materials of the existing ateliers. */
 export function buildLair(scene, m) {
@@ -96,7 +96,41 @@ export function buildLair(scene, m) {
       if (i % 5 === 0) box(staticGroup, 17.1, .006, .009, m.darkWood, 0, .045, z - .155).castShadow = false;
     }
     // Double-height room, measured from the same floor datum as the original.
-    box(staticGroup, 17.4, 13.8, .27, m.plaster, 0, 6.76, -5.62).castShadow = false;
+    // The arched opening runs all the way through the plaster. A solid box
+    // would occlude any exterior scenery and leave the glass looking painted on.
+    const backOutline = new THREE.Shape();
+    backOutline.moveTo(-8.7, -.14);
+    backOutline.lineTo(8.7, -.14);
+    backOutline.lineTo(8.7, 13.66);
+    backOutline.lineTo(-8.7, 13.66);
+    backOutline.closePath();
+    const opening = new THREE.Path();
+    const openingX = -.05, openingHalf = 4.23, openingBottom = 2.13;
+    const openingSpring = 7.43, openingRise = 2.15;
+    opening.moveTo(openingX - openingHalf, openingBottom);
+    opening.lineTo(openingX - openingHalf, openingSpring);
+    for (let i = 1; i <= 64; i++) {
+      const angle = Math.PI - Math.PI * i / 64;
+      opening.lineTo(openingX + openingHalf * Math.cos(angle), openingSpring + openingRise * Math.sin(angle));
+    }
+    opening.lineTo(openingX + openingHalf, openingBottom);
+    opening.closePath();
+    backOutline.holes.push(opening);
+    const wallGeometry = new THREE.ExtrudeGeometry(backOutline, { depth: .27, bevelEnabled: false, curveSegments: 64 });
+    // ExtrudeGeometry uses world-unit cap UVs; normalize so the gouache scale
+    // still matches the original single-piece plaster wall.
+    const wallPosition = wallGeometry.getAttribute('position');
+    const wallUV = wallGeometry.getAttribute('uv');
+    const cap = wallGeometry.groups[0];
+    for (let i = cap.start; i < cap.start + cap.count; i++) {
+      wallUV.setXY(i, (wallPosition.getX(i) + 8.7) / 17.4, (wallPosition.getY(i) + .14) / 13.8);
+    }
+    wallUV.needsUpdate = true;
+    const backWall = new THREE.Mesh(wallGeometry, m.plaster);
+    backWall.name = 'back-wall-arched-cutout';
+    backWall.position.z = -5.755;
+    backWall.receiveShadow = true;
+    staticGroup.add(backWall);
     box(staticGroup, .27, 13.8, 13.0, m.plaster, -8.55, 6.76, .75).castShadow = false;
     box(staticGroup, .27, 13.8, 13.0, m.plaster, 8.55, 6.76, .75).castShadow = false;
     box(staticGroup, 17.5, .20, 13.5, m.darkWood, 0, 13.62, .65).castShadow = false;
@@ -126,7 +160,7 @@ export function buildLair(scene, m) {
     // No timber line across the middle of the double-height room.
     for (const side of [-1, 1]) box(staticGroup, .22, .20, 12.9, m.walnut, side * 8.29, 13.30, .75);
     // Leave the centre of the back wall open for the enlarged arched window.
-    for (const x of [-8.25, -4.25, 4.25, 8.25]) {
+    for (const x of [-8.25, -4.68, 4.68, 8.25]) {
       box(staticGroup, .31, 13.35, .32, m.darkWood, x, 6.64, -5.32);
       box(staticGroup, .45, .22, .48, m.walnut, x, 12.70, -5.31);
     }
@@ -197,10 +231,30 @@ export function buildLair(scene, m) {
   }
 
   function buildWindow() {
-    // Twice the former width and height, with a real elliptical arched outline.
+    // A real recessed opening with three painted exterior planes at different
+    // distances; camera rotation creates parallax through the transparent glass.
+    const exterior = new THREE.Group();
+    exterior.name = 'city-view-parallax';
+    staticGroup.add(exterior);
+    const addCityPlane = (name, texture, width, height, x, y, z, translucent = false) => {
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(width, height), new THREE.MeshBasicMaterial({
+        map: texture, toneMapped: false, fog: false, side: THREE.DoubleSide,
+        transparent: translucent, depthWrite: !translucent,
+      }));
+      mesh.name = name;
+      mesh.position.set(x, y, z);
+      mesh.frustumCulled = true;
+      exterior.add(mesh);
+      return mesh;
+    };
+    addCityPlane('city-distant-panorama', makeCityWindowTexture(), 48, 24, -.05, 5.7, -32);
+    addCityPlane('city-middle-rooftops', makeCityDepthTexture('middle'), 25, 10.5, -.35, 3.6, -17.5, true);
+    addCityPlane('city-near-canalside', makeCityDepthTexture('near'), 14.4, 8.0, -.15, 2.05, -9.4, true);
+
     const window = new THREE.Group();
     window.name = 'main-arched-window';
-    window.position.set(-.05, 2.23, -5.12);
+    // Timber sits within the 27 cm masonry, behind its front face at z=-5.485.
+    window.position.set(-.05, 2.23, -5.65);
     staticGroup.add(window);
     const halfWidth = 4.15, straightHeight = 5.20, archRise = 2.10;
     const archProfile = (half, spring, rise, base = 0) => {
@@ -215,19 +269,15 @@ export function buildLair(scene, m) {
       shape.closePath();
       return shape;
     };
-    const cityTex = makeCityWindowTexture();
     const glassShape = archProfile(halfWidth - .18, straightHeight - .05, archRise - .16, .08);
     const glassGeometry = new THREE.ShapeGeometry(glassShape, 64);
-    const glassPositions = glassGeometry.getAttribute('position');
-    const uv = glassGeometry.getAttribute('uv');
-    for (let i = 0; i < uv.count; i++) uv.setXY(i,
-      (glassPositions.getX(i) + halfWidth) / (halfWidth * 2),
-      glassPositions.getY(i) / (straightHeight + archRise));
     const glass = new THREE.Mesh(glassGeometry,
-      new THREE.MeshBasicMaterial({ map: cityTex, toneMapped: false, side: THREE.DoubleSide }));
+      new THREE.MeshPhysicalMaterial({ color: '#c7d7d0', roughness: .17, metalness: .04,
+        clearcoat: .45, clearcoatRoughness: .12, transparent: true, opacity: .10,
+        depthWrite: false, side: THREE.DoubleSide }));
     glass.name = 'main-arched-window-glass';
-    glass.position.z = .06;
-    glass.receiveShadow = true;
+    glass.position.z = -.055;
+    glass.castShadow = false;
     window.add(glass);
 
     const makeArchTrim = (half, spring, rise, radius, material, z) => {
@@ -263,14 +313,53 @@ export function buildLair(scene, m) {
       box(window, .115, roof - .08, .13, m.darkWood, x, (roof + .08) / 2, .25);
     }
     for (const y of [2.68, straightHeight - .04]) box(window, 7.94, .11, .14, m.darkWood, 0, y, .24);
-    // Curtain folds follow the tall straight jambs, leaving the arch exposed.
+    // Dense woven linen with actual pleated geometry. The fixed top edge is
+    // suspended from brass rings, while the lower folds answer to the wind.
+    const curtainMap = makeCurtainLinenTexture();
+    const curtainMaterial = new THREE.MeshPhysicalMaterial({
+      map: curtainMap, color: '#d6e0d7', roughness: .91, metalness: 0,
+      sheen: .6, sheenColor: '#b6cbc5', sheenRoughness: .9,
+      side: THREE.DoubleSide,
+    });
     for (const sign of [-1, 1]) {
-      const curtain = new THREE.Group(); curtain.position.set(sign * 4.01, 2.69, .47); window.add(curtain);
+      const width = .96, height = 5.23;
+      const geometry = new THREE.PlaneGeometry(width, height, 28, 42);
+      const positions = geometry.getAttribute('position');
+      positions.setUsage(THREE.DynamicDrawUsage);
+      const rest = new Float32Array(positions.array);
+      const sideName = sign < 0 ? 'left' : 'right';
+      const cloth = new THREE.Mesh(geometry, curtainMaterial);
+      cloth.name = `window-curtain-${sideName}`;
+      cloth.userData.windAnimated = true;
+      cloth.position.set(sign * 3.78, 2.69, .56);
+      cloth.castShadow = true;
+      cloth.receiveShadow = true;
+      cloth.frustumCulled = false;
+      window.add(cloth);
+      const updateCloth = time => {
+        const phase = time * 1.18 + (sign < 0 ? .35 : 1.9);
+        for (let i = 0; i < positions.count; i++) {
+          const x = rest[i * 3], y = rest[i * 3 + 1];
+          const height01 = THREE.MathUtils.clamp((y + height / 2) / height, 0, 1);
+          const freedom = (1 - height01) ** 1.7; // the sewn upper seam stays fixed
+          const u = (x + width / 2) / width;
+          const pleat = .105 * Math.sin(u * Math.PI * 6.0 + .28 * (1 - height01));
+          const wind = Math.sin(phase + u * 1.8) * .12 + Math.sin(time * .53 + u * 3.8) * .045;
+          positions.setXYZ(i,
+            x * (.81 + .19 * freedom) + sign * freedom * wind,
+            y - freedom * (.018 + .015 * Math.sin(phase + u * 5.0)),
+            pleat + freedom * (.17 * Math.sin(phase * .83 + u * 1.5) + .054 * Math.sin(time * 2.1 + u * 4.0)));
+        }
+        positions.needsUpdate = true;
+        geometry.computeVertexNormals();
+      };
+      updateCloth(0);
+      animated.push(updateCloth);
+      rod(window, [sign * 3.23, 5.37, .55], [sign * 4.29, 5.37, .55], .037, m.oldBrass, 10);
       for (let i = 0; i < 5; i++) {
-        const strip = box(curtain, .15, 5.27 + Math.sin(i * 1.8) * .07, .10, m.slate, sign * (i * .09), 0, Math.sin(i * 2) * .08);
-        strip.rotation.z = sign * .02 * i;
+        sphere(window, .046, m.oldBrass, sign * 3.78 + (i - 2) * .18, 5.29, .64, 10);
       }
-      sphere(window, .115, m.oldBrass, sign * 4.03, 2.26, .67);
+      sphere(window, .10, m.oldBrass, sign * 4.03, 2.26, .69);
     }
     // Broad translucent sunlight falls across the central table.
     const beamMat = new THREE.MeshBasicMaterial({ color: '#f7d3a0', transparent: true, opacity: .036, depthWrite: false, side: THREE.DoubleSide });

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0e171b" />
+  <title>KEYNLOCK — Верстак</title>
+  <link rel="stylesheet" href="./style.css" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./vendor/three.js",
+      "three/core": "./vendor/three-core.js",
+      "three/addons/controls/OrbitControls.js": "./vendor/OrbitControls.js",
+      "three/addons/geometries/RoundedBoxGeometry.js": "./vendor/RoundedBoxGeometry.js"
+    }
+  }
+  </script>
+</head>
+<body>
+  <main class="app">
+    <canvas id="scene" aria-label="Интерактивная 3D-мастерская KEYNLOCK"></canvas>
+
+    <header class="masthead ui">
+      <div class="brand"><span class="mark">K</span><span><b>KEYNLOCK</b><small>МАСТЕРСКАЯ МЕХАНИЗМОВ</small></span></div>
+      <nav class="workspace-tabs" aria-label="Режимы верстака">
+        <button type="button" class="workspace-tab active" data-mode="key" aria-pressed="true"><span>01</span> Выпиливание ключа</button>
+        <button type="button" class="workspace-tab" data-mode="assembly" aria-pressed="false"><span>02</span> Штифтовый механизм</button>
+      </nav>
+      <div class="scene-stats"><span id="fps">—</span> FPS <i></i> THREE.JS r187</div>
+    </header>
+
+    <div class="scene-label ui"><span class="index" id="sceneIndex">01 / 02</span><h1 id="sceneTitle">Изготовление ключа</h1><p id="sceneDescription">Заготовка зажата в тисках. Выпилите четыре паза по чертежу.</p></div>
+
+    <aside class="side-panel ui" aria-label="Панель верстака">
+      <div id="keyPanel" class="panel-screen">
+        <div class="eyebrow" id="blankNo">ЗАГОТОВКА № 001 · ЛАТУНЬ</div>
+        <h2>Нарезка профиля</h2>
+        <p id="keyToolInstruction">Зубцы направлены вниз. Ведите середину насечки под ключом: стержень уходит за него. ЛКМ + движение вдоль оси — пилить; Q / E — поворот.</p>
+        <div class="difficulty-control">
+          <span>СЛОЖНОСТЬ · ЧИСЛО ПАЗОВ</span>
+          <div class="difficulty-buttons" role="group" aria-label="Сложность изготовления ключа">
+            <button type="button" data-cuts="4" aria-pressed="true" class="active">4</button>
+            <button type="button" data-cuts="6" aria-pressed="false">6</button>
+            <button type="button" data-cuts="8" aria-pressed="false">8</button>
+          </div>
+        </div>
+        <div class="key-method-control" role="group" aria-label="Способ изготовления ключа">
+          <button type="button" data-key-method="guided" class="active" aria-pressed="true">По чертежу</button>
+          <button type="button" data-key-method="imprint" aria-pressed="false">По схеме</button>
+          <button type="button" data-key-method="soap" aria-pressed="false">По слепку</button>
+        </div>
+        <div class="file-side-control" id="fileOrientationControl">
+          <span>ПОЛОЖЕНИЕ ЗАГОТОВКИ</span>
+          <div class="file-side-buttons" role="group" aria-label="Положение заготовки при пилении">
+            <button type="button" data-file-orientation="bottom" aria-pressed="true" class="active">Зубцы вниз ↓</button>
+            <button type="button" data-file-orientation="top" aria-pressed="false">Зубцы вверх ↑</button>
+          </div>
+        </div>
+        <div class="section-heading"><span>Зубцы ключа</span><small id="cutCaption">ФАКТ / ЧЕРТЁЖ</small></div>
+        <div id="cutRows" class="cut-rows"></div>
+        <div class="result-note" id="keyFeedback" role="status">Наведите мышь на паз, затем ведите напильник с зажатой ЛКМ.</div>
+        <div class="button-stack">
+          <button id="newBlank" class="secondary">Новая заготовка <span>↻</span></button>
+          <button id="inspectKey" class="primary">Проверить профиль <span>→</span></button>
+        </div>
+        <div class="soft-note" id="filingNote">На 95% паз автоматически совпадает с чертежом. Дальнейшие движения углубляют его: можно перепилить ключ насквозь.</div>
+        <div class="soft-note" id="difficultyNote" hidden></div>
+      </div>
+
+      <div id="assemblyPanel" class="panel-screen" hidden>
+        <div class="eyebrow">СХЕМА · ШТИФТОВЫЙ ЦИЛИНДР</div>
+        <h2>Сборка механизма</h2>
+        <p>Соберите замок по единому контурному чертежу. Группы деталей можно выбирать в любом порядке.</p>
+        <div class="manual-card">
+          <div class="manual-top"><span>СХЕМА СБОРКИ · ИЗОМЕТРИЯ</span><b>01 / 01</b></div>
+          <div id="manualIllustration" class="manual-illustration" aria-label="Иллюстрация текущего шага сборки"></div>
+          <p id="manualInstruction">Порядок штифтов показан римскими цифрами на общем чертеже.</p>
+          <div class="parts-filter-label">ДЕТАЛИ НА СТОЛЕ</div>
+          <div id="partsFilter" class="parts-filter" role="group" aria-label="Группы деталей для свободной сборки"></div>
+        </div>
+        <div class="assembly-metrics">
+          <span>УСТАНОВЛЕНО ДЕТАЛЕЙ</span><strong id="assemblyCount">0 / 13</strong>
+        </div>
+        <div class="part-selection" id="partSelection">
+          <span id="partSelectionLabel">Деталь не выбрана</span>
+          <button id="removeSelected" class="secondary" type="button" disabled>Снять деталь ↶</button>
+        </div>
+        <div class="result-note" id="assemblyFeedback" role="status">Выберите деталь в лотке, затем её гнездо на механизме.</div>
+        <div class="button-stack">
+          <button id="resetAssembly" class="secondary">Разобрать заново <span>↻</span></button>
+          <button id="runTest" class="primary">Испытать механизм <span>▶</span></button>
+        </div>
+        <div class="soft-note">Установленную деталь можно перетащить обратно в лоток, снять кнопкой или клавишей Delete. Верхние запирающие штифты уже находятся в корпусе.</div>
+      </div>
+    </aside>
+
+    <div class="workbench-hint ui" id="workbenchHint" aria-label="Подсказка по выпиливанию">
+      <span><span class="workbench-cursor" aria-hidden="true">↖</span> Наведите указатель на участок заготовки</span>
+      <span class="workbench-hint-separator" aria-hidden="true"></span>
+      <span><kbd>Пробел</kbd> — пилить</span>
+    </div>
+
+    <div class="toast ui" id="toast" role="status" aria-live="polite"></div>
+  </main>
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>

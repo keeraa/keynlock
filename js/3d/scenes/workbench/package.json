@@ -1,0 +1,11 @@
+{
+  "name": "keynlock-workbench",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "check": "npm test && node --check public/js/main.js && node --check public/js/scene.js && node --check public/js/manual.js",
+    "build": "node scripts/build.mjs"
+  }
+}

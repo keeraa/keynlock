@@ -16,6 +16,8 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
   let stageWidth = 0, stageHeight = 0;
   const originalLabel = document.querySelector('.label-original');
   const copyLabel = document.querySelector('.label-copy');
+  // #scene hosts the WebGL canvas; overlay labels belong to its parent .stage.
+  const stageShell = stage.closest?.('.stage') || stage;
   const labelProjection = new THREE.Vector3();
 
   Object.assign(labelLayer.style, { inset: '0', width: 'auto' });
@@ -190,7 +192,7 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
     controls.enableRotate = false;
     controls.enablePan = true;
     if (controls.mouseButtons) controls.mouseButtons.LEFT = THREE.MOUSE.PAN;
-    stage.classList.add('wall-gallery-active');
+    stageShell.classList.add('wall-gallery-active');
     wallOverviewPose = wallOverviewDestination();
     onWallChange({ mode: 'overview' });
     flyCamera(wallOverviewPose, 1350);
@@ -223,7 +225,6 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
     wallMode = false;
     wallFocusedId = null;
     wallArtwork = null;
-    stage.classList.remove('wall-gallery-active');
     onWallChange({ mode: 'closed' });
     const destination = wallOriginPose || {
       position: new THREE.Vector3(0, paintingCenterY + .4, overviewDistance()),
@@ -248,8 +249,11 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
       controls.target.copy(destination.target);
       controls.enabled = true;
       restore();
+      stageShell.classList.remove('wall-gallery-active');
     } else {
-      flyCamera(destination, 1250);
+      flyCamera(destination, 1250, () => {
+        if (!wallMode) stageShell.classList.remove('wall-gallery-active');
+      });
       // The camera stays interpolated with controls disabled. Restoring limits
       // now also makes a rapid gallery re-entry safe.
       restore();

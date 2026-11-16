@@ -87,11 +87,18 @@ test('gallery camera rises to the wall, focuses a painting and returns without a
   const previousResizeObserver = globalThis.ResizeObserver;
   const nodes = new Map();
   const node = (id) => {
-    if (!nodes.has(id)) nodes.set(id, {
-      style: {}, hidden: false, textContent: '',
-      classList: { add() {}, remove() {} },
-      setAttribute() {}, addEventListener() {},
-    });
+    if (!nodes.has(id)) {
+      const classes = new Set();
+      nodes.set(id, {
+        style: {}, hidden: false, textContent: '',
+        classList: {
+          add(value) { classes.add(value); },
+          remove(value) { classes.delete(value); },
+          contains(value) { return classes.has(value); },
+        },
+        setAttribute() {}, addEventListener() {},
+      });
+    }
     return nodes.get(id);
   };
   globalThis.document = { querySelector: node };
@@ -109,9 +116,13 @@ test('gallery camera rises to the wall, focuses a painting and returns without a
     const stage = node('.stage');
     stage.clientWidth = 1400;
     stage.clientHeight = 850;
+    const sceneHost = node('#scene');
+    sceneHost.clientWidth = 1400;
+    sceneHost.clientHeight = 850;
+    sceneHost.closest = () => stage;
     const changes = [];
     const nav = createSceneNavigation({
-      THREE, camera, controls, renderer: { setSize() {} }, stage, easelX: 1.28,
+      THREE, camera, controls, renderer: { setSize() {} }, stage: sceneHost, easelX: 1.28,
       cartoonFilter: { resize() {} }, labelLayer: node('.painting-labels'),
       getTexture: () => ({ image: { width: 1200, height: 900 } }),
       getTool: () => null, clearUV() {}, damageHint: node('#damage-hint'),
@@ -121,6 +132,7 @@ test('gallery camera rises to the wall, focuses a painting and returns without a
     const start = camera.position.clone();
     const now = performance.now();
     nav.enterWallGallery({ minY: 7.2, maxY: 17.25, width: 14.6 });
+    assert.ok(stage.classList.contains('wall-gallery-active'), 'easel overlays hide on the real stage');
     assert.ok(camera.position.distanceTo(start) < 1e-6, 'begin ascent without a snap');
     nav.animate(now + 1800);
     assert.ok(camera.position.y > 11, 'camera rises above the easels');
@@ -135,7 +147,9 @@ test('gallery camera rises to the wall, focuses a painting and returns without a
     nav.animate(now + 4800);
     assert.equal(nav.focusedWallId(), null);
     nav.leaveWallGallery();
+    assert.ok(stage.classList.contains('wall-gallery-active'), 'labels stay hidden on the way down');
     nav.animate(now + 6500);
+    assert.equal(stage.classList.contains('wall-gallery-active'), false, 'labels return at the easels');
     assert.ok(camera.position.distanceTo(start) < .03, 'return to original workshop camera');
     assert.equal(controls.minPolarAngle, 1.23);
     assert.equal(controls.mouseButtons.LEFT, THREE.MOUSE.ROTATE);

@@ -2150,7 +2150,7 @@ body {
 .wall-gallery-heading { display: flex; flex-direction: column; gap: 5px; max-width: 45%; text-shadow: 0 2px 17px #21160d; }
 .wall-gallery-heading strong { font: 500 clamp(27px,3vw,44px)/1 'Cormorant Garamond',Georgia,serif; color: #fff0d3; }
 .wall-gallery-heading small { font: 11px/1.5 Manrope,sans-serif; color: #e1d3ba; }
-.wall-gallery-actions { display: flex; align-items: center; gap: 10px; pointer-events: auto; }
+.wall-gallery-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; pointer-events: auto; }
 .wall-gallery-actions button, .wall-art-back, .wall-gallery-navigation button {
   border: 1px solid #d6b988a5;
   background: #29241bdc;
@@ -2161,6 +2161,9 @@ body {
   backdrop-filter: blur(9px);
 }
 .wall-gallery-actions button:hover, .wall-art-back:hover, .wall-gallery-navigation button:hover { background: #5c482dec; }
+.wall-gallery-actions button[hidden] { display: none; }
+.wall-gallery-actions #wall-gallery-demo { border-color: #d8af6a; color: #f9d89f; }
+.wall-gallery-actions #wall-gallery-shuffle { border-color: #8d8069; }
 .wall-gallery-actions span { margin-left: 6px; color: #d9c399; }
 .wall-gallery-navigation { position: absolute; z-index: 5; right: 3.6%; bottom: 24px; display: flex; flex-direction: column; gap: 8px; }
 .wall-gallery-navigation button { padding: 10px 17px; font: 24px/1 'Cormorant Garamond',Georgia,serif; }

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createCartoonFilter } from './effects/cartoon-filter.js';
 import { createWallGallery } from './wall-gallery.js';
+import { chooseDemoWallPaintings } from './wall-demo.js';
 import { createWorkshopRoom } from './workshop-room.js';
 import { createArtworkRenderer } from './artwork-renderer.js';
 import { createPaintingTextureCache } from './painting-texture-cache.js';
@@ -46,6 +47,8 @@ const paintings = [
     ...art, short: art.title, category: paintingCategory(art), ...restorationTint(art.id),
   })),
 ];
+let demoWallArtworks = chooseDemoWallPaintings(paintings);
+let showingDemoWall = true;
 
 const woodVariants = [
   { name: 'Охра', image: '/textures/wood-oak-gouache-v2.webp', grade: { contrast: .94, saturation: .71, tint: [-8, -2, 14] } },
@@ -179,7 +182,7 @@ const collectionUI = createPaintingCollectionUI({
     if (!outcome.changed && outcome.reason === 'full') showToast('На стене уже 30 картин. Снимите одну, чтобы повесить другую.');
     if (outcome.changed) {
       updateWallCounters();
-      void refreshWallGallery();
+      if (!showingDemoWall) void refreshWallGallery();
     }
   },
   onSelect: (index) => {
@@ -196,14 +199,18 @@ let wasWorkbenchVisible = null;
 
 function updateWallCounters() {
   const count = playerProgress.getWallIds().length;
-  $('wall-count').textContent = `${count} / 30`;
+  $('wall-count').textContent = showingDemoWall ? `${demoWallArtworks.length} ДЕМО` : `${count} / 30`;
   $('wall-select-count').textContent = `${count}/30`;
   $('collection-wall-count').textContent = `${count}/30`;
+  $('wall-gallery-demo').textContent = showingDemoWall ? 'МОИ КАРТИНЫ' : 'ДЕМО · 30';
+  $('wall-gallery-demo').setAttribute('aria-pressed', String(showingDemoWall));
+  $('wall-gallery-shuffle').hidden = !showingDemoWall;
 }
 
 async function refreshWallGallery() {
   const artById = new Map(paintings.map((art) => [art.id, art]));
-  const selectedArtworks = playerProgress.getWallIds().map((id) => artById.get(id)).filter(Boolean);
+  const selectedArtworks = showingDemoWall ? demoWallArtworks
+    : playerProgress.getWallIds().map((id) => artById.get(id)).filter(Boolean);
   try { await wallGallery.setPaintings(selectedArtworks); }
   catch (error) { console.error('Не удалось обновить стену картин:', error); }
 }
@@ -211,7 +218,7 @@ async function refreshWallGallery() {
 function onNewRestoration(id) {
   if (playerProgress.autoPin(id)) {
     updateWallCounters();
-    void refreshWallGallery();
+    if (!showingDemoWall) void refreshWallGallery();
   }
   collectionUI.refresh();
 }
@@ -224,7 +231,8 @@ function handleWallChange({ mode, art }) {
   $('wall-art-back').hidden = mode !== 'art';
   $('wall-art-hover').hidden = true;
   $('wall-gallery-title').textContent = mode === 'art' ? art.title : 'Стена восстановленных картин';
-  $('wall-gallery-caption').textContent = mode === 'art' ? `${art.artist} · ${art.year}`
+  $('wall-gallery-caption').textContent = mode === 'art' ? `${art.artist} · ${art.year}${showingDemoWall ? ' · демо' : ''}`
+    : showingDemoWall ? 'Демо-экспозиция: 30 случайных произведений · прогресс реставрации не меняется'
     : playerProgress.getWallIds().length ? 'Выберите картину на стене — камера приблизится к ней'
       : 'Очистите полотно и восстановите цвет — готовая работа появится здесь';
   if (mode === 'art') void wallGallery.showHighResolution(art.id);
@@ -289,6 +297,20 @@ workshopUI = wireWorkshopUI({ cartoonFilter, navigation, restorationInput, colle
 $('wall-gallery-open').addEventListener('click', () => navigation.enterWallGallery(wallGallery.getLayout().bounds));
 $('wall-gallery-back').addEventListener('click', () => navigation.leaveWallGallery());
 $('wall-gallery-select').addEventListener('click', () => collectionUI.open('wall'));
+$('wall-gallery-demo').addEventListener('click', () => {
+  showingDemoWall = !showingDemoWall;
+  if (navigation.focusedWallId()) navigation.leaveWallArt();
+  updateWallCounters();
+  if (navigation.isWallGallery()) handleWallChange({ mode: 'overview' });
+  void refreshWallGallery();
+});
+$('wall-gallery-shuffle').addEventListener('click', () => {
+  demoWallArtworks = chooseDemoWallPaintings(paintings);
+  if (navigation.focusedWallId()) navigation.leaveWallArt();
+  updateWallCounters();
+  if (navigation.isWallGallery()) handleWallChange({ mode: 'overview' });
+  void refreshWallGallery();
+});
 $('wall-art-back').addEventListener('click', () => navigation.leaveWallArt());
 $('wall-gallery-up').addEventListener('click', () => navigation.moveAlongWall(1));
 $('wall-gallery-down').addEventListener('click', () => navigation.moveAlongWall(-1));
@@ -459,7 +481,7 @@ $('reset-button').addEventListener('click', () => {
   updateUI();
   updateRestorationStatus();
   playerProgress.save();
-  if (removedFromWall) { updateWallCounters(); void refreshWallGallery(); }
+  if (removedFromWall) { updateWallCounters(); if (!showingDemoWall) void refreshWallGallery(); }
   collectionUI.refresh();
   scheduleSurfaceSave();
 });

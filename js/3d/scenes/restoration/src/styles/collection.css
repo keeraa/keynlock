@@ -1,0 +1,263 @@
+/* The collection is a real, searchable archive, not a row of preloaded textures. */
+.collection-open {
+  background: transparent;
+  border: 0;
+  padding: 12px 8px;
+  color: #dbc5a0;
+  font: 700 10px Manrope, sans-serif;
+  letter-spacing: .16em;
+  text-shadow: 0 2px 12px #181512;
+  white-space: nowrap;
+}
+
+.collection-open:hover {
+  color: #fff1d2;
+}
+
+.collection-open .collection-total {
+  color: #eed3a3;
+  margin-left: 6px;
+}
+
+.collection-footer-button {
+  flex: none;
+  padding: 11px 13px;
+  border: 1px solid #bca883;
+  background: #e7d9bc;
+  color: #614e37;
+  font: 700 9px Manrope, sans-serif;
+  letter-spacing: .06em;
+  white-space: nowrap;
+}
+
+.collection-footer-button:hover {
+  background: #d4be99;
+}
+
+.collection-footer-button span {
+  color: #94744d;
+}
+
+.collection-modal[hidden] {
+  display: none;
+}
+
+.collection-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 18;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.collection-shade {
+  position: absolute;
+  inset: 0;
+  background: #0a1419dc;
+  backdrop-filter: blur(7px);
+}
+
+.collection-dialog {
+  position: relative;
+  width: min(1120px, 96vw);
+  max-height: min(870px, 94dvh);
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  background: #f0e7d7;
+  border: 1px solid #d0b78d;
+  box-shadow: 0 30px 120px #000a;
+  padding: clamp(20px, 3vw, 38px);
+  color: #40372d;
+}
+
+.collection-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.collection-header .section-number {
+  font-size: 10px;
+}
+
+.collection-header h2 {
+  font: 500 clamp(36px, 3.8vw, 58px)/1 'Cormorant Garamond', Georgia, serif;
+  margin: 8px 0 6px;
+}
+
+.collection-header h2 em {
+  font-weight: 400;
+  color: #a07843;
+}
+
+.collection-header p {
+  color: #887b69;
+  font-size: 11px;
+  margin: 0 0 20px;
+}
+
+#collection-close {
+  background: none;
+  border: 0;
+  font: 38px/1 'Cormorant Garamond', serif;
+  color: #6b573e;
+}
+
+#collection-close:hover {
+  color: #2d261b;
+}
+
+.collection-search-label {
+  font: 700 9px Manrope, sans-serif;
+  letter-spacing: .14em;
+  color: #9c825e;
+  margin-bottom: 7px;
+}
+
+.collection-search {
+  width: 100%;
+  flex: none;
+  padding: 13px 15px;
+  border: 1px solid #c5b393;
+  background: #fffaf0;
+  color: #46392b;
+  border-radius: 0;
+  font: 13px Manrope, sans-serif;
+  outline: none;
+}
+
+.collection-search:focus {
+  border-color: #8e6a38;
+  box-shadow: 0 0 0 2px #af8d5b3d;
+}
+
+.collection-filters {
+  display: flex;
+  flex: none;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  gap: 6px;
+  padding: 17px 0 12px;
+}
+
+.collection-filter {
+  flex: none;
+  background: transparent;
+  border: 1px solid #cfbea3;
+  padding: 8px 11px;
+  font: 700 9px Manrope, sans-serif;
+  color: #7b684d;
+  white-space: nowrap;
+}
+
+.collection-filter:hover {
+  background: #e4d5bd;
+}
+
+.collection-filter.active {
+  color: #fff2de;
+  background: #665039;
+  border-color: #665039;
+}
+
+.collection-results {
+  flex: none;
+  font: 700 9px Manrope, sans-serif;
+  color: #9d886d;
+  letter-spacing: .13em;
+  padding: 5px 0 12px;
+}
+
+.collection-grid {
+  min-height: 140px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 13px;
+  padding: 1px 9px 5px 0;
+  align-content: start;
+  scrollbar-width: thin;
+}
+
+.collection-card {
+  border: 1px solid #d6c6ae;
+  background: #f7efe1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 5px;
+  text-align: left;
+  min-width: 0;
+  color: #483c2e;
+}
+
+.collection-card:hover {
+  border-color: #8d6c3f;
+  background: #eee0c8;
+}
+
+.collection-card.current {
+  outline: 2px solid #ad8350;
+}
+
+.collection-card img {
+  height: 150px;
+  width: 100%;
+  object-fit: contain;
+  background: #d9c9ae;
+  font: 10px Manrope,sans-serif;
+}
+
+.collection-card.missing-image img {
+  opacity: .25;
+}
+
+.collection-card div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 9px 4px 7px;
+}
+
+.collection-card strong {
+  font: 600 14px/1.14 'Cormorant Garamond', Georgia, serif;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.collection-card span {
+  font: 9px/1.4 Manrope, sans-serif;
+  color: #88765e;
+}
+
+.collection-empty {
+  grid-column: 1/-1;
+  color: #867259;
+  text-align: center;
+  padding: 32px 0;
+}
+
+.collection-more {
+  margin-top: 12px;
+  align-self: center;
+  border: 1px solid #b59a72;
+  padding: 11px 18px;
+  background: transparent;
+  color: #746041;
+  font: 700 10px Manrope, sans-serif;
+  letter-spacing: .09em;
+}
+
+.collection-more:hover {
+  background: #e2d0b2;
+}
+
+.collection-more[hidden] {
+  display: none;
+}
+

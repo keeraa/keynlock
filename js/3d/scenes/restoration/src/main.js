@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createCartoonFilter } from './effects/cartoon-filter.js';
 import { createWallGallery } from './wall-gallery.js';
-import { chooseDemoWallPaintings } from './wall-demo.js';
+import { createWallExhibitionController } from './wall-exhibition-controller.js';
 import { createWorkshopRoom } from './workshop-room.js';
 import { createArtworkRenderer } from './artwork-renderer.js';
 import { createPaintingTextureCache } from './painting-texture-cache.js';
@@ -12,57 +12,16 @@ import { createRestorationSessions } from './restoration-sessions.js';
 import { createSceneNavigation } from './scene-navigation.js';
 import { createRestorationInput } from './restoration-input.js';
 import { wireWorkshopUI } from './workshop-ui.js';
-import { gradeWoodTexture, applyWoodTexture } from './wood-materials.js';
-import { keynlockPaintings, paintingCategory, restorationTint } from './painting-catalog.js';
+import { featuredPaintings, paintings, woodVariants } from './atelier-config.js';
+import { createWoodStyle } from './wood-style.js';
 import { createPaintingCollectionUI } from './painting-collection-ui.js';
 import { createPerformanceHUD } from './performance-hud.js';
+import { createRestorationFeedback } from './restoration-feedback.js';
 import './style.css';
-
-const featuredPaintings = [
-  {
-    id: 'girl-pearl', category: 'baroque', title: 'Девушка с жемчужной серёжкой', short: 'Девушка с серьгой', artist: 'Ян Вермеер', year: 'около 1665',
-    image: '/paintings/vermeer-girl.jpg', hue: 22, saturation: 0.73, brightness: 1.15,
-  },
-  {
-    id: 'starry-night', category: 'impressionism', title: 'Звёздная ночь', short: 'Звёздная ночь', artist: 'Винсент ван Гог', year: '1889',
-    image: '/paintings/vangogh-starry.jpg', hue: -26, saturation: 1.27, brightness: 0.78,
-  },
-  {
-    id: 'vangogh-self', category: 'impressionism', title: 'Автопортрет', short: 'Автопортрет', artist: 'Винсент ван Гог', year: '1889',
-    image: '/paintings/vangogh-self.jpg', hue: 29, saturation: 0.82, brightness: 0.84,
-  },
-  {
-    id: 'great-wave', category: 'japan', title: 'Большая волна в Канагаве', short: 'Большая волна', artist: 'Кацусика Хокусай', year: 'около 1831',
-    image: '/paintings/hokusai-wave.jpg', hue: -18, saturation: 0.68, brightness: 1.23,
-  },
-  {
-    id: 'mona-lisa', category: 'renaissance', title: 'Мона Лиза', short: 'Мона Лиза', artist: 'Леонардо да Винчи', year: '1503–1519',
-    image: '/paintings/leonardo-mona.jpg', hue: 14, saturation: 1.31, brightness: 0.79,
-  },
-];
-const featuredIds = new Set(featuredPaintings.map((art) => art.id));
-const paintings = [
-  ...featuredPaintings,
-  ...keynlockPaintings.filter((art) => !featuredIds.has(art.id)).map((art) => ({
-    ...art, short: art.title, category: paintingCategory(art), ...restorationTint(art.id),
-  })),
-];
-let demoWallArtworks = chooseDemoWallPaintings(paintings);
-let showingDemoWall = true;
-
-const woodVariants = [
-  { name: 'Охра', image: '/textures/wood-oak-gouache-v2.webp', grade: { contrast: .94, saturation: .71, tint: [-8, -2, 14] } },
-  { name: 'Орех', image: '/textures/wood-walnut-gouache-v2.webp', grade: { contrast: .72, saturation: .91, tint: [0, 2, 4] } },
-  { name: 'Пепел', image: '/textures/wood-ash-gouache-v2.webp' },
-];
-let woodTextures = [];
-const selectedWood = { easel: 1, frame: 1 };
 
 const $ = (id) => document.getElementById(id);
 const stage = $('scene');
 const performanceHUD = createPerformanceHUD({ fpsElement: $('fps-value'), polygonsElement: $('poly-value') });
-const inputs = { hue: $('hue'), saturation: $('saturation'), brightness: $('brightness') };
-const values = { hue: $('hue-value'), saturation: $('saturation-value'), brightness: $('brightness-value') };
 const playerProgress = createPlayerProgress({ paintings });
 const state = playerProgress.state;
 let selected = 0;
@@ -122,33 +81,11 @@ const mats = {
   linen: new THREE.MeshStandardMaterial({ color: '#c6ae89', roughness: 1 }),
   metal: new THREE.MeshStandardMaterial({ color: '#8c7957', metalness: 0.76, roughness: 0.34 }),
 };
-function applyWoodVariant(target, index) {
-  if (!(target in selectedWood) || !woodVariants[index]) return;
-  selectedWood[target] = index;
-  document.querySelectorAll(`.wood-option[data-target="${target}"]`).forEach((button) => {
-    const active = Number(button.dataset.wood) === index;
-    button.classList.toggle('selected', active);
-    button.setAttribute('aria-pressed', String(active));
-  });
-  if (!woodTextures.length) return;
-
-  const texture = woodTextures[index];
-  const woodMats = target === 'easel' ? [
-    [mats.easel, '#e8dfd0'],
-    [mats.easelEdge, '#fff2da'],
-    [mats.deepWood, '#c7b8a3'],
-  ] : [
-    [mats.frameWood, '#e8dfd0'],
-  ];
-  applyWoodTexture(woodMats, texture);
-}
-
-document.querySelectorAll('.wood-option').forEach((button) => {
-  button.addEventListener('click', () => applyWoodVariant(button.dataset.target, Number(button.dataset.wood)));
-});
-
 const framedArtwork = createArtworkRenderer({ THREE, frameWood: mats.frameWood });
 const { dust, makeEasel, wallpaperMaterial, floorWoodMaterials } = createWorkshopRoom({ THREE, scene, mats });
+const textureLoader = new THREE.TextureLoader();
+const woodStyle = createWoodStyle({ THREE, renderer, loader: textureLoader, mats, wallpaperMaterial,
+  floorWoodMaterials, variants: woodVariants });
 const wallGallery = createWallGallery({
   THREE, scene, camera, renderer, frameWood: mats.frameWood,
   onLayout: (layout) => navigation.updateWallLayout(layout),
@@ -160,7 +97,6 @@ const rightEasel = makeEasel(easelX, -.045);
 // Shared Keynlock post-processing: depth/normal outlines and softly stepped light.
 const cartoonFilter = createCartoonFilter({ THREE, renderer, scene, camera });
 
-const textureLoader = new THREE.TextureLoader();
 const paintingTextureCache = createPaintingTextureCache({ THREE, loader: textureLoader, renderer });
 let persistenceWarningShown = false;
 const restorationStore = createRestorationStore({
@@ -173,18 +109,12 @@ const restorationStore = createRestorationStore({
   },
 });
 const restorationSessions = createRestorationSessions({ THREE, store: restorationStore });
+let exhibition;
 const collectionUI = createPaintingCollectionUI({
   paintings,
   isRestored: (id) => playerProgress.isRestored(id),
   getWallIds: () => playerProgress.getWallIds(),
-  onToggleWall: (id) => {
-    const outcome = playerProgress.toggleWall(id);
-    if (!outcome.changed && outcome.reason === 'full') showToast('На стене уже 30 картин. Снимите одну, чтобы повесить другую.');
-    if (outcome.changed) {
-      updateWallCounters();
-      if (!showingDemoWall) void refreshWallGallery();
-    }
-  },
+  onToggleWall: (id) => exhibition.toggleWall(id),
   onSelect: (index) => {
     if (navigation.isWallGallery()) navigation.leaveWallGallery({ immediate: true });
     void showPainting(index);
@@ -195,57 +125,6 @@ let activeSurface = null;
 let paintingRequest = 0;
 let surfaceSaveTimer = null;
 let workshopUI;
-let wasWorkbenchVisible = null;
-
-function updateWallCounters() {
-  const count = playerProgress.getWallIds().length;
-  $('wall-count').textContent = showingDemoWall ? `${demoWallArtworks.length} ДЕМО` : `${count} / 30`;
-  $('wall-select-count').textContent = `${count}/30`;
-  $('collection-wall-count').textContent = `${count}/30`;
-  $('wall-gallery-demo').textContent = showingDemoWall ? 'МОИ КАРТИНЫ' : 'ДЕМО · 30';
-  $('wall-gallery-demo').setAttribute('aria-pressed', String(showingDemoWall));
-  $('wall-gallery-shuffle').hidden = !showingDemoWall;
-}
-
-async function refreshWallGallery() {
-  const artById = new Map(paintings.map((art) => [art.id, art]));
-  const selectedArtworks = showingDemoWall ? demoWallArtworks
-    : playerProgress.getWallIds().map((id) => artById.get(id)).filter(Boolean);
-  try { await wallGallery.setPaintings(selectedArtworks); }
-  catch (error) { console.error('Не удалось обновить стену картин:', error); }
-}
-
-function onNewRestoration(id) {
-  if (playerProgress.autoPin(id)) {
-    updateWallCounters();
-    if (!showingDemoWall) void refreshWallGallery();
-  }
-  collectionUI.refresh();
-}
-
-function handleWallChange({ mode, art }) {
-  const active = mode !== 'closed';
-  $('wall-gallery-open').hidden = active;
-  $('wall-gallery-toolbar').hidden = !active;
-  $('wall-gallery-navigation').hidden = !active || mode === 'art';
-  $('wall-art-back').hidden = mode !== 'art';
-  $('wall-art-hover').hidden = true;
-  $('wall-gallery-title').textContent = mode === 'art' ? art.title : 'Стена восстановленных картин';
-  $('wall-gallery-caption').textContent = mode === 'art'
-    ? `${art.columnLabel} · ${art.artist} · ${art.year}${showingDemoWall ? ' · демо' : ''}`
-    : showingDemoWall ? '12 вертикальных колонок · 30 случайных работ · листайте влево и вправо'
-    : playerProgress.getWallIds().length ? '12 направлений · листайте колонки и выбирайте картину'
-      : '12 тематических колонок ждут ваших отреставрированных картин';
-  if (mode === 'art') void wallGallery.showHighResolution(art.id);
-  else wallGallery.clearFocus();
-  if (active && wasWorkbenchVisible === null) {
-    wasWorkbenchVisible = workshopUI?.isWorkbenchVisible() ?? true;
-    workshopUI?.setWorkbenchVisible(false);
-  } else if (!active && wasWorkbenchVisible !== null) {
-    workshopUI?.setWorkbenchVisible(wasWorkbenchVisible);
-    wasWorkbenchVisible = null;
-  }
-}
 
 function scheduleSurfaceSave(delay = 250) {
   clearTimeout(surfaceSaveTimer);
@@ -264,20 +143,21 @@ function flushSurfaceSave() {
 }
 
 let restorationInput;
+let restorationFeedback;
 const navigation = createSceneNavigation({
   THREE, camera, controls, renderer, stage, easelX, cartoonFilter, labelLayer,
   getTexture: () => activeTexture,
   getTool: () => restorationInput?.currentTool(),
   clearUV: () => restorationInput?.clearUV(),
-  onWallChange: handleWallChange,
+  onWallChange: (event) => exhibition?.handleModeChange(event),
   damageHint: $('damage-hint'), $,
 });
 restorationInput = createRestorationInput({
   THREE, renderer, camera, controls, scene, stage, leftEasel, rightEasel, navigation,
   getTexture: () => activeTexture, getSurface: () => activeSurface,
-  onStrokeFinished: () => { updateRestorationStatus(true); scheduleSurfaceSave(); },
-  onStrokeProgress: () => updateRestorationStatus(),
-  onToolChanged: () => updateRestorationStatus(),
+  onStrokeFinished: () => { restorationFeedback.updateRestorationStatus(true); scheduleSurfaceSave(); },
+  onStrokeProgress: () => restorationFeedback.updateRestorationStatus(),
+  onToolChanged: () => restorationFeedback.updateRestorationStatus(),
   getWallArtworkHit: (event) => wallGallery.hitTest(event),
   onWallArtworkClick: (art) => navigation.focusWallArt(art),
   onWallArtworkHover: (art, event) => {
@@ -295,116 +175,23 @@ restorationInput = createRestorationInput({
   $,
 });
 workshopUI = wireWorkshopUI({ cartoonFilter, navigation, restorationInput, collectionUI, $ });
-$('wall-gallery-open').addEventListener('click', () => navigation.enterWallGallery(wallGallery.getLayout().bounds));
-$('wall-gallery-back').addEventListener('click', () => navigation.leaveWallGallery());
-$('wall-gallery-select').addEventListener('click', () => collectionUI.open('wall'));
-$('wall-gallery-demo').addEventListener('click', () => {
-  showingDemoWall = !showingDemoWall;
-  if (navigation.focusedWallId()) navigation.leaveWallArt();
-  updateWallCounters();
-  if (navigation.isWallGallery()) handleWallChange({ mode: 'overview' });
-  void refreshWallGallery();
-});
-$('wall-gallery-shuffle').addEventListener('click', () => {
-  demoWallArtworks = chooseDemoWallPaintings(paintings);
-  if (navigation.focusedWallId()) navigation.leaveWallArt();
-  updateWallCounters();
-  if (navigation.isWallGallery()) handleWallChange({ mode: 'overview' });
-  void refreshWallGallery();
-});
-$('wall-art-back').addEventListener('click', () => navigation.leaveWallArt());
-$('wall-gallery-next').addEventListener('click', () => navigation.moveAlongWall(1));
-$('wall-gallery-prev').addEventListener('click', () => navigation.moveAlongWall(-1));
-updateWallCounters();
+exhibition = createWallExhibitionController({ paintings, playerProgress, wallGallery, collectionUI,
+  getNavigation: () => navigation, getWorkshopUI: () => workshopUI, showToast, $ });
+exhibition.bind();
+restorationFeedback = createRestorationFeedback({ paintings, getSelectedIndex: () => selected,
+  getSurface: () => activeSurface, getCopyMaterial: () => copyMaterial,
+  getCurrentTool: () => restorationInput.currentTool(), playerProgress,
+  onRestorationComplete: (id) => exhibition.onNewRestoration(id), showToast, $ });
+restorationFeedback.bindControls();
 window.addEventListener('pagehide', flushSurfaceSave);
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') flushSurfaceSave();
 });
-function playerSettings() {
-  return state[selected];
-}
-
-function updateDamageShader() {
-  if (!copyMaterial) return;
-  const art = paintings[selected], player = playerSettings();
-  copyMaterial.uniforms.uHue.value = art.hue + player.hue;
-  copyMaterial.uniforms.uSaturation.value = art.saturation * player.saturation / 100;
-  copyMaterial.uniforms.uBrightness.value = art.brightness * player.brightness / 100;
-}
-
-function accuracy() {
-  const art = paintings[selected], player = playerSettings();
-  const h = Math.abs(art.hue + player.hue) / 60;
-  const s = Math.abs(Math.log(art.saturation * player.saturation / 100)) / Math.log(1.8);
-  const b = Math.abs(Math.log(art.brightness * player.brightness / 100)) / Math.log(1.7);
-  const error = Math.sqrt(.34 * h * h + .33 * s * s + .33 * b * b);
-  const unassisted = Math.max(0, Math.min(100, 100 * (1 - error * 1.4)));
-  // A 95% physical match is a perfect game score; 90% reads as 95%.
-  return Math.min(100, Math.round(unassisted / .95));
-}
-
 function showToast(message) {
   clearTimeout(toastTimeout);
   $('toast-text').textContent = message;
   $('toast').classList.add('show');
   toastTimeout = setTimeout(() => $('toast').classList.remove('show'), 3400);
-}
-
-function updateRestorationStatus(checkCompletion = false) {
-  if (!activeSurface) return;
-  const progress = activeSurface.progress();
-  $('restoration-progress').firstChild.textContent = `${progress.cleaning}% `;
-  const instructions = {
-    brush: `Щётка: зажмите ЛКМ и ведите по картине · стойкие пятна — тампон (7)`,
-    swab: `Тампон: зажмите ЛКМ и медленно очищайте пятна круговыми движениями`,
-    uv: 'УФ: наведите фонарь, затем зажмите ЛКМ и просканируйте повреждения',
-    reagent: 'Реагент: зажмите ЛКМ и проведите по участкам, отмеченным УФ',
-    retouch: 'Кисть: аккуратно закрашивайте светлые сколы на полотне · размер кисти маленький',
-  };
-  $('restoration-description').textContent = instructions[restorationInput.currentTool()] ||
-    'Наведите курсор на пятно — игра подскажет подходящий инструмент';
-  const player = playerSettings();
-  if (checkCompletion) {
-    let message = null;
-    if (progress.dirt >= 91 && !player.dustMilestone) {
-      player.dustMilestone = true;
-      message = 'Пыль и грязь удалены — проявились детали картины';
-    }
-    if (progress.varnish >= 91 && !player.varnishMilestone) {
-      player.varnishMilestone = true;
-      message = 'Пожелтевший лак снят — цвета раскрываются';
-    }
-    if (progress.retouch >= 94 && !player.retouchMilestone) {
-      player.retouchMilestone = true;
-      message = 'Сколы восстановлены — живопись снова цельная';
-    }
-    if (progress.cleaning >= 96 && !player.surfaceComplete) {
-      player.surfaceComplete = true;
-      message = `«${paintings[selected].short}» — реставрация завершена!`;
-      onNewRestoration(paintings[selected].id);
-    }
-    if (message) { showToast(message); playerProgress.save(); }
-  }
-}
-
-function updateUI() {
-  const art = paintings[selected], player = playerSettings();
-  for (const key of ['hue', 'saturation', 'brightness']) inputs[key].value = player[key];
-  values.hue.textContent = `${player.hue > 0 ? '+' : ''}${player.hue}°`;
-  values.saturation.textContent = `${player.saturation}%`;
-  values.brightness.textContent = `${player.brightness}%`;
-  const score = accuracy();
-  $('score-number').textContent = score;
-  $('score-fill').style.width = `${score}%`;
-  $('score-comment').textContent = score >= 97 ? 'Цвет почти восстановлен ✦' : score >= 83 ? 'Очень близко к эталону' : score >= 63 ? 'Уже похоже, продолжайте' : 'Нужно восстановить баланс';
-  $('score-fill').style.background = score >= 97 ? '#688264' : '#a88b54';
-  updateDamageShader();
-  if (score >= 98 && !player.completed) {
-    player.completed = true;
-    playerProgress.save();
-    showToast(`«${art.short}» — цвет восстановлен!`);
-    onNewRestoration(art.id);
-  }
 }
 
 async function showPainting(index) {
@@ -454,8 +241,8 @@ async function showPainting(index) {
     collectionUI.setActive(art.id);
     playerProgress.setSelected(art.id);
     $('collection-footer').classList.toggle('active', selected >= featuredPaintings.length);
-    updateUI();
-    updateRestorationStatus();
+    restorationFeedback.updateUI();
+    restorationFeedback.updateRestorationStatus();
     navigation.renderLabels();
     if (restorationInput.currentTool()) navigation.focusOn('copy');
   } catch (error) {
@@ -467,22 +254,15 @@ async function showPainting(index) {
   }
 }
 
-for (const key of Object.keys(inputs)) {
-  inputs[key].addEventListener('input', (event) => {
-    playerSettings()[key] = Number(event.target.value);
-    updateUI();
-    playerProgress.save();
-  });
-}
 $('reset-button').addEventListener('click', () => {
   const removedFromWall = playerProgress.removeFromWall(paintings[selected].id);
-  Object.assign(playerSettings(), { hue: 0, saturation: 100, brightness: 100, completed: false,
+  Object.assign(state[selected], { hue: 0, saturation: 100, brightness: 100, completed: false,
     surfaceComplete: false, dustMilestone: false, varnishMilestone: false, retouchMilestone: false });
   activeSurface?.reset();
-  updateUI();
-  updateRestorationStatus();
+  restorationFeedback.updateUI();
+  restorationFeedback.updateRestorationStatus();
   playerProgress.save();
-  if (removedFromWall) { updateWallCounters(); if (!showingDemoWall) void refreshWallGallery(); }
+  if (removedFromWall) exhibition.refreshAfterWallChange();
   collectionUI.refresh();
   scheduleSurfaceSave();
 });
@@ -519,41 +299,9 @@ function animate(now) {
 
 async function init() {
   try {
-    const [loadedWood, wallpaper] = await Promise.all([
-      Promise.all(woodVariants.map(async (variant) => {
-        const source = await textureLoader.loadAsync(variant.image);
-        const texture = gradeWoodTexture({ THREE, texture: source, grade: variant.grade });
-        texture.colorSpace = THREE.SRGBColorSpace;
-        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-        texture.repeat.set(1, 1);
-        texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-        return texture;
-      })),
-      textureLoader.loadAsync('/textures/atelier-wallpaper-gouache.webp'),
-    ]);
-    woodTextures = loadedWood;
-    wallpaper.colorSpace = THREE.SRGBColorSpace;
-    wallpaper.wrapS = wallpaper.wrapT = THREE.ClampToEdgeWrapping;
-    wallpaper.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-    wallpaperMaterial.map = wallpaper;
-    wallpaperMaterial.needsUpdate = true;
-    const floorTexture = woodTextures[1].clone();
-    floorTexture.center.set(.5, .5);
-    floorTexture.rotation = Math.PI / 2;
-    floorTexture.repeat.set(3.5, 1.25);
-    floorTexture.needsUpdate = true;
-    floorWoodMaterials.forEach((material) => {
-      material.map = floorTexture;
-      material.needsUpdate = true;
-    });
-    applyWoodTexture([
-      [mats.roomWood, '#c7b8a3'],
-      [mats.roomEdge, '#e8dfd0'],
-    ], woodTextures[1]);
+    await woodStyle.initialize();
     // Gallery previews stream independently; the easels need not wait for 30 images.
-    void refreshWallGallery();
-    applyWoodVariant('easel', selectedWood.easel);
-    applyWoodVariant('frame', selectedWood.frame);
+    void exhibition.refresh();
     await showPainting(playerProgress.getSelectedIndex());
     navigation.resize();
     requestAnimationFrame(animate);

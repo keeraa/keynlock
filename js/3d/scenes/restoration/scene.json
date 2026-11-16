@@ -5,7 +5,7 @@
   "threeVersion": "0.187.0",
   "status": "standalone",
   "source": "ChatGPT Sites",
-  "sourceCommit": "949920aeb69875ea4615769e2136ebbd824970d2",
+  "sourceCommit": "2d91f8f0860d895f5dae44da769790fdb4b0143a",
   "savedOn": "2026-11-16",
   "liveUrl": "https://atelier-restoration-1115.k1r11111.chatgpt.site",
   "entry": "index.html",
@@ -26,7 +26,7 @@
     },
     "wallHeightReductionPercent": 30,
     "framesDistanceFromWallMeters": 0.045,
-    "navigation": "close-gallery-view-horizontal-bounded-pan-auto-return-to-easels",
+    "navigation": "unified-camera-modes-viewport-framing-queued-horizontal-pan-auto-easel-return",
     "wallWidthMeters": 30,
     "columnCount": 12,
     "maxCameraDistance": "viewport-dependent-1.18x-overview",
@@ -36,5 +36,15 @@
     "target": "KEYNLOCK",
     "status": "pending",
     "host": "js/3d"
+  },
+  "architecture": {
+    "cameraModules": [
+      "navigation/camera-framing.js",
+      "navigation/camera-transition.js",
+      "navigation/easel-overlay.js"
+    ],
+    "stylesheets": 8,
+    "tests": 28,
+    "mainFileLines": 314
   }
 }

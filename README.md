@@ -11,6 +11,7 @@ Current implemented story: [«Чужие подписи»](docs/narrative/chapte
 - `js/core/` — shared runtime
 - `js/world/` — inventory, lair, map/navigation and missions
 - `js/modes/` — puzzle mechanics
+- `js/3d/scenes/locks/lab/` — standalone Three.js lock-mechanism laboratory (Sites v51 snapshot)
 - `assets/` — active artwork
 - `scripts/serve.mjs` — dependency-free local static server
 - `scripts/check.mjs` — JS syntax, entry-resource, asset-path, ID and mode checks

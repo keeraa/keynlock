@@ -2,7 +2,9 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createMaterials } from './materials.js';
 import { buildLair } from './room.js';
+import { createRoomOutlines, mountVisualSettings } from './visual-settings.js';
 import './style.css';
+import './visual.css';
 
 const canvas = document.querySelector('#scene');
 const loading = document.querySelector('#loading');
@@ -47,6 +49,7 @@ const zones = {
 };
 
 let renderer, scene, camera, controls, room;
+let visualUI = null;
 let transitioning = false;
 let desiredPosition = new THREE.Vector3();
 let desiredTarget = new THREE.Vector3();
@@ -111,8 +114,10 @@ function setup() {
   windowLight.position.set(-.3, 4.55, -4.8); scene.add(windowLight);
   const leftLight = new THREE.PointLight('#ffd5aa', 12, 8, 2);
   leftLight.position.set(-5.8, 3.65, .3); scene.add(leftLight);
-  const { materials } = createMaterials();
+  const { materials, visual } = createMaterials();
   room = buildLair(scene, materials);
+  const outlines = createRoomOutlines(scene);
+  visualUI = mountVisualSettings({ visual, room, outlines, grain: document.querySelector('.grain'), onOpen: closePanel });
 
   window.addEventListener('resize', resize);
   canvas.addEventListener('pointerdown', e => { startPointer = [e.clientX, e.clientY]; });
@@ -187,7 +192,7 @@ function resetView() {
 
 function handleKey(e) {
   if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-  if (e.key === 'Escape') { resetView(); return; }
+  if (e.key === 'Escape') { if (visualUI?.isOpen()) visualUI.close(); else resetView(); return; }
   if (e.key === '0') { resetView(); return; }
   const names = ['restoration','planning','workbench','alchemy','gramophone'];
   const number = Number(e.key);

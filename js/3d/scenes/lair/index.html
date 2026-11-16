@@ -21,9 +21,49 @@
         <div class="top-actions">
           <div class="stats" aria-label="Производительность"><span><b id="fps">—</b> FPS</span><i></i><span><b id="triangles">—</b> ТРЕУГ.</span></div>
           <span class="release">THREE.JS <b>r187</b></span>
+          <button id="visual-toggle" class="visual-toggle" type="button" aria-controls="visual-panel" aria-expanded="false">⚙ <span>ВИЗУАЛ</span></button>
           <button id="sound-toggle" class="icon-button" type="button" aria-label="Звуковое окружение" aria-pressed="false" title="Звуковое окружение">♪</button>
         </div>
       </header>
+
+      <aside id="visual-panel" class="visual-panel" hidden aria-label="Настройки визуала">
+        <div class="visual-heading"><div><span>МАСТЕРСКАЯ ЦВЕТА</span><h2>Визуал сцены</h2></div><button id="visual-close" type="button" aria-label="Закрыть настройки">×</button></div>
+        <div class="visual-section"><h3>Гуашевые текстуры</h3>
+          <label for="paint-saturation">Насыщенность пигмента <output id="paint-saturation-output">100%</output></label>
+          <input id="paint-saturation" data-visual-setting type="range" min="35" max="175" value="100" step="5" />
+          <label for="paint-contrast">Контраст мазков <output id="paint-contrast-output">100%</output></label>
+          <input id="paint-contrast" data-visual-setting type="range" min="55" max="160" value="100" step="5" />
+          <label for="paint-scale">Масштаб фактуры <output id="paint-scale-output">100%</output></label>
+          <input id="paint-scale" data-visual-setting type="range" min="50" max="225" value="100" step="5" />
+          <label for="paint-grain">Зернистость рисунка <output id="paint-grain-output">13%</output></label>
+          <input id="paint-grain" data-visual-setting type="range" min="0" max="35" value="13" step="1" />
+        </div>
+        <div class="visual-section"><h3>Металлические поверхности</h3>
+          <label for="metal-finish">Оттенок металла</label>
+          <select id="metal-finish" data-visual-setting><option value="original">Старая латунь</option><option value="copper">Тёплая медь</option><option value="silver">Холодное серебро</option></select>
+          <label for="metal-roughness">Шероховатость <output id="metal-roughness-output">50%</output></label>
+          <input id="metal-roughness" data-visual-setting type="range" min="0" max="100" value="50" step="5" />
+          <label for="metal-metalness">Металличность <output id="metal-metalness-output">65%</output></label>
+          <input id="metal-metalness" data-visual-setting type="range" min="0" max="100" value="65" step="5" />
+        </div>
+        <div class="visual-section"><h3>Отделка правой стены</h3>
+          <div class="wallpaper-options" role="group" aria-label="Выбор обоев правой стены">
+            <button data-wallpaper="tile" aria-pressed="true" type="button"><span class="wallpaper-swatch tile"></span>Зелёная плитка</button>
+            <button data-wallpaper="ochre" aria-pressed="false" type="button"><span class="wallpaper-swatch ochre"></span>Охра</button>
+            <button data-wallpaper="botanical" aria-pressed="false" type="button"><span class="wallpaper-swatch botanical"></span>Ботаника</button>
+            <button data-wallpaper="damask" aria-pressed="false" type="button"><span class="wallpaper-swatch damask"></span>Дамаск</button>
+          </div>
+        </div>
+        <div class="visual-section"><h3>Рисовка и воздух</h3>
+          <label class="visual-switch" for="outline-enabled"><span>Контурная обводка <small>Из Village Engine</small></span><input id="outline-enabled" data-visual-setting type="checkbox" checked /></label>
+          <label for="outline-width">Толщина контура <output id="outline-width-output">65%</output></label>
+          <input id="outline-width" data-visual-setting type="range" min="20" max="140" value="65" step="5" />
+          <label class="visual-switch" for="dust-enabled"><span>Пыль в лучах света <small>Частицы Three.js</small></span><input id="dust-enabled" data-visual-setting type="checkbox" checked /></label>
+          <label for="dust-density">Плотность частиц <output id="dust-density-output">65%</output></label>
+          <input id="dust-density" data-visual-setting type="range" min="0" max="100" value="65" step="5" />
+        </div>
+        <button id="visual-reset" class="visual-reset" type="button">↺ СБРОСИТЬ НАСТРОЙКИ</button>
+      </aside>
 
       <div class="chapter-caption"><span class="eyebrow">ГЛАВА I · МЕСТО, ГДЕ СОХРАНЯЮТ ИСКУССТВО</span><h1>Тихое убежище</h1><p>Вещи обретают вторую жизнь. У каждой находки здесь своя история.</p></div>
 

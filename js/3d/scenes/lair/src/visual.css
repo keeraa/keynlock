@@ -1,0 +1,30 @@
+.visual-toggle{height:33px;padding:0 13px;border:1px solid rgba(210,176,122,.48);background:rgba(43,38,27,.82);color:#e4c998;font-size:15px;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.visual-toggle span{font-size:10px;font-weight:800;letter-spacing:.14em}
+.visual-toggle:hover,.visual-toggle[aria-expanded=true]{border-color:#d8b580;background:#5a422e}
+.visual-panel{position:absolute;z-index:22;right:24px;top:94px;width:min(353px,calc(100vw - 26px));max-height:calc(100vh - 112px);padding:20px 23px 23px;overflow-y:auto;overscroll-behavior:contain;background:linear-gradient(150deg,rgba(26,32,29,.97),rgba(14,22,20,.985));color:#ecddc1;border:1px solid #77644a;box-shadow:0 14px 55px #050b08da,0 0 0 3px #1f251d88;backdrop-filter:blur(14px);scrollbar-color:#81674c #202923;scrollbar-width:thin}
+.visual-panel[hidden]{display:none}
+.visual-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:8px}
+.visual-heading span{display:block;font-size:9px;color:#bd9969;letter-spacing:.23em;font-weight:800}
+.visual-heading h2{font:normal 27px Georgia,serif;margin:7px 0;color:#fff0d3}
+.visual-heading button{background:transparent;border:0;color:#d6bd94;font-size:26px;line-height:1;min-width:29px;min-height:29px}
+.visual-section{border-top:1px solid rgba(207,174,123,.24);padding:15px 0 6px}
+.visual-section h3{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:#dfbc83;font-weight:760;margin:0 0 17px}
+.visual-section label:not(.visual-switch){display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;color:#d7c8ad;margin:13px 0 7px}
+.visual-section label output{font-size:11px;font-weight:800;color:#e7bb7a;font-variant-numeric:tabular-nums;white-space:nowrap}
+.visual-section input[type=range]{width:100%;height:18px;margin:0 0 4px;accent-color:#c09a60;cursor:pointer}
+.visual-section select{width:100%;min-height:33px;background:#27342d;color:#efdbc0;border:1px solid #6b624f;padding:6px 9px;font:12px Inter,Segoe UI,sans-serif;cursor:pointer}
+.visual-switch{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;margin:15px 0 12px;cursor:pointer}
+.visual-switch span{display:flex;flex-direction:column;gap:5px;color:#e2d3bb}
+.visual-switch small{font-size:10px;letter-spacing:.04em;color:#988d76}
+.visual-switch input{width:20px;height:20px;accent-color:#c3a06b;cursor:pointer}
+.wallpaper-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.wallpaper-options button{padding:7px 7px 9px;text-align:center;background:#1c2823;color:#d6c5a8;border:1px solid rgba(194,168,125,.33);font-size:11px;line-height:1.4;cursor:pointer}
+.wallpaper-options button:hover,.wallpaper-options button[aria-pressed=true]{border-color:#efc789;color:#ffe2b2;background:#384036;box-shadow:inset 0 0 0 1px #c9aa76aa}
+.wallpaper-swatch{display:block;height:45px;margin-bottom:6px;border:1px solid #ffffff25}
+.wallpaper-swatch.tile{background-color:#334f43;background-image:linear-gradient(90deg,#162c27 2px,transparent 2px),linear-gradient(#162c27 2px,transparent 2px),radial-gradient(ellipse at 30% 20%,#698071aa,transparent 70%);background-size:20px 20px,20px 20px,100% 100%}
+.wallpaper-swatch.ochre{background:linear-gradient(140deg,#b36a38,#a45e32 48%,#d28a4b 65%,#93532e)}
+.wallpaper-swatch.botanical{background-color:#3c5a49;background-image:radial-gradient(ellipse at 50% 40%,transparent 8px,#a6b48355 10px,transparent 13px),repeating-linear-gradient(45deg,transparent 0 15px,#c2bb7955 16px,transparent 18px);background-size:34px 34px,34px 34px}
+.wallpaper-swatch.damask{background-color:#42352f;background-image:radial-gradient(ellipse at 50% 50%,#af835b78 0 5px,transparent 11px),repeating-linear-gradient(135deg,transparent 0 18px,#a87f5955 19px,transparent 22px);background-size:32px 42px,32px 42px}
+.visual-reset{width:100%;margin-top:9px;padding:12px;background:rgba(155,119,73,.18);color:#d8bd90;border:1px solid rgba(216,173,107,.43);font-size:10px;font-weight:800;letter-spacing:.11em;cursor:pointer}
+.visual-reset:hover{background:rgba(176,136,83,.3)}
+@media(max-width:800px){.visual-panel{top:71px;right:11px;max-height:calc(100vh - 83px)}.topbar .visual-toggle{padding:0 9px}.visual-toggle span{display:none}.topbar .release{display:none}.topbar .stats{font-size:8px;gap:6px}.topbar{padding-left:13px;padding-right:12px}.location{display:none}.brand{min-width:0}.brand-text strong{font-size:15px}}

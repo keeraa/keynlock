@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { canvasTexture, makeCityWindowTexture, makeCityDepthTexture, makeCurtainLinenTexture, makeMapTexture } from './materials.js';
+import { createAmbientParticles } from './engine/ambient-particles.js';
 
 /** A single continuous room, using the proportions and gouache materials of the existing ateliers. */
 export function buildLair(scene, m) {
@@ -8,6 +9,8 @@ export function buildLair(scene, m) {
   const hitTargets = [];
   const animated = [];
   const artTextures = new Map();
+  let rightWallFinish = null;
+  let ambientParticles = null;
   const staticGroup = new THREE.Group();
   scene.add(staticGroup);
   const shadow = mesh => { mesh.castShadow = true; mesh.receiveShadow = true; return mesh; };
@@ -144,6 +147,7 @@ export function buildLair(scene, m) {
     rightFinish.rotation.y = -Math.PI / 2;
     rightFinish.castShadow = false;
     rightFinish.name = 'alchemy-right-wall';
+    rightWallFinish = rightFinish;
 
     // Wainscot panels, framed with dark timber; the left wall is kept free for the restoration easel.
     box(staticGroup, 17.25, 1.65, .08, m.agedWood, 0, .9, -5.39);
@@ -314,15 +318,18 @@ export function buildLair(scene, m) {
     }
     for (const y of [2.68, straightHeight - .04]) box(window, 7.94, .11, .14, m.darkWood, 0, y, .24);
     // Dense woven linen with actual pleated geometry. The fixed top edge is
-    // suspended from brass rings, while the lower folds answer to the wind.
+    // suspended from a wall-wide brass pole level with the upper crossbar.
+    rod(window, [-4.13, straightHeight - .04, .55], [4.13, straightHeight - .04, .55], .043, m.oldBrass, 12)
+      .name = 'curtain-pole-full-width';
     const curtainMap = makeCurtainLinenTexture();
     const curtainMaterial = new THREE.MeshPhysicalMaterial({
       map: curtainMap, color: '#d6e0d7', roughness: .91, metalness: 0,
       sheen: .6, sheenColor: '#b6cbc5', sheenRoughness: .9,
       side: THREE.DoubleSide,
     });
+    curtainMaterial.userData.inkSkipOutline = true; // the cloth deforms every frame
     for (const sign of [-1, 1]) {
-      const width = .96, height = 5.23;
+      const width = .96, height = 5.10;
       const geometry = new THREE.PlaneGeometry(width, height, 28, 42);
       const positions = geometry.getAttribute('position');
       positions.setUsage(THREE.DynamicDrawUsage);
@@ -331,7 +338,7 @@ export function buildLair(scene, m) {
       const cloth = new THREE.Mesh(geometry, curtainMaterial);
       cloth.name = `window-curtain-${sideName}`;
       cloth.userData.windAnimated = true;
-      cloth.position.set(sign * 3.78, 2.69, .56);
+      cloth.position.set(sign * 3.78, 2.57, .56);
       cloth.castShadow = true;
       cloth.receiveShadow = true;
       cloth.frustumCulled = false;
@@ -355,11 +362,12 @@ export function buildLair(scene, m) {
       };
       updateCloth(0);
       animated.push(updateCloth);
-      rod(window, [sign * 3.23, 5.37, .55], [sign * 4.29, 5.37, .55], .037, m.oldBrass, 10);
       for (let i = 0; i < 5; i++) {
-        sphere(window, .046, m.oldBrass, sign * 3.78 + (i - 2) * .18, 5.29, .64, 10);
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(.056, .015, 6, 12), m.oldBrass);
+        ring.position.set(sign * 3.78 + (i - 2) * .18, straightHeight - .078, .62);
+        ring.castShadow = false;
+        window.add(ring);
       }
-      sphere(window, .10, m.oldBrass, sign * 4.03, 2.26, .69);
     }
     // Broad translucent sunlight falls across the central table.
     const beamMat = new THREE.MeshBasicMaterial({ color: '#f7d3a0', transparent: true, opacity: .036, depthWrite: false, side: THREE.DoubleSide });
@@ -464,6 +472,7 @@ export function buildLair(scene, m) {
       3.49 + (i % 4) * .58, pigmentColors[i % pigmentColors.length], .25 + (i % 2) * .07, .105);
 
     const table = makeTable(staticGroup, 2.11, .97, -6.60, -4.39, 1.04);
+    table.name = 'restoration-paint-table';
     table.rotation.y = Math.PI / 2;
     table.scale.setScalar(.84);
     box(table, .95, .025, .62, m.linen, -.43, 1.035, -.09);
@@ -518,6 +527,7 @@ export function buildLair(scene, m) {
 
   function buildPlanning() {
     const table = makeTable(staticGroup, 2.95, 1.95, -.05, 1.44, 1.05);
+    table.name = 'planning-main-table';
     box(table, 2.63, .06, 1.7, m.leather, 0, 1.18, 0, .03);
     makePaper(table, -.52, 1.222, .08, -.16, [.75, 1.04]);
     makePaper(table, .48, 1.233, -.29, .12, [.75, 1.07]);
@@ -739,6 +749,7 @@ export function buildLair(scene, m) {
 
   function buildGramophone() {
     const chest = makeTable(staticGroup, 1.37, .76, 1.97, -3.67, 1.17);
+    chest.name = 'gramophone-table';
     box(chest, 1.43, .12, .78, m.ash, 0, 1.29, 0, .025);
     box(chest, 1.26, .55, .54, m.darkWood, 0, .81, -.02, .03);
     box(chest, 1.12, .36, .05, m.walnut, 0, .83, .29);
@@ -768,16 +779,23 @@ export function buildLair(scene, m) {
       sphere(lamp, .22, new THREE.MeshBasicMaterial({ color: '#f0c591', transparent: true, opacity: .65 }), 0, 0, .19);
       const light = new THREE.PointLight('#ffc183', 3.5, 5.5, 2); light.position.set(0, 0, .35); lamp.add(light);
     }
-    // Real dust motes drift through the sunlight.
-    let seed = 42; const rng = () => ((seed = (1664525 * seed + 1013904223) >>> 0) / 4294967296);
-    const count = 185, positions = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) { positions[i * 3] = (rng() - .5) * 15; positions[i * 3 + 1] = rng() * 12.9 + .35; positions[i * 3 + 2] = rng() * 10 - 4.9; }
-    const geom = new THREE.BufferGeometry(); geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    const dust = new THREE.Points(geom, new THREE.PointsMaterial({ color: '#ffe8bc', size: .019, transparent: true, opacity: .42, depthWrite: false }));
-    staticGroup.add(dust);
-    animated.push(t => { dust.rotation.y = Math.sin(t * .075) * .004; const att = geom.getAttribute('position'); for (let i = 1; i < att.count * 3; i += 3) { att.array[i] += .0005; if (att.array[i] > 13.25) att.array[i] = .2; } att.needsUpdate = true; });
+    ambientParticles = createAmbientParticles(staticGroup);
+    animated.push(t => ambientParticles.update(t));
   }
 
   buildShell(); buildWindow(); buildRestoration(); buildPlanning(); buildWorkbench(); buildAlchemy(); buildGramophone(); buildDetails();
-  return { anchors, hitTargets, animated };
+  const wallpapers = {
+    tile: m.alchemyTile,
+    ochre: m.restorationWall,
+    botanical: m.wallpaperBotanical,
+    damask: m.wallpaperDamask,
+  };
+  return {
+    anchors, hitTargets, animated, ambientParticles,
+    setRightWallpaper(name) {
+      if (!Object.hasOwn(wallpapers, name) || !rightWallFinish) return false;
+      rightWallFinish.material = wallpapers[name];
+      return true;
+    },
+  };
 }

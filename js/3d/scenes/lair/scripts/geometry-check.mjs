@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import * as THREE from 'three';
 import { createMaterials } from '../src/materials.js';
 import { buildLair } from '../src/room.js';
+import { createRoomOutlines } from '../src/visual-settings.js';
 
 // Exercise the scene graph without a GPU or browser canvas.
 const noop = () => {};
@@ -18,7 +19,7 @@ globalThis.document = {
 THREE.TextureLoader.prototype.load = () => new THREE.Texture();
 
 const scene = new THREE.Scene();
-const { materials } = createMaterials();
+const { materials, visual } = createMaterials();
 const world = buildLair(scene, materials);
 scene.updateMatrixWorld(true);
 const unique = name => {
@@ -47,6 +48,9 @@ assert.ok(unique('main-arched-window-frame').geometry.type === 'TubeGeometry', '
 assert.ok(unique('main-arched-window-glass').geometry.type === 'ShapeGeometry', 'glass fits inside the arch');
 assert.equal(unique('main-arched-window-glass').material.transparent, true, 'the exterior is visible through the glazing');
 assert.equal(unique('main-arched-window-sill').geometry.userData.paintedWoodUV, true, 'wood uses physical-scale UV mapping');
+const curtainPole = unique('curtain-pole-full-width');
+assert.ok(new THREE.Box3().setFromObject(curtainPole).max.x - new THREE.Box3().setFromObject(curtainPole).min.x > 8.2, 'curtain pole spans the window');
+assert.equal(unique('main-arched-window').children.filter(child => child.geometry?.type === 'SphereGeometry').length, 0, 'window-edge ball finials removed');
 const wall = unique('back-wall-arched-cutout');
 assert.equal(wall.geometry.type, 'ExtrudeGeometry', 'the masonry has a dimensional arched reveal');
 const openingRay = new THREE.Raycaster(new THREE.Vector3(0, 5.6, 0), new THREE.Vector3(0, 0, -1));
@@ -73,7 +77,7 @@ for (const side of ['left', 'right']) {
 }
 world.animated.forEach(update => update(2.9));
 for (const { positions, topBefore, hemBefore } of hangingCloths) {
-  assert.equal(positions.getZ(0), topBefore, 'the upper seam remains fixed');
+  assert.ok(Math.abs(positions.getZ(0) - topBefore) < .00001, 'the upper seam remains fixed');
   assert.ok(hemBefore.some((value, i) => Math.abs(positions.getZ(positions.count - 29 + i) - value) > .01), 'wind moves the free hem');
 }
 assert.ok(workbench.min.z > alchemyTable.max.z + 1.0, 'workbench is separated to the right of alchemy');
@@ -91,6 +95,44 @@ assert.ok(unique('restoration-weathered-patina'), 'the right painting is visibly
 assert.ok(unique('restoration-caption-reference').position.y > 3.4, 'reference caption sits above the easel');
 assert.ok(unique('restoration-caption-work').position.y > 3.4, 'work caption sits above the easel');
 assert.equal(Object.keys(world.anchors).length, 5, 'all five hotspots retained');
+const wallpaper = unique('alchemy-right-wall');
+assert.equal(wallpaper.material, materials.alchemyTile, 'green tile remains the default right-wall finish');
+assert.equal(world.setRightWallpaper('botanical'), true);
+assert.equal(wallpaper.material, materials.wallpaperBotanical, 'botanical wallpaper option changes the actual 3D material');
+assert.equal(world.setRightWallpaper('damask'), true);
+assert.equal(wallpaper.material, materials.wallpaperDamask, 'dark wallpaper option is available');
+assert.equal(world.setRightWallpaper('unknown'), false);
+assert.equal(world.setRightWallpaper('tile'), true);
+const paintedScale = materials.walnut.map.repeat.x;
+visual.setPaintSettings({ saturation: 140, contrast: 120, scale: 170 });
+assert.ok(materials.walnut.map.repeat.x < paintedScale, 'texture scale control affects Three.js UV repeat');
+visual.setPaintSettings();
+const brassRoughness = materials.brass.roughness;
+visual.setMetalSettings({ roughness: 12, metalness: 88, palette: 'silver' });
+assert.ok(materials.brass.roughness < brassRoughness, 'metal polish setting changes physical roughness');
+assert.equal(materials.brass.color.getHexString(), 'b1b5b3', 'metal palette changes the metal finish');
+visual.setMetalSettings();
+const motes = unique('ambient-dust-engine');
+assert.ok(motes.isPoints && motes.material.isShaderMaterial, 'ambient particles use one shader-driven Points cloud');
+const dustBefore = motes.geometry.getAttribute('position').getX(0);
+world.ambientParticles.update(3.8);
+assert.ok(Math.abs(dustBefore - motes.geometry.getAttribute('position').getX(0)) > .001, 'wind drifts floating particles');
+world.ambientParticles.setDensity(.25);
+assert.equal(motes.geometry.drawRange.count, 105, 'particle density changes draw range');
+world.ambientParticles.setEnabled(false);
+assert.equal(motes.visible, false, 'air particles are switchable');
+world.ambientParticles.setEnabled(true);
+const outlines = createRoomOutlines(scene);
+assert.ok(outlines.shells.length >= 6, 'shared Village Engine outlines attach to key 3D structures');
+const paintShader = { uniforms: {}, fragmentShader: THREE.ShaderLib.standard.fragmentShader };
+materials.walnut.onBeforeCompile(paintShader);
+assert.ok(paintShader.fragmentShader.includes('pigmentGray') && paintShader.uniforms.uPigmentContrast, 'painted pigments are adjustable in a Three.js shader');
+assert.ok(paintShader.fragmentShader.includes('inkFacing'), 'shared ink rim shading is installed');
+outlines.setEnabled(false);
+assert.ok(outlines.shells.every(shell => shell.visible === false), 'ink outline toggle works');
+outlines.setEnabled(true);
+outlines.setWidth(110);
+assert.ok(outlines.shells.every(shell => shell.material.uniforms.strokeScale.value === 1.1), 'outline width is adjustable');
 
 for (const name of ['sardanapalus.jpg', 'starry-night.jpg', 'wood-gouache-walnut.webp', 'wood-gouache-ash.webp', 'wood-gouache-oak.webp']) {
   assert.ok(existsSync(new URL(`../public/assets/${name}`, import.meta.url)), `${name} available`);

@@ -25,6 +25,13 @@ export function createMaterials() {
   const floorAlternateMap = floorMap.clone();
   floorAlternateMap.offset.set(.17, .14);
   floorAlternateMap.needsUpdate = true;
+  const botanicalMap = makeWallpaperTexture('botanical');
+  const damaskMap = makeWallpaperTexture('damask');
+  for (const texture of [botanicalMap, damaskMap]) {
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(5, 5.4);
+    texture.anisotropy = 4;
+  }
   const materials = {
     walnut: new THREE.MeshStandardMaterial({ map: walnutMap, color: '#ffffff', roughness: .96 }),
     agedWood: new THREE.MeshStandardMaterial({ map: walnutMap, color: '#d0b8a5', roughness: .96 }),
@@ -34,6 +41,8 @@ export function createMaterials() {
     plaster: new THREE.MeshStandardMaterial({ map: plasterMap, color: '#e0d8d0', roughness: 1 }),
     restorationWall: new THREE.MeshStandardMaterial({ map: restorationPlasterMap, color: '#f9cbaa', roughness: 1, side: THREE.DoubleSide }),
     alchemyTile: new THREE.MeshStandardMaterial({ map: makeAlchemyTileTexture(THREE, { width: 42.5, height: 29, textureWidth: 960, textureHeight: 1024 }), roughness: 1, metalness: 0, side: THREE.DoubleSide }),
+    wallpaperBotanical: new THREE.MeshStandardMaterial({ map: botanicalMap, color: '#e8e6d8', roughness: .99, side: THREE.DoubleSide }),
+    wallpaperDamask: new THREE.MeshStandardMaterial({ map: damaskMap, color: '#f1e9d6', roughness: .99, side: THREE.DoubleSide }),
     floor: new THREE.MeshStandardMaterial({ map: floorMap, color: '#fff4e8', roughness: 1 }),
     floorAlternate: new THREE.MeshStandardMaterial({ map: floorAlternateMap, color: '#e0c5b7', roughness: 1 }),
     brass: mat('#b49459', .36, .63),
@@ -56,7 +65,60 @@ export function createMaterials() {
     liquidAmber: new THREE.MeshStandardMaterial({ color: '#b87f41', emissive: '#6d3d1d', emissiveIntensity: .21, roughness: .27, transparent: true, opacity: .88 }),
     liquidBlue: new THREE.MeshStandardMaterial({ color: '#668b8c', emissive: '#3b696d', emissiveIntensity: .18, roughness: .25, transparent: true, opacity: .87 }),
   };
-  return { materials, load, textureLoader };
+  // Share one pair of uniforms across every painted wood/plaster finish. These
+  // modify the real Three.js fragment shader, with no texture regeneration.
+  const pigment = { saturation: { value: 1 }, contrast: { value: 1 } };
+  const painted = ['walnut', 'agedWood', 'darkWood', 'ash', 'oak', 'plaster',
+    'restorationWall', 'floor', 'floorAlternate', 'alchemyTile', 'wallpaperBotanical', 'wallpaperDamask'];
+  for (const name of painted) {
+    const material = materials[name];
+    const oldCompile = material.onBeforeCompile;
+    material.onBeforeCompile = function (shader, ...args) {
+      oldCompile.call(this, shader, ...args);
+      shader.uniforms.uPigmentSaturation = pigment.saturation;
+      shader.uniforms.uPigmentContrast = pigment.contrast;
+      shader.fragmentShader = shader.fragmentShader.replace('#include <map_fragment>', `
+        #include <map_fragment>
+        float pigmentGray = dot(diffuseColor.rgb, vec3(.2126, .7152, .0722));
+        diffuseColor.rgb = mix(vec3(pigmentGray), diffuseColor.rgb, uPigmentSaturation);
+        diffuseColor.rgb = clamp((diffuseColor.rgb - vec3(.5)) * uPigmentContrast + vec3(.5), 0.0, 2.0);
+      `).replace('void main() {', `
+        uniform float uPigmentSaturation;
+        uniform float uPigmentContrast;
+        void main() {
+      `);
+    };
+    material.customProgramCacheKey = () => 'keynlock-painted-v1';
+  }
+  const scaledTextures = [walnutMap, ashMap, oakMap, plasterMap, restorationPlasterMap,
+    floorMap, floorAlternateMap, botanicalMap, damaskMap];
+  const originalRepeats = scaledTextures.map(map => map.repeat.clone());
+  function setPaintSettings({ saturation = 100, contrast = 100, scale = 100 } = {}) {
+    pigment.saturation.value = THREE.MathUtils.clamp(saturation / 100, .35, 1.75);
+    pigment.contrast.value = THREE.MathUtils.clamp(contrast / 100, .55, 1.6);
+    const factor = THREE.MathUtils.clamp(scale / 100, .5, 2.25);
+    scaledTextures.forEach((texture, i) => texture.repeat.copy(originalRepeats[i]).multiplyScalar(1 / factor));
+  }
+  const metalNames = ['brass', 'oldBrass', 'copper', 'iron', 'blackMetal'];
+  const metalBases = metalNames.map(name => ({
+    material: materials[name], roughness: materials[name].roughness,
+    metalness: materials[name].metalness, color: materials[name].color.clone(),
+  }));
+  const metalPalettes = {
+    original: null,
+    copper: ['#b77e57', '#95664f', '#c17b50', '#81675d', '#3d3837'],
+    silver: ['#b1b5b3', '#848d8c', '#a6a8a5', '#737d81', '#384348'],
+  };
+  function setMetalSettings({ roughness = 50, metalness = 65, palette = 'original' } = {}) {
+    const colors = metalPalettes[palette] || null;
+    metalBases.forEach((base, i) => {
+      base.material.roughness = THREE.MathUtils.clamp(base.roughness + (roughness - 50) * .009, .07, 1);
+      base.material.metalness = THREE.MathUtils.clamp(base.metalness + (metalness - 65) * .012, 0, 1);
+      if (colors) base.material.color.set(colors[i]);
+      else base.material.color.copy(base.color);
+    });
+  }
+  return { materials, load, textureLoader, visual: { setPaintSettings, setMetalSettings } };
 }
 
 export function canvasTexture(draw, width = 1024, height = 1024) {
@@ -67,6 +129,49 @@ export function canvasTexture(draw, width = 1024, height = 1024) {
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   return texture;
+}
+
+/** Small seamless-feeling painterly papers for the optional right-wall finishes. */
+export function makeWallpaperTexture(kind = 'botanical') {
+  return canvasTexture((ctx, w, h) => {
+    const botanical = kind === 'botanical';
+    const ground = ctx.createLinearGradient(0, 0, w, h);
+    if (botanical) {
+      ground.addColorStop(0, '#526a5a'); ground.addColorStop(.5, '#425c4d'); ground.addColorStop(1, '#344e45');
+    } else {
+      ground.addColorStop(0, '#54483e'); ground.addColorStop(.5, '#423b36'); ground.addColorStop(1, '#352f2c');
+    }
+    ctx.fillStyle = ground; ctx.fillRect(0, 0, w, h);
+    let seed = botanical ? 678 : 512;
+    const random = () => ((seed = (1664525 * seed + 1013904223) >>> 0) / 4294967296);
+    for (let i = 0; i < 1600; i++) {
+      ctx.fillStyle = random() < .5 ? 'rgba(243,223,183,.026)' : 'rgba(9,20,17,.052)';
+      ctx.fillRect(random() * w, random() * h, 1 + random() * 22, 1 + random() * 14);
+    }
+    for (const cy of [84, 256, 428]) for (const cx of [84, 256, 428]) {
+      ctx.strokeStyle = botanical ? 'rgba(183,180,129,.48)' : 'rgba(192,151,106,.42)';
+      ctx.lineWidth = botanical ? 3 : 4;
+      ctx.beginPath(); ctx.moveTo(cx, cy + 55);
+      ctx.bezierCurveTo(cx - 40, cy + 12, cx + 42, cy - 8, cx, cy - 58);
+      ctx.stroke();
+      for (const side of [-1, 1]) for (let i = 0; i < 3; i++) {
+        const x = cx + side * (18 + i * 9), y = cy + 30 - i * 27;
+        ctx.save(); ctx.translate(x, y); ctx.rotate(side * (.64 + i * .12));
+        ctx.beginPath(); ctx.ellipse(0, 0, botanical ? 8 : 11, botanical ? 22 : 27, 0, 0, Math.PI * 2);
+        ctx.fillStyle = botanical ? 'rgba(157,177,119,.30)' : 'rgba(180,135,105,.23)';
+        ctx.fill(); ctx.stroke(); ctx.restore();
+      }
+      ctx.fillStyle = botanical ? '#b0ac79' : '#b38c65';
+      for (let k = 0; k < 5; k++) {
+        const angle = k * Math.PI * 2 / 5;
+        ctx.beginPath(); ctx.ellipse(cx + Math.cos(angle) * 9, cy - 59 + Math.sin(angle) * 9, 6, 10, angle, 0, Math.PI * 2);ctx.fill();
+      }
+      ctx.fillStyle = '#d1b887'; ctx.beginPath(); ctx.arc(cx, cy - 59, 4, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.strokeStyle = botanical ? 'rgba(26,48,38,.35)' : 'rgba(214,168,105,.13)';
+    ctx.lineWidth = 2;
+    for (let x = 0; x < w; x += 172) { ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke(); }
+  }, 512, 512);
 }
 
 export function makeCityWindowTexture() {

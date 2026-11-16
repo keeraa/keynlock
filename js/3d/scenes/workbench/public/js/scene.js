@@ -12,6 +12,7 @@ import {createFileSurfaceMaterials,createMetalShavings,FILE_BODY_SCALE,
   FILE_MAX_STROKE,fileWorkingAnchor,fileStoppedAtContour,fileTouchesContour,
   createFileSteelGeometry,
   createFileHandleGeometry,fileAxialStrokePixels,
+  fallingFragmentLocalY,
   FILE_CAMERA_POSITION,FILE_CAMERA_TARGET,FILE_KEYROOT_Z,
   FILE_CONTACT_DEPTH_FRONT,FILE_CONTACT_DEPTH_BACK} from './filing-effects.js';
 import {createKeyBladeGeometry,KEY_BLADE_OFFSET_Z} from './key-blade.js';
@@ -466,7 +467,8 @@ export function createWorkshopScene(canvas){
       const t=Math.max(0,(now-fallenAt)/1000);
       const drop=Math.min(5.2,3.2*t*t);
       const bounce=t>1.28?.10*Math.exp(-(t-1.28)*5)*Math.abs(Math.sin((t-1.28)*14)):0;
-      fallenPiece.group.position.y=-drop+bounce;
+      fallenPiece.group.position.y=fallingFragmentLocalY(
+        drop,bounce,keyRoot.scale.y*blankRoot.scale.y);
       fallenPiece.group.rotation.z=-Math.min(.90,t*.95);
       fallenPiece.group.rotation.x=Math.min(.45,t*.35);
     }

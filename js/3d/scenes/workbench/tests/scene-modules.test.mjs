@@ -8,6 +8,26 @@ import {shouldRebuildTargetGuide,targetGuideGeometry} from '../public/js/key-gui
 import {zoneSurfaceSamples,createZoneFaceGeometry,createZoneRimGeometry,
   createZoneOutlineGeometry} from '../public/js/key-zone-highlight.js';
 import {readFileSync} from 'node:fs';
+import {fallingFragmentLocalY} from '../public/js/filing-effects.js';
+
+test('a detached key fragment falls downward with teeth up or down',()=>{
+  const drop=2.4,bounce=.08,worldFalls=[];
+  for(const verticalScale of [.5,-.5]){
+    const keyRoot=new THREE.Group();keyRoot.scale.setScalar(.7);
+    const blankRoot=new THREE.Group();blankRoot.scale.y=verticalScale;
+    const fragment=new THREE.Group();keyRoot.add(blankRoot);blankRoot.add(fragment);
+    fragment.position.y=fallingFragmentLocalY(
+      drop,bounce,keyRoot.scale.y*blankRoot.scale.y);
+    keyRoot.updateWorldMatrix(true,true);
+    const offset=fragment.getWorldPosition(new THREE.Vector3()).y-
+      blankRoot.getWorldPosition(new THREE.Vector3()).y;
+    assert.ok(offset<0,'gravity must move the fragment down in world space');
+    worldFalls.push(offset);
+  }
+  assert.ok(Math.abs(worldFalls[0]-worldFalls[1])<1e-10,
+    'both orientations must have the same fall distance');
+  assert.equal(fallingFragmentLocalY(0,0,-.5),0);
+});
 
 test('performance HUD shows rendered polygon count alongside FPS',()=>{
   const page=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');

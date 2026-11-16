@@ -43,6 +43,14 @@ export function fileAxialStrokePixels(dx,dy,axisX,axisY){
   return (dx*axisX+dy*axisY)/length;
 }
 
+// The blank is mirrored vertically when its teeth face down. Convert the
+// gravity-driven displacement to local space so the fragment always falls
+// down in the world, regardless of the blank's vertical scale sign.
+export function fallingFragmentLocalY(drop,bounce,parentWorldYScale){
+  const distance=Math.max(0,drop-bounce);
+  return parentWorldYScale<0?distance:-distance;
+}
+
 // A real file narrows gently toward its nose; its other end enters the ferrule.
 export function createFileSteelGeometry(THREE){
   const geometry=new THREE.BoxGeometry(FILE_STEEL_LENGTH,FILE_STEEL_HEIGHT,

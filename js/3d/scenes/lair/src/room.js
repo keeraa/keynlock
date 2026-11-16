@@ -127,9 +127,11 @@ export function buildLair(scene, m) {
     rug.rotation.x = -Math.PI / 2; rug.position.set(-.1, .05, 1.2); rug.receiveShadow = true; staticGroup.add(rug);
   }
 
-  function framedPainting(parent, width, height, artName, x, y, z, yaw = 0) {
+  function framedPainting(parent, width, height, artName, x, y, z, yaw = 0, options = {}) {
     const group = new THREE.Group(); group.position.set(x, y, z); group.rotation.y = yaw; parent.add(group);
-    box(group, width + .13, height + .13, .1, m.darkWood, 0, 0, 0);
+    const frame = options.frameMaterial || m.walnut;
+    const innerFrame = options.innerFrameMaterial || m.oldBrass;
+    box(group, width + .13, height + .13, .1, options.backingMaterial || m.darkWood, 0, 0, 0);
     if (!artTextures.has(artName)) {
       const image = new THREE.TextureLoader().load(`/assets/${artName}`);
       image.colorSpace = THREE.SRGBColorSpace;
@@ -138,11 +140,27 @@ export function buildLair(scene, m) {
     const art = artTextures.get(artName);
     const artwork = new THREE.Mesh(new THREE.PlaneGeometry(width - .09, height - .09), new THREE.MeshStandardMaterial({ map: art, roughness: 1 }));
     artwork.position.z = .063; group.add(artwork);
+    if (options.weathered) {
+      // The restoration canvas carries a translucent, irregular painted patina.
+      const washMap = canvasTexture((ctx, w, h) => {
+        let seed = 712;
+        const random = () => ((seed = (1664525 * seed + 1013904223) >>> 0) / 4294967296);
+        ctx.fillStyle = 'rgba(211,188,153,.33)'; ctx.fillRect(0, 0, w, h);
+        for (let i = 0; i < 620; i++) {
+          ctx.fillStyle = `rgba(${178 + Math.floor(random() * 55)},${151 + Math.floor(random() * 47)},${125 + Math.floor(random() * 47)},${.017 + random() * .11})`;
+          ctx.fillRect(random() * w, random() * h, 4 + random() * 48, 1 + random() * 19);
+        }
+      }, 512, 512);
+      const patina = new THREE.Mesh(new THREE.PlaneGeometry(width - .09, height - .09), new THREE.MeshBasicMaterial({ map: washMap, transparent: true, opacity: .81, depthWrite: false }));
+      patina.name = 'restoration-weathered-patina';
+      patina.position.z = .071;
+      group.add(patina);
+    }
     for (const side of [-1, 1]) {
-      box(group, .115, height + .32, .16, m.walnut, side * (width / 2 + .05), 0, .08, .02);
-      box(group, width + .32, .115, .16, m.walnut, 0, side * (height / 2 + .05), .08, .02);
-      box(group, .016, height + .09, .05, m.oldBrass, side * (width / 2 - .025), 0, .17);
-      box(group, width + .09, .016, .05, m.oldBrass, 0, side * (height / 2 - .025), .17);
+      box(group, .115, height + .32, .16, frame, side * (width / 2 + .05), 0, .08, .02);
+      box(group, width + .32, .115, .16, frame, 0, side * (height / 2 + .05), .08, .02);
+      box(group, .016, height + .09, .05, innerFrame, side * (width / 2 - .025), 0, .17);
+      box(group, width + .09, .016, .05, innerFrame, 0, side * (height / 2 - .025), .17);
     }
     return group;
   }
@@ -200,35 +218,64 @@ export function buildLair(scene, m) {
   }
 
   function buildRestoration() {
-    // The orange wall, wood baseboards and collection are continuous with the
-    // existing "Ателье цвета" scene. Both easels face into the room from the left.
-    framedPainting(staticGroup, 1.62, 1.96, 'girl-pearl.jpg', -8.28, 7.72, -4.12, Math.PI / 2);
-    framedPainting(staticGroup, 1.76, 1.22, 'great-wave.jpg', -8.28, 8.28, -.45, Math.PI / 2);
-    framedPainting(staticGroup, 1.32, 1.45, 'starry-night.jpg', -8.28, 7.62, 3.38, Math.PI / 2);
-    const sign = label(staticGroup, 'ATELIER DE COULEUR', -8.27, 5.65, -2.0, 2.45, .34);
+    // A straight-on recreation of the original Atelier de Couleur restoration wall.
+    framedPainting(staticGroup, 1.62, 1.96, 'girl-pearl.jpg', -8.28, 5.59, -4.18, Math.PI / 2);
+    framedPainting(staticGroup, 1.76, 1.22, 'great-wave.jpg', -8.28, 5.77, -.92, Math.PI / 2);
+    framedPainting(staticGroup, 1.32, 1.45, 'starry-night.jpg', -8.28, 5.61, 3.35, Math.PI / 2);
+    const sign = label(staticGroup, 'ATELIER DE COULEUR', -8.27, 4.52, -1.18, 2.35, .32);
     sign.rotation.y = Math.PI / 2;
 
-    const makeEasel = (x, z, yaw, caption) => {
+    const easelCaption = (parent, caption, right) => {
+      const titleMap = canvasTexture((ctx, w, h) => {
+        ctx.clearRect(0, 0, w, h);
+        ctx.font = `${right ? 61 : 68}px Georgia`;
+        ctx.fillStyle = '#fff0d4'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.shadowColor = '#3e2718'; ctx.shadowBlur = 13;
+        ctx.fillText(right ? `${caption} ↙` : `${caption} ↘`, w / 2, h / 2);
+      }, 1024, 150);
+      const title = plane(parent, right ? 2.55 : 1.65, .29,
+        new THREE.MeshBasicMaterial({ map: titleMap, transparent: true, depthWrite: false, side: THREE.DoubleSide }), 0, 3.54, .61);
+      title.name = right ? 'restoration-caption-work' : 'restoration-caption-reference';
+      title.receiveShadow = false;
+    };
+    const makeEasel = (x, z, caption, isWork) => {
       const easel = new THREE.Group();
-      easel.name = caption === 'ЭТАЛОН' ? 'restoration-easel-reference' : 'restoration-easel-work';
-      easel.position.set(x, 0, z); easel.rotation.y = yaw; staticGroup.add(easel);
-      rod(easel, [-.71, .05, .34], [-.09, 3.75, -.10], .073, m.walnut);
-      rod(easel, [.71, .05, .34], [.09, 3.75, -.10], .073, m.walnut);
+      easel.name = isWork ? 'restoration-easel-work' : 'restoration-easel-reference';
+      easel.position.set(x, 0, z); easel.rotation.y = Math.PI / 2; staticGroup.add(easel);
+      rod(easel, [-.81, .05, .34], [-.09, 3.75, -.10], .073, m.walnut);
+      rod(easel, [.81, .05, .34], [.09, 3.75, -.10], .073, m.walnut);
       rod(easel, [0, .05, -1.00], [0, 3.12, -.22], .062, m.walnut);
-      for (const xx of [-.71, .71]) box(easel, .21, .08, .35, m.darkWood, xx, .055, .33);
+      for (const xx of [-.81, .81]) box(easel, .21, .08, .35, m.darkWood, xx, .055, .33);
       box(easel, .22, .08, .35, m.darkWood, 0, .055, -1.00);
       box(easel, .14, 2.93, .15, m.walnut, 0, 2.28, -.13);
-      box(easel, 1.88, .11, .27, m.darkWood, 0, 1.46, .34);
-      box(easel, 1.88, .072, .07, m.walnut, 0, 1.53, .49);
+      box(easel, 2.21, .11, .27, m.darkWood, 0, 1.36, .34);
+      box(easel, 2.21, .072, .07, m.walnut, 0, 1.43, .49);
       box(easel, .31, .12, .18, m.darkWood, 0, 3.20, .45);
-      framedPainting(easel, 1.86, 1.54, 'sardanapalus.jpg', 0, 2.35, .44);
-      // Small brass tag below the actual canvas: standard / restoration.
-      const tag = label(easel, caption, 0, 1.30, .50, 1.35, .19);
-      tag.castShadow = false;
+      framedPainting(easel, 2.17, 1.74, 'starry-night.jpg', 0, 2.33, .44, 0,
+        { frameMaterial: m.ash, backingMaterial: m.ash, innerFrameMaterial: m.oak, weathered: isWork });
+      easelCaption(easel, caption, isWork);
       return easel;
     };
-    makeEasel(-6.83, -2.71, 1.14, 'ЭТАЛОН');
-    makeEasel(-6.49, .52, 1.04, 'РЕСТАВРАЦИЯ');
+    // In a perpendicular view the reference is on the left and work on the right.
+    makeEasel(-6.56, .30, 'ЭТАЛОН', false);
+    makeEasel(-6.56, -2.51, 'ВАША РЕСТАВРАЦИЯ', true);
+
+    const rugMap = canvasTexture((ctx, w, h) => {
+      ctx.fillStyle = '#b6a17b'; ctx.fillRect(0, 0, w, h);
+      let seed = 405;
+      const rnd = () => ((seed = (1664525 * seed + 1013904223) >>> 0) / 4294967296);
+      for (let i = 0; i < 2600; i++) {
+        ctx.fillStyle = `rgba(236,219,180,${.015 + rnd() * .065})`;
+        ctx.fillRect(rnd() * w, rnd() * h, 1 + rnd() * 13, 1 + rnd() * 5);
+      }
+      ctx.strokeStyle = 'rgba(108,85,59,.2)'; ctx.lineWidth = 12;
+      ctx.strokeRect(20, 20, w - 40, h - 40);
+    }, 512, 512);
+    const rug = new THREE.Mesh(new THREE.PlaneGeometry(3.3, 6.0),
+      new THREE.MeshStandardMaterial({ map: rugMap, roughness: 1 }));
+    rug.name = 'restoration-rug';
+    rug.rotation.x = -Math.PI / 2; rug.position.set(-5.91, .057, -1.10);
+    rug.receiveShadow = true; staticGroup.add(rug);
 
     const pigmentColors = [m.ruby, m.green, m.slate, m.liquidAmber, m.paperDark];
     // Paint shelves are actually attached to the left wall, including supports.
@@ -239,8 +286,9 @@ export function buildLair(scene, m) {
     for (let i = 0; i < 12; i++) bottle(staticGroup, -8.02, 2.81 + Math.floor(i / 4) * .93,
       3.49 + (i % 4) * .58, pigmentColors[i % pigmentColors.length], .25 + (i % 2) * .07, .105);
 
-    const table = makeTable(staticGroup, 2.11, .97, -6.87, 3.77, .91);
+    const table = makeTable(staticGroup, 2.11, .97, -6.06, -4.39, 1.04);
     table.rotation.y = Math.PI / 2;
+    table.scale.setScalar(.84);
     box(table, .95, .025, .62, m.linen, -.43, 1.035, -.09);
     for (let i = 0; i < 6; i++) brush(table, -.93 + i * .19, 1.047, .30, -.1 + i * .11);
     for (let i = 0; i < 5; i++) bottle(table, -.87 + i * .30, 1.22, -.29, pigmentColors[i], .29, .095);
@@ -252,13 +300,20 @@ export function buildLair(scene, m) {
     cylinder(table, .12, .12, .016, m.glassBlue, .84, 1.104, -.20, 24);
     rod(table, [.86, 1.1, -.09], [1.03, 1.11, .12], .023, m.walnut);
 
-    const stool = new THREE.Group(); stool.position.set(-5.62, 0, 4.50); staticGroup.add(stool);
+    const stool = new THREE.Group(); stool.position.set(-4.87, 0, -4.33); staticGroup.add(stool);
     cylinder(stool, .43, .40, .14, m.ash, 0, .57, 0, 24);
     for (const xx of [-.26, .26]) for (const zz of [-.25, .25]) rod(stool, [xx, .09, zz], [xx * .75, .55, zz * .75], .052, m.walnut);
     for (let i = 0; i < 3; i++) {
-      const roll = cylinder(staticGroup, .095, .095, 1.30 + i * .19, m.canvas,
-        -8.07 + i * .14, .76 + i * .08, 5.80 + i * .18, 14);
-      roll.rotation.z = -.15 - i * .08;
+      const blank = new THREE.Group();
+      blank.position.set(-8.0 + i * .045, .0, -4.65 + i * .20);
+      blank.rotation.y = Math.PI / 2;
+      blank.rotation.z = -.07 - i * .035;
+      staticGroup.add(blank);
+      box(blank, .98 + i * .11, 1.22 + i * .13, .055, m.canvas, 0, .76 + i * .04, 0);
+      for (const side of [-1, 1]) {
+        box(blank, .045, 1.27 + i * .13, .07, m.ash, side * (.51 + i * .055), .76 + i * .04, .025);
+        box(blank, 1.06 + i * .11, .045, .07, m.ash, 0, .76 + i * .04 + side * (.63 + i * .065), .025);
+      }
     }
     station('restoration', [-6.39, 2.28, -1.06], [3.28, 4.9, 6.90]);
   }

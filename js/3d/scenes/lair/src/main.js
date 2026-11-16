@@ -13,10 +13,10 @@ const panel = document.querySelector('#zone-panel');
 const zones = {
   restoration: {
     number: '01', kicker: 'АТЕЛЬЕ САЙ', title: 'Реставрация',
-    description: 'У охристой левой стены стоят два мольберта — эталон и реставрация «Смерти Сарданапала». Рядом краски, кисти, палитра и коллекция спасённых полотен.',
+    description: 'У охристой левой стены стоят два мольберта — эталон и ваша реставрация «Звёздной ночи». Рядом краски, кисти, палитра и коллекция спасённых полотен.',
     status: '3D-мастерская уже существует как отдельная сцена.',
     link: 'https://atelier-restoration-1115.k1r11111.chatgpt.site/',
-    camera: [-.15, 4.44, 2.55], target: [-6.45, 2.42, -1.12],
+    camera: [2.10, 3.22, -1.08], target: [-6.51, 2.48, -1.08],
   },
   planning: {
     number: '02', kicker: 'БАЗА КОМАНДЫ', title: 'Карта и дела',
@@ -82,7 +82,10 @@ function setup() {
   controls.target.copy(homeTarget);
   controls.enableDamping = true;
   controls.dampingFactor = .075;
-  controls.enablePan = false;
+  // OrbitControls maps Command + left drag to pan when panning is enabled.
+  controls.enablePan = true;
+  controls.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
+  controls.panSpeed = .72;
   controls.minDistance = 3.0;
   controls.maxDistance = 21;
   controls.minPolarAngle = .72;
@@ -115,6 +118,9 @@ function setup() {
   canvas.addEventListener('pointerdown', e => { startPointer = [e.clientX, e.clientY]; });
   canvas.addEventListener('pointermove', hover3D);
   canvas.addEventListener('click', click3D);
+  window.addEventListener('keydown', e => { if (e.key === 'Meta') canvas.classList.add('command-pan'); });
+  window.addEventListener('keyup', e => { if (e.key === 'Meta') canvas.classList.remove('command-pan'); });
+  window.addEventListener('blur', () => canvas.classList.remove('command-pan'));
   document.querySelectorAll('[data-zone]').forEach(button => {
     button.addEventListener('click', event => {
       event.stopPropagation();
@@ -207,6 +213,7 @@ function hover3D(e) {
 }
 
 function click3D(e) {
+  if (e.metaKey) return;
   if (startPointer && Math.hypot(e.clientX - startPointer[0], e.clientY - startPointer[1]) > 7) return;
   const id = hitZone(e);
   if (id) openZone(id);
@@ -215,6 +222,10 @@ function click3D(e) {
 function updateHotspots() {
   const width = canvas.clientWidth, height = canvas.clientHeight;
   for (const button of document.querySelectorAll('.hotspot')) {
+    if (button.dataset.zone === currentZone) {
+      button.classList.add('offscreen');
+      continue;
+    }
     const anchor = room.anchors[button.dataset.zone];
     const point = anchor.clone();
     // Position scene labels above the object surface, never at floor level.

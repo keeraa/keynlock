@@ -39,9 +39,18 @@ assert.ok(alchemyTable.max.x > 8.0, 'alchemy tabletop is close to tile wall');
 assert.ok(alchemyTable.min.x > 5.7, 'alchemy tabletop does not cross the room');
 assert.ok(unique('restoration-easel-reference').position.x < -6.0);
 assert.ok(unique('restoration-easel-work').position.x < -6.0);
+const reference = unique('restoration-easel-reference');
+const work = unique('restoration-easel-work');
+assert.equal(reference.position.x, work.position.x, 'paintings align at the same wall depth');
+assert.ok(reference.position.z > work.position.z, 'reference appears to the left of the restoration');
+assert.equal(reference.rotation.y, Math.PI / 2, 'the reference faces the restoration camera');
+assert.equal(work.rotation.y, reference.rotation.y, 'both paintings face the same direction');
+assert.ok(unique('restoration-weathered-patina'), 'the right painting is visibly aged');
+assert.ok(unique('restoration-caption-reference').position.y > 3.4, 'reference caption sits above the easel');
+assert.ok(unique('restoration-caption-work').position.y > 3.4, 'work caption sits above the easel');
 assert.equal(Object.keys(world.anchors).length, 5, 'all five hotspots retained');
 
-for (const name of ['sardanapalus.jpg', 'wood-gouache-walnut.webp', 'wood-gouache-ash.webp', 'wood-gouache-oak.webp']) {
+for (const name of ['sardanapalus.jpg', 'starry-night.jpg', 'wood-gouache-walnut.webp', 'wood-gouache-ash.webp', 'wood-gouache-oak.webp']) {
   assert.ok(existsSync(new URL(`../public/assets/${name}`, import.meta.url)), `${name} available`);
 }
 for (const metal of ['aurum', 'argentum', 'ferrum', 'cuprum', 'stannum', 'plumbum', 'hydrargyrum']) {

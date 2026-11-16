@@ -6,6 +6,7 @@ Release planning: [first episode roadmap and acceptance criteria](docs/release-r
 Latest audit: [release readiness, reproduced defects and all 70 mission launches](docs/qa/release-readiness-2026-09-09.md).
 Current implemented story: [«Чужие подписи»](docs/narrative/chapter-one-proposal.md).
 Worldbuilding: [официальный флаг Киенлока и его символика](docs/lore/flag.md).
+Логово и музыка: [мастерские, галерея и саундтрек Шопена](docs/lore/lair-and-soundtrack.md).
 
 - `index.html` — KEYNLOCK entry point
 - `css/` — modular CSS

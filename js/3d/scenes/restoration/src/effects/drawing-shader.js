@@ -11,6 +11,7 @@ export const drawingFragmentShader = `
   uniform sampler2D tColor;
   uniform sampler2D tDepth;
   uniform sampler2D tNormal;
+  uniform sampler2D tBlur;
   uniform vec2 uTexel;
   uniform float uNear;
   uniform float uFar;
@@ -20,7 +21,6 @@ export const drawingFragmentShader = `
   uniform float uOutlineWidth;
   uniform float uFocus;
   uniform float uBackgroundBlur;
-  uniform float uBlurRadius;
   varying vec2 vUv;
 
   float eyeDepth(vec2 uv) {
@@ -81,30 +81,13 @@ export const drawingFragmentShader = `
   void main() {
     vec4 center = texture2D(tColor, vUv);
     if (uBackgroundBlur > 0.0) {
-      // Blur only the room behind the current focus plane. Samples from the
-      // foreground paintings are rejected to keep their silhouettes crisp.
       float centerDepth = eyeDepth(vUv);
       float background = backgroundMask(centerDepth) * uBackgroundBlur;
       if (background > 0.001) {
-        vec2 shift = uTexel * uBlurRadius;
-        vec4 soft = center * 1.7;
-        float weight = 1.7;
-        // Eight taps on staggered rings provide a legible soft-focus effect
-        // without the cost of a separate full-screen blur pass.
-        for (int i = 0; i < 8; i++) {
-          vec2 offset = i == 0 ? vec2(shift.x, 0.0) :
-            i == 1 ? vec2(-shift.x, 0.0) :
-            i == 2 ? vec2(0.0, shift.y) :
-            i == 3 ? vec2(0.0, -shift.y) :
-            i == 4 ? shift * vec2(.58, .58) :
-            i == 5 ? shift * vec2(-.58, .58) :
-            i == 6 ? shift * vec2(.58, -.58) : shift * vec2(-.58, -.58);
-          vec2 uv = clamp(vUv + offset, vec2(0.0), vec2(1.0));
-          float tap = backgroundMask(eyeDepth(uv));
-          soft += texture2D(tColor, uv) * tap;
-          weight += tap;
-        }
-        center = mix(center, soft / weight, background);
+        // Blur texture is Gaussian-filtered and premultiplied by background
+        // coverage. Division removes foreground-edge halos from the wall.
+        vec4 soft = texture2D(tBlur, vUv);
+        if (soft.a > .001) center.rgb = mix(center.rgb, soft.rgb / soft.a, background);
       }
     }
     gl_FragColor = center;

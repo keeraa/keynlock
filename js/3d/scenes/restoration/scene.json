@@ -5,7 +5,7 @@
   "threeVersion": "0.187.0",
   "status": "standalone",
   "source": "ChatGPT Sites",
-  "sourceCommit": "02569766969b481ea3f519c06bdb574840b91370",
+  "sourceCommit": "19b58dbee11d6dc9af72d11a1f392940abfb53dd",
   "savedOn": "2026-11-16",
   "liveUrl": "https://atelier-restoration-1115.k1r11111.chatgpt.site",
   "entry": "index.html",
@@ -67,7 +67,12 @@
       "method": "screen-space-visible-area-weighted-by-center-proximity",
       "updateThrottleMs": 90,
       "manualFocusPreserved": true,
-      "textureMemory": "shared-wall-preview-cache-with-eviction-disposal"
+      "textureMemory": "shared-wall-preview-cache-with-eviction-disposal",
+      "activeModes": [
+        "gallery",
+        "art"
+      ],
+      "keepsClickedArtworkDuringFlight": true
     }
   },
   "integration": {

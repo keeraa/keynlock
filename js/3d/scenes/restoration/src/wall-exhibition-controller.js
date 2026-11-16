@@ -53,7 +53,10 @@ export function createWallExhibitionController({ paintings, playerProgress, wall
   }
 
   function updateViewedArtwork(now) {
-    if (getNavigation().mode() !== 'gallery' || now - lastAutoPickAt < 90) return;
+    const navigation = getNavigation();
+    const mode = navigation.mode();
+    if ((mode !== 'gallery' && mode !== 'art') || navigation.isTraveling?.()
+      || now - lastAutoPickAt < 90) return;
     lastAutoPickAt = now;
     const prominent = wallGallery.getProminentPainting(viewedId);
     if (!prominent || prominent.id === viewedId) return;

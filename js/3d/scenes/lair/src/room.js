@@ -73,6 +73,12 @@ export function buildLair(scene, m) {
     const leftFinish = plane(staticGroup, 12.88, 13.55, m.restorationWall, -8.391, 6.72, .75);
     leftFinish.rotation.y = Math.PI / 2;
     leftFinish.name = 'restoration-left-wall';
+    // One continuous sage-green tiled finish covers the entire right wall.
+    // It sits just in front of the plaster, from the floor to the ceiling.
+    const rightFinish = plane(staticGroup, 13.0, 13.54, m.alchemyTile, 8.392, 6.77, .75);
+    rightFinish.rotation.y = -Math.PI / 2;
+    rightFinish.castShadow = false;
+    rightFinish.name = 'alchemy-right-wall';
 
     // Wainscot panels, framed with dark timber; the left wall is kept free for the restoration easel.
     box(staticGroup, 17.25, 1.65, .08, m.agedWood, 0, .9, -5.39);
@@ -82,18 +88,12 @@ export function buildLair(scene, m) {
       box(staticGroup, .09, 1.45, .09, m.darkWood, i * 1.18, .93, -5.31);
       if (i < 7) box(staticGroup, .92, .04, .045, m.oldBrass, i * 1.18 + .59, 1.49, -5.23);
     }
-    for (const side of [-1, 1]) {
-      // Leave the right-hand alcove tiled down to the floor as in Alchemy.
-      const strips = side < 0 ? [[.75, 12.9]] : [[4.08, 6.33], [-5.20, .72]];
-      for (const [z, length] of strips) {
-        box(staticGroup, .08, 1.66, length, m.agedWood, side * 8.35, .88, z);
-        box(staticGroup, .19, .15, length, m.darkWood, side * 8.23, 1.77, z);
-        box(staticGroup, .22, .20, length, m.walnut, side * 8.20, .17, z);
-      }
-      if (side < 0) box(staticGroup, .17, .20, 12.9, m.darkWood, side * 8.30, 6.85, .75);
-      else box(staticGroup, .17, .20, 6.33, m.darkWood, side * 8.30, 6.85, 4.08);
-      box(staticGroup, .22, .20, 12.9, m.walnut, side * 8.29, 13.30, .75);
-    }
+    // The restoration side retains its wood wainscot. Keep the tiled side clear.
+    box(staticGroup, .08, 1.66, 12.9, m.agedWood, -8.35, .88, .75);
+    box(staticGroup, .19, .15, 12.9, m.darkWood, -8.23, 1.77, .75);
+    box(staticGroup, .22, .20, 12.9, m.walnut, -8.20, .17, .75);
+    box(staticGroup, .17, .20, 12.9, m.darkWood, -8.30, 6.85, .75);
+    for (const side of [-1, 1]) box(staticGroup, .22, .20, 12.9, m.walnut, side * 8.29, 13.30, .75);
     for (const x of [-8.25, -4.25, 0, 4.25, 8.25]) {
       box(staticGroup, .31, 13.35, .32, m.darkWood, x, 6.64, -5.32);
       box(staticGroup, .45, .22, .48, m.walnut, x, 12.70, -5.31);
@@ -439,17 +439,11 @@ export function buildLair(scene, m) {
 
   function buildAlchemy() {
     // The entire laboratory is turned 90 degrees. Its FRONT faces the room,
-    // with its back, sage-tiled wall and tabletop against the RIGHT wall.
+    // with its back and tabletop against the fully sage-tiled RIGHT wall.
     const alcove = new THREE.Group();
     alcove.position.set(6.50, 0, -2.10);
     alcove.rotation.y = -Math.PI / 2;
     staticGroup.add(alcove);
-    const tileWall = plane(alcove, 5.45, 11.32, m.alchemyTile, 0, 5.66, -1.88);
-    tileWall.castShadow = false;
-    tileWall.name = 'alchemy-right-wall';
-    box(alcove, 5.64, .19, .14, m.darkWood, 0, 11.42, -1.80);
-    for (const xx of [-2.74, 2.74]) box(alcove, .13, 11.1, .14, m.darkWood, xx, 5.56, -1.78);
-    box(alcove, 5.62, .18, .19, m.walnut, 0, .20, -1.78);
 
     const counter = makeTable(alcove, 4.75, 1.74, 0, -.86, .97);
     counter.name = 'alchemy-facing-wall-table';

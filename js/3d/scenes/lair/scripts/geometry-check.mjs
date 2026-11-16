@@ -34,6 +34,8 @@ const alchemyTable = bounds('alchemy-facing-wall-table');
 assert.ok(restWall.max.y > 13.4, 'left wall reaches the double-height ceiling');
 assert.ok(restWall.max.x < -8.3, 'ochre plaster lies on left wall');
 assert.ok(alchemyWall.min.x > 8.25 && alchemyWall.max.x < 8.45, 'sage tiles lie against right wall');
+assert.ok(alchemyWall.max.y > 13.4 && alchemyWall.min.y < .1, 'tiles cover the entire wall height');
+assert.ok(alchemyWall.min.z < -5.6 && alchemyWall.max.z > 7.1, 'tiles cover the entire wall width');
 assert.ok(alchemyTable.max.x < alchemyWall.min.x, 'alchemy tabletop sits in front of tile wall');
 assert.ok(alchemyTable.max.x > 8.0, 'alchemy tabletop is close to tile wall');
 assert.ok(alchemyTable.min.x > 5.7, 'alchemy tabletop does not cross the room');

@@ -1,5 +1,5 @@
 // The sage tiles use the same non-repeating, painted-wall algorithm as the
-// original KEYNLOCK alchemy laboratory. One texture covers the whole alcove.
+// original KEYNLOCK alchemy laboratory. One texture covers the entire wall.
 const PALETTE = {
   base: [62, 86, 79], highlight: [116, 136, 116],
   shadow: [38, 65, 61], grout: [34, 49, 47],
@@ -19,7 +19,7 @@ function noise(x, y, seed) {
 }
 
 export function makeAlchemyTileTexture(THREE, span = { width: 6, height: 12 }) {
-  const width = 576, height = 960, seed = 21;
+  const width = span.textureWidth ?? 576, height = span.textureHeight ?? 960, seed = 21;
   const pixels = new Uint8Array(width * height * 4);
   for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
     const u = x / width, v = y / height;

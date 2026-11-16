@@ -33,7 +33,7 @@ export function createMaterials() {
     oak: new THREE.MeshStandardMaterial({ map: oakMap, color: '#ffffff', roughness: .96 }),
     plaster: new THREE.MeshStandardMaterial({ map: plasterMap, color: '#e0d8d0', roughness: 1 }),
     restorationWall: new THREE.MeshStandardMaterial({ map: restorationPlasterMap, color: '#f9cbaa', roughness: 1, side: THREE.DoubleSide }),
-    alchemyTile: new THREE.MeshStandardMaterial({ map: makeAlchemyTileTexture(THREE, { width: 18, height: 24 }), roughness: 1, metalness: 0, side: THREE.DoubleSide }),
+    alchemyTile: new THREE.MeshStandardMaterial({ map: makeAlchemyTileTexture(THREE, { width: 42.5, height: 29, textureWidth: 960, textureHeight: 1024 }), roughness: 1, metalness: 0, side: THREE.DoubleSide }),
     floor: new THREE.MeshStandardMaterial({ map: floorMap, color: '#fff4e8', roughness: 1 }),
     floorAlternate: new THREE.MeshStandardMaterial({ map: floorAlternateMap, color: '#e0c5b7', roughness: 1 }),
     brass: mat('#b49459', .36, .63),

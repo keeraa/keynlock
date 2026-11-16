@@ -1,7 +1,8 @@
 /** Pointer hit-testing, drag capture, tool cursor and UV spotlight. */
 export function createRestorationInput({ THREE, renderer, camera, controls, scene, stage,
   leftEasel, rightEasel, navigation, getSurface, getTexture, onStrokeFinished,
-  onStrokeProgress, onToolChanged, $ }) {
+  onStrokeProgress, onToolChanged, getWallArtworkHit = () => null,
+  onWallArtworkClick = () => {}, onWallArtworkHover = () => {}, $ }) {
   let activeTool = null;
   let stroke = null;
   let pointerStart = null;
@@ -193,7 +194,10 @@ export function createRestorationInput({ THREE, renderer, camera, controls, scen
       return;
     }
     updateToolCursor(event, hit);
-    if (!pointerStart) renderer.domElement.style.cursor = activeTool && hit?.side === 'copy' ? 'none' : hit ? 'zoom-in' : 'grab';
+    const wallHit = !stroke && !navigation.isTraveling() && !hit ? getWallArtworkHit(event) : null;
+    onWallArtworkHover(wallHit, event);
+    if (!pointerStart) renderer.domElement.style.cursor = wallHit ? 'pointer'
+      : activeTool && hit?.side === 'copy' ? 'none' : hit ? 'zoom-in' : 'grab';
   }, true);
 
   renderer.domElement.addEventListener('pointercancel', (event) => {
@@ -210,13 +214,16 @@ export function createRestorationInput({ THREE, renderer, camera, controls, scen
     const moved = Math.hypot(event.clientX - pointerStart.x, event.clientY - pointerStart.y);
     pointerStart = null;
     const hit = paintingHit(event);
-    renderer.domElement.style.cursor = activeTool && hit?.side === 'copy' ? 'none' : hit ? 'zoom-in' : 'grab';
+    const wallHit = !hit && !navigation.isTraveling() ? getWallArtworkHit(event) : null;
+    renderer.domElement.style.cursor = wallHit ? 'pointer' : activeTool && hit?.side === 'copy' ? 'none' : hit ? 'zoom-in' : 'grab';
     if (moved <= 7 && hit?.side) navigation.focusOn(hit.side);
+    else if (moved <= 7 && wallHit) onWallArtworkClick(wallHit);
   }, true);
   renderer.domElement.addEventListener('pointerleave', () => {
     if (!stroke) toolCursor.hidden = true;
     damageHint.hidden = true;
     updateUVIllumination(null);
+    onWallArtworkHover(null);
   });
   document.querySelectorAll('.restoration-tool').forEach((button) => {
     button.addEventListener('click', () => selectTool(button.dataset.tool));

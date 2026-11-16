@@ -81,3 +81,67 @@ test('painting focus eases into place without a camera snap, even after a resize
     globalThis.ResizeObserver = originalResizeObserver;
   }
 });
+
+test('gallery camera rises to the wall, focuses a painting and returns without a reset snap', () => {
+  const previousDocument = globalThis.document;
+  const previousResizeObserver = globalThis.ResizeObserver;
+  const nodes = new Map();
+  const node = (id) => {
+    if (!nodes.has(id)) nodes.set(id, {
+      style: {}, hidden: false, textContent: '',
+      classList: { add() {}, remove() {} },
+      setAttribute() {}, addEventListener() {},
+    });
+    return nodes.get(id);
+  };
+  globalThis.document = { querySelector: node };
+  globalThis.ResizeObserver = class { observe() {} };
+  try {
+    const camera = new THREE.PerspectiveCamera(39, 1, .1, 65);
+    camera.position.set(0, 2.3, 7.7);
+    const controls = {
+      target: new THREE.Vector3(0, 1.91, 0),
+      enableDamping: true, enabled: true, enableRotate: true, enablePan: false,
+      minDistance: 5.25, maxDistance: 11.6, minPolarAngle: 1.23, maxPolarAngle: 1.67,
+      mouseButtons: { LEFT: THREE.MOUSE.ROTATE },
+      update() { camera.lookAt(this.target); },
+    };
+    const stage = node('.stage');
+    stage.clientWidth = 1400;
+    stage.clientHeight = 850;
+    const changes = [];
+    const nav = createSceneNavigation({
+      THREE, camera, controls, renderer: { setSize() {} }, stage, easelX: 1.28,
+      cartoonFilter: { resize() {} }, labelLayer: node('.painting-labels'),
+      getTexture: () => ({ image: { width: 1200, height: 900 } }),
+      getTool: () => null, clearUV() {}, damageHint: node('#damage-hint'),
+      onWallChange: (state) => changes.push(state.mode), $: node,
+    });
+    nav.resize();
+    const start = camera.position.clone();
+    const now = performance.now();
+    nav.enterWallGallery({ minY: 7.2, maxY: 17.25, width: 14.6 });
+    assert.ok(camera.position.distanceTo(start) < 1e-6, 'begin ascent without a snap');
+    nav.animate(now + 1800);
+    assert.ok(camera.position.y > 11, 'camera rises above the easels');
+    assert.equal(nav.isWallGallery(), true);
+    const art = { id: 'restored-1', x: 2.4, y: 16.3, width: 1.55, height: 2.0 };
+    nav.focusWallArt(art);
+    nav.animate(now + 3200);
+    assert.equal(nav.focusedWallId(), art.id);
+    assert.ok(Math.abs(controls.target.y - art.y) < 1e-6);
+    assert.ok(Math.abs(camera.position.x - art.x) < 1e-6);
+    nav.leaveWallArt();
+    nav.animate(now + 4800);
+    assert.equal(nav.focusedWallId(), null);
+    nav.leaveWallGallery();
+    nav.animate(now + 6500);
+    assert.ok(camera.position.distanceTo(start) < .03, 'return to original workshop camera');
+    assert.equal(controls.minPolarAngle, 1.23);
+    assert.equal(controls.mouseButtons.LEFT, THREE.MOUSE.ROTATE);
+    assert.deepEqual(changes, ['overview', 'art', 'overview', 'closed']);
+  } finally {
+    globalThis.document = previousDocument;
+    globalThis.ResizeObserver = previousResizeObserver;
+  }
+});

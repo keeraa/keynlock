@@ -1,11 +1,18 @@
 /** Camera, focus transitions and 2D labels for the two painting easels. */
 export function createSceneNavigation({ THREE, camera, controls, renderer, stage, easelX,
-  cartoonFilter, labelLayer, getTexture, getTool, clearUV, damageHint, $ }) {
+  cartoonFilter, labelLayer, getTexture, getTool, clearUV, damageHint, onWallChange = () => {}, $ }) {
   let paintingCenterY = 1.91;
   let activeFocus = null;
   let lastFocusedSide = 'copy';
   let overviewPose = null;
   let cameraTravel = null;
+  let wallMode = false;
+  let wallFocusedId = null;
+  let wallArtwork = null;
+  let wallOriginPose = null;
+  let wallOverviewPose = null;
+  let wallBounds = { minY: 7, maxY: 17.25, width: 14.6 };
+  let originalControlLimits = null;
   let stageWidth = 0, stageHeight = 0;
   const originalLabel = document.querySelector('.label-original');
   const copyLabel = document.querySelector('.label-copy');
@@ -35,7 +42,7 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
     return { position: new THREE.Vector3(x, y, z), target };
   }
 
-  function flyCamera(destination) {
+  function flyCamera(destination, duration = 780, onComplete = null) {
     clearUV();
     damageHint.hidden = true;
     const fromPosition = camera.position.clone();
@@ -50,7 +57,7 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
     controls.target.copy(fromTarget);
     camera.lookAt(fromTarget);
     cameraTravel = {
-      started: performance.now(), duration: 780,
+      started: performance.now(), duration, onComplete,
       fromPosition, fromTarget,
       toPosition: destination.position.clone(), toTarget: destination.target.clone(),
     };
@@ -83,7 +90,7 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
   }
 
   function focusOn(side) {
-    if (!getTexture() || (side !== 'original' && side !== 'copy') || activeFocus === side) return;
+    if (wallMode || !getTexture() || (side !== 'original' && side !== 'copy') || activeFocus === side) return;
     lastFocusedSide = side;
     const changingSide = Boolean(activeFocus);
     if (!changingSide) overviewPose = { position: camera.position.clone(), target: controls.target.clone() };
@@ -97,8 +104,7 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
     flyCamera(focusDestination(side, changingSide));
   }
 
-  function leaveFocus({ immediate = false } = {}) {
-    if (!activeFocus) return;
+  function resetFocusUI() {
     clearUV();
     damageHint.hidden = true;
     activeFocus = null;
@@ -108,6 +114,11 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
     $('focus-exit').hidden = true;
     $('scene-hint-text').innerHTML = 'Клик / W / ↑ — приблизить <span class="hint-divider">·</span> S / ↓ — общий вид <span class="hint-divider">·</span> A/D, ←/→ — картины';
     updateStepper();
+  }
+
+  function leaveFocus({ immediate = false } = {}) {
+    if (!activeFocus || wallMode) return;
+    resetFocusUI();
     const destination = overviewPose || {
       position: new THREE.Vector3(0, paintingCenterY + .4, overviewDistance()),
       target: new THREE.Vector3(0, paintingCenterY, 0),
@@ -127,11 +138,151 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
 
   function setPaintingCenterY(next) {
     paintingCenterY = next;
-    if (activeFocus) return;
+    if (activeFocus || wallMode) return;
     const offsetY = paintingCenterY - controls.target.y;
     controls.target.y = paintingCenterY;
     camera.position.y += offsetY;
     controls.update();
+  }
+
+  function wallOverviewDestination() {
+    const centerY = (wallBounds.minY + wallBounds.maxY) / 2;
+    const fov = THREE.MathUtils.degToRad(camera.fov);
+    const horizontalFov = 2 * Math.atan(Math.tan(fov / 2) * camera.aspect);
+    const height = Math.max(3, wallBounds.maxY - wallBounds.minY);
+    const distance = Math.max(9.5,
+      height / (2 * Math.tan(fov / 2) * .72),
+      wallBounds.width / (2 * Math.tan(horizontalFov / 2) * .75));
+    const target = new THREE.Vector3(0, centerY, -4.3);
+    return { position: new THREE.Vector3(0, centerY, -4.3 + Math.min(32, distance)), target };
+  }
+
+  function wallArtDestination(art) {
+    if (!art) return wallOverviewDestination();
+    const fov = THREE.MathUtils.degToRad(camera.fov);
+    const horizontalFov = 2 * Math.atan(Math.tan(fov / 2) * camera.aspect);
+    const distance = Math.max(2.2,
+      art.height / (2 * Math.tan(fov / 2) * .72),
+      art.width / (2 * Math.tan(horizontalFov / 2) * .75));
+    const target = new THREE.Vector3(art.x, art.y, -4.3);
+    return { position: new THREE.Vector3(art.x, art.y, -4.3 + Math.min(14, distance)), target };
+  }
+
+  function enterWallGallery(bounds = wallBounds) {
+    if (wallMode) return;
+    wallBounds = bounds;
+    // Always return to the two easels, even when the gallery was opened from a closeup.
+    const source = activeFocus && overviewPose ? overviewPose : { position: camera.position, target: controls.target };
+    wallOriginPose = { position: source.position.clone(), target: source.target.clone() };
+    if (activeFocus) resetFocusUI();
+    overviewPose = null;
+    originalControlLimits = {
+      minDistance: controls.minDistance, maxDistance: controls.maxDistance,
+      minPolarAngle: controls.minPolarAngle, maxPolarAngle: controls.maxPolarAngle,
+      enableRotate: controls.enableRotate, enablePan: controls.enablePan,
+      leftButton: controls.mouseButtons?.LEFT,
+    };
+    wallMode = true;
+    controls.minDistance = 1.35;
+    controls.maxDistance = 36;
+    controls.minPolarAngle = .05;
+    controls.maxPolarAngle = Math.PI - .05;
+    controls.enableRotate = false;
+    controls.enablePan = true;
+    if (controls.mouseButtons) controls.mouseButtons.LEFT = THREE.MOUSE.PAN;
+    stage.classList.add('wall-gallery-active');
+    wallOverviewPose = wallOverviewDestination();
+    onWallChange({ mode: 'overview' });
+    flyCamera(wallOverviewPose, 1350);
+  }
+
+  function focusWallArt(art) {
+    if (!art?.id) return;
+    if (!wallMode) enterWallGallery();
+    if (!wallFocusedId) {
+      wallOverviewPose = { position: camera.position.clone(), target: controls.target.clone() };
+      // Coming directly from the easels uses the full-wall overview as return pose.
+      if (camera.position.y < wallBounds.minY - 1) wallOverviewPose = wallOverviewDestination();
+    }
+    wallFocusedId = art.id;
+    wallArtwork = art;
+    onWallChange({ mode: 'art', art });
+    flyCamera(wallArtDestination(art), 1200);
+  }
+
+  function leaveWallArt() {
+    if (!wallMode || !wallFocusedId) return;
+    wallFocusedId = null;
+    wallArtwork = null;
+    onWallChange({ mode: 'overview' });
+    flyCamera(wallOverviewPose || wallOverviewDestination(), 940);
+  }
+
+  function leaveWallGallery({ immediate = false } = {}) {
+    if (!wallMode) return;
+    wallMode = false;
+    wallFocusedId = null;
+    wallArtwork = null;
+    stage.classList.remove('wall-gallery-active');
+    onWallChange({ mode: 'closed' });
+    const destination = wallOriginPose || {
+      position: new THREE.Vector3(0, paintingCenterY + .4, overviewDistance()),
+      target: new THREE.Vector3(0, paintingCenterY, 0),
+    };
+    const correctionY = paintingCenterY - destination.target.y;
+    destination.target.y += correctionY;
+    destination.position.y += correctionY;
+    wallOriginPose = null;
+    wallOverviewPose = null;
+    const restore = () => {
+      if (!originalControlLimits) return;
+      const { leftButton, ...limits } = originalControlLimits;
+      Object.assign(controls, limits);
+      if (controls.mouseButtons && leftButton !== undefined) controls.mouseButtons.LEFT = leftButton;
+      originalControlLimits = null;
+      if (!cameraTravel) controls.update();
+    };
+    if (immediate) {
+      cameraTravel = null;
+      camera.position.copy(destination.position);
+      controls.target.copy(destination.target);
+      controls.enabled = true;
+      restore();
+    } else {
+      flyCamera(destination, 1250);
+      // The camera stays interpolated with controls disabled. Restoring limits
+      // now also makes a rapid gallery re-entry safe.
+      restore();
+    }
+  }
+
+  function updateWallLayout(nextLayout) {
+    wallBounds = nextLayout.bounds;
+    if (!wallMode) return;
+    if (wallFocusedId) {
+      const moved = nextLayout.placements.find((art) => art.id === wallFocusedId);
+      if (!moved) { leaveWallArt(); return; }
+      wallArtwork = moved;
+      flyCamera(wallArtDestination(moved), 820);
+      return;
+    }
+    wallOverviewPose = wallOverviewDestination();
+    flyCamera(wallOverviewPose, 820);
+  }
+
+  function moveAlongWall(direction) {
+    if (!wallMode) return;
+    if (wallFocusedId) { leaveWallArt(); return; }
+    const current = controls.target.y;
+    const wanted = THREE.MathUtils.clamp(current + direction * 2.5,
+      Math.min(7, wallBounds.minY), wallBounds.maxY);
+    if (Math.abs(wanted - current) < .01) return;
+    const delta = wanted - current;
+    wallOverviewPose = {
+      position: camera.position.clone().add(new THREE.Vector3(0, delta, 0)),
+      target: controls.target.clone().add(new THREE.Vector3(0, delta, 0)),
+    };
+    flyCamera(wallOverviewPose, 690);
   }
 
   function updateLabel(element, x, y, z) {
@@ -142,6 +293,7 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
   }
 
   function renderLabels() {
+    if (wallMode) return;
     const texture = getTexture();
     if (!texture) return;
     const aspect = (texture.image.naturalWidth || texture.image.width) / (texture.image.naturalHeight || texture.image.height);
@@ -167,10 +319,17 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
         const destination = focusDestination(activeFocus);
         cameraTravel.toPosition.copy(destination.position);
         cameraTravel.toTarget.copy(destination.target);
+      } else if (wallMode) {
+        const destination = wallFocusedId ? wallArtDestination(wallArtwork)
+          : wallOverviewPose || wallOverviewDestination();
+        cameraTravel.toPosition.copy(destination.position);
+        cameraTravel.toTarget.copy(destination.target);
       }
     } else {
       controls.enabled = true;
-      if (activeFocus) {
+      if (wallMode) {
+        // Keep the current wall pose instead of snapping back to the easels.
+      } else if (activeFocus) {
         const centerX = activeFocus === 'original' ? -easelX : easelX;
         const offsetX = centerX - controls.target.x;
         controls.target.x = centerX;
@@ -195,6 +354,7 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
     controls.target.lerpVectors(cameraTravel.fromTarget, cameraTravel.toTarget, eased);
     camera.lookAt(controls.target);
     if (progress >= 1) {
+      const onComplete = cameraTravel.onComplete;
       cameraTravel = null;
       controls.enabled = true;
       // Don't carry an old orbit delta into the first frame after arrival.
@@ -202,6 +362,7 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
       controls.enableDamping = false;
       controls.update();
       controls.enableDamping = damping;
+      onComplete?.();
     }
     return true;
   }
@@ -211,7 +372,9 @@ export function createSceneNavigation({ THREE, camera, controls, renderer, stage
   $('next-painting').addEventListener('click', () => focusOn('copy'));
   new ResizeObserver(resize).observe(stage);
 
-  return { focusOn, leaveFocus, updateStepper, updateFocusedHint, setPaintingCenterY,
+  return { focusOn, leaveFocus, enterWallGallery, leaveWallGallery, focusWallArt, leaveWallArt,
+    updateWallLayout, moveAlongWall, updateStepper, updateFocusedHint, setPaintingCenterY,
     renderLabels, resize, animate, isTraveling: () => Boolean(cameraTravel),
-    focusedSide: () => activeFocus, lastFocusedSide: () => lastFocusedSide };
+    focusedSide: () => activeFocus, lastFocusedSide: () => lastFocusedSide,
+    isWallGallery: () => wallMode, focusedWallId: () => wallFocusedId };
 }

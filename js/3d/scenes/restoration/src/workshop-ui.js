@@ -56,6 +56,17 @@ export function wireWorkshopUI({ cartoonFilter, navigation, restorationInput, co
 
   window.addEventListener('keydown', (event) => {
     if (collectionUI.isOpen()) return;
+    if (navigation.isWallGallery()) {
+      if (event.code === 'Escape') {
+        event.preventDefault();
+        if (navigation.focusedWallId()) navigation.leaveWallArt();
+        else navigation.leaveWallGallery();
+      } else if (['ArrowUp', 'KeyW', 'ArrowDown', 'KeyS'].includes(event.code)) {
+        event.preventDefault();
+        navigation.moveAlongWall(['ArrowUp', 'KeyW'].includes(event.code) ? 1 : -1);
+      }
+      return;
+    }
     // Use physical keys so WASD/number tools work with RU keyboard layouts.
     if (!event.altKey && !event.ctrlKey && !event.metaKey && !event.isComposing) {
       const side = { ArrowLeft: 'original', KeyA: 'original', ArrowRight: 'copy', KeyD: 'copy' }[event.code];
@@ -88,4 +99,5 @@ export function wireWorkshopUI({ cartoonFilter, navigation, restorationInput, co
       event.preventDefault(); restorationInput.selectTool(restorationInput.currentTool());
     }
   }, { capture: true });
+  return { setWorkbenchVisible, isWorkbenchVisible: () => !workbenchContent.hidden };
 }

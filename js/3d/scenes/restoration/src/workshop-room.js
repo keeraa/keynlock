@@ -50,10 +50,10 @@ export function createWorkshopRoom({ THREE, scene, mats }) {
     sun.shadow.mapSize.set(2048, 2048);
     sun.shadow.camera.near = .5;
     sun.shadow.camera.far = 24;
-    sun.shadow.camera.left = -10;
-    sun.shadow.camera.right = 10;
-    sun.shadow.camera.top = 10;
-    sun.shadow.camera.bottom = -10;
+    sun.shadow.camera.left = -12;
+    sun.shadow.camera.right = 12;
+    sun.shadow.camera.top = 19;
+    sun.shadow.camera.bottom = -6;
     sun.shadow.bias = -.00015;
     sun.shadow.normalBias = .025;
     scene.add(sun);
@@ -63,8 +63,11 @@ export function createWorkshopRoom({ THREE, scene, mats }) {
 
     // One continuous hand-painted gouache sheet, mapped once across the entire wall.
     wallpaperMaterial = new THREE.MeshStandardMaterial({ color: '#bdac98', roughness: 1 });
-    const wall = box(32, 12, .2, wallpaperMaterial, 0, 4.4, -4.7);
+    // The gallery rises well above the easels; its top is deliberately out of
+    // frame in the normal workshop view and revealed by the traveling camera.
+    const wall = box(32, 20.3, .2, wallpaperMaterial, 0, 8.6, -4.7);
     wall.castShadow = false;
+    box(16.5, .12, .18, mats.roomWood, 0, 18.20, -4.47);
     box(32, .26, .31, mats.roomWood, 0, 1.24, -4.48);
     box(32, 1.22, .15, new THREE.MeshStandardMaterial({ color: '#69513e', roughness: .92 }), 0, .58, -4.53);
     for (let i = -13; i <= 13; i++) box(.033, 1.16, .03, mats.roomWood, i * 1.12, .59, -4.43);

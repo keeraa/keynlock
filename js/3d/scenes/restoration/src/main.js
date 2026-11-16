@@ -52,9 +52,6 @@ const woodVariants = [
   { name: 'Орех', image: '/textures/wood-walnut-gouache-v2.webp', grade: { contrast: .72, saturation: .91, tint: [0, 2, 4] } },
   { name: 'Пепел', image: '/textures/wood-ash-gouache-v2.webp' },
 ];
-// Leave empty until paintings should be displayed behind the two easels.
-// Example: { paintingIndex: 1, x: 0, y: 3.7, width: 1.3, height: .95, angle: -.035 }
-const rearWallLayout = [];
 let woodTextures = [];
 const selectedWood = { easel: 1, frame: 1 };
 
@@ -83,7 +80,7 @@ featuredPaintings.forEach((art, i) => {
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color('#71604c');
-scene.fog = new THREE.Fog('#756650', 10, 23);
+scene.fog = new THREE.Fog('#756650', 10, 55);
 
 const camera = new THREE.PerspectiveCamera(39, 1, 0.1, 65);
 camera.position.set(0, 2.27, 7.65);
@@ -149,7 +146,10 @@ document.querySelectorAll('.wood-option').forEach((button) => {
 
 const framedArtwork = createArtworkRenderer({ THREE, frameWood: mats.frameWood });
 const { dust, makeEasel, wallpaperMaterial, floorWoodMaterials } = createWorkshopRoom({ THREE, scene, mats });
-const wallGallery = createWallGallery({ THREE, scene, frameWood: mats.frameWood });
+const wallGallery = createWallGallery({
+  THREE, scene, camera, renderer, frameWood: mats.frameWood,
+  onLayout: (layout) => navigation.updateWallLayout(layout),
+});
 const easelX = 1.28;
 const leftEasel = makeEasel(-easelX, .045);
 const rightEasel = makeEasel(easelX, -.045);
@@ -172,12 +172,71 @@ const restorationStore = createRestorationStore({
 const restorationSessions = createRestorationSessions({ THREE, store: restorationStore });
 const collectionUI = createPaintingCollectionUI({
   paintings,
-  onSelect: (index) => { void showPainting(index); },
+  isRestored: (id) => playerProgress.isRestored(id),
+  getWallIds: () => playerProgress.getWallIds(),
+  onToggleWall: (id) => {
+    const outcome = playerProgress.toggleWall(id);
+    if (!outcome.changed && outcome.reason === 'full') showToast('На стене уже 30 картин. Снимите одну, чтобы повесить другую.');
+    if (outcome.changed) {
+      updateWallCounters();
+      void refreshWallGallery();
+    }
+  },
+  onSelect: (index) => {
+    if (navigation.isWallGallery()) navigation.leaveWallGallery({ immediate: true });
+    void showPainting(index);
+  },
 });
 let activeTexture = null;
 let activeSurface = null;
 let paintingRequest = 0;
 let surfaceSaveTimer = null;
+let workshopUI;
+let wasWorkbenchVisible = null;
+
+function updateWallCounters() {
+  const count = playerProgress.getWallIds().length;
+  $('wall-count').textContent = `${count} / 30`;
+  $('wall-select-count').textContent = `${count}/30`;
+  $('collection-wall-count').textContent = `${count}/30`;
+}
+
+async function refreshWallGallery() {
+  const artById = new Map(paintings.map((art) => [art.id, art]));
+  const selectedArtworks = playerProgress.getWallIds().map((id) => artById.get(id)).filter(Boolean);
+  try { await wallGallery.setPaintings(selectedArtworks); }
+  catch (error) { console.error('Не удалось обновить стену картин:', error); }
+}
+
+function onNewRestoration(id) {
+  if (playerProgress.autoPin(id)) {
+    updateWallCounters();
+    void refreshWallGallery();
+  }
+  collectionUI.refresh();
+}
+
+function handleWallChange({ mode, art }) {
+  const active = mode !== 'closed';
+  $('wall-gallery-open').hidden = active;
+  $('wall-gallery-toolbar').hidden = !active;
+  $('wall-gallery-navigation').hidden = !active || mode === 'art';
+  $('wall-art-back').hidden = mode !== 'art';
+  $('wall-art-hover').hidden = true;
+  $('wall-gallery-title').textContent = mode === 'art' ? art.title : 'Стена восстановленных картин';
+  $('wall-gallery-caption').textContent = mode === 'art' ? `${art.artist} · ${art.year}`
+    : playerProgress.getWallIds().length ? 'Выберите картину на стене — камера приблизится к ней'
+      : 'Очистите полотно и восстановите цвет — готовая работа появится здесь';
+  if (mode === 'art') void wallGallery.showHighResolution(art.id);
+  else wallGallery.clearFocus();
+  if (active && wasWorkbenchVisible === null) {
+    wasWorkbenchVisible = workshopUI?.isWorkbenchVisible() ?? true;
+    workshopUI?.setWorkbenchVisible(false);
+  } else if (!active && wasWorkbenchVisible !== null) {
+    workshopUI?.setWorkbenchVisible(wasWorkbenchVisible);
+    wasWorkbenchVisible = null;
+  }
+}
 
 function scheduleSurfaceSave(delay = 250) {
   clearTimeout(surfaceSaveTimer);
@@ -201,6 +260,7 @@ const navigation = createSceneNavigation({
   getTexture: () => activeTexture,
   getTool: () => restorationInput?.currentTool(),
   clearUV: () => restorationInput?.clearUV(),
+  onWallChange: handleWallChange,
   damageHint: $('damage-hint'), $,
 });
 restorationInput = createRestorationInput({
@@ -209,9 +269,30 @@ restorationInput = createRestorationInput({
   onStrokeFinished: () => { updateRestorationStatus(true); scheduleSurfaceSave(); },
   onStrokeProgress: () => updateRestorationStatus(),
   onToolChanged: () => updateRestorationStatus(),
+  getWallArtworkHit: (event) => wallGallery.hitTest(event),
+  onWallArtworkClick: (art) => navigation.focusWallArt(art),
+  onWallArtworkHover: (art, event) => {
+    const element = $('wall-art-hover');
+    if (!art || !navigation.isWallGallery() || navigation.focusedWallId()) {
+      element.hidden = true;
+      return;
+    }
+    element.textContent = art.title;
+    element.hidden = false;
+    const bounds = stage.getBoundingClientRect();
+    element.style.left = `${Math.min(bounds.width - 180, Math.max(16, event.clientX - bounds.left + 17))}px`;
+    element.style.top = `${Math.max(15, event.clientY - bounds.top - 42)}px`;
+  },
   $,
 });
-wireWorkshopUI({ cartoonFilter, navigation, restorationInput, collectionUI, $ });
+workshopUI = wireWorkshopUI({ cartoonFilter, navigation, restorationInput, collectionUI, $ });
+$('wall-gallery-open').addEventListener('click', () => navigation.enterWallGallery(wallGallery.getLayout().bounds));
+$('wall-gallery-back').addEventListener('click', () => navigation.leaveWallGallery());
+$('wall-gallery-select').addEventListener('click', () => collectionUI.open('wall'));
+$('wall-art-back').addEventListener('click', () => navigation.leaveWallArt());
+$('wall-gallery-up').addEventListener('click', () => navigation.moveAlongWall(1));
+$('wall-gallery-down').addEventListener('click', () => navigation.moveAlongWall(-1));
+updateWallCounters();
 window.addEventListener('pagehide', flushSurfaceSave);
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') flushSurfaceSave();
@@ -277,6 +358,7 @@ function updateRestorationStatus(checkCompletion = false) {
     if (progress.cleaning >= 96 && !player.surfaceComplete) {
       player.surfaceComplete = true;
       message = `«${paintings[selected].short}» — реставрация завершена!`;
+      onNewRestoration(paintings[selected].id);
     }
     if (message) { showToast(message); playerProgress.save(); }
   }
@@ -298,6 +380,7 @@ function updateUI() {
     player.completed = true;
     playerProgress.save();
     showToast(`«${art.short}» — цвет восстановлен!`);
+    onNewRestoration(art.id);
   }
 }
 
@@ -369,12 +452,15 @@ for (const key of Object.keys(inputs)) {
   });
 }
 $('reset-button').addEventListener('click', () => {
+  const removedFromWall = playerProgress.removeFromWall(paintings[selected].id);
   Object.assign(playerSettings(), { hue: 0, saturation: 100, brightness: 100, completed: false,
     surfaceComplete: false, dustMilestone: false, varnishMilestone: false, retouchMilestone: false });
   activeSurface?.reset();
   updateUI();
   updateRestorationStatus();
   playerProgress.save();
+  if (removedFromWall) { updateWallCounters(); void refreshWallGallery(); }
+  collectionUI.refresh();
   scheduleSurfaceSave();
 });
 
@@ -441,12 +527,8 @@ async function init() {
       [mats.roomWood, '#c7b8a3'],
       [mats.roomEdge, '#e8dfd0'],
     ], woodTextures[1]);
-    if (rearWallLayout.length) {
-      const wallArt = await Promise.all(rearWallLayout.map(async ({ paintingIndex, ...placement }) => ({
-        ...placement, texture: await paintingTextureCache.load(paintings[paintingIndex]),
-      })));
-      wallGallery.setPaintings(wallArt);
-    }
+    // Gallery previews stream independently; the easels need not wait for 30 images.
+    void refreshWallGallery();
     applyWoodVariant('easel', selectedWood.easel);
     applyWoodVariant('frame', selectedWood.frame);
     await showPainting(playerProgress.getSelectedIndex());

@@ -20,6 +20,9 @@ export function createPaintingCollectionUI({ paintings, onSelect, isRestored = (
   let activeId = paintings[0]?.id;
 
   allCount.forEach((element) => { element.textContent = String(paintings.length); });
+  document.getElementById('collection-policy-department').textContent = loreLabels.policyDepartment;
+  document.getElementById('collection-policy-motto').textContent = loreLabels.policy;
+  document.getElementById('collection-policy-explanation').textContent = loreLabels.policyExplanation;
 
   function candidates() {
     return mode === 'wall' ? paintings.filter((art) => isRestored(art.id)) : paintings;

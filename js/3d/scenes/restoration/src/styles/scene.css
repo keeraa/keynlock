@@ -91,6 +91,13 @@
   font: 500 10px/1.45 Manrope,sans-serif;
   color: #f5e7d3;
 }
+.art-ban-notice small {
+  display: block;
+  margin-top: 8px;
+  font: 700 9px/1.35 Manrope,sans-serif;
+  color: #d9ad7f;
+  letter-spacing: .02em;
+}
 
 .stage-side-note {
   position: absolute;

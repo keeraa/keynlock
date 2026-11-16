@@ -99,6 +99,32 @@
   margin: 0 0 20px;
 }
 
+.collection-policy-note {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 5px 14px;
+  margin: -6px 0 14px;
+  padding: 10px 13px;
+  background: #e7d9c6;
+  border-left: 3px solid #996348;
+}
+.collection-policy-note > span {
+  font: 700 8px/1.4 Manrope,sans-serif;
+  letter-spacing: .09em;
+  color: #976646;
+}
+.collection-policy-note > strong {
+  font: 700 11px/1.4 Manrope,sans-serif;
+  color: #70452e;
+}
+.collection-policy-note > p {
+  flex-basis: 100%;
+  margin: 0;
+  font: 10px/1.45 Manrope,sans-serif;
+  color: #74624f;
+}
+
 #collection-close {
   background: none;
   border: 0;

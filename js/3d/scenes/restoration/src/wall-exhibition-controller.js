@@ -66,8 +66,10 @@ export function createWallExhibitionController({ paintings, playerProgress, wall
     if (mode === 'art') {
       const lore = getPaintingLore(art.id);
       $('wall-art-description').textContent = lore?.description || '';
-      $('wall-art-ban-label').textContent = getPaintingLoreLabels().banned;
+      const labels = getPaintingLoreLabels();
+      $('wall-art-ban-label').textContent = labels.banned;
       $('wall-art-ban-reason').textContent = lore?.banReason || '';
+      $('wall-art-policy').textContent = labels.policy;
     }
     if (mode === 'art') void wallGallery.showHighResolution(art.id);
     else wallGallery.clearFocus();

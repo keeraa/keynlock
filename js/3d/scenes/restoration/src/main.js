@@ -236,6 +236,7 @@ async function showPainting(index) {
     $('art-description').textContent = lore?.description || '';
     $('art-ban-label').textContent = loreLabels.banned;
     $('art-ban-reason').textContent = lore?.banReason || '';
+    $('art-policy').textContent = loreLabels.policy;
     $('art-index').textContent = `№ ${String(selected + 1).padStart(2, '0')}`;
     $('top-index').textContent = `${String(selected + 1).padStart(2, '0')} / ${String(paintings.length).padStart(2, '0')}`;
     navigation.updateStepper();

@@ -49,7 +49,7 @@
             <h1 id="art-title">Девушка с жемчужной серёжкой</h1>
             <p id="art-author">Ян Вермеер · около 1665</p>
             <p class="art-description" id="art-description"></p>
-            <div class="art-ban-notice"><span id="art-ban-label">ЗАПРЕЩЕНО В КИЙЕНЛОКЕ</span><p id="art-ban-reason"></p></div>
+            <div class="art-ban-notice"><span id="art-ban-label">ЗАПРЕЩЕНО В КИЙЕНЛОКЕ</span><p id="art-ban-reason"></p><small id="art-policy"></small></div>
           </div>
 
           <div class="painting-labels" aria-hidden="true"><span class="painting-label label-original">ЭТАЛОН <b>↘</b></span><span class="painting-label label-copy">ВАША РЕСТАВРАЦИЯ <b>↙</b></span></div>
@@ -57,7 +57,15 @@
 
           <button class="wall-gallery-open" id="wall-gallery-open" type="button" aria-label="Подняться к галерее отреставрированных картин"><span aria-hidden="true">↑</span> СТЕНА РЕСТАВРАЦИЙ <b id="wall-count">0 / 30</b></button>
           <div class="wall-gallery-toolbar" id="wall-gallery-toolbar" hidden>
-            <div class="wall-gallery-heading"><span class="small-kicker">СОБРАНИЕ МАСТЕРСКОЙ · 12 НАПРАВЛЕНИЙ</span><strong id="wall-gallery-title">Стена восстановленных картин</strong><small id="wall-gallery-caption">Вертикальные колонки по направлениям</small></div>
+            <div class="wall-gallery-heading">
+              <span class="small-kicker">СОБРАНИЕ МАСТЕРСКОЙ · 12 НАПРАВЛЕНИЙ</span>
+              <strong id="wall-gallery-title">Стена восстановленных картин</strong>
+              <small id="wall-gallery-caption">Вертикальные колонки по направлениям</small>
+              <section class="wall-art-lore" id="wall-art-lore" aria-label="Описание картины и причина запрета" hidden>
+                <p id="wall-art-description"></p>
+                <div class="wall-art-ban"><span id="wall-art-ban-label">ЗАПРЕЩЕНО В КИЙЕНЛОКЕ</span><strong id="wall-art-ban-reason"></strong><small id="wall-art-policy"></small></div>
+              </section>
+            </div>
             <div class="wall-gallery-actions">
               <button type="button" id="wall-gallery-select">✦ ВЫБРАТЬ РАБОТЫ <span id="wall-select-count">0/30</span></button>
               <button type="button" id="wall-gallery-shuffle" aria-label="Выбрать другие 30 случайных картин">↻ ПЕРЕМЕШАТЬ</button>
@@ -71,10 +79,6 @@
           </div>
           <button class="wall-art-back" id="wall-art-back" type="button" hidden>← КО ВСЕЙ СТЕНЕ</button>
           <div class="wall-art-hover" id="wall-art-hover" hidden></div>
-          <section class="wall-art-lore" id="wall-art-lore" aria-label="Описание картины и причина запрета" hidden>
-            <p id="wall-art-description"></p>
-            <div class="wall-art-ban"><span id="wall-art-ban-label">ЗАПРЕЩЕНО В КИЙЕНЛОКЕ</span><strong id="wall-art-ban-reason"></strong></div>
-          </section>
 
           <div class="stage-side-note" aria-hidden="true">MCMXCIX · ATELIER DE COULEUR</div>
 
@@ -154,6 +158,11 @@
             <div><span class="section-number">АРХИВ МАСТЕРСКОЙ</span><h2 id="collection-title">Коллекция <em>картин</em></h2><p id="collection-description">Произведения из собрания Keynlock. Выберите полотно для реставрации.</p></div>
             <button id="collection-close" type="button" aria-label="Закрыть коллекцию">×</button>
           </div>
+          <aside class="collection-policy-note" aria-label="Государственная политика в отношении искусства">
+            <span id="collection-policy-department">ГОСУДАРСТВЕННАЯ ПРОГРАММА ЗАБОТЫ</span>
+            <strong id="collection-policy-motto">«МЫ СДЕЛАЕМ ВАС СЧАСТЛИВЫМИ»</strong>
+            <p id="collection-policy-explanation"></p>
+          </aside>
           <div class="collection-tabs" role="group" aria-label="Раздел коллекции">
             <button id="collection-tab-all" type="button" aria-pressed="true">ВСЕ КАРТИНЫ</button>
             <button id="collection-tab-wall" type="button" aria-pressed="false">ГОТОВЫЕ ДЛЯ СТЕНЫ <span id="collection-wall-count">0/30</span></button>

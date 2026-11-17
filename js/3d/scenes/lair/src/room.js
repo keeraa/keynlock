@@ -461,6 +461,7 @@ export function buildLair(scene, m, {useOriginalRestoration = false} = {}) {
       const easel = new THREE.Group();
       easel.name = isWork ? 'restoration-easel-work' : 'restoration-easel-reference';
       easel.position.set(x, 0, z); easel.rotation.y = Math.PI / 2; staticGroup.add(easel);
+      easel.scale.y = 1.2;
       rod(easel, [-.81, .05, .34], [-.09, 3.75, -.10], .073, m.walnut);
       rod(easel, [.81, .05, .34], [.09, 3.75, -.10], .073, m.walnut);
       rod(easel, [0, .05, -1.00], [0, 3.12, -.22], .062, m.walnut);
@@ -564,6 +565,7 @@ export function buildLair(scene, m, {useOriginalRestoration = false} = {}) {
   function buildPlanning() {
     const table = makeTable(staticGroup, 2.95, 1.95, -.05, 1.44, 1.05);
     table.name = 'planning-main-table';
+    table.scale.setScalar(1.3);
     box(table, 2.63, .06, 1.7, m.leather, 0, 1.18, 0, .03);
     makePaper(table, -.52, 1.222, .08, -.16, [.75, 1.04]);
     makePaper(table, .48, 1.233, -.29, .12, [.75, 1.07]);
@@ -576,6 +578,7 @@ export function buildLair(scene, m, {useOriginalRestoration = false} = {}) {
     bottle(table, -1.12, 1.47, .58, m.charcoal, .31, .09);
     rod(table, [-.95, 1.31, .44], [-.64, 1.48, .15], .014, m.paper);
     const chair = new THREE.Group(); chair.position.set(-.25, 0, 3.12); staticGroup.add(chair);
+    chair.scale.setScalar(1.3);
     box(chair, .85, .14, .8, m.agedWood, 0, .58, 0, .04);
     for (const x of [-.3, .3]) for (const z of [-.25, .25]) rod(chair, [x, .05, z], [x, .58, z], .06, m.darkWood);
     box(chair, .85, .82, .14, m.agedWood, 0, 1.13, .32, .045);
@@ -841,7 +844,10 @@ export function buildLair(scene, m, {useOriginalRestoration = false} = {}) {
     animated.push(t => ambientParticles.update(t));
   }
 
-  buildShell(); buildWindow(); buildRestoration(); buildPlanning(); buildWorkbench(); buildAlchemy(); buildGramophone(); buildDetails();
+  // Alchemy is supplied by integrations/alchemy/src/alchemy.js, with its own
+  // original geometry, materials and mechanics. The legacy stand-in is unused.
+  buildShell(); buildWindow(); buildRestoration(); buildPlanning(); buildWorkbench(); buildGramophone(); buildDetails();
+  station('alchemy', [6.86, 2.34, 10.10], [3.05, 5.8, 5.22]);
   const wallpapers = {
     tile: m.alchemyTile,
     ochre: m.restorationWall,

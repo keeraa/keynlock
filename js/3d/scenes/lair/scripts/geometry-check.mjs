@@ -58,7 +58,6 @@ assert.ok(portalRay(0,10.1,1,unique('alchemy-right-wall'))>0,'alchemy side remai
 assert.ok(portalRay(0,20.07,1,unique('alchemy-right-wall'))>0,'workbench side remains solid without a doorway');
 assert.equal(scene.getObjectByName('lair-left-portal-masonry'),undefined,'no invented left door frame');
 assert.equal(scene.getObjectByName('lair-right-portal-masonry'),undefined,'no invented right door frame');
-const alchemyTable = bounds('alchemy-facing-wall-table');
 const archedWindow = bounds('main-arched-window');
 const workbench = bounds('workbench-right-of-alchemy');
 
@@ -79,16 +78,11 @@ assert.ok(world.atelierWall && world.atelierWall.getArtCount()===0,
 assert.ok(alchemyWall.min.x > 8.25 && alchemyWall.max.x < 8.45, 'sage tiles lie against right wall');
 assert.ok(alchemyWall.max.y > 13.4 && alchemyWall.min.y < .1, 'tiles cover the entire wall height');
 assert.ok(alchemyWall.min.z < -5.6 && alchemyWall.max.z > 7.1, 'tiles cover the entire wall width');
-assert.ok(alchemyTable.max.x < alchemyWall.min.x, 'alchemy tabletop sits in front of tile wall');
-assert.ok(alchemyTable.max.x > 8.0, 'alchemy tabletop is close to tile wall');
-assert.ok(alchemyTable.min.x > 5.7, 'alchemy tabletop does not cross the room');
-assert.equal(world.alchemyVials.size,11,'all seven metals and four pigments are clickable 3D sources');
-assert.equal(world.alchemyInteractive.length,13,'reagents, receiver and burner belong to the shared scene');
-assert.ok(world.alchemyMixingFlask.isGroup,'the original table supports a working receiver');
-world.setAlchemyMixture('#a35239',60);
-assert.ok(world.alchemyMixingFlask.userData.alchemyLiquid.visible,'mixed pigment fills the physical flask');
-assert.equal(world.alchemyMixingFlask.userData.alchemyLiquid.material.color.getHexString(),'a35239');
-world.setAlchemyMixture('#344446',0);
+assert.equal(scene.getObjectByName('alchemy-facing-wall-table'),undefined,
+  'the legacy imitated laboratory is absent: the original module owns every bottle and table');
+assert.equal(world.alchemyVials.size,0,'no duplicated bottles occupy the source laboratory space');
+assert.equal(world.alchemyInteractive.length,0,'only the original lab owns its interactions');
+assert.ok(world.anchors.alchemy,'the original laboratory still has a navigation hotspot');
 assert.ok(archedWindow.max.x - archedWindow.min.x > 8.20, 'new window is twice as wide');
 assert.ok(archedWindow.max.y - archedWindow.min.y > 7.20, 'new window is twice as tall');
 assert.ok(unique('main-arched-window-frame').geometry.type === 'TubeGeometry', 'arched frame follows the curved upper edge');
@@ -127,7 +121,7 @@ for (const { positions, topBefore, hemBefore } of hangingCloths) {
   assert.ok(Math.abs(positions.getZ(0) - topBefore) < .00001, 'the upper seam remains fixed');
   assert.ok(hemBefore.some((value, i) => Math.abs(positions.getZ(positions.count - 29 + i) - value) > .01), 'wind moves the free hem');
 }
-assert.ok(workbench.min.z > alchemyTable.max.z + 1.0, 'workbench is separated to the right of alchemy');
+assert.ok(workbench.min.z > 15, 'workbench stays beyond the original alchemy station');
 assert.ok(workbench.max.x < alchemyWall.min.x, 'workbench does not enter the tile wall');
 assert.ok(unique('workbench-tool-wall').position.z > 3.5, 'tool wall moved with the workbench');
 assert.ok(unique('restoration-easel-reference').position.x < -7.0);

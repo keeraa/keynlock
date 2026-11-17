@@ -21,7 +21,8 @@ test('three unchanged source scenes occupy one physically connected world',()=>{
   assert.equal(registry.entries.size,3);
   assert.equal(registry.roots.get('restoration').visible,true,
     'the original Atelier is visible inside the main Lair renderer');
-  assert.equal(registry.roots.get('alchemy').visible,false);
+  assert.equal(registry.roots.get('alchemy').visible,true,
+    'the original laboratory must remain visible from the common Lair camera');
   assert.equal(registry.roots.get('workbench').visible,false);
   assert.equal(new Set(Object.values(sources).map(({original})=>original)).size,3);
   for(const [id,{original,camera,mesh}] of Object.entries(sources)){
@@ -48,7 +49,12 @@ test('three unchanged source scenes occupy one physically connected world',()=>{
     'the exact original gallery wall overlays the left Lair plaster');
   assert.ok(wallBounds.min.z > -5.8 && wallBounds.max.z < 26.5,
     'the whole original 32m gallery fits the original Lair room without doors');
-  assert.ok(sources.alchemy.camera.getWorldPosition(new THREE.Vector3()).x>8.55);
+  assert.ok(sources.alchemy.camera.getWorldPosition(new THREE.Vector3()).x<8.39,
+    'the source alchemy camera must be inside the Lair, facing the right tiled wall');
+  const sourceAlchemyWallX=WORKSHOP_PLACEMENTS.alchemy.position[0]
+    - (-5.25)*WORKSHOP_PLACEMENTS.alchemy.scale;
+  assert.ok(sourceAlchemyWallX>8.25 && sourceAlchemyWallX<8.39,
+    'original tiled backdrop aligns with the Lair right wall');
   assert.ok(sources.workbench.camera.getWorldPosition(new THREE.Vector3()).x>8.55);
 });
 
@@ -78,3 +84,56 @@ test('alchemy backdrop and both workbench tools persist under one parent',()=>{
   registry.setLighting(null);
   assert.equal(light.visible,false,'returning to the Lair restores corridor lighting');
 });
+
+test('alchemy furniture feet rest on the Lair floor and the camera uses the original orbit pivot',()=>{
+  const registry=createWorldStationRegistry(new THREE.Scene());
+  const original=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(37,1.6,.1,100);
+  registry.register('alchemy',{scene:original,camera});
+  const localTarget=new THREE.Vector3(0,1.7,-.45);
+  camera.position.set(0,5.2,13.6);
+  camera.lookAt(localTarget);
+  camera.userData.keynlockLocalTarget=localTarget;
+  const root=registry.roots.get('alchemy');
+  const bottom=root.localToWorld(new THREE.Vector3(0,-9.525,0));
+  assert.ok(Math.abs(bottom.y-.0385)<1e-6,
+    'the original metal foot caps touch the common Lair timber floor');
+  const pose=registry.pose('alchemy');
+  const expectedPosition=root.localToWorld(new THREE.Vector3(0,5.2,13.6));
+  const expectedTarget=root.localToWorld(localTarget.clone());
+  assert.ok(pose.position.distanceTo(expectedPosition)<1e-6);
+  assert.ok(pose.target.distanceTo(expectedTarget)<1e-6,
+    'the visible camera must orbit the source alchemy pivot, not a synthetic 9m point');
+  assert.equal(pose.fov,37,'preserve original laboratory field of view');
+});
+
+test('embedded lab suppresses its second background rig and scales point lights only during drawing',()=>{
+  const registry=createWorldStationRegistry(new THREE.Scene());
+  const foreground=new THREE.Scene(),background=new THREE.Scene();
+  const bulb=new THREE.PointLight(0xffffff,10,4,2);
+  const backdrop=new THREE.HemisphereLight(0xffffff,0x222222,2.5);
+  foreground.add(bulb);
+  background.add(backdrop);
+  registry.register('alchemy',{scene:foreground,additionalScenes:[background],
+    camera:new THREE.PerspectiveCamera()});
+  registry.update();
+  registry.setLighting('alchemy');
+  assert.equal(bulb.visible,true);
+  assert.equal(backdrop.visible,false,
+    'background-only source lights must not illuminate the combined Lair twice');
+  registry.prepareLightsForRender();
+  assert.ok(Math.abs(bulb.intensity-10*.28**2)<1e-8);
+  assert.ok(Math.abs(bulb.distance-4*.28)<1e-8);
+  registry.restoreLightsAfterRender();
+  assert.equal(bulb.intensity,10,'restore the source simulation intensity after drawing');
+  assert.equal(bulb.distance,4);
+  bulb.intensity=12;
+  registry.prepareLightsForRender();
+  assert.ok(Math.abs(bulb.intensity-12*.28**2)<1e-8,
+    'new source candle intensity is scaled for each rendered frame');
+  registry.restoreLightsAfterRender();
+  assert.equal(bulb.intensity,12);
+  registry.setLighting(null);
+  assert.equal(bulb.visible,false);
+});
+

@@ -31,8 +31,9 @@ test('gallery entry, separate camera controls and collapsible in-room Atelier ar
   const stylesheet = readFileSync(new URL('../src/original-stations.css', import.meta.url), 'utf8');
   for (const id of ['wall-collection-entry','lair-gallery-controls','gallery-prev',
     'gallery-next','gallery-easels','gallery-select']) assert.ok(html.includes(`id="${id}"`));
-  assert.ok(lair.includes('focus(zone.camera, zone.target, roomFov)'),
-    'restoration entry must not inherit the last wall gallery pose');
+  assert.ok(lair.includes("const sourcePose = id === 'alchemy' ? rendererHost?.getWorldPose('alchemy') : null") &&
+    lair.includes('const stationPosition = sourcePose?.position.toArray() || zone.camera'),
+    'restoration entry must keep its preset easel view rather than inheriting the wall gallery pose');
   assert.ok(lair.includes("rendererHost.getWorldPose('restoration')"),
     'the room renderer must follow the real gallery camera');
   assert.ok(atelier.includes('window.__keynlockAtelierGallery'));

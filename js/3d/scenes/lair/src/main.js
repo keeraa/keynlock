@@ -5,10 +5,12 @@ import { buildLair } from './room.js';
 import { createRoomOutlines, mountVisualSettings } from './visual-settings.js';
 import { mountOriginalStations, ORIGINAL_STATIONS } from './original-stations.js';
 import { mountAtelierInRoom } from './atelier-in-room.js';
+import { mountAlchemyInRoom } from './alchemy-in-room.js';
 import { createSharedRendererHost } from './shared-renderer-host.js';
 import { createCartoonFilter } from '../integrations/atelier/src/effects/cartoon-filter.js';
 import { createCameraTransition } from '../integrations/atelier/src/navigation/camera-transition.js';
 import { addRoomLighting } from './room-lighting.js';
+import { ALCHEMY_LOOK } from '../integrations/alchemy/src/look/alchemy-look.js';
 import { createInitialLoadingGate } from './initial-loading.js';
 import './style.css';
 import './initial-loading.css';
@@ -54,7 +56,9 @@ const zones = {
     description: 'Вся правая стена от пола до потолка покрыта зелёной гуашевой плиткой. У стены стоит алхимический стол с двумя ярусами, семью реагентами, пигментами, стеклом и свечами; над ним рецепт и часы.',
     status: 'Исходная лаборатория: переливание, физика жидкостей, рецепты и все настройки.',
     link: ORIGINAL_STATIONS.alchemy.sourceUrl,
-    camera: [1.12, 4.16, 10.10], target: [7.10, 2.54, 10.10],
+    // Fallback only. The loaded source laboratory supplies its actual orbit
+    // position, pivot and 37° field of view when entering this station.
+    camera: [3.08, 4.18, 10.10], target: [6.99, 3.18, 10.10],
   },
   gramophone: {
     number: '05', kicker: 'СКРЫТАЯ КОЛЛЕКЦИЯ', title: 'Музыка в Логове',
@@ -74,6 +78,8 @@ let desiredTarget = new THREE.Vector3();
 let desiredFov = 47;
 let roomFov = 47;
 let currentZone = null;
+let roomLightDefaults = [];
+let originalRoomRenderLook = null;
 let galleryActive = false;
 let galleryDrag = null;
 let artworkInfoKey = null;
@@ -83,6 +89,8 @@ let atelierFovTravel = null;
 let lastSceneTriangles = 0;
 let startPointer = null;
 let hoveredZone = null;
+let pendingStationOpen = null;
+let alchemyApproachDistance = 0;
 const homePosition = new THREE.Vector3(.25, 8.35, 31.2);
 const homeTarget = new THREE.Vector3(0, 4.70, 9.60);
 const clock = new THREE.Clock();
@@ -108,6 +116,15 @@ function setup() {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   const loadingBar = loading.querySelector('.loading-line i');
   const loadingStatus = loading.querySelector('small');
+  let galleryLoaded = false;
+  let alchemyLoaded = false;
+  const completeInitialLoad = () => {
+    if (galleryLoaded && alchemyLoaded) initialLoading.finish();
+    else if (galleryLoaded) {
+      loadingStatus.textContent = 'ПОДГОТАВЛИВАЕМ АЛХИМИЧЕСКУЮ ЛАБОРАТОРИЮ';
+      loadingBar.style.width = '94%';
+    }
+  };
   const initialLoading = createInitialLoadingGate({
     onProgress: ({ loaded, total }) => {
       loading.classList.add('is-tracking');
@@ -115,7 +132,7 @@ function setup() {
       loadingBar.style.width = `${total ? loaded / total * 100 : 100}%`;
     },
     onDone: (reason) => {
-      if (reason !== 'ready') console.warn('Начальная загрузка галереи завершилась с ошибкой или по таймауту:', reason);
+      if (reason !== 'ready') console.warn('Начальная загрузка мастерских завершилась по таймауту или с ошибкой:', reason);
       loading.setAttribute('aria-busy', 'false');
       loading.classList.add('done');
     },
@@ -123,8 +140,12 @@ function setup() {
   window.addEventListener('keynlock:atelier', (event) => {
     const { type, loaded, total } = event.detail || {};
     if (type === 'initial-gallery-progress') initialLoading.progress(loaded, total);
-    if (type === 'initial-gallery-ready') initialLoading.finish();
+    if (type === 'initial-gallery-ready') {galleryLoaded = true;completeInitialLoad();}
     if (type === 'error') initialLoading.finish('error');
+  });
+  window.addEventListener('keynlock:alchemy:v1',event => {
+    if (event.detail?.type === 'ready') {alchemyLoaded = true;completeInitialLoad();}
+    if (event.detail?.type === 'error') initialLoading.finish('error');
   });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
   scene = new THREE.Scene();
@@ -135,6 +156,35 @@ function setup() {
   window.__keynlockRestorationActive = false;
   controls = new OrbitControls(camera, interaction);
   window.__keynlockLairControls = controls;
+  window.__keynlockLairManipulateAlchemy = ({rotateX = 0,rotateY = 0,panX = 0,panY = 0,zoom = 1} = {}) => {
+    if (currentZone !== 'alchemy' || transitioning) return;
+    const offset = camera.position.clone().sub(controls.target);
+    const spherical = new THREE.Spherical().setFromVector3(offset);
+    spherical.theta -= rotateX * .0055;
+    spherical.phi = THREE.MathUtils.clamp(spherical.phi + rotateY * .0045,.13,Math.PI - .13);
+    spherical.radius = THREE.MathUtils.clamp(spherical.radius * zoom,2,28);
+    if (panX || panY) {
+      const units = 2 * spherical.radius * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) / Math.max(1,canvas.clientHeight);
+      const right = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,0);
+      const up = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,1);
+      controls.target.addScaledVector(right,-panX * units).addScaledVector(up,panY * units);
+    }
+    camera.position.copy(controls.target).add(offset.setFromSpherical(spherical));
+    camera.lookAt(controls.target);
+    controls.update();
+  };
+  window.__keynlockLairResetAlchemyCamera = () => {
+    if (currentZone !== 'alchemy') return;
+    const pose = rendererHost?.getWorldPose('alchemy');
+    if (!pose) return;
+    atelierFlight?.cancel();
+    transitioning = false;
+    camera.position.copy(pose.position);
+    controls.target.copy(pose.target);
+    camera.fov = pose.fov;
+    camera.updateProjectionMatrix();
+    camera.lookAt(controls.target);
+  };
   controls.target.copy(homeTarget);
   controls.enabled = true;
   controls.enableRotate = true;
@@ -155,11 +205,21 @@ function setup() {
   controls.zoomSpeed = .70;
   controls.addEventListener('start', () => {
     transitioning = false;
-    if(currentZone!=='restoration')rendererHost?.setWorldLighting(null);
+    if(currentZone!=='restoration' && currentZone!=='alchemy')rendererHost?.setWorldLighting(null);
   });
   atelierFlight = createCameraTransition({ camera, controls });
 
   addRoomLighting({ THREE, scene });
+  // Keep the source laboratory's original lighting legible in this shared room.
+  // The source rig is registered separately and activated only at its station.
+  roomLightDefaults = scene.children.filter(child=>child.isLight)
+    .map(light=>({light,intensity:light.intensity,visible:light.visible}));
+  originalRoomRenderLook = {
+    outputColorSpace:renderer.outputColorSpace,toneMapping:renderer.toneMapping,
+    toneMappingExposure:renderer.toneMappingExposure,
+    shadowEnabled:renderer.shadowMap.enabled,shadowType:renderer.shadowMap.type,
+    shadowAutoUpdate:renderer.shadowMap.autoUpdate,
+  };
   const { materials, visual } = createMaterials();
   room = buildLair(scene, materials, {useOriginalRestoration:true});
   // Render the preserved Atelier shader against the room's real canvas and
@@ -203,6 +263,9 @@ function setup() {
   };
   originalStations = mountOriginalStations({onExit: resetView,onReady: onStationReady,rendererHost});
   const atelierElement = mountAtelierInRoom();
+  const alchemyElement = mountAlchemyInRoom();
+  alchemyElement.querySelector('.lair-alchemy-exit')?.addEventListener('click', resetView);
+  const alchemyInput = alchemyElement.querySelector('#scene');
   const observeAtelierMenu = () => document.querySelector('#app').style.setProperty(
     '--atelier-panel-height',`${Math.round(atelierElement.getBoundingClientRect().height)}px`);
   new ResizeObserver(observeAtelierMenu).observe(atelierElement);
@@ -274,8 +337,11 @@ function resize() {
   const w = canvas.clientWidth, h = canvas.clientHeight;
   camera.aspect = w / Math.max(h, 1);
   roomFov = w < 720 ? 59 : w < 1050 ? 52 : 47;
-  desiredFov = roomFov;
-  camera.fov = roomFov;
+  const sourceFov = currentZone === 'alchemy'
+    ? rendererHost?.getWorldPose('alchemy')?.fov ?? 37
+    : roomFov;
+  desiredFov = sourceFov;
+  camera.fov = sourceFov;
   camera.updateProjectionMatrix();
   renderer.setSize(w, h, false);
   atelierFilter?.resize(w,h,renderer.getPixelRatio());
@@ -306,6 +372,17 @@ function focus(position, target, fov = roomFov) {
 }
 
 function onStationReady(id) {
+  if (id === 'alchemy') {
+    zones.alchemy.status = 'Алхимическая лаборатория работает внутри общей сцены логова.';
+    if (currentZone === 'alchemy' && pendingStationOpen === 'alchemy') {
+      const pose = rendererHost?.getWorldPose('alchemy');
+      if (pose) {
+        alchemyApproachDistance = camera.position.distanceTo(pose.position);
+        focus(pose.position.toArray(), pose.target.toArray(), pose.fov);
+      }
+    }
+    return;
+  }
   if (id !== 'restoration') return;
   window.__keynlockRestorationBridge?.setViewportAspect?.(
     canvas.clientWidth / Math.max(1,canvas.clientHeight));
@@ -320,6 +397,42 @@ function onStationReady(id) {
   }
   if (currentZone === 'restoration') rendererHost.setWorldLighting('restoration');
   if (queuedGallery) enterGalleryCamera();
+}
+
+function applyWorldAlchemyLook(enabled) {
+  if (!renderer || !originalRoomRenderLook) return;
+  for (const {light,intensity,visible} of roomLightDefaults) {
+    light.intensity = intensity;
+    // The laboratory has its own complete lighting rig. Leaving the Lair's
+    // six ambient, directional and point lights active doubles the brightness
+    // and makes every lit material evaluate unnecessary light sources.
+    light.visible = !enabled && visible;
+  }
+  // The original lab is much closer to the camera than the full Lair. Keep
+  // its pixel cost bounded on retina screens, without lowering other rooms.
+  const pixelRatio = Math.min(window.devicePixelRatio || 1, enabled ? 1.35 : 1.75);
+  if (Math.abs(renderer.getPixelRatio() - pixelRatio) > .001) {
+    renderer.setPixelRatio(pixelRatio);
+    atelierFilter?.resize(canvas.clientWidth,canvas.clientHeight,pixelRatio);
+  }
+  if (enabled) {
+    // Both scenes already use ACES/sRGB. Changing the global shadow-map type
+    // here would invalidate every material program in the large shared scene
+    // and produce a multi-second shader compilation stall on station entry.
+    renderer.toneMappingExposure = ALCHEMY_LOOK.renderer.exposure;
+    // The original laboratory caches its mostly static 2048px shadow atlas.
+    // Avoid re-rendering all workshop shadows during every Lair frame.
+    renderer.shadowMap.autoUpdate = false;
+  } else {
+    renderer.outputColorSpace = originalRoomRenderLook.outputColorSpace;
+    renderer.toneMapping = originalRoomRenderLook.toneMapping;
+    renderer.toneMappingExposure = originalRoomRenderLook.toneMappingExposure;
+    renderer.shadowMap.enabled = originalRoomRenderLook.shadowEnabled;
+    renderer.shadowMap.type = originalRoomRenderLook.shadowType;
+    renderer.shadowMap.autoUpdate = originalRoomRenderLook.shadowAutoUpdate;
+  }
+  renderer.shadowMap.needsUpdate = true;
+  rendererHost?.setWorldLighting(enabled ? 'alchemy' : null);
 }
 
 function leaveGalleryCamera() {
@@ -370,9 +483,13 @@ function returnToEasels() {
 
 function openZone(id) {
   if (!zones[id]) return;
+  pendingStationOpen = null;
   leaveGalleryCamera();
   if(visualUI?.isOpen())visualUI.close();
   currentZone = id;
+  // The standalone laboratory owns its own visual pipeline. Keep the Lair
+  // renderer responsive during the approach camera animation.
+  applyWorldAlchemyLook(false);
   const zone = zones[id];
   const hasOriginal = Boolean(ORIGINAL_STATIONS[id]);
   const restoring = id === 'restoration';
@@ -382,10 +499,17 @@ function openZone(id) {
   window.__keynlockRestorationActive = restoring;
   document.querySelector('#app').classList.toggle('restoration-mode',restoring);
   if (!restoring) originalStations?.hideRestorationInRoom();
-  rendererHost?.setWorldLighting(null);
+  if (id !== 'alchemy') originalStations?.hideAlchemyInRoom();
+  // Avoid switching every source light off and immediately on again when
+  // entering alchemy: that doubles expensive WebGL shader transitions.
+  if (id !== 'alchemy') rendererHost?.setWorldLighting(null);
   // Restoration always starts at the two easels, regardless of the source
   // Atelier's last camera pose (which could be up at the salon gallery).
-  focus(zone.camera, zone.target, roomFov);
+  const sourcePose = id === 'alchemy' ? rendererHost?.getWorldPose('alchemy') : null;
+  const stationPosition = sourcePose?.position.toArray() || zone.camera;
+  const stationTarget = sourcePose?.target.toArray() || zone.target;
+  if (id === 'alchemy') alchemyApproachDistance = camera.position.distanceTo(new THREE.Vector3(...stationPosition));
+  focus(stationPosition, stationTarget, sourcePose?.fov ?? (id === 'alchemy' ? 37 : roomFov));
   document.querySelector('#panel-kicker').textContent = `${zone.number} / ${zone.kicker}`;
   document.querySelector('#panel-title').textContent = zone.title;
   document.querySelector('#panel-description').textContent = zone.description;
@@ -407,15 +531,22 @@ function openZone(id) {
       // original artwork meshes, which the Lair camera renders in this room.
       originalStations.showRestorationInRoom();
       if (originalStations.isReady(id)) rendererHost.setWorldLighting(id);
+    } else if (id === 'alchemy') {
+      // Keep the room visible while the camera approaches the laboratory.
+      // Its standalone controls take over after the camera has arrived.
+      pendingStationOpen = id;
     } else originalStations.open(id);
   }
 }
 
 function closePanel() {
+  pendingStationOpen = null;
   leaveGalleryCamera();
   window.__keynlockRestorationActive = false;
   document.querySelector('#app').classList.remove('restoration-mode');
   originalStations?.hideRestorationInRoom();
+  originalStations?.hideAlchemyInRoom();
+  applyWorldAlchemyLook(false);
   interaction.style.cursor = 'grab';
   panel.hidden = true;
   currentZone = null;
@@ -455,6 +586,8 @@ function handleKey(e) {
   }
   // The original Atelier owns number keys 4–8 in restoration mode.
   if (currentZone === 'restoration' && /^Digit[4-8]$/.test(e.code)) return;
+  if (currentZone === 'alchemy' && e.key === 'Escape' &&
+      !document.querySelector('#alchemy-embedded-app #recipe-overlay')?.hidden) return;
   if (e.key === 'Escape') { if (visualUI?.isOpen()) visualUI.close(); else resetView(); return; }
   if (e.key === '0') { resetView(); return; }
   const names = ['restoration','planning','workbench','alchemy','gramophone'];
@@ -595,12 +728,26 @@ function animate() {
       camera.fov += (desiredFov-camera.fov)*factor;
       camera.updateProjectionMatrix();
     }
+    // Alchemy uses an independent input runtime, so OrbitControls.update()
+    // is intentionally paused. Aim the Lair camera explicitly during flight.
+    if (currentZone === 'alchemy') camera.lookAt(controls.target);
     if (camera.position.distanceTo(desiredPosition) < .014 && controls.target.distanceTo(desiredTarget) < .014 && Math.abs(camera.fov-desiredFov)<.06) {
       transitioning = false;
     }
   }
+  // Reveal the loaded laboratory while the camera is still moving towards it.
+  // During the overlay fade the room keeps rendering underneath.
+  const approachingAlchemy = pendingStationOpen === 'alchemy' &&
+    currentZone === 'alchemy' && originalStations.isReady('alchemy') &&
+    camera.position.distanceTo(desiredPosition) < alchemyApproachDistance * .55;
+  if (pendingStationOpen && (!transitioning || approachingAlchemy) && currentZone === pendingStationOpen) {
+    const id = pendingStationOpen;
+    pendingStationOpen = null;
+    originalStations.open(id);
+    if (id === 'alchemy') applyWorldAlchemyLook(true);
+  }
   if (atelierFlight?.isTraveling()) atelierFlight.update(performance.now());
-  else controls.update();
+  else if (currentZone !== 'alchemy') controls.update();
   if (atelierFovTravel) {
     const t = Math.min(1, (performance.now() - atelierFovTravel.started) / atelierFovTravel.duration);
     const eased = t ** 3 * (t * (t * 6 - 15) + 10);
@@ -636,16 +783,25 @@ function animate() {
   updateHotspots();
   updateRestorationArtInfo();
   updateRestorationEaselHUD();
+  rendererHost.stepWorldRuntime(time * 1000);
   rendererHost.updateWorld();
+  // Embedded modules may disable WebGLRenderer.info.autoReset for multi-pass
+  // rendering. Our counter is per frame, never a lifetime accumulation.
+  renderer.info.reset();
   // Restoring paintings uses this canvas, camera and renderer continuously.
-  if (!originalStations?.isOpen()) {
-    if (currentZone === 'restoration') {
-      atelierFilter.setFocus(camera.position.distanceTo(controls.target));
-      const frame = atelierFilter.render();
-      lastSceneTriangles = frame.sceneTriangles ?? frame.triangles ?? 0;
-    } else {
-      renderer.render(scene, camera);
-      lastSceneTriangles = renderer.info.render.triangles;
+  if (!originalStations?.isOpen() || transitioning) {
+    rendererHost.prepareWorldLightsForRender();
+    try {
+      if (currentZone === 'restoration') {
+        atelierFilter.setFocus(camera.position.distanceTo(controls.target));
+        const frame = atelierFilter.render();
+        lastSceneTriangles = frame.sceneTriangles ?? frame.triangles ?? 0;
+      } else {
+        renderer.render(scene, camera);
+        lastSceneTriangles = renderer.info.render.triangles;
+      }
+    } finally {
+      rendererHost.restoreWorldLightsAfterRender();
     }
   }
   frames++; fpsTime += delta;

@@ -1,15 +1,14 @@
 /**
- * Present the preserved KEYNLOCK workshop sources through the Lair renderer.
+ * Coordinate the original KEYNLOCK workshops from the Lair.
  *
  * The original Atelier source runs in this document, including its UI and
- * input handling. Only the other workstations retain standalone iframes.
+ * input handling. Alchemy currently uses its isolated standalone runtime.
  */
 export const ORIGINAL_STATIONS = Object.freeze({
   restoration: {
     title: 'Реставрация',
     url: '/stations/atelier/',
     sourceUrl: 'https://atelier-restoration-1115.k1r11111.chatgpt.site/',
-    readyBridge: 'keynlock:atelier-embed:v1',
   },
   workbench: {
     title: 'Верстак',
@@ -18,7 +17,7 @@ export const ORIGINAL_STATIONS = Object.freeze({
   },
   alchemy: {
     title: 'Алхимия',
-    url: '/stations/alchemy/',
+    url: '/integrations/alchemy/src/index.html?standalone=1',
     sourceUrl: 'https://keynlock-alchemy-lab-1115.k1r11111.chatgpt.site/',
   },
 });
@@ -38,7 +37,7 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
   // iframe, second workshop page or detached menu exists.
   const frames = new Map();
   const readyStations = new Set();
-  const names = ['alchemy','workbench'];
+  const names = ['workbench','alchemy'];
   for (const [index,id] of names.entries()) {
     const frame = index === 0 ? firstFrame : firstFrame.cloneNode(false);
     if (index) {
@@ -54,6 +53,7 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
   let station = null;
   let opened = false;
   let restorationInRoom = false;
+  let alchemyInRoom = false;
   let warningTimer = null;
   let atelierStartTimer = null;
   let atelierFailure = null;
@@ -129,6 +129,12 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
       // must remain available if optional startup work fails.
       atelier.inert = !restorationInRoom;
     }
+    const alchemy = document.querySelector('#alchemy-embedded-app');
+    if (alchemy) {
+      alchemy.classList.toggle('is-active',alchemyInRoom);
+      alchemy.inert = !alchemyInRoom;
+    }
+    document.querySelector('#alchemy-input-plane')?.classList.toggle('is-active',alchemyInRoom);
   }
 
   function showRestorationInRoom() {
@@ -145,10 +151,26 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
     showCurrentFrame();
   }
 
+  function hideAlchemyInRoom() {
+    alchemyInRoom = false;
+    rendererHost?.setWorldRuntimeActive('alchemy',false);
+    window.__alchemy?.lifecycle?.setActive(false);
+    if (window.__keynlockLairControls) window.__keynlockLairControls.enabled = true;
+    showCurrentFrame();
+  }
+
+  function showAlchemyInRoom() {
+    alchemyInRoom = true;
+    if (window.__keynlockLairControls) window.__keynlockLairControls.enabled = false;
+    rendererHost?.setWorldRuntimeActive('alchemy', true);
+    window.__alchemy?.lifecycle?.setActive(true);
+    showCurrentFrame();
+  }
+
   function preload(id) {
     const next = ORIGINAL_STATIONS[id];
     if (!next) return;
-    if (id === 'restoration') return; // the scene and original controls are already mounted
+    if (id === 'restoration' || id === 'alchemy') return;
     clearTimers();
     station = id;
     overlay.classList.remove('station-ready');
@@ -166,9 +188,11 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
   function open(id) {
     if (!ORIGINAL_STATIONS[id]) return;
     if (id === 'restoration') {showRestorationInRoom();return;}
+    if (id === 'alchemy') {showAlchemyInRoom();return;}
     if (station !== id) preload(id);
     opened = true;
-    rendererHost?.activate(id);
+    overlay.dataset.station = id;
+    if (id !== 'alchemy') rendererHost?.activate(id);
     overlay.classList.add('station-open');
     overlay.setAttribute('aria-hidden', 'false');
     showCurrentFrame();
@@ -189,16 +213,12 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
     overlay.setAttribute('aria-hidden', 'true');
     showCurrentFrame();
     clearTimers();
-    const old = ORIGINAL_STATIONS[station];
-    if (old?.readyBridge) {
-      frames.get(station)?.contentWindow?.postMessage({bridge: old.readyBridge, type: 'flush'}, window.location.origin);
-    }
     rendererHost?.deactivate(station);
     onExit();
   }
 
   function onLoad(id) {
-    if (!rendererHost?.hasWorldScene(id)) return;
+    if (id !== 'alchemy' && !rendererHost?.hasWorldScene(id)) return;
     markReady(id);
   }
 
@@ -222,15 +242,21 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
     }
   }
 
-  function onMessage(event) {
-    if (event.origin !== window.location.origin) return;
-    const id = names.find(id => frames.get(id)?.contentWindow === event.source);
-    const config = ORIGINAL_STATIONS[id];
-    if (!config?.readyBridge || event.data?.bridge !== config.readyBridge) return;
-    if (event.data.type === 'models-ready' || event.data.type === 'ready') markReady(id);
-    if (event.data.type === 'error' && id===station) {
-      warning.hidden = false;
-      fallback.hidden = false;
+  function onAlchemyEvent(event) {
+    if (event.detail?.type === 'ready') markReady('alchemy');
+    if (event.detail?.type === 'error') {
+      console.error('Алхимия:',event.detail.message);
+      const root = document.querySelector('#alchemy-embedded-app');
+      if (root) {
+        let failure = root.querySelector('.lair-alchemy-runtime-error');
+        if (!failure) {
+          failure = document.createElement('div');
+          failure.className = 'lair-alchemy-runtime-error';
+          failure.setAttribute('role','alert');
+          root.appendChild(failure);
+        }
+        failure.textContent = `Ошибка лаборатории: ${event.detail.message || 'неизвестная ошибка'}`;
+      }
     }
   }
 
@@ -240,18 +266,13 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
     frame.addEventListener('load',listener);
     loadListeners.set(id,listener);
   }
-  window.addEventListener('message', onMessage);
   window.addEventListener('keynlock:atelier', onAtelierEvent);
+  window.addEventListener('keynlock:alchemy:v1', onAlchemyEvent);
   returnButton.addEventListener('click', close);
   return {
     preload, open, close, isOpen: () => opened,
     isReady: id => readyStations.has(id),
-    showRestorationInRoom, hideRestorationInRoom,
-    preloadAll() {
-      // Stagger parsing/texture creation to keep the initial Lair responsive.
-      for(const [index,id] of ['alchemy','workbench'].entries())
-        setTimeout(()=>ensureFrame(id), 1700 + index*1350);
-    },
+    showRestorationInRoom, hideRestorationInRoom, showAlchemyInRoom, hideAlchemyInRoom,
     dispose() {
       clearTimers();
       clearTimeout(atelierStartTimer);
@@ -260,8 +281,8 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
         frame.src='about:blank';
         if(frame!==firstFrame)frame.remove();
       }
-      window.removeEventListener('message', onMessage);
       window.removeEventListener('keynlock:atelier', onAtelierEvent);
+      window.removeEventListener('keynlock:alchemy:v1', onAlchemyEvent);
       returnButton.removeEventListener('click', close);
       opened = false;
       rendererHost?.deactivate(station);

@@ -42,6 +42,9 @@ export function createWallPreviewCache({ THREE, renderer, maxConcurrent = 5 }) {
     const texture = new THREE.CanvasTexture(canvas);
     texture.colorSpace = THREE.SRGBColorSpace;
     texture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+    // Upload every preview while the initial loading veil is still present.
+    // Otherwise the first visible render uploads paintings one by one.
+    renderer.initTexture?.(texture);
     return { texture, aspect };
   }
 

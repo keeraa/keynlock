@@ -73,6 +73,8 @@ test('the initial Lair loading waits for the Atelier exhibition completion event
   assert.match(atelier, /const galleryReady = await exhibition\.refresh/);
   assert.match(atelier, /if \(!galleryReady\) throw/);
   assert.match(atelier, /notifyLair\('initial-gallery-ready'\)/);
-  assert.match(room, /if \(type === 'initial-gallery-ready'\) initialLoading\.finish\(\)/);
+  assert.match(room, /if \(type === 'initial-gallery-ready'\) \{galleryLoaded = true;completeInitialLoad\(\);\}/);
+  assert.match(room, /galleryLoaded && alchemyLoaded/,
+    'the original laboratory should finish initialization during the initial loading screen');
   assert.doesNotMatch(room, /setTimeout\(\(\) => loading\.classList\.add\('done'\), 900\)/);
 });

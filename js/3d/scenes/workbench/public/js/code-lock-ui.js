@@ -7,28 +7,28 @@ export function createCodeLockUI({canvas,$,toast,isActive}){
   let scene=null,selectedWheel=0,webglUnavailable=false;
   const grid=$('codeWheelGrid'),fallbackGrid=$('codeFallbackDigits');
   const displays=[],fallbackDisplays=[];
+  function makeWheel(index,{fallback=false}={}){
+    const field=document.createElement('div');
+    field.className=fallback?'code-fallback-wheel':'code-wheel';
+    const arrow=(delta)=>{
+      const button=document.createElement('button');button.type='button';
+      button.textContent=fallback?(delta>0?'▲':'▼'):(delta>0?'⌃':'⌄');
+      button.dataset.wheel=String(index);button.dataset.delta=String(delta);
+      const action=delta>0?'увеличить':'уменьшить';
+      button.setAttribute('aria-label',`${fallback?'На шкатулке: '+action:action[0].toUpperCase()+action.slice(1)} цифру ${index+1}`);
+      return button;
+    };
+    const up=arrow(1),down=arrow(-1);
+    const digit=document.createElement('output');
+    digit.className=fallback?'code-fallback-digit':'code-wheel-digit';
+    if(!fallback)digit.setAttribute('aria-label',`Цифра ${index+1}`);
+    field.append(up,digit,down);
+    return {field,up,down,digit};
+  }
   for(let index=0;index<CODE_LENGTH;index++){
-    const field=document.createElement('div');field.className='code-wheel';
-    const up=document.createElement('button');up.type='button';up.textContent='⌃';
-    up.dataset.wheel=String(index);up.dataset.delta='1';
-    up.setAttribute('aria-label',`Увеличить цифру ${index+1}`);
-    const digit=document.createElement('output');digit.className='code-wheel-digit';
-    digit.setAttribute('aria-label',`Цифра ${index+1}`);
-    const down=document.createElement('button');down.type='button';down.textContent='⌄';
-    down.dataset.wheel=String(index);down.dataset.delta='-1';
-    down.setAttribute('aria-label',`Уменьшить цифру ${index+1}`);
-    field.append(up,digit,down);grid.append(field);displays.push({field,up,down,digit});
-    const fallbackWheel=document.createElement('div');fallbackWheel.className='code-fallback-wheel';
-    const fallbackUp=document.createElement('button');fallbackUp.type='button';
-    fallbackUp.textContent='▲';fallbackUp.dataset.wheel=String(index);fallbackUp.dataset.delta='1';
-    fallbackUp.setAttribute('aria-label',`На шкатулке: увеличить цифру ${index+1}`);
-    const fallbackDigit=document.createElement('output');fallbackDigit.className='code-fallback-digit';
-    const fallbackDown=document.createElement('button');fallbackDown.type='button';
-    fallbackDown.textContent='▼';fallbackDown.dataset.wheel=String(index);fallbackDown.dataset.delta='-1';
-    fallbackDown.setAttribute('aria-label',`На шкатулке: уменьшить цифру ${index+1}`);
-    fallbackWheel.append(fallbackUp,fallbackDigit,fallbackDown);
-    fallbackGrid.append(fallbackWheel);
-    fallbackDisplays.push({up:fallbackUp,down:fallbackDown,digit:fallbackDigit});
+    const wheel=makeWheel(index),fallback=makeWheel(index,{fallback:true});
+    grid.append(wheel.field);fallbackGrid.append(fallback.field);
+    displays.push(wheel);fallbackDisplays.push(fallback);
   }
   function render(){
     displays.forEach(({field,up,down,digit},index)=>{
@@ -72,11 +72,7 @@ export function createCodeLockUI({canvas,$,toast,isActive}){
     }else toast(`Совпало ${result.matched} из 6 цифр.`);
     render();
   }
-  const onGridClick=event=>{
-    const button=event.target.closest('button[data-wheel]');
-    if(button)rotate(Number(button.dataset.wheel),Number(button.dataset.delta));
-  };
-  const onFallbackClick=event=>{
+  const onWheelClick=event=>{
     const button=event.target.closest('button[data-wheel]');
     if(button)rotate(Number(button.dataset.wheel),Number(button.dataset.delta));
   };
@@ -96,8 +92,8 @@ export function createCodeLockUI({canvas,$,toast,isActive}){
     }else return;
     render();
   };
-  grid.addEventListener('click',onGridClick);
-  fallbackGrid.addEventListener('click',onFallbackClick);
+  grid.addEventListener('click',onWheelClick);
+  fallbackGrid.addEventListener('click',onWheelClick);
   $('codeTry').addEventListener('click',test);
   $('codeNew').addEventListener('click',onNew);
   window.addEventListener('keydown',onKey);
@@ -120,8 +116,8 @@ export function createCodeLockUI({canvas,$,toast,isActive}){
     close(){scene?.close();},
     dispose(){
       scene?.dispose();
-      grid.removeEventListener('click',onGridClick);
-      fallbackGrid.removeEventListener('click',onFallbackClick);
+      grid.removeEventListener('click',onWheelClick);
+      fallbackGrid.removeEventListener('click',onWheelClick);
       $('codeTry').removeEventListener('click',test);
       $('codeNew').removeEventListener('click',onNew);
       window.removeEventListener('keydown',onKey);

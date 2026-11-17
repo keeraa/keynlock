@@ -5,6 +5,7 @@ import {BOARD,PARTS,PIN_CODES,portsFor,canPick,makePart,keywayWrenchProfile} fro
 import {createClassicLockHousing} from './classic-lock-housing.js';
 import {createStandardPickingTools,STANDARD_TENSION_TOOLS,tensionProfileHeight,
   TENSION_GUIDE_STATIONS} from './mechanism-lockpicks.js';
+import {captureMechanismThumbnails} from './mechanism-thumbnails.js';
 
 // The contact solver works in drawing coordinates. Both the mechanism and its
 // mounting points live on real, depth-separated surfaces inside this 3D case.
@@ -153,15 +154,20 @@ export function createMechanism3D(canvas,options={}){
   const paintedTextures=[],paintedLoads=[];
   if(!options.rendererFactory){
     const loader=new THREE.TextureLoader();
+    const cachedMaps=new Map();
     for(const [finish,name] of [['case','painted-steel'],['edge','painted-steel'],
       ['steel','painted-steel'],['inner','painted-steel'],['iron','painted-steel'],
       ['brass','painted-brass'],['bronze','painted-brass'],['pale','painted-pin']]){
-      let ready;
-      paintedLoads.push(new Promise(resolve=>{ready=resolve;}));
-      const map=loader.load(`./assets/${name}.webp`,ready,undefined,ready);
-      map.colorSpace=THREE.SRGBColorSpace;
-      map.wrapS=map.wrapT=THREE.RepeatWrapping;map.repeat.set(2,2);map.anisotropy=4;
-      m[finish].map=map;m[finish].needsUpdate=true;paintedTextures.push(map);
+      if(!cachedMaps.has(name)){
+        let ready;
+        paintedLoads.push(new Promise(resolve=>{ready=resolve;}));
+        const map=loader.load(`./assets/${name}.webp`,ready,undefined,ready);
+        map.colorSpace=THREE.SRGBColorSpace;
+        map.wrapS=map.wrapT=THREE.RepeatWrapping;map.repeat.set(2,2);map.anisotropy=4;
+        cachedMaps.set(name,map);
+        paintedTextures.push(map);
+      }
+      m[finish].map=cachedMaps.get(name);m[finish].needsUpdate=true;
     }
   }
   const board=new THREE.Group();scene.add(board);
@@ -425,61 +431,7 @@ export function createMechanism3D(canvas,options={}){
       type:part.type,setting:part.setting,positionX:part.x};
   }
   function captureThumbnails(types){
-    // Render the exact installed part meshes once, using the scene's WebGL
-    // context and metal textures. This avoids a second context per thumbnail.
-    if(!renderer.setRenderTarget||!renderer.readRenderTargetPixels)return {};
-    const width=128,preview=new THREE.Scene();
-    preview.add(new THREE.HemisphereLight(0xf3e6d2,0x36434a,2.7));
-    const lamp=new THREE.DirectionalLight(0xffdaaa,3.4);
-    lamp.position.set(-2,4,7);preview.add(lamp);
-    const fill=new THREE.DirectionalLight(0xa6d6e0,1.5);
-    fill.position.set(3,-1,4);preview.add(fill);
-    const lens=new THREE.PerspectiveCamera(34,1,.02,40);
-    const target=new THREE.WebGLRenderTarget(width,width,{depthBuffer:true,
-      format:THREE.RGBAFormat,colorSpace:THREE.SRGBColorSpace});
-    const previous=renderer.getRenderTarget();
-    const clear=renderer.getClearColor(new THREE.Color()).clone();
-    const alpha=renderer.getClearAlpha();
-    const pixels=new Uint8Array(width*width*4);
-    const surface=document.createElement('canvas');surface.width=surface.height=width;
-    const ctx=surface.getContext('2d');
-    const out={};
-    try{
-      renderer.setRenderTarget(target);renderer.setClearColor(0x101a1c,0);
-      for(const type of types){
-        if(!PARTS[type])continue;
-        const part=makePart(type,`thumbnail-${type}`,0,0);
-        const model=makeModel(part);
-        const pickerIndex=pickTargets.indexOf(model.picker);
-        if(pickerIndex>=0)pickTargets.splice(pickerIndex,1);
-        model.picker.visible=false;
-        model.portsRoot.visible=false;
-        preview.add(model.group);
-        const box=new THREE.Box3().setFromObject(model.mount)
-          .union(new THREE.Box3().setFromObject(model.dynamic));
-        const center=box.getCenter(new THREE.Vector3());
-        const bounds=box.getSize(new THREE.Vector3());
-        const extent=Math.max(bounds.x,bounds.y,bounds.z*.9,.65);
-        const distance=Math.max(2.0,extent*1.92);
-        lens.position.copy(center).add(new THREE.Vector3(distance*.25,distance*.18,distance));
-        lens.lookAt(center);lens.updateProjectionMatrix();
-        renderer.clear();renderer.render(preview,lens);
-        renderer.readRenderTargetPixels(target,0,0,width,width,pixels);
-        const image=ctx.createImageData(width,width);
-        for(let y=0;y<width;y++){
-          const start=(width-1-y)*width*4;
-          image.data.set(pixels.subarray(start,start+width*4),y*width*4);
-        }
-        ctx.putImageData(image,0,0);
-        out[type]=surface.toDataURL('image/png');
-        disposeObject(model.group);
-      }
-    }catch(error){console.warn('3D component thumbnails:',error);}
-    finally{
-      renderer.setRenderTarget(previous);renderer.setClearColor(clear,alpha);
-      target.dispose();
-    }
-    return out;
+    return captureMechanismThumbnails(types,{renderer,makeModel,pickTargets,disposeObject});
   }
   function disposeObject(object){
     object.traverse(child=>{

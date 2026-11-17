@@ -424,11 +424,10 @@ export function createWorkshopScene(canvas){
     setSelectedPart(null);
     controls.update();}
   setMode('key');
-  let stopped=false,suspended=false;
+  let stopped=false,suspended=false,frameId=0;
   function frame(now){
-    if(stopped)return;
-    requestAnimationFrame(frame);
-    if(suspended){lastFrame=now;fpsClock=now;frames=0;return;}
+    if(stopped||suspended){frameId=0;return;}
+    frameId=requestAnimationFrame(frame);
     controls.update();updateTest(now);
     const dt=Math.min(.05,Math.max(0,(now-lastFrame)/1000));
     shavings.update(dt);
@@ -482,20 +481,31 @@ export function createWorkshopScene(canvas){
     if(now-fpsClock>800){fps=Math.round(frames*1000/(now-fpsClock));frames=0;fpsClock=now;}
     lastFrame=now;
   }
-  requestAnimationFrame(frame);
+  frameId=requestAnimationFrame(frame);
   const resizeObserver=new ResizeObserver(()=>{
     const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;
     camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false);
   });resizeObserver.observe(canvas);
   canvas.addEventListener('contextmenu',e=>e.preventDefault(),{signal:sceneListeners.signal});
-  return {setMode,setSuspended:value=>{suspended=Boolean(value);},
+  return {setMode,setSuspended:value=>{
+    const next=Boolean(value);
+    if(next===suspended)return;
+    suspended=next;
+    if(suspended){
+      cancelAnimationFrame(frameId);frameId=0;fps=0;renderedPolygons=0;
+    }else if(!stopped){
+      lastFrame=performance.now();fpsClock=lastFrame;frames=0;
+      frameId=requestAnimationFrame(frame);
+    }
+  },
     setBlueprint,setCuts,setWear,setActiveCut,setFiling,
     setKeyMethod,setFileOrientation,rotateFile,filingContact,filingPulse,filingChips,
     setFilePointer,setFilePointerActive,fileStrokePixels,
     hitTest,pointerPoint,updateInstalled,setPartGroup,setAssemblyDesign,
     setSelectedPart,movePart,findNearestSocket,startTest,
     getFps:()=>fps,getPolygons:()=>renderedPolygons,
-    dispose:()=>{stopped=true;sceneListeners.abort();resizeObserver.disconnect();controls.dispose();
+    dispose:()=>{stopped=true;cancelAnimationFrame(frameId);frameId=0;
+      sceneListeners.abort();resizeObserver.disconnect();controls.dispose();
       imprintBoard.dispose();shavings.dispose();fileSurface.dispose();bow.dispose();
       disposeSceneResources(scene);
       // The marker template is cloned before attachment and isn't in the graph.

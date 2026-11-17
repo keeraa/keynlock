@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 
 const page=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
 const ui=readFileSync(new URL('../public/js/mechanism-ui.js',import.meta.url),'utf8');
+const playback=readFileSync(new URL('../public/js/mechanism-playback.js',import.meta.url),'utf8');
 const styles=readFileSync(new URL('../public/style.css',import.meta.url),'utf8');
 
 test('lockpicking presents the four physical stages and original tools',()=>{
@@ -71,8 +72,9 @@ test('a beginner can select a functional example and watch force progress throug
   assert.match(page,/id="mechPresetDetail"/);
   assert.match(page,/id="mechMotionReadout" hidden/);
   assert.match(ui,/mechanismPreset\(name\)/);
-  assert.match(ui,/function transmissionStages\(parts,view\)/);
-  assert.match(ui,/function stagedView\(full,stages,elapsed,parts\)/);
+  assert.match(ui,/from '\.\/mechanism-playback\.js'/);
+  assert.match(playback,/function transmissionStages\(parts,view\)/);
+  assert.match(playback,/function stagedView\(full,stages,elapsed,parts\)/);
   assert.match(ui,/motionActive=current\.ids/);
   assert.match(ui,/shackleReleased=everOpen\|\|Boolean\(playback\.result\.open/);
   assert.match(ui,/advanced\.className='mech-advanced'/);

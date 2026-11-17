@@ -34,7 +34,9 @@ scene.setWear(state.wear);
 scene.setKeyMethod(state.keyMethod);
 scene.setAssemblyDesign(state.assemblyVariant,state.freeDesign);
 scene.updateInstalled(state.installed);
-const sandbox=createMechanismUI();
+// The sandbox creates its own WebGL context and component thumbnails. Do not
+// allocate them until the player actually enters that station.
+let sandbox=null;
 const codeBox=createCodeLockUI({canvas:$('codeCanvas'),$,toast,
   isActive:()=>state.mode==='code'});
 
@@ -80,7 +82,10 @@ function setMode(mode){
   scene.setSuspended(mode==='mechanism'||mode==='code');
   document.body.classList.toggle('mechanism-active',mode==='mechanism');
   document.body.classList.toggle('code-active',mode==='code');
-  if(mode==='mechanism')sandbox.open();else sandbox.close();
+  if(mode==='mechanism'){
+    if(!sandbox)sandbox=createMechanismUI();
+    sandbox.open();
+  }else sandbox?.close();
   $('codeWorkspace').hidden=mode!=='code';
   if(mode==='code')codeBox.open();else codeBox.close();
   document.querySelectorAll('.workspace-tab').forEach(button=>{
@@ -279,6 +284,6 @@ const fpsTimer=setInterval(()=>{
   $('polygons').textContent=scene.getPolygons().toLocaleString('ru-RU');
 },850);
 window.addEventListener('beforeunload',()=>{
-  clearTimeout(toastTimer);clearInterval(fpsTimer);detachControls();sandbox.dispose();
+  clearTimeout(toastTimer);clearInterval(fpsTimer);detachControls();sandbox?.dispose();
   codeBox.dispose();scene.dispose();
 },{once:true});

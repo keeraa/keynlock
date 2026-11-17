@@ -3,6 +3,8 @@ import {BOARD,PARTS,PALETTE,CORE_PALETTE,ADVANCED_PALETTE,PIN_CODES,makePart,dem
   canPick,checkTensionFit,MECHANISM_PRESETS,mechanismPreset,identifyMechanismPreset} from './mechanism-engine.js';
 import {createMechanism3D} from './mechanism-3d.js';
 import {STANDARD_TENSION_TOOLS,tensionToolIcon} from './mechanism-lockpicks.js';
+import {STAGE_MS,transmissionStages,stepCaption,stagedView} from './mechanism-playback.js';
+import {escapeMechanismHtml,mechanismInspectorMarkup} from './mechanism-inspector.js';
 
 const STORAGE_KEY='keynlock-mechanism-board-v1';
 const BACKUP_KEY='keynlock-mechanism-custom-backup-v1';
@@ -21,70 +23,7 @@ const effects={pinbank:'Правильный ключ выставляет пя�
   splitter:'Одна тяга приводит в движение сразу два плеча.',
   interlock:'Отпускает засов лишь тогда, когда оба входа сдвинулись.',
   shield:'Перекрывает крючку путь к секрету, но не мешает правильному ключу.'};
-const html=s=>String(s).replace(/[&<>"']/g,ch=>({
-  '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-const STAGE_MS=510;
-
-// Follow the actual contacts, including parallel branches. A disconnected
-// component does not light up when the key is turned.
-function transmissionStages(parts,view){
-  const byId=new Map(parts.map(part=>[part.id,part]));
-  const key=parts.find(part=>part.type==='key');if(!key)return [];
-  const depths=new Map([[key.id,0]]),queue=[key.id];
-  for(let i=0;i<queue.length;i++)for(const link of view.links){
-    if(link.from!==queue[i]||depths.has(link.to))continue;
-    depths.set(link.to,depths.get(link.from)+1);queue.push(link.to);
-  }
-  const levels=[...new Set(depths.values())].sort((a,b)=>a-b);
-  const stages=levels.map(depth=>({
-    ids:parts.filter(part=>depths.get(part.id)===depth).map(part=>part.id),depth
-  }));
-  const stopped=stages.findIndex(stage=>stage.depth>0&&stage.ids.every(id=>
-    Math.abs(view.values[id]||0)<.015));
-  return stopped>=0?stages.slice(0,stopped+1):stages;
-}
-function stepCaption(stage,parts,view){
-  const matches=stage.ids.map(id=>parts.find(part=>part.id===id)).filter(Boolean);
-  const part=matches[0];if(!part)return {title:'Нет контакта',detail:'Передача разорвана.'};
-  const moving=matches.some(item=>(view.values[item.id]||0)>.015);
-  switch(part.type){
-    case 'key':return {title:'Ключ поворачивает сердцевину',detail:'Поворот ключа — источник движения всего механизма.'};
-    case 'pinbank':return {title:moving?'Штифты освободили сердцевину':'Штифты удерживают сердцевину',
-      detail:'Пять пар поднимаются на разную высоту; их стыки должны совпасть с линией среза.'};
-    case 'cam':return {title:moving?'Кулачок начинает давить на защёлку':'Кулачку не хватает хода',
-      detail:'Поворот диска превращается в поступательное усилие.'};
-    case 'latch':return {title:moving?'Защёлка отходит от засова':'Защёлка продолжает держать засов',
-      detail:'Пружинный стопор должен выйти из паза, иначе засов не сдвинется.'};
-    case 'bolt':return {title:view.ready?'Засов освобождает правую скобу':'Засов остаётся запертым',
-      detail:'Только после освобождения стопоров стальной стержень может уйти внутрь корпуса.'};
-    case 'ratchet':{
-      const count=view.runtime.pawls[part.id]?.steps||0;
-      return {title:`Трещотка: ${count} из ${part.setting} щелчков`,
-        detail:'Собачка удерживает каждый шаг после возврата ключа. Нужно набрать все щелчки.'};
-    }
-    case 'splitter':return {title:'Усилие расходится на две тяги',detail:'Одно движение от сердцевины передаётся верхнему и нижнему плечу.'};
-    case 'lever':return {title:'Два рычага двигаются вместе',detail:'Каждое плечо поворачивается вокруг своей опоры и толкает отдельный вход стопора.'};
-    case 'interlock':return {title:moving?'Оба рычага освободили стопор':'Один из входов не сработал',
-      detail:'Для освобождения засова два плеча должны давить одновременно.'};
-    case 'gear':return {title:'Шестерня передаёт вращение',detail:'Зацепление меняет направление вращения следующей оси.'};
-    default:return {title:PARTS[part.type].name,
-      detail:moving?'Передача усилия продолжается.':'Этот узел остановил передачу движения.'};
-  }
-}
-function stagedView(full,stages,elapsed,parts){
-  const positions=new Map(stages.flatMap((stage,i)=>stage.ids.map(id=>[id,i])));
-  const fade=index=>{
-    if(index===undefined)return 0;
-    const t=clamp((elapsed-index*STAGE_MS)/STAGE_MS,0,1);
-    return t*t*(3-2*t);
-  };
-  const values={},inputs={};
-  for(const [id,value] of Object.entries(full.values))values[id]=value*fade(positions.get(id));
-  for(const [id,value] of Object.entries(full.inputs))inputs[id]=value*fade(positions.get(id));
-  const bolt=parts.find(part=>part.type==='bolt')?.id;
-  return {...full,values,inputs,
-    boltTravel:full.boltTravel*fade(positions.get(bolt))};
-}
+const html=escapeMechanismHtml;
 
 function initialParts(){
   try{
@@ -294,64 +233,9 @@ export function createMechanismUI(){
 
   function renderInspector(){
     const part=parts.find(item=>item.id===selected);
-    if(mode==='attack'){
-      const bank=parts.find(item=>item.type==='pinbank');
-      const fixed=(runtime.pinBanks?.[bank?.id]?.pins||[]).filter(pin=>pin.set).length;
-      inspector.innerHTML=`<div class="mech-part-name">Как открыть этот замок</div>
-        <ol class="mech-physical-chain">
-          <li><b>Форма натяжителя</b> должна пройти через направляющую у скважины.</li>
-          <li><b>Подходящий натяжитель</b> чуть поворачивает сердцевину и удерживает поднятые штифты.</li>
-          <li><b>Отмычка-крючок</b> по одному приподнимает штифты внутри скважины.</li>
-          <li><b>Щелчок ✓</b> означает правильное положение. Когда все штифты выставлены, сердцевина может повернуться.</li>
-        </ol>
-        ${bank?'<div class="mech-param-row"><span>Выставлено штифтов</span><strong>'+fixed+' / '+PIN_CODES.length+'</strong></div>':
-          '<p>В механизме нет штифтового секрета. Исследуйте доступные точки через скважину.</p>'}
-        <p class="mech-pin-help">Выбирайте штифт под замком. Если подняли слишком высоко, извлеките натяжитель — штифты опустятся.</p>`;
-      return;
-    }
-    if(!part){
-      inspector.innerHTML=`<div class="mech-part-name">Как открыть замок</div>
-        <ol class="mech-physical-chain">
-          <li><b>Ключ</b> приподнимает пять штифтов на нужную высоту.</li>
-          <li><b>Сердцевина</b> получает возможность повернуться.</li>
-          <li><b>Кулачок или тяги</b> отводят пружинную защёлку.</li>
-          <li><b>Засов</b> втягивается и отпускает правую скобу.</li>
-        </ol><p>Нажмите «Повернуть ключ». Каждый этап будет подсвечен прямо на металле. Нажмите на деталь в 3D, чтобы увидеть её роль.</p>`;
-      return;
-    }
+    inspector.innerHTML=mechanismInspectorMarkup({parts,selected,mode,runtime,view,effects});
+    if(mode==='attack'||!part)return;
     const def=PARTS[part.type];
-    const contacts=buildContacts(parts).filter(link=>link.from===part.id||link.to===part.id).length;
-    let body=`<div class="mech-part-name">${def.name}</div>
-      <div class="mech-part-kind">${part.type==='shield'?'ЗАЩИТНАЯ ПЛАСТИНА':`СОЕДИНЕНИЙ С ДРУГИМИ ДЕТАЛЯМИ: ${contacts}`}</div>
-      <p class="mech-simple-explanation">${html(effects[part.type]||def.detail)}</p>
-      <details class="mech-technical-note"><summary>Как устроена деталь</summary><p>${html(def.detail)}</p></details>`;
-    if(mode==='build'){
-      if(part.type==='key'){
-        body+=`<label class="mech-keyway-label" for="mechKeywayProfile">Фигурный паз для натяжителя</label>
-          <select id="mechKeywayProfile" class="mech-keyway-select" aria-label="Форма направляющей скважины">
-            ${STANDARD_TENSION_TOOLS.map((tool,i)=>`<option value="${i}" ${part.wrenchProfile===i?'selected':''}>${html(tool.name)}</option>`).join('')}
-          </select>
-          <p class="mech-pin-help">Изгиб направляющей определяет, какой натяжитель войдёт в замок.</p>`;
-      }
-      if(def.param){
-        const title={ratio:'Передаточное число',resistance:'Сопротивление',strength:'Сила возврата',
-          steps:'Число щелчков',phase:'Начало рабочей фазы',threshold:'Порог открытия',
-          radius:'Радиус защиты'}[def.param];
-        body+=`<label class="mech-param-row" for="mechParameter"><span>${title}</span>
-          <strong id="mechParameterValue">${Number(part.setting).toFixed(def.step===1||def.step===5?0:2)}${def.unit}</strong></label>
-          <input id="mechParameter" type="range" min="${def.min}" max="${def.max}"
-          step="${def.step}" value="${part.setting}" />`;
-      }
-      if(['lever'].includes(part.type))body+=`<label class="mech-toggle-row"><input type="checkbox" id="mechFlip" ${part.flip?'checked':''} /> Обратное плечо</label>`;
-      if(['pin','cam','latch'].includes(part.type))body+=`<label class="mech-toggle-row"><input type="checkbox" id="mechPolarity" ${part.polarity===-1?'checked':''} /> Работает от обратного усилия</label>`;
-      body+=`<div class="mech-properties-actions"><button id="mechRotate" type="button" ${def.fixed?'disabled':''}>Повернуть 90° ↻</button>
-        <button id="mechRemove" type="button" ${def.fixed?'disabled':''}>Убрать деталь ×</button></div>`;
-    }else{
-      const level=view?.values[part.id]||0;
-      body+=`<div class="mech-param-row"><span>Текущий ход</span><strong>${Math.round(Math.abs(level)*100)}%</strong></div>`;
-      if(mode==='attack')body+=`<div class="mech-param-row"><span>Доступ крючком</span><strong>${canPick(part,parts)?'ЕСТЬ':'НЕТ'}</strong></div>`;
-    }
-    inspector.innerHTML=body;
     $('mechRotate')?.addEventListener('click',()=>rotateSelected(1));
     $('mechRemove')?.addEventListener('click',removeSelected);
     $('mechParameter')?.addEventListener('input',event=>{
@@ -364,6 +248,15 @@ export function createMechanismUI(){
     $('mechPolarity')?.addEventListener('change',event=>{part.polarity=event.target.checked?-1:1;changed();});
     $('mechKeywayProfile')?.addEventListener('change',event=>{
       part.wrenchProfile=Number(event.target.value);changed();});
+  }
+  function updateInspectorReadout(){
+    if(mode!=='attack')return;
+    const node=inspector.querySelector('[data-mech-pin-count]');
+    if(!node)return;
+    const bank=parts.find(part=>part.type==='pinbank');
+    const fixed=(runtime.pinBanks?.[bank?.id]?.pins||[]).filter(pin=>pin.set).length;
+    const label=`${fixed} / ${PIN_CODES.length}`;
+    if(node.textContent!==label)node.textContent=label;
   }
 
   function renderDiagnostics(){
@@ -633,7 +526,8 @@ export function createMechanismUI(){
 
   // The real mesh hierarchy and all interaction targets are rendered in Three.js.
   function frame(now){
-    raf=requestAnimationFrame(frame);if(!active)return;
+    if(!active){raf=0;return;}
+    raf=requestAnimationFrame(frame);
     const dt=clamp((now-(lastFrame||now))/1000,.008,.05);lastFrame=now;
     const key=mode==='build'&&now<pulseUntil?1:0;
     view=stepMechanism(parts,runtime,{key,
@@ -682,7 +576,7 @@ export function createMechanismUI(){
       tension,wrenchIndex,wrenchAttemptUntil,activePin,dragging:drag?.id,motionActive,unlocked:shackleReleased},now);
     if(now-lastInfo>350){
       lastInfo=now;
-      if(selected&&mode!=='build')renderInspector();
+      updateInspectorReadout();
       const pawls=parts.filter(part=>part.type==='ratchet');
       const snaps=pawls.map(part=>runtime.pawls[part.id]?.steps||0);
       const count=snaps.reduce((a,b)=>a+b,0);
@@ -720,13 +614,14 @@ export function createMechanismUI(){
     $('mech3dUnavailable').textContent='Для трёхмерной песочницы требуется WebGL. Не удалось открыть 3D-корпус замка.';
     $('mechFeedback').textContent='В этом браузере не удалось создать WebGL-сцену.';
   }
-  renderInspector();renderDiagnostics();raf=requestAnimationFrame(frame);
+  renderInspector();renderDiagnostics();
 
   return {
-    open(){active=true;root.hidden=false;lastFrame=0;model3d?.open();
-      renderDiagnostics();renderInspector();},
-    close(){active=false;root.hidden=true;drag=null;hidePartTooltip();model3d?.close();resetMotion();},
-    dispose(){disposed=true;cancelAnimationFrame(raf);model3d?.dispose();
+    open(){root.hidden=false;model3d?.open();renderDiagnostics();renderInspector();
+      if(!active){active=true;lastFrame=0;raf=requestAnimationFrame(frame);}},
+    close(){active=false;cancelAnimationFrame(raf);raf=0;
+      root.hidden=true;drag=null;hidePartTooltip();model3d?.close();resetMotion();},
+    dispose(){disposed=true;active=false;cancelAnimationFrame(raf);raf=0;model3d?.dispose();
       for(const [target,event,fn,options] of listeners)target.removeEventListener(event,fn,options);
       tooltip.remove();}
   };

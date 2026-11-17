@@ -297,7 +297,7 @@
 @media(min-width:761px) and (max-width:980px){.mech-preset-grid{grid-template-columns:1fr}.mech-preset-grid button{min-height:43px}}
 @media(max-width:760px){.mechanism-workspace{inset:92px 0 0;grid-template-columns:1fr;grid-template-rows:auto auto auto;overflow-y:auto}.mech-stage{order:0;padding:10px}.mech-stage-header{flex-direction:row;align-items:center}.mech-stage-header h2{font-size:16px}.mech-stage-header .mech-eyebrow{font-size:7px}.mech-mode-tabs button{font-size:9px;padding:7px 6px}.mech-board-container{max-height:none}.mech-catalog{order:1;border-right:0;border-top:1px solid #45504a;overflow:visible}.mech-inspector{order:2;border-left:0;border-top:1px solid #45504a;overflow:visible}.mech-palette{grid-template-columns:repeat(3,minmax(0,82px));justify-content:start}.mech-palette-heading{grid-column:1/-1}.mech-palette button{display:grid;justify-items:center;text-align:center}.mech-controls{min-height:0}.mech-board-watermark{font-size:9px}.mech-board-watermark span{display:none}}
 
-/* Fifth workshop station — six-dial casket, using the lock's painted metal palette. */
+/* Fourth workshop station — six-dial casket, using the lock's painted metal palette. */
 .masthead{gap:15px;padding-left:26px;padding-right:26px}
 .brand{min-width:200px}
 .workspace-tabs{gap:6px;min-width:0}

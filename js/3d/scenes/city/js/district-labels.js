@@ -42,14 +42,28 @@ export function createDistrictLabels({districts,city,camera,canvas,onFocus,getSe
     if(!visible)return;
     const width=canvas.clientWidth,height=canvas.clientHeight;
     const selectedId=getSelectedId();
+    const occupied=[];
     for(const marker of markers) {
       const point=marker.projected.copy(marker.point).project(camera);
-      const onScreen=point.z>=-1&&point.z<=1&&Math.abs(point.x)<.96&&
-        Math.abs(point.y)<.91&&(camera.zoom<2.65||selectedId===marker.district.id);
+      const onScreen=point.z>=-1&&point.z<=1&&Math.abs(point.x)<.92&&
+        Math.abs(point.y)<.86&&(camera.zoom<1.65||selectedId===marker.district.id);
       marker.element.hidden=!onScreen;
       if(!onScreen)continue;
-      marker.element.style.left=`${(point.x*.5+.5)*width}px`;
-      marker.element.style.top=`${(-point.y*.5+.5)*height}px`;
+      const x=Math.max(80,Math.min(width-80,(point.x*.5+.5)*width));
+      const baseY=Math.max(96,Math.min(height-48,(-point.y*.5+.5)*height));
+      const markerWidth=Math.min(146,marker.element.offsetWidth||130);
+      const markerHeight=marker.element.offsetHeight||34;
+      let y=baseY;
+      for(let attempt=0;attempt<6;attempt++){
+        const bounds={left:x-markerWidth/2,right:x+markerWidth/2,top:y-markerHeight/2,bottom:y+markerHeight/2};
+        const collision=occupied.find(other=>bounds.left<other.right+8&&bounds.right+8>other.left&&bounds.top<other.bottom+8&&bounds.bottom+8>other.top);
+        if(!collision)break;
+        y=collision.bottom+markerHeight/2+10;
+        if(y+markerHeight/2>height-24)y=collision.top-markerHeight/2-10;
+      }
+      occupied.push({left:x-markerWidth/2,right:x+markerWidth/2,top:y-markerHeight/2,bottom:y+markerHeight/2});
+      marker.element.style.left=`${x}px`;
+      marker.element.style.top=`${y}px`;
       marker.element.classList.toggle('selected',selectedId===marker.district.id);
     }
   }

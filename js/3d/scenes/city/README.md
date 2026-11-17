@@ -1,17 +1,24 @@
-# KEYNLOCK — карта игрового мира
+# KEYNLOCK — редактор зданий
 
-Interactive illustrated city map and Three.js r187 world concept for the game [keeraa/keynlock](https://github.com/keeraa/keynlock).
+Текущая версия игрового мира: https://keynlock-world-map-1115.k1r11111.chatgpt.site
+
+Чат разработки: https://chatgpt.com/c/6afb4b25-7b64-83ed-a650-1656902b597f
+
+Three.js r187 architectural workshop for the game [keeraa/keynlock](https://github.com/keeraa/keynlock). The root URL opens the parametric house editor; special landmarks and district building prototypes remain in their labs. The terrain editor is intentionally a separate future project.
 
 The seven district identifiers follow `js/data/world.js` in the main game. Districts are distinguished by architecture and landmarks: a clock tower, theater, art museum, formal gardens, factory chimneys, harbor piers and palace.
 
-## Controls
+## Editors
 
-- Left drag: orbit; right drag: pan; wheel/pinch: zoom.
-- WASD / arrow keys: pan the map (also works with a Russian keyboard layout); hold Shift to move faster.
-- The live 3D city opens by default. Click the map, a district name or a district in the sidebar to select or focus it.
-- The «Районы» drawer has a toggle for the map labels.
-- H hides the interface; Escape closes panels.
-- Visual settings and label visibility persist locally.
+- `/house-builder/` — main parametric 3D house editor (opens by default).
+- `/landmark-lab/` — special architectural models and their levels of detail.
+- `/street-lab/` — district house and block composition tests.
+
+## Portable house module
+
+`modules/house-builder/index.js` is the stable, UI-free model API. `modules/house-builder/editor.js` mounts the visual editor. The architecture, dependency list and embed instructions are in [`modules/house-builder/README.md`](modules/house-builder/README.md).
+
+`npm run export:house` produces a standalone source folder and `.tar.gz` archive in ignored `exports/`. `npm run test:house-module` verifies the extracted API, asset paths and standalone editor page.
 
 ## Code structure
 
@@ -19,9 +26,9 @@ The seven district identifiers follow `js/data/world.js` in the main game. Distr
 | --- | --- |
 | `js/main.js` | Renderer, camera, lights, controls and settings |
 | `js/district-labels.js` | Map labels, coordinate projection and label toggle |
-| `js/district-zoning.js` | Seven geographic planning polygons and the river exclusion in reference-image coordinates |
-| `district-zones/` | Interactive geographic zoning map based on the supplied river-and-canals plan |
-| `js/city.js` | Buildings, streets, bridges, landmarks, vegetation and boats |
+| `js/city.js` | Map scene orchestration: streets, bridges, terrain objects and boats |
+| `js/city/city-house-lots.js` | Deterministic district lots, setbacks and door connections |
+| `js/street/street-smoke.js`, `js/street/street-lod-fade.js` | Shared smoke emitters and stable, cached LOD transitions for districts |
 | `js/navigation/house-paths.js` | Pathfinding and paved approaches from doors to streets |
 | `js/world-data.js` | District and location identifiers |
 | `js/terrain.js`, `js/water.js` | Land relief and animated water |
@@ -29,43 +36,30 @@ The seven district identifiers follow `js/data/world.js` in the main game. Distr
 | `js/buildings/house-config.js` | Stable, versioned house blueprint and validated settings |
 | `js/buildings/house-layout.js` | Floor-by-floor window positioning, including door/balcony clearance |
 | `js/buildings/house-model.js` | One rebuildable Three.js house with configurable roof, walls, windows, entrance and details |
+| `modules/house-builder/core/house-atmosphere.js` | Shared painted moss, chimney and window-glow resources; in-place moss height updates |
+| `modules/house-builder/core/building-smoke-batch.js` | One GPU particle draw per city, street scene or landmark, with shared fade and density |
+| `modules/house-builder/core/house-texture-assets.js` | Active house/fallback texture manifest used by the build and portable export |
 | `js/buildings/house-editor.js` | Controls and camera for `/house-builder/` |
-| `js/landmarks/landmark-model.js` | Five reusable signature buildings, each with high/medium/low geometry |
+| `js/landmarks/landmark-model.js` | Six reusable signature buildings, each with high/medium/low geometry |
 | `js/landmarks/landmark-editor.js` | Interactive architectural inspector at `/landmark-lab/` |
 | `js/buildings/house-fallback.js` | Paintable 2D projection if WebGL is unavailable |
 | `tests/` | Scene geometry, optimization and district-label checks |
 
-## District geography plan
-
-The `/district-zones/` planning page uses the provided 1548×1148 city reference as
-the geographic basis for seven named districts. The central river separates the
-northern industrial, palace and upper districts from the port, arts, bohemian and
-old-city areas on the south bank. Each polygon and its anchor are stored in
-`js/district-zoning.js` in image coordinates, with the river explicitly excluded
-from land zone lookups. Boundaries, selections and the source image scale together
-as the player pans or zooms. The main map links to this plan from «Районы».
-
-This is the approved direction for **future city geography**; the current 3D
-prototype's pre-existing coastline, terrain and streets remain intact until they
-are migrated to the new plan. The zoning file is independent of the existing
-`world-data.js` 3D district anchors, so development can proceed in stages.
-
 ## Signature buildings
 
-The standalone `/landmark-lab/` is a design and performance inspector for five special buildings:
-the main-square church, a royal theater, the arts museum, town hall and hilltop palace.
+The standalone `/landmark-lab/` is a design and performance inspector for six special buildings:
+the main-square church, a royal theater, the arts museum, town hall, hilltop palace and clock tower.
 Each procedural model has the same entrance orientation (+Z), is sized in world metres,
 and can be inspected from four viewpoints in three geometry LOD levels. A model's meshes,
-triangle count and bounding height are shown live. This is an independent asset library;
-the legacy landmark silhouettes on the city map are intentionally unchanged until the
-building and square layout is approved. Use `createLandmarkModel(THREE,id,{detail})` to
+triangle count and bounding height are shown live. The city uses the same
+approved painted models with smaller scale and medium LOD. Use `createLandmarkModel(THREE,id,{detail})` to
 instantiate and explicitly call its `dispose()` when discarding the model.
 
 ## Single-house constructor
 
 Open `/house-builder/` from the **Конструктор** button above the city map. Its current scope is a single, editable reference house. Controls include 1–4 storeys, facade width/depth, gable/hip/flat roof, ridge height, three color channels, front/side window counts, window and doorway shapes, shutters, chimney, balcony, and timber framing. The model updates immediately; it can be orbit-rotated and inspected from four preset views.
 
-Configurations are saved in browser storage and can be downloaded or copied as JSON. Exports use `schema: "keynlock.house"`, `version: 1` and a normalized `params` object. The city's 125 existing houses remain unchanged until this reference design is approved; a future city generator can instantiate the same `house-model` geometry from exported blueprints, with shared-material and instancing optimizations as a separate phase.
+Configurations are saved in browser storage and can be downloaded or copied as JSON. Exports use `schema: "keynlock.house"`, `version: 1` and a normalized `params` object. The city currently instantiates 122 houses with the shared painted `house-model`, batched by district and facade variant.
 
 ## Visual pipeline
 
@@ -81,7 +75,10 @@ Configurations are saved in browser storage and can be downloaded or copied as J
 - Industrial residences and the factory complex, chimneys, and loading yard sit together beyond the western riverbank, connected by industrial road loops and paved entrances.
 - The castle sits on a raised plateau with an open arched gateway, masonry entrance steps and large multi-storey windows. Blue-roofed residences surround the hill. Factory, warehouse, and palace roof panels use common local foundations to stay aligned on slopes. Stone plinths extend to the lowest corners of waterfront warehouses and steeply sloping residential lots.
 - At night the town turns dark blue, with pooled warm lights and soft halos from street lanterns and seaward-facing residential windows. The outline pass excludes transparent glow sprites.
+- Chimney smoke grows while slowly rising from the outlet. City houses share one particle batch; a district scene also uses one batch, and each special building uses one draw for all of its chimneys. Smoke and window halos reuse the same cached paintings across the editors.
+- Gouache moss covers the foundations of ordinary and signature buildings. Changing its height updates existing vertices and UVs without recreating GPU geometry.
 - Static shadow maps update only when lighting changes; ocean reflections update immediately on camera motion and at ~30 fps while stationary. Static painted road/garden meshes are merged by material.
+- Production and standalone exports copy only active texture files from the shared manifest. Unused and original paintings stay in source history; the large copper roof is shipped as a compressed WebP.
 - `assets/city-concept-01.webp`: original hand-painted concept kept as a source reference. It is excluded from the deployed static build.
 - Clickable district names are projected from `world-data.js` anchors and may be hidden from the sidebar.
 

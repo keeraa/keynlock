@@ -34,7 +34,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{ou
 .range-field{margin:0 0 24px}.range-field:last-child{margin-bottom:4px}
 .field-note{margin:8px 0 0;color:#a7b4b1;font-size:10px;line-height:1.5}
 .field-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}
-.field-top label,.select-field{color:#c1cbc2;font-size:11px}
+.field-top label,.field-label{color:#c1cbc2;font-size:11px}
 .field-top output{color:#ebcd98;font-size:11px;font-weight:600;white-space:nowrap}
 input[type=range]{width:100%;height:5px;display:block;cursor:pointer;margin:0;accent-color:#caa569;appearance:none;background:linear-gradient(to right,#c9a773,#c9a773) no-repeat,#52625f;border-radius:5px}
 input[type=range]::-webkit-slider-thumb{appearance:none;width:15px;height:15px;border-radius:50%;background:#f3e2bc;border:3px solid #ac8a55;box-shadow:0 0 0 3px #22353a}
@@ -50,6 +50,10 @@ input[type=range]:disabled{opacity:.4;cursor:not-allowed}
 .roof-sketch.gable:before{width:28px;left:-1px;transform:rotate(-27deg);transform-origin:right}.roof-sketch.gable:after{width:28px;right:-1px;transform:rotate(27deg);transform-origin:left}
 .roof-sketch.hip:before{width:29px;left:0;transform:rotate(-24deg);transform-origin:right}.roof-sketch.hip:after{width:21px;right:0;transform:rotate(28deg);transform-origin:left}
 .roof-sketch.flat:before{width:44px;top:8px;left:2px}.roof-sketch.flat:after{width:2px;height:18px;top:9px;right:2px}
+.floor-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.floor-options button{min-height:39px;background:#182c31;border:1px solid #a4a79350;border-radius:6px;color:#b7c3bb;font-size:14px}
+.floor-options button:hover,.shape-option:hover{background:#304749;color:#f2e4c5}
+.floor-options button.selected,.shape-option.selected{background:#465248;border-color:#d4af70;color:#f9e3b7;box-shadow:inset 0 0 0 1px #e9c88b22}
 .color-field{margin:4px 0 24px}.color-field:last-child{margin-bottom:2px}
 .damage-settings{margin:1px 0 22px;padding:0 12px 9px;border:1px solid #d4ba8650;border-radius:8px;background:#25383a85}
 .damage-settings .toggle-row{padding:12px 0}.damage-options{padding:15px 0 0;transition:opacity .18s}.damage-options.is-disabled{opacity:.42}
@@ -61,8 +65,12 @@ input[type=range]:disabled{opacity:.4;cursor:not-allowed}
 .custom-color span{position:absolute;pointer-events:none;background:#1c3133c9;width:18px;height:18px;display:grid;place-items:center;border-radius:50%;font-size:12px}
 .custom-color input{position:absolute;inset:-5px;width:47px;height:47px;padding:0;border:none;cursor:pointer;background:transparent;opacity:.65}
 .inline-fields{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-.select-field{display:flex;flex-direction:column;gap:9px}
-.select-field select{appearance:none;width:100%;padding:11px 27px 11px 10px;border:1px solid #afb5ab33;border-radius:6px;color:#e6d6b9;font-size:11px;background:#1a2c31 url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"%3E%3Cpath d="m4 6 4 4 4-4" fill="none" stroke="%23d4bc87" stroke-width="1.4"/%3E%3C/svg%3E') right 7px center/16px no-repeat}
+.choice-field{min-width:0;display:flex;flex-direction:column;gap:10px}
+.shape-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+.shape-option{display:flex;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:9px 3px 7px;background:#1a2c31;border:1px solid #afb5ab44;border-radius:6px;color:#b7c3bb;transition:background .15s,border-color .15s}
+.shape-option svg{width:31px;height:34px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+.shape-option .icon-fill{fill:currentColor;stroke:none}
+.shape-option span{font-size:9px;white-space:nowrap}
 .details-section h2{margin-bottom:11px}.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;cursor:pointer;border-bottom:1px solid #ffffff12}.toggle-row:last-child{border-bottom:0}
 .toggle-row b{display:block;color:#dce1d1;font-size:11px;font-weight:600}.toggle-row small{display:block;margin-top:5px;color:#8c9f9c;font-size:9px}
 .toggle-row input{position:absolute;opacity:0;pointer-events:none}.toggle-row i{position:relative;display:block;width:33px;height:19px;flex:none;border-radius:30px;background:#445457;border:1px solid #7e8e8a;transition:background .16s}
@@ -90,6 +98,14 @@ input[type=range]:disabled{opacity:.4;cursor:not-allowed}
 .view-controls button.active{background:#344b4a;color:#f2e5cc;box-shadow:0 2px 4px #273c3b22}
 .camera-hint{color:#697971;font-size:8px;font-weight:700;letter-spacing:.12em;text-align:right;line-height:1.7;text-shadow:0 1px #fffbefbd}.camera-hint span{color:#ad8f67;margin:0 5px}
 .stage-error{position:absolute;z-index:4;left:50%;top:50%;width:min(360px,86%);transform:translate(-50%,-50%);background:#203539ed;border:1px solid #e1c49375;border-radius:10px;padding:24px;color:#f8e4b8;font-size:13px;line-height:1.6;text-align:center}
+.atmosphere-section h2{margin-bottom:13px}.atmosphere-details{border-top:1px solid #d5bd8a33;padding:12px 0}
+.atmosphere-details summary{list-style:none;cursor:pointer;color:#f0d9b2;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 0}
+.atmosphere-details summary::-webkit-details-marker{display:none}.atmosphere-details summary:before{content:'▸';margin-right:4px;color:#c49e68}.atmosphere-details[open] summary:before{content:'▾'}
+.atmosphere-details summary small{color:#9aada3;font-size:9px;font-weight:400;margin-left:auto}
+.atmosphere-range{margin:15px 0 13px}.atmosphere-range .field-top{margin-bottom:10px}.atmosphere-range input[type=range]{width:100%}
+.viewer.is-night{background:radial-gradient(ellipse at 48% 35%,#3d5164,#1c3041 90%)}
+.viewer.is-night .model-title{color:#f3dfbb;text-shadow:0 2px 12px #111f32}.viewer.is-night .model-title .small-label,.viewer.is-night .model-title p{color:#d2c0a5}
+.viewer.is-night .model-kicker,.viewer.is-night .live-indicator,.viewer.is-night .camera-hint{color:#e6d4b9;text-shadow:0 1px 9px #162437}
 .summary-panel{z-index:2;padding:30px 20px;background:linear-gradient(164deg,#f0e1c5,#dfcfb0);border-left:1px solid #7f775d63;box-shadow:-8px 0 24px #635d5024;color:#253a3c;overflow-y:auto;min-width:0}
 .summary-kicker{color:#a7784a;margin-bottom:20px;letter-spacing:.17em}
 .summary-stats{display:grid;grid-template-columns:1fr 1fr;gap:17px 7px}.summary-stats>div{display:flex;flex-direction:column;gap:5px}.summary-stats strong{font:500 31px/1 Cormorant,Georgia,serif;color:#2b4746}.summary-stats span{font-size:10px;color:#69756c}

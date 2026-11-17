@@ -16,3 +16,33 @@
 @media(max-width:1280px){.layout{grid-template-columns:293px minmax(0,1fr) 209px}.top-path{display:none}.topbar{gap:12px}.catalogue-head{padding-left:19px}.catalogue-head h1{font-size:36px}.stage-title h2{font-size:34px}.help{display:none}}
 @media(max-width:1010px){.layout{grid-template-columns:290px minmax(0,1fr)}.passport{display:none}.header-metrics span:last-child{display:none}}
 @media(max-width:670px){html,body{overflow:auto}.shell{position:relative;height:auto;min-height:100dvh;overflow:visible}.topbar{height:65px;padding:0 11px}.brand-mark{width:36px;height:36px}.brand b{font-size:14px}.brand small{font-size:7px}.header-metrics{display:none}.topbar nav a:not(:last-child){display:none}.layout{display:flex;flex-direction:column}.stage{order:0;height:62dvh;min-height:450px}.catalogue{order:1;overflow:visible}.stage-head{top:18px;left:15px;right:15px}.stage-title{top:58px;left:15px}.stage-title h2{font-size:35px;max-width:290px}.stage-bottom{left:11px;right:11px;bottom:16px}.views button{padding:10px 9px;font-size:9px}.building-list{display:grid;grid-template-columns:1fr 1fr}.building-option{padding:8px}.building-symbol{display:none}.catalogue-head h1 br{display:none}}
+.effect-settings{padding:0 17px 27px;display:grid;gap:8px}
+.effect-night{background:#243d46!important;border-color:#a1afbd66!important}
+.effect-switch{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #b8b59a2c;background:#21373b;border-radius:7px;padding:11px 12px;color:#e9dac0;font-size:11px;cursor:pointer}
+.effect-switch b{font-size:11px;font-weight:600}.effect-switch small{display:block;font-size:9px;color:#aabbb4;margin-top:5px;line-height:1.35}
+.effect-switch input[type=checkbox]{appearance:none;flex:none;width:36px;height:20px;position:relative;border-radius:99px;border:1px solid #839387;background:#53645f;margin:0;cursor:pointer;transition:background .15s ease}
+.effect-switch input[type=checkbox]:after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#eee8d5;transition:transform .15s ease}
+.effect-switch input[type=checkbox]:checked{background:#bb9c67;border-color:#e0bf7e}
+.effect-switch input[type=checkbox]:checked:after{transform:translateX(16px);background:#172d30}
+.effect-switch input:focus-visible,.effect-range input:focus-visible{outline:2px solid #efd39a;outline-offset:4px}
+.effect-group{border:1px solid #c0af8d39;border-radius:7px;background:#1a3035;padding:0 11px 11px}
+.effect-group summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:13px 1px;cursor:pointer;font-size:11px;color:#e2d4b7}
+.effect-group summary::-webkit-details-marker{display:none}
+.effect-group summary:before{content:"▸";font-size:10px;color:#c8b17f;margin-right:5px;transition:transform .15s ease}
+.effect-group[open] summary:before{transform:rotate(90deg)}
+.effect-group summary span{flex:1}.effect-group summary i{font-style:normal;font-size:9px;color:#90a79e;letter-spacing:.07em}
+.effect-inline{padding:9px 2px;border:0;background:none;font-size:10px}
+.effect-inline input[type=checkbox]{transform:scale(.85);transform-origin:right center}
+.effect-range{display:block;padding:8px 3px 9px;color:#b8c5bb;font-size:10px}
+.effect-range>span{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.effect-range output{color:#e5c992;font-size:10px;font-weight:700;font-variant-numeric:tabular-nums}
+.effect-range input[type=range]{display:block;margin:12px 0 2px;width:100%;height:4px;appearance:none;border-radius:5px;background:#687e75;cursor:pointer;accent-color:#d4b989}
+.effect-range input[type=range]::-webkit-slider-thumb{appearance:none;width:13px;height:13px;border:2px solid #21383d;border-radius:50%;background:#e8cf9c;box-shadow:0 0 0 1px #d4b989}
+.effect-night-glow{padding:7px 12px 8px;border:1px solid #b8b59a2c;border-radius:7px}
+.night-mode .stage{background:#172431}
+.night-mode .stage-head,.night-mode .stage-title span{color:#b6c0c3}
+.night-mode .stage-head b{color:#e9c697}
+.night-mode .stage-title{text-shadow:0 2px 14px #08131be0}
+.night-mode .stage-title h2{color:#ede4d2}
+.night-mode .stage-title p,.night-mode .help{color:#b6bdba}
+.night-mode .grain{mix-blend-mode:screen;opacity:.055}

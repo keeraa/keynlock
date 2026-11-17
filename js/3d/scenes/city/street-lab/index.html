@@ -7,18 +7,19 @@
   <meta name="description" content="Лаборатория KEYNLOCK: генератор исторических улиц и кварталов по архитектурным правилам семи районов." />
   <title>Лаборатория квартала · KEYNLOCK</title>
   <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="../css/editor-visual.css" />
   <script type="importmap">{"imports":{"three":"../vendor/three.js","three/core":"../vendor/three-core.js"}}</script>
 </head>
 <body>
   <div class="shell">
     <header class="topbar">
-      <a class="brand" href="../" aria-label="Вернуться к карте города">
+      <a class="brand" href="../house-builder/" aria-label="Редактор зданий KEYNLOCK">
         <span class="brand-monogram">K<span>✦</span>L</span>
         <span class="brand-name"><b>KEYNLOCK</b><small>ГОРОДСКАЯ МАСТЕРСКАЯ</small></span>
       </a>
-      <div class="breadcrumb">ПРОТОТИП ГОРОДА <span>/</span> <b id="breadcrumbMode">ТЕСТОВЫЙ КВАРТАЛ</b></div>
+      <div class="breadcrumb">РЕДАКТОР ЗДАНИЙ <span>/</span> <b id="breadcrumbMode">ТЕСТОВЫЙ КВАРТАЛ</b></div>
       <div class="top-metrics"><span><small>FPS</small><strong id="fpsValue">—</strong></span><span><small>ТРЕУГОЛЬНИКИ</small><strong id="triangleValue">—</strong></span><span><small>ВЫЗОВЫ GPU</small><strong id="drawCallsValue">—</strong></span></div>
-      <nav class="top-links"><a href="../landmark-lab/">Особые здания</a><a href="../house-builder/">Конструктор домов</a><a class="back-link" href="../">← На карту</a></nav>
+      <nav class="top-links"><a href="../landmark-lab/">Особые здания</a><a href="../house-builder/">Конструктор домов</a></nav>
     </header>
 
     <main class="layout">
@@ -41,12 +42,31 @@
           <div class="double-field street-fields"><label>Тип фонарей<select id="lampStyle" data-override="lampStyle"><option value="gas">Газовые</option><option value="ornate">Фигурные</option><option value="industrial">Промышленные</option></select></label><label>Шаг, м<input type="number" id="lampSpacing" data-override="lampSpacing" min="10" max="28" step="1" /></label></div>
           <label class="toggle"><span><b>Вечерний свет</b><small>Проверка освещения фонарей</small></span><input id="nightMode" type="checkbox" /><i></i></label>
         </section>
+        <section class="control-section street-atmosphere" aria-label="Атмосфера обычных домов">
+          <h2><span>04</span> Эффекты домов</h2>
+          <p class="atmosphere-intro">Общие настройки для обычных домов, кварталов и архитектурных доминант.</p>
+          <div class="range-row"><div><label>Свечение окон ночью</label><output data-atmo-value="windowGlow">67%</output></div><input aria-label="Свечение окон" type="range" min="0" max="100" step="1" data-atmo="windowGlow" /></div>
+          <details class="street-effect-group" open><summary>Мох на фундаментах</summary>
+            <label class="toggle"><span><b>Показывать мох</b></span><input type="checkbox" data-atmo="moss" /><i></i></label>
+            <div class="range-row"><div><label>Плотность мха</label><output data-atmo-value="mossDensity">62%</output></div><input aria-label="Плотность мха" type="range" min="0" max="100" step="1" data-atmo="mossDensity" /></div>
+            <div class="range-row"><div><label>Высота мха</label><output data-atmo-value="mossHeight">85 см</output></div><input aria-label="Высота мха" type="range" min="15" max="160" step="5" data-atmo="mossHeight" /></div>
+          </details>
+          <details class="street-effect-group"><summary>Блеск стекла</summary>
+            <div class="range-row"><div><label>Глянцевость</label><output data-atmo-value="glassGloss">74%</output></div><input aria-label="Глянцевость окон" type="range" min="0" max="100" step="1" data-atmo="glassGloss" /></div>
+            <div class="range-row"><div><label>Отражения</label><output data-atmo-value="glassReflection">46%</output></div><input aria-label="Отражения окон" type="range" min="0" max="100" step="1" data-atmo="glassReflection" /></div>
+          </details>
+          <details class="street-effect-group"><summary>Гуашевый дым</summary>
+            <label class="toggle"><span><b>Дым из труб</b></span><input type="checkbox" data-atmo="smoke" /><i></i></label>
+            <label class="toggle"><span><b>Обводка дыма</b></span><input type="checkbox" data-atmo="smokeOutline" /><i></i></label>
+            <div class="range-row"><div><label>Густота</label><output data-atmo-value="smokeDensity">62%</output></div><input aria-label="Густота дыма" type="range" min="0" max="100" step="1" data-atmo="smokeDensity" /></div>
+          </details>
+        </section>
         <div class="form-actions"><button id="newStreet" class="generate-button" type="button">↻ &nbsp; Новый квартал</button><div class="secondary-actions"><button id="resetDistrict" type="button">Сброс района</button><button id="exportStreet" type="button">↓ Экспорт JSON</button></div><p>Изменения сохраняются отдельно для каждого района.</p></div>
       </aside>
 
       <section class="stage" aria-label="Генерируемые исторические улицы и кварталы">
         <canvas id="streetCanvas" aria-label="Обзор созданной улицы, дома можно выбирать"></canvas>
-        <div class="stage-grain" aria-hidden="true"></div>
+        <div class="stage-grain" id="stageGrain" aria-hidden="true"></div>
         <div class="stage-top"><div class="stage-number">ГЕНЕРАЦИЯ <b id="seedValue">001129</b></div><div class="live-indicator"><i></i> <span id="renderMode">3D СЦЕНА</span></div></div>
         <div class="stage-title"><div class="eyebrow" id="stageEyebrow">РАЙОН 01 / 07</div><h2 id="streetTitle">Старый квартал</h2><p id="streetDescription">Плотная старинная застройка, красные крыши, фахверк</p></div>
         <div class="stage-foot"><div id="viewButtons" class="view-buttons" role="group" aria-label="Ракурс камеры"><button type="button" data-view="three-quarter" class="active">¾ Вид</button><button type="button" data-view="street">Вдоль улицы</button><button type="button" data-view="aerial">Сверху</button><button type="button" data-view="walk">Пешеход</button></div><div class="camera-note" id="cameraNote">ПОВЕРНИ МЫШЬЮ · КОЛЕСО — МАСШТАБ · НАЖМИ НА ДОМ</div></div>

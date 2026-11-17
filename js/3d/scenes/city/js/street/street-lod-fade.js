@@ -38,9 +38,12 @@ export function isolateHouseFade(group,start=0,order=12,{fixedMaterials=[],showF
       visible:object.visible,baseOpacity:originals.map(material=>material.opacity)});
   });
   let disposed=false;
+  let lastOpacity=NaN;
   const setOpacity=value=>{
     if(disposed)return;
     const amount=Math.min(1,Math.max(0,value));
+    if(amount===lastOpacity)return;
+    lastOpacity=amount;
     for(const entry of entries){
       entry.object.visible=entry.visible&&amount>.002;
       entry.temporaries.forEach((temporary,i)=>{

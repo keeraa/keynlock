@@ -3,6 +3,16 @@ import { DISTRICTS, LOCATIONS } from './world-data.js';
 import { createWaterMaterials } from './water.js';
 import { makeHeightSampler, createTerrainMeshes, northTerrainEdge } from './terrain.js';
 import { connectHousePaths } from './navigation/house-paths.js';
+import { createHouseModel } from './buildings/house-model.js';
+import { batchHouseGeometry } from './buildings/house-batch.js';
+import {setHouseGlassAppearance} from './buildings/house-materials.js';
+import {acquireHouseAtmosphereResources,createHouseMossGeometry,setHouseMossGeometryHeight,houseChimneyOutlet,loadBuildingAtmosphereSettings} from './buildings/house-atmosphere.js';
+import {createBuildingSmokeBatch} from '../modules/house-builder/core/building-smoke-batch.js';
+import {populateCityHouseLots} from './city/city-house-lots.js';
+import {windowLayout} from './buildings/house-layout.js';
+import { createLandmarkModel } from './landmarks/landmark-model.js';
+import {createLandmarkAtmosphere} from './landmarks/landmark-atmosphere.js';
+import { DISTRICT_PROFILES } from './street/district-profiles.js';
 
 const TAU=Math.PI*2;
 const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
@@ -20,9 +30,14 @@ export function createCity({THREE: T=THREE,scene,materials}) {
   const occupiedLots=[];
   const houseEntrances=[];
   const housePaths=[];
+  const newHousePlacements=new Map();
   const waterfrontWarehouses=[];
   const smokePuffs=[];
   const windowLightSites=[];
+  const houseAtmosphereResources=acquireHouseAtmosphereResources(T);
+  let buildingSettings=loadBuildingAtmosphereSettings(),buildingGlassEnvironment=null;
+  const cityMossBatches=[],cityHouseModels=[],cityLandmarkModels=[],citySmokeParticles=[];
+  let cityHouseSmoke=null,cityHouseSmokeBatch=null;
   const streetLampSites=[];
   const stairRuns=[];
   const palaceEntrySteps=[];
@@ -74,10 +89,6 @@ export function createCity({THREE: T=THREE,scene,materials}) {
     entry.entries.push(matrix);
   }
   function local(x,z,dx,dz,angle) {return [x+dx*Math.cos(angle)+dz*Math.sin(angle),z-dx*Math.sin(angle)+dz*Math.cos(angle)];}
-  function piece(mat,shape,base,dx,dy,dz,sx,sy,sz,tilt=0) {
-    const [x,z]=local(base.x,base.z,dx,dz,base.yaw);
-    part(mat,shape,x,base.y+dy,z,sx,sy,sz,base.yaw,tilt,0,heightAt(base.x,base.z));
-  }
   function collectSurface(geometry,material) {
     if(!surfaces.has(material))surfaces.set(material,[]);
     surfaces.get(material).push(geometry);
@@ -281,7 +292,7 @@ export function createCity({THREE: T=THREE,scene,materials}) {
     [93,-33,5.8],
     // Each characterful neighborhood gets a legible civic landmark and space
     // around it; random houses must never swallow these focal points.
-    [-42,-2,8.2],[43,-40,6.3],
+    [-42,-2,8.2],[43,-40,6.3],[-35,-6,7.8],[42,-32,7.8],
     [30,0,7],[23,0,2.4],[41,0,2.4],[5,-57,20],[-1,-4,5],[24,-24,6],[-12,15,5],[45,15,6],
     [-34,16,6.5],[18,15,6.5],
     ...fieldPlots.map(([x,z,w,d])=>[x,z,Math.max(w,d)*.73]),
@@ -499,181 +510,6 @@ export function createCity({THREE: T=THREE,scene,materials}) {
         const [px,pz]=local(x,z,dx,0,heading);
         const base=heightAt(px,pz),support=Math.max(.28,deckY-base-.16);
         part('stone','box',px,support/2,pz,.85,support,width+.25,heading,0,0,base);
-      }
-    }
-  }
-  function house(x,z,style='old',scale=1,angle=0) {
-    const size=style==='upper'?1.27:style==='industrial'?1.2:style==='port'?1.17:1;
-    const w=(2.2+random()*1.6)*scale*size;
-    const d=(2.8+random()*1.7)*scale*size;
-    const h=(2.4+random()*2.35)*scale*(style==='upper'?1.29:style==='port'?.88:1);
-    const roofVariant=random();
-    const halfX=(Math.abs(Math.cos(angle))*w+Math.abs(Math.sin(angle))*d)/2+.24;
-    const halfZ=(Math.abs(Math.sin(angle))*w+Math.abs(Math.cos(angle))*d)/2+.24;
-    const corners=[[x-halfX,z-halfZ],[x+halfX,z-halfZ],[x-halfX,z+halfZ],[x+halfX,z+halfZ]];
-    const midpoints=[[x,z],[x-halfX,z],[x+halfX,z],[x,z-halfZ],[x,z+halfZ]];
-    if([...corners,...midpoints].some(([px,pz])=>atPolyline(px,pz,riverPoints)<5.3))return false;
-    if(corners.some(([px,pz])=>!isBuildable(px,pz,.35)))return false;
-    if(occupiedLots.some(lot=>Math.abs(x-lot.x)<halfX+lot.halfX+.48&&Math.abs(z-lot.z)<halfZ+lot.halfZ+.48))return false;
-    occupiedLots.push({x,z,halfX,halfZ,style});
-    const base={x,z,yaw:angle,y:0};
-    const wall={old:['plaster','timber','ochre','plaster'],bohemian:['rose','ochre','rose','pale'],arts:['pale','pale','stone'],upper:['palaceWall','pale','stone','palaceWall'],hill:['pale','plaster','palaceWall'],industrial:['brick','darkBrick','industrial'],port:['timber','brick','plaster']}[style]||['stone'];
-    const roof={old:['roofRed','roofOchre','roofRed','roofNeutral'],bohemian:['roofRed','roofJade','roofRed','roofBlue'],arts:['roofJade','roofSlateLight','roofCopper'],upper:['roofBlue','roofCopper','roofSlateLight'],hill:['roofBlue','roofBlue','roofBlue','roofSlateLight'],industrial:['roofDark','roofSlate','roofRed'],port:['roofDark','roofRed','roofNeutral']}[style]||['roofNeutral'];
-    const wallMat=wall[Math.floor(random()*wall.length)],roofMat=roof[Math.floor(random()*roof.length)];
-    piece(wallMat,'box',base,0,h/2,0,w,h,d);
-    const plinthDepth=foundationDepth(x,z,halfX,halfZ);
-    piece('stone','box',base,0,.08-plinthDepth/2,0,w+.09,plinthDepth+.16,d+.1);
-    const rise=(style==='industrial'?.48:style==='hill'?.20+roofVariant*.19:.28)*w*(.75+random()*.5);
-    const slope=Math.atan2(rise,w/2),panelW=Math.hypot(w/2,rise)+.32;
-    piece(roofMat,'box',base,-w/4,h+rise/2,0,panelW,.19,d+.42,slope);
-    piece(roofMat,'box',base,w/4,h+rise/2,0,panelW,.19,d+.42,-slope);
-    piece(roofMat,'box',base,0,h+rise+.045,0,.15,.12,d+.5);
-    const frontZ=d/2+.065;
-    const rows=h>5.65?3:h>3.75?2:1;
-    for(let row=0;row<rows;row++)for(const dx of [-w*.26,w*.26]) {
-      const windowY=1.25+row*1.42;
-      const glowing=random()>.46;
-      // A single inset glass pane within a complete, evenly aligned frame.
-      // No decorative horizontal band may bisect its dark surround.
-      piece('darkTimber','box',base,dx,windowY,frontZ,.59,.81,.11);
-      piece(glowing?'litWindow':'windows','box',base,dx,windowY,frontZ+.061,.43,.63,.065);
-      piece('pale','box',base,dx,windowY-.43,frontZ+.1,.66,.085,.18);
-      if(glowing){
-        const [wx,wz]=local(x,z,dx,frontZ+.19,angle);
-        windowLightSites.push({x:wx,y:heightAt(x,z)+windowY,z:wz});
-      }
-    }
-    piece('darkTimber','box',base,0,.77,frontZ+.02,.69,1.42,.14);
-    piece('iron','box',base,.19,.77,frontZ+.12,.045,.045,.045);
-    if(style==='old') {
-      // Distinctive old-town timber framing, aligned around the actual glass.
-      for(const xx of [-w*.455,w*.455])
-        piece('darkTimber','box',base,xx,h/2,frontZ+.08,.115,h-.14,.11);
-      piece('darkTimber','box',base,0,h-.15,frontZ+.09,w*.95,.14,.14);
-    }
-    if(random()>.6 && style!=='industrial') {
-      piece('brick','box',base,-w*.28,h+rise*.72,-d*.15,.38,rise*.9+.52,.36);
-      piece('stone','box',base,-w*.28,h+rise*1.15+.27,-d*.15,.52,.12,.5);
-    }
-    if(style==='arts'||style==='upper'||style==='hill') {
-      // The cornice sits above every window and the doorway. The former
-      // one-third-height fascia cut straight through the glazing.
-      const bandY=h-.16;
-      for(const zz of [-d/2-.14,d/2+.14])
-        piece('pale','box',base,0,bandY,zz,w+.3,.13,.18);
-      for(const xx of [-w/2-.14,w/2+.14])
-        piece('pale','box',base,xx,bandY,0,.18,.13,d+.3);
-      for(const xx of [-w/2-.12,w/2+.12])for(const zz of [-d/2-.12,d/2+.12])
-        piece('pale','box',base,xx,h/2,zz,.19,h+.16,.19);
-    }
-    if((style==='old'||style==='port')&&random()>.51) {
-      const canopy=style==='port'?'roofDark':'roofRed';
-      piece(canopy,'box',base,0,1.79,frontZ+.18,w*.68,.13,.55,.12);
-      for(const xx of [-w*.3,w*.3])piece('timber','box',base,xx,.83,frontZ+.42,.095,1.65,.11);
-    }
-    if(style==='bohemian'&&h>3.7) {
-      piece('timber','box',base,0,2.02,frontZ+.2,w*.66,.1,.42);
-      for(let xx=-w*.27;xx<=w*.27;xx+=.36)piece('darkTimber','box',base,xx,1.87,frontZ+.4,.07,.25,.08);
-      piece('rose','box',base,-w*.39,h*.58,frontZ+.18,.27,.9,.2);
-    }
-    if(style==='bohemian'&&roofVariant>.31){
-      // Painterly shop awnings give the artist quarter a lively warm rhythm.
-      piece(roofVariant>.7?'roofJade':'roofRed','box',base,0,1.95,frontZ+.39,w*.82,.14,.84,.12);
-      for(const xx of [-w*.36,w*.36])
-        piece('timber','box',base,xx,.92,frontZ+.7,.085,1.84,.09);
-    }
-    if(style==='upper'||style==='hill') {
-      piece('pale','box',base,0,h-.25,frontZ+.12,w*.9,.24,.23);
-      for(const xx of [-w*.39,w*.39])piece('stone','box',base,xx,.42,frontZ+.62,.32,.84,.3);
-      if(roofVariant>.43){
-        // A shallow porch and small side posts break the monotonous facades.
-        piece('stone','box',base,0,.09,frontZ+.43,w*.66,.18,.81);
-        piece(roofMat,'box',base,0,1.95,frontZ+.42,w*.77,.15,.94);
-        for(const xx of [-w*.34,w*.34])piece('pale','box',base,xx,.99,frontZ+.77,.12,1.92,.12);
-      }
-      if(roofVariant<.36&&h>3.15){
-        // A compact attic bay sits within the gabled front of the roof.
-        piece('pale','box',base,0,h+.16,frontZ-.11,w*.27,.56,.52);
-        piece('roofBlue','box',base,0,h+.53,frontZ-.1,w*.34,.14,.65);
-        piece('windows','box',base,0,h+.18,frontZ+.18,w*.14,.31,.08);
-      }
-    }
-    if(style==='arts'&&random()>.4) {
-      piece('roofCopper','box',base,0,h-.35,frontZ+.18,w*.73,.12,.26);
-      piece('pale','box',base,0,2.16,frontZ+.18,w*.45,.14,.21);
-    }
-    if(style==='arts') {
-      for(const xx of [-w*.39,w*.39])
-        piece('pale','box',base,xx,1.49,frontZ+.25,.18,2.94,.2);
-      piece('roofCopper','box',base,0,2.97,frontZ+.28,w*.94,.13,.27);
-    }
-    if(style==='upper'&&roofVariant>.54){
-      // Stone balconies distinguish affluent residences from hill cottages.
-      piece('stone','box',base,0,2.6,frontZ+.51,w*.74,.15,1.0);
-      for(const xx of [-w*.32,0,w*.32])
-        piece('pale','box',base,xx,2.95,frontZ+.92,.12,.63,.12);
-    }
-    if(style==='industrial') {
-      // The factory chimneys dominate the skyline; workers' cottages only
-      // occasionally have their own short chimney.
-      if(random()>.82) {
-        const [cx,cz]=local(x,z,w*.32,-d*.3,angle);
-        part('brick','cylinder',cx,h+1.35,cz,.33,2.7,.33);
-        part('iron','cylinder',cx,h+2.75,cz,.4,.13,.4);
-      }
-      if(random()>.75)piece('iron','box',base,0,h+rise*1.15,0,d*.45,.22,.25);
-    }
-    // Start the approach below the doorway, so the paving is tucked under
-    // the sill and never stops a metre short of the house facade.
-    const [doorX,doorZ]=local(x,z,0,d/2-.08,angle);
-    houseEntrances.push({x:doorX,z:doorZ,forward:[Math.sin(angle),Math.cos(angle)],lot:occupiedLots[occupiedLots.length-1]});
-    return true;
-  }
-
-  function districtBuildings() {
-    const zones=[
-      {name:'industrial',x0:-109,x1:-73,z0:-64,z1:-11,target:30},
-      {name:'old',x0:-54,x1:-10,z0:-12,z1:14,target:30},
-      {name:'bohemian',x0:-12,x1:18,z0:-17,z1:14,target:23},
-      {name:'arts',x0:18,x1:57,z0:-11,z1:14,target:27},
-      {name:'upper',x0:18,x1:57,z0:-42,z1:-13,target:22},
-      // Blue-roofed homes break up the otherwise empty hills on both sides
-      // of the long stairway to the palace, outside the castle walls.
-      {name:'hill',x0:-25,x1:-6,z0:-84,z1:-37,target:17},
-      {name:'hill',x0:19,x1:34,z0:-81,z1:-36,target:19},
-      {name:'port',x0:-55,x1:55,z0:11,z1:20,target:15},
-    ];
-    for(const zone of zones) {
-      let placed=0;
-      // Search for open parcels inside the street grid, then reserve the actual
-      // building footprint. Crowded blocks are left with visible breathing room.
-      for(let attempt=0;attempt<2600 && placed<zone.target;attempt++) {
-        const x=zone.x0+random()*(zone.x1-zone.x0);
-        const z=zone.z0+random()*(zone.z1-zone.z0);
-        if(!isBuildable(x,z,.45))continue;
-        const scale=zone.name==='port'?.83:zone.name==='industrial'?.78+random()*.17:zone.name==='upper'?.97:zone.name==='hill'?.68+random()*.33:.8+random()*.22;
-        // Waterfront homes show their front windows toward the sea (+Z).
-        const angle=zone.name==='port'?0:(attempt%3===0?Math.PI*.5:0);
-        if(house(x,z,zone.name,scale,angle))placed++;
-      }
-    }
-    // Small infill buildings finish the old streets and port without closing
-    // the wider gaps left between major houses and public buildings.
-    const infill=[
-      {name:'old',x0:-55,x1:-10,z0:-12,z1:15,target:9},
-      {name:'bohemian',x0:-12,x1:18,z0:-17,z1:15,target:7},
-      {name:'arts',x0:18,x1:57,z0:-10,z1:15,target:7},
-      {name:'port',x0:-55,x1:55,z0:11,z1:19,target:10},
-    ];
-    for(const zone of infill) {
-      let count=0;
-      for(let attempt=0;attempt<1600&&count<zone.target;attempt++) {
-        const x=zone.x0+random()*(zone.x1-zone.x0);
-        const z=zone.z0+random()*(zone.z1-zone.z0);
-        if(!isBuildable(x,z,.32))continue;
-        if(!occupiedLots.some(lot=>lot.style===zone.name&&Math.hypot(lot.x-x,lot.z-z)<8.8))continue;
-        const angle=zone.name==='port'?0:(attempt%4===0?Math.PI/2:0);
-        if(house(x,z,zone.name,.69+random()*.11,angle))count++;
       }
     }
   }
@@ -1327,6 +1163,8 @@ export function createCity({THREE: T=THREE,scene,materials}) {
       smokeBatch.setMatrixAt(i,smokeMatrix);
     }
     if(smokeBatch)smokeBatch.instanceMatrix.needsUpdate=true;
+    cityHouseSmokeBatch?.update(time);
+    for(const {effects} of cityLandmarkModels)effects.update(time);
     for(const boat of boats) {
       const phase=time*boat.speed+boat.phase;
       const vx=-boat.rx*Math.sin(phase)*boat.speed;
@@ -1366,18 +1204,9 @@ export function createCity({THREE: T=THREE,scene,materials}) {
   // Hundreds of independent lamps would create a huge fragment-shader cost;
   // the glowing glass itself remains instanced for the entire city.
   const nightEmitters=[];
-  let nightMode='day',nightGlowTexture=null;
+  let nightMode='day';
   function createNightLights(){
-    const dim=32,rgba=new Uint8Array(dim*dim*4);
-    for(let y=0;y<dim;y++)for(let x=0;x<dim;x++){
-      const radius=Math.hypot((x+.5-dim/2)/(dim/2),(y+.5-dim/2)/(dim/2));
-      const alpha=Math.max(0,Math.exp(-radius*radius*7)-Math.exp(-7));
-      const p=(y*dim+x)*4;
-      rgba[p]=255;rgba[p+1]=215;rgba[p+2]=155;rgba[p+3]=Math.round(alpha*150);
-    }
-    nightGlowTexture=new T.DataTexture(rgba,dim,dim,T.RGBAFormat);
-    nightGlowTexture.needsUpdate=true;
-    const glowMaterial=new T.SpriteMaterial({map:nightGlowTexture,
+    const glowMaterial=new T.SpriteMaterial({map:houseAtmosphereResources.glowMap,
       color:'#ffe0ab',transparent:true,blending:T.AdditiveBlending,
       depthWrite:false,depthTest:true,opacity:.92});
     effectMaterials.push(glowMaterial);
@@ -1418,6 +1247,7 @@ export function createCity({THREE: T=THREE,scene,materials}) {
   }
   function setNightLighting(time){
     nightMode=time;
+    setBuildingAtmosphereSettings({night:time!=='day'});
     for(const {light,glow} of nightEmitters){
       light.visible=false;glow.visible=false;
     }
@@ -1478,21 +1308,166 @@ export function createCity({THREE: T=THREE,scene,materials}) {
     surfaces.clear();
   }
 
+  function addDetailedBuildings() {
+    const dummy=new T.Object3D();
+    const foundations=[...newHousePlacements.values()].flat();
+    const plinths=new T.InstancedMesh(new T.BoxGeometry(1,1,1),materials.get('stone'),foundations.length);
+    plinths.name='legacy-geography-house-foundations';
+    plinths.castShadow=true;plinths.receiveShadow=true;
+    foundations.forEach(({x,z,angle,width,depth,ground,foundation},index)=>{
+      dummy.position.set(x,ground-foundation/2+.08,z);
+      dummy.rotation.set(0,angle,0);
+      dummy.scale.set(width+.08,foundation,depth+.08);
+      dummy.updateMatrix();plinths.setMatrixAt(index,dummy.matrix);
+    });
+    plinths.instanceMatrix.needsUpdate=true;plinths.computeBoundingSphere();
+    scene.add(plinths);objects.push(plinths);
+    for(const [key,positions] of newHousePlacements) {
+      const split=key.lastIndexOf('-');
+      const district=key.slice(0,split),variant=Number(key.slice(split+1));
+      const profile=DISTRICT_PROFILES[district]||DISTRICT_PROFILES.old;
+      const config={
+        floors:Math.min(profile.floors[1],profile.floors[0]+variant%4),
+        width:Math.min(12,profile.width[0]+(variant%5)*.72),
+        depth:Math.min(10,profile.depth[0]+(variant%4)*.55),
+        roofType:profile.roofs[variant%profile.roofs.length],
+        roofHeight:1.1+(variant%5)*.43,
+        roofColor:profile.roofsPalette[variant%profile.roofsPalette.length],
+        plasterColor:profile.walls[variant%profile.walls.length],
+        woodColor:profile.woods[variant%profile.woods.length],
+        frontWindows:2+variant%3,sideWindows:1+variant%3,
+        windowStyle:profile.details.arch>.5&&variant%4?'arched':'straight',
+        doorStyle:profile.details.arch>.5?'arched':'straight',
+        shutters:profile.details.shutters>.45&&variant%4!==0,
+        chimney:profile.details.chimney>.45&&variant%5!==0,
+        balcony:variant%3===2&&profile.details.balcony>.5,
+        timberFrame:profile.details.timberFrame>.4&&variant%3!==1,
+        plasterDamage:variant%3===1&&profile.details.damage>.38,
+        damageAmount:25,
+      };
+      const model=createHouseModel(T,config,{detail:'low'});
+      cityHouseModels.push(model);
+      batchHouseGeometry(T,model.group);
+      for(const part of model.group.children) {
+        if(!part.isMesh)continue;
+        const mesh=new T.InstancedMesh(part.geometry,part.material,positions.length);
+        mesh.name=`legacy-geography-detailed-${key}`;
+        mesh.castShadow=true;mesh.receiveShadow=true;
+        positions.forEach(({x,z,angle,width,depth,ground},index)=>{
+          dummy.position.set(x,ground+.08,z);
+          dummy.rotation.set(0,angle,0);
+          const widthScale=width/config.width,depthScale=depth/config.depth;
+          dummy.scale.set(widthScale,Math.min(1.02,Math.max(.66,(widthScale+depthScale)*.9)),depthScale);
+          dummy.updateMatrix();mesh.setMatrixAt(index,dummy.matrix);
+        });
+        mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();
+        scene.add(mesh);objects.push(mesh);
+      }
+      // One instanced moss shell per house variant, including its door cutout.
+      // The same transparently painted sheet is reused across all districts.
+      const mossMesh=new T.InstancedMesh(createHouseMossGeometry(T,config,{height:buildingSettings.mossHeight/100}),houseAtmosphereResources.mossMaterial,positions.length);
+      mossMesh.name=`city-gouache-house-moss-${key}`;
+      mossMesh.frustumCulled=false;
+      mossMesh.renderOrder=2;
+      const updateMossMatrices=()=>{
+        positions.forEach(({x,z,angle,width,depth,ground},index)=>{
+          const widthScale=width/config.width,depthScale=depth/config.depth;
+          const verticalScale=Math.min(1.02,Math.max(.66,(widthScale+depthScale)*.9));
+          dummy.position.set(x,ground+.08,z);dummy.rotation.set(0,angle,0);
+          dummy.scale.set(widthScale,verticalScale,depthScale);
+          dummy.updateMatrix();mossMesh.setMatrixAt(index,dummy.matrix);
+        });
+        mossMesh.instanceMatrix.needsUpdate=true;mossMesh.computeBoundingSphere();
+      };
+      cityMossBatches.push(mossMesh);
+      updateMossMatrices();
+      scene.add(mossMesh);objects.push(mossMesh);
+      const chimney=houseChimneyOutlet(config);
+      const litWindow=windowLayout(config).front[0];
+      positions.forEach(({x,z,angle,width,depth,ground},index)=>{
+        const widthScale=width/config.width,depthScale=depth/config.depth;
+        const verticalScale=Math.min(1.02,Math.max(.66,(widthScale+depthScale)*.9));
+        if(chimney){
+          const cx=x+Math.cos(angle)*chimney.x*widthScale+Math.sin(angle)*chimney.z*depthScale;
+          const cz=z-Math.sin(angle)*chimney.x*widthScale+Math.cos(angle)*chimney.z*depthScale;
+          for(let p=0;p<3;p++)citySmokeParticles.push({x:cx,y:ground+.08+chimney.y*verticalScale,
+            z:cz,phase:p/3+(index%7)*.031,seed:index*.71+p*1.53});
+        }
+        if(litWindow&&index%2===0){
+          const wx=x+Math.cos(angle)*litWindow.x*widthScale+Math.sin(angle)*depth*.53;
+          const wz=z-Math.sin(angle)*litWindow.x*widthScale+Math.cos(angle)*depth*.53;
+          windowLightSites.push({x:wx,y:ground+.08+litWindow.y*verticalScale,z:wz});
+        }
+      });
+    }
+    const landmarks=[
+      ['palace',5,-57,.64],['museum',32,0,.47],
+      ['theater',0,-5,.43],['townhall',-46,.15,.39],
+      ['church',-35,-6,.42],['tower',42,-32,.38],
+    ];
+    for(const [id,x,z,scale] of landmarks) {
+      const model=createLandmarkModel(T,id,{detail:'medium'});
+      model.group.position.set(x,heightAt(x,z)+.15,z);
+      model.group.scale.setScalar(scale);
+      const effects=createLandmarkAtmosphere(T,model,{settings:buildingSettings,mossMap:model.textureMaps.moss});
+      effects.group.position.copy(model.group.position);
+      effects.group.scale.copy(model.group.scale);
+      scene.add(model.group,effects.group);objects.push(model.group);
+      cityLandmarkModels.push({model,effects});
+    }
+    if(citySmokeParticles.length){
+      cityHouseSmokeBatch=createBuildingSmokeBatch(T,citySmokeParticles,{
+        resources:houseAtmosphereResources,settings:buildingSettings,
+        name:'city-instanced-gouache-chimney-smoke',
+      });
+      cityHouseSmoke=cityHouseSmokeBatch.points;
+      scene.add(cityHouseSmoke);
+    }
+    // The previous raised palace paving was built for the removed castle's
+    // tall stone plinth; the detailed palace sits directly on the hill.
+    pavedRectangle(32,7,14,4.6,.055,'paving');
+    pavedRectangle(0,2.3,8,5,.049);
+    pavedRectangle(-42,-.45,10.6,7.2,.072,'paving');
+  }
+
+  function setBuildingAtmosphereSettings(patch={},envMap=buildingGlassEnvironment){
+    const previousHeight=buildingSettings.mossHeight;
+    buildingSettings={...buildingSettings,...patch};
+    buildingGlassEnvironment=envMap;
+    houseAtmosphereResources.mossMaterial.opacity=Math.min(1,buildingSettings.mossDensity*.013);
+    for(const mesh of cityMossBatches){
+      mesh.visible=Boolean(buildingSettings.moss)&&buildingSettings.mossDensity>0;
+      if(buildingSettings.mossHeight!==previousHeight)
+        setHouseMossGeometryHeight(mesh.geometry,buildingSettings.mossHeight/100);
+    }
+    cityHouseSmokeBatch?.setSettings(buildingSettings);
+    setHouseGlassAppearance(T,{gloss:buildingSettings.glassGloss,reflection:buildingSettings.glassReflection,
+      night:buildingSettings.night,glow:buildingSettings.windowGlow,envMap:buildingGlassEnvironment?.texture??null});
+    for(const {model,effects} of cityLandmarkModels){
+      model.setWindowAppearance({gloss:buildingSettings.glassGloss,reflection:buildingSettings.glassReflection,
+        night:buildingSettings.night,glow:buildingSettings.windowGlow,envMap:buildingGlassEnvironment?.texture??null});
+      effects.setSettings(buildingSettings);
+    }
+  }
+
   const waterMats=landAndSea();
   infrastructure(waterMats);
-  districtBuildings();
+  populateCityHouseLots({random,atPolyline,riverPoints,isBuildable,
+    occupiedLots,newHousePlacements,houseEntrances,windowLightSites,
+    heightAt,foundationDepth,local});
   connectHousePaths({
     mainRoads,minorRoads,houseEntrances,occupiedLots,riverPoints,
     atPolyline,clamp,coast,ROOT_COORDINATES,housePaths,
     ribbon,pavedRoadHeight,roadStairs,
   });
-  factoryComplex();palaceComplex();agriculturalFields();countrysideWindmill();
-  museumAndTheater();oldTownCivicSquare();upperCityGarden();oldTownMarket();portAndQuays();
+  factoryComplex();agriculturalFields();countrysideWindmill();
+  addDetailedBuildings();upperCityGarden();oldTownMarket();portAndQuays();
   gardensAndTrees();hillsideLandscaping();riverbankLandscaping();greenOutskirts();streetFurniture();boatsAndWaves();
   const surfaceStats={before:[...surfaces.values()].reduce((total,group)=>total+group.length,0),after:surfaces.size};
   const hits=finalize();
   finalizeSurfaces();
   createNightLights();
+  setBuildingAtmosphereSettings();
   update(0);
   const districtAt=(x,z)=>{
     if(z>13)return 'port';
@@ -1509,20 +1484,23 @@ export function createCity({THREE: T=THREE,scene,materials}) {
     windmillRotor,
     roadSurfaceHeight:pavedRoadHeight,terrainSurfaceHeight:terrainSurfaceAt,riverSurfaceHeight,
     nightLightSites:{lamps:streetLampSites,windows:windowLightSites},
-    setNightLighting,updateNightLights,
+    setNightLighting,updateNightLights,setBuildingAtmosphereSettings,
     setWaterTime:time=>waterMats.setTime(time),
     setWaterView:eye=>waterMats.setView(eye),
     setWaterLighting:time=>waterMats.setTimeOfDay(time),
     dispose() {
       for(const mesh of hits){scene.remove(mesh);mesh.dispose();}
       for(const obj of objects){scene.remove(obj);obj.geometry?.dispose();}
+      if(cityHouseSmokeBatch){scene.remove(cityHouseSmoke);cityHouseSmokeBatch.dispose();}
+      for(const {effects,model} of cityLandmarkModels){scene.remove(effects.group);effects.dispose();model.dispose();}
+      for(const model of cityHouseModels)model.dispose();
       if(smokeBatch){scene.remove(smokeBatch);smokeBatch.dispose();}
       for(const boat of boats){scene.remove(boat.group);boat.group.traverse(child=>{if(child.isMesh)child.geometry.dispose();});}
       for(const material of boatSails)material.dispose();
       if(windmillRotor){scene.remove(windmillRotor);for(const geometry of windmillRotor.userData.bladeGeometries)geometry.dispose();}
       for(const material of effectMaterials)material.dispose();
-      if(nightGlowTexture)nightGlowTexture.dispose();
       for(const {light,glow} of nightEmitters){scene.remove(light);scene.remove(glow);}
+      houseAtmosphereResources.release();
       waterMats.dispose();
       for(const g of Object.values(geometries))g.dispose();
     }

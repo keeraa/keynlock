@@ -7,23 +7,23 @@
   <meta name="description" content="Параметрический конструктор городских домов KEYNLOCK: этажи, крыши, штукатурка, окна и детали фасада." />
   <title>Конструктор домов · KEYNLOCK</title>
   <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="../css/editor-visual.css" />
   <script type="importmap">{"imports":{"three":"../vendor/three.js","three/core":"../vendor/three-core.js"}}</script>
 </head>
 <body>
   <div class="shell">
     <header class="site-header">
-      <a href="../" class="brand" aria-label="Вернуться к карте KEYNLOCK">
+      <a href="./" class="brand" aria-label="Редактор зданий KEYNLOCK">
         <span class="brand-mark">K<span>✦</span>L</span>
         <span><b>KEYNLOCK</b><small>АРХИТЕКТУРНАЯ МАСТЕРСКАЯ</small></span>
       </a>
-      <div class="header-trail">ПРОТОТИП ГОРОДА <span>/</span> <b>КОНСТРУКТОР ДОМОВ</b></div>
+      <div class="header-trail">РЕДАКТОР ЗДАНИЙ <span>/</span> <b>КОНСТРУКТОР ДОМОВ</b></div>
       <div class="header-metrics" aria-label="Производительность модели">
         <span><i>FPS</i><strong id="fpsValue">—</strong></span>
         <span><i>ПОЛИГОНЫ</i><strong id="polygonValue">—</strong></span>
       </div>
       <a href="../street-lab/" class="back-button">Улица ↗</a>
       <a href="../landmark-lab/" class="back-button">Особые здания ↗</a>
-      <a href="../" class="back-button">← &nbsp; На карту</a>
     </header>
 
     <main class="workspace">
@@ -31,7 +31,6 @@
         <div class="settings-head">
           <div class="eyebrow"><span class="small-diamond">✦</span> 01 / 01 · ЭТАЛОН ЗДАНИЯ</div>
           <h1 id="settings-title">Конструктор дома</h1>
-          <p>Один дом — множество вариантов. Изменения сразу отражаются на модели.</p>
         </div>
 
         <form id="houseForm" autocomplete="off">
@@ -55,9 +54,13 @@
           <section class="section" aria-labelledby="dimensions-title">
             <h2 id="dimensions-title"><span>02</span> Архитектура</h2>
             <div class="range-field">
-              <div class="field-top"><label for="floors">Этажность</label><output id="floorsValue" for="floors">2 этажа</output></div>
-              <input id="floors" name="floors" type="range" min="1" max="4" step="1" value="2" />
-              <div class="scale-labels"><span>1</span><span>2</span><span>3</span><span>4</span></div>
+              <div class="field-top"><span class="field-label">Этажность</span><output id="floorsValue">2 этажа</output></div>
+              <div class="floor-options" role="group" aria-label="Этажность">
+                <button type="button" data-floors="1" aria-pressed="false">1</button>
+                <button type="button" data-floors="2" class="selected" aria-pressed="true">2</button>
+                <button type="button" data-floors="3" aria-pressed="false">3</button>
+                <button type="button" data-floors="4" aria-pressed="false">4</button>
+              </div>
             </div>
             <div class="range-field">
               <div class="field-top"><label for="width">Ширина фасада</label><output id="widthValue" for="width">8 м</output></div>
@@ -106,12 +109,28 @@
               <input id="sideWindows" name="sideWindows" type="range" min="0" max="4" step="1" value="2" />
             </div>
             <div class="inline-fields">
-              <label class="select-field">Форма окон
-                <select id="windowStyle" name="windowStyle"><option value="arched">Арочные</option><option value="straight">Прямые</option></select>
-              </label>
-              <label class="select-field">Форма входа
-                <select id="doorStyle" name="doorStyle"><option value="arched">Арочный</option><option value="straight">Прямой</option></select>
-              </label>
+              <div class="choice-field">
+                <span class="field-label">Форма окон</span>
+                <div class="shape-options" role="group" aria-label="Форма окон">
+                  <button type="button" class="shape-option selected" data-house-option="windowStyle" data-value="arched" aria-pressed="true" aria-label="Арочные окна">
+                    <svg viewBox="0 0 36 38" aria-hidden="true"><path d="M7 33V15a11 11 0 0 1 22 0v18Z"/><path d="M18 4v29M7 19h22"/></svg><span>Арочные</span>
+                  </button>
+                  <button type="button" class="shape-option" data-house-option="windowStyle" data-value="straight" aria-pressed="false" aria-label="Прямые окна">
+                    <svg viewBox="0 0 36 38" aria-hidden="true"><rect x="7" y="5" width="22" height="28" rx=".5"/><path d="M18 5v28M7 19h22"/></svg><span>Прямые</span>
+                  </button>
+                </div>
+              </div>
+              <div class="choice-field">
+                <span class="field-label">Форма входа</span>
+                <div class="shape-options" role="group" aria-label="Форма входа">
+                  <button type="button" class="shape-option selected" data-house-option="doorStyle" data-value="arched" aria-pressed="true" aria-label="Арочный вход">
+                    <svg viewBox="0 0 36 38" aria-hidden="true"><path d="M7 34V16a11 11 0 0 1 22 0v18Z"/><path d="M18 6v28"/><circle cx="22" cy="24" r="1" class="icon-fill"/></svg><span>Арочный</span>
+                  </button>
+                  <button type="button" class="shape-option" data-house-option="doorStyle" data-value="straight" aria-pressed="false" aria-label="Прямой вход">
+                    <svg viewBox="0 0 36 38" aria-hidden="true"><rect x="7" y="5" width="22" height="29" rx=".5"/><path d="M18 5v29"/><circle cx="22" cy="24" r="1" class="icon-fill"/></svg><span>Прямой</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -122,6 +141,25 @@
             <label class="toggle-row" id="balconyRow"><span><b>Балкон</b><small>Балкон на втором этаже</small></span><input id="balcony" name="balcony" type="checkbox" /><i aria-hidden="true"></i></label>
             <label class="toggle-row"><span><b>Фахверковые балки</b><small>Деревянная сетка по фасаду</small></span><input id="timberFrame" name="timberFrame" type="checkbox" /><i aria-hidden="true"></i></label>
           </section>
+          <section class="section atmosphere-section" aria-labelledby="atmosphere-title">
+            <h2 id="atmosphere-title"><span>06</span> Атмосфера здания</h2>
+            <label class="toggle-row"><span><b>Ночной режим</b><small>Тёплый свет из окон</small></span><input type="checkbox" data-atmo="night" /><i aria-hidden="true"></i></label>
+            <div class="range-field atmosphere-range"><div class="field-top"><label>Яркость окон</label><output data-atmo-value="windowGlow">67%</output></div><input aria-label="Яркость окон" type="range" min="0" max="100" step="1" data-atmo="windowGlow" /></div>
+            <details class="atmosphere-details" open><summary>Гуашевый мох <small>На фундаменте</small></summary>
+              <label class="toggle-row"><span><b>Показывать мох</b></span><input type="checkbox" data-atmo="moss" /><i aria-hidden="true"></i></label>
+              <div class="range-field atmosphere-range"><div class="field-top"><label>Плотность</label><output data-atmo-value="mossDensity">62%</output></div><input aria-label="Плотность мха" type="range" min="0" max="100" step="1" data-atmo="mossDensity" /></div>
+              <div class="range-field atmosphere-range"><div class="field-top"><label>Высота от земли</label><output data-atmo-value="mossHeight">85 см</output></div><input aria-label="Высота мха" type="range" min="15" max="160" step="5" data-atmo="mossHeight" /></div>
+            </details>
+            <details class="atmosphere-details"><summary>Стёкла окон <small>Блеск</small></summary>
+              <div class="range-field atmosphere-range"><div class="field-top"><label>Глянцевость</label><output data-atmo-value="glassGloss">74%</output></div><input aria-label="Глянец окон" type="range" min="0" max="100" step="1" data-atmo="glassGloss" /></div>
+              <div class="range-field atmosphere-range"><div class="field-top"><label>Отражения</label><output data-atmo-value="glassReflection">46%</output></div><input aria-label="Отражения окон" type="range" min="0" max="100" step="1" data-atmo="glassReflection" /></div>
+            </details>
+            <details class="atmosphere-details"><summary>Дым из трубы <small>Three.js</small></summary>
+              <label class="toggle-row"><span><b>Показывать дым</b></span><input type="checkbox" data-atmo="smoke" /><i aria-hidden="true"></i></label>
+              <label class="toggle-row"><span><b>Гуашевая обводка</b></span><input type="checkbox" data-atmo="smokeOutline" /><i aria-hidden="true"></i></label>
+              <div class="range-field atmosphere-range"><div class="field-top"><label>Густота дыма</label><output data-atmo-value="smokeDensity">62%</output></div><input aria-label="Густота дыма" type="range" min="0" max="100" step="1" data-atmo="smokeDensity" /></div>
+            </details>
+          </section>
           <div class="bottom-actions"><button id="resetHouse" class="secondary-action" type="button">↺ &nbsp; Сбросить</button><button id="exportHouse" class="save-action" type="button">↓ &nbsp; Сохранить JSON</button></div>
           <p class="storage-hint">Параметры автоматически сохраняются в этом браузере.</p>
         </form>
@@ -129,13 +167,13 @@
 
       <section class="viewer" aria-label="Трёхмерный предпросмотр дома">
         <canvas id="houseCanvas" aria-label="Вращаемая трёхмерная модель дома"></canvas>
-        <div class="paper-grain" aria-hidden="true"></div>
+        <div class="paper-grain" id="stageGrain" aria-hidden="true"></div>
         <div class="viewer-top"><div class="model-kicker">ОБРАЗЕЦ <span>№ 001</span></div><div class="live-indicator"><i></i> ЖИВОЙ ПРОСМОТР</div></div>
         <div class="model-title"><div class="small-label">АРХИТЕКТУРА КИЙЕНЛОКА</div><h2>Дом городского квартала</h2><p id="modelSubtitle">Двускатная крыша · 2 этажа</p></div>
         <div id="stageError" class="stage-error" hidden>3D-просмотр недоступен в этом браузере. Настройки и сохранение проекта продолжают работать.</div>
         <div class="viewer-bottom">
           <div class="view-controls" role="group" aria-label="Ракурс камеры"><button data-view="three-quarter" type="button" class="active">¾ Вид</button><button data-view="front" type="button">Фасад</button><button data-view="side" type="button">Сбоку</button><button data-view="top" type="button">Сверху</button></div>
-          <div class="camera-hint">ПЕРЕТАЩИ, ЧТОБЫ ПОВЕРНУТЬ <span>·</span> КОЛЕСО — МАСШТАБ</div>
+          <div class="camera-hint">ПЕРЕТАЩИ — ПОВОРОТ <span>·</span> ⌘ + ПЕРЕТАЩИ — ПЕРЕМЕЩЕНИЕ <span>·</span> КОЛЕСО — МАСШТАБ</div>
         </div>
       </section>
 
@@ -145,10 +183,10 @@
         <div class="summary-divider"></div>
         <dl><div><dt>Площадь основания</dt><dd id="summaryArea">52 м²</dd></div><div><dt>Форма крыши</dt><dd id="summaryRoof">Двускатная</dd></div><div><dt>Структура</dt><dd>Параметрическая</dd></div></dl>
         <button id="copyHouse" type="button" class="copy-button">⧉ &nbsp; Копировать параметры</button>
-        <p>Этот образец станет основой библиотеки домов для города.</p>
+        <p>По этой модели собираются обычные дома на карте города и в кварталах.</p>
       </aside>
     </main>
   </div>
-  <script type="module" src="../js/buildings/house-editor.js"></script>
+  <script type="module" src="../modules/house-builder/editor.js"></script>
 </body>
 </html>

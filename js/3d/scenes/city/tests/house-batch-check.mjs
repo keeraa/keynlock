@@ -16,11 +16,29 @@ for(const config of configs) {
   const model=createHouseModel(THREE,config);
   const beforeBox=new THREE.Box3().setFromObject(model.group);
   const triangles=housePolygonCount(model.group);
+  let originalShadowTriangles=0,originalReceiverTriangles=0;
+  model.group.traverse(mesh=>{
+    if(!mesh.isMesh)return;
+    const count=(mesh.geometry.index?.count??mesh.geometry.getAttribute('position').count)/3;
+    if(mesh.castShadow)originalShadowTriangles+=count;
+    if(mesh.receiveShadow)originalReceiverTriangles+=count;
+  });
   const stats=batchHouseGeometry(THREE,model.group);
   const afterBox=new THREE.Box3().setFromObject(model.group);
-  assert(stats.before>stats.after*7,`Expected major mesh reduction: ${JSON.stringify(config)}`);
+  assert(stats.before>stats.after*6,`Expected major mesh reduction: ${JSON.stringify(config)}`);
   // Stable facade pieces are a separate batch so the detail LOD can fade.
-  assert(stats.after<=17,'Batch material count must stay bounded');
+  assert(stats.after<=30,'Batches must remain bounded while respecting individual shadow settings');
+  let batchedShadowTriangles=0,batchedReceiverTriangles=0;
+  model.group.traverse(mesh=>{
+    if(!mesh.isMesh)return;
+    const count=(mesh.geometry.index?.count??mesh.geometry.getAttribute('position').count)/3;
+    if(mesh.castShadow)batchedShadowTriangles+=count;
+    if(mesh.receiveShadow)batchedReceiverTriangles+=count;
+  });
+  assert.equal(batchedShadowTriangles,originalShadowTriangles,
+    'Batches must not turn non-shadowing glass, plates and details into casters');
+  assert.equal(batchedReceiverTriangles,originalReceiverTriangles,
+    'Batches must retain the original shadow receivers');
   const invariantMeshes=model.group.children.filter(mesh=>mesh.userData.houseInvariant);
   assert(invariantMeshes.length>=4,'Invariant building shell must survive batching');
   assert.equal(housePolygonCount(model.group),triangles,'Merging must preserve triangle count');
@@ -29,9 +47,23 @@ for(const config of configs) {
   originals+=stats.before;optimized+=stats.after;
   models.push(model);
 }
+// The editor batches a finished house, retints the existing materials and
+// replaces those merged meshes only when a structural control changes.
+const editable=createHouseModel(THREE,{floors:4,windowStyle:'arched',shutters:true});
+const firstBatch=batchHouseGeometry(THREE,editable.group);
+const stableMeshes=editable.group.children.slice();
+editable.update({floors:4,windowStyle:'arched',shutters:true,woodColor:'#5d444b'});
+assert.deepEqual(editable.group.children,stableMeshes,
+  'Changing a colour must preserve already-batched window geometry');
+editable.update({floors:4,windowStyle:'straight',shutters:true,woodColor:'#5d444b'});
+assert.ok(editable.group.children.length>firstBatch.after,
+  'Structural edits should reconstruct the full unbatched model');
+const nextBatch=batchHouseGeometry(THREE,editable.group);
+assert.ok(nextBatch.after<=30,'Edited houses can be batched again after a shape change');
+editable.dispose();
 assert.equal(houseTextureCacheStats(THREE).houses,3);
 assert.equal(houseMaterialCacheStats(THREE).houses,3);
-assert.equal(houseMaterialCacheStats(THREE).materials,9);
+assert.equal(houseMaterialCacheStats(THREE).materials,11);
 models[0].dispose();
 assert.equal(houseTextureCacheStats(THREE).houses,2);
 assert.equal(houseMaterialCacheStats(THREE).houses,2);

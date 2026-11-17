@@ -3,6 +3,7 @@ import { OrbitControls } from '../vendor/OrbitControls.js';
 import { createCartoonFilter } from './effects/cartoon-filter.js';
 import { CityMaterials } from './materials.js';
 import { createCity } from './city.js';
+import {loadBuildingAtmosphereSettings,makePaintedGlassEnvironment} from './buildings/house-atmosphere.js';
 import { createSky } from './sky.js';
 import { DISTRICTS } from './world-data.js';
 import { createDistrictLabels } from './district-labels.js';
@@ -17,7 +18,7 @@ const qs=id=>document.getElementById(id);
 let saved={};try{saved=JSON.parse(localStorage.getItem(SAVE_KEY)||'{}')||{};}catch{}
 const state={...DEFAULTS,...Object.fromEntries(Object.entries(saved).filter(([key])=>key in DEFAULTS))};
 const canvas=qs('world'),status=qs('status');
-let renderer,scene,camera,controls,city,materials,filter,sun,fill,ambient,skyVisual;
+let renderer,scene,camera,controls,city,materials,filter,sun,fill,ambient,skyVisual,buildingGlassEnvironment;
 let selectedDistrict=null,focusAnimation=null,cleanMode=false;
 let districtLabels=null;
 let previousMaterialSignature='';
@@ -70,11 +71,13 @@ function init() {
   sun=new THREE.DirectionalLight('#ffe0a9',3.5);
   sun.position.set(-37,92,46);sun.castShadow=true;
   sun.shadow.mapSize.set(2048,2048);
-  Object.assign(sun.shadow.camera,{left:-80,right:80,top:80,bottom:-80,near:1,far:220});
+  Object.assign(sun.shadow.camera,{left:-80,right:80,top:80,bottom:-80,near:1,far:320});
   sun.shadow.bias=-.00028;sun.shadow.normalBias=.025;scene.add(sun);
   fill=new THREE.DirectionalLight('#8db8c8',1.0);fill.position.set(55,26,-45);scene.add(fill);
   materials=new CityMaterials();
   city=createCity({THREE,scene,materials});
+  buildingGlassEnvironment=makePaintedGlassEnvironment(THREE,renderer);
+  city.setBuildingAtmosphereSettings(loadBuildingAtmosphereSettings(),buildingGlassEnvironment);
   const windowMat=materials.get('litWindow');windowMat.emissive.set('#e8b878');windowMat.emissiveIntensity=.48;
   filter=createCartoonFilter({THREE,renderer,scene,camera});
   updateVisuals();
@@ -84,6 +87,8 @@ function init() {
   setTimeout(()=>status.classList.add('ready'),450);
   window.__keynlockWorld={districts:DISTRICTS,locations:city.locations,focus:focusDistrict,reset:resetView,
     getVisual:()=>({...state}),getStats:()=>({...lastRenderStats,surfaceBatches:city.surfaceStats})};
+  const requestedDistrict=new URLSearchParams(location.search).get('district');
+  if(DISTRICTS.some(d=>d.id===requestedDistrict))focusDistrict(requestedDistrict);
 }
 
 function resize() {
@@ -288,7 +293,8 @@ function focusDistrict(id) {
   const district=DISTRICTS.find(d=>d.id===id);if(!district)return;
   selectDistrict(id);
   const zoom=Math.min(2.65,Math.max(1.7,camera.zoom*1.25));
-  focusAnimation={start:performance.now(),duration:800,from:controls.target.clone(),to:new THREE.Vector3(district.anchor[0],city.heightAt(district.anchor[0],district.anchor[2]),district.anchor[2]),startZoom:camera.zoom,endingZoom:zoom};
+  const anchor=district.anchor;
+  focusAnimation={start:performance.now(),duration:800,from:controls.target.clone(),to:new THREE.Vector3(anchor[0],city.heightAt(anchor[0],anchor[2]),anchor[2]),startZoom:camera.zoom,endingZoom:zoom};
 }
 function resetView() {
   qs('selection').hidden=true;

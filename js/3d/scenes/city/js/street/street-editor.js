@@ -3,6 +3,8 @@ import { DISTRICT_PROFILES, resolveDistrictProfile, ROOF_TYPES } from './distric
 import { createStreetBlueprint, generateStreetPlan } from './street-generator.js';
 import { generateQuarterPlan } from './quarter-generator.js';
 import { createStreetFallback } from './street-fallback.js';
+import { mountEditorVisual } from '../effects/editor-visual.js';
+import {loadBuildingAtmosphereSettings,saveBuildingAtmosphereSettings} from '../buildings/house-atmosphere.js';
 
 const $=id=>document.getElementById(id);
 const STORAGE_KEY='keynlock.street.lab.v1';
@@ -14,12 +16,33 @@ let district=DISTRICT_PROFILES[stored.district]?stored.district:'old';
 let mode=stored.mode==='street'?'street':'quarter';
 let seed=Number.isFinite(Number(stored.seed))?(Number(stored.seed)>>>0):1129;
 let overrides=stored.overrides&&typeof stored.overrides==='object'?stored.overrides:{};
-let night=Boolean(stored.night);
+let atmosphereSettings=loadBuildingAtmosphereSettings();
+let night=Boolean(atmosphereSettings.night);
 let view='three-quarter';
 let engine,plan,refreshQueued=false;
+const visual=mountEditorVisual();
 function current(){return overrides[district]||{};}
 function profile(){return resolveDistrictProfile(district,current());}
 function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({district,mode,seed,overrides,night}));}catch{}}
+function syncAtmosphereControls(){
+  document.querySelectorAll('[data-atmo]').forEach(input=>{
+    const key=input.dataset.atmo;
+    if(input.type==='checkbox')input.checked=Boolean(atmosphereSettings[key]);
+    else input.value=atmosphereSettings[key];
+    const output=document.querySelector(`[data-atmo-value="${key}"]`);
+    if(output)output.textContent=atmosphereSettings[key]+(key==='mossHeight'?' см':'%');
+  });
+}
+function changeAtmosphere(key,value){
+  atmosphereSettings={...atmosphereSettings,[key]:value};
+  night=Boolean(atmosphereSettings.night);
+  saveBuildingAtmosphereSettings(atmosphereSettings);
+  persist();syncAtmosphereControls();
+  $('nightMode').checked=night;
+  document.querySelector('.stage').classList.toggle('is-night',night);
+  engine?.setAtmosphereSettings?.(atmosphereSettings);
+  if(!engine?.setAtmosphereSettings)engine?.setNight(night);
+}
 function updateOverride(key,value){
   overrides[district]={...current(),[key]:value};persist();
   if(refreshQueued)return;
@@ -75,6 +98,7 @@ function syncEditor(){
   document.querySelectorAll('[data-roof]').forEach(input=>{input.checked=p.roofs.includes(input.dataset.roof);});
   drawSwatches('wallPalette','walls');drawSwatches('roofPalette','roofsPalette');
   $('nightMode').checked=night;
+  syncAtmosphereControls();
   document.querySelector('.stage').classList.toggle('is-night',night);
   miniPalette('previewWalls',p.walls);miniPalette('previewRoofs',p.roofsPalette);
   $('streetTitle').textContent=p.name;
@@ -139,7 +163,10 @@ function bind(){
   $('newStreet').addEventListener('click',()=>{seed=(seed+1)>>>0;updatePlan();});
   $('resetDistrict').addEventListener('click',()=>{delete overrides[district];syncEditor();updatePlan();});
   $('exportStreet').addEventListener('click',downloadJson);
-  $('nightMode').addEventListener('change',()=>{night=$('nightMode').checked;document.querySelector('.stage').classList.toggle('is-night',night);engine?.setNight(night);persist();});
+  $('nightMode').addEventListener('change',()=>changeAtmosphere('night',$('nightMode').checked));
+  document.querySelectorAll('[data-atmo]').forEach(input=>input.addEventListener(input.type==='range'?'input':'change',()=>{
+    changeAtmosphere(input.dataset.atmo,input.type==='checkbox'?input.checked:Number(input.value));
+  }));
   document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{
     view=button.dataset.view;document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b===button));engine?.setView(view);
   }));
@@ -149,7 +176,7 @@ async function bootstrap(){
   let canvas=$('streetCanvas');
   try {
     const {createStreetScene}=await import('./street-scene.js');
-    engine=createStreetScene(canvas,{onMetrics,onPick:renderPicked});
+    engine=createStreetScene(canvas,{onMetrics,onPick:renderPicked,visual});
   }catch(error){
     console.warn('WebGL недоступен, включена схема улицы:',error);
     const replacement=document.createElement('canvas');replacement.id=canvas.id;replacement.setAttribute('aria-label',canvas.getAttribute('aria-label'));
@@ -158,6 +185,7 @@ async function bootstrap(){
     $('renderMode').textContent='СХЕМА · WEBGL НЕДОСТУПЕН';
     $('cameraNote').textContent='ВИД СВЕРХУ · НАЖМИ НА ДОМ ДЛЯ ПАРАМЕТРОВ';
   }
+  engine.setAtmosphereSettings?.(atmosphereSettings);
   engine.setNight(night);
   updatePlan(true);
 }

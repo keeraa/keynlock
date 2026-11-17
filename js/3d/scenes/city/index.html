@@ -2,94 +2,12 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#17242a" />
-  <title>KEYNLOCK — Игровой мир</title>
-  <link rel="stylesheet" href="./css/style.css" />
-  <script type="importmap">
-    {"imports":{"three":"./vendor/three.js","three/core":"./vendor/three-core.js"}}
-  </script>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#17282d" />
+  <meta name="description" content="KEYNLOCK — 3D-редактор зданий: дома, архитектурные детали и особые постройки." />
+  <title>KEYNLOCK — Редактор зданий</title>
+  <meta http-equiv="refresh" content="0;url=./house-builder/" />
+  <script>location.replace(new URL('./house-builder/', location.href));</script>
 </head>
-<body>
-  <main id="app">
-    <canvas id="world" aria-label="Трёхмерная карта города Кийенлок"></canvas>
-    <div class="paper-grain" aria-hidden="true"></div>
-    <div id="mapLabels" class="map-labels interface" aria-label="Районы на карте"></div>
-
-    <header class="topbar interface">
-      <div class="identity">
-        <span class="identity-mark" aria-hidden="true">K<span>✦</span>L</span>
-        <div><strong>KEYNLOCK</strong><small>ГОРОД КИЙЕНЛОК · ПРОТОТИП МИРА</small></div>
-      </div>
-      <div class="top-actions">
-        <a class="surface-button house-builder-link" href="./house-builder/">Конструктор <span>⌂</span></a>
-        <a class="surface-button street-lab-link" href="./street-lab/">Тестовая улица <span>↗</span></a>
-        <a class="surface-button" href="./landmark-lab/">Особые здания <span>♜</span></a>
-        <button id="districtsButton" class="surface-button" type="button" aria-expanded="false" aria-controls="districtDrawer">Районы <span>07</span></button>
-        <button id="visualButton" class="surface-button primary" type="button" aria-expanded="false" aria-controls="visualDrawer">Визуал <span>⚙</span></button>
-        <button id="hideButton" class="icon-button" type="button" title="Скрыть интерфейс (H)" aria-label="Скрыть интерфейс">◧</button>
-      </div>
-    </header>
-
-    <aside id="visualDrawer" class="drawer interface" hidden aria-labelledby="visualTitle">
-      <div class="drawer-head"><div><small>НАСТРОЙКИ РИСОВКИ</small><h2 id="visualTitle">Визуал города</h2></div><button class="drawer-close" data-close type="button" aria-label="Закрыть">×</button></div>
-      <div class="drawer-scroll">
-        <section class="setting-section">
-          <div class="setting-toggle"><div><b>Мультяшная рисовка</b><small>Два независимых эффекта</small></div><button class="switch on" type="button" id="cartoonToggle" aria-pressed="true" aria-label="Мультяшная рисовка"><i></i></button></div>
-          <div class="setting-card">
-            <div class="setting-toggle minor"><b>01 · Мультяшный свет</b><button class="switch on" type="button" id="toonToggle" aria-pressed="true" aria-label="Мультяшный свет"><i></i></button></div>
-            <label for="toonStrength">Сила эффекта <output id="toonStrengthValue">80%</output></label>
-            <input id="toonStrength" type="range" min="0" max="100" value="80" />
-            <label for="toonBands">Ступени света <output id="toonBandsValue">4 ступ.</output></label>
-            <input id="toonBands" type="range" min="2" max="7" value="4" />
-          </div>
-          <div class="setting-card">
-            <div class="setting-toggle minor"><b>02 · Контурная обводка</b><button class="switch on" type="button" id="outlineToggle" aria-pressed="true" aria-label="Контурная обводка"><i></i></button></div>
-            <label for="outlineStrength">Насыщенность <output id="outlineStrengthValue">70%</output></label>
-            <input id="outlineStrength" type="range" min="0" max="100" value="70" />
-            <label for="outlineWidth">Толщина линии <output id="outlineWidthValue">1 px</output></label>
-            <input id="outlineWidth" type="range" min="1" max="4" step="0.5" value="1" />
-          </div>
-        </section>
-        <section class="setting-section">
-          <div class="setting-toggle"><div><b>Рисованные материалы</b><small>Гуашь · 5 цветовых вариаций</small></div><button class="switch on" type="button" id="paintToggle" aria-pressed="true" aria-label="Рисованные материалы"><i></i></button></div>
-          <div class="setting-subtitle">Крыши и черепица</div>
-          <div class="swatch-row" id="roofSwatches"><button type="button" class="swatch active" data-roof="slate" aria-pressed="true"><i style="background:#586b73"></i>Сланец</button><button type="button" class="swatch" data-roof="terracotta" aria-pressed="false"><i style="background:#a76b58"></i>Терракота</button><button type="button" class="swatch" data-roof="jade" aria-pressed="false"><i style="background:#567c75"></i>Нефрит</button></div>
-          <div class="setting-subtitle">Каменные и деревянные поверхности</div>
-          <div class="swatch-row" id="wallSwatches"><button type="button" class="swatch active" data-wall="warm" aria-pressed="true"><i style="background:#c6b49a"></i>Тёплый камень</button><button type="button" class="swatch" data-wall="cool" aria-pressed="false"><i style="background:#9aaab0"></i>Холодный камень</button></div>
-          <div class="setting-card">
-            <label for="paintStrength">Выразительность мазков <output id="paintStrengthValue">95%</output></label>
-            <input id="paintStrength" type="range" min="0" max="100" value="95" />
-            <label for="paintMaterial">Мультяшный материал <output id="paintMaterialValue">90%</output></label>
-            <input id="paintMaterial" type="range" min="0" max="100" value="90" />
-            <label for="paintDetail">Детализация мазков <output id="paintDetailValue">2%</output></label>
-            <input id="paintDetail" type="range" min="0" max="100" value="2" />
-          </div>
-        </section>
-        <section class="setting-section">
-          <div class="setting-subtitle">Атмосфера</div>
-          <div class="atmosphere-buttons" role="group" aria-label="Время суток"><button type="button" class="active" data-time="day">День</button><button type="button" data-time="dusk">Закат</button><button type="button" data-time="night">Ночь</button></div>
-          <div class="setting-toggle"><span>Анимация моря</span><button class="switch on" type="button" id="waterToggle" aria-pressed="true" aria-label="Анимация моря"><i></i></button></div>
-        </section>
-        <button id="resetVisual" class="text-button" type="button">Вернуть исходные параметры</button>
-      </div>
-    </aside>
-
-    <aside id="districtDrawer" class="drawer interface" hidden aria-labelledby="districtTitle">
-      <div class="drawer-head"><div><small>КАРТА МИРА</small><h2 id="districtTitle">Семь районов</h2></div><button class="drawer-close" data-close type="button" aria-label="Закрыть">×</button></div>
-      <p class="drawer-description">Город поднимается от моря и торговых кварталов к дворцу. Выбери район, чтобы приблизиться к нему.</p>
-      <button id="mapLabelsToggle" class="map-labels-toggle" type="button" aria-pressed="true"><span>Названия на карте</span><i aria-hidden="true"></i></button>
-      <div id="districtList" class="district-list"></div>
-      <a class="district-plan-link" href="./district-zones/">Открыть географическую схему районов <span aria-hidden="true">↗</span></a>
-      <button id="fullMap" class="text-button" type="button">Показать весь город</button>
-    </aside>
-
-    <section id="selection" class="selection interface" hidden><span id="selectionIndex">РАЙОН 01 / 07</span><button id="selectionClose" type="button" aria-label="Закрыть">×</button><h2 id="selectionName">Старый квартал</h2><p id="selectionText"></p><div class="selection-actions"><button id="focusDistrict" type="button">Приблизить</button><span id="selectionStatus">Эскиз игрового мира</span></div></section>
-
-    <footer class="footbar interface"><span class="compass" aria-hidden="true"><i>С</i> ✧</span><span id="controlHelp">ЛКМ · вращение <em>·</em> WASD / стрелки · карта <em>·</em> Колесо · масштаб <em>·</em> H · чистая карта</span><span class="revision">THREE.JS R187 <i></i> КАРТА 01</span></footer>
-    <div id="status" role="status" aria-live="polite">Строим город…</div>
-    <button id="showInterface" type="button" aria-label="Показать интерфейс" title="Показать интерфейс (H)" hidden>◧</button>
-  </main>
-  <script type="module" src="./js/main.js"></script>
-</body>
+<body><p><a href="./house-builder/">Открыть редактор зданий KEYNLOCK</a></p></body>
 </html>

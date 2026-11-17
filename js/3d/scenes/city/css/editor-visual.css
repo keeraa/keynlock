@@ -1,0 +1,37 @@
+/* Shared KEYNLOCK visual drawer for houses, quarters and landmarks. */
+.keynlock-visual{position:relative;flex:none;z-index:12;margin-left:auto;color:#efdfbf}
+.keynlock-visual-button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:37px;padding:9px 14px;border:1px solid #caad79a8;border-radius:6px;background:#2c4545;color:#f1dbaf;white-space:nowrap;font:600 11px Arial,Helvetica,sans-serif;letter-spacing:.02em;transition:background .16s,border-color .16s}
+.keynlock-visual-button:hover,.keynlock-visual-button.is-active{background:#486055;border-color:#ead19c}
+.keynlock-visual-button:focus-visible,.keynlock-visual button:focus-visible,.keynlock-visual a:focus-visible{outline:2px solid #f5d398;outline-offset:3px}
+.keynlock-visual-panel{position:absolute;right:0;top:calc(100% + 15px);z-index:20;width:min(328px,calc(100vw - 22px));max-height:calc(100dvh - 100px);overflow:auto;overscroll-behavior:contain;padding:0 17px 12px;border:1px solid #c8ad7b91;border-radius:10px;background:linear-gradient(155deg,#2b4445,#1b3338 72%,#172b30);box-shadow:0 17px 45px #06151b99;color:#efe1c5;scrollbar-width:thin;scrollbar-color:#72817a transparent;font-family:Arial,Helvetica,sans-serif;text-align:left;letter-spacing:normal}
+.keynlock-visual-panel[hidden]{display:none!important}
+.keynlock-visual-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 0 16px;border-bottom:1px solid #d0bc9340}
+.keynlock-visual-head small{color:#d5bc86;font-size:9px;font-weight:700;letter-spacing:.16em}
+.keynlock-visual-head h2{margin:6px 0 0;font:500 29px/1 Cormorant,Georgia,serif;color:#f4e3c2}
+.keynlock-visual .keynlock-visual-close{background:transparent;border:1px solid #d7c09545;border-radius:5px;width:27px;height:27px;padding:0;color:#cbbd9e;font-size:22px;line-height:1}
+.keynlock-visual .keynlock-visual-close:hover{background:#486055}
+.keynlock-visual-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:15px 0 12px}
+.keynlock-visual-row b{display:block;color:#f2dfb9;font-size:11px;font-weight:600}
+.keynlock-visual-row small{display:block;color:#9eb3ac;font-size:9px;line-height:1.5;margin-top:4px}
+.keynlock-visual .keynlock-visual-switch{display:block;flex:none;width:37px;height:21px;padding:2px;border:1px solid #82938a;border-radius:15px;background:#4b615e;transition:background .18s,border-color .18s}
+.keynlock-visual-switch span{display:block;width:15px;height:15px;border-radius:50%;background:#c1c9b8;transition:transform .18s}
+.keynlock-visual .keynlock-visual-switch.is-on{background:#ac884c;border-color:#e5c184}
+.keynlock-visual .keynlock-visual-switch.is-on span{background:#ffe6b2;transform:translateX(15px)}
+.keynlock-visual-section{border-top:1px solid #d0bc932f;padding-bottom:10px}
+.keynlock-visual-section-title{padding:15px 0 2px;color:#e2c693;font-size:10px;letter-spacing:.07em;font-weight:700}
+.keynlock-visual-range{display:block;margin:0 0 17px;cursor:pointer}
+.keynlock-visual-range>span{display:flex;justify-content:space-between;align-items:center;gap:12px;color:#c9d3c8;font-size:10px;margin-bottom:11px}
+.keynlock-visual-range output{color:#e6c68e;font-size:10px;white-space:nowrap;font-weight:700}
+.keynlock-visual-range input[type=range]{display:block;width:100%;height:5px;margin:0;appearance:none;-webkit-appearance:none;background:#5e736a;border-radius:4px;accent-color:#dbb47b;cursor:pointer}
+.keynlock-visual-range input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:15px;height:15px;border-radius:50%;border:3px solid #af8b59;background:#f6e0b2;box-shadow:0 0 0 2px #233a3d}
+.keynlock-visual-range input[type=range]::-moz-range-thumb{width:11px;height:11px;border-radius:50%;border:3px solid #af8b59;background:#f6e0b2}
+.keynlock-visual-range input[type=range]:disabled{opacity:.34;cursor:not-allowed}
+.keynlock-visual-foot{border-top:1px solid #d0bc9340;padding:12px 0;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.keynlock-visual-foot span{color:#8fa79d;font-size:9px;line-height:1.5;max-width:155px}
+.keynlock-visual .keynlock-visual-foot button{padding:8px 10px;border-radius:5px;background:#314a49;border:1px solid #cbb48670;color:#e7d5b1;font-size:10px;white-space:nowrap}
+.keynlock-visual .keynlock-visual-foot button:hover{background:#496159}
+.keynlock-visual-nav{display:flex;align-items:center;flex-wrap:wrap;gap:6px;border-top:1px solid #d0bc9325;padding-top:12px}
+.keynlock-visual-nav a{display:block;padding:7px 9px;border:1px solid #c9b58e40;border-radius:5px;color:#d4c9b4;text-decoration:none;font-size:9px;white-space:nowrap}
+.keynlock-visual-nav a:hover{background:#405b56;color:#fff0cd}
+@media(max-width:900px){.site-header .header-metrics,.topbar .top-metrics,.topbar .header-metrics{display:none}}
+@media(max-width:760px){.site-header .back-button,.topbar nav:not(.keynlock-visual-nav),.topbar .top-links{display:none}.keynlock-visual{margin-left:auto}.keynlock-visual-button{padding:9px 12px}.keynlock-visual-panel{top:calc(100% + 12px);max-height:calc(100dvh - 80px)}}

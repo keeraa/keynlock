@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import { OrbitControls } from '../../vendor/OrbitControls.js';
 import { createHouseModel } from '../buildings/house-model.js';
+import {setHouseGlassAppearance} from '../buildings/house-materials.js';
+import {createHouseAtmosphere,loadBuildingAtmosphereSettings,makePaintedGlassEnvironment} from '../buildings/house-atmosphere.js';
+import {createBuildingSmokeBatch} from '../../modules/house-builder/core/building-smoke-batch.js';
+import {buildStreetSmokeParticles} from './street-smoke.js';
 import { batchHouseGeometry } from '../buildings/house-batch.js';
 import { diffStreetPlans } from './street-diff.js';
 import { buildQuarterPaving } from './quarter-paving.js';
@@ -140,7 +144,7 @@ function lantern(root, position, style, materialSet, glowPieces) {
   return {x:lampX,y:lampY,z};
 }
 
-export function createStreetScene(canvas,{onMetrics=()=>{},onPick=()=>{}}={}) {
+export function createStreetScene(canvas,{onMetrics=()=>{},onPick=()=>{},visual=null}={}) {
   const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'high-performance'});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.55));
   renderer.outputColorSpace=THREE.SRGBColorSpace;
@@ -150,6 +154,8 @@ export function createStreetScene(canvas,{onMetrics=()=>{},onPick=()=>{}}={}) {
   scene.fog=new THREE.Fog('#e9e2cd',105,250);
   const camera=new THREE.PerspectiveCamera(45,1,.2,390);
   camera.position.set(42,41,51);
+  const glassEnvironment=makePaintedGlassEnvironment(THREE,renderer);
+  visual?.connect({THREE,renderer,scene,camera});
   const controls=new OrbitControls(camera,canvas);
   controls.enableDamping=true;controls.dampingFactor=.07;
   controls.minDistance=3;controls.maxDistance=260;
@@ -164,6 +170,10 @@ export function createStreetScene(canvas,{onMetrics=()=>{},onPick=()=>{}}={}) {
   const glowPieces=[];const pointLights=[];
   const raycaster=new THREE.Raycaster();const pointer=new THREE.Vector2();
   let models=[],selectedBox=null,selectedId=null,plan=null,night=false,disposed=false;
+  let streetSmoke=null;
+  const lastLODPosition=new THREE.Vector3(Infinity,Infinity,Infinity);
+  let lastLODSelection=null,lodTargetsDirty=true;
+  let atmosphereSettings=loadBuildingAtmosphereSettings();
   const lightMats={
     iron:new THREE.MeshStandardMaterial({color:'#363f3c',metalness:.4,roughness:.66}),
     trim:new THREE.MeshStandardMaterial({color:'#a38253',metalness:.5,roughness:.5}),
@@ -196,6 +206,7 @@ export function createStreetScene(canvas,{onMetrics=()=>{},onPick=()=>{}}={}) {
     layer.instance.dispose();
   }
   function removeHouse(model) {
+    if(model.atmosphere){houseGroup.remove(model.atmosphere.group);model.atmosphere.dispose();model.atmosphere=null;}
     if(model.layers){
       for(const layer of model.layers.values())removeHouseLayer(layer);
       model.layers.clear();
@@ -206,6 +217,7 @@ export function createStreetScene(canvas,{onMetrics=()=>{},onPick=()=>{}}={}) {
   }
   function clear() {
     clearSelection();selectedId=null;
+    if(streetSmoke){houseGroup.remove(streetSmoke.points);streetSmoke.dispose();streetSmoke=null;}
     for(const model of models)removeHouse(model);
     models=[];
     clearStaticGroup(roadGroup);
@@ -219,10 +231,20 @@ export function createStreetScene(canvas,{onMetrics=()=>{},onPick=()=>{}}={}) {
     houseGroup.add(instance.group);
     return {record:house,instance,detail};
   }
+  function decorateHouse(model){
+    const atmosphere=createHouseAtmosphere(THREE,model.record.config,{
+      detail:model.detail,settings:atmosphereSettings,smokeParticles:false,
+    });
+    atmosphere.group.position.copy(model.instance.group.position);
+    atmosphere.group.rotation.copy(model.instance.group.rotation);
+    houseGroup.add(atmosphere.group);
+    model.atmosphere=atmosphere;
+    return model;
+  }
   function makeQuarterHouse(house) {
     // Keep one opaque, texture-stable shell for the entire lifetime of a house.
     // Nearby LODs contribute only architectural details with alpha blending.
-    const model=makeHouse(house,'low');
+    const model=decorateHouse(makeHouse(house,'low'));
     const fade=isolateHouseFade(model.instance.group,1,10,{
       fixedMaterials:model.instance.group.userData.shellMaterials,
       showFixed:true,
@@ -250,6 +272,16 @@ export function createStreetScene(canvas,{onMetrics=()=>{},onPick=()=>{}}={}) {
       lod[model.detail]++;
     }
     onMetrics({meshCount:batched,originalMeshCount:unbatched,lod});
+  }
+  function rebuildStreetSmoke(){
+    if(streetSmoke){houseGroup.remove(streetSmoke.points);streetSmoke.dispose();streetSmoke=null;}
+    const particles=buildStreetSmokeParticles(models.map(model=>model.record));
+    if(!particles.length)return;
+    streetSmoke=createBuildingSmokeBatch(THREE,particles,{
+      settings:atmosphereSettings,pointScale:900,nearDistance:110,
+      name:'street-batched-gouache-chimney-smoke',
+    });
+    houseGroup.add(streetSmoke.points);
   }
   // Prebuild each detail layer before its blend range. Limit expensive model
   // creation per tick; camera motion never forces an unfinished fade to end.
@@ -280,11 +312,22 @@ export function createStreetScene(canvas,{onMetrics=()=>{},onPick=()=>{}}={}) {
     lastDetailTime=now;
     if(plan?.mode!=='quarter')return;
     const response=1-Math.exp(-dt/(HOUSE_LOD_FADE_MS*.48));
+    const refreshTargets=lodTargetsDirty||lastLODPosition.distanceToSquared(camera.position)>1e-6||
+      lastLODSelection!==selectedId;
+    if(refreshTargets){
+      lastLODPosition.copy(camera.position);
+      lastLODSelection=selectedId;
+      lodTargetsDirty=false;
+    }
     let changed=false;
     for(const model of models){
-      const distance=houseCameraDistance(camera.position,model.record);
+      const distance=refreshTargets||model.lodDistance===undefined?
+        houseCameraDistance(camera.position,model.record):model.lodDistance;
       const selected=model.record.id===selectedId;
-      const desired=houseLODWeights(distance,selected);
+      const desired=refreshTargets||!model.lodWeights?
+        houseLODWeights(distance,selected):model.lodWeights;
+      model.lodDistance=distance;
+      model.lodWeights=desired;
       // Reassign a layer's weight to an already loaded lower level while the
       // requested detail is being built. No blank or suddenly appearing face.
       const high=model.layers.has('high')?desired.high:0;
@@ -309,6 +352,8 @@ export function createStreetScene(canvas,{onMetrics=()=>{},onPick=()=>{}}={}) {
   }
   function setPlan(next) {
     const changes=diffStreetPlans(plan,next);
+    const smokeChanged=!plan||plan.mode!==next.mode||
+      ['removed','changed','added','moved'].some(key=>changes[key].length>0);
     if(changes.roadChanged){
       clearStaticGroup(roadGroup);
       if(next.mode==='quarter')buildQuarterPaving(THREE,roadGroup,next);
@@ -324,16 +369,20 @@ export function createStreetScene(canvas,{onMetrics=()=>{},onPick=()=>{}}={}) {
     for(const house of next.houses) {
       let model=existing.get(house.id);
       if(!model) {
-        model=next.mode==='quarter'?makeQuarterHouse(house):makeHouse(house,'high');
+        model=next.mode==='quarter'?makeQuarterHouse(house):decorateHouse(makeHouse(house,'high'));
       }
       model.record=house;
       for(const instance of model.layers?[...model.layers.values()].map(layer=>layer.instance):[model.instance]){
         instance.group.position.set(house.x,0,house.z);
         instance.group.rotation.y=house.rotation;
       }
+      model.atmosphere?.group.position.set(house.x,0,house.z);
+      if(model.atmosphere)model.atmosphere.group.rotation.y=house.rotation;
       nextModels.push(model);
     }
     models=nextModels;
+    lodTargetsDirty=true;
+    if(smokeChanged)rebuildStreetSmoke();
     if(changes.lampsChanged){
       clearLamps();
       for(const lamp of next.lamps) {
@@ -361,6 +410,12 @@ export function createStreetScene(canvas,{onMetrics=()=>{},onPick=()=>{}}={}) {
   }
   function setNight(on) {
     night=Boolean(on);
+    atmosphereSettings.night=night;
+    for(const model of models)model.atmosphere?.setSettings(atmosphereSettings);
+    streetSmoke?.setSettings(atmosphereSettings);
+    setHouseGlassAppearance(THREE,{gloss:atmosphereSettings.glassGloss,
+      reflection:atmosphereSettings.glassReflection,night,glow:atmosphereSettings.windowGlow,
+      envMap:glassEnvironment?.texture??null});
     scene.background.set(night?'#283a4a':'#e9e2cd');
     scene.fog.color.set(night?'#283a4a':'#e9e2cd');
     hemi.intensity=night?.64:2.25;
@@ -369,6 +424,11 @@ export function createStreetScene(canvas,{onMetrics=()=>{},onPick=()=>{}}={}) {
     lightMats.glass.emissiveIntensity=night?3.6:.55;
     lightMats.bulb.emissiveIntensity=night?4:.9;
     for(const light of pointLights)light.intensity=night?9:0;
+    renderer.toneMappingExposure=night?.96:1.31;
+  }
+  function setAtmosphereSettings(settings={}){
+    atmosphereSettings={...atmosphereSettings,...settings};
+    setNight(atmosphereSettings.night);
   }
   function setView(view='three-quarter'){
     if(!plan)return;
@@ -406,7 +466,7 @@ export function createStreetScene(canvas,{onMetrics=()=>{},onPick=()=>{}}={}) {
     }
   }
   canvas.addEventListener('click',onCanvasClick);
-  const resize=()=>{const rect=canvas.getBoundingClientRect();if(!rect.width||!rect.height)return;renderer.setSize(rect.width,rect.height,false);camera.aspect=rect.width/rect.height;camera.updateProjectionMatrix();};
+  const resize=()=>{const rect=canvas.getBoundingClientRect();if(!rect.width||!rect.height)return;renderer.setSize(rect.width,rect.height,false);camera.aspect=rect.width/rect.height;camera.updateProjectionMatrix();visual?.resize(rect.width,rect.height,renderer.getPixelRatio());};
   const observer=new ResizeObserver(resize);observer.observe(canvas);resize();
   let frames=0,last=performance.now(),animationId=0;
   let lastLODRefresh=0;
@@ -418,10 +478,16 @@ export function createStreetScene(canvas,{onMetrics=()=>{},onPick=()=>{}}={}) {
       ensureHouseLayers(3);lastLODRefresh=now;
     }
     updateHouseLayers(now);
-    renderer.render(scene,camera);
-    if(++frames>25 && now-last>950){onMetrics({fps:Math.round(frames*1000/(now-last)),triangles:renderer.info.render.triangles,drawCalls:renderer.info.render.calls});frames=0;last=now;}
+    for(const model of models){
+      if(!model.atmosphere)continue;
+      const distance=houseCameraDistance(camera.position,model.record);
+      model.atmosphere.setNear(distance<110);
+    }
+    streetSmoke?.update(now*.001,camera.position);
+    const frameStats=visual?visual.render():(renderer.render(scene,camera),{...renderer.info.render});
+    if(++frames>25 && now-last>950){onMetrics({fps:Math.round(frames*1000/(now-last)),triangles:frameStats.sceneTriangles??frameStats.triangles,drawCalls:frameStats.calls});frames=0;last=now;}
   }
   animationId=requestAnimationFrame(render);
-  function dispose(){disposed=true;cancelAnimationFrame(animationId);canvas.removeEventListener('click',onCanvasClick);observer.disconnect();controls.dispose();clear();Object.values(lightMats).forEach(m=>m.dispose());renderer.dispose();}
-  return {setPlan,setNight,setView,dispose};
+  function dispose(){disposed=true;cancelAnimationFrame(animationId);canvas.removeEventListener('click',onCanvasClick);observer.disconnect();controls.dispose();clear();glassEnvironment?.dispose();Object.values(lightMats).forEach(m=>m.dispose());visual?.dispose();renderer.dispose();}
+  return {setPlan,setNight,setAtmosphereSettings,setView,dispose};
 }

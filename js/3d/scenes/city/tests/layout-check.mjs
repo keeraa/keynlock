@@ -13,6 +13,16 @@ const source=readFileSync(cityFile,'utf8')
   .replace("from './water.js'",`from "${pathToFileURL(resolve('js/water.js')).href}"`)
   .replace("from './terrain.js'",`from "${pathToFileURL(resolve('js/terrain.js')).href}"`)
   .replace("from './navigation/house-paths.js'",`from "${pathToFileURL(resolve('js/navigation/house-paths.js')).href}"`)
+  .replace("from './buildings/house-model.js'",`from "${pathToFileURL(resolve('js/buildings/house-model.js')).href}"`)
+  .replace("from './buildings/house-batch.js'",`from "${pathToFileURL(resolve('js/buildings/house-batch.js')).href}"`)
+  .replace("from './buildings/house-materials.js'",`from "${pathToFileURL(resolve('js/buildings/house-materials.js')).href}"`)
+  .replace("from './buildings/house-atmosphere.js'",`from "${pathToFileURL(resolve('js/buildings/house-atmosphere.js')).href}"`)
+  .replace("from '../modules/house-builder/core/building-smoke-batch.js'",`from "${pathToFileURL(resolve('modules/house-builder/core/building-smoke-batch.js')).href}"`)
+  .replace("from './city/city-house-lots.js'",`from "${pathToFileURL(resolve('js/city/city-house-lots.js')).href}"`)
+  .replace("from './buildings/house-layout.js'",`from "${pathToFileURL(resolve('js/buildings/house-layout.js')).href}"`)
+  .replace("from './landmarks/landmark-model.js'",`from "${pathToFileURL(resolve('js/landmarks/landmark-model.js')).href}"`)
+  .replace("from './landmarks/landmark-atmosphere.js'",`from "${pathToFileURL(resolve('js/landmarks/landmark-atmosphere.js')).href}"`)
+  .replace("from './street/district-profiles.js'",`from "${pathToFileURL(resolve('js/street/district-profiles.js')).href}"`)
   .replace('const occupiedLots=[];','const occupiedLots=globalThis.__keynlockTestLots=[];');
 const {createCity}=await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
 const scene=new THREE.Scene(),materialCache=new Map();
@@ -26,7 +36,7 @@ const lots=globalThis.__keynlockTestLots;
 const ships=scene.children.filter(obj=>obj.isGroup && /boat|ship/.test(obj.name));
 const land=city.terrain;
 const streets=scene.children.filter(obj=>obj.name==='city-merged-surface'&&obj.material===materials.get('road'));
-const river=scene.children.find(obj=>obj.material?.isShaderMaterial&&obj!==city.water);
+const river=scene.children.find(obj=>obj.material?.isShaderMaterial&&obj!==city.water&&obj.material.uniforms?.normalSampler);
 const smoke=scene.children.find(obj=>obj.name==='factory-smoke');
 const instancedTriangles=city.hits.reduce((total,mesh)=>total+mesh.count*
   ((mesh.geometry.index?.count||mesh.geometry.getAttribute('position').count)/3),0);
@@ -195,14 +205,10 @@ for(let i=0;i<stairIndices.count;i+=3){
 }
 assert.ok(uphillRoadFaces>1000&&clippedUphillFaces/uphillRoadFaces<.015,
   'Uphill road ribbons must stay on top of the actual triangulated terrain');
-assert.equal(city.palaceEntrySteps.length,38,'The palace gate should have its own tightly spaced stone entrance steps');
-assert.ok(city.palaceEntrySteps.every((step,i,all)=>step.run<.27&&step.width>=6&&
-  (i===0||step.top>all[i-1].top)),
-  'Palace entry treads must ascend smoothly to the open gateway');
-assert.ok(city.palaceEntrySteps.at(-1).top>city.heightAt(5,-48)+2.2,
-  'The top step must reach the actual raised palace courtyard');
-assert.ok(city.palaceWindowPanes.length>=60&&city.palaceWindowPanes.every(pane=>pane.height>1.4),
-  'Both sides of the palace should have large, consistent multi-storey windows');
+assert.equal(scene.children.filter(object=>/^KEYNLOCK · (church|theater|museum|townhall|palace|tower) ·/.test(object.name)).length,6,
+  'All six new landmark models must be mounted on the original geography');
+assert.ok(scene.children.some(object=>object.name.startsWith('legacy-geography-detailed-')),
+  'The old street lots must be populated with the detailed house models');
 assert.ok(lots.filter(lot=>lot.style==='hill').length>=32,
   'The palace hillside should contain additional homes with blue roofs');
 assert.ok(city.riverWidth(-80,-94)<city.riverWidth(-37,-32)-1.5,
@@ -216,8 +222,8 @@ assert.equal(city.pierLayouts.filter(pier=>pier.kind==='fishing').length,2,
   'Two fishing piers should have a lighter shore canopy');
 assert.ok(new Set(city.pierLayouts.map(pier=>pier.length)).size===4,
   'The waterfront should have piers of different lengths');
-assert.ok(city.hits.some(mesh=>mesh.name==='city-roofBlue'&&mesh.count>=60),
-  'Blue tiles must appear on the actual 3D rooftops');
+assert.ok(scene.children.some(mesh=>mesh.name.startsWith('legacy-geography-detailed-palace-')),
+  'Detailed palace-district roof variants must appear in the original uphill lots');
 assert.ok(city.heightAt(5,-57)>city.heightAt(5,-37)+1,'The palace must be farther and higher than its former site');
 assert.ok(city.heightAt(32,-30)>1,'The upper district should have rolling hills');
 for(const warehouse of city.waterfrontWarehouses){
@@ -244,15 +250,10 @@ const roadMesh=scene.children.find(obj=>obj.material===materials.get('road')&&ob
 const roadHeights=[];
 for(let i=0;i<roadMesh.geometry.getAttribute('position').count;i++)roadHeights.push(roadMesh.geometry.getAttribute('position').getY(i));
 assert.ok(Math.max(...roadHeights)-Math.min(...roadHeights)>1,'Roads should follow the uneven ground');
-const towerMesh=city.hits.find(mesh=>mesh.geometry.parameters?.radiusTop===.78);
-assert.equal(towerMesh.count,4,'The palace should keep all four towers');
-const towerMatrix=new THREE.Matrix4(),towerPosition=new THREE.Vector3(),towerRotation=new THREE.Quaternion(),towerScale=new THREE.Vector3();
-for(let i=0;i<towerMesh.count;i++){
-  towerMesh.getMatrixAt(i,towerMatrix);
-  towerMatrix.decompose(towerPosition,towerRotation,towerScale);
-  assert.ok(Math.abs(towerPosition.y-towerScale.y/2-city.heightAt(towerPosition.x,towerPosition.z))<.01,
-    'Palace towers must touch the terrain');
-}
+const palace=scene.children.find(object=>object.name==='KEYNLOCK · palace · medium');
+assert.ok(palace?.children.length>15,'The new palace must retain its detailed wings and towers');
+assert.ok(Math.abs(palace.position.y-city.heightAt(palace.position.x,palace.position.z)-.15)<.01,
+  'The new palace must be grounded on the old palace hill');
 assert.ok(Math.abs(city.coast(-40)-city.coast(35))>1,'The coastline must curve');
 assert.ok(city.water?.isWater,'The sea should use the original Three.js r187 reflective Water mesh');
 const seabed=scene.children.find(obj=>obj.name==='city-sandy-seabed');
@@ -312,6 +313,20 @@ city.setNightLighting('day');
 assert.ok(warmLights.every(light=>!light.visible)&&lightHalos.every(sprite=>!sprite.visible),
   'Daytime should release expensive point-light shading');
 assert.equal(smoke.count,15,'Factory chimney smoke must be batched into 15 moving instances');
+const houseMoss=scene.children.filter(object=>object.name?.startsWith('city-gouache-house-moss-'));
+const houseSmoke=scene.children.find(object=>object.name==='city-instanced-gouache-chimney-smoke');
+assert(houseMoss.length>0&&houseMoss.every(object=>object.isInstancedMesh&&object.geometry.index.count<=96),
+  'All districts need visible, instanced gouache moss on ordinary house foundations');
+assert(houseSmoke?.isPoints&&houseSmoke.material.isShaderMaterial,
+  'Ordinary chimney smoke should be one size-animated particle batch');
+city.update(0);
+const smallPuff=houseSmoke.geometry.getAttribute('puffSize').getX(0);
+const firstPuffY=houseSmoke.geometry.getAttribute('position').getY(0);
+city.update(2);
+assert(houseSmoke.geometry.getAttribute('puffSize').getX(0)>smallPuff,
+  'City chimney smoke must become larger as it rises');
+assert(houseSmoke.geometry.getAttribute('position').getY(0)>firstPuffY+1,
+  'City chimney smoke must rise visibly higher than the outlet');
 assert.ok(instancedTriangles<200000,'The district detail should stay inside the geometry budget');
 for(let i=0;i<lots.length;i++)for(let j=i+1;j<lots.length;j++){
   const a=lots[i],b=lots[j];

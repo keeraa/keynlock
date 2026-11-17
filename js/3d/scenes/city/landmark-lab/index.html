@@ -7,20 +7,21 @@
   <meta name="description" content="3D-архитектурная мастерская KEYNLOCK: церковь, театр, музей, ратуша и дворец с уровнями детализации." />
   <title>Особые здания · KEYNLOCK</title>
   <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="../css/editor-visual.css" />
   <script type="importmap">{"imports":{"three":"../vendor/three.js","three/core":"../vendor/three-core.js"}}</script>
 </head>
 <body>
   <div class="shell">
     <header class="topbar">
-      <a class="brand" href="../" aria-label="Вернуться к карте"><span class="brand-mark">K<span>✦</span>L</span><span><b>KEYNLOCK</b><small>АРХИТЕКТУРНАЯ МАСТЕРСКАЯ</small></span></a>
-      <div class="top-path">ПРОТОТИП ГОРОДА <span>/</span> <b>ОСОБЫЕ ЗДАНИЯ</b></div>
+      <a class="brand" href="../house-builder/" aria-label="Редактор зданий"><span class="brand-mark">K<span>✦</span>L</span><span><b>KEYNLOCK</b><small>АРХИТЕКТУРНАЯ МАСТЕРСКАЯ</small></span></a>
+      <div class="top-path">РЕДАКТОР ЗДАНИЙ <span>/</span> <b>ОСОБЫЕ ЗДАНИЯ</b></div>
       <div class="header-metrics"><span><small>FPS</small><strong id="fpsValue">—</strong></span><span><small>ТРЕУГОЛЬНИКИ</small><strong id="sceneTriangles">—</strong></span></div>
-      <nav><a href="../house-builder/">Дома</a><a href="../street-lab/">Кварталы</a><a href="../">← Карта</a></nav>
+      <nav><a href="../house-builder/">Дома</a><a href="../street-lab/">Кварталы</a></nav>
     </header>
     <main class="layout">
       <aside class="catalogue">
-        <div class="catalogue-head"><span class="eyebrow">✦ КИЙЕНЛОК · МАСТЕРСКАЯ 03</span><h1>Архитектурные<br />доминанты</h1><p>Пять уникальных зданий для главных площадей и особых районов города.</p></div>
-        <div class="section-kicker">01 <span>ВЫБЕРИ ЗДАНИЕ</span> <small>05 МОДЕЛЕЙ</small></div>
+        <div class="catalogue-head"><span class="eyebrow">✦ КИЙЕНЛОК · МАСТЕРСКАЯ 03</span><h1>Архитектурные<br />доминанты</h1><p>Шесть уникальных зданий для главных площадей и особых районов города.</p></div>
+        <div class="section-kicker">01 <span>ВЫБЕРИ ЗДАНИЕ</span> <small>06 МОДЕЛЕЙ</small></div>
         <div class="building-list" id="buildingList" role="group" aria-label="Особые здания"></div>
         <div class="catalogue-tip"><b>Принцип города</b><p>Большие здания закреплены за площадями и перекрёстками. Для каждого предусмотрена зона перед парадным входом.</p></div>
         <div class="section-kicker">02 <span>ДЕТАЛИЗАЦИЯ</span></div>
@@ -30,11 +31,39 @@
           <button type="button" data-lod="low" aria-pressed="false">Низкая<small>Карта</small></button>
         </div>
         <p class="lod-note">Силуэт остаётся узнаваемым на любом расстоянии.</p>
+        <div class="section-kicker">03 <span>АТМОСФЕРА</span> <small>НАСТРОЙКИ</small></div>
+        <div class="effect-settings" aria-label="Эффекты особых зданий">
+          <label class="effect-switch effect-night">
+            <span><b>Ночной режим</b><small>Свет в окнах и ночная подсветка</small></span>
+            <input type="checkbox" data-atmo="night" id="nightMode" />
+          </label>
+          <label class="effect-range effect-night-glow">
+            <span>Свечение окон <output data-atmo-value="windowGlow">67%</output></span>
+            <input type="range" min="0" max="100" step="1" data-atmo="windowGlow" />
+          </label>
+          <details class="effect-group" open>
+            <summary><span>Мох на камне</span><i>Гуашь</i></summary>
+            <label class="effect-switch effect-inline"><span>Показывать мох</span><input type="checkbox" data-atmo="moss" /></label>
+            <label class="effect-range"><span>Плотность <output data-atmo-value="mossDensity">62%</output></span><input type="range" min="0" max="100" step="1" data-atmo="mossDensity" /></label>
+            <label class="effect-range"><span>Высота от основания <output data-atmo-value="mossHeight">85 см</output></span><input type="range" min="15" max="160" step="5" data-atmo="mossHeight" /></label>
+          </details>
+          <details class="effect-group">
+            <summary><span>Стекло окон</span><i>Блики</i></summary>
+            <label class="effect-range"><span>Глянцевость <output data-atmo-value="glassGloss">74%</output></span><input type="range" min="0" max="100" step="1" data-atmo="glassGloss" /></label>
+            <label class="effect-range"><span>Сила отражений <output data-atmo-value="glassReflection">46%</output></span><input type="range" min="0" max="100" step="1" data-atmo="glassReflection" /></label>
+          </details>
+          <details class="effect-group">
+            <summary><span>Дым из труб</span><i>Three.js</i></summary>
+            <label class="effect-switch effect-inline"><span>Показывать дым</span><input type="checkbox" data-atmo="smoke" /></label>
+            <label class="effect-switch effect-inline"><span>Рисованная обводка</span><input type="checkbox" data-atmo="smokeOutline" /></label>
+            <label class="effect-range"><span>Густота дыма <output data-atmo-value="smokeDensity">62%</output></span><input type="range" min="0" max="100" step="1" data-atmo="smokeDensity" /></label>
+          </details>
+        </div>
       </aside>
       <section class="stage" aria-label="Интерактивная 3D-модель выбранного здания">
         <canvas id="landmarkCanvas" aria-label="3D-модель, можно вращать и приближать"></canvas>
-        <div class="grain" aria-hidden="true"></div>
-        <div class="stage-head"><span>ПАМЯТНИК АРХИТЕКТУРЫ <b id="modelIndex">01 / 05</b></span><span class="live"><i></i> THREE.JS R187</span></div>
+        <div class="grain" id="stageGrain" aria-hidden="true"></div>
+        <div class="stage-head"><span>ПАМЯТНИК АРХИТЕКТУРЫ <b id="modelIndex">01 / 06</b></span><span class="live"><i></i> THREE.JS R187</span></div>
         <div class="stage-title"><span id="modelDistrict">СТАРЫЙ ГОРОД</span><h2 id="modelTitle">Церковь главной площади</h2><p id="modelSubtitle">Каменный неф · колокольня · витражи</p></div>
         <div class="stage-bottom"><div class="views" id="viewControls" role="group" aria-label="Ракурс камеры"><button type="button" data-view="three-quarter" class="active">¾ вид</button><button type="button" data-view="front">Фасад</button><button type="button" data-view="side">Сбоку</button><button type="button" data-view="top">Сверху</button></div><div class="help">ЛКМ · ВРАЩЕНИЕ <span>·</span> КОЛЕСО · МАСШТАБ</div></div>
         <div id="webglError" class="webgl-error" hidden>3D не запустился. Проверь поддержку WebGL в браузере.</div>
@@ -52,7 +81,7 @@
           <div><dt>Парадный вход</dt><dd id="passportEntrance">—</dd></div>
         </dl>
         <div class="passport-guide"><span class="eyebrow">ПОДГОТОВЛЕНО ДЛЯ ГОРОДА</span><p>Модель создаётся в общем масштабе с домами, использует одну систему координат и экспортируется как Three.js-группа.</p></div>
-        <div class="passport-foot">Модели этой мастерской пока представлены отдельно от существующей карты города.</div>
+        <div class="passport-foot">Те же модели используются на карте города с подходящим масштабом и уровнем детализации.</div>
       </aside>
     </main>
   </div>

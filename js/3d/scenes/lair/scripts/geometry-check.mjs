@@ -21,6 +21,16 @@ THREE.TextureLoader.prototype.load = () => new THREE.Texture();
 const scene = new THREE.Scene();
 const { materials, visual } = createMaterials();
 const world = buildLair(scene, materials);
+const nativeAtelierScene = new THREE.Scene();
+const nativeAtelierWorld = buildLair(nativeAtelierScene, materials, {useOriginalRestoration:true});
+assert.equal(nativeAtelierScene.getObjectByName('restoration-left-wall')?.material, materials.restorationWall,
+  'the native Atelier wall uses a gouache-mapped material while the source wallpaper loads');
+assert.equal(nativeAtelierScene.getObjectByName('lair-restoration-preview'),undefined,
+  'native Atelier mode never creates the temporary duplicate easels');
+assert.equal(nativeAtelierScene.getObjectByName('restoration-easel-reference'),undefined,
+  'native Atelier mode has no static reference painting in front of the real one');
+assert.ok(nativeAtelierWorld.anchors.restoration,
+  'the restoration interaction target is retained without the duplicate scene');
 scene.updateMatrixWorld(true);
 const unique = name => {
   const found = scene.getObjectByName(name);
@@ -28,8 +38,26 @@ const unique = name => {
   return found;
 };
 const bounds = name => new THREE.Box3().setFromObject(unique(name));
+const ceilingRibs = [];
+scene.traverse(object => {
+  if (object.name.startsWith('lair-ceiling-beam-')) ceilingRibs.push(object);
+});
+assert.ok(ceilingRibs.length >= 8, 'the long room retains its complete timber ceiling');
+assert.ok(ceilingRibs.every(beam => !beam.castShadow),
+  'the roof ribs do not project long diagonal stripes onto the gallery and floor');
+assert.equal(unique('restoration-left-wall').castShadow, false,
+  'structural wall facing does not cast shadows across the room');
+assert.ok(unique('planning-main-table').children.some(child => child.castShadow),
+  'furniture retains its local contact shadows');
 const restWall = bounds('restoration-left-wall');
 const alchemyWall = bounds('alchemy-right-wall');
+const portalRay = (x,z,direction,object) => new THREE.Raycaster(
+  new THREE.Vector3(x,2.8,z),new THREE.Vector3(direction,0,0)).intersectObject(object).length;
+assert.ok(portalRay(0,12.1,-1,unique('restoration-left-wall'))>0,'atelier side is once again one uninterrupted wall');
+assert.ok(portalRay(0,10.1,1,unique('alchemy-right-wall'))>0,'alchemy side remains solid without a doorway');
+assert.ok(portalRay(0,20.07,1,unique('alchemy-right-wall'))>0,'workbench side remains solid without a doorway');
+assert.equal(scene.getObjectByName('lair-left-portal-masonry'),undefined,'no invented left door frame');
+assert.equal(scene.getObjectByName('lair-right-portal-masonry'),undefined,'no invented right door frame');
 const alchemyTable = bounds('alchemy-facing-wall-table');
 const archedWindow = bounds('main-arched-window');
 const workbench = bounds('workbench-right-of-alchemy');
@@ -54,6 +82,13 @@ assert.ok(alchemyWall.min.z < -5.6 && alchemyWall.max.z > 7.1, 'tiles cover the 
 assert.ok(alchemyTable.max.x < alchemyWall.min.x, 'alchemy tabletop sits in front of tile wall');
 assert.ok(alchemyTable.max.x > 8.0, 'alchemy tabletop is close to tile wall');
 assert.ok(alchemyTable.min.x > 5.7, 'alchemy tabletop does not cross the room');
+assert.equal(world.alchemyVials.size,11,'all seven metals and four pigments are clickable 3D sources');
+assert.equal(world.alchemyInteractive.length,13,'reagents, receiver and burner belong to the shared scene');
+assert.ok(world.alchemyMixingFlask.isGroup,'the original table supports a working receiver');
+world.setAlchemyMixture('#a35239',60);
+assert.ok(world.alchemyMixingFlask.userData.alchemyLiquid.visible,'mixed pigment fills the physical flask');
+assert.equal(world.alchemyMixingFlask.userData.alchemyLiquid.material.color.getHexString(),'a35239');
+world.setAlchemyMixture('#344446',0);
 assert.ok(archedWindow.max.x - archedWindow.min.x > 8.20, 'new window is twice as wide');
 assert.ok(archedWindow.max.y - archedWindow.min.y > 7.20, 'new window is twice as tall');
 assert.ok(unique('main-arched-window-frame').geometry.type === 'TubeGeometry', 'arched frame follows the curved upper edge');

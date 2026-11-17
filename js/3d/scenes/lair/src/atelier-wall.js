@@ -109,6 +109,7 @@ export function createAtelierWall({ THREE, parent, materials, canvases }) {
   const items=new Map();
   const originalFrameMaterial=new THREE.MeshStandardMaterial({color:'#b7b3ab',roughness:1});
   const previewCache=new Map();
+  const imageAspects=new Map();
   const backingMaterial=new THREE.MeshStandardMaterial({color:'#b29e7d',roughness:1});
   const imageLoader=new THREE.TextureLoader();
   let request=0;
@@ -119,6 +120,7 @@ export function createAtelierWall({ THREE, parent, materials, canvases }) {
   let layerMeshes=[];
   let snapshotRequest=0;
   let currentSettings={};
+  let editing=false;
 
   function drawColumns(columns=[]) {
     ctx.clearRect(0,0,captions.width,captions.height);
@@ -152,6 +154,7 @@ export function createAtelierWall({ THREE, parent, materials, canvases }) {
       image.onload=()=>{
         clearTimeout(timer);
         const aspect=image.naturalWidth/image.naturalHeight;
+        imageAspects.set(url,aspect);
         const canvas=document.createElement('canvas');
         canvas.width=Math.max(1,Math.round(Math.min(480,480*aspect)));
         canvas.height=Math.max(1,Math.round(Math.min(480,480/aspect)));
@@ -226,30 +229,54 @@ export function createAtelierWall({ THREE, parent, materials, canvases }) {
         item.image.visible=Boolean(texture);
       });
     }
-    const previousActive=activeId;
-    activeId=data.selectedId||null;
-    if(previousActive!==activeId){clearSnapshot();canvases.work.patina.visible=true;}
-    const current=byId.get(activeId)||data.activePainting;
-    if(current){
-      const player=currentSettings[activeId]||{};
-      const restoredTint={
-        hue:(current.hue??0)+(player.hue??0),
-        saturation:100*(current.saturation??1)*(player.saturation??100)/100,
-        brightness:100*(current.brightness??1)*(player.brightness??100)/100,
-      };
-      if(previousActive===activeId&&Math.abs((activeAspect??0)-(current.aspect??1))<.001
-        &&canvases.work.artwork.material.isShaderMaterial){
-        updateTint(canvases.work.artwork.material,restoredTint);
-      }else void updateEasels(current,restoredTint);
+    if(!editing){
+      const previousActive=activeId;
+      activeId=data.selectedId||null;
+      if(previousActive!==activeId){clearSnapshot();canvases.work.patina.visible=true;}
+      const current=byId.get(activeId)||data.activePainting;
+      if(current){
+        const player=currentSettings[activeId]||{};
+        const restoredTint=restorationTint(current,player);
+        if(previousActive===activeId&&Math.abs((activeAspect??0)-(current.aspect??1))<.001
+          &&canvases.work.artwork.material.isShaderMaterial){
+          updateTint(canvases.work.artwork.material,restoredTint);
+        }else void updateEasels(current,restoredTint);
+      }
     }
+  }
+
+  function restorationTint(art,player={}){
+    return {
+      hue:(art.hue??0)+(player.hue??0),
+      saturation:100*(art.saturation??1)*(player.saturation??100)/100,
+      brightness:100*(art.brightness??1)*(player.brightness??100)/100,
+    };
+  }
+
+  async function beginEditing(art,player={}){
+    editing=true;
+    clearSnapshot();
+    const result=await updateEasels(art,restorationTint(art,player));
+    canvases.work.patina && (canvases.work.patina.visible=false);
+    return result;
+  }
+
+  function setCorrection(art,player={}){
+    const material=canvases.work.artwork.material;
+    if(material?.isShaderMaterial)updateTint(material,restorationTint(art,player));
+  }
+
+  function getGalleryHit(raycaster){
+    const images=[...items.values()].map(item=>item.image).filter(image=>image.visible);
+    return raycaster.intersectObjects(images,false)[0]?.object?.userData?.galleryId||null;
   }
 
   async function updateEasels(art,correction={}) {
     const current=art.id;
     const task=++easelRequest;
     const texture=await previewFor(art);
-    if(task!==easelRequest || !texture)return;
-    const aspect=art.aspect||texture.image.width/Math.max(1,texture.image.height);
+    if(task!==easelRequest || !texture)return false;
+    const aspect=imageAspects.get(localArtworkURL(art))||art.aspect||texture.image.width/Math.max(1,texture.image.height);
     const height=Math.min(2.28,2.17/Math.max(.1,aspect));
     const width=height*aspect;
     activeAspect=aspect;
@@ -264,6 +291,7 @@ export function createAtelierWall({ THREE, parent, materials, canvases }) {
       if(canvas.patina)canvas.patina.visible=type==='work'&&layerMeshes.length===0;
     }
     activeId=current;
+    return {width,height};
   }
 
   function clearSnapshot() {
@@ -277,6 +305,7 @@ export function createAtelierWall({ THREE, parent, materials, canvases }) {
   }
 
   async function setSnapshot({id,snapshot}) {
+    if(editing)return;
     const next=++snapshotRequest;
     if(id!==activeId || !snapshot?.layers)return;
     const keys=['varnish','cracks','loss','dirt','dust'];
@@ -314,6 +343,10 @@ export function createAtelierWall({ THREE, parent, materials, canvases }) {
     root,paintingsRoot,
     setState,
     setSnapshot,
+    beginEditing,
+    endEditing(){editing=false;++easelRequest;},
+    setCorrection,
+    getGalleryHit,
     getArtCount:()=>items.size,
     getArtIds:()=>[...items.keys()],
     getActivePaintingId:()=>activeId,

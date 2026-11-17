@@ -5,7 +5,7 @@ import { createAmbientParticles } from './engine/ambient-particles.js';
 import { createAtelierWall } from './atelier-wall.js';
 
 /** A single continuous room, using the proportions and gouache materials of the existing ateliers. */
-export function buildLair(scene, m) {
+export function buildLair(scene, m, {useOriginalRestoration = false} = {}) {
   const anchors = {};
   const hitTargets = [];
   const animated = [];
@@ -14,6 +14,11 @@ export function buildLair(scene, m) {
   let ambientParticles = null;
   let atelierWall = null;
   let restorationCanvases = null;
+  const alchemyInteractive = [];
+  const alchemyVials = new Map();
+  let alchemyMixingFlask = null;
+  let alchemyBurner = null;
+  let alchemyRecipeTexture = null;
   const staticGroup = new THREE.Group();
   scene.add(staticGroup);
   const shadow = mesh => { mesh.castShadow = true; mesh.receiveShadow = true; return mesh; };
@@ -143,6 +148,8 @@ export function buildLair(scene, m) {
     backWall.position.z = -5.755;
     backWall.receiveShadow = true;
     staticGroup.add(backWall);
+    // Preserve the original uninterrupted painted walls. The existing
+    // workstations are reached by a camera focus, without new architecture.
     box(staticGroup, .27, 13.8, longRoomLength, m.plaster, -8.55, 6.76, longRoomCenter).castShadow = false;
     box(staticGroup, .27, 13.8, longRoomLength, m.plaster, 8.55, 6.76, longRoomCenter).castShadow = false;
     box(staticGroup, 17.5, .20, longRoomLength, m.darkWood, 0, 13.62, longRoomCenter).castShadow = false;
@@ -177,8 +184,9 @@ export function buildLair(scene, m) {
       box(staticGroup, .31, 13.35, .32, m.darkWood, x, 6.64, -5.32);
       box(staticGroup, .45, .22, .48, m.walnut, x, 12.70, -5.31);
     }
-    for (let z = -4.8; z < longRoomEnd; z += 3.1) {
-      box(staticGroup, 17.15, .30, .34, m.darkWood, 0, 13.37, z);
+    for (let z = -4.8, beamIndex = 0; z < longRoomEnd; z += 3.1, beamIndex++) {
+      box(staticGroup, 17.15, .30, .34, m.darkWood, 0, 13.37, z)
+        .name = `lair-ceiling-beam-${beamIndex}`;
       for (const x of [-8.15, 8.15]) box(staticGroup, .42, .44, .52, m.walnut, x, 13.22, z);
     }
     box(staticGroup, 17.22, .25, .32, m.walnut, 0, 13.24, -5.29);
@@ -203,6 +211,14 @@ export function buildLair(scene, m) {
     });
     const rug = new THREE.Mesh(new THREE.PlaneGeometry(6.4, 4.3), new THREE.MeshStandardMaterial({ map: rugTex, roughness: 1 }));
     rug.rotation.x = -Math.PI / 2; rug.position.set(-.1, .05, 1.2); rug.receiveShadow = true; staticGroup.add(rug);
+
+    // Roof joists, tall posts and perimeter trim used to project enormous
+    // diagonal shadow bars onto the gallery wall and floor. The architecture
+    // receives light, while furniture added after buildShell keeps its own
+    // normal contact shadows.
+    staticGroup.traverse(object => {
+      if (object.isMesh) object.castShadow = false;
+    });
   }
 
   function framedPainting(parent, width, height, artName, x, y, z, yaw = 0, options = {}) {
@@ -413,6 +429,19 @@ export function buildLair(scene, m) {
   }
 
   function buildRestoration() {
+    if (useOriginalRestoration) {
+      // The source Atelier owns the real, editable easels and all its props.
+      // Keep the room's picking target without creating a second mock scene.
+      station('restoration', [-6.93, 2.28, 12.10], [3.28, 4.9, 7.20]);
+      return;
+    }
+    // Keep the previous Lair mock-up as a removable fallback until the actual
+    // Atelier has loaded into the same THREE.Scene. Once the original is ready
+    // the entire mock-up is hidden, including its unnamed prop meshes.
+    const restorationPreview = new THREE.Group();
+    restorationPreview.name = 'lair-restoration-preview';
+    scene.add(restorationPreview);
+    const staticGroup = restorationPreview;
     // Exact thirty-metre salon gallery from the original restoration atelier.
 
     const easelCaption = (parent, caption, right) => {
@@ -634,6 +663,7 @@ export function buildLair(scene, m) {
     const fill = new THREE.Mesh(new THREE.CylinderGeometry(.30, .31, .25, 20), liquid);
     fill.position.y = .24; fill.castShadow = false; group.add(fill);
     cylinder(group, .15, .16, .055, m.oldBrass, 0, 1.02, 0, 18);
+    group.userData.alchemyLiquid = fill;
     return group;
   }
 
@@ -658,9 +688,13 @@ export function buildLair(scene, m) {
     const metalLabels = new THREE.TextureLoader();
     for (let i = 0; i < 7; i++) {
       const vial = new THREE.Group(); vial.position.set(-1.91 + i * .635, .88, 1.11); counter.add(vial);
+      vial.userData.alchemyReagent = reagentLabels[i];
       cylinder(vial, .195, .20, .055, m.oldBrass, 0, .035, 0, 16);
       cylinder(vial, .170, .176, .48, m.glassBlue, 0, .30, 0, 18);
-      cylinder(vial, .148, .15, .23, fluids[i], 0, .19, 0, 16).castShadow = false;
+      const liquid = cylinder(vial, .148, .15, .23, fluids[i], 0, .19, 0, 16);
+      liquid.castShadow = false;
+      alchemyVials.set(reagentLabels[i], { group: vial, liquid });
+      alchemyInteractive.push(vial);
       cylinder(vial, .087, .107, .105, m.agedWood, 0, .59, 0, 12);
       const labelTex = metalLabels.load(`/assets/label-${reagentLabels[i]}.png`);
       labelTex.colorSpace = THREE.SRGBColorSpace;
@@ -679,11 +713,17 @@ export function buildLair(scene, m) {
     }
     box(rack, 1.78, .14, .55, m.walnut, 0, 2.16, -.03);
     const pigments = [m.ruby, m.liquidBlue, m.liquidAmber, m.paper];
+    const pigmentIds = ['red','blue','yellow','white'];
     for (let i = 0; i < 4; i++) {
       const xx = -.55 + i * .37;
-      cylinder(rack, .114, .114, .65, m.glassBlue, xx, 1.78, 0, 12);
-      cylinder(rack, .100, .10, .59, pigments[i], xx, 1.74, 0, 12).castShadow = false;
-      cylinder(rack, .124, .124, .042, m.oldBrass, xx, 2.20, 0, 12);
+      const tube = new THREE.Group(); tube.position.set(xx, 0, 0); rack.add(tube);
+      tube.userData.alchemyReagent = pigmentIds[i];
+      cylinder(tube, .114, .114, .65, m.glassBlue, 0, 1.78, 0, 12);
+      const liquid = cylinder(tube, .100, .10, .59, pigments[i], 0, 1.74, 0, 12);
+      liquid.castShadow = false;
+      cylinder(tube, .124, .124, .042, m.oldBrass, 0, 2.20, 0, 12);
+      alchemyVials.set(pigmentIds[i], { group: tube, liquid });
+      alchemyInteractive.push(tube);
     }
 
     const makeGlassStand = (x, height) => {
@@ -706,9 +746,19 @@ export function buildLair(scene, m) {
     bottle(counter, 1.25, 1.34, .16, m.liquidGreen, .25, .082);
     bottle(counter, 1.56, 1.34, .18, m.liquidAmber, .23, .079);
     const mixingFlask = flask(counter, .65, 1.23, .02, m.liquidBlue, .47);
+    mixingFlask.userData.alchemyAction = 'receiver';
+    mixingFlask.userData.alchemyLiquid.material = mixingFlask.userData.alchemyLiquid.material.clone();
+    mixingFlask.userData.alchemyLiquid.visible = false;
+    alchemyMixingFlask = mixingFlask;
+    alchemyInteractive.push(mixingFlask);
     const flameMat = new THREE.MeshBasicMaterial({ color: '#90dce2', transparent: true, opacity: .74, blending: THREE.AdditiveBlending, depthWrite: false });
     const flame = new THREE.Mesh(new THREE.ConeGeometry(.095, .25, 12), flameMat);
     flame.position.set(.65, 1.25, .02); counter.add(flame);
+    const burnerLever = cylinder(counter, .082, .082, .13, m.oldBrass, .92, 1.25, .06, 14);
+    burnerLever.userData.alchemyAction = 'burner';
+    alchemyBurner = flame;
+    alchemyInteractive.push(burnerLever);
+    flame.visible = false;
     animated.push(t => {
       flame.scale.set(.9 + Math.sin(t * 7) * .1, 1 + Math.sin(t * 9) * .14, .9);
       mixingFlask.rotation.z = Math.sin(t * .65) * .006;
@@ -735,6 +785,7 @@ export function buildLair(scene, m) {
       ctx.font = 'bold 123px Georgia'; ctx.fillText('2● + 3♄ + 2△', w / 2, 417);
       ctx.font = '29px Georgia'; ctx.fillText('НИКТО НЕ ЗНАЕТЪ СЕКРЕТА', w / 2, 576);
     }, 1024, 650);
+    alchemyRecipeTexture = recipe;
     const recipeFrame = new THREE.Group(); recipeFrame.position.set(-.34, 4.46, -1.67); alcove.add(recipeFrame);
     box(recipeFrame, 1.94, 1.44, .09, m.darkWood);
     plane(recipeFrame, 1.77, 1.28, new THREE.MeshStandardMaterial({ map: recipe, roughness: 1 }), 0, 0, .065);
@@ -798,7 +849,54 @@ export function buildLair(scene, m) {
     damask: m.wallpaperDamask,
   };
   return {
-    anchors, hitTargets, animated, ambientParticles, atelierWall,
+    anchors, hitTargets, animated, ambientParticles, atelierWall, restorationCanvases,
+    alchemyInteractive, alchemyVials, alchemyMixingFlask,
+    setAlchemyRecipe(current) {
+      if (!alchemyRecipeTexture) return;
+      const image = alchemyRecipeTexture.image;
+      const ctx = image.getContext('2d');
+      const w = image.width, h = image.height;
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = '#bcad86'; ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = '#514b36'; ctx.lineWidth = 19; ctx.strokeRect(24, 24, w - 48, h - 48);
+      ctx.strokeStyle = 'rgba(70,61,43,.52)'; ctx.lineWidth = 3; ctx.strokeRect(47, 49, w - 94, h - 100);
+      ctx.fillStyle = '#393a30'; ctx.textAlign = 'center';
+      ctx.font = '32px Georgia'; ctx.fillText(`ALCHEMIA · ${String(current.number).padStart(2,'0')}`, w / 2, 117);
+      ctx.font = 'bold 54px Georgia'; ctx.fillText('РЕЦЕПТ ЗЕЛЬЯ', w / 2, 202);
+      ctx.font = '31px Georgia'; ctx.fillText(`СТРАНИЦА ${current.level} · ${current.stages.length} ЭТАП`, w / 2, 252);
+      const symbols = { red:'●',blue:'●',yellow:'●',white:'○',aurum:'☉',argentum:'☽',cuprum:'♀',ferrum:'♂',stannum:'♃',hydrargyrum:'☿',plumbum:'♄' };
+      const pigmentColors={red:'#a93b38',blue:'#2f69a1',yellow:'#b79328',white:'#f4e7c3'};
+      for(const [i,stage] of current.stages.entries()) {
+        const y=current.stages.length>1?366+i*108:392;
+        const size=current.stages.length>1?55:77;
+        const step=Math.min(235,900/stage.ingredients.length);
+        const total=step*(stage.ingredients.length-1);
+        for(const [j,{id,count}] of stage.ingredients.entries()) {
+          const x=w/2-total/2+j*step;
+          ctx.textAlign='center';ctx.font=`bold ${size}px Georgia`;
+          ctx.fillStyle='#393a30';ctx.fillText(String(count),x-size*.42,y);
+          ctx.fillStyle=pigmentColors[id]||'#393a30';ctx.fillText(symbols[id]||'●',x+size*.25,y);
+          if(j<stage.ingredients.length-1){ctx.fillStyle='#393a30';ctx.font='44px Georgia';ctx.fillText('+',x+step/2,y);}
+        }
+        ctx.fillStyle='#393a30';
+        ctx.font='28px Georgia';
+        ctx.fillText(`НАГРЕВ ${stage.heatSeconds} СЕК.`,w/2,current.stages.length>1?403+i*108:456);
+      }
+      ctx.font = '26px Georgia'; ctx.fillText('ПРИМЕНЯТЬ В УКАЗАННОМ ПОРЯДКЕ', w / 2, 587);
+      alchemyRecipeTexture.needsUpdate = true;
+    },
+    setAlchemyMixture(color, volume) {
+      const liquid = alchemyMixingFlask?.userData.alchemyLiquid;
+      if (!liquid) return;
+      liquid.visible = volume > 0;
+      liquid.material.color.set(color);
+      liquid.scale.y = Math.max(.03, Math.min(1, volume / 160));
+    },
+    setAlchemyReagentAmount(id, fraction) {
+      const vial=alchemyVials.get(id);
+      if(vial)vial.liquid.scale.y = Math.max(.04, Math.min(1, fraction));
+    },
+    setAlchemyBurner(active) { if (alchemyBurner) alchemyBurner.visible = Boolean(active); },
     setRightWallpaper(name) {
       if (!Object.hasOwn(wallpapers, name) || !rightWallFinish) return false;
       rightWallFinish.material = wallpapers[name];

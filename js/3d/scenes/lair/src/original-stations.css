@@ -1,0 +1,505 @@
+.original-station-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 140;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: transparent;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .36s ease, visibility 0s linear .36s;
+}
+.original-station-overlay.station-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity .36s ease, visibility 0s;
+}
+.original-station-bar {
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 0 0 47px;
+  gap: 15px;
+  padding: 0 20px;
+  border-bottom: 1px solid #6b644d;
+  background: #1a221e;
+  color: #e3d7bd;
+}
+.original-station-return {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid rgba(203,173,125,.46);
+  background: transparent;
+  color: #e6ce9c;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  padding: 8px 12px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.original-station-return:hover, .original-station-return:focus-visible {
+  background: #304038;
+  border-color: #e1c48d;
+}
+.original-station-title {
+  font: 500 15px Georgia, 'Times New Roman', serif;
+  letter-spacing: .16em;
+  text-align: center;
+}
+.original-station-title span {
+  font-family: system-ui, sans-serif;
+  font-size: 10px;
+  letter-spacing: .17em;
+  color: #bcb096;
+  margin-right: 17px;
+  padding-right: 17px;
+  border-right: 1px solid #69624e;
+}
+.original-station-external {
+  color: #c3b093;
+  font-size: 10px;
+  letter-spacing: .09em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.original-station-external:hover {color: #f2dba9}
+.original-station-frame {
+  position: absolute;
+  inset: 47px 0 0;
+  display: block;
+  width: 100%;
+  height: calc(100% - 47px);
+  min-height: 0;
+  border: 0;
+  background: transparent;
+  visibility: hidden;
+  pointer-events: none;
+}
+.original-station-frame.is-active {
+  visibility: visible;
+  pointer-events: auto;
+}
+#atelier-embedded-app {
+  display: none;
+  position: absolute;
+  z-index: 18;
+  inset: auto 0 0;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  border-top: 1px solid #c9ae7b;
+  box-shadow: 0 14px 35px #090d0ccc;
+  background: #f2e9d7;
+  color: #4d4234;
+  font-family: Manrope, Arial, sans-serif;
+}
+#atelier-embedded-app.is-active {display: block}
+#atelier-embedded-app .atelier-start-error {
+  position: absolute;
+  z-index: 25;
+  top: 8px;
+  right: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 8px 12px;
+  border: 1px solid #bd9d6f;
+  background: #3a2a1df2;
+  color: #f8e7cb;
+  font: 600 12px/1.45 Arial, sans-serif;
+  box-shadow: 0 4px 18px #34201244;
+}
+#atelier-embedded-app .atelier-start-error button {
+  flex: none;
+  cursor: pointer;
+  border: 1px solid #d4b17e;
+  background: #e8d4b6;
+  color: #5d432d;
+  padding: 7px 12px;
+  font: 700 11px Arial, sans-serif;
+}
+#atelier-embedded-app .topbar,
+#atelier-embedded-app .stage,
+#atelier-embedded-app .loading,
+#atelier-embedded-app .visual-panel {display: none !important}
+#atelier-embedded-app .main,
+#atelier-embedded-app .workbench {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+}
+#atelier-embedded-app .main {overflow: visible}
+#atelier-embedded-app .workbench {overflow: visible; border: 0; box-shadow: none}
+#atelier-embedded-app .workbench-toggle {display: flex !important; top:-29px}
+#atelier-embedded-app .workbench-content {
+  display: block;
+  max-height: min(50vh, 372px);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+#atelier-embedded-app .workbench-content[hidden] {display: none !important}
+#atelier-embedded-app .workbench-intro {display: none}
+#atelier-embedded-app .workbench-main {
+  grid-template-columns: repeat(3,minmax(0,1fr)) minmax(150px,.6fr);
+  gap: 18px;
+  padding: 13px 2.1% 14px;
+}
+#atelier-embedded-app .restoration-row {padding: 8px 2.1%; gap: 12px; min-height: 0}
+#atelier-embedded-app .workbench-footer {padding: 7px 2.1% 9px; min-height: 0; gap: 10px}
+#atelier-embedded-app:has(.workbench.is-collapsed) {
+  height: 0;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+#atelier-embedded-app .workbench.is-collapsed {height:0;overflow:visible}
+#atelier-embedded-app .workbench.is-collapsed .workbench-toggle {top:-29px}
+#atelier-embedded-app .collection-modal[hidden] {display:none!important}
+#restoration-scene-feedback {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 17;
+  pointer-events: none;
+}
+.restoration-mode #restoration-scene-feedback {display:block}
+#atelier-embedded-app.collection-expanded {
+  position: absolute;
+  z-index: 150;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height:0;
+  border: none;
+  box-shadow: none;
+}
+#atelier-embedded-app.collection-expanded:has(.workbench.is-collapsed) {
+  height: 100%;
+  background: transparent;
+}
+#atelier-embedded-app.collection-expanded .main,
+#atelier-embedded-app.collection-expanded .workbench {height:100%}
+#atelier-embedded-app.collection-expanded .workbench {overflow: hidden}
+.restoration-mode .chapter-caption,
+.restoration-mode .scene-hotspots,
+.restoration-mode .bottom-ui .interaction-hint,
+.restoration-mode .bottom-ui .zone-nav {display:none}
+.restoration-mode .bottom-ui {background:none;pointer-events:none}
+.restoration-mode #reset-camera {
+  position: fixed;
+  top: 101px;
+  right: 21px;
+  bottom: auto;
+  z-index: 24;
+}
+/* The collection entrance remains pinned to the painted left wall as the
+   unified Lair camera orbits around it. */
+.wall-collection-entry {
+  position: absolute;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transform: translate(-50%, -50%);
+  padding: 10px 15px 10px 10px;
+  border: 1px solid #cfac72;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 3px #2d271f,0 7px 23px #1a120ccc;
+  color: #f6dcae;
+  background: #2b261eea;
+  font: 700 10px/1.3 Manrope, Arial, sans-serif;
+  letter-spacing: .10em;
+  white-space: nowrap;
+  text-align: left;
+}
+.wall-collection-entry[hidden], .lair-gallery-controls[hidden],
+.lair-gallery-panner[hidden], #gallery-art-back[hidden] {display:none!important}
+.wall-collection-entry:hover {background:#51402d;border-color:#f8d298}
+.wall-collection-entry.pinned {transform:none}
+.wall-collection-entry small {
+  display:block;
+  margin-top:3px;
+  color:#bc9a68;
+  font:700 8px Manrope,Arial,sans-serif;
+  letter-spacing:.14em;
+}
+.wall-collection-mark {
+  display:grid;
+  place-items:center;
+  width:30px;
+  height:30px;
+  flex:none;
+  border:1px solid #9f865a;
+  color:#e7c58c;
+  font:20px Georgia,serif;
+}
+/* The Atelier's original reference/copy markers and easel stepper, projected
+   onto its preserved meshes by the common Lair camera. */
+.lair-easel-labels {position:absolute;inset:0;z-index:14;pointer-events:none}
+.lair-easel-labels[hidden],.lair-easel-camera-controls[hidden],
+.lair-easel-camera-controls button[hidden],.lair-wall-art-hover[hidden] {display:none!important}
+.lair-easel-labels span {
+  position:absolute;transform:translate(-50%,-50%);
+  padding:0;border:0;
+  background:transparent;color:#f3e1c0;
+  text-shadow:0 1px 4px #160e0bea,0 2px 12px #160e0b;
+  font:700 10px/1.15 Manrope,Arial,sans-serif;
+  letter-spacing:.13em;white-space:nowrap;
+}
+.lair-easel-labels span b{padding-left:7px;color:#d6b37a;font:18px Georgia,serif}
+.lair-easel-labels span.is-offscreen {display:none}
+.lair-easel-camera-controls {
+  position:absolute;z-index:24;right:clamp(14px,3vw,48px);left:auto;
+  bottom:min(calc(var(--atelier-panel-height,0px) + 12px),calc(100vh - 164px));
+  transform:none;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:5px 7px;border:1px solid #a38a65;
+  background:#29231ed9;box-shadow:0 7px 24px #160e0b88;
+  backdrop-filter:blur(7px);white-space:nowrap;
+}
+.lair-easel-camera-controls > button {
+  border:1px solid #92734e;background:#4c3b2b;color:#f0dab7;
+  cursor:pointer;font:700 11px Manrope,Arial,sans-serif;
+  padding:9px 12px;letter-spacing:.04em;
+}
+.lair-easel-camera-controls > button:not(#lair-focus-exit){min-width:35px;font:24px/1 Georgia,serif;padding:2px 10px 6px}
+.lair-easel-camera-controls > button:hover{background:#70573b}
+.lair-easel-camera-controls > button:disabled{opacity:.35;cursor:default}
+#lair-easel-camera-state{min-width:131px;text-align:center;color:#f2dfc0;font:700 10px Manrope,Arial,sans-serif;letter-spacing:.11em}
+#lair-focus-exit small{display:block;margin-top:3px;color:#c4a67f;font-size:8px}
+.lair-wall-art-hover {
+  position:absolute;z-index:25;pointer-events:none;
+  padding:8px 11px;background:#29231ce8;border:1px solid #af8b60;
+  box-shadow:0 5px 21px #160f0c9c;color:#f2dfc2;
+  font:700 11px/1.3 Manrope,Arial,sans-serif;
+  max-width:260px;
+}
+/* Exact artwork notes and prohibition lore, mirrored from the Atelier source.
+   The source stage remains hidden because the Lair owns the single 3D canvas. */
+.restoration-art-info {
+  position:absolute;
+  top:155px;
+  right:22px;
+  z-index:23;
+  width:min(348px,calc(100vw - 44px));
+  max-height:calc(100vh - 255px);
+  overflow-y:auto;
+  border:1px solid #9f8053;
+  box-shadow:0 12px 32px #130d07a8,inset 0 0 0 3px #30281f;
+  background:#28251eea;
+  color:#f2e4c8;
+  pointer-events:auto;
+}
+.restoration-art-info[hidden],.restoration-art-info #restoration-info-body[hidden] {display:none!important}
+.restoration-art-heading {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:13px;
+  padding:15px 16px 14px;
+}
+.restoration-art-heading > div {min-width:0}
+#restoration-info-index {
+  display:block;
+  margin-bottom:5px;
+  color:#c8a675;
+  font:700 9px/1.5 Manrope,Arial,sans-serif;
+  letter-spacing:.15em;
+}
+#restoration-info-title {
+  margin:0 0 4px;
+  color:#f7e5c7;
+  font:500 22px/1.15 Georgia,'Times New Roman',serif;
+}
+#restoration-info-author {
+  color:#c9b494;
+  font:11px/1.5 Manrope,Arial,sans-serif;
+}
+#restoration-info-toggle {
+  display:grid;
+  place-items:center;
+  flex:none;
+  width:28px;
+  height:28px;
+  border:1px solid #957850;
+  background:#4b3a2b;
+  color:#efd8b0;
+  font:19px/1 Georgia,serif;
+  cursor:pointer;
+}
+#restoration-info-toggle:hover {background:#71553a}
+#restoration-info-body {padding:0 16px 15px}
+#restoration-info-description {
+  margin:0 0 13px;
+  font:12px/1.58 Manrope,Arial,sans-serif;
+  color:#e5d8c0;
+}
+.restoration-info-ban {
+  padding-top:11px;
+  border-top:1px solid #806c4b;
+}
+#restoration-info-ban-label {
+  color:#d0aa77;
+  font:700 9px/1.45 Manrope,Arial,sans-serif;
+  letter-spacing:.11em;
+}
+#restoration-info-ban-reason {
+  margin:5px 0 7px;
+  color:#f0dbc0;
+  font:600 12px/1.48 Manrope,Arial,sans-serif;
+}
+#restoration-info-policy {
+  color:#b49b79;
+  font:10px/1.4 Georgia,serif;
+}
+/* Controls for the preserved source gallery's traveling/panning camera. */
+.lair-gallery-controls {
+  position:absolute;
+  z-index:22;
+  left:50%;
+  bottom:67px;
+  transform:translateX(-50%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  width:max-content;
+  max-width:calc(100vw - 30px);
+  padding:7px;
+  border:1px solid #ae8e61;
+  background:#211e1bed;
+  box-shadow:0 13px 32px #100c09a8;
+  backdrop-filter:blur(12px);
+}
+.lair-gallery-controls button {
+  flex:none;
+  border:1px solid #66533b;
+  background:#3b3023;
+  color:#e7d0aa;
+  font:700 10px Manrope,Arial,sans-serif;
+  letter-spacing:.04em;
+  padding:11px 13px;
+  white-space:nowrap;
+}
+.lair-gallery-controls button[hidden] {display:none!important}
+.lair-gallery-controls button:hover {background:#665139;color:#fff0d0}
+.lair-gallery-panner {display:flex;align-items:center;gap:10px}
+.lair-gallery-panner button {
+  min-width:40px;
+  font:22px/1 Georgia,serif;
+  padding:6px 10px;
+}
+.lair-gallery-panner span {
+  text-align:center;
+  font:700 10px Manrope,Arial,sans-serif;
+  color:#ead9ba;
+  letter-spacing:.09em;
+  white-space:nowrap;
+}
+.lair-gallery-panner small {
+  display:block;
+  color:#bca681;
+  font-size:8px;
+  margin-top:4px;
+}
+.lair-gallery-controls #gallery-select {background:#dbc5a3;color:#47331f}
+.lair-gallery-controls #gallery-select:hover {background:#f5dbb0}
+.original-station-loading {
+  position: absolute;
+  z-index: 1;
+  inset: 47px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 19px;
+  padding: 24px;
+  background: #131b18;
+  color: #e8cd9f;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: .15em;
+  transition: opacity .45s ease, visibility 0s linear .45s;
+}
+.original-station-overlay.station-ready .original-station-loading {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.original-station-loading-symbol {
+  font: 56px Georgia, serif;
+  color: #bfa66f;
+}
+.original-station-loading-rule {
+  width: 186px;
+  height: 2px;
+  overflow: hidden;
+  background: #3c453c;
+}
+.original-station-loading-rule i {
+  display: block;
+  width: 40%;
+  height: 100%;
+  background: #d5bb87;
+  animation: original-station-scan 1.5s ease-in-out infinite alternate;
+}
+.original-station-warning {
+  max-width: 470px;
+  line-height: 1.7;
+  font-size: 13px;
+  letter-spacing: 0;
+  color: #e0c7a6;
+}
+.original-station-loading a {font-size: 13px; color: #f1d8a6; letter-spacing: 0}
+.original-station-loading [hidden] {display: none !important}
+@keyframes original-station-scan {
+  from {transform: translateX(-110%)}
+  to {transform: translateX(360%)}
+}
+@media (max-width: 660px) {
+  #atelier-embedded-app {
+    inset: auto 0 0;
+    width: 100%;
+  }
+  #atelier-embedded-app .workbench-main {grid-template-columns: repeat(2,minmax(0,1fr));gap:12px;padding:12px 10px}
+  #atelier-embedded-app .workbench-content {max-height:60vh}
+  #atelier-embedded-app .restoration-row {padding:8px 10px}
+  #atelier-embedded-app .workbench-footer {padding:8px 10px}
+  .restoration-mode #reset-camera {top:75px;right:10px}
+  .wall-collection-entry {font-size:8px;padding:7px 9px;gap:6px}
+  .wall-collection-mark {width:25px;height:25px;font-size:16px}
+  .restoration-art-info {top:118px;right:10px;width:min(318px,calc(100vw - 20px));max-height:34vh}
+  .restoration-art-heading {padding:10px 12px}
+  #restoration-info-title {font-size:18px}
+  #restoration-info-body {padding:0 12px 11px}
+  .lair-gallery-controls {bottom:52px;flex-wrap:wrap;width:calc(100% - 16px);gap:4px;padding:5px}
+  .lair-gallery-controls button {font-size:9px;padding:8px 9px}
+  .lair-gallery-panner {order:-1;width:100%;justify-content:center;gap:6px}
+  .lair-gallery-panner small {font-size:7px}
+  .lair-easel-labels span {font-size:8px}
+  .lair-easel-camera-controls {right:8px;max-width:calc(100vw - 16px);gap:3px;padding:4px;bottom:min(calc(var(--atelier-panel-height,0px) + 48px),calc(100vh - 146px))}
+  #lair-easel-camera-state {min-width:100px;font-size:9px}
+  .lair-easel-camera-controls > button {font-size:9px;padding:6px}
+  .original-station-bar {padding: 0 8px; gap: 6px}
+  .original-station-return {font-size: 10px; gap: 4px; padding: 8px}
+  .original-station-title {font-size: 12px}
+  .original-station-title span {display: none}
+  .original-station-external {font-size: 9px}
+}
+@media (prefers-reduced-motion: reduce) {
+  .original-station-overlay, .original-station-loading,
+  .original-station-loading-rule i {transition: none; animation: none}
+}

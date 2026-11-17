@@ -1,0 +1,5 @@
+.loading.is-tracking .loading-line i {
+  animation: none;
+  transform: none;
+  transition: width .18s ease;
+}

@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import { makeAlchemyTileTexture } from './wall-tiles.js';
+import { atelierWallpaperSource } from '../integrations/atelier/src/painted-assets.js';
 
 export function createMaterials() {
   const textureLoader = new THREE.TextureLoader();
   const load = (name, rx = 1, ry = 1) => {
-    const texture = textureLoader.load(`/assets/${name}`);
+    const texture = textureLoader.load(name.startsWith('data:') || name.startsWith('/') ? name : `/assets/${name}`);
     texture.colorSpace = THREE.SRGBColorSpace;
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.set(rx, ry);
@@ -18,7 +19,7 @@ export function createMaterials() {
   const ashMap = load('wood-gouache-ash.webp');
   const oakMap = load('wood-gouache-oak.webp');
   const plasterMap = load('atelier-wallpaper-gouache.webp', 1.3, 2.15);
-  const restorationPlasterMap = load('atelier-wallpaper-gouache.webp', 1.0, 1.8);
+  const restorationPlasterMap = load(atelierWallpaperSource, 1, 1);
   const floorMap = walnutMap.clone();
   floorMap.repeat.set(5.2, .68);
   floorMap.needsUpdate = true;
@@ -39,7 +40,7 @@ export function createMaterials() {
     ash: new THREE.MeshStandardMaterial({ map: ashMap, color: '#ffffff', roughness: .95 }),
     oak: new THREE.MeshStandardMaterial({ map: oakMap, color: '#ffffff', roughness: .96 }),
     plaster: new THREE.MeshStandardMaterial({ map: plasterMap, color: '#e0d8d0', roughness: 1 }),
-    restorationWall: new THREE.MeshStandardMaterial({ map: restorationPlasterMap, color: '#f9cbaa', roughness: 1, side: THREE.DoubleSide }),
+    restorationWall: new THREE.MeshStandardMaterial({ map: restorationPlasterMap, color: '#ffffff', roughness: 1, side: THREE.DoubleSide }),
     // Preserve the tile's physical size after mirroring the 30m gallery wing.
     alchemyTile: new THREE.MeshStandardMaterial({ map: makeAlchemyTileTexture(THREE, { width: 105, height: 29, textureWidth: 2048, textureHeight: 1024 }), roughness: 1, metalness: 0, side: THREE.DoubleSide }),
     wallpaperBotanical: new THREE.MeshStandardMaterial({ map: botanicalMap, color: '#e8e6d8', roughness: .99, side: THREE.DoubleSide }),

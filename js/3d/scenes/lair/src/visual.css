@@ -9,9 +9,13 @@
 .visual-heading button{background:transparent;border:0;color:#d6bd94;font-size:26px;line-height:1;min-width:29px;min-height:29px}
 .visual-section{border-top:1px solid rgba(207,174,123,.24);padding:15px 0 6px}
 .visual-section h3{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:#dfbc83;font-weight:760;margin:0 0 17px}
+.visual-section h3 small{display:block;margin-top:5px;color:#a89c86;font-size:9px;letter-spacing:.05em;text-transform:none;font-weight:500}
 .visual-section label:not(.visual-switch){display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;color:#d7c8ad;margin:13px 0 7px}
 .visual-section label output{font-size:11px;font-weight:800;color:#e7bb7a;font-variant-numeric:tabular-nums;white-space:nowrap}
 .visual-section input[type=range]{width:100%;height:18px;margin:0 0 4px;accent-color:#c09a60;cursor:pointer}
+.visual-section input[type=range]:disabled{opacity:.28;cursor:not-allowed}
+.atelier-effects .visual-switch{padding:5px 0 3px;margin-bottom:4px}
+.atelier-effects .visual-switch:not(:first-of-type){border-top:1px solid #9e82573b;padding-top:15px}
 .visual-section select{width:100%;min-height:33px;background:#27342d;color:#efdbc0;border:1px solid #6b624f;padding:6px 9px;font:12px Inter,Segoe UI,sans-serif;cursor:pointer}
 .visual-switch{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;margin:15px 0 12px;cursor:pointer}
 .visual-switch span{display:flex;flex-direction:column;gap:5px;color:#e2d3bb}

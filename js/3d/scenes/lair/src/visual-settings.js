@@ -7,6 +7,9 @@ const DEFAULTS = Object.freeze({
   'metal-finish': 'original', 'metal-roughness': 50, 'metal-metalness': 65,
   wallpaper: 'tile', 'outline-enabled': true, 'outline-width': 65,
   'dust-enabled': true, 'dust-density': 65,
+  'atelier-toon-enabled': true, 'atelier-toon-strength': 80, 'atelier-toon-bands': 4,
+  'atelier-ink-enabled': true, 'atelier-ink-strength': 70, 'atelier-ink-width': 1,
+  'atelier-blur-enabled': true, 'atelier-blur-strength': 72, 'atelier-blur-radius': 6.5,
 });
 
 /** Reuse Village Engine's ink silhouette shader on room objects of manageable size. */
@@ -39,7 +42,7 @@ export function createRoomOutlines(scene) {
 }
 
 /** Compact live materials lab. All controls affect materials, geometry or Three.js particles. */
-export function mountVisualSettings({ visual, room, outlines, grain, onOpen = () => {} }) {
+export function mountVisualSettings({ visual, room, outlines, grain, atelierFilter, onOpen = () => {} }) {
   const panel = document.querySelector('#visual-panel');
   const toggle = document.querySelector('#visual-toggle');
   const inputs = [...document.querySelectorAll('[data-visual-setting]')];
@@ -69,7 +72,16 @@ export function mountVisualSettings({ visual, room, outlines, grain, onOpen = ()
       if (input.type === 'checkbox') input.checked = state[input.id];
       else input.value = state[input.id];
       const output = document.querySelector(`#${input.id}-output`);
-      if (output) output.textContent = `${state[input.id]}%`;
+      if (output) {
+        const unit = input.id === 'atelier-toon-bands' ? ' ступ.'
+          : input.id === 'atelier-ink-width' || input.id === 'atelier-blur-radius' ? ' px' : '%';
+        output.textContent = `${state[input.id]}${unit}`;
+      }
+      if (input.id.startsWith('atelier-') && input.type === 'range') {
+        const group = input.id.startsWith('atelier-toon-') ? 'atelier-toon-enabled'
+          : input.id.startsWith('atelier-ink-') ? 'atelier-ink-enabled' : 'atelier-blur-enabled';
+        input.disabled = !state[group];
+      }
     }
     papers.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.wallpaper === state.wallpaper)));
   };
@@ -85,6 +97,20 @@ export function mountVisualSettings({ visual, room, outlines, grain, onOpen = ()
     room.ambientParticles.setDensity(state['dust-density'] / 100);
     outlines.setEnabled(state['outline-enabled']);
     outlines.setWidth(state['outline-width']);
+    atelierFilter?.setOptions({
+      toon: state['atelier-toon-enabled'],
+      toonStrength: state['atelier-toon-strength'] / 100,
+      bands: state['atelier-toon-bands'],
+      outline: state['atelier-ink-enabled'],
+      outlineStrength: state['atelier-ink-strength'] / 100,
+      outlineWidth: state['atelier-ink-width'],
+      backgroundBlur: state['atelier-blur-enabled'] ? state['atelier-blur-strength'] / 100 : 0,
+      backgroundRadius: state['atelier-blur-radius'],
+      // The Lair's physical wall is ~1.3 m behind the focus plane, versus
+      // ~4 m in the standalone Atelier. Keep both shader passes in sync.
+      backgroundBlurNear: .25,
+      backgroundBlurFar: 1.25,
+    });
     grain.style.opacity = `${state['paint-grain'] / 100}`;
     refreshControls();
   };

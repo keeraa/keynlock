@@ -77,3 +77,348 @@
 .design-key-button{display:flex;justify-content:space-between;gap:10px;width:100%;padding:10px 11px;border:1px solid #c2a479;border-radius:5px;background:rgba(175,132,68,.19);color:#f1dcba;font-size:10px;text-align:left}
 .design-key-button:hover{background:rgba(175,132,68,.32)}
 @media(max-width:760px){.assembly-variant-control{margin:5px 0 9px}.design-card{padding:9px}.design-pin select{padding:5px}.design-key-button{padding:7px}}
+
+/* Mechanism sandbox — a real Three.js lock enclosure with an interactive cutaway. */
+.mechanism-active .scene-label,.mechanism-active .side-panel,.mechanism-active .workbench-hint,
+.mechanism-active .scene-stats{display:none}
+.mechanism-active #scene{visibility:hidden}
+.mechanism-active .masthead{z-index:7;background:rgba(10,18,21,.98);border-bottom:1px solid rgba(204,180,140,.18)}
+.mechanism-workspace{position:absolute;inset:86px 0 0;z-index:5;display:grid;
+  grid-template-columns:218px minmax(0,1fr) 284px;min-height:0;background:#10191b;color:#e4d7be}
+.mechanism-workspace[hidden],.mech-control-group[hidden]{display:none}
+.mech-catalog,.mech-inspector{min-height:0;overflow-y:auto;scrollbar-color:#4a514d #152023;
+  background:linear-gradient(180deg,#192729,#101b1d);padding:22px 16px}
+.mech-catalog{border-right:1px solid rgba(198,173,135,.23)}
+.mech-inspector{border-left:1px solid rgba(198,173,135,.23)}
+.mech-eyebrow{font:9px/1.5 ui-monospace,monospace;letter-spacing:.17em;color:#c5a270}
+.mech-catalog h2,.mech-inspector h2{font:normal 22px/1.12 Georgia,serif;margin:8px 0 12px;color:#efdfc2}
+.mech-catalog>p{font-size:11px;line-height:1.6;color:#93a9a7;margin:0 0 15px}
+.mech-preset-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:9px 0 9px}
+.mech-preset-grid button{min-width:0;min-height:64px;padding:10px 6px 8px;cursor:pointer;text-align:left;
+  background:#223235;border:1px solid rgba(175,162,137,.29);border-radius:7px;color:#dfd4c0;
+  font:600 11px/1.3 ui-sans-serif,system-ui,sans-serif}
+.mech-preset-grid button span{display:block;margin-top:5px;color:#96aba7;font:9px ui-sans-serif,system-ui,sans-serif}
+.mech-preset-grid button:hover,.mech-preset-grid button.active{border-color:#cfac78;background:#4a3c2c;color:#fff0ce}
+.mech-preset-grid button.active span{color:#dfb77e}
+.mech-restore-custom{width:100%;margin:0 0 8px;padding:8px;background:rgba(61,85,76,.29);
+  border:1px solid rgba(154,191,156,.35);border-radius:6px;color:#afd3bd;font-size:10px;cursor:pointer}
+.mech-restore-custom[hidden]{display:none}
+.mech-restore-custom:hover{color:#ebffdf;border-color:#c1d7af}
+.mech-preset-detail{border-left:2px solid #b88954;background:rgba(182,136,74,.07);padding:8px 10px;
+  color:#c1cabf;font:11px/1.55 ui-sans-serif,system-ui,sans-serif}
+.mech-preset-detail strong{display:block;margin-bottom:3px;color:#edce9c;font-size:11px}
+.mech-preset-detail p{margin:4px 0 0;color:#a7bcb6}
+.mech-parts-label{margin-top:18px;margin-bottom:8px}
+.mech-palette{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.mech-palette-heading{grid-column:1/-1;margin:8px 0 1px;padding-top:9px;border-top:1px solid rgba(210,178,129,.17);
+  font:9px/1.4 ui-monospace,monospace;letter-spacing:.12em;color:#d2ac77}
+.mech-built-in-note{margin:11px 0 0;color:#b3a58e;font-size:10px;line-height:1.5}
+.mech-palette button{display:grid;place-items:center;width:100%;aspect-ratio:1;padding:5px;
+  background:rgba(34,53,55,.7);border:1px solid rgba(173,160,138,.24);
+  border-radius:7px;color:#e7d9c1;transition:background .13s,border-color .13s;cursor:grab}
+.mech-palette button:hover{background:rgba(76,65,48,.55);border-color:#bc986a}
+.mech-palette button:focus-visible{outline:2px solid #efd29d;outline-offset:2px}
+.mech-palette .mech-glyph{width:100%;max-width:60px;aspect-ratio:1;flex:none;border:1px solid rgba(216,177,118,.46);
+  border-radius:7px;display:grid;place-items:center;background:radial-gradient(circle at 30% 15%,#70583c,#2a3230 72%);
+  overflow:hidden;color:#f2d8a5;font:25px Georgia,serif;text-shadow:0 2px 4px #000}
+.mech-palette .mech-glyph img{display:block;width:100%;height:100%;object-fit:contain;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
+.mech-advanced{grid-column:1/-1;border-top:1px solid rgba(210,178,129,.18);margin-top:7px;padding-top:10px}
+.mech-advanced summary{cursor:pointer;color:#c9ae83;font:10px/1.6 ui-sans-serif,system-ui,sans-serif;margin-bottom:8px}
+.mech-advanced summary:hover{color:#f2d4a1}
+.mech-advanced .mech-palette{margin:8px 0 0}
+.mech-clear-layout{width:100%;margin-top:12px;padding:8px 10px;text-align:center;color:#afaaa0;
+  background:none;border:1px solid rgba(170,160,136,.22);border-radius:6px;font:10px ui-sans-serif,system-ui,sans-serif;cursor:pointer}
+.mech-clear-layout:hover{color:#efc78d;border-color:#b08b60}
+.mech-part-tooltip{position:absolute;z-index:15;pointer-events:none;width:211px;max-width:calc(100% - 16px);
+  padding:11px 13px;background:rgba(19,32,34,.97);border:1px solid rgba(209,173,119,.63);
+  border-radius:8px;color:#eee0c4;box-shadow:0 12px 28px rgba(0,0,0,.47)}
+.mech-part-tooltip[hidden]{display:none}
+.mech-part-tooltip strong{display:block;font:600 12px/1.4 Georgia,serif}
+.mech-part-tooltip small{display:block;margin-top:5px;font:10px/1.5 ui-sans-serif,system-ui,sans-serif;color:#a5bbb4}
+.mech-pin-label{font:9px ui-monospace,monospace;letter-spacing:.12em;color:#d6b57e;margin:14px 0 8px}
+.mech-pin-choices{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+.mech-pin-choices button{font:600 14px Georgia,serif;color:#e1ca9d;background:#263335;
+  border:1px solid #49544f;border-radius:5px;cursor:pointer;min-height:47px}
+.mech-pin-choices button.active{border-color:#eac88c;box-shadow:0 0 0 1px #eac88c inset}
+.mech-pin-choices button.set{color:#9ce4bc;background:#244638}
+.mech-pin-choices button small{font:10px ui-monospace,monospace;display:block;margin-top:4px;color:inherit}
+.mech-pin-help{font-size:10px;line-height:1.55;color:#9fafaa}
+.mech-catalog-footer{margin-top:19px;padding-top:13px;border-top:1px solid rgba(204,180,140,.15)}
+.mech-key-hint{font-size:10px;line-height:2;color:#849b98}
+.mech-key-hint kbd{background:#2a3635;border:1px solid #576057;border-radius:3px;padding:2px 5px;margin-right:4px;color:#e5cba2}
+.mech-stage{min-width:0;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;
+  padding:19px 21px 16px;background:radial-gradient(ellipse at center,#273134 0,#142023 72%)}
+.mech-stage-header{display:flex;justify-content:space-between;align-items:center;gap:15px;min-height:51px;padding:0 0 16px}
+.mech-stage-header h2{font:normal clamp(21px,2.2vw,28px) Georgia,serif;margin:3px 0 0;letter-spacing:.005em}
+.mech-mode-tabs{display:flex;gap:4px;flex:none}
+.mech-mode-tabs button,.mech-control-group button,.mech-file-controls button,.mech-property-panel button{
+  border:1px solid rgba(191,174,145,.35);background:#1d2b2d;color:#b7c6bf;border-radius:6px;
+  padding:10px 11px;font-size:11px;white-space:nowrap}
+.mech-mode-tabs button:hover,.mech-control-group button:hover,.mech-file-controls button:hover,.mech-property-panel button:hover{
+  border-color:#d6af77;color:#f0dbc0}
+.mech-mode-tabs button.active,.mech-control-group button.active,.mech-control-group button[aria-pressed="true"]{
+  background:linear-gradient(155deg,#775c39,#4c4539);border-color:#d8ae74;color:#ffe5b6}
+.mech-board-container{position:relative;width:100%;min-height:0;max-height:calc(100dvh - 300px);
+  aspect-ratio:920/610;align-self:center;border:1px solid #51514b;border-radius:16px;
+  overflow:hidden;box-shadow:0 20px 65px rgba(0,0,0,.37),inset 0 1px rgba(255,255,255,.09);touch-action:none}
+#mechBoard{display:block;width:100%;height:100%;cursor:grab;touch-action:none}
+#mechBoard:active{cursor:grabbing}
+.mech-board-watermark{pointer-events:none;position:absolute;right:21px;bottom:13px;color:rgba(207,180,124,.36);
+  font:13px Georgia,serif;letter-spacing:.15em}
+.mech-board-watermark span{font:8px ui-monospace,monospace;margin-left:8px;letter-spacing:.07em}
+.mech-3d-caption,.mech-3d-stats{pointer-events:none;position:absolute;z-index:2;
+  padding:7px 10px;border:1px solid rgba(186,157,111,.31);border-radius:5px;
+  color:#d9c39b;background:rgba(10,23,26,.7);backdrop-filter:blur(6px);
+  font:9px ui-monospace,monospace;letter-spacing:.09em}
+.mech-3d-caption{left:13px;top:13px}
+.mech-3d-stats{right:13px;top:13px;color:#9ebcb2;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.mech-motion-readout{pointer-events:none;position:absolute;z-index:3;left:50%;bottom:26px;
+  transform:translateX(-50%);display:flex;align-items:flex-start;gap:12px;width:min(84%,480px);
+  padding:11px 15px;color:#e9d6b3;border:1px solid rgba(214,171,106,.52);border-radius:9px;
+  background:rgba(14,27,29,.91);box-shadow:0 8px 32px rgba(0,0,0,.45)}
+.mech-motion-readout[hidden]{display:none}
+.mech-motion-readout>span{flex:none;white-space:nowrap;color:#f1bd72;font:10px/1.7 ui-monospace,monospace}
+.mech-motion-readout strong{display:block;font:600 13px/1.4 Georgia,serif}
+.mech-motion-readout div span{display:block;margin-top:3px;color:#acc0b6;font:11px/1.45 ui-sans-serif,system-ui,sans-serif}
+.mech-3d-unavailable{position:absolute;z-index:4;inset:15%;padding:24px;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  color:#e0b08b;background:#182325;border:1px solid #956c52;border-radius:10px;
+  font:16px/1.6 Georgia,serif}
+.mech-3d-unavailable[hidden],.mech-camera-controls button[hidden]{display:none}
+.mech-camera-controls{display:flex;gap:7px;justify-content:flex-end}
+.mech-camera-controls button{font-size:10px;color:#d1b894;border:1px solid rgba(202,170,114,.38);
+  background:rgba(49,54,48,.7);border-radius:6px;padding:7px 12px;cursor:pointer}
+.mech-camera-controls button:hover{border-color:#f0c389;color:#ffe4b2}
+.mechanism-workspace.mech-attack-active{grid-template-columns:minmax(0,1fr) 258px}
+.mech-attack-active .mech-catalog{display:none}
+@media(max-width:760px){.mechanism-workspace.mech-attack-active{grid-template-columns:1fr}}
+.mech-controls{min-height:87px;padding-top:12px;display:flex;flex-direction:column;gap:11px}
+.mech-control-group{display:flex;gap:7px;flex-wrap:wrap;min-height:35px}
+.mech-control-group button{padding:8px 12px}
+.mech-control-group button:disabled{opacity:.63;cursor:progress}
+.mech-control-group button.mech-primary{background:#ba9361;color:#132226;border-color:#dabb8a;font-weight:650}
+.mech-control-group button.mech-primary:hover{background:#e3b981;color:#132226}
+.mech-attack-controls{display:grid;gap:9px}
+.mech-attack-controls[hidden],.mech-attack-pins[hidden]{display:none}
+.mech-attack-active .mech-stage{overflow-y:auto;scrollbar-color:#46534d transparent}
+.mech-attack-actions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px}
+.mech-tool-button{display:flex;align-items:center;justify-content:flex-start;gap:9px;min-width:0;
+  padding:9px 11px;text-align:left;border-radius:9px;border:1px solid rgba(196,181,155,.4);
+  background:rgba(32,46,48,.89);color:#e2d3b6;cursor:pointer;transition:border-color .16s,background .16s}
+.mech-tool-button:hover,.mech-reset-attack:hover{border-color:#e0b679;background:#374035}
+.mech-tool-button.active{border-color:#e7bf82;background:linear-gradient(120deg,#715637,#34382f);
+  box-shadow:inset 0 0 0 1px rgba(238,198,133,.14)}
+.mech-tool-icon{display:block;width:57px;height:36px;flex:none}
+.mech-tool-icon svg{width:100%;height:100%;object-fit:contain}
+.mech-tool-copy{min-width:0}
+.mech-tool-copy strong{display:block;font:600 12px/1.3 ui-sans-serif,system-ui,sans-serif;white-space:normal}
+.mech-tool-copy small{display:block;margin-top:4px;color:#99ada7;font:10px/1.3 ui-sans-serif,system-ui,sans-serif;white-space:normal}
+.mech-tool-button.active .mech-tool-copy small{color:#ecd1a4}
+.mech-tool-button:disabled{opacity:.48;cursor:not-allowed}
+.mech-reset-attack{border:1px solid rgba(194,176,144,.3);border-radius:7px;padding:8px 11px;
+  color:#b6beb3;background:#243033;font-size:11px;white-space:nowrap;cursor:pointer}
+.mech-attack-pins{display:flex;gap:14px;align-items:center;justify-content:space-between;
+  padding:9px 11px;border:1px solid rgba(202,176,133,.22);background:rgba(17,31,33,.58);border-radius:9px}
+.mech-attack-pins-caption{display:grid;gap:4px;min-width:153px;color:#eed6b1;font-size:11px}
+.mech-attack-pins-caption small{color:#94aa9f;font:10px ui-sans-serif,system-ui,sans-serif}
+.mech-attack-pins .mech-pin-choices{flex:1;max-width:415px}
+.mech-attack-pins .mech-pin-choices button{min-height:39px;display:flex;align-items:center;
+  justify-content:center;gap:5px;padding:4px 5px;border-radius:6px;font-size:12px}
+.mech-attack-pins .mech-pin-choices button small{margin:0;font-size:10px}
+.mech-attack-pins .mech-pin-choices button:hover{border-color:#d7b277}
+.mech-attack-pins .mech-pin-choices button.set{border-color:rgba(122,210,155,.65)}
+.mech-attack-pins .mech-pin-choices button:disabled{opacity:.44;cursor:not-allowed}
+.mech-keyway-label{display:block;margin-top:10px;color:#d8c49d;font-size:11px}
+.mech-keyway-select{display:block;margin:6px 0 9px;width:100%;padding:8px;
+  background:#203139;color:#e5d3b4;border:1px solid #6c644f;border-radius:6px;font-size:11px}
+.mech-wrench-options{padding:10px 11px;border:1px solid rgba(202,176,133,.31);background:rgba(17,31,33,.66);
+  border-radius:9px;color:#a5ada8;font:10px ui-sans-serif,system-ui,sans-serif}
+.mech-wrench-heading{display:flex;justify-content:space-between;align-items:center;gap:9px;
+  color:#ead4ad;font-size:11px}
+.mech-wrench-heading small{color:#ddbe8f;text-align:right;font-size:10px}
+.mech-wrench-options p{margin:8px 0 0;font-size:10px;color:#a8b5ae;line-height:1.4}
+.mech-wrench-options p.good{color:#b1d9bb}
+.mech-wrench-options p.bad{color:#ecac91}
+.mech-wrench-choices{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:9px}
+.mech-wrench-choices button{min-width:0;display:grid;gap:4px;place-items:center;cursor:pointer;
+  border:1px solid rgba(164,168,154,.3);background:#223237;color:#bbc4bc;border-radius:6px;padding:6px 4px}
+.mech-wrench-choices button:hover,.mech-wrench-choices button.active{border-color:#e6bc7b;
+  background:#4c4537;color:#ffe2b3}
+.mech-wrench-choices button:focus-visible{outline:2px solid #efc487;outline-offset:2px}
+.mech-wrench-choices button.active{box-shadow:inset 0 0 0 1px rgba(235,185,111,.23)}
+.mech-wrench-choices button small{font:9px/1.2 ui-sans-serif,system-ui,sans-serif;white-space:normal;text-align:center}
+.mech-wrench-drawing{display:block;width:100%;height:38px}
+.mech-wrench-drawing svg{display:block;width:100%;height:100%}
+@media(max-width:850px){
+  .mech-attack-actions{grid-template-columns:1fr 1fr}
+  .mech-reset-attack{grid-column:1/-1}
+  .mech-attack-pins{flex-wrap:wrap}
+  .mech-attack-pins-caption{display:flex;justify-content:space-between;width:100%}
+  .mech-attack-pins .mech-pin-choices{width:100%;max-width:none}
+}
+@media(max-width:410px){.mech-tool-icon{width:36px}.mech-tool-copy small{display:none}
+  .mech-tool-copy strong{font-size:10px}.mech-tool-button{gap:5px;padding:7px}}
+.mech-feedback{font-size:11px;color:#a5b6ac;line-height:1.45;margin:0;min-height:24px}
+.mech-feedback.good{color:#b1d9bb}.mech-feedback.bad{color:#e0a58f}
+.mech-property-panel{font-size:11px;line-height:1.5;color:#b5c7c1}
+.mech-part-name{font:19px Georgia,serif;color:#f2d9ac;margin-bottom:8px}
+.mech-part-kind{font:9px ui-monospace,monospace;letter-spacing:.13em;color:#809e9b;margin-bottom:11px}
+.mech-property-panel p{margin:0 0 16px;font-size:11px;line-height:1.65;color:#9fada8}
+.mech-property-panel p.mech-simple-explanation{font-size:12px;line-height:1.55;color:#ddcda9;margin-bottom:10px}
+.mech-physical-chain{margin:5px 0 13px;padding:0 0 0 18px;color:#abbeb6;font:11px/1.55 ui-sans-serif,system-ui,sans-serif}
+.mech-physical-chain li{margin:0 0 10px;padding-left:3px}
+.mech-physical-chain b{color:#ebcb95}
+.mech-technical-note{margin:0 0 12px;padding:8px 0;border-top:1px solid rgba(204,178,129,.12);
+  border-bottom:1px solid rgba(204,178,129,.12);font:10px/1.5 ui-sans-serif,system-ui,sans-serif}
+.mech-technical-note summary{cursor:pointer;color:#95afa6}
+.mech-property-panel .mech-technical-note p{margin:10px 0 0}
+.mech-param-row{display:flex;justify-content:space-between;gap:9px;margin:12px 0 4px;color:#c5cabe}
+.mech-param-row strong{color:#f3d29a;font:12px ui-monospace,monospace}
+.mech-property-panel input[type=range]{width:100%;accent-color:#d5ab75}
+.mech-properties-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:15px 0 0}
+.mech-properties-actions button{padding:9px 6px;font-size:10px}
+.mech-toggle-row{margin:13px 0 3px;display:flex;gap:9px;align-items:center;font-size:11px;color:#d5cfb8}
+.mech-toggle-row input{accent-color:#d0a56e;width:15px;height:15px}
+.mech-divider{height:1px;background:rgba(192,175,145,.19);margin:20px 0}
+.mech-diagnostics{font-size:11px;color:#9fb1a9;line-height:1.9;margin-top:9px}
+.mech-diagnostics b{color:#ead3a7;font-weight:650}
+.mech-signal-status{font:600 12px/1.5 ui-sans-serif,system-ui,sans-serif;margin:0 0 8px}
+.mech-signal-status.good{color:#a8d6b4}.mech-signal-status.bad{color:#e1a590}
+.mech-issue{margin-top:8px;border-left:2px solid #a36f51;padding-left:8px;color:#d0a994;line-height:1.5}
+.mech-security{margin-top:10px;font-size:11px;line-height:1.6;color:#afc1b6}
+.mech-security .mech-security-name{display:block;color:#e4cc9b;font:14px Georgia,serif;margin-bottom:7px}
+.mech-security[data-status=guarded] .mech-security-name{color:#92c6af}
+.mech-security[data-status=pickable] .mech-security-name{color:#e2bd86}
+.mech-file-controls{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.mech-file-controls button{font-size:10px;padding:9px 4px}
+@media(max-width:1280px){.mechanism-workspace{grid-template-columns:192px minmax(0,1fr) 245px}.mech-catalog,.mech-inspector{padding:16px 11px}.mech-stage{padding:14px 10px}.mech-mode-tabs button{padding:8px;font-size:10px}.mech-palette button{padding:5px}.mech-palette .mech-glyph{width:100%;height:auto}}
+@media(max-width:980px){.mechanism-workspace{grid-template-columns:142px minmax(0,1fr) 192px}.mech-stage-header{align-items:flex-start;flex-direction:column;gap:10px}.mech-board-container{max-height:calc(100dvh - 345px)}.mech-palette .mech-glyph{width:100%;height:auto;font-size:20px}.mech-stage-header h2{font-size:21px}.mech-catalog h2,.mech-inspector h2{font-size:17px}}
+@media(min-width:761px) and (max-width:980px){.mech-preset-grid{grid-template-columns:1fr}.mech-preset-grid button{min-height:43px}}
+@media(max-width:760px){.mechanism-workspace{inset:92px 0 0;grid-template-columns:1fr;grid-template-rows:auto auto auto;overflow-y:auto}.mech-stage{order:0;padding:10px}.mech-stage-header{flex-direction:row;align-items:center}.mech-stage-header h2{font-size:16px}.mech-stage-header .mech-eyebrow{font-size:7px}.mech-mode-tabs button{font-size:9px;padding:7px 6px}.mech-board-container{max-height:none}.mech-catalog{order:1;border-right:0;border-top:1px solid #45504a;overflow:visible}.mech-inspector{order:2;border-left:0;border-top:1px solid #45504a;overflow:visible}.mech-palette{grid-template-columns:repeat(3,minmax(0,82px));justify-content:start}.mech-palette-heading{grid-column:1/-1}.mech-palette button{display:grid;justify-items:center;text-align:center}.mech-controls{min-height:0}.mech-board-watermark{font-size:9px}.mech-board-watermark span{display:none}}
+
+/* Fifth workshop station — six-dial casket, using the lock's painted metal palette. */
+.masthead{gap:15px;padding-left:26px;padding-right:26px}
+.brand{min-width:200px}
+.workspace-tabs{gap:6px;min-width:0}
+.workspace-tab{display:inline-flex;align-items:center;text-decoration:none;padding:12px 12px;font-size:11px}
+.workspace-tab:hover{text-decoration:none}
+.code-workspace{position:absolute;inset:0;z-index:1;background:#101f25}
+.code-workspace[hidden]{display:none}
+#codeCanvas{display:block;width:100%;height:100%;cursor:grab;touch-action:none}
+.code-active #scene,.code-active .workbench-hint,.code-active .scene-stats{visibility:hidden}
+.code-active .masthead{z-index:7;background:rgba(10,18,21,.96)}
+.code-active .side-panel{z-index:3}
+.code-active .scene-label{z-index:2}
+#codePanel>p{margin-bottom:17px}
+.code-target{margin:0 0 16px;padding:12px 14px 13px;border:1px solid rgba(220,181,119,.45);
+  border-radius:7px;background:linear-gradient(120deg,rgba(106,83,51,.26),rgba(19,33,37,.83));
+  box-shadow:inset 0 1px rgba(251,217,167,.08)}
+.code-target span{display:block;color:#bdad93;font:9px ui-monospace,monospace;letter-spacing:.16em}
+.code-target output{display:block;margin-top:7px;color:#f4d79e;text-align:center;
+  font:25px/1.2 Georgia,serif;letter-spacing:.13em;text-shadow:0 2px 8px #000}
+.code-lock-top{display:flex;justify-content:space-between;align-items:center;gap:6px;margin:4px 0 12px;
+  color:#c7a46f;font:9px ui-monospace,monospace;letter-spacing:.08em}
+.code-lock-top b{padding:5px 7px;border:1px solid rgba(198,149,94,.35);color:#d9a97b;
+  border-radius:4px;font-size:9px}
+.code-lock-top b.unlocked{border-color:#8dc5a1;color:#acddb6}
+.code-wheel-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;margin-bottom:15px}
+.code-wheel{min-width:0;display:grid;grid-template-rows:27px 42px 27px;justify-items:stretch;
+  border:1px solid rgba(211,177,125,.25);border-radius:5px;overflow:hidden;background:#202d2e;
+  box-shadow:inset 0 1px 7px rgba(0,0,0,.35)}
+.code-wheel.selected{border-color:#cbaa73;box-shadow:0 0 0 1px rgba(223,183,119,.17)}
+.code-wheel button{border:0;background:#35403d;color:#baab8c;font-size:19px;line-height:1;padding:0}
+.code-wheel button:hover{background:#69563a;color:#f4d8a4}
+.code-wheel-digit{display:grid;place-items:center;background:linear-gradient(145deg,#0e181b,#2d3735);
+  color:#f2dcaa;font:23px Georgia,serif;text-shadow:0 1px 5px #000}
+.code-lock-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.code-lock-stats>div{border:1px solid rgba(177,153,113,.21);border-radius:5px;
+  padding:10px;background:rgba(20,36,39,.63)}
+.code-lock-stats span{display:block;color:#91a7a4;font:9px ui-monospace,monospace;letter-spacing:.10em}
+.code-lock-stats strong{display:block;margin-top:6px;color:#ecd1a3;font:24px Georgia,serif}
+#codePanel .result-note{margin:13px 0}
+@media(max-width:1430px){.masthead{gap:11px;padding:0 18px}.brand{min-width:173px}
+  .workspace-tab{padding:11px 9px;font-size:10px}.workspace-tab span{margin-right:5px}
+  .scene-stats{display:none}}
+@media(max-width:930px){.masthead{gap:8px}.brand{min-width:140px}.brand b{font-size:16px}
+  .workspace-tabs{overflow-x:auto;scrollbar-width:none}.workspace-tabs::-webkit-scrollbar{display:none}
+  .workspace-tab{flex:none}}
+@media(max-width:760px){.masthead{height:92px;padding:8px 11px;gap:6px}
+  .brand{min-width:100%}.workspace-tabs{max-width:100%;width:100%;gap:5px}
+  .workspace-tab{flex:none;font-size:10px;padding:7px 9px}.workspace-tab span{display:inline;margin-right:3px}
+  .code-active .scene-label{top:108px}.code-active .scene-label h1{font-size:21px}
+  .code-active .side-panel{max-height:41dvh;bottom:8px;padding:12px 14px}
+  #codePanel>p{display:block;font-size:11px;margin-bottom:10px}
+  .code-target{margin-bottom:9px;padding:8px 10px}.code-target output{font-size:20px;margin-top:3px}
+  .code-wheel{grid-template-rows:23px 32px 23px}.code-wheel-digit{font-size:19px}
+  .code-wheel-grid{margin-bottom:10px}.code-lock-stats>div{padding:6px}
+  .code-lock-stats strong{font-size:19px}}
+
+/* Graceful painted fallback for devices with no WebGL context. */
+#codeCanvas[hidden],.code-fallback[hidden]{display:none}
+.code-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:20px;padding:90px 360px 30px 20px;
+  background:radial-gradient(ellipse at 42% 38%,#294046,#14262c 60%,#0e1b20 92%)}
+.code-fallback:after{content:"";position:absolute;bottom:4%;left:1%;width:75%;height:14%;
+  border-radius:50%;background:rgba(0,0,0,.24);filter:blur(28px);pointer-events:none}
+.code-fallback-casket{position:relative;flex:none;width:min(57vw,610px);height:340px;
+  filter:drop-shadow(0 22px 33px rgba(0,0,0,.5));perspective:900px}
+.code-fallback-interior{position:absolute;top:28%;left:4%;width:92%;height:50%;
+  background:radial-gradient(ellipse at 50% 40%,#32494b,#0d1c21 77%);
+  border:12px solid #526b71;box-shadow:inset 0 0 0 4px #b7a078,inset 0 0 28px #03090b}
+.code-fallback-rectangle{position:absolute;top:20%;left:35%;width:30%;height:41%;
+  background:#d8c9aa;border:2px solid #efe0be;box-shadow:0 8px 12px #050c0d;
+  transform:skewY(-4deg)}
+.code-fallback-lid{position:absolute;z-index:3;top:9%;left:2%;width:96%;height:53%;
+  transform-origin:50% 5%;transition:transform 1.35s cubic-bezier(.18,.8,.19,1);
+  background:linear-gradient(125deg,rgba(83,114,118,.50),rgba(13,32,41,.78)),
+    url('./assets/painted-steel.webp');background-size:cover,260px 260px;
+  border:12px solid #849da0;border-radius:8px;
+  box-shadow:inset 0 0 0 5px #23383e,inset 0 0 0 7px #baa078,0 8px 14px rgba(0,0,0,.55)}
+.code-fallback-lid-inlay{position:absolute;inset:15% 10%;border:5px double #c3aa82;
+  outline:1px solid #30444a;border-radius:4px;
+  background:linear-gradient(145deg,rgba(50,78,85,.35),rgba(16,29,36,.7)),
+    url('./assets/painted-gear.webp');background-size:cover,220px 220px}
+.code-fallback-lid-inlay:after{content:"◆";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  display:grid;place-items:center;width:44px;height:44px;border:4px double #d9b780;border-radius:50%;
+  background:linear-gradient(125deg,rgba(96,119,116,.12),rgba(20,42,46,.65)),
+    url('./assets/painted-brass.webp');background-size:cover,120px 120px;
+  box-shadow:inset 0 0 0 2px #405254,0 2px 6px rgba(0,0,0,.38);
+  color:#e6ca9a;font:21px Georgia,serif;text-shadow:0 2px 4px #101e23}
+.code-fallback-casket.opened .code-fallback-lid{transform:rotateX(-145deg)}
+.code-fallback-front{position:absolute;z-index:4;left:2%;top:55%;width:96%;height:35%;
+  display:grid;place-items:center;border:8px solid #95adb0;border-radius:5px;
+  background:linear-gradient(130deg,rgba(78,108,116,.66),rgba(16,32,40,.87)),
+    url('./assets/painted-steel.webp');background-size:cover,260px 260px;
+  box-shadow:inset 0 0 0 3px #c09d71,inset 0 0 0 7px #2d4247}
+.code-fallback-front:before,.code-fallback-front:after{content:"";position:absolute;left:3%;right:3%;height:4px;
+  background:linear-gradient(90deg,rgba(30,48,53,.55),rgba(215,178,117,.2)),
+    url('./assets/painted-brass.webp');background-size:cover,220px 220px;
+  box-shadow:0 1px 2px rgba(0,0,0,.5);pointer-events:none}
+.code-fallback-front:before{top:2px}.code-fallback-front:after{bottom:2px}
+.code-fallback-digits{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;
+  padding:5px 10px;background:#172326;border:4px solid #6f7775;
+  transform:translateY(3px) scale(.94);transform-origin:center;
+  box-shadow:inset 0 5px 15px rgba(0,0,0,.8),inset 0 0 0 1px #aa9270,0 2px 4px rgba(0,0,0,.4)}
+.code-fallback-wheel{display:grid;grid-template-rows:16px 31px 16px;justify-items:stretch;width:35px;
+  border:1px solid #665c4c;background:#182529}
+.code-fallback-wheel button{padding:0;border:0;background:linear-gradient(rgba(115,132,132,.62),rgba(34,58,63,.88)),
+  url('./assets/painted-steel.webp');background-size:cover,90px 90px;
+  color:#efd3a1;font-size:11px;line-height:1;cursor:pointer}
+.code-fallback-wheel button:hover{background:#b59667;color:#172326}
+.code-fallback-wheel button:disabled{opacity:.5;cursor:default}
+.code-fallback-digit{display:grid;place-items:center;border-top:1px solid #8c8b7c;
+  border-bottom:1px solid #8c8b7c;background:linear-gradient(#304043,#111e21 50%,#304043);
+  font:24px Georgia,serif;color:#efd6a8}
+.code-fallback-caption{color:#8ba6a2;font:11px ui-monospace,monospace;letter-spacing:.08em}
+@media(max-width:1100px){.code-fallback{padding-right:290px}
+  .code-fallback-casket{width:min(54vw,540px);height:280px}
+  .code-fallback-digits{gap:4px;padding:3px 7px}.code-fallback-wheel{width:30px;grid-template-rows:14px 25px 14px}
+  .code-fallback-digit{font-size:20px}}
+@media(max-width:760px){.code-fallback{justify-content:flex-start;padding:130px 12px 0}
+  .code-fallback-casket{width:min(94vw,480px);height:215px}
+  .code-fallback-front{border-width:5px}.code-fallback-lid{border-width:7px}
+  .code-fallback-digits{padding:3px 5px;gap:3px;border-width:3px}
+  .code-fallback-wheel{width:26px;grid-template-rows:12px 21px 12px}
+  .code-fallback-wheel button{font-size:9px}.code-fallback-digit{font-size:16px}
+  .code-fallback-caption{font-size:9px}}

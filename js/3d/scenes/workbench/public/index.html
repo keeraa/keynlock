@@ -20,12 +20,25 @@
 <body>
   <main class="app">
     <canvas id="scene" aria-label="Интерактивная 3D-мастерская KEYNLOCK"></canvas>
+    <div id="codeWorkspace" class="code-workspace" hidden>
+      <canvas id="codeCanvas" aria-label="Трёхмерная кодовая шкатулка с шестью вращающимися дисками"></canvas>
+      <div id="codeFallback" class="code-fallback" hidden>
+        <div id="codeFallbackCasket" class="code-fallback-casket" role="group" aria-label="Металлическая шкатулка с шестью кодовыми дисками, стрелками и откидной крышкой">
+          <div class="code-fallback-interior"><div class="code-fallback-rectangle"></div></div>
+          <div class="code-fallback-lid"><div class="code-fallback-lid-inlay"></div></div>
+          <div class="code-fallback-front"><div id="codeFallbackDigits" class="code-fallback-digits"></div></div>
+        </div>
+        <p class="code-fallback-caption">Упрощённый вид · для объёмной сцены требуется WebGL</p>
+      </div>
+    </div>
 
     <header class="masthead ui">
       <div class="brand"><span class="mark">K</span><span><b>KEYNLOCK</b><small>МАСТЕРСКАЯ МЕХАНИЗМОВ</small></span></div>
       <nav class="workspace-tabs" aria-label="Режимы верстака">
         <button type="button" class="workspace-tab active" data-mode="key" aria-pressed="true"><span>01</span> Выпиливание ключа</button>
         <button type="button" class="workspace-tab" data-mode="assembly" aria-pressed="false"><span>02</span> Штифтовый механизм</button>
+        <button type="button" class="workspace-tab" data-mode="mechanism" aria-pressed="false"><span>03</span> Песочница механизмов</button>
+        <button type="button" class="workspace-tab" data-mode="code" aria-pressed="false"><span>04</span> Кодовый замок</button>
       </nav>
       <div class="scene-stats" aria-label="Производительность сцены">
         <span id="fps">—</span> FPS <i></i>
@@ -33,7 +46,7 @@
       </div>
     </header>
 
-    <div class="scene-label ui"><span class="index" id="sceneIndex">01 / 02</span><h1 id="sceneTitle">Изготовление ключа</h1><p id="sceneDescription">Заготовка зажата в тисках. Выпилите четыре паза по чертежу.</p></div>
+    <div class="scene-label ui"><span class="index" id="sceneIndex">01 / 04</span><h1 id="sceneTitle">Изготовление ключа</h1><p id="sceneDescription">Заготовка зажата в тисках. Выпилите четыре паза по чертежу.</p></div>
 
     <aside class="side-panel ui" aria-label="Панель верстака">
       <div id="keyPanel" class="panel-screen">
@@ -78,7 +91,7 @@
         <div class="assembly-variant-control" role="group" aria-label="Режим сборки замка">
           <button type="button" data-assembly-variant="classic" class="active" aria-pressed="true">13 деталей</button>
           <button type="button" data-assembly-variant="extended" aria-pressed="false">Расширенная</button>
-          <button type="button" data-assembly-variant="free" aria-pressed="false">Свой проект</button>
+          <button type="button" data-assembly-variant="free" aria-pressed="false">Код цилиндра</button>
         </div>
         <section id="freeDesignPanel" class="design-card" aria-label="Конструктор собственного замка" hidden>
           <div class="design-top">ПРОЕКТ МЕХАНИЗМА <span>4 КАНАЛА · 2 ПЕРЕДАЧИ</span></div>
@@ -113,7 +126,124 @@
         </div>
         <div class="soft-note">Установленную деталь можно перетащить обратно в лоток, снять кнопкой или клавишей Delete. Верхние запирающие штифты уже находятся в корпусе.</div>
       </div>
+
+      <div id="codePanel" class="panel-screen" hidden>
+        <div class="eyebrow">04 / КОДОВЫЙ ЗАМОК</div>
+        <h2>Шкатулка с секретом</h2>
+        <p>Шесть механических дисков. Выставьте указанный код и откройте шкатулку.</p>
+        <div class="code-target" aria-label="Код для открытия шкатулки">
+          <span>КОД ДЛЯ ОТКРЫТИЯ</span>
+          <output id="codeTarget" aria-live="polite">— — — — — —</output>
+        </div>
+        <div class="code-lock-top"><span>ШЕСТИЗНАЧНЫЙ ШИФР</span><b id="codeStatus">ЗАПЕРТО</b></div>
+        <div id="codeWheelGrid" class="code-wheel-grid" role="group" aria-label="Шестизначный код шкатулки"></div>
+        <div class="code-lock-stats">
+          <div><span>ПОПЫТОК</span><strong id="codeAttemptCount">0</strong></div>
+          <div><span>СОВПАЛО ЦИФР</span><strong id="codeMatchedCount">—</strong></div>
+        </div>
+        <div id="codeFeedback" class="result-note" role="status">Вращайте диски, чтобы подобрать код.</div>
+        <div class="button-stack">
+          <button id="codeTry" type="button" class="primary">Проверить код <span>→</span></button>
+          <button id="codeNew" type="button" class="secondary">Новый код <span>↻</span></button>
+        </div>
+        <div class="soft-note">Над и под каждой цифрой на шкатулке есть стрелки ↑ ↓. Проверка показывает число цифр на своих местах.</div>
+      </div>
     </aside>
+
+    <div id="mechanismWorkspace" class="mechanism-workspace" hidden>
+      <aside class="mech-catalog" aria-label="Каталог механических деталей">
+        <div class="mech-eyebrow">KEYNLOCK / КОНСТРУКТОР</div>
+        <h2>Внутренности замка</h2>
+        <div class="mech-eyebrow">ГОТОВЫЕ РАБОЧИЕ СХЕМЫ</div>
+        <div id="mechPresetList" class="mech-preset-grid" role="group" aria-label="Работающие примеры замков"></div>
+        <button type="button" id="mechRestoreCustom" class="mech-restore-custom" hidden>↶ Вернуть мою сборку</button>
+        <div id="mechPresetDetail" class="mech-preset-detail"></div>
+        <div class="mech-eyebrow mech-parts-label">ДЕТАЛИ ДЛЯ СВОЕЙ СХЕМЫ</div>
+        <div id="mechPalette" class="mech-palette"></div>
+        <p class="mech-built-in-note">Пружины штифтов и защёлки встроены. Отдельно устанавливать их не нужно.</p>
+        <button type="button" id="mechClear" class="mech-clear-layout">Разобрать механизм</button>
+        <div class="mech-catalog-footer">
+          <div class="mech-key-hint"><kbd>Q</kbd><kbd>E</kbd> поворот выбранной детали</div>
+          <div class="mech-key-hint"><kbd>Del</kbd> убрать · ЛКМ на детали — переместить</div>
+          <div class="mech-key-hint"><kbd>ЛКМ</kbd> пустое место — вращать камеру</div>
+          <div class="mech-key-hint"><kbd>Shift</kbd>+<kbd>ЛКМ</kbd> — сдвинуть · колесо — зум</div>
+        </div>
+      </aside>
+      <section class="mech-stage" aria-label="Трёхмерный механизм замка">
+        <div class="mech-stage-header">
+          <div><div class="mech-eyebrow">КОНСТРУКТОР / ЗАМОК В РАЗРЕЗЕ</div><h2>Внутри замка</h2></div>
+          <div class="mech-mode-tabs" role="group" aria-label="Режим песочницы">
+            <button type="button" data-mech-mode="build" class="active" aria-pressed="true">Сборка</button>
+            <button type="button" data-mech-mode="attack" aria-pressed="false">Взлом</button>
+          </div>
+        </div>
+        <div class="mech-board-container" id="mechBoardContainer">
+          <canvas id="mechBoard" width="920" height="610" aria-label="3D-корпус замка с интерактивными деталями"></canvas>
+          <div class="mech-3d-caption" id="mech3dViewLabel">3D-РАЗРЕЗ · ВНУТРЕННИЙ МЕХАНИЗМ</div>
+          <div class="mech-3d-stats" id="mech3dStats">THREE.JS r187</div>
+          <div class="mech-motion-readout" id="mechMotionReadout" hidden aria-live="polite">
+            <span id="mechMotionIndex">ШАГ 1</span>
+            <div><strong id="mechMotionTitle"></strong><span id="mechMotionDetail"></span></div>
+          </div>
+          <div class="mech-3d-unavailable" id="mech3dUnavailable" hidden></div>
+          <div class="mech-board-watermark">KEYNLOCK <span>МЕХАНИЧЕСКИЙ КОРПУС · 03</span></div>
+        </div>
+        <div class="mech-controls">
+          <div id="mechBuildControls" class="mech-control-group">
+            <button type="button" id="mechTurnKey" class="mech-primary">▶ Повернуть ключ — посмотреть движение</button>
+            <button type="button" id="mechResetTest">Сбросить движение</button>
+            <button type="button" id="mechShowContacts" aria-pressed="false">Контакты: выкл.</button>
+          </div>
+          <div class="mech-camera-controls">
+            <button type="button" id="mechResetCamera">Вернуть камеру</button>
+            <button type="button" id="mechToggleCover" aria-pressed="false">Закрыть крышку</button>
+          </div>
+          <div id="mechAttackControls" class="mech-attack-controls" hidden>
+            <div class="mech-wrench-options">
+              <div class="mech-wrench-heading"><strong>1 · Подберите натяжитель по форме паза</strong><small id="mechWrenchLabel">Двойной изгиб</small></div>
+              <div id="mechWrenchChoices" class="mech-wrench-choices" role="group" aria-label="Подбор натяжителя к направляющей скважины"></div>
+              <p id="mechFitStatus" role="status">Сравните изгиб инструмента с металлической направляющей у скважины.</p>
+            </div>
+            <div class="mech-attack-actions">
+              <button type="button" id="mechTension" class="mech-tool-button" aria-pressed="false" title="Натяжитель слегка поворачивает сердцевину и удерживает поднятые штифты">
+                <span id="mechTensionIcon" class="mech-tool-icon" aria-hidden="true"></span>
+                <span class="mech-tool-copy"><strong id="mechTensionLabel">2 · Проверить посадку</strong><small>Вставить и слегка повернуть</small></span>
+              </button>
+              <button type="button" id="mechPickStroke" class="mech-tool-button mech-pick-button" title="Поднимите выбранный штифт настоящей отмычкой-крючком">
+                <svg class="mech-tool-icon" viewBox="0 0 82 32" fill="none" aria-hidden="true">
+                  <path d="M6 22H32" stroke="#a16742" stroke-width="8" stroke-linecap="round"/>
+                  <path d="M30 22H64Q69 22 72 17L77 8" stroke="#d6dddb" stroke-width="2.9" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="mech-tool-copy"><strong>4 · Поднять крючком</strong><small>Каждое нажатие — один шаг</small></span>
+              </button>
+              <button type="button" id="mechResetAttack" class="mech-reset-attack" title="Извлечь инструменты и начать заново">↺ <span>Заново</span></button>
+            </div>
+            <div class="mech-attack-pins">
+              <div class="mech-attack-pins-caption"><span>3 · Выберите штифт</span><small id="mechPinProgress">0 из 5</small></div>
+              <div id="mechPinChoices" class="mech-pin-choices" role="group" aria-label="Выбрать штифт для подъёма"></div>
+            </div>
+          </div>
+          <p id="mechFeedback" class="mech-feedback" role="status">Выберите пример слева и поверните ключ — движение каждого узла покажем по порядку.</p>
+        </div>
+      </section>
+      <aside class="mech-inspector" aria-label="Свойства механизма">
+        <div class="mech-eyebrow">СОСТОЯНИЕ КОНСТРУКЦИИ</div>
+        <h2>Свойства</h2>
+        <div id="mechPartInspector" class="mech-property-panel"></div>
+        <div class="mech-divider"></div>
+        <div class="mech-eyebrow">ДИАГНОСТИКА ПЕРЕДАЧИ</div>
+        <div id="mechDiagnostics" class="mech-diagnostics"></div>
+        <div class="mech-divider"></div>
+        <div class="mech-eyebrow">УЯЗВИМОСТЬ</div>
+        <div id="mechSecurity" class="mech-security"></div>
+        <div class="mech-divider"></div>
+        <div class="mech-file-controls">
+          <button id="mechExport" type="button">Экспорт JSON ↓</button>
+          <button id="mechImport" type="button">Импорт ↑</button>
+          <input id="mechImportFile" type="file" accept="application/json,.json" hidden />
+        </div>
+      </aside>
+    </div>
 
     <div class="workbench-hint ui" id="workbenchHint" aria-label="Подсказка по выпиливанию">
       <span><span class="workbench-cursor" aria-hidden="true">↖</span> Наведите указатель на участок заготовки</span>

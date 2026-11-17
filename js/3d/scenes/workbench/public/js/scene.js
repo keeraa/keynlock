@@ -424,10 +424,12 @@ export function createWorkshopScene(canvas){
     setSelectedPart(null);
     controls.update();}
   setMode('key');
-  let stopped=false;
+  let stopped=false,suspended=false;
   function frame(now){
     if(stopped)return;
-    requestAnimationFrame(frame);controls.update();updateTest(now);
+    requestAnimationFrame(frame);
+    if(suspended){lastFrame=now;fpsClock=now;frames=0;return;}
+    controls.update();updateTest(now);
     const dt=Math.min(.05,Math.max(0,(now-lastFrame)/1000));
     shavings.update(dt);
     const highlightEase=1-Math.exp(-14*dt);
@@ -486,7 +488,8 @@ export function createWorkshopScene(canvas){
     camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false);
   });resizeObserver.observe(canvas);
   canvas.addEventListener('contextmenu',e=>e.preventDefault(),{signal:sceneListeners.signal});
-  return {setMode,setBlueprint,setCuts,setWear,setActiveCut,setFiling,
+  return {setMode,setSuspended:value=>{suspended=Boolean(value);},
+    setBlueprint,setCuts,setWear,setActiveCut,setFiling,
     setKeyMethod,setFileOrientation,rotateFile,filingContact,filingPulse,filingChips,
     setFilePointer,setFilePointerActive,fileStrokePixels,
     hitTest,pointerPoint,updateInstalled,setPartGroup,setAssemblyDesign,

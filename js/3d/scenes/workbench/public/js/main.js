@@ -8,22 +8,35 @@ import {describeKeyInspection} from './key-inspection.js';
 import {createKeyPanel} from './key-panel.js';
 import {createAssemblyPanel,partName} from './assembly-panel.js';
 import {installWorkbenchInput} from './workbench-input.js';
+import {createMechanismUI} from './mechanism-ui.js';
+import {createCodeLockUI} from './code-lock-ui.js';
 
 const $=id=>document.getElementById(id);
 const canvas=$('scene');
 const state=loadWorkbenchState();
 let scene;
+let hasWebGL=true;
 try{scene=createWorkshopScene(canvas);}catch(error){
   console.error(error);
-  $('sceneDescription').textContent='Для работы мастерской нужен браузер с поддержкой WebGL2.';
-  $('keyFeedback').textContent='Не удалось запустить 3D-сцену.';
-  throw error;
+  hasWebGL=false;
+  // The free-form lock is another WebGL scene. Show a clear diagnostic if the
+  // device cannot create either renderer.
+  const noop=()=>{};
+  scene=new Proxy({}, {get:(_target,key)=>key==='getFps'||key==='getPolygons'?()=>0:
+    key==='filingContact'?()=>-1:key==='hitTest'?()=>null:noop});
+  $('sceneDescription').textContent='Для трёхмерной мастерской и механизмов требуется WebGL.';
+  $('keyFeedback').textContent='Браузер не поддерживает запуск этой 3D-сцены.';
+  document.querySelectorAll('[data-mode="key"],[data-mode="assembly"]').forEach(button=>{
+    button.disabled=true;button.title='Для 3D-сцен требуется WebGL2';});
 }
 scene.setBlueprint(state.targets);scene.setCuts(state.cuts);
 scene.setWear(state.wear);
 scene.setKeyMethod(state.keyMethod);
 scene.setAssemblyDesign(state.assemblyVariant,state.freeDesign);
 scene.updateInstalled(state.installed);
+const sandbox=createMechanismUI();
+const codeBox=createCodeLockUI({canvas:$('codeCanvas'),$,toast,
+  isActive:()=>state.mode==='code'});
 
 let toastTimer;
 function toast(message){
@@ -62,16 +75,31 @@ function setMode(mode){
   if(state.filing||state.spaceFiling){state.filing=false;state.spaceFiling=false;
     scene.setFiling(false);save();try{canvas.releasePointerCapture(state.filingPointer);}catch{}}
   if(state.drag){state.drag=null;scene.updateInstalled(state.installed);}
-  state.mode=mode;state.selectedPart=null;state.cameraDragging=false;scene.setMode(mode);
+  state.mode=mode;state.selectedPart=null;state.cameraDragging=false;
+  scene.setMode(mode==='mechanism'||mode==='code'?'assembly':mode);
+  scene.setSuspended(mode==='mechanism'||mode==='code');
+  document.body.classList.toggle('mechanism-active',mode==='mechanism');
+  document.body.classList.toggle('code-active',mode==='code');
+  if(mode==='mechanism')sandbox.open();else sandbox.close();
+  $('codeWorkspace').hidden=mode!=='code';
+  if(mode==='code')codeBox.open();else codeBox.close();
   document.querySelectorAll('.workspace-tab').forEach(button=>{
     const active=button.dataset.mode===mode;button.classList.toggle('active',active);
     button.setAttribute('aria-pressed',String(active));
   });
   $('keyPanel').hidden=mode!=='key';$('assemblyPanel').hidden=mode!=='assembly';
+  $('codePanel').hidden=mode!=='code';
   $('workbenchHint').hidden=mode!=='key';
-  $('sceneIndex').textContent=mode==='key'?'01 / 02':'02 / 02';
-  $('sceneTitle').textContent=mode==='key'?'Изготовление ключа':'Сборка штифтового механизма';
-  $('sceneDescription').textContent=mode==='key'?keySceneDescription():assemblySceneDescription();
+  $('sceneIndex').textContent=mode==='key'?'01 / 04':mode==='assembly'?'02 / 04':
+    mode==='mechanism'?'03 / 04':'04 / 04';
+  $('sceneTitle').textContent=mode==='key'?'Изготовление ключа':
+    mode==='assembly'?'Сборка штифтового механизма':
+    mode==='mechanism'?'Песочница механизмов':'Кодовая шкатулка';
+  $('sceneDescription').textContent=mode==='key'?keySceneDescription():
+    mode==='assembly'?assemblySceneDescription():
+      mode==='mechanism'?
+      'Трёхмерный разрез замка: взаимосвязанные механизмы, ключ, стопоры и проверка взлома.':
+      'Сверьтесь с шестизначным кодом в меню. Нажимайте стрелки на шкатулке и откройте крышку.';
   renderAssembly();
 }
 document.querySelectorAll('.workspace-tab').forEach(button=>button.addEventListener('click',()=>setMode(button.dataset.mode)));
@@ -245,11 +273,12 @@ function releaseCapture(pointerId){
 const detachControls=installWorkbenchInput({canvas,state,scene,save,toast,measuredCuts,
   inspectCurrentKey,selectCut,renderCuts,renderSelection,removePart,placement,
   testMechanism,releaseCapture,inspectKeyButton:$('inspectKey')});
-buildCutRows();selectCut(0);renderCuts();renderAssembly();setMode('key');
+buildCutRows();selectCut(0);renderCuts();renderAssembly();setMode(hasWebGL?'key':'mechanism');
 const fpsTimer=setInterval(()=>{
   $('fps').textContent=String(scene.getFps()||'—');
   $('polygons').textContent=scene.getPolygons().toLocaleString('ru-RU');
 },850);
 window.addEventListener('beforeunload',()=>{
-  clearTimeout(toastTimer);clearInterval(fpsTimer);detachControls();scene.dispose();
+  clearTimeout(toastTimer);clearInterval(fpsTimer);detachControls();sandbox.dispose();
+  codeBox.dispose();scene.dispose();
 },{once:true});

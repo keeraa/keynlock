@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test tests/*.test.mjs",
-    "check": "npm test && node --check public/js/main.js && node --check public/js/scene.js && node --check public/js/manual.js",
+    "check": "npm test && node --experimental-loader ./tests/three-vendor-loader.mjs tests/mechanism-ui.runtime.smoke.mjs && node --experimental-loader ./tests/three-vendor-loader.mjs tests/mechanism-three.smoke.mjs && node --check public/js/main.js && node --check public/js/scene.js && node --check public/js/manual.js && node --check public/js/mechanism-engine.js && node --check public/js/mechanism-3d.js && node --check public/js/mechanism-ui.js && node --check public/js/code-box-scene.js && node --check public/js/code-lock-ui.js",
     "build": "node scripts/build.mjs"
   }
 }

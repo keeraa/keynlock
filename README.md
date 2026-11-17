@@ -8,6 +8,7 @@ Current implemented story: [«Чужие подписи»](docs/narrative/chapte
 Worldbuilding: [официальный флаг Киенлока и его символика](docs/lore/flag.md).
 Логово и музыка: [мастерские, галерея и саундтрек Шопена](docs/lore/lair-and-soundtrack.md).
 Сюжетные печати: [семь районов, алхимических металлов и планет](docs/lore/seven-seals.md).
+Игровой дизайн: [три способа взлома, награды, дневная мастерская и свободное строительство](docs/gameplay-core-three-approaches.md).
 
 - `index.html` — KEYNLOCK entry point
 - `css/` — modular CSS

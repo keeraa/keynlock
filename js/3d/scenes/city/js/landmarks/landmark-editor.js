@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import {OrbitControls} from '../../vendor/OrbitControls.js';
-import {createLandmarkModel,LANDMARK_CATALOG} from './landmark-model.js';
+import {createLandmarkModel,LANDMARK_CATALOG,LANDMARK_CHIMNEY_DEFAULTS} from './landmark-model.js';
 import {createLandmarkAtmosphere} from './landmark-atmosphere.js';
 import {loadBuildingAtmosphereSettings,saveBuildingAtmosphereSettings} from '../buildings/house-atmosphere.js';
 import {mountEditorVisual} from '../effects/editor-visual.js';
@@ -8,7 +8,16 @@ import {mountEditorVisual} from '../effects/editor-visual.js';
 const $=id=>document.getElementById(id);
 const names={high:'Высокая',medium:'Средняя',low:'Низкая'};
 const symbols={church:'✝',theater:'♜',museum:'◈',townhall:'◷',palace:'♛',tower:'♙'};
-const state={id:'church',lod:'high',view:'three-quarter',model:null,atmosphere:null,settings:loadBuildingAtmosphereSettings()};
+const chimneyStorageKey='keynlock-landmark-chimneys-v1';
+function loadChimneyChoices(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(chimneyStorageKey)||'{}');
+    return Object.fromEntries(Object.entries(LANDMARK_CHIMNEY_DEFAULTS).map(([id,enabled])=>
+      [id,typeof saved[id]==='boolean'?saved[id]:enabled]));
+  }catch{return {...LANDMARK_CHIMNEY_DEFAULTS};}
+}
+const state={id:'church',lod:'high',view:'three-quarter',model:null,atmosphere:null,
+  settings:loadBuildingAtmosphereSettings(),chimneys:loadChimneyChoices()};
 const nf=new Intl.NumberFormat('ru-RU');
 const visual=mountEditorVisual();
 const catalogue=$('buildingList');
@@ -66,6 +75,11 @@ function updateInterface(){
   $('passportTriangles').textContent=nf.format(state.model.stats.triangles);
   $('passportMeshes').textContent=nf.format(state.model.stats.meshes);
   $('passportEntrance').textContent=state.model.entranceCount>0?'Предусмотрен':'Нет';
+  const chimneyToggle=$('landmarkChimneys');
+  chimneyToggle.disabled=state.id==='tower';
+  chimneyToggle.checked=Boolean(state.chimneys[state.id]);
+  $('chimneyNote').textContent=state.id==='tower'?'Для башни дымоход не предусмотрен':
+    chimneyToggle.checked?'Дымоходы присутствуют на модели':'Дымоходы убраны с модели';
 }
 
 function rebuild(){
@@ -73,7 +87,7 @@ function rebuild(){
     // Acquire the next model before releasing the previous one, so changing
     // buildings/LOD never evicts and reloads the shared painted GPU maps.
     const previous=state.model,previousAtmosphere=state.atmosphere;
-    const next=createLandmarkModel(THREE,state.id,{detail:state.lod});
+    const next=createLandmarkModel(THREE,state.id,{detail:state.lod,chimneys:state.chimneys[state.id]});
     const atmosphere=createLandmarkAtmosphere(THREE,next,{
       settings:state.settings,mossMap:next.textureMaps.moss,
     });
@@ -229,6 +243,12 @@ document.querySelectorAll('[data-lod]').forEach(button=>button.addEventListener(
 document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{
   state.view=button.dataset.view;aimView();
 }));
+// Per-building chimney choice is independent of the shared smoke style.
+$('landmarkChimneys').addEventListener('change',event=>{
+  state.chimneys[state.id]=event.target.checked;
+  try{localStorage.setItem(chimneyStorageKey,JSON.stringify(state.chimneys));}catch{}
+  rebuild();
+});
 syncAtmosphereControls();
 document.querySelectorAll('[data-atmo]').forEach(input=>input.addEventListener(
   input.type==='range'?'input':'change',()=>{

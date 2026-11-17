@@ -18,6 +18,9 @@ export const LANDMARK_CATALOG = Object.freeze([
 ]);
 
 const DETAILS=['high','medium','low'];
+export const LANDMARK_CHIMNEY_DEFAULTS=Object.freeze({
+  church:false,theater:false,museum:false,townhall:false,palace:true,tower:false,
+});
 export function landmarkTriangleCount(root) {
   let triangles=0,meshes=0;
   root.traverse(object=>{
@@ -29,7 +32,7 @@ export function landmarkTriangleCount(root) {
   return {triangles:Math.round(triangles),meshes};
 }
 
-export function createLandmarkModel(T,id,{detail='high'}={}) {
+export function createLandmarkModel(T,id,{detail='high',chimneys=LANDMARK_CHIMNEY_DEFAULTS[id]}={}) {
   if(!DETAILS.includes(detail))throw new Error(`Неизвестный LOD: ${detail}`);
   if(!LANDMARK_CATALOG.some(item=>item.id===id))throw new Error(`Неизвестный памятник: ${id}`);
   const hi=detail==='high',lo=detail==='low',mid=!hi&&!lo;
@@ -133,6 +136,10 @@ export function createLandmarkModel(T,id,{detail='high'}={}) {
     ]).flat(),2));
     geometry.setIndex(faces);geometry.computeVertexNormals();
     const roof=attach(geometry,mat);roof.userData.landmarkRoofSurface=true;
+    // Seal the paper-thin painted roof at the eave to prevent daylight gaps
+    // when viewed from beneath the auditorium and stage roofs.
+    const soffit=box(x,edge-.105,z,w+eaves*2,.21,d+eaves*2,'roofTrim');
+    soffit.userData.landmarkRoofSoffit=true;
     for(const s of [-1,1]){
       const zz=s===1?front:back;
       // Both gable ends need outward-facing triangles and actual paint UVs.
@@ -314,12 +321,17 @@ export function createLandmarkModel(T,id,{detail='high'}={}) {
     }}
   };
   const pediment=(x,y,z,w,rise,mat='ivory')=>{
-    const geom=new T.BufferGeometry();geom.setAttribute('position',new T.Float32BufferAttribute([x-w/2,y,z,x+w/2,y,z,x,y+rise,z],3));
-    geom.setAttribute('uv',new T.Float32BufferAttribute([
-      0,0,w/STONE_METRES_PER_TILE,0,w/(2*STONE_METRES_PER_TILE),rise/STONE_METRES_PER_TILE,
-    ],2));
-    geom.computeVertexNormals();const face=attach(geom,mat);
-    if(!lo){beam([x-w/2,y,z+.08],[x,y+rise,z+.08],.11,'stone');beam([x,y+rise,z+.08],[x+w/2,y,z+.08],.11,'stone');}
+    // A closed stone tympanum. The previous one-sided triangle disappeared
+    // from oblique angles, leaving only two floating border beams.
+    const profile=new T.Shape();profile.moveTo(-w/2,0);profile.lineTo(w/2,0);
+    profile.lineTo(0,rise);profile.closePath();
+    const depth=.26;
+    const geom=new T.ExtrudeGeometry(profile,{depth,steps:1,bevelEnabled:false,curveSegments:1});
+    const face=attach(geom,mat,[x,y,z]);face.userData.landmarkSolidPediment=true;
+    if(!lo){
+      beam([x-w/2,y,z+depth+.07],[x,y+rise,z+depth+.07],.11,'stone');
+      beam([x,y+rise,z+depth+.07],[x+w/2,y,z+depth+.07],.11,'stone');
+    }
     return face;
   };
   const stairs=(platformFront,width=7,steps=4,rise=.16)=>{
@@ -340,11 +352,18 @@ export function createLandmarkModel(T,id,{detail='high'}={}) {
     cap.userData.landmarkSmokeEmitter={x,y:baseY+height+.16,z};
   };
   const clock=(x,y,z,r=1.22)=>{
+    // The inset stone drum physically connects the clock face and bezel to
+    // the masonry, including on the high tower where the wall is set back.
+    const backing=attach(new T.CylinderGeometry(r*1.035,r*1.035,.24,lo?16:36),
+      'stone',[x,y,z+.06],[Math.PI/2,0,0]);
+    backing.userData.landmarkClockBacking=true;
     const face=attach(new T.CylinderGeometry(r,r,.12,lo?16:36),'pale',[x,y,z],[Math.PI/2,0,0]);
-    face.userData.clock=true;
-    cyl(x,y,z+.09,r*1.08,r*1.08,.12,'gold',lo?16:36).rotation.x=Math.PI/2;
-    // face must sit forward of the bezel.
+    face.userData.clock=true;face.userData.landmarkClockFace=true;
+    // One concentric ring on the front replaces a rear cylinder whose
+    // lower silhouette looked like a detached arc under the clock.
     face.position.z=z+.17;
+    const bezel=attach(new T.TorusGeometry(r*1.025,.083,8,lo?24:48),'gold',[x,y-.055,z+.295]);
+    bezel.userData.landmarkClockBezel=true;
     if(!lo){
       for(let i=0;i<12;i++){
         const a=i*Math.PI/6;
@@ -372,7 +391,7 @@ export function createLandmarkModel(T,id,{detail='high'}={}) {
     box(0,5.8,-1.1,9.8,10.8,18,'ivory');
     box(0,1.15,-1.1,10.1,1.55,18.3,'stone');
     wedge(0,11.15,-1.1,10.0,18,4.1,'slate');
-    chimney(-3.0,11.45,-4.5,3.35);
+    if(chimneys)chimney(-3.0,11.45,-4.5,3.35);
     for(const s of [-1,1]){
       box(s*6.35,3.7,-1.2,3.1,6.9,15.4,'cream');
       box(s*6.35,.7,-1.2,3.4,.9,15.5,'stone');
@@ -442,9 +461,12 @@ export function createLandmarkModel(T,id,{detail='high'}={}) {
     box(0,5.2,-11.2,15.2,9.8,6.2,'plaster'); // stage fly-house
     box(0,11.2,-11.2,15.3,2.4,6.3,'brick');
     wedge(0,10.0,-1.1,19.1,14.1,3.9,'roof',.45,'brick');
-    wedge(0,12.6,-11.2,15.2,6.3,2.6,'roofDeep',.45,'brick');
-    chimney(4.15,12.7,-11.1,3.45);
-    box(0,5.2,6.95,16.3,8.9,2.7,'ivory');
+    // The stage roof now ends behind the auditorium eave; pitched meshes
+    // previously intersected and made an uneven notch at the junction.
+    wedge(0,12.6,-11.85,15.2,5.95,2.6,'roofDeep',.45,'brick');
+    if(chimneys)chimney(4.15,12.7,-11.1,3.45);
+    const entranceWallZ=6.55;
+    box(0,5.2,5.2,16.3,8.9,2.7,'ivory');
     box(0,9.8,8.6,18,.72,3.6,'stone');
     // A solid stone podium replaces the previously suspended thin shelf.
     // Its bottom joins the plaza foundation and its top carries every column.
@@ -455,15 +477,17 @@ export function createLandmarkModel(T,id,{detail='high'}={}) {
       const x=(-.5+i/(count-1))*13.3;
       column(x,9.05,1.24,8.25,.37);
     }
-    pediment(0,10.15,9.08,18,3.1,'ivory');
+    pediment(0,10.15,10.4,18,3.1,'ivory');
     if(hi){
-      box(0,11.03,9.2,4.9,.33,.22,'gold');
+      box(0,11.03,10.77,4.9,.33,.22,'gold');
       // Decorative lyre motif in the tympanum.
-      beam([-1.2,10.72,9.24],[0,12.06,9.24],.1,'gold');
-      beam([1.2,10.72,9.24],[0,12.06,9.24],.1,'gold');
-      ball(0,11.3,9.35,.25,'gold');
+      beam([-1.2,10.72,10.8],[0,12.06,10.8],.1,'gold');
+      beam([1.2,10.72,10.8],[0,12.06,10.8],.1,'gold');
+      ball(0,11.3,10.85,.25,'gold');
     }
-    for(const x of [-4.1,0,4.1])facadeArch(8.3,x,1.24,8.39,2.25,4.25,{entrance:true,frame:'stone'});
+    // Recess the entrance wall and put the half-sized doors in the bays
+    // between columns instead of directly behind their shafts.
+    for(const x of [-5.32,0,5.32])facadeArch(entranceWallZ,x,1.24,entranceWallZ+.07,1.125,2.125,{entrance:true,frame:'stone'});
     const sideN=lo?2:4;
     for(const sign of [-1,1])for(let i=0;i<sideN;i++)arch(sign*9.7,5.1,-5.6+i*(10/(sideN-1)),1.25,2.4,{glass:'glassLight',side:sign});
     if(!lo){
@@ -483,7 +507,7 @@ export function createLandmarkModel(T,id,{detail='high'}={}) {
     box(0,5.15,-1.6,22.5,9.3,14.6,'plaster');
     box(0,9.95,-1.6,23,.56,15.2,'ivory');
     hipRoof(0,10.2,-1.6,23,15,2.5,'slate');
-    chimney(-7.5,10.45,-4.6,3.55);
+    if(chimneys)chimney(-7.5,10.45,-4.6,3.55);
     // Round rotunda emerges from the shallow hipped gallery roof.
     cyl(0,12.1,-2.4,4.1,4.1,3.55,'stone',hi?28:lo?12:18);
     for(let i=0;i<(lo?6:hi?12:8);i++){
@@ -502,9 +526,9 @@ export function createLandmarkModel(T,id,{detail='high'}={}) {
       const x=-7.2+i*14.4/(count-1);
       column(x,8.7,.56,8.56,.43);
     }
-    pediment(0,9.71,8.78,18.2,3.1,'ivory');
+    pediment(0,9.71,10.95,18.2,3.1,'ivory');
     // All openings lie against the actual 8.05 m front wall.
-    facadeArch(8.05,0,1.0,8.13,2.85,4.6,{entrance:true,frame:'stone'});
+    facadeArch(8.05,0,1.0,8.13,1.425,2.3,{entrance:true,frame:'stone'});
     for(const x of [-4.3,4.3])facadeArch(8.05,x,2.75,8.13,1.9,4.1,{glass:'glassLight',frame:'stone'});
     for(const sign of [-1,1])for(let i=0;i<(lo?2:4);i++)arch(sign*11.32,3.9,-6.8+i*3.6,1.18,2.85,{glass:'glassLight',side:sign});
     if(!lo){
@@ -520,36 +544,39 @@ export function createLandmarkModel(T,id,{detail='high'}={}) {
   const townhall=()=>{
     box(0,.28,-.6,19.6,.56,14.8,'stone');
     box(0,6.3,-1,18.4,11.8,13,'cream');
-    box(0,1.25,-1,18.9,2.15,13.4,'stone');
+    // Low plinth stops below the openings; the old 2.15 m band hid
+    // the lower portions of every ground-floor arch and the main door.
+    box(0,.51,-1,18.9,.88,13.4,'stone');
     wedge(0,12.15,-1,18.8,13.6,4.0,'slate');
-    chimney(-5.65,11.95,-4.2,4.05);
+    if(chimneys)chimney(-5.65,11.95,-4.2,4.05);
     // Public arcaded ground floor, dark inset archways.
     const count=lo?3:5;
     for(let i=0;i<count;i++){
       const x=-7.0+i*(14/(count-1));
-      arch(x,1.0,5.65,1.8,3.3,{glass:i===(count-1)/2?'wood':'shadow',frame:'ivory',entrance:i===(count-1)/2});
+      arch(x,1.1,5.65,1.8,3.3,{glass:i===(count-1)/2?'wood':'shadow',frame:'ivory',entrance:i===(count-1)/2});
       if(!lo)arch(x,7.0,5.69,1.35,2.3,{glass:'glassLight',frame:'ivory'});
     }
     for(const sign of [-1,1])for(let i=0;i<(lo?2:3);i++)arch(sign*9.26,6,-4.5+i*3.65,1.2,2.5,{glass:'glassLight',side:sign});
-    box(0,4.4,6.3,6.1,.32,2.1,'stone'); // balcony
+    box(0,4.67,6.3,6.1,.32,2.1,'stone'); // balcony
     if(!lo){
-      for(let i=0;i<9;i++)box(-2.6+i*.65,5.03,7.2,.13,1.05,.13,'iron');
-      box(0,5.55,7.2,6,.18,.2,'iron');
+      for(let i=0;i<9;i++)box(-2.6+i*.65,5.30,7.2,.13,1.05,.13,'iron');
+      box(0,5.82,7.2,6,.18,.2,'iron');
     }
     // Tall municipal tower, clock set into the front wall above the roofline.
-    box(0,16.1,-1.1,5.7,11.4,5.6,'ivory');
-    for(const y of [12.0,17.9,21.9])box(0,y,-1.1,6.05,.45,6.0,'stone');
-    clock(0,18.9,1.64,1.45);
-    arch(0,14.0,1.84,1.6,2.5,{glass:'shadow',frame:'stone'});
+    const towerLift=3.5;
+    box(0,16.1+towerLift,-1.1,5.7,11.4,5.6,'ivory');
+    for(const y of [12.0,17.9,21.9])box(0,y+towerLift,-1.1,6.05,.45,6.0,'stone');
+    clock(0,18.9+towerLift,1.64,1.45);
+    arch(0,14.0+towerLift,1.84,1.6,2.5,{glass:'shadow',frame:'stone'});
     if(!lo){
-      for(const sign of [-1,1])arch(sign*2.9,14,-1.15,1.12,2.7,{glass:'shadow',side:sign});
-      for(const x of [-2.7,2.7])cyl(x,22.7,1.2,.25,.25,1.2,'gold',8);
+      for(const sign of [-1,1])arch(sign*2.9,14+towerLift,-1.15,1.12,2.7,{glass:'shadow',side:sign});
+      for(const x of [-2.7,2.7])cyl(x,22.7+towerLift,1.2,.25,.25,1.2,'gold',8);
     }
-    box(0,22.43,-1.1,6.3,.65,6.2,'stone');
-    cone(0,25.85,-1.1,4.2,6.2,'copper',4);
-    cyl(0,29.3,-1.1,.12,.12,1.4,'gold',8);
-    ball(0,30.15,-1.1,.4,'gold',10);
-    stairs(6.8,8.6,4,.14);
+    box(0,22.43+towerLift,-1.1,6.3,.65,6.2,'stone');
+    cone(0,25.85+towerLift,-1.1,4.2,6.2,'copper',4);
+    cyl(0,29.3+towerLift,-1.1,.12,.12,1.4,'gold',8);
+    ball(0,30.15+towerLift,-1.1,.4,'gold',10);
+    stairs(6.8,8.6,4,.26);
   };
 
   const palace=()=>{
@@ -564,7 +591,7 @@ export function createLandmarkModel(T,id,{detail='high'}={}) {
       // Eaves should overlap the cornice rather than reveal sky between them.
       const roof=hipRoof(x,11.86,-2.1,w+.1,16.1,3.8,'slate');
       roof.userData.landmarkPalaceRoof=true;
-      chimney(x,12.8,-4.1,3.7);
+      if(chimneys)chimney(x,12.8,-4.1,3.7);
       const n=lo?3:hi?6:4;
       for(let i=0;i<n;i++){
         const xx=x+(i/(n-1)-.5)*(w-2.3);

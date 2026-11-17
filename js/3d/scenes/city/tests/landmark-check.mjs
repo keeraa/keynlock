@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFile,stat} from 'node:fs/promises';
 import * as T from '../vendor/three.js';
-import {createLandmarkModel,landmarkTriangleCount,LANDMARK_CATALOG} from '../js/landmarks/landmark-model.js';
+import {createLandmarkModel,landmarkTriangleCount,LANDMARK_CATALOG,LANDMARK_CHIMNEY_DEFAULTS} from '../js/landmarks/landmark-model.js';
 import {LANDMARK_TEXTURE_ASSETS,landmarkTextureCacheStats} from '../js/landmarks/landmark-textures.js';
 
 assert.equal(LANDMARK_CATALOG.length,6,'All six signature buildings must have a catalogue entry');
@@ -74,8 +74,8 @@ for(const item of LANDMARK_CATALOG){
       }
     }
     const chimneyCaps=meshes.filter(node=>node.userData.landmarkSmokeEmitter);
-    assert.equal(chimneyCaps.length,item.id==='tower'?0:item.id==='palace'?2:1,
-      `${item.id}/${detail} chimney emitter count must match its rooftop`);
+    assert.equal(chimneyCaps.length,LANDMARK_CHIMNEY_DEFAULTS[item.id]?(item.id==='palace'?2:1):0,
+      `${item.id}/${detail} should contain only requested chimneys`);
     const originalMap=facadeOpenings.flatMap(o=>o.children)
       .find(mesh=>mesh.userData.landmarkPaintedGlass)?.material.map;
     model.setWindowAppearance({gloss:100,reflection:100,night:true,glow:85});
@@ -110,6 +110,8 @@ for(const item of LANDMARK_CATALOG){
         'Theater portico foundation must span the entire building width');
       const gables=meshes.filter(node=>node.userData.landmarkRoofGable);
       assert.equal(gables.length,4,'Both theater roofs need front and rear sealed gables');
+      assert.equal(meshes.filter(node=>node.userData.landmarkRoofSoffit).length,2,
+        'Both theater roofs need solid eaves and an opaque underside');
       for(const cap of gables){
         assert.equal(cap.geometry.getAttribute('uv').count,6,'Gable painting needs real UV coordinates');
         const normals=cap.geometry.getAttribute('normal');
@@ -123,6 +125,39 @@ for(const item of LANDMARK_CATALOG){
         assert(Math.abs(b.min.y-1.24)<.01&&Math.abs(b.max.y-9.44)<.01,
           'Theater pilaster should touch the podium and upper entablature');
       }
+      const entries=facadeOpenings.filter(node=>node.userData.entrance);
+      assert.deepEqual(entries.map(node=>Math.round(node.position.x*100)/100),[-5.32,0,5.32],
+        'Theater doors must occupy clear bays between the six columns');
+      for(const entrance of entries){
+        assert.equal(entrance.userData.landmarkOpeningWidth,1.125);
+        assert.equal(entrance.userData.landmarkOpeningHeight,2.125);
+        assert(entrance.position.z<7,'Theater entrance must be recessed behind the colonnade');
+      }
+      const triangle=meshes.find(node=>node.userData.landmarkSolidPediment);
+      assert(triangle?.geometry.type==='ExtrudeGeometry',
+        'Theater pediment needs a closed triangular solid rather than a transparent face');
+      assert(new T.Box3().setFromObject(triangle).max.z>10.5,
+        'Theater pediment must reach the front of the cornice');
+    }
+    if(item.id==='museum'){
+      const door=entrances[0];
+      assert.equal(door.userData.landmarkOpeningWidth,1.425);
+      assert.equal(door.userData.landmarkOpeningHeight,2.3);
+      const triangle=meshes.find(node=>node.userData.landmarkSolidPediment);
+      assert(triangle?.geometry.type==='ExtrudeGeometry'&&new T.Box3().setFromObject(triangle).max.z>11,
+        'Museum pediment must be solid and seated at the front of the portico');
+    }
+    if(item.id==='townhall'){
+      const arches=model.group.children.filter(node=>Number.isFinite(node.userData.landmarkOpeningWidth)&&node.position.y<5&&node.position.z>5);
+      assert.equal(arches.length,detail==='low'?3:5);
+      assert(arches.every(node=>node.position.y>=1.1),
+        'Town hall ground floor openings must clear the stone base');
+      const dial=meshes.find(node=>node.userData.landmarkClockFace);
+      const bezel=meshes.find(node=>node.userData.landmarkClockBezel);
+      assert(dial.position.y>22&&bezel.position.y>22,
+        'The municipal tower and clock need to be raised');
+      assert(Math.abs(dial.position.y-bezel.position.y)<.1,
+        'The clock outline should be concentric with the dial');
     }
     if(item.id==='palace'){
       const foundation=meshes.find(node=>node.userData.landmarkPalaceFoundation);
@@ -146,12 +181,12 @@ for(const item of LANDMARK_CATALOG){
         return Math.abs(bottom-11.86)<.01||Math.abs(bottom-14.06)<.01;
       }), 'Palace roof eaves should meet their cornices');
       const pediment=meshes.find(node=>node.userData.landmarkPalacePediment);
-      assert(pediment&&pediment.position.z===0,
+      assert(pediment&&Math.abs(pediment.position.z-10.78)<.01,
         'Palace sun pediment must be part of the facade, not a floating group');
       const front=new T.Box3().setFromObject(pediment);
-      assert(front.max.z>=10.7&&front.max.z<=11.0,
+      assert(front.max.z>=10.7&&front.max.z<=11.14,
         'Palace pediment must stand near the front edge of the entablature');
-      assert.equal(pediment.geometry.getAttribute('uv')?.count,3,
+      assert(pediment.geometry.getAttribute('uv')?.count>=6,
         'Palace stone pediment must have gouache UVs');
     }
     const paintedWindows=meshes.filter(node=>node.userData.landmarkPaintedGlass);
@@ -223,6 +258,12 @@ for(const item of LANDMARK_CATALOG){
     assert.ok(Math.abs(bounds[0].z-bounds[n].z)<2.5,`${item.id} LOD depth must be stable`);
   }
   console.log(`${item.id}: ${counts.join(' / ')} triangles (High / Medium / Low)`);
+}
+for(const id of ['church','theater','museum','townhall','palace']){
+  const model=createLandmarkModel(T,id,{chimneys:true});
+  const emitters=[];model.group.traverse(node=>{if(node.userData.landmarkSmokeEmitter)emitters.push(node);});
+  assert.equal(emitters.length,id==='palace'?2:1,`${id} should permit adding and removing chimneys`);
+  model.dispose();
 }
 // Preview switching and city instances must share one lease bucket.
 const a=createLandmarkModel(T,'church'),b=createLandmarkModel(T,'theater');

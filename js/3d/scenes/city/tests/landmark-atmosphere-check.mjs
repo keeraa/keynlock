@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import * as T from '../vendor/three.js';
-import {createLandmarkModel,LANDMARK_CATALOG} from '../js/landmarks/landmark-model.js';
+import {createLandmarkModel,LANDMARK_CATALOG,LANDMARK_CHIMNEY_DEFAULTS} from '../js/landmarks/landmark-model.js';
 import {createLandmarkAtmosphere,LANDMARK_ATMOSPHERE_DEFAULTS} from '../js/landmarks/landmark-atmosphere.js';
 
 for(const {id} of LANDMARK_CATALOG)for(const detail of ['high','medium','low']){
@@ -17,9 +17,10 @@ for(const {id} of LANDMARK_CATALOG)for(const detail of ['high','medium','low']){
   }), 'Landmark moss decals must show the painted lichen rather than the transparent texture');
   assert(effects.decals.every(node=>node.userData.landmarkMossBase<1.1),
     'Moss may grow only from the first metre of masonry');
-  assert.equal(effects.particles.length,(id==='tower'?0:id==='palace'?2:1)*6,
+  const expectedChimneys=LANDMARK_CHIMNEY_DEFAULTS[id]?(id==='palace'?2:1):0;
+  assert.equal(effects.particles.length,expectedChimneys*6,
     `${id}/${detail} must emit smoke only from actual stone chimneys`);
-  assert.equal(effects.smokeGroup.children.length,id==='tower'?0:1,
+  assert.equal(effects.smokeGroup.children.length,expectedChimneys?1:0,
     'Landmark smoke must render as one point batch regardless of chimney count');
   if(effects.smokeBatch)assert(effects.smokeBatch.points.isPoints,
     'Landmark smoke should use a single draw rather than independent sprites');
@@ -28,7 +29,7 @@ for(const {id} of LANDMARK_CATALOG)for(const detail of ['high','medium','low']){
     smoke:true,smokeOutline:false,smokeDensity:70});
   assert.equal(effects.glowGroup.visible,true);
   assert.equal(effects.mossGroup.visible,true);
-  assert.equal(effects.smokeGroup.visible,id!=='tower');
+  assert.equal(effects.smokeGroup.visible,expectedChimneys>0);
   assert(effects.decals.every(node=>Math.abs(node.scale.y-1.3)<.001));
   effects.update(0);
   const cloud=effects.smokeBatch?.points.geometry;

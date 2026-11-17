@@ -33,6 +33,8 @@
 .effect-group summary span{flex:1}.effect-group summary i{font-style:normal;font-size:9px;color:#90a79e;letter-spacing:.07em}
 .effect-inline{padding:9px 2px;border:0;background:none;font-size:10px}
 .effect-inline input[type=checkbox]{transform:scale(.85);transform-origin:right center}
+.effect-inline input[type=checkbox]:disabled{opacity:.38;cursor:not-allowed}
+.chimney-note{margin:0 2px 8px;color:#90a79e;font-size:9px;line-height:1.45}
 .effect-range{display:block;padding:8px 3px 9px;color:#b8c5bb;font-size:10px}
 .effect-range>span{display:flex;align-items:center;justify-content:space-between;gap:6px}
 .effect-range output{color:#e5c992;font-size:10px;font-weight:700;font-variant-numeric:tabular-nums}

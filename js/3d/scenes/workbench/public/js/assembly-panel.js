@@ -21,7 +21,8 @@ export function partName(id,ratio='12:16'){
   return 'Деталь не выбрана';
 }
 
-export function createAssemblyPanel({state,scene,feedback,$,onChange=()=>{},onCutDesignKey=()=>{}}){
+export function createAssemblyPanel({state,scene,feedback,$,
+  query=selector=>document.querySelectorAll(selector),onChange=()=>{},onCutDesignKey=()=>{}}){
   const groups=[...ASSEMBLY_STEPS,...EXTENDED_STEPS];
   const partGroupButtons=groups.map((step,i)=>{
     const button=document.createElement('button');button.type='button';button.className='parts-filter-button';
@@ -63,7 +64,7 @@ export function createAssemblyPanel({state,scene,feedback,$,onChange=()=>{},onCu
   $('cutDesignKey').addEventListener('click',()=>{
     if(!state.testing)onCutDesignKey();
   });
-  document.querySelectorAll('[data-assembly-variant]').forEach(button=>{
+  query('[data-assembly-variant]').forEach(button=>{
     button.addEventListener('click',()=>{
       if(state.testing)return;
       state.assemblyVariant=button.dataset.assemblyVariant;
@@ -110,7 +111,7 @@ export function createAssemblyPanel({state,scene,feedback,$,onChange=()=>{},onCu
   function renderDesign(){
     const variant=state.assemblyVariant,design=state.freeDesign;
     $('freeDesignPanel').hidden=variant!=='free';
-    document.querySelectorAll('[data-assembly-variant]').forEach(button=>{
+    query('[data-assembly-variant]').forEach(button=>{
       const active=button.dataset.assemblyVariant===variant;
       button.classList.toggle('active',active);
       button.setAttribute('aria-pressed',String(active));

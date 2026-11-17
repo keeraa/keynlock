@@ -1,6 +1,6 @@
-import * as THREE from 'three';
-import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+import * as THREE from '../vendor/three.js';
+import {OrbitControls} from '../vendor/OrbitControls.js';
+import {RoundedBoxGeometry} from '../vendor/RoundedBoxGeometry.js';
 import {createGeometryPrimitives} from './primitives.js';
 import {createWorkshopMaterials,populateWorkshopRoom} from './workshop-room.js';
 import {disposeSceneResources} from './scene-disposal.js';

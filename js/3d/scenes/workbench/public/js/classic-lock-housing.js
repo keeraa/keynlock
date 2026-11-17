@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as THREE from '../vendor/three.js';
 
 // The KEYNLOCK pin laboratory's continuous rounded casting, adapted to the
 // larger mechanism sandbox. The side bores are real openings in the shell.

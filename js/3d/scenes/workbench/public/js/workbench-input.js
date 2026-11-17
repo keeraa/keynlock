@@ -2,7 +2,7 @@ import {applyFilingStroke,assistedFilingStroke,BREAK_CUT,cutTolerance} from './l
 
 export function installWorkbenchInput({canvas,state,scene,save,toast,measuredCuts,
   inspectCurrentKey,selectCut,renderCuts,renderSelection,removePart,placement,
-  testMechanism,releaseCapture,inspectKeyButton}){
+  testMechanism,releaseCapture,inspectKeyButton,isActive=()=>true}){
 const subscriptions=[];
 function listen(target,type,handler){
   target.addEventListener(type,handler);
@@ -152,6 +152,7 @@ listen(canvas,'pointercancel',event=>{
 });
 
 listen(window,'keydown',event=>{
+  if(!isActive())return;
   if(event.metaKey||event.ctrlKey||event.altKey||event.target?.closest?.('input,textarea,select'))return;
   if(state.mode==='key'){
     if(event.code==='Space'){
@@ -181,11 +182,13 @@ listen(window,'keydown',event=>{
 });
 
 listen(window,'keyup',event=>{
+  if(!isActive())return;
   if(event.code==='Space'&&state.spaceFiling){
     event.preventDefault();state.spaceFiling=false;scene.setFiling(state.filing);save();
   }
 });
 listen(window,'blur',()=>{
+  if(!isActive())return;
   state.spaceFiling=false;scene.setFiling(state.filing);
   if(!state.filing)scene.setFilePointerActive(false);
 });
@@ -197,6 +200,7 @@ const spaceTimer=setInterval(()=>{
   const now=performance.now();
   const elapsed=Math.min(.09,Math.max(0,(now-previousSpaceTick)/1000));
   previousSpaceTick=now;
+  if(!isActive())return;
   if(!state.spaceFiling||state.filing||state.mode!=='key'||state.testing)return;
   const index=scene.filingContact();
   if(index>=0)strokeAt(index,elapsed*120,Math.sin(now*.024)*.38);

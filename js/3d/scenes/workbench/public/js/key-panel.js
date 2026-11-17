@@ -1,6 +1,7 @@
 import {MAX_CUT,cutTolerance} from './logic.js';
 
-export function createKeyPanel({state,scene,inspectCurrentKey,measuredCuts,feedback,$}){
+export function createKeyPanel({state,scene,inspectCurrentKey,measuredCuts,feedback,$,
+  query=selector=>document.querySelectorAll(selector)}){
   let rows=[];
 function buildCutRows(){
   $('cutRows').replaceChildren();
@@ -14,7 +15,7 @@ function buildCutRows(){
     row.querySelector('.cut-track').style.setProperty('--target',`${target/MAX_CUT*100}%`);
     return row;
   });
-  document.querySelectorAll('[data-cuts]').forEach(button=>{
+  query('[data-cuts]').forEach(button=>{
     const active=Number(button.dataset.cuts)===state.difficulty;
     button.classList.toggle('active',active);
     button.setAttribute('aria-pressed',String(active));

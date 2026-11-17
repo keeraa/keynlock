@@ -31,7 +31,7 @@ test('a detached key fragment falls downward with teeth up or down',()=>{
 
 test('performance HUD shows rendered polygon count alongside FPS',()=>{
   const page=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
-  const app=readFileSync(new URL('../public/js/main.js',import.meta.url),'utf8');
+  const app=readFileSync(new URL('../public/js/workbench-app.js',import.meta.url),'utf8');
   const render=readFileSync(new URL('../public/js/scene.js',import.meta.url),'utf8');
   assert.match(page,/id="fps"/);
   assert.match(page,/id="polygons"/);

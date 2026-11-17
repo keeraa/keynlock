@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as THREE from '../vendor/three.js';
 import {PARTS,makePart} from './mechanism-engine.js';
 
 // Capture the installed 3D part geometry with the mechanism's existing WebGL

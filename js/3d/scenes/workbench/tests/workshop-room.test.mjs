@@ -11,9 +11,8 @@ test('key and lock share the same painted materials and texture sources',()=>{
   }
   const mat=createWorkshopMaterials({...THREE,TextureLoader:StubLoader});
   assert.deepEqual(loaded,[
-    './assets/painted-gear.webp','./assets/painted-pin.webp',
-    './assets/painted-brass.webp','./assets/painted-steel.webp'
-  ]);
+    'painted-gear','painted-pin','painted-brass','painted-steel'
+  ].map(name=>new URL(`../public/assets/${name}.webp`,import.meta.url).href));
   assert.equal(mat.brass.map,mat.steel.map);
   assert.equal(mat.key.map,mat.copper.map);
   assert.equal(mat.key.side,THREE.DoubleSide);

@@ -8,7 +8,6 @@ import {escapeMechanismHtml,mechanismInspectorMarkup} from './mechanism-inspecto
 
 const STORAGE_KEY='keynlock-mechanism-board-v1';
 const BACKUP_KEY='keynlock-mechanism-custom-backup-v1';
-const $=id=>document.getElementById(id);
 const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
 const icons={pinbank:'▥',gear:'⚙',lever:'⌁',pin:'↥',spring:'≈',ratchet:'◌',cam:'◉',latch:'⊐',
   splitter:'⑂',interlock:'⊗',shield:'▣'};
@@ -38,7 +37,8 @@ function initialParts(){
   return demoMechanism();
 }
 
-export function createMechanismUI(){
+export function createMechanismUI({mountRoot=document,isKeyboardActive=()=>true}={}){
+  const $=id=>mountRoot.getElementById?mountRoot.getElementById(id):mountRoot.querySelector(`#${id}`);
   const root=$('mechanismWorkspace'),canvas=$('mechBoard');
   const palette=$('mechPalette'),inspector=$('mechPartInspector');
   let parts=initialParts(),selected=null,mode='build',wrenchIndex=null,
@@ -414,14 +414,16 @@ export function createMechanismUI(){
     const type=event.dataTransfer.getData('text/plain');
     if(PALETTE.includes(type))addPart(type,coordinates(event));});
   listen(window,'keydown',event=>{
-    if(!active||mode!=='build'||['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName))return;
+    const focused=root.getRootNode?.()?.activeElement||document.activeElement;
+    if(!active||!isKeyboardActive()||mode!=='build'||
+      ['INPUT','TEXTAREA','SELECT'].includes(focused?.tagName))return;
     if(['KeyQ','KeyE','Delete','Backspace'].includes(event.code))event.preventDefault();
     if(event.code==='KeyE')rotateSelected(1);
     else if(event.code==='KeyQ')rotateSelected(-1);
     else if(event.code==='Delete'||event.code==='Backspace')removeSelected();
   });
 
-  document.querySelectorAll('[data-mech-mode]').forEach(button=>listen(button,'click',()=>setMechanismMode(button.dataset.mechMode)));
+  root.querySelectorAll('[data-mech-mode]').forEach(button=>listen(button,'click',()=>setMechanismMode(button.dataset.mechMode)));
   listen($('mechTension'),'click',()=>{
     if(wrenchIndex===null){notify('Сначала выберите форму натяжителя.','bad');return;}
     if(!tension){
@@ -509,7 +511,7 @@ export function createMechanismUI(){
       $('mechToggleCover').textContent='Закрыть крышку';
       $('mechToggleCover').setAttribute('aria-pressed','false');
     }
-    document.querySelectorAll('[data-mech-mode]').forEach(button=>{
+    root.querySelectorAll('[data-mech-mode]').forEach(button=>{
       const isCurrent=button.dataset.mechMode===mode;
       button.classList.toggle('active',isCurrent);button.setAttribute('aria-pressed',String(isCurrent));});
     $('mechBuildControls').hidden=mode!=='build';
@@ -594,7 +596,7 @@ export function createMechanismUI(){
     }
   }
   try{
-    model3d=createMechanism3D(canvas);
+    model3d=createMechanism3D(canvas,{statsElement:$('mech3dStats')});
     const refreshThumbnails=()=>{
       if(disposed)return;
       const thumbnails=model3d.captureThumbnails(PALETTE);

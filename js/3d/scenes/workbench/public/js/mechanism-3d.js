@@ -1,6 +1,6 @@
-import * as THREE from 'three';
-import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+import * as THREE from '../vendor/three.js';
+import {OrbitControls} from '../vendor/OrbitControls.js';
+import {RoundedBoxGeometry} from '../vendor/RoundedBoxGeometry.js';
 import {BOARD,PARTS,PIN_CODES,portsFor,canPick,makePart,keywayWrenchProfile} from './mechanism-engine.js';
 import {createClassicLockHousing} from './classic-lock-housing.js';
 import {createStandardPickingTools,STANDARD_TENSION_TOOLS,tensionProfileHeight,
@@ -16,7 +16,6 @@ const toWorld=(x,y,z=0)=>new THREE.Vector3((x-BOARD.width/2)*SCALE,
   (BOARD.height/2-y)*SCALE,z);
 const fromWorld=point=>({x:Math.round(point.x/SCALE+BOARD.width/2),
   y:Math.round(BOARD.height/2-point.y/SCALE)});
-const segmentCache=new Map();
 
 function material(color,metalness=.65,roughness=.48,other={}){
   return new THREE.MeshStandardMaterial({color,metalness,roughness,...other});
@@ -44,7 +43,7 @@ function rod(root,a,b,r,finish){
   mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),direction.normalize());
   return mesh;
 }
-function gearGeometry(teeth=14,radius=.3){
+function gearGeometry(segmentCache,teeth=14,radius=.3){
   const name=`${teeth}:${radius}`;
   if(segmentCache.has(name))return segmentCache.get(name);
   const shape=new THREE.Shape();
@@ -114,6 +113,9 @@ function label(root,words,x,y,z,width,ink){
 }
 
 export function createMechanism3D(canvas,options={}){
+  // Geometry belongs to one mounted sandbox; disposing another mount must not
+  // invalidate any meshes that remain on screen.
+  const segmentCache=new Map();
   const renderer=options.rendererFactory?.(canvas)||new THREE.WebGLRenderer({
     canvas,antialias:true,alpha:false,powerPreference:'high-performance'});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.8));
@@ -161,7 +163,7 @@ export function createMechanism3D(canvas,options={}){
       if(!cachedMaps.has(name)){
         let ready;
         paintedLoads.push(new Promise(resolve=>{ready=resolve;}));
-        const map=loader.load(`./assets/${name}.webp`,ready,undefined,ready);
+        const map=loader.load(new URL(`../assets/${name}.webp`,import.meta.url).href,ready,undefined,ready);
         map.colorSpace=THREE.SRGBColorSpace;
         map.wrapS=map.wrapT=THREE.RepeatWrapping;map.repeat.set(2,2);map.anisotropy=4;
         cachedMaps.set(name,map);
@@ -238,7 +240,8 @@ export function createMechanism3D(canvas,options={}){
     let ready;
     paintedLoads.push(new Promise(resolve=>{ready=resolve;}));
     const painting=new THREE.TextureLoader().load(
-      './assets/handles/japanese/geisha-red-fan.webp',ready,undefined,ready);
+      new URL('../assets/handles/japanese/geisha-red-fan.webp',import.meta.url).href,
+      ready,undefined,ready);
     painting.colorSpace=THREE.SRGBColorSpace;
     painting.wrapS=THREE.RepeatWrapping;
     painting.anisotropy=8;
@@ -361,7 +364,7 @@ export function createMechanism3D(canvas,options={}){
         break;
       }
       case 'gear':{
-        put(dynamic,gearGeometry(Math.round(12+part.setting*3),
+        put(dynamic,gearGeometry(segmentCache,Math.round(12+part.setting*3),
           .295+(part.setting-1)*.038),m.brass,0,0,.30);
         ring(dynamic,.20,.024,m.dark,0,0,.40);
         addPivot(dynamic,0,0,.33);break;
@@ -383,7 +386,7 @@ export function createMechanism3D(canvas,options={}){
         break;
       }
       case 'ratchet':{
-        put(dynamic,gearGeometry(10,.30),m.bronze,0,0,.30);
+        put(dynamic,gearGeometry(segmentCache,10,.30),m.bronze,0,0,.30);
         addPivot(dynamic,0,0,.34);
         rod(mount,new THREE.Vector3(.34,.32,.41),new THREE.Vector3(.16,.18,.41),.055,m.pale);
         disc(mount,.065,.09,m.dark,.35,.32,.44,14);break;
@@ -602,7 +605,7 @@ export function createMechanism3D(canvas,options={}){
     frames++;
     if(now-lastFps>650){
       const fps=lastFps?Math.round(frames*1000/(now-lastFps)):0;
-      const stats=document.getElementById('mech3dStats');
+      const stats=options.statsElement||document.getElementById('mech3dStats');
       if(stats)stats.textContent=`${fps} FPS  ·  ${renderer.info.render.triangles.toLocaleString('ru-RU')} треугольников`;
       frames=0;lastFps=now;
     }

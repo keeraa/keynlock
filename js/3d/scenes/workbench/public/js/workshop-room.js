@@ -5,7 +5,7 @@ export const WORKBENCH_TOP_Y=-1.82+.34/2;
 export function createWorkshopMaterials(THREE){
   const loader=new THREE.TextureLoader();
   const texture=(name,repeat=1)=>{
-    const map=loader.load(`./assets/${name}.webp`);
+    const map=loader.load(new URL(`../assets/${name}.webp`,import.meta.url).href);
     map.colorSpace=THREE.SRGBColorSpace;
     map.wrapS=THREE.RepeatWrapping;map.wrapT=THREE.RepeatWrapping;
     map.repeat.set(repeat,repeat);map.anisotropy=4;return map;

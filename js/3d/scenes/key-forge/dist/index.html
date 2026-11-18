@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#182326" />
+  <meta name="description" content="Кийенлок — 3D-конструктор десяти видов ключей с редактируемой геометрией и гуашевыми материалами." />
+  <title>Кийенлок — Мастерская ключей</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-seal" aria-hidden="true"><span>K</span><i></i></div>
+        <div><div class="brand-name">КИЙЕНЛОК</div><div class="brand-sub">МАСТЕРСКАЯ КЛЮЧЕЙ</div></div>
+      </div>
+      <div class="header-center"><span class="header-rule"></span> РЕДАКТОР ФОРМЫ <span class="header-rule"></span></div>
+      <div class="header-actions">
+        <button class="button button-ghost" id="resetButton" type="button" title="Вернуть стандартную заготовку">↺ <span>Сбросить</span></button>
+        <button class="button button-ghost" id="pngButton" type="button" title="Сохранить вид ключа как PNG">↓ <span>PNG</span></button>
+        <button class="button button-outline" id="stlButton" type="button" title="Экспортировать модель в STL">↓ <span>3D / STL</span></button>
+      </div>
+    </header>
+
+    <main class="work-area">
+      <aside class="editor-panel" aria-label="Параметры ключа">
+        <div class="panel-intro">
+          <div class="eyebrow"><span class="tiny-diamond">◆</span> ЛИТЕЙНАЯ ФОРМА <span class="tiny-diamond">◆</span></div>
+          <h1>Создай свой ключ<span class="headline-dot">.</span></h1>
+          <p>Выбери силуэт, настрой бородку и состарь закреплённый за ключом металл.</p>
+        </div>
+
+        <section class="editor-section template-section" aria-labelledby="templatesTitle">
+          <div class="section-heading"><span class="section-index">01</span><h2 id="templatesTitle">Вид заготовки</h2><span class="section-suffix">10 ФОРМ</span></div>
+          <div class="template-grid" id="templateGrid" role="group" aria-label="Десять форм ключей"></div>
+          <div class="brotherhood-binding" id="brotherhoodBinding" aria-live="polite"></div>
+        </section>
+
+        <section class="editor-section material-section" aria-labelledby="materialsTitle">
+          <div class="section-heading"><span class="section-index">02</span><h2 id="materialsTitle">Гуашевый металл</h2></div>
+          <div class="fixed-metal" id="materials" role="note" aria-label="Закреплённый металл ключа"></div>
+          <div class="material-description" id="materialDescription">Тёплая состаренная латунь · сухая кисть</div>
+        </section>
+
+        <section class="editor-section parameters-section" aria-labelledby="parametersTitle">
+          <div class="section-heading"><span class="section-index">03</span><h2 id="parametersTitle">Обработка формы</h2></div>
+          <div class="sliders">
+            <label class="slider-row" for="shaftLength"><span>Длина стержня</span><output id="shaftLengthValue"></output><input id="shaftLength" type="range" min="1.65" max="3.05" value="2.2" step="0.05" /></label>
+            <label class="slider-row" for="headSize"><span>Размер головки</span><output id="headSizeValue"></output><input id="headSize" type="range" min="75" max="135" value="100" step="5" /></label>
+            <label class="slider-row" for="teeth"><span>Количество зубцов</span><output id="teethValue"></output><input id="teeth" type="range" min="2" max="7" value="4" step="1" /></label>
+            <label class="slider-row" for="cutDepth"><span>Глубина бородки</span><output id="cutDepthValue"></output><input id="cutDepth" type="range" min="10" max="45" value="27" step="1" /></label>
+            <label class="slider-row" for="thickness"><span>Толщина металла</span><output id="thicknessValue"></output><input id="thickness" type="range" min="6" max="22" value="12" step="1" /></label>
+            <label class="slider-row" for="rustAmount"><span>Гуашевая ржавчина</span><output id="rustAmountValue"></output><input id="rustAmount" type="range" min="0" max="200" value="0" step="5" title="100% — обычная, 200% — выраженная ржавчина" /></label>
+          </div>
+          <div class="toggle-row"><label for="broken"><span>Сломанный ключ</span><small>Надломить стержень вниз</small></label><input id="broken" type="checkbox" /></div>
+          <label class="slider-row conditional-angle" id="breakAngleRow" for="breakAngle" hidden><span>Угол надлома</span><output id="breakAngleValue"></output><input id="breakAngle" type="range" min="60" max="80" value="70" step="5" /></label>
+          <div class="toggle-row"><label for="dirtEnabled"><span>Грязевой налёт</span><small>Выкл. / полностью покрыть ключ</small></label><input id="dirtEnabled" type="checkbox" /></div>
+          <div class="toggle-row"><label for="doubleSided"><span>Двусторонняя бородка</span><small>Зубцы по обеим сторонам</small></label><input id="doubleSided" type="checkbox" /></div>
+          <div class="toggle-row"><label for="engraving"><span>Гуашевые овалы</span><small>Вписаны в металл, без накладной текстуры</small></label><input id="engraving" type="checkbox" checked /></div>
+        </section>
+        <div class="editor-footnote">Каждая из 10 заготовок сохраняется отдельно в твоей коллекции.</div>
+      </aside>
+
+      <section class="viewer-panel" aria-label="Трёхмерный предпросмотр ключа">
+        <div class="viewer-grain" aria-hidden="true"></div>
+        <div class="viewer-topline"><div class="viewer-left"><div class="viewer-id"><span class="mini-label">ЧЕРТЁЖ /</span><span id="viewerNumber">01</span><span class="viewer-slash">—</span><span id="viewerName">Подвальный</span></div><div class="viewer-story" id="viewerStory"></div></div><div class="viewer-right"><div class="preview-mode"><span class="pulse-dot"></span> ЖИВОЙ 3D-ПРОСМОТР</div><div class="performance-stats" aria-label="Производительность и геометрия"><span>FPS <strong id="fpsValue">—</strong></span><span class="stats-separator"></span><span>ПОЛИГОНОВ <strong id="polygonValue">—</strong></span></div></div></div>
+        <div id="sceneContainer" class="scene-container"><canvas id="threeCanvas" aria-label="3D ключ, вращайте мышью"></canvas></div>
+        <div class="drafting-circle drafting-circle-one" aria-hidden="true"></div>
+        <div class="drafting-circle drafting-circle-two" aria-hidden="true"></div>
+        <div class="stage-scale stage-scale-left" aria-hidden="true"></div>
+        <div class="stage-scale stage-scale-right" aria-hidden="true"></div>
+        <div class="viewer-note" aria-hidden="true">КОНСТРУКЦИЯ № <span id="blueprintId">01</span><br/>ГРАВИРОВКА И ЛИТЬЁ</div>
+        <div class="stage-tools" role="group" aria-label="Управление предпросмотром">
+          <button id="zoomInButton" type="button" title="Приблизить" aria-label="Приблизить">+</button>
+          <button id="zoomOutButton" type="button" title="Отдалить" aria-label="Отдалить">−</button>
+          <span class="tools-divider"></span>
+          <button id="frontButton" type="button" title="Вид спереди" aria-label="Вернуть вид спереди">⤾</button>
+        </div>
+        <div class="viewer-bottom">
+          <div class="drag-hint"><span class="mouse-symbol" aria-hidden="true"></span><span>ТЯНИ — ВРАЩАТЬ <b>·</b> КОЛЕСО — МАСШТАБ</span></div>
+          <button id="saveButton" class="button button-save" type="button"><span class="save-symbol">✥</span><span id="saveButtonText">Добавить в коллекцию</span><span class="save-arrow">↗</span></button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="collection-panel" aria-label="Коллекция ключей">
+      <div class="collection-title"><span class="eyebrow">АРХИВ МАСТЕРА</span><div class="collection-row"><strong>Коллекция ключей</strong><span id="collectionCount">00 / 10</span></div><div class="collection-small">Нажми на ячейку, чтобы открыть чертёж</div></div>
+      <div class="collection-track" id="collectionTrack"></div>
+    </footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

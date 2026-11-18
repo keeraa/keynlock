@@ -19,10 +19,10 @@ export function createToonShader() {
     uniform float uSteps;
     uniform float uMaterial;
     varying vec2 vUv;
-    float luminance(vec3 c) { return dot(c, vec3(.2126,.7152,.0722)); }
+    float archiveLuma(vec3 c) { return dot(c, vec3(.2126,.7152,.0722)); }
     void main() {
       vec3 color = texture2D(tScene, vUv).rgb;
-      float light = luminance(color);
+      float light = archiveLuma(color);
       float bands = max(2.0, uSteps);
       float position = clamp(light, 0.0, 1.0) * bands;
       float bandCenter = (floor(position) + .5) / bands;

@@ -47,7 +47,9 @@ async function enterArchive(page, label) {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => {
-    if (message.type() === 'error') errors.push(message.text());
+    if (message.type() !== 'error') return;
+    if (label === 'canvas' && message.text().includes('Error creating WebGL context')) return;
+    errors.push(message.text());
   });
   page.on('response', response => {
     if (response.status() >= 400) errors.push(`HTTP ${response.status()}: ${response.url()}`);

@@ -12,6 +12,8 @@ test('toon controls operate through one GPU stage without changing scene materia
     assert.match(renderer, /stages\.toon\.uniforms\.uSteps\.value = next\.toonSteps/);
     assert.match(renderer, /stages\.toon\.uniforms\.uToonLight\.value/);
     assert.match(shader.fragmentShader, /float bandCenter/);
+    assert.match(shader.fragmentShader, /float archiveLuma\(vec3 c\)/);
+    assert.doesNotMatch(shader.fragmentShader, /float luminance\(/, 'Three.js already defines luminance in shader chunks');
     assert.match(shader.fragmentShader, /clamp\(bandCenter - light, -\.075, \.075\)/);
     assert.equal(uniforms.uSteps.value, 4);
   } finally {

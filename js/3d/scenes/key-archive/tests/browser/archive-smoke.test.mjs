@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { createInitialState, STORAGE_KEY } from '../../dist/js/rules.js';
 
-const directory = fileURLToPath(new URL('../../dist/', import.meta.url));
+const directory = resolve(fileURLToPath(new URL('../../dist/', import.meta.url)));
 const screenshots = fileURLToPath(new URL('../../test-results/', import.meta.url));
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',
   '.webp': 'image/webp', '.png': 'image/png', '.json': 'application/json' };
@@ -31,6 +31,8 @@ before(async () => {
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   baseUrl = `http://127.0.0.1:${server.address().port}/`;
+  const response = await fetch(baseUrl);
+  assert.equal(response.status, 200, 'Archive test server must serve index.html');
   await mkdir(screenshots, { recursive: true });
   browser = await chromium.launch({ headless: true,
     args: ['--enable-webgl', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });

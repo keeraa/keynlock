@@ -1,8 +1,9 @@
 import * as THREE from '../vendor/three.js';
 import { KEY_TEMPLATES, fixedMetal } from './key-data.js';
-import { createBowShape, pathFromPoints, bladeSections, BROKEN_TIP_Z_OFFSET } from './key-shapes.js';
+import { createBowShape, pathFromPoints, bladeSections } from './key-shapes.js';
 import { getMetalMaterial } from './key-materials.js';
 import { crustWidth, dirtTriangles, getDirtMaterial } from './key-dirt.js';
+import { getKeyAnchors } from './key-placement.js';
 
 function extrude(shape,depth) {
   // Flat caps and one side wall per edge retain the silhouette and STL volume.
@@ -134,15 +135,16 @@ export function createKeyModel(design,{materialCache=null}={}) {
   // The blade sits slightly inside the thicker bow on both faces. Their front
   // caps cannot be coplanar, and there are no overlapping collar/end-cap boxes.
   const bladeDepth=Math.max(.02,depth-.008);
-  for(const [part,points] of bladeSections(template,design).entries())
+  for(const points of bladeSections(template,design))
     addMesh(group,extrude(pathFromPoints(points),bladeDepth),metal,
-      [0,0,(depth-bladeDepth)/2+(part?BROKEN_TIP_Z_OFFSET:0)]);
+      [0,0,(depth-bladeDepth)/2]);
   if(crustWidth(design)>0) {
     const dirt=addMesh(group,dirtTriangles(template,design),getDirtMaterial(),[0,0,0],false);
     dirt.userData.outlineable=true;
   }
   mergeKeyMeshes(group);
   group.userData.template=template.id;
+  group.userData.anchors=getKeyAnchors(design);
   group.userData.materialCache=cache;
   group.userData.ownsMaterialCache=!materialCache;
   return group;

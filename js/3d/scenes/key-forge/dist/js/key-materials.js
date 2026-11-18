@@ -4,19 +4,34 @@ import { MAX_KEY_MARKS, markPigment, keyMarkings } from './key-markings.js';
 import { KEY_ART } from './key-art.js';
 
 const textureCache=new Map();
+const texturePromises=new Map();
 export const matCache=new Map();
 const loader=new THREE.TextureLoader();
 
 function loadPaintedTexture(file) {
   if(typeof document==='undefined') return null;
   if(textureCache.has(file)) return textureCache.get(file);
-  const texture=loader.load(keyAssetUrl(file));
+  let resolveReady,rejectReady;
+  const ready=new Promise((resolve,reject)=>{resolveReady=resolve;rejectReady=reject;});
+  const texture=loader.load(keyAssetUrl(file),()=>resolveReady(texture),undefined,rejectReady);
   texture.colorSpace=THREE.SRGBColorSpace;
   texture.wrapS=texture.wrapT=file===RUST_TEXTURE?THREE.RepeatWrapping:THREE.MirroredRepeatWrapping;
   texture.repeat.set(file===RUST_TEXTURE?1:.72,file===RUST_TEXTURE?1:.72);
   texture.anisotropy=4;
   textureCache.set(file,texture);
+  texturePromises.set(file,ready);
   return texture;
+}
+
+// The archive awaits this once before placing hundreds of keys. Lazy editor
+// loads and explicit preloads share the same GPU textures and in-flight jobs.
+export function preloadKeyTextures() {
+  if(typeof document==='undefined')return Promise.resolve([]);
+  const files=[...new Set([...METALS.map(m=>m.file),RUST_TEXTURE])];
+  return Promise.all(files.map(file=>{
+    loadPaintedTexture(file);
+    return texturePromises.get(file);
+  }));
 }
 
 function rustPlacement(templateIndex) {
@@ -81,11 +96,23 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
       shader.uniforms.uMarkTint=markTintUniform;
       shader.uniforms.uMarkDepth=markDepthUniform;
       shader.vertexShader=shader.vertexShader
-        .replace('#include <common>','#include <common>\nvarying vec3 vKeySurface;')
-        .replace('#include <begin_vertex>','#include <begin_vertex>\nvKeySurface = position;');
+        .replace('#include <common>',`#include <common>
+          varying vec3 vKeySurface;
+          varying vec3 vInstanceKeyPaint;
+          #ifdef USE_INSTANCING
+          attribute vec3 instanceKeyPaint;
+          #endif`)
+        .replace('#include <begin_vertex>',`#include <begin_vertex>
+          vKeySurface = position;
+          #ifdef USE_INSTANCING
+          vInstanceKeyPaint = instanceKeyPaint;
+          #else
+          vInstanceKeyPaint = vec3(-1.0);
+          #endif`);
       shader.fragmentShader=shader.fragmentShader
         .replace('#include <common>',`#include <common>
           varying vec3 vKeySurface;
+          varying vec3 vInstanceKeyPaint;
           uniform float uDirtAmount;
           uniform float uDirtSeed;
           uniform float uMarkCount;
@@ -104,17 +131,22 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
           '#include <map_pars_fragment>\nuniform sampler2D uPaintedRust;\nuniform float uRustAmount;\nuniform vec2 uRustShift;\nuniform float uRustAngle;')
         .replace('#include <map_fragment>',
           `#include <map_fragment>
-          float rustC = cos(uRustAngle), rustS = sin(uRustAngle);
-          vec2 rustUv = mat2(rustC, rustS, -rustS, rustC) * (vMapUv * vec2(1.13, 1.29)) + uRustShift;
+          float keyRust = vInstanceKeyPaint.x < 0.0 ? uRustAmount : vInstanceKeyPaint.x;
+          float keyDirt = vInstanceKeyPaint.y < 0.0 ? uDirtAmount : vInstanceKeyPaint.y;
+          float keySeed = max(0.0,vInstanceKeyPaint.z);
+          float rustAngle = uRustAngle + keySeed*.127;
+          float rustC = cos(rustAngle), rustS = sin(rustAngle);
+          vec2 rustUv = mat2(rustC, rustS, -rustS, rustC) * (vMapUv * vec2(1.13, 1.29))
+            + uRustShift + vec2(keySeed*.031,keySeed*.071);
           vec4 rustPigment = texture2D(uPaintedRust, rustUv);
-          float rustCoverage = clamp(rustPigment.a * uRustAmount * 1.12, 0.0, 1.0);
-          float rustDeepen = clamp(uRustAmount - 1.0, 0.0, 1.0);
+          float rustCoverage = clamp(rustPigment.a * keyRust * 1.12, 0.0, 1.0);
+          float rustDeepen = clamp(keyRust - 1.0, 0.0, 1.0);
           vec3 rustColor = mix(rustPigment.rgb, vec3(0.14, 0.055, 0.021), rustDeepen * 0.68);
           diffuseColor.rgb = mix(diffuseColor.rgb, rustColor, rustCoverage);
           // Filled gouache ovals are pigments IN the metal's BRDF. They use
           // the exact same lights, cast no floating planes and cost 0 polygons.
           float markCoverage=0.0;
-          if(uMarkCount > 0.5 && uDirtAmount < .995 &&
+          if(uMarkCount > 0.5 && keyDirt < .995 &&
              abs(vKeySurface.x+1.21)<.82 && abs(vKeySurface.y)<.87 &&
              (abs(vKeySurface.z) < .002 || abs(vKeySurface.z-uMarkDepth) < .002)) {
             float brush=(dirtNoise(vKeySurface.xy*71.3+vec2(5.9,2.2))-.5)*.14;
@@ -128,12 +160,12 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
           }
           diffuseColor.rgb=mix(diffuseColor.rgb,uMarkTint,markCoverage*.96);
           float dirtCoverage = 0.0;
-          if(uDirtAmount > 0.001) {
-            vec2 grainUv=vKeySurface.xy+vec2(uDirtSeed,uDirtSeed*.371);
+          if(keyDirt > 0.001) {
+            vec2 grainUv=vKeySurface.xy+vec2(uDirtSeed+keySeed,uDirtSeed*.371+keySeed*.13);
             float broad=dirtNoise(grainUv*3.7);
             float speckles=dirtNoise(grainUv*18.9+vec2(2.1,7.6));
             float variation=broad*.74+speckles*.26;
-            float threshold=mix(.94,-.16,clamp(uDirtAmount,0.0,1.0));
+            float threshold=mix(.94,-.16,clamp(keyDirt,0.0,1.0));
             dirtCoverage=smoothstep(threshold-.085,threshold+.085,variation);
             vec3 mud=mix(vec3(.15,.091,.049),vec3(.35,.257,.15),.28+speckles*.69);
             diffuseColor.rgb=mix(diffuseColor.rgb,mud,dirtCoverage);
@@ -143,7 +175,7 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
         .replace('#include <metalnessmap_fragment>',
           '#include <metalnessmap_fragment>\nmetalnessFactor = mix(metalnessFactor, .08, markCoverage);\nmetalnessFactor *= (1.0 - 0.98 * dirtCoverage);');
     };
-    material.customProgramCacheKey=()=> 'keynlock-gouache-stamps-rust-grime-v4';
+    material.customProgramCacheKey=()=> 'keynlock-gouache-stamps-rust-grime-instancing-v5';
   }
   cache.set(id,material);return material;
 }

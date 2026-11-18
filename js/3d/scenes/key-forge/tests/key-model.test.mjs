@@ -252,8 +252,8 @@ test('пакеты ключей одного металла сохраняют �
   const first=hall.children.find(mesh=>mesh.userData.templateId==='archive'&&mesh.userData.exportable);
   const second=hall.children.find(mesh=>mesh.userData.templateId==='alchemy'&&mesh.userData.exportable);
   assert.notEqual(first.material,second.material);
-  assert.equal(first.material.userData.dirtUniform.value,.75);
-  assert.equal(second.material.userData.dirtUniform.value,.1);
+  assert.equal(first.material.userData.dirtUniform.value,1);
+  assert.equal(second.material.userData.dirtUniform.value,1);
   assert.notEqual(first.material.userData.dirtSeedUniform.value,second.material.userData.dirtSeedUniform.value);
   // Rust uniforms only exist after TextureLoader is available in a browser.
   if(first.material.userData.rustUniform) {
@@ -335,9 +335,9 @@ test('все 10 ключей сгибаются вниз на 60–80° в гл�
       const design={...defaultDesign(i),broken:true,breakAngle:angle};
       const pieces=bladeSections(template,design);
       assert.equal(keyBreakAngle(design),angle);
-      assert.equal(pieces.length,2);
+      assert.equal(pieces.length,1,'надлом должен оставаться одним замкнутым телом');
       assert.ok(pieces.every(part=>part.length>=4&&part.every(p=>p.every(Number.isFinite))));
-      assert.ok(pieces[0].every(p=>p[0]<=keyBreakX(template,design)+1e-6));
+      assert.ok(pieces[0].some(p=>p[0]>keyBreakX(template,design)));
       const bounds=keyBounds(template,design);
       assert.ok(bounds.minY<-.85,`${template.id}: надлом не уходит вниз`);
       assert.match(keyPreviewSvg(design),/<svg/);
@@ -347,6 +347,30 @@ test('все 10 ключей сгибаются вниз на 60–80° в гл�
       assert.ok(model.children.length<=2);
       disposeKeyModel(model);
     }
+  }
+});
+
+test('контуры надлома не пересекают сами себя и не создают двойной торец',()=>{
+  const cross=(a,b,c)=> (b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
+  for(let i=0;i<KEY_TEMPLATES.length;i++)for(const angle of [60,70,80]) {
+    const design={...defaultDesign(i),broken:true,breakAngle:angle};
+    const polygon=bladeSections(KEY_TEMPLATES[i],design)[0];
+    for(let a=0;a<polygon.length;a++) {
+      const b=(a+1)%polygon.length;
+      for(let c=a+2;c<polygon.length;c++) {
+        const d=(c+1)%polygon.length;
+        if(a===d)continue; // adjacent edges share a legitimate vertex
+        const ab1=cross(polygon[a],polygon[b],polygon[c]);
+        const ab2=cross(polygon[a],polygon[b],polygon[d]);
+        const cd1=cross(polygon[c],polygon[d],polygon[a]);
+        const cd2=cross(polygon[c],polygon[d],polygon[b]);
+        assert.ok(!(ab1*ab2< -1e-10&&cd1*cd2< -1e-10),
+          `${KEY_TEMPLATES[i].id}: самопересечение при ${angle}°`);
+      }
+    }
+    const metal=createKeyModel(design).children.find(mesh=>mesh.userData.exportable);
+    assert.ok(metal.geometry.getAttribute('position').array.every(Number.isFinite));
+    metal.geometry.dispose();
   }
 });
 

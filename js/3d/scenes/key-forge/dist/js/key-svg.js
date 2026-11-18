@@ -1,5 +1,5 @@
 import { KEY_TEMPLATES, METALS, defaultDesign, RUST_TEXTURE, keyAssetUrl, fixedMetal } from './key-data.js';
-import { bowPoints, holesFor, bladeSections, keyBreakX, keyBreakAngle,
+import { bowPoints, holesFor, bladeSections,
   keyBounds, shaftStartX, shaftHalfHeight } from './key-shapes.js';
 import { keyMarkings, markPigment } from './key-markings.js';
 import { dirtPaint, stableNoise, crustWidth, dirtSections, dirtSegments } from './key-dirt.js';
@@ -8,28 +8,7 @@ function svgPath(points) {
   return `M ${points.map(([x,y])=>`${x.toFixed(3)} ${(-y).toFixed(3)}`).join(' L ')} Z`;
 }
 
-// Do not outline both end caps at the fracture: two dark rectangles there look
-// like overlapping parts. Only the visible outer edges receive ink.
-function svgBladeOutline(template,design,sections) {
-  if(!design.broken)return svgPath(sections[0]);
-  const hinge=keyBreakX(template,design),angle=-keyBreakAngle(design)*Math.PI/180;
-  const paths=[];
-  for(const [part,points] of sections.entries()) {
-    const originalX=point=>part===0?point[0]:
-      hinge+Math.cos(angle)*(point[0]-hinge)+Math.sin(angle)*point[1];
-    let path='',penUp=true;
-    for(let i=0;i<points.length;i++) {
-      const a=points[i],b=points[(i+1)%points.length];
-      const seam=Math.abs(originalX(a)-hinge)<.0001&&Math.abs(originalX(b)-hinge)<.0001;
-      if(seam){penUp=true;continue;}
-      if(penUp)path+=`M ${a[0].toFixed(3)} ${(-a[1]).toFixed(3)} `;
-      path+=`L ${b[0].toFixed(3)} ${(-b[1]).toFixed(3)} `;
-      penUp=false;
-    }
-    paths.push(path);
-  }
-  return paths.join(' ');
-}
+function svgBladeOutline(template,design,sections) { return svgPath(sections[0]); }
 
 function svgDirtCrust(template,design) {
   const width=crustWidth(design);

@@ -140,10 +140,8 @@ export function bladeProfile(template, design, sampleCount=210) {
   return [...simplifyPolyline(top),...simplifyPolyline(bottom).reverse()];
 }
 
-// A visibly snapped key has two independently closed metal pieces. The tip
-// folds down in the plane of the key; a tiny Z step hides coplanar overlap at
-// the torn joint. The cut stays in the plain shaft, before the first teeth.
-export const BROKEN_TIP_Z_OFFSET=.014;
+// A broken/bent key is a single solid outline. A mitered corner connects the
+// two parts without intersecting caps, exposed seam walls or a Z offset.
 
 export function keyBreakAngle(design) {
   return design.broken?Math.max(60,Math.min(80,Number(design.breakAngle)||70)):0;
@@ -154,33 +152,32 @@ export function keyBreakX(template,design) {
   return shaftStartX(template,design)+design.shaftLength*straightEnd*.70;
 }
 
-function clipAtX(polygon,edgeX,keepLeft) {
-  const kept=[];
-  for(let i=0;i<polygon.length;i++) {
-    const a=polygon[i],b=polygon[(i+1)%polygon.length];
-    const insideA=keepLeft?a[0]<=edgeX:a[0]>=edgeX;
-    const insideB=keepLeft?b[0]<=edgeX:b[0]>=edgeX;
-    if(insideA!==insideB) {
-      const ratio=(edgeX-a[0])/(b[0]-a[0]);
-      kept.push([edgeX,a[1]+(b[1]-a[1])*ratio]);
-    }
-    if(insideB)kept.push([...b]);
-  }
-  return kept.filter((p,i)=>i===0||Math.hypot(p[0]-kept[i-1][0],p[1]-kept[i-1][1])>1e-7);
-}
-
 export function bladeSections(template,design,sampleCount=210) {
   const full=bladeProfile(template,design,sampleCount);
   if(!design.broken)return [full];
   const hinge=keyBreakX(template,design);
   const angle=-keyBreakAngle(design)*Math.PI/180;
   const cos=Math.cos(angle),sin=Math.sin(angle);
-  const left=clipAtX(full,hinge,true);
-  const tip=clipAtX(full,hinge,false).map(([x,y])=>{
+  const half=shaftHalfHeight(template);
+  const join=half*Math.tan(-angle/2);
+  const rightmost=Math.max(...full.map(p=>p[0]));
+  const split=full.findIndex(p=>p[0]===rightmost);
+  const top=full.slice(0,split+1),bottom=full.slice(split+1).reverse();
+  const turn=([x,y])=>{
     const dx=x-hinge;
     return [hinge+dx*cos-y*sin,dx*sin+y*cos];
-  });
-  return [left,tip];
+  };
+  const epsilon=1e-7;
+  const outline=[
+    ...top.filter(p=>p[0]<hinge-epsilon),
+    [hinge+join,half],
+    turn([hinge,half]),
+    ...top.filter(p=>p[0]>hinge+epsilon).map(turn),
+    ...bottom.filter(p=>p[0]>hinge+join+epsilon).reverse().map(turn),
+    [hinge-join,-half],
+    ...bottom.filter(p=>p[0]<hinge-epsilon).reverse(),
+  ];
+  return [outline];
 }
 
 export function keyBounds(template,design) {

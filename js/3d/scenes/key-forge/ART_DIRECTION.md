@@ -22,16 +22,29 @@
 Достаточно импортировать `dist/js/key-model.js` и оставить соседние `key-*.js`, `vendor/three.js` и `assets/` в тех же относительных каталогах. `keyAssetUrl()` определяет адрес фактур по расположению **модуля**, не страницы, поэтому вложенная сцена зала может переиспользовать мастерскую без перенастройки URL.
 
 ```js
-import { defaultDesign, createKeyModel, disposeKeyModel,
-  createInstancedKeyCollection, disposeInstancedKeyCollection } from '../js/key-model.js';
+import { defaultDesign, createKeyModel, disposeKeyModel, preloadKeyTextures,
+  getKeyAnchors, createKeyPlacementMatrix, createInstancedKeyCollection,
+  keyInstanceFromIntersection, moveKeyInstance, removeKeyInstance,
+  disposeInstancedKeyCollection } from '../js/key-model.js';
 
 const single=createKeyModel({...defaultDesign(9),broken:true,breakAngle:70,dirtAmount:100});
 scene.add(single);
 // Позже: scene.remove(single); disposeKeyModel(single);
 
-const hall=createInstancedKeyCollection([{template:9,position:[0,0,0]}]);
+await preloadKeyTextures();
+const keyDesign=defaultDesign(9);
+const anchors=getKeyAnchors(keyDesign); // hang / holeCenter / floor / center
+const hall=createInstancedKeyCollection([
+  {id:'brotherhood-001',design:keyDesign,
+    placement:{mode:'hang',position:[0,2.1,0],yaw:0}},
+  {id:'brotherhood-002',design:{...keyDesign,rustAmount:140},
+    placement:{mode:'floor',position:[2,0,1],yaw:1.4}},
+],{castShadow:false}); // для большого зала; свет по-прежнему действует на металл
 scene.add(hall);
+// const selected=keyInstanceFromIntersection(raycaster.intersectObjects(hall.children)[0]);
+moveKeyInstance(hall,'brotherhood-002',[4,0,1]);
+removeKeyInstance(hall,'brotherhood-001');
 // Позже: scene.remove(hall); disposeInstancedKeyCollection(hall);
 ```
 
-В JSON и экспорте доступны `broken`, `breakAngle` (60–80°) и `dirtAmount` (0/100). Старые сохранения с частичной грязью при чтении преобразуются в 100% покрытие. Зал должен группировать одинаковые дизайны через `createInstancedKeyCollection`.
+В JSON и экспорте доступны `broken`, `breakAngle` (60–80°) и `dirtAmount` (0/100). Старые сохранения с частичной грязью при чтении преобразуются в 100% покрытие. Инстансирование объединяет разные степени ржавчины, сохраняя геометрические варианты отдельно. Не переносить настройки фоновой бумаги мастерской в зал: они зафиксированы выше как стиль редактора.

@@ -18,7 +18,7 @@ test('STL после рефакторинга содержит замкнуту�
   }
 });
 
-test('сломанный ключ экспортируется двумя цельными секциями без слоя грязи', async () => {
+test('надломленный ключ экспортируется одним замкнутым контуром без слоя грязи', async () => {
   for(const index of [0,5,9]) {
     const design={...defaultDesign(index),broken:true,breakAngle:80};
     const snapped=createKeyModel(design);

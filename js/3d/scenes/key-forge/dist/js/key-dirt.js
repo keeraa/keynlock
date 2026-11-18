@@ -1,6 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { bowPoints, holesFor, bladeSections, keyBreakX, keyBreakAngle, shaftStartX, shaftHalfHeight,
-  BROKEN_TIP_Z_OFFSET } from './key-shapes.js';
+import { bowPoints, holesFor, bladeSections, shaftStartX, shaftHalfHeight } from './key-shapes.js';
 
 // The grime is a genuine, uneven rim outside the silhouette. It has its own
 // thin front/back crust and edge wall, but never becomes part of the STL key.
@@ -62,27 +61,15 @@ export function dirtSections(template,design) {
     sections.push({kind:'hole',points:hole.map(([x,y])=>[x*scale-1.21,y*scale]),
       seed:design.template*11+index+7,top:depth,bottom:0,invert:true});
   }
-  for(const [i,points] of bladeSections(template,design).entries())
-    sections.push({kind:i?'blade-tip':'blade',points,seed:design.template*13+3+i*29,
-      top:bladeDepth+bladeOffset+(i?BROKEN_TIP_Z_OFFSET:0),
-      bottom:bladeOffset+(i?BROKEN_TIP_Z_OFFSET:0),invert:false,
-      breakX:design.broken?keyBreakX(template,design):null,
-      breakAngle:design.broken?keyBreakAngle(design):0});
+  for(const points of bladeSections(template,design))
+    sections.push({kind:'blade',points,seed:design.template*13+3,
+      top:bladeDepth+bladeOffset,bottom:bladeOffset,invert:false});
   return sections;
 }
 
 function exposedDirtEdge(section,index,neck,half,width) {
   const a=section.points[index],b=section.points[(index+1)%section.points.length];
   const midX=(a[0]+b[0])/2,midY=(a[1]+b[1])/2;
-  if(section.breakX!==null&&section.breakX!==undefined) {
-    const originalX=point=>{
-      if(section.kind!=='blade-tip')return point[0];
-      const angle=-section.breakAngle*Math.PI/180;
-      return section.breakX+Math.cos(angle)*(point[0]-section.breakX)+Math.sin(angle)*point[1];
-    };
-    if(Math.abs(originalX(a)-section.breakX)<.0001 &&
-       Math.abs(originalX(b)-section.breakX)<.0001)return false;
-  }
   if(section.kind==='head'&&midX>neck-.02&&Math.abs(midY)<half+width*.5)return false;
   if(section.kind==='blade'&&midX<neck+.042)return false;
   return true;

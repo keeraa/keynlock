@@ -175,16 +175,6 @@
       ]
     },
     {
-      "id": "gouache-vault-ceiling-v1",
-      "category": "architecture",
-      "path": "js/3d/shared/materials/architecture/gouache-vault-ceiling-v1.webp",
-      "gitBlobSha": "a97190adfccf96e6fc18cbfd3811f77b67b735c4",
-      "bytes": 106594,
-      "consumers": [
-        "js/3d/scenes/key-archive/dist/assets/gouache-vault-ceiling-v1.webp"
-      ]
-    },
-    {
       "id": "gouache-vault-ceiling-v2",
       "category": "architecture",
       "path": "js/3d/shared/materials/architecture/gouache-vault-ceiling-v2.webp",
@@ -267,17 +257,6 @@
     {
       "id": "glass-antique",
       "category": "glass",
-      "path": "js/3d/shared/materials/glass/glass-antique.png",
-      "gitBlobSha": "0c6484157cc9abdfc4ba881c0d8b67815fd73e3c",
-      "bytes": 2704003,
-      "consumers": [
-        "js/3d/scenes/lair/integrations/alchemy/src/assets/glass-antique.png",
-        "js/3d/scenes/lair/public/stations/alchemy/assets/glass-antique.png"
-      ]
-    },
-    {
-      "id": "glass-antique",
-      "category": "glass",
       "path": "js/3d/shared/materials/glass/glass-antique.webp",
       "gitBlobSha": "c787292f6f5401e6237c886e862db6018c9dc698",
       "bytes": 631824,
@@ -289,34 +268,12 @@
     {
       "id": "glass-frosted",
       "category": "glass",
-      "path": "js/3d/shared/materials/glass/glass-frosted.png",
-      "gitBlobSha": "29c44d5c4826e7eab3d0a16f406165c0735669bd",
-      "bytes": 3109603,
-      "consumers": [
-        "js/3d/scenes/lair/integrations/alchemy/src/assets/glass-frosted.png",
-        "js/3d/scenes/lair/public/stations/alchemy/assets/glass-frosted.png"
-      ]
-    },
-    {
-      "id": "glass-frosted",
-      "category": "glass",
       "path": "js/3d/shared/materials/glass/glass-frosted.webp",
       "gitBlobSha": "99e1845c238c7290489e62b899f901d3c7ea0fbe",
       "bytes": 928344,
       "consumers": [
         "js/3d/scenes/alchemy/lab/assets/glass-frosted.webp",
         "js/3d/scenes/alchemy/src/assets/glass-frosted.webp"
-      ]
-    },
-    {
-      "id": "glass-watercolor",
-      "category": "glass",
-      "path": "js/3d/shared/materials/glass/glass-watercolor.png",
-      "gitBlobSha": "ee85309ee95937ead7f0754e5d97dc2ee66ddc01",
-      "bytes": 1975365,
-      "consumers": [
-        "js/3d/scenes/lair/integrations/alchemy/src/assets/glass-watercolor.png",
-        "js/3d/scenes/lair/public/stations/alchemy/assets/glass-watercolor.png"
       ]
     },
     {
@@ -520,16 +477,6 @@
       ]
     },
     {
-      "id": "wood-ash-gouache",
-      "category": "wood",
-      "path": "js/3d/shared/materials/wood/wood-ash-gouache.webp",
-      "gitBlobSha": "4ff2ced25a7dc0767b3afc6cbcf2ba1d5bd04332",
-      "bytes": 169210,
-      "consumers": [
-        "js/3d/scenes/restoration/public/textures/wood-ash-gouache.webp"
-      ]
-    },
-    {
       "id": "wood-gouache-ash",
       "category": "wood",
       "path": "js/3d/shared/materials/wood/wood-gouache-ash.webp",
@@ -576,16 +523,6 @@
       ]
     },
     {
-      "id": "wood-oak-gouache",
-      "category": "wood",
-      "path": "js/3d/shared/materials/wood/wood-oak-gouache.webp",
-      "gitBlobSha": "1577382bc489e8a6976863abbbce8db22f199be2",
-      "bytes": 165192,
-      "consumers": [
-        "js/3d/scenes/restoration/public/textures/wood-oak-gouache.webp"
-      ]
-    },
-    {
       "id": "wood-walnut-gouache-v2",
       "category": "wood",
       "path": "js/3d/shared/materials/wood/wood-walnut-gouache-v2.webp",
@@ -593,16 +530,6 @@
       "bytes": 170242,
       "consumers": [
         "js/3d/scenes/lair/public/assets/wood-walnut-gouache-v2.webp"
-      ]
-    },
-    {
-      "id": "wood-walnut-gouache",
-      "category": "wood",
-      "path": "js/3d/shared/materials/wood/wood-walnut-gouache.webp",
-      "gitBlobSha": "b36b7fd93901282657cbe1f78474c824b648766b",
-      "bytes": 120670,
-      "consumers": [
-        "js/3d/scenes/restoration/public/textures/wood-walnut-gouache.webp"
       ]
     }
   ]

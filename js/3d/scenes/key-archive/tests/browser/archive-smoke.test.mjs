@@ -82,7 +82,8 @@ test('Chromium renders the Three.js hall and opens the visual controls', { timeo
   assert.notEqual(visualState, 'Canvas 2D', 'WebGL unexpectedly fell back to Canvas');
   const frameCount = Number(await page.locator('#fps').textContent());
   assert.ok(Number.isFinite(frameCount) && frameCount > 0);
-  await page.screenshot({ path: join(screenshots, 'archive-webgl.png') });
+  // SwiftShader can stall on full-page WebGL readback; the smoke test checks
+  // live rendering and shader errors instead. Canvas snapshots remain in CI.
   await page.keyboard.press('v');
   await page.locator('#visual').waitFor({ state: 'visible' });
   await page.locator('#visual-resume').click();

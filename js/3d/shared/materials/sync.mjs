@@ -23,9 +23,9 @@ for(const material of manifest.materials){
     if(mode==='sync'){
       await mkdir(dirname(destination),{recursive:true});
       await copyFile(canonical,destination);
-      process.stdout.write('synced '+consumer+'\\n');
-    }else process.stderr.write('out of sync '+consumer+'\\n');
+      process.stdout.write('synced '+consumer+'\n');
+    }else process.stderr.write('out of sync '+consumer+'\n');
   }
 }
 if(mode==='check'&&changed)process.exitCode=1;
-else process.stdout.write(mode+': '+changed+' mirror(s) '+(mode==='check'?'out of sync':'updated')+'\\n');
+else process.stdout.write(mode+': '+changed+' mirror(s) '+(mode==='check'?'out of sync':'updated')+'\n');

@@ -9,7 +9,8 @@ import {
   FLOOR_DISTRIBUTION_VERSION, upgradeFloorDistribution, upgradeStationBaths,
 } from '../dist/js/rules.js';
 import {
-  sampleThrow, THROW_DURATION, THROW_FLIGHT_SECONDS, THROW_BOUNCE_SECONDS, THROW_SLIDE_SECONDS,
+  sampleThrow, THROW_DURATION, THROW_FLIGHT_SECONDS, THROW_BOUNCE_SECONDS,
+  THROW_SLIDE_SECONDS, THROW_SPIN_DELAY_SECONDS,
 } from '../dist/js/throw-physics.js';
 import { separateFloorKeys, findFreeFloorSpot, KEY_CLEARANCE } from '../dist/js/key-spacing.js';
 import {
@@ -17,7 +18,7 @@ import {
   CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_SHELF_DEPTH,
   CABINET_SHELF_CENTER_Z, CABINET_GRID_BOTTOM_Y, CABINET_GRID_TOP_Y,
   CABINET_BLANK_ROW_BOTTOM_Y,
-  CABINET_OUTLINE, pegForSlot,
+  CABINET_OUTLINE, pegForSlot, cabinetKeyPose,
 } from '../dist/js/cabinet-layout.js';
 import { STATIONS, BATH_CAPACITY, SOAK_SECONDS, bathId, inStationFootprint } from '../dist/js/station-layout.js';
 import { HALL_FLOOR_TOP, RUG_TOP, floorSurfaceY, restingKeyY } from '../dist/js/floor-contact.js';
@@ -234,6 +235,10 @@ test('each cabinet has 96 individual cubbies, four within each original square',
   assert.ok(Math.abs(CABINET_OUTLINE.width / 2 + CABINET_OUTLINE.thickness / 2 - (1.76 + .26 / 2)) < .015);
   assert.ok(CABINET_OUTLINE.top + CABINET_OUTLINE.thickness / 2 <= 4.77 + .24 / 2);
   assert.throws(() => pegForSlot(96), RangeError);
+  const finalPose = cabinetKeyPose(12, .185);
+  assert.deepEqual([finalPose.x, finalPose.y, finalPose.z],
+    [cells[12].x, cells[12].y - .015, cells[12].z]);
+  assert.equal(finalPose.scale, .145);
   assert.deepEqual(new Set(getProgress(createInitialState()).required), new Set([96]));
 });
 
@@ -300,6 +305,10 @@ test('a thrown key rises, lands and bounces to rest', () => {
   const end = { x: 3, y: .085, z: -2 };
   const apex = sampleThrow(start, end, .22);
   assert.ok(apex.y > start.y);
+  assert.equal(sampleThrow(start, end, THROW_SPIN_DELAY_SECONDS * .5).spin, 0);
+  assert.equal(sampleThrow(start, end, THROW_SPIN_DELAY_SECONDS).spin, 0);
+  assert.ok(sampleThrow(start, end, THROW_SPIN_DELAY_SECONDS + .1).spin > 0);
+  assert.ok(Math.abs(sampleThrow(start, end, THROW_FLIGHT_SECONDS).spin - Math.PI * 2) < 1e-8);
   assert.ok(sampleThrow(start, end, THROW_FLIGHT_SECONDS).y >= 0);
   assert.ok(sampleThrow(start, end, THROW_FLIGHT_SECONDS + .1).y > end.y);
   const reboundOne = sampleThrow(start, end, THROW_FLIGHT_SECONDS + THROW_BOUNCE_SECONDS * .30);

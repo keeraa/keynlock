@@ -33,3 +33,13 @@ export function pegForSlot(index) {
     z: .48,
   };
 }
+
+// The flying key must finish at precisely the same pose as its stored instance.
+export const CABINET_PLACE_SECONDS = 1.10;
+export function cabinetKeyPose(index, displayScale) {
+  const peg = pegForSlot(index);
+  return {
+    x: peg.x, y: peg.y - .015, z: peg.z,
+    scale: Math.min(.145, displayScale),
+  };
+}

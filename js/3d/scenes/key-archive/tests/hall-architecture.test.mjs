@@ -3,7 +3,7 @@ import test from 'node:test';
 import { readFileSync } from 'node:fs';
 import * as THREE from '../dist/vendor/three.js';
 import {
-  WINDOW_CENTERS, PILASTER_CENTERS, WINDOW_CROWN_Y,
+  WINDOW_CENTERS, PILASTER_CENTERS, WINDOW_CROWN_Y, WINDOW_SCALE, WINDOW_CENTER_Y,
   PERIMETER_BAND_Y, createWindowedWallGeometry, createWindowPaneGeometry,
   createVaultGeometry, vaultHeight, archedOpening,
 } from '../dist/js/hall-architecture.js';
@@ -20,6 +20,10 @@ test('solid side walls have five real arched openings for daylight', () => {
   };
   assert.equal(WINDOW_CENTERS.length, 5);
   assert.ok(WINDOW_CENTERS.every(x => hits(x, 7.2) === 0));
+  assert.equal(WINDOW_SCALE, .8);
+  assert.ok(WINDOW_CENTERS.every(x => hits(x + .92, 7.2) > 0),
+    'smaller aperture must close the former outer 20 percent of the window');
+  assert.equal(WINDOW_CENTER_Y, (5.86 + WINDOW_CROWN_Y) / 2);
   assert.equal(hits(0, 11), 0); // above the wall entirely
   assert.ok(WINDOW_CENTERS.every(x => hits(x, 10.5) > 0));
   assert.ok(PILASTER_CENTERS.every(x => hits(x, 7.2) > 0));

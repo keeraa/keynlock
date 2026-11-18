@@ -4,6 +4,7 @@ import { PAINTED_METALS } from './painted-textures.js';
 import { keyAssetUrl, RUST_TEXTURE } from './key-data.js';
 import { dirtPaint, stableNoise } from './key-dirt.js';
 import { restingKeyY } from './floor-contact.js';
+import { CABINET_PLACE_SECONDS } from './cabinet-layout.js?v=22';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -229,13 +230,31 @@ export function createFallbackKeyPainter({ ctx, project, keyHover }) {
     position.y += Math.sin(Math.PI * travel) * .16;
     const p = project(position.x, position.y, position.z);
     if (!p) return;
-    const finalSize = clamp(53 / p.depth, 5, 17);
-    const size = (1 - ease) * Math.min(76, height * .12) + ease * finalSize;
-    const sway = elapsed > .30 ? Math.sin((elapsed - .30) * 15) * .20 * Math.exp(-(elapsed - .30) * 2.6) : 0;
+    const finalSize = clamp(15 / p.depth, .9, 3.5);
+    const size = (1 - ease) * Math.min(76, height * .12) + ease * finalSize * 2;
+    const sway = elapsed > .30 ? Math.sin((elapsed - .30) * 15) * .06 *
+      Math.max(0, (CABINET_PLACE_SECONDS - elapsed) / (CABINET_PLACE_SECONDS - .30)) : 0;
+    const glyphBlend = clamp((elapsed - .24) / .18, 0, 1);
     ctx.save();
     ctx.translate(p.x, p.y);
     ctx.rotate(sway);
-    ctx.drawImage(stampFor(motion.key), -size * .5, -size * .45, size, size * 1.39);
+    if (glyphBlend < 1) {
+      ctx.globalAlpha = 1 - glyphBlend;
+      ctx.drawImage(stampFor(motion.key), -size * .5, -size * .45, size, size * 1.39);
+    }
+    if (glyphBlend > 0) {
+      ctx.globalAlpha = glyphBlend;
+      ctx.fillStyle = '#ebd9b6';
+      ctx.beginPath();
+      ctx.arc(0, finalSize * 1.5, finalSize * .9, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#99784f';
+      ctx.lineWidth = Math.max(.7, finalSize * .5);
+      ctx.beginPath();
+      ctx.moveTo(0, finalSize * 2.3);
+      ctx.lineTo(0, finalSize * 4.5);
+      ctx.stroke();
+    }
     ctx.restore();
   }
 

@@ -4,21 +4,22 @@ import {
   pickupKey, selectedKey, putKeyInCabinet, trashSelectedKey, dropSelectedKey,
   getProgress, startSoak, collectSoakedKey, bathContents, keyCondition,
 } from './rules.js?v=23';
-import { createWorld } from './world.js?v=49';
+import { createWorld } from './world.js?v=50';
 import { installKeyAssetProvider } from './key-factory.js?v=3';
 import { createArchiveHud } from './archive-hud.js';
 import { loadArchiveState, loadVisualSettings, saveArchiveState } from './archive-persistence.js?v=2';
 import { createVisualPanel } from './visual-panel.js';
 import externalKeyProvider from './key-provider-entry.js?v=3';
-import { createFallbackWorld } from './fallback-world.js?v=35';
+import { createFallbackWorld } from './fallback-world.js?v=36';
 import { createPlayerMovement } from './player-movement.js?v=4';
 import { createPerformanceHud } from './performance-hud.js';
 import { logicalKey } from './controls.js';
 import { edgeLookRate } from './mouse-look.js';
-import { findFloorKeyAtReticle } from './key-picking.js?v=3';
+import { findFloorKeyAtReticle } from './key-picking.js?v=4';
 import { createKeyIndex } from './key-index.js';
 import { findFreeFloorSpot } from './key-spacing.js?v=18';
 import { restingKeyY } from './floor-contact.js';
+import { KEY_REACH, CABINET_REACH, STATION_REACH } from './interaction-range.js';
 
 const $ = id => document.getElementById(id);
 if (externalKeyProvider) installKeyAssetProvider(externalKeyProvider);
@@ -178,8 +179,8 @@ function targetInView() {
   const intersections = raycaster.intersectObjects(world.interactables, false);
   for (const hit of intersections) {
     const data = hit.object.userData;
-    if (!data?.kind || hit.distance > (data.kind === 'cabinet' ? 6.5 :
-      data.kind === 'bath' || data.kind === 'forge' ? 4.7 : 4)) continue;
+    if (!data?.kind || hit.distance > (data.kind === 'cabinet' ? CABINET_REACH :
+      data.kind === 'bath' || data.kind === 'forge' ? STATION_REACH : KEY_REACH)) continue;
     if (data.kind === 'key-batch') {
       const id = world.keyIdFromHit(data.type, hit.instanceId);
       if (!id || world.isThrowing(id) || keyIndex.get(id)?.status !== 'floor') continue;
@@ -200,7 +201,7 @@ function targetInView() {
     const direction = targetCenter.clone().sub(camera.position);
     const distance = direction.length();
     const alignment = forward.dot(direction.normalize());
-    if (distance < 6.5 && alignment > .81 && distance < bestScore) {
+    if (distance < CABINET_REACH && alignment > .81 && distance < bestScore) {
       bestScore = distance;
       closest = { kind: 'cabinet', type: cabinet.type };
     }
@@ -322,7 +323,7 @@ function drop() {
   forward.y = 0;
   forward.normalize();
   const landing = findFreeFloorSpot(state.keys,
-    camera.position.x + forward.x * 2.8, camera.position.z + forward.z * 2.8);
+    camera.position.x + forward.x * 4.5, camera.position.z + forward.z * 4.5);
   const { x, z } = landing;
   const start = { x: camera.position.x + forward.x * .42, y: camera.position.y - .27,
     z: camera.position.z + forward.z * .42 };

@@ -7,6 +7,8 @@ export const WINDOW_SILL_Y = 5.86;
 export const WINDOW_SPRING_Y = 9.17;
 export const WINDOW_OPENING_RADIUS = 1.07;
 export const WINDOW_CROWN_Y = WINDOW_SPRING_Y + WINDOW_OPENING_RADIUS;
+export const WINDOW_SCALE = .8;
+export const WINDOW_CENTER_Y = (WINDOW_SILL_Y + WINDOW_CROWN_Y) / 2;
 export const PERIMETER_BAND_Y = 5.2;
 
 export function vaultHeight(x) {
@@ -34,7 +36,10 @@ export function createWindowedWallGeometry() {
   wall.lineTo(23.4, 10.98);
   wall.lineTo(-23.4, 10.98);
   wall.closePath();
-  for (const center of WINDOW_CENTERS) wall.holes.push(archedOpening(center));
+  for (const center of WINDOW_CENTERS) wall.holes.push(archedOpening(
+    center, WINDOW_OPENING_RADIUS * WINDOW_SCALE,
+    WINDOW_CENTER_Y + (WINDOW_SILL_Y - WINDOW_CENTER_Y) * WINDOW_SCALE,
+    WINDOW_CENTER_Y + (WINDOW_SPRING_Y - WINDOW_CENTER_Y) * WINDOW_SCALE));
   return new THREE.ExtrudeGeometry(wall, {
     depth: .44, bevelEnabled: false, curveSegments: 22, steps: 1,
   });
@@ -64,8 +69,11 @@ function smallBox(group, size, position, material, castsShadow = false) {
 
 export function addArchedWindow(parent, side, z, mat, snow) {
   const group = new THREE.Group();
-  group.position.set(side * 11.86, 0, z);
+  // Scale every pane/frame/muntin about the original window centre so the
+  // visible arch remains exactly aligned with the smaller hole in the wall.
+  group.position.set(side * 11.86, WINDOW_CENTER_Y * (1 - WINDOW_SCALE), z);
   group.rotation.y = side === -1 ? Math.PI / 2 : -Math.PI / 2;
+  group.scale.set(WINDOW_SCALE, WINDOW_SCALE, 1);
   parent.add(group);
 
   const glass = new THREE.Mesh(paneGeometry, mat.glass);

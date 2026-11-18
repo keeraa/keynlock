@@ -1,8 +1,9 @@
 // One continuous inertial trajectory, with two diminishing floor rebounds.
 // The same positions and timing drive Three.js and the Canvas fallback.
-export const THROW_FLIGHT_SECONDS = .68;
+export const THROW_FLIGHT_SECONDS = .82;
 export const THROW_BOUNCE_SECONDS = .62;
 export const THROW_SLIDE_SECONDS = .65;
+export const THROW_SPIN_DELAY_SECONDS = .18;
 export const THROW_DURATION = THROW_FLIGHT_SECONDS + THROW_BOUNCE_SECONDS + THROW_SLIDE_SECONDS;
 
 export function sampleThrow(start, end, seconds) {
@@ -19,7 +20,9 @@ export function sampleThrow(start, end, seconds) {
       x: start.x + (end.x - start.x) * horizontal,
       y: start.y + verticalSpeed * t - g * t * t / 2,
       z: start.z + (end.z - start.z) * horizontal,
-      spin: f * Math.PI * 2,
+      // The key travels forward first; the tumbling begins after release.
+      spin: Math.PI * 2 * Math.pow(Math.max(0,
+        (t - THROW_SPIN_DELAY_SECONDS) / (THROW_FLIGHT_SECONDS - THROW_SPIN_DELAY_SECONDS)), 1.15),
       landed: false,
     };
   }

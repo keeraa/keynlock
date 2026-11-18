@@ -3,7 +3,7 @@ import { KEY_TYPES } from './rules.js?v=22';
 import { makeLabel } from './art.js?v=17';
 import { createCombinedKeyGeometry, getKeyMaterial, getKeyDisplayScale } from './key-factory.js?v=3';
 import { createPaintedInstanceGeometry } from './key-instance-finish.js';
-import { CABINET_Z, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS, CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_SHELF_DEPTH, CABINET_GRID_BOTTOM_Y, CABINET_BLANK_ROW_BOTTOM_Y, CABINET_SHELF_CENTER_Z, CABINET_GROUND_OFFSET, pegForSlot } from './cabinet-layout.js?v=21';
+import { CABINET_Z, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS, CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_SHELF_DEPTH, CABINET_GRID_BOTTOM_Y, CABINET_BLANK_ROW_BOTTOM_Y, CABINET_SHELF_CENTER_Z, CABINET_GROUND_OFFSET, cabinetKeyPose } from './cabinet-layout.js?v=22';
 import { box, contactShadow } from './world-architecture.js';
 
 export function createCabinet(scene, type, mat) {
@@ -105,10 +105,10 @@ export function createCabinet(scene, type, mat) {
   function refresh(keys, hiddenCount = 0, required = CABINET_CAPACITY) {
     inserted.count = Math.max(0, Math.min(keys.length - hiddenCount, CABINET_CAPACITY));
     for (let i = 0; i < inserted.count; i++) {
-      const peg = pegForSlot(i);
-      dummy.position.set(peg.x, peg.y - .015, peg.z);
+      const peg = cabinetKeyPose(i, getKeyDisplayScale('cabinet', type));
+      dummy.position.set(peg.x, peg.y, peg.z);
       dummy.rotation.set(0, 0, 0);
-      dummy.scale.setScalar(Math.min(.145, getKeyDisplayScale('cabinet', type)));
+      dummy.scale.setScalar(peg.scale);
       dummy.updateMatrix();
       inserted.setMatrixAt(i, dummy.matrix);
     }

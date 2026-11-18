@@ -3,12 +3,12 @@ import { KEY_TYPES, KEYS_PER_TYPE, getProgress } from './rules.js?v=23';
 import {
   createKeyModel, createCombinedKeyGeometry,
   getKeyMaterial, getKeyCrustGeometry, getKeyCrustMaterial, getKeyRustStrength,
-  getKeyColliderSize, getKeyDisplayScale, disposeKeySceneModel,
+  getKeyDisplayScale, disposeKeySceneModel,
 } from './key-factory.js?v=3';
 import { createPaintedInstanceGeometry, setKeyInstanceFinish } from './key-instance-finish.js';
 import { createKeyThumbnailRenderer } from './key-thumbnails.js';
-import { sampleThrow } from './throw-physics.js?v=2';
-import { CABINET_CAPACITY, pegForSlot } from './cabinet-layout.js?v=21';
+import { sampleThrow } from './throw-physics.js?v=3';
+import { cabinetKeyPose, CABINET_PLACE_SECONDS } from './cabinet-layout.js?v=22';
 import { restingKeyY } from './floor-contact.js';
 import { createWorkstations } from './wash-forge-stations.js?v=24';
 import { createPaintedRenderer } from './painted-renderer.js?v=25';
@@ -17,11 +17,12 @@ import { createWetSnow } from './wet-snow.js?v=21';
 import { PLAYER_EYE_HEIGHT } from './player-config.js';
 import { createKeyHoverOutline } from './key-hover-outline.js';
 import { createMaterials } from './world-materials.js';
-import { makeHall } from './world-architecture.js?v=4';
+import { makeHall } from './world-architecture.js?v=5';
 import { makeChandeliers } from './world-lighting.js';
-import { createCabinet } from './world-cabinet.js?v=4';
+import { createCabinet } from './world-cabinet.js?v=5';
 import { addDust } from './world-particles.js';
 import { nextHandMotionWeight } from './held-key-motion.js';
+import { KEY_PICK_HALF_LENGTH, KEY_PICK_RADIUS } from './interaction-range.js';
 
 const ROOM = { halfWidth: 12, halfLength: 23.4, height: 11.25 };
 
@@ -88,7 +89,9 @@ export function createWorld(canvas, state, visualSettings) {
   const interactables = [...cabinets.map(cabinet => cabinet.collider), ...workstations.interactables];
   const colliderMaterial = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false });
   const floorBatches = KEY_TYPES.map((family, type) => {
-    const colliderGeometry = new THREE.BoxGeometry(...getKeyColliderSize(type).map(size => size * .72 * .7));
+    // Pick against the whole physical key, including its bow and the teeth.
+    const colliderGeometry = new THREE.BoxGeometry(
+      KEY_PICK_RADIUS * 2, .14, KEY_PICK_HALF_LENGTH * 2 + KEY_PICK_RADIUS * 2);
     const material = getKeyMaterial(type);
     // A small depth bias keeps thin metal faces stable against the painted
     // floor during the transition from a flying model to its pooled instance.
@@ -203,7 +206,7 @@ export function createWorld(canvas, state, visualSettings) {
       batch.mudCrust.setMatrixAt(instance.mudIndex, dummy.matrix);
       batch.mudCrust.instanceMatrix.needsUpdate = true;
     }
-    dummy.position.set(key.x, restingY + .105, key.z);
+    dummy.position.set(key.x, restingY + .055, key.z);
     dummy.rotation.set(0, key.rotation, 0);
     dummy.scale.setScalar(visible ? 1 : .000001);
     dummy.updateMatrix();
@@ -233,16 +236,16 @@ export function createWorld(canvas, state, visualSettings) {
     const start = camera.localToWorld(new THREE.Vector3(.42, -.37, -.84));
     const cabinet = cabinets[key.type];
     cabinet.group.updateMatrixWorld(true);
-    const peg = pegForSlot(slotIndex);
+    const peg = cabinetKeyPose(slotIndex, getKeyDisplayScale('cabinet', key.type));
     const end = cabinet.group.localToWorld(new THREE.Vector3(peg.x, peg.y, peg.z));
     const model = createKeyModel(key.type, { id: key.id, variation: key.variation });
-    model.position.y = -.063;
     const pivot = new THREE.Group();
     pivot.add(model);
     scene.add(pivot);
     placingKeys.set(key.id, {
-      key, start, end, pivot, model, startTime: performance.now(),
-      startRotation: camera.quaternion.clone(), endRotation: cabinet.group.quaternion.clone(),
+      key, start, end, endScale: peg.scale, pivot, model, startTime: performance.now(),
+      startRotation: camera.quaternion.clone(),
+      endRotation: cabinet.group.getWorldQuaternion(new THREE.Quaternion()),
     });
     refreshCabinet(key.type);
   }
@@ -347,14 +350,18 @@ export function createWorld(canvas, state, visualSettings) {
       motion.pivot.position.lerpVectors(motion.start, motion.end, easing);
       motion.pivot.position.y += Math.sin(Math.PI * travel) * .16;
       motion.pivot.quaternion.slerpQuaternions(motion.startRotation, motion.endRotation, easing);
-      const endScale = getKeyDisplayScale('cabinet', motion.key.type);
+      const endScale = motion.endScale;
       const startScale = getKeyDisplayScale('floor', motion.key.type);
       motion.model.scale.setScalar(endScale + (startScale - endScale) * (1 - easing));
       if (elapsed > .30) {
         const swayTime = elapsed - .30;
-        motion.pivot.rotateZ(Math.sin(swayTime * 15) * .18 * Math.exp(-swayTime * 2.6));
+        // Absolute, damped rotation: never accumulate a new twist each frame.
+        motion.pivot.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(
+          new THREE.Vector3(0, 0, 1),
+          Math.sin(swayTime * 15) * .055 * Math.exp(-swayTime * 3) *
+          Math.max(0, (CABINET_PLACE_SECONDS - elapsed) / (CABINET_PLACE_SECONDS - .30))));
       }
-      if (elapsed < 1.65) continue;
+      if (elapsed < CABINET_PLACE_SECONDS) continue;
       geometryStatsCache?.invalidate();
       scene.remove(motion.pivot);
       disposeKeySceneModel(motion.model);

@@ -1,14 +1,14 @@
 import * as THREE from '../vendor/three.js';
 import { KEY_TYPES, KEYS_PER_TYPE } from './rules.js?v=23';
 import { createFallbackSurfaces } from './fallback-surfaces.js';
-import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=2';
-import { getKeyColliderSize } from './key-factory.js?v=3';
-import { sampleThrow } from './throw-physics.js?v=2';
-import { findFloorKeyAtReticle } from './key-picking.js?v=2';
-import { CABINET_Z, CABINET_GROUND_OFFSET, pegForSlot } from './cabinet-layout.js?v=21';
+import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=3';
+import { sampleThrow } from './throw-physics.js?v=3';
+import { findFloorKeyAtReticle } from './key-picking.js?v=4';
+import { CABINET_Z, CABINET_GROUND_OFFSET, cabinetKeyPose, CABINET_PLACE_SECONDS } from './cabinet-layout.js?v=22';
 import { STATIONS, FIXTURE_OFFSETS, bathId } from './station-layout.js?v=2';
 import { restingKeyY } from './floor-contact.js';
 import { PLAYER_EYE_HEIGHT } from './player-config.js';
+import { CABINET_REACH, STATION_REACH, KEY_PICK_HALF_LENGTH, KEY_PICK_RADIUS } from './interaction-range.js';
 
 // A lightweight first-person perspective renderer for browsers that disable WebGL.
 // All picking and game rules still use the same Three.js world coordinates.
@@ -51,7 +51,8 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
   const dummy = new THREE.Object3D();
   const keyColliders = KEY_TYPES.map((_, type) => {
     const collider = new THREE.InstancedMesh(
-      new THREE.BoxGeometry(...getKeyColliderSize(type).map(size => size * .72)), colliderMaterial, KEYS_PER_TYPE);
+      new THREE.BoxGeometry(KEY_PICK_RADIUS * 2, .14,
+        KEY_PICK_HALF_LENGTH * 2 + KEY_PICK_RADIUS * 2), colliderMaterial, KEYS_PER_TYPE);
     collider.userData = { kind: 'key-batch', type };
     collider.frustumCulled = false;
     scene.add(collider);
@@ -115,7 +116,7 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
   function syncKey(key) {
     const target = keyTargets.get(key.id);
     if (!target) return;
-    dummy.position.set(key.x, restingKeyY(key.x, key.z) + (key.layer || 0) + .105, key.z);
+    dummy.position.set(key.x, restingKeyY(key.x, key.z) + (key.layer || 0) + .055, key.z);
     dummy.rotation.set(0, key.rotation, 0);
     dummy.scale.setScalar(key.status === 'floor' && !thrownKeys.has(key.id) ? 1 : .000001);
     dummy.updateMatrix();
@@ -140,14 +141,14 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
       const distance = Math.hypot(dx, dy, dz);
       const alignment = (forward.x * dx + forward.y * dy + forward.z * dz) / distance;
       const score = (1 - alignment) * 8 + distance * .018;
-      if (distance < 4.7 && alignment > .90 && score < bestFixtureScore) {
+      if (distance < STATION_REACH && alignment > .90 && score < bestFixtureScore) {
         bestFixtureScore = score;
         fixture = object.userData;
       }
     }
     if (fixture) return fixture;
     let nearestCabinet = null;
-    let distanceBest = 6.5;
+    let distanceBest = CABINET_REACH;
     for (const cabinet of cabinets) {
       const x = cabinet.type < 5 ? -10.84 : 10.84;
       const dx = x - camera.position.x;
@@ -170,9 +171,11 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
     camera.updateMatrixWorld(true);
     const start = camera.localToWorld(new THREE.Vector3(.42, -.37, -.84));
     const cabinet = cabinets[key.type];
-    cabinet.group.updateMatrixWorld(true);
-    const peg = pegForSlot(slotIndex);
-    const end = cabinet.group.localToWorld(new THREE.Vector3(peg.x, peg.y, peg.z));
+    const peg = cabinetKeyPose(slotIndex, .185);
+    const left = key.type < 5;
+    // The fallback's stored glyph is drawn on the cabinet face at this point.
+    const end = new THREE.Vector3(left ? -10.73 : 10.73, peg.y,
+      cabinet.group.position.z + (left ? -peg.x : peg.x));
     placingKeys.set(key.id, { key, start, end, startTime: performance.now() });
   }
   function animateDiscard(key, stationId = 'center') {
@@ -215,7 +218,7 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
       syncKey(motion.key);
     }
     for (const [id, motion] of placingKeys) {
-      if ((now - motion.startTime) / 1000 < 1.65) continue;
+      if ((now - motion.startTime) / 1000 < CABINET_PLACE_SECONDS) continue;
       placingKeys.delete(id);
     }
     for (const [id, motion] of discardingKeys) {

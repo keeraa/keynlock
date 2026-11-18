@@ -2,7 +2,7 @@ import * as THREE from '../vendor/three.js';
 import { makeLabel } from './art.js?v=17';
 import { HALL_SURFACE_TILE_METERS } from './hall-surface-textures.js?v=26';
 import { createMetricBoxGeometry } from './metric-box-geometry.js?v=23';
-import { WINDOW_CENTERS, PILASTER_CENTERS, PERIMETER_BAND_Y, addArchedWindow, addWindowedWall, addVault } from './hall-architecture.js?v=24';
+import { WINDOW_CENTERS, PILASTER_CENTERS, PERIMETER_BAND_Y, addArchedWindow, addWindowedWall, addVault } from './hall-architecture.js?v=25';
 import { ENTRANCE_DOOR_TEXTURE_URL } from './entrance-door-texture.js';
 
 export function box(parent, size, position, material) {
@@ -113,22 +113,26 @@ export function makeHall(scene, mat, snow) {
 
   addVault(scene, mat.hallVault, mat.hallBeam);
 
-  // A sealed passage for a future chapter; its keyhole is not a key-family sign.
-  box(scene, [5.5, 7.15, .4], [0, 3.67, -23.04], mat.darkBrass);
-  box(scene, [4.67, 6.45, .43], [0, 3.39, -22.77], mat.blackWood);
+  // The sealed chapter door is half-size, including panels, lock and signage.
+  const forgottenDoor = new THREE.Group();
+  forgottenDoor.scale.set(.5, .5, 1);
+  forgottenDoor.position.y = .05; // Keep its bottom planted on the floor.
+  scene.add(forgottenDoor);
+  box(forgottenDoor, [5.5, 7.15, .4], [0, 3.67, -23.04], mat.darkBrass);
+  box(forgottenDoor, [4.67, 6.45, .43], [0, 3.39, -22.77], mat.blackWood);
   for (const x of [-1.6, -.8, 0, .8, 1.6])
-    roomBox(scene, [.11, 6.15, .48], [x, 3.35, -22.51], mat.darkWood);
-  for (const y of [1.1, 3.9, 6.3]) box(scene, [4.49, .12, .49], [0, y, -22.5], mat.brass);
-  const keyholePlate = cylinder(scene, .42, .075, [0, 5.25, -22.14], mat.brass, 24);
+    roomBox(forgottenDoor, [.11, 6.15, .48], [x, 3.35, -22.51], mat.darkWood);
+  for (const y of [1.1, 3.9, 6.3]) box(forgottenDoor, [4.49, .12, .49], [0, y, -22.5], mat.brass);
+  const keyholePlate = cylinder(forgottenDoor, .42, .075, [0, 5.25, -22.14], mat.brass, 24);
   keyholePlate.rotation.x = Math.PI / 2;
   const keyholeTop = new THREE.Mesh(new THREE.SphereGeometry(.145, 12, 8), mat.ink);
   keyholeTop.scale.z = .18;
   keyholeTop.position.set(0, 5.30, -22.08);
-  scene.add(keyholeTop);
-  box(scene, [.17, .38, .045], [0, 5.07, -22.07], mat.ink);
+  forgottenDoor.add(keyholeTop);
+  box(forgottenDoor, [.17, .38, .045], [0, 5.07, -22.07], mat.ink);
   const backLabel = makeLabel('ЗАЛ ЗАБЫТЫХ ДВЕРЕЙ', 'за архивом · закрыто', { worldWidth: 4.45, worldHeight: .95, fontSize: 64 });
   backLabel.position.set(0, 8.43, -22.85);
-  scene.add(backLabel);
+  forgottenDoor.add(backLabel);
 
   // A few side worktables add scale without blocking the sorting path.
   for (const x of [-9.3, 9.3]) for (const z of [-20.7, 20.7]) {

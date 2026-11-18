@@ -5,13 +5,15 @@ import { KEY_TYPES, getProgress, bathContents } from './rules.js?v=23';
 import { sampleThrow } from './throw-physics.js';
 import { CABINET_Z, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS,
   CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_GRID_BOTTOM_Y,
-  CABINET_BLANK_ROW_BOTTOM_Y, CABINET_OUTLINE, pegForSlot } from './cabinet-layout.js?v=21';
+  CABINET_BLANK_ROW_BOTTOM_Y, CABINET_OUTLINE, pegForSlot } from './cabinet-layout.js?v=22';
 import { FIXTURE_OFFSETS, bathId } from './station-layout.js?v=2';
 import { drawBathActivity, drawBathKeys, drawForgeActivity } from './station-canvas-effects.js';
 import { WINDOW_CENTERS, PILASTER_CENTERS, PERIMETER_BAND_Y, vaultHeight,
-  WINDOW_SILL_Y, WINDOW_SPRING_Y } from './hall-architecture.js?v=23';
+  WINDOW_SILL_Y, WINDOW_SPRING_Y, WINDOW_SCALE, WINDOW_CENTER_Y,
+  WINDOW_OPENING_RADIUS } from './hall-architecture.js?v=25';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+const windowY = y => WINDOW_CENTER_Y + (y - WINDOW_CENTER_Y) * WINDOW_SCALE;
 
 // Canvas-only illustration code. No collision, input, save, or game-state mutation.
 export function createFallbackCanvasRenderer({
@@ -120,7 +122,7 @@ export function createFallbackCanvasRenderer({
       const random = n => (Math.sin(n * 78.233) * 43758.5453 + 1) % 1;
       const u = ((random(seed) + seconds * wind * .034 * (1 + index % 3)) % 1 + 1) % 1;
       const v = ((random(seed + 3.5) - seconds * (.082 + index % 7 * .014)) % 1 + 1) % 1;
-      const position = project(x, 6.31 + v * 2.79, z - .93 + u * 1.86);
+      const position = project(x, windowY(6.31 + v * 2.79), z + (-.93 + u * 1.86) * WINDOW_SCALE);
       if (!position) continue;
       const size = clamp((index % 5 === 0 ? 12 : 8) / position.depth, .75, 2.8);
       ctx.fillStyle = `rgba(228,242,238,${(.34 + amount * .48).toFixed(2)})`;
@@ -138,10 +140,10 @@ export function createFallbackCanvasRenderer({
     }
     // Condensed meltwater drifts down the glass more slowly than the flakes.
     for (let index = 0; index < 4; index++) {
-      const offset = ((index * .273 + .12) % 1) * 1.72 - .86;
+      const offset = (((index * .273 + .12) % 1) * 1.72 - .86) * WINDOW_SCALE;
       const lead = ((seconds * (.019 + index * .006) + index * .21) % 1 + 1) % 1;
-      const from = project(x, 8.86 - lead * 1.8, z + offset);
-      const to = project(x, 8.63 - lead * 1.8, z + offset - wind * .04);
+      const from = project(x, windowY(8.86 - lead * 1.8), z + offset);
+      const to = project(x, windowY(8.63 - lead * 1.8), z + offset - wind * .04 * WINDOW_SCALE);
       if (!from || !to) continue;
       ctx.strokeStyle = `rgba(219,244,241,${(amount * .27).toFixed(2)})`;
       ctx.lineWidth = 1;
@@ -206,17 +208,20 @@ export function createFallbackCanvasRenderer({
         segment([x, 10.66, z - .34], [x, 10.66, z + .34], '#76573f', 7);
       }
       for (const z of WINDOW_CENTERS) {
-        const pane = [[x, WINDOW_SILL_Y, z - 1.07], [x, WINDOW_SILL_Y, z + 1.07],
-          [x, WINDOW_SPRING_Y, z + 1.07]];
+        const radius = WINDOW_OPENING_RADIUS * WINDOW_SCALE;
+        const pane = [[x, windowY(WINDOW_SILL_Y), z - radius],
+          [x, windowY(WINDOW_SILL_Y), z + radius],
+          [x, windowY(WINDOW_SPRING_Y), z + radius]];
         for (let i = 0; i <= 16; i++) {
           const angle = Math.PI * i / 16;
-          pane.push([x, WINDOW_SPRING_Y + 1.07 * Math.sin(angle), z + 1.07 * Math.cos(angle)]);
+          pane.push([x, windowY(WINDOW_SPRING_Y) + radius * Math.sin(angle),
+            z + radius * Math.cos(angle)]);
         }
         path3(pane, 'rgba(177,219,204,.46)', '#e0c58e', 3);
         drawWindowSnow(x, z);
-        segment([x, WINDOW_SILL_Y, z], [x, WINDOW_SPRING_Y + 1.07, z], '#76573f', 3);
+        segment([x, windowY(WINDOW_SILL_Y), z], [x, windowY(WINDOW_SPRING_Y + WINDOW_OPENING_RADIUS), z], '#76573f', 3);
         for (const y of [7.43, 8.64])
-          segment([x, y, z - 1.07], [x, y, z + 1.07], '#76573f', 3);
+          segment([x, windowY(y), z - radius], [x, windowY(y), z + radius], '#76573f', 3);
       }
     }
     for (const z of PILASTER_CENTERS) {
@@ -231,11 +236,11 @@ export function createFallbackCanvasRenderer({
     for (const z of [-23, 23]) segment([-11.8, PERIMETER_BAND_Y, z],
       [11.8, PERIMETER_BAND_Y, z], '#76573f', 4);
     // A sealed door ahead, visible behind the scattered keys.
-    path3([[-2.5, .15, -22.7], [2.5, .15, -22.7], [2.5, 7, -22.7], [-2.5, 7, -22.7]], '#221f1e', '#c4a576', 5);
-    for (const x of [-1.55, -.8, 0, .8, 1.55]) segment([x, .2, -22.6], [x, 6.8, -22.6], '#70563c', 3);
-    const emblem = project(0, 5.1, -22.5);
+    path3([[-1.25, .125, -22.7], [1.25, .125, -22.7], [1.25, 3.55, -22.7], [-1.25, 3.55, -22.7]], '#221f1e', '#c4a576', 5);
+    for (const x of [-1.55, -.8, 0, .8, 1.55]) segment([x * .5, .15, -22.6], [x * .5, 3.45, -22.6], '#70563c', 3);
+    const emblem = project(0, 2.60, -22.5);
     if (emblem) {
-      const radius = clamp(50 / emblem.depth * 3, 5, 24);
+      const radius = clamp(25 / emblem.depth * 3, 2.5, 12);
       ctx.fillStyle = '#c9a46c';
       ctx.beginPath();
       ctx.arc(emblem.x, emblem.y, radius, 0, Math.PI * 2);

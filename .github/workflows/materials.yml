@@ -1,0 +1,22 @@
+name: Gouache material consistency
+on:
+  push:
+    paths:
+      - 'js/3d/shared/materials/**'
+      - 'js/3d/scenes/**/assets/**'
+      - '.github/workflows/materials.yml'
+  pull_request:
+    paths:
+      - 'js/3d/shared/materials/**'
+      - 'js/3d/scenes/**/assets/**'
+      - '.github/workflows/materials.yml'
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check canonical gouache material mirrors
+        run: node js/3d/shared/materials/sync.mjs --check

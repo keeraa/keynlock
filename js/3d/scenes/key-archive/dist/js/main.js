@@ -4,13 +4,13 @@ import {
   pickupKey, selectedKey, putKeyInCabinet, trashSelectedKey, dropSelectedKey,
   getProgress, startSoak, collectSoakedKey, bathContents, keyCondition,
 } from './rules.js?v=23';
-import { createWorld } from './world.js?v=48';
+import { createWorld } from './world.js?v=49';
 import { installKeyAssetProvider } from './key-factory.js?v=3';
 import { createArchiveHud } from './archive-hud.js';
 import { loadArchiveState, loadVisualSettings, saveArchiveState } from './archive-persistence.js?v=2';
 import { createVisualPanel } from './visual-panel.js';
 import externalKeyProvider from './key-provider-entry.js?v=3';
-import { createFallbackWorld } from './fallback-world.js?v=34';
+import { createFallbackWorld } from './fallback-world.js?v=35';
 import { createPlayerMovement } from './player-movement.js?v=4';
 import { createPerformanceHud } from './performance-hud.js';
 import { logicalKey } from './controls.js';
@@ -18,6 +18,7 @@ import { edgeLookRate } from './mouse-look.js';
 import { findFloorKeyAtReticle } from './key-picking.js?v=3';
 import { createKeyIndex } from './key-index.js';
 import { findFreeFloorSpot } from './key-spacing.js?v=18';
+import { restingKeyY } from './floor-contact.js';
 
 const $ = id => document.getElementById(id);
 if (externalKeyProvider) installKeyAssetProvider(externalKeyProvider);
@@ -325,7 +326,7 @@ function drop() {
   const { x, z } = landing;
   const start = { x: camera.position.x + forward.x * .42, y: camera.position.y - .27,
     z: camera.position.z + forward.z * .42 };
-  const end = { x, y: .085, z };
+  const end = { x, y: restingKeyY(x, z), z };
   dropSelectedKey(state, x, z, -yaw + .6);
   world.animateThrow(key, start, end);
   updateHud();

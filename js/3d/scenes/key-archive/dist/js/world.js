@@ -7,7 +7,7 @@ import {
 } from './key-factory.js?v=3';
 import { createPaintedInstanceGeometry, setKeyInstanceFinish } from './key-instance-finish.js';
 import { createKeyThumbnailRenderer } from './key-thumbnails.js';
-import { sampleThrow } from './throw-physics.js';
+import { sampleThrow } from './throw-physics.js?v=2';
 import { CABINET_CAPACITY, pegForSlot } from './cabinet-layout.js?v=21';
 import { restingKeyY } from './floor-contact.js';
 import { createWorkstations } from './wash-forge-stations.js?v=24';
@@ -21,6 +21,7 @@ import { makeHall } from './world-architecture.js?v=4';
 import { makeChandeliers } from './world-lighting.js';
 import { createCabinet } from './world-cabinet.js?v=4';
 import { addDust } from './world-particles.js';
+import { nextHandMotionWeight } from './held-key-motion.js';
 
 const ROOM = { halfWidth: 12, halfLength: 23.4, height: 11.25 };
 
@@ -89,6 +90,11 @@ export function createWorld(canvas, state, visualSettings) {
   const floorBatches = KEY_TYPES.map((family, type) => {
     const colliderGeometry = new THREE.BoxGeometry(...getKeyColliderSize(type).map(size => size * .72 * .7));
     const material = getKeyMaterial(type);
+    // A small depth bias keeps thin metal faces stable against the painted
+    // floor during the transition from a flying model to its pooled instance.
+    material.polygonOffset = true;
+    material.polygonOffsetFactor = -1;
+    material.polygonOffsetUnits = -1;
     const healthyKeys = keysByType[type].filter(key => !key.broken);
     const damagedKeys = keysByType[type].filter(key => key.broken);
     const muddyKeys = healthyKeys.filter(key => key.mud);
@@ -147,6 +153,7 @@ export function createWorld(canvas, state, visualSettings) {
   camera.add(handLight);
   let displayedHandId = null;
   let handModel = null;
+  let handMotion = 0;
   let hovered = null;
   let keyHoverOpacity = 0;
   let keyHoverTarget = 0;
@@ -371,8 +378,13 @@ export function createWorld(canvas, state, visualSettings) {
       motion.model.scale.setScalar(.38 * (1 - ease) + .04);
     }
     if (handModel) {
-      hand.rotation.z = Math.sin(now * .0031) * (moving ? .045 : .012);
-      hand.position.y = -.45 + Math.sin(now * .0029) * (moving ? .035 : .012);
+      // Blend walk sway in over several frames: an instant amplitude change
+      // on the first step looked like a one-frame key flicker.
+      handMotion = nextHandMotionWeight(handMotion, moving, elapsed);
+      hand.rotation.z = Math.sin(now * .0031) * (.012 + handMotion * .033);
+      hand.position.y = -.45 + Math.sin(now * .0029) * (.012 + handMotion * .023);
+    } else {
+      handMotion = 0;
     }
   }
 

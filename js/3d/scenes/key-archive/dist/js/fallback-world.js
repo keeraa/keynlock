@@ -3,7 +3,7 @@ import { KEY_TYPES, KEYS_PER_TYPE } from './rules.js?v=23';
 import { createFallbackSurfaces } from './fallback-surfaces.js';
 import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=2';
 import { getKeyColliderSize } from './key-factory.js?v=3';
-import { sampleThrow } from './throw-physics.js';
+import { sampleThrow } from './throw-physics.js?v=2';
 import { findFloorKeyAtReticle } from './key-picking.js?v=2';
 import { CABINET_Z, CABINET_GROUND_OFFSET, pegForSlot } from './cabinet-layout.js?v=21';
 import { STATIONS, FIXTURE_OFFSETS, bathId } from './station-layout.js?v=2';

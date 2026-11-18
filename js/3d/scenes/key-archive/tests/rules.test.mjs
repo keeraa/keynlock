@@ -302,6 +302,12 @@ test('a thrown key rises, lands and bounces to rest', () => {
   assert.ok(apex.y > start.y);
   assert.ok(sampleThrow(start, end, THROW_FLIGHT_SECONDS).y >= 0);
   assert.ok(sampleThrow(start, end, THROW_FLIGHT_SECONDS + .1).y > end.y);
+  const reboundOne = sampleThrow(start, end, THROW_FLIGHT_SECONDS + THROW_BOUNCE_SECONDS * .30);
+  const reboundTwo = sampleThrow(start, end, THROW_FLIGHT_SECONDS + THROW_BOUNCE_SECONDS * .80);
+  const between = sampleThrow(start, end, THROW_FLIGHT_SECONDS + THROW_BOUNCE_SECONDS * .60);
+  assert.ok(reboundOne.y > reboundTwo.y && reboundTwo.y > end.y, 'two progressively smaller rebounds');
+  assert.ok(Math.abs(between.y - end.y) < 1e-9, 'key touches the floor between rebounds');
+  assert.ok(reboundOne.x < reboundTwo.x, 'horizontal momentum continues through both rebounds');
   assert.deepEqual(sampleThrow(start, end, THROW_DURATION).landed, true);
   assert.equal(sampleThrow(start, end, THROW_DURATION).y, end.y);
   const bounceEnd = THROW_FLIGHT_SECONDS + THROW_BOUNCE_SECONDS;

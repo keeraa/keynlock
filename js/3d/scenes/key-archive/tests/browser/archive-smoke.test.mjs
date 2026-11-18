@@ -41,15 +41,29 @@ after(async () => {
   if (server) await new Promise(resolve => server.close(resolve));
 });
 
-async function enterArchive(page) {
+async function enterArchive(page, label) {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
+  page.on('console', message => {
+    if (message.type() === 'error') errors.push(message.text());
+  });
+  page.on('response', response => {
+    if (response.status() >= 400) errors.push(`HTTP ${response.status()}: ${response.url()}`);
+  });
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => {
-    const value = document.querySelector('#fps')?.textContent?.trim();
-    return value && value !== '—';
-  }, null,
-    { timeout: 60000 });
+  try {
+    await page.waitForFunction(() => {
+      const value = document.querySelector('#fps')?.textContent?.trim();
+      return value && value !== '—';
+    }, null, { timeout: 30000 });
+  } catch (error) {
+    await page.screenshot({ path: join(screenshots, `archive-${label}-boot-error.png`) });
+    const state = await page.evaluate(() => ({ title: document.title,
+      fps: document.querySelector('#fps')?.textContent,
+      status: document.querySelector('#visual-status')?.textContent,
+      scripts: [...document.scripts].map(script => script.src) }));
+    throw new Error(`Archive ${label} bootstrap stalled: ${JSON.stringify({ errors, state })}`, { cause: error });
+  }
   await page.locator('#start-btn').click();
   assert.equal(await page.locator('#intro').evaluate(element => element.classList.contains('is-hidden')), true);
   assert.deepEqual(errors, []);
@@ -59,7 +73,7 @@ async function enterArchive(page) {
 test('Chromium renders the Three.js hall and opens the visual controls', { timeout: 120000 }, async t => {
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   t.after(() => page.close());
-  const errors = await enterArchive(page);
+  const errors = await enterArchive(page, 'webgl');
   const visualState = await page.locator('#visual-status').textContent();
   assert.notEqual(visualState, 'Canvas 2D', 'WebGL unexpectedly fell back to Canvas');
   const frameCount = Number(await page.locator('#fps').textContent());
@@ -99,7 +113,7 @@ test('Canvas fallback retains keys, migrates old baths and accepts a drop action
   muddy.bathUntil = Date.now() + 60000;
   await page.addInitScript(({ storageKey, snapshot }) => localStorage.setItem(storageKey, snapshot),
     { storageKey: STORAGE_KEY, snapshot: JSON.stringify(state) });
-  const errors = await enterArchive(page);
+  const errors = await enterArchive(page, 'canvas');
   assert.equal(await page.locator('#visual-status').textContent(), 'Canvas 2D');
   assert.equal(await page.locator('#hand-count').textContent(), '1 / 4');
   assert.equal(await page.locator('.slot-thumbnail').count(), 1);

@@ -5,6 +5,16 @@
   "policy": "canonical",
   "materials": [
     {
+      "id": "gouache-entrance-rousseau-v1",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-entrance-rousseau-v1.webp",
+      "gitBlobSha": "b1d1a773504dc8a3b4a9867d84fb27b4705c232e",
+      "bytes": 495904,
+      "consumers": [
+        "js/3d/scenes/key-archive/dist/assets/gouache-entrance-rousseau-v1.webp"
+      ]
+    },
+    {
       "id": "gouache-entry-door-carved-v1",
       "category": "architecture",
       "path": "js/3d/shared/materials/architecture/gouache-entry-door-carved-v1.webp",
@@ -70,9 +80,7 @@
       "path": "js/3d/shared/materials/architecture/gouache-plaster-wall-v1.webp",
       "gitBlobSha": "f8a255cdd5752df6fa71ec3c11fc08bedf37c755",
       "bytes": 167480,
-      "consumers": [
-        "js/3d/scenes/key-archive/dist/assets/gouache-plaster-wall-v1.webp"
-      ]
+      "consumers": []
     },
     {
       "id": "gouache-plaster",
@@ -180,9 +188,7 @@
       "path": "js/3d/shared/materials/architecture/gouache-vault-ceiling-v2.webp",
       "gitBlobSha": "2623e09a65b3fce548b9362886b269f1dea1cc93",
       "bytes": 137114,
-      "consumers": [
-        "js/3d/scenes/key-archive/dist/assets/gouache-vault-ceiling-v2.webp"
-      ]
+      "consumers": []
     },
     {
       "id": "gouache-window-glass-v2",

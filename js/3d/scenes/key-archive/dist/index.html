@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#14211f" />
   <meta name="description" content="Кийенлок — гуашевый архив ключей: поиск, отмачивание, очистка ржавчины и переплавка брака." />
   <title>Кийенлок · Архив ключей</title>
-  <link rel="stylesheet" href="./styles.css?v=21" />
+  <link rel="stylesheet" href="./styles.css?v=23" />
 </head>
 <body>
   <canvas id="world" aria-label="Трёхмерный зал архива ключей"></canvas>
@@ -18,19 +18,16 @@
       <div class="brand-copy"><small>КИЙЕНЛОК · ПРОТОТИП 01</small><strong>Архив ключей</strong></div>
     </header>
     <div class="top-center">ЗАЛ ДЕСЯТИ СЕМЕЙСТВ</div>
-    <div class="telemetry-panel" aria-label="Статистика игры">
-      <span>НА ПОЛУ <strong id="floor-count">1000</strong></span>
-      <span>ПЕРЕПЛАВЛЕНО <strong id="trash-count">0 / 40</strong></span>
-      <span>МЕТАЛЛ <strong id="metal-count">0</strong></span>
-      <span>В ВАННАХ <strong id="soak-count">0</strong></span>
+    <div class="fps-counter" aria-label="Производительность сцены">
+      <div>FPS <strong id="fps">—</strong></div>
+      <div>ПОЛИГОНЫ <strong id="poly-count">—</strong></div>
+      <div>ТРЕУГОЛЬНИКИ <strong id="triangle-count">—</strong></div>
+      <div>CPU СР. / ПИК <strong id="cpu-count">—</strong></div>
+      <div>ВЫЗОВЫ ОТРИСОВКИ <strong id="draw-count">—</strong></div>
+      <div>ПРОХОДЫ <strong id="pass-count">—</strong></div>
+      <div>ВИЗУАЛ <strong id="visual-status">—</strong></div>
     </div>
-    <div class="fps-counter" aria-label="Частота кадров">FPS <strong id="fps">—</strong></div>
     <div id="crosshair" class="crosshair" aria-hidden="true"></div>
-    <div id="capture-hint" class="capture-hint is-hidden" role="status">
-      <span>Захват мыши ограничен браузером.</span>
-      <button type="button" id="capture-retry">Повторить</button>
-      <a href="./" target="_blank" rel="noopener noreferrer">Открыть отдельно</a>
-    </div>
     <div id="interaction-prompt" class="interaction-prompt is-hidden"></div>
     <div class="hud-footer">
       <div class="quick-keys">WASD/ЦФЫВ <span>ходьба</span> &nbsp; МЫШЬ <span>взгляд</span> &nbsp; E/У <span>взять / обработать</span> &nbsp; R/К <span>бросить</span> &nbsp; ESC <span>пауза</span></div>
@@ -83,14 +80,12 @@
         <div class="visual-control"><label for="cartoonMaterial">Мультяшный материал <output for="cartoonMaterial">90%</output></label><input id="cartoonMaterial" type="range" min="0" max="100" value="90" /></div>
         <div class="visual-group"><span>02 · КОНТУРНАЯ ОБВОДКА</span><label class="visual-switch"><input id="outlineEnabled" type="checkbox" checked /> Включена</label></div>
         <div class="visual-control"><label for="outlineStrength">Сила обводки <output for="outlineStrength">70%</output></label><input id="outlineStrength" type="range" min="0" max="100" value="70" /></div>
-        <div class="visual-control"><label for="outlineWidth">Толщина контура <output for="outlineWidth">1 px</output></label><input id="outlineWidth" type="range" min="1" max="4" step="1" value="1" /></div>
-        <div class="visual-group"><span>03 · ГУАШЕВЫЙ МАТЕРИАЛ</span></div>
-        <div class="visual-control"><label for="brushExpression">Выразительность мазков <output for="brushExpression">95%</output></label><input id="brushExpression" type="range" min="0" max="100" value="95" /></div>
-        <div class="visual-control"><label for="strokeDetail">Детализация мазков <output for="strokeDetail">2%</output></label><input id="strokeDetail" type="range" min="0" max="100" value="2" /></div>
-        <div class="visual-group"><span>04 · МОКРЫЙ СНЕГ</span><label class="visual-switch"><input id="wetSnowEnabled" type="checkbox" checked /> За окнами</label></div>
+        <div class="visual-control"><label for="outlineWidth">Толщина контура <output for="outlineWidth">×1</output></label><input id="outlineWidth" type="range" min="1" max="4" step="1" value="1" /></div>
+        <div class="visual-control"><label for="outlineSensitivity">Чувствительность к граням <output for="outlineSensitivity">50%</output></label><input id="outlineSensitivity" type="range" min="0" max="100" step="1" value="50" /></div>
+        <div class="visual-group"><span>03 · МОКРЫЙ СНЕГ</span><label class="visual-switch"><input id="wetSnowEnabled" type="checkbox" checked /> За окнами</label></div>
         <div class="visual-control"><label for="snowIntensity">Интенсивность снегопада <output for="snowIntensity">65%</output></label><input id="snowIntensity" type="range" min="0" max="100" value="65" /></div>
         <div class="visual-control"><label for="snowWind">Ветер <output for="snowWind">28%</output></label><input id="snowWind" type="range" min="-100" max="100" value="28" /></div>
-        <div class="visual-group"><span>05 · ДНЕВНОЙ СВЕТ</span></div>
+        <div class="visual-group"><span>04 · ДНЕВНОЙ СВЕТ</span></div>
         <div class="visual-control"><label for="windowDaylight">Свет сквозь окна <output for="windowDaylight">75%</output></label><input id="windowDaylight" type="range" min="0" max="100" value="75" /></div>
       </div>
       <div class="visual-actions"><button id="visual-natural" class="text-button">Исходный вид</button><button id="visual-reset" class="text-button">Пресет KEYNLOCK</button><button id="visual-back" class="secondary-button">НАЗАД</button></div>
@@ -108,6 +103,6 @@
       <button id="victory-reset" class="text-button">Пройти заново</button>
     </div>
   </div>
-  <script type="module" src="./js/main.js?v=23"></script>
+  <script type="module" src="./js/main.js?v=41"></script>
 </body>
 </html>

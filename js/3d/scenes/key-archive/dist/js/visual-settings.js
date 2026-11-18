@@ -9,8 +9,7 @@ export const DEFAULT_VISUAL_SETTINGS = Object.freeze({
   outlineEnabled: true,
   outlineStrength: 70,
   outlineWidth: 1,
-  brushExpression: 95,
-  strokeDetail: 2,
+  outlineSensitivity: 50,
   wetSnowEnabled: true,
   snowIntensity: 65,
   snowWind: 28,
@@ -23,8 +22,7 @@ const BOUNDS = Object.freeze({
   cartoonMaterial: [0, 100],
   outlineStrength: [0, 100],
   outlineWidth: [1, 4],
-  brushExpression: [0, 100],
-  strokeDetail: [0, 100],
+  outlineSensitivity: [0, 100],
   snowIntensity: [0, 100],
   snowWind: [-100, 100],
   windowDaylight: [0, 100],
@@ -46,5 +44,5 @@ export function normalizeVisualSettings(values) {
 
 export function visualPassNeeded(settings) {
   return Boolean((settings.toonEnabled && settings.toonLight > 0 && settings.cartoonMaterial > 0) ||
-    (settings.outlineEnabled && settings.outlineStrength > 0) || settings.brushExpression > 0);
+    (settings.outlineEnabled && settings.outlineStrength > 0));
 }

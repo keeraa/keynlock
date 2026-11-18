@@ -13,9 +13,7 @@ import {
 } from '../dist/js/throw-physics.js';
 import { separateFloorKeys, findFreeFloorSpot, KEY_CLEARANCE } from '../dist/js/key-spacing.js';
 import {
-  CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS, CABINET_PEG_LENGTH,
-  CABINET_PEG_VISIBLE_LENGTH, CABINET_PEG_BACK_Z, CABINET_PEG_TIP_Z,
-  CABINET_PEG_CENTER_Z, CABINET_BACK_FRONT_Z, CABINET_GROUND_OFFSET,
+  CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS, CABINET_BACK_FRONT_Z, CABINET_GROUND_OFFSET,
   CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_SHELF_DEPTH,
   CABINET_SHELF_CENTER_Z, CABINET_GRID_BOTTOM_Y, CABINET_GRID_TOP_Y,
   CABINET_BLANK_ROW_BOTTOM_Y,
@@ -192,43 +190,24 @@ test('scattered and thrown keys keep enough room not to intersect', () => {
   assert.ok(state.keys.every(key => !inStationFootprint(key.x, key.z, .20)));
 });
 
-test('each cabinet has 96 recessed pegs in 24 square compartments above a blank lower row', () => {
+test('each cabinet has 96 individual cubbies, four within each original square', () => {
   assert.equal(CABINET_ROWS, 4);
   assert.equal(CABINET_COLUMNS, 6);
   assert.equal(CABINET_CAPACITY, 96);
   assert.equal(CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT);
   assert.ok(Math.abs(CABINET_GRID_BOTTOM_Y - CABINET_BLANK_ROW_BOTTOM_Y - CABINET_ROW_HEIGHT) < 1e-9);
   assert.ok(Math.abs(CABINET_GRID_TOP_Y - CABINET_GRID_BOTTOM_Y - 4 * CABINET_ROW_HEIGHT) < 1e-9);
-  assert.equal(CABINET_PEG_VISIBLE_LENGTH, .175);
-  assert.equal(CABINET_PEG_LENGTH, CABINET_PEG_TIP_Z - CABINET_PEG_BACK_Z);
-  assert.ok(CABINET_PEG_BACK_Z < CABINET_BACK_FRONT_Z);
-  assert.equal(CABINET_PEG_CENTER_Z, (CABINET_PEG_BACK_Z + CABINET_PEG_TIP_Z) / 2);
-  // Neither a peg nor the key hung on it can protrude past the shelf's front edge.
-  assert.ok(CABINET_PEG_TIP_Z <= CABINET_SHELF_CENTER_Z + CABINET_SHELF_DEPTH / 2);
-  assert.ok(CABINET_PEG_TIP_Z < CABINET_OUTLINE.front);
+  assert.ok(CABINET_BACK_FRONT_Z < CABINET_SHELF_CENTER_Z);
   assert.ok(Math.abs(CABINET_GROUND_OFFSET + .15 - .33 / 2 - (-.05)) < 1e-9);
   assert.equal(CABINET_SHELF_DEPTH, .57 / 2);
-  const pegs = Array.from({ length: CABINET_CAPACITY }, (_, index) => pegForSlot(index));
-  assert.equal(new Set(pegs.map(peg => `${peg.x.toFixed(3)}|${peg.y.toFixed(3)}`)).size, CABINET_CAPACITY);
-  assert.ok(pegs.every(peg => peg.x >= -1.62 && peg.x <= 1.62 && peg.y > CABINET_GRID_BOTTOM_Y && peg.y < CABINET_GRID_TOP_Y));
-  assert.ok(pegs.every(peg => peg.z < CABINET_PEG_TIP_Z && peg.z > CABINET_SHELF_CENTER_Z));
-  assert.ok(pegs.every(peg => peg.z + .065 * .185 < CABINET_SHELF_CENTER_Z + CABINET_SHELF_DEPTH / 2));
-  // Each horizontal group of 12 hangs at a common height, with the next group below it.
-  assert.ok(pegs.every((peg, index) => index === 0 || peg.y <= pegs[index - 1].y));
-  for (let line = 0; line < CABINET_ROWS * 2; line++) {
-    const pegsInLine = pegs.slice(line * CABINET_COLUMNS * 2, (line + 1) * CABINET_COLUMNS * 2);
-    assert.equal(new Set(pegsInLine.map(peg => peg.y)).size, 1);
-  }
-  // A hanging key's teeth and bow stay clear of both surrounding shelves.
-  const keyBottom = -.063 - .425 * .185;
-  const keyTop = -.063 + .624 * .185;
-  for (let rowFromTop = 0; rowFromTop < CABINET_ROWS; rowFromTop++) {
-    const bottomShelf = CABINET_GRID_BOTTOM_Y + (CABINET_ROWS - rowFromTop - 1) * CABINET_ROW_HEIGHT;
-    const upperShelf = bottomShelf + CABINET_ROW_HEIGHT;
-    const upperLineIndex = rowFromTop * CABINET_COLUMNS * 4;
-    const lowerLineIndex = upperLineIndex + CABINET_COLUMNS * 2;
-    assert.ok(pegs[lowerLineIndex].y + keyBottom > bottomShelf + .055 + .028 / 2);
-    assert.ok(pegs[upperLineIndex].y + keyTop < upperShelf - .078 / 2);
+  const cells = Array.from({ length: CABINET_CAPACITY }, (_, index) => pegForSlot(index));
+  assert.equal(new Set(cells.map(cell => `${cell.x.toFixed(3)}|${cell.y.toFixed(3)}`)).size, CABINET_CAPACITY);
+  assert.ok(cells.every(cell => cell.x > -1.62 && cell.x < 1.62 && cell.y > CABINET_GRID_BOTTOM_Y && cell.y < CABINET_GRID_TOP_Y));
+  assert.ok(cells.every(cell => cell.z > CABINET_SHELF_CENTER_Z && cell.z < CABINET_OUTLINE.front));
+  assert.equal(new Set(cells.map(cell => cell.x)).size, CABINET_COLUMNS * 2);
+  assert.equal(new Set(cells.map(cell => cell.y)).size, CABINET_ROWS * 2);
+  for (let i = 0; i < CABINET_CAPACITY; i += 4) {
+    assert.ok(cells[i].y >= cells[i + 3].y);
   }
   assert.ok(Math.abs(CABINET_OUTLINE.width / 2 + CABINET_OUTLINE.thickness / 2 - (1.76 + .26 / 2)) < .015);
   assert.ok(CABINET_OUTLINE.top + CABINET_OUTLINE.thickness / 2 <= 4.77 + .24 / 2);

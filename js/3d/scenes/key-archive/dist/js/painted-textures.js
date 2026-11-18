@@ -14,24 +14,27 @@ export const METAL_BY_KEY_TYPE = Object.freeze([
   'brass', 'steel', 'brass', 'copper', 'brass',
 ]);
 
-let sharedTextures;
+const sharedTextures = {};
+const loader = new THREE.TextureLoader();
+
+export function getPaintedMetalTexture(kind) {
+  if (!PAINTED_METALS[kind]) return null;
+  if (sharedTextures[kind]) return sharedTextures[kind];
+  const texture = loader.load(PAINTED_METALS[kind], undefined, undefined,
+    () => console.warn(`Не загружена гуашевая текстура ${kind}`));
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = texture.wrapT = THREE.MirroredRepeatWrapping;
+  texture.repeat.set(.7, .7);
+  texture.anisotropy = 4;
+  sharedTextures[kind] = texture;
+  return texture;
+}
 
 export function getPaintedMetalTextures() {
-  if (sharedTextures) return sharedTextures;
-  const loader = new THREE.TextureLoader();
-  sharedTextures = {};
-  for (const [kind, url] of Object.entries(PAINTED_METALS)) {
-    const texture = loader.load(url, undefined, undefined,
-      () => console.warn(`Не загружена гуашевая текстура ${kind}`));
-    texture.colorSpace = THREE.SRGBColorSpace;
-    texture.wrapS = texture.wrapT = THREE.MirroredRepeatWrapping;
-    texture.repeat.set(.7, .7);
-    texture.anisotropy = 4;
-    sharedTextures[kind] = texture;
-  }
+  // Existing callers may read the shared cache; loading remains demand-driven.
   return sharedTextures;
 }
 
 export function getKeyPaint(type) {
-  return getPaintedMetalTextures()[METAL_BY_KEY_TYPE[type]];
+  return getPaintedMetalTexture(METAL_BY_KEY_TYPE[type]);
 }

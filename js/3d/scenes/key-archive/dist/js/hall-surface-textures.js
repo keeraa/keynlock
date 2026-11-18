@@ -3,20 +3,21 @@ import * as THREE from '../vendor/three.js';
 // Separate original gouache paintings for plaster and the continuous wood vault.
 // Asset paths are resolved relative to the module so hosting works at any base URL.
 export const HALL_SURFACE_URLS = Object.freeze({
-  wall: new URL('../assets/gouache-plaster-wall-v1.webp', import.meta.url).href,
-  ceiling: new URL('../assets/gouache-vault-ceiling-v2.webp', import.meta.url).href,
+  wall: new URL('../assets/gouache-archive-warm-plaster-v5.webp', import.meta.url).href,
+  ceiling: new URL('../assets/gouache-archive-ivory-v3.webp', import.meta.url).href,
   carpet: new URL('../assets/gouache-carpet-v1.webp', import.meta.url).href,
+  wood: new URL('../assets/gouache-archive-walnut-v4.webp', import.meta.url).href,
 });
 
 // Shared archive palette: cream-sage plaster, soft green columns, pale-oak vault,
 // faded claret fabric and warm walnut framing.
 export const HALL_PALETTE = Object.freeze({
-  wall: 0xcbd4c8,
-  pilaster: 0xb6cbbd,
-  ceiling: 0xf1e9d8,
+  wall: 0xf0e9df,
+  pilaster: 0xe3d9cc,
+  ceiling: 0xffffff,
   carpet: 0xdcc9c5,
-  trim: 0xcbb09b,
-  beam: 0xb69d89,
+  trim: 0xb9aea0,
+  beam: 0x948a7c,
 });
 
 export const HALL_SURFACE_TILE_METERS = Object.freeze({
@@ -36,6 +37,10 @@ function loadPaintedTexture(url, fallback, repeatU, repeatV) {
   return texture;
 }
 
+export function createArchiveWoodTexture(fallback) {
+  return loadPaintedTexture(HALL_SURFACE_URLS.wood, fallback, 1, 1);
+}
+
 export function createHallSurfaceMaterials(plasterFallback, woodFallback, carpetFallback) {
   const plaster = (repeatU, repeatV, color = HALL_PALETTE.wall) => new THREE.MeshStandardMaterial({
     map: loadPaintedTexture(HALL_SURFACE_URLS.wall, plasterFallback, repeatU, repeatV),
@@ -45,9 +50,8 @@ export function createHallSurfaceMaterials(plasterFallback, woodFallback, carpet
   const wallTile = HALL_SURFACE_TILE_METERS.wall;
   const ceilingTile = HALL_SURFACE_TILE_METERS.ceiling;
   const carpetTile = HALL_SURFACE_TILE_METERS.carpet;
-  const beamPaint = woodFallback.clone();
-  beamPaint.repeat.set(24 / HALL_SURFACE_TILE_METERS.trim, 1);
-  beamPaint.needsUpdate = true;
+  const trimPaint = loadPaintedTexture(HALL_SURFACE_URLS.wood, woodFallback, 1, 1);
+  const beamPaint = loadPaintedTexture(HALL_SURFACE_URLS.wood, woodFallback, 7, 1);
   return {
     // ExtrudeGeometry uses world-sized UVs; BoxGeometry uses normalized UVs.
     hallWall: plaster(1 / wallTile, 1 / wallTile),
@@ -67,7 +71,7 @@ export function createHallSurfaceMaterials(plasterFallback, woodFallback, carpet
       roughness: 1,
     }),
     hallTrim: new THREE.MeshStandardMaterial({
-      map: woodFallback, color: HALL_PALETTE.trim, roughness: .98,
+      map: trimPaint, color: HALL_PALETTE.trim, roughness: .98,
     }),
     hallBeam: new THREE.MeshStandardMaterial({
       map: beamPaint, color: HALL_PALETTE.beam, roughness: .98,

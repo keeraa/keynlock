@@ -79,16 +79,16 @@ export function addArchedWindow(parent, side, z, mat, snow) {
   frame.holes.push(archedOpening());
   const surround = new THREE.Mesh(new THREE.ExtrudeGeometry(frame, {
     depth: .13, bevelEnabled: false, curveSegments: 22, steps: 1,
-  }), mat.brass);
+  }), mat.agedBronze);
   surround.position.z = -.055;
   surround.castShadow = true;
   group.add(surround);
 
   // All muntins meet the continuous arch surround; nothing ends mid-window.
-  smallBox(group, [.105, 4.35, .11], [0, 8.04, .075], mat.darkWood, true);
+  smallBox(group, [.105, 4.35, .11], [0, 8.04, .075], mat.cabinetWalnut, true);
   for (const y of [7.43, 8.64])
-    smallBox(group, [2.25, .095, .11], [0, y, .075], mat.darkWood, true);
-  smallBox(group, [2.5, .16, .21], [0, 5.73, .025], mat.brass, true);
+    smallBox(group, [2.25, .095, .11], [0, y, .075], mat.cabinetWalnut, true);
+  smallBox(group, [2.5, .16, .21], [0, 5.73, .025], mat.agedBronze, true);
   snow.addToWindow(group);
   return group;
 }
@@ -143,7 +143,7 @@ export function addVault(parent, ceilingMaterial, beamMaterial) {
       const x = -11.82 + i * 23.64 / 24;
       return new THREE.Vector3(x, vaultHeight(x) - .035, z);
     }));
-    parent.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 48, .115, 8, false), beamMaterial));
+    parent.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 48, .19, 8, false), beamMaterial));
   }
   return ceiling;
 }

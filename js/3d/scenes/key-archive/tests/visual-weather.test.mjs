@@ -7,27 +7,31 @@ import {
 import { createWetSnow } from '../dist/js/wet-snow.js';
 import { logicalKey } from '../dist/js/controls.js';
 
-test('KEYNLOCK visual preset retains the shared toon, ink and gouache values', () => {
+test('KEYNLOCK visual preset retains toon, ink and weather values', () => {
   const settings = normalizeVisualSettings(null);
   assert.equal(settings.toonLight, 80);
   assert.equal(settings.toonSteps, 4);
   assert.equal(settings.outlineStrength, 70);
   assert.equal(settings.outlineWidth, 1);
-  assert.equal(settings.brushExpression, 95);
+  assert.equal(settings.outlineSensitivity, 50);
   assert.equal(settings.cartoonMaterial, 90);
-  assert.equal(settings.strokeDetail, 2);
+  assert.equal('brushExpression' in settings, false);
+  assert.equal('strokeDetail' in settings, false);
+  assert.equal('brushExpression' in normalizeVisualSettings({ brushExpression: 100, strokeDetail: 100 }), false);
   assert.equal(settings.wetSnowEnabled, true);
   assert.equal(settings.windowDaylight, 75);
 });
 
 test('visual controls reject invalid saved values and keep switches independent', () => {
   const settings = normalizeVisualSettings({ toonLight: 120, toonSteps: -2, outlineStrength: 'bad',
-    outlineWidth: 99, snowWind: -200, snowIntensity: 12.1, windowDaylight: 150, toonEnabled: false,
-    outlineEnabled: false, brushExpression: 0 });
+    outlineWidth: 99, outlineSensitivity: 140, snowWind: -200, snowIntensity: 12.1,
+    windowDaylight: 150, toonEnabled: false,
+    outlineEnabled: false, brushExpression: 99 });
   assert.equal(settings.toonLight, 100);
   assert.equal(settings.toonSteps, 2);
   assert.equal(settings.outlineStrength, 70);
   assert.equal(settings.outlineWidth, 4);
+  assert.equal(settings.outlineSensitivity, 100);
   assert.equal(settings.snowWind, -100);
   assert.equal(settings.snowIntensity, 12);
   assert.equal(settings.windowDaylight, 100);

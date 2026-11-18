@@ -1,6 +1,6 @@
 import * as THREE from '../vendor/three.js';
-import { createCombinedKeyGeometry, makeLabel } from './art.js?v=17';
-import { getKeyPaint } from './painted-textures.js';
+import { makeLabel } from './art.js?v=17';
+import { createKeyModel, disposeKeySceneModel, getKeyDisplayScale } from './key-factory.js?v=3';
 import { bathContents } from './rules.js';
 import { BATH_CAPACITY, FIXTURE_OFFSETS, STATIONS, bathId } from './station-layout.js';
 
@@ -24,18 +24,6 @@ function rim(parent, radius, y, x, z, material) {
   object.position.set(x, y, z);
   parent.add(object);
   return object;
-}
-
-function addHoverRim(edge) {
-  const material = new THREE.MeshBasicMaterial({
-    color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, toneMapped: false,
-  });
-  const outline = new THREE.Mesh(edge.geometry, material);
-  outline.scale.setScalar(1.09);
-  outline.position.z = -.014;
-  outline.visible = false;
-  edge.add(outline);
-  return { outline, material, hoverTarget: 0, hoverAmount: 0 };
 }
 
 function mountSign(group, label, materials, { x, y, z, width, height, supports }) {
@@ -82,7 +70,7 @@ function createBath(group, station, kind, materials) {
     cylinder(holder, .035, .035, .012, [0, .012, 0], materials.brass, 9);
     slots.push({ holder, keyId: null, keyMesh: null });
   }
-  return { id, kind, edge, slots, collider, waterMaterial, ...addHoverRim(edge) };
+  return { id, kind, edge, slots, collider, waterMaterial };
 }
 
 function createForge(group, station, materials) {
@@ -111,7 +99,7 @@ function createForge(group, station, materials) {
   collider.position.set(x, 1.29, .08);
   collider.userData = { kind: 'forge', stationId: station.id };
   group.add(collider);
-  return { edge, embers, collider, ...addHoverRim(edge) };
+  return { edge, embers, collider };
 }
 
 export function createWorkstations(scene, materials, state) {
@@ -130,10 +118,6 @@ export function createWorkstations(scene, materials, state) {
       block(group, [.16, .80, .16], [x, .38, z], materials.darkWood);
     block(group, [4.86, .12, .27], [0, .29, -.49], materials.blackWood);
     block(group, [4.86, .12, .27], [0, .29, .67], materials.blackWood);
-    const title = makeLabel(`СТАНЦИЯ · ${station.name}`, 'отмачивание · очистка · переплавка',
-      { worldWidth: 3.8, worldHeight: .65, fontSize: 71 });
-    mountSign(group, title, materials,
-      { x: 0, y: 2.47, z: -.52, width: 3.8, height: .65, supports: 1.65 });
     const baths = ['mud', 'rust'].map(kind => createBath(group, station, kind, materials));
     const forge = createForge(group, station, materials);
     for (const bath of baths) {
@@ -145,15 +129,11 @@ export function createWorkstations(scene, materials, state) {
     stations.push({ ...station, group, baths, forge });
   }
 
-  const hoverFixtures = [...bathMap.values(), ...forgeMap.values()];
-  let lastHoverFrame = performance.now();
-  function highlight(target) {
-    const fixture = target?.kind === 'bath' ? bathMap.get(target.id) :
-      target?.kind === 'forge' ? forgeMap.get(target.stationId) : null;
-    for (const current of hoverFixtures) current.hoverTarget = current === fixture ? 1 : 0;
+  function getHoverCollider(target) {
+    return target?.kind === 'bath' ? bathMap.get(target.id)?.collider :
+      target?.kind === 'forge' ? forgeMap.get(target.stationId)?.collider : null;
   }
 
-  const keyMaterials = new Map();
   function refreshBaths(now = Date.now()) {
     for (const bath of bathMap.values()) {
       const contents = bathContents(state, bath.id, now).keys;
@@ -162,16 +142,15 @@ export function createWorkstations(scene, materials, state) {
         if (slot.keyId !== (key?.id || null)) {
           if (slot.keyMesh) {
             slot.holder.remove(slot.keyMesh);
+            disposeKeySceneModel(slot.keyMesh);
             slot.keyMesh = null;
           }
           slot.keyId = key?.id || null;
           if (key) {
-            if (!keyMaterials.has(key.type)) keyMaterials.set(key.type,
-              new THREE.MeshStandardMaterial({ map: getKeyPaint(key.type), color: 0xe6d1a8,
-                roughness: .75, metalness: .16 }));
-            slot.keyMesh = new THREE.Mesh(createCombinedKeyGeometry(key.type), keyMaterials.get(key.type));
+            slot.keyMesh = createKeyModel(key.type, { id: key.id, variation: key.variation,
+              broken: key.broken, mud: key.mud, rust: key.rust,
+              scale: getKeyDisplayScale('bath', key.type) });
             slot.keyMesh.rotation.x = -Math.PI / 2;
-            slot.keyMesh.scale.setScalar(.22);
             slot.holder.add(slot.keyMesh);
           }
         }
@@ -185,14 +164,6 @@ export function createWorkstations(scene, materials, state) {
   }
 
   function update(now) {
-    const dt = Math.max(0, Math.min(.1, (now - lastHoverFrame) / 1000));
-    lastHoverFrame = now;
-    const hoverFactor = 1 - Math.exp(-dt / .15);
-    for (const fixture of hoverFixtures) {
-      fixture.hoverAmount += (fixture.hoverTarget - fixture.hoverAmount) * hoverFactor;
-      fixture.material.opacity = fixture.hoverAmount;
-      fixture.outline.visible = fixture.hoverAmount > .005;
-    }
     // The hot metal breathes softly; no dynamic shadow-casting lights or particles.
     for (const station of stations) {
       station.forge.embers.forEach((ember, index) => {
@@ -205,5 +176,5 @@ export function createWorkstations(scene, materials, state) {
   }
 
   refreshBaths();
-  return { stations, interactables, highlight, refreshBaths, update };
+  return { stations, interactables, getHoverCollider, refreshBaths, update };
 }

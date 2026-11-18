@@ -1,20 +1,23 @@
 import * as THREE from '../vendor/three.js';
-import { KEY_TYPES, KEYS_PER_TYPE, getProgress, keyCondition, bathContents } from './rules.js?v=21';
-import { keyHeadPoints, makePaintTexture } from './art.js?v=17';
+import { KEY_TYPES, KEYS_PER_TYPE, getProgress, keyCondition, bathContents } from './rules.js?v=22';
+import { createFallbackSurfaces } from './fallback-surfaces.js';
+import {
+  getKeyFallbackHeadPoints, createKeyFallbackStamp, getKeyColliderSize, getKeyMetal,
+} from './key-factory.js?v=3';
 import { sampleThrow } from './throw-physics.js';
-import { METAL_BY_KEY_TYPE, PAINTED_METALS } from './painted-textures.js';
-import { findFloorKeyAtReticle } from './key-picking.js';
+import { PAINTED_METALS } from './painted-textures.js';
+import { findFloorKeyAtReticle } from './key-picking.js?v=2';
 import {
   CABINET_Z, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS,
   CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_GRID_BOTTOM_Y,
   CABINET_BLANK_ROW_BOTTOM_Y, CABINET_GROUND_OFFSET,
   CABINET_OUTLINE, pegForSlot,
-} from './cabinet-layout.js?v=20';
+} from './cabinet-layout.js?v=21';
 import { STATIONS, FIXTURE_OFFSETS, bathId } from './station-layout.js';
-import { getPatinaTexture } from './key-patina.js';
+import { keyAssetUrl, RUST_TEXTURE } from './key-data.js';
+import { dirtPaint, stableNoise } from './key-dirt.js';
 import { restingKeyY } from './floor-contact.js';
 import { PLAYER_EYE_HEIGHT } from './player-config.js';
-import { HALL_SURFACE_URLS } from './hall-surface-textures.js?v=23';
 import {
   WINDOW_CENTERS, PILASTER_CENTERS, PERIMETER_BAND_Y, vaultHeight,
   WINDOW_SILL_Y, WINDOW_SPRING_Y,
@@ -27,19 +30,7 @@ const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 export function createFallbackWorld(canvas, state, initialVisualSettings) {
   const ctx = canvas.getContext('2d', { alpha: false });
   if (!ctx) throw new Error('Не удалось инициализировать 2D- или 3D-графику.');
-  const woodPattern = ctx.createPattern(makePaintTexture('wood', 45).image, 'repeat');
-  let plasterPattern = ctx.createPattern(makePaintTexture('plaster', 32).image, 'repeat');
-  let ceilingPattern = woodPattern;
-  const wallImage = new Image();
-  wallImage.onload = () => { plasterPattern = ctx.createPattern(wallImage, 'repeat') || plasterPattern; };
-  wallImage.src = HALL_SURFACE_URLS.wall;
-  const ceilingImage = new Image();
-  ceilingImage.onload = () => { ceilingPattern = ctx.createPattern(ceilingImage, 'repeat') || ceilingPattern; };
-  ceilingImage.src = HALL_SURFACE_URLS.ceiling;
-  let rugPattern = ctx.createPattern(makePaintTexture('rug', 177).image, 'repeat');
-  const rugImage = new Image();
-  rugImage.onload = () => { rugPattern = ctx.createPattern(rugImage, 'repeat') || rugPattern; };
-  rugImage.src = HALL_SURFACE_URLS.carpet;
+  const surfaces = createFallbackSurfaces(ctx);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(73, 1, .06, 120);
   camera.position.set(0, PLAYER_EYE_HEIGHT, 20.2);
@@ -72,11 +63,11 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
   }
   setVisualSettings(initialVisualSettings);
 
-  const colliderGeometry = new THREE.BoxGeometry(.43, .21, .65);
   const colliderMaterial = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 });
   const dummy = new THREE.Object3D();
   const keyColliders = KEY_TYPES.map((_, type) => {
-    const collider = new THREE.InstancedMesh(colliderGeometry, colliderMaterial, KEYS_PER_TYPE);
+    const collider = new THREE.InstancedMesh(
+      new THREE.BoxGeometry(...getKeyColliderSize(type).map(size => size * .72)), colliderMaterial, KEYS_PER_TYPE);
     collider.userData = { kind: 'key-batch', type };
     collider.frustumCulled = false;
     scene.add(collider);
@@ -162,17 +153,18 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
       if (toon > 0 && typeof fill !== 'string') {
         ctx.save();
         ctx.globalAlpha = toon * .43;
-        ctx.fillStyle = fill === woodPattern ? '#b38d6e' :
-          fill === ceilingPattern ? '#76513b' :
-          fill === rugPattern ? '#a27a82' : '#b8c2b1';
+        ctx.fillStyle = fill === surfaces.wood ? '#b38d6e' :
+          fill === surfaces.ceiling ? '#76513b' :
+          fill === surfaces.carpet ? '#a27a82' : '#b8c2b1';
         ctx.fill();
         ctx.restore();
       }
     }
     if (stroke) {
       if (visualSettings.outlineEnabled) {
-        ctx.strokeStyle = `rgba(20,28,27,${visualSettings.outlineStrength / 100})`;
-        ctx.lineWidth = strokeWidth + visualSettings.outlineWidth * 1.7;
+        ctx.strokeStyle = `rgba(51,42,35,${.91 * visualSettings.outlineStrength / 100})`;
+        ctx.lineWidth = strokeWidth + visualSettings.outlineWidth *
+          (1.4 + .6 * visualSettings.outlineSensitivity / 100);
         ctx.stroke();
       }
       ctx.strokeStyle = stroke;
@@ -263,15 +255,15 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
 
   function architecture() {
     // The room is drawn as a set of projected linework and painted wall planes.
-    path3([[-11.8, 0, -23], [11.8, 0, -23], [11.8, 0, 23], [-11.8, 0, 23]], woodPattern);
-    path3([[-11.85, 0, -23], [-11.85, 11, -23], [-11.85, 11, 23], [-11.85, 0, 23]], plasterPattern, '#a0906e');
-    path3([[11.85, 0, -23], [11.85, 11, -23], [11.85, 11, 23], [11.85, 0, 23]], plasterPattern, '#a0906e');
-    path3([[-11.8, 0, -23], [11.8, 0, -23], [11.8, 11, -23], [-11.8, 11, -23]], plasterPattern, '#b7a078');
+    path3([[-11.8, 0, -23], [11.8, 0, -23], [11.8, 0, 23], [-11.8, 0, 23]], surfaces.wood);
+    path3([[-11.85, 0, -23], [-11.85, 11, -23], [-11.85, 11, 23], [-11.85, 0, 23]], surfaces.plaster, '#a0906e');
+    path3([[11.85, 0, -23], [11.85, 11, -23], [11.85, 11, 23], [11.85, 0, 23]], surfaces.plaster, '#a0906e');
+    path3([[-11.8, 0, -23], [11.8, 0, -23], [11.8, 11, -23], [-11.8, 11, -23]], surfaces.plaster, '#b7a078');
     path3([[-11.8, vaultHeight(-11.8), -23], [11.8, vaultHeight(11.8), -23],
-      [11.8, vaultHeight(11.8), 23], [-11.8, vaultHeight(-11.8), 23]], ceilingPattern);
+      [11.8, vaultHeight(11.8), 23], [-11.8, vaultHeight(-11.8), 23]], surfaces.ceiling);
 
     // Red-brown sorting rug with hand-painted brass border.
-    path3([[-8, .017, -18.6], [8, .017, -18.6], [8, .017, 18.2], [-8, .017, 18.2]], rugPattern, '#ddbd81', 3);
+    path3([[-8, .017, -18.6], [8, .017, -18.6], [8, .017, 18.2], [-8, .017, 18.2]], surfaces.carpet, '#ddbd81', 3);
     if (visualSettings.windowDaylight > 0) {
       ctx.save();
       ctx.globalAlpha = visualSettings.windowDaylight / 100 * .17;
@@ -359,28 +351,28 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
     const x1 = left ? -10.8 : 10.8;
     const base = [[x1, -.04, z - 1.95], [x1, -.04, z + 1.95],
       [x1, 4.85, z + 1.95], [x1, 4.85, z - 1.95]];
-    if (!path3(base, woodPattern, '#d0a675', 4)) return;
+    if (!path3(base, surfaces.wood, '#d0a675', 4)) return;
     path3([[faceX, .31, z - 1.52], [faceX, .31, z + 1.52], [faceX, 3.88, z + 1.52], [faceX, 3.88, z - 1.52]], '#0b0d0d', '#d5b384', 2);
     path3([[faceX, .31, z - 1.62], [faceX, .31, z + 1.62],
       [faceX, CABINET_BLANK_ROW_BOTTOM_Y, z + 1.62], [faceX, CABINET_BLANK_ROW_BOTTOM_Y, z - 1.62]],
-    woodPattern, '#b99263', 2);
+    surfaces.wood, '#b99263', 2);
     path3([[faceX, CABINET_BLANK_ROW_BOTTOM_Y, z - 1.62],
       [faceX, CABINET_BLANK_ROW_BOTTOM_Y, z + 1.62],
       [faceX, CABINET_GRID_BOTTOM_Y, z + 1.62],
       [faceX, CABINET_GRID_BOTTOM_Y, z - 1.62]], '#695043', '#b99263', 2);
-    for (let row = 0; row <= CABINET_ROWS; row++) {
-      const y = CABINET_GRID_BOTTOM_Y + row * CABINET_ROW_HEIGHT;
+    for (let row = 0; row <= CABINET_ROWS * 2; row++) {
+      const y = CABINET_GRID_BOTTOM_Y + row * CABINET_ROW_HEIGHT / 2;
       segment([faceX, y, z - 1.55], [faceX, y, z + 1.55], '#b89163', 4);
     }
-    for (let divider = 0; divider <= CABINET_COLUMNS; divider++) {
-      const shift = -1.62 + divider * CABINET_COLUMN_WIDTH;
+    for (let divider = 0; divider <= CABINET_COLUMNS * 2; divider++) {
+      const shift = -1.62 + divider * CABINET_COLUMN_WIDTH / 2;
       const dividerZ = z + (left ? -shift : shift);
       segment([faceX, CABINET_GRID_BOTTOM_Y, dividerZ],
         [faceX, CABINET_GRID_BOTTOM_Y + CABINET_ROWS * CABINET_ROW_HEIGHT, dividerZ], '#b99263', 4);
     }
-    const sign = project(faceX, 4.25, z);
+    const sign = project(faceX, 4.25, z + (left ? -.32 : .32));
     if (sign) {
-      const charSize = clamp(100 / sign.depth * 3, 9, 24);
+      const charSize = clamp(123 / sign.depth * 3, 12, 30);
       ctx.textAlign = 'center';
       ctx.fillStyle = '#ecd2a0';
       ctx.font = `${charSize}px Georgia`;
@@ -389,29 +381,21 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
       ctx.fillText(KEY_TYPES[type].name.toUpperCase(), sign.x, sign.y, 220);
       ctx.shadowBlur = 0;
     }
-    segment([faceX, 4.81, z], [faceX, 5.75, z], '#674b38', 5);
-    const medallion = project(faceX, 5.85, z);
-    if (medallion) {
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#d4b16e';
-      ctx.font = `${clamp(160 / medallion.depth * 3, 15, 44)}px Georgia`;
-      ctx.fillText(['◯', '△', '□', '◇', '⬟', '⬡', '★', '✿', '⬭', '♛'][type], medallion.x, medallion.y);
+    const signKey = project(faceX, 4.25, z + (left ? 1.23 : -1.23));
+    if (signKey) {
+      ctx.font = `${clamp(110 / signKey.depth * 3, 12, 28)}px Georgia`;
+      ctx.fillStyle = '#dbbd8c';
+      ctx.fillText('⚿', signKey.x, signKey.y);
     }
     const count = cabinetCounts[type];
     const inFlight = [...placingKeys.values()].filter(motion => motion.key.type === type).length;
-    const showPegs = Math.hypot(camera.position.x - faceX, camera.position.z - z) < 17;
-    for (let i = 0; showPegs && i < CABINET_CAPACITY; i++) {
+    const showKeys = Math.hypot(camera.position.x - faceX, camera.position.z - z) < 17;
+    for (let i = 0; showKeys && i < CABINET_CAPACITY; i++) {
       const peg = pegForSlot(i);
       const hookZ = z + (left ? -peg.x : peg.x);
       const hook = project(faceX + (left ? .05 : -.05), peg.y, hookZ);
       if (!hook) continue;
       const size = clamp(15 / hook.depth, .9, 3.5);
-      ctx.strokeStyle = '#171d1d';
-      ctx.lineWidth = size;
-      ctx.beginPath();
-      ctx.moveTo(hook.x, hook.y);
-      ctx.lineTo(hook.x + (left ? size * .20 : -size * .20), hook.y + size * .08);
-      ctx.stroke();
       if (i < count - inFlight) {
         ctx.fillStyle = '#ebd9b6';
         ctx.beginPath();
@@ -450,7 +434,7 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
     const { x, z } = station;
     const table = [[x - 2.52, .88, z - .74], [x + 2.52, .88, z - .74],
       [x + 2.52, .88, z + .87], [x - 2.52, .88, z + .87]];
-    path3(table, woodPattern, '#cba774', 3);
+    path3(table, surfaces.wood, '#cba774', 3);
     const tableHover = Math.max(fixtureHover.get(bathId(station.id, 'mud')) || 0,
       fixtureHover.get(bathId(station.id, 'rust')) || 0,
       fixtureHover.get(`forge:${station.id}`) || 0);
@@ -516,11 +500,16 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
     }
   }
 
-  const headShapes = KEY_TYPES.map((_, type) => keyHeadPoints(type));
+  const headShapes = KEY_TYPES.map((_, type) => getKeyFallbackHeadPoints(type));
+  const providedStamps = KEY_TYPES.map((_, type) => [
+    createKeyFallbackStamp(type, false), createKeyFallbackStamp(type, true),
+  ]);
   const cabinetCounts = new Array(KEY_TYPES.length).fill(0);
   const requiredCounts = getProgress(state).required;
   // Cached gouache-like key stamps: no per-frame polygon tessellation on Canvas.
   const keyStamps = headShapes.map((shape, type) => {
+    const provided = providedStamps[type][0];
+    if (provided) return provided;
     const stamp = document.createElement('canvas');
     stamp.width = 160;
     stamp.height = 220;
@@ -553,7 +542,9 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
     }
     return stamp;
   });
-  const brokenStamps = keyStamps.map(stamp => {
+  const brokenStamps = keyStamps.map((stamp, type) => {
+    const provided = providedStamps[type][1];
+    if (provided) return provided;
     const broken = document.createElement('canvas');
     broken.width = stamp.width;
     broken.height = stamp.height;
@@ -568,11 +559,14 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
     return broken;
   });
   const patinaStamps = new Map();
+  const forgeRust = new Image();
+  forgeRust.onload = () => patinaStamps.clear();
+  forgeRust.src = keyAssetUrl(RUST_TEXTURE);
   function stampFor(key) {
     if (key.broken) return brokenStamps[key.type];
     const condition = keyCondition(key);
     if (condition === 'clean') return keyStamps[key.type];
-    const id = `${key.type}-${condition}`;
+    const id = `${key.type}-${condition}-${key.variation ?? 0}`;
     if (!patinaStamps.has(id)) {
       const canvas = document.createElement('canvas');
       canvas.width = 160; canvas.height = 220;
@@ -580,9 +574,22 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
       brush.drawImage(keyStamps[key.type], 0, 0);
       brush.save();
       brush.globalCompositeOperation = 'source-atop';
-      for (const kind of ['mud', 'rust']) if (key[kind]) {
-        brush.globalAlpha = kind === 'mud' ? .88 : .71;
-        brush.drawImage(getPatinaTexture(key.type, kind).image, 0, 0, 160, 220);
+      if (key.rust && forgeRust.naturalWidth) {
+        brush.globalAlpha = .85;
+        brush.drawImage(forgeRust, (key.type % 3 - 1) * 13, (key.variation % 3 - 1) * 9,
+          184, 242);
+      }
+      if (key.mud) {
+        // Same opaque earthen pigments as Forge's 3D crust, simplified for 2D.
+        brush.globalAlpha = 1;
+        brush.fillStyle = dirtPaint[0];
+        brush.fillRect(0, 0, 160, 220);
+        brush.globalAlpha = .22;
+        for (let y = 0; y < 220; y += 9) for (let x = 0; x < 160; x += 9) {
+          const n = stableNoise(x * .21 + y * .13 + key.type * 5 + (key.variation ?? 0));
+          brush.fillStyle = dirtPaint[Math.floor(n * dirtPaint.length)];
+          brush.fillRect(x, y, 9, 9);
+        }
       }
       brush.restore();
       patinaStamps.set(id, canvas);
@@ -591,13 +598,13 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
   }
   const handPatterns = {};
   for (const [metal, source] of Object.entries(PAINTED_METALS)) {
-    if (!new Set(METAL_BY_KEY_TYPE).has(metal)) continue;
+    if (!KEY_TYPES.some((_, type) => getKeyMetal(type) === metal)) continue;
     const image = new Image();
     image.onload = () => {
       handPatterns[metal] = ctx.createPattern(image, 'repeat');
       patinaStamps.clear();
       for (let type = 0; type < keyStamps.length; type++) {
-        if (METAL_BY_KEY_TYPE[type] !== metal) continue;
+        if (getKeyMetal(type) !== metal) continue;
         for (const stamp of [keyStamps[type], brokenStamps[type]]) {
           const brush = stamp.getContext('2d');
           brush.save();
@@ -662,7 +669,17 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
 
   function drawHand() {
     if (!carriedKey) return;
-    const shape = keyHeadPoints(carriedKey.type);
+    if (providedStamps[carriedKey.type][carriedKey.broken ? 1 : 0]) {
+      const stamp = stampFor(carriedKey);
+      const scale = Math.min(width, height) * .0008;
+      ctx.save();
+      ctx.translate(width * .67, height * .77 + Math.sin(frameTime * .003) * 6);
+      ctx.rotate(-.45);
+      ctx.drawImage(stamp, -80 * scale, -110 * scale, 160 * scale, 220 * scale);
+      ctx.restore();
+      return;
+    }
+    const shape = getKeyFallbackHeadPoints(carriedKey.type);
     const scale = Math.min(width, height) * .077;
     ctx.save();
     ctx.translate(width * .67, height * .77 + Math.sin(frameTime * .003) * 6);
@@ -670,7 +687,7 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
     ctx.shadowColor = 'rgba(0,0,0,.65)';
     ctx.shadowBlur = 22;
     ctx.strokeStyle = '#241c17';
-    ctx.fillStyle = carriedKey.mud ? '#817455' : carriedKey.rust ? '#a97047' : handPatterns[METAL_BY_KEY_TYPE[carriedKey.type]] ||
+    ctx.fillStyle = carriedKey.mud ? '#817455' : carriedKey.rust ? '#a97047' : handPatterns[getKeyMetal(carriedKey.type)] ||
       `#${KEY_TYPES[carriedKey.type].metal.toString(16).padStart(6, '0')}`;
     ctx.lineWidth = 3;
     ctx.beginPath();
@@ -791,12 +808,24 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
     drawDistantKeys(distantKeys);
     for (const item of drawables) item.draw();
     drawHand();
-    // Fine stipple keeps the gouache atmosphere even on a 2D-only machine.
+    // Soft vignette retains the room's depth in the 2D fallback.
     const shade = ctx.createRadialGradient(width / 2, height * .47, width * .09, width / 2, height * .48, width * .73);
     shade.addColorStop(0, 'rgba(0,0,0,0)');
     shade.addColorStop(1, 'rgba(9,17,13,.29)');
     ctx.fillStyle = shade;
     ctx.fillRect(0, 0, width, height);
+    if (visualSettings.toonEnabled && visualSettings.toonLight && visualSettings.cartoonMaterial) {
+      const strength = visualSettings.toonLight * visualSettings.cartoonMaterial / 10000;
+      const bands = Math.max(2, visualSettings.toonSteps);
+      ctx.save();
+      ctx.globalAlpha = strength * .12;
+      ctx.globalCompositeOperation = 'soft-light';
+      for (let i = 0; i < bands; i++) {
+        ctx.fillStyle = i % 2 ? '#b3a07d' : '#f6dbb7';
+        ctx.fillRect(0, height * i / bands, width, height / bands + 1);
+      }
+      ctx.restore();
+    }
     return true;
   }
 
@@ -920,6 +949,8 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
   return {
     THREE, scene, camera, interactables, cabinets, workstations,
     renderer: { render: draw },
+    getGeometryStats: () => null,
+    getVisualStatus: () => ({ mode: 'canvas', error: '' }),
     setVisualSettings,
     refreshHand, syncKey, refreshCabinet, highlight, update, resize,
     keyIdFromHit, animateThrow, animatePlace, animateDiscard, isThrowing, pickTarget, throwingCount: () => thrownKeys.size,

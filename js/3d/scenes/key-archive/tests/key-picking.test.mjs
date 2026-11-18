@@ -23,3 +23,11 @@ test('floor picking skips distant, thrown and already sorted keys', () => {
   assert.equal(findFloorKeyAtReticle(eye, forward, [near], id => id === 'near'), null);
   assert.equal(findFloorKeyAtReticle(eye, { x: 0, y: 0, z: -1 }, [near]), null);
 });
+
+test('ground fallback targeting defaults to 70 percent of its previous radius', () => {
+  const eye = { x: 0, y: 1.68, z: 3 };
+  const forward = { x: 0, y: -1.58 / 3, z: -1 };
+  const key = { id: 'edge', x: .28, z: 0, status: 'floor' };
+  assert.equal(findFloorKeyAtReticle(eye, forward, [key]), null);
+  assert.equal(findFloorKeyAtReticle(eye, forward, [key], () => false, { radius: .34 })?.id, 'edge');
+});

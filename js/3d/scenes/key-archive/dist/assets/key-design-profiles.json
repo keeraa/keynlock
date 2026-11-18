@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "source": "keynlock-key-forge-1118",
+  "profiles": [
+    {"id":"cellar","shaftLength":2.15,"headSize":100,"teeth":3,"cutDepth":25,"thickness":12,"doubleSided":false,"breakAngle":70},
+    {"id":"tower","shaftLength":2.5,"headSize":100,"teeth":4,"cutDepth":34,"thickness":12,"doubleSided":false,"breakAngle":70},
+    {"id":"archive","shaftLength":2.05,"headSize":100,"teeth":5,"cutDepth":25,"thickness":12,"doubleSided":true,"breakAngle":70},
+    {"id":"astral","shaftLength":2.3,"headSize":100,"teeth":5,"cutDepth":22,"thickness":12,"doubleSided":false,"breakAngle":70},
+    {"id":"garden","shaftLength":1.85,"headSize":100,"teeth":3,"cutDepth":23,"thickness":12,"doubleSided":false,"breakAngle":70},
+    {"id":"clock","shaftLength":2.35,"headSize":100,"teeth":6,"cutDepth":21,"thickness":12,"doubleSided":false,"breakAngle":70},
+    {"id":"palace","shaftLength":2.75,"headSize":100,"teeth":4,"cutDepth":31,"thickness":12,"doubleSided":false,"breakAngle":70},
+    {"id":"forge","shaftLength":2.55,"headSize":100,"teeth":3,"cutDepth":39,"thickness":17,"doubleSided":true,"breakAngle":70},
+    {"id":"alchemy","shaftLength":2.1,"headSize":100,"teeth":6,"cutDepth":25,"thickness":12,"doubleSided":false,"breakAngle":70},
+    {"id":"brotherhood","shaftLength":2.4,"headSize":100,"teeth":4,"cutDepth":33,"thickness":12,"doubleSided":true,"breakAngle":70}
+  ]
+}

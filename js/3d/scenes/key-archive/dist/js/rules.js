@@ -1,16 +1,17 @@
 import { BATH_CAPACITY, SOAK_SECONDS, validBathId } from './station-layout.js';
 
+// `id` is a stable legacy save slot. The displayed family is from the Forge.
 export const KEY_TYPES = [
-  { id: 'circle', name: 'Кольцо', hint: 'Круглая головка', metal: 0xc7a66a, mark: 'I' },
-  { id: 'triangle', name: 'Треугольник', hint: 'Три острых угла', metal: 0xb9aa89, mark: 'II' },
-  { id: 'square', name: 'Квадрат', hint: 'Четыре прямые стороны', metal: 0xb88e56, mark: 'III' },
-  { id: 'diamond', name: 'Ромб', hint: 'Косая квадратная рамка', metal: 0xd2ab6e, mark: 'IV' },
-  { id: 'pentagon', name: 'Пятиугольник', hint: 'Пять граней', metal: 0xa49e96, mark: 'V' },
-  { id: 'hexagon', name: 'Шестигранник', hint: 'Шесть граней', metal: 0xc8a671, mark: 'VI' },
-  { id: 'star', name: 'Звезда', hint: 'Пять лучей', metal: 0xa9a0a0, mark: 'VII' },
-  { id: 'clover', name: 'Клевер', hint: 'Четыре лепестка', metal: 0xcbb482, mark: 'VIII' },
-  { id: 'oval', name: 'Овал', hint: 'Вытянутое кольцо', metal: 0xa58a66, mark: 'IX' },
-  { id: 'crown', name: 'Корона', hint: 'Три зубца наверху', metal: 0xd1b37a, mark: 'X' },
+  { id: 'circle', name: 'Подвальный', hint: 'Круг · ртуть', metal: 0x839fa6, mark: 'I' },
+  { id: 'triangle', name: 'Башенный', hint: 'Готическая арка · олово', metal: 0xb4b7aa, mark: 'II' },
+  { id: 'square', name: 'Архивный', hint: 'Квадрат · сталь', metal: 0xa1acac, mark: 'III' },
+  { id: 'diamond', name: 'Часовой', hint: 'Ромб · свинец', metal: 0x747c83, mark: 'IV' },
+  { id: 'pentagon', name: 'Астролябия', hint: 'Зубчатый венец · латунь', metal: 0xce9b4c, mark: 'V' },
+  { id: 'hexagon', name: 'Кузнечный', hint: 'Шестигранник · чернёное железо', metal: 0x515c60, mark: 'VI' },
+  { id: 'star', name: 'Алхимический', hint: 'Звезда · медь', metal: 0xbc704d, mark: 'VII' },
+  { id: 'clover', name: 'Садовый', hint: 'Клевер · серебро', metal: 0xd5d9d6, mark: 'VIII' },
+  { id: 'oval', name: 'Дворцовый', hint: 'Вытянутый овал · позолота', metal: 0xe4b866, mark: 'IX' },
+  { id: 'crown', name: 'Братства', hint: 'Двойное ушко · медь', metal: 0xbc704d, mark: 'X' },
 ];
 
 export const KEYS_PER_TYPE = 100;

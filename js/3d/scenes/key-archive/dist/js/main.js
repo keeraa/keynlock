@@ -1,39 +1,30 @@
 import * as THREE from '../vendor/three.js';
 import {
-  KEY_TYPES, KEYS_PER_TYPE, TOTAL_KEYS, MAX_HELD, STORAGE_KEY, LEGACY_STORAGE_KEY,
-  createInitialState, validateState, migrateLegacyState, pickupKey, selectedKey,
-  putKeyInCabinet, trashSelectedKey, dropSelectedKey, getProgress, upgradeKeyConditions,
-  upgradeFloorDistribution, startSoak, collectSoakedKey, bathContents, keyCondition,
-} from './rules.js?v=21';
-import { createWorld } from './world.js?v=23';
-import { createFallbackWorld } from './fallback-world.js?v=23';
-import { VISUAL_STORAGE_KEY, DEFAULT_VISUAL_SETTINGS, normalizeVisualSettings } from './visual-settings.js?v=21';
-import { PLAYER_EYE_HEIGHT } from './player-config.js';
+  KEY_TYPES, KEYS_PER_TYPE, TOTAL_KEYS, MAX_HELD, STORAGE_KEY,
+  pickupKey, selectedKey, putKeyInCabinet, trashSelectedKey, dropSelectedKey,
+  getProgress, startSoak, collectSoakedKey, bathContents, keyCondition,
+} from './rules.js?v=22';
+import { createWorld } from './world.js?v=44';
+import { installKeyAssetProvider } from './key-factory.js?v=3';
+import { createArchiveHud } from './archive-hud.js';
+import { loadArchiveState, loadVisualSettings, saveArchiveState } from './archive-persistence.js';
+import { createVisualPanel } from './visual-panel.js';
+import externalKeyProvider from './key-provider-entry.js?v=3';
+import { createFallbackWorld } from './fallback-world.js?v=31';
+import { createPlayerMovement } from './player-movement.js?v=3';
+import { createPerformanceHud } from './performance-hud.js';
 import { logicalKey } from './controls.js';
 import { edgeLookRate } from './mouse-look.js';
-import { findFloorKeyAtReticle } from './key-picking.js';
-import { separateFloorKeys, findFreeFloorSpot } from './key-spacing.js?v=17';
-import { inStationFootprint } from './station-layout.js';
+import { findFloorKeyAtReticle } from './key-picking.js?v=3';
+import { createKeyIndex } from './key-index.js';
+import { findFreeFloorSpot } from './key-spacing.js?v=17';
 
 const $ = id => document.getElementById(id);
+if (externalKeyProvider) installKeyAssetProvider(externalKeyProvider);
 const canvas = $('world');
-let visualSettings;
-try {
-  visualSettings = normalizeVisualSettings(JSON.parse(localStorage.getItem(VISUAL_STORAGE_KEY) || 'null'));
-} catch {
-  visualSettings = normalizeVisualSettings(null);
-}
-let state;
-try {
-  const snapshot = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-  const previous = JSON.parse(localStorage.getItem(LEGACY_STORAGE_KEY) || 'null');
-  state = validateState(snapshot) ? snapshot : migrateLegacyState(previous) || createInitialState();
-} catch {
-  state = createInitialState();
-}
-upgradeKeyConditions(state);
-upgradeFloorDistribution(state);
-separateFloorKeys(state.keys);
+const visualSettings = loadVisualSettings(localStorage);
+const state = loadArchiveState(localStorage);
+const keyIndex = createKeyIndex(state.keys);
 let world;
 try {
   world = createWorld(canvas, state, visualSettings);
@@ -42,10 +33,13 @@ try {
   world = createFallbackWorld(canvas, state, visualSettings);
 }
 const camera = world.camera;
+const movement = createPlayerMovement(camera, world.bounds);
 const raycaster = new THREE.Raycaster();
 const center = new THREE.Vector2(0, 0);
 const clamp = (number, a, b) => Math.max(a, Math.min(b, number));
-const symbols = ['◯', '△', '□', '◇', '⬟', '⬡', '★', '✿', '⬭', '♛'];
+const hud = createArchiveHud(document, world, state, keyIndex);
+const performanceHud = createPerformanceHud(document, world);
+const visualPanel = createVisualPanel(document, world, localStorage, visualSettings);
 
 let mode = 'intro';
 let yaw = 0;
@@ -63,36 +57,11 @@ let lastHoverKey = '';
 let toastTimeout = 0;
 const heldMovement = new Set();
 let lastTick = performance.now();
-let lastFpsAt = lastTick;
-let framesRendered = 0;
-let stepPhase = 0;
 let soundContext;
 
 function save() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { /* private windows */ }
-}
-
-function saveVisual() {
-  try { localStorage.setItem(VISUAL_STORAGE_KEY, JSON.stringify(visualSettings)); } catch { /* private windows */ }
-}
-
-function updateVisualControls() {
-  for (const [key, value] of Object.entries(visualSettings)) {
-    const control = $(key);
-    if (!control) continue;
-    if (control.type === 'checkbox') control.checked = value;
-    else control.value = value;
-    const output = document.querySelector(`output[for="${key}"]`);
-    if (output) output.textContent = key === 'toonSteps' ? String(value) :
-      key === 'outlineWidth' ? `${value} px` : `${value}%`;
-  }
-}
-
-function setVisualSettings(values) {
-  visualSettings = normalizeVisualSettings(values);
-  world.setVisualSettings(visualSettings);
-  updateVisualControls();
-  saveVisual();
+  keyIndex.rebuild();
+  saveArchiveState(localStorage, state);
 }
 
 function tone(kind = 'take') {
@@ -132,40 +101,12 @@ function toast(message, error = false) {
   toastTimeout = setTimeout(() => element.classList.remove('visible'), 2100);
 }
 
-function updateHud() {
-  const progress = getProgress(state);
-  $('floor-count').textContent = Math.max(0, progress.floorCount - (world.throwingCount?.() || 0));
-  $('trash-count').textContent = `${progress.trashed} / ${progress.broken}`;
-  $('metal-count').textContent = String(state.metal || 0);
-  $('soak-count').textContent = String(progress.soaking);
-  $('hand-count').textContent = `${state.held.length} / ${MAX_HELD}`;
-
-  const inventory = $('inventory');
-  inventory.replaceChildren();
-  for (let slot = 0; slot < MAX_HELD; slot++) {
-    const key = state.keys.find(item => item.id === state.held[slot]);
-    const element = document.createElement('div');
-    element.className = `inventory-slot${key && slot === state.selected ? ' selected' : ''}${key?.broken ? ' broken' : ''}${key?.mud ? ' muddy' : ''}${key?.rust ? ' rusty' : ''}`;
-    element.innerHTML = `<span class="slot-num">${slot + 1}</span>`;
-    if (key) {
-      const mark = document.createElement('span');
-      mark.className = 'slot-mark';
-      mark.textContent = symbols[key.type];
-      const name = document.createElement('span');
-      name.className = 'slot-name';
-      name.textContent = key.broken ? 'СЛОМАН · ПЛАВКА' : key.mud && key.rust ? 'ГРЯЗЬ + РЖАВЧИНА' :
-        key.mud ? 'В ГРЯЗИ · ВОДА' : key.rust ? 'РЖАВЧИНА · РАСТВОР' : KEY_TYPES[key.type].name;
-      element.append(mark, name);
-    }
-    inventory.append(element);
-  }
-  world.refreshHand(selectedKey(state));
-}
+function updateHud() { hud.update(); }
 
 function promptFor(target) {
   if (!target) return '';
   if (target.kind === 'key') {
-    const key = state.keys.find(item => item.id === target.id);
+    const key = keyIndex.get(target.id);
     if (!key || key.status !== 'floor') return '';
     const condition = keyCondition(key);
     const conditionNote = condition === 'broken' ? ' · СЛОМАН' :
@@ -202,12 +143,12 @@ function promptFor(target) {
   const progress = getProgress(state);
   const count = progress.sorted[target.type];
   const required = progress.required[target.type];
-  if (!key) return `<kbd>${symbols[target.type]}</kbd> Шкаф «${KEY_TYPES[target.type].name}» · ${count}/${required}`;
+  if (!key) return `Шкаф «${KEY_TYPES[target.type].name}» · ${count}/${required}`;
   if (key.broken) return '<kbd>!</kbd> Сломанный ключ · отнеси к ближайшей плавильне';
   if (key.mud || key.rust) return '<kbd>!</kbd> Ключ нужно очистить · ванны находятся на трёх станциях зала';
   return key.type === target.type
     ? `<kbd>E / У</kbd> Повесить ключ · ${KEY_TYPES[target.type].name} · ${count}/${required}`
-    : `<kbd>${symbols[target.type]}</kbd> Шкаф для ключей «${KEY_TYPES[target.type].name}»`;
+    : `Шкаф для ключей «${KEY_TYPES[target.type].name}»`;
 }
 
 function setHovered(target) {
@@ -234,14 +175,14 @@ function targetInView() {
       data.kind === 'bath' || data.kind === 'forge' ? 4.7 : 4)) continue;
     if (data.kind === 'key-batch') {
       const id = world.keyIdFromHit(data.type, hit.instanceId);
-      if (!id || world.isThrowing(id) || state.keys.find(item => item.id === id)?.status !== 'floor') continue;
+      if (!id || world.isThrowing(id) || keyIndex.get(id)?.status !== 'floor') continue;
       return { kind: 'key', id };
     }
-    if (data.kind === 'key' && (world.isThrowing(data.id) || state.keys.find(item => item.id === data.id)?.status !== 'floor')) continue;
+    if (data.kind === 'key' && (world.isThrowing(data.id) || keyIndex.get(data.id)?.status !== 'floor')) continue;
     return data;
   }
   const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
-  const nearKey = findFloorKeyAtReticle(camera.position, forward, state.keys, world.isThrowing);
+  const nearKey = findFloorKeyAtReticle(camera.position, forward, state.keys, world.isThrowing, { index: keyIndex });
   if (nearKey) return { kind: 'key', id: nearKey.id };
   // Cabinet fronts are generous interaction targets, including from an angle.
   const targetCenter = new THREE.Vector3();
@@ -271,7 +212,7 @@ function interact() {
       tone('wrong');
       return;
     }
-    world.syncKey(state.keys.find(key => key.id === target.id));
+    world.syncKey(keyIndex.get(target.id));
     updateHud();
     save();
     tone('take');
@@ -413,16 +354,12 @@ function setMode(next) {
   heldMovement.clear();
   lastPointer = null;
   edgeLook = { x: 0, y: 0, until: 0 };
-  $('capture-hint').classList.add('is-hidden');
   setHovered(null);
 }
 
 function onMouseLockUnavailable() {
   lockRequestPending = false;
   lockUnavailable = true;
-  if (mode === 'play' && document.pointerLockElement !== canvas) {
-    $('capture-hint').classList.remove('is-hidden');
-  }
 }
 
 function requestMouseLock() {
@@ -486,20 +423,7 @@ $('victory-explore').addEventListener('click', play);
 $('visual-open').addEventListener('click', openVisual);
 $('visual-resume').addEventListener('click', play);
 $('visual-back').addEventListener('click', () => setMode('pause'));
-$('visual-reset').addEventListener('click', () => setVisualSettings(DEFAULT_VISUAL_SETTINGS));
-$('visual-natural').addEventListener('click', () => setVisualSettings({ ...visualSettings,
-  toonEnabled: false, outlineEnabled: false, brushExpression: 0 }));
-for (const key of Object.keys(DEFAULT_VISUAL_SETTINGS)) {
-  const control = $(key);
-  control.addEventListener(control.type === 'checkbox' ? 'change' : 'input', event => {
-    setVisualSettings({ ...visualSettings, [key]: control.type === 'checkbox' ? event.target.checked : Number(event.target.value) });
-  });
-}
-updateVisualControls();
-$('capture-retry').addEventListener('click', () => {
-  lockUnavailable = false;
-  requestMouseLock();
-});
+visualPanel.bind();
 $('reset-btn').addEventListener('click', resetGame);
 $('victory-reset').addEventListener('click', resetGame);
 $('sensitivity').addEventListener('input', event => { sensitivity = Number(event.target.value); });
@@ -512,7 +436,6 @@ document.addEventListener('pointerlockchange', () => {
     pointerEverLocked = true;
     lastPointer = null;
     edgeLook = { x: 0, y: 0, until: 0 };
-    $('capture-hint').classList.add('is-hidden');
   } else if (pointerEverLocked && mode === 'play') {
     lockRequestPending = false;
     pause();
@@ -581,39 +504,13 @@ canvas.addEventListener('wheel', event => {
   selectSlot((state.selected + delta + state.held.length) % state.held.length);
 }, { passive: false });
 
-function positionBlocked(x, z) {
-  if (Math.abs(x) > world.bounds.x || Math.abs(z) > world.bounds.z) return true;
-  for (const tx of [-9.3, 9.3]) for (const tz of [-20.7, 20.7]) {
-    if (Math.abs(x - tx) < 1.15 && Math.abs(z - tz) < 1.34) return true;
-  }
-  if (inStationFootprint(x, z, .22)) return true;
-  return false;
-}
-
-function movePlayer(delta) {
-  const forward = Number(heldMovement.has('w') || heldMovement.has('arrowup')) - Number(heldMovement.has('s') || heldMovement.has('arrowdown'));
-  const right = Number(heldMovement.has('d') || heldMovement.has('arrowright')) - Number(heldMovement.has('a') || heldMovement.has('arrowleft'));
-  const length = Math.hypot(forward, right);
-  if (!length) {
-    camera.position.y += (PLAYER_EYE_HEIGHT - camera.position.y) * Math.min(1, delta * 8);
-    return false;
-  }
-  const speed = (heldMovement.has('shift') ? 7.4 : 4.4) * delta / length;
-  const dx = (-Math.sin(yaw) * forward + Math.cos(yaw) * right) * speed;
-  const dz = (-Math.cos(yaw) * forward - Math.sin(yaw) * right) * speed;
-  if (!positionBlocked(camera.position.x + dx, camera.position.z)) camera.position.x += dx;
-  if (!positionBlocked(camera.position.x, camera.position.z + dz)) camera.position.z += dz;
-  stepPhase += delta * (heldMovement.has('shift') ? 15 : 10);
-  camera.position.y = PLAYER_EYE_HEIGHT + Math.sin(stepPhase) * .025;
-  return true;
-}
-
 function tick(now) {
   requestAnimationFrame(tick);
+  const cpuStart = performance.now();
   const delta = Math.min((now - lastTick) / 1000, .04);
   lastTick = now;
   let moving = false;
-  if (mode === 'play') moving = movePlayer(delta);
+  if (mode === 'play') moving = movement.move(heldMovement, yaw, delta);
   if (mode === 'play' && document.pointerLockElement !== canvas && now < edgeLook.until) {
     yaw -= edgeLook.x * 1.6 * delta;
     pitch = clamp(pitch - edgeLook.y * 1.3 * delta, -1.31, 1.27);
@@ -625,13 +522,8 @@ function tick(now) {
     if ($('interaction-prompt').innerHTML !== currentPrompt) $('interaction-prompt').innerHTML = currentPrompt;
   }
   world.update(now, moving);
-  if (world.renderer.render(world.scene, camera) !== false) framesRendered++;
-  if (now - lastFpsAt >= 800) {
-    $('fps').textContent = Math.round(framesRendered * 1000 / (now - lastFpsAt));
-    $('floor-count').textContent = Math.max(0, getProgress(state).floorCount - (world.throwingCount?.() || 0));
-    framesRendered = 0;
-    lastFpsAt = now;
-  }
+  const rendered = world.renderer.render(world.scene, camera) !== false;
+  performanceHud.sample(now, performance.now() - cpuStart, rendered);
 }
 
 updateHud();

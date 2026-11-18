@@ -1,0 +1,25 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+
+test('cabinet face uses individual cubbies, an actual key on the plaque and no hooks', () => {
+  const source = readFileSync(new URL('../dist/js/world-cabinet.js', import.meta.url), 'utf8');
+  assert.match(source, /const plaqueKey = new THREE\.Mesh\(createCombinedKeyGeometry\(type\)/);
+  assert.match(source, /fontSize: 100/);
+  assert.match(source, /group\.scale\.z = \.5/);
+  assert.match(source, /plaqueKey\.scale\.setScalar\(\.23 \* 2\.7 \* \.8\)/);
+  assert.match(source, /plaqueKey\.rotation\.z = -Math\.PI \/ 2/);
+  assert.match(source, /const plaqueGlow/);
+  assert.match(source, /smoothstep\(0\.0, \.22, vUv\.x\)/);
+  assert.match(source, /vec3\(1\.0, \.78, \.51\)/);
+  assert.match(source, /CABINET_COLUMNS; divider\+\+/);
+  assert.match(source, /CABINET_ROWS; row\+\+/);
+  assert.doesNotMatch(source, /CylinderGeometry|createBowGlyph|KEY_TYPES\[type\]\.mark/);
+});
+
+test('game HUD hides the status strip and mouse-lock warning', () => {
+  const page = readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8');
+  const main = readFileSync(new URL('../dist/js/main.js', import.meta.url), 'utf8');
+  assert.doesNotMatch(page, /telemetry-panel|capture-hint/);
+  assert.doesNotMatch(main, /capture-retry|floor-count|symbols\[target\.type\]/);
+});

@@ -34,23 +34,14 @@ export function buildPinMechanism({THREE,document,rand,grainMap,material,mat,roo
     'Вкладыш замочной скважины','Непрозрачная металлическая вставка с вертикальным сквозным пазом в круглом входе.');
   cyl(pinPlug,.13,.28,.69,0,0,mat.brass,'x');
   part(pinPlug,[.7,-.6,.5],.38);
-  // Five user-provided metal finishes compressed to self-contained WebP maps.
+  // One shared painted texture with five material tints; no photo-finish assets.
   const pinFinishNames=['Патинированная медь','Чёрная сталь','Матовая сталь','Старая латунь','Золотистая латунь'];
-  const pinTextureImages=[
-    './assets/pin-patina.webp',
-    './assets/pin-black-steel.webp',
-    './assets/pin-matte-steel.webp',
-    './assets/pin-old-brass.webp',
-    './assets/pin-gold-brass.webp'
-  ];
-  const pinTextureLoader=new THREE.TextureLoader();
-  const pinTextures=pinTextureImages.map(uri=>{
-    const texture=pinTextureLoader.load(uri);
-    texture.colorSpace=THREE.SRGBColorSpace;
-    texture.anisotropy=8;
-    texture.wrapS=THREE.RepeatWrapping;
-    return texture;
-  });
+  const pinTextureImages=Array(5).fill('./assets/painted-pin.webp');
+  const pinBaseTexture=new THREE.TextureLoader().load('./assets/painted-pin.webp');
+  pinBaseTexture.colorSpace=THREE.SRGBColorSpace;
+  pinBaseTexture.anisotropy=8;
+  pinBaseTexture.wrapS=THREE.RepeatWrapping;
+  const pinTextures=Array(5).fill(pinBaseTexture);
   const pinStacks=[];
   function makePinPositions(count){
     const n=THREE.MathUtils.clamp(Math.round(Number(count)),4,6);

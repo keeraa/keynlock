@@ -381,61 +381,6 @@
       ]
     },
     {
-      "id": "pin-black-steel",
-      "category": "metals",
-      "path": "js/3d/shared/materials/metals/pin-black-steel.webp",
-      "gitBlobSha": "915a474bd61430933c43c6a4567f70e2b85b4c4d",
-      "bytes": 11068,
-      "consumers": [
-        "js/3d/scenes/locks/lab/assets/pin-black-steel.webp",
-        "js/3d/scenes/locks/src/assets/pin-black-steel.webp"
-      ]
-    },
-    {
-      "id": "pin-gold-brass",
-      "category": "metals",
-      "path": "js/3d/shared/materials/metals/pin-gold-brass.webp",
-      "gitBlobSha": "4f021f5b9e15d2075d12c0e1939a42e302459f39",
-      "bytes": 7542,
-      "consumers": [
-        "js/3d/scenes/locks/lab/assets/pin-gold-brass.webp",
-        "js/3d/scenes/locks/src/assets/pin-gold-brass.webp"
-      ]
-    },
-    {
-      "id": "pin-matte-steel",
-      "category": "metals",
-      "path": "js/3d/shared/materials/metals/pin-matte-steel.webp",
-      "gitBlobSha": "5b30810b3e2b515358f065cb6b29c7395c10e1ee",
-      "bytes": 9318,
-      "consumers": [
-        "js/3d/scenes/locks/lab/assets/pin-matte-steel.webp",
-        "js/3d/scenes/locks/src/assets/pin-matte-steel.webp"
-      ]
-    },
-    {
-      "id": "pin-old-brass",
-      "category": "metals",
-      "path": "js/3d/shared/materials/metals/pin-old-brass.webp",
-      "gitBlobSha": "eb9a09076feb7f5b6452de3a95d3df0edd8fcd8d",
-      "bytes": 12876,
-      "consumers": [
-        "js/3d/scenes/locks/lab/assets/pin-old-brass.webp",
-        "js/3d/scenes/locks/src/assets/pin-old-brass.webp"
-      ]
-    },
-    {
-      "id": "pin-patina",
-      "category": "metals",
-      "path": "js/3d/shared/materials/metals/pin-patina.webp",
-      "gitBlobSha": "81cedb7e88102bbe3e252b98a44ef9c71a3a2144",
-      "bytes": 14628,
-      "consumers": [
-        "js/3d/scenes/locks/lab/assets/pin-patina.webp",
-        "js/3d/scenes/locks/src/assets/pin-patina.webp"
-      ]
-    },
-    {
       "id": "atelier-wallpaper-gouache",
       "category": "surfaces",
       "path": "js/3d/shared/materials/surfaces/atelier-wallpaper-gouache.webp",

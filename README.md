@@ -33,3 +33,5 @@ npm run dev
 For automatic web previews, import `keeraa/keynlock` into Vercel once and keep `main` as the production branch. After the Git integration is connected, pushes to `main` deploy automatically and other branches get preview deployments.
 
 Stable checkpoints: `v250-stable`, `v251-stable`, `v252-stable`.
+
+Гуашевые материалы: [каталог с миниатюрами и путями использования](js/3d/shared/materials/catalog.html) · [реестр](js/3d/shared/materials/manifest.json).

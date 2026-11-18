@@ -1,3 +1,4 @@
 *.tar.gz
 .sites-checkout/
 node_modules/
+test-results/

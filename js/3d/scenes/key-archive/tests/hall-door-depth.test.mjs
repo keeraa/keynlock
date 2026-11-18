@@ -9,6 +9,8 @@ test('entrance door has two framed wooden leaves and brass handles', () => {
   assert.match(architecture, /for \(const side of \[-1, 1\]\)/);
   assert.match(architecture, /new THREE\.TorusGeometry\(\.13, \.035, 8, 20\)/);
   assert.match(architecture, /addEntranceDoor\(scene, mat\)/);
+  assert.match(architecture, /ENTRANCE_DOOR_TEXTURE_URL/);
+  assert.match(architecture, /new THREE\.PlaneGeometry\(4\.40, 6\.44\)/);
 });
 
 test('distance blur uses original camera depth to keep close objects sharp', () => {

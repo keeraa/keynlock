@@ -4,13 +4,13 @@ import {
   pickupKey, selectedKey, putKeyInCabinet, trashSelectedKey, dropSelectedKey,
   getProgress, startSoak, collectSoakedKey, bathContents, keyCondition,
 } from './rules.js?v=23';
-import { createWorld } from './world.js?v=45';
+import { createWorld } from './world.js?v=46';
 import { installKeyAssetProvider } from './key-factory.js?v=3';
 import { createArchiveHud } from './archive-hud.js';
 import { loadArchiveState, loadVisualSettings, saveArchiveState } from './archive-persistence.js?v=2';
 import { createVisualPanel } from './visual-panel.js';
 import externalKeyProvider from './key-provider-entry.js?v=3';
-import { createFallbackWorld } from './fallback-world.js?v=32';
+import { createFallbackWorld } from './fallback-world.js?v=33';
 import { createPlayerMovement } from './player-movement.js?v=4';
 import { createPerformanceHud } from './performance-hud.js';
 import { logicalKey } from './controls.js';

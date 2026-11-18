@@ -1,0 +1,38 @@
+name: Key Archive browser smoke
+on:
+  push:
+    paths:
+      - 'js/3d/scenes/key-archive/**'
+      - '.github/workflows/key-archive-browser.yml'
+  pull_request:
+    paths:
+      - 'js/3d/scenes/key-archive/**'
+      - '.github/workflows/key-archive-browser.yml'
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: js/3d/scenes/key-archive
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test tools
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium and system libraries
+        run: npx playwright install --with-deps chromium
+      - name: Unit and state tests
+        run: npm test
+      - name: WebGL, Canvas and persistence smoke tests
+        run: npm run test:browser
+      - name: Keep visual snapshots for inspection
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: key-archive-browser-snapshots
+          path: js/3d/scenes/key-archive/test-results/*.png
+          if-no-files-found: ignore

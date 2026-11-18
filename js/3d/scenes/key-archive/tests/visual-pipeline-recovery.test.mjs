@@ -14,7 +14,7 @@ test('visual post-process can recover from a failed frame without capturing unre
 });
 
 test('2D fallback applies toon controls without full-screen gouache overlay', () => {
-  const source = readFileSync(new URL('../dist/js/fallback-world.js', import.meta.url), 'utf8');
+  const source = readFileSync(new URL('../dist/js/fallback-canvas-renderer.js', import.meta.url), 'utf8');
   for (const control of ['toonEnabled', 'toonLight', 'toonSteps', 'cartoonMaterial']) {
     assert.match(source, new RegExp(`visualSettings\\.${control}|settings\\.${control}`));
   }

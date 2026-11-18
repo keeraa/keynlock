@@ -17,7 +17,7 @@ import { createWetSnow } from './wet-snow.js?v=21';
 import { PLAYER_EYE_HEIGHT } from './player-config.js';
 import { createKeyHoverOutline } from './key-hover-outline.js';
 import { createMaterials } from './world-materials.js';
-import { makeHall } from './world-architecture.js?v=3';
+import { makeHall } from './world-architecture.js?v=4';
 import { makeChandeliers } from './world-lighting.js';
 import { createCabinet } from './world-cabinet.js?v=4';
 import { addDust } from './world-particles.js';

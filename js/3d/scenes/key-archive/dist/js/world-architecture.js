@@ -3,6 +3,7 @@ import { makeLabel } from './art.js?v=17';
 import { HALL_SURFACE_TILE_METERS } from './hall-surface-textures.js?v=26';
 import { createMetricBoxGeometry } from './metric-box-geometry.js?v=23';
 import { WINDOW_CENTERS, PILASTER_CENTERS, PERIMETER_BAND_Y, addArchedWindow, addWindowedWall, addVault } from './hall-architecture.js?v=24';
+import { ENTRANCE_DOOR_TEXTURE_URL } from './entrance-door-texture.js';
 
 export function box(parent, size, position, material) {
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
@@ -38,16 +39,17 @@ function addEntranceDoor(scene, mat) {
   const z = 22.94;
   box(scene, [5.10, 7.10, .18], [0, 3.60, z + .11], mat.darkBrass);
   box(scene, [4.72, 6.72, .19], [0, 3.46, z - .035], mat.cabinetWalnut);
+  const painting = new THREE.TextureLoader().load(ENTRANCE_DOOR_TEXTURE_URL);
+  painting.colorSpace = THREE.SRGBColorSpace;
+  painting.anisotropy = 4;
+  const paintedLeaves = new THREE.Mesh(new THREE.PlaneGeometry(4.40, 6.44),
+    new THREE.MeshStandardMaterial({ map: painting, roughness: .94, metalness: 0, side: THREE.DoubleSide }));
+  paintedLeaves.rotation.y = Math.PI;
+  paintedLeaves.position.set(0, 3.45, z - .275);
+  scene.add(paintedLeaves);
   for (const side of [-1, 1]) {
     const x = side * 1.16;
     box(scene, [2.22, 6.48, .12], [x, 3.45, z - .19], mat.wood);
-    for (const y of [1.6, 3.85, 5.82]) {
-      box(scene, [1.79, 1.47, .055], [x, y, z - .283], mat.cabinetBack);
-      for (const edge of [-.96, .96])
-        box(scene, [.075, 1.58, .09], [x + edge, y, z - .315], mat.carvedWood);
-      for (const dy of [-.78, .78])
-        box(scene, [1.97, .065, .095], [x, y + dy, z - .315], mat.carvedWood);
-    }
     box(scene, [.10, 6.48, .10], [x - side * 1.09, 3.45, z - .30], mat.darkBrass);
     const handlePlate = box(scene, [.19, .61, .065], [side * .25, 2.82, z - .345], mat.brass);
     handlePlate.material = mat.agedBronze;

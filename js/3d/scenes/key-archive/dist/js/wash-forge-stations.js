@@ -2,7 +2,7 @@ import * as THREE from '../vendor/three.js';
 import { makeLabel } from './art.js?v=17';
 import { createKeyModel, disposeKeySceneModel, getKeyDisplayScale } from './key-factory.js?v=3';
 import { bathContents } from './rules.js';
-import { BATH_CAPACITY, FIXTURE_OFFSETS, STATIONS, bathId } from './station-layout.js';
+import { BATH_CAPACITY, FIXTURE_OFFSETS, STATIONS, bathId } from './station-layout.js?v=2';
 
 function block(parent, dimensions, where, material) {
   const object = new THREE.Mesh(new THREE.BoxGeometry(...dimensions), material);

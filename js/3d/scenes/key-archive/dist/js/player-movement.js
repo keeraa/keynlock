@@ -1,5 +1,5 @@
 import { PLAYER_EYE_HEIGHT } from './player-config.js';
-import { inStationFootprint } from './station-layout.js';
+import { inStationFootprint } from './station-layout.js?v=2';
 import { CABINET_Z } from './cabinet-layout.js';
 
 export function createPlayerMovement(camera, bounds) {

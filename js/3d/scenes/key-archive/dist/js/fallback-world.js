@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { KEY_TYPES, KEYS_PER_TYPE, getProgress, keyCondition, bathContents } from './rules.js?v=22';
+import { KEY_TYPES, KEYS_PER_TYPE, getProgress, keyCondition, bathContents } from './rules.js?v=23';
 import { createFallbackSurfaces } from './fallback-surfaces.js';
 import {
   getKeyFallbackHeadPoints, createKeyFallbackStamp, getKeyColliderSize, getKeyMetal,
@@ -13,7 +13,7 @@ import {
   CABINET_BLANK_ROW_BOTTOM_Y, CABINET_GROUND_OFFSET,
   CABINET_OUTLINE, pegForSlot,
 } from './cabinet-layout.js?v=21';
-import { STATIONS, FIXTURE_OFFSETS, bathId } from './station-layout.js';
+import { STATIONS, FIXTURE_OFFSETS, bathId } from './station-layout.js?v=2';
 import { keyAssetUrl, RUST_TEXTURE } from './key-data.js';
 import { dirtPaint, stableNoise } from './key-dirt.js';
 import { restingKeyY } from './floor-contact.js';
@@ -892,10 +892,10 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
     const end = cabinet.group.localToWorld(new THREE.Vector3(peg.x, peg.y, peg.z));
     placingKeys.set(key.id, { key, start, end, startTime: performance.now() });
   }
-  function animateDiscard(key, stationId = 'near') {
+  function animateDiscard(key, stationId = 'center') {
     camera.updateMatrixWorld(true);
     const start = camera.localToWorld(new THREE.Vector3(.42, -.37, -.84));
-    const station = workstations.stations.find(item => item.id === stationId) || workstations.stations[2];
+    const station = workstations.stations.find(item => item.id === stationId) || workstations.stations[0];
     station.group.updateMatrixWorld(true);
     const end = station.group.localToWorld(new THREE.Vector3(0, 1.48, .08));
     discardingKeys.set(key.id, { key, start, end, startTime: performance.now() });

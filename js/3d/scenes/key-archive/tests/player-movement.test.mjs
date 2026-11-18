@@ -14,6 +14,8 @@ test('movement uses camera coordinates and stops at walls and workstations', () 
   assert.equal(player.positionBlocked(10, 8.5), false);
   assert.equal(player.positionBlocked(0, 22), true);
   assert.equal(player.positionBlocked(0, 0), true);
+  assert.equal(player.positionBlocked(0, -12.5), false);
+  assert.equal(player.positionBlocked(0, 12.5), false);
   assert.equal(player.move(new Set(['w']), 0, .04), true);
   assert.ok(camera.position.z < 20);
   assert.equal(player.move(new Set(), 0, .04), false);

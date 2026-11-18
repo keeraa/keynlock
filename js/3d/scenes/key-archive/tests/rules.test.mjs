@@ -6,7 +6,7 @@ import {
   trashSelectedKey, upgradeKeyConditions, dropSelectedKey, getProgress,
   MUD_ORDINALS, RUST_ORDINALS, BOTH_ORDINALS, keyCondition,
   startSoak, bathContents, collectSoakedKey,
-  FLOOR_DISTRIBUTION_VERSION, upgradeFloorDistribution,
+  FLOOR_DISTRIBUTION_VERSION, upgradeFloorDistribution, upgradeStationBaths,
 } from '../dist/js/rules.js';
 import {
   sampleThrow, THROW_DURATION, THROW_FLIGHT_SECONDS, THROW_BOUNCE_SECONDS, THROW_SLIDE_SECONDS,
@@ -97,13 +97,13 @@ test('the 1,000 keys include balanced layers of mud, rust and breakage', () => {
   }, { clean: 0, mud: 0, rust: 0, both: 0, broken: 0 });
   assert.deepEqual(counts, { clean: 800, mud: 80, rust: 60, both: 20, broken: 40 });
   assert.equal(new Set([...MUD_ORDINALS, ...RUST_ORDINALS, ...BOTH_ORDINALS]).size, 16);
-  assert.equal(STATIONS.length, 3);
-  assert.deepEqual(STATIONS.map(station => station.z), [-12.5, 0, 12.5]);
+  assert.equal(STATIONS.length, 1);
+  assert.deepEqual(STATIONS.map(station => station.z), [0]);
 });
 
 test('water and rust solution each hold four keys and release only after soaking', () => {
   const state = createInitialState();
-  const id = bathId('near', 'mud');
+  const id = bathId('center', 'mud');
   const muddy = state.keys.filter(key => key.mud).slice(0, BATH_CAPACITY + 1);
   const start = 1000;
   for (const key of muddy.slice(0, BATH_CAPACITY)) {
@@ -130,8 +130,9 @@ test('mud-and-rust keys need both baths before they can be shelved', () => {
   const both = state.keys.find(key => key.mud && key.rust);
   assert.equal(pickupKey(state, both.id), true);
   assert.equal(putKeyInCabinet(state, both.type), false);
-  assert.equal(startSoak(state, bathId('far', 'mud'), 'mud', 1000), true);
-  assert.equal(collectSoakedKey(state, bathId('far', 'mud'), 6000)?.id, both.id);
+  assert.equal(startSoak(state, bathId('far', 'mud'), 'mud', 1000), false);
+  assert.equal(startSoak(state, bathId('center', 'mud'), 'mud', 1000), true);
+  assert.equal(collectSoakedKey(state, bathId('center', 'mud'), 6000)?.id, both.id);
   assert.equal(keyCondition(both), 'rust');
   assert.equal(putKeyInCabinet(state, both.type), false);
   assert.equal(startSoak(state, bathId('center', 'rust'), 'rust', 6000), true);
@@ -140,6 +141,27 @@ test('mud-and-rust keys need both baths before they can be shelved', () => {
   assert.equal(keyCondition(both), 'clean');
   assert.equal(putKeyInCabinet(state, both.type), true);
   assert.equal(validateState(state), true);
+});
+
+test('old baths migrate into the central station without losing soaking keys', () => {
+  const state = createInitialState();
+  const muddy = state.keys.filter(key => key.mud).slice(0, 7);
+  for (const [index, key] of muddy.entries()) {
+    key.status = 'bath';
+    key.bathId = index === 0 ? bathId('center', 'mud') : bathId(index % 2 ? 'far' : 'near', 'mud');
+    key.bathUntil = index * 1000 + 5000;
+  }
+  assert.equal(validateState(state), false);
+  assert.equal(upgradeStationBaths(state, 10000), 6);
+  const central = state.keys.filter(key => key.status === 'bath' && key.bathId === bathId('center', 'mud'));
+  assert.equal(central.length, BATH_CAPACITY);
+  assert.equal(central[0].id, muddy[0].id);
+  const overflow = muddy.filter(key => key.status === 'floor');
+  assert.equal(overflow.length, 3);
+  assert.deepEqual(overflow.map(key => key.mud), [false, false, true]);
+  assert.ok(overflow.every(key => !('bathUntil' in key) && !('bathId' in key)));
+  assert.equal(validateState(state), true);
+  assert.equal(upgradeStationBaths(state, 10000), 0);
 });
 
 test('upgrading a previous save keeps sorted keys clean and previously melted metal', () => {

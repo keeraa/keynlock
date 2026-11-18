@@ -3,21 +3,21 @@ import {
   KEY_TYPES, KEYS_PER_TYPE, TOTAL_KEYS, MAX_HELD, STORAGE_KEY,
   pickupKey, selectedKey, putKeyInCabinet, trashSelectedKey, dropSelectedKey,
   getProgress, startSoak, collectSoakedKey, bathContents, keyCondition,
-} from './rules.js?v=22';
-import { createWorld } from './world.js?v=44';
+} from './rules.js?v=23';
+import { createWorld } from './world.js?v=45';
 import { installKeyAssetProvider } from './key-factory.js?v=3';
 import { createArchiveHud } from './archive-hud.js';
-import { loadArchiveState, loadVisualSettings, saveArchiveState } from './archive-persistence.js';
+import { loadArchiveState, loadVisualSettings, saveArchiveState } from './archive-persistence.js?v=2';
 import { createVisualPanel } from './visual-panel.js';
 import externalKeyProvider from './key-provider-entry.js?v=3';
-import { createFallbackWorld } from './fallback-world.js?v=31';
-import { createPlayerMovement } from './player-movement.js?v=3';
+import { createFallbackWorld } from './fallback-world.js?v=32';
+import { createPlayerMovement } from './player-movement.js?v=4';
 import { createPerformanceHud } from './performance-hud.js';
 import { logicalKey } from './controls.js';
 import { edgeLookRate } from './mouse-look.js';
 import { findFloorKeyAtReticle } from './key-picking.js?v=3';
 import { createKeyIndex } from './key-index.js';
-import { findFreeFloorSpot } from './key-spacing.js?v=17';
+import { findFreeFloorSpot } from './key-spacing.js?v=18';
 
 const $ = id => document.getElementById(id);
 if (externalKeyProvider) installKeyAssetProvider(externalKeyProvider);
@@ -145,7 +145,7 @@ function promptFor(target) {
   const required = progress.required[target.type];
   if (!key) return `Шкаф «${KEY_TYPES[target.type].name}» · ${count}/${required}`;
   if (key.broken) return '<kbd>!</kbd> Сломанный ключ · отнеси к ближайшей плавильне';
-  if (key.mud || key.rust) return '<kbd>!</kbd> Ключ нужно очистить · ванны находятся на трёх станциях зала';
+  if (key.mud || key.rust) return '<kbd>!</kbd> Ключ нужно очистить · ванны в центре зала';
   return key.type === target.type
     ? `<kbd>E / У</kbd> Повесить ключ · ${KEY_TYPES[target.type].name} · ${count}/${required}`
     : `Шкаф для ключей «${KEY_TYPES[target.type].name}»`;
@@ -280,7 +280,7 @@ function interact() {
     return;
   }
   if (key.mud || key.rust) {
-    toast('Сперва очисти ключ · используй ванны на ближайшей станции', true);
+    toast('Сперва очисти ключ · используй ванны в центре зала', true);
     tone('wrong');
     return;
   }

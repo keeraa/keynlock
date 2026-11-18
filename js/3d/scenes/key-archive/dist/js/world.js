@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { KEY_TYPES, KEYS_PER_TYPE, getProgress } from './rules.js?v=22';
+import { KEY_TYPES, KEYS_PER_TYPE, getProgress } from './rules.js?v=23';
 import {
   createKeyModel, createCombinedKeyGeometry,
   getKeyMaterial, getKeyCrustGeometry, getKeyCrustMaterial, getKeyRustStrength,
@@ -10,7 +10,7 @@ import { createKeyThumbnailRenderer } from './key-thumbnails.js';
 import { sampleThrow } from './throw-physics.js';
 import { CABINET_CAPACITY, pegForSlot } from './cabinet-layout.js?v=21';
 import { restingKeyY } from './floor-contact.js';
-import { createWorkstations } from './wash-forge-stations.js?v=22';
+import { createWorkstations } from './wash-forge-stations.js?v=23';
 import { createPaintedRenderer } from './painted-renderer.js?v=24';
 import { createSceneGeometryStatsCache } from './geometry-stats.js';
 import { createWetSnow } from './wet-snow.js?v=21';
@@ -142,7 +142,7 @@ export function createWorld(canvas, state, visualSettings) {
   const hand = new THREE.Group();
   hand.position.set(.43, -.45, -.82);
   camera.add(hand);
-  const handLight = new THREE.PointLight(0xffd6a1, 2.2, 3);
+  const handLight = new THREE.PointLight(0xffd6a1, 1.7, 3);
   handLight.position.set(.3, -.3, -.5);
   camera.add(handLight);
   let displayedHandId = null;
@@ -240,11 +240,11 @@ export function createWorld(canvas, state, visualSettings) {
     refreshCabinet(key.type);
   }
 
-  function animateDiscard(key, stationId = 'near') {
+  function animateDiscard(key, stationId = 'center') {
     geometryStatsCache?.invalidate();
     camera.updateMatrixWorld(true);
     const start = camera.localToWorld(new THREE.Vector3(.42, -.37, -.84));
-    const station = workstations.stations.find(item => item.id === stationId) || workstations.stations[2];
+    const station = workstations.stations.find(item => item.id === stationId) || workstations.stations[0];
     station.group.updateMatrixWorld(true);
     const end = station.group.localToWorld(new THREE.Vector3(0, 1.48, .08));
     const model = createKeyModel(key.type, { id: key.id, variation: key.variation, broken: true });

@@ -1,4 +1,4 @@
-import { BATH_CAPACITY, SOAK_SECONDS, validBathId } from './station-layout.js';
+import { BATH_CAPACITY, SOAK_SECONDS, bathId, validBathId } from './station-layout.js?v=2';
 
 // `id` is a stable legacy save slot. The displayed family is from the Forge.
 export const KEY_TYPES = [
@@ -97,6 +97,34 @@ export function upgradeKeyConditions(state) {
     state.metal = state.keys.filter(key => key.status === 'trashed').length;
   }
   return state;
+}
+
+// Earlier builds had two additional workstations. Preserve soaking keys when
+// those stations disappear, keeping the original completion times whenever a
+// central bath has room. Overflow returns to the floor; finished keys are clean.
+export function upgradeStationBaths(state, now = Date.now()) {
+  if (state?.version !== 2 || !Array.isArray(state.keys)) return 0;
+  let migrated = 0;
+  for (const kind of ['mud', 'rust']) {
+    const centralId = bathId('center', kind);
+    const occupied = state.keys.filter(key => key.status === 'bath' && key.bathId === centralId).length;
+    const free = Math.max(0, BATH_CAPACITY - occupied);
+    const removedBathIds = [bathId('far', kind), bathId('near', kind)];
+    const waiting = state.keys.filter(key => key.status === 'bath' && removedBathIds.includes(key.bathId))
+      .sort((a, b) => a.bathUntil - b.bathUntil);
+    waiting.forEach((key, index) => {
+      migrated++;
+      if (index < free) {
+        key.bathId = centralId;
+      } else {
+        if (now >= key.bathUntil) key[kind] = false;
+        key.status = 'floor';
+        delete key.bathId;
+        delete key.bathUntil;
+      }
+    });
+  }
+  return migrated;
 }
 
 export function validateState(candidate) {

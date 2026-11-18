@@ -1,9 +1,6 @@
-// Three evenly spaced work islands keep every floor key close to a cleaning
-// or recycling point.  Their footprint also reserves a clear patch of floor.
+// The cleaning baths and forge share one central work island.
 export const STATIONS = Object.freeze([
-  { id: 'far', name: 'ДАЛЬНЯЯ', x: 0, z: -12.5 },
   { id: 'center', name: 'ЦЕНТРАЛЬНАЯ', x: 0, z: 0 },
-  { id: 'near', name: 'БЛИЖНЯЯ', x: 0, z: 12.5 },
 ]);
 
 export const BATH_CAPACITY = 4;

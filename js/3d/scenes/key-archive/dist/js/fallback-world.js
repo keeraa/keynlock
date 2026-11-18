@@ -1,7 +1,7 @@
 import * as THREE from '../vendor/three.js';
 import { KEY_TYPES, KEYS_PER_TYPE } from './rules.js?v=23';
 import { createFallbackSurfaces } from './fallback-surfaces.js';
-import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js';
+import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=2';
 import { getKeyColliderSize } from './key-factory.js?v=3';
 import { sampleThrow } from './throw-physics.js';
 import { findFloorKeyAtReticle } from './key-picking.js?v=2';
@@ -88,7 +88,7 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
     forgeCollider.position.set(0, 1.29, .08);
     forgeCollider.userData = { kind: 'forge', stationId: station.id };
     group.add(forgeCollider);
-    workstations.stations.push({ ...station, group, baths, forge: { collider: forgeCollider } });
+    workstations.stations.push({ ...station, group, baths, forge: { collider: forgeCollider, impactAt: -Infinity } });
     workstations.interactables.push(...baths.map(bath => bath.collider), forgeCollider);
   }
   interactables.push(...workstations.interactables);
@@ -179,6 +179,7 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
     camera.updateMatrixWorld(true);
     const start = camera.localToWorld(new THREE.Vector3(.42, -.37, -.84));
     const station = workstations.stations.find(item => item.id === stationId) || workstations.stations[0];
+    station.forge.impactAt = performance.now() + 440;
     station.group.updateMatrixWorld(true);
     const end = station.group.localToWorld(new THREE.Vector3(0, 1.48, .08));
     discardingKeys.set(key.id, { key, start, end, startTime: performance.now() });

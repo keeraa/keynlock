@@ -4,13 +4,13 @@ import {
   pickupKey, selectedKey, putKeyInCabinet, trashSelectedKey, dropSelectedKey,
   getProgress, startSoak, collectSoakedKey, bathContents, keyCondition,
 } from './rules.js?v=23';
-import { createWorld } from './world.js?v=47';
+import { createWorld } from './world.js?v=48';
 import { installKeyAssetProvider } from './key-factory.js?v=3';
 import { createArchiveHud } from './archive-hud.js';
 import { loadArchiveState, loadVisualSettings, saveArchiveState } from './archive-persistence.js?v=2';
 import { createVisualPanel } from './visual-panel.js';
 import externalKeyProvider from './key-provider-entry.js?v=3';
-import { createFallbackWorld } from './fallback-world.js?v=33';
+import { createFallbackWorld } from './fallback-world.js?v=34';
 import { createPlayerMovement } from './player-movement.js?v=4';
 import { createPerformanceHud } from './performance-hud.js';
 import { logicalKey } from './controls.js';
@@ -70,7 +70,10 @@ function tone(kind = 'take') {
     soundContext ||= new (window.AudioContext || window.webkitAudioContext)();
     if (soundContext.state === 'suspended') soundContext.resume();
     const now = soundContext.currentTime;
-    const notes = kind === 'trash' ? [[330, .07], [220, .16]] :
+    const notes = kind === 'water' ? [[310, .11], [235, .15], [365, .08]] :
+      kind === 'rust' ? [[880, .07], [720, .10], [560, .13]] :
+      kind === 'melt' ? [[260, .12], [160, .20], [95, .30]] :
+      kind === 'trash' ? [[330, .07], [220, .16]] :
       kind === 'place' ? [[440, .09], [660, .12]] :
       kind === 'finish' ? [[440, .11], [554, .14], [659, .20]] :
       kind === 'wrong' ? [[220, .11]] : [[680, .06], [910, .05]];
@@ -78,16 +81,19 @@ function tone(kind = 'take') {
     for (const [frequency, duration] of notes) {
       const oscillator = soundContext.createOscillator();
       const gain = soundContext.createGain();
-      oscillator.type = kind === 'wrong' ? 'triangle' : 'sine';
+      oscillator.type = kind === 'wrong' || kind === 'rust' ? 'triangle' :
+        kind === 'melt' ? 'sawtooth' : 'sine';
       oscillator.frequency.setValueAtTime(frequency, now + offset);
       oscillator.frequency.exponentialRampToValueAtTime(frequency * .75, now + offset + duration);
       gain.gain.setValueAtTime(.0001, now + offset);
-      gain.gain.exponentialRampToValueAtTime(kind === 'wrong' ? .028 : .056, now + offset + .009);
+      const peak = kind === 'wrong' ? .028 : kind === 'melt' ? .021 :
+        kind === 'rust' ? .026 : .056;
+      gain.gain.exponentialRampToValueAtTime(peak, now + offset + .009);
       gain.gain.exponentialRampToValueAtTime(.0001, now + offset + duration);
       oscillator.connect(gain).connect(soundContext.destination);
       oscillator.start(now + offset);
       oscillator.stop(now + offset + duration + .02);
-      offset += kind === 'finish' ? .10 : .045;
+      offset += kind === 'finish' ? .10 : kind === 'water' || kind === 'rust' ? .10 : .045;
     }
   } catch { /* audio is a nonessential enhancement */ }
 }
@@ -230,7 +236,7 @@ function interact() {
       world.workstations?.refreshBaths?.();
       updateHud();
       save();
-      tone('take');
+      tone(target.bathKind === 'mud' ? 'water' : 'rust');
       toast(target.bathKind === 'mud' ? 'Ключ отмокает в воде · 5 секунд' : 'Ключ в очищающем растворе · 7 секунд');
     } else {
       const collected = collectSoakedKey(state, target.id);
@@ -263,7 +269,7 @@ function interact() {
     trashSelectedKey(state);
     updateHud();
     save();
-    tone('trash');
+    tone('melt');
     toast('Сломанный ключ переплавлен · +1 металл');
     lastHoverKey = '!';
     if (getProgress(state).processed === TOTAL_KEYS) setTimeout(showVictory, 1100);

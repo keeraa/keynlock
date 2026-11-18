@@ -3,6 +3,7 @@ import { makeLabel } from './art.js?v=17';
 import { createKeyModel, disposeKeySceneModel, getKeyDisplayScale } from './key-factory.js?v=3';
 import { bathContents } from './rules.js';
 import { BATH_CAPACITY, FIXTURE_OFFSETS, STATIONS, bathId } from './station-layout.js?v=2';
+import { createBathEffects, createForgeEffects, createEffectSpotTexture } from './station-visual-effects.js';
 
 function block(parent, dimensions, where, material) {
   const object = new THREE.Mesh(new THREE.BoxGeometry(...dimensions), material);
@@ -39,7 +40,7 @@ function mountSign(group, label, materials, { x, y, z, width, height, supports }
   group.add(label);
 }
 
-function createBath(group, station, kind, materials) {
+function createBath(group, station, kind, materials, spotTexture) {
   const x = FIXTURE_OFFSETS[kind];
   const id = bathId(station.id, kind);
   const waterMaterial = new THREE.MeshStandardMaterial({
@@ -68,12 +69,13 @@ function createBath(group, station, kind, materials) {
     group.add(holder);
     // A pale four-place rack is visible even when nothing is soaking.
     cylinder(holder, .035, .035, .012, [0, .012, 0], materials.brass, 9);
-    slots.push({ holder, keyId: null, keyMesh: null });
+    slots.push({ holder, keyId: null, keyMesh: null, readyAppearance: false });
   }
-  return { id, kind, edge, slots, collider, waterMaterial };
+  return { id, kind, edge, slots, collider, waterMaterial,
+    visual: createBathEffects(group, x, kind, spotTexture), visualKeys: [] };
 }
 
-function createForge(group, station, materials) {
+function createForge(group, station, materials, spotTexture) {
   const x = FIXTURE_OFFSETS.forge;
   const soot = new THREE.MeshStandardMaterial({ color: 0x453733, roughness: 1 });
   const ember = new THREE.MeshBasicMaterial({ color: 0xef8b45 });
@@ -99,7 +101,7 @@ function createForge(group, station, materials) {
   collider.position.set(x, 1.29, .08);
   collider.userData = { kind: 'forge', stationId: station.id };
   group.add(collider);
-  return { edge, embers, collider };
+  return { edge, embers, collider, visual: createForgeEffects(group, x, spotTexture, hotMetal) };
 }
 
 export function createWorkstations(scene, materials, state) {
@@ -107,6 +109,7 @@ export function createWorkstations(scene, materials, state) {
   const interactables = [];
   const bathMap = new Map();
   const forgeMap = new Map();
+  const spotTexture = createEffectSpotTexture();
   for (const station of STATIONS) {
     const group = new THREE.Group();
     group.position.set(station.x, 0, station.z);
@@ -118,8 +121,8 @@ export function createWorkstations(scene, materials, state) {
       block(group, [.16, .80, .16], [x, .38, z], materials.darkWood);
     block(group, [4.86, .12, .27], [0, .29, -.49], materials.blackWood);
     block(group, [4.86, .12, .27], [0, .29, .67], materials.blackWood);
-    const baths = ['mud', 'rust'].map(kind => createBath(group, station, kind, materials));
-    const forge = createForge(group, station, materials);
+    const baths = ['mud', 'rust'].map(kind => createBath(group, station, kind, materials, spotTexture));
+    const forge = createForge(group, station, materials, spotTexture);
     for (const bath of baths) {
       bathMap.set(bath.id, bath);
       interactables.push(bath.collider);
@@ -137,25 +140,28 @@ export function createWorkstations(scene, materials, state) {
   function refreshBaths(now = Date.now()) {
     for (const bath of bathMap.values()) {
       const contents = bathContents(state, bath.id, now).keys;
+      bath.visualKeys = contents;
       bath.slots.forEach((slot, index) => {
         const key = contents[index];
-        if (slot.keyId !== (key?.id || null)) {
+        const ready = Boolean(key && now >= key.bathUntil);
+        if (slot.keyId !== (key?.id || null) || slot.readyAppearance !== ready) {
           if (slot.keyMesh) {
             slot.holder.remove(slot.keyMesh);
             disposeKeySceneModel(slot.keyMesh);
             slot.keyMesh = null;
           }
           slot.keyId = key?.id || null;
+          slot.readyAppearance = ready;
           if (key) {
             slot.keyMesh = createKeyModel(key.type, { id: key.id, variation: key.variation,
-              broken: key.broken, mud: key.mud, rust: key.rust,
+              broken: key.broken, mud: key.mud && !(ready && bath.kind === 'mud'),
+              rust: key.rust && !(ready && bath.kind === 'rust'),
               scale: getKeyDisplayScale('bath', key.type) });
             slot.keyMesh.rotation.x = -Math.PI / 2;
             slot.holder.add(slot.keyMesh);
           }
         }
         if (slot.keyMesh) {
-          const ready = now >= key.bathUntil;
           slot.keyMesh.position.y = ready ? .15 : .035;
           slot.keyMesh.rotation.z = Math.sin(now * .001 + index) * .06;
         }
@@ -164,17 +170,22 @@ export function createWorkstations(scene, materials, state) {
   }
 
   function update(now) {
-    // The hot metal breathes softly; no dynamic shadow-casting lights or particles.
+    const wallTime = Date.now();
+    refreshBaths(wallTime);
+    // Static pigment geometry and pooled sprites keep these effects inexpensive.
     for (const station of stations) {
       station.forge.embers.forEach((ember, index) => {
         if (index % 2 === 0) ember.scale.y = .72 + .27 * Math.sin(now * .0024 + index);
       });
-      for (const bath of station.baths)
+      station.forge.visual.update(now);
+      for (const bath of station.baths) {
         bath.waterMaterial.emissiveIntensity = .14 + .055 * Math.sin(now * .0015 + station.z);
+        bath.visual.update(now, bath.visualKeys, wallTime);
+      }
     }
-    refreshBaths(Date.now());
   }
 
   refreshBaths();
-  return { stations, interactables, getHoverCollider, refreshBaths, update };
+  return { stations, interactables, getHoverCollider, refreshBaths, update,
+    startMelt(stationId = 'center') { forgeMap.get(stationId)?.visual.ignite(performance.now()); } };
 }

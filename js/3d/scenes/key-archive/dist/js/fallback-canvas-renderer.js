@@ -7,6 +7,7 @@ import { CABINET_Z, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS,
   CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_GRID_BOTTOM_Y,
   CABINET_BLANK_ROW_BOTTOM_Y, CABINET_OUTLINE, pegForSlot } from './cabinet-layout.js?v=21';
 import { FIXTURE_OFFSETS, bathId } from './station-layout.js?v=2';
+import { drawBathActivity, drawBathKeys, drawForgeActivity } from './station-canvas-effects.js';
 import { WINDOW_CENTERS, PILASTER_CENTERS, PERIMETER_BAND_Y, vaultHeight,
   WINDOW_SILL_Y, WINDOW_SPRING_Y } from './hall-architecture.js?v=23';
 
@@ -378,12 +379,15 @@ export function createFallbackCanvasRenderer({
       ctx.lineWidth = 3;
       ctx.strokeStyle = '#cfaf82';
       ctx.stroke();
+      const contents = bathContents(state, bathId(station.id, kind));
+      const wallTime = Date.now();
+      drawBathActivity(ctx, p, r, kind, contents.keys, frameTime, wallTime);
+      drawBathKeys(ctx, p, r, kind, contents.keys, wallTime);
       if (active > .005) {
         ctx.save(); ctx.globalAlpha = active;
         ctx.lineWidth = 6; ctx.strokeStyle = '#ffffff'; ctx.stroke();
         ctx.restore();
       }
-      const contents = bathContents(state, bathId(station.id, kind));
       ctx.fillStyle = '#f5e8d0';
       ctx.font = `bold ${clamp(80 / p.depth, 10, 20)}px Arial`;
       ctx.textAlign = 'center';
@@ -401,6 +405,7 @@ export function createFallbackCanvasRenderer({
       ctx.beginPath();
       ctx.ellipse(f.x, f.y, r, r * .40, 0, 0, Math.PI * 2);
       ctx.fillStyle = '#dd793c'; ctx.fill();
+      drawForgeActivity(ctx, f, r, frameTime, station.forge.impactAt);
       ctx.strokeStyle = '#756151';
       ctx.lineWidth = 5; ctx.stroke();
       const active = fixtureHover.get(`forge:${station.id}`) || 0;

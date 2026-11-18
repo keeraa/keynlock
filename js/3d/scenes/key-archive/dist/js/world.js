@@ -10,7 +10,7 @@ import { createKeyThumbnailRenderer } from './key-thumbnails.js';
 import { sampleThrow } from './throw-physics.js';
 import { CABINET_CAPACITY, pegForSlot } from './cabinet-layout.js?v=21';
 import { restingKeyY } from './floor-contact.js';
-import { createWorkstations } from './wash-forge-stations.js?v=23';
+import { createWorkstations } from './wash-forge-stations.js?v=24';
 import { createPaintedRenderer } from './painted-renderer.js?v=25';
 import { createSceneGeometryStatsCache } from './geometry-stats.js';
 import { createWetSnow } from './wet-snow.js?v=21';
@@ -242,6 +242,7 @@ export function createWorld(canvas, state, visualSettings) {
 
   function animateDiscard(key, stationId = 'center') {
     geometryStatsCache?.invalidate();
+    workstations.startMelt(stationId);
     camera.updateMatrixWorld(true);
     const start = camera.localToWorld(new THREE.Vector3(.42, -.37, -.84));
     const station = workstations.stations.find(item => item.id === stationId) || workstations.stations[0];

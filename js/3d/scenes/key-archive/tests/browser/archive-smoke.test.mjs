@@ -77,6 +77,16 @@ async function enterArchive(page, label) {
 test('Chromium renders the Three.js hall and opens the visual controls', { timeout: 120000 }, async t => {
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   t.after(() => page.close());
+  const state = createInitialState();
+  const muddy = state.keys.find(key => key.mud && !key.broken);
+  const rusty = state.keys.find(key => key.rust && !key.broken && key.id !== muddy.id);
+  for (const [key, kind] of [[muddy, 'mud'], [rusty, 'rust']]) {
+    key.status = 'bath';
+    key.bathId = `center-${kind}`;
+    key.bathUntil = Date.now() + 12000;
+  }
+  await page.addInitScript(({ storageKey, snapshot }) => localStorage.setItem(storageKey, snapshot),
+    { storageKey: STORAGE_KEY, snapshot: JSON.stringify(state) });
   const errors = await enterArchive(page, 'webgl');
   const visualState = await page.locator('#visual-status').textContent();
   assert.notEqual(visualState, 'Canvas 2D', 'WebGL unexpectedly fell back to Canvas');

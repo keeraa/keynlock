@@ -1,0 +1,451 @@
+{
+  "schemaVersion": 1,
+  "library": "KEYNLOCK gouache materials",
+  "root": "js/3d/shared/materials",
+  "policy": "canonical",
+  "materials": [
+    {
+      "id": "gouache-entry-door-carved-v1",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-entry-door-carved-v1.webp",
+      "gitBlobSha": "496b39a467d40444a3384cdf8e95d2fe179c9319",
+      "bytes": 306346,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/gouache-entry-door-carved-v1.webp"
+      ]
+    },
+    {
+      "id": "gouache-landmark-moss-v1",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-landmark-moss-v1.webp",
+      "gitBlobSha": "c97f7aef5c6276567a293b4fb08e8c938dbdd9bc",
+      "bytes": 101960,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/gouache-landmark-moss-v1.webp"
+      ]
+    },
+    {
+      "id": "gouache-landmark-stone-v1",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-landmark-stone-v1.webp",
+      "gitBlobSha": "d39d6cd7dff6e2eb642db372112d1355178ed95b",
+      "bytes": 151596,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/gouache-landmark-stone-v1.webp"
+      ]
+    },
+    {
+      "id": "gouache-plaster-chipped-v2",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-plaster-chipped-v2.webp",
+      "gitBlobSha": "bd74c7fdd9cbfc2ae560331cfcbbc5630d78208c",
+      "bytes": 63516,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/gouache-plaster-chipped-v2.webp"
+      ]
+    },
+    {
+      "id": "gouache-plaster-chipped-v3",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-plaster-chipped-v3.webp",
+      "gitBlobSha": "1668db17ca97cb85316fd077bf2d293584dfd54f",
+      "bytes": 23034,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/gouache-plaster-chipped-v3.webp"
+      ]
+    },
+    {
+      "id": "gouache-plaster-chipped",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-plaster-chipped.webp",
+      "gitBlobSha": "a3683e702305266df56ff079578594249619a010",
+      "bytes": 209968,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/gouache-plaster-chipped.webp"
+      ]
+    },
+    {
+      "id": "gouache-plaster",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-plaster.webp",
+      "gitBlobSha": "9bd3819f90069538ef67079216902fece89ef4f0",
+      "bytes": 197276,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/gouache-plaster.webp"
+      ]
+    },
+    {
+      "id": "gouache-roof-tiles-dense-v3",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-roof-tiles-dense-v3.webp",
+      "gitBlobSha": "2a9cd01f1ba870745e7b297eb5486ea621fb2122",
+      "bytes": 162358,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/gouache-roof-tiles-dense-v3.webp"
+      ]
+    },
+    {
+      "id": "gouache-roof-tiles-finer-v2",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-roof-tiles-finer-v2.webp",
+      "gitBlobSha": "fbefdd1f3a08216bd0dcc9314137c3f735c9a8d0",
+      "bytes": 113318,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/gouache-roof-tiles-finer-v2.webp"
+      ]
+    },
+    {
+      "id": "gouache-roof-tiles",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-roof-tiles.webp",
+      "gitBlobSha": "3856a0a79a8267d716257c2bb7041f4ad1befc97",
+      "bytes": 95096,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/gouache-roof-tiles.webp"
+      ]
+    },
+    {
+      "id": "gouache-shutters-horizontal-v4",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-shutters-horizontal-v4.webp",
+      "gitBlobSha": "80548fb20d8ebe26a6a00d68a1458b42566601c8",
+      "bytes": 193232,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/gouache-shutters-horizontal-v4.webp"
+      ]
+    },
+    {
+      "id": "gouache-shutters-oak-louver-v5",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-shutters-oak-louver-v5.webp",
+      "gitBlobSha": "bbe15bb3b1d57fbf3315629680ba4ea2cd90bfc1",
+      "bytes": 178112,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/gouache-shutters-oak-louver-v5.webp"
+      ]
+    },
+    {
+      "id": "gouache-shutters-v2",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-shutters-v2.webp",
+      "gitBlobSha": "7ef0b47d65e4232ab6b0965cda7cde4dddef8057",
+      "bytes": 57812,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/gouache-shutters-v2.webp"
+      ]
+    },
+    {
+      "id": "gouache-shutters-v3",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-shutters-v3.webp",
+      "gitBlobSha": "e57904f7190a7c6c882ed63de4f43addf88c737f",
+      "bytes": 96612,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/gouache-shutters-v3.webp"
+      ]
+    },
+    {
+      "id": "gouache-shutters",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-shutters.webp",
+      "gitBlobSha": "733defd1a2641c57a7be2a7b958976ee4a123aec",
+      "bytes": 51980,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/gouache-shutters.webp"
+      ]
+    },
+    {
+      "id": "gouache-stone-band",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-stone-band.webp",
+      "gitBlobSha": "20e4f95506381560b4f96ac170723f8a3349d2de",
+      "bytes": 52046,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/gouache-stone-band.webp"
+      ]
+    },
+    {
+      "id": "gouache-window-glass-v2",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-window-glass-v2.webp",
+      "gitBlobSha": "69eb607cfee7d8deaa35be8d32e50ac9775be5f0",
+      "bytes": 39108,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/gouache-window-glass-v2.webp"
+      ]
+    },
+    {
+      "id": "gouache-window-glass",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-window-glass.webp",
+      "gitBlobSha": "406bf7a31ffd9aa6b98918546abe35b697ce8e2c",
+      "bytes": 35346,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/gouache-window-glass.webp"
+      ]
+    },
+    {
+      "id": "gouache-window-sill-v2",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-window-sill-v2.webp",
+      "gitBlobSha": "70f1177bc08302baff37ab3237a65fa90ecb6840",
+      "bytes": 94606,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/gouache-window-sill-v2.webp"
+      ]
+    },
+    {
+      "id": "gouache-window-sill",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/gouache-window-sill.webp",
+      "gitBlobSha": "79487f33424063382cde74d9de0387256cfc5cbb",
+      "bytes": 62938,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/gouache-window-sill.webp"
+      ]
+    },
+    {
+      "id": "landmark-copper-gouache",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/landmark-copper-gouache.png",
+      "gitBlobSha": "ea52d1b4ae8268b1b07ab707d5458cff6b348fa2",
+      "bytes": 786445,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/landmark-copper-gouache.png"
+      ]
+    },
+    {
+      "id": "landmark-copper-gouache",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/landmark-copper-gouache.webp",
+      "gitBlobSha": "84ac71d62cb87e77c238fb055d439340d6aac02c",
+      "bytes": 444424,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/landmark-copper-gouache.webp"
+      ]
+    },
+    {
+      "id": "landmark-slate-gouache",
+      "category": "architecture",
+      "path": "js/3d/shared/materials/architecture/landmark-slate-gouache.png",
+      "gitBlobSha": "638c440c2765355bca3f6f3b0b6257beefd42498",
+      "bytes": 786445,
+      "consumers": [
+        "js/3d/scenes/city/assets/house-textures/landmark-slate-gouache.png"
+      ]
+    },
+    {
+      "id": "glass-antique",
+      "category": "glass",
+      "path": "js/3d/shared/materials/glass/glass-antique.webp",
+      "gitBlobSha": "c787292f6f5401e6237c886e862db6018c9dc698",
+      "bytes": 631824,
+      "consumers": [
+        "js/3d/scenes/alchemy/lab/assets/glass-antique.webp",
+        "js/3d/scenes/alchemy/src/assets/glass-antique.webp"
+      ]
+    },
+    {
+      "id": "glass-frosted",
+      "category": "glass",
+      "path": "js/3d/shared/materials/glass/glass-frosted.webp",
+      "gitBlobSha": "99e1845c238c7290489e62b899f901d3c7ea0fbe",
+      "bytes": 928344,
+      "consumers": [
+        "js/3d/scenes/alchemy/lab/assets/glass-frosted.webp",
+        "js/3d/scenes/alchemy/src/assets/glass-frosted.webp"
+      ]
+    },
+    {
+      "id": "glass-watercolor",
+      "category": "glass",
+      "path": "js/3d/shared/materials/glass/glass-watercolor.webp",
+      "gitBlobSha": "f2c174e3ed128353f90bd6307bad62c910aa1f97",
+      "bytes": 424338,
+      "consumers": [
+        "js/3d/scenes/alchemy/lab/assets/glass-watercolor.webp",
+        "js/3d/scenes/alchemy/src/assets/glass-watercolor.webp"
+      ]
+    },
+    {
+      "id": "painted-gear",
+      "category": "mechanisms",
+      "path": "js/3d/shared/materials/mechanisms/painted-gear.webp",
+      "gitBlobSha": "3dbaf4137b525ecbfa5cf1708c0d5bddb1840704",
+      "bytes": 84918,
+      "consumers": [
+        "js/3d/scenes/lair/public/stations/workbench/assets/painted-gear.webp",
+        "js/3d/scenes/locks/lab/assets/painted-gear.webp",
+        "js/3d/scenes/workbench/public/assets/painted-gear.webp"
+      ]
+    },
+    {
+      "id": "painted-manifold",
+      "category": "mechanisms",
+      "path": "js/3d/shared/materials/mechanisms/painted-manifold.webp",
+      "gitBlobSha": "9969d00244d4287193d2272c66a434df1bc43515",
+      "bytes": 25488,
+      "consumers": [
+        "js/3d/scenes/locks/lab/assets/painted-manifold.webp"
+      ]
+    },
+    {
+      "id": "painted-pin",
+      "category": "mechanisms",
+      "path": "js/3d/shared/materials/mechanisms/painted-pin.webp",
+      "gitBlobSha": "703d021eeadaddd0d42bc1ab2daad4c69c78c817",
+      "bytes": 45030,
+      "consumers": [
+        "js/3d/scenes/lair/public/stations/workbench/assets/painted-pin.webp",
+        "js/3d/scenes/locks/lab/assets/painted-pin.webp",
+        "js/3d/scenes/workbench/public/assets/painted-pin.webp"
+      ]
+    },
+    {
+      "id": "painted-brass",
+      "category": "metals",
+      "path": "js/3d/shared/materials/metals/painted-brass.webp",
+      "gitBlobSha": "26686028c0b9aeed8ed3e8554f8b9b964ac40b0b",
+      "bytes": 58548,
+      "consumers": [
+        "js/3d/scenes/alchemy/lab/assets/painted-brass.webp",
+        "js/3d/scenes/lair/public/stations/workbench/assets/painted-brass.webp",
+        "js/3d/scenes/locks/lab/assets/painted-brass.webp",
+        "js/3d/scenes/workbench/public/assets/painted-brass.webp"
+      ]
+    },
+    {
+      "id": "painted-copper",
+      "category": "metals",
+      "path": "js/3d/shared/materials/metals/painted-copper.webp",
+      "gitBlobSha": "36cbbcf6323d6d1ac880e5750d454e5d366c7ec8",
+      "bytes": 28738,
+      "consumers": [
+        "js/3d/scenes/alchemy/lab/assets/painted-copper.webp",
+        "js/3d/scenes/locks/lab/assets/painted-copper.webp"
+      ]
+    },
+    {
+      "id": "painted-enamel",
+      "category": "metals",
+      "path": "js/3d/shared/materials/metals/painted-enamel.webp",
+      "gitBlobSha": "c5f4937b8d9b9a44d7b27a3d3bbf8d2ecb189736",
+      "bytes": 28838,
+      "consumers": [
+        "js/3d/scenes/alchemy/lab/assets/painted-enamel.webp",
+        "js/3d/scenes/locks/lab/assets/painted-enamel.webp"
+      ]
+    },
+    {
+      "id": "painted-graphite",
+      "category": "metals",
+      "path": "js/3d/shared/materials/metals/painted-graphite.webp",
+      "gitBlobSha": "7083f345f8c98abac49add3a2358d7f8da7a2997",
+      "bytes": 19024,
+      "consumers": [
+        "js/3d/scenes/alchemy/lab/assets/painted-graphite.webp",
+        "js/3d/scenes/locks/lab/assets/painted-graphite.webp"
+      ]
+    },
+    {
+      "id": "painted-steel",
+      "category": "metals",
+      "path": "js/3d/shared/materials/metals/painted-steel.webp",
+      "gitBlobSha": "0d334a3ec28ccd1efc1ca7076f92f386463aa712",
+      "bytes": 67612,
+      "consumers": [
+        "js/3d/scenes/alchemy/lab/assets/painted-steel.webp",
+        "js/3d/scenes/lair/public/stations/workbench/assets/painted-steel.webp",
+        "js/3d/scenes/locks/lab/assets/painted-steel.webp",
+        "js/3d/scenes/workbench/public/assets/painted-steel.webp"
+      ]
+    },
+    {
+      "id": "atelier-wallpaper-gouache",
+      "category": "surfaces",
+      "path": "js/3d/shared/materials/surfaces/atelier-wallpaper-gouache.webp",
+      "gitBlobSha": "8609cbbc12608d7974ff6d8cb1558af635bef70c",
+      "bytes": 269760,
+      "consumers": [
+        "js/3d/scenes/lair/public/assets/atelier-wallpaper-gouache.webp"
+      ]
+    },
+    {
+      "id": "painted-cork",
+      "category": "surfaces",
+      "path": "js/3d/shared/materials/surfaces/painted-cork.webp",
+      "gitBlobSha": "61596eafd0611c7070c9b3846f07f580a651b224",
+      "bytes": 50826,
+      "consumers": [
+        "js/3d/scenes/alchemy/lab/assets/painted-cork.webp",
+        "js/3d/scenes/alchemy/src/assets/painted-cork.webp"
+      ]
+    },
+    {
+      "id": "wood-ash-gouache-v2",
+      "category": "wood",
+      "path": "js/3d/shared/materials/wood/wood-ash-gouache-v2.webp",
+      "gitBlobSha": "f54640095b993982717e6cda16d8e00d1148a4d6",
+      "bytes": 208532,
+      "consumers": [
+        "js/3d/scenes/lair/public/assets/wood-ash-gouache-v2.webp"
+      ]
+    },
+    {
+      "id": "wood-gouache-ash",
+      "category": "wood",
+      "path": "js/3d/shared/materials/wood/wood-gouache-ash.webp",
+      "gitBlobSha": "8dc28e7813984ef49aa6609e7f918e2fcfb9a6da",
+      "bytes": 131988,
+      "consumers": [
+        "js/3d/scenes/alchemy/lab/assets/wood-gouache-ash.webp",
+        "js/3d/scenes/alchemy/src/assets/wood-gouache-ash.webp",
+        "js/3d/scenes/lair/public/assets/wood-gouache-ash.webp"
+      ]
+    },
+    {
+      "id": "wood-gouache-oak",
+      "category": "wood",
+      "path": "js/3d/shared/materials/wood/wood-gouache-oak.webp",
+      "gitBlobSha": "d3a1692511bdfb398a8b92ad86cacc56e36cbef6",
+      "bytes": 156078,
+      "consumers": [
+        "js/3d/scenes/alchemy/lab/assets/wood-gouache-oak.webp",
+        "js/3d/scenes/alchemy/src/assets/wood-gouache-oak.webp",
+        "js/3d/scenes/lair/public/assets/wood-gouache-oak.webp"
+      ]
+    },
+    {
+      "id": "wood-gouache-walnut",
+      "category": "wood",
+      "path": "js/3d/shared/materials/wood/wood-gouache-walnut.webp",
+      "gitBlobSha": "d3c8e7d5c22a8f947af56a3b953ae0126aebf93b",
+      "bytes": 124110,
+      "consumers": [
+        "js/3d/scenes/alchemy/lab/assets/wood-gouache-walnut.webp",
+        "js/3d/scenes/alchemy/src/assets/wood-gouache-walnut.webp",
+        "js/3d/scenes/lair/public/assets/wood-gouache-walnut.webp"
+      ]
+    },
+    {
+      "id": "wood-oak-gouache-v2",
+      "category": "wood",
+      "path": "js/3d/shared/materials/wood/wood-oak-gouache-v2.webp",
+      "gitBlobSha": "b89fab255fdc95ac199da0f6b65d6f8c2c70a9ca",
+      "bytes": 270450,
+      "consumers": [
+        "js/3d/scenes/lair/public/assets/wood-oak-gouache-v2.webp"
+      ]
+    },
+    {
+      "id": "wood-walnut-gouache-v2",
+      "category": "wood",
+      "path": "js/3d/shared/materials/wood/wood-walnut-gouache-v2.webp",
+      "gitBlobSha": "a36d2a49f8343be3763bf2df392ccb5b281969f4",
+      "bytes": 170242,
+      "consumers": [
+        "js/3d/scenes/lair/public/assets/wood-walnut-gouache-v2.webp"
+      ]
+    }
+  ]
+}

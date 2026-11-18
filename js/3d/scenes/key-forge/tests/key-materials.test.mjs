@@ -30,6 +30,8 @@ test('библиотека предзагружает текстуры один 
     assert.match(shader.vertexShader,/#ifdef USE_INSTANCING/);
     assert.match(shader.fragmentShader,/vInstanceKeyPaint\.x/);
     assert.match(shader.fragmentShader,/keySeed\*\.031/);
+    assert.doesNotMatch(shader.fragmentShader,/uMark|markCoverage|uKeyMarks/);
+    assert.equal(Object.keys(shader.uniforms).some(name=>name.startsWith('uMark')),false);
     assert.ok(shader.uniforms.uPaintedRust.value);
     material.dispose();
   } finally {

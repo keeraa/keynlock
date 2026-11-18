@@ -127,7 +127,7 @@ export function createKeyModel(design,{materialCache=null}={}) {
   const group=new THREE.Group();
   const cache=materialCache??new Map();
   const metal=getMetalMaterial(fixedMetal(design.template),design.rustAmount??0,
-    design.template,design.dirtAmount??0,cache,design);
+    design.template,design.dirtAmount??0,cache);
   const depth=design.thickness/100;
   const headScale=design.headSize/100;
   const head=new THREE.Group();head.position.x=-1.21;head.scale.set(headScale,headScale,1);group.add(head);
@@ -154,7 +154,7 @@ export function createKeyModel(design,{materialCache=null}={}) {
 // GPU buffer instead of extruding the entire key again for cosmetic sliders.
 export function updateKeyPaint(group,design) {
   const material=getMetalMaterial(fixedMetal(design.template),design.rustAmount??0,
-    design.template,design.dirtAmount??0,group.userData.materialCache,design);
+    design.template,design.dirtAmount??0,group.userData.materialCache);
   group.traverse(mesh=>{
     if(mesh.isMesh&&mesh.userData.exportable!==false)mesh.material=material;
   });

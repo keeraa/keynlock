@@ -1,7 +1,6 @@
 import { KEY_TEMPLATES, METALS, defaultDesign, RUST_TEXTURE, keyAssetUrl, fixedMetal } from './key-data.js';
 import { bowPoints, holesFor, bladeSections,
   keyBounds, shaftStartX, shaftHalfHeight } from './key-shapes.js';
-import { keyMarkings, markPigment } from './key-markings.js';
 import { dirtPaint, stableNoise, crustWidth, dirtSections, dirtSegments } from './key-dirt.js';
 
 function svgPath(points) {
@@ -162,7 +161,6 @@ export function keyPreviewSvg(design) {
   const rustOffsetX=(-2.35+design.template*.13).toFixed(2);
   const rustOffsetY=(-1.62+design.template*.09).toFixed(2);
   const rustRotation=(design.template*29-19)%67;
-  const marks=keyMarkings(t,design).map(mark=>`<ellipse cx="${mark.x.toFixed(3)}" cy="${(-mark.y).toFixed(3)}" rx="${mark.rx.toFixed(3)}" ry="${mark.ry.toFixed(3)}" fill="${markPigment(metal.id)}" opacity=".96"/>`).join('');
   const bounds=keyBounds(t,design);
   const left=Math.min(-2.15,bounds.minX-.25),rightEdge=Math.max(right,bounds.maxX+.35);
   const top=Math.max(1.18,bounds.maxY+.25),bottom=Math.min(-1.18,bounds.minY-.25);
@@ -176,7 +174,7 @@ export function keyPreviewSvg(design) {
       ${dirtLayer}
       <path d="${bodyPath}" fill="url(#keypaint)"/><path d="${bowPath}" fill="url(#keypaint)" fill-rule="evenodd"/>
       <path d="${bodyPath}" fill="${metal.color}" fill-opacity="${['mercury','tin','lead','silver'].includes(metal.id)?'.42':'.1'}"/><path d="${bowPath}" fill="${metal.color}" fill-opacity="${['mercury','tin','lead','silver'].includes(metal.id)?'.42':'.1'}" fill-rule="evenodd"/>
-      ${rustLayer}<g opacity=".9">${marks}</g>${dirtCoat}
+      ${rustLayer}${dirtCoat}
       ${design.dirtAmount>0?'':`<path d="${svgBladeOutline(t,design,shafts)}" fill="none" stroke="${stroke}" stroke-width=".035"/><path d="${bowPath}" fill="none" stroke="${stroke}" stroke-width=".035"/>`}
     </g>
   </svg>`;

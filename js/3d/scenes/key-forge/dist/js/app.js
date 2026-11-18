@@ -70,7 +70,6 @@ function renderControls() {
     input.style.setProperty('--value',`${(Number(input.value)-min)/(max-min)*100}%`);
   }
   $('doubleSided').checked=!!design.doubleSided;
-  $('engraving').checked=!!design.engraving;
   $('broken').checked=!!design.broken;
   $('dirtEnabled').checked=design.dirtAmount>0;
   $('breakAngleRow').hidden=!design.broken;
@@ -120,7 +119,7 @@ function initializeInput() {
     const button=ev.target.closest('[data-collection]'); if(button) selectTemplate(Number(button.dataset.collection));
   });
   for(const key of parameters) $(key).addEventListener('input',ev=>updateParameter(key,ev.target.value));
-  for(const key of ['doubleSided','engraving']) $(key).addEventListener('change',ev=>{
+  for(const key of ['doubleSided']) $(key).addEventListener('change',ev=>{
     design[key]=ev.target.checked;scheduleModelUpdate();
   });
   $('broken').addEventListener('change',ev=>{
@@ -176,7 +175,7 @@ function countKeyPolygons(root) {
 
 function keyGeometrySignature(d) {
   return [d.template,d.shaftLength,d.headSize,d.teeth,d.cutDepth,d.thickness,
-    Number(!!d.doubleSided),Number(!!d.engraving),d.dirtAmount??0,
+    Number(!!d.doubleSided),d.dirtAmount??0,
     Number(!!d.broken),d.broken?(d.breakAngle??70):0].join(':');
 }
 

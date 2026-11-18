@@ -3,10 +3,9 @@ import assert from 'node:assert/strict';
 import { statSync } from 'node:fs';
 import * as THREE from '../dist/vendor/three.js';
 import { KEY_TEMPLATES, METALS, BROTHERHOOD_KEYS, brotherhoodBinding, RUST_TEXTURE,
-  keyAssetUrl, defaultDesign, bowPoints, bladeProfile, bladeSections, keyBreakX,
+  keyAssetUrl, defaultDesign, normalizeKeyDesign, bowPoints, bladeProfile, bladeSections, keyBreakX,
   keyBreakAngle, keyBounds, shaftStartX, keyIconSvg, keyPreviewSvg, createKeyModel,
   updateKeyPaint, disposeKeyModel, createInstancedKeyCollection, disposeInstancedKeyCollection } from '../dist/js/key-model.js';
-import { keyMarkings } from '../dist/js/key-markings.js';
 import { KEY_ART } from '../dist/js/key-art.js';
 
 function interpolateEdge(points,x) {
@@ -263,19 +262,21 @@ test('пакеты ключей одного металла сохраняют �
   disposeInstancedKeyCollection(hall);
 });
 
-test('без рисованных меток на ключе остаётся только цельная металлическая сетка', () => {
+test('гуашевые овалы удалены из моделей и устаревших сохранений', () => {
   for(let i=0;i<KEY_TEMPLATES.length;i++) {
-    const decorated=createKeyModel(defaultDesign(i));
-    const key=createKeyModel({...defaultDesign(i),engraving:false,rustAmount:100});
+    const standard=createKeyModel(defaultDesign(i));
+    const legacy=normalizeKeyDesign({...defaultDesign(i),engraving:true,rustAmount:100});
+    const key=createKeyModel(legacy);
     const meshes=[];
     key.traverse(obj=>{if(obj.isMesh)meshes.push(obj);});
     assert.equal(meshes.length,1,KEY_TEMPLATES[i].id);
     assert.equal(meshes[0].userData.exportable,true);
-    assert.equal(triangleCount(meshes[0]),triangleCount(decorated.children[0]),'овалы увеличивают геометрию');
-    assert.equal(key.children[0].material.userData.markCountUniform.value,0);
-    assert.equal(decorated.children[0].material.userData.markCountUniform.value,keyMarkings(KEY_TEMPLATES[i],defaultDesign(i)).length);
-    disposeKeyModel(decorated);
-    meshes[0].geometry.dispose();
+    assert.equal(triangleCount(meshes[0]),triangleCount(standard.children[0]));
+    assert.equal(legacy.engraving,undefined);
+    assert.equal(defaultDesign(i).engraving,undefined);
+    assert.equal('markCountUniform' in meshes[0].material.userData,false);
+    disposeKeyModel(standard);
+    disposeKeyModel(key);
   }
 });
 
@@ -310,12 +311,12 @@ test('гуашевые поверхности и миниатюры доступ
   for(let i=0;i<KEY_TEMPLATES.length;i++) {
     assert.match(keyIconSvg(i),/<svg/);
     assert.match(keyPreviewSvg(defaultDesign(i)),/painted-.*\.webp/);
-    const withEtching=keyPreviewSvg(defaultDesign(i));
-    const withoutEtching=keyPreviewSvg({...defaultDesign(i),engraving:false});
-    assert.match(withEtching,/<ellipse cx=/);
-    assert.doesNotMatch(withoutEtching,/<ellipse cx=/);
-    assert.doesNotMatch(withEtching,/gouache-rivet-circle\.png/);
-    assert.match(withoutEtching,/stroke="#332a23"/);
+    const preview=keyPreviewSvg(defaultDesign(i));
+    const oldPreview=keyPreviewSvg({...defaultDesign(i),engraving:true});
+    assert.doesNotMatch(preview,/<ellipse\b/);
+    assert.equal(oldPreview,preview,'старая настройка гравировки не влияет на рисунок');
+    assert.doesNotMatch(preview,/gouache-rivet-circle\.png/);
+    assert.match(preview,/stroke="#332a23"/);
     assert.equal(defaultDesign(i).rustAmount,0);
     const rusty=keyPreviewSvg({...defaultDesign(i),rustAmount:70});
     assert.match(rusty,/gouache-rust-overlay\.webp/);
@@ -390,14 +391,14 @@ test('грязь закрывает согнутый ключ, а инстанс
 test('при переносе в другую сцену ключи не делят изменяемую окраску', () => {
   const clean=createKeyModel(defaultDesign(9));
   const aged=createKeyModel({...defaultDesign(9),rustAmount:180,dirtAmount:100,
-    engraving:false,broken:true});
+    broken:true});
   const cleanMetal=clean.children.find(mesh=>mesh.userData.exportable).material;
   const agedMetal=aged.children.find(mesh=>mesh.userData.exportable).material;
   assert.notEqual(cleanMetal,agedMetal);
   assert.equal(cleanMetal.userData.dirtUniform.value,0);
   assert.equal(agedMetal.userData.dirtUniform.value,1);
-  assert.equal(cleanMetal.userData.markCountUniform.value,4);
-  assert.equal(agedMetal.userData.markCountUniform.value,0);
+  assert.equal('markCountUniform' in cleanMetal.userData,false);
+  assert.equal('markCountUniform' in agedMetal.userData,false);
   updateKeyPaint(clean,{...defaultDesign(9),rustAmount:90});
   assert.equal(agedMetal.userData.dirtUniform.value,1);
   disposeKeyModel(clean);

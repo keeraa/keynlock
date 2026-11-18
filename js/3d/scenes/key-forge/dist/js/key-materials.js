@@ -1,6 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { METALS, KEY_TEMPLATES, RUST_TEXTURE, keyAssetUrl } from './key-data.js';
-import { MAX_KEY_MARKS, markPigment, keyMarkings } from './key-markings.js';
+import { METALS, RUST_TEXTURE, keyAssetUrl } from './key-data.js';
 import { KEY_ART } from './key-art.js';
 
 const textureCache=new Map();
@@ -39,23 +38,14 @@ function rustPlacement(templateIndex) {
     angle:.43+templateIndex*1.127};
 }
 
-export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,cache=matCache,design=null) {
+export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,cache=matCache) {
   const strength=Math.max(0,Math.min(200,rustAmount))/100;
   const grime=Math.max(0,Math.min(100,dirtAmount))/100;
   const placement=rustPlacement(templateIndex);
-  const marks=design?keyMarkings(KEY_TEMPLATES[templateIndex],design):[];
-  const stampLocations=Array.from({length:MAX_KEY_MARKS},(_,index)=>{
-    const mark=marks[index];
-    return new THREE.Vector4(mark?.x??0,mark?.y??0,mark?.rx??0,mark?.ry??0);
-  });
   if(cache.has(id)) {
     const material=cache.get(id);
     material.userData.dirtUniform.value=grime;
     material.userData.dirtSeedUniform.value=templateIndex*11.37+3.71;
-    material.userData.markCountUniform.value=marks.length;
-    material.userData.markLocationsUniform.value=stampLocations;
-    material.userData.markTintUniform.value.set(markPigment(id));
-    material.userData.markDepthUniform.value=(design?.thickness??12)/100;
     if(material.userData.rustUniform) {
       material.userData.rustUniform.value=strength;
       material.userData.rustShiftUniform.value.set(placement.shiftX,placement.shiftY);
@@ -69,13 +59,6 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
   const dirtUniform={value:grime},dirtSeedUniform={value:templateIndex*11.37+3.71};
   material.userData.dirtUniform=dirtUniform;
   material.userData.dirtSeedUniform=dirtSeedUniform;
-  const markCountUniform={value:marks.length},markLocationsUniform={value:stampLocations};
-  const markTintUniform={value:new THREE.Color(markPigment(id))};
-  const markDepthUniform={value:(design?.thickness??12)/100};
-  material.userData.markCountUniform=markCountUniform;
-  material.userData.markLocationsUniform=markLocationsUniform;
-  material.userData.markTintUniform=markTintUniform;
-  material.userData.markDepthUniform=markDepthUniform;
   const rustTexture=loadPaintedTexture(RUST_TEXTURE);
   if(rustTexture) {
     const rustUniform={value:strength};
@@ -91,10 +74,6 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
       shader.uniforms.uRustAngle=rustAngleUniform;
       shader.uniforms.uDirtAmount=dirtUniform;
       shader.uniforms.uDirtSeed=dirtSeedUniform;
-      shader.uniforms.uMarkCount=markCountUniform;
-      shader.uniforms.uKeyMarks=markLocationsUniform;
-      shader.uniforms.uMarkTint=markTintUniform;
-      shader.uniforms.uMarkDepth=markDepthUniform;
       shader.vertexShader=shader.vertexShader
         .replace('#include <common>',`#include <common>
           varying vec3 vKeySurface;
@@ -115,10 +94,6 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
           varying vec3 vInstanceKeyPaint;
           uniform float uDirtAmount;
           uniform float uDirtSeed;
-          uniform float uMarkCount;
-          uniform float uMarkDepth;
-          uniform vec3 uMarkTint;
-          uniform vec4 uKeyMarks[${MAX_KEY_MARKS}];
           float dirtHash(vec2 p) {return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
           float dirtNoise(vec2 p) {
             vec2 cell=floor(p),f=fract(p);
@@ -143,22 +118,6 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
           float rustDeepen = clamp(keyRust - 1.0, 0.0, 1.0);
           vec3 rustColor = mix(rustPigment.rgb, vec3(0.14, 0.055, 0.021), rustDeepen * 0.68);
           diffuseColor.rgb = mix(diffuseColor.rgb, rustColor, rustCoverage);
-          // Filled gouache ovals are pigments IN the metal's BRDF. They use
-          // the exact same lights, cast no floating planes and cost 0 polygons.
-          float markCoverage=0.0;
-          if(uMarkCount > 0.5 && keyDirt < .995 &&
-             abs(vKeySurface.x+1.21)<.82 && abs(vKeySurface.y)<.87 &&
-             (abs(vKeySurface.z) < .002 || abs(vKeySurface.z-uMarkDepth) < .002)) {
-            float brush=(dirtNoise(vKeySurface.xy*71.3+vec2(5.9,2.2))-.5)*.14;
-            for(int i=0;i<${MAX_KEY_MARKS};i++) {
-              if(float(i)>=uMarkCount)break;
-              vec4 stamp=uKeyMarks[i];
-              vec2 delta=(vKeySurface.xy-stamp.xy)/stamp.zw;
-              float edge=length(delta);
-              markCoverage=max(markCoverage,1.0-smoothstep(.88+brush,1.03+brush,edge));
-            }
-          }
-          diffuseColor.rgb=mix(diffuseColor.rgb,uMarkTint,markCoverage*.96);
           float dirtCoverage = 0.0;
           if(keyDirt > 0.001) {
             vec2 grainUv=vKeySurface.xy+vec2(uDirtSeed+keySeed,uDirtSeed*.371+keySeed*.13);
@@ -171,11 +130,11 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
             diffuseColor.rgb=mix(diffuseColor.rgb,mud,dirtCoverage);
           }`)
         .replace('#include <roughnessmap_fragment>',
-          '#include <roughnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, .89, markCoverage);\nroughnessFactor = mix(roughnessFactor, 1.0, dirtCoverage);')
+          '#include <roughnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, 1.0, dirtCoverage);')
         .replace('#include <metalnessmap_fragment>',
-          '#include <metalnessmap_fragment>\nmetalnessFactor = mix(metalnessFactor, .08, markCoverage);\nmetalnessFactor *= (1.0 - 0.98 * dirtCoverage);');
+          '#include <metalnessmap_fragment>\nmetalnessFactor *= (1.0 - 0.98 * dirtCoverage);');
     };
-    material.customProgramCacheKey=()=> 'keynlock-gouache-stamps-rust-grime-instancing-v5';
+    material.customProgramCacheKey=()=> 'keynlock-gouache-rust-grime-instancing-v6';
   }
   cache.set(id,material);return material;
 }

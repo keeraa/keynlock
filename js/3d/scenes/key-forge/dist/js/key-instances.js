@@ -17,7 +17,7 @@ function entryDesign(entry) {
 
 function shapeSignature(d) {
   return JSON.stringify([d.template,d.shaftLength,d.headSize,d.teeth,d.cutDepth,
-    d.thickness,!!d.doubleSided,!!d.engraving,d.dirtAmount>0,
+    d.thickness,!!d.doubleSided,d.dirtAmount>0,
     !!d.broken,d.broken?d.breakAngle:0]);
 }
 

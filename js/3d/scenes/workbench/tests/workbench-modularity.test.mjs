@@ -17,9 +17,9 @@ test('a host scene can import the workbench without starting the standalone app'
   assert.match(source('style.css'),/:host \.app\{/);
 });
 
-test('key, assembly, mechanism and casket have separate controller boundaries',()=>{
+test('key, assembly, gears, mechanism and casket have separate controller boundaries',()=>{
   const app=source('js/workbench-app.js');
-  for(const mode of ['key','assembly','mechanism','code']){
+  for(const mode of ['key','assembly','gears','mechanism','code']){
     assert.ok(existsSync(join(pub,`js/modes/${mode}-mode.js`)),mode);
     assert.match(app,new RegExp(`${mode}:\\{index:`));
   }

@@ -23,7 +23,7 @@ test('extended mechanism has five genuine additional snap-in parts',()=>{
   assert.equal(ALL_ASSEMBLY_SLOTS.length,18);
   assert.equal(requiredAssemblySlots('classic').length,13);
   assert.equal(requiredAssemblySlots('extended').length,18);
-  assert.equal(assemblyStepsFor('extended').length,7);
+  assert.equal(assemblyStepsFor('extended').length,6);
   assert.deepEqual(requiredAssemblySlots('free',{...DEFAULT_FREE_DESIGN,reinforced:false}),SLOT_TYPES);
   assert.equal(requiredAssemblySlots('free',DEFAULT_FREE_DESIGN).length,18);
   assert.equal(checkSocket('washer-0','washer-1'),true);
@@ -87,12 +87,20 @@ test('saved custom drawings and add-on installations restore without losing clas
   assert.equal(invalid.freeKeyBlueprint,'');
 });
 
-test('the assembly sheet adapts to extended parts and reversed gearing',()=>{
+test('the assembly sheet reflects the 35 detachable 3D pieces and both drive types',()=>{
   const basic=manualIllustration(PIN_ORDER);
   const expanded=manualIllustration([1,0,3,2],{ratio:'16:12',hardware:true});
-  assert.match(basic,/13 ДЕТАЛЕЙ/);
-  assert.match(expanded,/18 ДЕТАЛЕЙ/);
+  const gears=manualIllustration(PIN_ORDER,{mode:'gears'});
+  assert.match(basic,/35 СЪЁМНЫХ УЗЛОВ/);
+  assert.match(expanded,/35 СЪЁМНЫХ УЗЛОВ/);
   assert.match(expanded,/16:12/);
-  assert.match(expanded,/СТ/);
-  assert.ok(expanded.length>basic.length);
+  assert.match(expanded,/РАСШИРЕННАЯ СБОРКА/);
+  assert.match(expanded,/Стойка с кольцом/);
+  assert.equal((expanded.match(/data-gear-teeth=/g)||[]).length,2);
+  assert.match(gears,/data-drawing-mode="gears"/);
+  assert.match(gears,/02 \/ 02/);
+  assert.equal((gears.match(/data-gear-teeth=/g)||[]).length,5);
+  assert.match(gears,/16–16–14–16–14/);
+  assert.match(gears,/Маслёнка/);
+  assert.ok(gears.length>basic.length);
 });

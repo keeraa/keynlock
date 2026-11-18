@@ -525,7 +525,8 @@ export function createMechanism3D(canvas,options={}){
   resetCamera();
   const resizeObserver=new ResizeObserver(()=>{if(active)resize();});
   resizeObserver.observe(canvas.parentElement);
-  canvas.addEventListener('contextmenu',event=>event.preventDefault());
+  const preventContextMenu=event=>event.preventDefault();
+  canvas.addEventListener('contextmenu',preventContextMenu);
   scene.add(new THREE.HemisphereLight(0xc6e4dd,0x2c2824,2.3));
   const keyLight=new THREE.DirectionalLight(0xffd5a1,3.4);keyLight.position.set(-4,6,10);
   keyLight.castShadow=true;keyLight.shadow.mapSize.set(1024,1024);
@@ -617,6 +618,7 @@ export function createMechanism3D(canvas,options={}){
     whenTexturesReady(){return Promise.all(paintedLoads);},
     dispose(){active=false;resizeObserver.disconnect();controls.dispose();
       canvas.removeEventListener('pointerdown',shiftPan,{capture:true});
+      canvas.removeEventListener('contextmenu',preventContextMenu);
       for(const model of models.values())disposeObject(model.group);
       for(const child of [...linksRoot.children,...accessRoot.children])disposeObject(child);
       disposeObject(board);for(const g of segmentCache.values())g.dispose();segmentCache.clear();

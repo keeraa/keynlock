@@ -24,10 +24,18 @@ test('old save restores its exact four-tooth profile and fitted parts',()=>{
   assert.deepEqual(state.installed,saved.installed);
   assert.equal(state.keyMethod,'soap');
   assert.equal(state.fileOrientation,'top');
+  assert.equal(state.assemblyCameraLocked,true);
   assert.equal(state.blueprint,true);
   assert.equal(state.serial,7);
-  assert.equal(state.mode,'key');
+  assert.equal(state.mode,'assembly');
   assert.equal(state.filing,false);
+});
+
+test('fixed overhead camera is on by default and its switch is persisted',()=>{
+  const cameraFree=restoreWorkbenchState({...oldSave(),assemblyCameraLocked:false});
+  assert.equal(cameraFree.assemblyCameraLocked,false);
+  assert.equal(snapshotWorkbenchState(cameraFree).assemblyCameraLocked,false);
+  assert.equal(restoreWorkbenchState({...oldSave(),assemblyCameraLocked:true}).assemblyCameraLocked,true);
 });
 
 test('saved eight-tooth blanks restore without changing the four-pin code',()=>{

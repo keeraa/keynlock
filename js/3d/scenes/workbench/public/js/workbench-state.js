@@ -22,7 +22,7 @@ export function restoreWorkbenchState(value={}){
     {targets:stored.targets,pinOrder:stored.pinOrder,signature:stored.signature||''}:
     generateBlueprint(difficulty);
   const state={
-    mode:'key',difficulty,
+    mode:'assembly',difficulty,
     targets:[...blueprint.targets],pinOrder:[...blueprint.pinOrder],signature:blueprint.signature,
     serial:Number.isInteger(stored.serial)&&stored.serial>0?stored.serial:1,
     cuts:usesStoredBlueprint&&Array.isArray(stored.cuts)&&stored.cuts.length===difficulty?
@@ -34,10 +34,11 @@ export function restoreWorkbenchState(value={}){
     keyInspection:null,
     fileOrientation:stored.fileOrientation==='top'?'top':'bottom',
     filing:false,spaceFiling:false,cameraDragging:false,
+    assemblyCameraLocked:stored.assemblyCameraLocked!==false,
     lastPointerX:0,lastPointerY:0,drag:null,testing:false,
     blueprint:usesStoredBlueprint&&stored.blueprint===true,
     partGroup:0,warnedOvercut:Array(difficulty).fill(false),
-    assemblyVariant:ASSEMBLY_VARIANTS.includes(stored.assemblyVariant)?stored.assemblyVariant:'classic',
+    assemblyVariant:ASSEMBLY_VARIANTS.includes(stored.assemblyVariant)?stored.assemblyVariant:'extended',
     freeDesign:normalizeFreeDesign(stored.freeDesign),
     freeKeyBlueprint:typeof stored.freeKeyBlueprint==='string'?stored.freeKeyBlueprint:''
   };
@@ -64,6 +65,7 @@ export function snapshotWorkbenchState(state){
     targets:state.targets,pinOrder:state.pinOrder,signature:state.signature,
     serial:state.serial,installed:state.installed,blueprint:state.blueprint,
     keyMethod:state.keyMethod,fileOrientation:state.fileOrientation,
+    assemblyCameraLocked:state.assemblyCameraLocked,
     assemblyVariant:state.assemblyVariant,freeDesign:state.freeDesign,
     freeKeyBlueprint:state.freeKeyBlueprint};
 }

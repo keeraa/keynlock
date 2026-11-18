@@ -36,10 +36,11 @@ test('performance HUD shows rendered polygon count alongside FPS',()=>{
   assert.match(page,/id="fps"/);
   assert.match(page,/id="polygons"/);
   assert.match(app,/getPolygons\(\)\.toLocaleString\('ru-RU'\)/);
-  assert.match(render,/renderedPolygons=renderer\.info\.render\.triangles/);
+  assert.match(render,/renderedPolygons=frameStats\.sceneTriangles\?\?frameStats\.triangles/);
+  assert.doesNotMatch(render,/renderedPolygons=renderer\.info\.render\.triangles/);
 });
 
-test('3D pointer picking selects the intended tooth and refuses a broken blank',()=>{
+test('3D pointer picking selects the tooth and physical hardware, ignoring retired parts',()=>{
   const layout=cutLayout(4),cuts=Array(4).fill(0);
   const camera=new THREE.PerspectiveCamera(40,1,.04,100);
   camera.position.set(0,0,5);camera.lookAt(0,0,0);camera.updateMatrixWorld();
@@ -63,18 +64,68 @@ test('3D pointer picking selects the intended tooth and refuses a broken blank',
   part.userData={kind:'part',id:'pin-2'};
   assemblyRoot.add(part);hitObjects.push(part);
   assemblyRoot.updateMatrixWorld(true);
-  assert.deepEqual(picker.hitTest(200,200),{kind:'part',id:'pin-2'});
-  const clip=new THREE.Mesh(new THREE.SphereGeometry(.18),new THREE.MeshBasicMaterial());
-  clip.position.z=.95;clip.userData={kind:'slot',id:'clip-0'};
-  const washer=new THREE.Mesh(new THREE.SphereGeometry(.18),new THREE.MeshBasicMaterial());
-  washer.position.z=.60;washer.userData={kind:'slot',id:'washer-0'};
-  assemblyRoot.add(clip,washer);hitObjects.push(clip,washer);
+  assert.equal(picker.hitTest(200,200),null,
+    'flat legacy inventory must not create interactive ghosts');
+  const loose=new THREE.Mesh(new THREE.SphereGeometry(.18),new THREE.MeshBasicMaterial());
+  loose.position.z=.60;loose.userData={kind:'loose',index:2};
+  const cover=new THREE.Mesh(new THREE.SphereGeometry(.18),new THREE.MeshBasicMaterial());
+  cover.position.z=.95;cover.userData={kind:'cover'};
+  assemblyRoot.add(loose,cover);hitObjects.push(loose,cover);
   assemblyRoot.updateMatrixWorld(true);
-  assert.deepEqual(picker.hitTest(200,200,'washer-1'),{kind:'slot',id:'washer-0'},
-    'a washer selects its matching socket even behind a closer snap-ring socket');
-  assert.deepEqual(picker.hitTest(200,200,'clip-0'),{kind:'slot',id:'clip-0'});
+  assert.deepEqual(picker.hitTest(200,200),{kind:'loose',index:2},
+    'a loose screw can be grabbed even when the cover is behind it');
+  loose.visible=false;
+  assert.deepEqual(picker.hitTest(200,200),{kind:'cover'});
   part.geometry.dispose();part.material.dispose();
-  clip.geometry.dispose();clip.material.dispose();washer.geometry.dispose();washer.material.dispose();
+  loose.geometry.dispose();loose.material.dispose();cover.geometry.dispose();cover.material.dispose();
+});
+
+test('pointer selects an unlocked mechanism part through an ineligible rear plate',()=>{
+  const camera=new THREE.PerspectiveCamera(40,1,.04,100);
+  camera.position.set(0,0,5);camera.lookAt(0,0,0);camera.updateMatrixWorld();
+  const keyRoot=new THREE.Group();keyRoot.visible=false;
+  const assemblyRoot=new THREE.Group();
+  const blockedRear=new THREE.Mesh(new THREE.BoxGeometry(1.5,1.5,.1),
+    new THREE.MeshBasicMaterial());
+  blockedRear.position.z=.9;blockedRear.userData={kind:'internal',id:'rear-0'};
+  const accessibleCap=new THREE.Mesh(new THREE.BoxGeometry(.6,.15,.1),
+    new THREE.MeshBasicMaterial());
+  accessibleCap.position.z=.4;accessibleCap.userData={kind:'internal',id:'cover-0'};
+  assemblyRoot.add(blockedRear,accessibleCap);
+  const canvas={getBoundingClientRect:()=>({left:0,top:0,width:400,height:400})};
+  const picker=createScenePicking({THREE,canvas,camera,
+    blankRoot:new THREE.Group(),keyRoot,assemblyRoot,
+    hitObjects:[blockedRear,accessibleCap],getLayout:()=>[],getCuts:()=>[],
+    canDetachPart:id=>({allowed:id==='cover-0'})});
+  assemblyRoot.updateMatrixWorld(true);
+  assert.equal(picker.hitTest(200,200)?.id,'cover-0',
+    'the available retaining bar wins over an opaque blocked shell');
+  for(const object of [blockedRear,accessibleCap]){
+    object.geometry.dispose();object.material.dispose();
+  }
+});
+
+test('tiny removable parts can be selected within a forgiving screen-space margin',()=>{
+  const camera=new THREE.PerspectiveCamera(40,1,.04,100);
+  camera.position.set(0,0,5);camera.lookAt(0,0,0);camera.updateMatrixWorld();
+  const keyRoot=new THREE.Group();keyRoot.visible=false;
+  const assemblyRoot=new THREE.Group();
+  const pin=new THREE.Mesh(new THREE.BoxGeometry(.05,.05,.05),
+    new THREE.MeshBasicMaterial());
+  pin.userData={kind:'internal',id:'pin-0'};
+  assemblyRoot.add(pin);assemblyRoot.updateMatrixWorld(true);
+  const canvas={getBoundingClientRect:()=>({left:0,top:0,width:400,height:400})};
+  const picker=createScenePicking({THREE,canvas,camera,
+    blankRoot:new THREE.Group(),keyRoot,assemblyRoot,hitObjects:[pin],
+    getLayout:()=>[],getCuts:()=>[],canDetachPart:()=>({allowed:true})});
+  assert.equal(picker.hitTest(218,200)?.id,'pin-0',
+    '19px padding finds the small pin without clicking an exact polygon');
+  assert.equal(picker.hitTest(235,200),null,
+    'screen-space assistance does not turn the whole work surface into a hitbox');
+  const assisted=picker.hitTest(218,200,false,true);
+  assert.ok(assisted.point instanceof THREE.Vector3,
+    'assisted grabbing still provides a stable world contact');
+  pin.geometry.dispose();pin.material.dispose();
 });
 
 test('hidden manual guides defer geometry rebuild until guided mode returns',()=>{

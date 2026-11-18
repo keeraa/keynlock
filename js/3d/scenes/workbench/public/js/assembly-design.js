@@ -2,12 +2,9 @@ import {ASSEMBLY_STEPS,SLOT_TYPES,CUT_LEVELS,inspectKey} from './logic.js';
 
 // These are actual additional meshes with their own snap sockets and test motion.
 export const EXTENDED_STEPS=Object.freeze([
-  {id:'retainers',title:'Шайбы и стопорное кольцо',
-    instruction:'Поставьте две опорные шайбы на оси шестерён и зафиксируйте кулачок стопорным кольцом.',
-    slots:['washer-0','washer-1','clip-0']},
-  {id:'linkage',title:'Тяга и подвижный засов',
-    instruction:'Соедините кулачок тягой с отдельным подвижным засовом.',
-    slots:['rod-0','bolt-0']}
+  {id:'hardware',title:'Крепёж, тяга и засов',
+    instruction:'Найдите шайбы, стопорное кольцо, тягу и подвижный засов.',
+    slots:['washer-0','washer-1','clip-0','rod-0','bolt-0']}
 ]);
 export const EXTENDED_SLOTS=Object.freeze(EXTENDED_STEPS.flatMap(step=>step.slots));
 export const ALL_ASSEMBLY_SLOTS=Object.freeze([...SLOT_TYPES,...EXTENDED_SLOTS]);

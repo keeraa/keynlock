@@ -1,4 +1,6 @@
 export const WORKBENCH_TOP_Y=-1.82+.34/2;
+export const WORKBENCH_WIDTH=11.5;
+export const WORKBENCH_DEPTH=6.6;
 
 // The same painted metal and wood palette is shared by the key and lock
 // stations. Scene logic does not need to know where its textures come from.
@@ -49,7 +51,7 @@ export function populateWorkshopRoom(THREE,scene,shapes,mat){
   halo.position.set(-3.8,2.1,-1.2);scene.add(halo);
 
   // One persistent workshop with two interchangeable work surfaces.
-  shapes.box(scene,11.5,.34,6.6,0,-1.82,-.5,mat.woodTop,.08);
+  shapes.box(scene,WORKBENCH_WIDTH,.34,WORKBENCH_DEPTH,0,-1.82,-.5,mat.woodTop,.08);
   shapes.box(scene,11.9,.13,6.9,0,-2.0,-.5,mat.wood,.02);
   for(const x of [-4.7,4.7])for(const z of [-2.7,1.8])
     shapes.box(scene,.28,2.4,.31,x,-3.12,z,mat.wood,.03);

@@ -153,10 +153,11 @@ export function generateBlueprint(difficulty=4,previous='',random=Math.random){
 }
 
 // Pointer gestures shared by both workbench scenes. Tools own clicks on
-// interactive geometry; bare left-drags orbit, and Shift-drags pan.
+// interactive geometry; bare left-drags orbit, and Cmd/Ctrl-drags pan.
 export function cameraPointerAction({toolTarget=false,shiftKey=false,metaKey=false,ctrlKey=false}={}) {
-  if(toolTarget && !shiftKey && !metaKey && !ctrlKey)return 'tool';
-  return shiftKey?'pan':'orbit';
+  if(metaKey||ctrlKey)return 'pan';
+  if(toolTarget&&!shiftKey)return 'tool';
+  return 'orbit';
 }
 
 export function clamp(value, min, max) {

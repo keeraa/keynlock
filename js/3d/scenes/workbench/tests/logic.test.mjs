@@ -47,8 +47,8 @@ function coversFacePoint(geometry,x,y,z=.085){
 test('plain left drag orbits, Shift pans, and tool targets keep their click', () => {
   assert.equal(cameraPointerAction(), 'orbit');
   assert.equal(cameraPointerAction({toolTarget:true}), 'tool');
-  assert.equal(cameraPointerAction({toolTarget:true,shiftKey:true}), 'pan');
-  assert.equal(cameraPointerAction({toolTarget:true,metaKey:true}), 'orbit');
+  assert.equal(cameraPointerAction({toolTarget:true,shiftKey:true}), 'orbit');
+  assert.equal(cameraPointerAction({toolTarget:true,metaKey:true}), 'pan');
   assert.equal(cameraPointerAction({toolTarget:true,ctrlKey:true,shiftKey:true}), 'pan');
 });
 
@@ -725,11 +725,19 @@ test('imprint never reveals target guides after a filing stroke or mode change',
   assert.equal(showKeyTargetGuide('guided',false),false);
 });
 
-test('one white assembly sheet projects all mechanical contours from 3D',()=>{
+test('the current white assembly sheet includes physical hardware and its real removal count',()=>{
   const svg=manualIllustration([2,0,3,1]);
   assert.ok(svg.includes('viewBox="0 0 560 310"'));
-  assert.ok(svg.includes('01 / 01'));
-  assert.ok(svg.includes('13 ДЕТАЛЕЙ'));
+  assert.ok(svg.includes('01 / 02'));
+  assert.ok(svg.includes('data-drawing-mode="pins"'));
+  assert.ok(svg.includes('data-real-part-count="30"'));
+  assert.ok(svg.includes('35 СЪЁМНЫХ УЗЛОВ'));
+  assert.ok(svg.includes('Стойка с кольцом'));
+  assert.ok(svg.includes('Задняя стенка'));
+  assert.ok(svg.includes('data-part="rear-fixed"'));
+  assert.ok(svg.includes('data-part="cover-0"'));
+  assert.ok(svg.includes('data-gear-teeth="12"'));
+  assert.ok(svg.includes('data-gear-teeth="16"'));
   assert.ok((svg.match(/M\d/g)||[]).length>150);
   for(const roman of ['I','II','III','IV'])assert.ok(svg.includes(`>${roman}</text>`));
   assert.ok(!svg.includes('NaN'));

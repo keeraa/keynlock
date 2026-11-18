@@ -3,9 +3,13 @@ import {OrbitControls} from '../vendor/OrbitControls.js';
 import {RoundedBoxGeometry} from '../vendor/RoundedBoxGeometry.js';
 import {createGeometryPrimitives} from './primitives.js';
 import {createAssemblyMechanism} from './assembly-scene.js';
+import {createCartoonFilter} from './lab/effects/cartoon-filter.js';
+import {createFloatingParticles} from './lab/effects/floating-particles.js';
 import {createScenePicking} from './scene-picking.js';
 import {disposeSceneResources} from './scene-disposal.js';
 import {createWorkshopMaterials,populateWorkshopRoom,WORKBENCH_TOP_Y} from './workshop-room.js';
+import {assemblyOverheadDirection,assemblyOverheadPosition,
+  createBenchPanController} from './workshop-camera.js';
 import {targetGuideGeometry,shouldRebuildTargetGuide} from './key-guide.js';
 import {createFileSurfaceMaterials,createMetalShavings,FILE_BODY_SCALE,
   FILE_STEEL_CENTER_X,
@@ -49,6 +53,10 @@ export function createWorkshopScene(canvas){
   renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x14242b,.023);
   const camera=new THREE.PerspectiveCamera(40,canvas.clientWidth/canvas.clientHeight,.04,100);
+  const assemblyOutline=createCartoonFilter({THREE,renderer,scene,camera});
+  assemblyOutline.setOptions({toon:false,outline:true,outlineStrength:.85,outlineWidth:1.3});
+  const assemblySnow=createFloatingParticles({THREE,scene,pixelRatio:renderer.getPixelRatio()});
+  assemblySnow.particles.visible=false;
   camera.position.set(...FILE_CAMERA_POSITION);
   const controls=new OrbitControls(camera,canvas);
   controls.target.set(...FILE_CAMERA_TARGET);controls.enableDamping=true;controls.dampingFactor=.07;
@@ -61,20 +69,29 @@ export function createWorkshopScene(canvas){
   // Interacting with a tooth or a loose part keeps the left button for tools.
   // On the rest of the canvas, an ordinary left-drag rotates the camera.
   const sceneListeners=new AbortController();
+  let handheldToolActive=false;
   canvas.addEventListener('pointerdown',event=>{
     if(event.button!==0)return;
+    if(mode==='assembly'){
+      // Assembly and gear gestures use the workbench-plane pan controller.
+      // OrbitControls stays responsible for wheel zoom and key-mode orbit.
+      controls.mouseButtons.LEFT=null;
+      return;
+    }
     const hit=hitTest(event.clientX,event.clientY);
-    const toolTarget=keyRoot.visible?(hit?.kind==='cut'):
-      hit?.kind==='part'||hit?.kind==='slot';
+    const toolTarget=handheldToolActive||(keyRoot.visible?(hit?.kind==='cut'):
+      ['screw','rag','screwdriver','dust','loose','cover','internal','shackle'].includes(hit?.kind));
     const gesture=cameraPointerAction({toolTarget,shiftKey:event.shiftKey,
       metaKey:event.metaKey,ctrlKey:event.ctrlKey});
     // OrbitControls swaps ROTATE and PAN when a keyboard modifier is held.
-    // Cmd alone keeps the old orbit shortcut; Shift pans the work surface.
+    // Cmd/Ctrl pans the tabletop; regular dragging orbits around the workpiece.
     controls.mouseButtons.LEFT=gesture==='tool'?null:
-      ((event.metaKey||event.ctrlKey)&&!event.shiftKey?
-        THREE.MOUSE.PAN:THREE.MOUSE.ROTATE);
+      (gesture==='pan'?THREE.MOUSE.PAN:THREE.MOUSE.ROTATE);
   },{capture:true,signal:sceneListeners.signal});
-  const restoreCameraButton=()=>{controls.mouseButtons.LEFT=THREE.MOUSE.ROTATE;};
+  const restoreCameraButton=()=>{
+    controls.mouseButtons.LEFT=mode==='assembly'?null:THREE.MOUSE.ROTATE;
+    if(mode==='assembly')controls.enablePan=!assemblyCameraLocked;
+  };
   canvas.addEventListener('pointerup',restoreCameraButton,{capture:true,signal:sceneListeners.signal});
   canvas.addEventListener('pointercancel',restoreCameraButton,{capture:true,signal:sceneListeners.signal});
 
@@ -370,14 +387,29 @@ export function createWorkshopScene(canvas){
   }
   setBlueprint(cutTargets);
 
-  const assembly=createAssemblyMechanism({scene,shapes,mat,addMesh,hitObjects,makeTextLabel});
+  const assembly=createAssemblyMechanism({scene,addMesh,hitObjects,camera});
   const assemblyRoot=assembly.root;
-  const {setPartGroup,setAssemblyDesign,updateInstalled,setSelectedPart,movePart,
-    findNearestSocket,startTest,updateTest}=assembly;
+  const {setAssemblyDesign,updateInstalled,
+    unscrewCorner,remainingScrews,stowScrewdriver,canRemoveCover,canDetachPart,
+    setGearMode:toggleGearLock,setGearHover,getGearState,turnGear,resetGear,
+    oilPart,setOilerHeld,moveOiler,
+    getDustiness,getAssemblyGuidance,getAssemblyPartInfo,setHoveredDetachable,removeCover,
+    beginLooseDrag,beginInternalDrag,moveLooseDrag,endLooseDrag,
+    interactionPlaneY,setShacklePull,updateTools,resetScrews,
+    setWiping,captureRagGrip,setRagContact,wipeDust,puffDust,
+    setScrewdriverHeld,moveHeldTool}=assembly;
 
-  const {hitTest,pointerPoint,keyPointer}=createScenePicking({
+  let gearStudyActive=false;
+  function setGearMode(next){
+    gearStudyActive=Boolean(next);
+    toggleGearLock(gearStudyActive);
+    if(!gearStudyActive)setGearHover(null);
+  }
+
+  const {hitTest,pointerToolPoint,keyPointer}=createScenePicking({
     THREE,canvas,camera,blankRoot,keyRoot,assemblyRoot,hitObjects,
-    getLayout:()=>layout,getCuts:()=>cutValues
+    getLayout:()=>layout,getCuts:()=>cutValues,canDetachPart,
+    isGearMode:()=>gearStudyActive
   });
   function setFilePointer(clientX,clientY){
     const projection=keyPointer(clientX,clientY);if(!projection)return;
@@ -405,31 +437,101 @@ export function createWorkshopScene(canvas){
       (fileAxisStart.y-fileAxisEnd.y)*height/2);
   }
 
+  // Shift framing slightly left to keep room for the right-hand control panel.
+  const assemblyCameraTarget=new THREE.Vector3(.55,-1.5,-.5);
+  const benchPan=createBenchPanController({THREE,canvas,camera,controls,
+    planeY:assemblyCameraTarget.y});
+  const assemblyCameraDirection=assemblyOverheadDirection(THREE);
   const rememberedViews={
     key:{position:camera.position.clone(),target:controls.target.clone()},
-    assembly:{position:new THREE.Vector3(1.75,2.15,8.7),target:new THREE.Vector3(.75,-.18,0)}
+    assembly:{position:assemblyOverheadPosition(THREE,assemblyCameraTarget),
+      target:assemblyCameraTarget.clone()}
   };
   let mode='key',lastFrame=performance.now(),frames=0,fps=0,fpsClock=lastFrame;
+  let assemblyCameraLocked=true;
+  const rotationSpherical=new THREE.Spherical(),rotationOffset=new THREE.Vector3();
+  function beginInspectionRotation(hit){
+    if(mode!=='assembly')return null;
+    if(assembly.beginObjectRotation(hit))return 'part';
+    return 'lock';
+  }
+  function rotateInspection(kind,dx,dy){
+    if(kind==='part')return assembly.rotateObject(dx,dy);
+    if(kind!=='lock'||mode!=='assembly')return false;
+    if(assemblyCameraLocked)setAssemblyCameraLocked(false);
+    rotationOffset.subVectors(camera.position,controls.target);
+    rotationSpherical.setFromVector3(rotationOffset);
+    rotationSpherical.theta-=dx*.009;
+    rotationSpherical.phi=THREE.MathUtils.clamp(
+      rotationSpherical.phi-dy*.008,.14,Math.PI-.14);
+    camera.position.copy(controls.target).add(
+      rotationOffset.setFromSpherical(rotationSpherical));
+    camera.lookAt(controls.target);
+    controls.update();
+    return true;
+  }
+  function endInspectionRotation(kind){
+    if(kind==='part')assembly.endObjectRotation();
+  }
   let renderedPolygons=0;
   const cameraInKeySpace=new THREE.Vector3();
+  function enforceAssemblyOverhead(){
+    const distance=Math.max(controls.minDistance,
+      Math.min(controls.maxDistance,camera.position.distanceTo(controls.target)||11.5));
+    // Move over the tabletop in X/Z, without allowing a screen-space pan to
+    // lift the camera vertically away from the work surface.
+    controls.target.y=assemblyCameraTarget.y;
+    camera.position.copy(controls.target).addScaledVector(assemblyCameraDirection,distance);
+    camera.lookAt(controls.target);
+  }
+  function setAssemblyCameraLocked(value){
+    assemblyCameraLocked=Boolean(value);
+    if(mode==='assembly'){
+      controls.enableRotate=!assemblyCameraLocked;
+      controls.enablePan=!assemblyCameraLocked;
+      controls.enableDamping=!assemblyCameraLocked;
+      restoreCameraButton();
+      if(assemblyCameraLocked)enforceAssemblyOverhead();
+      controls.update();
+      if(assemblyCameraLocked)enforceAssemblyOverhead();
+    }
+    return assemblyCameraLocked;
+  }
   function setMode(next){
     if(next!==mode){
+      benchPan.cancel();
       rememberedViews[mode].position.copy(camera.position);
       rememberedViews[mode].target.copy(controls.target);
       camera.position.copy(rememberedViews[next].position);
       controls.target.copy(rememberedViews[next].target);
     }
+    camera.up.set(0,next==='assembly'?0:1,next==='assembly'?-1:0);
+    controls.enableRotate=next!=='assembly'||!assemblyCameraLocked;
+    controls.enablePan=next!=='assembly'||!assemblyCameraLocked;
+    controls.enableDamping=next!=='assembly'||!assemblyCameraLocked;
+    controls.maxDistance=next==='assembly'?19:9.2;
+    controls.minPolarAngle=next==='assembly'?0:.65;
+    controls.maxPolarAngle=next==='assembly'?Math.PI:2.0;
+    if(next==='assembly'&&assemblyCameraLocked)enforceAssemblyOverhead();
+    camera.lookAt(controls.target);
     mode=next;keyRoot.visible=next==='key';assemblyRoot.visible=next==='assembly';
+    controls.mouseButtons.MIDDLE=next==='assembly'?null:THREE.MOUSE.DOLLY;
+    controls.mouseButtons.RIGHT=next==='assembly'?null:THREE.MOUSE.ROTATE;
+    if(next!=='assembly')setHoveredDetachable?.(null);
+    restoreCameraButton();
+    assemblySnow.particles.visible=next==='assembly';
     if(next==='key')filePointerSeen=false;
-    setSelectedPart(null);
-    controls.update();}
+    controls.update();
+    if(next==='assembly'&&assemblyCameraLocked)enforceAssemblyOverhead();}
   setMode('key');
   let stopped=false,suspended=false,frameId=0;
   function frame(now){
     if(stopped||suspended){frameId=0;return;}
     frameId=requestAnimationFrame(frame);
-    controls.update();updateTest(now);
+    controls.update();
+    if(mode==='assembly'&&assemblyCameraLocked)enforceAssemblyOverhead();
     const dt=Math.min(.05,Math.max(0,(now-lastFrame)/1000));
+    if(mode==='assembly'){updateTools(now);assemblySnow.update(dt);}
     shavings.update(dt);
     const highlightEase=1-Math.exp(-14*dt);
     for(const marker of cutMarkers){
@@ -473,10 +575,10 @@ export function createWorkshopScene(canvas){
       fallenPiece.group.rotation.z=-Math.min(.90,t*.95);
       fallenPiece.group.rotation.x=Math.min(.45,t*.35);
     }
-    renderer.render(scene,camera);
-    // The renderer counts the triangles actually drawn in this frame,
-    // including the active workbench mode and its visible geometry.
-    renderedPolygons=renderer.info.render.triangles;
+    const frameStats=assemblyOutline.render();
+    // The postprocessing quad is the last WebGL render pass. Count the scene
+    // pass instead, excluding normal/depth passes and the fullscreen quad.
+    renderedPolygons=frameStats.sceneTriangles??frameStats.triangles??0;
     frames++;
     if(now-fpsClock>800){fps=Math.round(frames*1000/(now-fpsClock));frames=0;fpsClock=now;}
     lastFrame=now;
@@ -485,9 +587,16 @@ export function createWorkshopScene(canvas){
   const resizeObserver=new ResizeObserver(()=>{
     const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;
     camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false);
+    assemblyOutline.resize(w,h,renderer.getPixelRatio());
+    assembly.setHoverViewport(w,h);
   });resizeObserver.observe(canvas);
+  assembly.setHoverViewport(canvas.clientWidth||1200,canvas.clientHeight||800);
   canvas.addEventListener('contextmenu',e=>e.preventDefault(),{signal:sceneListeners.signal});
-  return {setMode,setSuspended:value=>{
+  return {setMode,setAssemblyCameraLocked,
+    beginCameraPan:(pointerId,x,y)=>mode==='assembly'&&benchPan.begin(pointerId,x,y),
+    moveCameraPan:(pointerId,x,y)=>benchPan.move(pointerId,x,y),
+    endCameraPan:pointerId=>benchPan.end(pointerId),
+    isAssemblyCameraLocked:()=>mode==='assembly'&&assemblyCameraLocked,setSuspended:value=>{
     const next=Boolean(value);
     if(next===suspended)return;
     suspended=next;
@@ -501,11 +610,22 @@ export function createWorkshopScene(canvas){
     setBlueprint,setCuts,setWear,setActiveCut,setFiling,
     setKeyMethod,setFileOrientation,rotateFile,filingContact,filingPulse,filingChips,
     setFilePointer,setFilePointerActive,fileStrokePixels,
-    hitTest,pointerPoint,updateInstalled,setPartGroup,setAssemblyDesign,
-    setSelectedPart,movePart,findNearestSocket,startTest,
+    hitTest,pointerToolPoint,updateInstalled,setAssemblyDesign,
+    setGearMode,setGearHover,getGearState,turnGear,resetGear,oilPart,
+    setOilerHeld,moveOiler,
+    unscrewCorner,remainingScrews,stowScrewdriver,canRemoveCover,canDetachPart,
+    getDustiness,getAssemblyGuidance,getAssemblyPartInfo,setHoveredDetachable,removeCover,
+    beginInspectionRotation,rotateInspection,endInspectionRotation,
+    beginLooseDrag,beginInternalDrag,moveLooseDrag,endLooseDrag,
+    interactionPlaneY,setShacklePull,resetScrews,setWiping,setRagContact,wipeDust,puffDust,
+    captureRagGrip,setScrewdriverHeld,moveHeldTool,
+    setToolHeld:active=>{handheldToolActive=Boolean(active);},
+    setVisualOptions:options=>assemblyOutline.setOptions(options),
     getFps:()=>fps,getPolygons:()=>renderedPolygons,
     dispose:()=>{stopped=true;cancelAnimationFrame(frameId);frameId=0;
       sceneListeners.abort();resizeObserver.disconnect();controls.dispose();
+      assemblyOutline.dispose();assemblySnow.dispose();
+      assembly.dispose();
       imprintBoard.dispose();shavings.dispose();fileSurface.dispose();bow.dispose();
       disposeSceneResources(scene);
       // The marker template is cloned before attachment and isn't in the graph.

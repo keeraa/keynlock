@@ -38,6 +38,8 @@ const stage=createMechanism3D(canvas,{
   controlsFactory:(camera)=>({target:new THREE.Vector3(),mouseButtons:{},
     update(){camera.lookAt(this.target);camera.updateMatrixWorld();},dispose(){}})
 });
+assert.ok(listeners.has('pointerdown')&&listeners.has('contextmenu'),
+  'the sandbox has its pan and context-menu handlers only while mounted');
 const parts=demoMechanism();
 let runtime=createMechanismRuntime();
 stage.open();
@@ -167,4 +169,5 @@ assert.equal(thumbnailsDrawn,6,'one preview scene rendered per mechanism part');
 assert.ok(Object.values(thumbnailImages).every(src=>src.startsWith('data:image/png')));
 assert.equal(currentTarget,null,'thumbnail capture restores the regular render target');
 stage.close();stage.dispose();
+assert.equal(listeners.size,0,'closing the 3D sandbox releases every canvas listener');
 console.log('3D geometry, camera picking, cutaway and attack contacts: OK');

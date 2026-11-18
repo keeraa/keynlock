@@ -44,4 +44,7 @@ test('floor picking has a firm half-distance reach and a narrow sideways margin'
   const farEye = { x: 0, y: 1.68, z: 3 };
   assert.equal(findFloorKeyAtReticle(farEye, { x: 0, y: -.56, z: -1 },
     [{ id: 'far', x: 0, z: 0, rotation: 0, status: 'floor' }]), null);
+  const withinReach = { x: 0, y: 1.68, z: 2.15 };
+  assert.equal(findFloorKeyAtReticle(withinReach, { x: 0, y: -1.68, z: -2.15 },
+    [{ id: 'near', x: 0, z: 0, rotation: 0, status: 'floor' }])?.id, 'near');
 });

@@ -8,7 +8,8 @@ export function findFloorKeyAtReticle(eye, forward, keys, isThrowing = () => fal
   const magnitude = Math.hypot(forward.x, forward.y, forward.z);
   if (magnitude === 0 || forward.y / magnitude >= -.04) return null;
   const distance = (ground - eye.y) * magnitude / forward.y;
-  if (!Number.isFinite(distance) || distance <= .35 || distance > reach) return null;
+  const groundDistance = Math.hypot(forward.x, forward.z) / magnitude * distance;
+  if (!Number.isFinite(distance) || distance <= .35 || groundDistance > reach) return null;
   const x = eye.x + forward.x / magnitude * distance;
   const z = eye.z + forward.z / magnitude * distance;
   let bestDistance = radius * radius;

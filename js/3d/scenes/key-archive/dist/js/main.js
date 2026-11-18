@@ -15,7 +15,7 @@ import { createPlayerMovement } from './player-movement.js?v=4';
 import { createPerformanceHud } from './performance-hud.js';
 import { logicalKey } from './controls.js';
 import { edgeLookRate } from './mouse-look.js';
-import { findFloorKeyAtReticle } from './key-picking.js?v=4';
+import { findFloorKeyAtReticle } from './key-picking.js?v=5';
 import { createKeyIndex } from './key-index.js';
 import { findFreeFloorSpot } from './key-spacing.js?v=18';
 import { restingKeyY } from './floor-contact.js';
@@ -179,7 +179,13 @@ function targetInView() {
   const intersections = raycaster.intersectObjects(world.interactables, false);
   for (const hit of intersections) {
     const data = hit.object.userData;
-    if (!data?.kind || hit.distance > (data.kind === 'cabinet' ? CABINET_REACH :
+    if (!data?.kind) continue;
+    // Floor key reach uses walkable horizontal distance, not eye-to-floor ray
+    // length, so aiming lower cannot change which nearby key is in reach.
+    const isKey = data.kind === 'key' || data.kind === 'key-batch';
+    const distance = isKey ? Math.hypot(hit.point.x - camera.position.x,
+      hit.point.z - camera.position.z) : hit.distance;
+    if (distance > (data.kind === 'cabinet' ? CABINET_REACH :
       data.kind === 'bath' || data.kind === 'forge' ? STATION_REACH : KEY_REACH)) continue;
     if (data.kind === 'key-batch') {
       const id = world.keyIdFromHit(data.type, hit.instanceId);

@@ -1,7 +1,7 @@
 import * as THREE from '../vendor/three.js';
 import { KEY_TYPES, KEYS_PER_TYPE } from './rules.js?v=23';
 import { createFallbackSurfaces } from './fallback-surfaces.js';
-import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=5';
+import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=7';
 import { sampleThrow } from './throw-physics.js?v=3';
 import { samplePlacement, sampleDiscard } from './archive-key-motion.js';
 import { CABINET_Z, CABINET_GROUND_OFFSET, cabinetKeyPose } from './cabinet-layout.js?v=22';
@@ -9,6 +9,7 @@ import { STATIONS, FIXTURE_OFFSETS, bathId } from './station-layout.js?v=2';
 import { restingKeyY } from './floor-contact.js';
 import { PLAYER_EYE_HEIGHT } from './player-config.js';
 import { KEY_PICK_HALF_LENGTH, KEY_PICK_RADIUS } from './interaction-range.js';
+import { sampleThrowHand } from './held-key-motion.js';
 
 // A lightweight first-person perspective renderer for browsers that disable WebGL.
 // All picking and game rules still use the same Three.js world coordinates.
@@ -29,7 +30,6 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
   const discardingKeys = new Map();
   const cabinets = [];
   let hovered = null;
-  const cabinetHover = new Float32Array(KEY_TYPES.length);
   const fixtureHover = new Map();
   const keyHover = { id: null, opacity: 0, target: 0 };
   let lastHoverFrame = performance.now();
@@ -110,7 +110,7 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
 
   const canvasRenderer = createFallbackCanvasRenderer({
     ctx, scene, camera, surfaces, state, cabinets, workstations,
-    thrownKeys, placingKeys, discardingKeys, cabinetHover, fixtureHover, keyHover,
+    thrownKeys, placingKeys, discardingKeys, fixtureHover, keyHover,
   });
 
   function syncKey(key) {
@@ -125,7 +125,7 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
   }
   function keyIdFromHit(type, index) { return keysByType[type]?.[index]?.id || null; }
   function animateThrow(key, start, end) {
-    thrownKeys.set(key.id, { key, start, end, startTime: performance.now() });
+    thrownKeys.set(key.id, { key, start, end, startTime: performance.now(), stage: 'windup' });
     syncKey(key);
   }
   function animatePlace(key, slotIndex) {
@@ -149,6 +149,7 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
     discardingKeys.set(key.id, { key, start, end, startTime: performance.now() });
   }
   function isThrowing(id) { return thrownKeys.has(id); }
+  function isWindingUp() { return [...thrownKeys.values()].some(motion => motion.stage === 'windup'); }
   function highlight(target) {
     hovered = target;
     if (target?.kind === 'key') keyHover.id = target.id;
@@ -159,10 +160,6 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
     const elapsed = Math.max(0, Math.min(.1, (now - lastHoverFrame) / 1000));
     lastHoverFrame = now;
     const hoverFactor = 1 - Math.exp(-elapsed / .15);
-    cabinetHover.forEach((amount, type) => {
-      const target = hovered?.kind === 'cabinet' && hovered.type === type ? 1 : 0;
-      cabinetHover[type] = amount + (target - amount) * hoverFactor;
-    });
     for (const station of STATIONS) {
       for (const id of [bathId(station.id, 'mud'), bathId(station.id, 'rust'), `forge:${station.id}`]) {
         const target = hovered?.kind === 'bath' && hovered.id === id ||
@@ -174,6 +171,16 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
     keyHover.opacity += (keyHover.target - keyHover.opacity) * hoverFactor;
     frameTime = now;
     for (const [id, motion] of thrownKeys) {
+      if (motion.stage === 'windup') {
+        const pose = sampleThrowHand((now - motion.startTime) / 1000);
+        if (!pose.released) continue;
+        camera.updateMatrixWorld(true);
+        const start = camera.localToWorld(new THREE.Vector3(pose.x, pose.y, pose.z));
+        motion.start = { x: start.x, y: start.y, z: start.z };
+        motion.startTime = now;
+        motion.stage = 'flight';
+        continue;
+      }
       if (!sampleThrow(motion.start, motion.end, (now - motion.startTime) / 1000).landed) continue;
       thrownKeys.delete(id);
       syncKey(motion.key);
@@ -202,7 +209,8 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
     getVisualStatus: () => ({ mode: 'canvas', error: '' }),
     setVisualSettings,
     refreshHand, syncKey, refreshCabinet, highlight, update, resize,
-    keyIdFromHit, animateThrow, animatePlace, animateDiscard, isThrowing, throwingCount: () => thrownKeys.size,
+    keyIdFromHit, animateThrow, animatePlace, animateDiscard, isThrowing, isWindingUp,
+    throwingCount: () => thrownKeys.size,
     bounds: { x: 11.12, z: 22.53 },
   };
 }

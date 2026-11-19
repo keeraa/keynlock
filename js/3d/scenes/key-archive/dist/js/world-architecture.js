@@ -19,6 +19,26 @@ function roomBox(parent, size, position, material, tileMeters = HALL_SURFACE_TIL
   return mesh;
 }
 
+export function pilasterFreeTrimSpans() {
+  // End every strip just before a pilaster. A continuous solid wainscot used
+  // to penetrate the columns, causing flickering faces at the lower joins.
+  const boundaries = [-23.4, ...PILASTER_CENTERS, 23.4];
+  const spans = [];
+  for (let index = 0; index < boundaries.length - 1; index++) {
+    const start = boundaries[index] + (index === 0 ? 0 : .321);
+    const end = boundaries[index + 1] - (index === boundaries.length - 2 ? 0 : .321);
+    if (end > start) spans.push([start, end]);
+  }
+  return spans;
+}
+
+function addTrimBetweenPilasters(scene, side, size, y, material) {
+  for (const [start, end] of pilasterFreeTrimSpans()) {
+    roomBox(scene, [size[0], size[1], end - start],
+      [side * 11.93, y, (start + end) / 2], material);
+  }
+}
+
 export function cylinder(parent, radius, height, position, material, sides = 12) {
   const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, height, sides), material);
   mesh.position.set(...position);
@@ -85,7 +105,7 @@ export function makeHall(scene, mat, snow) {
 
   for (const side of [-1, 1]) {
     addWindowedWall(scene, side, mat.hallWall);
-    roomBox(scene, [.55, 1.15, 46.8], [side * 11.93, .53, 0], mat.hallTrim);
+    addTrimBetweenPilasters(scene, side, [.55, 1.15], .53, mat.hallTrim);
     roomBox(scene, [.54, .29, 46.8], [side * 11.77, PERIMETER_BAND_Y, 0], mat.hallTrim);
     for (const z of PILASTER_CENTERS) {
       contactShadow(scene, 1.9, 1.65, side * 11.43, -.048, z, shadowMaterial);

@@ -3,8 +3,8 @@
 // all display variants are derived from those same ten designs on page load.
 import * as THREE from '../vendor/three.js';
 import { KEY_TEMPLATES, METALS, defaultDesign, normalizeKeyDesign } from './key-data.js';
-import { createKeyModel as createForgeModel, disposeKeyModel } from './key-geometry.js';
-import { bowPoints, holesFor, bladeSections, createBowShape, keyBounds } from './key-shapes.js';
+import { createKeyModel as createForgeModel, disposeKeyModel } from './key-geometry.js?v=2';
+import { bowPoints, createBowShape, joinedKeyShape, keyBounds } from './key-shapes.js?v=2';
 import { getMetalMaterial } from './key-materials.js';
 import { dirtTriangles, getDirtMaterial } from './key-dirt.js';
 import { createPaintedInstanceGeometry, setKeyInstanceFinish } from './key-instance-finish.js';
@@ -87,12 +87,10 @@ function fallbackStamp(type, broken, profiles) {
   if (!ctx) return null;
   const design = geometryDesign(type, broken, profiles);
   const template = KEY_TEMPLATES[design.template];
-  const headScale = design.headSize / 100;
-  const head = bowPoints(template.bow).map(([x,y]) => [-1.21 + x * headScale, y * headScale]);
-  const holes = holesFor(template.bow).map(path =>
-    path.map(([x,y]) => [-1.21 + x * headScale, y * headScale]));
-  const sections = bladeSections(template, design);
-  const allPoints = [...head, ...sections.flat()];
+  const joined = joinedKeyShape(template, design).extractPoints(12);
+  const outline = joined.shape.map(point => [point.x, point.y]);
+  const holes = joined.holes.map(points => points.map(point => [point.x, point.y]));
+  const allPoints = outline;
   const rotated = allPoints.map(([x,y]) => [y, -x]);
   const xs = rotated.map(p => p[0]), ys = rotated.map(p => p[1]);
   const minX = Math.min(...xs), maxX = Math.max(...xs);
@@ -116,10 +114,7 @@ function fallbackStamp(type, broken, profiles) {
   ctx.strokeStyle = '#332a23';
   ctx.lineWidth = 2.8;
   ctx.lineJoin = 'round';
-  for (const section of sections) {
-    ctx.beginPath(); trace(section); ctx.fill(); ctx.stroke();
-  }
-  ctx.beginPath(); trace(head);
+  ctx.beginPath(); trace(outline);
   for (const hole of holes) trace(hole);
   ctx.fill('evenodd'); ctx.stroke();
   return canvas;

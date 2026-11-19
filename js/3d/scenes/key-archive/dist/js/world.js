@@ -7,7 +7,7 @@ import {
 } from './key-factory.js?v=3';
 import { createPaintedInstanceGeometry, setKeyInstanceFinish } from './key-instance-finish.js';
 import { createKeyThumbnailRenderer } from './key-thumbnails.js';
-import { createWorldKeyAnimations } from './world-key-animations.js';
+import { createWorldKeyAnimations } from './world-key-animations.js?v=2';
 import { restingKeyY } from './floor-contact.js';
 import { createWorkstations } from './wash-forge-stations.js?v=24';
 import { createPaintedRenderer } from './painted-renderer.js?v=25';
@@ -16,9 +16,9 @@ import { createWetSnow } from './wet-snow.js?v=21';
 import { PLAYER_EYE_HEIGHT } from './player-config.js';
 import { createKeyHoverOutline } from './key-hover-outline.js';
 import { createMaterials } from './world-materials.js';
-import { makeHall } from './world-architecture.js?v=6';
+import { makeHall } from './world-architecture.js?v=7';
 import { makeChandeliers } from './world-lighting.js';
-import { createCabinet } from './world-cabinet.js?v=6';
+import { createCabinet } from './world-cabinet.js?v=8';
 import { addDust } from './world-particles.js';
 import { nextHandMotionWeight } from './held-key-motion.js';
 import { KEY_PICK_HALF_LENGTH, KEY_PICK_RADIUS } from './interaction-range.js';
@@ -140,14 +140,14 @@ export function createWorld(canvas, state, visualSettings) {
   objectMask.matrixAutoUpdate = false;
   objectMask.visible = false;
   const objectOutline = createKeyHoverOutline(renderer, camera, objectMask);
-  const cabinetMaskGeometry = new THREE.BoxGeometry(3.92, 5.04, .92);
   const bathMaskGeometry = new THREE.CylinderGeometry(.53, .47, .44, 24);
   const forgeMaskGeometry = new THREE.CylinderGeometry(.54, .46, .74, 24);
   const dummy = new THREE.Object3D();
   let geometryStatsCache;
   const keyAnimations = createWorldKeyAnimations({ scene, camera, cabinets, workstations,
     invalidate: () => geometryStatsCache?.invalidate(), syncKey, refreshCabinet });
-  const { thrownKeys, placingKeys, animateThrow, animatePlace, animateDiscard, isThrowing } = keyAnimations;
+  const { thrownKeys, placingKeys, animateThrow, animatePlace, animateDiscard,
+    isThrowing, isWindingUp } = keyAnimations;
   const hand = new THREE.Group();
   hand.position.set(.43, -.45, -.82);
   camera.add(hand);
@@ -228,21 +228,17 @@ export function createWorld(canvas, state, visualSettings) {
 
   function highlight(target) {
     hovered = target;
-    const interactive = target?.kind === 'cabinet' || target?.kind === 'bath' || target?.kind === 'forge';
+    // The thin white cabinet silhouette shimmered against the floor whenever
+    // the camera moved. The crosshair and cabinet name already show targeting.
+    const interactive = target?.kind === 'bath' || target?.kind === 'forge';
     objectHoverTarget = interactive ? 1 : 0;
     if (interactive) {
-      const collider = target.kind === 'cabinet' ? cabinets[target.type]?.collider :
-        workstations.getHoverCollider(target);
+      const collider = workstations.getHoverCollider(target);
       if (collider) {
         collider.updateWorldMatrix(true, false);
         objectMask.matrix.copy(collider.matrixWorld);
-        if (target.kind === 'cabinet') {
-          objectMask.geometry = cabinetMaskGeometry;
-          objectMask.matrix.multiply(new THREE.Matrix4().makeTranslation(0, -.04, -.54));
-        } else {
-          objectMask.geometry = target.kind === 'bath' ? bathMaskGeometry : forgeMaskGeometry;
-          objectMask.matrix.multiply(new THREE.Matrix4().makeTranslation(0, -.08, 0));
-        }
+        objectMask.geometry = target.kind === 'bath' ? bathMaskGeometry : forgeMaskGeometry;
+        objectMask.matrix.multiply(new THREE.Matrix4().makeTranslation(0, -.08, 0));
       } else objectHoverTarget = 0;
     }
     keyHoverTarget = target?.kind === 'key' ? 1 : 0;
@@ -277,6 +273,7 @@ export function createWorld(canvas, state, visualSettings) {
     snow.update(now);
     workstations.update(now);
     keyAnimations.update(now);
+    hand.visible = !isWindingUp();
     if (handModel) {
       // Blend walk sway in over several frames: an instant amplitude change
       // on the first step looked like a one-frame key flicker.
@@ -328,7 +325,8 @@ export function createWorld(canvas, state, visualSettings) {
       painted.setSettings(settings);
       snow.setSettings(settings);
     },
-    keyIdFromHit, animateThrow, animatePlace, animateDiscard, isThrowing, throwingCount: () => thrownKeys.size,
+    keyIdFromHit, animateThrow, animatePlace, animateDiscard, isThrowing, isWindingUp,
+    throwingCount: () => thrownKeys.size,
     progress: () => getProgress(state),
     bounds: { x: ROOM.halfWidth - .88, z: ROOM.halfLength - .87 },
   };

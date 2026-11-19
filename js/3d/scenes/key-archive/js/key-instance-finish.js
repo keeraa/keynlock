@@ -1,0 +1,34 @@
+import * as THREE from '../vendor/three.js';
+
+// Each mesh gets only a tiny per-instance paint attribute. The indexed metal
+// vertices, normals and UV buffers remain shared across every key condition.
+export function createPaintedInstanceGeometry(source, count) {
+  const geometry = new THREE.InstancedBufferGeometry();
+  geometry.userData.keyPaintInstanceWrapper = true;
+  geometry.setIndex(source.index);
+  for (const [name, attribute] of Object.entries(source.attributes))
+    geometry.setAttribute(name, attribute);
+  geometry.boundingBox = source.boundingBox?.clone() || null;
+  geometry.boundingSphere = source.boundingSphere?.clone() || null;
+  const paint = new THREE.InstancedBufferAttribute(new Float32Array(count * 3), 3);
+  paint.setUsage(THREE.DynamicDrawUsage);
+  geometry.setAttribute('instanceKeyPaint', paint);
+  return geometry;
+}
+
+export function keyPaintSeed(key) {
+  let hash = 2166136261;
+  const source = String(key.id ?? `${key.type}:${key.variation ?? 0}`);
+  for (let i = 0; i < source.length; i++) {
+    hash = Math.imul(hash ^ source.charCodeAt(i), 16777619);
+  }
+  return ((hash >>> 0) % 1000) / 20;
+}
+
+export function setKeyInstanceFinish(mesh, index, key, rustStrength = 1.35) {
+  const paint = mesh.geometry.getAttribute('instanceKeyPaint');
+  if (!paint || index < 0 || index >= paint.count)
+    throw new RangeError('Missing instance paint slot');
+  paint.setXYZ(index, key.rust ? rustStrength : 0, key.mud ? 1 : 0, keyPaintSeed(key));
+  paint.needsUpdate = true;
+}

@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#14211f" />
   <meta name="description" content="Кийенлок — гуашевый архив ключей: поиск, отмачивание, очистка ржавчины и переплавка брака." />
   <title>Кийенлок · Архив ключей</title>
-  <link rel="stylesheet" href="./styles.css?v=23" />
+  <link rel="stylesheet" href="./styles.css?v=24" />
 </head>
 <body>
   <canvas id="world" aria-label="Трёхмерный зал архива ключей"></canvas>
@@ -30,13 +30,15 @@
     <div id="crosshair" class="crosshair" aria-hidden="true"></div>
     <div id="interaction-prompt" class="interaction-prompt is-hidden"></div>
     <div class="hud-footer">
-      <div class="quick-keys">WASD/ЦФЫВ <span>ходьба</span> &nbsp; МЫШЬ <span>взгляд</span> &nbsp; E/У <span>взять / обработать</span> &nbsp; R/К <span>бросить</span> &nbsp; ESC <span>пауза</span></div>
+      <div class="hud-guides">
+        <div class="quick-keys">WASD/ЦФЫВ <span>ходьба</span> &nbsp; МЫШЬ <span>взгляд</span> &nbsp; E/У <span>взять / обработать</span> &nbsp; R/К <span>бросить</span> &nbsp; ESC <span>пауза</span></div>
+        <div class="help-hotkeys">H/Р <span>подсказки</span> &nbsp; M/Ь <span>звук</span> &nbsp; V/М <span>визуал</span></div>
+      </div>
       <div class="inventory-shell">
         <div class="inventory-caption"><span>В РУКАХ</span><span id="hand-count">0 / 4</span></div>
         <div id="inventory" class="inventory" role="group" aria-label="Переносимые ключи"></div>
         <div class="inventory-help">1–4 · выбор ключа &nbsp; / &nbsp; колесо мыши</div>
       </div>
-      <div class="help-hotkeys">H/Р <span>подсказки</span> &nbsp; M/Ь <span>звук</span> &nbsp; V/М <span>визуал</span></div>
     </div>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </div>
@@ -103,6 +105,6 @@
       <button id="victory-reset" class="text-button">Пройти заново</button>
     </div>
   </div>
-  <script type="module" src="./js/main.js?v=50"></script>
+  <script type="module" src="./js/main.js?v=52"></script>
 </body>
 </html>

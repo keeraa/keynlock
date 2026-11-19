@@ -1,6 +1,6 @@
 import * as THREE from '../vendor/three.js';
 import { KEY_TEMPLATES, fixedMetal } from './key-data.js';
-import { createBowShape, pathFromPoints, bladeSections } from './key-shapes.js';
+import { joinedKeyShape } from './key-shapes.js?v=2';
 import { getMetalMaterial } from './key-materials.js';
 import { crustWidth, dirtTriangles, getDirtMaterial } from './key-dirt.js';
 import { getKeyAnchors } from './key-placement.js';
@@ -129,15 +129,8 @@ export function createKeyModel(design,{materialCache=null}={}) {
   const metal=getMetalMaterial(fixedMetal(design.template),design.rustAmount??0,
     design.template,design.dirtAmount??0,cache);
   const depth=design.thickness/100;
-  const headScale=design.headSize/100;
-  const head=new THREE.Group();head.position.x=-1.21;head.scale.set(headScale,headScale,1);group.add(head);
-  addMesh(head,extrude(createBowShape(template.bow),depth),metal);
-  // The blade sits slightly inside the thicker bow on both faces. Their front
-  // caps cannot be coplanar, and there are no overlapping collar/end-cap boxes.
-  const bladeDepth=Math.max(.02,depth-.008);
-  for(const points of bladeSections(template,design))
-    addMesh(group,extrude(pathFromPoints(points),bladeDepth),metal,
-      [0,0,(depth-bladeDepth)/2]);
+  // One watertight piece of metal: no internal side wall or cap at the neck.
+  addMesh(group,extrude(joinedKeyShape(template,design),depth),metal);
   if(crustWidth(design)>0) {
     const dirt=addMesh(group,dirtTriangles(template,design),getDirtMaterial(),[0,0,0],false);
     dirt.userData.outlineable=true;

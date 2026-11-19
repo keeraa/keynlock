@@ -118,6 +118,15 @@ export function createCabinet(scene, type, mat) {
   plaqueKey.scale.setScalar(.23 * 2.7 * .8);
   plaqueKey.rotation.z = -Math.PI / 2;
   group.add(plaqueKey);
+  // Each cabinet carries its own monumental key. The lower blade is buried
+  // inside the cabinet, leaving the matching head and neck above the cornice.
+  // Forge geometry already has its head at +Y; no additional rotation needed.
+  const crownKey = new THREE.Mesh(createCombinedKeyGeometry(type), getKeyMaterial(type));
+  crownKey.position.set(0, 4.43, -.18);
+  crownKey.scale.setScalar(5.6);
+  crownKey.castShadow = true;
+  crownKey.frustumCulled = false;
+  group.add(crownKey);
   const collider = new THREE.Mesh(
     new THREE.BoxGeometry(3.82, 4.65, .15),
     new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }),

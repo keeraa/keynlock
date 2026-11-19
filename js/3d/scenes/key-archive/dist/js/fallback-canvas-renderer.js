@@ -1,11 +1,13 @@
 import * as THREE from '../vendor/three.js';
 import { createFallbackKeyPainter } from './fallback-canvas-keys.js';
 import { createFallbackArchitecture } from './fallback-canvas-architecture.js';
+import { getKeyFallbackHeadPoints } from './key-factory.js?v=3';
+import { sampleThrowHand } from './held-key-motion.js';
 import { KEY_TYPES, getProgress, bathContents } from './rules.js?v=23';
 import { sampleThrow } from './throw-physics.js';
 import { CABINET_Z, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS,
   CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_GRID_BOTTOM_Y,
-  CABINET_BLANK_ROW_BOTTOM_Y, CABINET_OUTLINE, pegForSlot } from './cabinet-layout.js?v=22';
+  CABINET_BLANK_ROW_BOTTOM_Y, pegForSlot } from './cabinet-layout.js?v=22';
 import { FIXTURE_OFFSETS, bathId } from './station-layout.js?v=2';
 import { drawBathActivity, drawBathKeys, drawForgeActivity } from './station-canvas-effects.js';
 
@@ -14,7 +16,7 @@ const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 // Canvas-only illustration code. No collision, input, save, or game-state mutation.
 export function createFallbackCanvasRenderer({
   ctx, scene, camera, surfaces, state, cabinets, workstations,
-  thrownKeys, placingKeys, discardingKeys, cabinetHover, fixtureHover, keyHover,
+  thrownKeys, placingKeys, discardingKeys, fixtureHover, keyHover,
 }) {
   let width = 0, height = 0, frameTime = 0, lastDraw = -Infinity;
   let visualSettings = null, hovered = null, carriedKey = null;
@@ -128,6 +130,20 @@ export function createFallbackCanvasRenderer({
       ctx.fillStyle = '#dbbd8c';
       ctx.fillText('⚿', signKey.x, signKey.y);
     }
+    // The 2D renderer shows the same family crest above each cabinet.
+    const crownX = faceX + (left ? -.10 : .10);
+    const crownMetal = `#${KEY_TYPES[type].metal.toString(16).padStart(6, '0')}`;
+    path3([[crownX, 5.02, z - .17], [crownX, 6.08, z - .17],
+      [crownX, 6.08, z + .17], [crownX, 5.02, z + .17]],
+    crownMetal, '#4b372a', 2);
+    const headPoints = getKeyFallbackHeadPoints(type);
+    const crest = headPoints.map(([x, y]) => [crownX, 6.21 + y * 3.5, z + x * 3.5]);
+    path3(crest, crownMetal, '#ecce92', 2.5);
+    const cutout = Array.from({ length: 18 }, (_, i) => {
+      const angle = i * Math.PI * 2 / 18;
+      return [crownX, 6.21 + Math.sin(angle) * .34, z + Math.cos(angle) * .34];
+    });
+    path3(cutout, '#302a25', '#876e4b', 1.5);
     const count = cabinetCounts[type];
     const inFlight = [...placingKeys.values()].filter(motion => motion.key.type === type).length;
     const showKeys = Math.hypot(camera.position.x - faceX, camera.position.z - z) < 17;
@@ -150,18 +166,8 @@ export function createFallbackCanvasRenderer({
         ctx.stroke();
       }
     }
-    if (cabinetHover[type] > .005) {
-      ctx.save();
-      ctx.globalAlpha = cabinetHover[type];
-      ctx.shadowColor = 'rgba(255,255,255,.8)';
-      ctx.shadowBlur = 8;
-      const halfBorder = CABINET_OUTLINE.width / 2;
-      const baseY = CABINET_GROUND_OFFSET + CABINET_OUTLINE.bottom;
-      const topY = CABINET_GROUND_OFFSET + CABINET_OUTLINE.top;
-      path3([[x1, baseY, z - halfBorder], [x1, baseY, z + halfBorder],
-        [x1, topY, z + halfBorder], [x1, topY, z - halfBorder]], null, '#ffffff', 4);
-      ctx.restore();
-    }
+    // Cabinet hover is communicated by the reticle and label, not a
+    // shimmering high-contrast white border against its base.
     if (count === requiredCounts[type]) {
       const top = project(faceX, 4.73, z);
       if (top) {
@@ -276,6 +282,7 @@ export function createFallbackCanvasRenderer({
       else drawables.push({ distance, draw: () => drawKey(key) });
     }
     for (const motion of thrownKeys.values()) {
+      if (motion.stage === 'windup') continue;
       const pose = sampleThrow(motion.start, motion.end, (currentTime - motion.startTime) / 1000);
       const airborne = { ...motion.key, x: pose.x, z: pose.z };
       drawables.push({ distance: Math.hypot(camera.position.x - pose.x, camera.position.z - pose.z),
@@ -326,7 +333,9 @@ export function createFallbackCanvasRenderer({
       carriedKey = currentHand;
       frameTime = now;
       visualSettings = settings;
-      keyPainter.setFrame({ width, height, frameTime, carriedKey });
+      const winding = [...thrownKeys.values()].find(motion => motion.stage === 'windup');
+      keyPainter.setFrame({ width, height, frameTime, carriedKey: winding?.key ?? carriedKey,
+        throwPose: winding ? sampleThrowHand((currentTime - winding.startTime) / 1000) : null });
       return draw();
     },
   };

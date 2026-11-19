@@ -5,6 +5,7 @@ import {
 } from './rules.js?v=23';
 import { findFreeFloorSpot } from './key-spacing.js?v=18';
 import { restingKeyY } from './floor-contact.js';
+import { sampleThrowHand, THROW_RELEASE_SECONDS } from './held-key-motion.js';
 
 // All state-changing player actions live here and work identically in both renderers.
 export function createArchiveActions({
@@ -116,6 +117,7 @@ export function createArchiveActions({
 
   function drop() {
     if (!isPlaying()) return;
+    if (world.isWindingUp?.()) return;
     const key = selectedKey(state);
     if (!key) return;
     const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
@@ -124,8 +126,10 @@ export function createArchiveActions({
     const landing = findFreeFloorSpot(state.keys,
       camera.position.x + forward.x * 4.5, camera.position.z + forward.z * 4.5);
     const { x, z } = landing;
-    const start = { x: camera.position.x + forward.x * .42, y: camera.position.y - .27,
-      z: camera.position.z + forward.z * .42 };
+    camera.updateMatrixWorld(true);
+    const release = sampleThrowHand(THROW_RELEASE_SECONDS);
+    const releasePoint = camera.localToWorld(new THREE.Vector3(release.x,release.y,release.z));
+    const start = { x: releasePoint.x, y: releasePoint.y, z: releasePoint.z };
     const end = { x, y: restingKeyY(x, z), z };
     dropSelectedKey(state, x, z, -getYaw() + .6);
     world.animateThrow(key, start, end);

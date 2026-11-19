@@ -180,6 +180,58 @@ export function bladeSections(template,design,sampleCount=210) {
   return [outline];
 }
 
+// The bow and shaft must share one outer contour and one pair of face caps.
+// Overlapping separate extrusions create a visible line at the neck even
+// when their faces are offset by a fraction of a millimetre.
+export function joinedKeyShape(template,design) {
+  const scale=design.headSize/100;
+  let bow=bowPoints(template.bow).map(([x,y])=>[-1.21+x*scale,y*scale]);
+  const signedArea=bow.reduce((sum,[x,y],i)=>{
+    const [nx,ny]=bow[(i+1)%bow.length];
+    return sum+x*ny-nx*y;
+  },0);
+  if(signedArea<0)bow=bow.reverse();
+  const rightJoinAt=y=>{
+    let match=null;
+    for(let i=0;i<bow.length;i++) {
+      const [ax,ay]=bow[i], [bx,by]=bow[(i+1)%bow.length];
+      if(!((ay<=y&&by>y)||(by<=y&&ay>y)))continue;
+      const t=(y-ay)/(by-ay), x=ax+(bx-ax)*t;
+      if(!match||x>match.point[0])match={edge:i,t,point:[x,y]};
+    }
+    if(!match)throw new Error('Key bow has no shaft attachment');
+    return match;
+  };
+  const half=shaftHalfHeight(template);
+  const top=rightJoinAt(half),bottom=rightJoinAt(-half);
+  const outline=[top.point];
+  let edge=top.edge;
+  // Travel counter-clockwise around the whole head, skipping the short
+  // right-hand rim replaced by the shaft. Handles joins on the same edge.
+  for(let step=0;step<=bow.length;step++) {
+    if(edge===bottom.edge&&(step>0||bottom.t>top.t))break;
+    outline.push(bow[(edge+1)%bow.length]);
+    edge=(edge+1)%bow.length;
+  }
+  outline.push(bottom.point);
+  const blade=bladeSections(template,design)[0];
+  const topIndex=blade.findIndex(([x,y])=>x>=top.point[0]-1e-7&&Math.abs(y-half)<1e-5);
+  const bottomIndex=blade.findLastIndex(([x,y])=>x>=bottom.point[0]-1e-7&&Math.abs(y+half)<1e-5);
+  if(topIndex<0||bottomIndex<=topIndex)throw new Error('Key blade cannot join its bow');
+  outline.push(...blade.slice(topIndex,bottomIndex+1).reverse());
+  const shape=pathFromPoints(outline);
+  for(const points of holesFor(template.bow)) {
+    const hole=new THREE.Path();
+    points.forEach(([x,y],index)=>{
+      const px=-1.21+x*scale, py=y*scale;
+      if(index)hole.lineTo(px,py);else hole.moveTo(px,py);
+    });
+    hole.closePath();
+    shape.holes.push(hole);
+  }
+  return shape;
+}
+
 export function keyBounds(template,design) {
   const scale=design.headSize/100;
   const points=[...bowPoints(template.bow).map(([x,y])=>[-1.21+x*scale,y*scale]),

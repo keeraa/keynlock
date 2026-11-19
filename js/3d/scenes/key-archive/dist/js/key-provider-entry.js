@@ -1,4 +1,4 @@
-import { createForgeKeyProvider } from './key-forge-adapter.js?v=3';
+import { createForgeKeyProvider } from './key-forge-adapter.js?v=4';
 import { preloadKeyTextures } from './key-materials.js';
 
 // A versioned profile file is the single design input for the archive.

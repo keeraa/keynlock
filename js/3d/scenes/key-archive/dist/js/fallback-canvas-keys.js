@@ -10,7 +10,7 @@ const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
 // Key paint, stains, carrying pose, and movement thumbnails for Canvas 2D.
 export function createFallbackKeyPainter({ ctx, project, keyHover }) {
-  let width = 0, height = 0, frameTime = 0, carriedKey = null;
+  let width = 0, height = 0, frameTime = 0, carriedKey = null, throwPose = null;
   const headShapes = KEY_TYPES.map((_, type) => getKeyFallbackHeadPoints(type));
   const providedStamps = KEY_TYPES.map((_, type) => [
     createKeyFallbackStamp(type, false), createKeyFallbackStamp(type, true),
@@ -178,12 +178,17 @@ export function createFallbackKeyPainter({ ctx, project, keyHover }) {
 
   function drawHand() {
     if (!carriedKey) return;
+    // Windup is drawn in the right hand before the airborne key appears.
+    const handX = width * .67 + (throwPose ? (throwPose.x - .43) * width * .29 : 0);
+    const handY = height * .77 + Math.sin(frameTime * .003) * 6 -
+      (throwPose ? (throwPose.y + .45) * height * .34 : 0);
+    const handAngle = -.45 + (throwPose ? (throwPose.rotationZ + .53) * .8 : 0);
     if (providedStamps[carriedKey.type][carriedKey.broken ? 1 : 0]) {
       const stamp = stampFor(carriedKey);
       const scale = Math.min(width, height) * .0008;
       ctx.save();
-      ctx.translate(width * .67, height * .77 + Math.sin(frameTime * .003) * 6);
-      ctx.rotate(-.45);
+      ctx.translate(handX, handY);
+      ctx.rotate(handAngle);
       ctx.drawImage(stamp, -80 * scale, -110 * scale, 160 * scale, 220 * scale);
       ctx.restore();
       return;
@@ -191,8 +196,8 @@ export function createFallbackKeyPainter({ ctx, project, keyHover }) {
     const shape = getKeyFallbackHeadPoints(carriedKey.type);
     const scale = Math.min(width, height) * .077;
     ctx.save();
-    ctx.translate(width * .67, height * .77 + Math.sin(frameTime * .003) * 6);
-    ctx.rotate(-.45);
+    ctx.translate(handX, handY);
+    ctx.rotate(handAngle);
     ctx.shadowColor = 'rgba(0,0,0,.65)';
     ctx.shadowBlur = 22;
     ctx.strokeStyle = '#241c17';
@@ -289,6 +294,7 @@ export function createFallbackKeyPainter({ ctx, project, keyHover }) {
     setFrame(frame) {
       width = frame.width; height = frame.height;
       frameTime = frame.frameTime; carriedKey = frame.carriedKey;
+      throwPose = frame.throwPose ?? null;
     },
     drawKey, drawHand, drawPlacingKey, drawDiscardingKey, drawDistantKeys,
   };

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#14211f" />
+  <meta name="description" content="Кийенлок — гуашевый архив ключей: поиск, отмачивание, очистка ржавчины и переплавка брака." />
+  <title>Кийенлок · Архив ключей</title>
+  <link rel="stylesheet" href="./styles.css?v=24" />
+</head>
+<body>
+  <canvas id="world" aria-label="Трёхмерный зал архива ключей"></canvas>
+  <div id="vignette" aria-hidden="true"></div>
+
+  <div id="hud" class="is-hidden">
+    <header class="hud-title">
+      <div class="brand-sign">K<span>✦</span></div>
+      <div class="brand-copy"><small>КИЙЕНЛОК · ПРОТОТИП 01</small><strong>Архив ключей</strong></div>
+    </header>
+    <div class="top-center">ЗАЛ ДЕСЯТИ СЕМЕЙСТВ</div>
+    <div class="fps-counter" aria-label="Производительность сцены">
+      <div>FPS <strong id="fps">—</strong></div>
+      <div>ПОЛИГОНЫ <strong id="poly-count">—</strong></div>
+      <div>ТРЕУГОЛЬНИКИ <strong id="triangle-count">—</strong></div>
+      <div>CPU СР. / ПИК <strong id="cpu-count">—</strong></div>
+      <div>ВЫЗОВЫ ОТРИСОВКИ <strong id="draw-count">—</strong></div>
+      <div>ПРОХОДЫ <strong id="pass-count">—</strong></div>
+      <div>ВИЗУАЛ <strong id="visual-status">—</strong></div>
+    </div>
+    <div id="crosshair" class="crosshair" aria-hidden="true"></div>
+    <div id="interaction-prompt" class="interaction-prompt is-hidden"></div>
+    <div class="hud-footer">
+      <div class="hud-guides">
+        <div class="quick-keys">WASD/ЦФЫВ <span>ходьба</span> &nbsp; МЫШЬ <span>взгляд</span> &nbsp; E/У <span>взять / обработать</span> &nbsp; R/К <span>бросить</span> &nbsp; ESC <span>пауза</span></div>
+        <div class="help-hotkeys">H/Р <span>подсказки</span> &nbsp; M/Ь <span>звук</span> &nbsp; V/М <span>визуал</span></div>
+      </div>
+      <div class="inventory-shell">
+        <div class="inventory-caption"><span>В РУКАХ</span><span id="hand-count">0 / 4</span></div>
+        <div id="inventory" class="inventory" role="group" aria-label="Переносимые ключи"></div>
+        <div class="inventory-help">1–4 · выбор ключа &nbsp; / &nbsp; колесо мыши</div>
+      </div>
+    </div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </div>
+
+  <div id="intro" class="screen-overlay">
+    <div class="top-kicker"><span>КИЙЕНЛОК</span><span>ЭКСПЕРИМЕНТАЛЬНЫЙ РЕЖИМ</span></div>
+    <div class="menu-card">
+      <div class="seal-mark"><span>✥</span><i>Х</i></div>
+      <div class="eyebrow">ГЛАВА I · ПРОТОТИП</div>
+      <h1>Архив<br/><em>потерянных ключей</em></h1>
+      <p>Тысяча потерянных ключей. Чистые развесь по шкафам, грязные отмочи в воде, ржавые обработай раствором, а сломанные переплавь. Рабочие устройства находятся в центре зала.</p>
+      <div class="menu-stats"><span><b>1000</b><small>ключей</small></span><span><b>10</b><small>шкафов</small></span><span><b>1</b><small>станция</small></span></div>
+      <button id="start-btn" class="primary-button">ВОЙТИ В АРХИВ <span>→</span></button>
+      <div class="menu-controls">WASD / ЦФЫВ — ходить &nbsp;·&nbsp; Мышь — смотреть &nbsp;·&nbsp; E / У — взять &nbsp;·&nbsp; R / К — бросить</div>
+    </div>
+    <div class="menu-bottom">ПРОГРЕСС СОХРАНЯЕТСЯ АВТОМАТИЧЕСКИ</div>
+  </div>
+
+  <div id="pause" class="screen-overlay is-hidden">
+    <div class="menu-card compact">
+      <div class="eyebrow">АРХИВ КЛЮЧЕЙ</div>
+      <h2>Пауза</h2>
+      <p>Каждый собранный ключ останется на своём месте.</p>
+      <button id="resume-btn" class="primary-button">ПРОДОЛЖИТЬ <span>→</span></button>
+      <div class="settings-row"><label for="sensitivity">Чувствительность мыши</label><input id="sensitivity" type="range" min="6" max="28" step="1" value="14" /></div>
+      <div class="settings-row"><label for="sound">Звук</label><input id="sound" type="checkbox" checked /></div>
+      <button id="visual-open" class="secondary-button">ВИЗУАЛ · РИСОВКА И СНЕГ <span>✦</span></button>
+      <button id="reset-btn" class="text-button">Начать сортировку заново</button>
+    </div>
+  </div>
+
+  <div id="visual" class="screen-overlay visual-overlay is-hidden">
+    <section class="visual-card" aria-labelledby="visual-title">
+      <div class="eyebrow">KEYNLOCK · ОБЩИЙ ФИЛЬТР</div>
+      <h2 id="visual-title">Визуал <em>и погода</em></h2>
+      <p>Настройки применяются сразу. Исходные гуашевые карты металла и дерева сохраняются.</p>
+      <div class="visual-scroll">
+        <div class="visual-group"><span>01 · МУЛЬТЯШНАЯ РИСОВКА</span><label class="visual-switch"><input id="toonEnabled" type="checkbox" checked /> Включена</label></div>
+        <div class="visual-control"><label for="toonLight">Мультяшный свет <output for="toonLight">80%</output></label><input id="toonLight" type="range" min="0" max="100" value="80" /></div>
+        <div class="visual-control"><label for="toonSteps">Ступени освещения <output for="toonSteps">4</output></label><input id="toonSteps" type="range" min="2" max="8" step="1" value="4" /></div>
+        <div class="visual-control"><label for="cartoonMaterial">Мультяшный материал <output for="cartoonMaterial">90%</output></label><input id="cartoonMaterial" type="range" min="0" max="100" value="90" /></div>
+        <div class="visual-group"><span>02 · КОНТУРНАЯ ОБВОДКА</span><label class="visual-switch"><input id="outlineEnabled" type="checkbox" checked /> Включена</label></div>
+        <div class="visual-control"><label for="outlineStrength">Сила обводки <output for="outlineStrength">70%</output></label><input id="outlineStrength" type="range" min="0" max="100" value="70" /></div>
+        <div class="visual-control"><label for="outlineWidth">Толщина контура <output for="outlineWidth">×1</output></label><input id="outlineWidth" type="range" min="1" max="4" step="1" value="1" /></div>
+        <div class="visual-control"><label for="outlineSensitivity">Чувствительность к граням <output for="outlineSensitivity">50%</output></label><input id="outlineSensitivity" type="range" min="0" max="100" step="1" value="50" /></div>
+        <div class="visual-group"><span>03 · МОКРЫЙ СНЕГ</span><label class="visual-switch"><input id="wetSnowEnabled" type="checkbox" checked /> За окнами</label></div>
+        <div class="visual-control"><label for="snowIntensity">Интенсивность снегопада <output for="snowIntensity">65%</output></label><input id="snowIntensity" type="range" min="0" max="100" value="65" /></div>
+        <div class="visual-control"><label for="snowWind">Ветер <output for="snowWind">28%</output></label><input id="snowWind" type="range" min="-100" max="100" value="28" /></div>
+        <div class="visual-group"><span>04 · ДНЕВНОЙ СВЕТ</span></div>
+        <div class="visual-control"><label for="windowDaylight">Свет сквозь окна <output for="windowDaylight">75%</output></label><input id="windowDaylight" type="range" min="0" max="100" value="75" /></div>
+      </div>
+      <div class="visual-actions"><button id="visual-natural" class="text-button">Исходный вид</button><button id="visual-reset" class="text-button">Пресет KEYNLOCK</button><button id="visual-back" class="secondary-button">НАЗАД</button></div>
+      <button id="visual-resume" class="primary-button">ПРОДОЛЖИТЬ ИГРУ <span>→</span></button>
+    </section>
+  </div>
+
+  <div id="victory" class="screen-overlay is-hidden">
+    <div class="menu-card compact victory-card">
+      <div class="seal-mark small"><span>✥</span><i>Х</i></div>
+      <div class="eyebrow">АРХИВ РАЗОБРАН</div>
+      <h2>Все ключи<br/><em>разобраны.</em></h2>
+      <p>Чистые ключи висят на своих штырях, а металл сломанных ключей отправлен на переплавку.</p>
+      <button id="victory-explore" class="primary-button">ОСМОТРЕТЬ ЗАЛ <span>→</span></button>
+      <button id="victory-reset" class="text-button">Пройти заново</button>
+    </div>
+  </div>
+  <script type="module" src="./js/main.js?v=51"></script>
+</body>
+</html>

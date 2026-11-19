@@ -8,6 +8,16 @@ import {
   createVaultGeometry, vaultHeight, archedOpening,
 } from '../dist/js/hall-architecture.js';
 import { PLAYER_EYE_HEIGHT } from '../dist/js/player-config.js';
+import { pilasterFreeTrimSpans } from '../dist/js/world-architecture.js';
+
+test('lower wood trim stops before pilaster faces, with no intersecting solids', () => {
+  const sections = pilasterFreeTrimSpans();
+  assert.equal(sections.length, PILASTER_CENTERS.length + 1);
+  for (const center of PILASTER_CENTERS)
+    assert.ok(sections.every(([from, to]) => to < center - .315 || from > center + .315));
+  assert.equal(sections[0][0], -23.4);
+  assert.equal(sections.at(-1)[1], 23.4);
+});
 
 test('solid side walls have five real arched openings for daylight', () => {
   const mesh = new THREE.Mesh(createWindowedWallGeometry(),

@@ -64,6 +64,9 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
     const rustUniform={value:strength};
     const rustShiftUniform={value:new THREE.Vector2(placement.shiftX,placement.shiftY)};
     const rustAngleUniform={value:placement.angle};
+    // Rust soak animation: 0 keeps all rust, above 1 every patch has flaked off.
+    const rustErodeUniform={value:-.1};
+    material.userData.rustErodeUniform=rustErodeUniform;
     material.userData.rustUniform=rustUniform;
     material.userData.rustShiftUniform=rustShiftUniform;
     material.userData.rustAngleUniform=rustAngleUniform;
@@ -72,6 +75,7 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
       shader.uniforms.uRustAmount=rustUniform;
       shader.uniforms.uRustShift=rustShiftUniform;
       shader.uniforms.uRustAngle=rustAngleUniform;
+      shader.uniforms.uRustErode=rustErodeUniform;
       shader.uniforms.uDirtAmount=dirtUniform;
       shader.uniforms.uDirtSeed=dirtSeedUniform;
       shader.vertexShader=shader.vertexShader
@@ -103,7 +107,7 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
             return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);
           }`)
         .replace('#include <map_pars_fragment>',
-          '#include <map_pars_fragment>\nuniform sampler2D uPaintedRust;\nuniform float uRustAmount;\nuniform vec2 uRustShift;\nuniform float uRustAngle;')
+          '#include <map_pars_fragment>\nuniform sampler2D uPaintedRust;\nuniform float uRustAmount;\nuniform vec2 uRustShift;\nuniform float uRustAngle;\nuniform float uRustErode;')
         .replace('#include <map_fragment>',
           `#include <map_fragment>
           float keyRust = vInstanceKeyPaint.x < 0.0 ? uRustAmount : vInstanceKeyPaint.x;
@@ -115,6 +119,9 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
             + uRustShift + vec2(keySeed*.031,keySeed*.071);
           vec4 rustPigment = texture2D(uPaintedRust, rustUv);
           float rustCoverage = clamp(rustPigment.a * keyRust * 1.12, 0.0, 1.0);
+          // Flaking: patches of rust drop away one after another.
+          float rustFlake = dirtNoise(vKeySurface.xy*5.3+vec2(1.7,4.1))*.7+dirtNoise(vKeySurface.xy*13.1+vec2(8.3,2.9))*.3;
+          rustCoverage *= smoothstep(uRustErode-.05, uRustErode+.05, rustFlake);
           float rustDeepen = clamp(keyRust - 1.0, 0.0, 1.0);
           vec3 rustColor = mix(rustPigment.rgb, vec3(0.14, 0.055, 0.021), rustDeepen * 0.68);
           diffuseColor.rgb = mix(diffuseColor.rgb, rustColor, rustCoverage);
@@ -134,7 +141,7 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
         .replace('#include <metalnessmap_fragment>',
           '#include <metalnessmap_fragment>\nmetalnessFactor *= (1.0 - 0.98 * dirtCoverage);');
     };
-    material.customProgramCacheKey=()=> 'keynlock-gouache-rust-grime-instancing-v6';
+    material.customProgramCacheKey=()=> 'keynlock-gouache-rust-grime-instancing-v7';
   }
   cache.set(id,material);return material;
 }

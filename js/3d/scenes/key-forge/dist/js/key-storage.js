@@ -14,8 +14,8 @@ export function parseCollection(raw) {
     const existing=data[i];
     if(!existing||existing.template!==i)return null;
     const base=defaultDesign(i);
-    for(const key of [...DESIGN_PARAMETERS,'dirtAmount']) {
-      if(['rustAmount','dirtAmount','breakAngle'].includes(key)&&existing[key]===undefined)continue;
+    for(const key of [...DESIGN_PARAMETERS,'dirtAmount','waxAmount']) {
+      if(['rustAmount','dirtAmount','waxAmount','breakAngle'].includes(key)&&existing[key]===undefined)continue;
       if(!Number.isFinite(existing[key]))return null;
     }
     return normalizeKeyDesign({...base,...existing,template:i});

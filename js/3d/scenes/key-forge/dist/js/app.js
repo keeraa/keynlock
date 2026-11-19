@@ -6,6 +6,9 @@ import { ScreenSpaceOutlinePass } from './outline-pass.js';
 import { DESIGN_PARAMETERS, loadCollection, persistCollection } from './key-storage.js';
 import { modelToSTL } from './key-stl.js';
 import { installKeyPreviewArt } from './key-art.js';
+import { createWaxMelt } from './wax-melt.js';
+import { createMudWash } from './mud-wash.js';
+import { createRustSoak } from './rust-soak.js';
 
 const $ = id => document.getElementById(id);
 const parameters=DESIGN_PARAMETERS;
@@ -72,6 +75,11 @@ function renderControls() {
   $('doubleSided').checked=!!design.doubleSided;
   $('broken').checked=!!design.broken;
   $('dirtEnabled').checked=design.dirtAmount>0;
+  $('waxEnabled').checked=design.waxAmount>0;
+  $('meltWaxButton').hidden=!(design.waxAmount>0)&&melt?.recipe!==CLEANING.wax;
+  $('washMudButton').hidden=!(design.dirtAmount>0)&&melt?.recipe!==CLEANING.mud;
+  $('soakRustButton').hidden=!(design.rustAmount>0)&&melt?.recipe!==CLEANING.rust;
+  $('meltWaxButton').disabled=$('washMudButton').disabled=$('soakRustButton').disabled=!!melt;
   $('breakAngleRow').hidden=!design.broken;
 }
 
@@ -108,6 +116,7 @@ function updateParameter(key,value) {
   $(key+'Value').textContent=valueFormat[key](n);
   const input=$(key), min=Number(input.min), max=Number(input.max);
   input.style.setProperty('--value',`${(n-min)/(max-min)*100}%`);
+  if(key==='rustAmount')$('soakRustButton').hidden=!(n>0)&&melt?.recipe!==CLEANING.rust;
   scheduleModelUpdate(key!=='rustAmount');
 }
 
@@ -129,8 +138,17 @@ function initializeInput() {
   });
   $('dirtEnabled').addEventListener('change',ev=>{
     design.dirtAmount=ev.target.checked?100:0;
+    renderControls();
     scheduleModelUpdate();
   });
+  $('waxEnabled').addEventListener('change',ev=>{
+    design.waxAmount=ev.target.checked?100:0;
+    renderControls();
+    scheduleModelUpdate();
+  });
+  $('meltWaxButton').addEventListener('click',()=>startCleaning('wax'));
+  $('washMudButton').addEventListener('click',()=>startCleaning('mud'));
+  $('soakRustButton').addEventListener('click',()=>startCleaning('rust'));
   $('resetButton').addEventListener('click',()=>{
     design=defaultDesign(current);drafts[current]=design;renderUI();scheduleModelUpdate();showToast('Заготовка восстановлена');
   });
@@ -147,6 +165,9 @@ function initializeInput() {
 
 // Three.js scene: real extruded key geometry and reusable painted-material textures.
 let renderer,scene,camera,keyGroup,shadowPlane,outlinePass;
+let melt=null,meltDesign=null,meltAnnounced=false,lastFrameTime=0,savedView=null;
+// Effects present the key lying flat, face up, tilted towards the viewer.
+const PRESENT_POSE=Object.freeze({x:-.96,y:0,z:0,zoom:1.05});
 let ready=false;
 let flatPreview=false;
 let targetX=-.13,targetY=.17,targetZ=-.06,zoomTarget=1;
@@ -175,7 +196,7 @@ function countKeyPolygons(root) {
 
 function keyGeometrySignature(d) {
   return [d.template,d.shaftLength,d.headSize,d.teeth,d.cutDepth,d.thickness,
-    Number(!!d.doubleSided),d.dirtAmount??0,
+    Number(!!d.doubleSided),d.dirtAmount??0,d.waxAmount??0,
     Number(!!d.broken),d.broken?(d.breakAngle??70):0].join(':');
 }
 
@@ -324,7 +345,7 @@ function updateFlatZoom() {
 function initializeOrbit() {
   let pointer=null;
   canvas.addEventListener('pointerdown',ev=>{
-    if(ev.button!==0)return;
+    if(ev.button!==0||melt)return;
     pointer={id:ev.pointerId,x:ev.clientX,y:ev.clientY};canvas.setPointerCapture(ev.pointerId);
   });
   canvas.addEventListener('pointermove',ev=>{
@@ -336,8 +357,52 @@ function initializeOrbit() {
   function endPointer(ev){if(pointer?.id===ev.pointerId)pointer=null;}
   canvas.addEventListener('pointerup',endPointer);canvas.addEventListener('pointercancel',endPointer);
   canvas.addEventListener('lostpointercapture',()=>pointer=null);
-  canvas.addEventListener('wheel',ev=>{ev.preventDefault();zoomBy(ev.deltaY>0?.915:1.095);},{passive:false});
-  canvas.addEventListener('dblclick',()=>{targetX=0;targetY=0;targetZ=0;zoomTarget=1;});
+  canvas.addEventListener('wheel',ev=>{ev.preventDefault();if(melt)return;zoomBy(ev.deltaY>0?.915:1.095);},{passive:false});
+  canvas.addEventListener('dblclick',()=>{if(melt)return;targetX=0;targetY=0;targetZ=0;zoomTarget=1;});
+}
+
+// Cleaning animations present the key lying flat, then save it clean:
+// wax melts over a candle, mud is washed off in a water trough.
+const CLEANING=Object.freeze({
+  wax:{field:'waxAmount',create:()=>createWaxMelt({scene,keyGroup,design,floorY:camera.bottom/PRESENT_POSE.zoom}),
+    finished:run=>run.melted,quick:'Воск растоплен',done:'Воск растоплен · ключ чистый'},
+  mud:{field:'dirtAmount',create:()=>createMudWash({scene,keyGroup,design}),
+    finished:run=>run.done,quick:'Грязь смыта',done:'Грязь смыта · ключ чистый'},
+  rust:{field:'rustAmount',create:()=>createRustSoak({scene,keyGroup,design}),
+    finished:run=>run.done,quick:'Ржавчина снята',done:'Ржавчина осыпалась · ключ чистый'},
+});
+
+function startCleaning(kind) {
+  const recipe=CLEANING[kind];
+  if(melt||!(design[recipe.field]>0))return;
+  if(flatPreview||!ready) {
+    design[recipe.field]=0;renderControls();scheduleModelUpdate();
+    showToast(recipe.quick);return;
+  }
+  if(pendingGeometryRebuild||updateScheduled){requestAnimationFrame(()=>startCleaning(kind));return;}
+  meltDesign=design;meltAnnounced=false;
+  savedView={x:targetX,y:targetY,z:targetZ,zoom:zoomTarget};
+  ({x:targetX,y:targetY,z:targetZ,zoom:zoomTarget}=PRESENT_POSE);
+  melt=Object.assign(recipe.create(),{recipe});
+  renderControls();
+}
+
+function stepCleaning(dt) {
+  if(!melt)return;
+  renderer.shadowMap.needsUpdate=true;
+  const finished=melt.update(dt);
+  if(melt.recipe.finished(melt)&&!meltAnnounced) {
+    meltAnnounced=true;
+    meltDesign[melt.recipe.field]=0;
+    showToast(melt.recipe.done);
+  }
+  if(finished) {
+    melt.dispose();melt=null;
+    if(savedView){({x:targetX,y:targetY,z:targetZ,zoom:zoomTarget}=savedView);savedView=null;}
+    renderControls();
+    if(meltDesign===design)scheduleModelUpdate();
+    meltDesign=null;
+  }
 }
 
 function zoomBy(factor) { zoomTarget=Math.min(2.1,Math.max(.65,zoomTarget*factor));if(flatPreview)updateFlatZoom(); }
@@ -368,6 +433,8 @@ function animate(now) {
     renderer.shadowMap.needsUpdate=true;
   actualZoom+=(zoomTarget-actualZoom)*.13;
   keyGroup.rotation.set(actualX,actualY,actualZ);
+  const dt=Math.min(.05,lastFrameTime?(now-lastFrameTime)/1000:0);lastFrameTime=now;
+  stepCleaning(dt);
   camera.zoom=actualZoom;camera.updateProjectionMatrix();
   try { renderKeyFrame(); }
   catch(err) { activateFlatPreview(err);return; }

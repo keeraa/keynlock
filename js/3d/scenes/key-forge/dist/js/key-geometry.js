@@ -2,7 +2,8 @@ import * as THREE from '../vendor/three.js';
 import { KEY_TEMPLATES, fixedMetal } from './key-data.js';
 import { createBowShape, pathFromPoints, bladeSections } from './key-shapes.js';
 import { getMetalMaterial } from './key-materials.js';
-import { crustWidth, dirtTriangles, getDirtMaterial } from './key-dirt.js';
+import { hasMud, mudGeometry, getMudMaterial } from './key-mud.js';
+import { hasWax, waxGeometry, getWaxMaterial } from './key-wax.js';
 import { getKeyAnchors } from './key-placement.js';
 
 function extrude(shape,depth) {
@@ -127,7 +128,7 @@ export function createKeyModel(design,{materialCache=null}={}) {
   const group=new THREE.Group();
   const cache=materialCache??new Map();
   const metal=getMetalMaterial(fixedMetal(design.template),design.rustAmount??0,
-    design.template,design.dirtAmount??0,cache);
+    design.template,0,cache);
   const depth=design.thickness/100;
   const headScale=design.headSize/100;
   const head=new THREE.Group();head.position.x=-1.21;head.scale.set(headScale,headScale,1);group.add(head);
@@ -138,9 +139,13 @@ export function createKeyModel(design,{materialCache=null}={}) {
   for(const points of bladeSections(template,design))
     addMesh(group,extrude(pathFromPoints(points),bladeDepth),metal,
       [0,0,(depth-bladeDepth)/2]);
-  if(crustWidth(design)>0) {
-    const dirt=addMesh(group,dirtTriangles(template,design),getDirtMaterial(),[0,0,0],false);
-    dirt.userData.outlineable=true;
+  if(hasMud(design)) {
+    const mud=addMesh(group,mudGeometry(template,design),getMudMaterial(),[0,0,0],false);
+    mud.userData.outlineable=true;
+  }
+  if(hasWax(design)) {
+    const wax=addMesh(group,waxGeometry(template,design),getWaxMaterial(),[0,0,0],false);
+    wax.userData.outlineable=true;
   }
   mergeKeyMeshes(group);
   group.userData.template=template.id;
@@ -154,7 +159,7 @@ export function createKeyModel(design,{materialCache=null}={}) {
 // GPU buffer instead of extruding the entire key again for cosmetic sliders.
 export function updateKeyPaint(group,design) {
   const material=getMetalMaterial(fixedMetal(design.template),design.rustAmount??0,
-    design.template,design.dirtAmount??0,group.userData.materialCache);
+    design.template,0,group.userData.materialCache);
   group.traverse(mesh=>{
     if(mesh.isMesh&&mesh.userData.exportable!==false)mesh.material=material;
   });

@@ -53,9 +53,13 @@
             <label class="slider-row" for="thickness"><span>Толщина металла</span><output id="thicknessValue"></output><input id="thickness" type="range" min="6" max="22" value="12" step="1" /></label>
             <label class="slider-row" for="rustAmount"><span>Гуашевая ржавчина</span><output id="rustAmountValue"></output><input id="rustAmount" type="range" min="0" max="200" value="0" step="5" title="100% — обычная, 200% — выраженная ржавчина" /></label>
           </div>
+          <button id="soakRustButton" class="melt-button" type="button" hidden><span aria-hidden="true">🧪</span> Замочить в растворе</button>
           <div class="toggle-row"><label for="broken"><span>Сломанный ключ</span><small>Надломить стержень вниз</small></label><input id="broken" type="checkbox" /></div>
           <label class="slider-row conditional-angle" id="breakAngleRow" for="breakAngle" hidden><span>Угол надлома</span><output id="breakAngleValue"></output><input id="breakAngle" type="range" min="60" max="80" value="70" step="5" /></label>
-          <div class="toggle-row"><label for="dirtEnabled"><span>Грязевой налёт</span><small>Выкл. / полностью покрыть ключ</small></label><input id="dirtEnabled" type="checkbox" /></div>
+          <div class="toggle-row"><label for="dirtEnabled"><span>Грязевой налёт</span><small>Комки засохшей грязи</small></label><input id="dirtEnabled" type="checkbox" /></div>
+          <button id="washMudButton" class="melt-button" type="button" hidden><span aria-hidden="true">💧</span> Отмыть в воде</button>
+          <div class="toggle-row"><label for="waxEnabled"><span>Воск</span><small>Ключ залит свечным воском</small></label><input id="waxEnabled" type="checkbox" /></div>
+          <button id="meltWaxButton" class="melt-button" type="button" hidden><span aria-hidden="true">🕯</span> Растопить над свечой</button>
           <div class="toggle-row"><label for="doubleSided"><span>Двусторонняя бородка</span><small>Зубцы по обеим сторонам</small></label><input id="doubleSided" type="checkbox" /></div>
         </section>
         <div class="editor-footnote">Каждая из 10 заготовок сохраняется отдельно в твоей коллекции.</div>

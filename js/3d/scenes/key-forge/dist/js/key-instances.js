@@ -17,7 +17,7 @@ function entryDesign(entry) {
 
 function shapeSignature(d) {
   return JSON.stringify([d.template,d.shaftLength,d.headSize,d.teeth,d.cutDepth,
-    d.thickness,!!d.doubleSided,d.dirtAmount>0,
+    d.thickness,!!d.doubleSided,d.dirtAmount>0,d.waxAmount>0,
     !!d.broken,d.broken?d.breakAngle:0]);
 }
 
@@ -109,7 +109,7 @@ export function createInstancedKeyCollection(entries,{castShadow=true,receiveSha
         const paint=new Float32Array(ids.length*3);
         for(const [index,record] of group.records.entries()) {
           paint[index*3]=Math.max(0,Math.min(200,record.design.rustAmount??0))/100;
-          paint[index*3+1]=record.design.dirtAmount/100;
+          paint[index*3+1]=0; // mud is geometry (key-mud.js), not a stain
           paint[index*3+2]=record.seed;
         }
         mesh.geometry.setAttribute('instanceKeyPaint',

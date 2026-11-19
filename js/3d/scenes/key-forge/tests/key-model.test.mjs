@@ -142,64 +142,51 @@ test('смена металла и ржавчины сохраняет геом�
   }
 });
 
-test('гуашевая грязь не пересчитывает пятна при смене ржавчины или металла', () => {
+test('комки грязи не меняются при смене ржавчины или металла', () => {
   for(let i=0;i<KEY_TEMPLATES.length;i++) {
-    const base={...defaultDesign(i),dirtAmount:55};
-    const coat=svg=>svg.match(/<g class="dirt-coat">[\s\S]*?<\/g>/)?.[0];
-    const initial=coat(keyPreviewSvg(base));
+    const base={...defaultDesign(i),dirtAmount:100};
+    const mud=svg=>svg.match(/<g class="mud">[\s\S]*?<\/g>/)?.[0];
+    const initial=mud(keyPreviewSvg(base));
     assert.ok(initial,KEY_TEMPLATES[i].id);
-    assert.equal(coat(keyPreviewSvg({...base,rustAmount:180,metal:'copper'})),initial);
-    assert.equal(coat(keyPreviewSvg({...base,rustAmount:40,metal:'steel'})),initial);
+    assert.equal(mud(keyPreviewSvg({...base,rustAmount:180,metal:'copper'})),initial);
+    assert.equal(mud(keyPreviewSvg({...base,rustAmount:40,metal:'steel'})),initial);
   }
 });
 
-test('грязевой налёт непрозрачно покрывает металл и обе стороны кромки, не загрязняя STL', () => {
+test('грязь — непрозрачные комки на обеих сторонах ключа, не попадающие в STL', () => {
   for(let i=0;i<KEY_TEMPLATES.length;i++) {
+    const id=KEY_TEMPLATES[i].id;
     const base=createKeyModel(defaultDesign(i));
     const dirty=createKeyModel({...defaultDesign(i),dirtAmount:100});
     const meshes=dirty.children.filter(mesh=>mesh.isMesh);
-    const dirt=meshes.find(mesh=>mesh.userData.exportable===false&&mesh.geometry.hasAttribute('color'));
-    assert.ok(dirt,KEY_TEMPLATES[i].id);
-    assert.equal(dirt.userData.outlineable,true,`${KEY_TEMPLATES[i].id}: кромка отсутствует в экранной обводке`);
-    assert.ok(meshes.length<=3,`${KEY_TEMPLATES[i].id}: дорогая отрисовка грязи`);
+    const mud=meshes.find(mesh=>mesh.userData.exportable===false&&mesh.geometry.hasAttribute('color'));
+    assert.ok(mud,id);
+    assert.equal(mud.userData.outlineable,true,`${id}: комки без экранной обводки`);
+    assert.equal(meshes.length,2,`${id}: металл и один меш грязи`);
     const triangles=meshes.reduce((total,mesh)=>total+triangleCount(mesh),0);
-    assert.ok(triangles<2000,`${KEY_TEMPLATES[i].id}: слишком много полигонов при максимальном налёте`);
-    assert.ok(dirt.geometry.getAttribute('position').array.every(Number.isFinite));
-    assert.equal(dirt.material.transparent,false);
-    assert.equal(dirt.material.depthWrite,true);
-    assert.equal(dirt.material.side,2); // DoubleSide: грязь видна с оборота
-    const paintedMetal=meshes.find(mesh=>mesh.userData.exportable===true);
-    assert.equal(paintedMetal.material.userData.dirtUniform.value,1);
-    assert.equal(dirt.geometry.getAttribute('position').count,dirt.geometry.getAttribute('color').count);
-    const outer=dirt.geometry.getAttribute('position');
-    assert.ok(outer.count>100);
+    assert.ok(triangles<2500,`${id}: слишком много полигонов грязи (${triangles})`);
+    assert.ok(mud.geometry.getAttribute('position').array.every(Number.isFinite));
+    assert.equal(mud.material.transparent,false);
+    assert.equal(mud.material.side,2); // DoubleSide: грязь видна с оборота
+    // Пятна на металле больше не рисуются: грязь — только геометрия.
+    const metal=meshes.find(mesh=>mesh.userData.exportable===true);
+    assert.equal(metal.material.userData.dirtUniform.value,0);
+    const position=mud.geometry.getAttribute('position');
+    let top=-Infinity,bottom=Infinity;
+    for(let v=0;v<position.count;v++){top=Math.max(top,position.getZ(v));bottom=Math.min(bottom,position.getZ(v));}
     const depth=defaultDesign(i).thickness/100;
-    const dirtLevels=new Set(Array.from({length:outer.count},(_,j)=>outer.getZ(j).toFixed(3)));
-    assert.deepEqual([...dirtLevels].sort(),[
-      depth+.009,depth+.005,-.009,-.005,
-    ].map(z=>z.toFixed(3)).sort(),`${KEY_TEMPLATES[i].id}: грязь оторвана от торцов`);
+    assert.ok(top>depth&&bottom<0,`${id}: комки должны выступать над обеими сторонами`);
     assert.equal(base.children.some(mesh=>mesh.geometry.hasAttribute('color')),false);
     const flat=keyPreviewSvg({...defaultDesign(i),dirtAmount:100});
-    assert.match(flat,/class="dirt-crust"/);
-    assert.match(flat,/class="dirt-coat"/);
-    assert.match(flat,/fill="#55412d"/); // при 100% есть непрозрачная основа
-    const crustPosition=flat.indexOf('<g class="dirt-crust">');
-    const metalPosition=flat.indexOf(`fill="url(#keypaint)"`);
-    assert.ok(crustPosition>=0&&crustPosition<metalPosition,`${KEY_TEMPLATES[i].id}: налёт рисуется поверх металла`);
-    assert.match(flat,/class="dirt-crust"[\s\S]*?stroke="#332a23"/);
-    assert.doesNotMatch(flat,/fill="none" stroke="#332a23" stroke-width="\.035"/);
-    assert.doesNotMatch(flat,/class="dirt-crust" opacity=/);
-    assert.doesNotMatch(flat,/class="dirt-coat" opacity=/);
-    assert.match(keyPreviewSvg({...defaultDesign(i),dirtAmount:45}),/class="dirt-coat"/);
-    assert.doesNotMatch(keyPreviewSvg(defaultDesign(i)),/class="dirt-crust"/);
-    assert.doesNotMatch(keyPreviewSvg(defaultDesign(i)),/class="dirt-coat"/);
-    base.traverse(mesh=>{if(mesh.isMesh)mesh.geometry.dispose();});
-    dirty.traverse(mesh=>{if(mesh.isMesh)mesh.geometry.dispose();});
+    assert.ok(flat.indexOf('<g class="mud">')>flat.indexOf('fill="url(#keypaint)"'),`${id}: комки рисуются поверх металла`);
+    assert.doesNotMatch(keyPreviewSvg(defaultDesign(i)),/class="mud"/);
+    disposeKeyModel(base);disposeKeyModel(dirty);
   }
 });
 
 test('тонкие округлые контуры экономят треугольники и вершины на всех десяти ключах', () => {
-  const maxDirtyTriangles=[706,544,604,940,812,280,866,604,528,1182];
+  // Грязь и воск — отдельные декоративные меши, здесь проверяется сам металл.
+  const maxCleanTriangles=[292,220,244,388,356,112,356,244,216,480];
   let indexedBatches=0,vertexReferences=0,uniqueVertices=0;
   for(let i=0;i<KEY_TEMPLATES.length;i++) {
     const model=createKeyModel({...defaultDesign(i),dirtAmount:100});
@@ -207,14 +194,14 @@ test('тонкие округлые контуры экономят треуго
     model.traverse(mesh=>{
       if(!mesh.isMesh)return;
       const geometry=mesh.geometry;
-      triangles+=triangleCount(mesh);
+      if(mesh.userData.exportable!==false)triangles+=triangleCount(mesh);
       const referenced=geometry.index?.count??geometry.getAttribute('position').count;
       vertexReferences+=referenced;
       uniqueVertices+=geometry.getAttribute('position').count;
       if(geometry.index)indexedBatches++;
       geometry.dispose();
     });
-    assert.ok(triangles<=maxDirtyTriangles[i],`${KEY_TEMPLATES[i].id}: сетка стала плотнее (${triangles})`);
+    assert.ok(triangles<=maxCleanTriangles[i],`${KEY_TEMPLATES[i].id}: сетка стала плотнее (${triangles})`);
   }
   assert.ok(indexedBatches>=10,'сетки всех десяти ключей должны использовать общие вершины');
   assert.ok(uniqueVertices<vertexReferences*.7,'повторные вершины сократились менее чем на 30%');
@@ -251,8 +238,9 @@ test('пакеты ключей одного металла сохраняют �
   const first=hall.children.find(mesh=>mesh.userData.templateId==='archive'&&mesh.userData.exportable);
   const second=hall.children.find(mesh=>mesh.userData.templateId==='alchemy'&&mesh.userData.exportable);
   assert.notEqual(first.material,second.material);
-  assert.equal(first.material.userData.dirtUniform.value,1);
-  assert.equal(second.material.userData.dirtUniform.value,1);
+  // Грязь — геометрия: у грязных ключей отдельная партия комков.
+  assert.ok(hall.children.some(mesh=>mesh.userData.templateId==='archive'&&mesh.userData.exportable===false));
+  assert.ok(hall.children.some(mesh=>mesh.userData.templateId==='alchemy'&&mesh.userData.exportable===false));
   assert.notEqual(first.material.userData.dirtSeedUniform.value,second.material.userData.dirtSeedUniform.value);
   // Rust uniforms only exist after TextureLoader is available in a browser.
   if(first.material.userData.rustUniform) {
@@ -378,9 +366,9 @@ test('контуры надлома не пересекают сами себя 
 test('грязь закрывает согнутый ключ, а инстансы разделяют целые и сломанные заготовки', () => {
   const base=defaultDesign(9),broken={...base,broken:true,breakAngle:80,dirtAmount:100};
   const model=createKeyModel(broken);
-  assert.equal(model.children.length,2,'металл и непрозрачная грязевая кромка');
-  assert.equal(model.children.find(m=>m.userData.exportable).material.userData.dirtUniform.value,1);
-  assert.match(keyPreviewSvg(broken),/class="dirt-coat"/);
+  assert.equal(model.children.length,2,'металл и комки грязи');
+  assert.ok(model.children.some(m=>m.userData.exportable===false));
+  assert.match(keyPreviewSvg(broken),/class="mud"/);
   disposeKeyModel(model);
   const hall=createInstancedKeyCollection([{design:base},{design:broken},{design:{...broken,breakAngle:60}}]);
   assert.equal(hall.userData.uniqueDesigns,3);
@@ -395,13 +383,11 @@ test('при переносе в другую сцену ключи не дел�
   const cleanMetal=clean.children.find(mesh=>mesh.userData.exportable).material;
   const agedMetal=aged.children.find(mesh=>mesh.userData.exportable).material;
   assert.notEqual(cleanMetal,agedMetal);
-  assert.equal(cleanMetal.userData.dirtUniform.value,0);
-  assert.equal(agedMetal.userData.dirtUniform.value,1);
+  assert.ok(aged.children.some(mesh=>mesh.userData.exportable===false),'у состаренного ключа есть комки грязи');
   assert.equal('markCountUniform' in cleanMetal.userData,false);
   assert.equal('markCountUniform' in agedMetal.userData,false);
   updateKeyPaint(clean,{...defaultDesign(9),rustAmount:90});
-  assert.equal(agedMetal.userData.dirtUniform.value,1);
   disposeKeyModel(clean);
-  assert.equal(agedMetal.userData.dirtUniform.value,1,'очистка другого ключа изменила материал');
+  assert.ok(aged.children.some(mesh=>mesh.userData.exportable===false),'очистка другого ключа задела грязь');
   disposeKeyModel(aged);
 });

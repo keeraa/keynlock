@@ -1,7 +1,7 @@
 import * as THREE from '../vendor/three.js';
 import { KEY_TYPES, KEYS_PER_TYPE } from './rules.js?v=24';
 import { createFallbackSurfaces } from './fallback-surfaces.js';
-import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=8';
+import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=9';
 import { sampleThrow } from './throw-physics.js?v=3';
 import { samplePlacement, sampleDiscard } from './archive-key-motion.js';
 import { CABINET_Z, CABINET_GROUND_OFFSET, cabinetKeyPose } from './cabinet-layout.js?v=23';

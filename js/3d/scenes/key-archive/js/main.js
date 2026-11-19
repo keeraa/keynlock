@@ -1,11 +1,11 @@
 import { TOTAL_KEYS, STORAGE_KEY, getProgress } from './rules.js?v=24';
-import { createWorld } from './world.js?v=55';
+import { createWorld } from './world.js?v=56';
 import { installKeyAssetProvider } from './key-factory.js?v=3';
 import { createArchiveHud } from './archive-hud.js';
 import { loadArchiveState, loadVisualSettings, saveArchiveState } from './archive-persistence.js?v=3';
 import { createVisualPanel } from './visual-panel.js';
 import externalKeyProvider from './key-provider-entry.js?v=4';
-import { createFallbackWorld } from './fallback-world.js?v=41';
+import { createFallbackWorld } from './fallback-world.js?v=42';
 import { createPlayerMovement } from './player-movement.js?v=4';
 import { createPerformanceHud } from './performance-hud.js';
 import { logicalKey } from './controls.js';

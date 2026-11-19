@@ -6,7 +6,8 @@ import { KEY_TYPES, getProgress, bathContents } from './rules.js?v=23';
 import { sampleThrow } from './throw-physics.js';
 import { CABINET_Z, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS,
   CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_GRID_BOTTOM_Y,
-  CABINET_BLANK_ROW_BOTTOM_Y, pegForSlot } from './cabinet-layout.js?v=23';
+  CABINET_BLANK_ROW_BOTTOM_Y, pegForSlot, CABINET_CELL_INNER_HALF_WIDTH,
+  CABINET_CELL_INNER_HALF_HEIGHT } from './cabinet-layout.js?v=24';
 import { FIXTURE_OFFSETS, bathId } from './station-layout.js?v=2';
 import { drawBathActivity, drawBathKeys, drawForgeActivity } from './station-canvas-effects.js';
 
@@ -176,10 +177,13 @@ export function createFallbackCanvasRenderer({
       if (Number.isInteger(hovered.slot)) {
         const peg = pegForSlot(hovered.slot);
         const cellZ = z + (left ? -peg.x : peg.x);
-        const square = [[frontX, peg.y - .126, cellZ - .126],
-          [frontX, peg.y - .126, cellZ + .126],
-          [frontX, peg.y + .126, cellZ + .126],
-          [frontX, peg.y + .126, cellZ - .126]];
+        // Align to the recessed black opening, not the larger front trim.
+        const halfW = CABINET_CELL_INNER_HALF_WIDTH;
+        const halfH = CABINET_CELL_INNER_HALF_HEIGHT;
+        const square = [[faceX, peg.y - halfH, cellZ - halfW],
+          [faceX, peg.y - halfH, cellZ + halfW],
+          [faceX, peg.y + halfH, cellZ + halfW],
+          [faceX, peg.y + halfH, cellZ - halfW]];
         for (let edge = 0; edge < 4; edge++)
           segment(square[edge], square[(edge + 1) % 4], '#ffe2a2', 3);
       }

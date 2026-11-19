@@ -12,6 +12,8 @@ test('cabinet face uses individual cubbies, an actual key on the plaque and no h
   assert.match(source, /const crownKey = new THREE\.Mesh\(createCombinedKeyGeometry\(type\)/);
   assert.match(source, /crownKey\.position\.set\(0, 4\.43, -\.18\)/);
   assert.match(source, /crownKey\.scale\.setScalar\(4\.48\)/);
+  assert.match(source, /new THREE\.EdgesGeometry\(crownKey\.geometry, 35\)/);
+  assert.match(source, /crownContour\.material\.opacity = strength \* \.008/);
   assert.match(source, /cabinetKeyPose\(visible\[i\]\.cabinetSlot/);
   assert.match(source, /\[0, \.48, \.42\]/);
   assert.match(source, /const plaqueGlow/);

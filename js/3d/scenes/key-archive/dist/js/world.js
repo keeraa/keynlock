@@ -10,7 +10,7 @@ import { createKeyThumbnailRenderer } from './key-thumbnails.js';
 import { createWorldKeyAnimations } from './world-key-animations.js?v=3';
 import { restingKeyY } from './floor-contact.js';
 import { createWorkstations } from './wash-forge-stations.js?v=24';
-import { createPaintedRenderer } from './painted-renderer.js?v=25';
+import { createPaintedRenderer } from './painted-renderer.js?v=26';
 import { createSceneGeometryStatsCache } from './geometry-stats.js';
 import { createWetSnow } from './wet-snow.js?v=21';
 import { PLAYER_EYE_HEIGHT } from './player-config.js';
@@ -18,11 +18,12 @@ import { createKeyHoverOutline } from './key-hover-outline.js';
 import { createMaterials } from './world-materials.js';
 import { makeHall } from './world-architecture.js?v=8';
 import { makeChandeliers } from './world-lighting.js?v=2';
-import { createCabinet } from './world-cabinet.js?v=9';
+import { createCabinet } from './world-cabinet.js?v=10';
 import { addDust } from './world-particles.js';
 import { nextHandMotionWeight } from './held-key-motion.js';
 import { KEY_PICK_HALF_LENGTH, KEY_PICK_RADIUS } from './interaction-range.js';
-import { pegForSlot } from './cabinet-layout.js?v=23';
+import { pegForSlot, CABINET_CELL_INNER_HALF_WIDTH, CABINET_CELL_INNER_HALF_HEIGHT,
+  CABINET_CELL_BACK_Z } from './cabinet-layout.js?v=24';
 
 const ROOM = { halfWidth: 12, halfLength: 23.4, height: 13.5 };
 
@@ -81,6 +82,7 @@ export function createWorld(canvas, state, visualSettings) {
   const painted = createPaintedRenderer(renderer, scene, camera, visualSettings);
   snow.setSettings(visualSettings);
   const cabinets = KEY_TYPES.map((_, index) => createCabinet(scene, index, mat));
+  cabinets.forEach(cabinet => cabinet.setContour(visualSettings));
   const workstations = createWorkstations(scene, mat, state);
   const floorKeys = new Map(); // key ID -> its family batch and instance index
   const keysById = new Map(state.keys.map(key => [key.id, key]));
@@ -144,9 +146,11 @@ export function createWorld(canvas, state, visualSettings) {
   const bathMaskGeometry = new THREE.CylinderGeometry(.53, .47, .44, 24);
   const forgeMaskGeometry = new THREE.CylinderGeometry(.54, .46, .74, 24);
   const cabinetMaskGeometry = new THREE.BoxGeometry(3.74, 4.02, .06);
+  const innerW = CABINET_CELL_INNER_HALF_WIDTH;
+  const innerH = CABINET_CELL_INNER_HALF_HEIGHT;
   const cellOutline = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints([
-    new THREE.Vector3(-.126, -.126, 0), new THREE.Vector3(.126, -.126, 0),
-    new THREE.Vector3(.126, .126, 0), new THREE.Vector3(-.126, .126, 0),
+    new THREE.Vector3(-innerW, -innerH, 0), new THREE.Vector3(innerW, -innerH, 0),
+    new THREE.Vector3(innerW, innerH, 0), new THREE.Vector3(-innerW, innerH, 0),
   ]), new THREE.LineBasicMaterial({ color: 0xffe4ad, depthTest: false }));
   cellOutline.matrixAutoUpdate = false;
   cellOutline.visible = false;
@@ -251,7 +255,7 @@ export function createWorld(canvas, state, visualSettings) {
         if (Number.isInteger(target.slot)) {
           const peg = pegForSlot(target.slot);
           cellOutline.matrix.copy(cabinet.group.matrixWorld)
-            .multiply(new THREE.Matrix4().makeTranslation(peg.x, peg.y, .86));
+            .multiply(new THREE.Matrix4().makeTranslation(peg.x, peg.y, CABINET_CELL_BACK_Z));
           cellOutline.matrixWorldNeedsUpdate = true;
           cellOutline.visible = true;
         }
@@ -346,6 +350,7 @@ export function createWorld(canvas, state, visualSettings) {
       applyWindowDaylight(settings);
       painted.setSettings(settings);
       snow.setSettings(settings);
+      cabinets.forEach(cabinet => cabinet.setContour(settings));
     },
     keyIdFromHit, animateThrow, animatePlace, animateDiscard, isThrowing, cancelPlace,
     throwingCount: () => thrownKeys.size,

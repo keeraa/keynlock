@@ -56,3 +56,14 @@ test('outline uses its own GPU pass without allocating key or room hulls', () =>
   assert.doesNotMatch(world, /inkOutlines|createInkOutlines/);
   assert.match(page, /id="outlineSensitivity" type="range"/);
 });
+
+test('giant cabinet keys receive a local ink edge while sharing global contour controls', () => {
+  const cabinets = readFileSync(new URL('../dist/js/world-cabinet.js', import.meta.url), 'utf8');
+  const world = readFileSync(new URL('../dist/js/world.js', import.meta.url), 'utf8');
+  const painter = readFileSync(new URL('../dist/js/painted-renderer.js', import.meta.url), 'utf8');
+  assert.match(cabinets, /color: KEY_ART\.outline\.ink/);
+  assert.match(cabinets, /crownContour\.visible = Boolean\(settings\.outlineEnabled\)/);
+  assert.match(world, /cabinets\.forEach\(cabinet => cabinet\.setContour\(visualSettings\)\)/);
+  assert.match(world, /cabinets\.forEach\(cabinet => cabinet\.setContour\(settings\)\)/);
+  assert.match(painter, /object\.isPoints \|\| object\.isLine/);
+});

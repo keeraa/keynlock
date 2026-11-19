@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from '../dist/vendor/three.js';
-import { CABINET_CAPACITY, cabinetSlotAtLocalPoint, pegForSlot } from '../dist/js/cabinet-layout.js';
+import { CABINET_CAPACITY, CABINET_CELL_INNER_HALF_WIDTH, CABINET_CELL_INNER_HALF_HEIGHT,
+  CABINET_CELL_BACK_Z, CABINET_BACK_FRONT_Z, cabinetSlotAtLocalPoint, pegForSlot,
+} from '../dist/js/cabinet-layout.js';
 import { createArchiveTargeting } from '../dist/js/archive-targeting.js';
 import { createArchiveActions } from '../dist/js/archive-actions.js';
 import { createKeyIndex } from '../dist/js/key-index.js';
@@ -11,6 +13,8 @@ import { STORAGE_KEY, createInitialState, pickupKey, selectedKey, cabinetSlotKey
 } from '../dist/js/rules.js';
 
 test('all 96 visible cubbies map from the aim point to their exact slot', () => {
+  assert.equal(CABINET_CELL_BACK_Z, CABINET_BACK_FRONT_Z);
+  assert.ok(CABINET_CELL_INNER_HALF_WIDTH < .12 && CABINET_CELL_INNER_HALF_HEIGHT < .12);
   for (let slot = 0; slot < CABINET_CAPACITY; slot++) {
     const peg = pegForSlot(slot);
     assert.equal(cabinetSlotAtLocalPoint(peg.x, peg.y), slot);

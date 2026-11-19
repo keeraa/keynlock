@@ -14,6 +14,10 @@ export const CABINET_SHELF_DEPTH = .57 / 2;
 export const CABINET_SHELF_CENTER_Z = .385;
 // The visible section ends inside the cabinet's front trim.
 export const CABINET_BACK_FRONT_Z = .29 + .12 / 2;
+// The aim frame hugs the black recess, inset from the wooden cell borders.
+export const CABINET_CELL_INNER_HALF_WIDTH = .106;
+export const CABINET_CELL_INNER_HALF_HEIGHT = .104;
+export const CABINET_CELL_BACK_Z = CABINET_BACK_FRONT_Z;
 export const CABINET_GROUND_OFFSET = -.035;
 export const CABINET_OUTLINE = Object.freeze({
   width: 3.73, bottom: .04, top: 4.85, front: .605, thickness: .065,

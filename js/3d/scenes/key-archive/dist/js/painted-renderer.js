@@ -91,7 +91,7 @@ export function createPaintedRenderer(renderer, scene, camera, initialSettings) 
     const prior = scene.overrideMaterial;
     scene.traverse(object => {
       if (!object.visible) return;
-      if (object.isPoints || (object.isMesh &&
+      if (object.isPoints || object.isLine || (object.isMesh &&
           (Array.isArray(object.material) ? object.material : [object.material])
             .some(material => material?.transparent))) {
         hidden.push(object);

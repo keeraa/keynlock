@@ -60,7 +60,9 @@ test('cabinet hover restores a front-face outline and highlights its aimed cell'
   assert.match(world, /cabinetMaskGeometry/);
   assert.match(world, /pegForSlot\(target\.slot\)/);
   assert.match(world, /makeTranslation\(0, 2\.78, \.78\)/);
+  assert.match(world, /makeTranslation\(peg\.x, peg\.y, CABINET_CELL_BACK_Z\)/);
   assert.doesNotMatch(canvas, /CABINET_OUTLINE/);
   assert.match(canvas, /hovered\?\.kind === 'cabinet'/);
+  assert.match(canvas, /\[faceX, peg\.y - halfH, cellZ - halfW\]/);
   assert.match(canvas, /getKeyFallbackHeadPoints\(type\)/);
 });

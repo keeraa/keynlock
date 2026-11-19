@@ -3,6 +3,7 @@ import { KEY_TYPES } from './rules.js?v=24';
 import { makeLabel } from './art.js?v=17';
 import { createCombinedKeyGeometry, getKeyMaterial, getKeyDisplayScale } from './key-factory.js?v=3';
 import { createPaintedInstanceGeometry } from './key-instance-finish.js';
+import { KEY_ART } from './key-art.js';
 import { CABINET_Z, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS, CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_SHELF_DEPTH, CABINET_GRID_BOTTOM_Y, CABINET_BLANK_ROW_BOTTOM_Y, CABINET_SHELF_CENTER_Z, CABINET_GROUND_OFFSET, cabinetKeyPose } from './cabinet-layout.js?v=23';
 import { box, contactShadow } from './world-architecture.js';
 
@@ -128,6 +129,15 @@ export function createCabinet(scene, type, mat) {
   crownKey.scale.setScalar(4.48);
   crownKey.castShadow = true;
   crownKey.frustumCulled = false;
+  // On a flat key pressed close to the wall, the shared depth/normal pass has
+  // little contrast to detect. Supplement its visible metal edges with the
+  // same ink pigment, keeping the scene's contour controls authoritative.
+  const crownContour = new THREE.LineSegments(
+    new THREE.EdgesGeometry(crownKey.geometry, 35),
+    new THREE.LineBasicMaterial({ color: KEY_ART.outline.ink, transparent: true,
+      opacity: .56, depthTest: true, depthWrite: false }));
+  crownContour.position.z = .018;
+  crownKey.add(crownContour);
   group.add(crownKey);
   const collider = new THREE.Mesh(
     new THREE.BoxGeometry(3.82, 4.65, .15),
@@ -167,5 +177,10 @@ export function createCabinet(scene, type, mat) {
     plaque.material.emissive = new THREE.Color(keys.length === required ? 0x8a5a1d : 0x000000);
     plaque.material.emissiveIntensity = keys.length === required ? .35 : 0;
   }
-  return { type, group, collider, refresh };
+  function setContour(settings) {
+    const strength = Math.max(0, Math.min(100, Number(settings.outlineStrength) || 0));
+    crownContour.visible = Boolean(settings.outlineEnabled) && strength > 0;
+    crownContour.material.opacity = strength * .008;
+  }
+  return { type, group, collider, refresh, setContour };
 }

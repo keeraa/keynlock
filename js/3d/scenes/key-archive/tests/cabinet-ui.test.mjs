@@ -10,7 +10,7 @@ test('cabinet face uses individual cubbies, an actual key on the plaque and no h
   assert.match(source, /plaqueKey\.scale\.setScalar\(\.23 \* 2\.7 \* \.8\)/);
   assert.match(source, /plaqueKey\.rotation\.z = -Math\.PI \/ 2/);
   assert.match(source, /const crownKey = new THREE\.Mesh\(createCombinedKeyGeometry\(type\)/);
-  assert.match(source, /crownKey\.position\.set\(0, 4\.43, \.10\)/);
+  assert.match(source, /crownKey\.position\.set\(0, 4\.43, -\.18\)/);
   assert.match(source, /crownKey\.scale\.setScalar\(5\.6\)/);
   assert.match(source, /const plaqueGlow/);
   assert.match(source, /smoothstep\(0\.0, \.22, vUv\.x\)/);

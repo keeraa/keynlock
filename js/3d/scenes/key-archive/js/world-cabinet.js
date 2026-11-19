@@ -122,7 +122,7 @@ export function createCabinet(scene, type, mat) {
   // inside the cabinet, leaving the matching head and neck above the cornice.
   // Forge geometry already has its head at +Y; no additional rotation needed.
   const crownKey = new THREE.Mesh(createCombinedKeyGeometry(type), getKeyMaterial(type));
-  crownKey.position.set(0, 4.43, .10);
+  crownKey.position.set(0, 4.43, -.18);
   crownKey.scale.setScalar(5.6);
   crownKey.castShadow = true;
   crownKey.frustumCulled = false;

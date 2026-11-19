@@ -5,10 +5,30 @@ import * as THREE from '../dist/vendor/three.js';
 import { KEY_TYPES, createInitialState, validateState } from '../dist/js/rules.js';
 import { KEY_TEMPLATES, METALS } from '../dist/js/key-data.js';
 import { ARCHIVE_TO_FORGE, archiveDesign, createForgeKeyProvider } from '../dist/js/key-forge-adapter.js';
+import { createKeyModel } from '../dist/js/key-geometry.js';
+import { joinedKeyShape, holesFor } from '../dist/js/key-shapes.js';
 
 const source = JSON.parse(readFileSync(new URL('../dist/assets/key-design-profiles.json',import.meta.url),'utf8'));
 const expected = ['cellar','tower','archive','clock','astral',
   'forge','alchemy','garden','palace','brotherhood'];
+
+test('all clean and broken forge keys extrude one continuous bow-and-shaft silhouette', () => {
+  for(let index=0;index<KEY_TEMPLATES.length;index++) {
+    for(const broken of [false,true]) {
+      const design={...archiveDesign(ARCHIVE_TO_FORGE.indexOf(KEY_TEMPLATES[index].id)),broken};
+      const template=KEY_TEMPLATES[design.template];
+      const shape=joinedKeyShape(template,design);
+      assert.equal(shape.holes.length,holesFor(template.bow).length);
+      assert.ok(shape.getPoints().length>20,'silhouette includes the bow and blade');
+      const model=createKeyModel(design);
+      assert.equal(model.children.length,1,`seam-free solid ${template.id} broken=${broken}`);
+      assert.ok(model.children[0].geometry.getAttribute('position').count>30);
+    }
+  }
+  const adapter=readFileSync(new URL('../dist/js/key-forge-adapter.js',import.meta.url),'utf8');
+  assert.match(adapter,/joinedKeyShape\(template, design\)\.extractPoints\(12\)/,
+    '2D thumbnails also share the unbroken outline');
+});
 
 test('all ten archive slots have stable one-to-one forge identities and locked metals', () => {
   assert.deepEqual(ARCHIVE_TO_FORGE,expected);

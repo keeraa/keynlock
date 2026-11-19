@@ -7,7 +7,7 @@ import {
 } from './key-factory.js?v=3';
 import { createPaintedInstanceGeometry, setKeyInstanceFinish } from './key-instance-finish.js';
 import { createKeyThumbnailRenderer } from './key-thumbnails.js';
-import { createWorldKeyAnimations } from './world-key-animations.js';
+import { createWorldKeyAnimations } from './world-key-animations.js?v=2';
 import { restingKeyY } from './floor-contact.js';
 import { createWorkstations } from './wash-forge-stations.js?v=24';
 import { createPaintedRenderer } from './painted-renderer.js?v=25';
@@ -18,7 +18,7 @@ import { createKeyHoverOutline } from './key-hover-outline.js';
 import { createMaterials } from './world-materials.js';
 import { makeHall } from './world-architecture.js?v=7';
 import { makeChandeliers } from './world-lighting.js';
-import { createCabinet } from './world-cabinet.js?v=7';
+import { createCabinet } from './world-cabinet.js?v=8';
 import { addDust } from './world-particles.js';
 import { nextHandMotionWeight } from './held-key-motion.js';
 import { KEY_PICK_HALF_LENGTH, KEY_PICK_RADIUS } from './interaction-range.js';
@@ -146,7 +146,8 @@ export function createWorld(canvas, state, visualSettings) {
   let geometryStatsCache;
   const keyAnimations = createWorldKeyAnimations({ scene, camera, cabinets, workstations,
     invalidate: () => geometryStatsCache?.invalidate(), syncKey, refreshCabinet });
-  const { thrownKeys, placingKeys, animateThrow, animatePlace, animateDiscard, isThrowing } = keyAnimations;
+  const { thrownKeys, placingKeys, animateThrow, animatePlace, animateDiscard,
+    isThrowing, isWindingUp } = keyAnimations;
   const hand = new THREE.Group();
   hand.position.set(.43, -.45, -.82);
   camera.add(hand);
@@ -272,6 +273,7 @@ export function createWorld(canvas, state, visualSettings) {
     snow.update(now);
     workstations.update(now);
     keyAnimations.update(now);
+    hand.visible = !isWindingUp();
     if (handModel) {
       // Blend walk sway in over several frames: an instant amplitude change
       // on the first step looked like a one-frame key flicker.
@@ -323,7 +325,8 @@ export function createWorld(canvas, state, visualSettings) {
       painted.setSettings(settings);
       snow.setSettings(settings);
     },
-    keyIdFromHit, animateThrow, animatePlace, animateDiscard, isThrowing, throwingCount: () => thrownKeys.size,
+    keyIdFromHit, animateThrow, animatePlace, animateDiscard, isThrowing, isWindingUp,
+    throwingCount: () => thrownKeys.size,
     progress: () => getProgress(state),
     bounds: { x: ROOM.halfWidth - .88, z: ROOM.halfLength - .87 },
   };

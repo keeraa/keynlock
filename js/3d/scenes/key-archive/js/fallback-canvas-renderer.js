@@ -2,6 +2,7 @@ import * as THREE from '../vendor/three.js';
 import { createFallbackKeyPainter } from './fallback-canvas-keys.js';
 import { createFallbackArchitecture } from './fallback-canvas-architecture.js';
 import { getKeyFallbackHeadPoints } from './key-factory.js?v=3';
+import { sampleThrowHand } from './held-key-motion.js';
 import { KEY_TYPES, getProgress, bathContents } from './rules.js?v=23';
 import { sampleThrow } from './throw-physics.js';
 import { CABINET_Z, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS,
@@ -130,7 +131,7 @@ export function createFallbackCanvasRenderer({
       ctx.fillText('⚿', signKey.x, signKey.y);
     }
     // The 2D renderer shows the same family crest above each cabinet.
-    const crownX = faceX + (left ? .07 : -.07);
+    const crownX = faceX + (left ? -.10 : .10);
     const crownMetal = `#${KEY_TYPES[type].metal.toString(16).padStart(6, '0')}`;
     path3([[crownX, 5.02, z - .17], [crownX, 6.08, z - .17],
       [crownX, 6.08, z + .17], [crownX, 5.02, z + .17]],
@@ -281,6 +282,7 @@ export function createFallbackCanvasRenderer({
       else drawables.push({ distance, draw: () => drawKey(key) });
     }
     for (const motion of thrownKeys.values()) {
+      if (motion.stage === 'windup') continue;
       const pose = sampleThrow(motion.start, motion.end, (currentTime - motion.startTime) / 1000);
       const airborne = { ...motion.key, x: pose.x, z: pose.z };
       drawables.push({ distance: Math.hypot(camera.position.x - pose.x, camera.position.z - pose.z),
@@ -331,7 +333,9 @@ export function createFallbackCanvasRenderer({
       carriedKey = currentHand;
       frameTime = now;
       visualSettings = settings;
-      keyPainter.setFrame({ width, height, frameTime, carriedKey });
+      const winding = [...thrownKeys.values()].find(motion => motion.stage === 'windup');
+      keyPainter.setFrame({ width, height, frameTime, carriedKey: winding?.key ?? carriedKey,
+        throwPose: winding ? sampleThrowHand((currentTime - winding.startTime) / 1000) : null });
       return draw();
     },
   };

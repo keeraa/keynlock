@@ -1,9 +1,9 @@
 import * as THREE from '../vendor/three.js';
-import { KEY_TYPES } from './rules.js?v=22';
+import { KEY_TYPES } from './rules.js?v=24';
 import { makeLabel } from './art.js?v=17';
 import { createCombinedKeyGeometry, getKeyMaterial, getKeyDisplayScale } from './key-factory.js?v=3';
 import { createPaintedInstanceGeometry } from './key-instance-finish.js';
-import { CABINET_Z, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS, CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_SHELF_DEPTH, CABINET_GRID_BOTTOM_Y, CABINET_BLANK_ROW_BOTTOM_Y, CABINET_SHELF_CENTER_Z, CABINET_GROUND_OFFSET, cabinetKeyPose } from './cabinet-layout.js?v=22';
+import { CABINET_Z, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS, CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_SHELF_DEPTH, CABINET_GRID_BOTTOM_Y, CABINET_BLANK_ROW_BOTTOM_Y, CABINET_SHELF_CENTER_Z, CABINET_GROUND_OFFSET, cabinetKeyPose } from './cabinet-layout.js?v=23';
 import { box, contactShadow } from './world-architecture.js';
 
 function addTrimInstances(group, instances, material) {
@@ -45,7 +45,9 @@ export function createCabinet(scene, type, mat) {
     box(group, [.33, .13, .76], [x, .30, .11], mat.carvedWood);
   }
   // One solid lower section supports four raised rows of square key compartments.
-  box(group, [3.24, .36, .17], [0, .48, .45], mat.wood);
+  // Recede the lower panel behind the base moulding. The old two front caps
+  // shared a plane along their overlap and shimmered while walking past.
+  box(group, [3.24, .36, .17], [0, .48, .42], mat.wood);
   box(group, [3.24, CABINET_ROW_HEIGHT, .17],
     [0, CABINET_BLANK_ROW_BOTTOM_Y + CABINET_ROW_HEIGHT / 2, .45], mat.darkWood);
   const halfRow = CABINET_ROW_HEIGHT / 2;
@@ -123,7 +125,7 @@ export function createCabinet(scene, type, mat) {
   // Forge geometry already has its head at +Y; no additional rotation needed.
   const crownKey = new THREE.Mesh(createCombinedKeyGeometry(type), getKeyMaterial(type));
   crownKey.position.set(0, 4.43, -.18);
-  crownKey.scale.setScalar(5.6);
+  crownKey.scale.setScalar(4.48);
   crownKey.castShadow = true;
   crownKey.frustumCulled = false;
   group.add(crownKey);
@@ -149,10 +151,11 @@ export function createCabinet(scene, type, mat) {
   adornment.position.set(0, 4.8, .45);
   adornment.visible = false;
   group.add(adornment);
-  function refresh(keys, hiddenCount = 0, required = CABINET_CAPACITY) {
-    inserted.count = Math.max(0, Math.min(keys.length - hiddenCount, CABINET_CAPACITY));
+  function refresh(keys, hiddenIds = new Set(), required = CABINET_CAPACITY) {
+    const visible = keys.filter(key => !hiddenIds.has(key.id));
+    inserted.count = Math.min(visible.length, CABINET_CAPACITY);
     for (let i = 0; i < inserted.count; i++) {
-      const peg = cabinetKeyPose(i, getKeyDisplayScale('cabinet', type));
+      const peg = cabinetKeyPose(visible[i].cabinetSlot, getKeyDisplayScale('cabinet', type));
       dummy.position.set(peg.x, peg.y, peg.z);
       dummy.rotation.set(0, 0, 0);
       dummy.scale.setScalar(peg.scale);

@@ -1,19 +1,19 @@
-import { TOTAL_KEYS, STORAGE_KEY, getProgress } from './rules.js?v=23';
-import { createWorld } from './world.js?v=54';
+import { TOTAL_KEYS, STORAGE_KEY, getProgress } from './rules.js?v=24';
+import { createWorld } from './world.js?v=55';
 import { installKeyAssetProvider } from './key-factory.js?v=3';
 import { createArchiveHud } from './archive-hud.js';
-import { loadArchiveState, loadVisualSettings, saveArchiveState } from './archive-persistence.js?v=2';
+import { loadArchiveState, loadVisualSettings, saveArchiveState } from './archive-persistence.js?v=3';
 import { createVisualPanel } from './visual-panel.js';
 import externalKeyProvider from './key-provider-entry.js?v=4';
-import { createFallbackWorld } from './fallback-world.js?v=40';
+import { createFallbackWorld } from './fallback-world.js?v=41';
 import { createPlayerMovement } from './player-movement.js?v=4';
 import { createPerformanceHud } from './performance-hud.js';
 import { logicalKey } from './controls.js';
 import { edgeLookRate } from './mouse-look.js';
 import { createKeyIndex } from './key-index.js';
-import { createArchiveTargeting } from './archive-targeting.js';
-import { createArchivePrompts } from './archive-interaction-prompts.js';
-import { createArchiveActions } from './archive-actions.js';
+import { createArchiveTargeting } from './archive-targeting.js?v=2';
+import { createArchivePrompts } from './archive-interaction-prompts.js?v=2';
+import { createArchiveActions } from './archive-actions.js?v=2';
 import { createArchiveAudio } from './archive-audio.js';
 
 const $ = id => document.getElementById(id);
@@ -79,7 +79,8 @@ function toast(message, error = false) {
 function updateHud() { hud.update(); }
 
 function setHovered(target) {
-  const identity = target ? `${target.kind}-${target.id ?? target.stationId ?? target.type}` : '';
+  const identity = target ? `${target.kind}-${target.id ?? target.stationId ?? target.type}` +
+    (target.kind === 'cabinet' ? `:${target.slot ?? '-'}` : '') : '';
   if (identity === lastHoverKey) return;
   hovered = target;
   lastHoverKey = identity;

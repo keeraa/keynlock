@@ -1,10 +1,9 @@
 import { ENTRANCE_DOOR_TEXTURE_URL } from './entrance-door-texture.js';
 import { WINDOW_CENTERS, PILASTER_CENTERS, PERIMETER_BAND_Y, vaultHeight,
-  WINDOW_SILL_Y, WINDOW_SPRING_Y, WINDOW_SCALE, WINDOW_CENTER_Y,
-  WINDOW_OPENING_RADIUS } from './hall-architecture.js?v=25';
+  WINDOW_SILL_Y, WINDOW_SPRING_Y, WINDOW_SCALE, WINDOW_VERTICAL_SCALE, windowY,
+  HALL_HEIGHT_SCALE, WINDOW_OPENING_RADIUS } from './hall-architecture.js?v=26';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-const windowY = y => WINDOW_CENTER_Y + (y - WINDOW_CENTER_Y) * WINDOW_SCALE;
 
 // Static hall, weather, walls and entrance painting for the 2D renderer.
 export function createFallbackArchitecture({ ctx, camera, surfaces, project, path3, segment }) {
@@ -99,9 +98,13 @@ export function createFallbackArchitecture({ ctx, camera, surfaces, project, pat
   function architecture() {
     // The room is drawn as a set of projected linework and painted wall planes.
     path3([[-11.8, 0, -23], [11.8, 0, -23], [11.8, 0, 23], [-11.8, 0, 23]], surfaces.floor);
-    path3([[-11.85, 0, -23], [-11.85, 11, -23], [-11.85, 11, 23], [-11.85, 0, 23]], surfaces.plaster, '#a0906e');
-    path3([[11.85, 0, -23], [11.85, 11, -23], [11.85, 11, 23], [11.85, 0, 23]], surfaces.plaster, '#a0906e');
-    path3([[-11.8, 0, -23], [11.8, 0, -23], [11.8, 11, -23], [-11.8, 11, -23]], surfaces.plaster, '#b7a078');
+    const wallTop = 11 * HALL_HEIGHT_SCALE;
+    path3([[-11.85, 0, -23], [-11.85, wallTop, -23],
+      [-11.85, wallTop, 23], [-11.85, 0, 23]], surfaces.plaster, '#a0906e');
+    path3([[11.85, 0, -23], [11.85, wallTop, -23],
+      [11.85, wallTop, 23], [11.85, 0, 23]], surfaces.plaster, '#a0906e');
+    path3([[-11.8, 0, -23], [11.8, 0, -23],
+      [11.8, wallTop, -23], [-11.8, wallTop, -23]], surfaces.plaster, '#b7a078');
     path3([[-11.8, vaultHeight(-11.8), -23], [11.8, vaultHeight(11.8), -23],
       [11.8, vaultHeight(11.8), 23], [-11.8, vaultHeight(-11.8), 23]], surfaces.ceiling);
 
@@ -126,9 +129,10 @@ export function createFallbackArchitecture({ ctx, camera, surfaces, project, pat
     // Pilasters and transoms that repeat in perspective.
     for (const x of [-11.78, 11.78]) {
       for (const z of PILASTER_CENTERS) {
-        segment([x, .2, z], [x, 10.7, z], '#9bae9d', 10);
+        segment([x, .2, z], [x, 10.7 * HALL_HEIGHT_SCALE, z], '#9bae9d', 10);
         segment([x, PERIMETER_BAND_Y, z - .32], [x, PERIMETER_BAND_Y, z + .32], '#76573f', 7);
-        segment([x, 10.66, z - .34], [x, 10.66, z + .34], '#76573f', 7);
+        segment([x, 10.66 * HALL_HEIGHT_SCALE, z - .34],
+          [x, 10.66 * HALL_HEIGHT_SCALE, z + .34], '#76573f', 7);
       }
       for (const z of WINDOW_CENTERS) {
         const radius = WINDOW_OPENING_RADIUS * WINDOW_SCALE;
@@ -137,7 +141,8 @@ export function createFallbackArchitecture({ ctx, camera, surfaces, project, pat
           [x, windowY(WINDOW_SPRING_Y), z + radius]];
         for (let i = 0; i <= 16; i++) {
           const angle = Math.PI * i / 16;
-          pane.push([x, windowY(WINDOW_SPRING_Y) + radius * Math.sin(angle),
+          pane.push([x, windowY(WINDOW_SPRING_Y) +
+            WINDOW_OPENING_RADIUS * WINDOW_VERTICAL_SCALE * Math.sin(angle),
             z + radius * Math.cos(angle)]);
         }
         path3(pane, 'rgba(177,219,204,.46)', '#e0c58e', 3);
@@ -176,7 +181,7 @@ export function createFallbackArchitecture({ ctx, camera, surfaces, project, pat
     }
     drawEntranceDoor();
     for (const z of [-13, 0, 13]) {
-      segment([0, 11, z], [0, 8, z], '#ac9367', 3);
+      segment([0, vaultHeight(0) - .1, z], [0, 8, z], '#ac9367', 3);
       const bulb = project(0, 7.92, z);
       if (!bulb) continue;
       const radius = clamp(26 / bulb.depth * 3, 3, 18);

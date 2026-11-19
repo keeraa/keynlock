@@ -2,7 +2,8 @@ import * as THREE from '../vendor/three.js';
 import { makeLabel } from './art.js?v=17';
 import { HALL_SURFACE_TILE_METERS } from './hall-surface-textures.js?v=26';
 import { createMetricBoxGeometry } from './metric-box-geometry.js?v=23';
-import { WINDOW_CENTERS, PILASTER_CENTERS, PERIMETER_BAND_Y, addArchedWindow, addWindowedWall, addVault } from './hall-architecture.js?v=25';
+import { WINDOW_CENTERS, PILASTER_CENTERS, PERIMETER_BAND_Y, HALL_HEIGHT_SCALE,
+  addArchedWindow, addWindowedWall, addVault } from './hall-architecture.js?v=26';
 import { ENTRANCE_DOOR_TEXTURE_URL } from './entrance-door-texture.js';
 
 export function box(parent, size, position, material) {
@@ -109,18 +110,20 @@ export function makeHall(scene, mat, snow) {
     roomBox(scene, [.54, .29, 46.8], [side * 11.77, PERIMETER_BAND_Y, 0], mat.hallTrim);
     for (const z of PILASTER_CENTERS) {
       contactShadow(scene, 1.9, 1.65, side * 11.43, -.048, z, shadowMaterial);
-      roomBox(scene, [.83, 11.0, .63], [side * 11.76, 5.5, z],
+      roomBox(scene, [.83, 11.0 * HALL_HEIGHT_SCALE, .63],
+        [side * 11.76, 5.5 * HALL_HEIGHT_SCALE, z],
         mat.hallPilaster, HALL_SURFACE_TILE_METERS.wall);
       roomBox(scene, [1.14, .34, .91], [side * 11.73, PERIMETER_BAND_Y, z], mat.hallTrim);
-      roomBox(scene, [1.1, .29, .88], [side * 11.73, 10.66, z], mat.hallTrim);
+      roomBox(scene, [1.1, .29, .88], [side * 11.73, 10.66 * HALL_HEIGHT_SCALE, z], mat.hallTrim);
       // Pilasters continue to the floor without the former brown base apron.
-      roomBox(scene, [1.18, .18, 1.10], [side * 11.72, 10.83, z], mat.hallTrim);
-      roomBox(scene, [1.30, .10, 1.21], [side * 11.71, 10.98, z], mat.agedBronze);
+      roomBox(scene, [1.18, .18, 1.10], [side * 11.72, 10.83 * HALL_HEIGHT_SCALE, z], mat.hallTrim);
+      roomBox(scene, [1.30, .10, 1.21], [side * 11.71, 10.98 * HALL_HEIGHT_SCALE, z], mat.agedBronze);
     }
     for (const z of WINDOW_CENTERS) addArchedWindow(scene, side, z, mat, snow);
   }
   for (const z of [-23.39, 23.39]) {
-    const endWall = box(scene, [24, 11, .42], [0, 5.50, z], mat.hallEnd);
+    const endWall = box(scene, [24, 11 * HALL_HEIGHT_SCALE, .42],
+      [0, 5.50 * HALL_HEIGHT_SCALE, z], mat.hallEnd);
     endWall.castShadow = true;
     roomBox(scene, [24, 1.15, .6], [0, .53, z + (z < 0 ? .13 : -.13)], mat.hallTrim);
     roomBox(scene, [24, .29, .65], [0, PERIMETER_BAND_Y, z + (z < 0 ? .1 : -.1)], mat.hallTrim);

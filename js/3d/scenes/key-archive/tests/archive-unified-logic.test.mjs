@@ -6,24 +6,19 @@ import { createArchiveTargeting } from '../dist/js/archive-targeting.js';
 import { samplePlacement, sampleDiscard } from '../dist/js/archive-key-motion.js';
 import { createKeyIndex } from '../dist/js/key-index.js';
 import { CABINET_PLACE_SECONDS } from '../dist/js/cabinet-layout.js';
-import { sampleThrowHand, THROW_WINDUP_SECONDS, THROW_RELEASE_SECONDS } from '../dist/js/held-key-motion.js';
+import { RIGHT_HAND_RELEASE } from '../dist/js/held-key-motion.js';
 import { createArchiveActions } from '../dist/js/archive-actions.js';
 import { createInitialState, pickupKey } from '../dist/js/rules.js';
 
-test('throw starts with a visible backswing and releases from the right hand', () => {
-  const resting=sampleThrowHand(0);
-  const pulled=sampleThrowHand(THROW_WINDUP_SECONDS);
-  const release=sampleThrowHand(THROW_RELEASE_SECONDS);
-  assert.equal(resting.x,.43);
-  assert.equal(resting.released,false);
-  assert.ok(pulled.x>resting.x&&pulled.y<resting.y&&pulled.z>resting.z);
-  assert.ok(release.x>.4&&release.y>pulled.y&&release.z<pulled.z);
-  assert.equal(release.released,true);
-  assert.deepEqual(sampleThrowHand(THROW_RELEASE_SECONDS+.5),release);
+test('throw has no windup and launches immediately from the right hand', () => {
+  assert.equal(RIGHT_HAND_RELEASE.x,.43);
+  assert.equal(RIGHT_HAND_RELEASE.y,-.45);
   const webgl=readFileSync(new URL('../dist/js/world-key-animations.js', import.meta.url), 'utf8');
   const fallback=readFileSync(new URL('../dist/js/fallback-world.js', import.meta.url), 'utf8');
-  assert.match(webgl,/sampleThrowHand\(elapsed\)/);
-  assert.match(fallback,/sampleThrowHand\(\(now - motion\.startTime\) \/ 1000\)/);
+  assert.doesNotMatch(webgl,/stage: 'windup'/);
+  assert.doesNotMatch(fallback,/stage: 'windup'/);
+  assert.match(webgl,/scene\.add\(model\)/);
+  assert.match(fallback,/sampleThrow\(motion\.start, motion\.end/);
 });
 
 test('dropping a key targets the right-hand release pose, not camera center', () => {
@@ -36,7 +31,6 @@ test('dropping a key targets the right-hand release pose, not camera center', ()
   const actions=createArchiveActions({
     state,keyIndex,camera,world:{
       animateThrow(key,start,end){captured={key,start,end};},
-      isWindingUp:()=>false,
     },
     getYaw:()=>0,isPlaying:()=>true,
     save(){},updateHud(){},tone(){},toast(){},showVictory(){},invalidateHover(){},

@@ -1,6 +1,7 @@
 import * as THREE from '../vendor/three.js';
 import { findFloorKeyAtReticle } from './key-picking.js?v=5';
 import { KEY_REACH, CABINET_REACH, STATION_REACH } from './interaction-range.js';
+import { cabinetSlotAtLocalPoint } from './cabinet-layout.js?v=23';
 
 // Both graphical backends expose the same world-space interaction meshes.
 // Keeping this query shared prevents Canvas and WebGL from disagreeing about
@@ -30,6 +31,12 @@ export function createArchiveTargeting({ camera, world, state, keyIndex }) {
         return { kind: 'key', id };
       }
       if (data.kind === 'key' && (world.isThrowing(data.id) || keyIndex.get(data.id)?.status !== 'floor')) continue;
+      if (data.kind === 'cabinet') {
+        const cabinet = world.cabinets[data.type];
+        const local = cabinet.group.worldToLocal(hit.point.clone());
+        return { kind: 'cabinet', type: data.type,
+          slot: cabinetSlotAtLocalPoint(local.x, local.y) };
+      }
       return data;
     }
 

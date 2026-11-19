@@ -4,7 +4,7 @@ import { cylinder } from './world-architecture.js';
 export function makeChandeliers(scene, mat) {
   for (const z of [-13, 0, 13]) {
     // Antique forged ring, curved hangers, candle dishes and tapered flames.
-    cylinder(scene, .048, 3.0, [0, 9.61, z], mat.agedBronze);
+    cylinder(scene, .048, 5.25, [0, 10.735, z], mat.agedBronze);
     const ring = new THREE.Mesh(new THREE.TorusGeometry(1.43, .057, 8, 48), mat.agedBronze);
     ring.rotation.x = Math.PI / 2;
     ring.position.set(0, 8.05, z);

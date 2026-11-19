@@ -1,8 +1,8 @@
 import {
   STORAGE_KEY, LEGACY_STORAGE_KEY, createInitialState,
   validateState, migrateLegacyState, upgradeKeyConditions, upgradeFloorDistribution,
-  upgradeStationBaths,
-} from './rules.js?v=23';
+  upgradeStationBaths, upgradeCabinetSlots,
+} from './rules.js?v=24';
 import { separateFloorKeys } from './key-spacing.js?v=18';
 import { VISUAL_STORAGE_KEY, normalizeVisualSettings } from './visual-settings.js?v=23';
 
@@ -15,6 +15,7 @@ export function loadArchiveState(storage) {
     state = validateState(snapshot) ? snapshot : migrateLegacyState(previous) || createInitialState();
   } catch { state = createInitialState(); }
   upgradeKeyConditions(state);
+  upgradeCabinetSlots(state);
   upgradeFloorDistribution(state);
   separateFloorKeys(state.keys);
   return state;

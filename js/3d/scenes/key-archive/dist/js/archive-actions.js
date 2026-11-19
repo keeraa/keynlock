@@ -1,11 +1,12 @@
 import * as THREE from '../vendor/three.js';
 import {
   KEY_TYPES, TOTAL_KEYS, MAX_HELD, pickupKey, selectedKey, putKeyInCabinet,
-  trashSelectedKey, dropSelectedKey, getProgress, startSoak, collectSoakedKey, bathContents,
-} from './rules.js?v=23';
+  takeKeyFromCabinet, cabinetSlotKey, trashSelectedKey, dropSelectedKey, getProgress,
+  startSoak, collectSoakedKey, bathContents,
+} from './rules.js?v=24';
 import { findFreeFloorSpot } from './key-spacing.js?v=18';
 import { restingKeyY } from './floor-contact.js';
-import { sampleThrowHand, THROW_RELEASE_SECONDS } from './held-key-motion.js';
+import { RIGHT_HAND_RELEASE } from './held-key-motion.js?v=2';
 
 // All state-changing player actions live here and work identically in both renderers.
 export function createArchiveActions({
@@ -80,6 +81,27 @@ export function createArchiveActions({
       return;
     }
     if (target.kind !== 'cabinet') return;
+    if (target.slot === null || target.slot === undefined) {
+      toast('Наведи указатель на ячейку шкафа', true);
+      return;
+    }
+    const occupied = cabinetSlotKey(state, target.type, target.slot);
+    if (occupied) {
+      const taken = takeKeyFromCabinet(state, target.type, target.slot);
+      if (!taken) {
+        toast('В руках помещается четыре ключа', true);
+        tone('wrong');
+        return;
+      }
+      world.cancelPlace?.(taken.id);
+      world.refreshCabinet(target.type);
+      updateHud();
+      save();
+      tone('take');
+      toast('Ключ снят с ячейки · можно переложить');
+      invalidateHover();
+      return;
+    }
     const key = selectedKey(state);
     if (!key) { toast('Сначала возьми ключ с пола'); return; }
     if (key.broken) {
@@ -98,8 +120,8 @@ export function createArchiveActions({
       return;
     }
     const keyType = key.type;
-    if (!putKeyInCabinet(state, target.type)) return;
-    world.animatePlace(key, getProgress(state).sorted[keyType] - 1);
+    if (!putKeyInCabinet(state, target.type, target.slot)) return;
+    world.animatePlace(key, target.slot);
     world.refreshCabinet(keyType);
     updateHud();
     save();
@@ -117,7 +139,6 @@ export function createArchiveActions({
 
   function drop() {
     if (!isPlaying()) return;
-    if (world.isWindingUp?.()) return;
     const key = selectedKey(state);
     if (!key) return;
     const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
@@ -127,8 +148,8 @@ export function createArchiveActions({
       camera.position.x + forward.x * 4.5, camera.position.z + forward.z * 4.5);
     const { x, z } = landing;
     camera.updateMatrixWorld(true);
-    const release = sampleThrowHand(THROW_RELEASE_SECONDS);
-    const releasePoint = camera.localToWorld(new THREE.Vector3(release.x,release.y,release.z));
+    const releasePoint = camera.localToWorld(new THREE.Vector3(
+      RIGHT_HAND_RELEASE.x, RIGHT_HAND_RELEASE.y, RIGHT_HAND_RELEASE.z));
     const start = { x: releasePoint.x, y: releasePoint.y, z: releasePoint.z };
     const end = { x, y: restingKeyY(x, z), z };
     dropSelectedKey(state, x, z, -getYaw() + .6);

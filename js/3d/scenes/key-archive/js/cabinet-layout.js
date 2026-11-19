@@ -19,6 +19,16 @@ export const CABINET_OUTLINE = Object.freeze({
   width: 3.73, bottom: .04, top: 4.85, front: .605, thickness: .065,
 });
 
+export function cabinetSlotAtLocalPoint(x, y) {
+  const cellWidth = CABINET_COLUMN_WIDTH / 2;
+  const cellHeight = CABINET_ROW_HEIGHT / 2;
+  if (x < -1.62 || x >= 1.62 || y < CABINET_GRID_BOTTOM_Y || y >= CABINET_GRID_TOP_Y)
+    return null;
+  const column = Math.floor((x + 1.62) / cellWidth);
+  const rowFromBottom = Math.floor((y - CABINET_GRID_BOTTOM_Y) / cellHeight);
+  return (CABINET_ROWS * 2 - rowFromBottom - 1) * CABINET_COLUMNS * 2 + column;
+}
+
 export function pegForSlot(index) {
   if (!Number.isInteger(index) || index < 0 || index >= CABINET_CAPACITY)
     throw new RangeError(`Шкаф вмещает ${CABINET_CAPACITY} ключей`);

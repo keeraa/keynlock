@@ -1,9 +1,9 @@
 import * as THREE from '../vendor/three.js';
 import { createKeyModel, disposeKeySceneModel, getKeyDisplayScale } from './key-factory.js?v=3';
-import { cabinetKeyPose } from './cabinet-layout.js?v=22';
+import { cabinetKeyPose } from './cabinet-layout.js?v=23';
 import { sampleThrow } from './throw-physics.js?v=3';
 import { samplePlacement, sampleDiscard } from './archive-key-motion.js';
-import { sampleThrowHand } from './held-key-motion.js';
+import { RIGHT_HAND_RELEASE } from './held-key-motion.js?v=2';
 
 // The WebGL representation of the same trajectories used by Canvas.
 export function createWorldKeyAnimations({ scene, camera, cabinets, workstations, invalidate, syncKey, refreshCabinet }) {
@@ -17,13 +17,26 @@ export function createWorldKeyAnimations({ scene, camera, cabinets, workstations
     invalidate();
     const model = createKeyModel(key.type, { id: key.id, variation: key.variation,
       broken: key.broken, mud: key.mud, rust: key.rust,
-      scale: getKeyDisplayScale('hand', key.type) });
-    camera.add(model);
-    thrownKeys.set(key.id, { key, start, end, startTime: performance.now(), model, stage: 'windup' });
+      scale: getKeyDisplayScale('floor', key.type) });
+    model.position.set(start.x, start.y, start.z);
+    const releaseQuaternion = camera.quaternion.clone().multiply(
+      new THREE.Quaternion().setFromEuler(new THREE.Euler(
+        RIGHT_HAND_RELEASE.rotationX, RIGHT_HAND_RELEASE.rotationY, RIGHT_HAND_RELEASE.rotationZ)));
+    model.quaternion.copy(releaseQuaternion);
+    scene.add(model);
+    thrownKeys.set(key.id, { key, start, end, startTime: performance.now(), model, releaseQuaternion });
     syncKey(key);
   }
   function isThrowing(keyId) { return thrownKeys.has(keyId); }
-  function isWindingUp() { return [...thrownKeys.values()].some(motion => motion.stage === 'windup'); }
+
+  function cancelPlace(keyId) {
+    const motion = placingKeys.get(keyId);
+    if (!motion) return;
+    scene.remove(motion.model);
+    disposeKeySceneModel(motion.model);
+    placingKeys.delete(keyId);
+    invalidate();
+  }
 
   function animatePlace(key, slotIndex) {
     invalidate();
@@ -61,25 +74,6 @@ export function createWorldKeyAnimations({ scene, camera, cabinets, workstations
   function update(now) {
     for (const [id, motion] of thrownKeys) {
       const elapsed = (now - motion.startTime) / 1000;
-      if (motion.stage === 'windup') {
-        const pose = sampleThrowHand(elapsed);
-        motion.model.position.set(pose.x, pose.y, pose.z);
-        motion.model.rotation.set(pose.rotationX, pose.rotationY, pose.rotationZ);
-        if (!pose.released) continue;
-        camera.updateMatrixWorld(true);
-        const releasePoint = camera.localToWorld(new THREE.Vector3(pose.x, pose.y, pose.z));
-        const releaseQuaternion = motion.model.getWorldQuaternion(new THREE.Quaternion());
-        camera.remove(motion.model);
-        scene.add(motion.model);
-        motion.model.position.copy(releasePoint);
-        motion.model.quaternion.copy(releaseQuaternion);
-        motion.model.scale.setScalar(getKeyDisplayScale('floor', motion.key.type));
-        motion.start = { x: releasePoint.x, y: releasePoint.y, z: releasePoint.z };
-        motion.releaseQuaternion = releaseQuaternion;
-        motion.startTime = now;
-        motion.stage = 'flight';
-        continue;
-      }
       const pose = sampleThrow(motion.start, motion.end, elapsed);
       if (pose.landed) {
         invalidate();
@@ -134,5 +128,5 @@ export function createWorldKeyAnimations({ scene, camera, cabinets, workstations
     }
   }
   return { thrownKeys, placingKeys, discardingKeys, animateThrow, animatePlace,
-    animateDiscard, isThrowing, isWindingUp, update };
+    animateDiscard, isThrowing, cancelPlace, update };
 }

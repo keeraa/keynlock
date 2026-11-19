@@ -1,15 +1,14 @@
 import * as THREE from '../vendor/three.js';
-import { KEY_TYPES, KEYS_PER_TYPE } from './rules.js?v=23';
+import { KEY_TYPES, KEYS_PER_TYPE } from './rules.js?v=24';
 import { createFallbackSurfaces } from './fallback-surfaces.js';
-import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=7';
+import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=8';
 import { sampleThrow } from './throw-physics.js?v=3';
 import { samplePlacement, sampleDiscard } from './archive-key-motion.js';
-import { CABINET_Z, CABINET_GROUND_OFFSET, cabinetKeyPose } from './cabinet-layout.js?v=22';
+import { CABINET_Z, CABINET_GROUND_OFFSET, cabinetKeyPose } from './cabinet-layout.js?v=23';
 import { STATIONS, FIXTURE_OFFSETS, bathId } from './station-layout.js?v=2';
 import { restingKeyY } from './floor-contact.js';
 import { PLAYER_EYE_HEIGHT } from './player-config.js';
 import { KEY_PICK_HALF_LENGTH, KEY_PICK_RADIUS } from './interaction-range.js';
-import { sampleThrowHand } from './held-key-motion.js';
 
 // A lightweight first-person perspective renderer for browsers that disable WebGL.
 // All picking and game rules still use the same Three.js world coordinates.
@@ -125,7 +124,7 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
   }
   function keyIdFromHit(type, index) { return keysByType[type]?.[index]?.id || null; }
   function animateThrow(key, start, end) {
-    thrownKeys.set(key.id, { key, start, end, startTime: performance.now(), stage: 'windup' });
+    thrownKeys.set(key.id, { key, start, end, startTime: performance.now() });
     syncKey(key);
   }
   function animatePlace(key, slotIndex) {
@@ -149,7 +148,7 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
     discardingKeys.set(key.id, { key, start, end, startTime: performance.now() });
   }
   function isThrowing(id) { return thrownKeys.has(id); }
-  function isWindingUp() { return [...thrownKeys.values()].some(motion => motion.stage === 'windup'); }
+  function cancelPlace(keyId) { placingKeys.delete(keyId); }
   function highlight(target) {
     hovered = target;
     if (target?.kind === 'key') keyHover.id = target.id;
@@ -171,16 +170,6 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
     keyHover.opacity += (keyHover.target - keyHover.opacity) * hoverFactor;
     frameTime = now;
     for (const [id, motion] of thrownKeys) {
-      if (motion.stage === 'windup') {
-        const pose = sampleThrowHand((now - motion.startTime) / 1000);
-        if (!pose.released) continue;
-        camera.updateMatrixWorld(true);
-        const start = camera.localToWorld(new THREE.Vector3(pose.x, pose.y, pose.z));
-        motion.start = { x: start.x, y: start.y, z: start.z };
-        motion.startTime = now;
-        motion.stage = 'flight';
-        continue;
-      }
       if (!sampleThrow(motion.start, motion.end, (now - motion.startTime) / 1000).landed) continue;
       thrownKeys.delete(id);
       syncKey(motion.key);
@@ -209,7 +198,7 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
     getVisualStatus: () => ({ mode: 'canvas', error: '' }),
     setVisualSettings,
     refreshHand, syncKey, refreshCabinet, highlight, update, resize,
-    keyIdFromHit, animateThrow, animatePlace, animateDiscard, isThrowing, isWindingUp,
+    keyIdFromHit, animateThrow, animatePlace, animateDiscard, isThrowing, cancelPlace,
     throwingCount: () => thrownKeys.size,
     bounds: { x: 11.12, z: 22.53 },
   };

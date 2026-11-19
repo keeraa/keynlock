@@ -53,11 +53,14 @@ test('cabinet and workstation hover use continuous mask outlines instead of geom
   assert.doesNotMatch(stations, /СТАНЦИЯ ·/);
 });
 
-test('cabinet picking keeps prompts without a flickering white perimeter', () => {
+test('cabinet hover restores a front-face outline and highlights its aimed cell', () => {
   const world = readFileSync(new URL('../dist/js/world.js', import.meta.url), 'utf8');
   const canvas = readFileSync(new URL('../dist/js/fallback-canvas-renderer.js', import.meta.url), 'utf8');
-  assert.match(world, /const interactive = target\?\.kind === 'bath' \|\| target\?\.kind === 'forge'/);
-  assert.doesNotMatch(world, /cabinetMaskGeometry/);
+  assert.match(world, /target\?\.kind === 'cabinet' \|\| target\?\.kind === 'bath'/);
+  assert.match(world, /cabinetMaskGeometry/);
+  assert.match(world, /pegForSlot\(target\.slot\)/);
+  assert.match(world, /makeTranslation\(0, 2\.78, \.78\)/);
   assert.doesNotMatch(canvas, /CABINET_OUTLINE/);
+  assert.match(canvas, /hovered\?\.kind === 'cabinet'/);
   assert.match(canvas, /getKeyFallbackHeadPoints\(type\)/);
 });

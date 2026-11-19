@@ -1,6 +1,6 @@
 import {
-  KEY_TYPES, MAX_HELD, selectedKey, getProgress, bathContents, keyCondition,
-} from './rules.js?v=23';
+  KEY_TYPES, MAX_HELD, selectedKey, cabinetSlotKey, getProgress, bathContents, keyCondition,
+} from './rules.js?v=24';
 
 export function createArchivePrompts(state, keyIndex) {
   return function promptFor(target) {
@@ -43,11 +43,18 @@ export function createArchivePrompts(state, keyIndex) {
     const progress = getProgress(state);
     const count = progress.sorted[target.type];
     const required = progress.required[target.type];
-    if (!key) return `Шкаф «${KEY_TYPES[target.type].name}» · ${count}/${required}`;
+    if (!Number.isInteger(target.slot))
+      return `Шкаф «${KEY_TYPES[target.type].name}» · ${count}/${required} · наведи на ячейку`;
+    const cell = target.slot + 1;
+    const occupant = cabinetSlotKey(state, target.type, target.slot);
+    if (occupant) return state.held.length >= MAX_HELD
+      ? `Ячейка ${cell} занята · освободи место в руках`
+      : `<kbd>E / У</kbd> Взять ключ из ячейки ${cell} · ${count}/${required}`;
+    if (!key) return `Шкаф «${KEY_TYPES[target.type].name}» · ячейка ${cell} свободна`;
     if (key.broken) return '<kbd>!</kbd> Сломанный ключ · отнеси к ближайшей плавильне';
     if (key.mud || key.rust) return '<kbd>!</kbd> Ключ нужно очистить · ванны в центре зала';
     return key.type === target.type
-      ? `<kbd>E / У</kbd> Повесить ключ · ${KEY_TYPES[target.type].name} · ${count}/${required}`
+      ? `<kbd>E / У</kbd> Положить в ячейку ${cell} · ${KEY_TYPES[target.type].name} · ${count}/${required}`
       : `Шкаф для ключей «${KEY_TYPES[target.type].name}»`;
   };
 }

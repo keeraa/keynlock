@@ -1,13 +1,12 @@
 import * as THREE from '../vendor/three.js';
 import { createFallbackKeyPainter } from './fallback-canvas-keys.js';
-import { createFallbackArchitecture } from './fallback-canvas-architecture.js';
+import { createFallbackArchitecture } from './fallback-canvas-architecture.js?v=2';
 import { getKeyFallbackHeadPoints } from './key-factory.js?v=3';
-import { sampleThrowHand } from './held-key-motion.js';
 import { KEY_TYPES, getProgress, bathContents } from './rules.js?v=23';
 import { sampleThrow } from './throw-physics.js';
 import { CABINET_Z, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS,
   CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_GRID_BOTTOM_Y,
-  CABINET_BLANK_ROW_BOTTOM_Y, pegForSlot } from './cabinet-layout.js?v=22';
+  CABINET_BLANK_ROW_BOTTOM_Y, pegForSlot } from './cabinet-layout.js?v=23';
 import { FIXTURE_OFFSETS, bathId } from './station-layout.js?v=2';
 import { drawBathActivity, drawBathKeys, drawForgeActivity } from './station-canvas-effects.js';
 
@@ -133,19 +132,19 @@ export function createFallbackCanvasRenderer({
     // The 2D renderer shows the same family crest above each cabinet.
     const crownX = faceX + (left ? -.10 : .10);
     const crownMetal = `#${KEY_TYPES[type].metal.toString(16).padStart(6, '0')}`;
-    path3([[crownX, 5.02, z - .17], [crownX, 6.08, z - .17],
-      [crownX, 6.08, z + .17], [crownX, 5.02, z + .17]],
+    path3([[crownX, 5.02, z - .136], [crownX, 5.87, z - .136],
+      [crownX, 5.87, z + .136], [crownX, 5.02, z + .136]],
     crownMetal, '#4b372a', 2);
     const headPoints = getKeyFallbackHeadPoints(type);
-    const crest = headPoints.map(([x, y]) => [crownX, 6.21 + y * 3.5, z + x * 3.5]);
+    const crest = headPoints.map(([x, y]) => [crownX, 5.97 + y * 2.8, z + x * 2.8]);
     path3(crest, crownMetal, '#ecce92', 2.5);
     const cutout = Array.from({ length: 18 }, (_, i) => {
       const angle = i * Math.PI * 2 / 18;
-      return [crownX, 6.21 + Math.sin(angle) * .34, z + Math.cos(angle) * .34];
+      return [crownX, 5.97 + Math.sin(angle) * .272, z + Math.cos(angle) * .272];
     });
     path3(cutout, '#302a25', '#876e4b', 1.5);
     const count = cabinetCounts[type];
-    const inFlight = [...placingKeys.values()].filter(motion => motion.key.type === type).length;
+    const inFlight = new Set([...placingKeys.values()].map(motion => motion.key.id));
     const showKeys = Math.hypot(camera.position.x - faceX, camera.position.z - z) < 17;
     for (let i = 0; showKeys && i < CABINET_CAPACITY; i++) {
       const peg = pegForSlot(i);
@@ -153,7 +152,8 @@ export function createFallbackCanvasRenderer({
       const hook = project(faceX + (left ? .05 : -.05), peg.y, hookZ);
       if (!hook) continue;
       const size = clamp(15 / hook.depth, .9, 3.5);
-      if (i < count - inFlight) {
+      const occupantId = cabinetSlots[type].get(i);
+      if (occupantId && !inFlight.has(occupantId)) {
         ctx.fillStyle = '#ebd9b6';
         ctx.beginPath();
         ctx.arc(hook.x, hook.y + size * 1.5, size * .9, 0, Math.PI * 2);
@@ -166,8 +166,24 @@ export function createFallbackCanvasRenderer({
         ctx.stroke();
       }
     }
-    // Cabinet hover is communicated by the reticle and label, not a
-    // shimmering high-contrast white border against its base.
+    if (hovered?.kind === 'cabinet' && hovered.type === type) {
+      // The bright outline stays on the cabinet front, above the floor joint.
+      const frontX = faceX + (left ? .07 : -.07);
+      const corners = [[frontX, .55, z - 1.82], [frontX, .55, z + 1.82],
+        [frontX, 4.84, z + 1.82], [frontX, 4.84, z - 1.82]];
+      for (let edge = 0; edge < 4; edge++)
+        segment(corners[edge], corners[(edge + 1) % 4], 'rgba(255,239,193,.86)', 2.5);
+      if (Number.isInteger(hovered.slot)) {
+        const peg = pegForSlot(hovered.slot);
+        const cellZ = z + (left ? -peg.x : peg.x);
+        const square = [[frontX, peg.y - .126, cellZ - .126],
+          [frontX, peg.y - .126, cellZ + .126],
+          [frontX, peg.y + .126, cellZ + .126],
+          [frontX, peg.y + .126, cellZ - .126]];
+        for (let edge = 0; edge < 4; edge++)
+          segment(square[edge], square[(edge + 1) % 4], '#ffe2a2', 3);
+      }
+    }
     if (count === requiredCounts[type]) {
       const top = project(faceX, 4.73, z);
       if (top) {
@@ -252,6 +268,7 @@ export function createFallbackCanvasRenderer({
   }
 
   const cabinetCounts = new Array(KEY_TYPES.length).fill(0);
+  const cabinetSlots = Array.from({ length: KEY_TYPES.length }, () => new Map());
   const requiredCounts = getProgress(state).required;
   const keyPainter = createFallbackKeyPainter({ ctx, project, keyHover });
   const { drawKey, drawHand, drawPlacingKey, drawDiscardingKey, drawDistantKeys } = keyPainter;
@@ -282,7 +299,6 @@ export function createFallbackCanvasRenderer({
       else drawables.push({ distance, draw: () => drawKey(key) });
     }
     for (const motion of thrownKeys.values()) {
-      if (motion.stage === 'windup') continue;
       const pose = sampleThrow(motion.start, motion.end, (currentTime - motion.startTime) / 1000);
       const airborne = { ...motion.key, x: pose.x, z: pose.z };
       drawables.push({ distance: Math.hypot(camera.position.x - pose.x, camera.position.z - pose.z),
@@ -322,7 +338,9 @@ export function createFallbackCanvasRenderer({
   }
 
   function refreshCabinet(type) {
-    cabinetCounts[type] = state.keys.filter(key => key.type === type && key.status === 'sorted').length;
+    const sorted = state.keys.filter(key => key.type === type && key.status === 'sorted');
+    cabinetCounts[type] = sorted.length;
+    cabinetSlots[type] = new Map(sorted.map(key => [key.cabinetSlot, key.id]));
   }
 
   return {
@@ -333,9 +351,7 @@ export function createFallbackCanvasRenderer({
       carriedKey = currentHand;
       frameTime = now;
       visualSettings = settings;
-      const winding = [...thrownKeys.values()].find(motion => motion.stage === 'windup');
-      keyPainter.setFrame({ width, height, frameTime, carriedKey: winding?.key ?? carriedKey,
-        throwPose: winding ? sampleThrowHand((currentTime - winding.startTime) / 1000) : null });
+      keyPainter.setFrame({ width, height, frameTime, carriedKey });
       return draw();
     },
   };

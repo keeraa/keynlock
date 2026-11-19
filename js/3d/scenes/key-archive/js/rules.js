@@ -1,4 +1,5 @@
 import { BATH_CAPACITY, SOAK_SECONDS, bathId, validBathId } from './station-layout.js?v=2';
+import { CABINET_CAPACITY } from './cabinet-layout.js?v=23';
 
 // `id` is a stable legacy save slot. The displayed family is from the Forge.
 export const KEY_TYPES = [
@@ -99,6 +100,30 @@ export function upgradeKeyConditions(state) {
   return state;
 }
 
+// Older saves only recorded that a key was sorted. Assign those keys to their
+// original top-to-bottom cells once, without moving already positioned keys.
+export function upgradeCabinetSlots(state) {
+  for (let type = 0; type < KEY_TYPES.length; type++) {
+    const used = new Set();
+    const sorted = state.keys.filter(key => key.type === type && key.status === 'sorted');
+    for (const key of sorted) {
+      if (Number.isInteger(key.cabinetSlot) && key.cabinetSlot >= 0 &&
+          key.cabinetSlot < CABINET_CAPACITY && !used.has(key.cabinetSlot)) {
+        used.add(key.cabinetSlot);
+      } else delete key.cabinetSlot;
+    }
+    for (const key of sorted) {
+      if (key.cabinetSlot !== undefined) continue;
+      const slot = Array.from({ length: CABINET_CAPACITY }, (_, i) => i)
+        .find(index => !used.has(index));
+      if (slot === undefined) throw new RangeError('Cabinet has no unoccupied cell');
+      key.cabinetSlot = slot;
+      used.add(slot);
+    }
+  }
+  return state;
+}
+
 // Earlier builds had two additional workstations. Preserve soaking keys when
 // those stations disappear, keeping the original completion times whenever a
 // central bath has room. Overflow returns to the floor; finished keys are clean.
@@ -143,6 +168,8 @@ export function validateState(candidate) {
         (key.status === 'trashed' && !key.broken) ||
         (key.status === 'bath' && (key.broken || !validBathId(key.bathId) ||
           !Number.isFinite(key.bathUntil))) ||
+        (key.cabinetSlot !== undefined && (!Number.isInteger(key.cabinetSlot) ||
+          key.cabinetSlot < 0 || key.cabinetSlot >= CABINET_CAPACITY)) ||
         ids.has(key.id)) return false;
     ids.add(key.id);
     if ((key.status === 'held') !== heldIDs.has(key.id)) return false;
@@ -186,13 +213,35 @@ export function selectedKey(state) {
   return state.keys.find(key => key.id === state.held[state.selected]) || null;
 }
 
-export function putKeyInCabinet(state, cabinetType) {
+export function cabinetSlotKey(state, cabinetType, slotIndex) {
+  return state.keys.find(key => key.type === cabinetType && key.status === 'sorted' &&
+    key.cabinetSlot === slotIndex) || null;
+}
+
+export function putKeyInCabinet(state, cabinetType, slotIndex = null) {
   const key = selectedKey(state);
   if (!key || key.broken || key.mud || key.rust || key.type !== cabinetType) return false;
+  const taken = new Set(state.keys.filter(item => item.type === cabinetType && item.status === 'sorted')
+    .map(item => item.cabinetSlot));
+  const slot = slotIndex === null ? Array.from({ length: CABINET_CAPACITY }, (_, i) => i)
+    .find(index => !taken.has(index)) : slotIndex;
+  if (!Number.isInteger(slot) || slot < 0 || slot >= CABINET_CAPACITY || taken.has(slot)) return false;
   key.status = 'sorted';
+  key.cabinetSlot = slot;
   state.held.splice(state.selected, 1);
   state.selected = Math.max(0, Math.min(state.selected, state.held.length - 1));
   return true;
+}
+
+export function takeKeyFromCabinet(state, cabinetType, slotIndex) {
+  if (state.held.length >= MAX_HELD) return null;
+  const key = cabinetSlotKey(state, cabinetType, slotIndex);
+  if (!key) return null;
+  key.status = 'held';
+  delete key.cabinetSlot;
+  state.held.push(key.id);
+  state.selected = state.held.length - 1;
+  return key;
 }
 
 export function trashSelectedKey(state) {

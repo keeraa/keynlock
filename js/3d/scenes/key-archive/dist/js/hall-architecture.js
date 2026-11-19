@@ -8,20 +8,26 @@ export const WINDOW_SPRING_Y = 9.17;
 export const WINDOW_OPENING_RADIUS = 1.07;
 export const WINDOW_CROWN_Y = WINDOW_SPRING_Y + WINDOW_OPENING_RADIUS;
 export const WINDOW_SCALE = .8;
+export const WINDOW_VERTICAL_SCALE = WINDOW_SCALE * .8;
+export const WINDOW_RAISE_Y = .85;
 export const WINDOW_CENTER_Y = (WINDOW_SILL_Y + WINDOW_CROWN_Y) / 2;
 export const PERIMETER_BAND_Y = 5.2;
+export const HALL_HEIGHT_SCALE = 1.2;
+
+export const windowY = y => WINDOW_CENTER_Y +
+  (y - WINDOW_CENTER_Y) * WINDOW_VERTICAL_SCALE + WINDOW_RAISE_Y;
 
 export function vaultHeight(x) {
-  return 10.66 + .62 * (1 - (x / 12) ** 2);
+  return (10.66 + .62 * (1 - (x / 12) ** 2)) * HALL_HEIGHT_SCALE;
 }
 
 export function archedOpening(center = 0, radius = WINDOW_OPENING_RADIUS,
-  sill = WINDOW_SILL_Y, spring = WINDOW_SPRING_Y) {
+  sill = WINDOW_SILL_Y, spring = WINDOW_SPRING_Y, rise = radius) {
   const shape = new THREE.Shape();
   shape.moveTo(center - radius, sill);
   shape.lineTo(center + radius, sill);
   shape.lineTo(center + radius, spring);
-  shape.absarc(center, spring, radius, 0, Math.PI, false);
+  shape.absellipse(center, spring, radius, rise, 0, Math.PI, false, 0);
   shape.lineTo(center - radius, sill);
   shape.closePath();
   return shape;
@@ -33,13 +39,13 @@ export function createWindowedWallGeometry() {
   const wall = new THREE.Shape();
   wall.moveTo(-23.4, -.02);
   wall.lineTo(23.4, -.02);
-  wall.lineTo(23.4, 10.98);
-  wall.lineTo(-23.4, 10.98);
+  wall.lineTo(23.4, 10.98 * HALL_HEIGHT_SCALE);
+  wall.lineTo(-23.4, 10.98 * HALL_HEIGHT_SCALE);
   wall.closePath();
   for (const center of WINDOW_CENTERS) wall.holes.push(archedOpening(
     center, WINDOW_OPENING_RADIUS * WINDOW_SCALE,
-    WINDOW_CENTER_Y + (WINDOW_SILL_Y - WINDOW_CENTER_Y) * WINDOW_SCALE,
-    WINDOW_CENTER_Y + (WINDOW_SPRING_Y - WINDOW_CENTER_Y) * WINDOW_SCALE));
+    windowY(WINDOW_SILL_Y), windowY(WINDOW_SPRING_Y),
+    WINDOW_OPENING_RADIUS * WINDOW_VERTICAL_SCALE));
   return new THREE.ExtrudeGeometry(wall, {
     depth: .44, bevelEnabled: false, curveSegments: 22, steps: 1,
   });
@@ -71,9 +77,10 @@ export function addArchedWindow(parent, side, z, mat, snow) {
   const group = new THREE.Group();
   // Scale every pane/frame/muntin about the original window centre so the
   // visible arch remains exactly aligned with the smaller hole in the wall.
-  group.position.set(side * 11.86, WINDOW_CENTER_Y * (1 - WINDOW_SCALE), z);
+  group.position.set(side * 11.86,
+    WINDOW_CENTER_Y * (1 - WINDOW_VERTICAL_SCALE) + WINDOW_RAISE_Y, z);
   group.rotation.y = side === -1 ? Math.PI / 2 : -Math.PI / 2;
-  group.scale.set(WINDOW_SCALE, WINDOW_SCALE, 1);
+  group.scale.set(WINDOW_SCALE, WINDOW_VERTICAL_SCALE, 1);
   parent.add(group);
 
   const glass = new THREE.Mesh(paneGeometry, mat.glass);

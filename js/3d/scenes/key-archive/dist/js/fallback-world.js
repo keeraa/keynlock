@@ -1,14 +1,14 @@
 import * as THREE from '../vendor/three.js';
 import { KEY_TYPES, KEYS_PER_TYPE } from './rules.js?v=23';
 import { createFallbackSurfaces } from './fallback-surfaces.js';
-import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=3';
+import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=4';
 import { sampleThrow } from './throw-physics.js?v=3';
-import { findFloorKeyAtReticle } from './key-picking.js?v=4';
-import { CABINET_Z, CABINET_GROUND_OFFSET, cabinetKeyPose, CABINET_PLACE_SECONDS } from './cabinet-layout.js?v=22';
+import { samplePlacement, sampleDiscard } from './archive-key-motion.js';
+import { CABINET_Z, CABINET_GROUND_OFFSET, cabinetKeyPose } from './cabinet-layout.js?v=22';
 import { STATIONS, FIXTURE_OFFSETS, bathId } from './station-layout.js?v=2';
 import { restingKeyY } from './floor-contact.js';
 import { PLAYER_EYE_HEIGHT } from './player-config.js';
-import { CABINET_REACH, STATION_REACH, KEY_PICK_HALF_LENGTH, KEY_PICK_RADIUS } from './interaction-range.js';
+import { KEY_PICK_HALF_LENGTH, KEY_PICK_RADIUS } from './interaction-range.js';
 
 // A lightweight first-person perspective renderer for browsers that disable WebGL.
 // All picking and game rules still use the same Three.js world coordinates.
@@ -124,45 +124,6 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
     keyColliders[target.type].instanceMatrix.needsUpdate = true;
   }
   function keyIdFromHit(type, index) { return keysByType[type]?.[index]?.id || null; }
-  const forward = new THREE.Vector3();
-  function pickTarget() {
-    forward.set(0, 0, -1).applyQuaternion(camera.quaternion);
-    const nearKey = findFloorKeyAtReticle(camera.position, forward, state.keys, id => thrownKeys.has(id));
-    if (nearKey) return { kind: 'key', id: nearKey.id };
-    let fixture = null;
-    let bestFixtureScore = Infinity;
-    for (const station of workstations.stations) for (const object of [
-      ...station.baths.map(bath => bath.collider), station.forge.collider,
-    ]) {
-      const point = object.getWorldPosition(new THREE.Vector3());
-      const dx = point.x - camera.position.x;
-      const dy = point.y - camera.position.y;
-      const dz = point.z - camera.position.z;
-      const distance = Math.hypot(dx, dy, dz);
-      const alignment = (forward.x * dx + forward.y * dy + forward.z * dz) / distance;
-      const score = (1 - alignment) * 8 + distance * .018;
-      if (distance < STATION_REACH && alignment > .90 && score < bestFixtureScore) {
-        bestFixtureScore = score;
-        fixture = object.userData;
-      }
-    }
-    if (fixture) return fixture;
-    let nearestCabinet = null;
-    let distanceBest = CABINET_REACH;
-    for (const cabinet of cabinets) {
-      const x = cabinet.type < 5 ? -10.84 : 10.84;
-      const dx = x - camera.position.x;
-      const dy = 2.53 - camera.position.y;
-      const dz = cabinet.group.position.z - camera.position.z;
-      const distance = Math.hypot(dx, dy, dz);
-      const alignment = (forward.x * dx + forward.y * dy + forward.z * dz) / distance;
-      if (distance < distanceBest && alignment > .85) {
-        nearestCabinet = cabinet;
-        distanceBest = distance;
-      }
-    }
-    return nearestCabinet && { kind: 'cabinet', type: nearestCabinet.type };
-  }
   function animateThrow(key, start, end) {
     thrownKeys.set(key.id, { key, start, end, startTime: performance.now() });
     syncKey(key);
@@ -218,17 +179,20 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
       syncKey(motion.key);
     }
     for (const [id, motion] of placingKeys) {
-      if ((now - motion.startTime) / 1000 < CABINET_PLACE_SECONDS) continue;
+      if (!samplePlacement(motion.start, motion.end, (now - motion.startTime) / 1000).landed) continue;
       placingKeys.delete(id);
     }
     for (const [id, motion] of discardingKeys) {
-      if ((now - motion.startTime) / 1000 < .48) continue;
+      if (!sampleDiscard(motion.start, motion.end, (now - motion.startTime) / 1000).landed) continue;
       discardingKeys.delete(id);
     }
   }
   function refreshCabinet(type) { canvasRenderer.refreshCabinet(type); }
   for (const key of state.keys) syncKey(key);
   for (let type = 0; type < KEY_TYPES.length; type++) refreshCabinet(type);
+  // Canvas does not invoke WebGL's scene update; world matrices must still be
+  // initialized so the shared raycaster can hit cabinet and station colliders.
+  scene.updateMatrixWorld(true);
   resize();
 
   return {
@@ -238,7 +202,7 @@ export function createFallbackWorld(canvas, state, initialVisualSettings) {
     getVisualStatus: () => ({ mode: 'canvas', error: '' }),
     setVisualSettings,
     refreshHand, syncKey, refreshCabinet, highlight, update, resize,
-    keyIdFromHit, animateThrow, animatePlace, animateDiscard, isThrowing, pickTarget, throwingCount: () => thrownKeys.size,
+    keyIdFromHit, animateThrow, animatePlace, animateDiscard, isThrowing, throwingCount: () => thrownKeys.size,
     bounds: { x: 11.12, z: 22.53 },
   };
 }

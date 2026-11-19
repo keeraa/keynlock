@@ -4,7 +4,7 @@ import { PAINTED_METALS } from './painted-textures.js';
 import { keyAssetUrl, RUST_TEXTURE } from './key-data.js';
 import { dirtPaint, stableNoise } from './key-dirt.js';
 import { restingKeyY } from './floor-contact.js';
-import { CABINET_PLACE_SECONDS } from './cabinet-layout.js?v=22';
+import { samplePlacement, sampleDiscard } from './archive-key-motion.js';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -224,20 +224,15 @@ export function createFallbackKeyPainter({ ctx, project, keyHover }) {
 
   function drawPlacingKey(motion, now) {
     const elapsed = (now - motion.startTime) / 1000;
-    const travel = Math.min(1, elapsed / .30);
-    const ease = 1 - (1 - travel) ** 3;
-    const position = motion.start.clone().lerp(motion.end, ease);
-    position.y += Math.sin(Math.PI * travel) * .16;
-    const p = project(position.x, position.y, position.z);
+    const pose = samplePlacement(motion.start, motion.end, elapsed);
+    const p = project(pose.x, pose.y, pose.z);
     if (!p) return;
     const finalSize = clamp(15 / p.depth, .9, 3.5);
-    const size = (1 - ease) * Math.min(76, height * .12) + ease * finalSize * 2;
-    const sway = elapsed > .30 ? Math.sin((elapsed - .30) * 15) * .06 *
-      Math.max(0, (CABINET_PLACE_SECONDS - elapsed) / (CABINET_PLACE_SECONDS - .30)) : 0;
+    const size = (1 - pose.ease) * Math.min(76, height * .12) + pose.ease * finalSize * 2;
     const glyphBlend = clamp((elapsed - .24) / .18, 0, 1);
     ctx.save();
     ctx.translate(p.x, p.y);
-    ctx.rotate(sway);
+    ctx.rotate(pose.sway);
     if (glyphBlend < 1) {
       ctx.globalAlpha = 1 - glyphBlend;
       ctx.drawImage(stampFor(motion.key), -size * .5, -size * .45, size, size * 1.39);
@@ -259,15 +254,12 @@ export function createFallbackKeyPainter({ ctx, project, keyHover }) {
   }
 
   function drawDiscardingKey(motion, now) {
-    const progress = clamp((now - motion.startTime) / 480, 0, 1);
-    const ease = 1 - (1 - progress) ** 3;
-    const position = motion.start.clone().lerp(motion.end, ease);
-    position.y += Math.sin(Math.PI * progress) * .26;
-    const p = project(position.x, position.y, position.z);
+    const pose = sampleDiscard(motion.start, motion.end, (now - motion.startTime) / 1000);
+    const p = project(pose.x, pose.y, pose.z);
     if (!p) return;
-    const size = Math.max(2, (1 - ease) * 56 + 3);
+    const size = Math.max(2, (1 - pose.ease) * 56 + 3);
     ctx.save();
-    ctx.translate(p.x, p.y); ctx.rotate(progress * Math.PI * 1.3);
+    ctx.translate(p.x, p.y); ctx.rotate(pose.rotationX);
     ctx.drawImage(stampFor(motion.key), -size / 2, -size / 2, size, size * 1.36);
     ctx.restore();
   }

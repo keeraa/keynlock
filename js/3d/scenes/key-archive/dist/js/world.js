@@ -7,8 +7,7 @@ import {
 } from './key-factory.js?v=3';
 import { createPaintedInstanceGeometry, setKeyInstanceFinish } from './key-instance-finish.js';
 import { createKeyThumbnailRenderer } from './key-thumbnails.js';
-import { sampleThrow } from './throw-physics.js?v=3';
-import { cabinetKeyPose, CABINET_PLACE_SECONDS } from './cabinet-layout.js?v=22';
+import { createWorldKeyAnimations } from './world-key-animations.js';
 import { restingKeyY } from './floor-contact.js';
 import { createWorkstations } from './wash-forge-stations.js?v=24';
 import { createPaintedRenderer } from './painted-renderer.js?v=25';
@@ -145,9 +144,10 @@ export function createWorld(canvas, state, visualSettings) {
   const bathMaskGeometry = new THREE.CylinderGeometry(.53, .47, .44, 24);
   const forgeMaskGeometry = new THREE.CylinderGeometry(.54, .46, .74, 24);
   const dummy = new THREE.Object3D();
-  const thrownKeys = new Map();
-  const placingKeys = new Map();
-  const discardingKeys = new Map();
+  let geometryStatsCache;
+  const keyAnimations = createWorldKeyAnimations({ scene, camera, cabinets, workstations,
+    invalidate: () => geometryStatsCache?.invalidate(), syncKey, refreshCabinet });
+  const { thrownKeys, placingKeys, animateThrow, animatePlace, animateDiscard, isThrowing } = keyAnimations;
   const hand = new THREE.Group();
   hand.position.set(.43, -.45, -.82);
   camera.add(hand);
@@ -164,7 +164,6 @@ export function createWorld(canvas, state, visualSettings) {
   let objectHoverTarget = 0;
   let lastHoverFrame = performance.now();
   let highlightedShape = '0:false';
-  let geometryStatsCache;
 
   function refreshHand(key) {
     if (displayedHandId === (key?.id || null)) return;
@@ -216,51 +215,6 @@ export function createWorld(canvas, state, visualSettings) {
 
   function keyIdFromHit(type, instanceId) {
     return keysByType[type]?.[instanceId]?.id || null;
-  }
-
-  function animateThrow(key, start, end) {
-    geometryStatsCache?.invalidate();
-    const model = createKeyModel(key.type, { id: key.id, variation: key.variation,
-      broken: key.broken, mud: key.mud, rust: key.rust,
-      scale: getKeyDisplayScale('floor', key.type) });
-    scene.add(model);
-    thrownKeys.set(key.id, { key, start, end, startTime: performance.now(), model });
-    syncKey(key);
-  }
-
-  function isThrowing(keyId) { return thrownKeys.has(keyId); }
-
-  function animatePlace(key, slotIndex) {
-    geometryStatsCache?.invalidate();
-    camera.updateMatrixWorld(true);
-    const start = camera.localToWorld(new THREE.Vector3(.42, -.37, -.84));
-    const cabinet = cabinets[key.type];
-    cabinet.group.updateMatrixWorld(true);
-    const peg = cabinetKeyPose(slotIndex, getKeyDisplayScale('cabinet', key.type));
-    const end = cabinet.group.localToWorld(new THREE.Vector3(peg.x, peg.y, peg.z));
-    const model = createKeyModel(key.type, { id: key.id, variation: key.variation });
-    const pivot = new THREE.Group();
-    pivot.add(model);
-    scene.add(pivot);
-    placingKeys.set(key.id, {
-      key, start, end, endScale: peg.scale, pivot, model, startTime: performance.now(),
-      startRotation: camera.quaternion.clone(),
-      endRotation: cabinet.group.getWorldQuaternion(new THREE.Quaternion()),
-    });
-    refreshCabinet(key.type);
-  }
-
-  function animateDiscard(key, stationId = 'center') {
-    geometryStatsCache?.invalidate();
-    workstations.startMelt(stationId);
-    camera.updateMatrixWorld(true);
-    const start = camera.localToWorld(new THREE.Vector3(.42, -.37, -.84));
-    const station = workstations.stations.find(item => item.id === stationId) || workstations.stations[0];
-    station.group.updateMatrixWorld(true);
-    const end = station.group.localToWorld(new THREE.Vector3(0, 1.48, .08));
-    const model = createKeyModel(key.type, { id: key.id, variation: key.variation, broken: true });
-    scene.add(model);
-    discardingKeys.set(key.id, { start, end, model, startTime: performance.now() });
   }
 
   function refreshCabinet(type) {
@@ -322,68 +276,7 @@ export function createWorld(canvas, state, visualSettings) {
     dust.update(now);
     snow.update(now);
     workstations.update(now);
-    for (const [id, motion] of thrownKeys) {
-      const elapsed = (now - motion.startTime) / 1000;
-      const pose = sampleThrow(motion.start, motion.end, elapsed);
-      if (pose.landed) {
-        geometryStatsCache?.invalidate();
-        thrownKeys.delete(id);
-        scene.remove(motion.model);
-        disposeKeySceneModel(motion.model);
-        syncKey(motion.key);
-        continue;
-      }
-      motion.model.position.set(pose.x, pose.y, pose.z);
-      const settle = Math.min(1, Math.max(0, (elapsed - .5) / 1.2));
-      const eased = 1 - (1 - settle) ** 3;
-      motion.model.rotation.set(
-        pose.spin - Math.PI * .5 * eased,
-        pose.spin * .11 * (1 - eased) + motion.key.rotation * eased,
-        Math.sin(pose.spin) * .18 * (1 - eased),
-        'YXZ',
-      );
-    }
-    for (const [id, motion] of placingKeys) {
-      const elapsed = (now - motion.startTime) / 1000;
-      const travel = Math.min(elapsed / .30, 1);
-      const easing = 1 - (1 - travel) ** 3;
-      motion.pivot.position.lerpVectors(motion.start, motion.end, easing);
-      motion.pivot.position.y += Math.sin(Math.PI * travel) * .16;
-      motion.pivot.quaternion.slerpQuaternions(motion.startRotation, motion.endRotation, easing);
-      const endScale = motion.endScale;
-      const startScale = getKeyDisplayScale('floor', motion.key.type);
-      motion.model.scale.setScalar(endScale + (startScale - endScale) * (1 - easing));
-      if (elapsed > .30) {
-        const swayTime = elapsed - .30;
-        // Absolute, damped rotation: never accumulate a new twist each frame.
-        motion.pivot.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(
-          new THREE.Vector3(0, 0, 1),
-          Math.sin(swayTime * 15) * .055 * Math.exp(-swayTime * 3) *
-          Math.max(0, (CABINET_PLACE_SECONDS - elapsed) / (CABINET_PLACE_SECONDS - .30))));
-      }
-      if (elapsed < CABINET_PLACE_SECONDS) continue;
-      geometryStatsCache?.invalidate();
-      scene.remove(motion.pivot);
-      disposeKeySceneModel(motion.model);
-      placingKeys.delete(id);
-      refreshCabinet(motion.key.type);
-    }
-    for (const [id, motion] of discardingKeys) {
-      const elapsed = (now - motion.startTime) / 1000;
-      if (elapsed > .48) {
-        geometryStatsCache?.invalidate();
-        scene.remove(motion.model);
-        disposeKeySceneModel(motion.model);
-        discardingKeys.delete(id);
-        continue;
-      }
-      const progress = elapsed / .48;
-      const ease = 1 - (1 - progress) ** 3;
-      motion.model.position.lerpVectors(motion.start, motion.end, ease);
-      motion.model.position.y += Math.sin(Math.PI * progress) * .26;
-      motion.model.rotation.set(ease * Math.PI * 1.3, ease * Math.PI * 1.1, 0);
-      motion.model.scale.setScalar(.38 * (1 - ease) + .04);
-    }
+    keyAnimations.update(now);
     if (handModel) {
       // Blend walk sway in over several frames: an instant amplitude change
       // on the first step looked like a one-frame key flicker.

@@ -1,25 +1,20 @@
-import * as THREE from '../vendor/three.js';
-import {
-  KEY_TYPES, KEYS_PER_TYPE, TOTAL_KEYS, MAX_HELD, STORAGE_KEY,
-  pickupKey, selectedKey, putKeyInCabinet, trashSelectedKey, dropSelectedKey,
-  getProgress, startSoak, collectSoakedKey, bathContents, keyCondition,
-} from './rules.js?v=23';
-import { createWorld } from './world.js?v=50';
+import { TOTAL_KEYS, STORAGE_KEY, getProgress } from './rules.js?v=23';
+import { createWorld } from './world.js?v=51';
 import { installKeyAssetProvider } from './key-factory.js?v=3';
 import { createArchiveHud } from './archive-hud.js';
 import { loadArchiveState, loadVisualSettings, saveArchiveState } from './archive-persistence.js?v=2';
 import { createVisualPanel } from './visual-panel.js';
 import externalKeyProvider from './key-provider-entry.js?v=3';
-import { createFallbackWorld } from './fallback-world.js?v=36';
+import { createFallbackWorld } from './fallback-world.js?v=37';
 import { createPlayerMovement } from './player-movement.js?v=4';
 import { createPerformanceHud } from './performance-hud.js';
 import { logicalKey } from './controls.js';
 import { edgeLookRate } from './mouse-look.js';
-import { findFloorKeyAtReticle } from './key-picking.js?v=5';
 import { createKeyIndex } from './key-index.js';
-import { findFreeFloorSpot } from './key-spacing.js?v=18';
-import { restingKeyY } from './floor-contact.js';
-import { KEY_REACH, CABINET_REACH, STATION_REACH } from './interaction-range.js';
+import { createArchiveTargeting } from './archive-targeting.js';
+import { createArchivePrompts } from './archive-interaction-prompts.js';
+import { createArchiveActions } from './archive-actions.js';
+import { createArchiveAudio } from './archive-audio.js';
 
 const $ = id => document.getElementById(id);
 if (externalKeyProvider) installKeyAssetProvider(externalKeyProvider);
@@ -36,8 +31,6 @@ try {
 }
 const camera = world.camera;
 const movement = createPlayerMovement(camera, world.bounds);
-const raycaster = new THREE.Raycaster();
-const center = new THREE.Vector2(0, 0);
 const clamp = (number, a, b) => Math.max(a, Math.min(b, number));
 const hud = createArchiveHud(document, world, state, keyIndex);
 const performanceHud = createPerformanceHud(document, world);
@@ -47,7 +40,6 @@ let mode = 'intro';
 let yaw = 0;
 let pitch = -.17;
 let sensitivity = 14;
-let muted = false;
 let pointerEverLocked = false;
 let lockRequestPending = false;
 let lockUnavailable = false;
@@ -59,45 +51,20 @@ let lastHoverKey = '';
 let toastTimeout = 0;
 const heldMovement = new Set();
 let lastTick = performance.now();
-let soundContext;
+const audio = createArchiveAudio(window);
+const { tone } = audio;
+const { targetInView } = createArchiveTargeting({ camera, world, state, keyIndex });
+const promptFor = createArchivePrompts(state, keyIndex);
+const { interact, drop } = createArchiveActions({
+  state, keyIndex, world, camera, targetInView,
+  getYaw: () => yaw, isPlaying: () => mode === 'play',
+  save, updateHud, tone, toast, showVictory,
+  invalidateHover: () => { lastHoverKey = '!'; },
+});
 
 function save() {
   keyIndex.rebuild();
   saveArchiveState(localStorage, state);
-}
-
-function tone(kind = 'take') {
-  if (muted) return;
-  try {
-    soundContext ||= new (window.AudioContext || window.webkitAudioContext)();
-    if (soundContext.state === 'suspended') soundContext.resume();
-    const now = soundContext.currentTime;
-    const notes = kind === 'water' ? [[310, .11], [235, .15], [365, .08]] :
-      kind === 'rust' ? [[880, .07], [720, .10], [560, .13]] :
-      kind === 'melt' ? [[260, .12], [160, .20], [95, .30]] :
-      kind === 'trash' ? [[330, .07], [220, .16]] :
-      kind === 'place' ? [[440, .09], [660, .12]] :
-      kind === 'finish' ? [[440, .11], [554, .14], [659, .20]] :
-      kind === 'wrong' ? [[220, .11]] : [[680, .06], [910, .05]];
-    let offset = 0;
-    for (const [frequency, duration] of notes) {
-      const oscillator = soundContext.createOscillator();
-      const gain = soundContext.createGain();
-      oscillator.type = kind === 'wrong' || kind === 'rust' ? 'triangle' :
-        kind === 'melt' ? 'sawtooth' : 'sine';
-      oscillator.frequency.setValueAtTime(frequency, now + offset);
-      oscillator.frequency.exponentialRampToValueAtTime(frequency * .75, now + offset + duration);
-      gain.gain.setValueAtTime(.0001, now + offset);
-      const peak = kind === 'wrong' ? .028 : kind === 'melt' ? .021 :
-        kind === 'rust' ? .026 : .056;
-      gain.gain.exponentialRampToValueAtTime(peak, now + offset + .009);
-      gain.gain.exponentialRampToValueAtTime(.0001, now + offset + duration);
-      oscillator.connect(gain).connect(soundContext.destination);
-      oscillator.start(now + offset);
-      oscillator.stop(now + offset + duration + .02);
-      offset += kind === 'finish' ? .10 : kind === 'water' || kind === 'rust' ? .10 : .045;
-    }
-  } catch { /* audio is a nonessential enhancement */ }
 }
 
 function toast(message, error = false) {
@@ -111,54 +78,6 @@ function toast(message, error = false) {
 
 function updateHud() { hud.update(); }
 
-function promptFor(target) {
-  if (!target) return '';
-  if (target.kind === 'key') {
-    const key = keyIndex.get(target.id);
-    if (!key || key.status !== 'floor') return '';
-    const condition = keyCondition(key);
-    const conditionNote = condition === 'broken' ? ' · СЛОМАН' :
-      condition === 'both' ? ' · ГРЯЗЬ + РЖАВЧИНА' : condition === 'mud' ? ' · ГРЯЗЬ' :
-      condition === 'rust' ? ' · РЖАВЧИНА' : '';
-    return state.held.length >= MAX_HELD
-      ? `<kbd>4/4</kbd> Руки заняты · положи ключ в шкаф или на пол`
-      : `<kbd>E / У</kbd> Взять · ${KEY_TYPES[key.type].name.toLowerCase()}${conditionNote}`;
-  }
-  if (target.kind === 'bath') {
-    const contents = bathContents(state, target.id);
-    const held = selectedKey(state);
-    const label = target.bathKind === 'mud' ? 'Ванна · отмачивание грязи' : 'Раствор · очистка ржавчины';
-    const count = `${contents.keys.length}/4`;
-    if (held && !held.broken && held[target.bathKind] && contents.space > 0)
-      return `<kbd>E / У</kbd> Погрузить ключ · ${label} · ${count}`;
-    if (contents.ready.length && state.held.length < MAX_HELD)
-      return `<kbd>E / У</kbd> Забрать очищенный ключ · ${count}`;
-    if (contents.ready.length) return `Ключ готов · освободи место в руках · ${count}`;
-    if (contents.pending.length) {
-      const seconds = Math.max(1, Math.ceil(Math.min(...contents.pending.map(key => key.bathUntil)) / 1000 - Date.now() / 1000));
-      return `${label} · ${count} · осталось ≈${seconds} сек`;
-    }
-    return contents.space ? `${label} · ${count} · <kbd>E / У</kbd> опустить подходящий ключ` : `${label} · ванна заполнена`;
-  }
-  if (target.kind === 'forge') {
-    const held = selectedKey(state);
-    if (!held) return 'Урна-плавильня · сломанные ключи → металл · <kbd>E / У</kbd>';
-    return held.broken
-      ? '<kbd>E / У</kbd> Переплавить сломанный ключ · +1 металл'
-      : 'Урна-плавильня · здесь перерабатываются только сломанные ключи';
-  }
-  const key = selectedKey(state);
-  const progress = getProgress(state);
-  const count = progress.sorted[target.type];
-  const required = progress.required[target.type];
-  if (!key) return `Шкаф «${KEY_TYPES[target.type].name}» · ${count}/${required}`;
-  if (key.broken) return '<kbd>!</kbd> Сломанный ключ · отнеси к ближайшей плавильне';
-  if (key.mud || key.rust) return '<kbd>!</kbd> Ключ нужно очистить · ванны в центре зала';
-  return key.type === target.type
-    ? `<kbd>E / У</kbd> Повесить ключ · ${KEY_TYPES[target.type].name} · ${count}/${required}`
-    : `Шкаф для ключей «${KEY_TYPES[target.type].name}»`;
-}
-
 function setHovered(target) {
   const identity = target ? `${target.kind}-${target.id ?? target.stationId ?? target.type}` : '';
   if (identity === lastHoverKey) return;
@@ -170,176 +89,6 @@ function setHovered(target) {
   prompt.innerHTML = content;
   prompt.classList.toggle('is-hidden', !content);
   $('crosshair').classList.toggle('target', Boolean(content));
-}
-
-function targetInView() {
-  if (world.pickTarget) return world.pickTarget();
-  camera.updateMatrixWorld();
-  raycaster.setFromCamera(center, camera);
-  const intersections = raycaster.intersectObjects(world.interactables, false);
-  for (const hit of intersections) {
-    const data = hit.object.userData;
-    if (!data?.kind) continue;
-    // Floor key reach uses walkable horizontal distance, not eye-to-floor ray
-    // length, so aiming lower cannot change which nearby key is in reach.
-    const isKey = data.kind === 'key' || data.kind === 'key-batch';
-    const distance = isKey ? Math.hypot(hit.point.x - camera.position.x,
-      hit.point.z - camera.position.z) : hit.distance;
-    if (distance > (data.kind === 'cabinet' ? CABINET_REACH :
-      data.kind === 'bath' || data.kind === 'forge' ? STATION_REACH : KEY_REACH)) continue;
-    if (data.kind === 'key-batch') {
-      const id = world.keyIdFromHit(data.type, hit.instanceId);
-      if (!id || world.isThrowing(id) || keyIndex.get(id)?.status !== 'floor') continue;
-      return { kind: 'key', id };
-    }
-    if (data.kind === 'key' && (world.isThrowing(data.id) || keyIndex.get(data.id)?.status !== 'floor')) continue;
-    return data;
-  }
-  const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
-  const nearKey = findFloorKeyAtReticle(camera.position, forward, state.keys, world.isThrowing, { index: keyIndex });
-  if (nearKey) return { kind: 'key', id: nearKey.id };
-  // Cabinet fronts are generous interaction targets, including from an angle.
-  const targetCenter = new THREE.Vector3();
-  let closest = null;
-  let bestScore = Infinity;
-  for (const cabinet of world.cabinets) {
-    cabinet.collider.getWorldPosition(targetCenter);
-    const direction = targetCenter.clone().sub(camera.position);
-    const distance = direction.length();
-    const alignment = forward.dot(direction.normalize());
-    if (distance < CABINET_REACH && alignment > .81 && distance < bestScore) {
-      bestScore = distance;
-      closest = { kind: 'cabinet', type: cabinet.type };
-    }
-  }
-  if (closest) return closest;
-  return null;
-}
-
-function interact() {
-  if (mode !== 'play') return;
-  const target = targetInView();
-  if (!target) return;
-  if (target.kind === 'key') {
-    if (!pickupKey(state, target.id)) {
-      toast('В руках помещается четыре ключа', true);
-      tone('wrong');
-      return;
-    }
-    world.syncKey(keyIndex.get(target.id));
-    updateHud();
-    save();
-    tone('take');
-    const picked = selectedKey(state);
-    toast(picked.broken ? 'Сломанный ключ · отнеси к плавильне' :
-      picked.mud && picked.rust ? 'Ключ в грязи и ржавчине · потребуется обе ванны' :
-      picked.mud ? 'Грязный ключ · отмочи в воде' : picked.rust ? 'Ржавый ключ · погрузи в раствор' :
-        `Ключ взят · ${KEY_TYPES[picked.type].name}`);
-    lastHoverKey = '!';
-    return;
-  }
-  if (target.kind === 'bath') {
-    const key = selectedKey(state);
-    if (key && startSoak(state, target.id, target.bathKind)) {
-      world.workstations?.refreshBaths?.();
-      updateHud();
-      save();
-      tone(target.bathKind === 'mud' ? 'water' : 'rust');
-      toast(target.bathKind === 'mud' ? 'Ключ отмокает в воде · 5 секунд' : 'Ключ в очищающем растворе · 7 секунд');
-    } else {
-      const collected = collectSoakedKey(state, target.id);
-      if (collected) {
-        world.workstations?.refreshBaths?.();
-        world.syncKey(collected);
-        updateHud();
-        save();
-        tone('place');
-        toast(collected.mud || collected.rust ? 'Один слой очищен · нужна вторая ванна' : 'Ключ очищен · можно нести к шкафу');
-      } else {
-        const contents = bathContents(state, target.id);
-        toast(contents.ready.length && state.held.length >= MAX_HELD ? 'Освободи место для чистого ключа' :
-          contents.space === 0 ? 'Ванна заполнена · четыре ключа' :
-            contents.pending.length ? 'Подожди, пока ключи отмокнут' :
-              target.bathKind === 'mud' ? 'Здесь очищают ключи от грязи' : 'Здесь удаляют ржавчину', true);
-        tone('wrong');
-      }
-    }
-    lastHoverKey = '!';
-    return;
-  }
-  if (target.kind === 'forge') {
-    if (!selectedKey(state)?.broken) {
-      toast('Плавильня принимает только сломанные ключи', true);
-      tone('wrong');
-      return;
-    }
-    world.animateDiscard(selectedKey(state), target.stationId);
-    trashSelectedKey(state);
-    updateHud();
-    save();
-    tone('melt');
-    toast('Сломанный ключ переплавлен · +1 металл');
-    lastHoverKey = '!';
-    if (getProgress(state).processed === TOTAL_KEYS) setTimeout(showVictory, 1100);
-    return;
-  }
-  const key = selectedKey(state);
-  if (!key) {
-    toast('Сначала возьми ключ с пола');
-    return;
-  }
-  if (key.broken) {
-    toast('Сломанный ключ · отнеси к плавильне', true);
-    tone('wrong');
-    return;
-  }
-  if (key.mud || key.rust) {
-    toast('Сперва очисти ключ · используй ванны в центре зала', true);
-    tone('wrong');
-    return;
-  }
-  if (key.type !== target.type) {
-    toast('Это шкаф для ключей «' + KEY_TYPES[target.type].name + '»', true);
-    tone('wrong');
-    return;
-  }
-  const keyType = key.type;
-  if (!putKeyInCabinet(state, target.type)) return;
-  world.animatePlace(key, getProgress(state).sorted[keyType] - 1);
-  world.refreshCabinet(keyType);
-  updateHud();
-  save();
-  const progress = getProgress(state);
-  if (progress.sorted[keyType] === progress.required[keyType]) {
-    tone('finish');
-    toast('Шкаф «' + KEY_TYPES[keyType].name + '» заполнен');
-  } else {
-    tone('place');
-    toast('Ключ на своём месте');
-  }
-  lastHoverKey = '!';
-  if (progress.processed === TOTAL_KEYS) setTimeout(showVictory, 1900);
-}
-
-function drop() {
-  if (mode !== 'play') return;
-  const key = selectedKey(state);
-  if (!key) return;
-  const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
-  forward.y = 0;
-  forward.normalize();
-  const landing = findFreeFloorSpot(state.keys,
-    camera.position.x + forward.x * 4.5, camera.position.z + forward.z * 4.5);
-  const { x, z } = landing;
-  const start = { x: camera.position.x + forward.x * .42, y: camera.position.y - .27,
-    z: camera.position.z + forward.z * .42 };
-  const end = { x, y: restingKeyY(x, z), z };
-  dropSelectedKey(state, x, z, -yaw + .6);
-  world.animateThrow(key, start, end);
-  updateHud();
-  save();
-  tone('take');
-  toast('Ключ брошен');
 }
 
 function selectSlot(slot) {
@@ -441,7 +190,7 @@ visualPanel.bind();
 $('reset-btn').addEventListener('click', resetGame);
 $('victory-reset').addEventListener('click', resetGame);
 $('sensitivity').addEventListener('input', event => { sensitivity = Number(event.target.value); });
-$('sound').addEventListener('change', event => { muted = !event.target.checked; });
+$('sound').addEventListener('change', event => { audio.setMuted(!event.target.checked); });
 
 document.addEventListener('pointerlockchange', () => {
   if (document.pointerLockElement === canvas) {
@@ -501,7 +250,7 @@ window.addEventListener('keydown', event => {
     footer.style.opacity = footer.style.opacity === '0' ? '' : '0';
   }
   if (key === 'm') {
-    muted = !muted;
+    const muted = audio.toggleMuted();
     $('sound').checked = !muted;
     toast(muted ? 'Звук выключен' : 'Звук включён');
   }

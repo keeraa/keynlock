@@ -6,6 +6,21 @@ import { createPaintedInstanceGeometry } from './key-instance-finish.js';
 import { CABINET_Z, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS, CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_SHELF_DEPTH, CABINET_GRID_BOTTOM_Y, CABINET_BLANK_ROW_BOTTOM_Y, CABINET_SHELF_CENTER_Z, CABINET_GROUND_OFFSET, cabinetKeyPose } from './cabinet-layout.js?v=22';
 import { box, contactShadow } from './world-architecture.js';
 
+function addTrimInstances(group, instances, material) {
+  const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), material, instances.length);
+  const dummy = new THREE.Object3D();
+  for (let index = 0; index < instances.length; index++) {
+    const { size, position } = instances[index];
+    dummy.position.set(...position);
+    dummy.scale.set(...size);
+    dummy.updateMatrix();
+    mesh.setMatrixAt(index, dummy.matrix);
+  }
+  mesh.instanceMatrix.needsUpdate = true;
+  mesh.frustumCulled = false;
+  group.add(mesh);
+}
+
 export function createCabinet(scene, type, mat) {
   const group = new THREE.Group();
   const left = type < 5;
@@ -33,26 +48,49 @@ export function createCabinet(scene, type, mat) {
   box(group, [3.24, .36, .17], [0, .48, .45], mat.wood);
   box(group, [3.24, CABINET_ROW_HEIGHT, .17],
     [0, CABINET_BLANK_ROW_BOTTOM_Y + CABINET_ROW_HEIGHT / 2, .45], mat.darkWood);
-  for (let divider = 0; divider <= CABINET_COLUMNS; divider++) {
-    const x = -1.62 + divider * CABINET_COLUMN_WIDTH;
-    box(group, [.065, CABINET_ROWS * CABINET_ROW_HEIGHT, CABINET_SHELF_DEPTH],
-      [x, CABINET_GRID_BOTTOM_Y + CABINET_ROWS * CABINET_ROW_HEIGHT / 2, CABINET_SHELF_CENTER_Z], mat.wood);
+  const halfRow = CABINET_ROW_HEIGHT / 2;
+  const cellWidth = CABINET_COLUMN_WIDTH / 2;
+  const mainShelfThickness = .078;
+  const innerShelfThickness = .036;
+  const uprightInstances = [];
+  const inlayInstances = [];
+  // Every upright occupies only the space between shelves. Full-height bars
+  // overlapped horizontal boards on the same front plane and z-fought at joins.
+  for (let divider = 0; divider <= CABINET_COLUMNS * 2; divider++) {
+    const x = -1.62 + divider * cellWidth;
+    const thickness = divider % 2 === 0 ? .065 : .034;
+    for (let section = 0; section < CABINET_ROWS * 2; section++) {
+      const bottomThickness = section % 2 === 0 ? mainShelfThickness : innerShelfThickness;
+      const topThickness = section % 2 === 0 ? innerShelfThickness : mainShelfThickness;
+      const span = halfRow - (bottomThickness + topThickness) / 2 - .004;
+      const centerY = CABINET_GRID_BOTTOM_Y + (section + .5) * halfRow +
+        (bottomThickness - topThickness) / 4;
+      uprightInstances.push({ size: [thickness, span, CABINET_SHELF_DEPTH],
+        position: [x, centerY, CABINET_SHELF_CENTER_Z] });
+    }
   }
   for (let row = 0; row <= CABINET_ROWS; row++) {
     const y = CABINET_GRID_BOTTOM_Y + row * CABINET_ROW_HEIGHT;
-    box(group, [3.23, .078, CABINET_SHELF_DEPTH], [0, y, CABINET_SHELF_CENTER_Z], mat.wood);
-    box(group, [3.22, .028, CABINET_SHELF_DEPTH], [0, y + .055, CABINET_SHELF_CENTER_Z + .01], mat.darkBrass);
+    box(group, [3.23, mainShelfThickness, CABINET_SHELF_DEPTH],
+      [0, y, CABINET_SHELF_CENTER_Z], mat.wood);
+    // Narrow brass inlay sits lower on the front lip, not over the shelf's
+    // whole top face. Split at uprights to avoid overlapping coplanar surfaces.
+    for (let column = 0; column < CABINET_COLUMNS * 2; column++) {
+      const x = -1.62 + (column + .5) * cellWidth;
+      const front = CABINET_SHELF_CENTER_Z + CABINET_SHELF_DEPTH / 2;
+      inlayInstances.push({ size: [cellWidth - .076, .023, .021],
+        position: [x, y + .014, front + .013] });
+    }
   }
   // A finer 12 × 8 grid creates 96 actual cubbies; no hanging pegs remain.
-  for (let divider = 0; divider < CABINET_COLUMNS; divider++) {
-    const x = -1.62 + (divider + .5) * CABINET_COLUMN_WIDTH;
-    box(group, [.034, CABINET_ROWS * CABINET_ROW_HEIGHT, CABINET_SHELF_DEPTH],
-      [x, CABINET_GRID_BOTTOM_Y + CABINET_ROWS * CABINET_ROW_HEIGHT / 2, CABINET_SHELF_CENTER_Z], mat.wood);
-  }
   for (let row = 0; row < CABINET_ROWS; row++) {
     const y = CABINET_GRID_BOTTOM_Y + (row + .5) * CABINET_ROW_HEIGHT;
-    box(group, [3.23, .036, CABINET_SHELF_DEPTH], [0, y, CABINET_SHELF_CENTER_Z], mat.wood);
+    box(group, [3.23, innerShelfThickness, CABINET_SHELF_DEPTH],
+      [0, y, CABINET_SHELF_CENTER_Z], mat.wood);
   }
+  // Two draw calls for all uprights and brass lips instead of ~170 small meshes.
+  addTrimInstances(group, uprightInstances, mat.wood);
+  addTrimInstances(group, inlayInstances, mat.darkBrass);
   box(group, [3.37, 1.14, .27], [0, 4.04, .39], mat.blackWood);
   const plaque = box(group, [3.27, .66, .05], [0, 4.17, .55], mat.darkBrass.clone());
   const label = makeLabel(KEY_TYPES[type].name.toUpperCase(), '', {

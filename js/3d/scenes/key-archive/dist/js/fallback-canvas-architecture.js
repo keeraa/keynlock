@@ -98,7 +98,7 @@ export function createFallbackArchitecture({ ctx, camera, surfaces, project, pat
 
   function architecture() {
     // The room is drawn as a set of projected linework and painted wall planes.
-    path3([[-11.8, 0, -23], [11.8, 0, -23], [11.8, 0, 23], [-11.8, 0, 23]], surfaces.wood);
+    path3([[-11.8, 0, -23], [11.8, 0, -23], [11.8, 0, 23], [-11.8, 0, 23]], surfaces.floor);
     path3([[-11.85, 0, -23], [-11.85, 11, -23], [-11.85, 11, 23], [-11.85, 0, 23]], surfaces.plaster, '#a0906e');
     path3([[11.85, 0, -23], [11.85, 11, -23], [11.85, 11, 23], [11.85, 0, 23]], surfaces.plaster, '#a0906e');
     path3([[-11.8, 0, -23], [11.8, 0, -23], [11.8, 11, -23], [-11.8, 11, -23]], surfaces.plaster, '#b7a078');

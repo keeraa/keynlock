@@ -12,7 +12,10 @@ test('cabinet face uses individual cubbies, an actual key on the plaque and no h
   assert.match(source, /const plaqueGlow/);
   assert.match(source, /smoothstep\(0\.0, \.22, vUv\.x\)/);
   assert.match(source, /vec3\(1\.0, \.78, \.51\)/);
-  assert.match(source, /CABINET_COLUMNS; divider\+\+/);
+  assert.match(source, /CABINET_COLUMNS \* 2; divider\+\+/);
+  assert.match(source, /addTrimInstances\(group, uprightInstances, mat\.wood\)/);
+  assert.match(source, /addTrimInstances\(group, inlayInstances, mat\.darkBrass\)/);
+  assert.match(source, /front \+ \.013/);
   assert.match(source, /CABINET_ROWS; row\+\+/);
   assert.doesNotMatch(source, /CylinderGeometry|createBowGlyph|KEY_TYPES\[type\]\.mark/);
 });

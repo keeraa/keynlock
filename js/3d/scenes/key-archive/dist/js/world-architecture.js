@@ -89,14 +89,11 @@ export function makeHall(scene, mat, snow) {
     roomBox(scene, [.54, .29, 46.8], [side * 11.77, PERIMETER_BAND_Y, 0], mat.hallTrim);
     for (const z of PILASTER_CENTERS) {
       contactShadow(scene, 1.9, 1.65, side * 11.43, -.048, z, shadowMaterial);
-      roomBox(scene, [.83, 10.8, .63], [side * 11.76, 5.5, z],
+      roomBox(scene, [.83, 11.0, .63], [side * 11.76, 5.5, z],
         mat.hallPilaster, HALL_SURFACE_TILE_METERS.wall);
       roomBox(scene, [1.14, .34, .91], [side * 11.73, PERIMETER_BAND_Y, z], mat.hallTrim);
       roomBox(scene, [1.1, .29, .88], [side * 11.73, 10.66, z], mat.hallTrim);
-      // Layered limestone plinths and restrained capitals anchor the pilasters.
-      roomBox(scene, [1.12, .36, 1.04], [side * 11.72, .13, z], mat.hallPilaster,
-        HALL_SURFACE_TILE_METERS.wall);
-      roomBox(scene, [1.26, .12, 1.16], [side * 11.70, .35, z], mat.hallTrim);
+      // Pilasters continue to the floor without the former brown base apron.
       roomBox(scene, [1.18, .18, 1.10], [side * 11.72, 10.83, z], mat.hallTrim);
       roomBox(scene, [1.30, .10, 1.21], [side * 11.71, 10.98, z], mat.agedBronze);
     }

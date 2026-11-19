@@ -2,6 +2,7 @@ import * as THREE from '../vendor/three.js';
 import { makePaintTexture } from './art.js?v=17';
 import { getPaintedMetalTexture } from './painted-textures.js';
 import { createHallSurfaceMaterials, createArchiveWoodTexture } from './hall-surface-textures.js?v=26';
+import { ARCHIVE_FLOOR_TEXTURE_URL } from './archive-floor-texture.js';
 
 function makeContactShadowMaterial() {
   const canvas = document.createElement('canvas');
@@ -22,8 +23,11 @@ function makeContactShadowMaterial() {
 export function createMaterials() {
   const brassPaint = getPaintedMetalTexture('brass');
   const wood = makePaintTexture('wood', 45);
-  const floorWood = makePaintTexture('wood', 81);
+  const floorWood = new THREE.TextureLoader().load(ARCHIVE_FLOOR_TEXTURE_URL);
+  floorWood.colorSpace = THREE.SRGBColorSpace;
+  floorWood.wrapS = floorWood.wrapT = THREE.RepeatWrapping;
   floorWood.repeat.set(7, 13);
+  floorWood.anisotropy = 8;
   const plaster = makePaintTexture('plaster', 32);
   const carpetFallback = makePaintTexture('rug', 177);
   const walnut = createArchiveWoodTexture(wood);

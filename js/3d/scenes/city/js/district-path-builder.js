@@ -27,7 +27,7 @@ export function mountCityDistricts({
   sampleHeight = () => 0,
   mapUvToWorld = (u, v) => ({ x: (u - .5) * mapWidth, z: (v - .5) * mapHeight }),
   onSelect = () => {},
-  initiallyVisible = false,
+  initiallyVisible = true,
 } = {}) {
   if (!viewport || !canvas || !camera) {
     throw new Error('mountCityDistricts requires viewport, canvas, and camera');

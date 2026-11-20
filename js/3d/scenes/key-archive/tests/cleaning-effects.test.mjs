@@ -88,3 +88,15 @@ test('coat meshes are tagged so a held key with copied materials still finds its
   model.traverse(object => { if (object.isMesh) object.material = object.material.clone(); });
   assert.ok(model.children.find(child => child.userData.coatKind === 'wax'));
 });
+
+test('wax melts where the flame is, and the flame gutters meanwhile', async () => {
+  const world = readFileSync(new URL('../dist/js/world.js', import.meta.url), 'utf8');
+  assert.match(world, /melt\.heat\[index\] = Math\.min\(1, melt\.heat\[index\] \+ rate \* dt\)/);
+  assert.match(world, /candle\?\.disturb\?\.\(meltPose\.candleId \? meltPose\.blend : 0\)/);
+  const { createArchiveCandles } = await import('../dist/js/archive-candles.js');
+  const scene = new THREE.Scene();
+  const { candles } = createArchiveCandles(scene);
+  assert.equal(typeof candles[0].disturb, 'function');
+  candles[0].disturb(1);
+  candles[0].update(true, 1000);
+});

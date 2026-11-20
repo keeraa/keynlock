@@ -246,7 +246,6 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
 
   // Wax melting over a candle while the player holds the key to the flame.
   // progress 0 restores the full coat; beads fall into the flame meanwhile.
-  const meltedWax = new Map();
   let waxBeadAt = 0;
   // While wax melts the key leaves the hand and lies flat over the flame,
   // then flies back. `meltPose.blend` eases between the two poses.
@@ -262,6 +261,8 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
     if (Math.abs(goal - meltPose.blend) < .002) meltPose.blend = goal;
     poseScratch.base.setFromEuler(HAND_POSE);
     const candle = candleSet.candles.find(item => item.id === meltPose.lastCandleId);
+    // The flame gutters while the wax over it melts.
+    candle?.disturb?.(meltPose.candleId ? meltPose.blend : 0);
     if (!candle || meltPose.blend <= 0) {
       handModel.position.set(0, 0, 0);
       handModel.quaternion.copy(poseScratch.base);
@@ -301,34 +302,65 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
     const key = keyIndex.get(displayedHandId);
     if (!key) return;
     crust.userData.fullCoat ??= crust.geometry;
-    const step = Math.round(Math.max(0, Math.min(1, progress)) * 24);
-    if (step === 0) { crust.geometry = crust.userData.fullCoat; return; }
-    const id = `${key.type}:${!!key.broken}:${step}`;
-    if (!meltedWax.has(id)) {
-      const layout = getKeyCoatLayout(key.type, key.broken, 'wax') || [];
-      const t = step / 24;
-      // Pools melt one after another, each a little behind the previous one.
-      // sag:false: archive keys hang head-up, so Forge's 'down' would run sideways;
-      // the wax shrinks in place and the beads do the falling.
-      const blobs = meltWaxBlobs(layout, blob => t * 1.6 - .6 * ((blob.x * 3.7 + blob.y * 1.3) % 1 + 1) % 1,
-        { sag: false });
-      meltedWax.set(id, { blobs,
-        geometry: buildKeyCoatGeometry(key.type, key.broken, 'wax', { blobs, heightScale: 1 - .5 * t }) });
-    }
-    const melted = meltedWax.get(id);
-    crust.geometry = melted.geometry;
     const now = performance.now();
-    const candle = candleSet.candles.find(item => item.id === candleId);
-    if (candle && melted.blobs.length && now - waxBeadAt > 170 && progress < .95) {
-      waxBeadAt = now;
-      const blob = melted.blobs[Math.floor(Math.random() * melted.blobs.length)];
-      const local = getKeyCoatPoint(key.type, key.broken, blob.x, blob.y - blob.ry * .8, -.02);
-      if (local) {
-        crust.updateMatrixWorld(true);
-        const point = crust.localToWorld(local);
-        cleaningEffects.drop('wax', point, .007 + Math.random() * .006, candle.y + CANDLE_WICK_Y + .05);
-      }
+    if (!(progress > 0)) {
+      releaseMelt(crust);
+      crust.geometry = crust.userData.fullCoat;
+      return;
     }
+    // Heat builds up only on the wax right above the flame, so the pool the
+    // flame is under melts while the rest waits for its turn.
+    if (melt.keyId !== key.id) {
+      releaseMelt(crust);
+      const layout = getKeyCoatLayout(key.type, key.broken, 'wax') || [];
+      Object.assign(melt, { keyId: key.id, layout, heat: new Float32Array(layout.length),
+        points: layout.map(blob => getKeyCoatPoint(key.type, key.broken, blob.x, blob.y, 0)),
+        reach: layout.map(blob => Math.max(blob.rx, blob.ry)), last: now, built: 0 });
+    }
+    const dt = Math.min(.1, (now - melt.last) / 1000);
+    melt.last = now;
+    const candle = candleSet.candles.find(item => item.id === candleId);
+    if (!candle || !melt.layout.length) return;
+    crust.updateMatrixWorld(true);
+    const flame = crust.worldToLocal(new THREE.Vector3(candle.x,
+      candle.y + CANDLE_WICK_Y + CANDLE_FLAME_HEIGHT * .6, candle.z));
+    const scale = getKeyCoatPoint(key.type, key.broken, 1, 0, 0)
+      ?.distanceTo(getKeyCoatPoint(key.type, key.broken, 0, 0, 0)) || .3;
+    let hottest = -1, hottestRate = 0;
+    melt.layout.forEach((blob, index) => {
+      const point = melt.points[index];
+      if (!point) return;
+      // Distance in the key's plane, measured in Forge units.
+      const distance = Math.hypot(point.x - flame.x, point.y - flame.y) / scale;
+      const rate = 1.5 * Math.exp(-Math.pow(distance / (.35 + melt.reach[index]), 2));
+      melt.heat[index] = Math.min(1, melt.heat[index] + rate * dt);
+      if (rate > hottestRate && melt.heat[index] < 1) { hottest = index; hottestRate = rate; }
+    });
+    // The rules finish melting on a timer; make sure nothing is left by then.
+    const catchUp = Math.max(0, progress * 1.6 - .6);
+    const melted = blob => Math.min(1, melt.heat[melt.layout.indexOf(blob)] + catchUp);
+    if (now - melt.built > 60) {
+      melt.built = now;
+      const blobs = meltWaxBlobs(melt.layout, melted, { sag: false });
+      if (melt.geometry) melt.geometry.dispose();
+      melt.geometry = buildKeyCoatGeometry(key.type, key.broken, 'wax', { blobs, heightScale: 1 - .35 * progress });
+      crust.geometry = melt.geometry;
+    }
+    // Beads drip from the pool that is melting right now.
+    if (hottest >= 0 && hottestRate > .25 && now - waxBeadAt > 150) {
+      waxBeadAt = now;
+      const blob = melt.layout[hottest];
+      const local = getKeyCoatPoint(key.type, key.broken, blob.x + (Math.random() - .5) * blob.rx,
+        blob.y + (Math.random() - .5) * blob.ry, -.02);
+      if (local) cleaningEffects.drop('wax', crust.localToWorld(local), .007 + Math.random() * .006,
+        candle.y + CANDLE_WICK_Y + .05);
+    }
+  }
+  const melt = { keyId: null, geometry: null };
+  function releaseMelt(crust) {
+    if (melt.geometry && crust?.geometry === melt.geometry) crust.geometry = crust.userData.fullCoat;
+    melt.geometry?.dispose();
+    Object.assign(melt, { keyId: null, geometry: null });
   }
   function shineHand() { pendingHandShine = true; }
 
@@ -456,6 +488,8 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
       placeHeldKey(elapsed);
     } else {
       handMotion = 0;
+      // Nothing held any more: a flame left mid-melt calms down.
+      if (meltPose.lastCandleId) candleSet.candles.find(item => item.id === meltPose.lastCandleId)?.disturb?.(0);
     }
   }
 

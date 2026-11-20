@@ -103,20 +103,24 @@ export function createArchiveCandles(scene, { drawMeshes = false } = {}) {
       }
       group.add(holder, body, wick, halo, flame);
     }
+    // 0..1: something is melting over this flame, so it gutters and jumps.
+    let disturbance = 0;
     function update(lit, now) {
       collider.userData.lit = lit;
       if (!flame) return;
       flame.visible = halo.visible = lit;
       if (lit) {
         const flicker = sampleCandleFlicker(now, x, z);
-        flame.scale.y = 1 + .065 * flicker;
-        flame.rotation.z = .048 * flicker;
-        halo.material.opacity = .25 + .027 * flicker;
-        if (deskLight) deskLight.intensity = .94 * (1 + .12 * flicker);
+        const jolt = disturbance * (Math.sin(now * .031 + x) * .6 + Math.sin(now * .053 + z) * .4);
+        flame.scale.y = 1 + .065 * flicker + disturbance * .16 + jolt * .14;
+        flame.scale.x = 1 + jolt * .16;
+        flame.rotation.z = .048 * flicker + jolt * .24;
+        halo.material.opacity = .25 + .027 * flicker + disturbance * .06;
+        if (deskLight) deskLight.intensity = .94 * (1 + .12 * flicker + .22 * jolt);
       }
     }
     update(type === null, 0);
-    return { ...candle, collider, update };
+    return { ...candle, collider, update, disturb(amount) { disturbance = Math.max(0, Math.min(1, amount)); } };
   });
   if (drawMeshes) batchStaticHallMeshes(root);
   function update(now, cabinets) {

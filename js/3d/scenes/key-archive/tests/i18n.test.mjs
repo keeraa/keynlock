@@ -17,11 +17,11 @@ test('t() fills placeholders, falls back to Russian, then to the key', () => {
   // Node reports navigator.language too; start from Russian explicitly.
   setLanguage('ru', { reload: false });
   assert.equal(getLanguage(), 'ru');
-  assert.equal(t('toast.picked', { name: 'Садовый' }), 'Ключ взят · Садовый');
+  assert.equal(t('toast.wrongCabinet', { name: 'Садовый' }), 'Это шкаф для ключей «Садовый»');
   assert.equal(t('no.such.key'), 'no.such.key');
   assert.equal(familyName(7), 'Садовый');
   setLanguage('en', { reload: false });
-  assert.equal(t('toast.picked', { name: familyName(7) }), 'Key taken · Garden');
+  assert.equal(t('toast.wrongCabinet', { name: familyName(7) }), 'This cabinet is for "Garden" keys');
   setLanguage('ru', { reload: false });
 });
 

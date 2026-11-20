@@ -17,9 +17,9 @@ test('библиотека предзагружает текстуры один 
     const {getMetalMaterial,preloadKeyTextures}=await import('../dist/js/key-materials.js');
     const first=await preloadKeyTextures();
     const second=await preloadKeyTextures();
-    assert.equal(first.length,6,'пять гуашевых металлов и ржавчина');
+    assert.equal(first.length,7,'шесть гуашевых металлов (с садовой зеленью) и ржавчина');
     assert.deepEqual(first,second);
-    assert.equal(images,6,'повторное использование текстур между сценами');
+    assert.equal(images,7,'повторное использование текстур между сценами');
     const cache=new Map();
     const material=getMetalMaterial('brass',90,3,0,cache);
     assert.equal(typeof material.onBeforeCompile,'function');

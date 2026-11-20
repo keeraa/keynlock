@@ -1,6 +1,6 @@
 import * as THREE from '../vendor/three.js';
 import { KEY_TEMPLATES, fixedMetal } from './key-data.js';
-import { createBowShape, pathFromPoints, bladeSections } from './key-shapes.js';
+import { createKeyShape } from './key-shapes.js';
 import { getMetalMaterial } from './key-materials.js';
 import { hasMud, mudGeometry, getMudMaterial } from './key-mud.js';
 import { hasWax, waxGeometry, getWaxMaterial } from './key-wax.js';
@@ -130,15 +130,8 @@ export function createKeyModel(design,{materialCache=null}={}) {
   const metal=getMetalMaterial(fixedMetal(design.template),design.rustAmount??0,
     design.template,0,cache);
   const depth=design.thickness/100;
-  const headScale=design.headSize/100;
-  const head=new THREE.Group();head.position.x=-1.21;head.scale.set(headScale,headScale,1);group.add(head);
-  addMesh(head,extrude(createBowShape(template.bow),depth),metal);
-  // The blade sits slightly inside the thicker bow on both faces. Their front
-  // caps cannot be coplanar, and there are no overlapping collar/end-cap boxes.
-  const bladeDepth=Math.max(.02,depth-.008);
-  for(const points of bladeSections(template,design))
-    addMesh(group,extrude(pathFromPoints(points),bladeDepth),metal,
-      [0,0,(depth-bladeDepth)/2]);
+  // Bow and blade are one outline (keyOutline): a single solid, no joint.
+  addMesh(group,extrude(createKeyShape(template,design),depth),metal);
   if(hasMud(design)) {
     const mud=addMesh(group,mudGeometry(template,design),getMudMaterial(),[0,0,0],false);
     mud.userData.outlineable=true;

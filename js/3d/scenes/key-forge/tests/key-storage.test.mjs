@@ -6,7 +6,7 @@ import { KEY_TEMPLATES, METALS, BROTHERHOOD_KEYS, defaultDesign, fixedMetal, nor
 import { parseCollection, loadCollection, persistCollection, STORAGE_KEY } from '../dist/js/key-storage.js';
 
 test('один постоянный металл задан для каждой из десяти форм', () => {
-  const expected=['mercury','tin','steel','brass','silver','lead','gold','graphite','copper','copper'];
+  const expected=['mercury','tin','steel','brass','garden-green','lead','gold','graphite','copper','copper'];
   assert.equal(expected.length,KEY_TEMPLATES.length);
   for(let i=0;i<expected.length;i++) {
     assert.equal(fixedMetal(i),expected[i]);

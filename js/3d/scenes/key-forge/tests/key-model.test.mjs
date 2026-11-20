@@ -7,6 +7,7 @@ import { KEY_TEMPLATES, METALS, BROTHERHOOD_KEYS, brotherhoodBinding, RUST_TEXTU
   keyBreakAngle, keyBounds, shaftStartX, keyIconSvg, keyPreviewSvg, createKeyModel,
   updateKeyPaint, disposeKeyModel, createInstancedKeyCollection, disposeInstancedKeyCollection } from '../dist/js/key-model.js';
 import { KEY_ART } from '../dist/js/key-art.js';
+import { shaftHalfHeight } from '../dist/js/key-shapes.js';
 
 function interpolateEdge(points,x) {
   for(let i=1;i<points.length;i++) {
@@ -59,7 +60,7 @@ test('все ключи создаются полностью при миним�
   }
 });
 
-test('головка и стержень разделены по глубине и не мерцают на совпадающих плоскостях', () => {
+test('стержень примыкает к головке вровень: без перекрытия и без ступеньки', () => {
   for(let i=0;i<KEY_TEMPLATES.length;i++) {
     for(const headSize of [75,100,135]) {
       const design={...defaultDesign(i),headSize,rustAmount:200};
@@ -73,15 +74,35 @@ test('головка и стержень разделены по глубине 
         if(normals.getZ(vertex)>.99)frontFaces.add(positions.getZ(vertex).toFixed(3));
         if(normals.getZ(vertex)<-.99)backFaces.add(positions.getZ(vertex).toFixed(3));
       }
-      assert.equal(frontFaces.size,2,`${KEY_TEMPLATES[i].id}: лишняя пересекающаяся поверхность`);
-      assert.ok(frontFaces.has((design.thickness/100).toFixed(3)));
-      assert.ok(frontFaces.has(((design.thickness/100)-.004).toFixed(3)));
-      assert.deepEqual([...backFaces].sort(),['0.000','0.004']);
+      // One front plane and one back plane: the joint has no visible step.
+      assert.deepEqual([...frontFaces],[(design.thickness/100).toFixed(3)],`${KEY_TEMPLATES[i].id}: ступенька на стыке`);
+      assert.deepEqual([...backFaces],['0.000']);
+      // No blade point lies inside the bow, so the flush faces never overlap.
+      const bow=bowPoints(KEY_TEMPLATES[i].bow).map(([x,y])=>[-1.21+x*headSize/100,y*headSize/100]);
+      for(const [x,y] of bladeProfile(KEY_TEMPLATES[i],design))
+        assert.ok(!insideStrict([x,y],bow),`${KEY_TEMPLATES[i].id}: стержень заходит в головку (${x.toFixed(3)}, ${y.toFixed(3)})`);
       assert.equal(metal.material.side,THREE.FrontSide);
       model.traverse(mesh=>{if(mesh.isMesh)mesh.geometry.dispose();});
     }
   }
 });
+
+function insideStrict([x,y],polygon,margin=1e-6) {
+  let inside=false;
+  for(let i=0,j=polygon.length-1;i<polygon.length;j=i++) {
+    const [ax,ay]=polygon[i],[bx,by]=polygon[j];
+    if((ay>y)!==(by>y)&&x<(bx-ax)*(y-ay)/(by-ay)+ax)inside=!inside;
+  }
+  if(!inside)return false;
+  // Points on the rim itself count as outside.
+  for(let i=0,j=polygon.length-1;i<polygon.length;j=i++) {
+    const [ax,ay]=polygon[i],[bx,by]=polygon[j];
+    const dx=bx-ax,dy=by-ay,len=dx*dx+dy*dy;
+    const t=len?Math.max(0,Math.min(1,((x-ax)*dx+(y-ay)*dy)/len)):0;
+    if(Math.hypot(x-ax-t*dx,y-ay-t*dy)<margin)return false;
+  }
+  return true;
+}
 
 test('у каждого ключа существует замкнутый профиль стержня без пересечения верхней и нижней кромок', () => {
   for(let i=0;i<KEY_TEMPLATES.length;i++) {
@@ -90,8 +111,10 @@ test('у каждого ключа существует замкнутый пр�
     assert.ok(points.length>=8&&points.length<222,`${KEY_TEMPLATES[i].id}: профиль не был упрощён`);
     const right=Math.max(...points.map(p=>p[0]));
     const split=points.findIndex(p=>p[0]===right);
-    const top=points.slice(0,split+1);
-    const bottom=points.slice(split+1).reverse();
+    // The left end follows the bow's rim; check the edges from the neck on.
+    const neck=shaftStartX(KEY_TEMPLATES[i],design)+.25;
+    const top=points.slice(0,split+1).filter(p=>p[0]>=neck);
+    const bottom=points.slice(split+1).reverse().filter(p=>p[0]>=neck);
     assert.ok(top.length>1&&bottom.length>1);
     assert.ok(points.every(p=>p.length===2&&p.every(Number.isFinite)));
     for(const edge of [top,bottom]) {
@@ -186,7 +209,7 @@ test('грязь — непрозрачные комки на обеих сто�
 
 test('тонкие округлые контуры экономят треугольники и вершины на всех десяти ключах', () => {
   // Грязь и воск — отдельные декоративные меши, здесь проверяется сам металл.
-  const maxCleanTriangles=[292,220,244,388,356,112,356,244,216,480];
+  const maxCleanTriangles=[268,204,248,364,332,112,332,232,200,448];
   let indexedBatches=0,vertexReferences=0,uniqueVertices=0;
   for(let i=0;i<KEY_TEMPLATES.length;i++) {
     const model=createKeyModel({...defaultDesign(i),dirtAmount:100});
@@ -216,13 +239,13 @@ test('зал из 1000 ключей использует инстансы и н�
   assert.equal(hall.userData.keyCount,1000);
   assert.equal(hall.userData.uniqueDesigns,10);
   assert.ok(hall.userData.drawCalls<=10,`${hall.userData.drawCalls} вызовов отрисовки`);
-  assert.equal(hall.userData.renderedTriangles,290800);
-  assert.equal(hall.userData.uniqueTriangles,2908);
+  assert.equal(hall.userData.renderedTriangles,274000);
+  assert.equal(hall.userData.uniqueTriangles,2740);
   assert.ok(hall.children.every(mesh=>mesh.isInstancedMesh));
   assert.ok(hall.children.every(mesh=>mesh.count===100));
   const metal=hall.children.find(mesh=>mesh.userData.templateId==='brotherhood'&&mesh.userData.exportable);
   assert.ok(metal);
-  assert.equal(metal.geometry.getIndex().count/3,480);
+  assert.equal(metal.geometry.getIndex().count/3,448);
   const got=new THREE.Matrix4();
   metal.getMatrixAt(2,got);
   assert.ok(got.equals(placements[29].matrix));
@@ -286,7 +309,9 @@ test('стержень начинается на наружном ободе и 
       const conservativeHoleRight=-1.21+.22*headSize/100;
       assert.ok(neck>conservativeHoleRight,`${t.id}: стержень перекрыл отверстие`);
       assert.ok(neck<outermost,`${t.id}: стержень отсоединился от головки`);
-      assert.ok(Math.abs(bladeProfile(t,design,50)[0][0]-neck)<1e-7);
+      const [firstX,firstY]=bladeProfile(t,design,50)[0];
+      assert.ok(firstX>=neck-1e-9&&firstX<=outermost,`${t.id}: стержень начинается не на ободе`);
+      assert.ok(Math.abs(firstY-shaftHalfHeight(t))<1e-9);
     }
   }
 });

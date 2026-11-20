@@ -3,7 +3,7 @@ export const KEY_TEMPLATES = Object.freeze([
   { id:'tower', name:'Башенный', bow:'gothic', blade:'stepped', metal:'tin', teeth:4, length:2.5, depth:34, description:'Готическая арка · высокий стержень' },
   { id:'archive', name:'Архивный', bow:'square', blade:'double', metal:'steel', teeth:5, length:2.05, depth:25, description:'Угловатая головка · две стороны' },
   { id:'astral', name:'Астролябия', bow:'gear', blade:'comb', metal:'brass', teeth:5, length:2.3, depth:22, description:'Зубчатый венец · гребёнка' },
-  { id:'garden', name:'Садовый', bow:'clover', blade:'warded', metal:'silver', teeth:3, length:1.85, depth:23, description:'Четырёхлистник · тонкая бородка' },
+  { id:'garden', name:'Садовый', bow:'clover', blade:'warded', metal:'garden-green', teeth:3, length:1.85, depth:23, description:'Четырёхлистник · тонкая бородка' },
   { id:'clock', name:'Часовой', bow:'diamond', blade:'serrated', metal:'lead', teeth:6, length:2.35, depth:21, description:'Ромб · точная насечка' },
   { id:'palace', name:'Дворцовый', bow:'oval', blade:'ornate', metal:'gold', teeth:4, length:2.75, depth:31, description:'Вытянутый овал · фигурный край' },
   { id:'forge', name:'Кузнечный', bow:'hexagon', blade:'double', metal:'graphite', teeth:3, length:2.55, depth:39, description:'Шестигранник · массивная бородка' },
@@ -21,6 +21,7 @@ export const METALS = Object.freeze([
   { id:'mercury', name:'Ртуть · символ', color:'#839fa6', description:'Меркурий · холодная серебристо-синяя гуашь', file:'painted-steel.webp', tint:0xc4e3ef },
   { id:'tin', name:'Олово', color:'#b4b7aa', description:'Юпитер · светлое олово с приглушённой зеленью', file:'painted-steel.webp', tint:0xe1e6d0 },
   { id:'lead', name:'Свинец · символ', color:'#489f9c', description:'Сатурн · бирюзовая гуашевая эмаль', file:'painted-enamel.webp', tint:0xffffff },
+  { id:'garden-green', name:'Садовая зелень', color:'#2f5a3a', description:'Тёмно-зелёная гуашь · густые мазки', file:'painted-green.webp', tint:0xffffff },
   { id:'silver', name:'Серебро', color:'#d5d9d6', description:'Луна · прохладное серебро с мягкими мазками', file:'painted-steel.webp', tint:0xffffff },
 ]);
 
@@ -33,7 +34,7 @@ export const BROTHERHOOD_KEYS = Object.freeze([
   { templateId:'cellar', district:'Портовый', alchemicalMetal:'Ртуть', planet:'Меркурий', material:'mercury', accent:'#86b2c9', meaning:'торговля и движение' },
   { templateId:'tower', district:'Верхний город', alchemicalMetal:'Олово', planet:'Юпитер', material:'tin', accent:'#a4b58a', meaning:'закон и порядок' },
   { templateId:'clock', district:'Старый квартал', alchemicalMetal:'Свинец', planet:'Сатурн', material:'lead', accent:'#a4aeca', meaning:'время и память' },
-  { templateId:'garden', district:'Район искусств', alchemicalMetal:'Серебро', planet:'Луна', material:'silver', accent:'#c8d0d7', meaning:'образы и иллюзии' },
+  { templateId:'garden', district:'Район искусств', alchemicalMetal:'Серебро', planet:'Луна', material:'garden-green', accent:'#c8d0d7', meaning:'образы и иллюзии' },
 ]);
 
 export function brotherhoodBinding(templateId) {

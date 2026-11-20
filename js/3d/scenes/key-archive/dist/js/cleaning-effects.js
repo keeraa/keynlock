@@ -36,6 +36,22 @@ function starTexture() {
   return texture;
 }
 
+function softTexture() {
+  if (typeof document === 'undefined') return null;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  const puff = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  puff.addColorStop(0, 'rgba(255,255,255,.9)');
+  puff.addColorStop(.55, 'rgba(255,255,255,.35)');
+  puff.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = puff;
+  ctx.fillRect(0, 0, 64, 64);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
 export function createCleaningEffects(scene, camera) {
   const root = new THREE.Group();
   root.name = 'cleaning-effects';
@@ -52,9 +68,23 @@ export function createCleaningEffects(scene, camera) {
     star: new THREE.MeshBasicMaterial({ map: starTexture(), transparent: true, depthWrite: false,
       blending: THREE.AdditiveBlending, color: '#fff6dc' }),
   };
+  const smokeMap = softTexture();
   const falling = [];
   const rings = [];
   const stars = [];
+  const puffs = [];
+
+  // A wisp of reaction smoke rising from the rust solution.
+  function smoke(position, size = .06, color = '#d9d0bd') {
+    const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: smokeMap, color,
+      transparent: true, opacity: 0, depthWrite: false }));
+    sprite.position.copy(position);
+    sprite.scale.setScalar(size);
+    sprite.userData = { age: 0, life: 1.8 + Math.random() * .8, size,
+      drift: new THREE.Vector3((Math.random() - .5) * .05, .13 + Math.random() * .06, (Math.random() - .5) * .05) };
+    root.add(sprite);
+    puffs.push(sprite);
+  }
 
   // A piece falls (with a little drag for flakes) until it reaches `landY`.
   function drop(kind, position, size, landY, { onLand } = {}) {
@@ -114,6 +144,16 @@ export function createCleaningEffects(scene, camera) {
   }
 
   function update(dt) {
+    for (let i = puffs.length - 1; i >= 0; i--) {
+      const puff = puffs[i];
+      const data = puff.userData;
+      data.age += dt;
+      const life = data.age / data.life;
+      if (life >= 1) { root.remove(puff); puff.material.dispose(); puffs.splice(i, 1); continue; }
+      puff.position.addScaledVector(data.drift, dt);
+      puff.scale.setScalar(data.size * (1 + 2.2 * life));
+      puff.material.opacity = .38 * Math.sin(Math.PI * Math.min(1, life * 1.4)) * (1 - life);
+    }
     for (let i = falling.length - 1; i >= 0; i--) {
       const piece = falling[i];
       const data = piece.userData;
@@ -153,7 +193,7 @@ export function createCleaningEffects(scene, camera) {
   }
 
   return {
-    drop, ripple, shine, update,
-    get active() { return falling.length + rings.length + stars.length; },
+    drop, ripple, shine, smoke, update,
+    get active() { return falling.length + rings.length + stars.length + puffs.length; },
   };
 }

@@ -100,3 +100,19 @@ test('wax melts where the flame is, and the flame gutters meanwhile', async () =
   candles[0].disturb(1);
   candles[0].update(true, 1000);
 });
+
+test('rust tray: smoke rises and fades; bath keys aim along their length; bench hides floor keys', () => {
+  const scene = new THREE.Scene();
+  const effects = createCleaningEffects(scene, new THREE.PerspectiveCamera());
+  effects.smoke(new THREE.Vector3(0, 1, 0));
+  assert.equal(effects.active, 1);
+  for (let i = 0; i < 200; i++) effects.update(.02);
+  assert.equal(effects.active, 0);
+  const stations = readFileSync(new URL('../dist/js/wash-forge-stations.js', import.meta.url), 'utf8');
+  const aim = readFileSync(new URL('../dist/js/archive-surface-aim.js', import.meta.url), 'utf8');
+  assert.match(stations, /function trayKey\(bath, slot, key, index, wallTime\)/);
+  assert.match(stations, /ray\.intersectsBox\(keyBox\)/);
+  assert.match(stations, /occluders\.push\(block\(group, \[4\.92/);
+  assert.match(aim, /if \(hiddenBehindFurniture\(hit\.point\)\) continue;/);
+  assert.match(aim, /const assisted = visibleKey\(/);
+});

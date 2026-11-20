@@ -6,7 +6,7 @@ import { createKeyModel, createCombinedKeyGeometry, disposeKeySceneModel, getKey
   getKeyCoatLayout, buildKeyCoatGeometry, getKeyCoatPoint } from './key-factory.js?v=key-ring';
 import { rustFlakingPaint } from './key-instance-finish.js?v=wax-and-bundles';
 import { bathKeyProgress, waterDip, BATH_LIFT_MS } from './station-visual-state.js?v=cleaning-cues';
-import { BATH_CAPACITY, FORGE_SURFACE_Y, FIXTURE_OFFSETS, STATIONS, bathId } from './station-layout.js?v=working-baths';
+import { BATH_CAPACITY, FORGE_SURFACE_Y, FIXTURE_OFFSETS, STATIONS, SOAK_SECONDS, bathId } from './station-layout.js?v=working-baths';
 import { createBathEffects, createForgeEffects, createEffectSpotTexture } from './station-visual-effects.js?v=cleaning-cues';
 
 function block(parent, dimensions, where, material) {
@@ -159,6 +159,8 @@ function bindBathFinish(slot) {
   slot.original = null;
   slot.level = 0;
   slot.flakeDebt = 0;
+  slot.splashed = false;
+  slot.lastPuff = 0;
   slot.keyMesh.traverse(object => {
     if (!object.isMesh) return;
     const paint = object.geometry.getAttribute('instanceKeyPaint');
@@ -265,6 +267,7 @@ function createForge(group, station, materials, spotTexture, finish) {
 export function createWorkstations(scene, materials, keyIndex, { effects = null, onLiftDone = null } = {}) {
   const stations = [];
   const interactables = [];
+  const occluders = [];
   const bathMap = new Map();
   const forgeMap = new Map();
   const spotTexture = createEffectSpotTexture();
@@ -277,8 +280,9 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
     scene.add(group);
     contactShadow(group, 5.55, 2.25, 0, RUG_TOP + .0026, .08, tableShade);
     // Low, open workbench: the hall remains readable and cabinets stay visible.
-    block(group, [5.05, .16, 1.62], [0, .81, .08], finish.benchEdge);
-    block(group, [4.92, .045, 1.48], [0, .905, .08], finish.benchTop);
+    // The bench hides floor keys under it from aiming.
+    occluders.push(block(group, [5.05, .16, 1.62], [0, .81, .08], finish.benchEdge));
+    occluders.push(block(group, [4.92, .045, 1.48], [0, .905, .08], finish.benchTop));
     for (const x of [-2.29, 2.29]) for (const z of [-.55, .69])
       block(group, [.16, .80, .16], [x, .38, z], materials.darkWood);
     block(group, [4.86, .12, .27], [0, .29, -.49], materials.blackWood);
@@ -344,11 +348,14 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
   function aimedBathKey(id, ray, tolerance = .13) {
     const bath = bathMap.get(id);
     if (!bath) return null;
-    let best = null, bestDistance = tolerance * tolerance;
+    let best = null, bestDistance = Infinity;
     for (const slot of bath.slots) {
       if (!slot.keyMesh || !slot.keyId) continue;
-      keyBox.setFromObject(slot.keyMesh).getCenter(keyCenter);
-      const distance = ray.distanceSqToPoint(keyCenter);
+      // Anywhere along the key counts: the ray must pass through its
+      // (slightly padded) box; the nearest centre wins between neighbours.
+      keyBox.setFromObject(slot.keyMesh).expandByScalar(tolerance * .35);
+      if (!ray.intersectsBox(keyBox)) continue;
+      const distance = ray.distanceSqToPoint(keyBox.getCenter(keyCenter));
       if (distance < bestDistance) { bestDistance = distance; best = slot.keyId; }
     }
     return best;
@@ -408,6 +415,42 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
     });
   }
 
+  // Rust tray: the key drops in and sinks with a splash, the solution reacts
+  // (smoke, fizzing rings), then its head floats up so it can be grabbed.
+  const TRAY_ENTRY_MS = 850, TRAY_FLOAT_MS = 1600;
+  const slotWorld = new THREE.Vector3();
+  function trayKey(bath, slot, key, index, wallTime) {
+    const elapsed = wallTime - (key.bathUntil - SOAK_SECONDS.rust * 1000);
+    const entry = Math.max(0, Math.min(1, elapsed / TRAY_ENTRY_MS));
+    const fall = 1 - entry;
+    const floating = Math.max(0, Math.min(1, (elapsed - TRAY_ENTRY_MS - 1200) / TRAY_FLOAT_MS));
+    const float = floating * floating * (3 - 2 * floating);
+    const bob = Math.sin(wallTime * .0015 + index) * .05;
+    // Falls in tilted, lies flat under the liquid, then the head rises out.
+    slot.keyMesh.position.y = -.03 + .36 * fall * fall + .02 * float;
+    slot.keyMesh.rotation.set(-Math.PI / 2 + .9 * fall + .34 * float, 0, bob * (1 - fall));
+    if (!effects) return;
+    slot.holder.getWorldPosition(slotWorld);
+    const surface = bath.group.position.y + bath.surfaceY;
+    if (entry >= 1 && !slot.splashed) {
+      slot.splashed = elapsed < TRAY_ENTRY_MS + 600;       // no splash for keys loaded from a save
+      if (slot.splashed) {
+        effects.ripple(slotWorld.x, surface, slotWorld.z, .16);
+        effects.ripple(slotWorld.x, surface, slotWorld.z, .09);
+      }
+      slot.splashed = true;
+    }
+    const soaking = entry >= 1 && wallTime < key.bathUntil;
+    if (soaking && wallTime - slot.lastPuff > 380 + index * 37) {
+      slot.lastPuff = wallTime;
+      const along = (Math.random() - .5) * .26;
+      effects.smoke(slotWorld.clone().add(new THREE.Vector3((Math.random() - .5) * .05, .02, along)),
+        .05 + Math.random() * .04);
+      if (Math.random() < .7) effects.ripple(slotWorld.x + (Math.random() - .5) * .05, surface,
+        slotWorld.z + (Math.random() - .5) * .26, .035);
+    }
+  }
+
   function animateBathKeys(bath, wallTime) {
     let drip = 0;
     for (let index = 0; index < bath.visualKeys.length; index++) {
@@ -416,9 +459,7 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
       const progress = bathKeyProgress(key, bath.kind, wallTime);
       const dip = bath.kind === 'mud' ? waterDip(progress) : null;
       if (bath.tray) {
-        // Lying flat in the shallow tray, just under the solution.
-        slot.keyMesh.position.y = -.03;
-        slot.keyMesh.rotation.set(-Math.PI / 2, 0, Math.sin(wallTime * .0015 + index) * .05);
+        trayKey(bath, slot, key, index, wallTime);
         continue;
       }
       slot.keyMesh.position.y = dip ? dip.height : -.07;
@@ -471,6 +512,6 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
     }
   }
 
-  return { stations, interactables, getHoverSurface, aimedBathKey, update, liftKey, isLifting,
+  return { stations, interactables, occluders, getHoverSurface, aimedBathKey, update, liftKey, isLifting,
     startMelt(stationId = 'center') { forgeMap.get(stationId)?.visual.ignite(performance.now()); } };
 }

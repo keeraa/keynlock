@@ -49,6 +49,20 @@ export function createArchiveTargeting({ camera, world, state, keyIndex }) {
     return { kind: 'cabinet', type, slot: suggested, assisted: suggested !== null, full: suggested === null };
   }
 
+  // A floor key under the bench (or any other occluder) cannot be aimed at.
+  const occlusionRay = new THREE.Raycaster();
+  const occlusionPoint = new THREE.Vector3();
+  const occlusionDirection = new THREE.Vector3();
+  function hiddenBehindFurniture(point) {
+    const occluders = world.workstations?.occluders;
+    if (!occluders?.length) return false;
+    occlusionDirection.copy(point).sub(camera.position);
+    const distance = occlusionDirection.length();
+    occlusionRay.set(camera.position, occlusionDirection.normalize());
+    occlusionRay.far = distance - .02;
+    return occlusionRay.intersectObjects(occluders, false).length > 0;
+  }
+
   function targetInView() {
     camera.updateMatrixWorld();
     raycaster.setFromCamera(center, camera);
@@ -103,6 +117,7 @@ export function createArchiveTargeting({ camera, world, state, keyIndex }) {
         }
         for (const hit of keyHits) {
           if (hit.distance >= nearestDistance || Math.hypot(hit.point.x - x, hit.point.z - z) > KEY_REACH) continue;
+          if (hiddenBehindFurniture(hit.point)) continue;
           nearest = { kind: 'key', id: key.id };
           nearestDistance = hit.distance;
         }
@@ -113,9 +128,11 @@ export function createArchiveTargeting({ camera, world, state, keyIndex }) {
       lastFloorKey = nearest.kind === 'key' ? keyIndex.get(nearest.id) : null;
       return nearest;
     }
-    const assisted = findFloorKeyAtReticle(camera.position, forward, state.keys,
-      world.isThrowing, { index: keyIndex, radius: PICK_ASSIST_RADIUS });
-    const floorKey = assisted || (lastFloorKey && findFloorKeyAtReticle(camera.position, forward, [lastFloorKey],
+    const visibleKey = key => key && !hiddenBehindFurniture(
+      occlusionPoint.set(key.x, restingKeyY(key.x, key.z), key.z)) ? key : null;
+    const assisted = visibleKey(findFloorKeyAtReticle(camera.position, forward, state.keys,
+      world.isThrowing, { index: keyIndex, radius: PICK_ASSIST_RADIUS }));
+    const floorKey = assisted || visibleKey(lastFloorKey && findFloorKeyAtReticle(camera.position, forward, [lastFloorKey],
       world.isThrowing, { radius: PICK_RETAIN_RADIUS }));
     lastFloorKey = floorKey || null;
     if (floorKey) return { kind: 'key', id: floorKey.id };

@@ -529,7 +529,8 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
       const dustCoverage = painted.getDustCoverage();
       try { hoverOutline.render(keyHoverOpacity, dustCoverage); }
       catch (error) { console.warn('KEYNLOCK: hover silhouette unavailable', error); }
-      try { objectOutline.render(objectHoverOpacity, dustCoverage, painted.getSceneDepth()); }
+      // A key in a bath is outlined whole, even the part under the liquid.
+      try { objectOutline.render(objectHoverOpacity, hoverAnchor ? null : dustCoverage, painted.getSceneDepth()); }
       catch (error) { console.warn('KEYNLOCK: object silhouette unavailable', error); }
     } }, interactables, cabinets, workstations, floorKeys, candles: candleSet.candles,
     refreshHand, syncKey, refreshCabinet, highlight, update, resize, meltHeldWax, shineHand,

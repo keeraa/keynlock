@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createAutoQuality, qualityLevels } from '../dist/js/auto-quality.js';
 import { DEFAULT_VISUAL_SETTINGS, normalizeVisualSettings } from '../dist/js/visual-settings.js';
+import { mainSource } from './helpers/main-source.mjs';
 
 // Feeds `seconds` of frames at `fps`; returns every ratio change.
 function run(quality, start, seconds, fps, active = true) {
@@ -55,12 +56,12 @@ test('the auto quality option is on by default and can be turned off', () => {
   assert.match(html, /<input id="autoQuality" type="checkbox" checked \/>/);
   const world = readFileSync(new URL('../dist/js/world.js', import.meta.url), 'utf8');
   assert.match(world, /adaptQuality\(now, frameMs, active\)/);
-  const main = readFileSync(new URL('../dist/js/main.js', import.meta.url), 'utf8');
+  const main = mainSource();
   assert.match(main, /world\.adaptQuality\?\.\(now, frameMs, playing && document\.visibilityState === 'visible'\)/);
 });
 
 test('a finished bath is announced across the hall, not only next to it', async () => {
-  const main = readFileSync(new URL('../dist/js/main.js', import.meta.url), 'utf8');
+  const main = mainSource();
   assert.match(main, /tone\('ready', Math\.max\(\.35, level\)\)/, 'audible from afar');
   assert.match(main, /if \(distance > 4\) toast\(t\(`toast\.bathReady\.\$\{kind\}`\)\)/);
   assert.match(main, /bathProgress\.update\(playing, playAt, announceBathReady\)/);
@@ -96,4 +97,33 @@ test('bath progress calls onReady once, when a soaking key finishes', async () =
   progress.update(true, () => {}, onReady);
   assert.equal(announced.length, 1, 'once, not every frame');
   assert.equal(announced[0][0], 'mud');
+});
+
+test('the forge bar scans the 1000 keys a few times a second, not every frame', async () => {
+  const THREE = await import('../dist/vendor/three.js');
+  const { createBathProgress } = await import('../dist/js/archive-bath-progress.js');
+  const { createInitialState, SMELT_SECONDS } = await import('../dist/js/rules.js');
+  const state = createInitialState();
+  const broken = state.keys.find(key => key.broken);
+  Object.assign(broken, { status: 'smelting', smeltUntil: 1000 + SMELT_SECONDS * 1000 });
+  let scans = 0;
+  const filter = state.keys.filter.bind(state.keys);
+  state.keys.filter = (...args) => { scans++; return filter(...args); };
+  const timer = { textContent: '' }, bar = { style: {}, value: 0 };
+  const element = id => ({ id, hidden: false, dataset: {}, style: {}, value: 0,
+    querySelector: selector => selector === 'progress' ? bar : timer });
+  const elements = new Map();
+  const document = { getElementById: id => {
+    if (!elements.has(id)) elements.set(id, id === 'world' ? { clientWidth: 800, clientHeight: 600 } : element(id));
+    return elements.get(id);
+  } };
+  const camera = new THREE.PerspectiveCamera(70, 4 / 3, .1, 100);
+  camera.position.set(0, 1.7, 4);
+  camera.lookAt(0, 1.4, 0);
+  let now = 1000;
+  const progress = createBathProgress(document, { camera, THREE }, { bathKeys: () => [] }, state, () => now);
+  for (let frame = 0; frame < 60; frame++) { now += 16; progress.update(true, () => {}); }
+  assert.ok(scans <= 2, `${scans} scans in 60 frames`);
+  assert.match(timer.textContent, /^0:\d\d$/, 'the countdown still updates from the cached queue');
+  assert.ok(bar.value > 0);
 });

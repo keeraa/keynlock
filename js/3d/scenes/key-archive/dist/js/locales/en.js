@@ -1,5 +1,7 @@
 // English. Same keys as ru.js; keep {placeholders} and markup intact.
 export default Object.freeze({
+  'webgl.title': 'A browser with WebGL is needed',
+  'webgl.text': 'The Key Archive is drawn in 3D. Open it in an up-to-date Chrome, Edge, Firefox or Safari and make sure hardware acceleration is on.',
   'meta.title': 'Key Archive',
   'meta.description': 'Key Archive — a gouache game of finding, washing, de-rusting and smelting keys.',
   'aria.world': 'Three-dimensional hall of the key archive',

@@ -49,7 +49,6 @@ const NOT_PLAYER_TEXT = new Map([
   ['station-layout.js', 'internal station names'],
   ['cabinet-layout.js', 'developer error'],
   ['key-shapes.js', 'developer error'],
-  ['fallback-world.js', 'developer error when no renderer is available'],
 ]);
 
 test('player-facing modules have no hard-coded Russian left', () => {

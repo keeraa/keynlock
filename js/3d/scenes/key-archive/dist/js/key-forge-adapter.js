@@ -4,7 +4,7 @@
 import * as THREE from '../vendor/three.js';
 import { KEY_TEMPLATES, METALS, defaultDesign, normalizeKeyDesign } from './key-data.js';
 import { createKeyModel as createForgeModel, disposeKeyModel } from './key-geometry.js';
-import { bowPoints, createBowShape, joinedKeyShape, keyBounds } from './key-shapes.js';
+import { createBowShape, joinedKeyShape, keyBounds } from './key-shapes.js';
 import { getMetalMaterial } from './key-materials.js';
 import { mudGeometry, getMudMaterial, mudBlobLayout } from './key-mud.js';
 import { waxGeometry, getWaxMaterial, waxBlobLayout } from './key-wax.js';
@@ -259,11 +259,6 @@ export function createForgeKeyProvider(profiles = []) {
     getColor: type => metalFor(type).tint,
     getColliderSize: () => [.43, .21, .65],
     getDisplayScale: mode => ({ floor: .455, hand: .52, cabinet: .185, bath: .22 })[mode] ?? 1,
-    getFallbackHeadPoints(type) {
-      const design = designFor(type);
-      return bowPoints(KEY_TEMPLATES[design.template].bow)
-        .map(([x,y]) => [x * .53, y * .53]);
-    },
     createFallbackStamp(type, broken = false) {
       const key = `${type}:${!!broken}`;
       if (!stampCache.has(key)) stampCache.set(key, fallbackStamp(type, !!broken, profiles));

@@ -13,14 +13,6 @@ test('visual post-process can recover from a failed frame without capturing unre
   assert.doesNotMatch(source, /debug\.onShaderError\s*=/);
 });
 
-test('2D fallback applies toon controls without full-screen gouache overlay', () => {
-  const source = readFileSync(new URL('../dist/js/fallback-canvas-renderer.js', import.meta.url), 'utf8');
-  for (const control of ['toonEnabled', 'toonLight', 'toonSteps', 'cartoonMaterial']) {
-    assert.match(source, new RegExp(`visualSettings\\.${control}|settings\\.${control}`));
-  }
-  assert.doesNotMatch(source, /createFallbackBrush|brushPattern/);
-});
-
 test('visual menu and GPU stages do not apply a screen-space gouache layer', () => {
   const page = readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8');
   const painter = readFileSync(new URL('../dist/js/painted-renderer.js', import.meta.url), 'utf8');

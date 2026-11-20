@@ -6,6 +6,7 @@ import { createCleaningEffects } from '../dist/js/cleaning-effects.js';
 import { rustFlakingPaint, RUST_FLAKING_BASE } from '../dist/js/key-instance-finish.js';
 import { createForgeKeyProvider } from '../dist/js/key-forge-adapter.js';
 import { worldSource } from './helpers/world-source.mjs';
+import { mainSource } from './helpers/main-source.mjs';
 
 const source = JSON.parse(readFileSync(new URL('../dist/assets/key-design-profiles.json', import.meta.url), 'utf8'));
 
@@ -118,7 +119,9 @@ test('rust tray: smoke rises and fades; bath keys aim along their length; bench 
   assert.equal(effects.active, 0);
   const stations = readFileSync(new URL('../dist/js/wash-forge-stations.js', import.meta.url), 'utf8');
   const aim = readFileSync(new URL('../dist/js/archive-surface-aim.js', import.meta.url), 'utf8');
-  assert.match(stations, /function trayKey\(bath, slot, key, index, wallTime\)/);
+  const tray = readFileSync(new URL('../dist/js/rust-tray.js', import.meta.url), 'utf8');
+  assert.match(tray, /export function animateTrayKey\(bath, slot, key, index, wallTime/);
+  assert.match(stations, /animateTrayKey\(bath, slot, key, index, wallTime, \{ effects, playSound \}\)/);
   assert.match(stations, /ray\.intersectsBox\(keyBox\)/);
   // One slab (no separate board on top) that still hides floor keys under it.
   assert.match(stations, /occluders\.push\(top\)/);
@@ -136,11 +139,11 @@ test('row chime starts with the shimmer; rust splash sounds when the key lands',
   const row = Array.from({ length: CABINET_COLUMNS * 2 }, (_, slot) => ({ cabinetSlot: slot }));
   completion.refresh(row, 100);
   assert.equal(completion.rowsStarted(), 1, 'counted the moment the row fills');
-  const main = readFileSync(new URL('../dist/js/main.js', import.meta.url), 'utf8');
+  const main = mainSource();
   assert.match(main, /if \(started > startedRows\[cabinet\.type\]\) playAt\('row'/);
   assert.doesNotMatch(main, /else if \(started >/, 'the final row chimes as well as the cabinet');
-  const stations = readFileSync(new URL('../dist/js/wash-forge-stations.js', import.meta.url), 'utf8');
-  assert.match(stations, /playSound\?\.\('rust', slotWorld\.clone\(\)\)/);
+  const tray = readFileSync(new URL('../dist/js/rust-tray.js', import.meta.url), 'utf8');
+  assert.match(tray, /playSound\?\.\('rust', slotWorld\.clone\(\)\)/);
   const actions = readFileSync(new URL('../dist/js/archive-actions.js', import.meta.url), 'utf8');
   assert.doesNotMatch(actions, /tone\('rust'\)/, 'no early splash at the moment of the action');
 });
@@ -184,7 +187,8 @@ test('the held key flies into the hand, lies over the candle, and the flame calm
 });
 
 test('the workbench is one narrow slab that still holds the widest bowl', async () => {
-  const { BENCH, RUST_TRAY } = await import('../dist/js/wash-forge-stations.js');
+  const { BENCH } = await import('../dist/js/wash-forge-stations.js');
+  const { RUST_TRAY } = await import('../dist/js/rust-tray.js');
   const { FORGE_SURFACE_Y } = await import('../dist/js/station-layout.js');
   assert.ok(BENCH.depth <= 1.3, 'narrower than the old 1.48 m top');
   const waterBowl = .57, forge = .55;

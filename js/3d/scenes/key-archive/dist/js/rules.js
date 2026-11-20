@@ -392,7 +392,7 @@ export function smeltingState(state, now = Date.now()) {
   return { key: current, waiting: queue.length - 1,
     progress: Math.max(0, Math.min(1, 1 - (current.smeltUntil - now) / duration)),
     secondsLeft: Math.ceil((current.smeltUntil - now) / 1000),
-    totalSecondsLeft: Math.ceil((queue.at(-1).smeltUntil - now) / 1000) };
+    totalSecondsLeft: Math.ceil((queue.at(-1).smeltUntil - now) / 1000), lastUntil: queue.at(-1).smeltUntil };
 }
 
 export function keyCondition(key) {

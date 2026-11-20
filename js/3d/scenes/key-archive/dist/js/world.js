@@ -15,6 +15,7 @@ import { PLAYER_EYE_HEIGHT } from './player-config.js';
 import { batchStaticHallMeshes } from './static-mesh-batches.js';
 import { createMaterials } from './world-materials.js';
 import { addArchiveLedger } from './archive-ledger.js';
+import { addArchiveDeskProps } from './archive-desk-props.js';
 import { makeHall } from './world-architecture.js';
 import { makeChandeliers } from './world-lighting.js';
 import { createCabinet } from './world-cabinet.js';
@@ -222,6 +223,11 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
   }
   resize();
   geometryStatsCache = createSceneGeometryStatsCache(scene);
+  void addArchiveDeskProps(scene).then(() => {
+    renderer.shadowMap.needsUpdate = true;
+    invalidate();
+  });
+
   window.addEventListener('resize', resize);
 
   let thumbnailRenderer;

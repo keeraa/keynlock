@@ -9,16 +9,14 @@ import { CABINET_PLACE_SECONDS } from '../dist/js/cabinet-layout.js';
 import { RIGHT_HAND_RELEASE } from '../dist/js/held-key-motion.js';
 import { createArchiveActions } from '../dist/js/archive-actions.js';
 import { BUNDLE_COST, createInitialState, pickupKey } from '../dist/js/rules.js';
+import { mainSource } from './helpers/main-source.mjs';
 
 test('throw has no windup and launches immediately from the right hand', () => {
   assert.equal(RIGHT_HAND_RELEASE.x,.43);
   assert.equal(RIGHT_HAND_RELEASE.y,-.45);
   const webgl=readFileSync(new URL('../dist/js/world-key-animations.js', import.meta.url), 'utf8');
-  const fallback=readFileSync(new URL('../dist/js/fallback-world.js', import.meta.url), 'utf8');
   assert.doesNotMatch(webgl,/stage: 'windup'/);
-  assert.doesNotMatch(fallback,/stage: 'windup'/);
   assert.match(webgl,/scene\.add\(model\)/);
-  assert.match(fallback,/sampleThrow\(motion\.start, motion\.end/);
 });
 
 test('dropping a key targets the right-hand release pose, not camera center', () => {
@@ -43,12 +41,9 @@ test('dropping a key targets the right-hand release pose, not camera center', ()
   assert.equal(captured.key.status,'floor');
 });
 
-test('WebGL and Canvas use the same interaction query and key silhouette', () => {
-  const main = readFileSync(new URL('../dist/js/main.js', import.meta.url), 'utf8');
-  const fallback = readFileSync(new URL('../dist/js/fallback-world.js', import.meta.url), 'utf8');
+test('aiming picks a key by its complete collider and ignores held keys', () => {
+  const main = mainSource();
   assert.match(main, /createArchiveTargeting\(\{ camera, world, state, keyIndex \}\)/);
-  assert.doesNotMatch(fallback, /function pickTarget\(/);
-  assert.match(fallback, /scene\.updateMatrixWorld\(true\)/);
 
   const camera = new THREE.PerspectiveCamera(73, 1, .055, 120);
   camera.position.set(0, 1.68, 1.35);
@@ -58,15 +53,13 @@ test('WebGL and Canvas use the same interaction query and key silhouette', () =>
   const state = { keys: [key] };
   const keyIndex = createKeyIndex(state.keys);
   const worldShape = { interactables: [], cabinets: [], isThrowing: () => false };
-  for (const mode of ['webgl', 'canvas']) {
-    assert.deepEqual(createArchiveTargeting({ camera, world: worldShape, state, keyIndex }).targetInView(),
-      { kind: 'key', id: 'k-01' }, `${mode} picks the complete key collider`);
-  }
+  assert.deepEqual(createArchiveTargeting({ camera, world: worldShape, state, keyIndex }).targetInView(),
+    { kind: 'key', id: 'k-01' });
   key.status = 'held';
   assert.equal(createArchiveTargeting({ camera, world: worldShape, state, keyIndex }).targetInView(), null);
 });
 
-test('the same cabinet placement easing and damped sway is used by both renderers', () => {
+test('cabinet placement eases in and sways with damping', () => {
   const start = { x: 0, y: 1.3, z: 0 };
   const end = { x: 3, y: 2, z: -2 };
   assert.deepEqual(samplePlacement(start, end, 0),
@@ -84,7 +77,7 @@ test('the same cabinet placement easing and damped sway is used by both renderer
   assert.equal(Math.abs(samplePlacement(start, end, CABINET_PLACE_SECONDS).sway), 0);
 });
 
-test('forge key movement follows the same half-second trajectory in both renderers', () => {
+test('forge key movement follows a half-second trajectory', () => {
   const start = { x: 1, y: 1, z: 2 };
   const end = { x: 0, y: 1.5, z: 0 };
   assert.deepEqual(sampleDiscard(start, end, 0),

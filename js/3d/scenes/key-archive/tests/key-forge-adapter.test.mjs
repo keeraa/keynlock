@@ -72,7 +72,6 @@ test('the forge provider reuses twenty 3D shapes, preserves holes and points tee
       'snapshot model shares the original metal vertex buffer');
     assert.equal(group.children[0].geometry.getAttribute('instanceKeyPaint').count,1);
     assert.equal(group.scale.x,.455);
-    assert.equal(provider.getFallbackHeadPoints(i).length>2,true);
     assert.equal(provider.getMetal(i),KEY_TEMPLATES[archiveDesign(i).template].metal);
   }
   assert.ok(totalTriangles<25000,`unexpectedly dense geometry: ${totalTriangles}`);

@@ -31,7 +31,70 @@ function rim(parent, radius, y, x, z, material, thickness = .052) {
   return object;
 }
 
+// The rust solution sits in a low rectangular ceramic tray; keys lie flat in
+// one row under the liquid.
+export const RUST_TRAY = Object.freeze({ width: .94, depth: .56, wall: .045, base: .95, height: .12,
+  surface: 1.035, slots: [-.31, -.105, .105, .31] });
+
+function trayRing(outerW, outerD, wall) {
+  const shape = new THREE.Shape();
+  shape.moveTo(-outerW / 2, -outerD / 2); shape.lineTo(outerW / 2, -outerD / 2);
+  shape.lineTo(outerW / 2, outerD / 2); shape.lineTo(-outerW / 2, outerD / 2); shape.closePath();
+  const hole = new THREE.Path();
+  const w = outerW / 2 - wall, d = outerD / 2 - wall;
+  hole.moveTo(-w, -d); hole.lineTo(-w, d); hole.lineTo(w, d); hole.lineTo(w, -d); hole.closePath();
+  shape.holes.push(hole);
+  return shape;
+}
+
+function createRustTray(group, station, spotTexture, ceramic) {
+  const kind = 'rust';
+  const x = FIXTURE_OFFSETS[kind];
+  const id = bathId(station.id, kind);
+  const { width, depth, wall, base, height, surface } = RUST_TRAY;
+  const trayMaterial = new THREE.MeshStandardMaterial({ map: ceramic, color: 0x81936b, roughness: .68 });
+  const lipMaterial = new THREE.MeshStandardMaterial({ map: ceramic, color: 0xaab792, roughness: .73 });
+  const liquidMaterial = new THREE.MeshStandardMaterial({
+    color: 0xa0a76e, roughness: .42, transparent: true, opacity: .78, depthWrite: false,
+    blending: THREE.CustomBlending,
+    blendSrc: THREE.SrcAlphaFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
+    blendSrcAlpha: THREE.ZeroFactor, blendDstAlpha: THREE.OneMinusSrcAlphaFactor,
+    emissive: 0x302e16, emissiveIntensity: .17,
+  });
+  // Walls are one extruded ring (also the hover outline); base and lip apart.
+  const walls = new THREE.ExtrudeGeometry(trayRing(width, depth, wall), { depth: height, bevelEnabled: false });
+  walls.rotateX(-Math.PI / 2);
+  const shell = new THREE.Mesh(walls, trayMaterial);
+  shell.position.set(x, base - .02, .10);
+  group.add(shell);
+  block(group, [width - .01, .022, depth - .01], [x, base - .009, .10], trayMaterial);
+  const lipGeometry = new THREE.ExtrudeGeometry(trayRing(width + .016, depth + .016, wall + .016),
+    { depth: .014, bevelEnabled: false });
+  lipGeometry.rotateX(-Math.PI / 2);
+  const lip = new THREE.Mesh(lipGeometry, lipMaterial);
+  lip.position.set(x, base - .02 + height, .10);
+  group.add(lip);
+  const liquid = block(group, [width - 2 * wall, .01, depth - 2 * wall], [x, surface, .10], liquidMaterial);
+  liquid.renderOrder = 2;
+
+  const collider = new THREE.Mesh(new THREE.BoxGeometry(width + .08, base + height - .87, depth + .08),
+    new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
+  collider.position.set(x, (base + height + .87) / 2, .10);
+  collider.userData = { kind: 'bath', id, bathKind: kind, stationId: station.id };
+  group.add(collider);
+  const slots = RUST_TRAY.slots.slice(0, BATH_CAPACITY).map(offset => {
+    const holder = new THREE.Group();
+    holder.position.set(x + offset, surface, .10);
+    group.add(holder);
+    return { holder, keyId: null, keyMesh: null, paint: null, crust: null };
+  });
+  return { id, kind, shell, slots, collider, waterMaterial: liquidMaterial, group, x, surfaceY: surface,
+    lift: null, tray: true,
+    visual: createBathEffects(group, x, kind, spotTexture, surface, .3), visualKeys: null };
+}
+
 function createBath(group, station, kind, spotTexture, ceramic) {
+  if (kind === 'rust') return createRustTray(group, station, spotTexture, ceramic);
   const x = FIXTURE_OFFSETS[kind];
   const id = bathId(station.id, kind);
   const isWater = kind === 'mud';
@@ -331,6 +394,12 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
       const slot = bath.slots[index];
       const progress = bathKeyProgress(key, bath.kind, wallTime);
       const dip = bath.kind === 'mud' ? waterDip(progress) : null;
+      if (bath.tray) {
+        // Lying flat in the shallow tray, just under the solution.
+        slot.keyMesh.position.y = -.03;
+        slot.keyMesh.rotation.set(-Math.PI / 2, 0, Math.sin(wallTime * .0015 + index) * .05);
+        continue;
+      }
       slot.keyMesh.position.y = dip ? dip.height : -.07;
       slot.keyMesh.rotation.set(dip ? -.53 : -1.04, .16, Math.sin(wallTime * .002 + index) * .11);
       if (dip) {
@@ -361,8 +430,14 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
             onLiftDone?.(key);
           } else {
             const lift = Math.min(1, progress * 2.1);
-            keyMesh.position.set(bath.x, bath.surfaceY - .06 + lift * .34, .1 + lift * .16);
-            keyMesh.rotation.set(-1 + lift * .70, .20, -.20);
+            if (bath.tray) {
+              // Raised from lying flat in the tray, tilting up towards the player.
+              keyMesh.position.set(bath.x, bath.surfaceY - .03 + lift * .36, .1 + lift * .16);
+              keyMesh.rotation.set(-Math.PI / 2 + lift * 1.27, .20 * lift, -.20 * lift);
+            } else {
+              keyMesh.position.set(bath.x, bath.surfaceY - .06 + lift * .34, .1 + lift * .16);
+              keyMesh.rotation.set(-1 + lift * .70, .20, -.20);
+            }
             // A lifted muddy key is already washed: no clods left to drop.
             applyBathFinish(bath.lift, bath.kind,
               bath.kind === 'rust' ? Math.max(0, 1 - (progress - .16) * 1.65) : 0, key,

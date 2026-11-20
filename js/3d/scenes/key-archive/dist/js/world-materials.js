@@ -3,6 +3,7 @@ import { makePaintTexture } from './art.js?v=key-ring';
 import { getPaintedMetalTexture } from './painted-textures.js';
 import { createHallSurfaceMaterials, createArchiveWoodTexture } from './hall-surface-textures.js?v=alchemy-candles';
 import { ARCHIVE_FLOOR_TEXTURE_URL } from './archive-floor-texture.js';
+import { createFurnitureShadows } from './furniture-shadows.js';
 
 function makeContactShadowMaterial() {
   const canvas = document.createElement('canvas');
@@ -18,6 +19,16 @@ function makeContactShadowMaterial() {
   map.colorSpace = THREE.SRGBColorSpace;
   return new THREE.MeshBasicMaterial({ map, transparent: true, depthWrite: false,
     polygonOffset: true, polygonOffsetFactor: -1 });
+}
+
+function makeFurnitureShadowMaterials() {
+  const shadows = createFurnitureShadows();
+  for (const shadow of Object.values(shadows)) {
+    const map = new THREE.CanvasTexture(shadow.canvas);
+    map.colorSpace = THREE.SRGBColorSpace;
+    shadow.material = new THREE.MeshBasicMaterial({ map, transparent: true, depthWrite: false, toneMapped: false });
+  }
+  return shadows;
 }
 
 export function createMaterials() {
@@ -38,6 +49,7 @@ export function createMaterials() {
     cabinetWalnut: new THREE.MeshStandardMaterial({ map: walnut, color: 0x8c8881, roughness: .98 }),
     agedBronze: new THREE.MeshStandardMaterial({ color: 0x77705e, roughness: .91, metalness: .18 }),
     contactShadow: makeContactShadowMaterial(),
+    furnitureShadows: makeFurnitureShadowMaterials(),
     floor: new THREE.MeshStandardMaterial({ map: floorWood, color: 0xada596, roughness: .98 }),
     ...createHallSurfaceMaterials(plaster, wood, carpetFallback),
     blackWood: new THREE.MeshStandardMaterial({ map: walnut, color: 0x615d56, roughness: .99 }),

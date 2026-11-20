@@ -4,7 +4,8 @@ import { createCabinetCompletion } from './cabinet-completion.js?v=wax-and-bundl
 import { PERIMETER_BAND_Y } from './hall-architecture.js?v=alchemy-candles';
 import { CANDLE_FLAME_HEIGHT, CANDLE_FLAME_WIDTH, CANDLE_WICK_Y, sampleCandleFlicker } from './archive-candles.js?v=key-catalog';
 import { createFallbackKeyPainter } from './fallback-canvas-keys.js?v=stable-pickup';
-import { createFallbackArchitecture } from './fallback-canvas-architecture.js?v=key-catalog';
+import { createFallbackArchitecture } from './fallback-canvas-architecture.js?v=furniture-shadows';
+import { createFurnitureShadows } from './furniture-shadows.js';
 import { getKeyFallbackHeadPoints } from './key-factory.js?v=key-ring';
 import { KEY_TYPES, getProgress } from './rules.js?v=key-ring';
 import { cabinetContactGlow } from './archive-key-motion.js?v=key-ring';
@@ -103,7 +104,22 @@ export function createFallbackCanvasRenderer({
     ctx.stroke();
   }
 
-  const architecturePainter = createFallbackArchitecture({ ctx, camera, surfaces, project, path3, segment });
+  const furnitureShadows = createFurnitureShadows();
+  function drawFurnitureShadow({ width, depth, canvas }, x, y, z) {
+    const origin = project(x - width / 2, y, z - depth / 2);
+    const right = project(x + width / 2, y, z - depth / 2);
+    const near = project(x - width / 2, y, z + depth / 2);
+    if (!origin || !right || !near) return;
+    ctx.save();
+    ctx.transform((right.x - origin.x) / canvas.width, (right.y - origin.y) / canvas.width,
+      (near.x - origin.x) / canvas.height, (near.y - origin.y) / canvas.height, origin.x, origin.y);
+    ctx.drawImage(canvas, 0, 0);
+    ctx.restore();
+  }
+
+  const architecturePainter = createFallbackArchitecture({
+    ctx, camera, surfaces, project, path3, segment, drawFurnitureShadow, furnitureShadows,
+  });
   const { background, architecture } = architecturePainter;
 
   function drawCabinet(type) {
@@ -341,7 +357,12 @@ export function createFallbackCanvasRenderer({
     const { x, z } = station;
     const table = [[x - 2.52, .88, z - .74], [x + 2.52, .88, z - .74],
       [x + 2.52, .88, z + .87], [x - 2.52, .88, z + .87]];
-    path3(table, surfaces.bench, '#cba774', 3);
+    if (path3(table, surfaces.bench, '#cba774', 3)) {
+      ctx.save();
+      ctx.clip();
+      drawFurnitureShadow(furnitureShadows.fixtures, x, .88, z + .08);
+      ctx.restore();
+    }
     for (const edgeX of [x - 2.28, x + 2.28]) {
       segment([edgeX, .8, z - .58], [edgeX, .15, z - .58], '#59483c', 6);
       segment([edgeX, .8, z + .67], [edgeX, .15, z + .67], '#59483c', 6);
@@ -432,6 +453,8 @@ export function createFallbackCanvasRenderer({
     architecturePainter.setFrame({ width, height, frameTime, playing, visualSettings, ledgerVisible, ledgerHovered: hovered?.kind === 'ledger' });
     background();
     architecture();
+    for (const station of workstations.stations)
+      drawFurnitureShadow(furnitureShadows.benchFloor, station.x, .017, station.z + .08);
     const drawables = [];
     const distantKeys = KEY_TYPES.map(() => []);
     for (let type = 0; type < 10; type++) {

@@ -6,6 +6,7 @@ import { WINDOW_CENTERS, PILASTER_CENTERS, PERIMETER_BAND_Y, HALL_HEIGHT_SCALE, 
   addArchedWindow, addWindowedWall, addVault } from './hall-architecture.js?v=window-sky';
 import { ENTRANCE_DOOR_TEXTURE_URL } from './entrance-door-texture.js';
 import { ARCHIVE_DESK, ARCHIVE_SIDE_TABLES } from './archive-ledger.js?v=key-catalog';
+import { floorSurfaceY } from './floor-contact.js';
 
 export function box(parent, size, position, material) {
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
@@ -54,6 +55,11 @@ export function contactShadow(parent, width, depth, x, y, z, material) {
   mesh.position.set(x, y, z);
   mesh.renderOrder = 1;
   parent.add(mesh);
+  return mesh;
+}
+
+export function furnitureShadow(parent, { width, depth, material }, x, y, z) {
+  contactShadow(parent, width, depth, x, y, z, material).renderOrder = 2;
 }
 
 function addEntranceDoor(scene, mat) {
@@ -157,11 +163,12 @@ export function makeHall(scene, mat) {
 
   // A few side worktables add scale without blocking the sorting path.
   for (const { x, z } of ARCHIVE_SIDE_TABLES) {
-    contactShadow(scene, 2.3, 2.75, x, -.046, z, shadowMaterial);
-    box(scene, [ARCHIVE_DESK.width, .18, ARCHIVE_DESK.depth], [x, .83, z], mat.wood);
+    furnitureShadow(scene, mat.furnitureShadows.deskFloor, x, floorSurfaceY(x, z) + .003, z);
+    const top = box(scene, [ARCHIVE_DESK.width, .18, ARCHIVE_DESK.depth], [x, .83, z], mat.wood);
+    top.castShadow = top.receiveShadow = true;
     for (const dx of [-.7, .7]) for (const dz of [-.9, .9])
-      roomBox(scene, [.13, .8, .13], [x + dx, .35, z + dz], mat.darkWood);
-    box(scene, [1.56, .05, 2.04], [x, ARCHIVE_DESK.y - .025, z], mat.darkBrass);
+      roomBox(scene, [.13, .8, .13], [x + dx, .35, z + dz], mat.darkWood).castShadow = true;
+    box(scene, [1.56, .05, 2.04], [x, ARCHIVE_DESK.y - .025, z], mat.darkBrass).receiveShadow = true;
   }
 }
 

@@ -1,6 +1,6 @@
 import * as THREE from '../vendor/three.js';
 import { RUG_TOP } from './floor-contact.js';
-import { contactShadow } from './world-architecture.js?v=key-ring';
+import { furnitureShadow } from './world-architecture.js?v=furniture-shadows';
 import { createStationFinishes } from './station-finish.js';
 import { createKeyModel, createCombinedKeyGeometry, disposeKeySceneModel, getKeyDisplayScale, getKeyRustStrength,
   getKeyCoatLayout, buildKeyCoatGeometry, getKeyCoatPoint } from './key-factory.js?v=key-ring';
@@ -243,6 +243,7 @@ function createForge(group, station, materials, spotTexture, finish) {
   const ember = new THREE.MeshBasicMaterial({ color: 0xef8b45 });
   const hotMetal = new THREE.MeshBasicMaterial({ color: 0xc96d36, transparent: true, opacity: .84 });
   const body = cylinder(group, .55, .42, .47, [x, 1.145, .08], iron, 18);
+  body.castShadow = true;
   const collar = cylinder(group, .53, .49, .09, [x, FORGE_SURFACE_Y - .065, .08], materials.darkBrass, 18, true);
   const hearth = cylinder(group, .43, .43, .022, [x, FORGE_SURFACE_Y - .007, .08], soot, 24);
   cylinder(group, .33, .33, .025, [x, FORGE_SURFACE_Y + .008, .08], hotMetal, 24);
@@ -272,24 +273,28 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
   const forgeMap = new Map();
   const spotTexture = createEffectSpotTexture();
   const finish = createStationFinishes();
-  const tableShade = materials.contactShadow.clone();
-  tableShade.opacity = .60;
+  const { benchFloor, fixtures } = materials.furnitureShadows;
   for (const station of STATIONS) {
     const group = new THREE.Group();
     group.position.set(station.x, 0, station.z);
     scene.add(group);
-    contactShadow(group, 5.55, 2.25, 0, RUG_TOP + .0026, .08, tableShade);
+    furnitureShadow(group, benchFloor, 0, RUG_TOP + .003, .08);
+    furnitureShadow(group, fixtures, 0, .905 + .045 / 2 + .002, .08);
     // Low, open workbench: the hall remains readable and cabinets stay visible.
     // The bench hides floor keys under it from aiming.
-    occluders.push(block(group, [5.05, .16, 1.62], [0, .81, .08], finish.benchEdge));
-    occluders.push(block(group, [4.92, .045, 1.48], [0, .905, .08], finish.benchTop));
+    const apron = block(group, [5.05, .16, 1.62], [0, .81, .08], finish.benchEdge);
+    const top = block(group, [4.92, .045, 1.48], [0, .905, .08], finish.benchTop);
+    apron.castShadow = true;
+    top.castShadow = top.receiveShadow = true;
+    occluders.push(apron, top);
     for (const x of [-2.29, 2.29]) for (const z of [-.55, .69])
-      block(group, [.16, .80, .16], [x, .38, z], materials.darkWood);
+      block(group, [.16, .80, .16], [x, .38, z], materials.darkWood).castShadow = true;
     block(group, [4.86, .12, .27], [0, .29, -.49], materials.blackWood);
     block(group, [4.86, .12, .27], [0, .29, .67], materials.blackWood);
     const baths = ['mud', 'rust'].map(kind => createBath(group, station, kind, spotTexture, finish.glaze));
     const forge = createForge(group, station, materials, spotTexture, finish);
     for (const bath of baths) {
+      bath.shell.castShadow = true;
       bathMap.set(bath.id, bath);
       interactables.push(bath.collider);
     }

@@ -115,7 +115,8 @@ test('rust tray: smoke rises and fades; bath keys aim along their length; bench 
   const aim = readFileSync(new URL('../dist/js/archive-surface-aim.js', import.meta.url), 'utf8');
   assert.match(stations, /function trayKey\(bath, slot, key, index, wallTime\)/);
   assert.match(stations, /ray\.intersectsBox\(keyBox\)/);
-  assert.match(stations, /occluders\.push\(block\(group, \[4\.92/);
+  assert.match(stations, /const top = block\(group, \[4\.92/);
+  assert.match(stations, /occluders\.push\(apron, top\)/);
   assert.match(aim, /if \(hiddenBehindFurniture\(hit\.point\)\) continue;/);
   assert.match(aim, /const assisted = visibleKey\(/);
 });

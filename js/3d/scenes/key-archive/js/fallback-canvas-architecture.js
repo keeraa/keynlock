@@ -20,7 +20,7 @@ const farVaultEdge = vaultEdge(-23);
 const nearVaultEdge = vaultEdge(23).reverse();
 
 // Static hall, weather, walls and entrance painting for the 2D renderer.
-export function createFallbackArchitecture({ ctx, camera, surfaces, project, path3, segment }) {
+export function createFallbackArchitecture({ ctx, camera, surfaces, project, path3, segment, drawFurnitureShadow, furnitureShadows }) {
   let width = 0, height = 0, frameTime = 0, visualSettings = null;
   let ledgerVisible = true, ledgerHovered = false;
   const bird = createWindowBirdFlight();
@@ -92,6 +92,7 @@ export function createFallbackArchitecture({ ctx, camera, surfaces, project, pat
     const { x: deskX, y: deskY, z: deskZ, width, depth } = ARCHIVE_DESK;
     const left = deskX - width / 2, right = deskX + width / 2;
     const front = deskZ - depth / 2, back = deskZ + depth / 2;
+    drawFurnitureShadow(furnitureShadows.deskFloor, deskX, 0, deskZ);
     for (const x of [deskX - .7, deskX + .7]) for (const z of [deskZ - .9, deskZ + .9]) {
       segment([x, 0, z], [x, .89, z], '#705039', 5);
     }

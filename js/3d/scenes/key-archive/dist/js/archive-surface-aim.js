@@ -129,7 +129,7 @@ export function createArchiveTargeting({ camera, world, state, keyIndex }) {
       return nearest;
     }
     const visibleKey = key => key && !hiddenBehindFurniture(
-      occlusionPoint.set(key.x, restingKeyY(key.x, key.z), key.z)) ? key : null;
+      occlusionPoint.set(key.x, restingKeyY(key.x, key.z) + (key.layer || 0), key.z)) ? key : null;
     const assisted = visibleKey(findFloorKeyAtReticle(camera.position, forward, state.keys,
       world.isThrowing, { index: keyIndex, radius: PICK_ASSIST_RADIUS }));
     const floorKey = assisted || visibleKey(lastFloorKey && findFloorKeyAtReticle(camera.position, forward, [lastFloorKey],

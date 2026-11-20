@@ -377,3 +377,55 @@ test('outline stays continuous across a slanted edge and yields to foreground du
   assert.ok(result.front < result.bare / 5, JSON.stringify(result));
   assert.ok(result.behind > result.bare / 2, JSON.stringify(result));
 });
+
+test('a muddy key thrown into the water starts washing', { timeout: 90000 * SLOW }, async t => {
+  const page = await browser.newPage({ viewport: { width: 960, height: 640 } });
+  t.after(() => page.close());
+  const state = createInitialState();
+  const muddy = state.keys.find(key => key.mud && !key.rust && !key.broken && !key.wax);
+  muddy.status = 'held';
+  state.held = [muddy.id];
+  state.firstRoute = false;
+  await page.addInitScript(({ key, snapshot }) => {
+    HTMLCanvasElement.prototype.requestPointerLock = undefined;
+    localStorage.setItem(key, snapshot);
+  }, { key: STORAGE_KEY, snapshot: JSON.stringify(state) });
+  await page.route('**/js/main.js*', async route => {
+    const response = await route.fetch();
+    await route.fulfill({ response, body: await response.text() + `
+      window.throwTest = { world, state, aim(yawValue, pitchValue) {
+        camera.position.set(${FIXTURE_OFFSETS.mud}, 1.78, 2.4);
+        yaw = yawValue; pitch = pitchValue; edgeLook.until = 0;
+        camera.rotation.set(pitch, yaw, 0, 'YXZ'); camera.updateMatrixWorld(true);
+      } };` });
+  });
+  const errors = await enterArchive(page, 'throw-water');
+  // Pick an aim at the bowl with the game's own physics, then throw with R.
+  const pitchValue = await page.evaluate(async () => {
+    const { simulateThrow, throwVelocity } = await import('/js/throw-flight.js');
+    const { restingKeyY } = await import('/js/floor-contact.js');
+    const q = window.throwTest, THREE = q.world.THREE;
+    const key = q.state.keys.find(item => item.status === 'held');
+    for (let degrees = 0; degrees <= 60; degrees += 1) {
+      q.aim(0, degrees * Math.PI / 180);
+      q.world.update(performance.now(), false, true, null);
+      const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(q.world.camera.quaternion);
+      const release = q.world.getThrowRelease();
+      const flight = simulateThrow({ start: { x: release.x, y: release.y, z: release.z },
+        velocity: throwVelocity(forward), floorY: restingKeyY,
+        ...q.world.getThrowScene().forKey(vessel => vessel.kind === 'mud' && key.mud) });
+      if (flight.landing.on === 'vessel') return degrees * Math.PI / 180;
+    }
+    return null;
+  });
+  assert.notEqual(pitchValue, null, 'an aim reaches the water');
+  await page.evaluate(pitchValue => window.throwTest.aim(0, pitchValue), pitchValue);
+  await page.keyboard.press('r');
+  await page.waitForFunction(({ storageKey, id }) =>
+    JSON.parse(localStorage.getItem(storageKey)).keys.find(key => key.id === id).status === 'bath',
+  { storageKey: STORAGE_KEY, id: muddy.id });
+  const soaked = await page.evaluate(({ storageKey, id }) =>
+    JSON.parse(localStorage.getItem(storageKey)).keys.find(key => key.id === id), { storageKey: STORAGE_KEY, id: muddy.id });
+  assert.equal(soaked.bathId, 'center-mud');
+  assert.deepEqual(errors, []);
+});

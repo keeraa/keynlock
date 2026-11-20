@@ -37,13 +37,17 @@ function rim(parent, radius, y, x, z, material, thickness = .052) {
 export const BENCH = Object.freeze({ width: 5.0, depth: 1.26, thickness: .2, surfaceY: .9275, z: .08,
   legs: Object.freeze([-.47, .47]), rails: Object.freeze([-.42, .42]) });
 
+// The round water bowl and the forge, named for the throw physics as well.
+export const WATER_BATH = Object.freeze({ radius: .57, surfaceY: 1.19, lipY: 1.19 + .026, z: .10 });
+export const FORGE = Object.freeze({ bodyRadius: .55, hearthRadius: .43, z: .08 });
+
 function createBath(group, station, kind, spotTexture, ceramic) {
   if (kind === 'rust') return createRustTray(group, station, spotTexture, ceramic);
   const x = FIXTURE_OFFSETS[kind];
   const id = bathId(station.id, kind);
   const isWater = kind === 'mud';
-  const surfaceY = isWater ? 1.19 : 1.415;
-  const radius = isWater ? .57 : .39;
+  const surfaceY = isWater ? WATER_BATH.surfaceY : 1.415;
+  const radius = isWater ? WATER_BATH.radius : .39;
   const lipY = surfaceY + .026;
   const bowlMaterial = new THREE.MeshStandardMaterial({
     map: ceramic, color: isWater ? 0x548d89 : 0x81936b, roughness: .68,
@@ -186,10 +190,10 @@ function createForge(group, station, materials, spotTexture, finish) {
     color: 0xbe895e, roughness: .76, metalness: .20 });
   const ember = new THREE.MeshBasicMaterial({ color: 0xef8b45 });
   const hotMetal = new THREE.MeshBasicMaterial({ color: 0xc96d36, transparent: true, opacity: .84 });
-  const body = cylinder(group, .55, .42, .47, [x, 1.145, .08], iron, 18);
+  const body = cylinder(group, FORGE.bodyRadius, .42, .47, [x, 1.145, .08], iron, 18);
   body.castShadow = true;
   const collar = cylinder(group, .53, .49, .09, [x, FORGE_SURFACE_Y - .065, .08], materials.darkBrass, 18, true);
-  const hearth = cylinder(group, .43, .43, .022, [x, FORGE_SURFACE_Y - .007, .08], soot, 24);
+  const hearth = cylinder(group, FORGE.hearthRadius, FORGE.hearthRadius, .022, [x, FORGE_SURFACE_Y - .007, .08], soot, 24);
   cylinder(group, .33, .33, .025, [x, FORGE_SURFACE_Y + .008, .08], hotMetal, 24);
   const edge = rim(group, .53, FORGE_SURFACE_Y, x, .08, copper, .037);
   const embers = [];

@@ -1,11 +1,10 @@
 import { t, familyName } from './i18n.js';
-import { SOAK_SECONDS } from './station-layout.js';
 import * as THREE from '../vendor/three.js';
 import {
   KEY_TYPES, TOTAL_KEYS, MAX_HELD, pickupKey, selectedKey, putKeyInCabinet,
   takeKeyFromCabinet, cabinetSlotKey, trashSelectedKey, dropSelectedKey, getProgress,
   startSoak, collectSoakedKey, BUNDLE_COST, buyBundle, putBundleInCabinet, meltSelectedWax,
-  SMELT_SECONDS, settleSmelting, canSoak, soakThrownKey, smeltThrownKey,
+  settleSmelting, canSoak, soakThrownKey, smeltThrownKey,
 } from './rules.js';
 import { WAX_MELT_MS } from './archive-candles.js';
 import { CABINET_CAPACITY, pegForSlot } from './cabinet-layout.js';
@@ -41,7 +40,7 @@ export function createArchiveActions({
     statistics?.record('wax', { dewaxed: 1, cleaned: key.mud || key.rust ? 0 : 1 });
     updateHud();
     save();
-    toast(t(key.mud || key.rust ? 'toast.waxMeltedLayer' : 'toast.waxMeltedClean'));
+    if (key.mud || key.rust) toast(t('toast.waxMeltedLayer'));
     invalidateHover();
   }
 
@@ -72,12 +71,8 @@ export function createArchiveActions({
       save();
       if (picked.status === 'held') world.animatePickup?.();
       tone(picked.status === 'bundled' ? 'bundle' : 'pickup');
-      toast(picked.status === 'bundled' ? t('toast.bundleMade') :
-        picked.broken ? t('toast.pickedBroken') :
-        picked.wax ? t('toast.pickedWax') :
-        picked.mud && picked.rust ? t('toast.pickedMudRust') :
-        picked.mud ? t('toast.pickedMud') : picked.rust ? t('toast.pickedRust') :
-          t('toast.picked', { name: familyName(picked.type) }));
+      // The slot shows what the key needs; only the ring's packing is news.
+      if (picked.status === 'bundled') toast(t('toast.bundleMade'));
       invalidateHover();
       return;
     }
@@ -90,7 +85,6 @@ export function createArchiveActions({
         updateHud();
         save();
         // The rust splash sounds from the tray once the key lands (wash-forge-stations).
-        toast(target.bathKind === 'mud' ? t('toast.washing') : t('toast.soaking', { seconds: SOAK_SECONDS.rust }));
       } else {
         const aimed = target.keyId && keyIndex.get(target.keyId);
         if (aimed && aimed.bathUntil > now) {
@@ -124,8 +118,8 @@ export function createArchiveActions({
           updateHud();
           save();
           tone('lift');
-          toast(taken.length > 1 ? t('toast.keysTaken', { count: taken.length }) :
-            t(shown.mud || shown.rust ? 'toast.layerCleaned' : 'toast.keyCleaned'));
+          // Still dirty after this bath: say which one it needs next.
+          if (taken.some(item => item.mud || item.rust)) toast(t('toast.layerCleaned'));
         } else {
           const contents = keyIndex.bathContents(target.id, now);
           toast(t(contents.ready.length && state.held.length >= MAX_HELD ? 'toast.freeHands' :
@@ -152,7 +146,6 @@ export function createArchiveActions({
           updateHud();
           save();
           tone('bundle');
-          if (state.activeBundle) toast(t('toast.bundleReady'));
           invalidateHover();
         } else {
           toast(t('toast.ringPrice', { cost: BUNDLE_COST, metal: state.metal ?? 0 }), true);
@@ -166,9 +159,6 @@ export function createArchiveActions({
       updateHud();
       save();
       tone('release');
-      const queued = getProgress(state).smelting;
-      toast(queued > 1 ? t('toast.smeltQueued', { ahead: queued - 1 }) :
-        t('toast.smelting', { seconds: SMELT_SECONDS }));
       // (the bar over the forge shows the countdown and the whole queue)
       invalidateHover();
       return;
@@ -191,7 +181,6 @@ export function createArchiveActions({
       updateHud();
       save();
       tone('take');
-      toast(t('toast.takenFromCell'));
       invalidateHover();
       return;
     }
@@ -250,8 +239,6 @@ export function createArchiveActions({
     const progress = getProgress(state);
     if (progress.sorted[keyType] === progress.required[keyType]) {
       toast(t('toast.cabinetDone', { name: familyName(keyType) }));
-    } else {
-      toast(t(bundle ? 'toast.bundlePlaced' : 'toast.keyPlaced'));
     }
     invalidateHover();
     if (progress.processed === TOTAL_KEYS) setTimeout(showVictory, 1900);
@@ -292,7 +279,6 @@ export function createArchiveActions({
     updateHud();
     save();
     tone('throw');
-    toast(t('toast.thrown'));
   }
 
   function towards(from, to, metres) {
@@ -310,13 +296,11 @@ export function createArchiveActions({
       world.workstations?.startMelt?.();
       statistics?.record('forge');
       tone('melt');
-      const queued = getProgress(state).smelting;
-      toast(queued > 1 ? t('toast.smeltQueued', { ahead: queued - 1 }) : t('toast.smelting', { seconds: SMELT_SECONDS }));
+
     } else if (landing.on === 'vessel') {
       if (!soakThrownKey(state, key, landing.vessel, landing.kind, now)) return;
       statistics?.record(landing.kind === 'mud' ? 'rinse' : 'rust');
       if (landing.kind === 'mud') tone('water');
-      toast(landing.kind === 'mud' ? t('toast.washing') : t('toast.soaking', { seconds: SOAK_SECONDS.rust }));
     } else {
       if (flight.bouncedOff) tone('wrong');
       return;

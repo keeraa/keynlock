@@ -30,18 +30,26 @@ float edgeAt(vec2 direction, float depth, vec3 normal, float here) {
   vec2 uv = clamp(vUv + direction * uTexel * uRadius, vec2(0.001), vec2(0.999));
   float neighborDepth = texture2D(uDepth, uv).r;
   float there = occupied(neighborDepth);
-  float silhouette = abs(here - there);
-  float crease = 0.0;
-  if (here > 0.5 && there > 0.5) {
-    vec3 neighborNormal = texture2D(uNormals, uv).rgb;
-    float normalDifference = length(normal - neighborNormal);
-    float depthDifference = abs(depth - neighborDepth);
-    crease = max(
-      smoothstep(uNormalThreshold, uNormalThreshold + 0.15, normalDifference),
-      smoothstep(uDepthThreshold, uDepthThreshold * 1.8, depthDifference)
-    );
-  }
-  return max(silhouette, crease);
+  // Draw a silhouette edge on the empty side, leaving thin metal visible.
+  if (here < .5) return there;
+  if (there < .5) return 0.0;
+
+  vec3 neighborNormal = texture2D(uNormals, uv).rgb;
+  float normalDifference = length(normal - neighborNormal);
+  float signedDepthDifference = depth - neighborDepth;
+  float crease = max(
+    smoothstep(uNormalThreshold, uNormalThreshold + .15, normalDifference),
+    smoothstep(uDepthThreshold, uDepthThreshold * 1.8, abs(signedDepthDifference))
+  );
+  // At an edge between two surfaces, put the ink on the farther one. Only
+  // when the depth step is decisive: along a fold (face meeting side wall)
+  // the step is near zero and its sign flickers from pixel to pixel, which
+  // broke the line into dashes. There both sides keep the ink.
+  float farther = smoothstep(-uDepthThreshold * .12, uDepthThreshold * .12,
+    signedDepthDifference);
+  float decisive = smoothstep(uDepthThreshold * .6, uDepthThreshold * 1.6,
+    abs(signedDepthDifference));
+  return crease * mix(1.0, farther, decisive);
 }
 
 void main() {

@@ -115,7 +115,10 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
   const workstations = createWorkstations(scene, mat, keyIndex, {
     effects: cleaningEffects,
     // The key leaves the bath for the hand: glint once it is fully clean.
-    onLiftDone: key => { if (!key.mud && !key.rust && !key.wax) pendingHandShine = true; },
+    onLiftDone: (key, from) => {
+      startHandFlight(key, from);
+      if (!key.mud && !key.rust && !key.wax) pendingHandShine = true;
+    },
   });
   const syncEntranceShadow = createEntranceContactShadows(scene, state.keys);
   const floorKeys = new Map(); // key ID -> its family batch and instance index
@@ -253,9 +256,37 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
   const meltPose = { candleId: null, blend: 0 };
   const poseScratch = { quaternion: new THREE.Quaternion(), hand: new THREE.Quaternion(),
     base: new THREE.Quaternion(), target: new THREE.Vector3(), yaw: new THREE.Euler() };
+  // A key taken from a bath flies from where it was raised into the hand.
+  const HAND_FLIGHT_MS = 420;
+  let handFlight = null;
+  function startHandFlight(key, from) {
+    if (!from) return;
+    const position = new THREE.Vector3(), quaternion = new THREE.Quaternion(), scale = new THREE.Vector3();
+    from.decompose(position, quaternion, scale);
+    handFlight = { keyId: key.id, position, quaternion, scale: scale.x, startedAt: performance.now() };
+  }
+  function flyToHand() {
+    if (!handFlight || displayedHandId !== handFlight.keyId) { handFlight = null; return false; }
+    const t = Math.min(1, (performance.now() - handFlight.startedAt) / HAND_FLIGHT_MS);
+    const ease = 1 - Math.pow(1 - t, 3);
+    hand.updateMatrixWorld(true);
+    const local = hand.worldToLocal(handFlight.position.clone());
+    const handTurn = hand.getWorldQuaternion(new THREE.Quaternion()).invert();
+    const localTurn = handTurn.multiply(handFlight.quaternion);
+    const localScale = handFlight.scale / hand.getWorldScale(new THREE.Vector3()).x;
+    // A small arc on the way, so it reads as a toss rather than a slide.
+    handModel.position.copy(local).multiplyScalar(1 - ease);
+    handModel.position.y += Math.sin(Math.PI * t) * .08;
+    handModel.quaternion.copy(localTurn).slerp(poseScratch.base.setFromEuler(HAND_POSE), ease);
+    handModel.scale.setScalar(localScale + (handModel.userData.handScale - localScale) * ease);
+    if (t >= 1) handFlight = null;
+    return true;
+  }
+
   function placeHeldKey(elapsed) {
     if (!handModel) return;
     handModel.userData.handScale ??= handModel.scale.x;
+    if (flyToHand()) return;
     const goal = meltPose.candleId ? 1 : 0;
     meltPose.blend += (goal - meltPose.blend) * (1 - Math.exp(-elapsed / .12));
     if (Math.abs(goal - meltPose.blend) < .002) meltPose.blend = goal;
@@ -408,6 +439,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
   for (const key of state.keys) syncKey(key);
 
   let hoverAnchor = null;
+  let outlinedKeyId = null;
   function highlight(target) {
     hovered = target;
     hoverAnchor = null;
@@ -440,6 +472,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
       }
     }
     keyHoverTarget = target?.kind === 'key' ? 1 : 0;
+    outlinedKeyId = keyHoverTarget ? target.id : outlinedKeyId;
     if (keyHoverTarget) {
       const key = keysById.get(target.id);
       if (key) {
@@ -468,6 +501,11 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
     const hoverFactor = 1 - Math.exp(-elapsed / .15);
     keyHoverOpacity += (keyHoverTarget - keyHoverOpacity) * hoverFactor;
     objectHoverOpacity += (objectHoverTarget - objectHoverOpacity) * hoverFactor;
+    // A picked-up key leaves the floor at once: drop its outline without the fade.
+    if (outlinedKeyId && keysById.get(outlinedKeyId)?.status !== 'floor') {
+      keyHoverOpacity = 0;
+      outlinedKeyId = null;
+    }
     keyOutline.visible = keyHoverOpacity > .005;
     objectMask.visible = objectHoverOpacity > .005;
     if (hoverAnchor?.parent) {
@@ -482,7 +520,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
     cabinets.forEach(cabinet => cabinet.update(now));
     candleSet.update(now, cabinets);
     cleaningEffects.update(elapsed);
-    if (pendingHandShine && handModel && hand.visible) {
+    if (pendingHandShine && handModel && hand.visible && !handFlight) {
       pendingHandShine = false;
       cleaningEffects.shine(handModel, 5, { attachTo: hand });
     }

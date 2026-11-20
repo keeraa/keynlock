@@ -499,8 +499,11 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
           const { startedAt, key, keyMesh } = bath.lift;
           const progress = Math.max(0, (now - startedAt) / bath.lift.duration);
           if (progress >= 1) {
+            // Hand the key over from where it hangs now: it flies to the hand.
+            keyMesh.updateWorldMatrix(true, false);
+            const from = keyMesh.matrixWorld.clone();
             clearLift(bath);
-            onLiftDone?.(key);
+            onLiftDone?.(key, from);
           } else {
             const lift = Math.min(1, progress * (bath.tray ? 1.5 : 2.1));
             const from = bath.lift.from;

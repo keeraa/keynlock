@@ -70,7 +70,9 @@ test('baths and candle drive the new cleaning animations', () => {
   const actions = readFileSync(new URL('../dist/js/archive-actions.js', import.meta.url), 'utf8');
   assert.match(stations, /cleaning\.clods\(slot, key/);
   assert.match(stations, /cleaning\.flakes\(slot, key/);
-  assert.match(stations, /onLiftDone\?\.\(key\)/);
+  assert.match(stations, /onLiftDone\?\.\(key, from\)/);
+  assert.match(world, /function startHandFlight\(key, from\)/, 'a bath key flies into the hand');
+  assert.match(world, /status !== 'floor'\) \{\s*keyHoverOpacity = 0;/, 'a picked-up key loses its outline at once');
   assert.match(world, /function meltHeldWax\(progress, candleId/);
   assert.match(world, /function placeHeldKey\(elapsed\)/, 'the key leaves the hand for the flame');
   assert.match(actions, /world\.meltHeldWax\?\.\(0, null, \{ restoreCoat: false \}\)/);

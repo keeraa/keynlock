@@ -992,11 +992,20 @@ test('wax melts at the entrance and a bundle lights cabinet candles in both rend
     assert.equal(await litCount(), 1);
     await view([7.32, 1.78, ENTRANCE_CANDLE.z], [8.62, 1.30, ENTRANCE_CANDLE.z]);
     await prompt.getByText(/Поднести ключ к пламени/).waitFor();
+    // Hold the station clock while checking that looking away interrupts the
+    // melt: on slow software-rendered CI the melt could otherwise finish first.
+    await page.evaluate(() => {
+      const real = performance.now.bind(performance);
+      const frozenAt = real();
+      window.restoreClock = () => { performance.now = real; };
+      performance.now = () => frozenAt;
+    });
     await page.keyboard.press('e');
     await prompt.getByText(/Воск тает/).waitFor();
     await view([7.32, 1.78, ENTRANCE_CANDLE.z], [6.3, 1.30, ENTRANCE_CANDLE.z]);
     await page.waitForFunction(() => !document.querySelector('#interaction-prompt').textContent.includes('Воск тает'));
     assert.equal(await page.evaluate(() => window.candleTest.state.keys.find(key => key.wax && key.status === 'held')?.wax), true);
+    await page.evaluate(() => window.restoreClock());
     await view([7.32, 1.78, ENTRANCE_CANDLE.z], [8.62, 1.30, ENTRANCE_CANDLE.z]);
     await prompt.getByText(/Поднести ключ к пламени/).waitFor();
     await page.keyboard.press('e');

@@ -52,7 +52,8 @@ export function createBathProgress(document, world, keyIndex, state = null, stat
         bar.dips.set(key.id, { until: key.bathUntil, count });
     }
   }
-  function update(playing, playSound) {
+  // onReady(kind, position): a bath just finished a key (defaults to a chime there).
+  function update(playing, playSound, onReady = null) {
     root.hidden = !playing;
     if (!playing) return;
     const now = stationNow();
@@ -69,7 +70,10 @@ export function createBathProgress(document, world, keyIndex, state = null, stat
       updateWaterDips(bar, keys, now, playSound);
       const pending = keys.filter(key => key.bathUntil > now);
       const ready = keys.length > pending.length;
-      if (ready && !bar.ready) playSound?.('ready', bar.position);
+      if (ready && !bar.ready) {
+        if (onReady) onReady(bar.kind, bar.position);
+        else playSound?.('ready', bar.position);
+      }
       bar.ready = ready;
       element.hidden = !visible || pending.length === 0;
       const status = pending.length ? 'processing' : ready ? 'ready' : 'empty';

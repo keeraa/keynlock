@@ -14,7 +14,7 @@
       "./js/archive-actions.js": "./js/archive-actions.js?v=58301f0a72",
       "./js/archive-aim.js": "./js/archive-aim.js?v=c82f77eb29",
       "./js/archive-audio.js": "./js/archive-audio.js?v=8d783a9a35",
-      "./js/archive-bath-progress.js": "./js/archive-bath-progress.js?v=2dad56b59e",
+      "./js/archive-bath-progress.js": "./js/archive-bath-progress.js?v=9ef37164a5",
       "./js/archive-cabinet-aim.js": "./js/archive-cabinet-aim.js?v=a2bf60b40b",
       "./js/archive-candles.js": "./js/archive-candles.js?v=cec0e0c2f7",
       "./js/archive-entrance-light.js": "./js/archive-entrance-light.js?v=ad2de414ff",
@@ -38,6 +38,7 @@
       "./js/archive-window-bird.js": "./js/archive-window-bird.js?v=43058cbfcb",
       "./js/archive-window-rays.js": "./js/archive-window-rays.js?v=0e295231ba",
       "./js/art.js": "./js/art.js?v=199ce1d8b9",
+      "./js/auto-quality.js": "./js/auto-quality.js?v=707a3023ed",
       "./js/cabinet-completion.js": "./js/cabinet-completion.js?v=859ca49493",
       "./js/cabinet-finish.js": "./js/cabinet-finish.js?v=bf4b3cc07e",
       "./js/cabinet-layout.js": "./js/cabinet-layout.js?v=9f6ca3ec34",
@@ -83,9 +84,9 @@
       "./js/key-spacing.js": "./js/key-spacing.js?v=919f9b5185",
       "./js/key-thumbnails.js": "./js/key-thumbnails.js?v=de79a4c562",
       "./js/key-wax.js": "./js/key-wax.js?v=5719cedd27",
-      "./js/locales/en.js": "./js/locales/en.js?v=8102bcd853",
-      "./js/locales/ru.js": "./js/locales/ru.js?v=9bb35c5381",
-      "./js/main.js": "./js/main.js?v=a8299c756d",
+      "./js/locales/en.js": "./js/locales/en.js?v=76cb8d7d91",
+      "./js/locales/ru.js": "./js/locales/ru.js?v=d63a5a83b2",
+      "./js/main.js": "./js/main.js?v=dcc43fc98c",
       "./js/metric-box-geometry.js": "./js/metric-box-geometry.js?v=0122b60957",
       "./js/mouse-look.js": "./js/mouse-look.js?v=dba9797d27",
       "./js/painted-renderer.js": "./js/painted-renderer.js?v=8f87c63bc5",
@@ -106,7 +107,7 @@
       "./js/station-visual-state.js": "./js/station-visual-state.js?v=51b160ddc2",
       "./js/throw-physics.js": "./js/throw-physics.js?v=fb6e6d21e9",
       "./js/visual-panel.js": "./js/visual-panel.js?v=3fea16bf45",
-      "./js/visual-settings.js": "./js/visual-settings.js?v=f15ae16ee2",
+      "./js/visual-settings.js": "./js/visual-settings.js?v=4932c88de6",
       "./js/wash-forge-stations.js": "./js/wash-forge-stations.js?v=a8a310c8e0",
       "./js/window-beam-light.js": "./js/window-beam-light.js?v=b357ee94f4",
       "./js/window-light-palette.js": "./js/window-light-palette.js?v=3556a8c524",
@@ -118,7 +119,7 @@
       "./js/world-lighting.js": "./js/world-lighting.js?v=2b4ed3e6f5",
       "./js/world-materials.js": "./js/world-materials.js?v=2ef46c8885",
       "./js/world-particles.js": "./js/world-particles.js?v=289a1a04e0",
-      "./js/world.js": "./js/world.js?v=1769403f80",
+      "./js/world.js": "./js/world.js?v=0613ea4bdb",
       "./vendor/three-core.js": "./vendor/three-core.js?v=39f6e7a9ee",
       "./vendor/three.js": "./vendor/three.js?v=da4930ac25"
     }
@@ -225,6 +226,7 @@
         <div class="visual-control"><label for="windowDaylight"><span data-i18n="visual.daylight">Свет сквозь окна</span> <output for="windowDaylight">75%</output></label><input id="windowDaylight" type="range" min="0" max="100" value="75" /></div>
         <div class="visual-group"><span data-i18n="visual.hatch">04 · ШТРИХОВКА ТЕНЕЙ</span><label class="visual-switch"><input id="hatchShadows" type="checkbox" /> <span data-i18n="visual.on">Включена</span></label></div>
         <p class="visual-note" data-i18n="visual.hatchNote">Проба: тёмные места рисуются пером вместо сплошной черноты.</p>
+        <div class="visual-group"><span data-i18n="visual.smooth">05 · ПЛАВНОСТЬ</span><label class="visual-switch"><input id="autoQuality" type="checkbox" checked /> <span data-i18n="visual.autoQuality">Снижать чёткость при низком FPS</span></label></div>
       </div>
       <div class="visual-actions"><button id="visual-natural" class="text-button" data-i18n="visual.natural">Исходный вид</button><button id="visual-reset" class="text-button" data-i18n="visual.reset">Рисовка по умолчанию</button><button id="visual-back" class="secondary-button" data-i18n="visual.back">НАЗАД</button></div>
       <button id="visual-resume" class="primary-button" data-i18n-html="visual.resume">ПРОДОЛЖИТЬ ИГРУ <span>→</span></button>
@@ -258,6 +260,6 @@
     <img id="catalog-flight" class="ledger-flight" alt="" aria-hidden="true" hidden />
   </dialog>
 
-  <script type="module" src="./js/main.js?v=a8299c756d"></script>
+  <script type="module" src="./js/main.js?v=dcc43fc98c"></script>
 </body>
 </html>

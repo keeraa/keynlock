@@ -7,6 +7,7 @@ import { DESIGN_PARAMETERS, loadCollection, persistCollection } from './key-stor
 import { modelToSTL } from './key-stl.js';
 import { installKeyPreviewArt } from './key-art.js';
 import { createWaxMelt } from './wax-melt.js';
+import { setKeyHatching } from './key-materials.js';
 import { createMudWash } from './mud-wash.js';
 import { createRustSoak } from './rust-soak.js';
 
@@ -146,6 +147,7 @@ function initializeInput() {
     renderControls();
     scheduleModelUpdate();
   });
+  $('hatchShadows').addEventListener('change',ev=>setKeyHatching(ev.target.checked));
   $('meltWaxButton').addEventListener('click',()=>startCleaning('wax'));
   $('washMudButton').addEventListener('click',()=>startCleaning('mud'));
   $('soakRustButton').addEventListener('click',()=>startCleaning('rust'));

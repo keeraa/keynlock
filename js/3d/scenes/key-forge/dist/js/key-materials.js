@@ -6,6 +6,17 @@ const SEAMLESS_TEXTURES=new Set([RUST_TEXTURE,'painted-green.webp']);
 const textureCache=new Map();
 const texturePromises=new Map();
 export const matCache=new Map();
+
+// Trial: draw deep shadow as pen hatching instead of solid black. The
+// shadowed metal keeps a muted version of its paint and gets ink strokes:
+// one direction in shade, crossed strokes in the darkest places.
+const hatchUniforms=new Set();
+let hatchEnabled=true;
+export function setKeyHatching(enabled) {
+  hatchEnabled=!!enabled;
+  for(const uniform of hatchUniforms)uniform.value=hatchEnabled?1:0;
+}
+export function keyHatchingEnabled(){return hatchEnabled;}
 const loader=new THREE.TextureLoader();
 
 function loadPaintedTexture(file) {
@@ -68,6 +79,10 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
     const rustAngleUniform={value:placement.angle};
     // Rust soak animation: 0 keeps all rust, above 1 every patch has flaked off.
     const rustErodeUniform={value:-.1};
+    const hatchUniform={value:hatchEnabled?1:0};
+    hatchUniforms.add(hatchUniform);
+    material.addEventListener('dispose',()=>hatchUniforms.delete(hatchUniform));
+    material.userData.hatchUniform=hatchUniform;
     material.userData.rustErodeUniform=rustErodeUniform;
     material.userData.rustUniform=rustUniform;
     material.userData.rustShiftUniform=rustShiftUniform;
@@ -78,17 +93,20 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
       shader.uniforms.uRustShift=rustShiftUniform;
       shader.uniforms.uRustAngle=rustAngleUniform;
       shader.uniforms.uRustErode=rustErodeUniform;
+      shader.uniforms.uHatch=hatchUniform;
       shader.uniforms.uDirtAmount=dirtUniform;
       shader.uniforms.uDirtSeed=dirtSeedUniform;
       shader.vertexShader=shader.vertexShader
         .replace('#include <common>',`#include <common>
           varying vec3 vKeySurface;
+          varying vec3 vKeyNormal;
           varying vec3 vInstanceKeyPaint;
           #ifdef USE_INSTANCING
           attribute vec3 instanceKeyPaint;
           #endif`)
         .replace('#include <begin_vertex>',`#include <begin_vertex>
           vKeySurface = position;
+          vKeyNormal = objectNormal;
           #ifdef USE_INSTANCING
           vInstanceKeyPaint = instanceKeyPaint;
           #else
@@ -97,9 +115,28 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
       shader.fragmentShader=shader.fragmentShader
         .replace('#include <common>',`#include <common>
           varying vec3 vKeySurface;
+          varying vec3 vKeyNormal;
           varying vec3 vInstanceKeyPaint;
           uniform float uDirtAmount;
           uniform float uDirtSeed;
+          uniform float uHatch;
+          // Hatching drawn on the key's own surface (it turns with the key).
+          // coord counts strokes; fwidth keeps strokes antialiased and fades
+          // them out when they get denser than about three pixels apart,
+          // so distant keys show a flat muted shade instead of moire.
+          float hatchLine(float coord, float width) {
+            float d=abs(fract(coord)-.5);
+            float w=fwidth(coord);
+            float line=1.0-smoothstep(width*.5-w,width*.5+w,d);
+            return line*(1.0-smoothstep(.22,.45,w));
+          }
+          // Each face is hatched in its own plane: the front and back by x/y,
+          // the side walls by their length and the key's thickness.
+          vec2 hatchPlane() {
+            vec3 n=abs(vKeyNormal);
+            if(n.z>=n.x&&n.z>=n.y)return vKeySurface.xy;
+            return n.x>n.y?vKeySurface.yz:vKeySurface.xz;
+          }
           float dirtHash(vec2 p) {return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
           float dirtNoise(vec2 p) {
             vec2 cell=floor(p),f=fract(p);
@@ -140,10 +177,26 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
           }`)
         .replace('#include <roughnessmap_fragment>',
           '#include <roughnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, 1.0, dirtCoverage);')
+        .replace('#include <opaque_fragment>',
+          `#include <opaque_fragment>
+          if(uHatch>.5) {
+            vec3 lit=gl_FragColor.rgb;
+            float light=dot(lit,vec3(.2126,.7152,.0722));
+            float shade=1.0-smoothstep(.03,.2,light);
+            if(shade>0.0) {
+              vec2 surface=hatchPlane()/.05;   // one stroke every 0.05 key units
+              float strokes=hatchLine((surface.x+surface.y)*.7071,.28);
+              float cross=hatchLine((surface.x-surface.y)*.7071,.24)*smoothstep(.55,.85,shade);
+              float ink=max(strokes,cross);
+              vec3 paper=diffuseColor.rgb*.55;
+              vec3 drawn=mix(paper,vec3(.03,.022,.016),ink*.9);
+              gl_FragColor.rgb=mix(lit,drawn,shade);
+            }
+          }`)
         .replace('#include <metalnessmap_fragment>',
           '#include <metalnessmap_fragment>\nmetalnessFactor *= (1.0 - 0.98 * dirtCoverage);');
     };
-    material.customProgramCacheKey=()=> 'keynlock-gouache-rust-grime-instancing-v7';
+    material.customProgramCacheKey=()=> 'keynlock-gouache-rust-grime-hatch-instancing-v9';
   }
   cache.set(id,material);return material;
 }

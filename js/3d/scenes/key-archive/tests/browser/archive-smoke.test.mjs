@@ -9,7 +9,7 @@ import { chromium } from 'playwright';
 import { BACKUP_STORAGE_KEY } from '../../dist/js/archive-save-state-with-route.js';
 import { BUNDLE_COST, createInitialState, pickupKey, STORAGE_KEY } from '../../dist/js/rules.js';
 import { CABINET_CELL_BACK_Z, CABINET_GRID_BOTTOM_Y, CABINET_GROUND_OFFSET, CABINET_HEADER_Y, CABINET_Z, pegForSlot } from '../../dist/js/cabinet-layout.js';
-import { FIRST_ROUTE_KEY_ID } from '../../dist/js/first-route.js';
+import { FIRST_ROUTE_KEY_ID } from '../../dist/js/archive-first-route-guide.js';
 import { FIXTURE_OFFSETS } from '../../dist/js/station-layout.js';
 import { RUST_TRAY } from '../../dist/js/wash-forge-stations.js';
 
@@ -291,12 +291,6 @@ test('the starter key can be placed in a suggested cell, retrieved and moved by 
   t.after(() => page.close());
   await page.addInitScript(() => { HTMLCanvasElement.prototype.requestPointerLock = undefined; });
   const aim = await installTestCamera(page);
-  // Exercise the new game script against the entry markup cached before the route.
-  await page.route(baseUrl, async route => {
-    const response = await route.fetch();
-    const html = (await response.text()).replace('main.js?v=bath-index', 'main.js?v=archive-entry-fix');
-    await route.fulfill({ response, body: html });
-  });
   const errors = await enterArchive(page, 'webgl-entrance-route');
   const goal = page.locator('#first-route-goal');
   const marker = page.locator('#first-route-marker');

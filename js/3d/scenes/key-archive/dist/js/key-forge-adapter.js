@@ -2,12 +2,12 @@
 // Editable designs enter through createForgeKeyProvider(profiles); geometry and
 // all display variants are derived from those same ten designs on page load.
 import * as THREE from '../vendor/three.js';
-import { KEY_TEMPLATES, METALS, defaultDesign, normalizeKeyDesign } from './key-data.js?v=plain-gouache';
+import { KEY_TEMPLATES, METALS, defaultDesign, normalizeKeyDesign } from './key-data.js';
 import { createKeyModel as createForgeModel, disposeKeyModel } from './key-geometry.js?v=wax-and-bundles';
-import { bowPoints, createBowShape, joinedKeyShape, keyBounds } from './key-shapes.js?v=2';
+import { bowPoints, createBowShape, joinedKeyShape, keyBounds } from './key-shapes.js';
 import { getMetalMaterial } from './key-materials.js?v=wax-and-bundles';
-import { mudGeometry, getMudMaterial, mudBlobLayout } from './key-mud.js?v=forge-coats';
-import { waxGeometry, getWaxMaterial, waxBlobLayout } from './key-wax.js?v=forge-coats';
+import { mudGeometry, getMudMaterial, mudBlobLayout } from './key-mud.js';
+import { waxGeometry, getWaxMaterial, waxBlobLayout } from './key-wax.js';
 
 // Hall keys are small on screen: a coarser coat grid keeps clods and wax
 // readable at about half the triangles of the Key Forge preview.

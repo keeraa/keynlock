@@ -1,16 +1,16 @@
-import { familyName } from './i18n.js';
+import { familyName } from './i18n.js?v=single-source';
 import * as THREE from '../vendor/three.js';
-import { KEY_TYPES } from './rules.js?v=key-ring';
+import { KEY_TYPES } from './rules.js?v=single-source';
 import { makeLabel } from './art.js?v=key-ring';
 import { createCombinedKeyGeometry, getKeyMaterial, getKeyDisplayScale } from './key-factory.js?v=key-ring';
 import { createPaintedInstanceGeometry } from './key-instance-finish.js?v=wax-and-bundles';
 import { KEY_ART } from './key-art.js';
-import { PERIMETER_BAND_Y } from './hall-architecture.js?v=alchemy-candles';
+import { PERIMETER_BAND_Y } from './hall-architecture.js?v=single-source';
 import { createCabinetCompletion } from './cabinet-completion.js?v=wax-and-bundles';
-import { CABINET_Z, CABINET_GRID_WIDTH, CABINET_GRID_HALF_WIDTH, CABINET_BODY_WIDTH, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS, CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_SHELF_DEPTH, CABINET_GRID_BOTTOM_Y, CABINET_HEADER_HEIGHT, CABINET_HEADER_Y, CABINET_CORNICE_TOP, CABINET_SHELF_CENTER_Z, CABINET_GROUND_OFFSET, CABINET_BACK_FRONT_Z, CABINET_CROWN_SCALE_FACTOR, cabinetKeyPose } from './cabinet-layout.js?v=cabinet-cell-glow';
+import { CABINET_Z, CABINET_GRID_WIDTH, CABINET_GRID_HALF_WIDTH, CABINET_BODY_WIDTH, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS, CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_SHELF_DEPTH, CABINET_GRID_BOTTOM_Y, CABINET_HEADER_HEIGHT, CABINET_HEADER_Y, CABINET_CORNICE_TOP, CABINET_SHELF_CENTER_Z, CABINET_GROUND_OFFSET, CABINET_BACK_FRONT_Z, CABINET_CROWN_SCALE_FACTOR, cabinetKeyPose } from './cabinet-layout.js?v=single-source';
 import { createCabinetFinish, createRoundedShelfGeometry } from './cabinet-finish.js?v=cabinet-cell-glow';
 import { createMetricBoxGeometry } from './metric-box-geometry.js?v=23';
-import { box, contactShadow } from './world-architecture.js?v=key-ring';
+import { box, contactShadow } from './world-architecture.js?v=single-source';
 
 function addTrimInstances(group, instances, material) {
   const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), material, instances.length);

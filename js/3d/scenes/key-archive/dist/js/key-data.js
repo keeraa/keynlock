@@ -49,7 +49,7 @@ export function keyAssetUrl(file) { return new URL(`../assets/${file}`,import.me
 export function defaultDesign(index) {
   const t = KEY_TEMPLATES[index];
   return { template:index, metal:t.metal, shaftLength:t.length, headSize:100, teeth:t.teeth,
-    cutDepth:t.depth, thickness:t.id==='forge'?17:12, rustAmount:0, dirtAmount:0,
+    cutDepth:t.depth, thickness:t.id==='forge'?17:12, rustAmount:0, dirtAmount:0, waxAmount:0,
     doubleSided: ['double','fork'].includes(t.blade),
     broken:false,breakAngle:70 };
 }
@@ -67,5 +67,6 @@ export function normalizeKeyDesign(design) {
   return {...rest,metal:fixedMetal(design.template),
     broken:design.broken===true,
     breakAngle:Math.max(60,Math.min(80,Number(design.breakAngle)||70)),
-    dirtAmount:Number(design.dirtAmount)>0?100:0};
+    dirtAmount:Number(design.dirtAmount)>0?100:0,
+    waxAmount:Number(design.waxAmount)>0?100:0};
 }

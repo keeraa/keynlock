@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { METALS, RUST_TEXTURE, keyAssetUrl } from './key-data.js?v=plain-gouache';
+import { METALS, RUST_TEXTURE, keyAssetUrl } from './key-data.js';
 import { KEY_ART } from './key-art.js';
 
 const SEAMLESS_TEXTURES=new Set([RUST_TEXTURE,'painted-green.webp']);

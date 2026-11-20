@@ -1,11 +1,11 @@
-import { t, applyTranslations, LANGUAGES, getLanguage, setLanguage } from './i18n.js?v=room-music';
+import { t, applyTranslations, LANGUAGES, getLanguage, setLanguage } from './i18n.js?v=single-source';
 // Static texts of the page follow the chosen language before anything shows.
 applyTranslations(document);
-import { TOTAL_KEYS, getProgress } from './rules.js?v=stable-pickup';
+import { TOTAL_KEYS, getProgress } from './rules.js?v=single-source';
 import { createWorld } from './world.js?v=held-key-clearance';
 import { installKeyAssetProvider } from './key-factory.js?v=key-ring';
 import { createArchiveHud } from './archive-hud.js?v=catalog-thumbnails';
-import { openArchiveSave, loadVisualSettings, clearArchiveState } from './archive-save-state-with-route.js?v=paused-stations';
+import { openArchiveSave, loadVisualSettings, clearArchiveState } from './archive-save-state-with-route.js?v=single-source';
 import { createVisualPanel } from './visual-panel.js?v=key-ring';
 import externalKeyProvider from './key-provider-entry.js?v=wax-and-bundles';
 import { createFallbackWorld } from './fallback-world.js?v=paused-scene';

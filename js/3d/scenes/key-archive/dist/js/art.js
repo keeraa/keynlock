@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { KEY_TYPES } from './rules.js?v=key-ring';
+import { KEY_TYPES } from './rules.js?v=single-source';
 import { getKeyPaint, METAL_BY_KEY_TYPE } from './painted-textures.js';
 
 function seeded(seed) {

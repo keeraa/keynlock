@@ -1,7 +1,7 @@
-import { t, familyName } from './i18n.js';
-import { CABINET_HEADER_Y } from './cabinet-layout.js?v=cabinet-cell-glow';
+import { t, familyName } from './i18n.js?v=single-source';
+import { CABINET_HEADER_Y } from './cabinet-layout.js?v=single-source';
 import * as THREE from '../vendor/three.js';
-import { KEY_TYPES } from './rules.js?v=key-ring';
+import { KEY_TYPES } from './rules.js?v=single-source';
 import { restingKeyY } from './floor-contact.js';
 
 export const FIRST_ROUTE_KEY_ID = '9-0';

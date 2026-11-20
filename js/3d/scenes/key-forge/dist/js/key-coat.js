@@ -8,6 +8,12 @@ import { bowPoints, holesFor, bladeSections } from './key-shapes.js';
 
 const THRESHOLD=.5;
 
+// Deterministic hash noise for coat layouts (wax, mud).
+export function stableNoise(value) {
+  const v=Math.sin(value*12.9898+78.233)*43758.5453;
+  return v-Math.floor(v);
+}
+
 function insidePolygon(x,y,points) {
   let inside=false;
   for(let i=0,j=points.length-1;i<points.length;j=i++) {

@@ -1,7 +1,7 @@
-import { t } from './i18n.js';
-import { STATIONS, FIXTURE_OFFSETS, FORGE_SURFACE_Y, bathId } from './station-layout.js';
+import { t } from './i18n.js?v=single-source';
+import { STATIONS, FIXTURE_OFFSETS, FORGE_SURFACE_Y, bathId } from './station-layout.js?v=single-source';
 import { RUST_TRAY } from './wash-forge-stations.js?v=paused-scene';
-import { smeltingState } from './rules.js?v=key-ring';
+import { smeltingState } from './rules.js?v=single-source';
 import { bathKeyProgress, waterDipCount } from './station-visual-state.js?v=cleaning-cues';
 
 // Membership comes from the existing bath index.

@@ -1,9 +1,9 @@
 import * as THREE from '../vendor/three.js';
-import { KEY_TEMPLATES, fixedMetal } from './key-data.js?v=plain-gouache';
-import { joinedKeyShape } from './key-shapes.js?v=2';
+import { KEY_TEMPLATES, fixedMetal } from './key-data.js';
+import { joinedKeyShape } from './key-shapes.js';
 import { getMetalMaterial } from './key-materials.js?v=wax-and-bundles';
 import { crustWidth, dirtTriangles, getDirtMaterial } from './key-dirt.js?v=wax-and-bundles';
-import { getKeyAnchors } from './key-placement.js?v=plain-gouache';
+import { getKeyAnchors } from './key-placement.js';
 
 function extrude(shape,depth) {
   // Flat caps and one side wall per edge retain the silhouette and STL volume.

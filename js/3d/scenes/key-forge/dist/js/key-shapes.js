@@ -245,6 +245,9 @@ export function createKeyShape(template,design) {
   return shape;
 }
 
+// The Key Archive's name for the same single outline.
+export function joinedKeyShape(template,design) { return createKeyShape(template,design); }
+
 export function keyBounds(template,design) {
   const scale=design.headSize/100;
   const points=[...bowPoints(template.bow).map(([x,y])=>[-1.21+x*scale,y*scale]),

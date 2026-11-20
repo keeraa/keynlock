@@ -1,8 +1,8 @@
 import * as THREE from '../vendor/three.js';
-import { CABINET_BODY_WIDTH, CABINET_Z } from './cabinet-layout.js?v=wax-and-bundles';
-import { HALL_SIDE_WALL_INNER_X } from './hall-architecture.js?v=alchemy-candles';
+import { CABINET_BODY_WIDTH, CABINET_Z } from './cabinet-layout.js?v=single-source';
+import { HALL_SIDE_WALL_INNER_X } from './hall-architecture.js?v=single-source';
 import { createCandleFlame, createCandleFlameMaterial } from './candle-flame.js?v=candlelight';
-import { ARCHIVE_DESK } from './archive-ledger.js?v=key-catalog';
+import { ARCHIVE_DESK } from './archive-ledger.js?v=single-source';
 import { batchStaticHallMeshes } from './static-mesh-batches.js';
 
 export const WAX_MELT_MS = 2500;

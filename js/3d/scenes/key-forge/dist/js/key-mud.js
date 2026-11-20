@@ -1,7 +1,6 @@
 import * as THREE from '../vendor/three.js';
 import { bowPoints, shaftStartX, shaftHalfHeight, keyBreakX, keyBreakAngle } from './key-shapes.js';
-import { stableNoise } from './key-dirt.js';
-import { coatGeometry, coatSvg } from './key-coat.js';
+import { coatGeometry, coatSvg, stableNoise } from './key-coat.js';
 
 // Mud: a few dried, lumpy clods stuck to the bow, the shaft and part of the
 // teeth, plus loose crumbs. Built with the same coat builder as candle wax,
@@ -88,9 +87,9 @@ export function washMudBlobs(blobs,progressFor) {
   return result.filter(blob=>blob.rx>.016&&blob.ry>.016);
 }
 
-export function mudGeometry(template,design,{blobs=mudBlobLayout(template,design),heightScale=1}={}) {
+export function mudGeometry(template,design,{blobs=mudBlobLayout(template,design),heightScale=1,cell=CELL}={}) {
   const seed=design.template*3.7+1.1;
-  return coatGeometry(template,design,blobs,{bulge:BULGE,cell:CELL,heightScale,colors:MUD_COLORS,
+  return coatGeometry(template,design,blobs,{bulge:BULGE,cell,heightScale,colors:MUD_COLORS,
     // Ragged, crumbly outline and a bumpy top.
     edge:(x,y)=>.16*(valueNoise(x*7.5,y*7.5,seed)-.5)+.07*(valueNoise(x*19,y*19,seed+5)-.5),
     relief:(x,y)=>.72+.5*valueNoise(x*9,y*9,seed+11)+.18*valueNoise(x*23,y*23,seed+17)});

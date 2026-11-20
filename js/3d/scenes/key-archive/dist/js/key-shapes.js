@@ -22,7 +22,9 @@ export function bowPoints(kind) {
   }
 }
 
-function ellipsePoints(cx,cy,rx,ry=rx,count=20) {
+// 16 sides: the facets stay under a pixel even at full zoom and hide inside
+// the 1.5 px ink outline (20 sides cost a quarter more triangles per hole).
+function ellipsePoints(cx,cy,rx,ry=rx,count=16) {
   return Array.from({length:count},(_,i)=>{const a=2*Math.PI*i/count;return [cx+Math.cos(a)*rx,cy+Math.sin(a)*ry];});
 }
 
@@ -137,7 +139,29 @@ export function bladeProfile(template, design, sampleCount=210) {
     const u=i/sampleCount;const x=start+(end-start)*u;
     top.push([x,edge(u,false)]);bottom.push([x,edge(u,true)]);
   }
-  return [...simplifyPolyline(top),...simplifyPolyline(bottom).reverse()];
+  // The blade butts exactly against the bow's outer rim instead of reaching
+  // inside it. Both have the same thickness, so their faces meet edge to edge
+  // with no overlap and no step: nothing for the depth buffer to fight over.
+  const rim=bowRimBetween(template,design,-half,half);
+  const rimTop=rim[rim.length-1],rimBottom=rim[0];
+  const topEdge=simplifyPolyline(top).filter(([x])=>x>rimTop[0]+1e-6);
+  const bottomEdge=simplifyPolyline(bottom).filter(([x])=>x>rimBottom[0]+1e-6);
+  return [rimTop,...topEdge,...bottomEdge.reverse(),...rim.slice(0,-1)];
+}
+
+// The bow's right-hand outline between two heights, bottom to top, in key
+// coordinates. It includes every bow vertex in that band, so the blade's edge
+// lies exactly on the bow's edge.
+function bowRimBetween(template,design,low,high) {
+  const scale=design.headSize/100;
+  const outline=bowPoints(template.bow);
+  const toKey=([x,y])=>[-1.21+x*scale,y*scale];
+  const points=[[rightContourAtY(outline,low/scale),low/scale],[rightContourAtY(outline,high/scale),high/scale]];
+  for(const [x,y] of outline) {
+    if(y*scale<=low||y*scale>=high)continue;
+    if(Math.abs(x-rightContourAtY(outline,y))<1e-9)points.push([x,y]);
+  }
+  return points.sort((a,b)=>a[1]-b[1]).map(toKey);
 }
 
 // A broken/bent key is a single solid outline. A mitered corner connects the
@@ -180,57 +204,49 @@ export function bladeSections(template,design,sampleCount=210) {
   return [outline];
 }
 
-// The bow and shaft must share one outer contour and one pair of face caps.
-// Overlapping separate extrusions create a visible line at the neck even
-// when their faces are offset by a fraction of a millimetre.
-export function joinedKeyShape(template,design) {
-  const scale=design.headSize/100;
-  let bow=bowPoints(template.bow).map(([x,y])=>[-1.21+x*scale,y*scale]);
-  const signedArea=bow.reduce((sum,[x,y],i)=>{
-    const [nx,ny]=bow[(i+1)%bow.length];
-    return sum+x*ny-nx*y;
-  },0);
-  if(signedArea<0)bow=bow.reverse();
-  const rightJoinAt=y=>{
-    let match=null;
-    for(let i=0;i<bow.length;i++) {
-      const [ax,ay]=bow[i], [bx,by]=bow[(i+1)%bow.length];
-      if(!((ay<=y&&by>y)||(by<=y&&ay>y)))continue;
-      const t=(y-ay)/(by-ay), x=ax+(bx-ax)*t;
-      if(!match||x>match.point[0])match={edge:i,t,point:[x,y]};
-    }
-    if(!match)throw new Error('Key bow has no shaft attachment');
-    return match;
-  };
-  const half=shaftHalfHeight(template);
-  const top=rightJoinAt(half),bottom=rightJoinAt(-half);
-  const outline=[top.point];
-  let edge=top.edge;
-  // Travel counter-clockwise around the whole head, skipping the short
-  // right-hand rim replaced by the shaft. Handles joins on the same edge.
-  for(let step=0;step<=bow.length;step++) {
-    if(edge===bottom.edge&&(step>0||bottom.t>top.t))break;
-    outline.push(bow[(edge+1)%bow.length]);
-    edge=(edge+1)%bow.length;
-  }
-  outline.push(bottom.point);
+// The whole key as ONE outline: the bow's contour with its rim between the
+// blade's edges replaced by the blade itself, plus the bow's finger holes.
+// One extrusion has no walls hidden inside the joint and no seam at all.
+export function keyOutline(template,design) {
+  const scale=design.headSize/100,half=shaftHalfHeight(template);
+  const place=points=>points.map(([x,y])=>[-1.21+x*scale,y*scale]);
+  let head=place(bowPoints(template.bow));
+  const area=head.reduce((sum,[x,y],i)=>{const [nx,ny]=head[(i+1)%head.length];return sum+x*ny-nx*y;},0);
+  if(area<0)head=head.reverse();                       // counter-clockwise
+  const leftmost=head.reduce((best,p,i)=>p[0]<head[best][0]?i:best,0);
+  head=[...head.slice(leftmost),...head.slice(0,leftmost)];
+  const rim=bowRimBetween(template,design,-half,half);
+  const rimBottom=rim[0],rimTop=rim[rim.length-1];
   const blade=bladeSections(template,design)[0];
-  const topIndex=blade.findIndex(([x,y])=>x>=top.point[0]-1e-7&&Math.abs(y-half)<1e-5);
-  const bottomIndex=blade.findLastIndex(([x,y])=>x>=bottom.point[0]-1e-7&&Math.abs(y+half)<1e-5);
-  if(topIndex<0||bottomIndex<=topIndex)throw new Error('Key blade cannot join its bow');
-  outline.push(...blade.slice(topIndex,bottomIndex+1).reverse());
-  const shape=pathFromPoints(outline);
-  for(const points of holesFor(template.bow)) {
-    const hole=new THREE.Path();
-    points.forEach(([x,y],index)=>{
-      const px=-1.21+x*scale, py=y*scale;
-      if(index)hole.lineTo(px,py);else hole.moveTo(px,py);
-    });
-    hole.closePath();
-    shape.holes.push(hole);
+  const middle=blade.slice(1,blade.length-(rim.length-1)).reverse();
+  // Rising edges of the right-hand side that hold the rim's end points.
+  const onEdge=(point,i)=>{
+    const [ax,ay]=head[i],[bx,by]=head[(i+1)%head.length];
+    if(!(ay<=point[1]+1e-9&&by>=point[1]-1e-9))return false;
+    const x=ay===by?ax:ax+(bx-ax)*(point[1]-ay)/(by-ay);
+    return Math.abs(x-point[0])<1e-7;
+  };
+  const k=head.findIndex((_,i)=>onEdge(rimBottom,i));
+  const m=head.findIndex((_,i)=>i>=k&&onEdge(rimTop,i));
+  if(k<0||m<0)throw new Error(`Не удалось соединить головку и стержень: ${template.id}`);
+  const outer=[...head.slice(0,k+1),rimBottom,...middle,rimTop,...head.slice(m+1)]
+    .filter((p,i,list)=>{const q=list[(i+list.length-1)%list.length];return Math.hypot(p[0]-q[0],p[1]-q[1])>1e-9;});
+  return {outer,holes:holesFor(template.bow).map(place)};
+}
+
+export function createKeyShape(template,design) {
+  const {outer,holes}=keyOutline(template,design);
+  const shape=pathFromPoints(outer);
+  for(const points of holes) {
+    const hole=new THREE.Path();hole.moveTo(...points[0]);
+    for(let i=1;i<points.length;i++)hole.lineTo(...points[i]);
+    hole.closePath();shape.holes.push(hole);
   }
   return shape;
 }
+
+// The Key Archive's name for the same single outline.
+export function joinedKeyShape(template,design) { return createKeyShape(template,design); }
 
 export function keyBounds(template,design) {
   const scale=design.headSize/100;

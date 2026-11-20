@@ -1,0 +1,4 @@
+{
+  "modules": ["key-art.js", "key-data.js", "key-placement.js", "key-shapes.js", "key-coat.js", "key-mud.js", "key-wax.js"],
+  "consumers": ["js/3d/scenes/key-forge/dist/js", "js/3d/scenes/key-archive/dist/js"]
+}

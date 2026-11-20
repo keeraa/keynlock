@@ -1,7 +1,6 @@
 import * as THREE from '../vendor/three.js';
 import { bowPoints, shaftStartX, shaftHalfHeight, keyBreakX, keyBreakAngle } from './key-shapes.js';
-import { stableNoise } from './key-dirt.js';
-import { coatGeometry, coatSvg } from './key-coat.js';
+import { coatGeometry, coatSvg, stableNoise } from './key-coat.js';
 
 // Mud: a few dried, lumpy clods stuck to the bow, the shaft and part of the
 // teeth, plus loose crumbs. Built with the same coat builder as candle wax,

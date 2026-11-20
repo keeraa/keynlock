@@ -1,5 +1,5 @@
-import { getLanguage, t } from './i18n.js';
-import { getProgress, TOTAL_KEYS } from './rules.js?v=key-ring';
+import { getLanguage, t } from './i18n.js?v=single-source';
+import { getProgress, TOTAL_KEYS } from './rules.js?v=single-source';
 
 const COUNTERS = ['pickedUp', 'throws', 'cleaned', 'washed', 'derusted', 'dewaxed'];
 const STAGES = ['explore', 'pickup', 'throw', 'rinse', 'rust', 'wax', 'sorted', 'forge', 'complete'];

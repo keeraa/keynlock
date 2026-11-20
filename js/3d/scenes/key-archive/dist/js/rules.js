@@ -1,5 +1,5 @@
-import { BATH_CAPACITY, SOAK_SECONDS, bathId, validBathId } from './station-layout.js?v=working-baths';
-import { CABINET_CAPACITY } from './cabinet-layout.js?v=cabinet-cell-glow';
+import { BATH_CAPACITY, SOAK_SECONDS, bathId, validBathId } from './station-layout.js?v=single-source';
+import { CABINET_CAPACITY } from './cabinet-layout.js?v=single-source';
 
 // `id` is a stable legacy save slot. The displayed family is from the Forge.
 export const KEY_TYPES = [

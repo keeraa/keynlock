@@ -1,5 +1,5 @@
-import { t, familyName } from './i18n.js';
-import { MAX_HELD, selectedKey } from './rules.js?v=key-ring';
+import { t, familyName } from './i18n.js?v=single-source';
+import { MAX_HELD, selectedKey } from './rules.js?v=single-source';
 import { thumbnailCacheKey } from './key-thumbnails.js?v=key-ring';
 import { createKeyFallbackStamp } from './key-factory.js?v=key-ring';
 

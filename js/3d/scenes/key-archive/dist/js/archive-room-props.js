@@ -114,14 +114,12 @@ function replaceChandeliers(scene, fallback, source, materials, onPlaced) {
   fallback.removeFromParent();
 }
 
-function paintBench(model, finish) {
+// Our gouache walnut on an imported wooden model: the top faces get the
+// light painted top, every other face the darker edge, with UVs projected
+// from the model's own bounds (the source textures are not used).
+function paintWithGouache(model, finish) {
   const bounds = new THREE.Box3().setFromObject(model, true);
-  const center = bounds.getCenter(new THREE.Vector3());
   const size = bounds.getSize(new THREE.Vector3());
-  model.scale.set(BENCH.width / size.x, (BENCH.surfaceY - RUG_TOP) / size.y, BENCH.depth / size.z);
-  model.position.set(-center.x * model.scale.x, RUG_TOP - bounds.min.y * model.scale.y,
-    BENCH.z - center.z * model.scale.z);
-
   model.traverse(mesh => {
     if (!mesh.isMesh) return;
     const base = mesh.geometry;
@@ -153,6 +151,38 @@ function paintBench(model, finish) {
   });
 }
 
+function paintBench(model, finish) {
+  const bounds = new THREE.Box3().setFromObject(model, true);
+  const center = bounds.getCenter(new THREE.Vector3());
+  const size = bounds.getSize(new THREE.Vector3());
+  paintWithGouache(model, finish);
+  model.scale.set(BENCH.width / size.x, (BENCH.surfaceY - RUG_TOP) / size.y, BENCH.depth / size.z);
+  model.position.set(-center.x * model.scale.x, RUG_TOP - bounds.min.y * model.scale.y,
+    BENCH.z - center.z * model.scale.z);
+}
+
+// The three corner tables: the model turned so its length runs along the
+// wall, scaled evenly to ARCHIVE_DESK.depth and to the tabletop height.
+function placeCornerTables(scene, source, finish, onPlaced) {
+  const bounds = new THREE.Box3().setFromObject(source, true);
+  const size = bounds.getSize(new THREE.Vector3());
+  const center = bounds.getCenter(new THREE.Vector3());
+  paintWithGouache(source, finish);
+  const across = ARCHIVE_DESK.depth / size.x;
+  for (const { x, z } of ARCHIVE_SIDE_TABLES) {
+    const table = source.clone(true);
+    table.name = 'archive-corner-table';
+    const floor = floorSurfaceY(x, z);
+    table.rotation.y = Math.PI / 2;
+    table.scale.set(across, (ARCHIVE_DESK.y - floor) / size.y, across);
+    // Turned 90°: the model's x runs along -z, its z along +x.
+    table.position.set(x - center.z * across, floor - bounds.min.y * table.scale.y, z + center.x * across);
+    table.traverse(mesh => { if (mesh.isMesh) mesh.castShadow = mesh.receiveShadow = true; });
+    scene.add(table);
+    onPlaced(table, new THREE.Box3().setFromObject(table, true), false, { surface: true });
+  }
+}
+
 function placeStools(scene, source, material, onPlaced) {
   const positions = ARCHIVE_SIDE_TABLES.flatMap(({ x, z }) => [-.87, .87].map((offset, index) => [
     x - Math.sign(x) * 1.28, z + offset, index ? -.27 : .13,
@@ -181,7 +211,7 @@ function placeStools(scene, source, material, onPlaced) {
   scene.add(shadows);
 }
 
-export async function addArchiveRoomProps(scene, { candles, chandeliers, workstations, materials, onPlaced }) {
+export async function addArchiveRoomProps(scene, { candles, chandeliers, workstations, materials, onPlaced, cornerTables = null }) {
   try {
     const { GLTFLoader } = await import('../vendor/loaders/GLTFLoader.js');
     const loader = new GLTFLoader().setResourcePath(new URL('../assets/selected-archive-props/', import.meta.url).href);
@@ -213,6 +243,10 @@ export async function addArchiveRoomProps(scene, { candles, chandeliers, worksta
         station.benchBody.visible = false;
         station.floorShadow.material = materials.furnitureShadows.paintedBenchFloor.material;
         onPlaced(model);
+      }),
+      place('corner tables', async () => {
+        placeCornerTables(scene, await load('wooden_table_02'), workstations.finish, onPlaced);
+        cornerTables?.hideFallback();
       }),
       place('stools', async () => placeStools(scene, await load('painted_wooden_stool', 'glb'), materials.contactShadow, onPlaced)),
       place('peg rack', async () => {

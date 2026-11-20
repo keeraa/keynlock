@@ -1,6 +1,9 @@
 // Short, procedural Foley. Clips are generated once per session and reused.
 const SAMPLE_RATE = 24000;
-const EFFECT_LEVEL = { water: .47, waxStart: .42, waxDone: .52, melt: .19 };
+const EFFECT_LEVEL = {
+  pickup: .65, throw: .56, dropWood: .67, dropRug: .60, row: .62,
+  water: .47, lift: .52, waxStart: .42, waxDone: .52, melt: .19,
+};
 const SOUND_KEY = 'keynlock-archive-sound-v1';
 
 // Each layer is a decaying impact or a filtered burst of noise. Offsets give
@@ -75,16 +78,24 @@ export function createArchiveAudio(browserWindow) {
   let walking = false;
   let variation = 0;
   let waxVoice;
+  let spatialVoices = 0;
   const clips = new Map();
   const lastPlayed = new Map();
-  const recordings = { stepWood: [], stepRug: [], waxStart: [], water: [] };
+  const paths = {
+    stepWood: Array.from({ length: 4 }, (_, i) => `footsteps/wood-${i + 1}.wav`),
+    stepRug: Array.from({ length: 4 }, (_, i) => `footsteps/rug-${i + 1}.wav`),
+    waxStart: ['cleaning/wax-sizzle.wav'],
+    waterBubbles: ['cleaning/water-bubbles.wav'],
+    water: ['cleaning/water-dip.wav'],
+    lift: ['cleaning/water-lift.wav'],
+    pickup: ['key-foley/pickup.wav'],
+    throw: ['key-foley/throw.wav'],
+    dropWood: ['key-foley/impact-wood.wav'],
+    dropRug: ['key-foley/impact-rug.wav'],
+    row: ['key-foley/row-bells.wav'],
+  };
+  const recordings = Object.fromEntries(Object.keys(paths).map(kind => [kind, []]));
   function loadRecordings() {
-    const paths = {
-      stepWood: Array.from({ length: 4 }, (_, i) => `footsteps/wood-${i + 1}.wav`),
-      stepRug: Array.from({ length: 4 }, (_, i) => `footsteps/rug-${i + 1}.wav`),
-      waxStart: ['cleaning/wax-sizzle.wav'],
-      water: ['cleaning/water-bubbles.wav'],
-    };
     for (const [kind, files] of Object.entries(paths)) {
       for (const file of files) {
         const url = new URL(`../assets/${file}`, import.meta.url);
@@ -118,10 +129,14 @@ export function createArchiveAudio(browserWindow) {
     master.gain.setTargetAtTime(playing && !muted ? .56 : 0, context.currentTime, .012);
   }
 
+  function proceduralLayers(kind) {
+    return CLIPS[kind === 'pickup' ? 'take' : kind === 'throw' ? 'release' : kind];
+  }
+
   function clipFor(kind) {
     const samples = recordings[kind];
     if (samples?.length) return samples[variation % samples.length];
-    if (!clips.has(kind)) clips.set(kind, makeClip(context, CLIPS[kind]));
+    if (!clips.has(kind)) clips.set(kind, makeClip(context, proceduralLayers(kind)));
     return clips.get(kind);
   }
 
@@ -159,7 +174,7 @@ export function createArchiveAudio(browserWindow) {
     const now = context.currentTime;
     const layers = [
       { buffer: sizzle, rate: .82, gain: .5, attack: .035, decay: FIZZ_SECONDS },
-      { buffer: recordings.water[0], rate: 1.7, gain: .16, attack: .25, decay: FIZZ_SECONDS * .75 },
+      { buffer: recordings.waterBubbles[0], rate: 1.7, gain: .16, attack: .25, decay: FIZZ_SECONDS * .75 },
     ];
     for (const layer of layers) {
       if (!layer.buffer) continue;
@@ -180,9 +195,28 @@ export function createArchiveAudio(browserWindow) {
     return true;
   }
 
-  function tone(kind, level = 1) {
+  function setListener(position, forward, up) {
+    const listener = context?.listener;
+    if (!listener || !spatialVoices) return;
+    if (!listener.positionX) {
+      listener.setPosition(position.x, position.y, position.z);
+      listener.setOrientation(forward.x, forward.y, forward.z, up.x, up.y, up.z);
+      return;
+    }
+    listener.positionX.value = position.x;
+    listener.positionY.value = position.y;
+    listener.positionZ.value = position.z;
+    listener.forwardX.value = forward.x;
+    listener.forwardY.value = forward.y;
+    listener.forwardZ.value = forward.z;
+    listener.upX.value = up.x;
+    listener.upY.value = up.y;
+    listener.upZ.value = up.z;
+  }
+
+  function tone(kind, level = 1, position = null) {
     if (kind === 'rust' && !muted && playing && context?.state === 'running' && level > 0 && fizz(level)) return;
-    if (muted || !playing || context?.state !== 'running' || !CLIPS[kind] || level <= 0) return;
+    if (muted || !playing || context?.state !== 'running' || !proceduralLayers(kind) || level <= 0) return;
     try {
       const now = context.currentTime;
       // A four-key bundle can make contact in a single frame. One sound is enough.
@@ -193,9 +227,31 @@ export function createArchiveAudio(browserWindow) {
       source.buffer = clipFor(kind);
       source.playbackRate.value = ['finish', 'row', 'ready'].includes(kind)
         ? 1 : [1, .94, 1.06, .98, 1.03][variation++ % 5];
-      volume.gain.value = Math.min(1, level) * (EFFECT_LEVEL[kind] ?? 1);
-      source.connect(volume).connect(master);
-      source.onended = () => { source.disconnect(); volume.disconnect(); };
+      const panner = position && context.createPanner?.();
+      volume.gain.value = (panner ? 1 : Math.min(1, level)) * (EFFECT_LEVEL[kind] ?? 1);
+      source.connect(volume);
+      if (panner) {
+        panner.panningModel = 'equalpower';
+        panner.distanceModel = 'linear';
+        panner.refDistance = 2;
+        panner.maxDistance = 10;
+        panner.rolloffFactor = 1;
+        if (panner.positionX) {
+          panner.positionX.value = position.x;
+          panner.positionY.value = position.y;
+          panner.positionZ.value = position.z;
+        } else panner.setPosition(position.x, position.y, position.z);
+        volume.connect(panner).connect(master);
+        spatialVoices++;
+      } else volume.connect(master);
+      source.onended = () => {
+        source.disconnect();
+        volume.disconnect();
+        if (panner) {
+          panner.disconnect();
+          spatialVoices--;
+        }
+      };
       source.start();
     } catch { /* sound is optional */ }
   }
@@ -224,7 +280,8 @@ export function createArchiveAudio(browserWindow) {
   }
 
   return {
-    tone, walk, unlock, setMuted, setWaxMelting, isMuted: () => muted,
+    tone, walk, unlock, setMuted, setWaxMelting, setListener,
+    hasSpatialVoices: () => spatialVoices > 0, isMuted: () => muted,
     setPlaying(value) {
       playing = Boolean(value);
       if (!playing) { walk(0); setWaxMelting(false); }

@@ -67,7 +67,7 @@ export function createArchiveActions({
       world.syncKey?.(picked);
       updateHud();
       save();
-      tone(picked.status === 'bundled' ? 'bundle' : 'take');
+      tone(picked.status === 'bundled' ? 'bundle' : 'pickup');
       toast(picked.status === 'bundled' ? t('toast.bundleMade') :
         picked.broken ? t('toast.pickedBroken') :
         picked.wax ? t('toast.pickedWax') :
@@ -243,7 +243,7 @@ export function createArchiveActions({
     world.animateThrow(key, start, end);
     updateHud();
     save();
-    tone('release');
+    tone('throw');
     toast(t('toast.thrown'));
   }
 

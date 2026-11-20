@@ -16,11 +16,11 @@ import { edgeLookRate } from './mouse-look.js';
 import { createKeyIndex } from './key-index.js?v=key-ring';
 import { createArchiveTargeting } from './archive-surface-aim.js?v=key-ring';
 import { createArchivePrompts } from './archive-interaction-prompts.js?v=key-ring';
-import { createArchiveActions } from './archive-actions.js?v=cleaning-cues';
+import { createArchiveActions } from './archive-actions.js?v=key-foley';
 import { FIRST_ROUTE_KEY_ID, createFirstRouteGuide } from './archive-first-route-guide.js?v=key-ring';
 import { createBathProgress } from './archive-bath-progress.js?v=cleaning-cues';
 import { createArchiveMusic } from './archive-music.js?v=music-resume-seek';
-import { createArchiveAudio } from './archive-audio.js?v=cleaning-cues';
+import { createArchiveAudio } from './archive-audio.js?v=key-foley';
 import { floorSurfaceY, RUG_TOP } from './floor-contact.js';
 
 const $ = id => document.getElementById(id);
@@ -111,12 +111,14 @@ function toast(message, error = false) {
 
 const promptFor = createArchivePrompts(state, keyIndex, isMelting);
 const litCabinets = world.cabinets.map(cabinet => cabinet.completion.isComplete());
-const settledRows = world.cabinets.map(cabinet => cabinet.completion.settledRows());
-const startedRows = [];
+const startedRows = world.cabinets.map(cabinet => cabinet.completion.rowsStarted());
+const soundForward = new world.THREE.Vector3();
+const soundUp = new world.THREE.Vector3();
 
 function playAt(kind, position) {
   const distance = Math.hypot(camera.position.x - position.x, camera.position.z - position.z);
-  tone(kind, Math.max(0, 1 - Math.max(0, distance - 2) / 8));
+  const level = Math.max(0, 1 - Math.max(0, distance - 2) / 8);
+  tone(kind, level, kind === 'dropRug' || kind === 'dropWood' ? position : null);
 }
 
 function updateHud() { hud.update(); }
@@ -389,16 +391,19 @@ function tick(now) {
   bathProgress.update(mode === 'play', playAt);
   routeGuide.update(mode === 'play');
   world.update(now, moving, mode === 'play', playAt);
+  if (audio.hasSpatialVoices()) {
+    soundForward.set(0, 0, -1).applyQuaternion(camera.quaternion);
+    soundUp.set(0, 1, 0).applyQuaternion(camera.quaternion);
+    audio.setListener(camera.position, soundForward, soundUp);
+  }
   for (const cabinet of world.cabinets) {
     const lit = cabinet.completion.isComplete();
-    const rows = cabinet.completion.settledRows();
     // The row chime starts together with the shimmer, not after it settles.
-    const started = cabinet.completion.rowsStarted?.() ?? 0;
+    const started = cabinet.completion.rowsStarted();
+    if (started > startedRows[cabinet.type]) playAt('row', cabinet.group.position);
     if (lit && !litCabinets[cabinet.type]) playAt('finish', cabinet.group.position);
-    else if (started > (startedRows[cabinet.type] ?? started)) playAt('row', cabinet.group.position);
     startedRows[cabinet.type] = started;
     litCabinets[cabinet.type] = lit;
-    settledRows[cabinet.type] = rows;
   }
   const rendered = world.renderer.render(world.scene, camera) !== false;
   performanceHud.sample(now, performance.now() - cpuStart, rendered);

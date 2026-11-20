@@ -129,7 +129,8 @@ test('row chime starts with the shimmer; rust splash sounds when the key lands',
   completion.refresh(row, 100);
   assert.equal(completion.rowsStarted(), 1, 'counted the moment the row fills');
   const main = readFileSync(new URL('../dist/js/main.js', import.meta.url), 'utf8');
-  assert.match(main, /started > \(startedRows\[cabinet\.type\] \?\? started\)\) playAt\('row'/);
+  assert.match(main, /if \(started > startedRows\[cabinet\.type\]\) playAt\('row'/);
+  assert.doesNotMatch(main, /else if \(started >/, 'the final row chimes as well as the cabinet');
   const stations = readFileSync(new URL('../dist/js/wash-forge-stations.js', import.meta.url), 'utf8');
   assert.match(stations, /playSound\?\.\('rust', slotWorld\.clone\(\)\)/);
   const actions = readFileSync(new URL('../dist/js/archive-actions.js', import.meta.url), 'utf8');

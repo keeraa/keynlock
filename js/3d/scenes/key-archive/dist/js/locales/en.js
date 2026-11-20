@@ -171,6 +171,7 @@ export default Object.freeze({
   'prompt.waxToCandle': '<kbd>!</kbd> Key in wax · melt it at a candle',
   'prompt.cleanFirst': '<kbd>!</kbd> Clean the key first · the baths are in the middle of the hall',
   'prompt.putAssisted': '<kbd>E</kbd> Put it in cell {cell} · or aim at another',
+  'prompt.putFour': '<kbd>E</kbd> Put all four in from cell {cell} · {name} · {count}/{required}',
   'prompt.put': '<kbd>E</kbd> Put it in cell {cell} · {name} · {count}/{required}',
   'prompt.cabinetFor': 'Cabinet for "{name}" keys',
 

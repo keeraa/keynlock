@@ -319,6 +319,28 @@ export function heldBundle(state, type) {
   return bundle.ids.map(id => state.keys.find(key => key.id === id));
 }
 
+// Four clean keys of one family in hand (all the hand holds) go into their
+// cabinet together, as a ring would carry them, ring or not.
+export function heldBatch(state, type) {
+  const keys = matchingHeldKeys(state, type);
+  return keys.length === MAX_HELD ? keys : null;
+}
+
+export function putHeldBatchInCabinet(state, type, slots) {
+  const keys = heldBatch(state, type);
+  if (!keys || slots.length !== MAX_HELD || new Set(slots).size !== MAX_HELD ||
+      slots.some(slot => !Number.isInteger(slot) || slot < 0 || slot >= CABINET_CAPACITY ||
+        cabinetSlotKey(state, type, slot))) return null;
+  keys.forEach((key, i) => {
+    key.status = 'sorted';
+    key.cabinetSlot = slots[i];
+  });
+  const ids = new Set(keys.map(key => key.id));
+  state.held = state.held.filter(id => !ids.has(id));
+  state.selected = 0;
+  return keys;
+}
+
 export function putBundleInCabinet(state, type, slots) {
   const keys = heldBundle(state, type);
   if (!keys || slots.length !== MAX_HELD || new Set(slots).size !== MAX_HELD ||

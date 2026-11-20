@@ -4,6 +4,7 @@ import {
   KEY_TYPES, TOTAL_KEYS, MAX_HELD, pickupKey, selectedKey, putKeyInCabinet,
   takeKeyFromCabinet, cabinetSlotKey, trashSelectedKey, dropSelectedKey, getProgress,
   startSoak, collectSoakedKey, BUNDLE_COST, buyBundle, putBundleInCabinet, meltSelectedWax,
+  heldBatch, putHeldBatchInCabinet,
   settleSmelting, canSoak, soakThrownKey, smeltThrownKey,
 } from './rules.js';
 import { WAX_MELT_MS } from './archive-candles.js';
@@ -210,29 +211,19 @@ export function createArchiveActions({
       tone('wrong');
       return;
     }
-    if (bundle) {
-      const center = pegForSlot(target.slot);
-      const distance = slot => {
-        const peg = pegForSlot(slot);
-        return (peg.x - center.x) ** 2 + (peg.y - center.y) ** 2;
-      };
-      const occupiedSlots = new Set(state.keys.filter(item => item.type === keyType && item.status === 'sorted')
-        .map(item => item.cabinetSlot));
-      const slots = Array.from({ length: CABINET_CAPACITY - target.slot }, (_, i) => target.slot + i)
-        .filter(slot => !occupiedSlots.has(slot)).slice(0, MAX_HELD);
-      if (slots.length < MAX_HELD) {
-        const before = Array.from({ length: target.slot }, (_, slot) => slot)
-          .filter(slot => !occupiedSlots.has(slot)).sort((a, b) => distance(a) - distance(b));
-        slots.push(...before.slice(0, MAX_HELD - slots.length));
-      }
-      const bundled = putBundleInCabinet(state, keyType, slots);
-      if (!bundled) {
+    // A ring's bundle, or four matching clean keys in hand: all four go in
+    // together, from the aimed cell onwards (then the nearest free ones).
+    const batch = bundle ? null : heldBatch(state, keyType);
+    if (bundle || batch) {
+      const slots = groupSlots(keyType, target.slot);
+      const placed = bundle ? putBundleInCabinet(state, keyType, slots) : putHeldBatchInCabinet(state, keyType, slots);
+      if (!placed) {
         toast(t('toast.bundleCells'), true);
         return;
       }
-      statistics?.count?.('bundlesPlaced');
-      bundled.forEach((item, index) => world.animatePlace(item, slots[index], {
-        fromRing: true, delay: index * BUNDLE_RELEASE_INTERVAL_MS,
+      if (bundle) statistics?.count?.('bundlesPlaced');
+      placed.forEach((item, index) => world.animatePlace(item, slots[index], {
+        fromRing: Boolean(bundle), delay: index * BUNDLE_RELEASE_INTERVAL_MS,
       }));
     } else {
       if (!putKeyInCabinet(state, target.type, target.slot)) return;
@@ -242,13 +233,33 @@ export function createArchiveActions({
     world.refreshCabinet(keyType);
     updateHud();
     save();
-    if (bundle) tone('bundle');
+    if (bundle || batch) tone('bundle');
     const progress = getProgress(state);
     if (progress.sorted[keyType] === progress.required[keyType]) {
       toast(t('toast.cabinetDone', { name: familyName(keyType) }));
     }
     invalidateHover();
     if (progress.processed === TOTAL_KEYS) setTimeout(showVictory, 1900);
+  }
+
+  // Four cells for a group: from the aimed one onwards, then the free cells
+  // nearest to it.
+  function groupSlots(keyType, first) {
+    const center = pegForSlot(first);
+    const distance = slot => {
+      const peg = pegForSlot(slot);
+      return (peg.x - center.x) ** 2 + (peg.y - center.y) ** 2;
+    };
+    const occupiedSlots = new Set(state.keys.filter(item => item.type === keyType && item.status === 'sorted')
+      .map(item => item.cabinetSlot));
+    const slots = Array.from({ length: CABINET_CAPACITY - first }, (_, i) => first + i)
+      .filter(slot => !occupiedSlots.has(slot)).slice(0, MAX_HELD);
+    if (slots.length < MAX_HELD) {
+      const before = Array.from({ length: first }, (_, slot) => slot)
+        .filter(slot => !occupiedSlots.has(slot)).sort((a, b) => distance(a) - distance(b));
+      slots.push(...before.slice(0, MAX_HELD - slots.length));
+    }
+    return slots;
   }
 
   function drop() {

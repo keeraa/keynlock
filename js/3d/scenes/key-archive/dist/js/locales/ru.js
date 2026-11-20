@@ -171,6 +171,7 @@ export default Object.freeze({
   'prompt.waxToCandle': '<kbd>!</kbd> Ключ в воске · растопи у свечи',
   'prompt.cleanFirst': '<kbd>!</kbd> Ключ нужно очистить · ванны в центре зала',
   'prompt.putAssisted': '<kbd>E / У</kbd> Положить в ячейку {cell} · можно навести на другую',
+  'prompt.putFour': '<kbd>E / У</kbd> Положить все четыре с ячейки {cell} · {name} · {count}/{required}',
   'prompt.put': '<kbd>E / У</kbd> Положить в ячейку {cell} · {name} · {count}/{required}',
   'prompt.cabinetFor': 'Шкаф для ключей «{name}»',
 

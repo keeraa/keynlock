@@ -133,3 +133,10 @@ body.playing #world,body.playing #hud{cursor:none}
 @media(max-width:620px){.carried-bundle{left:8px;bottom:125px;transform:scale(.7);transform-origin:bottom left}}
 
 .visual-note { margin: -4px 0 10px; color: #8d8577; font-size: 11px; line-height: 1.35; }
+
+.forge-world-progress{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:3px}
+.forge-world-progress[hidden]{display:none}
+.forge-world-progress .bath-world-progress{position:static;transform:none}
+.forge-world-progress .bath-world-progress::-webkit-progress-value{background:#e08a45}
+.forge-world-progress .bath-world-progress::-moz-progress-bar{background:#e08a45}
+.forge-timer{color:#f2dcad;font:11px Arial,sans-serif;text-shadow:0 1px 3px #160f0a;white-space:nowrap}

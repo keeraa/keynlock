@@ -174,12 +174,13 @@ export function validateState(candidate) {
   for (const key of candidate.keys) {
     if (!Number.isInteger(key.type) || key.type < 0 || key.type >= KEY_TYPES.length ||
         !Number.isFinite(key.x) || !Number.isFinite(key.z) ||
-        !Number.isFinite(key.rotation) || !['floor', 'held', 'bundled', 'sorted', 'trashed', 'bath'].includes(key.status) ||
+        !Number.isFinite(key.rotation) || !['floor', 'held', 'bundled', 'sorted', 'trashed', 'smelting', 'bath'].includes(key.status) ||
         (key.broken !== undefined && typeof key.broken !== 'boolean') ||
         (key.mud !== undefined && typeof key.mud !== 'boolean') ||
         (key.wax !== undefined && (typeof key.wax !== 'boolean' || (key.wax && key.status === 'sorted'))) ||
         (key.rust !== undefined && typeof key.rust !== 'boolean') ||
         (key.status === 'trashed' && !key.broken) ||
+        (key.status === 'smelting' && (!key.broken || !Number.isFinite(key.smeltUntil))) ||
         (key.status === 'bath' && (key.broken || !validBathId(key.bathId) ||
           !Number.isFinite(key.bathUntil))) ||
         (key.cabinetSlot !== undefined && (!Number.isInteger(key.cabinetSlot) ||
@@ -327,14 +328,46 @@ export function takeKeyFromCabinet(state, cabinetType, slotIndex) {
   return key;
 }
 
-export function trashSelectedKey(state) {
+// Smelting takes time. Broken keys queue in the forge one after another;
+// each becomes one unit of metal when its turn is over.
+export const SMELT_SECONDS = 8;
+
+export function trashSelectedKey(state, now = Date.now()) {
   const key = selectedKey(state);
   if (!key?.broken) return false;
-  key.status = 'trashed';
-  state.metal = (state.metal || 0) + 1;
+  const queueEnd = state.keys.reduce((latest, item) =>
+    item.status === 'smelting' ? Math.max(latest, item.smeltUntil) : latest, now);
+  key.status = 'smelting';
+  key.smeltUntil = queueEnd + SMELT_SECONDS * 1000;
   state.held.splice(state.selected, 1);
   state.selected = Math.max(0, Math.min(state.selected, state.held.length - 1));
   return true;
+}
+
+// Finished smelts turn into metal (also after reopening a save). Returns how many.
+export function settleSmelting(state, now = Date.now()) {
+  let settled = 0;
+  for (const key of state.keys) {
+    if (key.status !== 'smelting' || key.smeltUntil > now) continue;
+    key.status = 'trashed';
+    delete key.smeltUntil;
+    state.metal = (state.metal || 0) + 1;
+    settled++;
+  }
+  return settled;
+}
+
+// The key melting right now, its progress and how many wait behind it.
+export function smeltingState(state, now = Date.now()) {
+  const queue = state.keys.filter(key => key.status === 'smelting' && key.smeltUntil > now)
+    .sort((a, b) => a.smeltUntil - b.smeltUntil);
+  if (!queue.length) return null;
+  const current = queue[0];
+  const duration = SMELT_SECONDS * 1000;
+  return { key: current, waiting: queue.length - 1,
+    progress: Math.max(0, Math.min(1, 1 - (current.smeltUntil - now) / duration)),
+    secondsLeft: Math.ceil((current.smeltUntil - now) / 1000),
+    totalSecondsLeft: Math.ceil((queue.at(-1).smeltUntil - now) / 1000) };
 }
 
 export function keyCondition(key) {
@@ -401,6 +434,7 @@ export function getProgress(state) {
   let trashed = 0;
   let broken = 0;
   let soaking = 0;
+  let smelting = 0;
   for (const key of state.keys) {
     if (key.status === 'sorted') sorted[key.type]++;
     if (!key.broken) required[key.type]++;
@@ -408,12 +442,13 @@ export function getProgress(state) {
     if (key.status === 'floor') floorCount++;
     if (key.status === 'trashed') trashed++;
     if (key.status === 'bath') soaking++;
+    if (key.status === 'smelting') smelting++;
   }
   return {
     sorted, required, trashed, broken,
     done: sorted.reduce((a, b) => a + b, 0),
     processed: sorted.reduce((a, b) => a + b, trashed),
     completedCabinets: sorted.filter((count, type) => count === required[type]).length,
-    floorCount, soaking,
+    floorCount, soaking, smelting,
   };
 }

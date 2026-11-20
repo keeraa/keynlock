@@ -1,4 +1,6 @@
-import { STATIONS, FIXTURE_OFFSETS, bathId } from './station-layout.js';
+import { STATIONS, FIXTURE_OFFSETS, FORGE_SURFACE_Y, bathId } from './station-layout.js';
+import { RUST_TRAY } from './wash-forge-stations.js?v=cleaning-cues';
+import { smeltingState } from './rules.js?v=key-ring';
 import { bathKeyProgress, waterDipCount } from './station-visual-state.js?v=cleaning-cues';
 
 // Membership comes from the existing bath index.
@@ -8,7 +10,7 @@ export function bathReadiness(keys, kind, now) {
   return { progress, status: !keys.length ? 'empty' : progress >= 1 ? 'ready' : 'processing' };
 }
 
-export function createBathProgress(document, world, keyIndex) {
+export function createBathProgress(document, world, keyIndex, state = null) {
   const root = document.getElementById('bath-progress');
   const canvas = document.getElementById('world');
   const { camera, THREE } = world;
@@ -17,8 +19,15 @@ export function createBathProgress(document, world, keyIndex) {
     kind, id: bathId(station.id, kind),
     element: document.getElementById(`bath-progress-${kind}`),
     position: new THREE.Vector3(station.x + FIXTURE_OFFSETS[kind],
-      (kind === 'mud' ? 1.19 : 1.415) + .55, station.z + .10),
+      (kind === 'mud' ? 1.19 : RUST_TRAY.surface) + .55, station.z + .10),
   })));
+  // Smelting: one bar with a countdown over the forge.
+  const forge = {
+    element: document.getElementById('forge-progress'),
+    position: new THREE.Vector3(STATIONS[0].x + FIXTURE_OFFSETS.forge, FORGE_SURFACE_Y + .55, STATIONS[0].z + .10),
+  };
+  forge.bar = forge.element?.querySelector('progress');
+  forge.timer = forge.element?.querySelector('.forge-timer');
   const initialTime = Date.now();
   for (const bar of bars) {
     const keys = keyIndex.bathKeys(bar.id);
@@ -52,6 +61,7 @@ export function createBathProgress(document, world, keyIndex) {
     camera.updateMatrixWorld();
     const width = canvas.clientWidth, height = canvas.clientHeight;
     const focal = height / (2 * Math.tan(camera.fov * Math.PI / 360));
+    updateForge(now, width, height, focal);
     for (const bar of bars) {
       const element = bar.element;
       eye.copy(bar.position).applyMatrix4(camera.matrixWorldInverse);
@@ -77,5 +87,24 @@ export function createBathProgress(document, world, keyIndex) {
       element.style.height = `${Math.max(4, Math.min(8, barWidth * .065))}px`;
     }
   }
+  function updateForge(now, width, height, focal) {
+    if (!forge.element || !state) return;
+    const smelt = smeltingState(state, now);
+    eye.copy(forge.position).applyMatrix4(camera.matrixWorldInverse);
+    projected.copy(forge.position).project(camera);
+    const visible = eye.z < -.1 && Math.abs(projected.x) < 1.05 && Math.abs(projected.y) < 1.05;
+    forge.element.hidden = !smelt || !visible;
+    if (forge.element.hidden) return;
+    const percent = Math.round(smelt.progress * 100);
+    if (forge.bar.value !== percent) forge.bar.value = percent;
+    const text = `${smelt.secondsLeft} с${smelt.waiting ? ` · ещё ${smelt.waiting}` : ''}`;
+    if (forge.timer.textContent !== text) forge.timer.textContent = text;
+    const barWidth = Math.max(28, Math.min(116, focal * .95 / -eye.z));
+    forge.element.style.left = `${(projected.x + 1) * width / 2}px`;
+    forge.element.style.top = `${(1 - projected.y) * height / 2}px`;
+    forge.bar.style.width = `${barWidth}px`;
+    forge.bar.style.height = `${Math.max(4, Math.min(8, barWidth * .065))}px`;
+  }
+
   return { update };
 }

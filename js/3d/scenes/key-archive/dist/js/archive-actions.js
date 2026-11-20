@@ -3,6 +3,7 @@ import {
   KEY_TYPES, TOTAL_KEYS, MAX_HELD, pickupKey, selectedKey, putKeyInCabinet,
   takeKeyFromCabinet, cabinetSlotKey, trashSelectedKey, dropSelectedKey, getProgress,
   startSoak, collectSoakedKey, BUNDLE_COST, buyBundle, putBundleInCabinet, meltSelectedWax,
+  SMELT_SECONDS, settleSmelting,
 } from './rules.js?v=key-ring';
 import { WAX_MELT_MS } from './archive-candles.js?v=candlelight';
 import { CABINET_CAPACITY, pegForSlot } from './cabinet-layout.js?v=cabinet-cell-glow';
@@ -124,9 +125,10 @@ export function createArchiveActions({
       updateHud();
       save();
       tone('release');
-      toast('Сломанный ключ переплавлен · +1 металл');
+      const queued = getProgress(state).smelting;
+      toast(queued > 1 ? `Ключ в очереди на плавку · впереди ${queued - 1}` :
+        `Ключ плавится · ${SMELT_SECONDS} секунд`);
       invalidateHover();
-      if (getProgress(state).processed === TOTAL_KEYS) setTimeout(showVictory, 1100);
       return;
     }
     if (target.kind !== 'cabinet') return;
@@ -236,5 +238,16 @@ export function createArchiveActions({
     toast('Ключ брошен');
   }
 
-  return { interact, drop, updateWax, isMelting: () => Boolean(melting) };
+  // Metal is ready when a smelt finishes, even while the player is elsewhere.
+  function updateSmelting(now = Date.now()) {
+    const settled = settleSmelting(state, now);
+    if (!settled) return;
+    updateHud();
+    save();
+    tone('ready');
+    toast(settled > 1 ? `Металл готов · +${settled}` : 'Металл готов · +1');
+    if (getProgress(state).processed === TOTAL_KEYS) setTimeout(showVictory, 1100);
+  }
+
+  return { interact, drop, updateWax, updateSmelting, isMelting: () => Boolean(melting) };
 }

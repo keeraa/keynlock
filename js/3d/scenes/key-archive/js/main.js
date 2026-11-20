@@ -41,12 +41,13 @@ const camera = world.camera;
 const movement = createPlayerMovement(camera, world.bounds);
 const clamp = (number, a, b) => Math.max(a, Math.min(b, number));
 const hud = createArchiveHud(document, world, state, keyIndex);
-const bathProgress = createBathProgress(document, world, keyIndex);
+const bathProgress = createBathProgress(document, world, keyIndex, state);
 const routeGuide = createFirstRouteGuide(document, state, keyIndex, world);
 const performanceHud = createPerformanceHud(document, world);
 const visualPanel = createVisualPanel(document, world, storage, visualSettings);
 
 let mode = 'intro';
+let lastSmeltCheck = 0;
 let yaw = 0;
 let pitch = state.firstRoute && keyIndex.get(FIRST_ROUTE_KEY_ID)?.status === 'floor' ? -.30 : -.17;
 let sensitivity = 14;
@@ -76,7 +77,7 @@ const audio = createArchiveAudio(window);
 const music = createArchiveMusic(window, storage);
 const { tone } = audio;
 const { targetInView, clearAim } = createArchiveTargeting({ camera, world, state, keyIndex });
-const { interact, drop, updateWax, isMelting } = createArchiveActions({
+const { interact, drop, updateWax, updateSmelting, isMelting } = createArchiveActions({
   state, keyIndex, world, camera, targetInView,
   getYaw: () => yaw, isPlaying: () => mode === 'play',
   save, updateHud, tone, toast, showVictory,
@@ -367,6 +368,7 @@ function tick(now) {
   camera.rotation.set(pitch, yaw, 0, 'YXZ');
   const target = mode === 'play' ? targetInView() : null;
   updateWax(now, target);
+  if (now - lastSmeltCheck > 250) { lastSmeltCheck = now; updateSmelting(); }
   audio.setWaxMelting(isMelting());
   if (mode === 'play') setHovered(target);
   if (mode === 'play' && hovered?.kind === 'bath') {

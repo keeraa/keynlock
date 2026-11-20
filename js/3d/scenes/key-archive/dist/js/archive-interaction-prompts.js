@@ -1,6 +1,5 @@
 import {
-  KEY_TYPES, MAX_HELD, selectedKey, cabinetSlotKey, getProgress, keyCondition, BUNDLE_COST, canPickupKey,
-} from './rules.js?v=key-ring';
+  KEY_TYPES, MAX_HELD, selectedKey, cabinetSlotKey, getProgress, keyCondition, BUNDLE_COST, canPickupKey, SMELT_SECONDS } from './rules.js?v=key-ring';
 
 export function createArchivePrompts(state, keyIndex, isMelting = () => false) {
   return function promptFor(target) {
@@ -40,7 +39,7 @@ export function createArchivePrompts(state, keyIndex, isMelting = () => false) {
     }
     if (target.kind === 'forge') {
       const held = selectedKey(state);
-      if (held?.broken) return '<kbd>E / У</kbd> Переплавить сломанный ключ · +1 металл';
+      if (held?.broken) return `<kbd>E / У</kbd> Переплавить сломанный ключ · ${SMELT_SECONDS} с · +1 металл`;
       if (state.bundles) return 'Кольцо уже куплено · вмещает четыре ключа одного семейства';
       const amount = state.metal ?? 0;
       return amount >= BUNDLE_COST

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from '../dist/vendor/three.js';
-import { simulateThrow, throwVelocity, samplePath, THROW_SPEED, reticleTarget, launchTowards } from '../dist/js/throw-flight.js';
+import { simulateThrow, throwVelocity, samplePath, THROW_SPEED, MAX_REACH, reticleTarget, launchTowards } from '../dist/js/throw-flight.js';
 import { createThrowScene, HALL_WALLS } from '../dist/js/throw-scene.js';
 import { restingKeyY } from '../dist/js/floor-contact.js';
 import { BENCH, WATER_BATH } from '../dist/js/wash-forge-stations.js';
@@ -113,8 +113,8 @@ test('throwing a rusty key into the rust tray puts it in the tray when it lands'
   const tray = { x: FIXTURE_OFFSETS.rust, z: .10 };
   const camera = new THREE.PerspectiveCamera();
   let landed = null;
-  // Find an aim from in front of the bench that lands in the tray.
-  for (const deg of pitches) {
+  // Look down at the tray from in front of the bench, as a player would.
+  for (let deg = -40; deg <= 10; deg += 1) {
     const a = deg * Math.PI / 180;
     camera.position.set(tray.x, 1.78, 2.2);
     camera.rotation.set(a, 0, 0, 'YXZ');
@@ -143,7 +143,7 @@ function throwFromView(eye, forward, accepts = () => false) {
   const all = scene.forKey(accepts);
   const target = reticleTarget({ eye, forward, floorY: restingKeyY, ...all });
   const hand = { x: eye.x + .43, y: eye.y - .45, z: eye.z - .8 };
-  const velocity = target ? launchTowards(hand, target) : throwVelocity(forward);
+  const velocity = launchTowards(hand, target);
   return { target, flight: simulateThrow({ start: hand, velocity, floorY: restingKeyY, ...all }) };
 }
 const look = (degrees, yaw = 0) => {
@@ -164,11 +164,20 @@ test('the key first lands right under the reticle and stops close to it', () => 
   }
 });
 
-test('looking at nothing within reach throws along the view as far as the arm can', () => {
+test('aiming higher never throws shorter: distance rises with the aim up to a 7 m reach', () => {
   const eye = { x: 0, y: 1.78, z: 12 };
-  const { target, flight } = throwFromView(eye, look(25));
-  assert.equal(target, null);
-  assert.ok(12 - flight.landing.z > 4);
+  let previous = 0;
+  for (let degrees = -60; degrees <= 40; degrees += 2) {
+    const { target, flight } = throwFromView(eye, look(degrees));
+    const first = samplePath(flight.path, flight.impacts[0].t);
+    const reach = 12 - first.z;
+    assert.ok(reach >= previous - .05, `${degrees}°: lands at ${reach.toFixed(2)} m after ${previous.toFixed(2)} m`);
+    assert.ok(reach <= MAX_REACH + .1, `${degrees}°: ${reach.toFixed(2)} m is past reach`);
+    assert.ok(Math.abs(first.x - target.x) < .1, 'lands on the line of the reticle');
+    previous = reach;
+  }
+  // At the horizon and above, the key lands at full reach.
+  for (const degrees of [0, 15, 40]) assert.equal(throwFromView(eye, look(degrees)).target.clamped, true);
 });
 
 test('aiming at a vessel lands the right key in it, and only the right key', () => {

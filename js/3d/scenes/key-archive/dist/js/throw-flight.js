@@ -14,7 +14,7 @@
 
 export const THROW_SPEED = 6.5;          // m/s, along the view when nothing is under the reticle
 export const MAX_THROW_SPEED = 8;        // m/s, the strongest arm: about 7 m on the flat
-export const MAX_REACH = 14;             // m, how far the reticle can pick a target
+export const MAX_REACH = 7;              // m: no key flies farther than this
 const ARC_LIFT = .26;                    // rad above the straight line: a soft toss
 const VESSEL_ARC_LIFT = .7;              // ... into a vessel: a lob that clears its rim
 const AIM_STEP = .02;
@@ -203,23 +203,35 @@ export function simulateThrow({ start, velocity, floorY = () => 0, solids = [], 
     landing: { on: support?.surface === 'surface' ? 'surface' : 'floor', x: p.x, y: top, z: p.z } };
 }
 
-// The point the reticle rests on: where the line of sight from the eye first
-// meets the floor, a box's top or side, or a vessel's opening. null when it
-// meets nothing within reach (looking up into the hall).
+// Where the throw lands: the point under the reticle — the floor, a tabletop
+// or a vessel's opening, whatever the line of sight from the eye meets first.
+// Farther than `reach` (or looking at the horizon or above, where the line
+// never comes down), it is the floor `reach` metres away in the direction of
+// view. So aiming higher never throws shorter, and nothing flies past reach.
+// Cabinets, sconces and vessel walls do not stop the line: they are hit by the
+// flying key itself.
 export function reticleTarget({ eye, forward, floorY = () => 0, solids = [], vessels = [], reach = MAX_REACH }) {
   const length = Math.hypot(forward.x, forward.y, forward.z) || 1;
   const d = { x: forward.x / length, y: forward.y / length, z: forward.z / length };
+  const flat = Math.hypot(d.x, d.z);
+  const surfaces = solids.filter(box => box.surface);
   const p = { x: eye.x, y: eye.y, z: eye.z };
   let previousY = p.y;
-  for (let travelled = 0; travelled < reach; travelled += AIM_STEP) {
+  for (let travelled = AIM_STEP; flat * travelled <= reach; travelled += AIM_STEP) {
     p.x = eye.x + d.x * travelled; p.y = eye.y + d.y * travelled; p.z = eye.z + d.z * travelled;
     for (const vessel of vessels)
       if (previousY >= vessel.y && p.y < vessel.y && overVessel(vessel, p.x, p.z)) return { ...p, y: vessel.y, vessel: vessel.id };
+    for (const box of surfaces)
+      if (previousY >= box.max.y && p.y < box.max.y && p.x > box.min.x && p.x < box.max.x &&
+        p.z > box.min.z && p.z < box.max.z) return { ...p, y: box.max.y };
     if (p.y <= floorY(p.x, p.z)) return { ...p, y: floorY(p.x, p.z) };
-    for (const box of solids) if (inside(p, box, 0)) return { ...p };
     previousY = p.y;
+    if (flat < 1e-6) break;
   }
-  return null;
+  // Beyond reach: the floor at full reach, straight ahead.
+  const ux = flat > 1e-6 ? d.x / flat : 0, uz = flat > 1e-6 ? d.z / flat : -1;
+  const x = eye.x + ux * reach, z = eye.z + uz * reach;
+  return { x, y: floorY(x, z), z, clamped: true };
 }
 
 // Launch velocity from `start` that lands on `target`: a gentle arc a little

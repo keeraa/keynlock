@@ -9,7 +9,7 @@ import {
 } from './rules.js';
 import { WAX_MELT_MS } from './archive-candles.js';
 import { CABINET_CAPACITY, pegForSlot } from './cabinet-layout.js';
-import { simulateThrow, throwVelocity, reticleTarget, launchTowards } from './throw-flight.js';
+import { simulateThrow, reticleTarget, launchTowards } from './throw-flight.js';
 import { restingKeyY } from './floor-contact.js';
 import { BUNDLE_RELEASE_INTERVAL_MS } from './archive-key-motion.js';
 import { RIGHT_HAND_RELEASE } from './held-key-motion.js';
@@ -262,8 +262,8 @@ export function createArchiveActions({
     const key = selectedKey(state);
     if (!key || world.workstations?.isLifting?.(key.id)) return;
     // The key is tossed from the hand onto the point under the reticle (the
-    // floor, a tabletop, a vessel's opening), with the strength that needs.
-    // Looking at nothing within reach throws along the view. The flight is
+    // floor, a tabletop, a vessel's opening), with the strength that needs;
+    // beyond reach, onto the floor at full reach ahead. The flight is
     // simulated now and only replayed by the animation.
     const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
     camera.updateMatrixWorld(true);
@@ -278,7 +278,7 @@ export function createArchiveActions({
     const eye = camera.getWorldPosition(new THREE.Vector3());
     const target = reticleTarget({ eye, forward, floorY: restingKeyY, ...throwScene });
     const flight = simulateThrow({ start, floorY: restingKeyY, ...throwScene,
-      velocity: target ? launchTowards(start, target) : throwVelocity(forward) });
+      velocity: launchTowards(start, target) });
     const { landing } = flight;
     // Until a key bound for a vessel arrives it lies on the floor in front of
     // the workbench (only seen if the page reloads mid-flight).

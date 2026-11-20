@@ -1,5 +1,4 @@
 import * as THREE from '../vendor/three.js';
-import { getWaxMaterial } from './key-dirt.js?v=wax-and-bundles';
 import { createArchiveCandles } from './archive-candles.js?v=candlelight';
 import { KEY_TYPES, getProgress } from './rules.js?v=key-ring';
 import {
@@ -13,6 +12,7 @@ import { createWorldKeyAnimations } from './world-key-animations.js?v=key-ring';
 import { restingKeyY } from './floor-contact.js';
 import { createWorkstations } from './wash-forge-stations.js?v=cleaning-cues';
 import { createPaintedRenderer } from './painted-renderer.js?v=cabinet-rewards';
+import { patchSceneShadowHatch, setShadowHatch } from './shadow-hatch.js';
 import { createSceneGeometryStatsCache } from './geometry-stats.js';
 import { windowLightPalette } from './window-light-palette.js';
 import { PLAYER_EYE_HEIGHT } from './player-config.js';
@@ -104,6 +104,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
   const painted = createPaintedRenderer(renderer, scene, camera, visualSettings);
   const cabinets = KEY_TYPES.map((_, index) => createCabinet(scene, index, mat));
   cabinets.forEach(cabinet => cabinet.setContour(visualSettings));
+  setShadowHatch(visualSettings.hatchShadows);
   cabinets[0].warmEffects(renderer, camera);
   const candleSet = createArchiveCandles(scene, { drawMeshes: true });
   const workstations = createWorkstations(scene, mat, keyIndex);
@@ -130,12 +131,13 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
     const damaged = new THREE.InstancedMesh(
       createPaintedInstanceGeometry(createCombinedKeyGeometry(type, true), damagedKeys.length),
       material, damagedKeys.length);
-    const crustGeometry = getKeyCrustGeometry(type);
-    const crustMaterial = getKeyCrustMaterial();
-    const mudCrust = crustGeometry && crustMaterial ?
-      new THREE.InstancedMesh(crustGeometry, crustMaterial, muddyKeys.length) : null;
-    const waxCrust = crustGeometry && waxedKeys.length
-      ? new THREE.InstancedMesh(crustGeometry, getWaxMaterial(), waxedKeys.length) : null;
+    const mudGeometry = getKeyCrustGeometry(type, false, 'mud');
+    const mudMaterial = getKeyCrustMaterial('mud');
+    const mudCrust = mudGeometry && mudMaterial ?
+      new THREE.InstancedMesh(mudGeometry, mudMaterial, muddyKeys.length) : null;
+    const waxGeometry = getKeyCrustGeometry(type, false, 'wax');
+    const waxCrust = waxGeometry && waxedKeys.length
+      ? new THREE.InstancedMesh(waxGeometry, getKeyCrustMaterial('wax'), waxedKeys.length) : null;
     for (const instance of [healthy, damaged, mudCrust, waxCrust].filter(Boolean)) {
       instance.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
       instance.frustumCulled = false;
@@ -324,7 +326,10 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
     }
   }
 
+  let lastHatchPatch = 0;
   function update(now, moving, playing, playSound) {
+    // Newly created objects may bring new materials: give them the hatching too.
+    if (now - lastHatchPatch > 1500) { lastHatchPatch = now; patchSceneShadowHatch(scene); }
     const elapsed = Math.max(0, Math.min(.1, (now - lastHoverFrame) / 1000));
     lastHoverFrame = now;
     const hoverFactor = 1 - Math.exp(-elapsed / .15);
@@ -389,6 +394,8 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
       passes: painted.getPassCount() + hoverOutline.getPassCount() + objectOutline.getPassCount() }),
     setVisualSettings(settings) {
       applyWindowDaylight(settings);
+      patchSceneShadowHatch(scene);
+      setShadowHatch(settings.hatchShadows);
       painted.setSettings(settings);
       cabinets.forEach(cabinet => cabinet.setContour(settings));
     },

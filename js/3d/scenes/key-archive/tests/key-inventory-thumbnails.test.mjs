@@ -20,7 +20,7 @@ test('all condition variants reuse one metal mesh with independent per-key paint
   const paint=painted.getAttribute('instanceKeyPaint');
   assert.equal(paint.getX(0),0);
   assert.equal(paint.getY(0),0);
-  assert.equal(paint.getY(1),1);
+  assert.equal(paint.getY(1),0,'mud is a separate clod mesh, the metal is unstained');
   assert.ok(Math.abs(paint.getX(2)-1.6)<.000001);
   assert.notEqual(paint.getZ(1),paint.getZ(2));
   setKeyInstanceFinish(mesh,1,{...base,id:'124',mud:false});

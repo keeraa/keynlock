@@ -2,6 +2,8 @@ import * as THREE from '../vendor/three.js';
 import { METALS, RUST_TEXTURE, keyAssetUrl } from './key-data.js?v=plain-gouache';
 import { KEY_ART } from './key-art.js';
 
+const SEAMLESS_TEXTURES=new Set([RUST_TEXTURE,'painted-green.webp']);
+
 const textureCache=new Map();
 const texturePromises=new Map();
 export const matCache=new Map();
@@ -14,7 +16,8 @@ function loadPaintedTexture(file) {
   const ready=new Promise((resolve,reject)=>{resolveReady=resolve;rejectReady=reject;});
   const texture=loader.load(keyAssetUrl(file),()=>resolveReady(texture),undefined,rejectReady);
   texture.colorSpace=THREE.SRGBColorSpace;
-  texture.wrapS=texture.wrapT=file===RUST_TEXTURE?THREE.RepeatWrapping:THREE.MirroredRepeatWrapping;
+  // Seamless textures tile directly; mirroring them shows symmetric 'butterflies'.
+  texture.wrapS=texture.wrapT=SEAMLESS_TEXTURES.has(file)?THREE.RepeatWrapping:THREE.MirroredRepeatWrapping;
   texture.repeat.set(file===RUST_TEXTURE?1:.72,file===RUST_TEXTURE?1:.72);
   texture.anisotropy=4;
   textureCache.set(file,texture);

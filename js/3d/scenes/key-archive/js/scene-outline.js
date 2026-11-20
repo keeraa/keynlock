@@ -40,8 +40,14 @@ float edgeAt(vec2 direction, float depth, vec3 normal, float here) {
   }
   // Ink belongs on the farther surface, outside the foreground silhouette.
   // A two-sided depth edge can paint over almost the entire thin key shaft.
-  float outside = smoothstep(-uDepthThreshold * .12, uDepthThreshold * .12,
+  // Only where the depth step is decisive, though: along a fold (a face
+  // meeting a side wall) the step is near zero and its sign flickers from
+  // pixel to pixel, which broke lines into dashes. There both sides ink.
+  float farther = smoothstep(-uDepthThreshold * .12, uDepthThreshold * .12,
     depth - neighborDepth);
+  float decisive = smoothstep(uDepthThreshold * .6, uDepthThreshold * 1.6,
+    abs(depth - neighborDepth));
+  float outside = mix(1.0, farther, decisive);
   return max(silhouette, crease) * outside;
 }
 

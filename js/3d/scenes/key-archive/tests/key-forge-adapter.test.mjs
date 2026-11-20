@@ -110,11 +110,11 @@ test('Forge mud crust and random rust paint are shared across floor, hand, and b
   'crust extends outside the authentic key silhouette');
 
   const held=provider.createModel(key.type,key);
-  assert.equal(held.children.length,2,'Forge mud rim is a separate solid layer');
+  assert.equal(held.children.length,2,'Forge mud clods are a separate solid layer');
   assert.equal(held.children[1].geometry,crust);
   const attribute=held.children[0].geometry.getAttribute('instanceKeyPaint');
   assert.ok(attribute.getX(0)>1);
-  assert.equal(attribute.getY(0),1);
+  assert.equal(attribute.getY(0),0,'mud is clod geometry, not a stain on the metal');
   assert.ok(attribute.getZ(0)>0);
   assert.equal(provider.createModel(key.type,{...key,mud:false,rust:false}).children.length,1);
   provider.disposeModel(held);

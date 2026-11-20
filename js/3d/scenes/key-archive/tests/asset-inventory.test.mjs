@@ -10,6 +10,6 @@ test('all packaged hall paintings are referenced by the runtime', () => {
     'hall-surface-textures.js', 'painted-textures.js', 'archive-ledger.js',
     'key-data.js', 'station-finish.js', 'entrance-door-texture.js', 'archive-floor-texture.js',
   ].map(file => readFileSync(new URL(`../dist/js/${file}`, import.meta.url), 'utf8')).join('\n');
-  assert.equal(filenames.length, 16);
+  assert.equal(filenames.length, 17);
   for (const filename of filenames) assert.ok(runtime.includes(filename), `orphan: ${filename}`);
 });

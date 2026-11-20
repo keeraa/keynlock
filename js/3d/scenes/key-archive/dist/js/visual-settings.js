@@ -11,6 +11,8 @@ export const DEFAULT_VISUAL_SETTINGS = Object.freeze({
   outlineSensitivity: 100,
   nightLighting: false,
   windowDaylight: 75,
+  // Trial look: deep shadows drawn as pen hatching instead of solid black.
+  hatchShadows: false,
 });
 
 const BOUNDS = Object.freeze({
@@ -30,7 +32,7 @@ export function normalizeVisualSettings(values) {
     if (input[key] != null && Number.isFinite(number))
       settings[key] = Math.min(max, Math.max(min, Math.round(number)));
   }
-  for (const key of ['toonEnabled', 'outlineEnabled', 'nightLighting']) {
+  for (const key of ['toonEnabled', 'outlineEnabled', 'nightLighting', 'hatchShadows']) {
     if (typeof input[key] === 'boolean') settings[key] = input[key];
   }
   return settings;
@@ -38,5 +40,5 @@ export function normalizeVisualSettings(values) {
 
 export function visualPassNeeded(settings) {
   return Boolean((settings.toonEnabled && settings.toonLight > 0 && settings.cartoonMaterial > 0) ||
-    (settings.outlineEnabled && settings.outlineStrength > 0));
+    (settings.outlineEnabled && settings.outlineStrength > 0) || settings.hatchShadows);
 }

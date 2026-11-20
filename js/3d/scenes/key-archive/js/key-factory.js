@@ -63,10 +63,11 @@ export function getKeyMaterial(type) {
       metalness: .28, roughness: .78 }));
   return legacyMaterials.get(type);
 }
-export function getKeyCrustGeometry(type, broken = false) {
-  return active().getCrustGeometry?.(type, { broken }) || null;
+// kind: 'mud' (dried clods) or 'wax' (candle coat).
+export function getKeyCrustGeometry(type, broken = false, kind = 'mud') {
+  return active().getCrustGeometry?.(type, { broken, kind }) || null;
 }
-export function getKeyCrustMaterial() { return active().getCrustMaterial?.() || null; }
+export function getKeyCrustMaterial(kind = 'mud') { return active().getCrustMaterial?.(kind) || null; }
 export function getKeyRustStrength(type) { return active().getRustStrength?.(type) ?? 1.35; }
 export function getKeyMetal(type) { return active().getMetal(type); }
 // Optional per-family pigment for new forge finishes; legacy palette remains

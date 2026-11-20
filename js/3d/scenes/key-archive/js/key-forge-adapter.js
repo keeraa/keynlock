@@ -6,7 +6,12 @@ import { KEY_TEMPLATES, METALS, defaultDesign, normalizeKeyDesign } from './key-
 import { createKeyModel as createForgeModel, disposeKeyModel } from './key-geometry.js?v=wax-and-bundles';
 import { bowPoints, createBowShape, joinedKeyShape, keyBounds } from './key-shapes.js?v=2';
 import { getMetalMaterial } from './key-materials.js?v=wax-and-bundles';
-import { dirtTriangles, getDirtMaterial, getWaxMaterial } from './key-dirt.js?v=wax-and-bundles';
+import { mudGeometry, getMudMaterial } from './key-mud.js?v=forge-coats';
+import { waxGeometry, getWaxMaterial } from './key-wax.js?v=forge-coats';
+
+// Hall keys are small on screen: a coarser coat grid keeps clods and wax
+// readable at about half the triangles of the Key Forge preview.
+const HALL_COAT_CELL=Object.freeze({mud:.085,wax:.095});
 import { createPaintedInstanceGeometry, setKeyInstanceFinish } from './key-instance-finish.js?v=wax-and-bundles';
 
 // Old archive: circle, triangle, square, diamond, pentagon, hexagon, star,
@@ -152,13 +157,17 @@ export function createForgeKeyProvider(profiles = []) {
       makeArchiveGeometry(type, !!broken, profiles));
     return geometryCache.get(key).geometry;
   };
-  const crustFor = (type, broken = false) => {
-    const key = `${type}:${!!broken}`;
+  // Mud is a few dried clods, wax a thick candle coat (Key Forge coats).
+  const crustFor = (type, broken = false, kind = 'mud') => {
+    const key = `${type}:${!!broken}:${kind}`;
     if (!crustCache.has(key)) {
       geometryFor(type, broken);
-      const transform = geometryCache.get(key);
-      const design = { ...geometryDesign(type, broken, profiles), dirtAmount: 100 };
-      const crust = dirtTriangles(KEY_TEMPLATES[design.template], design);
+      const transform = geometryCache.get(`${type}:${!!broken}`);
+      const design = geometryDesign(type, broken, profiles);
+      const template = KEY_TEMPLATES[design.template];
+      const crust = kind === 'wax'
+        ? waxGeometry(template, design, { cell: HALL_COAT_CELL.wax })
+        : mudGeometry(template, design, { cell: HALL_COAT_CELL.mud });
       crust.rotateZ(-Math.PI / 2);
       crust.scale(transform.scale, transform.scale, transform.scale);
       crust.translate(transform.offset.x, transform.offset.y, transform.offset.z);
@@ -179,8 +188,8 @@ export function createForgeKeyProvider(profiles = []) {
       setKeyInstanceFinish(mesh, 0, { id, type, variation, rust, mud, wax }, rustStrengthFor(type));
       mesh.castShadow = false;
       group.add(mesh);
-      if (mud || wax) {
-        const crust = new THREE.Mesh(crustFor(type, broken), wax ? getWaxMaterial() : getDirtMaterial());
+      for (const kind of [mud && 'mud', wax && 'wax'].filter(Boolean)) {
+        const crust = new THREE.Mesh(crustFor(type, broken, kind), kind === 'wax' ? getWaxMaterial() : getMudMaterial());
         crust.castShadow = false;
         group.add(crust);
       }
@@ -194,8 +203,8 @@ export function createForgeKeyProvider(profiles = []) {
       });
     },
     getGeometry: (type, { broken = false } = {}) => geometryFor(type, broken),
-    getCrustGeometry: (type, { broken = false } = {}) => crustFor(type, broken),
-    getCrustMaterial: getDirtMaterial,
+    getCrustGeometry: (type, { broken = false, kind = 'mud' } = {}) => crustFor(type, broken, kind),
+    getCrustMaterial: (kind = 'mud') => kind === 'wax' ? getWaxMaterial() : getMudMaterial(),
     getMaterial: materialFor,
     getRustStrength: rustStrengthFor,
     createGlyph(type) {

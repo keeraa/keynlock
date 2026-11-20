@@ -90,8 +90,9 @@ export function createArchiveTargeting({ camera, world, state, keyIndex }) {
         keyMesh.updateMatrixWorld();
         keyMesh.geometry = createCombinedKeyGeometry(key.type, key.broken);
         keyMesh.raycast(raycaster, keyHits);
-        const crust = (key.mud || key.wax) && getKeyCrustGeometry(key.type, key.broken);
-        if (crust) {
+        for (const kind of [key.mud && 'mud', key.wax && 'wax'].filter(Boolean)) {
+          const crust = getKeyCrustGeometry(key.type, key.broken, kind);
+          if (!crust) continue;
           keyMesh.geometry = crust;
           keyMesh.raycast(raycaster, keyHits);
         }

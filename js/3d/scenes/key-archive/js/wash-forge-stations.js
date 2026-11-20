@@ -384,7 +384,12 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
     if (!bath) return;
     clearLift(bath);
     const keyMesh = keyForBath(key, bath.kind);
-    bath.lift = { keyMesh, key, startedAt: performance.now() };
+    // Rise from where the key was lying, in the pose it had there.
+    const slot = bath.slots.find(item => item.keyId === key.id && item.keyMesh);
+    const from = slot ? { x: slot.holder.position.x, z: slot.holder.position.z,
+      y: slot.holder.position.y + slot.keyMesh.position.y,
+      rotation: slot.keyMesh.rotation.clone() } : null;
+    bath.lift = { keyMesh, key, from, startedAt: performance.now() };
     bindBathFinish(bath.lift);
     bath.group.add(keyMesh);
   }
@@ -492,8 +497,13 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
             onLiftDone?.(key);
           } else {
             const lift = Math.min(1, progress * 2.1);
-            if (bath.tray) {
-              // Raised from lying flat in the tray, tilting up towards the player.
+            const from = bath.lift.from;
+            if (from) {
+              // Up from its own place, turning from its resting pose to face the player.
+              keyMesh.position.set(from.x, from.y + lift * .36, from.z + lift * .16);
+              keyMesh.rotation.set(from.rotation.x + (-.3 - from.rotation.x) * lift,
+                from.rotation.y + (.20 - from.rotation.y) * lift, from.rotation.z + (-.20 - from.rotation.z) * lift);
+            } else if (bath.tray) {
               keyMesh.position.set(bath.x, bath.surfaceY - .03 + lift * .36, .1 + lift * .16);
               keyMesh.rotation.set(-Math.PI / 2 + lift * 1.27, .20 * lift, -.20 * lift);
             } else {

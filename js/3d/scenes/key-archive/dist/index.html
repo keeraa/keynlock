@@ -4,27 +4,27 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#14211f" />
-  <meta name="description" content="Архив ключей — гуашевая игра: поиск, отмачивание, очистка ржавчины и переплавка брака." />
-  <title>Архив ключей</title>
+  <meta name="description" data-i18n-attr="content:meta.description" content="Архив ключей — гуашевая игра: поиск, отмачивание, очистка ржавчины и переплавка брака." />
+  <title data-i18n="meta.title">Архив ключей</title>
   <link rel="stylesheet" href="./styles.css?v=key-ring" />
 </head>
 <body>
-  <canvas id="world" aria-label="Трёхмерный зал архива ключей"></canvas>
+  <canvas id="world" data-i18n-attr="aria-label:aria.world" aria-label="Трёхмерный зал архива ключей"></canvas>
   <div id="vignette" aria-hidden="true"></div>
 
   <div id="hud" class="is-hidden">
     <header class="hud-title">
-      <div class="brand-copy"><strong>Архив ключей</strong></div>
+      <div class="brand-copy"><strong data-i18n="hud.brand">Архив ключей</strong></div>
     </header>
-    <div class="top-center">ЗАЛ ДЕСЯТИ СЕМЕЙСТВ</div>
-    <div class="fps-counter" aria-label="Производительность сцены">
+    <div class="top-center" data-i18n="hud.hall">ЗАЛ ДЕСЯТИ СЕМЕЙСТВ</div>
+    <div class="fps-counter" data-i18n-attr="aria-label:aria.performance" aria-label="Производительность сцены">
       <div>FPS <strong id="fps">—</strong></div>
-      <div>ПОЛИГОНЫ <strong id="poly-count">—</strong></div>
-      <div>ТРЕУГОЛЬНИКИ <strong id="triangle-count">—</strong></div>
-      <div>CPU СР. / ПИК <strong id="cpu-count">—</strong></div>
-      <div>ВЫЗОВЫ ОТРИСОВКИ <strong id="draw-count">—</strong></div>
-      <div>ПРОХОДЫ <strong id="pass-count">—</strong></div>
-      <div>ВИЗУАЛ <strong id="visual-status">—</strong></div>
+      <div><span data-i18n="hud.polygons">ПОЛИГОНЫ</span> <strong id="poly-count">—</strong></div>
+      <div><span data-i18n="hud.triangles">ТРЕУГОЛЬНИКИ</span> <strong id="triangle-count">—</strong></div>
+      <div><span data-i18n="hud.cpu">CPU СР. / ПИК</span> <strong id="cpu-count">—</strong></div>
+      <div><span data-i18n="hud.drawCalls">ВЫЗОВЫ ОТРИСОВКИ</span> <strong id="draw-count">—</strong></div>
+      <div><span data-i18n="hud.passes">ПРОХОДЫ</span> <strong id="pass-count">—</strong></div>
+      <div><span data-i18n="hud.visual">ВИЗУАЛ</span> <strong id="visual-status">—</strong></div>
     </div>
     <div id="crosshair" class="crosshair" aria-hidden="true"></div>
     <div id="interaction-prompt" class="interaction-prompt is-hidden"></div>
@@ -36,18 +36,18 @@
     </div>
     <div class="hud-footer">
       <div class="hud-guides">
-        <div class="quick-keys">E <span>— действие</span> &nbsp; R <span>— бросить</span></div>
+        <div class="quick-keys" data-i18n-html="hud.quickKeys">E <span>— действие</span> &nbsp; R <span>— бросить</span></div>
       </div>
       <div class="inventory-shell">
-        <div class="inventory-caption"><span>В РУКАХ</span><span id="hand-count">0 / 4</span></div>
+        <div class="inventory-caption"><span data-i18n="hud.inHands">В РУКАХ</span><span id="hand-count">0 / 4</span></div>
         <div id="archive-resources" class="archive-resources"></div>
-        <div id="inventory" class="inventory" role="group" aria-label="Переносимые ключи"></div>
+        <div id="inventory" class="inventory" role="group" data-i18n-attr="aria-label:aria.inventory" aria-label="Переносимые ключи"></div>
       </div>
     </div>
     <div id="bath-progress" class="bath-progress-layer" hidden>
-      <progress id="bath-progress-mud" class="bath-world-progress" hidden max="100" value="0" aria-label="Готовность промывки"></progress>
-      <progress id="bath-progress-rust" class="bath-world-progress" hidden max="100" value="0" aria-label="Готовность очистки от ржавчины"></progress>
-      <div id="forge-progress" class="forge-world-progress" hidden><progress class="bath-world-progress" max="100" value="0" aria-label="Плавка металла"></progress><span class="forge-timer"></span></div>
+      <progress id="bath-progress-mud" class="bath-world-progress" hidden max="100" value="0" data-i18n-attr="aria-label:aria.progressMud" aria-label="Готовность промывки"></progress>
+      <progress id="bath-progress-rust" class="bath-world-progress" hidden max="100" value="0" data-i18n-attr="aria-label:aria.progressRust" aria-label="Готовность очистки от ржавчины"></progress>
+      <div id="forge-progress" class="forge-world-progress" hidden><progress class="bath-world-progress" max="100" value="0" data-i18n-attr="aria-label:aria.progressForge" aria-label="Плавка металла"></progress><span class="forge-timer"></span></div>
     </div>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </div>
@@ -57,61 +57,62 @@
   <div id="intro" class="screen-overlay">
     <div class="menu-card">
       <div class="seal-mark"><span>✥</span><i>Х</i></div>
-      <div class="eyebrow">ГЛАВА I · ПРОТОТИП</div>
-      <h1>Архив <em>ключей</em></h1>
-      <p>После землетрясения все ключи рассыпались и перепутались. Собери их и наведи порядок в архиве. Чистые развесь по шкафам, грязные отмочи в воде, ржавые обработай раствором, а сломанные переплавь. Рабочие устройства находятся в центре зала.</p>
-      <button id="start-btn" disabled class="primary-button">ВОЙТИ В АРХИВ <span>→</span></button>
-      <div class="menu-controls">E — действие &nbsp;·&nbsp; R — бросить</div>
+      <div class="eyebrow" data-i18n="intro.eyebrow">ГЛАВА I · ПРОТОТИП</div>
+      <h1 data-i18n-html="intro.title">Архив <em>ключей</em></h1>
+      <p data-i18n="intro.text">После землетрясения все ключи рассыпались и перепутались. Собери их и наведи порядок в архиве. Чистые развесь по шкафам, грязные отмочи в воде, ржавые обработай раствором, а сломанные переплавь. Рабочие устройства находятся в центре зала.</p>
+      <button id="start-btn" disabled class="primary-button" data-i18n-html="intro.start">ВОЙТИ В АРХИВ <span>→</span></button>
+      <div class="menu-controls" data-i18n-html="intro.controls">E — действие &nbsp;·&nbsp; R — бросить</div>
     </div>
-    <div id="save-intro" class="menu-bottom">ПРОГРЕСС СОХРАНЯЕТСЯ АВТОМАТИЧЕСКИ</div>
+    <div id="save-intro" class="menu-bottom" data-i18n="intro.autosave">ПРОГРЕСС СОХРАНЯЕТСЯ АВТОМАТИЧЕСКИ</div>
   </div>
 
   <div id="pause" class="screen-overlay is-hidden">
     <div class="menu-card compact">
-      <div class="eyebrow">АРХИВ КЛЮЧЕЙ</div>
-      <h2>Пауза</h2>
-      <p id="save-pause">Каждый собранный ключ останется на своём месте.</p>
-      <button id="resume-btn" class="primary-button">ПРОДОЛЖИТЬ <span>→</span></button>
-      <div class="settings-row"><label for="sensitivity">Чувствительность мыши</label><input id="sensitivity" type="range" min="6" max="28" step="1" value="14" /></div>
-      <div class="settings-row"><label for="sound">Звуковые эффекты</label><input id="sound" type="checkbox" checked /></div>
-      <div class="settings-row"><label for="music-volume">Громкость музыки <output id="music-volume-value" for="music-volume">28%</output></label><input id="music-volume" type="range" min="0" max="100" step="1" value="28" /></div>
-      <button id="visual-open" class="secondary-button">ВИЗУАЛ · РИСОВКА И СВЕТ <span>✦</span></button>
-      <button id="reset-btn" class="text-button">Начать сортировку заново</button>
+      <div class="eyebrow" data-i18n="pause.eyebrow">АРХИВ КЛЮЧЕЙ</div>
+      <h2 data-i18n="pause.title">Пауза</h2>
+      <p id="save-pause" data-i18n="pause.saved">Каждый собранный ключ останется на своём месте.</p>
+      <button id="resume-btn" class="primary-button" data-i18n-html="pause.resume">ПРОДОЛЖИТЬ <span>→</span></button>
+      <div class="settings-row"><label for="sensitivity" data-i18n="pause.sensitivity">Чувствительность мыши</label><input id="sensitivity" type="range" min="6" max="28" step="1" value="14" /></div>
+      <div class="settings-row"><label for="sound" data-i18n="pause.sound">Звуковые эффекты</label><input id="sound" type="checkbox" checked /></div>
+      <div class="settings-row"><label for="music-volume"><span data-i18n="pause.music">Громкость музыки</span> <output id="music-volume-value" for="music-volume">28%</output></label><input id="music-volume" type="range" min="0" max="100" step="1" value="28" /></div>
+      <div class="settings-row"><label for="language" data-i18n="pause.language">Язык</label><select id="language" class="language-select"></select></div>
+      <button id="visual-open" class="secondary-button" data-i18n-html="pause.visual">ВИЗУАЛ · РИСОВКА И СВЕТ <span>✦</span></button>
+      <button id="reset-btn" class="text-button" data-i18n="pause.reset">Начать сортировку заново</button>
     </div>
   </div>
 
   <div id="visual" class="screen-overlay visual-overlay is-hidden">
     <section class="visual-card" aria-labelledby="visual-title">
-      <div class="eyebrow">НАСТРОЙКИ СЦЕНЫ</div>
-      <h2 id="visual-title">Визуал <em>и свет</em></h2>
-      <p>Настройки применяются сразу. Исходные гуашевые карты металла и дерева сохраняются.</p>
+      <div class="eyebrow" data-i18n="visual.eyebrow">НАСТРОЙКИ СЦЕНЫ</div>
+      <h2 id="visual-title" data-i18n-html="visual.title">Визуал <em>и свет</em></h2>
+      <p data-i18n="visual.text">Настройки применяются сразу. Исходные гуашевые карты металла и дерева сохраняются.</p>
       <div class="visual-scroll">
-        <div class="visual-group"><span>01 · МУЛЬТЯШНАЯ РИСОВКА</span><label class="visual-switch"><input id="toonEnabled" type="checkbox" checked /> Включена</label></div>
-        <div class="visual-control"><label for="toonLight">Мультяшный свет <output for="toonLight">80%</output></label><input id="toonLight" type="range" min="0" max="100" value="80" /></div>
-        <div class="visual-control"><label for="toonSteps">Ступени освещения <output for="toonSteps">4</output></label><input id="toonSteps" type="range" min="2" max="8" step="1" value="4" /></div>
-        <div class="visual-control"><label for="cartoonMaterial">Мультяшный материал <output for="cartoonMaterial">90%</output></label><input id="cartoonMaterial" type="range" min="0" max="100" value="90" /></div>
-        <div class="visual-group"><span>02 · КОНТУРНАЯ ОБВОДКА</span><label class="visual-switch"><input id="outlineEnabled" type="checkbox" checked /> Включена</label></div>
-        <div class="visual-control"><label for="outlineStrength">Сила обводки <output for="outlineStrength">100%</output></label><input id="outlineStrength" type="range" min="0" max="100" value="100" /></div>
+        <div class="visual-group"><span data-i18n="visual.toon">01 · МУЛЬТЯШНАЯ РИСОВКА</span><label class="visual-switch"><input id="toonEnabled" type="checkbox" checked /> <span data-i18n="visual.on">Включена</span></label></div>
+        <div class="visual-control"><label for="toonLight"><span data-i18n="visual.toonLight">Мультяшный свет</span> <output for="toonLight">80%</output></label><input id="toonLight" type="range" min="0" max="100" value="80" /></div>
+        <div class="visual-control"><label for="toonSteps"><span data-i18n="visual.toonSteps">Ступени освещения</span> <output for="toonSteps">4</output></label><input id="toonSteps" type="range" min="2" max="8" step="1" value="4" /></div>
+        <div class="visual-control"><label for="cartoonMaterial"><span data-i18n="visual.cartoonMaterial">Мультяшный материал</span> <output for="cartoonMaterial">90%</output></label><input id="cartoonMaterial" type="range" min="0" max="100" value="90" /></div>
+        <div class="visual-group"><span data-i18n="visual.outline">02 · КОНТУРНАЯ ОБВОДКА</span><label class="visual-switch"><input id="outlineEnabled" type="checkbox" checked /> <span data-i18n="visual.on">Включена</span></label></div>
+        <div class="visual-control"><label for="outlineStrength"><span data-i18n="visual.outlineStrength">Сила обводки</span> <output for="outlineStrength">100%</output></label><input id="outlineStrength" type="range" min="0" max="100" value="100" /></div>
         <input id="outlineWidth" type="hidden" value="1" disabled />
-        <div class="visual-control"><label for="outlineSensitivity">Чувствительность к граням <output for="outlineSensitivity">100%</output></label><input id="outlineSensitivity" type="range" min="0" max="100" step="1" value="100" /></div>
-        <div class="visual-group"><span>03 · СВЕТ ИЗ ОКОН</span><label class="visual-switch"><input id="nightLighting" type="checkbox" /> Ночной свет</label></div>
-        <div class="visual-control"><label for="windowDaylight">Свет сквозь окна <output for="windowDaylight">75%</output></label><input id="windowDaylight" type="range" min="0" max="100" value="75" /></div>
-        <div class="visual-group"><span>04 · ШТРИХОВКА ТЕНЕЙ</span><label class="visual-switch"><input id="hatchShadows" type="checkbox" /> Включена</label></div>
-        <p class="visual-note">Проба: тёмные места рисуются пером вместо сплошной черноты.</p>
+        <div class="visual-control"><label for="outlineSensitivity"><span data-i18n="visual.outlineSensitivity">Чувствительность к граням</span> <output for="outlineSensitivity">100%</output></label><input id="outlineSensitivity" type="range" min="0" max="100" step="1" value="100" /></div>
+        <div class="visual-group"><span data-i18n="visual.windows">03 · СВЕТ ИЗ ОКОН</span><label class="visual-switch"><input id="nightLighting" type="checkbox" /> <span data-i18n="visual.night">Ночной свет</span></label></div>
+        <div class="visual-control"><label for="windowDaylight"><span data-i18n="visual.daylight">Свет сквозь окна</span> <output for="windowDaylight">75%</output></label><input id="windowDaylight" type="range" min="0" max="100" value="75" /></div>
+        <div class="visual-group"><span data-i18n="visual.hatch">04 · ШТРИХОВКА ТЕНЕЙ</span><label class="visual-switch"><input id="hatchShadows" type="checkbox" /> <span data-i18n="visual.on">Включена</span></label></div>
+        <p class="visual-note" data-i18n="visual.hatchNote">Проба: тёмные места рисуются пером вместо сплошной черноты.</p>
       </div>
-      <div class="visual-actions"><button id="visual-natural" class="text-button">Исходный вид</button><button id="visual-reset" class="text-button">Рисовка по умолчанию</button><button id="visual-back" class="secondary-button">НАЗАД</button></div>
-      <button id="visual-resume" class="primary-button">ПРОДОЛЖИТЬ ИГРУ <span>→</span></button>
+      <div class="visual-actions"><button id="visual-natural" class="text-button" data-i18n="visual.natural">Исходный вид</button><button id="visual-reset" class="text-button" data-i18n="visual.reset">Рисовка по умолчанию</button><button id="visual-back" class="secondary-button" data-i18n="visual.back">НАЗАД</button></div>
+      <button id="visual-resume" class="primary-button" data-i18n-html="visual.resume">ПРОДОЛЖИТЬ ИГРУ <span>→</span></button>
     </section>
   </div>
 
   <div id="victory" class="screen-overlay is-hidden">
     <div class="menu-card compact victory-card">
       <div class="seal-mark small"><span>✥</span><i>Х</i></div>
-      <div class="eyebrow">АРХИВ РАЗОБРАН</div>
-      <h2>Все ключи<br/><em>разобраны.</em></h2>
-      <p>Чистые ключи висят на своих штырях, а металл сломанных ключей отправлен на переплавку.</p>
-      <button id="victory-explore" class="primary-button">ОСМОТРЕТЬ ЗАЛ <span>→</span></button>
-      <button id="victory-reset" class="text-button">Пройти заново</button>
+      <div class="eyebrow" data-i18n="victory.eyebrow">АРХИВ РАЗОБРАН</div>
+      <h2 data-i18n-html="victory.title">Все ключи<br/><em>разобраны.</em></h2>
+      <p data-i18n="victory.text">Чистые ключи висят на своих штырях, а металл сломанных ключей отправлен на переплавку.</p>
+      <button id="victory-explore" class="primary-button" data-i18n-html="victory.explore">ОСМОТРЕТЬ ЗАЛ <span>→</span></button>
+      <button id="victory-reset" class="text-button" data-i18n="victory.reset">Пройти заново</button>
     </div>
   </div>
   <script type="module" src="./js/main.js?v=music-resume-seek"></script>

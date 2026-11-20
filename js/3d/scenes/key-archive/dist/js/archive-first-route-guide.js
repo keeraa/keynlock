@@ -1,3 +1,4 @@
+import { t, familyName } from './i18n.js';
 import { CABINET_HEADER_Y } from './cabinet-layout.js?v=cabinet-cell-glow';
 import * as THREE from '../vendor/three.js';
 import { KEY_TYPES } from './rules.js?v=key-ring';
@@ -47,7 +48,7 @@ export function createFirstRouteGuide(document, state, keyIndex, world) {
     }
 
     const carrying = key.status !== 'floor';
-    const cabinetName = KEY_TYPES[key.type].name;
+    const cabinetName = familyName(key.type);
     if (carrying) {
       point.setFromMatrixPosition(world.cabinets[key.type].group.matrixWorld);
       point.y += CABINET_HEADER_Y;
@@ -65,14 +66,14 @@ export function createFirstRouteGuide(document, state, keyIndex, world) {
 
     let direction = '';
     if (!inView) {
-      if (local.z >= 0 && Math.abs(local.x) < .3) direction = ' · обернись';
-      else if (local.z >= 0 || Math.abs(point.x) >= .88) direction = local.x < 0 ? ' · слева' : ' · справа';
-      else direction = local.y < 0 ? ' · посмотри ниже' : ' · посмотри выше';
+      if (local.z >= 0 && Math.abs(local.x) < .3) direction = t('route.turnAround');
+      else if (local.z >= 0 || Math.abs(point.x) >= .88) direction = t(local.x < 0 ? 'route.left' : 'route.right');
+      else direction = t(local.y < 0 ? 'route.lookDown' : 'route.lookUp');
     }
     const selected = state.held[state.selected] === key.id;
-    const instruction = key.status === 'bundled' ? `Отнеси связку в шкаф «${cabinetName}»` : carrying
-      ? `Отнеси ключ в шкаф «${cabinetName}»${selected ? '' : ' · выбери ключ в руках'}`
-      : 'Подними отмеченный чистый ключ · E / У';
+    const instruction = key.status === 'bundled' ? t('route.bundle', { name: cabinetName }) : carrying
+      ? t('route.carry', { name: cabinetName, choose: selected ? '' : t('route.choose') })
+      : t('route.pick');
     const text = instruction + direction;
     if (goal.textContent !== text) goal.textContent = text;
   }

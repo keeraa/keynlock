@@ -1,3 +1,4 @@
+import { t, familyName } from './i18n.js';
 import { KEY_TYPES, MAX_HELD, getProgress, selectedKey } from './rules.js?v=key-ring';
 import { thumbnailCacheKey } from './key-thumbnails.js?v=key-ring';
 import { createKeyFallbackStamp } from './key-factory.js?v=key-ring';
@@ -29,14 +30,14 @@ export function createArchiveHud(document, world, state, keyIndex) {
     const progress = getProgress(state);
     $('hand-count').textContent = `${state.held.length} / ${MAX_HELD}`;
     const resources = $('archive-resources');
-    if (resources) resources.textContent = `Металл ${state.metal ?? 0}${state.bundles ? ' · Кольцо куплено' : ''}`;
+    if (resources) resources.textContent = t('hud.metal', { metal: state.metal ?? 0 }) + (state.bundles ? t('hud.ringOwned') : '');
     const bundle = $('carried-bundle');
     const label = $('bundle-label');
     const icons = $('bundle-keys');
     if (bundle && label && icons && renderedBundle !== state.activeBundle) {
       renderedBundle = state.activeBundle;
       bundle.hidden = !renderedBundle;
-      label.textContent = renderedBundle ? `В связке · ${KEY_TYPES[renderedBundle.type].name} ×4` : '';
+      label.textContent = renderedBundle ? t('hud.bundle', { name: familyName(renderedBundle.type) }) : '';
       icons.replaceChildren();
       const positions = [[40,22,23],[47,27,9],[56,28,-9],[64,21,-25]];
       renderedBundle?.ids.forEach((id,index) => {
@@ -65,14 +66,14 @@ export function createArchiveHud(document, world, state, keyIndex) {
         visual.className = image ? 'slot-thumbnail' : 'slot-mark';
         if (image) {
           visual.src = image;
-          visual.alt = `Ключ «${KEY_TYPES[key.type].name}»`;
+          visual.alt = t('hud.keyAlt', { name: familyName(key.type) });
           visual.decoding = 'async';
           visual.draggable = false;
         } else visual.textContent = KEY_SYMBOLS[key.type];
         const name = document.createElement('span');
         name.className = 'slot-name';
-        name.textContent = key.broken ? 'СЛОМАН · ПЛАВКА' : key.wax ? 'ВОСК · СВЕЧА' : key.mud && key.rust ? 'ГРЯЗЬ + РЖАВЧИНА' :
-          key.mud ? 'В ГРЯЗИ · ВОДА' : key.rust ? 'РЖАВЧИНА · РАСТВОР' : KEY_TYPES[key.type].name;
+        name.textContent = key.broken ? t('hud.slot.broken') : key.wax ? t('hud.slot.wax') : key.mud && key.rust ? t('hud.slot.both') :
+          key.mud ? t('hud.slot.mud') : key.rust ? t('hud.slot.rust') : familyName(key.type);
         element.title = name.textContent;
         element.append(visual, name);
       }

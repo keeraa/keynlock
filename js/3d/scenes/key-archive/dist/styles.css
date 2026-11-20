@@ -140,3 +140,5 @@ body.playing #world,body.playing #hud{cursor:none}
 .forge-world-progress .bath-world-progress::-webkit-progress-value{background:#e08a45}
 .forge-world-progress .bath-world-progress::-moz-progress-bar{background:#e08a45}
 .forge-timer{color:#f2dcad;font:11px Arial,sans-serif;text-shadow:0 1px 3px #160f0a;white-space:nowrap}
+
+.language-select{min-width:120px;padding:4px 8px;border:1px solid rgba(224,198,148,.55);border-radius:4px;background:#1b2421;color:#f2dcad;font:12px Arial,sans-serif}

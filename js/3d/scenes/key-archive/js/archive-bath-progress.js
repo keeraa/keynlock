@@ -1,3 +1,4 @@
+import { t } from './i18n.js';
 import { STATIONS, FIXTURE_OFFSETS, FORGE_SURFACE_Y, bathId } from './station-layout.js';
 import { RUST_TRAY } from './wash-forge-stations.js?v=cleaning-cues';
 import { smeltingState } from './rules.js?v=key-ring';
@@ -100,7 +101,7 @@ export function createBathProgress(document, world, keyIndex, state = null) {
     // Current smelt, and how many keys and how much time the queue still holds.
     const clock = seconds => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
     const text = smelt.waiting
-      ? `${clock(smelt.secondsLeft)} · в очереди ${smelt.waiting} · всего ${clock(smelt.totalSecondsLeft)}`
+      ? t('forge.queue', { current: clock(smelt.secondsLeft), waiting: smelt.waiting, total: clock(smelt.totalSecondsLeft) })
       : clock(smelt.secondsLeft);
     if (forge.timer.textContent !== text) forge.timer.textContent = text;
     const barWidth = Math.max(28, Math.min(116, focal * .95 / -eye.z));

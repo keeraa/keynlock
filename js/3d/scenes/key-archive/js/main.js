@@ -1,3 +1,6 @@
+import { t, applyTranslations, LANGUAGES, getLanguage, setLanguage } from './i18n.js';
+// Static texts of the page follow the chosen language before anything shows.
+applyTranslations(document);
 import { TOTAL_KEYS, getProgress } from './rules.js?v=key-ring';
 import { createWorld } from './world.js?v=cleaning-cues';
 import { installKeyAssetProvider } from './key-factory.js?v=key-ring';
@@ -63,11 +66,11 @@ let lastHoverKey = '';
 let toastTimeout = 0;
 let announceRecovery = archiveSave.recovered;
 const saveMessages = {
-  unavailable: 'Хранилище браузера недоступно. Прогресс этой сессии не сохраняется.',
-  damaged: 'Сохранение повреждено. Автосохранение приостановлено. Начать заново можно из меню паузы.',
-  conflict: 'Сохранение изменилось. Перезагрузи игру, чтобы открыть актуальный прогресс.',
-  'write-error': 'Не удалось записать прогресс. Автосохранение попробует ещё раз при следующем действии.',
-  'backup-error': 'Прогресс записан, но резервная копия не обновилась.',
+  unavailable: t('save.unavailable'),
+  damaged: t('save.damaged'),
+  conflict: t('save.conflict'),
+  'write-error': t('save.writeError'),
+  'backup-error': t('save.backupError'),
 };
 const heldMovement = new Set();
 const MENU_FRAME_INTERVAL = 1000 / 30;
@@ -90,7 +93,7 @@ function save({ initial = false } = {}) {
   keyIndex.rebuild();
   const result = archiveSave.save();
   const status = $('save-status');
-  const message = saveMessages[result] || (announceRecovery ? 'Прогресс восстановлен из резервной копии.' : '');
+  const message = saveMessages[result] || (announceRecovery ? t('save.recovered') : '');
   if (status.textContent !== message) status.textContent = message;
   status.hidden = !message;
   $('save-intro').hidden = result !== 'saved';
@@ -196,7 +199,7 @@ function play({ lockMouse = true } = {}) {
   music.start();
   lockUnavailable = false;
   if (lockMouse) requestMouseLock();
-  if (getProgress(state).processed === TOTAL_KEYS) toast('Архив уже разобран');
+  if (getProgress(state).processed === TOTAL_KEYS) toast(t('toast.archiveDone'));
 }
 
 function releaseMouseLock() {
@@ -225,11 +228,11 @@ function showVictory() {
 }
 
 function resetGame() {
-  if (!window.confirm('Сбросить прогресс и снова разложить все 1000 ключей?')) return;
+  if (!window.confirm(t('confirm.reset'))) return;
   try {
     clearArchiveState(storage);
   } catch {
-    toast('Не удалось сбросить прогресс', true);
+    toast(t('toast.resetFailed'), true);
     return;
   }
   window.location.reload();
@@ -246,6 +249,12 @@ visualPanel.bind();
 $('reset-btn').addEventListener('click', resetGame);
 $('victory-reset').addEventListener('click', resetGame);
 $('sensitivity').addEventListener('input', event => { sensitivity = Number(event.target.value); });
+// Language: the page reloads in the chosen language (progress is already saved).
+const languageSelect = $('language');
+if (languageSelect) {
+  for (const [code, name] of Object.entries(LANGUAGES)) languageSelect.add(new Option(name, code, false, code === getLanguage()));
+  languageSelect.addEventListener('change', event => { save(); setLanguage(event.target.value); });
+}
 $('sound').checked = !audio.isMuted();
 $('sound').addEventListener('change', event => { audio.setMuted(!event.target.checked); });
 

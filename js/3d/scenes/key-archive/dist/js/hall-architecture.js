@@ -12,6 +12,8 @@ export const WINDOW_VERTICAL_SCALE = WINDOW_SCALE * .8;
 export const WINDOW_RAISE_Y = .85;
 export const WINDOW_CENTER_Y = (WINDOW_SILL_Y + WINDOW_CROWN_Y) / 2;
 export const PERIMETER_BAND_Y = 5.2;
+const SIDE_WALL_DEPTH = .44;
+export const HALL_SIDE_WALL_INNER_X = 12.30 - SIDE_WALL_DEPTH;
 export const HALL_HEIGHT_SCALE = 1.2;
 
 export const windowY = y => WINDOW_CENTER_Y +
@@ -20,6 +22,9 @@ export const windowY = y => WINDOW_CENTER_Y +
 export function vaultHeight(x) {
   return (10.66 + .62 * (1 - (x / 12) ** 2)) * HALL_HEIGHT_SCALE;
 }
+
+// The end-wall boxes overlap the highest part of the vault at both ends.
+export const HALL_END_WALL_HEIGHT = vaultHeight(0) + .08;
 
 export function archedOpening(center = 0, radius = WINDOW_OPENING_RADIUS,
   sill = WINDOW_SILL_Y, spring = WINDOW_SPRING_Y, rise = radius) {
@@ -47,7 +52,7 @@ export function createWindowedWallGeometry() {
     windowY(WINDOW_SILL_Y), windowY(WINDOW_SPRING_Y),
     WINDOW_OPENING_RADIUS * WINDOW_VERTICAL_SCALE));
   return new THREE.ExtrudeGeometry(wall, {
-    depth: .44, bevelEnabled: false, curveSegments: 22, steps: 1,
+    depth: SIDE_WALL_DEPTH, bevelEnabled: false, curveSegments: 22, steps: 1,
   });
 }
 
@@ -73,7 +78,7 @@ function smallBox(group, size, position, material, castsShadow = false) {
   return mesh;
 }
 
-export function addArchedWindow(parent, side, z, mat, snow) {
+export function addArchedWindow(parent, side, z, mat) {
   const group = new THREE.Group();
   // Scale every pane/frame/muntin about the original window centre so the
   // visible arch remains exactly aligned with the smaller hole in the wall.
@@ -104,14 +109,13 @@ export function addArchedWindow(parent, side, z, mat, snow) {
   for (const y of [7.43, 8.64])
     smallBox(group, [2.25, .095, .11], [0, y, .075], mat.cabinetWalnut, true);
   smallBox(group, [2.5, .16, .21], [0, 5.73, .025], mat.agedBronze, true);
-  snow.addToWindow(group);
   return group;
 }
 
 export function addWindowedWall(parent, side, material) {
   const wall = new THREE.Mesh(createWindowedWallGeometry(), material);
   // The extruded front cap sits exactly on the inside surface, x=±11.86.
-  wall.position.x = side * 12.30;
+  wall.position.x = side * (HALL_SIDE_WALL_INNER_X + SIDE_WALL_DEPTH);
   wall.rotation.y = side === -1 ? Math.PI / 2 : -Math.PI / 2;
   wall.castShadow = true;
   parent.add(wall);

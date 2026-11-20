@@ -1,13 +1,13 @@
 import * as THREE from '../vendor/three.js';
 import { KEY_ART } from './key-art.js';
-import { createKeyModel, disposeKeySceneModel } from './key-factory.js?v=3';
+import { createKeyModel, disposeKeySceneModel } from './key-factory.js?v=key-ring';
 
 const SIZE = 160;
 const inkValue = Number.parseInt(KEY_ART.outline.ink.slice(1), 16);
 const INK = [(inkValue >> 16) & 255, (inkValue >> 8) & 255, inkValue & 255];
 
 export function thumbnailCacheKey(key) {
-  return `${key.type}:${key.variation ?? 0}:${Number(!!key.broken)}:${Number(!!key.mud)}:${Number(!!key.rust)}:${key.id ?? ''}`;
+  return `${key.type}:${key.variation ?? 0}:${Number(!!key.broken)}:${Number(!!key.mud)}:${Number(!!key.rust)}:${Number(!!key.wax)}:${key.id ?? ''}`;
 }
 
 // Render on the game's existing WebGL context only when the held inventory
@@ -40,7 +40,7 @@ export function createKeyThumbnailRenderer(renderer) {
     if (!context) return null;
     const model = createKeyModel(key.type, {
       id: key.id, variation: key.variation, broken: key.broken,
-      mud: key.mud, rust: key.rust,
+      mud: key.mud, rust: key.rust, wax: key.wax,
     });
     scene.add(model);
     const oldTarget = renderer.getRenderTarget();

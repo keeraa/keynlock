@@ -1,10 +1,11 @@
 import * as THREE from '../vendor/three.js';
-import { makeLabel } from './art.js?v=17';
-import { HALL_SURFACE_TILE_METERS } from './hall-surface-textures.js?v=26';
+import { makeLabel } from './art.js?v=key-ring';
+import { HALL_SURFACE_TILE_METERS } from './hall-surface-textures.js?v=alchemy-candles';
 import { createMetricBoxGeometry } from './metric-box-geometry.js?v=23';
-import { WINDOW_CENTERS, PILASTER_CENTERS, PERIMETER_BAND_Y, HALL_HEIGHT_SCALE,
-  addArchedWindow, addWindowedWall, addVault } from './hall-architecture.js?v=26';
+import { WINDOW_CENTERS, PILASTER_CENTERS, PERIMETER_BAND_Y, HALL_HEIGHT_SCALE, HALL_END_WALL_HEIGHT,
+  addArchedWindow, addWindowedWall, addVault } from './hall-architecture.js?v=alchemy-candles';
 import { ENTRANCE_DOOR_TEXTURE_URL } from './entrance-door-texture.js';
+import { addArchiveLedger, ARCHIVE_DESK, ARCHIVE_SIDE_TABLES } from './archive-ledger.js?v=ledger-candle';
 
 export function box(parent, size, position, material) {
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
@@ -58,6 +59,7 @@ export function contactShadow(parent, width, depth, x, y, z, material) {
 function addEntranceDoor(scene, mat) {
   // Closed double door at the player's entrance (the far sealed gate remains intact).
   const z = 22.94;
+  const handleY = 1.18;
   box(scene, [5.10, 7.10, .18], [0, 3.60, z + .11], mat.darkBrass);
   box(scene, [4.72, 6.72, .19], [0, 3.46, z - .035], mat.cabinetWalnut);
   const painting = new THREE.TextureLoader().load(ENTRANCE_DOOR_TEXTURE_URL);
@@ -72,17 +74,16 @@ function addEntranceDoor(scene, mat) {
     const x = side * 1.16;
     box(scene, [2.22, 6.48, .12], [x, 3.45, z - .19], mat.wood);
     box(scene, [.10, 6.48, .10], [x - side * 1.09, 3.45, z - .30], mat.darkBrass);
-    const handlePlate = box(scene, [.19, .61, .065], [side * .25, 2.82, z - .345], mat.brass);
-    handlePlate.material = mat.agedBronze;
+    box(scene, [.19, .61, .065], [side * .25, handleY + .09, z - .345], mat.agedBronze);
     const handle = new THREE.Mesh(new THREE.TorusGeometry(.13, .035, 8, 20), mat.brass);
-    handle.position.set(side * .25, 2.73, z - .41);
+    handle.position.set(side * .25, handleY, z - .41);
     scene.add(handle);
   }
   box(scene, [5.44, .32, .5], [0, 7.21, z - .02], mat.carvedWood);
   box(scene, [5.44, .18, .63], [0, .16, z - .04], mat.darkWood);
 }
 
-export function makeHall(scene, mat, snow) {
+export function makeHall(scene, mat) {
   const shadowMaterial = mat.contactShadow;
   // The broad carpet makes the small metal objects legible from a standing view.
   const hallFloor = box(scene, [24, .28, 46.8], [0, -.19, 0], mat.floor);
@@ -112,18 +113,18 @@ export function makeHall(scene, mat, snow) {
       contactShadow(scene, 1.9, 1.65, side * 11.43, -.048, z, shadowMaterial);
       roomBox(scene, [.83, 11.0 * HALL_HEIGHT_SCALE, .63],
         [side * 11.76, 5.5 * HALL_HEIGHT_SCALE, z],
-        mat.hallPilaster, HALL_SURFACE_TILE_METERS.wall);
+        mat.hallPilaster, 1);
       roomBox(scene, [1.14, .34, .91], [side * 11.73, PERIMETER_BAND_Y, z], mat.hallTrim);
       roomBox(scene, [1.1, .29, .88], [side * 11.73, 10.66 * HALL_HEIGHT_SCALE, z], mat.hallTrim);
       // Pilasters continue to the floor without the former brown base apron.
       roomBox(scene, [1.18, .18, 1.10], [side * 11.72, 10.83 * HALL_HEIGHT_SCALE, z], mat.hallTrim);
       roomBox(scene, [1.30, .10, 1.21], [side * 11.71, 10.98 * HALL_HEIGHT_SCALE, z], mat.agedBronze);
     }
-    for (const z of WINDOW_CENTERS) addArchedWindow(scene, side, z, mat, snow);
+    for (const z of WINDOW_CENTERS) addArchedWindow(scene, side, z, mat);
   }
   for (const z of [-23.39, 23.39]) {
-    const endWall = box(scene, [24, 11 * HALL_HEIGHT_SCALE, .42],
-      [0, 5.50 * HALL_HEIGHT_SCALE, z], mat.hallEnd);
+    const endWall = box(scene, [24, HALL_END_WALL_HEIGHT, .42],
+      [0, HALL_END_WALL_HEIGHT / 2, z], mat.hallEnd);
     endWall.castShadow = true;
     roomBox(scene, [24, 1.15, .6], [0, .53, z + (z < 0 ? .13 : -.13)], mat.hallTrim);
     roomBox(scene, [24, .29, .65], [0, PERIMETER_BAND_Y, z + (z < 0 ? .1 : -.1)], mat.hallTrim);
@@ -155,12 +156,13 @@ export function makeHall(scene, mat, snow) {
   forgottenDoor.add(backLabel);
 
   // A few side worktables add scale without blocking the sorting path.
-  for (const x of [-9.3, 9.3]) for (const z of [-20.7, 20.7]) {
+  for (const { x, z } of ARCHIVE_SIDE_TABLES) {
     contactShadow(scene, 2.3, 2.75, x, -.046, z, shadowMaterial);
-    box(scene, [1.75, .18, 2.25], [x, .83, z], mat.wood);
+    box(scene, [ARCHIVE_DESK.width, .18, ARCHIVE_DESK.depth], [x, .83, z], mat.wood);
     for (const dx of [-.7, .7]) for (const dz of [-.9, .9])
       roomBox(scene, [.13, .8, .13], [x + dx, .35, z + dz], mat.darkWood);
-    box(scene, [1.56, .05, 2.04], [x, .943, z], mat.darkBrass);
+    box(scene, [1.56, .05, 2.04], [x, ARCHIVE_DESK.y - .025, z], mat.darkBrass);
   }
+  addArchiveLedger(scene, mat);
 }
 

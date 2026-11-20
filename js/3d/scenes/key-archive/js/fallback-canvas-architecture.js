@@ -1,15 +1,31 @@
+import { windowLightPalette } from './window-light-palette.js';
+import { createWindowBirdFlight, BIRD_WIDTH, BIRD_HEIGHT } from './archive-window-bird.js?v=alchemy-candles';
+import { WINDOW_WASHES, WINDOW_BEAM_SLOPE, WINDOW_BEAM_HALF_WIDTH } from './window-beam-light.js?v=alchemy-candles';
 import { ENTRANCE_DOOR_TEXTURE_URL } from './entrance-door-texture.js';
+import { ENTRANCE_CANDLE, sampleCandleFlicker } from './archive-candles.js?v=candlelight';
+import { ARCHIVE_DESK, ARCHIVE_LEDGER, ARCHIVE_LEDGER_URL } from './archive-ledger.js?v=ledger-candle';
 import { WINDOW_CENTERS, PILASTER_CENTERS, PERIMETER_BAND_Y, vaultHeight,
   WINDOW_SILL_Y, WINDOW_SPRING_Y, WINDOW_SCALE, WINDOW_VERTICAL_SCALE, windowY,
-  HALL_HEIGHT_SCALE, WINDOW_OPENING_RADIUS } from './hall-architecture.js?v=26';
+  HALL_HEIGHT_SCALE, WINDOW_OPENING_RADIUS } from './hall-architecture.js?v=alchemy-candles';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
+// Use the same projected arch for the wall and the ceiling at each end.
+const vaultEdge = z => Array.from({ length: 17 }, (_, index) => {
+  const x = 11.85 * (index / 8 - 1);
+  return [x, vaultHeight(x), z];
+});
+const farVaultEdge = vaultEdge(-23);
+const nearVaultEdge = vaultEdge(23).reverse();
 
 // Static hall, weather, walls and entrance painting for the 2D renderer.
 export function createFallbackArchitecture({ ctx, camera, surfaces, project, path3, segment }) {
   let width = 0, height = 0, frameTime = 0, visualSettings = null;
+  const bird = createWindowBirdFlight();
   const entrancePainting = new Image();
   entrancePainting.src = ENTRANCE_DOOR_TEXTURE_URL;
+  const ledgerPainting = new Image();
+  ledgerPainting.src = ARCHIVE_LEDGER_URL;
   function background() {
     const horizon = height * (.48 + camera.rotation.x * .65);
     const wall = ctx.createLinearGradient(0, 0, 0, height);
@@ -32,48 +48,22 @@ export function createFallbackArchitecture({ ctx, camera, surfaces, project, pat
     ctx.fillRect(0, 0, width, Math.max(10, horizon));
   }
 
-  function drawWindowSnow(x, z) {
-    if (!visualSettings.wetSnowEnabled || visualSettings.snowIntensity === 0) return;
-    const amount = visualSettings.snowIntensity / 100;
-    const wind = visualSettings.snowWind / 100;
-    const visible = Math.round(4 + amount * 29);
-    const seconds = frameTime / 1000;
+  function drawBirdInPane(x, z, pane) {
+    const pose = bird.pose;
+    if (x > 0 || pose.z === 0 || Math.abs(pose.y - z) > WINDOW_OPENING_RADIUS * WINDOW_SCALE + BIRD_WIDTH / 2) return;
+    const left = pose.y - pose.w * BIRD_WIDTH / 2;
+    const right = pose.y + pose.w * BIRD_WIDTH / 2;
+    const top = pose.x + BIRD_HEIGHT / 2;
+    const topLeft = project(x, top, left);
+    const topRight = project(x, top, right);
+    const bottomLeft = project(x, top - BIRD_HEIGHT, left);
+    if (!topLeft || !topRight || !bottomLeft || !path3(pane, null)) return;
     ctx.save();
-    for (let index = 0; index < visible; index++) {
-      const seed = index * 17.13 + z * 1.71 + x * 2.7;
-      const random = n => (Math.sin(n * 78.233) * 43758.5453 + 1) % 1;
-      const u = ((random(seed) + seconds * wind * .034 * (1 + index % 3)) % 1 + 1) % 1;
-      const v = ((random(seed + 3.5) - seconds * (.082 + index % 7 * .014)) % 1 + 1) % 1;
-      const position = project(x, windowY(6.31 + v * 2.79), z + (-.93 + u * 1.86) * WINDOW_SCALE);
-      if (!position) continue;
-      const size = clamp((index % 5 === 0 ? 12 : 8) / position.depth, .75, 2.8);
-      ctx.fillStyle = `rgba(228,242,238,${(.34 + amount * .48).toFixed(2)})`;
-      ctx.beginPath();
-      ctx.arc(position.x, position.y, size, 0, Math.PI * 2);
-      ctx.fill();
-      if (index % 5 === 0) {
-        ctx.strokeStyle = `rgba(192,217,216,${(amount * .42).toFixed(2)})`;
-        ctx.lineWidth = .8;
-        ctx.beginPath();
-        ctx.moveTo(position.x, position.y - size);
-        ctx.lineTo(position.x - wind * 2, position.y + size * 3);
-        ctx.stroke();
-      }
-    }
-    // Condensed meltwater drifts down the glass more slowly than the flakes.
-    for (let index = 0; index < 4; index++) {
-      const offset = (((index * .273 + .12) % 1) * 1.72 - .86) * WINDOW_SCALE;
-      const lead = ((seconds * (.019 + index * .006) + index * .21) % 1 + 1) % 1;
-      const from = project(x, windowY(8.86 - lead * 1.8), z + offset);
-      const to = project(x, windowY(8.63 - lead * 1.8), z + offset - wind * .04 * WINDOW_SCALE);
-      if (!from || !to) continue;
-      ctx.strokeStyle = `rgba(219,244,241,${(amount * .27).toFixed(2)})`;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(from.x, from.y);
-      ctx.lineTo(to.x, to.y);
-      ctx.stroke();
-    }
+    ctx.clip();
+    ctx.transform((topRight.x - topLeft.x) / bird.canvas.width, (topRight.y - topLeft.y) / bird.canvas.width,
+      (bottomLeft.x - topLeft.x) / bird.canvas.height, (bottomLeft.y - topLeft.y) / bird.canvas.height,
+      topLeft.x, topLeft.y);
+    ctx.drawImage(bird.canvas, 0, 0);
     ctx.restore();
   }
 
@@ -95,7 +85,75 @@ export function createFallbackArchitecture({ ctx, camera, surfaces, project, pat
     ctx.restore();
   }
 
+  function drawArchiveDesk() {
+    const { x: deskX, y: deskY, z: deskZ, width, depth } = ARCHIVE_DESK;
+    const left = deskX - width / 2, right = deskX + width / 2;
+    const front = deskZ - depth / 2, back = deskZ + depth / 2;
+    for (const x of [deskX - .7, deskX + .7]) for (const z of [deskZ - .9, deskZ + .9]) {
+      segment([x, 0, z], [x, .89, z], '#705039', 5);
+    }
+    const tabletop = [[left, deskY, front], [right, deskY, front],
+      [right, deskY, back], [left, deskY, back]];
+    if (!path3(tabletop, surfaces.wood, '#60422d', 3)) return;
+    const { x, y, z, yaw, width: bookWidth, depth: bookDepth } = ARCHIVE_LEDGER;
+    const c = Math.cos(yaw), s = Math.sin(yaw);
+    const corner = (u, v) => project(x + c * u + s * v, y + .047, z - s * u + c * v);
+    const a = corner(-bookWidth / 2, -bookDepth / 2);
+    const b = corner(bookWidth / 2, -bookDepth / 2);
+    const d = corner(-bookWidth / 2, bookDepth / 2);
+    if (!a || !b || !d) return;
+    ctx.save();
+    ctx.transform(b.x - a.x, b.y - a.y, d.x - a.x, d.y - a.y, a.x, a.y);
+    if (ledgerPainting.naturalWidth) ctx.drawImage(ledgerPainting, 0, 0, 1, 1);
+    else {
+      ctx.fillStyle = '#ccb28b';
+      ctx.fillRect(0, 0, 1, 1);
+    }
+    ctx.restore();
+    drawDeskCandleLight(tabletop);
+  }
+
+  function drawDeskCandleLight(tabletop) {
+    const { x, y, z } = ENTRANCE_CANDLE;
+    const center = project(x + .045, y, z);
+    const along = project(x + 1.045, y, z);
+    const across = project(x + .045, y, z + 1);
+    if (!center || !along || !across || !path3(tabletop, null)) return;
+    ctx.save();
+    ctx.clip();
+    ctx.transform(along.x - center.x, along.y - center.y,
+      across.x - center.x, across.y - center.y, center.x, center.y);
+    const strength = 1 + .12 * sampleCandleFlicker(frameTime, x, z);
+    const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+    glow.addColorStop(0, `rgba(255,164,83,${.34 * strength})`);
+    glow.addColorStop(.56, `rgba(255,164,83,${.16 * strength})`);
+    glow.addColorStop(1, 'rgba(255,164,83,0)');
+    ctx.globalCompositeOperation = 'screen';
+    ctx.fillStyle = glow;
+    ctx.fillRect(-1, -1, 2, 2);
+    ctx.restore();
+  }
+
+  function drawLightWash({ x, z, width }, rgb, opacity) {
+    if (opacity <= 0) return;
+    const center = project(x, .021, z);
+    const length = project(x + width / 2, .021, z - width / 2 * WINDOW_BEAM_SLOPE.z);
+    const across = project(x, .021, z + WINDOW_BEAM_HALF_WIDTH * 1.10);
+    if (!center || !length || !across) return;
+    ctx.save();
+    ctx.transform(length.x - center.x, length.y - center.y,
+      across.x - center.x, across.y - center.y, center.x, center.y);
+    const gradient = ctx.createRadialGradient(0, 0, .22, 0, 0, 1);
+    gradient.addColorStop(0, `rgba(${rgb},${opacity})`);
+    gradient.addColorStop(.60, `rgba(${rgb},${opacity * .72})`);
+    gradient.addColorStop(1, `rgba(${rgb},0)`);
+    ctx.fillStyle = gradient;
+    ctx.fillRect(-1, -1, 2, 2);
+    ctx.restore();
+  }
+
   function architecture() {
+    const palette = windowLightPalette(visualSettings.nightLighting);
     // The room is drawn as a set of projected linework and painted wall planes.
     path3([[-11.8, 0, -23], [11.8, 0, -23], [11.8, 0, 23], [-11.8, 0, 23]], surfaces.floor);
     const wallTop = 11 * HALL_HEIGHT_SCALE;
@@ -103,22 +161,12 @@ export function createFallbackArchitecture({ ctx, camera, surfaces, project, pat
       [-11.85, wallTop, 23], [-11.85, 0, 23]], surfaces.plaster, '#a0906e');
     path3([[11.85, 0, -23], [11.85, wallTop, -23],
       [11.85, wallTop, 23], [11.85, 0, 23]], surfaces.plaster, '#a0906e');
-    path3([[-11.8, 0, -23], [11.8, 0, -23],
-      [11.8, wallTop, -23], [-11.8, wallTop, -23]], surfaces.plaster, '#b7a078');
-    path3([[-11.8, vaultHeight(-11.8), -23], [11.8, vaultHeight(11.8), -23],
-      [11.8, vaultHeight(11.8), 23], [-11.8, vaultHeight(-11.8), 23]], surfaces.ceiling);
+    path3([[11.85, 0, -23], [-11.85, 0, -23], ...farVaultEdge], surfaces.plaster, '#b7a078');
+    path3([...farVaultEdge, ...nearVaultEdge], surfaces.ceiling);
 
-    // Red-brown sorting rug with hand-painted brass border.
-    path3([[-8, .017, -18.6], [8, .017, -18.6], [8, .017, 18.2], [-8, .017, 18.2]], surfaces.carpet, '#ddbd81', 3);
-    if (visualSettings.windowDaylight > 0) {
-      ctx.save();
-      ctx.globalAlpha = visualSettings.windowDaylight / 100 * .17;
-      for (const z of WINDOW_CENTERS) {
-        path3([[-8.4, .021, z - 1.15], [-2.9, .021, z + .45],
-          [-2.9, .021, z + 2.35], [-8.4, .021, z + .75]], '#f9dc9c');
-      }
-      ctx.restore();
-    }
+    // Plain claret gouache rug, without an ornamental border.
+    path3([[-8, .017, -18.6], [8, .017, -18.6], [8, .017, 18.2], [-8, .017, 18.2]], surfaces.carpet, null, 0);
+    for (const wash of WINDOW_WASHES) drawLightWash(wash, palette.canvasWash, visualSettings.windowDaylight / 100 * .14);
     for (let x = -10; x <= 10; x += 2) {
       for (let z = -22; z < 23; z += 2) segment([x, .02, z], [x, .02, z + 2], 'rgba(184,151,104,.16)', 1);
     }
@@ -145,8 +193,8 @@ export function createFallbackArchitecture({ ctx, camera, surfaces, project, pat
             WINDOW_OPENING_RADIUS * WINDOW_VERTICAL_SCALE * Math.sin(angle),
             z + radius * Math.cos(angle)]);
         }
-        path3(pane, 'rgba(177,219,204,.46)', '#e0c58e', 3);
-        drawWindowSnow(x, z);
+        path3(pane, palette.canvasGlass, '#e0c58e', 3);
+        drawBirdInPane(x, z, pane);
         segment([x, windowY(WINDOW_SILL_Y), z], [x, windowY(WINDOW_SPRING_Y + WINDOW_OPENING_RADIUS), z], '#76573f', 3);
         for (const y of [7.43, 8.64])
           segment([x, windowY(y), z - radius], [x, windowY(y), z + radius], '#76573f', 3);
@@ -180,6 +228,7 @@ export function createFallbackArchitecture({ ctx, camera, surfaces, project, pat
       ctx.fillRect(emblem.x - radius * .18, emblem.y, radius * .36, radius * .57);
     }
     drawEntranceDoor();
+    drawArchiveDesk();
     for (const z of [-13, 0, 13]) {
       segment([0, vaultHeight(0) - .1, z], [0, 8, z], '#ac9367', 3);
       const bulb = project(0, 7.92, z);
@@ -202,6 +251,7 @@ export function createFallbackArchitecture({ ctx, camera, surfaces, project, pat
       width = frame.width;
       height = frame.height;
       frameTime = frame.frameTime;
+      bird.update(frame.frameTime, frame.playing);
       visualSettings = frame.visualSettings;
     },
   };

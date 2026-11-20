@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { METALS, RUST_TEXTURE, keyAssetUrl } from './key-data.js';
+import { METALS, RUST_TEXTURE, keyAssetUrl } from './key-data.js?v=plain-gouache';
 import { KEY_ART } from './key-art.js';
 
 const textureCache=new Map();
@@ -107,7 +107,8 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
         .replace('#include <map_fragment>',
           `#include <map_fragment>
           float keyRust = vInstanceKeyPaint.x < 0.0 ? uRustAmount : vInstanceKeyPaint.x;
-          float keyDirt = vInstanceKeyPaint.y < 0.0 ? uDirtAmount : vInstanceKeyPaint.y;
+          float hasWax = step(1.5, vInstanceKeyPaint.y);
+          float keyDirt = vInstanceKeyPaint.y < 0.0 ? uDirtAmount : min(vInstanceKeyPaint.y, 1.0);
           float keySeed = max(0.0,vInstanceKeyPaint.z);
           float rustAngle = uRustAngle + keySeed*.127;
           float rustC = cos(rustAngle), rustS = sin(rustAngle);
@@ -126,15 +127,21 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
             float variation=broad*.74+speckles*.26;
             float threshold=mix(.94,-.16,clamp(keyDirt,0.0,1.0));
             dirtCoverage=smoothstep(threshold-.085,threshold+.085,variation);
-            vec3 mud=mix(vec3(.15,.091,.049),vec3(.35,.257,.15),.28+speckles*.69);
+            vec3 mud=mix(vec3(.037,.016,.008),vec3(.103,.051,.023),.28+speckles*.69);
             diffuseColor.rgb=mix(diffuseColor.rgb,mud,dirtCoverage);
+          }
+          if (hasWax > .5) {
+            float drips = dirtNoise(vKeySurface.xy * vec2(12.0, 3.4) + keySeed);
+            vec3 wax = mix(vec3(.43,.214,.071), vec3(.89,.641,.324), smoothstep(.08,.82,drips));
+            diffuseColor.rgb = wax;
+            dirtCoverage = 1.0;
           }`)
         .replace('#include <roughnessmap_fragment>',
           '#include <roughnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, 1.0, dirtCoverage);')
         .replace('#include <metalnessmap_fragment>',
           '#include <metalnessmap_fragment>\nmetalnessFactor *= (1.0 - 0.98 * dirtCoverage);');
     };
-    material.customProgramCacheKey=()=> 'keynlock-gouache-rust-grime-instancing-v6';
+    material.customProgramCacheKey=()=> 'keynlock-gouache-rust-grime-wax-instancing';
   }
   cache.set(id,material);return material;
 }

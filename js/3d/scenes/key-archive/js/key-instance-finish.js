@@ -29,6 +29,6 @@ export function setKeyInstanceFinish(mesh, index, key, rustStrength = 1.35) {
   const paint = mesh.geometry.getAttribute('instanceKeyPaint');
   if (!paint || index < 0 || index >= paint.count)
     throw new RangeError('Missing instance paint slot');
-  paint.setXYZ(index, key.rust ? rustStrength : 0, key.mud ? 1 : 0, keyPaintSeed(key));
+  paint.setXYZ(index, key.rust ? rustStrength : 0, key.wax ? 2 : key.mud ? 1 : 0, keyPaintSeed(key));
   paint.needsUpdate = true;
 }

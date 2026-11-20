@@ -5,7 +5,7 @@ import * as THREE from '../dist/vendor/three.js';
 import {
   WINDOW_CENTERS, PILASTER_CENTERS, WINDOW_CROWN_Y, WINDOW_SCALE, WINDOW_CENTER_Y,
   WINDOW_VERTICAL_SCALE, WINDOW_RAISE_Y, HALL_HEIGHT_SCALE, windowY,
-  PERIMETER_BAND_Y, createWindowedWallGeometry, createWindowPaneGeometry,
+  PERIMETER_BAND_Y, HALL_END_WALL_HEIGHT, createWindowedWallGeometry, createWindowPaneGeometry,
   createVaultGeometry, vaultHeight, archedOpening,
 } from '../dist/js/hall-architecture.js';
 import { PLAYER_EYE_HEIGHT } from '../dist/js/player-config.js';
@@ -96,6 +96,7 @@ test('the continuous vaulted ceiling clears all windows and meets the dark beams
   assert.ok(vaultHeight(-12) > WINDOW_CROWN_Y + .2);
   assert.equal(vaultHeight(-12), vaultHeight(12));
   assert.ok(vaultHeight(0) > vaultHeight(12));
+  assert.ok(HALL_END_WALL_HEIGHT > vaultHeight(0));
   assert.equal(HALL_HEIGHT_SCALE, 1.2);
   assert.equal(PERIMETER_BAND_Y, 5.2);
   const geometry = createVaultGeometry();
@@ -113,4 +114,58 @@ test('FPS remains visible in its own overlay and the camera is taller', () => {
   assert.match(html, /class="fps-counter"/);
   assert.match(css, /\.fps-counter\{[^}]*position:absolute;right:/);
   assert.equal(PLAYER_EYE_HEIGHT, 1.78);
+});
+
+test('dust is illuminated through the window openings and remains dim behind the masonry', async () => {
+  const { dustOriginInWindowBeam, windowBeamLightAt } = await import('../dist/js/archive-window-rays.js');
+  for (let i = 0; i < 5; i++) {
+    const [x, y, z] = dustOriginInWindowBeam(i, () => .65);
+    assert.ok(windowBeamLightAt(x, y, z) > .85);
+    assert.equal(windowBeamLightAt(x, y, z + 3), 0);
+    assert.equal(windowBeamLightAt(x, y + 4, z), 0);
+  }
+});
+
+test('window air light reaches the painted footprints at carpet level', async () => {
+  const { addWindowAirLight } = await import('../dist/js/archive-window-rays.js');
+  const { WINDOW_WASHES } = await import('../dist/js/archive-entrance-light.js');
+  const { RUG_TOP } = await import('../dist/js/floor-contact.js');
+  const scene = new THREE.Scene();
+  const setDaylight = addWindowAirLight(scene);
+  const [beam] = scene.children;
+  const { position } = beam.geometry.attributes;
+  const verticesPerWindow = position.count / WINDOW_WASHES.length;
+  for (const [index, wash] of WINDOW_WASHES.entries()) {
+    for (let i = index * verticesPerWindow; i < (index + 1) * verticesPerWindow; i += 4) {
+      for (const edge of [i + 1, i + 2]) {
+        assert.ok(Math.abs(position.getY(edge) - RUG_TOP) < 1e-5);
+        assert.ok(Math.abs(position.getX(edge) - wash.x) < wash.width / 2);
+        assert.ok(Math.abs(position.getZ(edge) - wash.z) < wash.depth / 2);
+      }
+    }
+  }
+  assert.equal(beam.material.depthWrite, false);
+  setDaylight(0);
+  assert.equal(beam.visible, false);
+  setDaylight(.75);
+  assert.equal(beam.visible, true);
+  assert.ok(beam.material.uniforms.uAirStrength.value < .040 * .75);
+  beam.geometry.dispose();
+  beam.material.dispose();
+});
+
+test('both halves of the arched window light land on the painted carpet footprint', async () => {
+  const { WINDOW_WALL_X, WINDOW_BEAM_SILL, WINDOW_BEAM_CROWN, WINDOW_BEAM_SLOPE,
+    WINDOW_BEAM_HALF_WIDTH, WINDOW_WASHES, windowBeamLightAt } = await import('../dist/js/window-beam-light.js');
+  const { RUG_TOP } = await import('../dist/js/floor-contact.js');
+  const windowZ = WINDOW_CENTERS[2];
+  const wash = WINDOW_WASHES[2];
+  for (const y of [WINDOW_BEAM_SILL + .40, WINDOW_BEAM_CROWN - .44]) {
+    const distance = (y - RUG_TOP) / WINDOW_BEAM_SLOPE.y;
+    const x = WINDOW_WALL_X + distance;
+    const z = windowZ - distance * WINDOW_BEAM_SLOPE.z;
+    assert.ok(Math.abs(x - wash.x) < wash.width / 2);
+    assert.ok(windowBeamLightAt(x, RUG_TOP, z + WINDOW_BEAM_HALF_WIDTH * .50) > .72);
+    assert.equal(windowBeamLightAt(x, RUG_TOP, z + WINDOW_BEAM_HALF_WIDTH * 1.13), 0);
+  }
 });

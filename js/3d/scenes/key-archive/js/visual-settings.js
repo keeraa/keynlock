@@ -7,12 +7,9 @@ export const DEFAULT_VISUAL_SETTINGS = Object.freeze({
   toonSteps: 4,
   cartoonMaterial: 90,
   outlineEnabled: true,
-  outlineStrength: 70,
-  outlineWidth: 1,
-  outlineSensitivity: 50,
-  wetSnowEnabled: true,
-  snowIntensity: 65,
-  snowWind: 28,
+  outlineStrength: 100,
+  outlineSensitivity: 100,
+  nightLighting: false,
   windowDaylight: 75,
 });
 
@@ -21,10 +18,7 @@ const BOUNDS = Object.freeze({
   toonSteps: [2, 8],
   cartoonMaterial: [0, 100],
   outlineStrength: [0, 100],
-  outlineWidth: [1, 4],
   outlineSensitivity: [0, 100],
-  snowIntensity: [0, 100],
-  snowWind: [-100, 100],
   windowDaylight: [0, 100],
 });
 
@@ -36,7 +30,7 @@ export function normalizeVisualSettings(values) {
     if (input[key] != null && Number.isFinite(number))
       settings[key] = Math.min(max, Math.max(min, Math.round(number)));
   }
-  for (const key of ['toonEnabled', 'outlineEnabled', 'wetSnowEnabled']) {
+  for (const key of ['toonEnabled', 'outlineEnabled', 'nightLighting']) {
     if (typeof input[key] === 'boolean') settings[key] = input[key];
   }
   return settings;

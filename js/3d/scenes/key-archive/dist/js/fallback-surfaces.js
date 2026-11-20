@@ -1,6 +1,7 @@
-import { makePaintTexture } from './art.js?v=17';
-import { HALL_SURFACE_URLS } from './hall-surface-textures.js?v=23';
+import { makePaintTexture } from './art.js?v=key-ring';
+import { HALL_SURFACE_URLS } from './hall-surface-textures.js?v=alchemy-candles';
 import { ARCHIVE_FLOOR_TEXTURE_URL } from './archive-floor-texture.js';
+import { STATION_PAINT_URLS } from './station-finish.js';
 
 // Optional Canvas renderer retains its original paintings while images load.
 export function createFallbackSurfaces(ctx) {
@@ -11,8 +12,10 @@ export function createFallbackSurfaces(ctx) {
   };
   surfaces.floor = surfaces.wood;
   surfaces.ceiling = surfaces.wood;
+  surfaces.bench = surfaces.wood;
   for (const [name, url] of [
     ['floor', ARCHIVE_FLOOR_TEXTURE_URL],
+    ['bench', STATION_PAINT_URLS.bench],
     ['plaster', HALL_SURFACE_URLS.wall],
     ['ceiling', HALL_SURFACE_URLS.ceiling],
     ['carpet', HALL_SURFACE_URLS.carpet],

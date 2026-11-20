@@ -2,12 +2,12 @@
 // Editable designs enter through createForgeKeyProvider(profiles); geometry and
 // all display variants are derived from those same ten designs on page load.
 import * as THREE from '../vendor/three.js';
-import { KEY_TEMPLATES, METALS, defaultDesign, normalizeKeyDesign } from './key-data.js';
-import { createKeyModel as createForgeModel, disposeKeyModel } from './key-geometry.js?v=2';
+import { KEY_TEMPLATES, METALS, defaultDesign, normalizeKeyDesign } from './key-data.js?v=plain-gouache';
+import { createKeyModel as createForgeModel, disposeKeyModel } from './key-geometry.js?v=wax-and-bundles';
 import { bowPoints, createBowShape, joinedKeyShape, keyBounds } from './key-shapes.js?v=2';
-import { getMetalMaterial } from './key-materials.js';
-import { dirtTriangles, getDirtMaterial } from './key-dirt.js';
-import { createPaintedInstanceGeometry, setKeyInstanceFinish } from './key-instance-finish.js';
+import { getMetalMaterial } from './key-materials.js?v=wax-and-bundles';
+import { dirtTriangles, getDirtMaterial, getWaxMaterial } from './key-dirt.js?v=wax-and-bundles';
+import { createPaintedInstanceGeometry, setKeyInstanceFinish } from './key-instance-finish.js?v=wax-and-bundles';
 
 // Old archive: circle, triangle, square, diamond, pentagon, hexagon, star,
 // clover, oval, crown. Seven silhouettes match; three become new families.
@@ -73,6 +73,7 @@ function makeArchiveGeometry(type, broken, profiles) {
     -(scaled.min.y + scaled.max.y) / 2,
     .014 - scaled.min.z);
   geometry.translate(offset.x, offset.y, offset.z);
+  geometry.userData.headCenterY = 1.21 * scale + offset.y;
   geometry.computeBoundingBox();
   geometry.computeBoundingSphere();
   disposeKeyModel(model);
@@ -169,17 +170,17 @@ export function createForgeKeyProvider(profiles = []) {
   };
   return Object.freeze({
     createModel(type, { id, scale = 1, variation = 0, broken = false,
-      mud = false, rust = false } = {}) {
+      mud = false, rust = false, wax = false } = {}) {
       const group = new THREE.Group();
       const mesh = new THREE.InstancedMesh(
         createPaintedInstanceGeometry(geometryFor(type, broken), 1), materialFor(type), 1);
       mesh.setMatrixAt(0, new THREE.Matrix4());
       mesh.setColorAt(0, new THREE.Color().setScalar([.94, 1, .83][variation % 3]));
-      setKeyInstanceFinish(mesh, 0, { id, type, variation, rust, mud }, rustStrengthFor(type));
+      setKeyInstanceFinish(mesh, 0, { id, type, variation, rust, mud, wax }, rustStrengthFor(type));
       mesh.castShadow = false;
       group.add(mesh);
-      if (mud) {
-        const crust = new THREE.Mesh(crustFor(type, broken), getDirtMaterial());
+      if (mud || wax) {
+        const crust = new THREE.Mesh(crustFor(type, broken), wax ? getWaxMaterial() : getDirtMaterial());
         crust.castShadow = false;
         group.add(crust);
       }

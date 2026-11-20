@@ -7,7 +7,7 @@ import {
   createCombinedKeyGeometry as legacyGeometry,
   createBowGlyph as legacyGlyph,
   keyHeadPoints as legacyHeadPoints,
-} from './art.js?v=17';
+} from './art.js?v=key-ring';
 import * as THREE from '../vendor/three.js';
 import { getKeyPaint as legacyPaint, METAL_BY_KEY_TYPE } from './painted-textures.js';
 

@@ -1,6 +1,6 @@
 import * as THREE from '../vendor/three.js';
-import { applySceneOutlineSettings } from './scene-outline.js';
-import { createToonShader, createOutlineShader, createCopyShader, createDistanceBlurShader } from './painted-shader.js?v=26';
+import { applySceneOutlineSettings } from './scene-outline.js?v=readable-ink';
+import { createToonShader, createOutlineShader, createCopyShader, createDistanceBlurShader } from './painted-shader.js?v=cabinet-rewards';
 
 // Independent GPU passes: toon -> contours. Failure in one stage
 // cannot disable the others. The scene itself is always the final fallback.
@@ -29,8 +29,12 @@ export function createPaintedRenderer(renderer, scene, camera, initialSettings) 
   let currentHeight = 0;
   let passCount = 0;
   let lastPipelineError = '';
+  let dustCoverage = null;
   const bufferSize = new THREE.Vector2();
   const sample = new Uint8Array(4);
+  // The antialias flag only covers the default framebuffer. Geometry is
+  // rendered offscreen here, so resolve coverage before the fullscreen passes.
+  const geometrySamples = renderer.capabilities?.maxSamples >= 2 ? 2 : 0;
 
   function active(name) {
     if (name === 'toon') return settings.toonEnabled && settings.toonLight > 0 && settings.cartoonMaterial > 0;
@@ -38,12 +42,13 @@ export function createPaintedRenderer(renderer, scene, camera, initialSettings) 
     return true;
   }
 
-  function makeTarget(width, height, depth = false) {
+  function makeTarget(width, height, { depth = false, readDepth = false } = {}) {
     const target = new THREE.WebGLRenderTarget(width, height, {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,
-      depthBuffer: depth, stencilBuffer: false, samples: 0,
+      depthBuffer: depth, stencilBuffer: false, samples: depth ? geometrySamples : 0,
+      resolveDepthBuffer: readDepth,
     });
-    if (depth) {
+    if (readDepth) {
       const texture = new THREE.DepthTexture(width, height, THREE.UnsignedIntType);
       texture.format = THREE.DepthFormat;
       texture.minFilter = THREE.NearestFilter;
@@ -61,17 +66,20 @@ export function createPaintedRenderer(renderer, scene, camera, initialSettings) 
     sceneTarget?.depthTexture?.dispose();
     sceneTarget?.dispose();
     for (const target of intermediateTargets) target.dispose();
+    normalTarget?.depthTexture?.dispose();
     normalTarget?.dispose();
     normalTarget = null;
     normalMaterial?.dispose();
     normalMaterial = null;
     currentWidth = width;
     currentHeight = height;
-    sceneTarget = makeTarget(width, height, true);
+    sceneTarget = makeTarget(width, height, { depth: true, readDepth: true });
     intermediateTargets = [makeTarget(width, height), makeTarget(width, height)];
     const outline = stages.outline.uniforms;
-    outline.tDepth.value = sceneTarget.depthTexture;
-    stages.outline.uniforms.uResolution.value.set(width, height);
+    outline.tDustCoverage.value = sceneTarget.texture;
+    outline.uResolution.value.set(width, height);
+    outline.uNear.value = camera.near;
+    outline.uFar.value = camera.far;
     const blur = stages.distanceBlur.uniforms;
     blur.tDepth.value = sceneTarget.depthTexture;
     blur.uResolution.value.set(width, height);
@@ -82,16 +90,18 @@ export function createPaintedRenderer(renderer, scene, camera, initialSettings) 
 
   function renderNormals() {
     if (!normalTarget) {
-      normalTarget = makeTarget(currentWidth, currentHeight, true);
+      normalTarget = makeTarget(currentWidth, currentHeight, { depth: true, readDepth: true });
       normalMaterial = new THREE.MeshNormalMaterial({ side: THREE.DoubleSide });
       normalMaterial.toneMapped = false;
     }
-    stages.outline.uniforms.tNormal.value = normalTarget.texture;
+    const outline = stages.outline.uniforms;
+    outline.tNormal.value = normalTarget.texture;
+    outline.tDepth.value = normalTarget.depthTexture;
     const hidden = [];
     const prior = scene.overrideMaterial;
     scene.traverse(object => {
       if (!object.visible) return;
-      if (object.isPoints || object.isLine || (object.isMesh &&
+      if (object.isPoints || object.isLine || object.isSprite || (object.isMesh &&
           (Array.isArray(object.material) ? object.material : [object.material])
             .some(material => material?.transparent))) {
         hidden.push(object);
@@ -135,11 +145,14 @@ export function createPaintedRenderer(renderer, scene, camera, initialSettings) 
       stage.pending = true;
       stage.error = '';
     }
+    const airColor = stages.distanceBlur.uniforms.uAirColor;
+    if (airColor) airColor.value.setRGB(...(next.nightLighting ? [.20, .26, .33] : [.30, .325, .30]));
     stages.toon.uniforms.uToonLight.value = next.toonEnabled ? next.toonLight / 100 : 0;
     stages.toon.uniforms.uSteps.value = next.toonSteps;
     stages.toon.uniforms.uMaterial.value = next.cartoonMaterial / 100;
     applySceneOutlineSettings(stages.outline.uniforms, next, renderer.getPixelRatio());
     if (!active('outline')) {
+      normalTarget?.depthTexture?.dispose();
       normalTarget?.dispose();
       normalTarget = null;
       normalMaterial?.dispose();
@@ -150,6 +163,7 @@ export function createPaintedRenderer(renderer, scene, camera, initialSettings) 
   function render() {
     renderer.info.reset();
     passCount = 0;
+    dustCoverage = null;
     if (!Object.keys(stages).some(name => active(name) && !stages[name].failed)) {
       renderer.render(scene, camera);
       passCount++;
@@ -161,6 +175,7 @@ export function createPaintedRenderer(renderer, scene, camera, initialSettings) 
       renderer.setRenderTarget(sceneTarget);
       renderer.render(scene, camera);
       passCount++;
+      dustCoverage = sceneTarget.texture;
       let source = sceneTarget;
       let nextTarget = 0;
       let presented = false;
@@ -205,6 +220,7 @@ export function createPaintedRenderer(renderer, scene, camera, initialSettings) 
         passCount++;
       }
     } catch (error) {
+      dustCoverage = null;
       lastPipelineError = error.message || String(error);
       renderer.setRenderTarget(originalTarget);
       console.error('KEYNLOCK: visual framebuffer unavailable:', error);
@@ -230,6 +246,7 @@ export function createPaintedRenderer(renderer, scene, camera, initialSettings) 
     sceneTarget?.depthTexture?.dispose();
     sceneTarget?.dispose();
     for (const target of intermediateTargets) target.dispose();
+    normalTarget?.depthTexture?.dispose();
     normalTarget?.dispose();
     normalMaterial?.dispose();
     for (const stage of [...Object.values(stages), copy]) {
@@ -239,5 +256,6 @@ export function createPaintedRenderer(renderer, scene, camera, initialSettings) 
   }
 
   setSettings(initialSettings);
-  return { render, resize, setSettings, dispose, getPassCount: () => passCount, getStatus };
+  return { render, resize, setSettings, dispose, getPassCount: () => passCount, getDustCoverage: () => dustCoverage,
+    getSceneDepth: () => dustCoverage ? sceneTarget.depthTexture : null, getStatus };
 }

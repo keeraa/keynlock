@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { SCENE_OUTLINE_GLSL, createSceneOutlineUniforms } from './scene-outline.js';
+import { DUST_OCCLUSION_GLSL, SCENE_OUTLINE_GLSL, createSceneOutlineUniforms } from './scene-outline.js?v=readable-ink';
 
 const vertexShader = `varying vec2 vUv;
 void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;
@@ -44,22 +44,28 @@ export function createOutlineShader() {
     uniform sampler2D tScene;
     uniform sampler2D tDepth;
     uniform sampler2D tNormal;
+    uniform sampler2D tDustCoverage;
     uniform vec2 uResolution;
     uniform float uInk;
     uniform float uWidth;
+    uniform float uNear;
+    uniform float uFar;
     uniform float uNormalThreshold;
     uniform float uDepthThreshold;
     uniform vec3 uInkColor;
     varying vec2 vUv;
+    ${DUST_OCCLUSION_GLSL}
     ${SCENE_OUTLINE_GLSL}
     void main() {
       vec3 color = texture2D(tScene, vUv).rgb;
-      float edge = inkEdge(vUv) * uInk;
+      float dust = dustInkTransmission(texture2D(tDustCoverage, vUv).a);
+      float edge = inkEdge(vUv) * uInk * dust;
       color = mix(color, uInkColor, edge);
       gl_FragColor = vec4(color, 1.0);
       #include <colorspace_fragment>
     }`, {
     tScene: { value: null }, tDepth: { value: null }, tNormal: { value: null },
+    tDustCoverage: { value: null },
     uResolution: { value: new THREE.Vector2(1, 1) },
     ...createSceneOutlineUniforms(),
   });
@@ -82,6 +88,7 @@ export function createDistanceBlurShader() {
     uniform sampler2D tScene;
     uniform sampler2D tDepth;
     uniform vec2 uResolution;
+    uniform vec3 uAirColor;
     uniform float uNear;
     uniform float uFar;
     varying vec2 vUv;
@@ -96,11 +103,18 @@ export function createDistanceBlurShader() {
       soft += texture2D(tScene, vUv - vec2(stepPx.x, 0.0)).rgb * .17;
       soft += texture2D(tScene, vUv + vec2(0.0, stepPx.y)).rgb * .17;
       soft += texture2D(tScene, vUv - vec2(0.0, stepPx.y)).rgb * .17;
-      gl_FragColor = vec4(mix(sharp, soft, blur), 1.0);
+      vec3 color = mix(sharp, soft, blur);
+      // Aerial perspective affects the distant room after contours, preserving close metal.
+      float air = smoothstep(10.0, 42.0, distance);
+      float luminance = dot(color, vec3(.2126,.7152,.0722));
+      color = mix(color, vec3(luminance), air * .18);
+      color = mix(color, uAirColor, air * .28);
+      gl_FragColor = vec4(color, 1.0);
       #include <colorspace_fragment>
     }`, {
     tScene: { value: null }, tDepth: { value: null },
     uResolution: { value: new THREE.Vector2(1, 1) },
+    uAirColor: { value: new THREE.Color(.30, .325, .30) },
     uNear: { value: .055 }, uFar: { value: 120 },
   });
 }

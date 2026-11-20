@@ -1,6 +1,7 @@
+import { ARCHIVE_SIDE_TABLES } from './archive-ledger.js?v=ledger-candle';
 import { PLAYER_EYE_HEIGHT } from './player-config.js';
 import { inStationFootprint } from './station-layout.js?v=2';
-import { CABINET_Z } from './cabinet-layout.js';
+import { CABINET_Z, CABINET_BODY_WIDTH } from './cabinet-layout.js?v=cabinet-cell-glow';
 
 export function createPlayerMovement(camera, bounds) {
   let stepPhase = 0;
@@ -8,10 +9,10 @@ export function createPlayerMovement(camera, bounds) {
   function positionBlocked(x, z) {
     if (Math.abs(x) > bounds.x || Math.abs(z) > bounds.z) return true;
     // Cabinet fronts project into the hall farther than the side walls.
-    if (Math.abs(x) > 10.74 && CABINET_Z.some(cz => Math.abs(z - cz) < 2.22)) return true;
+    if (Math.abs(x) > 10.74 && CABINET_Z.some(cz => Math.abs(z - cz) < CABINET_BODY_WIDTH / 2 + .22)) return true;
     // Keep the player capsule clear of the sealed doors at either end.
     if (Math.abs(z) > 21.75) return true;
-    for (const tx of [-9.3, 9.3]) for (const tz of [-20.7, 20.7]) {
+    for (const { x: tx, z: tz } of ARCHIVE_SIDE_TABLES) {
       if (Math.abs(x - tx) < 1.15 && Math.abs(z - tz) < 1.34) return true;
     }
     return inStationFootprint(x, z, .22);

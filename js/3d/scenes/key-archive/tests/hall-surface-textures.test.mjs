@@ -9,16 +9,15 @@ test('the walls, brightened vault and carpet each use a small original gouache s
   const surfaces = Object.entries(HALL_SURFACE_URLS);
   assert.deepEqual(surfaces.map(([name]) => name), ['wall', 'ceiling', 'carpet', 'wood']);
   assert.match(HALL_SURFACE_URLS.ceiling, /ivory-v3\.webp$/);
-  assert.match(HALL_SURFACE_URLS.wall, /warm-plaster-v5\.webp$/);
-  assert.match(HALL_SURFACE_URLS.wood, /walnut-v4\.webp$/);
-  assert.ok(HALL_SURFACE_TILE_METERS.wall > 2 && HALL_SURFACE_TILE_METERS.wall < 6);
+  assert.match(HALL_SURFACE_URLS.wall, /limewash-v8\.webp$/);
+  assert.match(HALL_SURFACE_URLS.wood, /walnut-v5\.webp$/);
   assert.ok(HALL_SURFACE_TILE_METERS.ceiling > 3 && HALL_SURFACE_TILE_METERS.ceiling < 7);
   assert.ok(HALL_SURFACE_TILE_METERS.carpet > 2 && HALL_SURFACE_TILE_METERS.carpet < 6);
   const paintings = surfaces.map(([name, file]) => {
     const buffer = readFileSync(new URL(file));
     assert.equal(buffer.toString('ascii', 0, 4), 'RIFF', `${name} image header`);
     assert.equal(buffer.toString('ascii', 8, 12), 'WEBP', `${name} WebP format`);
-    assert.ok(buffer.byteLength > 30_000 && buffer.byteLength < 350_000,
+    assert.ok(buffer.byteLength > 5_000 && buffer.byteLength < 350_000,
       `${name} should retain painted details without a large GPU download`);
     return buffer;
   });

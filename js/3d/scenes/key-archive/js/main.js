@@ -1,70 +1,99 @@
-import { TOTAL_KEYS, STORAGE_KEY, getProgress } from './rules.js?v=24';
-import { createWorld } from './world.js?v=56';
-import { installKeyAssetProvider } from './key-factory.js?v=3';
-import { createArchiveHud } from './archive-hud.js';
-import { loadArchiveState, loadVisualSettings, saveArchiveState } from './archive-persistence.js?v=3';
-import { createVisualPanel } from './visual-panel.js';
-import externalKeyProvider from './key-provider-entry.js?v=4';
-import { createFallbackWorld } from './fallback-world.js?v=42';
-import { createPlayerMovement } from './player-movement.js?v=4';
+import { TOTAL_KEYS, getProgress } from './rules.js?v=key-ring';
+import { createWorld } from './world.js?v=cleaning-cues';
+import { installKeyAssetProvider } from './key-factory.js?v=key-ring';
+import { createArchiveHud } from './archive-hud.js?v=rinse-recordings';
+import { openArchiveSave, loadVisualSettings, clearArchiveState } from './archive-save-state-with-route.js?v=key-ring';
+import { createVisualPanel } from './visual-panel.js?v=key-ring';
+import externalKeyProvider from './key-provider-entry.js?v=wax-and-bundles';
+import { createFallbackWorld } from './fallback-world.js?v=cleaning-cues';
+import { createPlayerMovement } from './player-movement.js?v=ledger-candle';
 import { createPerformanceHud } from './performance-hud.js';
 import { logicalKey } from './controls.js';
 import { edgeLookRate } from './mouse-look.js';
-import { createKeyIndex } from './key-index.js';
-import { createArchiveTargeting } from './archive-targeting.js?v=2';
-import { createArchivePrompts } from './archive-interaction-prompts.js?v=2';
-import { createArchiveActions } from './archive-actions.js?v=2';
-import { createArchiveAudio } from './archive-audio.js';
+import { createKeyIndex } from './key-index.js?v=key-ring';
+import { createArchiveTargeting } from './archive-surface-aim.js?v=key-ring';
+import { createArchivePrompts } from './archive-interaction-prompts.js?v=key-ring';
+import { createArchiveActions } from './archive-actions.js?v=cleaning-cues';
+import { FIRST_ROUTE_KEY_ID, createFirstRouteGuide } from './archive-first-route-guide.js?v=key-ring';
+import { createBathProgress } from './archive-bath-progress.js?v=cleaning-cues';
+import { createArchiveMusic } from './archive-music.js?v=music-resume-seek';
+import { createArchiveAudio } from './archive-audio.js?v=cleaning-cues';
+import { floorSurfaceY, RUG_TOP } from './floor-contact.js';
 
 const $ = id => document.getElementById(id);
 if (externalKeyProvider) installKeyAssetProvider(externalKeyProvider);
 const canvas = $('world');
-const visualSettings = loadVisualSettings(localStorage);
-const state = loadArchiveState(localStorage);
+const storage = (() => {
+  try { return window.localStorage; } catch { return null; }
+})();
+const visualSettings = loadVisualSettings(storage);
+const archiveSave = openArchiveSave(storage);
+const { state } = archiveSave;
 const keyIndex = createKeyIndex(state.keys);
 let world;
 try {
-  world = createWorld(canvas, state, visualSettings);
+  world = createWorld(canvas, state, visualSettings, keyIndex);
 } catch (error) {
   console.warn('WebGL недоступен. Используется графический резервный режим.', error.message);
-  world = createFallbackWorld(canvas, state, visualSettings);
+  world = createFallbackWorld(canvas, state, visualSettings, keyIndex);
 }
 const camera = world.camera;
 const movement = createPlayerMovement(camera, world.bounds);
 const clamp = (number, a, b) => Math.max(a, Math.min(b, number));
 const hud = createArchiveHud(document, world, state, keyIndex);
+const bathProgress = createBathProgress(document, world, keyIndex);
+const routeGuide = createFirstRouteGuide(document, state, keyIndex, world);
 const performanceHud = createPerformanceHud(document, world);
-const visualPanel = createVisualPanel(document, world, localStorage, visualSettings);
+const visualPanel = createVisualPanel(document, world, storage, visualSettings);
 
 let mode = 'intro';
 let yaw = 0;
-let pitch = -.17;
+let pitch = state.firstRoute && keyIndex.get(FIRST_ROUTE_KEY_ID)?.status === 'floor' ? -.30 : -.17;
 let sensitivity = 14;
-let pointerEverLocked = false;
+let mouseWasLocked = false;
+let requestedMouseRelease = false;
+let nativePauseAt = -Infinity;
 let lockRequestPending = false;
 let lockUnavailable = false;
-let shownPickupHint = false;
 let lastPointer = null;
 let edgeLook = { x: 0, y: 0, until: 0 };
 let hovered = null;
 let lastHoverKey = '';
 let toastTimeout = 0;
+let announceRecovery = archiveSave.recovered;
+const saveMessages = {
+  unavailable: 'Хранилище браузера недоступно. Прогресс этой сессии не сохраняется.',
+  damaged: 'Сохранение повреждено. Автосохранение приостановлено. Начать заново можно из меню паузы.',
+  conflict: 'Сохранение изменилось. Перезагрузи игру, чтобы открыть актуальный прогресс.',
+  'write-error': 'Не удалось записать прогресс. Автосохранение попробует ещё раз при следующем действии.',
+  'backup-error': 'Прогресс записан, но резервная копия не обновилась.',
+};
 const heldMovement = new Set();
+const MENU_FRAME_INTERVAL = 1000 / 30;
+let lastRender = -Infinity;
 let lastTick = performance.now();
 const audio = createArchiveAudio(window);
+const music = createArchiveMusic(window, storage);
 const { tone } = audio;
-const { targetInView } = createArchiveTargeting({ camera, world, state, keyIndex });
-const promptFor = createArchivePrompts(state, keyIndex);
-const { interact, drop } = createArchiveActions({
+const { targetInView, clearAim } = createArchiveTargeting({ camera, world, state, keyIndex });
+const { interact, drop, updateWax, isMelting } = createArchiveActions({
   state, keyIndex, world, camera, targetInView,
   getYaw: () => yaw, isPlaying: () => mode === 'play',
   save, updateHud, tone, toast, showVictory,
   invalidateHover: () => { lastHoverKey = '!'; },
 });
 
-function save() {
+function save({ initial = false } = {}) {
+  if (!initial) announceRecovery = false;
+  if (state.firstRoute && keyIndex.get(FIRST_ROUTE_KEY_ID)?.status === 'sorted') state.firstRoute = false;
   keyIndex.rebuild();
-  saveArchiveState(localStorage, state);
+  const result = archiveSave.save();
+  const status = $('save-status');
+  const message = saveMessages[result] || (announceRecovery ? 'Прогресс восстановлен из резервной копии.' : '');
+  if (status.textContent !== message) status.textContent = message;
+  status.hidden = !message;
+  $('save-intro').hidden = result !== 'saved';
+  $('save-pause').hidden = result !== 'saved';
 }
 
 function toast(message, error = false) {
@@ -76,11 +105,20 @@ function toast(message, error = false) {
   toastTimeout = setTimeout(() => element.classList.remove('visible'), 2100);
 }
 
+const promptFor = createArchivePrompts(state, keyIndex, isMelting);
+const litCabinets = world.cabinets.map(cabinet => cabinet.completion.isComplete());
+const settledRows = world.cabinets.map(cabinet => cabinet.completion.settledRows());
+
+function playAt(kind, position) {
+  const distance = Math.hypot(camera.position.x - position.x, camera.position.z - position.z);
+  tone(kind, Math.max(0, 1 - Math.max(0, distance - 2) / 8));
+}
+
 function updateHud() { hud.update(); }
 
 function setHovered(target) {
   const identity = target ? `${target.kind}-${target.id ?? target.stationId ?? target.type}` +
-    (target.kind === 'cabinet' ? `:${target.slot ?? '-'}` : '') : '';
+    (target.kind === 'cabinet' ? `:${target.slot ?? '-'}:${target.assisted ? 'assisted' : 'direct'}:${Boolean(target.full)}` : target.kind === 'candle' ? `:${target.lit}` : '') : '';
   if (identity === lastHoverKey) return;
   hovered = target;
   lastHoverKey = identity;
@@ -108,6 +146,7 @@ function turn(dx, dy) {
 
 function setMode(next) {
   mode = next;
+  audio.setPlaying(mode === 'play');
   document.body.classList.toggle('playing', next === 'play');
   $('intro').classList.toggle('is-hidden', next !== 'intro');
   $('pause').classList.toggle('is-hidden', next !== 'pause');
@@ -118,7 +157,9 @@ function setMode(next) {
   heldMovement.clear();
   lastPointer = null;
   edgeLook = { x: 0, y: 0, until: 0 };
+  clearAim();
   setHovered(null);
+  if (next === 'pause') $('resume-btn').focus({ preventScroll: true });
 }
 
 function onMouseLockUnavailable() {
@@ -146,42 +187,53 @@ function requestMouseLock() {
   } catch { onMouseLockUnavailable(); }
 }
 
-function play() {
+function play({ lockMouse = true } = {}) {
   setMode('play');
+  audio.unlock();
+  music.start();
   lockUnavailable = false;
-  requestMouseLock();
-  if (!shownPickupHint && getProgress(state).processed === 0 && !state.held.length) {
-    shownPickupHint = true;
-    toast('Посмотри на ключ на полу · E / У или ЛКМ — подобрать');
-  }
+  if (lockMouse) requestMouseLock();
   if (getProgress(state).processed === TOTAL_KEYS) toast('Архив уже разобран');
+}
+
+function releaseMouseLock() {
+  const locked = document.pointerLockElement === canvas;
+  if (!locked && !mouseWasLocked) return;
+  requestedMouseRelease = true;
+  if (locked) document.exitPointerLock();
 }
 
 function pause() {
   if (mode !== 'play') return;
   setMode('pause');
-  if (document.pointerLockElement === canvas) document.exitPointerLock();
+  releaseMouseLock();
 }
 
 function openVisual() {
   if (mode !== 'play' && mode !== 'pause') return;
   setMode('visual');
-  if (document.pointerLockElement === canvas) document.exitPointerLock();
+  releaseMouseLock();
 }
 
 function showVictory() {
   if (getProgress(state).processed !== TOTAL_KEYS || mode !== 'play') return;
   setMode('victory');
-  if (document.pointerLockElement === canvas) document.exitPointerLock();
+  releaseMouseLock();
 }
 
 function resetGame() {
   if (!window.confirm('Сбросить прогресс и снова разложить все 1000 ключей?')) return;
-  try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
+  try {
+    clearArchiveState(storage);
+  } catch {
+    toast('Не удалось сбросить прогресс', true);
+    return;
+  }
   window.location.reload();
 }
 
 $('start-btn').addEventListener('click', play);
+$('start-btn').disabled = false;
 $('resume-btn').addEventListener('click', play);
 $('victory-explore').addEventListener('click', play);
 $('visual-open').addEventListener('click', openVisual);
@@ -191,17 +243,36 @@ visualPanel.bind();
 $('reset-btn').addEventListener('click', resetGame);
 $('victory-reset').addEventListener('click', resetGame);
 $('sensitivity').addEventListener('input', event => { sensitivity = Number(event.target.value); });
+$('sound').checked = !audio.isMuted();
 $('sound').addEventListener('change', event => { audio.setMuted(!event.target.checked); });
+
+const musicVolume = $('music-volume');
+const musicVolumeValue = $('music-volume-value');
+if (musicVolume && musicVolumeValue) {
+  musicVolume.value = music.getVolume();
+  musicVolumeValue.value = `${music.getVolume()}%`;
+  musicVolume.addEventListener('input', () => {
+    music.setVolume(musicVolume.value);
+    musicVolumeValue.value = `${music.getVolume()}%`;
+  });
+}
 
 document.addEventListener('pointerlockchange', () => {
   if (document.pointerLockElement === canvas) {
     lockRequestPending = false;
     lockUnavailable = false;
-    pointerEverLocked = true;
+    mouseWasLocked = true;
     lastPointer = null;
     edgeLook = { x: 0, y: 0, until: 0 };
-  } else if (pointerEverLocked && mode === 'play') {
-    lockRequestPending = false;
+    if (mode !== 'play') releaseMouseLock();
+    return;
+  }
+  const unlockedByBrowser = mouseWasLocked && !requestedMouseRelease;
+  mouseWasLocked = false;
+  requestedMouseRelease = false;
+  lockRequestPending = false;
+  if (unlockedByBrowser && mode === 'play') {
+    nativePauseAt = performance.now();
     pause();
   }
 });
@@ -231,14 +302,20 @@ canvas.addEventListener('contextmenu', event => event.preventDefault());
 
 window.addEventListener('keydown', event => {
   const key = logicalKey(event);
-  if (['w', 'a', 's', 'd', ' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) event.preventDefault();
   if (key === 'escape') {
+    if (event.repeat) return;
     if (mode === 'visual') setMode('pause');
-    if (mode === 'play' && document.pointerLockElement !== canvas) pause();
+    else if (mode === 'play') pause();
+    else if (mode === 'pause' && performance.now() - nativePauseAt > 100) {
+      // One browser Escape can both release pointer lock and reach this handler.
+      // Keyboard resume uses free mouse look until the next click can relock.
+      play({ lockMouse: false });
+    }
     return;
   }
   if (mode === 'visual' && key === 'v') { setMode('pause'); return; }
   if (mode !== 'play') return;
+  if (['w', 'a', 's', 'd', ' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) event.preventDefault();
   if (['w', 'a', 's', 'd', 'shift', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) heldMovement.add(key);
   if (event.repeat) return;
   if (key === 'e' || key === 'enter') interact();
@@ -250,13 +327,12 @@ window.addEventListener('keydown', event => {
     const footer = document.querySelector('.hud-footer');
     footer.style.opacity = footer.style.opacity === '0' ? '' : '0';
   }
-  if (key === 'm') {
-    const muted = audio.toggleMuted();
-    $('sound').checked = !muted;
-    toast(muted ? 'Звук выключен' : 'Звук включён');
-  }
 });
-window.addEventListener('keyup', event => heldMovement.delete(logicalKey(event)));
+window.addEventListener('keyup', event => {
+  const key = logicalKey(event);
+  if (key === 'escape') nativePauseAt = -Infinity;
+  heldMovement.delete(key);
+});
 window.addEventListener('blur', () => {
   heldMovement.clear();
   if (mode === 'play') pause();
@@ -270,26 +346,48 @@ canvas.addEventListener('wheel', event => {
 
 function tick(now) {
   requestAnimationFrame(tick);
+  if (mode !== 'play' && now - lastRender < MENU_FRAME_INTERVAL - 1) return;
+  lastRender = now;
   const cpuStart = performance.now();
   const delta = Math.min((now - lastTick) / 1000, .04);
   lastTick = now;
   let moving = false;
-  if (mode === 'play') moving = movement.move(heldMovement, yaw, delta);
+  let distance = 0;
+  if (mode === 'play') {
+    const { x, z } = camera.position;
+    moving = movement.move(heldMovement, yaw, delta);
+    distance = Math.hypot(camera.position.x - x, camera.position.z - z);
+    audio.walk(distance, floorSurfaceY(camera.position.x, camera.position.z) === RUG_TOP, heldMovement.has('shift'));
+  }
+  hud.walk(distance, delta);
   if (mode === 'play' && document.pointerLockElement !== canvas && now < edgeLook.until) {
     yaw -= edgeLook.x * 1.6 * delta;
     pitch = clamp(pitch - edgeLook.y * 1.3 * delta, -1.31, 1.27);
   }
   camera.rotation.set(pitch, yaw, 0, 'YXZ');
-  if (mode === 'play') setHovered(targetInView());
+  const target = mode === 'play' ? targetInView() : null;
+  updateWax(now, target);
+  audio.setWaxMelting(isMelting());
+  if (mode === 'play') setHovered(target);
   if (mode === 'play' && hovered?.kind === 'bath') {
     const currentPrompt = promptFor(hovered);
     if ($('interaction-prompt').innerHTML !== currentPrompt) $('interaction-prompt').innerHTML = currentPrompt;
   }
-  world.update(now, moving);
+  bathProgress.update(mode === 'play', playAt);
+  routeGuide.update(mode === 'play');
+  world.update(now, moving, mode === 'play', playAt);
+  for (const cabinet of world.cabinets) {
+    const lit = cabinet.completion.isComplete();
+    const rows = cabinet.completion.settledRows();
+    if (lit && !litCabinets[cabinet.type]) playAt('finish', cabinet.group.position);
+    else if (!lit && (rows & ~settledRows[cabinet.type])) playAt('row', cabinet.group.position);
+    litCabinets[cabinet.type] = lit;
+    settledRows[cabinet.type] = rows;
+  }
   const rendered = world.renderer.render(world.scene, camera) !== false;
   performanceHud.sample(now, performance.now() - cpuStart, rendered);
 }
 
 updateHud();
-save();
+save({ initial: true });
 requestAnimationFrame(tick);

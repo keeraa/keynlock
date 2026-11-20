@@ -1,7 +1,7 @@
 import * as THREE from '../vendor/three.js';
-import { makePaintTexture } from './art.js?v=17';
+import { makePaintTexture } from './art.js?v=key-ring';
 import { getPaintedMetalTexture } from './painted-textures.js';
-import { createHallSurfaceMaterials, createArchiveWoodTexture } from './hall-surface-textures.js?v=26';
+import { createHallSurfaceMaterials, createArchiveWoodTexture } from './hall-surface-textures.js?v=alchemy-candles';
 import { ARCHIVE_FLOOR_TEXTURE_URL } from './archive-floor-texture.js';
 
 function makeContactShadowMaterial() {

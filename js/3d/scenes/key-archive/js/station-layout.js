@@ -3,8 +3,9 @@ export const STATIONS = Object.freeze([
   { id: 'center', name: 'ЦЕНТРАЛЬНАЯ', x: 0, z: 0 },
 ]);
 
+export const FORGE_SURFACE_Y = 1.39;
 export const BATH_CAPACITY = 4;
-export const SOAK_SECONDS = Object.freeze({ mud: 5, rust: 7 });
+export const SOAK_SECONDS = Object.freeze({ mud: 5, rust: 30 });
 export const FIXTURE_OFFSETS = Object.freeze({ mud: -1.48, forge: 0, rust: 1.48 });
 
 export function bathId(stationId, kind) {

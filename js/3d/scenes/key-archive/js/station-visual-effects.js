@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { bathVisualState, meltVisualIntensity } from './station-visual-state.js';
+import { bathVisualState, meltVisualIntensity } from './station-visual-state.js?v=cleaning-cues';
 
 // Small reusable brush dabs; all effects are local to one workstation, without
 // point lights, shadow maps, per-frame allocations or additional render passes.
@@ -29,9 +29,9 @@ function paintPatchGeometry(seed) {
   return new THREE.ShapeGeometry(shape);
 }
 
-export function createBathEffects(group, x, kind, spotTexture) {
+export function createBathEffects(group, x, kind, spotTexture, waterY, radius) {
   const pigment = kind === 'mud' ? 0x998061 : 0xb47254;
-  const surfaceY = 1.256;
+  const surfaceY = waterY + .014;
   const patches = Array.from({ length: 4 }, (_, index) => {
     const material = new THREE.MeshBasicMaterial({ color: pigment, transparent: true,
       opacity: 0, depthWrite: false, side: THREE.DoubleSide });
@@ -40,6 +40,7 @@ export function createBathEffects(group, x, kind, spotTexture) {
     patch.position.set(x + Math.sin(index * 2.9) * .21, surfaceY + index * .0006,
       .10 + Math.cos(index * 2.9) * .19);
     patch.scale.set(.14 + (index % 2) * .055, .085 + (index % 3) * .025, 1);
+    patch.renderOrder = 3;
     group.add(patch);
     return patch;
   });
@@ -49,6 +50,7 @@ export function createBathEffects(group, x, kind, spotTexture) {
     const ring = new THREE.Mesh(new THREE.TorusGeometry(.16, .009, 4, 28), material);
     ring.rotation.x = -Math.PI / 2;
     ring.position.set(x, surfaceY + .004 + index * .001, .10);
+    ring.renderOrder = 3;
     group.add(ring);
     return ring;
   });
@@ -57,11 +59,12 @@ export function createBathEffects(group, x, kind, spotTexture) {
       color: kind === 'mud' ? 0xd0e0ce : 0xf2c499, transparent: true,
       opacity: 0, depthWrite: false }));
     sprite.position.set(x, surfaceY, .10);
+    sprite.renderOrder = 5;
     group.add(sprite);
     return sprite;
   });
 
-  function update(now, keys, wallTime) {
+  function update(now, keys, wallTime, drip) {
     const state = bathVisualState(keys, kind, wallTime);
     const active = state.active > 0;
     patches.forEach((patch, index) => {
@@ -76,12 +79,23 @@ export function createBathEffects(group, x, kind, spotTexture) {
       ring.visible = active;
       if (!active) return;
       const phase = (now * .00032 + index / ripples.length) % 1;
-      ring.scale.setScalar(.65 + phase * 1.55);
+      ring.scale.setScalar((.65 + phase * 1.55) * radius / .52);
       ring.material.opacity = .33 * (1 - phase) * Math.min(1, state.active * .65);
     });
     bubbles.forEach((bubble, index) => {
-      bubble.visible = active;
-      if (!active) return;
+      bubble.visible = active || drip > .015;
+      if (!bubble.visible) return;
+      if (drip > .015) {
+        const fall = (now * .003 + index * .163) % 1;
+        bubble.position.set(x + Math.sin(index * 3.7) * .13,
+          surfaceY + .33 * (1 - fall * fall), .10 + Math.cos(index * 2.2) * .16);
+        const size = .035 + (index % 3) * .015;
+        bubble.scale.set(size, size * (1.2 + fall * .7), 1);
+        bubble.material.color.setHex(pigment);
+        bubble.material.opacity = .9 * drip * Math.sin(fall * Math.PI);
+        return;
+      }
+      bubble.material.color.setHex(kind === 'mud' ? 0xd0e0ce : 0xf2c499);
       const phase = (now * (.00038 + (index % 3) * .00009) + index * .257) % 1;
       bubble.position.set(x + Math.sin(index * 5.6 + now * .0005) * .25,
         surfaceY + phase * .18, .10 + Math.cos(index * 3.6) * .22);
@@ -93,7 +107,7 @@ export function createBathEffects(group, x, kind, spotTexture) {
   return { update };
 }
 
-export function createForgeEffects(group, x, spotTexture, hotMetal) {
+export function createForgeEffects(group, x, spotTexture, hotMetal, surfaceY) {
   const glows = Array.from({ length: 5 }, (_, index) => {
     const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: spotTexture,
       color: index % 2 ? 0xf2ad59 : 0xe1aa77, transparent: true,
@@ -105,7 +119,7 @@ export function createForgeEffects(group, x, spotTexture, hotMetal) {
     new THREE.MeshBasicMaterial({ color: 0xffc67a, transparent: true,
       opacity: 0, depthWrite: false }));
   splash.rotation.x = -Math.PI / 2;
-  splash.position.set(x, 1.539, .08);
+  splash.position.set(x, surfaceY + .036, .08);
   group.add(splash);
   let impactAt = -Infinity;
   function ignite(now) { impactAt = now + 440; }
@@ -121,7 +135,7 @@ export function createForgeEffects(group, x, spotTexture, hotMetal) {
       const phase = Math.max(0, (now - impactAt) / 1500);
       const travel = (phase * (1.1 + index * .18) + index * .2) % 1;
       glow.position.set(x + Math.sin(index * 2.4 + now * .002) * (.08 + travel * .21),
-        1.54 + travel * .52, .08 + Math.cos(index * 4.1) * (.08 + travel * .14));
+        surfaceY + .04 + travel * .52, .08 + Math.cos(index * 4.1) * (.08 + travel * .14));
       const size = .13 + (index % 3) * .045;
       glow.scale.set(size, size * 1.4, 1);
       glow.material.opacity = intensity * (1 - travel) * .82;

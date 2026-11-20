@@ -1,4 +1,4 @@
-import { bathVisualState, meltVisualIntensity } from './station-visual-state.js';
+import { bathVisualState, meltVisualIntensity, bathKeyProgress, waterDip, BATH_LIFT_MS } from './station-visual-state.js?v=cleaning-cues';
 
 // Matching small gouache strokes for the emergency Canvas renderer.
 export function drawBathActivity(ctx, center, radius, kind, keys, now, wallTime) {
@@ -43,36 +43,55 @@ export function drawBathActivity(ctx, center, radius, kind, keys, now, wallTime)
     ctx.beginPath(); ctx.arc(x, y, bubble, 0, Math.PI * 2); ctx.fill();
   }
   ctx.restore();
-  // The rim itself shows how much of the current soak has elapsed.
-  ctx.save();
-  ctx.strokeStyle = highlight;
-  ctx.lineWidth = Math.max(2, radius * .065);
-  ctx.globalAlpha = .82;
-  ctx.beginPath();
-  ctx.ellipse(center.x, center.y, radius * 1.03, radius * .45,
-    0, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * state.progress);
-  ctx.stroke();
-  ctx.restore();
+
 }
 
-export function drawBathKeys(ctx, center, radius, kind, keys, wallTime) {
+export function drawBathKeys(ctx, center, radius, kind, keys, wallTime, lift, now) {
   ctx.save();
-  keys.slice(0, 4).forEach((key, index) => {
-    const ready = wallTime >= key.bathUntil;
-    const xx = center.x + (index % 2 ? .37 : -.37) * radius;
-    const yy = center.y + (index < 2 ? -.14 : .14) * radius;
-    const size = Math.max(2.5, radius * .105);
-    ctx.strokeStyle = ready ? '#f1d39b' : kind === 'mud' ? '#78694d' : '#a65b39';
-    ctx.lineWidth = Math.max(1.1, radius * .045);
+  function paint(x, y, residue, drip) {
+    const size = Math.max(3, radius * .15);
+    ctx.strokeStyle = '#e5cfa2';
+    const drawKey = () => {
+      ctx.beginPath();
+      ctx.arc(x - size * .27, y - size * .28, size * .32, 0, Math.PI * 2);
+      ctx.moveTo(x, y); ctx.lineTo(x + size * .83, y + size * 1.32);
+      ctx.lineTo(x + size * .54, y + size * 1.47);
+      ctx.moveTo(x + size * .56, y + size * .96);
+      ctx.lineTo(x + size * .30, y + size * 1.1);
+      ctx.stroke();
+    };
+    ctx.lineWidth = Math.max(1.1, radius * .048);
     ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.arc(xx - size * .22, yy - size * .20, size * .33, 0, Math.PI * 2);
-    ctx.moveTo(xx, yy); ctx.lineTo(xx + size * .72, yy + size * .56);
-    ctx.lineTo(xx + size * .52, yy + size * .84);
-    ctx.moveTo(xx + size * .48, yy + size * .38);
-    ctx.lineTo(xx + size * .32, yy + size * .60);
-    ctx.stroke();
+    drawKey();
+    if (residue > 0) {
+      ctx.globalAlpha = residue;
+      ctx.strokeStyle = kind === 'mud' ? '#6b523b' : '#a45433';
+      drawKey();
+    }
+    ctx.fillStyle = kind === 'mud' ? '#977455' : '#ad653f';
+    for (let i = 0; i < 4; i++) {
+      const fall = (now * .004 + i * .19) % 1;
+      ctx.globalAlpha = drip * (1 - fall);
+      ctx.beginPath();
+      ctx.ellipse(x + (i - 1.5) * size * .20, y + size * (1.5 + fall * .9), size * .13, size * .20, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+  keys.forEach((key, index) => {
+    const progress = bathKeyProgress(key, kind, wallTime);
+    const dip = kind === 'mud' ? waterDip(progress) : null;
+    if (dip && dip.height < -.05) return;
+    ctx.globalAlpha = dip ? Math.min(1, .45 + dip.height * 3) : .55;
+    paint(center.x + (index % 2 ? .32 : -.32) * radius,
+      center.y + ((index < 2 ? -.09 : .09) - (dip?.height || 0) * 2.5) * radius,
+      dip?.remaining ?? 1, dip?.drip || 0);
   });
+  if (lift) {
+    const progress = Math.min(1, Math.max(0, (now - lift.startedAt) / BATH_LIFT_MS));
+    paint(center.x, center.y - Math.min(1, progress * 2.1) * radius * .88,
+      kind === 'rust' ? Math.max(0, 1 - (progress - .16) * 1.65) : 0, Math.sin(progress * Math.PI));
+  }
   ctx.restore();
 }
 

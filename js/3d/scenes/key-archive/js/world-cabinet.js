@@ -1,11 +1,15 @@
 import * as THREE from '../vendor/three.js';
-import { KEY_TYPES } from './rules.js?v=24';
-import { makeLabel } from './art.js?v=17';
-import { createCombinedKeyGeometry, getKeyMaterial, getKeyDisplayScale } from './key-factory.js?v=3';
-import { createPaintedInstanceGeometry } from './key-instance-finish.js';
+import { KEY_TYPES } from './rules.js?v=key-ring';
+import { makeLabel } from './art.js?v=key-ring';
+import { createCombinedKeyGeometry, getKeyMaterial, getKeyDisplayScale } from './key-factory.js?v=key-ring';
+import { createPaintedInstanceGeometry } from './key-instance-finish.js?v=wax-and-bundles';
 import { KEY_ART } from './key-art.js';
-import { CABINET_Z, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS, CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_SHELF_DEPTH, CABINET_GRID_BOTTOM_Y, CABINET_BLANK_ROW_BOTTOM_Y, CABINET_SHELF_CENTER_Z, CABINET_GROUND_OFFSET, cabinetKeyPose } from './cabinet-layout.js?v=23';
-import { box, contactShadow } from './world-architecture.js';
+import { PERIMETER_BAND_Y } from './hall-architecture.js?v=alchemy-candles';
+import { createCabinetCompletion } from './cabinet-completion.js?v=wax-and-bundles';
+import { CABINET_Z, CABINET_GRID_WIDTH, CABINET_GRID_HALF_WIDTH, CABINET_BODY_WIDTH, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS, CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_SHELF_DEPTH, CABINET_GRID_BOTTOM_Y, CABINET_HEADER_HEIGHT, CABINET_HEADER_Y, CABINET_CORNICE_TOP, CABINET_SHELF_CENTER_Z, CABINET_GROUND_OFFSET, CABINET_BACK_FRONT_Z, CABINET_CROWN_SCALE_FACTOR, cabinetKeyPose } from './cabinet-layout.js?v=cabinet-cell-glow';
+import { createCabinetFinish, createRoundedShelfGeometry } from './cabinet-finish.js?v=cabinet-cell-glow';
+import { createMetricBoxGeometry } from './metric-box-geometry.js?v=23';
+import { box, contactShadow } from './world-architecture.js?v=key-ring';
 
 function addTrimInstances(group, instances, material) {
   const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), material, instances.length);
@@ -22,35 +26,48 @@ function addTrimInstances(group, instances, material) {
   group.add(mesh);
 }
 
-export function createCabinet(scene, type, mat) {
+const sideGeometry = createMetricBoxGeometry([.26, CABINET_CORNICE_TOP - .35, .78], 1.8);
+const shelfGeometries = new Map();
+const cabinetFinishes = new WeakMap();
+
+function addRoundedShelf(group, y, height, material) {
+  if (!shelfGeometries.has(height)) {
+    shelfGeometries.set(height, createRoundedShelfGeometry(CABINET_GRID_WIDTH - .01, height, CABINET_SHELF_DEPTH));
+  }
+  const shelf = new THREE.Mesh(shelfGeometries.get(height), material);
+  shelf.position.set(0, y, CABINET_SHELF_CENTER_Z);
+  group.add(shelf);
+}
+
+export function createCabinet(scene, type, materials) {
+  if (!cabinetFinishes.has(materials)) cabinetFinishes.set(materials, createCabinetFinish(materials));
+  const finish = cabinetFinishes.get(materials);
+  const mat = { ...materials, wood: finish.wood, darkWood: finish.darkWood,
+    carvedWood: finish.carvedWood, cabinetWalnut: finish.walnut };
   const group = new THREE.Group();
   const left = type < 5;
   group.position.set(left ? -11.58 : 11.58, CABINET_GROUND_OFFSET, CABINET_Z[type % 5]);
   group.rotation.y = left ? Math.PI / 2 : -Math.PI / 2;
   group.scale.z = .5; // Half-depth cabinet and individual key compartments.
   scene.add(group);
-  contactShadow(group, 4.5, 1.55, 0, .006, .14, mat.contactShadow);
-  box(group, [3.64, 4.89, .57], [0, 2.43, -.04], mat.cabinetWalnut);
-  box(group, [3.25, 3.79, .12], [0, 2.2, .29], mat.cabinetBack);
-  box(group, [3.92, .33, .90], [0, .15, .13], mat.cabinetWalnut);
-  box(group, [3.92, .24, .94], [0, 4.77, .11], mat.cabinetWalnut);
-  // Shallow stepped cornice and worn carved rails provide a furniture silhouette.
-  box(group, [4.05, .11, 1.02], [0, 4.91, .10], mat.carvedWood);
-  box(group, [3.80, .09, .84], [0, 5.01, .13], mat.darkWood);
-  box(group, [3.84, .07, .81], [0, .34, .13], mat.carvedWood);
-  for (const x of [-1.76, 1.76]) {
-    box(group, [.26, 4.61, .78], [x, 2.43, .11], mat.cabinetWalnut);
-    box(group, [.045, 4.55, .81], [x + Math.sign(x) * .12, 2.44, .12], mat.agedBronze);
-    box(group, [.065, 3.61, .07], [x - Math.sign(x) * .095, 2.40, .512], mat.carvedWood);
-    box(group, [.35, .23, .79], [x, .12, .11], mat.darkWood);
-    box(group, [.33, .13, .76], [x, .30, .11], mat.carvedWood);
+  contactShadow(group, CABINET_BODY_WIDTH + .5, 1.55, 0, .006, .14, mat.contactShadow);
+  const bodyHeight = CABINET_CORNICE_TOP - .13;
+  box(group, [CABINET_GRID_WIDTH + .40, bodyHeight, .57], [0, bodyHeight / 2, -.04], mat.cabinetWalnut);
+  const cellLightValues = new Uint8Array(CABINET_CAPACITY);
+  const cellLights = new THREE.DataTexture(cellLightValues, CABINET_COLUMNS * 2, CABINET_ROWS * 2, THREE.RedFormat);
+  cellLights.needsUpdate = true;
+  box(group, [CABINET_GRID_WIDTH + .01, CABINET_CORNICE_TOP - .5, .12],
+    [0, (CABINET_CORNICE_TOP - .5) / 2 + .31, CABINET_BACK_FRONT_Z - .06], finish.createRecess(cellLights));
+  box(group, [CABINET_BODY_WIDTH - .08, .33, .90], [0, .15, .13], mat.cabinetWalnut);
+  box(group, [CABINET_BODY_WIDTH - .12, .20, .83], [0, CABINET_CORNICE_TOP - .20, .11], mat.cabinetWalnut);
+  box(group, [CABINET_BODY_WIDTH, .10, .92], [0, CABINET_CORNICE_TOP - .05, .10], mat.carvedWood);
+  for (const x of [-CABINET_GRID_HALF_WIDTH - .14, CABINET_GRID_HALF_WIDTH + .14]) {
+    const side = new THREE.Mesh(sideGeometry, mat.cabinetWalnut);
+    side.position.set(x, (CABINET_CORNICE_TOP + .23) / 2, .11);
+    group.add(side);
   }
-  // One solid lower section supports four raised rows of square key compartments.
-  // Recede the lower panel behind the base moulding. The old two front caps
-  // shared a plane along their overlap and shimmered while walking past.
-  box(group, [3.24, .36, .17], [0, .48, .42], mat.wood);
-  box(group, [3.24, CABINET_ROW_HEIGHT, .17],
-    [0, CABINET_BLANK_ROW_BOTTOM_Y + CABINET_ROW_HEIGHT / 2, .45], mat.darkWood);
+  const lowerPanelHeight = CABINET_GRID_BOTTOM_Y - .32;
+  box(group, [CABINET_GRID_WIDTH, lowerPanelHeight, .17], [0, .32 + lowerPanelHeight / 2, .45], mat.darkWood);
   const halfRow = CABINET_ROW_HEIGHT / 2;
   const cellWidth = CABINET_COLUMN_WIDTH / 2;
   const mainShelfThickness = .078;
@@ -60,7 +77,7 @@ export function createCabinet(scene, type, mat) {
   // Every upright occupies only the space between shelves. Full-height bars
   // overlapped horizontal boards on the same front plane and z-fought at joins.
   for (let divider = 0; divider <= CABINET_COLUMNS * 2; divider++) {
-    const x = -1.62 + divider * cellWidth;
+    const x = -CABINET_GRID_HALF_WIDTH + divider * cellWidth;
     const thickness = divider % 2 === 0 ? .065 : .034;
     for (let section = 0; section < CABINET_ROWS * 2; section++) {
       const bottomThickness = section % 2 === 0 ? mainShelfThickness : innerShelfThickness;
@@ -74,12 +91,11 @@ export function createCabinet(scene, type, mat) {
   }
   for (let row = 0; row <= CABINET_ROWS; row++) {
     const y = CABINET_GRID_BOTTOM_Y + row * CABINET_ROW_HEIGHT;
-    box(group, [3.23, mainShelfThickness, CABINET_SHELF_DEPTH],
-      [0, y, CABINET_SHELF_CENTER_Z], mat.wood);
+    addRoundedShelf(group, y, mainShelfThickness, finish.shelf);
     // Narrow brass inlay sits lower on the front lip, not over the shelf's
     // whole top face. Split at uprights to avoid overlapping coplanar surfaces.
     for (let column = 0; column < CABINET_COLUMNS * 2; column++) {
-      const x = -1.62 + (column + .5) * cellWidth;
+      const x = -CABINET_GRID_HALF_WIDTH + (column + .5) * cellWidth;
       const front = CABINET_SHELF_CENTER_Z + CABINET_SHELF_DEPTH / 2;
       inlayInstances.push({ size: [cellWidth - .076, .023, .021],
         position: [x, y + .014, front + .013] });
@@ -88,45 +104,33 @@ export function createCabinet(scene, type, mat) {
   // A finer 12 × 8 grid creates 96 actual cubbies; no hanging pegs remain.
   for (let row = 0; row < CABINET_ROWS; row++) {
     const y = CABINET_GRID_BOTTOM_Y + (row + .5) * CABINET_ROW_HEIGHT;
-    box(group, [3.23, innerShelfThickness, CABINET_SHELF_DEPTH],
-      [0, y, CABINET_SHELF_CENTER_Z], mat.wood);
+    addRoundedShelf(group, y, innerShelfThickness, finish.shelf);
   }
   // Two draw calls for all uprights and brass lips instead of ~170 small meshes.
   addTrimInstances(group, uprightInstances, mat.wood);
   addTrimInstances(group, inlayInstances, mat.darkBrass);
-  box(group, [3.37, 1.14, .27], [0, 4.04, .39], mat.blackWood);
-  const plaque = box(group, [3.27, .66, .05], [0, 4.17, .55], mat.darkBrass.clone());
+  box(group, [CABINET_GRID_WIDTH + .13, CABINET_HEADER_HEIGHT, .27], [0, CABINET_HEADER_Y, .39], mat.carvedWood);
   const label = makeLabel(KEY_TYPES[type].name.toUpperCase(), '', {
-    worldWidth: 2.52, worldHeight: .67, fontSize: 100,
+    worldWidth: CABINET_GRID_WIDTH - .46, worldHeight: .45, fontSize: 111, color: '#ead0a0',
   });
-  label.position.set(.31, 4.18, .585);
+  label.position.set(0, CABINET_HEADER_Y, .531);
   group.add(label);
-  const plaqueGlow = new THREE.Mesh(new THREE.PlaneGeometry(1.46, .80), new THREE.ShaderMaterial({
-    vertexShader: `varying vec2 vUv;
-      void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-    fragmentShader: `varying vec2 vUv;
-      void main() {
-        vec2 p = (vUv - .5) * vec2(2.0, 2.0);
-        float glow = exp(-dot(p, p) * 4.8) * .30;
-        // Fade before reaching the plane boundary: no rectangular cut-off.
-        float fade = smoothstep(0.0, .22, vUv.x) * smoothstep(0.0, .22, 1.0-vUv.x)
-          * smoothstep(0.0, .2, vUv.y) * smoothstep(0.0, .2, 1.0-vUv.y);
-        gl_FragColor = vec4(vec3(1.0, .78, .51), glow * fade); }`,
-    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false,
-  }));
-  plaqueGlow.position.set(-1.27, 4.18, .607);
-  group.add(plaqueGlow);
-  const plaqueKey = new THREE.Mesh(createCombinedKeyGeometry(type), getKeyMaterial(type));
-  plaqueKey.position.set(-1.27, 4.18, .635);
-  plaqueKey.scale.setScalar(.23 * 2.7 * .8);
-  plaqueKey.rotation.z = -Math.PI / 2;
-  group.add(plaqueKey);
   // Each cabinet carries its own monumental key. The lower blade is buried
   // inside the cabinet, leaving the matching head and neck above the cornice.
   // Forge geometry already has its head at +Y; no additional rotation needed.
-  const crownKey = new THREE.Mesh(createCombinedKeyGeometry(type), getKeyMaterial(type));
-  crownKey.position.set(0, 4.43, -.18);
-  crownKey.scale.setScalar(4.48);
+  const crownGeometry = createCombinedKeyGeometry(type);
+  crownGeometry.computeBoundingBox();
+  const headCenter = crownGeometry.userData.headCenterY ?? crownGeometry.boundingBox.max.y - .16;
+  const crestCenterY = (CABINET_CORNICE_TOP + PERIMETER_BAND_Y - CABINET_GROUND_OFFSET) / 2;
+  const headHeight = Math.max(.01, 2 * (crownGeometry.boundingBox.max.y - headCenter));
+  const crownScale = Math.min(4.48,
+    (PERIMETER_BAND_Y - CABINET_CORNICE_TOP - CABINET_GROUND_OFFSET) * .86 / headHeight) * CABINET_CROWN_SCALE_FACTOR;
+  const crownMaterial = getKeyMaterial(type).clone();
+  crownMaterial.emissiveMap = crownMaterial.map;
+  const crownKey = new THREE.Mesh(crownGeometry, crownMaterial);
+  crownKey.position.set(0, crestCenterY - headCenter * crownScale, -.24);
+  crownKey.scale.setScalar(crownScale);
+  crownKey.userData.headCenterY = crestCenterY;
   crownKey.castShadow = true;
   crownKey.frustumCulled = false;
   // On a flat key pressed close to the wall, the shared depth/normal pass has
@@ -136,14 +140,14 @@ export function createCabinet(scene, type, mat) {
     new THREE.EdgesGeometry(crownKey.geometry, 35),
     new THREE.LineBasicMaterial({ color: KEY_ART.outline.ink, transparent: true,
       opacity: .56, depthTest: true, depthWrite: false }));
-  crownContour.position.z = .018;
+  crownContour.position.z = .008;
   crownKey.add(crownContour);
   group.add(crownKey);
   const collider = new THREE.Mesh(
-    new THREE.BoxGeometry(3.82, 4.65, .15),
+    new THREE.BoxGeometry(CABINET_GRID_WIDTH + .58, CABINET_CORNICE_TOP - .29, .15),
     new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }),
   );
-  collider.position.set(0, 2.53, .74);
+  collider.position.set(0, (CABINET_CORNICE_TOP + .29) / 2, .74);
   collider.userData = { kind: 'cabinet', type };
   group.add(collider);
 
@@ -154,15 +158,94 @@ export function createCabinet(scene, type, mat) {
   inserted.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   inserted.frustumCulled = false;
   group.add(inserted);
+  const completion = createCabinetCompletion();
+  let litKeys = [];
+  let lastSettledRows = 0;
+  const cellFlashes = new Map();
+  let cellLightingDirty = false;
+  // The backing reads a tiny per-cabinet mask, so glowing cells share its draw call.
+  function updateCellLights(settledRows) {
+    lastSettledRows = settledRows;
+    cellLightValues.fill(0);
+    for (const key of litKeys) {
+      const row = Math.floor(key.cabinetSlot / (CABINET_COLUMNS * 2));
+      cellLightValues[key.cabinetSlot] = settledRows & (1 << row) ? 225 : 140;
+    }
+    for (const [slot, strength] of cellFlashes) {
+      cellLightValues[slot] = Math.max(cellLightValues[slot], Math.round(255 * strength));
+    }
+    cellLightingDirty = false;
+    cellLights.needsUpdate = true;
+  }
+  function flashCell(slot, strength) {
+    if (!strength && !cellFlashes.has(slot)) return;
+    if (strength) cellFlashes.set(slot, strength);
+    else cellFlashes.delete(slot);
+    cellLightingDirty = true;
+  }
+  function pulsePanel(width, height, y, z, gain = 1) {
+    const material = new THREE.ShaderMaterial({
+      uniforms: { uGain: { value: gain }, uSweep: { value: 0 }, uFlash: { value: 0 }, uFade: { value: 0 } },
+      vertexShader: 'varying vec2 vPulseUv; void main(){vPulseUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+      fragmentShader: `varying vec2 vPulseUv; uniform float uSweep,uFlash,uFade,uGain;
+        void main(){
+          float band=exp(-pow((vPulseUv.x-(uSweep*1.24-.12))/.095,2.0));
+          float edge=smoothstep(0.0,.10,vPulseUv.y)*smoothstep(0.0,.10,1.0-vPulseUv.y)
+            *smoothstep(0.0,.045,vPulseUv.x)*smoothstep(0.0,.045,1.0-vPulseUv.x);
+          float light=(band*.56 + uFlash*.48 + step(vPulseUv.x,uSweep)*.045)*uFade*edge*uGain;
+          gl_FragColor=vec4(vec3(1.0,.72,.31),light);
+          #include <colorspace_fragment>
+        }`,
+      transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+      polygonOffset: true, polygonOffsetFactor: -1, toneMapped: false,
+    });
+    material.userData.inkSkipOutline = true;
+    const panel = new THREE.Mesh(new THREE.PlaneGeometry(width, height), material);
+    panel.position.set(0, y, z); panel.visible = false; panel.renderOrder = 4;
+    group.add(panel); return panel;
+  }
+  const rowPulses = Array.from({ length: CABINET_ROWS * 2 }, (_, row) =>
+    pulsePanel(CABINET_GRID_WIDTH, CABINET_ROW_HEIGHT / 2,
+      CABINET_GRID_BOTTOM_Y + (CABINET_ROWS * 2 - row - .5) * CABINET_ROW_HEIGHT / 2, .55));
+  const cabinetPulse = pulsePanel(CABINET_BODY_WIDTH, CABINET_CORNICE_TOP, CABINET_CORNICE_TOP / 2, .86, .60);
+  function warmEffects(renderer, camera) {
+    // Compile the shared celebration program before play, using the same linear
+    // offscreen color space as the scene pass. The first earned row must not hitch.
+    const target = new THREE.WebGLRenderTarget(1, 1);
+    const previous = renderer.getRenderTarget();
+    const warmScene = new THREE.Scene();
+    warmScene.add(new THREE.Mesh(rowPulses[0].geometry, rowPulses[0].material));
+    try { renderer.setRenderTarget(target); renderer.compile(warmScene, camera); }
+    finally { renderer.setRenderTarget(previous); target.dispose(); }
+  }
+  function applyPulse(panel, pulse) {
+    panel.visible = Boolean(pulse);
+    if (!pulse) return;
+    panel.material.uniforms.uSweep.value = pulse.sweep;
+    panel.material.uniforms.uFlash.value = pulse.flash;
+    panel.material.uniforms.uFade.value = pulse.fade;
+  }
+  function update(now) {
+    const frame = completion.frame(now);
+    if (litKeys.length || cellLightingDirty) {
+      const settledRows = completion.settledRows();
+      if (cellLightingDirty || settledRows !== lastSettledRows) updateCellLights(settledRows);
+    }
+    rowPulses.forEach(panel => { panel.visible = false; });
+    for (const row of frame.rows) applyPulse(rowPulses[row.row], row);
+    applyPulse(cabinetPulse, frame.cabinet);
+    crownMaterial.emissive.setHex(0xfff1d4);
+    crownMaterial.emissiveIntensity = frame.crownGlow;
+  }
   const dummy = new THREE.Object3D();
-  const adornment = new THREE.Mesh(new THREE.SphereGeometry(.14, 12, 8),
-    new THREE.MeshBasicMaterial({ color: 0xffd889 }));
-  adornment.material.userData.inkSkipOutline = true;
-  adornment.position.set(0, 4.8, .45);
-  adornment.visible = false;
-  group.add(adornment);
   function refresh(keys, hiddenIds = new Set(), required = CABINET_CAPACITY) {
+    for (const slot of cellFlashes.keys()) if (!keys.some(key => key.cabinetSlot === slot)) flashCell(slot, 0);
     const visible = keys.filter(key => !hiddenIds.has(key.id));
+    completion.refresh(visible);
+    if (visible.length || litKeys.length) {
+      litKeys = visible;
+      updateCellLights(completion.settledRows());
+    }
     inserted.count = Math.min(visible.length, CABINET_CAPACITY);
     for (let i = 0; i < inserted.count; i++) {
       const peg = cabinetKeyPose(visible[i].cabinetSlot, getKeyDisplayScale('cabinet', type));
@@ -173,14 +256,11 @@ export function createCabinet(scene, type, mat) {
       inserted.setMatrixAt(i, dummy.matrix);
     }
     inserted.instanceMatrix.needsUpdate = true;
-    adornment.visible = keys.length === required;
-    plaque.material.emissive = new THREE.Color(keys.length === required ? 0x8a5a1d : 0x000000);
-    plaque.material.emissiveIntensity = keys.length === required ? .35 : 0;
   }
   function setContour(settings) {
     const strength = Math.max(0, Math.min(100, Number(settings.outlineStrength) || 0));
     crownContour.visible = Boolean(settings.outlineEnabled) && strength > 0;
     crownContour.material.opacity = strength * .008;
   }
-  return { type, group, collider, refresh, setContour };
+  return { type, group, collider, refresh, flashCell, setContour, update, completion, warmEffects };
 }

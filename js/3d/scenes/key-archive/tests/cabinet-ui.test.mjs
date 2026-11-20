@@ -2,23 +2,18 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-test('cabinet face uses individual cubbies, an actual key on the plaque and no hooks', () => {
+test('cabinet face uses individual cubbies, a painted family name and no hooks', () => {
   const source = readFileSync(new URL('../dist/js/world-cabinet.js', import.meta.url), 'utf8');
-  assert.match(source, /const plaqueKey = new THREE\.Mesh\(createCombinedKeyGeometry\(type\)/);
-  assert.match(source, /fontSize: 100/);
+  assert.match(source, /label.position.set\(0, CABINET_HEADER_Y, \.531\)/);
+  assert.doesNotMatch(source, /plaqueKey|plaqueGlow|carvingPlane|Math\.sign\(x\)/);
   assert.match(source, /group\.scale\.z = \.5/);
-  assert.match(source, /plaqueKey\.scale\.setScalar\(\.23 \* 2\.7 \* \.8\)/);
-  assert.match(source, /plaqueKey\.rotation\.z = -Math\.PI \/ 2/);
-  assert.match(source, /const crownKey = new THREE\.Mesh\(createCombinedKeyGeometry\(type\)/);
-  assert.match(source, /crownKey\.position\.set\(0, 4\.43, -\.18\)/);
-  assert.match(source, /crownKey\.scale\.setScalar\(4\.48\)/);
+  assert.match(source, /const crownGeometry = createCombinedKeyGeometry\(type\)/);
+  assert.match(source, /crownKey\.position\.set\(0, crestCenterY - headCenter \* crownScale, -\.24\)/);
+  assert.match(source, /crownKey\.scale\.setScalar\(crownScale\)/);
   assert.match(source, /new THREE\.EdgesGeometry\(crownKey\.geometry, 35\)/);
   assert.match(source, /crownContour\.material\.opacity = strength \* \.008/);
   assert.match(source, /cabinetKeyPose\(visible\[i\]\.cabinetSlot/);
-  assert.match(source, /\[0, \.48, \.42\]/);
-  assert.match(source, /const plaqueGlow/);
-  assert.match(source, /smoothstep\(0\.0, \.22, vUv\.x\)/);
-  assert.match(source, /vec3\(1\.0, \.78, \.51\)/);
+  assert.match(source, /lowerPanelHeight = CABINET_GRID_BOTTOM_Y - \.32/);
   assert.match(source, /CABINET_COLUMNS \* 2; divider\+\+/);
   assert.match(source, /addTrimInstances\(group, uprightInstances, mat\.wood\)/);
   assert.match(source, /addTrimInstances\(group, inlayInstances, mat\.darkBrass\)/);
@@ -31,9 +26,10 @@ test('keyboard hints sit at lower left and inventory at lower right', () => {
   const page = readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8');
   const css = readFileSync(new URL('../dist/styles.css', import.meta.url), 'utf8');
   assert.ok(page.indexOf('class="hud-guides"') < page.indexOf('class="inventory-shell"'));
-  assert.ok(page.indexOf('class="help-hotkeys"') < page.indexOf('class="inventory-shell"'));
+  assert.match(page, /class="quick-keys">E <span>— действие<\/span> &nbsp; R <span>— бросить<\/span>/);
+  assert.doesNotMatch(page, /help-hotkeys|inventory-help|Мышь — смотреть/);
   assert.match(css, /\.inventory-shell\{width:382px;margin-left:auto/);
-  assert.match(css, /\.help-hotkeys\{text-align:left\}/);
+  assert.match(css, /\.quick-keys\{font:/);
 });
 
 test('game HUD hides the status strip and mouse-lock warning', () => {

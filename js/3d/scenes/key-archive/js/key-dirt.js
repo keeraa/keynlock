@@ -3,7 +3,7 @@ import { bowPoints, holesFor, bladeSections, shaftStartX, shaftHalfHeight } from
 
 // The grime is a genuine, uneven rim outside the silhouette. It has its own
 // thin front/back crust and edge wall, but never becomes part of the STL key.
-export const dirtPaint=['#54432f','#624f38','#705b42'];
+export const dirtPaint=['#382419','#483024','#583e2d'];
 const dirtColors=dirtPaint.map(color=>new THREE.Color(color));
 let dirtMaterial;
 export function getDirtMaterial() {
@@ -11,6 +11,12 @@ export function getDirtMaterial() {
     vertexColors:true,transparent:false,depthWrite:true,side:THREE.DoubleSide,
   });
   return dirtMaterial;
+}
+
+let waxMaterial;
+export function getWaxMaterial() {
+  return waxMaterial ??= new THREE.MeshStandardMaterial({ color: 0xffd894,
+    emissive: 0xb8863d, emissiveIntensity: .26, roughness: .88, side: THREE.DoubleSide });
 }
 
 export function stableNoise(value) {

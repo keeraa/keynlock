@@ -1,5 +1,5 @@
-import { createForgeKeyProvider } from './key-forge-adapter.js?v=4';
-import { preloadKeyTextures } from './key-materials.js';
+import { createForgeKeyProvider } from './key-forge-adapter.js?v=wax-and-bundles';
+import { preloadKeyTextures } from './key-materials.js?v=wax-and-bundles';
 
 // A versioned profile file is the single design input for the archive.
 // Changing it updates all instances, hand models, cabinets and 2D stamps on

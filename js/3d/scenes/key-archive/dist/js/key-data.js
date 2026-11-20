@@ -20,7 +20,7 @@ export const METALS = Object.freeze([
   { id:'gold', name:'Позолота', color:'#e4b866', description:'Светлая позолота · тёплые высветления', file:'painted-brass.webp', tint:0xffedbb },
   { id:'mercury', name:'Ртуть · символ', color:'#839fa6', description:'Меркурий · холодная серебристо-синяя гуашь', file:'painted-steel.webp', tint:0xc4e3ef },
   { id:'tin', name:'Олово', color:'#b4b7aa', description:'Юпитер · светлое олово с приглушённой зеленью', file:'painted-steel.webp', tint:0xe1e6d0 },
-  { id:'lead', name:'Свинец · символ', color:'#747c83', description:'Сатурн · тёмный матовый серо-синий металл', file:'painted-graphite.webp', tint:0xd2e1eb },
+  { id:'lead', name:'Свинец · символ', color:'#489f9c', description:'Сатурн · бирюзовая гуашевая эмаль', file:'painted-enamel.webp', tint:0xffffff },
   { id:'silver', name:'Серебро', color:'#d5d9d6', description:'Луна · прохладное серебро с мягкими мазками', file:'painted-steel.webp', tint:0xffffff },
 ]);
 

@@ -1,12 +1,12 @@
-import { BATH_CAPACITY, SOAK_SECONDS, bathId, validBathId } from './station-layout.js?v=2';
-import { CABINET_CAPACITY } from './cabinet-layout.js?v=23';
+import { BATH_CAPACITY, SOAK_SECONDS, bathId, validBathId } from './station-layout.js?v=working-baths';
+import { CABINET_CAPACITY } from './cabinet-layout.js?v=cabinet-cell-glow';
 
 // `id` is a stable legacy save slot. The displayed family is from the Forge.
 export const KEY_TYPES = [
   { id: 'circle', name: 'Подвальный', hint: 'Круг · ртуть', metal: 0x839fa6, mark: 'I' },
   { id: 'triangle', name: 'Башенный', hint: 'Готическая арка · олово', metal: 0xb4b7aa, mark: 'II' },
   { id: 'square', name: 'Архивный', hint: 'Квадрат · сталь', metal: 0xa1acac, mark: 'III' },
-  { id: 'diamond', name: 'Часовой', hint: 'Ромб · свинец', metal: 0x747c83, mark: 'IV' },
+  { id: 'diamond', name: 'Часовой', hint: 'Ромб · бирюзовая эмаль', metal: 0x489f9c, mark: 'IV' },
   { id: 'pentagon', name: 'Астролябия', hint: 'Зубчатый венец · латунь', metal: 0xce9b4c, mark: 'V' },
   { id: 'hexagon', name: 'Кузнечный', hint: 'Шестигранник · чернёное железо', metal: 0x515c60, mark: 'VI' },
   { id: 'star', name: 'Алхимический', hint: 'Звезда · медь', metal: 0xbc704d, mark: 'VII' },
@@ -18,6 +18,8 @@ export const KEY_TYPES = [
 export const KEYS_PER_TYPE = 100;
 export const TOTAL_KEYS = KEY_TYPES.length * KEYS_PER_TYPE;
 export const MAX_HELD = 4;
+export const BUNDLE_COST = 15;
+const WAX_ORDINALS = [19, 29, 46, 69, 93];
 export const BROKEN_ORDINALS = [13, 38, 63, 88];
 export const MUD_ORDINALS = [3, 15, 27, 39, 51, 65, 77, 89];
 export const RUST_ORDINALS = [7, 23, 35, 49, 71, 95];
@@ -52,6 +54,7 @@ export function createInitialKeys() {
         broken: BROKEN_ORDINALS.includes(ordinal),
         mud: MUD_ORDINALS.includes(ordinal) || BOTH_ORDINALS.includes(ordinal),
         rust: RUST_ORDINALS.includes(ordinal) || BOTH_ORDINALS.includes(ordinal),
+        wax: WAX_ORDINALS.includes(ordinal),
         status: 'floor',
       });
     }
@@ -60,7 +63,7 @@ export function createInitialKeys() {
 }
 
 export function createInitialState() {
-  return { version: 2, keys: createInitialKeys(), held: [], selected: 0, metal: 0,
+  return { version: 2, keys: createInitialKeys(), held: [], selected: 0, metal: 0, bundles: 0, activeBundle: null,
     floorDistributionVersion: FLOOR_DISTRIBUTION_VERSION };
 }
 
@@ -91,12 +94,17 @@ export function upgradeKeyConditions(state) {
     }
     if (typeof key.mud !== 'boolean') key.mud = key.status !== 'sorted' && !key.broken &&
       (MUD_ORDINALS.includes(ordinal) || BOTH_ORDINALS.includes(ordinal));
+    if (typeof key.wax !== 'boolean') key.wax = key.status === 'floor' && !key.broken && WAX_ORDINALS.includes(ordinal);
     if (typeof key.rust !== 'boolean') key.rust = key.status !== 'sorted' && !key.broken &&
       (RUST_ORDINALS.includes(ordinal) || BOTH_ORDINALS.includes(ordinal));
   }
   if (!Number.isInteger(state.metal) || state.metal < 0) {
     state.metal = state.keys.filter(key => key.status === 'trashed').length;
   }
+  // Previously every use deducted a purchased ring. Recover ownership from
+  // the record of smelted keys and metal spent on rings.
+  if (!state.bundles && state.keys.filter(key => key.status === 'trashed').length - state.metal >= BUNDLE_COST)
+    state.bundles = 1;
   return state;
 }
 
@@ -156,14 +164,20 @@ export function validateState(candidate) {
   if (!candidate || candidate.version !== 2 || !Array.isArray(candidate.keys) ||
       candidate.keys.length !== TOTAL_KEYS || !Array.isArray(candidate.held) ||
       candidate.held.length > MAX_HELD) return false;
+  const bundle = candidate.activeBundle;
+  if (bundle != null && (!Array.isArray(bundle.ids) || bundle.ids.length !== MAX_HELD ||
+      new Set(bundle.ids).size !== MAX_HELD || !Number.isInteger(bundle.type) ||
+      bundle.type < 0 || bundle.type >= KEY_TYPES.length || !(candidate.bundles > 0))) return false;
   const ids = new Set();
   const heldIDs = new Set(candidate.held);
+  const bundledIDs = new Set(bundle?.ids);
   for (const key of candidate.keys) {
     if (!Number.isInteger(key.type) || key.type < 0 || key.type >= KEY_TYPES.length ||
         !Number.isFinite(key.x) || !Number.isFinite(key.z) ||
-        !Number.isFinite(key.rotation) || !['floor', 'held', 'sorted', 'trashed', 'bath'].includes(key.status) ||
+        !Number.isFinite(key.rotation) || !['floor', 'held', 'bundled', 'sorted', 'trashed', 'bath'].includes(key.status) ||
         (key.broken !== undefined && typeof key.broken !== 'boolean') ||
         (key.mud !== undefined && typeof key.mud !== 'boolean') ||
+        (key.wax !== undefined && (typeof key.wax !== 'boolean' || (key.wax && key.status === 'sorted'))) ||
         (key.rust !== undefined && typeof key.rust !== 'boolean') ||
         (key.status === 'trashed' && !key.broken) ||
         (key.status === 'bath' && (key.broken || !validBathId(key.bathId) ||
@@ -172,12 +186,15 @@ export function validateState(candidate) {
           key.cabinetSlot < 0 || key.cabinetSlot >= CABINET_CAPACITY)) ||
         ids.has(key.id)) return false;
     ids.add(key.id);
-    if ((key.status === 'held') !== heldIDs.has(key.id)) return false;
+    if ((key.status === 'held') !== heldIDs.has(key.id) ||
+        (key.status === 'bundled') !== bundledIDs.has(key.id)) return false;
+    if (bundledIDs.has(key.id) && (key.type !== bundle.type || keyCondition(key) !== 'clean')) return false;
   }
+  if (candidate.bundles !== undefined && (!Number.isInteger(candidate.bundles) || candidate.bundles < 0 || candidate.bundles > 2)) return false;
   if (candidate.metal !== undefined && (!Number.isInteger(candidate.metal) || candidate.metal < 0)) return false;
   if (candidate.keys.filter(key => key.status === 'bath').some(key =>
     candidate.keys.filter(other => other.status === 'bath' && other.bathId === key.bathId).length > BATH_CAPACITY)) return false;
-  return candidate.held.every(id => ids.has(id));
+  return [...heldIDs, ...bundledIDs].every(id => ids.has(id));
 }
 
 // Preserve the player's progress when upgrading the first 80-key prototype.
@@ -193,6 +210,7 @@ export function migrateLegacyState(candidate) {
     key.z = saved.z;
     key.rotation = saved.rotation;
     key.status = saved.status;
+    if (key.status !== 'floor') key.wax = false;
   }
   next.held = [...candidate.held];
   next.selected = Math.min(Math.max(0, candidate.selected || 0), Math.max(0, next.held.length - 1));
@@ -200,12 +218,40 @@ export function migrateLegacyState(candidate) {
   return validateState(next) ? next : null;
 }
 
+function matchingHeldKeys(state, type) {
+  return state.held.map(id => state.keys.find(key => key.id === id))
+    .filter(key => key?.type === type && keyCondition(key) === 'clean');
+}
+
+function canPackWith(state, key) {
+  return Boolean(state.bundles && !state.activeBundle && key && keyCondition(key) === 'clean' &&
+    matchingHeldKeys(state, key.type).length === MAX_HELD - 1);
+}
+
+export function canPickupKey(state, key) {
+  return key?.status === 'floor' && (state.held.length < MAX_HELD || canPackWith(state, key));
+}
+
+export function packHeldBundle(state, type = selectedKey(state)?.type) {
+  if (!state.bundles || state.activeBundle || type === undefined || state.held.length < MAX_HELD) return false;
+  const keys = matchingHeldKeys(state, type);
+  if (keys.length !== MAX_HELD) return false;
+  const ids = keys.map(key => key.id);
+  for (const key of keys) key.status = 'bundled';
+  const selected = state.held[state.selected];
+  state.held = state.held.filter(id => !ids.includes(id));
+  state.selected = Math.max(0, state.held.indexOf(selected));
+  state.activeBundle = { type, ids };
+  return true;
+}
+
 export function pickupKey(state, keyId) {
   const key = state.keys.find(item => item.id === keyId);
-  if (!key || key.status !== 'floor' || state.held.length >= MAX_HELD) return false;
+  if (!canPickupKey(state, key)) return false;
   key.status = 'held';
   state.held.push(keyId);
   state.selected = state.held.length - 1;
+  packHeldBundle(state, key.type);
   return true;
 }
 
@@ -220,7 +266,7 @@ export function cabinetSlotKey(state, cabinetType, slotIndex) {
 
 export function putKeyInCabinet(state, cabinetType, slotIndex = null) {
   const key = selectedKey(state);
-  if (!key || key.broken || key.mud || key.rust || key.type !== cabinetType) return false;
+  if (!key || key.broken || key.wax || key.mud || key.rust || key.type !== cabinetType) return false;
   const taken = new Set(state.keys.filter(item => item.type === cabinetType && item.status === 'sorted')
     .map(item => item.cabinetSlot));
   const slot = slotIndex === null ? Array.from({ length: CABINET_CAPACITY }, (_, i) => i)
@@ -233,6 +279,42 @@ export function putKeyInCabinet(state, cabinetType, slotIndex = null) {
   return true;
 }
 
+export function buyBundle(state) {
+  if ((state.metal ?? 0) < BUNDLE_COST || state.bundles) return false;
+  state.metal -= BUNDLE_COST;
+  state.bundles = 1;
+  packHeldBundle(state);
+  return true;
+}
+
+export function heldBundle(state, type) {
+  const bundle = state.activeBundle;
+  if (!bundle || bundle.type !== type) return null;
+  return bundle.ids.map(id => state.keys.find(key => key.id === id));
+}
+
+export function putBundleInCabinet(state, type, slots) {
+  const keys = heldBundle(state, type);
+  if (!keys || slots.length !== MAX_HELD || new Set(slots).size !== MAX_HELD ||
+      slots.some(slot => !Number.isInteger(slot) || slot < 0 || slot >= CABINET_CAPACITY ||
+        cabinetSlotKey(state, type, slot))) return null;
+  keys.forEach((key, i) => {
+    key.status = 'sorted';
+    key.cabinetSlot = slots[i];
+  });
+  state.activeBundle = null;
+  packHeldBundle(state);
+  return keys;
+}
+
+export function meltSelectedWax(state) {
+  const key = selectedKey(state);
+  if (!key?.wax || key.broken) return null;
+  key.wax = false;
+  packHeldBundle(state, key.type);
+  return key;
+}
+
 export function takeKeyFromCabinet(state, cabinetType, slotIndex) {
   if (state.held.length >= MAX_HELD) return null;
   const key = cabinetSlotKey(state, cabinetType, slotIndex);
@@ -241,6 +323,7 @@ export function takeKeyFromCabinet(state, cabinetType, slotIndex) {
   delete key.cabinetSlot;
   state.held.push(key.id);
   state.selected = state.held.length - 1;
+  packHeldBundle(state, key.type);
   return key;
 }
 
@@ -256,6 +339,7 @@ export function trashSelectedKey(state) {
 
 export function keyCondition(key) {
   if (key.broken) return 'broken';
+  if (key.wax) return 'wax';
   if (key.mud && key.rust) return 'both';
   if (key.mud) return 'mud';
   if (key.rust) return 'rust';
@@ -263,14 +347,17 @@ export function keyCondition(key) {
 }
 
 export function bathContents(state, id, now = Date.now()) {
-  const keys = state.keys.filter(key => key.status === 'bath' && key.bathId === id);
+  return describeBathContents(state.keys.filter(key => key.status === 'bath' && key.bathId === id), now);
+}
+
+export function describeBathContents(keys, now) {
   return { keys, ready: keys.filter(key => now >= key.bathUntil),
     pending: keys.filter(key => now < key.bathUntil), space: BATH_CAPACITY - keys.length };
 }
 
 export function startSoak(state, id, kind, now = Date.now()) {
   const key = selectedKey(state);
-  if (!validBathId(id, kind) || !key || key.broken || !key[kind] ||
+  if (!validBathId(id, kind) || !key || key.broken || key.wax || !key[kind] ||
     bathContents(state, id, now).space <= 0) return false;
   key.status = 'bath';
   key.bathId = id;
@@ -291,6 +378,7 @@ export function collectSoakedKey(state, id, now = Date.now()) {
   delete key.bathUntil;
   state.held.push(key.id);
   state.selected = state.held.length - 1;
+  packHeldBundle(state, key.type);
   return key;
 }
 

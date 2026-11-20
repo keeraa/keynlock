@@ -13,23 +13,24 @@ test('Key Forge eight-direction silhouette and crease shader is shared by the fu
   assert.match(SCENE_OUTLINE_GLSL, /texture2D\(tNormal, uv\)/);
   assert.match(SCENE_OUTLINE_GLSL, /normalDifference/);
   assert.match(SCENE_OUTLINE_GLSL, /depthDifference/);
+  assert.match(SCENE_OUTLINE_GLSL, /smoothstep\(3.0, 12.0, distance\)/);
   assert.doesNotMatch(SCENE_OUTLINE_GLSL, /tScene|luminance|paintedBand/);
 });
 
-test('contour controls preserve Forge pigment and tune pixels, strength, and sensitivity', () => {
+test('contour controls preserve Forge pigment and fix width and tune strength and sensitivity', () => {
   const uniforms = createSceneOutlineUniforms();
   const settings = normalizeVisualSettings(null);
-  applySceneOutlineSettings(uniforms, settings, 1.35);
+  applySceneOutlineSettings(uniforms, { ...settings, outlineSensitivity: 50 }, 1.35);
   assert.equal(uniforms.uInkColor.value.getHexString(), KEY_ART.outline.ink.slice(1));
   assert.equal(uniforms.uWidth.value, KEY_ART.outline.radius * 1.35);
   assert.equal(uniforms.uNormalThreshold.value, KEY_ART.outline.normalThreshold);
   assert.equal(uniforms.uDepthThreshold.value, KEY_ART.outline.depthThreshold);
-  assert.equal(uniforms.uInk.value, KEY_ART.outline.opacity * .7);
+  assert.equal(uniforms.uInk.value, KEY_ART.outline.opacity);
 
   applySceneOutlineSettings(uniforms,
     normalizeVisualSettings({ ...settings, outlineWidth: 4, outlineStrength: 100,
       outlineSensitivity: 100 }), 1.35);
-  assert.equal(uniforms.uWidth.value, KEY_ART.outline.radius * 1.35 * 4);
+  assert.equal(uniforms.uWidth.value, KEY_ART.outline.radius * 1.35);
   assert.equal(uniforms.uInk.value, KEY_ART.outline.opacity);
   assert.ok(uniforms.uNormalThreshold.value < KEY_ART.outline.normalThreshold);
   assert.ok(uniforms.uDepthThreshold.value < KEY_ART.outline.depthThreshold);
@@ -65,5 +66,5 @@ test('giant cabinet keys receive a local ink edge while sharing global contour c
   assert.match(cabinets, /crownContour\.visible = Boolean\(settings\.outlineEnabled\)/);
   assert.match(world, /cabinets\.forEach\(cabinet => cabinet\.setContour\(visualSettings\)\)/);
   assert.match(world, /cabinets\.forEach\(cabinet => cabinet\.setContour\(settings\)\)/);
-  assert.match(painter, /object\.isPoints \|\| object\.isLine/);
+  assert.match(painter, /object\.isPoints \|\| object\.isLine \|\| object\.isSprite/);
 });

@@ -44,7 +44,7 @@ test('toon remains active when outline GPU pass fails', () => {
     });
     assert.ok(renderer.rendered.includes('copy'));
     renderer.failOutline(false);
-    pipeline.setSettings({ ...DEFAULT_VISUAL_SETTINGS, outlineWidth: 3 });
+    pipeline.setSettings({ ...DEFAULT_VISUAL_SETTINGS, outlineSensitivity: 60 });
     pipeline.render();
     assert.equal(pipeline.getStatus().stages.outline, 'active');
     assert.equal(pipeline.getStatus().mode, 'active');

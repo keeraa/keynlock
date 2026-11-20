@@ -38,8 +38,8 @@ test('hover outline renders an exact key silhouette mask and a continuous 2.5px 
 test('old normal-expanded silhouette rendering is fully removed', () => {
   const world = readFileSync(new URL('../dist/js/world.js', import.meta.url), 'utf8');
   assert.match(world, /createKeyHoverOutline\(renderer, camera, keyOutline\)/);
-  assert.match(world, /createKeyHoverOutline\(renderer, camera, objectMask\)/);
-  assert.match(world, /objectOutline\.render\(objectHoverOpacity\)/);
+  assert.match(world, /createKeyHoverOutline\(renderer, camera, objectMask, \{ depthAware: true \}\)/);
+  assert.match(world, /objectOutline\.render\(objectHoverOpacity, dustCoverage, painted\.getSceneDepth\(\)\)/);
   assert.match(world, /objectHoverOpacity \+= \(objectHoverTarget - objectHoverOpacity\)/);
   assert.doesNotMatch(world, /createKeyHoverMaterial|hoverOpacity\.value/);
 });
@@ -49,20 +49,23 @@ test('cabinet and workstation hover use continuous mask outlines instead of geom
   const stations = readFileSync(new URL('../dist/js/wash-forge-stations.js', import.meta.url), 'utf8');
   assert.doesNotMatch(cabinets, /border\.visible|setHovered\(/);
   assert.doesNotMatch(stations, /addHoverRim|hoverFixtures/);
-  assert.match(stations, /getHoverCollider/);
+  assert.match(stations, /forgeHoverGeometry\(\[body, collar, hearth, edge\]\)/);
+  const world = readFileSync(new URL('../dist/js/world.js', import.meta.url), 'utf8');
+  assert.match(world, /getHoverSurface\(target\)/);
+  assert.doesNotMatch(world, /forgeMaskGeometry/);
   assert.doesNotMatch(stations, /СТАНЦИЯ ·/);
 });
 
-test('cabinet hover restores a front-face outline and highlights its aimed cell', () => {
+test('cabinet hover restores a grid outline and highlights its aimed cell', () => {
   const world = readFileSync(new URL('../dist/js/world.js', import.meta.url), 'utf8');
   const canvas = readFileSync(new URL('../dist/js/fallback-canvas-renderer.js', import.meta.url), 'utf8');
   assert.match(world, /target\?\.kind === 'cabinet' \|\| target\?\.kind === 'bath'/);
   assert.match(world, /cabinetMaskGeometry/);
   assert.match(world, /pegForSlot\(target\.slot\)/);
-  assert.match(world, /makeTranslation\(0, 2\.78, \.78\)/);
-  assert.match(world, /makeTranslation\(peg\.x, peg\.y, CABINET_CELL_BACK_Z\)/);
+  assert.match(world, /makeTranslation\(0, cabinetGridCenterY, cabinetGridFrontZ\)/);
+  assert.match(world, /makeTranslation\(peg\.x, peg\.y, CABINET_CELL_BACK_Z \+ \.002\)/);
   assert.doesNotMatch(canvas, /CABINET_OUTLINE/);
   assert.match(canvas, /hovered\?\.kind === 'cabinet'/);
-  assert.match(canvas, /\[faceX, peg\.y - halfH, cellZ - halfW\]/);
+  assert.match(canvas, /path3\(cornersAt\(rearX\), null, null\)/);
   assert.match(canvas, /getKeyFallbackHeadPoints\(type\)/);
 });

@@ -2,10 +2,13 @@ import * as THREE from '../vendor/three.js';
 import {
   KEY_TYPES, TOTAL_KEYS, MAX_HELD, pickupKey, selectedKey, putKeyInCabinet,
   takeKeyFromCabinet, cabinetSlotKey, trashSelectedKey, dropSelectedKey, getProgress,
-  startSoak, collectSoakedKey, bathContents,
-} from './rules.js?v=24';
+  startSoak, collectSoakedKey, BUNDLE_COST, buyBundle, putBundleInCabinet, meltSelectedWax,
+} from './rules.js?v=key-ring';
+import { WAX_MELT_MS } from './archive-candles.js?v=candlelight';
+import { CABINET_CAPACITY, pegForSlot } from './cabinet-layout.js?v=cabinet-cell-glow';
 import { findFreeFloorSpot } from './key-spacing.js?v=18';
 import { restingKeyY } from './floor-contact.js';
+import { BUNDLE_RELEASE_INTERVAL_MS } from './archive-key-motion.js?v=key-ring';
 import { RIGHT_HAND_RELEASE } from './held-key-motion.js?v=2';
 
 // All state-changing player actions live here and work identically in both renderers.
@@ -13,22 +16,53 @@ export function createArchiveActions({
   state, keyIndex, world, camera, targetInView, getYaw, isPlaying,
   save, updateHud, tone, toast, showVictory, invalidateHover,
 }) {
+  let melting = null;
+
+  function updateWax(now, target) {
+    if (!melting) return;
+    const key = selectedKey(state);
+    if (!isPlaying() || target?.id !== melting.candleId || !target.lit || key?.id !== melting.keyId) {
+      melting = null;
+      invalidateHover();
+      return;
+    }
+    if (now < melting.until) return;
+    melting = null;
+    if (!meltSelectedWax(state)) return;
+    updateHud();
+    save();
+    tone('waxDone');
+    toast(key.mud || key.rust ? 'Воск растаял · остался ещё слой' : 'Воск растаял · ключ чистый');
+    invalidateHover();
+  }
+
   function interact() {
     if (!isPlaying()) return;
     const target = targetInView();
-    if (!target) return;
+    if (!target || world.workstations?.isLifting?.(selectedKey(state)?.id)) return;
+    if (target.kind === 'candle') {
+      const key = selectedKey(state);
+      if (!target.lit || !key?.wax || key.broken) return;
+      if (melting?.candleId === target.id && melting.keyId === key.id) return;
+      melting = { candleId: target.id, keyId: key.id, until: performance.now() + WAX_MELT_MS };
+      toast('Держи ключ у пламени');
+      invalidateHover();
+      return;
+    }
     if (target.kind === 'key') {
+      const picked = keyIndex.get(target.id);
       if (!pickupKey(state, target.id)) {
         toast('В руках помещается четыре ключа', true);
         tone('wrong');
         return;
       }
-      world.syncKey(keyIndex.get(target.id));
+      world.syncKey?.(picked);
       updateHud();
       save();
-      tone('take');
-      const picked = selectedKey(state);
-      toast(picked.broken ? 'Сломанный ключ · отнеси к плавильне' :
+      tone(picked.status === 'bundled' ? 'bundle' : 'take');
+      toast(picked.status === 'bundled' ? 'Связка собрана · четыре ключа отдельно от инвентаря' :
+        picked.broken ? 'Сломанный ключ · отнеси к плавильне' :
+        picked.wax ? 'Ключ в воске · растопи у свечи' :
         picked.mud && picked.rust ? 'Ключ в грязи и ржавчине · потребуется обе ванны' :
         picked.mud ? 'Грязный ключ · отмочи в воде' : picked.rust ? 'Ржавый ключ · погрузи в раствор' :
           `Ключ взят · ${KEY_TYPES[picked.type].name}`);
@@ -37,23 +71,23 @@ export function createArchiveActions({
     }
     if (target.kind === 'bath') {
       const key = selectedKey(state);
+      if (key?.wax) { toast('Ключ в воске · растопи у свечи', true); return; }
       if (key && startSoak(state, target.id, target.bathKind)) {
-        world.workstations?.refreshBaths?.();
         updateHud();
         save();
-        tone(target.bathKind === 'mud' ? 'water' : 'rust');
-        toast(target.bathKind === 'mud' ? 'Ключ отмокает в воде · 5 секунд' : 'Ключ в очищающем растворе · 7 секунд');
+        if (target.bathKind === 'rust') tone('rust');
+        toast(target.bathKind === 'mud' ? 'Промываем ключ' : 'Ключ замочен · 30 секунд');
       } else {
         const collected = collectSoakedKey(state, target.id);
         if (collected) {
-          world.workstations?.refreshBaths?.();
-          world.syncKey(collected);
+          world.workstations?.liftKey?.(target.id, collected);
+          world.syncKey?.(collected);
           updateHud();
           save();
-          tone('place');
+          tone('lift');
           toast(collected.mud || collected.rust ? 'Один слой очищен · нужна вторая ванна' : 'Ключ очищен · можно нести к шкафу');
         } else {
-          const contents = bathContents(state, target.id);
+          const contents = keyIndex.bathContents(target.id);
           toast(contents.ready.length && state.held.length >= MAX_HELD ? 'Освободи место для чистого ключа' :
             contents.space === 0 ? 'Ванна заполнена · четыре ключа' :
               contents.pending.length ? 'Подожди, пока ключи отмокнут' :
@@ -66,15 +100,25 @@ export function createArchiveActions({
     }
     if (target.kind === 'forge') {
       if (!selectedKey(state)?.broken) {
-        toast('Плавильня принимает только сломанные ключи', true);
-        tone('wrong');
+        if (state.bundles) { toast('Кольцо уже куплено'); return; }
+        if (buyBundle(state)) {
+          updateHud();
+          save();
+          tone('bundle');
+          toast(state.activeBundle ? 'Связка готова к переноске' :
+            'Связка куплена · четыре чистых ключа одного семейства свяжутся сами');
+          invalidateHover();
+        } else {
+          toast(`Связка стоит ${BUNDLE_COST} металла · сейчас ${state.metal ?? 0}`, true);
+          tone('wrong');
+        }
         return;
       }
       world.animateDiscard(selectedKey(state), target.stationId);
       trashSelectedKey(state);
       updateHud();
       save();
-      tone('melt');
+      tone('release');
       toast('Сломанный ключ переплавлен · +1 металл');
       invalidateHover();
       if (getProgress(state).processed === TOTAL_KEYS) setTimeout(showVictory, 1100);
@@ -82,7 +126,7 @@ export function createArchiveActions({
     }
     if (target.kind !== 'cabinet') return;
     if (target.slot === null || target.slot === undefined) {
-      toast('Наведи указатель на ячейку шкафа', true);
+      toast(target.full ? 'Все ячейки этого шкафа заняты' : 'Наведи указатель на ячейку шкафа', true);
       return;
     }
     const occupied = cabinetSlotKey(state, target.type, target.slot);
@@ -103,35 +147,61 @@ export function createArchiveActions({
       return;
     }
     const key = selectedKey(state);
-    if (!key) { toast('Сначала возьми ключ с пола'); return; }
-    if (key.broken) {
+    const keyType = target.type;
+    const bundle = state.activeBundle?.type === keyType;
+    if (!bundle && !key) { toast('Сначала возьми ключ с пола'); return; }
+    if (!bundle && key.broken) {
       toast('Сломанный ключ · отнеси к плавильне', true);
       tone('wrong');
       return;
     }
-    if (key.mud || key.rust) {
+    if (!bundle && key.wax) { toast('Ключ в воске · растопи у свечи', true); return; }
+    if (!bundle && (key.mud || key.rust)) {
       toast('Сперва очисти ключ · используй ванны в центре зала', true);
       tone('wrong');
       return;
     }
-    if (key.type !== target.type) {
+    if (!bundle && key.type !== target.type) {
       toast('Это шкаф для ключей «' + KEY_TYPES[target.type].name + '»', true);
       tone('wrong');
       return;
     }
-    const keyType = key.type;
-    if (!putKeyInCabinet(state, target.type, target.slot)) return;
-    world.animatePlace(key, target.slot);
+    if (bundle) {
+      const center = pegForSlot(target.slot);
+      const distance = slot => {
+        const peg = pegForSlot(slot);
+        return (peg.x - center.x) ** 2 + (peg.y - center.y) ** 2;
+      };
+      const occupiedSlots = new Set(state.keys.filter(item => item.type === keyType && item.status === 'sorted')
+        .map(item => item.cabinetSlot));
+      const slots = Array.from({ length: CABINET_CAPACITY - target.slot }, (_, i) => target.slot + i)
+        .filter(slot => !occupiedSlots.has(slot)).slice(0, MAX_HELD);
+      if (slots.length < MAX_HELD) {
+        const before = Array.from({ length: target.slot }, (_, slot) => slot)
+          .filter(slot => !occupiedSlots.has(slot)).sort((a, b) => distance(a) - distance(b));
+        slots.push(...before.slice(0, MAX_HELD - slots.length));
+      }
+      const bundled = putBundleInCabinet(state, keyType, slots);
+      if (!bundled) {
+        toast('Для связки нужно четыре свободные ячейки', true);
+        return;
+      }
+      bundled.forEach((item, index) => world.animatePlace(item, slots[index], {
+        fromRing: true, delay: index * BUNDLE_RELEASE_INTERVAL_MS,
+      }));
+    } else {
+      if (!putKeyInCabinet(state, target.type, target.slot)) return;
+      world.animatePlace(key, target.slot);
+    }
     world.refreshCabinet(keyType);
     updateHud();
     save();
+    if (bundle) tone('bundle');
     const progress = getProgress(state);
     if (progress.sorted[keyType] === progress.required[keyType]) {
-      tone('finish');
       toast('Шкаф «' + KEY_TYPES[keyType].name + '» заполнен');
     } else {
-      tone('place');
-      toast('Ключ на своём месте');
+      toast(bundle ? 'Четыре ключа на своих местах' : 'Ключ на своём месте');
     }
     invalidateHover();
     if (progress.processed === TOTAL_KEYS) setTimeout(showVictory, 1900);
@@ -140,25 +210,26 @@ export function createArchiveActions({
   function drop() {
     if (!isPlaying()) return;
     const key = selectedKey(state);
-    if (!key) return;
+    if (!key || world.workstations?.isLifting?.(key.id)) return;
     const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+    const aimHeight = forward.y;
     forward.y = 0;
     forward.normalize();
-    const landing = findFreeFloorSpot(state.keys,
-      camera.position.x + forward.x * 4.5, camera.position.z + forward.z * 4.5);
-    const { x, z } = landing;
     camera.updateMatrixWorld(true);
     const releasePoint = camera.localToWorld(new THREE.Vector3(
       RIGHT_HAND_RELEASE.x, RIGHT_HAND_RELEASE.y, RIGHT_HAND_RELEASE.z));
-    const start = { x: releasePoint.x, y: releasePoint.y, z: releasePoint.z };
-    const end = { x, y: restingKeyY(x, z), z };
+    const reach = 3.4 + aimHeight * 1.1;
+    const { x, z } = findFreeFloorSpot(state.keys,
+      releasePoint.x + forward.x * reach, releasePoint.z + forward.z * reach);
+    const start = { x: releasePoint.x, y: releasePoint.y, z: releasePoint.z, lift: 1.15 + aimHeight * 2 };
+    const end = { x, y: restingKeyY(x, z) + (key.layer || 0), z };
     dropSelectedKey(state, x, z, -getYaw() + .6);
     world.animateThrow(key, start, end);
     updateHud();
     save();
-    tone('take');
+    tone('release');
     toast('Ключ брошен');
   }
 
-  return { interact, drop };
+  return { interact, drop, updateWax, isMelting: () => Boolean(melting) };
 }

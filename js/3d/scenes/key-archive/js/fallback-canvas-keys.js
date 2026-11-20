@@ -1,16 +1,18 @@
-import { KEY_TYPES, keyCondition } from './rules.js?v=23';
-import { getKeyFallbackHeadPoints, createKeyFallbackStamp, getKeyMetal } from './key-factory.js?v=3';
+import { CABINET_KEY_SCALE_FACTOR } from './cabinet-layout.js?v=cabinet-cell-glow';
+import { KEY_TYPES, keyCondition } from './rules.js?v=key-ring';
+import { getKeyFallbackHeadPoints, createKeyFallbackStamp, getKeyMetal } from './key-factory.js?v=key-ring';
 import { PAINTED_METALS } from './painted-textures.js';
-import { keyAssetUrl, RUST_TEXTURE } from './key-data.js';
-import { dirtPaint, stableNoise } from './key-dirt.js';
-import { restingKeyY } from './floor-contact.js';
-import { samplePlacement, sampleDiscard } from './archive-key-motion.js';
+import { keyAssetUrl, RUST_TEXTURE } from './key-data.js?v=plain-gouache';
+import { dirtPaint, stableNoise } from './key-dirt.js?v=wax-and-bundles';
+import { RUG_TOP, restingKeyY } from './floor-contact.js';
+import { windowBeamLightAt } from './window-beam-light.js?v=alchemy-candles';
+import { samplePlacement, sampleDiscard } from './archive-key-motion.js?v=key-ring';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
 // Key paint, stains, carrying pose, and movement thumbnails for Canvas 2D.
 export function createFallbackKeyPainter({ ctx, project, keyHover }) {
-  let width = 0, height = 0, frameTime = 0, carriedKey = null;
+  let width = 0, height = 0, frameTime = 0, carriedKey = null, daylight = 0, heldKeyLight = 0;
   const headShapes = KEY_TYPES.map((_, type) => getKeyFallbackHeadPoints(type));
   const providedStamps = KEY_TYPES.map((_, type) => [
     createKeyFallbackStamp(type, false), createKeyFallbackStamp(type, true),
@@ -100,6 +102,16 @@ export function createFallbackKeyPainter({ ctx, project, keyHover }) {
           brush.fillRect(x, y, 9, 9);
         }
       }
+      if (key.wax) {
+        const wax = brush.createLinearGradient(40, 0, 110, 220);
+        wax.addColorStop(0, '#fff0c4');
+        wax.addColorStop(.48, '#daa65f');
+        wax.addColorStop(.76, '#fae0a1');
+        wax.addColorStop(1, '#bb7e40');
+        brush.globalAlpha = 1;
+        brush.fillStyle = wax;
+        brush.fillRect(0, 0, 160, 220);
+      }
       brush.restore();
       patinaStamps.set(id, canvas);
     }
@@ -126,7 +138,7 @@ export function createFallbackKeyPainter({ ctx, project, keyHover }) {
     };
     image.src = source;
   }
-  function drawKey(key, elevation = restingKeyY(key.x, key.z), spin = 0) {
+  function drawKey(key, elevation = restingKeyY(key.x, key.z) + (key.layer || 0), spin = 0) {
     if (key.status !== 'floor') return;
     const center = project(key.x, elevation, key.z);
     if (!center || center.depth > 46 || center.x < -250 || center.x > width + 250 ||
@@ -143,8 +155,8 @@ export function createFallbackKeyPainter({ ctx, project, keyHover }) {
         ctx.strokeStyle = '#ffffff'; ctx.lineWidth = lineWidth + 5;
         ctx.stroke(); ctx.restore();
       }
-      ctx.strokeStyle = `#${KEY_TYPES[key.type].metal.toString(16).padStart(6, '0')}`;
-      ctx.lineWidth = lineWidth;
+      ctx.strokeStyle = key.wax ? '#f4d89e' : key.mud ? dirtPaint[0] : `#${KEY_TYPES[key.type].metal.toString(16).padStart(6, '0')}`;
+      ctx.lineWidth = lineWidth * (key.wax ? 1.55 : 1);
       ctx.stroke();
     } else {
       const dx = Math.sin(rotation) * .24;
@@ -154,6 +166,22 @@ export function createFallbackKeyPainter({ ctx, project, keyHover }) {
       if (!head || !tip) return;
       const length = clamp(Math.hypot(head.x - tip.x, head.y - tip.y), .9, 170);
       const widthStamp = length * .65;
+      if (key.z > 11.5 && Math.abs(elevation - restingKeyY(key.x, key.z) - (key.layer || 0)) < .007) {
+        const contact = project(key.x, elevation - (key.layer || 0) - .012, key.z);
+        if (contact) {
+          ctx.save();
+          ctx.translate(contact.x, contact.y);
+          ctx.rotate(Math.atan2(head.y - tip.y, head.x - tip.x));
+          ctx.scale(Math.max(1, length * .57), Math.max(.65, length * .19));
+          const alpha = Math.min(.30, (key.z - 11.5) * .075);
+          const shadow = ctx.createRadialGradient(0, 0, .15, 0, 0, 1);
+          shadow.addColorStop(0, `rgba(35,25,32,${alpha})`);
+          shadow.addColorStop(1, 'rgba(35,25,32,0)');
+          ctx.fillStyle = shadow;
+          ctx.fillRect(-1, -1, 2, 2);
+          ctx.restore();
+        }
+      }
       ctx.save();
       ctx.translate(center.x, center.y);
       ctx.rotate(Math.atan2(tip.x - head.x, tip.y - head.y));
@@ -171,6 +199,10 @@ export function createFallbackKeyPainter({ ctx, project, keyHover }) {
         ctx.shadowColor = '#3a3025';
         ctx.shadowBlur = 9;
       }
+      if (daylight > 0) {
+        const strength = windowBeamLightAt(key.x, RUG_TOP, key.z);
+        if (strength > 0) ctx.filter = `brightness(${1 + daylight * strength * .3})`;
+      }
       ctx.drawImage(stamp, -widthStamp / 2, -length * .49, widthStamp, length * 1.15);
       ctx.restore();
     }
@@ -180,26 +212,23 @@ export function createFallbackKeyPainter({ ctx, project, keyHover }) {
     if (!carriedKey) return;
     const handX = width * .67;
     const handY = height * .77 + Math.sin(frameTime * .003) * 6;
-    const handAngle = -.45;
+    ctx.save();
+    ctx.translate(handX, handY);
+    ctx.rotate(-.45);
+    if (heldKeyLight > 0) ctx.filter = `brightness(${1 + .35 * heldKeyLight})`;
     if (providedStamps[carriedKey.type][carriedKey.broken ? 1 : 0]) {
       const stamp = stampFor(carriedKey);
       const scale = Math.min(width, height) * .0008;
-      ctx.save();
-      ctx.translate(handX, handY);
-      ctx.rotate(handAngle);
       ctx.drawImage(stamp, -80 * scale, -110 * scale, 160 * scale, 220 * scale);
       ctx.restore();
       return;
     }
     const shape = getKeyFallbackHeadPoints(carriedKey.type);
     const scale = Math.min(width, height) * .077;
-    ctx.save();
-    ctx.translate(handX, handY);
-    ctx.rotate(handAngle);
     ctx.shadowColor = 'rgba(0,0,0,.65)';
     ctx.shadowBlur = 22;
     ctx.strokeStyle = '#241c17';
-    ctx.fillStyle = carriedKey.mud ? '#817455' : carriedKey.rust ? '#a97047' : handPatterns[getKeyMetal(carriedKey.type)] ||
+    ctx.fillStyle = carriedKey.wax ? '#f4d89e' : carriedKey.mud ? dirtPaint[0] : carriedKey.rust ? '#a97047' : handPatterns[getKeyMetal(carriedKey.type)] ||
       `#${KEY_TYPES[carriedKey.type].metal.toString(16).padStart(6, '0')}`;
     ctx.lineWidth = 3;
     ctx.beginPath();
@@ -230,12 +259,15 @@ export function createFallbackKeyPainter({ ctx, project, keyHover }) {
     const pose = samplePlacement(motion.start, motion.end, elapsed);
     const p = project(pose.x, pose.y, pose.z);
     if (!p) return;
-    const finalSize = clamp(15 / p.depth, .9, 3.5);
+    const finalSize = clamp(15 / p.depth, .9, 3.5) * CABINET_KEY_SCALE_FACTOR;
     const size = (1 - pose.ease) * Math.min(76, height * .12) + pose.ease * finalSize * 2;
     const glyphBlend = clamp((elapsed - .24) / .18, 0, 1);
     ctx.save();
     ctx.translate(p.x, p.y);
+    const pivotHeight = finalSize * pose.ease;
+    ctx.translate(0, -pivotHeight);
     ctx.rotate(pose.sway);
+    ctx.translate(0, pivotHeight);
     if (glyphBlend < 1) {
       ctx.globalAlpha = 1 - glyphBlend;
       ctx.drawImage(stampFor(motion.key), -size * .5, -size * .45, size, size * 1.39);
@@ -244,13 +276,13 @@ export function createFallbackKeyPainter({ ctx, project, keyHover }) {
       ctx.globalAlpha = glyphBlend;
       ctx.fillStyle = '#ebd9b6';
       ctx.beginPath();
-      ctx.arc(0, finalSize * 1.5, finalSize * .9, 0, Math.PI * 2);
+      ctx.arc(0, finalSize * -.85, finalSize * .9, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = '#99784f';
       ctx.lineWidth = Math.max(.7, finalSize * .5);
       ctx.beginPath();
-      ctx.moveTo(0, finalSize * 2.3);
-      ctx.lineTo(0, finalSize * 4.5);
+      ctx.moveTo(0, finalSize * -.03);
+      ctx.lineTo(0, finalSize * 2.15);
       ctx.stroke();
     }
     ctx.restore();
@@ -292,6 +324,8 @@ export function createFallbackKeyPainter({ ctx, project, keyHover }) {
     setFrame(frame) {
       width = frame.width; height = frame.height;
       frameTime = frame.frameTime; carriedKey = frame.carriedKey;
+      daylight = frame.daylight;
+      heldKeyLight = frame.heldKeyLight;
     },
     drawKey, drawHand, drawPlacingKey, drawDiscardingKey, drawDistantKeys,
   };

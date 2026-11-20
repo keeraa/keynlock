@@ -402,9 +402,7 @@
       "path": "js/3d/shared/materials/surfaces/gouache-carpet-v1.webp",
       "gitBlobSha": "b65eb9211287fb63a95f13ce8873869b0ddf7bf8",
       "bytes": 174026,
-      "consumers": [
-        "js/3d/scenes/key-archive/dist/assets/gouache-carpet-v1.webp"
-      ]
+      "consumers": []
     },
     {
       "id": "painted-cork",

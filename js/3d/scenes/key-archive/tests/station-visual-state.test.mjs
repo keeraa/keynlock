@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { bathVisualState, meltVisualIntensity } from '../dist/js/station-visual-state.js';
+import { bathVisualState, meltVisualIntensity, waterDip } from '../dist/js/station-visual-state.js';
 import * as THREE from '../dist/vendor/three.js';
 import { createBathEffects, createForgeEffects } from '../dist/js/station-visual-effects.js';
 
@@ -46,4 +46,16 @@ test('pooled bath and forge graphics activate only for their processing windows'
   assert.ok(metal.opacity > .8);
   forge.update(4000);
   assert.ok(flareMeshes.every(mesh => !mesh.visible));
+});
+
+test('three rinses lower the key below the water and lift it with less mud each time', () => {
+  const rises = [];
+  for (let cycle = 0; cycle < 3; cycle++) {
+    assert.ok(waterDip((cycle + .5) / 3).height < 0);
+    const lifted = waterDip((cycle + .84) / 3);
+    assert.ok(lifted.height > 0 && lifted.drip > .4);
+    rises.push(lifted.remaining);
+  }
+  assert.ok(rises[0] > rises[1] && rises[1] > rises[2]);
+  assert.equal(waterDip(1).remaining, 0);
 });

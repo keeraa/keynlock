@@ -1,9 +1,9 @@
 import * as THREE from '../vendor/three.js';
 import { ARCHIVE_LEDGER, ARCHIVE_LEDGER_URL } from './archive-ledger.js?v=key-catalog';
 import { KEY_TYPES } from './rules.js?v=key-ring';
-import { familyName, t } from './i18n.js';
+import { familyName, t } from './i18n.js?v=catalog-spread';
 
-const KEYS_PER_PAGE = 4;
+const KEYS_PER_SPREAD = 8;
 const ease = t => t * t * t * (t * (t * 6 - 15) + 10);
 
 function bookFlight(camera, canvas, rect) {
@@ -68,14 +68,14 @@ export function createArchiveKeyCatalog(document, world, canvas, keyThumbnail, o
   const meter = $('catalog-page-number');
   const flight = $('catalog-flight');
   flight.src = ARCHIVE_LEDGER_URL;
-  const pageCount = Math.ceil(KEY_TYPES.length / KEYS_PER_PAGE);
-  let page = 0;
+  const spreadCount = Math.ceil(KEY_TYPES.length / KEYS_PER_SPREAD);
+  let spreadIndex = 0;
   let moving = false;
 
   function paint() {
     spread.replaceChildren();
-    const start = page * KEYS_PER_PAGE;
-    for (let type = start; type < Math.min(start + KEYS_PER_PAGE, KEY_TYPES.length); type++) {
+    const start = spreadIndex * KEYS_PER_SPREAD;
+    for (let type = start; type < Math.min(start + KEYS_PER_SPREAD, KEY_TYPES.length); type++) {
       const article = document.createElement('article');
       const picture = document.createElement('img');
       const name = document.createElement('h3');
@@ -86,15 +86,15 @@ export function createArchiveKeyCatalog(document, world, canvas, keyThumbnail, o
       article.append(picture, name);
       spread.append(article);
     }
-    previous.disabled = page === 0;
-    next.disabled = page === pageCount - 1;
-    meter.textContent = t('catalog.page', { current: page + 1, total: pageCount });
+    previous.disabled = spreadIndex === 0;
+    next.disabled = spreadIndex === spreadCount - 1;
+    meter.textContent = t('catalog.spread', { current: spreadIndex + 1, total: spreadCount });
   }
 
   function turn(offset) {
-    const target = page + offset;
-    if (moving || target < 0 || target >= pageCount) return;
-    page = target;
+    const target = spreadIndex + offset;
+    if (moving || target < 0 || target >= spreadCount) return;
+    spreadIndex = target;
     paint();
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       spread.animate([{ opacity: .58, transform: `translateX(${Math.sign(offset) * 10}px)` },

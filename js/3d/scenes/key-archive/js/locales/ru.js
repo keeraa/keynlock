@@ -220,5 +220,5 @@ export default Object.freeze({
   'catalog.navigation': "Страницы каталога",
   'catalog.previous': "Назад",
   'catalog.next': "Дальше",
-  'catalog.page': "Страница {current} из {total}",
+  'catalog.spread': "Разворот {current} из {total}",
 });

@@ -7,6 +7,7 @@ export const PAINTED_METALS = Object.freeze({
   copper: './assets/painted-copper.webp',
   graphite: './assets/painted-graphite.webp',
   enamel: './assets/painted-enamel.webp',
+  'garden-green': './assets/painted-green.webp',
 });
 
 export const METAL_BY_KEY_TYPE = Object.freeze([

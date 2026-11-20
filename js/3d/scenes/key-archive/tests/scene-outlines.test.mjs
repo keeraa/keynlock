@@ -68,3 +68,46 @@ test('giant cabinet keys receive a local ink edge while sharing global contour c
   assert.match(world, /cabinets\.forEach\(cabinet => cabinet\.setContour\(settings\)\)/);
   assert.match(painter, /object\.isPoints \|\| object\.isLine \|\| object\.isSprite/);
 });
+
+test('ink stays on both sides of a fold, so lines do not break into dashes', () => {
+  const outline = readFileSync(new URL('../dist/js/scene-outline.js', import.meta.url), 'utf8');
+  assert.match(outline, /float decisive = smoothstep/);
+  assert.match(outline, /float outside = mix\(1\.0, farther, decisive\)/);
+});
+
+test('shadow hatching patches lit materials once and toggles without recompiling', async () => {
+  const THREE = await import('../dist/vendor/three.js');
+  const { patchShadowHatch, patchSceneShadowHatch, setShadowHatch, shadowHatchEnabled } =
+    await import('../dist/js/shadow-hatch.js');
+  const metal = new THREE.MeshStandardMaterial();
+  const keyKey = metal.customProgramCacheKey();
+  assert.equal(patchShadowHatch(metal), true);
+  assert.equal(patchShadowHatch(metal), false, 'a material is patched only once');
+  assert.equal(patchShadowHatch(new THREE.MeshBasicMaterial()), false, 'unlit materials have no shadow');
+  assert.notEqual(metal.customProgramCacheKey(), keyKey);
+  const shader = { uniforms: {},
+    vertexShader: '#include <common>\n#include <beginnormal_vertex>\n#include <project_vertex>',
+    fragmentShader: '#include <common>\n#include <opaque_fragment>' };
+  metal.onBeforeCompile(shader);
+  assert.match(shader.vertexShader, /vHatchWorld = \(modelMatrix \* hatchPoint\)\.xyz/);
+  assert.match(shader.fragmentShader, /float received = dot\(outgoingLight/);
+  const clone = metal.clone();
+  patchShadowHatch(clone);
+  clone.onBeforeCompile = (inner => function (s2, r) { metal.onBeforeCompile(s2, r); inner.call(this, s2, r); })(clone.onBeforeCompile);
+  const twice = { uniforms: {}, vertexShader: '#include <common>\n#include <project_vertex>',
+    fragmentShader: '#include <common>\n#include <opaque_fragment>' };
+  clone.onBeforeCompile(twice);
+  assert.equal(twice.fragmentShader.split('uniform float uShadowHatch;').length, 2, 'hatching is injected once');
+  assert.equal(twice.vertexShader.split('varying vec3 vHatchWorld;').length, 2);
+  setShadowHatch(true);
+  assert.equal(shader.uniforms.uShadowHatch.value, 1);
+  assert.equal(shadowHatchEnabled(), true);
+  setShadowHatch(false);
+  assert.equal(shader.uniforms.uShadowHatch.value, 0);
+  const scene = new THREE.Scene();
+  scene.add(new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshLambertMaterial()));
+  scene.add(new THREE.Mesh(new THREE.BoxGeometry(), metal));
+  assert.equal(patchSceneShadowHatch(scene), 1);
+  const world = readFileSync(new URL('../dist/js/world.js', import.meta.url), 'utf8');
+  assert.match(world, /setShadowHatch\(settings\.hatchShadows\)/);
+});

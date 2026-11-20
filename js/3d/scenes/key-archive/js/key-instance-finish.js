@@ -29,6 +29,8 @@ export function setKeyInstanceFinish(mesh, index, key, rustStrength = 1.35) {
   const paint = mesh.geometry.getAttribute('instanceKeyPaint');
   if (!paint || index < 0 || index >= paint.count)
     throw new RangeError('Missing instance paint slot');
-  paint.setXYZ(index, key.rust ? rustStrength : 0, key.wax ? 2 : key.mud ? 1 : 0, keyPaintSeed(key));
+  // Mud and wax are separate coat meshes (key-mud.js / key-wax.js); the
+  // metal itself only carries rust and the pigment seed.
+  paint.setXYZ(index, key.rust ? rustStrength : 0, 0, keyPaintSeed(key));
   paint.needsUpdate = true;
 }

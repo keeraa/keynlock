@@ -131,3 +131,5 @@ body.playing #world,body.playing #hud{cursor:none}
 .bundle-keys span{color:#d9b881;font-size:27px}
 @media(prefers-reduced-motion:reduce){.bundle-art{transform:none}}
 @media(max-width:620px){.carried-bundle{left:8px;bottom:125px;transform:scale(.7);transform-origin:bottom left}}
+
+.visual-note { margin: -4px 0 10px; color: #8d8577; font-size: 11px; line-height: 1.35; }

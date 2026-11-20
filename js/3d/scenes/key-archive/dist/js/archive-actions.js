@@ -23,12 +23,15 @@ export function createArchiveActions({
     const key = selectedKey(state);
     if (!isPlaying() || target?.id !== melting.candleId || !target.lit || key?.id !== melting.keyId) {
       melting = null;
+      world.meltHeldWax?.(0);
       invalidateHover();
       return;
     }
+    world.meltHeldWax?.(1 - (melting.until - now) / WAX_MELT_MS, melting.candleId);
     if (now < melting.until) return;
     melting = null;
     if (!meltSelectedWax(state)) return;
+    if (!key.mud && !key.rust) world.shineHand?.();
     updateHud();
     save();
     tone('waxDone');

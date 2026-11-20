@@ -110,6 +110,9 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
         .replace('#include <map_fragment>',
           `#include <map_fragment>
           float keyRust = vInstanceKeyPaint.x < 0.0 ? uRustAmount : vInstanceKeyPaint.x;
+          // RUST_FLAKING_BASE + progress: rust flaking off in patches (bath lift).
+          float rustErode = keyRust >= 9.5 ? keyRust - 10.0 : -1.0;
+          if (rustErode >= -.5) keyRust = 1.35;
           float hasWax = step(1.5, vInstanceKeyPaint.y);
           float keyDirt = vInstanceKeyPaint.y < 0.0 ? uDirtAmount : min(vInstanceKeyPaint.y, 1.0);
           float keySeed = max(0.0,vInstanceKeyPaint.z);
@@ -119,6 +122,11 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
             + uRustShift + vec2(keySeed*.031,keySeed*.071);
           vec4 rustPigment = texture2D(uPaintedRust, rustUv);
           float rustCoverage = clamp(rustPigment.a * keyRust * 1.12, 0.0, 1.0);
+          if (rustErode >= -.5) {
+            float flake = dirtNoise(vKeySurface.xy * 9.0 + keySeed) * .7
+              + dirtNoise(vKeySurface.xy * 23.0 + vec2(8.3, 2.9)) * .3;
+            rustCoverage *= smoothstep(rustErode - .05, rustErode + .05, flake);
+          }
           float rustDeepen = clamp(keyRust - 1.0, 0.0, 1.0);
           vec3 rustColor = mix(rustPigment.rgb, vec3(0.14, 0.055, 0.021), rustDeepen * 0.68);
           diffuseColor.rgb = mix(diffuseColor.rgb, rustColor, rustCoverage);
@@ -144,7 +152,7 @@ export function getMetalMaterial(id,rustAmount=0,templateIndex=0,dirtAmount=0,ca
         .replace('#include <metalnessmap_fragment>',
           '#include <metalnessmap_fragment>\nmetalnessFactor *= (1.0 - 0.98 * dirtCoverage);');
     };
-    material.customProgramCacheKey=()=> 'keynlock-gouache-rust-grime-wax-instancing';
+    material.customProgramCacheKey=()=> 'keynlock-gouache-rust-grime-wax-flaking-instancing';
   }
   cache.set(id,material);return material;
 }

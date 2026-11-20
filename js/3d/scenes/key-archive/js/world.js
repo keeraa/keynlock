@@ -1,5 +1,8 @@
 import * as THREE from '../vendor/three.js';
-import { createArchiveCandles } from './archive-candles.js?v=candlelight';
+import { createArchiveCandles, CANDLE_WICK_Y } from './archive-candles.js?v=candlelight';
+import { createCleaningEffects } from './cleaning-effects.js';
+import { getKeyCoatLayout, buildKeyCoatGeometry, getKeyCoatPoint } from './key-factory.js?v=key-ring';
+import { meltWaxBlobs } from './key-wax.js?v=forge-coats';
 import { KEY_TYPES, getProgress } from './rules.js?v=key-ring';
 import {
   createKeyModel, createCombinedKeyGeometry,
@@ -107,7 +110,13 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
   setShadowHatch(visualSettings.hatchShadows);
   cabinets[0].warmEffects(renderer, camera);
   const candleSet = createArchiveCandles(scene, { drawMeshes: true });
-  const workstations = createWorkstations(scene, mat, keyIndex);
+  const cleaningEffects = createCleaningEffects(scene, camera);
+  let pendingHandShine = false;
+  const workstations = createWorkstations(scene, mat, keyIndex, {
+    effects: cleaningEffects,
+    // The key leaves the bath for the hand: glint once it is fully clean.
+    onLiftDone: key => { if (!key.mud && !key.rust && !key.wax) pendingHandShine = true; },
+  });
   const syncEntranceShadow = createEntranceContactShadows(scene, state.keys);
   const floorKeys = new Map(); // key ID -> its family batch and instance index
   const keysById = new Map(state.keys.map(key => [key.id, key]));
@@ -235,6 +244,48 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
     disposeHandLight = addHeldKeyWindowLight(handModel, heldKeyDaylight, windowWarmth);
   }
 
+  // Wax melting over a candle while the player holds the key to the flame.
+  // progress 0 restores the full coat; beads fall into the flame meanwhile.
+  const meltedWax = new Map();
+  let waxBeadAt = 0;
+  function meltHeldWax(progress, candleId) {
+    const crust = handModel?.children.find(child => child.isMesh &&
+      child.material === getKeyCrustMaterial('wax'));
+    if (!crust) return;
+    const key = keyIndex.get(displayedHandId);
+    if (!key) return;
+    crust.userData.fullCoat ??= crust.geometry;
+    const step = Math.round(Math.max(0, Math.min(1, progress)) * 24);
+    if (step === 0) { crust.geometry = crust.userData.fullCoat; return; }
+    const id = `${key.type}:${!!key.broken}:${step}`;
+    if (!meltedWax.has(id)) {
+      const layout = getKeyCoatLayout(key.type, key.broken, 'wax') || [];
+      const t = step / 24;
+      // Pools melt one after another, each a little behind the previous one.
+      // sag:false: archive keys hang head-up, so Forge's 'down' would run sideways;
+      // the wax shrinks in place and the beads do the falling.
+      const blobs = meltWaxBlobs(layout, blob => t * 1.6 - .6 * ((blob.x * 3.7 + blob.y * 1.3) % 1 + 1) % 1,
+        { sag: false });
+      meltedWax.set(id, { blobs,
+        geometry: buildKeyCoatGeometry(key.type, key.broken, 'wax', { blobs, heightScale: 1 - .5 * t }) });
+    }
+    const melted = meltedWax.get(id);
+    crust.geometry = melted.geometry;
+    const now = performance.now();
+    const candle = candleSet.candles.find(item => item.id === candleId);
+    if (candle && melted.blobs.length && now - waxBeadAt > 170 && progress < .95) {
+      waxBeadAt = now;
+      const blob = melted.blobs[Math.floor(Math.random() * melted.blobs.length)];
+      const local = getKeyCoatPoint(key.type, key.broken, blob.x, blob.y - blob.ry * .8, -.02);
+      if (local) {
+        crust.updateMatrixWorld(true);
+        const point = crust.localToWorld(local);
+        cleaningEffects.drop('wax', point, .007 + Math.random() * .006, candle.y + CANDLE_WICK_Y + .05);
+      }
+    }
+  }
+  function shineHand() { pendingHandShine = true; }
+
   function syncKey(key) {
     geometryStatsCache?.invalidate();
     const instance = floorKeys.get(key.id);
@@ -343,6 +394,11 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
     keyAnimations.update(now, playSound);
     cabinets.forEach(cabinet => cabinet.update(now));
     candleSet.update(now, cabinets);
+    cleaningEffects.update(elapsed);
+    if (pendingHandShine && handModel && hand.visible) {
+      pendingHandShine = false;
+      cleaningEffects.shine(handModel, 5, { attachTo: hand });
+    }
     if (handModel) {
       hand.visible = !workstations.isLifting(displayedHandId);
       // Blend walk sway in over several frames: an instant amplitude change
@@ -386,7 +442,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
       try { objectOutline.render(objectHoverOpacity, dustCoverage, painted.getSceneDepth()); }
       catch (error) { console.warn('KEYNLOCK: object silhouette unavailable', error); }
     } }, interactables, cabinets, workstations, floorKeys, candles: candleSet.candles,
-    refreshHand, syncKey, refreshCabinet, highlight, update, resize,
+    refreshHand, syncKey, refreshCabinet, highlight, update, resize, meltHeldWax, shineHand,
     captureKeyThumbnail, getGeometryStats,
     getVisualStatus: painted.getStatus,
     getRenderStats: () => ({ drawCalls: renderer.info.render.calls,

@@ -34,3 +34,11 @@ export function setKeyInstanceFinish(mesh, index, key, rustStrength = 1.35) {
   paint.setXYZ(index, key.rust ? rustStrength : 0, 0, keyPaintSeed(key));
   paint.needsUpdate = true;
 }
+
+// Instance paint X for rust that is flaking off in patches: progress 0 keeps
+// all of it, 1 has removed every patch (see the flake threshold in
+// key-materials.js). Values from this base up are never a rust strength.
+export const RUST_FLAKING_BASE = 10;
+export function rustFlakingPaint(progress) {
+  return RUST_FLAKING_BASE - .1 + Math.max(0, Math.min(1, progress)) * 1.25;
+}

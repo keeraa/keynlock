@@ -88,9 +88,15 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
     if (bounds.min.y > PLAYER_EYE_HEIGHT + 1.6 || bounds.max.y < -.08) return;
     handObstacles.push(bounds.expandByScalar(.018));
   }
+  // Solid hall parts as boxes, before static batching merges them: they stop
+  // the held key and, above the floor, thrown keys too (columns, trims, doors).
+  const hallThrowBoxes = [];
   hall.traverse(object => {
-    if (object.isMesh && !object.isInstancedMesh && object.material?.isMeshStandardMaterial &&
-        !object.material.transparent) cacheHandObstacle(object);
+    if (!object.isMesh || object.isInstancedMesh || !object.material?.isMeshStandardMaterial ||
+        object.material.transparent) return;
+    cacheHandObstacle(object);
+    const { min, max } = object.geometry.boundingBox.clone().applyMatrix4(object.matrixWorld);
+    if (max.y > .15 && min.y < 4) hallThrowBoxes.push({ min: { x: min.x, y: min.y, z: min.z }, max: { x: max.x, y: max.y, z: max.z } });
   });
   const limitHandReach = createHeldKeyClearance(handObstacles);
   const chandeliers = makeChandeliers(scene, mat);
@@ -199,6 +205,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
   // What a thrown key can hit: the layout's furniture and vessels, plus the
   // cabinets and candle sconces as boxes (built once, the hall does not move).
   let throwScene = null;
+  const throwPropBoxes = [];
   function getThrowScene() {
     if (throwScene) return throwScene;
     const boxOf = mesh => {
@@ -207,7 +214,8 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
       const { min, max } = mesh.geometry.boundingBox.clone().applyMatrix4(mesh.matrixWorld);
       return { min: { x: min.x, y: min.y, z: min.z }, max: { x: max.x, y: max.y, z: max.z } };
     };
-    throwScene = createThrowScene({ boxes: [
+    throwScene = createThrowScene({ hallBoxes: hallThrowBoxes, boxes: [
+      ...throwPropBoxes,
       ...cabinets.map(cabinet => boxOf(cabinet.collider)),
       ...candleSet.colliders.filter(collider => collider.userData.id !== 'entrance-candle').map(boxOf),
     ] });
@@ -255,6 +263,13 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
     });
     if (bounds) handObstacles.push(bounds.clone().expandByScalar(.018));
     if (blocksPlayer) stoolObstacles.push(bounds);
+    // Loaded furniture stops thrown keys too: a stool's seat can hold one,
+    // books and bottles on a table knock it aside.
+    if (bounds) {
+      throwPropBoxes.push({ min: { x: bounds.min.x, y: bounds.min.y, z: bounds.min.z },
+        max: { x: bounds.max.x, y: bounds.max.y, z: bounds.max.z }, surface: Boolean(blocksPlayer) });
+      throwScene = null;
+    }
     renderer.shadowMap.needsUpdate = true;
     invalidate();
   }

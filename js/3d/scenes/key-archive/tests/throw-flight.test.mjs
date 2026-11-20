@@ -198,3 +198,22 @@ test('aiming at a vessel lands the right key in it, and only the right key', () 
     }
   }
 });
+
+test('hall columns stop a thrown key; table parts do not hide the tabletop', async () => {
+  const { ARCHIVE_DESK } = await import('../dist/js/archive-ledger.js');
+  const pilaster = { min: { x: 11.345, y: 0, z: 3.935 }, max: { x: 12.175, y: 8, z: 4.565 } };
+  const tableTop = { min: { x: ARCHIVE_DESK.x - .875, y: .74, z: ARCHIVE_DESK.z - 1.125 },
+    max: { x: ARCHIVE_DESK.x + .875, y: ARCHIVE_DESK.y, z: ARCHIVE_DESK.z + 1.125 } };
+  const withHall = createThrowScene({ hallBoxes: [pilaster, tableTop] });
+  assert.ok(withHall.solids.includes(pilaster), 'the column is an obstacle');
+  assert.ok(!withHall.solids.includes(tableTop), 'the table is already a surface');
+  // Thrown hard at the column's foot: it bounces back into the hall.
+  const flight = simulateThrow({ start: { x: 8, y: 1.3, z: 4.25 }, velocity: { x: 7, y: -1, z: 0 },
+    floorY: restingKeyY, ...withHall.forKey(() => false) });
+  assert.ok(flight.landing.x < pilaster.min.x, `rests at x=${flight.landing.x.toFixed(2)}`);
+  // Dropped onto the side table: it stays on its single wooden top.
+  const onTable = simulateThrow({ start: { x: ARCHIVE_DESK.x, y: 1.4, z: ARCHIVE_DESK.z }, velocity: { x: .2, y: 0, z: 0 },
+    floorY: restingKeyY, ...withHall.forKey(() => false) });
+  assert.equal(onTable.landing.on, 'surface');
+  assert.ok(Math.abs(onTable.landing.y - ARCHIVE_DESK.y) < 1e-9);
+});

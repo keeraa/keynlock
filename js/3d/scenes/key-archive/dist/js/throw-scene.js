@@ -5,14 +5,15 @@ import { ARCHIVE_DESK, ARCHIVE_SIDE_TABLES } from './archive-ledger.js';
 
 // What a thrown key can hit, for throw-flight.js: boxes for the furniture
 // (tabletops can hold a key) and the vessels with their openings.
-const SIDE_TABLE_TOP = .92;
 export const HALL_WALLS = Object.freeze({ x: 11.85, z: 22.9 });
 
 const box = (minX, minY, minZ, maxX, maxY, maxZ, extra = {}) =>
   ({ min: { x: minX, y: minY, z: minZ }, max: { x: maxX, y: maxY, z: maxZ }, ...extra });
 
 // boxes: extra world boxes {min, max} (cabinets, candle sconces, chairs…).
-export function createThrowScene({ boxes = [] } = {}) {
+// hallBoxes: every solid part of the hall; the parts of tables (their top
+// and legs, already a surface here) are left out.
+export function createThrowScene({ boxes = [], hallBoxes = [] } = {}) {
   const solids = [];
   const vessels = [];
   for (const station of STATIONS) {
@@ -42,10 +43,15 @@ export function createThrowScene({ boxes = [] } = {}) {
       forgeX + FORGE.bodyRadius, FORGE_SURFACE_Y, forgeZ + FORGE.bodyRadius, { vessel: forge.id }) });
   }
   for (const { x, z } of ARCHIVE_SIDE_TABLES) {
-    solids.push(box(x - ARCHIVE_DESK.width / 2, SIDE_TABLE_TOP - .18, z - ARCHIVE_DESK.depth / 2,
-      x + ARCHIVE_DESK.width / 2, SIDE_TABLE_TOP, z + ARCHIVE_DESK.depth / 2, { surface: true }));
+    solids.push(box(x - ARCHIVE_DESK.width / 2, .74, z - ARCHIVE_DESK.depth / 2,
+      x + ARCHIVE_DESK.width / 2, ARCHIVE_DESK.y, z + ARCHIVE_DESK.depth / 2, { surface: true }));
   }
   solids.push(...boxes);
+  const surfaces = solids.filter(solid => solid.surface);
+  const partOfTable = part => surfaces.some(top =>
+    part.min.x >= top.min.x - .15 && part.max.x <= top.max.x + .15 &&
+    part.min.z >= top.min.z - .15 && part.max.z <= top.max.z + .15 && part.max.y <= top.max.y + .05);
+  solids.push(...hallBoxes.filter(part => !partOfTable(part)));
 
   // For one throw: which vessels would take this key.
   function forKey(accepts) {

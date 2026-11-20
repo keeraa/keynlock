@@ -1,7 +1,7 @@
 // A thrown key, simulated as a small ball under gravity.
 //
 // The key leaves the hand at a fixed speed along the view, so the player aims
-// with the reticle: looking higher throws farther, up to roughly four metres.
+// with the reticle: looking higher throws farther, up to about seven metres.
 // It bounces off furniture boxes, the walls and the floor, slides to a stop
 // with friction, and can come to rest on a tabletop. A vessel that accepts
 // the key (a muddy key and the water, a rusty key and the rust tray, a broken
@@ -12,7 +12,7 @@
 // so the landing is known when the key is released and the animation only
 // replays the sampled path.
 
-export const THROW_SPEED = 4.5;          // m/s: about 3.5 m at best
+export const THROW_SPEED = 6.5;          // m/s, a firm hand throw: about 7 m at best
 export const GRAVITY = 9.81;
 const STEP = 1 / 240;
 const SAMPLE = 1 / 60;

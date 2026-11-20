@@ -23,13 +23,13 @@ function throwAt(from, to, degrees, accepts = () => false) {
 const distance = (flight, from) => Math.hypot(flight.landing.x - from.x, flight.landing.z - from.z);
 const pitches = Array.from({ length: 36 }, (_, i) => -10 + i * 2);
 
-test('aiming higher throws farther, but never far: the reticle predicts the throw', () => {
+test('aiming higher throws farther, within the hall: the reticle predicts the throw', () => {
   const from = { x: 0, z: 12 }, ahead = { x: 0, z: 0 };
   const ranges = [-30, -10, 0, 15, 30].map(deg => distance(throwAt(from, ahead, deg), from));
   for (let i = 1; i < ranges.length; i++) assert.ok(ranges[i] > ranges[i - 1], `${ranges}`);
   const longest = Math.max(...pitches.map(deg => distance(throwAt(from, ahead, deg), from)));
-  assert.ok(longest > 3.5 && longest < 4.5, `longest throw ${longest.toFixed(2)} m`);
-  assert.equal(THROW_SPEED, 4.5);
+  assert.ok(longest > 6 && longest < 8, `longest throw ${longest.toFixed(2)} m`);
+  assert.equal(THROW_SPEED, 6.5);
 });
 
 test('the same throw always lands in the same place, whatever lies on the floor', () => {

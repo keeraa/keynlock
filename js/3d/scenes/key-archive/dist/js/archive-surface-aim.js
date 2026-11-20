@@ -3,7 +3,7 @@ import { findFloorKeyAtReticle } from './key-picking.js?v=5';
 import { KEY_REACH, CABINET_REACH, STATION_REACH, KEY_PICK_RADIUS } from './interaction-range.js';
 import { createCombinedKeyGeometry, getKeyCrustGeometry, getKeyDisplayScale } from './key-factory.js?v=key-ring';
 import { restingKeyY } from './floor-contact.js';
-import { CABINET_CAPACITY, CABINET_CELL_BACK_Z, cabinetSlotAtLocalPoint, pegForSlot } from './cabinet-layout.js?v=cabinet-cell-glow';
+import { CABINET_CAPACITY, CABINET_CELL_BACK_Z, cabinetSlotAtLocalPoint, pegForSlot } from './cabinet-layout.js?v=single-source';
 
 const PICK_ASSIST_RADIUS = KEY_PICK_RADIUS + .04;
 const PICK_RETAIN_RADIUS = PICK_ASSIST_RADIUS + .025;

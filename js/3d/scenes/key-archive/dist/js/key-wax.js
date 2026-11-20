@@ -1,7 +1,6 @@
 import * as THREE from '../vendor/three.js';
 import { bowPoints, shaftStartX, shaftHalfHeight, keyBreakX, keyBreakAngle } from './key-shapes.js';
-import { coatGeometry, coatSvg } from './key-coat.js';
-import { stableNoise } from './key-dirt.js';
+import { coatGeometry, coatSvg, stableNoise } from './key-coat.js';
 
 // Candle wax as a thick, smooth coat: the whole bit (teeth included) is sunk
 // in wax, the lower rim of the bow and a collar on the shaft are coated too.

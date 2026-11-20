@@ -1,7 +1,6 @@
 import * as THREE from '../vendor/three.js';
 import { bowPoints, shaftStartX, shaftHalfHeight, keyBreakX, keyBreakAngle } from './key-shapes.js';
-import { coatGeometry, coatSvg } from './key-coat.js';
-import { stableNoise } from './key-dirt.js';
+import { coatGeometry, coatSvg, stableNoise } from './key-coat.js';
 
 // Candle wax as a thick, smooth coat: the whole bit (teeth included) is sunk
 // in wax, the lower rim of the bow and a collar on the shaft are coated too.
@@ -96,8 +95,8 @@ export function meltWaxBlobs(blobs,progressFor,{sag=true}={}) {
 }
 
 // `blobs` and `heightScale` let the melt animation rebuild a thinning coat.
-export function waxGeometry(template,design,{blobs=waxBlobLayout(template,design),heightScale=1}={}) {
-  return coatGeometry(template,design,blobs,{bulge:BULGE,cell:CELL,heightScale,colors:WAX_COLORS});
+export function waxGeometry(template,design,{blobs=waxBlobLayout(template,design),heightScale=1,cell=CELL}={}) {
+  return coatGeometry(template,design,blobs,{bulge:BULGE,cell,heightScale,colors:WAX_COLORS});
 }
 
 let waxMaterial;

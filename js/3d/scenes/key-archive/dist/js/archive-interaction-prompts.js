@@ -1,6 +1,6 @@
-import { t, familyName } from './i18n.js';
+import { t, familyName } from './i18n.js?v=single-source';
 import {
-  KEY_TYPES, MAX_HELD, selectedKey, cabinetSlotKey, getProgress, keyCondition, BUNDLE_COST, canPickupKey, SMELT_SECONDS } from './rules.js?v=key-ring';
+  KEY_TYPES, MAX_HELD, selectedKey, cabinetSlotKey, getProgress, keyCondition, BUNDLE_COST, canPickupKey, SMELT_SECONDS } from './rules.js?v=single-source';
 
 export function createArchivePrompts(state, keyIndex, isMelting = () => false, stationNow = Date.now) {
   return function promptFor(target) {

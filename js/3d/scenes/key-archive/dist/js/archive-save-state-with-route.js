@@ -2,7 +2,7 @@ import {
   STORAGE_KEY, LEGACY_STORAGE_KEY, createInitialState,
   validateState, migrateLegacyState, upgradeKeyConditions, upgradeFloorDistribution,
   upgradeStationBaths, upgradeCabinetSlots, packHeldBundle,
-} from './rules.js?v=stable-pickup';
+} from './rules.js?v=single-source';
 import { prepareFirstRoute } from './archive-first-route-guide.js?v=key-ring';
 import { separateFloorKeys } from './key-spacing.js?v=18';
 import { VISUAL_STORAGE_KEY, normalizeVisualSettings } from './visual-settings.js?v=clear-day';

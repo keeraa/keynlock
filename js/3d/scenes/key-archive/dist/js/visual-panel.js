@@ -1,5 +1,5 @@
 import { DEFAULT_VISUAL_SETTINGS, normalizeVisualSettings } from './visual-settings.js?v=clear-day';
-import { saveVisualSettings } from './archive-save-state-with-route.js?v=key-ring';
+import { saveVisualSettings } from './archive-save-state-with-route.js?v=single-source';
 
 export function createVisualPanel(document, world, storage, initialSettings) {
   const $ = id => document.getElementById(id);

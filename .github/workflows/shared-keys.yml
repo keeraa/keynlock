@@ -1,0 +1,27 @@
+name: Shared key library consistency
+on:
+  push:
+    paths:
+      - 'js/3d/shared/keys/**'
+      - 'js/3d/scenes/key-forge/dist/js/**'
+      - 'js/3d/scenes/key-archive/dist/js/**'
+      - '.github/workflows/shared-keys.yml'
+  pull_request:
+    paths:
+      - 'js/3d/shared/keys/**'
+      - 'js/3d/scenes/key-forge/dist/js/**'
+      - 'js/3d/scenes/key-archive/dist/js/**'
+      - '.github/workflows/shared-keys.yml'
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Shared key modules are mirrored unchanged into every scene
+        run: node js/3d/shared/keys/sync.mjs --check
+      - name: Key Forge tests
+        working-directory: js/3d/scenes/key-forge
+        run: npm test

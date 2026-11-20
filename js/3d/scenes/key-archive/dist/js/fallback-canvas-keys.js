@@ -1,8 +1,8 @@
-import { CABINET_KEY_SCALE_FACTOR } from './cabinet-layout.js?v=cabinet-cell-glow';
-import { KEY_TYPES, keyCondition } from './rules.js?v=key-ring';
+import { CABINET_KEY_SCALE_FACTOR } from './cabinet-layout.js?v=single-source';
+import { KEY_TYPES, keyCondition } from './rules.js?v=single-source';
 import { getKeyFallbackHeadPoints, createKeyFallbackStamp, getKeyMetal } from './key-factory.js?v=key-ring';
 import { PAINTED_METALS } from './painted-textures.js';
-import { keyAssetUrl, RUST_TEXTURE } from './key-data.js?v=plain-gouache';
+import { keyAssetUrl, RUST_TEXTURE } from './key-data.js';
 import { dirtPaint, stableNoise } from './key-dirt.js?v=wax-and-bundles';
 import { RUG_TOP, restingKeyY } from './floor-contact.js';
 import { windowBeamLightAt } from './window-beam-light.js?v=alchemy-candles';

@@ -4,10 +4,10 @@ import { createWindowBirdFlight, BIRD_WIDTH, BIRD_HEIGHT } from './archive-windo
 import { WINDOW_WASHES, WINDOW_BEAM_SLOPE, WINDOW_BEAM_HALF_WIDTH } from './window-beam-light.js?v=alchemy-candles';
 import { ENTRANCE_DOOR_TEXTURE_URL } from './entrance-door-texture.js';
 import { ENTRANCE_CANDLE, sampleCandleFlicker } from './archive-candles.js?v=key-catalog';
-import { ARCHIVE_DESK, ARCHIVE_LEDGER, ARCHIVE_LEDGER_URL } from './archive-ledger.js?v=key-catalog';
+import { ARCHIVE_DESK, ARCHIVE_LEDGER, ARCHIVE_LEDGER_URL } from './archive-ledger.js?v=single-source';
 import { WINDOW_CENTERS, PILASTER_CENTERS, PERIMETER_BAND_Y, vaultHeight,
   WINDOW_SILL_Y, WINDOW_SPRING_Y, WINDOW_SCALE, WINDOW_VERTICAL_SCALE, windowY,
-  HALL_HEIGHT_SCALE, WINDOW_OPENING_RADIUS } from './hall-architecture.js?v=alchemy-candles';
+  HALL_HEIGHT_SCALE, WINDOW_OPENING_RADIUS } from './hall-architecture.js?v=single-source';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 

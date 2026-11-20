@@ -1,5 +1,5 @@
 import { WINDOW_CENTERS, WINDOW_SILL_Y, WINDOW_SPRING_Y, WINDOW_CROWN_Y,
-  WINDOW_OPENING_RADIUS, WINDOW_SCALE, windowY } from './hall-architecture.js?v=alchemy-candles';
+  WINDOW_OPENING_RADIUS, WINDOW_SCALE, windowY } from './hall-architecture.js?v=single-source';
 import { RUG_TOP } from './floor-contact.js';
 
 export const WINDOW_WALL_X = -11.86;

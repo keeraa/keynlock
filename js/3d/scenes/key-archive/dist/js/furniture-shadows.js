@@ -1,4 +1,4 @@
-import { FIXTURE_OFFSETS } from './station-layout.js?v=working-baths';
+import { FIXTURE_OFFSETS } from './station-layout.js?v=single-source';
 
 // Bake the broad shade and the darker contact at the feet into one image
 // per surface. The same artwork is projected in both renderers.

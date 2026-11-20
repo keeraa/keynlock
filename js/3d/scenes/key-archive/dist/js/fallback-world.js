@@ -1,15 +1,15 @@
 import * as THREE from '../vendor/three.js';
 import { floorSurfaceY, RUG_TOP } from './floor-contact.js';
-import { createLedgerCollider } from './archive-ledger.js?v=key-catalog';
+import { createLedgerCollider } from './archive-ledger.js?v=single-source';
 import { createArchiveCandles } from './archive-candles.js?v=key-catalog';
-import { KEY_TYPES } from './rules.js?v=key-ring';
+import { KEY_TYPES } from './rules.js?v=single-source';
 import { createFallbackSurfaces } from './fallback-surfaces.js?v=key-ring';
 import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=paused-scene';
-import { samplePickupLift } from './held-key-motion.js?v=stable-pickup';
+import { samplePickupLift } from './held-key-motion.js?v=single-source';
 import { sampleThrow } from './archive-throw-trajectory.js?v=archive-foley';
 import { playMotionContact, samplePlacement, sampleDiscard } from './archive-key-motion.js?v=key-ring';
-import { CABINET_GRID_WIDTH, CABINET_Z, CABINET_CORNICE_TOP, cabinetKeyPose } from './cabinet-layout.js?v=cabinet-cell-glow';
-import { STATIONS, FIXTURE_OFFSETS, bathId, FORGE_SURFACE_Y } from './station-layout.js?v=working-baths';
+import { CABINET_GRID_WIDTH, CABINET_Z, CABINET_CORNICE_TOP, cabinetKeyPose } from './cabinet-layout.js?v=single-source';
+import { STATIONS, FIXTURE_OFFSETS, bathId, FORGE_SURFACE_Y } from './station-layout.js?v=single-source';
 import { BATH_LIFT_MS } from './station-visual-state.js?v=cleaning-cues';
 import { PLAYER_EYE_HEIGHT } from './player-config.js';
 

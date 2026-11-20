@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { HALL_END_WALL_HEIGHT } from './hall-architecture.js?v=alchemy-candles';
+import { HALL_END_WALL_HEIGHT } from './hall-architecture.js?v=single-source';
 
 // Separate original gouache paintings for plaster and the continuous wood vault.
 // Asset paths are resolved relative to the module so hosting works at any base URL.

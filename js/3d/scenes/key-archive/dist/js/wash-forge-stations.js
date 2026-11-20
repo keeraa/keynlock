@@ -1,12 +1,12 @@
 import * as THREE from '../vendor/three.js';
 import { RUG_TOP } from './floor-contact.js';
-import { furnitureShadow } from './world-architecture.js?v=furniture-shadows';
+import { furnitureShadow } from './world-architecture.js?v=single-source';
 import { createStationFinishes } from './station-finish.js';
 import { createKeyModel, createCombinedKeyGeometry, disposeKeySceneModel, getKeyDisplayScale, getKeyRustStrength,
   getKeyCoatLayout, buildKeyCoatGeometry, getKeyCoatPoint } from './key-factory.js?v=key-ring';
 import { rustFlakingPaint } from './key-instance-finish.js?v=wax-and-bundles';
 import { bathKeyProgress, waterDip, BATH_LIFT_MS } from './station-visual-state.js?v=cleaning-cues';
-import { BATH_CAPACITY, FORGE_SURFACE_Y, FIXTURE_OFFSETS, STATIONS, SOAK_SECONDS, bathId } from './station-layout.js?v=working-baths';
+import { BATH_CAPACITY, FORGE_SURFACE_Y, FIXTURE_OFFSETS, STATIONS, SOAK_SECONDS, bathId } from './station-layout.js?v=single-source';
 import { createBathEffects, createForgeEffects, createEffectSpotTexture } from './station-visual-effects.js?v=cleaning-cues';
 
 function block(parent, dimensions, where, material) {

@@ -1,11 +1,11 @@
-import { FORGE_SURFACE_Y } from './station-layout.js?v=working-baths';
+import { FORGE_SURFACE_Y } from './station-layout.js?v=single-source';
 import * as THREE from '../vendor/three.js';
 import { floorSurfaceY, RUG_TOP } from './floor-contact.js';
 import { createKeyModel, disposeKeySceneModel, getKeyDisplayScale } from './key-factory.js?v=key-ring';
-import { cabinetKeyPose } from './cabinet-layout.js?v=cabinet-cell-glow';
+import { cabinetKeyPose } from './cabinet-layout.js?v=single-source';
 import { sampleThrow } from './archive-throw-trajectory.js?v=archive-foley';
 import { playMotionContact, samplePlacement, sampleDiscard, cabinetContactGlow } from './archive-key-motion.js?v=key-ring';
-import { RIGHT_HAND_RELEASE } from './held-key-motion.js?v=2';
+import { RIGHT_HAND_RELEASE } from './held-key-motion.js?v=single-source';
 
 // The WebGL representation of the same trajectories used by Canvas.
 export function createWorldKeyAnimations({ scene, camera, cabinets, workstations, invalidate, syncKey, refreshCabinet, sceneNow = () => performance.now() }) {

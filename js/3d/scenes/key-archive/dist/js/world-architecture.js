@@ -3,9 +3,9 @@ import { makeLabel } from './art.js?v=key-ring';
 import { HALL_SURFACE_TILE_METERS } from './hall-surface-textures.js?v=alchemy-candles';
 import { createMetricBoxGeometry } from './metric-box-geometry.js?v=23';
 import { WINDOW_CENTERS, PILASTER_CENTERS, PERIMETER_BAND_Y, HALL_HEIGHT_SCALE, HALL_END_WALL_HEIGHT,
-  addArchedWindow, addWindowedWall, addVault } from './hall-architecture.js?v=window-sky';
+  addArchedWindow, addWindowedWall, addVault } from './hall-architecture.js?v=single-source';
 import { ENTRANCE_DOOR_TEXTURE_URL } from './entrance-door-texture.js';
-import { ARCHIVE_DESK, ARCHIVE_SIDE_TABLES } from './archive-ledger.js?v=key-catalog';
+import { ARCHIVE_DESK, ARCHIVE_SIDE_TABLES } from './archive-ledger.js?v=single-source';
 import { floorSurfaceY } from './floor-contact.js';
 
 export function box(parent, size, position, material) {

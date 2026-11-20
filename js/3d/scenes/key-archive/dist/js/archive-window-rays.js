@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { WINDOW_CENTERS } from './hall-architecture.js?v=alchemy-candles';
+import { WINDOW_CENTERS } from './hall-architecture.js?v=single-source';
 import { birdShadowGlsl } from './archive-entrance-light.js?v=alchemy-candles';
 import { RUG_TOP } from './floor-contact.js';
 import { WINDOW_WALL_X as WALL_X, WINDOW_BEAM_SILL as SILL, WINDOW_BEAM_SPRING as SPRING,

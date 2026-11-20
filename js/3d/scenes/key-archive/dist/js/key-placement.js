@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { KEY_TEMPLATES } from './key-data.js?v=plain-gouache';
+import { KEY_TEMPLATES } from './key-data.js';
 import { holesFor, keyBounds } from './key-shapes.js';
 
 // Model space: the blade points along +X, the painted front is +Z.

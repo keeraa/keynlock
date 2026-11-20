@@ -1,18 +1,18 @@
-import { t, familyName } from './i18n.js';
-import { SOAK_SECONDS } from './station-layout.js?v=working-baths';
+import { t, familyName } from './i18n.js?v=single-source';
+import { SOAK_SECONDS } from './station-layout.js?v=single-source';
 import * as THREE from '../vendor/three.js';
 import {
   KEY_TYPES, TOTAL_KEYS, MAX_HELD, pickupKey, selectedKey, putKeyInCabinet,
   takeKeyFromCabinet, cabinetSlotKey, trashSelectedKey, dropSelectedKey, getProgress,
   startSoak, collectSoakedKey, BUNDLE_COST, buyBundle, putBundleInCabinet, meltSelectedWax,
   SMELT_SECONDS, settleSmelting,
-} from './rules.js?v=stable-pickup';
+} from './rules.js?v=single-source';
 import { WAX_MELT_MS } from './archive-candles.js?v=key-catalog';
-import { CABINET_CAPACITY, pegForSlot } from './cabinet-layout.js?v=cabinet-cell-glow';
+import { CABINET_CAPACITY, pegForSlot } from './cabinet-layout.js?v=single-source';
 import { findFreeFloorSpot } from './key-spacing.js?v=18';
 import { restingKeyY } from './floor-contact.js';
 import { BUNDLE_RELEASE_INTERVAL_MS } from './archive-key-motion.js?v=key-ring';
-import { RIGHT_HAND_RELEASE } from './held-key-motion.js?v=2';
+import { RIGHT_HAND_RELEASE } from './held-key-motion.js?v=single-source';
 
 // All state-changing player actions live here and work identically in both renderers.
 export function createArchiveActions({

@@ -1,4 +1,4 @@
-import { CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS } from './cabinet-layout.js?v=cabinet-cell-glow';
+import { CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS } from './cabinet-layout.js?v=single-source';
 
 export const COMPLETION_SECONDS = 2.25;
 export function sampleCabinetCelebration(seconds) {

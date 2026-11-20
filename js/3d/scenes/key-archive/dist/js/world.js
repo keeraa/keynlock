@@ -2,8 +2,8 @@ import * as THREE from '../vendor/three.js';
 import { createArchiveCandles, CANDLE_WICK_Y, CANDLE_FLAME_HEIGHT } from './archive-candles.js?v=key-catalog';
 import { createCleaningEffects } from './cleaning-effects.js?v=paused-scene';
 import { getKeyCoatLayout, buildKeyCoatGeometry, getKeyCoatPoint } from './key-factory.js?v=key-ring';
-import { meltWaxBlobs } from './key-wax.js?v=forge-coats';
-import { KEY_TYPES, getProgress } from './rules.js?v=key-ring';
+import { meltWaxBlobs } from './key-wax.js';
+import { KEY_TYPES, getProgress } from './rules.js?v=single-source';
 import {
   createKeyModel, createCombinedKeyGeometry,
   getKeyMaterial, getKeyCrustGeometry, getKeyCrustMaterial, getKeyRustStrength,
@@ -23,8 +23,8 @@ import { PLAYER_EYE_HEIGHT } from './player-config.js';
 import { createKeyHoverOutline } from './key-hover-outline.js?v=readable-ink';
 import { batchStaticHallMeshes } from './static-mesh-batches.js';
 import { createMaterials } from './world-materials.js?v=shadow-footprints';
-import { addArchiveLedger } from './archive-ledger.js?v=key-catalog';
-import { makeHall } from './world-architecture.js?v=furniture-shadows';
+import { addArchiveLedger } from './archive-ledger.js?v=single-source';
+import { makeHall } from './world-architecture.js?v=single-source';
 import { makeChandeliers } from './world-lighting.js?v=key-ring';
 import { createCabinet } from './world-cabinet.js?v=paused-scene';
 import { addEntranceLighting, createEntranceContactShadows, createEntranceKeyMaterial } from './archive-entrance-light.js?v=alchemy-candles';
@@ -32,11 +32,11 @@ import { WINDOW_LIGHT_POSITION, addWindowAirLight, windowBeamLightAt } from './a
 import { addWindowBird } from './archive-window-bird.js?v=paused-scene';
 import { addDust } from './world-particles.js?v=alchemy-candles';
 import { createHeldKeyClearance } from './held-key-clearance.js';
-import { nextHandMotionWeight, samplePickupLift, RIGHT_HAND_RELEASE } from './held-key-motion.js?v=stable-pickup';
+import { nextHandMotionWeight, samplePickupLift, RIGHT_HAND_RELEASE } from './held-key-motion.js?v=single-source';
 import { addHeldKeyWindowLight } from './held-key-light.js?v=clear-day';
 import { pegForSlot, CABINET_CELL_INNER_HALF_WIDTH, CABINET_CELL_INNER_HALF_HEIGHT,
   CABINET_CELL_BACK_Z, CABINET_COLUMNS, CABINET_COLUMN_WIDTH, CABINET_GRID_BOTTOM_Y,
-  CABINET_GRID_TOP_Y, CABINET_SHELF_CENTER_Z, CABINET_SHELF_DEPTH } from './cabinet-layout.js?v=cabinet-cell-glow';
+  CABINET_GRID_TOP_Y, CABINET_SHELF_CENTER_Z, CABINET_SHELF_DEPTH } from './cabinet-layout.js?v=single-source';
 
 const ROOM = { halfWidth: 12, halfLength: 23.4, height: 13.5 };
 

@@ -116,7 +116,8 @@ export function createCleaningEffects(scene, camera) {
 
   // Glint on a model: stars at points of its own geometry, facing the camera.
   // `attachTo` keeps the stars with a moving parent (the hand follows the camera).
-  function shine(model, count = 5, { attachTo = root } = {}) {
+  // `size` fixes the star size (a cabinet is far larger than a key).
+  function shine(model, count = 5, { attachTo = root, size = null } = {}) {
     if (!model) return;
     model.updateMatrixWorld(true);
     const box = new THREE.Box3().setFromObject(model);
@@ -133,7 +134,7 @@ export function createCleaningEffects(scene, camera) {
       attachTo.updateMatrixWorld(true);
       star.position.copy(attachTo.worldToLocal(point));
       star.renderOrder = 5;
-      star.userData = { age: -i * .13, size: box.getSize(new THREE.Vector3()).length() * .22,
+      star.userData = { age: -i * .13, size: size ?? box.getSize(new THREE.Vector3()).length() * .22,
         spin: (Math.random() - .5) * 2 };
       star.scale.setScalar(0);
       star.userData.size /= attachTo.getWorldScale(new THREE.Vector3()).x || 1;

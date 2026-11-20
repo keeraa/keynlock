@@ -75,15 +75,28 @@ export function createArchiveKeyCatalog(document, world, canvas, keyThumbnail, o
   function paint() {
     spread.replaceChildren();
     const start = spreadIndex * KEYS_PER_SPREAD;
+    // Each family shows how full its cabinet is; a finished cabinet is lit up.
+    const progress = world.progress?.();
     for (let type = start; type < Math.min(start + KEYS_PER_SPREAD, KEY_TYPES.length); type++) {
       const article = document.createElement('article');
       const picture = document.createElement('img');
+      const text = document.createElement('div');
       const name = document.createElement('h3');
+      const count = document.createElement('p');
       const image = keyThumbnail({ type });
       if (image) picture.src = image;
       picture.alt = '';
       name.textContent = familyName(type);
-      article.append(picture, name);
+      text.append(name);
+      if (progress) {
+        const sorted = progress.sorted[type], required = progress.required[type];
+        const complete = sorted >= required;
+        article.classList.toggle('is-complete', complete);
+        count.className = 'ledger-count';
+        count.textContent = complete ? t('catalog.complete') : t('catalog.count', { sorted, required });
+        text.append(count);
+      }
+      article.append(picture, text);
       spread.append(article);
     }
     previous.disabled = spreadIndex === 0;

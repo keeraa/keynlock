@@ -5,7 +5,7 @@ import { CABINET_CAPACITY, CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_GRI
   CABINET_CELL_BACK_Z, CABINET_BACK_FRONT_Z, CABINET_SHELF_DEPTH, cabinetSlotAtLocalPoint, pegForSlot,
 } from '../dist/js/cabinet-layout.js';
 import { createRoundedShelfGeometry } from '../dist/js/cabinet-finish.js';
-import { createArchiveTargeting } from '../dist/js/archive-targeting.js';
+import { createArchiveTargeting } from '../dist/js/archive-surface-aim.js';
 import { createArchiveActions } from '../dist/js/archive-actions.js';
 import { createKeyIndex } from '../dist/js/key-index.js';
 import { loadArchiveState } from '../dist/js/archive-save-state-with-route.js';

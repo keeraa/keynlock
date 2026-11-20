@@ -1,2 +1,2 @@
-// One painted plank surface shared by WebGL and the Canvas fallback.
+// One painted plank surface for the hall floor.
 export const ARCHIVE_FLOOR_TEXTURE_URL = './assets/gouache-floor-walnut-v1.webp';

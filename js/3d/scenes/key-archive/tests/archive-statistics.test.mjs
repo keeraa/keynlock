@@ -104,8 +104,9 @@ test('game actions report the new counters', async () => {
     assert.match(actions, new RegExp(`statistics\\?\\.count\\?\\.\\('${name}'\\)`), name);
   assert.match(actions, /statistics\?\.keyThrown\?\.\(key\.id/);
   assert.match(actions, /statistics\?\.keyPicked\?\.\(target\.id/);
-  const main = readFileSync(new URL('../dist/js/main.js', import.meta.url), 'utf8');
+  const { mainSource } = await import('./helpers/main-source.mjs');
+  const main = mainSource();
   assert.match(main, /statistics\.frame\(Math\.min\(frameMs, 250\)/);
-  assert.match(main, /statistics\.event\('rowTimes'\)/);
-  assert.match(main, /statistics\.event\('cabinetTimes'\)/);
+  assert.match(main, /statistics\?\.event\('rowTimes'\)/);
+  assert.match(main, /statistics\?\.event\('cabinetTimes'\)/);
 });

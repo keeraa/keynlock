@@ -17,9 +17,10 @@ export function createArchivePrompts(state, keyIndex, isMelting = () => false, s
     }
     if (target.kind === 'ledger') return t('prompt.openCatalog');
     if (target.kind === 'candle') {
-      if (!target.lit) return '';
       const key = selectedKey(state);
       if (!key?.wax || key.broken) return '';
+      // Candles beside a cabinet burn once that cabinet is full.
+      if (!target.lit) return t('prompt.candleUnlit');
       return t(isMelting() ? 'prompt.candleMelting' : 'prompt.candleUse');
     }
     if (target.kind === 'bath') {

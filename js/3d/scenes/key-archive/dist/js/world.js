@@ -15,6 +15,7 @@ import { PLAYER_EYE_HEIGHT } from './player-config.js';
 import { batchStaticHallMeshes } from './static-mesh-batches.js';
 import { createMaterials } from './world-materials.js';
 import { addArchiveLedger } from './archive-ledger.js';
+import { addArchiveDeskProps } from './archive-desk-props.js';
 import { makeHall } from './world-architecture.js';
 import { makeChandeliers } from './world-lighting.js';
 import { createCabinet } from './world-cabinet.js';
@@ -75,7 +76,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
   mat.glass = sky.material;
   const hall = new THREE.Group();
   scene.add(hall);
-  makeHall(hall, mat);
+  const hallParts = makeHall(hall, mat);
   const handObstacles = [];
   function cacheHandObstacle(mesh) {
     mesh.updateWorldMatrix(true, false);
@@ -132,6 +133,8 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
     },
   });
   for (const cabinet of cabinets) cacheHandObstacle(cabinet.collider);
+  // The held key also pulls back from the candle sconces beside the cabinets.
+  for (const collider of candleSet.colliders) cacheHandObstacle(collider);
   for (const occluder of workstations.occluders) cacheHandObstacle(occluder);
   const syncEntranceShadow = createEntranceContactShadows(scene, state.keys);
   const keysById = new Map(state.keys.map(key => [key.id, key]));
@@ -166,6 +169,30 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
   candleSet.update(0, cabinets);
   for (const key of state.keys) syncKey(key);
 
+  // Finished cabinet: a shower of gold stars over its face.
+  function celebrateCabinet(type) {
+    const cabinet = cabinets[type];
+    if (cabinet) cleaningEffects.shine(cabinet.group, 36, { size: .34 });
+  }
+
+  // The whole archive is done: the hall warms up and the sealed door to the
+  // Hall of Forgotten Doors swings open with light behind it. `instant` is for
+  // reopening a finished save (no show, just the open door).
+  const baseExposure = renderer.toneMappingExposure;
+  let finaleStartedAt = null;
+  function startFinale({ instant = false } = {}) {
+    if (finaleStartedAt !== null) return;
+    finaleStartedAt = instant ? -Infinity : sceneNow();
+    if (!instant) cabinets.forEach((_, type) => setTimeout(() => celebrateCabinet(type), 300 + type * 160));
+  }
+  function updateFinale(now) {
+    if (finaleStartedAt === null) return;
+    const seconds = (now - finaleStartedAt) / 1000;
+    hallParts?.forgottenDoor?.setOpen((seconds - 1.2) / 3.2);
+    renderer.toneMappingExposure = baseExposure + .2 * Math.min(1, Math.max(0, seconds / 3));
+  }
+  if (getProgress(state).processed === state.keys.length) startFinale({ instant: true });
+
   let lastHatchPatch = 0;
   let lastFrame = sceneNow();
   function update(now, moving, playing, playSound) {
@@ -182,6 +209,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
     cabinets.forEach(cabinet => cabinet.update(now));
     candleSet.update(now, cabinets);
     if (elapsed > 0) cleaningEffects.update(elapsed, now);
+    updateFinale(now);
     heldKey.update(now, elapsed, moving, playing, playSound);
   }
 
@@ -195,6 +223,11 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
   }
   resize();
   geometryStatsCache = createSceneGeometryStatsCache(scene);
+  void addArchiveDeskProps(scene).then(() => {
+    renderer.shadowMap.needsUpdate = true;
+    invalidate();
+  });
+
   window.addEventListener('resize', resize);
 
   let thumbnailRenderer;
@@ -244,7 +277,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
       painted.setSettings(settings);
       cabinets.forEach(cabinet => cabinet.setContour(settings));
     },
-    animateThrow, animatePlace, animateDiscard, isThrowing, cancelPlace,
+    animateThrow, animatePlace, animateDiscard, isThrowing, cancelPlace, celebrateCabinet, startFinale,
     throwingCount: () => thrownKeys.size,
     progress: () => getProgress(state),
     bounds: { x: ROOM.halfWidth - .88, z: ROOM.halfLength - .87 },

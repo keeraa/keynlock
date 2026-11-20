@@ -36,12 +36,10 @@ test('inventory uses cached 3D photographs and removes the archive patina overla
   const hud=readFileSync(new URL('../dist/js/archive-hud.js',import.meta.url),'utf8');
   const thumbnail=readFileSync(new URL('../dist/js/key-thumbnails.js',import.meta.url),'utf8');
   const world=worldSource();
-  const fallback=readFileSync(new URL('../dist/js/fallback-world.js',import.meta.url),'utf8');
   assert.match(hud,/slot-thumbnail/);
   assert.match(hud,/inventoryImages\.size > 48/);
   assert.match(world,/captureKeyThumbnail/);
   assert.match(thumbnail,/renderer\.readRenderTargetPixels/);
   assert.match(thumbnail,/disposeKeySceneModel\(model\)/);
   assert.doesNotMatch(world,/mudPaint|rustPaint|mudHalo|conditionTint|key-patina/);
-  assert.doesNotMatch(fallback,/key-patina|getPatinaTexture/);
 });

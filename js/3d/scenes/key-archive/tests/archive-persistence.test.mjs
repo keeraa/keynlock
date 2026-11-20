@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { BACKUP_STORAGE_KEY, loadArchiveState, openArchiveSave, loadVisualSettings, saveVisualSettings, clearArchiveState } from '../dist/js/archive-save-state-with-route.js';
-import { FIRST_ROUTE_KEY_ID } from '../dist/js/first-route.js';
+import { FIRST_ROUTE_KEY_ID } from '../dist/js/archive-first-route-guide.js';
 import { STORAGE_KEY, LEGACY_STORAGE_KEY, createInitialState, validateState, pickupKey } from '../dist/js/rules.js';
 
 test('archive persistence preserves existing storage schema and survives unavailable storage', () => {

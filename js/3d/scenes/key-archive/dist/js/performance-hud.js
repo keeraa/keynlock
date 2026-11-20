@@ -25,7 +25,7 @@ export function createPerformanceHud(document, world) {
     $('pass-count').textContent = frames ? (passesTotal / frames).toFixed(1) : '2D';
     const visual = world.getVisualStatus?.();
     const states = { active: t('hud.gpu.active'), checking: t('hud.gpu.checking'),
-      error: t('hud.gpu.error'), off: t('hud.gpu.off'), canvas: 'Canvas 2D' };
+      error: t('hud.gpu.error'), off: t('hud.gpu.off') };
     $('visual-status').textContent = states[visual?.mode] || '—';
     const stageNames = { toon: t('hud.stage.toon'), outline: t('hud.stage.outline') };
     const stageStates = { active: t('hud.stage.active'), checking: t('hud.stage.checking'),

@@ -1,5 +1,7 @@
 // Русский — основной язык архива. Ключи совпадают во всех словарях.
 export default Object.freeze({
+  'webgl.title': 'Нужен браузер с WebGL',
+  'webgl.text': 'Архив ключей рисуется в 3D. Откройте его в свежем Chrome, Edge, Firefox или Safari и проверьте, что аппаратное ускорение включено.',
   'meta.title': 'Архив ключей',
   'meta.description': 'Архив ключей — гуашевая игра: поиск, отмачивание, очистка ржавчины и переплавка брака.',
   'aria.world': 'Трёхмерный зал архива ключей',
@@ -135,6 +137,8 @@ export default Object.freeze({
   'toast.qualityLowered': 'Чёткость снижена ради плавности · {ratio}×',
   'visual.smooth': '05 · ПЛАВНОСТЬ',
   'visual.autoQuality': 'Снижать чёткость при низком FPS',
+  'toast.keysTaken': 'Ключей взято из ванны: {count}',
+  'toast.archiveComplete': 'Архив собран! Зал забытых дверей открыт',
   'toast.metalReady': 'Металл готов · +{count}',
   'toast.archiveDone': 'Архив уже разобран',
   'toast.resetFailed': 'Не удалось сбросить прогресс',
@@ -156,6 +160,7 @@ export default Object.freeze({
   'prompt.handsFull': '<kbd>4/4</kbd> Руки заняты · положи ключ в шкаф или на пол',
   'prompt.take': '<kbd>E / У</kbd> Взять · {name}{note}',
   'prompt.candleMelting': 'Воск тает · держи ключ у пламени',
+  'prompt.candleUnlit': 'Свеча загорится, когда шкаф будет собран · воск можно растопить у горящей свечи',
   'prompt.candleUse': '<kbd>E / У</kbd> Поднести ключ к пламени',
   'prompt.labelMud': 'Вода · промывка',
   'prompt.labelRust': 'Раствор · очистка ржавчины',
@@ -232,8 +237,11 @@ export default Object.freeze({
   'catalog.navigation': "Страницы каталога",
   'catalog.previous': "Назад",
   'catalog.next': "Дальше",
+  'catalog.count': "В шкафу {sorted} из {required}",
+  'catalog.complete': "Шкаф собран",
   'catalog.spread': "Разворот {current} из {total}",
 
   'sign.backHall': "ЗАЛ ЗАБЫТЫХ ДВЕРЕЙ",
+  'sign.backHallOpen': "открыто · архив собран",
   'sign.backHallNote': "за архивом · закрыто",
 });

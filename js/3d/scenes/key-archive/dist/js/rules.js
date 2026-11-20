@@ -19,7 +19,9 @@ export const KEY_TYPES = [
 export const KEYS_PER_TYPE = 100;
 export const TOTAL_KEYS = KEY_TYPES.length * KEYS_PER_TYPE;
 export const MAX_HELD = 4;
-export const BUNDLE_COST = 15;
+// Raised from 15 after playtests: the ring came too early and too cheap.
+export const BUNDLE_COST = 25;
+const LEGACY_BUNDLE_COST = 15;
 const WAX_ORDINALS = [19, 29, 46, 69, 93];
 export const BROKEN_ORDINALS = [13, 38, 63, 88];
 export const MUD_ORDINALS = [3, 15, 27, 39, 51, 65, 77, 89];
@@ -104,7 +106,8 @@ export function upgradeKeyConditions(state) {
   }
   // Previously every use deducted a purchased ring. Recover ownership from
   // the record of smelted keys and metal spent on rings.
-  if (!state.bundles && state.keys.filter(key => key.status === 'trashed').length - state.metal >= BUNDLE_COST)
+  // Rings were bought for LEGACY_BUNDLE_COST then; the current price is higher.
+  if (!state.bundles && state.keys.filter(key => key.status === 'trashed').length - state.metal >= LEGACY_BUNDLE_COST)
     state.bundles = 1;
   return state;
 }
@@ -389,7 +392,7 @@ export function smeltingState(state, now = Date.now()) {
   return { key: current, waiting: queue.length - 1,
     progress: Math.max(0, Math.min(1, 1 - (current.smeltUntil - now) / duration)),
     secondsLeft: Math.ceil((current.smeltUntil - now) / 1000),
-    totalSecondsLeft: Math.ceil((queue.at(-1).smeltUntil - now) / 1000) };
+    totalSecondsLeft: Math.ceil((queue.at(-1).smeltUntil - now) / 1000), lastUntil: queue.at(-1).smeltUntil };
 }
 
 export function keyCondition(key) {

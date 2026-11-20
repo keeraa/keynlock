@@ -45,7 +45,7 @@
 | Состояние `wax`, шкатулки, связки, металл | `js/rules.js` (модель, `validateState`, миграция сохранений), `js/archive-persistence.js` |
 | Действия игрока | `js/archive-actions.js` |
 | Подсказки | `js/archive-interaction-prompts.js` |
-| Свеча у входа, наведение на свечи и шкатулки | `js/archive-targeting.js`, `js/interaction-range.js` |
+| Свеча у входа, наведение на свечи и шкатулки | `js/archive-surface-aim.js`, `js/interaction-range.js` |
 | Свечи у шкафов | `js/world-cabinet.js`, `js/world.js`, `js/fallback-canvas-architecture.js` |
 | Вид воска на ключе | `js/key-instance-finish.js`, `js/key-dirt.js`, `js/fallback-canvas-keys.js` |
 | Шкатулки в зале | `js/world.js`, `js/fallback-world.js`, `js/fallback-canvas-renderer.js` |

@@ -17,7 +17,6 @@ test('a constructor adapter can supply assets before first scene use', () => {
     getMetal: () => 'steel',
     getColliderSize: () => [.5, .2, .7],
     getDisplayScale: () => .3,
-    getFallbackHeadPoints: () => [[-1, -1], [1, -1], [0, 1]],
     createFallbackStamp: () => null,
   };
   installKeyAssetProvider(adapter);

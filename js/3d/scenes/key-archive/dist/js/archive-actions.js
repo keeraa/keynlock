@@ -100,19 +100,33 @@ export function createArchiveActions({
           invalidateHover();
           return;
         }
-        const collected = collectSoakedKey(state, target.id, now, target.keyId ?? null);
-        if (collected) {
+        // One press takes every ready key that fits in the hands. The aimed key
+        // comes out last: it is the one that rises from the bath into the hand.
+        const ready = keyIndex.bathContents(target.id, now).ready;
+        const ordered = [...ready.filter(item => item.id !== target.keyId),
+          ...ready.filter(item => item.id === target.keyId)];
+        const taken = [];
+        for (const item of ordered) {
+          if (state.held.length >= MAX_HELD) break;
+          const collected = collectSoakedKey(state, target.id, now, item.id);
+          if (collected) taken.push(collected);
+        }
+        if (taken.length) {
           const washed = target.bathKind === 'mud';
-          statistics?.record(washed ? 'rinse' : 'rust', {
-            [washed ? 'washed' : 'derusted']: 1,
-            cleaned: collected.mud || collected.rust || collected.wax ? 0 : 1,
-          });
-          world.workstations?.liftKey?.(target.id, collected);
-          world.syncKey?.(collected);
+          for (const collected of taken) {
+            statistics?.record(washed ? 'rinse' : 'rust', {
+              [washed ? 'washed' : 'derusted']: 1,
+              cleaned: collected.mud || collected.rust || collected.wax ? 0 : 1,
+            });
+            world.syncKey?.(collected);
+          }
+          const shown = taken.at(-1);
+          world.workstations?.liftKey?.(target.id, shown);
           updateHud();
           save();
           tone('lift');
-          toast(t(collected.mud || collected.rust ? 'toast.layerCleaned' : 'toast.keyCleaned'));
+          toast(taken.length > 1 ? t('toast.keysTaken', { count: taken.length }) :
+            t(shown.mud || shown.rust ? 'toast.layerCleaned' : 'toast.keyCleaned'));
         } else {
           const contents = keyIndex.bathContents(target.id, now);
           toast(t(contents.ready.length && state.held.length >= MAX_HELD ? 'toast.freeHands' :

@@ -6,7 +6,6 @@ import {
   createKeyModel as legacyModel,
   createCombinedKeyGeometry as legacyGeometry,
   createBowGlyph as legacyGlyph,
-  keyHeadPoints as legacyHeadPoints,
 } from './art.js';
 import * as THREE from '../vendor/three.js';
 import { getKeyPaint as legacyPaint, METAL_BY_KEY_TYPE } from './painted-textures.js';
@@ -21,13 +20,12 @@ const legacyProvider = Object.freeze({
   getMetal: type => METAL_BY_KEY_TYPE[type],
   getColliderSize: () => [0.43, 0.21, 0.65],
   getDisplayScale: mode => ({ floor: .455, hand: .52, cabinet: .185, bath: .22 })[mode] ?? 1,
-  getFallbackHeadPoints: type => legacyHeadPoints(type),
   createFallbackStamp: () => null,
 });
 
 const REQUIRED_METHODS = [
   'createModel', 'getGeometry', 'createGlyph', 'getPaint', 'getMetal',
-  'getColliderSize', 'getDisplayScale', 'getFallbackHeadPoints', 'createFallbackStamp',
+  'getColliderSize', 'getDisplayScale', 'createFallbackStamp',
 ];
 let provider = legacyProvider;
 let used = false;
@@ -91,7 +89,6 @@ export function getKeyColor(type, context = 'floor') {
 }
 export function getKeyColliderSize(type) { return active().getColliderSize(type); }
 export function getKeyDisplayScale(mode, type) { return active().getDisplayScale(mode, type); }
-export function getKeyFallbackHeadPoints(type) { return active().getFallbackHeadPoints(type); }
 export function createKeyFallbackStamp(type, broken) { return active().createFallbackStamp(type, broken); }
 
 // Exposed for diagnostics; installation is intentionally one-way per page load.

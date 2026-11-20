@@ -7,11 +7,12 @@ import {
   trashSelectedKey, upgradeKeyConditions, dropSelectedKey, getProgress,
   MUD_ORDINALS, RUST_ORDINALS, BOTH_ORDINALS, keyCondition,
   startSoak, bathContents, collectSoakedKey, meltSelectedWax, buyBundle, putBundleInCabinet,
-  FLOOR_DISTRIBUTION_VERSION, upgradeFloorDistribution, upgradeStationBaths, settleSmelting, smeltingState, SMELT_SECONDS } from '../dist/js/rules.js';
+  FLOOR_DISTRIBUTION_VERSION, upgradeFloorDistribution, upgradeStationBaths, settleSmelting, smeltingState, SMELT_SECONDS,
+  BUNDLE_COST } from '../dist/js/rules.js';
 import {
   sampleThrow, throwFlightTime, THROW_FIRST_BOUNCE_SECONDS, THROW_SECOND_BOUNCE_SECONDS,
   THROW_BOUNCE_SECONDS, THROW_SLIDE_SECONDS,
-} from '../dist/js/throw-physics.js';
+} from '../dist/js/archive-throw-trajectory.js';
 import { separateFloorKeys, findFreeFloorSpot, KEY_CLEARANCE } from '../dist/js/key-spacing.js';
 import {
   CABINET_GRID_HALF_WIDTH, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS, CABINET_BACK_FRONT_Z, CABINET_GROUND_OFFSET,
@@ -395,7 +396,7 @@ test('wax blocks filing and bath soaking, then exposes the two original layers',
 
 test('a purchased bundle packs four matching keys beside a full mixed inventory', () => {
   const state = createInitialState();
-  state.metal = 14;
+  state.metal = BUNDLE_COST - 1;
   assert.equal(buyBundle(state), false);
   state.metal++;
   assert.equal(buyBundle(state), true);

@@ -1,4 +1,4 @@
-import { t, applyTranslations, LANGUAGES, getLanguage, setLanguage } from './i18n.js';
+import { t, applyTranslations } from './i18n.js';
 // Static texts of the page follow the chosen language before anything shows.
 applyTranslations(document);
 import { TOTAL_KEYS, getProgress, smeltingState } from './rules.js';
@@ -9,13 +9,15 @@ import { createArchiveHud } from './archive-hud.js';
 import { openArchiveSave, loadVisualSettings, clearArchiveState } from './archive-save-state-with-route.js';
 import { createVisualPanel } from './visual-panel.js';
 import externalKeyProvider from './key-provider-entry.js';
-import { createFallbackWorld } from './fallback-world.js';
 import { createPlayerMovement } from './player-movement.js';
 import { createPerformanceHud } from './performance-hud.js';
 import { createInventoryWheel, logicalKey } from './controls.js';
 import { edgeLookRate } from './mouse-look.js';
 import { createKeyIndex } from './key-index.js';
 import { createArchiveTargeting } from './archive-surface-aim.js';
+import { createPointerLock } from './archive-pointer-lock.js';
+import { bindSettingsControls } from './archive-settings-controls.js';
+import { createCelebrations } from './archive-celebrations.js';
 import { createArchivePrompts } from './archive-interaction-prompts.js';
 import { createArchiveActions } from './archive-actions.js';
 import { FIRST_ROUTE_KEY_ID, createFirstRouteGuide } from './archive-first-route-guide.js';
@@ -43,12 +45,26 @@ const sceneNow = sceneClock.now;
 const statistics = createArchiveStatistics(state);
 const statisticsPanel = createStatisticsPanel(document, statistics);
 const keyIndex = createKeyIndex(state.keys);
+// The archive needs WebGL. Without it the page says so plainly and stops:
+// the old 2D Canvas mode could not keep up with the 3D hall.
+function showWebglRequired() {
+  const notice = document.createElement('div');
+  notice.id = 'webgl-required';
+  notice.setAttribute('role', 'alert');
+  const title = document.createElement('h1');
+  const text = document.createElement('p');
+  title.textContent = t('webgl.title');
+  text.textContent = t('webgl.text');
+  notice.append(title, text);
+  document.body.append(notice);
+  document.body.classList.add('webgl-missing');
+}
 let world;
 try {
   world = createWorld(canvas, state, visualSettings, keyIndex, stationNow, sceneNow);
 } catch (error) {
-  console.warn('WebGL недоступен. Используется графический резервный режим.', error.message);
-  world = createFallbackWorld(canvas, state, visualSettings, keyIndex, stationNow, sceneNow);
+  showWebglRequired();
+  throw error;
 }
 const camera = world.camera;
 const movement = createPlayerMovement(camera, world.bounds);
@@ -66,13 +82,9 @@ let lastSmeltCheck = 0;
 let yaw = 0;
 let pitch = state.firstRoute && keyIndex.get(FIRST_ROUTE_KEY_ID)?.status === 'floor' ? -.30 : -.17;
 let sensitivity = 14;
-let mouseWasLocked = false;
-let requestedMouseRelease = false;
-let nativePauseAt = -Infinity;
-let lockRequestPending = false;
-let lockUnavailable = false;
 let lastPointer = null;
 let edgeLook = { x: 0, y: 0, until: 0 };
+const EDGE_LOOK_HOLD_MS = 300;
 let hovered = null;
 let lastHoverKey = '';
 let toastTimeout = 0;
@@ -90,6 +102,11 @@ const COVERED_SCENE_MODES = new Set(['intro', 'ledger']);
 const COVERED_FRAME_INTERVAL = 1000 / 30;
 let lastRender = -Infinity;
 let lastTick = performance.now();
+const pointerLock = createPointerLock({ canvas, document, isPlayMode: () => mode === 'play',
+  // A fresh lock starts mouse look from rest.
+  onLocked() { lastPointer = null; edgeLook = { x: 0, y: 0, until: 0 }; },
+  // The browser released the mouse itself (Escape): pause the game.
+  onBrowserUnlock: () => pause() });
 const audio = createArchiveAudio(window);
 const music = createArchiveMusic(window, storage);
 const { tone } = audio;
@@ -97,7 +114,7 @@ const { targetInView, clearAim } = createArchiveTargeting({ camera, world, state
 const { interact, drop, updateWax, updateSmelting, isMelting } = createArchiveActions({
   state, keyIndex, world, camera, targetInView,
   getYaw: () => yaw, isPlaying, stationNow,
-  save, updateHud, tone, toast, showVictory, statistics, openCatalog,
+  save, updateHud, tone, toast, showVictory: () => celebrations.celebrateCompletion(), statistics, openCatalog,
   invalidateHover: () => { lastHoverKey = '!'; },
 });
 
@@ -140,8 +157,6 @@ function toast(message, error = false) {
 }
 
 const promptFor = createArchivePrompts(state, keyIndex, isMelting, stationNow);
-const litCabinets = world.cabinets.map(cabinet => cabinet.completion.isComplete());
-const startedRows = world.cabinets.map(cabinet => cabinet.completion.rowsStarted());
 const soundForward = new world.THREE.Vector3();
 const soundUp = new world.THREE.Vector3();
 
@@ -176,6 +191,9 @@ function waitingAtWorkbench(now, time) {
 }
 
 function updateHud() { hud.update(); }
+
+const celebrations = createCelebrations({ world, state, tone, playAt, toast, statistics,
+  getMode: () => mode, showVictory });
 
 function setHovered(target) {
   const identity = target ? `${target.kind}-${target.id ?? target.stationId ?? target.type}` +
@@ -231,70 +249,38 @@ function setMode(next) {
   }
 }
 
-function onMouseLockUnavailable() {
-  lockRequestPending = false;
-  lockUnavailable = true;
-}
-
-function requestMouseLock() {
-  if (mode !== 'play' || document.pointerLockElement === canvas || lockRequestPending || lockUnavailable) return;
-  if (!canvas.requestPointerLock) {
-    onMouseLockUnavailable();
-    return;
-  }
-  lockRequestPending = true;
-  try {
-    const promise = canvas.requestPointerLock();
-    if (promise?.then) {
-      promise.then(() => { lockRequestPending = false; }, onMouseLockUnavailable);
-    } else {
-      // Older implementations use only pointerlockchange / pointerlockerror events.
-      setTimeout(() => {
-        if (lockRequestPending && document.pointerLockElement !== canvas) onMouseLockUnavailable();
-      }, 650);
-    }
-  } catch { onMouseLockUnavailable(); }
-}
-
 function play({ lockMouse = true } = {}) {
   setMode('play');
   audio.unlock();
   music.start();
-  lockUnavailable = false;
-  if (lockMouse) requestMouseLock();
+  pointerLock.retry();
+  if (lockMouse) pointerLock.request();
   if (getProgress(state).processed === TOTAL_KEYS) toast(t('toast.archiveDone'));
-}
-
-function releaseMouseLock() {
-  const locked = document.pointerLockElement === canvas;
-  if (!locked && !mouseWasLocked) return;
-  requestedMouseRelease = true;
-  if (locked) document.exitPointerLock();
 }
 
 function openCatalog() {
   if (mode !== 'play') return;
   setMode('ledger');
-  releaseMouseLock();
+  pointerLock.release();
   catalog.open();
 }
 
 function pause() {
   if (mode !== 'play') return;
   setMode('pause');
-  releaseMouseLock();
+  pointerLock.release();
 }
 
 function openVisual() {
   if (mode !== 'play' && mode !== 'pause') return;
   setMode('visual');
-  releaseMouseLock();
+  pointerLock.release();
 }
 
 function showVictory() {
   if (getProgress(state).processed !== TOTAL_KEYS || mode !== 'play') return;
   setMode('victory');
-  releaseMouseLock();
+  pointerLock.release();
 }
 
 function resetGame() {
@@ -329,51 +315,7 @@ $('visual-back').addEventListener('click', () => setMode('pause'));
 visualPanel.bind();
 $('reset-btn').addEventListener('click', resetGame);
 $('victory-reset').addEventListener('click', resetGame);
-$('sensitivity').addEventListener('input', event => { sensitivity = Number(event.target.value); });
-// Language: the page reloads in the chosen language (progress is already saved).
-const languageSelect = $('language');
-if (languageSelect) {
-  for (const [code, name] of Object.entries(LANGUAGES)) languageSelect.add(new Option(name, code, false, code === getLanguage()));
-  languageSelect.addEventListener('change', event => { save(); setLanguage(event.target.value); });
-}
-$('sound').checked = !audio.isMuted();
-$('sound').addEventListener('change', event => { audio.setMuted(!event.target.checked); });
-
-const musicVolume = $('music-volume');
-const musicVolumeValue = $('music-volume-value');
-if (musicVolume && musicVolumeValue) {
-  musicVolume.value = music.getVolume();
-  musicVolumeValue.value = `${music.getVolume()}%`;
-  musicVolume.addEventListener('input', () => {
-    music.setVolume(musicVolume.value);
-    musicVolumeValue.value = `${music.getVolume()}%`;
-  });
-}
-
-const musicSpatial = $('music-spatial');
-musicSpatial.checked = music.getSpatial();
-musicSpatial.addEventListener('change', () => music.setSpatial(musicSpatial.checked));
-
-document.addEventListener('pointerlockchange', () => {
-  if (document.pointerLockElement === canvas) {
-    lockRequestPending = false;
-    lockUnavailable = false;
-    mouseWasLocked = true;
-    lastPointer = null;
-    edgeLook = { x: 0, y: 0, until: 0 };
-    if (mode !== 'play') releaseMouseLock();
-    return;
-  }
-  const unlockedByBrowser = mouseWasLocked && !requestedMouseRelease;
-  mouseWasLocked = false;
-  requestedMouseRelease = false;
-  lockRequestPending = false;
-  if (unlockedByBrowser && mode === 'play') {
-    nativePauseAt = performance.now();
-    pause();
-  }
-});
-document.addEventListener('pointerlockerror', onMouseLockUnavailable);
+bindSettingsControls(document, { audio, music, save, onSensitivity: value => { sensitivity = value; } });
 
 document.addEventListener('mousemove', event => {
   if (mode !== 'play') return;
@@ -382,22 +324,26 @@ document.addEventListener('mousemove', event => {
     edgeLook.until = 0;
     return;
   }
-  if (document.pointerLockElement === canvas) {
+  if (pointerLock.locked()) {
     turn(event.movementX, event.movementY);
   } else {
     if (lastPointer) turn(event.clientX - lastPointer.x, event.clientY - lastPointer.y);
     lastPointer = { x: event.clientX, y: event.clientY };
+    // Edge turning is only for browsers that never grant Pointer Lock. A mouse
+    // merely released (Escape, keyboard resume) must not drift the camera, and
+    // a cursor resting near the edge stops turning almost at once.
+    if (!pointerLock.unavailable) { edgeLook.until = 0; return; }
     const x = edgeLookRate(event.clientX, window.innerWidth);
     const y = edgeLookRate(event.clientY, window.innerHeight);
-    edgeLook = { x, y, until: performance.now() + (x || y ? 1100 : 0) };
+    edgeLook = { x, y, until: performance.now() + (x || y ? EDGE_LOOK_HOLD_MS : 0) };
   }
 });
-document.addEventListener('mouseleave', () => { lastPointer = null; });
+document.addEventListener('mouseleave', () => { lastPointer = null; edgeLook.until = 0; });
 
 canvas.addEventListener('pointerdown', event => {
   if (mode !== 'play' || event.button !== 0) return;
   // A direct click is another browser user gesture that can grant Pointer Lock.
-  if (document.pointerLockElement !== canvas) requestMouseLock();
+  if (!pointerLock.locked()) pointerLock.request();
   interact();
 });
 canvas.addEventListener('contextmenu', event => event.preventDefault());
@@ -411,7 +357,7 @@ window.addEventListener('keydown', event => {
     if (mode === 'statistics') setMode(statisticsReturn);
     else if (mode === 'visual') setMode('pause');
     else if (mode === 'play') pause();
-    else if (mode === 'pause' && performance.now() - nativePauseAt > 100) {
+    else if (mode === 'pause' && !pointerLock.justReleasedByBrowser()) {
       // One browser Escape can both release pointer lock and reach this handler.
       // Keyboard resume uses free mouse look until the next click can relock.
       play({ lockMouse: false });
@@ -435,7 +381,7 @@ window.addEventListener('keydown', event => {
 });
 window.addEventListener('keyup', event => {
   const key = logicalKey(event);
-  if (key === 'escape') nativePauseAt = -Infinity;
+  if (key === 'escape') pointerLock.clearBrowserRelease();
   heldMovement.delete(key);
 });
 window.addEventListener('blur', () => {
@@ -500,17 +446,7 @@ function tick(now) {
     audio.setListener(camera.position, soundForward, soundUp);
     music.setListener(camera.position, soundForward, soundUp);
   }
-  for (const cabinet of world.cabinets) {
-    const lit = cabinet.completion.isComplete();
-    // The row chime starts together with the shimmer, not after it settles.
-    const started = cabinet.completion.rowsStarted();
-    if (started > startedRows[cabinet.type]) playAt('row', cabinet.group.position);
-    if (lit && !litCabinets[cabinet.type]) playAt('finish', cabinet.group.position);
-    for (let row = startedRows[cabinet.type]; row < started; row++) statistics.event('rowTimes');
-    if (lit && !litCabinets[cabinet.type]) statistics.event('cabinetTimes');
-    startedRows[cabinet.type] = started;
-    litCabinets[cabinet.type] = lit;
-  }
+  celebrations.update();
   const rendered = world.renderer.render(world.scene, camera) !== false;
   performanceHud.sample(now, performance.now() - cpuStart, rendered);
 }

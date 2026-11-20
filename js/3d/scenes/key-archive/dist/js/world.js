@@ -249,8 +249,8 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
   const meltedWax = new Map();
   let waxBeadAt = 0;
   function meltHeldWax(progress, candleId) {
-    const crust = handModel?.children.find(child => child.isMesh &&
-      child.material === getKeyCrustMaterial('wax'));
+    // The held model wears per-model material copies: find the wax by its tag.
+    const crust = handModel?.children.find(child => child.isMesh && child.userData.coatKind === 'wax');
     if (!crust) return;
     const key = keyIndex.get(displayedHandId);
     if (!key) return;

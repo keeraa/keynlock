@@ -72,6 +72,17 @@ test('baths and candle drive the new cleaning animations', () => {
   assert.match(stations, /cleaning\.flakes\(slot, key/);
   assert.match(stations, /onLiftDone\?\.\(key\)/);
   assert.match(world, /function meltHeldWax\(progress, candleId\)/);
+  assert.match(world, /child\.userData\.coatKind === 'wax'/, 'held wax is found even with copied materials');
   assert.match(actions, /world\.meltHeldWax\?\.\(1 - \(melting\.until - now\) \/ WAX_MELT_MS/);
   assert.match(actions, /world\.shineHand\?\.\(\)/);
+});
+
+test('coat meshes are tagged so a held key with copied materials still finds its wax', () => {
+  const provider = createForgeKeyProvider(source.profiles ?? source);
+  const model = provider.createModel(2, { id: 'k', wax: true, mud: true });
+  const kinds = model.children.map(child => child.userData.coatKind).filter(Boolean).sort();
+  assert.deepEqual(kinds, ['mud', 'wax']);
+  // Simulate the held-key light swapping materials for copies.
+  model.traverse(object => { if (object.isMesh) object.material = object.material.clone(); });
+  assert.ok(model.children.find(child => child.userData.coatKind === 'wax'));
 });

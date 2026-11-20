@@ -222,6 +222,9 @@ export function createForgeKeyProvider(profiles = []) {
       for (const kind of [mud && 'mud', wax && 'wax'].filter(Boolean)) {
         const crust = new THREE.Mesh(crustFor(type, broken, kind), kind === 'wax' ? getWaxMaterial() : getMudMaterial());
         crust.castShadow = false;
+        // Materials may be swapped for per-model copies (held key light), so
+        // cleaning animations find a coat by this tag, not by its material.
+        crust.userData.coatKind = kind;
         group.add(crust);
       }
       group.scale.setScalar(scale);

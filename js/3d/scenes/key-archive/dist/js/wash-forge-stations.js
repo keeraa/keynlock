@@ -265,7 +265,7 @@ function createForge(group, station, materials, spotTexture, finish) {
     visual: createForgeEffects(group, x, spotTexture, hotMetal, FORGE_SURFACE_Y) };
 }
 
-export function createWorkstations(scene, materials, keyIndex, { effects = null, onLiftDone = null } = {}) {
+export function createWorkstations(scene, materials, keyIndex, { effects = null, onLiftDone = null, stationNow = Date.now } = {}) {
   const stations = [];
   const interactables = [];
   const occluders = [];
@@ -492,7 +492,7 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
   let playSound = null;
   function update(now, sound = null) {
     playSound = sound;
-    const wallTime = Date.now();
+    const wallTime = stationNow();
     // Static pigment geometry and pooled sprites keep these effects inexpensive.
     for (const station of stations) {
       station.forge.embers.forEach((ember, index) => {

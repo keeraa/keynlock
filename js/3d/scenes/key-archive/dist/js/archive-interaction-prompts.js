@@ -2,7 +2,7 @@ import { t, familyName } from './i18n.js';
 import {
   KEY_TYPES, MAX_HELD, selectedKey, cabinetSlotKey, getProgress, keyCondition, BUNDLE_COST, canPickupKey, SMELT_SECONDS } from './rules.js?v=key-ring';
 
-export function createArchivePrompts(state, keyIndex, isMelting = () => false) {
+export function createArchivePrompts(state, keyIndex, isMelting = () => false, stationNow = Date.now) {
   return function promptFor(target) {
     if (!target) return '';
     if (target.kind === 'key') {
@@ -23,7 +23,8 @@ export function createArchivePrompts(state, keyIndex, isMelting = () => false) {
       return t(isMelting() ? 'prompt.candleMelting' : 'prompt.candleUse');
     }
     if (target.kind === 'bath') {
-      const contents = keyIndex.bathContents(target.id);
+      const now = stationNow();
+      const contents = keyIndex.bathContents(target.id, now);
       const held = selectedKey(state);
       if (held?.wax) return t('toast.pickedWax');
       const label = t(target.bathKind === 'mud' ? 'prompt.labelMud' : 'prompt.labelRust');
@@ -33,7 +34,7 @@ export function createArchivePrompts(state, keyIndex, isMelting = () => false) {
       const aimed = target.keyId && keyIndex.get(target.keyId);
       if (aimed) {
         const name = familyName(aimed.type);
-        const left = Math.ceil((aimed.bathUntil - Date.now()) / 1000);
+        const left = Math.ceil((aimed.bathUntil - now) / 1000);
         if (left > 0) return t('prompt.aimedLeft', { name, left, label });
         return state.held.length < MAX_HELD ? t('prompt.takeThis', { name })
           : t('prompt.aimedReadyFull', { name });

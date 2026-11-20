@@ -13,7 +13,7 @@ import { createPaintedInstanceGeometry, setKeyInstanceFinish } from './key-insta
 import { createKeyThumbnailRenderer } from './key-thumbnails.js?v=key-ring';
 import { createWorldKeyAnimations } from './world-key-animations.js?v=key-ring';
 import { restingKeyY } from './floor-contact.js';
-import { createWorkstations } from './wash-forge-stations.js?v=furniture-shadows';
+import { createWorkstations } from './wash-forge-stations.js?v=paused-stations';
 import { createPaintedRenderer } from './painted-renderer.js?v=cabinet-rewards';
 import { patchSceneShadowHatch, setShadowHatch } from './shadow-hatch.js';
 import { createSceneGeometryStatsCache } from './geometry-stats.js';
@@ -39,7 +39,7 @@ import { pegForSlot, CABINET_CELL_INNER_HALF_WIDTH, CABINET_CELL_INNER_HALF_HEIG
 
 const ROOM = { halfWidth: 12, halfLength: 23.4, height: 13.5 };
 
-export function createWorld(canvas, state, visualSettings, keyIndex) {
+export function createWorld(canvas, state, visualSettings, keyIndex, stationNow = Date.now) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
   // Keep counts from every scene/postprocess pass within a single frame.
   renderer.info.autoReset = false;
@@ -119,6 +119,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
   let pendingHandShine = null;
   const workstations = createWorkstations(scene, mat, keyIndex, {
     effects: cleaningEffects,
+    stationNow,
     // The key leaves the bath for the hand: glint once it is fully clean.
     onLiftDone: (key, from) => {
       startHandFlight(key, from);

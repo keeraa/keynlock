@@ -2,28 +2,29 @@ import { t, applyTranslations, LANGUAGES, getLanguage, setLanguage } from './i18
 // Static texts of the page follow the chosen language before anything shows.
 applyTranslations(document);
 import { TOTAL_KEYS, getProgress } from './rules.js?v=stable-pickup';
-import { createWorld } from './world.js?v=shadow-footprints';
+import { createWorld } from './world.js?v=paused-stations';
 import { installKeyAssetProvider } from './key-factory.js?v=key-ring';
 import { createArchiveHud } from './archive-hud.js?v=catalog-thumbnails';
-import { openArchiveSave, loadVisualSettings, clearArchiveState } from './archive-save-state-with-route.js?v=stable-pickup';
+import { openArchiveSave, loadVisualSettings, clearArchiveState } from './archive-save-state-with-route.js?v=paused-stations';
 import { createVisualPanel } from './visual-panel.js?v=key-ring';
 import externalKeyProvider from './key-provider-entry.js?v=wax-and-bundles';
-import { createFallbackWorld } from './fallback-world.js?v=shadow-footprints';
+import { createFallbackWorld } from './fallback-world.js?v=paused-stations';
 import { createPlayerMovement } from './player-movement.js?v=ledger-candle';
 import { createPerformanceHud } from './performance-hud.js';
 import { createInventoryWheel, logicalKey } from './controls.js?v=stable-pickup';
 import { edgeLookRate } from './mouse-look.js';
 import { createKeyIndex } from './key-index.js?v=key-ring';
 import { createArchiveTargeting } from './archive-surface-aim.js?v=key-ring';
-import { createArchivePrompts } from './archive-interaction-prompts.js?v=key-catalog';
-import { createArchiveActions } from './archive-actions.js?v=stable-pickup';
+import { createArchivePrompts } from './archive-interaction-prompts.js?v=paused-stations';
+import { createArchiveActions } from './archive-actions.js?v=paused-stations';
 import { FIRST_ROUTE_KEY_ID, createFirstRouteGuide } from './archive-first-route-guide.js?v=key-ring';
-import { createBathProgress } from './archive-bath-progress.js?v=cleaning-cues';
+import { createBathProgress } from './archive-bath-progress.js?v=paused-stations';
 import { createArchiveKeyCatalog } from './archive-key-catalog.js?v=catalog-spread';
 import { createArchiveStatistics, createStatisticsPanel } from './archive-statistics.js?v=processed-count';
 import { createArchiveMusic } from './archive-music.js?v=music-resume-seek';
 import { createArchiveAudio } from './archive-audio.js?v=key-shine';
 import { floorSurfaceY, RUG_TOP } from './floor-contact.js';
+import { createStationClock } from './archive-station-clock.js';
 
 const $ = id => document.getElementById(id);
 if (externalKeyProvider) installKeyAssetProvider(externalKeyProvider);
@@ -34,27 +35,30 @@ const storage = (() => {
 const visualSettings = loadVisualSettings(storage);
 const archiveSave = openArchiveSave(storage);
 const { state } = archiveSave;
+const stationClock = createStationClock(state.stationTime);
+const stationNow = stationClock.now;
 const statistics = createArchiveStatistics(state);
 const statisticsPanel = createStatisticsPanel(document, statistics);
 const keyIndex = createKeyIndex(state.keys);
 let world;
 try {
-  world = createWorld(canvas, state, visualSettings, keyIndex);
+  world = createWorld(canvas, state, visualSettings, keyIndex, stationNow);
 } catch (error) {
   console.warn('WebGL недоступен. Используется графический резервный режим.', error.message);
-  world = createFallbackWorld(canvas, state, visualSettings, keyIndex);
+  world = createFallbackWorld(canvas, state, visualSettings, keyIndex, stationNow);
 }
 const camera = world.camera;
 const movement = createPlayerMovement(camera, world.bounds);
 const clamp = (number, a, b) => Math.max(a, Math.min(b, number));
 const hud = createArchiveHud(document, world, state, keyIndex);
 const catalog = createArchiveKeyCatalog(document, world, canvas, hud.keyThumbnail, () => play({ lockMouse: false }));
-const bathProgress = createBathProgress(document, world, keyIndex, state);
+const bathProgress = createBathProgress(document, world, keyIndex, state, stationNow);
 const routeGuide = createFirstRouteGuide(document, state, keyIndex, world);
 const performanceHud = createPerformanceHud(document, world);
 const visualPanel = createVisualPanel(document, world, storage, visualSettings);
 
 let mode = 'intro';
+const isPlaying = () => mode === 'play' && !document.hidden;
 let lastSmeltCheck = 0;
 let yaw = 0;
 let pitch = state.firstRoute && keyIndex.get(FIRST_ROUTE_KEY_ID)?.status === 'floor' ? -.30 : -.17;
@@ -88,10 +92,21 @@ const { tone } = audio;
 const { targetInView, clearAim } = createArchiveTargeting({ camera, world, state, keyIndex });
 const { interact, drop, updateWax, updateSmelting, isMelting } = createArchiveActions({
   state, keyIndex, world, camera, targetInView,
-  getYaw: () => yaw, isPlaying: () => mode === 'play',
+  getYaw: () => yaw, isPlaying, stationNow,
   save, updateHud, tone, toast, showVictory, statistics, openCatalog,
   invalidateHover: () => { lastHoverKey = '!'; },
 });
+
+function saveSnapshot() {
+  state.stationTime = stationNow();
+  return archiveSave.save();
+}
+
+function syncActivity(active = isPlaying()) {
+  stationClock.setActive(active);
+  audio.setPlaying(active);
+  if (statistics.setActive(active)) saveSnapshot();
+}
 
 function save({ initial = false } = {}) {
   if (!initial) {
@@ -100,7 +115,7 @@ function save({ initial = false } = {}) {
   }
   if (state.firstRoute && keyIndex.get(FIRST_ROUTE_KEY_ID)?.status === 'sorted') state.firstRoute = false;
   keyIndex.rebuild();
-  const result = archiveSave.save();
+  const result = saveSnapshot();
   const status = $('save-status');
   const message = saveMessages[result] || (announceRecovery ? t('save.recovered') : '');
   if (status.textContent !== message) status.textContent = message;
@@ -118,7 +133,7 @@ function toast(message, error = false) {
   toastTimeout = setTimeout(() => element.classList.remove('visible'), 2100);
 }
 
-const promptFor = createArchivePrompts(state, keyIndex, isMelting);
+const promptFor = createArchivePrompts(state, keyIndex, isMelting, stationNow);
 const litCabinets = world.cabinets.map(cabinet => cabinet.completion.isComplete());
 const startedRows = world.cabinets.map(cabinet => cabinet.completion.rowsStarted());
 const soundForward = new world.THREE.Vector3();
@@ -164,8 +179,7 @@ function turn(dx, dy) {
 
 function setMode(next) {
   mode = next;
-  if (statistics.setActive(next === 'play' && !document.hidden)) archiveSave.save();
-  audio.setPlaying(mode === 'play');
+  syncActivity();
   document.body.classList.toggle('playing', next === 'play');
   $('intro').classList.toggle('is-hidden', next !== 'intro');
   $('pause').classList.toggle('is-hidden', next !== 'pause');
@@ -277,13 +291,9 @@ function openStatistics() {
 $('statistics-open').addEventListener('click', openStatistics);
 $('victory-statistics').addEventListener('click', openStatistics);
 $('statistics-back').addEventListener('click', () => setMode(statisticsReturn));
-document.addEventListener('visibilitychange', () => {
-  if (statistics.setActive(mode === 'play' && !document.hidden)) archiveSave.save();
-});
-window.addEventListener('pagehide', () => {
-  if (statistics.setActive(false)) archiveSave.save();
-});
-window.addEventListener('pageshow', () => statistics.setActive(mode === 'play' && !document.hidden));
+document.addEventListener('visibilitychange', () => syncActivity());
+window.addEventListener('pagehide', () => syncActivity(false));
+window.addEventListener('pageshow', () => syncActivity());
 $('visual-resume').addEventListener('click', play);
 $('visual-back').addEventListener('click', () => setMode('pause'));
 visualPanel.bind();
@@ -411,38 +421,40 @@ function tick(now) {
   if (COVERED_SCENE_MODES.has(mode) && now - lastRender < COVERED_FRAME_INTERVAL - 1) return;
   lastRender = now;
   const cpuStart = performance.now();
+  const playing = isPlaying();
   const delta = Math.min((now - lastTick) / 1000, .04);
   lastTick = now;
   let moving = false;
   let distance = 0;
-  if (mode === 'play') {
+  if (playing) {
     const { x, z } = camera.position;
     moving = movement.move(heldMovement, yaw, delta);
     distance = Math.hypot(camera.position.x - x, camera.position.z - z);
     audio.walk(distance, floorSurfaceY(camera.position.x, camera.position.z) === RUG_TOP, heldMovement.has('shift'));
   }
   hud.walk(distance, delta);
-  if (mode === 'play' && document.pointerLockElement !== canvas && now < edgeLook.until) {
+  if (playing && document.pointerLockElement !== canvas && now < edgeLook.until) {
     yaw -= edgeLook.x * 1.6 * delta;
     pitch = clamp(pitch - edgeLook.y * 1.3 * delta, -1.31, 1.27);
   }
   camera.rotation.set(pitch, yaw, 0, 'YXZ');
-  const target = mode === 'play' ? targetInView() : null;
-  updateWax(now, target);
+  const target = playing ? targetInView() : null;
+  const time = stationNow();
+  if (playing) updateWax(time, target);
   if (statistics.shouldCheckpoint()) {
     statistics.checkpoint();
-    archiveSave.save();
+    saveSnapshot();
   }
-  if (now - lastSmeltCheck > 250) { lastSmeltCheck = now; updateSmelting(); }
-  audio.setWaxMelting(isMelting());
-  if (mode === 'play') setHovered(target);
-  if (mode === 'play' && hovered?.kind === 'bath') {
+  if (playing && now - lastSmeltCheck > 250) { lastSmeltCheck = now; updateSmelting(time); }
+  audio.setWaxMelting(playing && isMelting());
+  if (playing) setHovered(target);
+  if (playing && hovered?.kind === 'bath') {
     const currentPrompt = promptFor(hovered);
     if ($('interaction-prompt').innerHTML !== currentPrompt) $('interaction-prompt').innerHTML = currentPrompt;
   }
-  bathProgress.update(mode === 'play', playAt);
-  routeGuide.update(mode === 'play');
-  world.update(now, moving, mode === 'play', playAt);
+  bathProgress.update(playing, playAt);
+  routeGuide.update(playing);
+  world.update(now, moving, playing, playing ? playAt : null);
   if (audio.hasSpatialVoices()) {
     soundForward.set(0, 0, -1).applyQuaternion(camera.quaternion);
     soundUp.set(0, 1, 0).applyQuaternion(camera.quaternion);

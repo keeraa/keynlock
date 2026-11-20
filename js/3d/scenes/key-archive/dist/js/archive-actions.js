@@ -17,7 +17,7 @@ import { RIGHT_HAND_RELEASE } from './held-key-motion.js?v=2';
 // All state-changing player actions live here and work identically in both renderers.
 export function createArchiveActions({
   state, keyIndex, world, camera, targetInView, getYaw, isPlaying,
-  save, updateHud, tone, toast, showVictory, invalidateHover, statistics, openCatalog,
+  save, updateHud, tone, toast, showVictory, invalidateHover, statistics, openCatalog, stationNow = Date.now,
 }) {
   let melting = null;
 
@@ -54,7 +54,7 @@ export function createArchiveActions({
       const key = selectedKey(state);
       if (!target.lit || !key?.wax || key.broken) return;
       if (melting?.candleId === target.id && melting.keyId === key.id) return;
-      melting = { candleId: target.id, keyId: key.id, until: performance.now() + WAX_MELT_MS };
+      melting = { candleId: target.id, keyId: key.id, until: stationNow() + WAX_MELT_MS };
       toast(t('toast.holdToFlame'));
       invalidateHover();
       return;
@@ -82,9 +82,10 @@ export function createArchiveActions({
       return;
     }
     if (target.kind === 'bath') {
+      const now = stationNow();
       const key = selectedKey(state);
       if (key?.wax) { toast(t('toast.pickedWax'), true); return; }
-      if (key && startSoak(state, target.id, target.bathKind)) {
+      if (key && startSoak(state, target.id, target.bathKind, now)) {
         statistics?.record(target.bathKind === 'mud' ? 'rinse' : 'rust');
         updateHud();
         save();
@@ -92,13 +93,13 @@ export function createArchiveActions({
         toast(target.bathKind === 'mud' ? t('toast.washing') : t('toast.soaking', { seconds: SOAK_SECONDS.rust }));
       } else {
         const aimed = target.keyId && keyIndex.get(target.keyId);
-        if (aimed && aimed.bathUntil > Date.now()) {
+        if (aimed && aimed.bathUntil > now) {
           toast(t(target.bathKind === 'mud' ? 'toast.stillWashing' : 'toast.stillSoaking'), true);
           tone('wrong');
           invalidateHover();
           return;
         }
-        const collected = collectSoakedKey(state, target.id, Date.now(), target.keyId ?? null);
+        const collected = collectSoakedKey(state, target.id, now, target.keyId ?? null);
         if (collected) {
           const washed = target.bathKind === 'mud';
           statistics?.record(washed ? 'rinse' : 'rust', {
@@ -112,7 +113,7 @@ export function createArchiveActions({
           tone('lift');
           toast(t(collected.mud || collected.rust ? 'toast.layerCleaned' : 'toast.keyCleaned'));
         } else {
-          const contents = keyIndex.bathContents(target.id);
+          const contents = keyIndex.bathContents(target.id, now);
           toast(t(contents.ready.length && state.held.length >= MAX_HELD ? 'toast.freeHands' :
             contents.space === 0 ? 'toast.bathFull' :
               contents.pending.length ? 'toast.waitSoak' :
@@ -146,7 +147,7 @@ export function createArchiveActions({
         return;
       }
       world.animateDiscard(key, target.stationId);
-      trashSelectedKey(state);
+      trashSelectedKey(state, stationNow());
       statistics?.record('forge');
       updateHud();
       save();
@@ -268,7 +269,7 @@ export function createArchiveActions({
   }
 
   // Metal is ready when a smelt finishes, even while the player is elsewhere.
-  function updateSmelting(now = Date.now()) {
+  function updateSmelting(now = stationNow()) {
     const settled = settleSmelting(state, now);
     if (!settled) return;
     statistics?.record('forge');

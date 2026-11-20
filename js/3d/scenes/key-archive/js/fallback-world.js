@@ -4,7 +4,7 @@ import { createLedgerCollider } from './archive-ledger.js?v=key-catalog';
 import { createArchiveCandles } from './archive-candles.js?v=key-catalog';
 import { KEY_TYPES } from './rules.js?v=key-ring';
 import { createFallbackSurfaces } from './fallback-surfaces.js?v=key-ring';
-import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=shadow-footprints';
+import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=paused-stations';
 import { samplePickupLift } from './held-key-motion.js?v=stable-pickup';
 import { sampleThrow } from './archive-throw-trajectory.js?v=archive-foley';
 import { playMotionContact, samplePlacement, sampleDiscard } from './archive-key-motion.js?v=key-ring';
@@ -15,7 +15,7 @@ import { PLAYER_EYE_HEIGHT } from './player-config.js';
 
 // A lightweight first-person perspective renderer for browsers that disable WebGL.
 // All picking and game rules still use the same Three.js world coordinates.
-export function createFallbackWorld(canvas, state, initialVisualSettings, keyIndex) {
+export function createFallbackWorld(canvas, state, initialVisualSettings, keyIndex, stationNow = Date.now) {
   const ctx = canvas.getContext('2d', { alpha: false });
   if (!ctx) throw new Error('Не удалось инициализировать 2D- или 3D-графику.');
   const surfaces = createFallbackSurfaces(ctx);
@@ -106,7 +106,7 @@ export function createFallbackWorld(canvas, state, initialVisualSettings, keyInd
   interactables.push(...candleSet.colliders, ledgerCollider);
   let ledgerVisible = true;
   const canvasRenderer = createFallbackCanvasRenderer({
-    candles: candleSet.candles,
+    candles: candleSet.candles, stationNow,
     ctx, scene, camera, surfaces, state, cabinets, workstations, keyIndex,
     thrownKeys, placingKeys, discardingKeys, fixtureHover, keyHover,
   });

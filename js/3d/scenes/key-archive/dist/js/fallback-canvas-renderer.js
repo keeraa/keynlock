@@ -24,7 +24,7 @@ const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 // Canvas-only illustration code. No collision, input, save, or game-state mutation.
 export function createFallbackCanvasRenderer({
   ctx, scene, camera, surfaces, state, cabinets, workstations, keyIndex,
-  thrownKeys, placingKeys, discardingKeys, fixtureHover, keyHover, candles,
+  thrownKeys, placingKeys, discardingKeys, fixtureHover, keyHover, candles, stationNow = Date.now,
 }) {
   let width = 0, height = 0, frameTime = 0, lastDraw = -Infinity;
   let playing = false, ledgerVisible = true;
@@ -398,7 +398,7 @@ export function createFallbackCanvasRenderer({
       ctx.stroke();
       const id = bathId(station.id, kind);
       const keys = keyIndex.bathKeys(id);
-      const wallTime = Date.now();
+      const wallTime = stationNow();
       drawBathActivity(ctx, p, r, kind, keys, frameTime, wallTime);
       drawBathKeys(ctx, p, r, kind, keys, wallTime, workstations.lifts.get(id), frameTime);
     }

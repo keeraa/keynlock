@@ -13,7 +13,7 @@ function readArchiveSnapshot(raw, migrate = value => value) {
   if (raw === null) return null;
   try {
     const snapshot = migrate(JSON.parse(raw));
-    upgradeStationBaths(snapshot);
+    upgradeStationBaths(snapshot, Number.isFinite(snapshot?.stationTime) ? snapshot.stationTime : undefined);
     if (!validateState(snapshot)) return null;
     upgradeKeyConditions(snapshot);
     upgradeCabinetSlots(snapshot);

@@ -1,6 +1,6 @@
 import { t } from './i18n.js';
 import { STATIONS, FIXTURE_OFFSETS, FORGE_SURFACE_Y, bathId } from './station-layout.js';
-import { RUST_TRAY } from './wash-forge-stations.js?v=cleaning-cues';
+import { RUST_TRAY } from './wash-forge-stations.js?v=paused-stations';
 import { smeltingState } from './rules.js?v=key-ring';
 import { bathKeyProgress, waterDipCount } from './station-visual-state.js?v=cleaning-cues';
 
@@ -11,7 +11,7 @@ export function bathReadiness(keys, kind, now) {
   return { progress, status: !keys.length ? 'empty' : progress >= 1 ? 'ready' : 'processing' };
 }
 
-export function createBathProgress(document, world, keyIndex, state = null) {
+export function createBathProgress(document, world, keyIndex, state = null, stationNow = Date.now) {
   const root = document.getElementById('bath-progress');
   const canvas = document.getElementById('world');
   const { camera, THREE } = world;
@@ -29,7 +29,7 @@ export function createBathProgress(document, world, keyIndex, state = null) {
   };
   forge.bar = forge.element?.querySelector('progress');
   forge.timer = forge.element?.querySelector('.forge-timer');
-  const initialTime = Date.now();
+  const initialTime = stationNow();
   for (const bar of bars) {
     const keys = keyIndex.bathKeys(bar.id);
     bar.ready = keys.some(key => key.bathUntil <= initialTime);
@@ -54,11 +54,8 @@ export function createBathProgress(document, world, keyIndex, state = null) {
   }
   function update(playing, playSound) {
     root.hidden = !playing;
-    const now = Date.now();
-    if (!playing) {
-      for (const bar of bars) updateWaterDips(bar, keyIndex.bathKeys(bar.id), now);
-      return;
-    }
+    if (!playing) return;
+    const now = stationNow();
     camera.updateMatrixWorld();
     const width = canvas.clientWidth, height = canvas.clientHeight;
     const focal = height / (2 * Math.tan(camera.fov * Math.PI / 360));

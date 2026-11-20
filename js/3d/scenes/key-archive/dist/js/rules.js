@@ -1,5 +1,6 @@
-import { BATH_CAPACITY, SOAK_SECONDS, bathId, validBathId } from './station-layout.js?v=single-source';
-import { CABINET_CAPACITY } from './cabinet-layout.js?v=single-source';
+import { BATH_CAPACITY, SOAK_SECONDS, bathId, validBathId } from './station-layout.js';
+import { CABINET_CAPACITY } from './cabinet-layout.js';
+import { SAVE_REVISION } from './save-revisions.js';
 
 // `id` is a stable legacy save slot. The displayed family is from the Forge.
 export const KEY_TYPES = [
@@ -63,8 +64,8 @@ export function createInitialKeys() {
 }
 
 export function createInitialState() {
-  return { version: 2, keys: createInitialKeys(), held: [], selected: 0, metal: 0, bundles: 0, activeBundle: null,
-    floorDistributionVersion: FLOOR_DISTRIBUTION_VERSION };
+  return { version: 2, revision: SAVE_REVISION, keys: createInitialKeys(), held: [], selected: 0, metal: 0, bundles: 0,
+    activeBundle: null, floorDistributionVersion: FLOOR_DISTRIBUTION_VERSION };
 }
 
 // Existing saves previously grouped each family in a separate heap. Redistribute

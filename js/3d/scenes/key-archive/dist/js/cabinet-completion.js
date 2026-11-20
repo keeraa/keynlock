@@ -1,4 +1,4 @@
-import { CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS } from './cabinet-layout.js?v=single-source';
+import { CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS } from './cabinet-layout.js';
 
 export const COMPLETION_SECONDS = 2.25;
 export function sampleCabinetCelebration(seconds) {

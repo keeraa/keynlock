@@ -1,5 +1,5 @@
-import ru from './locales/ru.js?v=room-music';
-import en from './locales/en.js?v=room-music';
+import ru from './locales/ru.js';
+import en from './locales/en.js';
 
 // Translations for every player-facing text of the archive.
 //  * Code: t('toast.keyPlaced'), t('toast.picked', { name }) with {placeholders}.

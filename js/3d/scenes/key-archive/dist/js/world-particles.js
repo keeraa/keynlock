@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { dustOriginInWindowBeam, windowBeamLightAt } from './archive-window-rays.js?v=alchemy-candles';
+import { dustOriginInWindowBeam, windowBeamLightAt } from './archive-window-rays.js';
 
 export function addDust(scene) {
   const count = 840;

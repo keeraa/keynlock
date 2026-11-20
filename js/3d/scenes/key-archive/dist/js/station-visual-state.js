@@ -1,4 +1,4 @@
-import { SOAK_SECONDS } from './station-layout.js?v=single-source';
+import { SOAK_SECONDS } from './station-layout.js';
 
 const clamp01 = value => Math.max(0, Math.min(1, value));
 export const BATH_LIFT_MS = 950;

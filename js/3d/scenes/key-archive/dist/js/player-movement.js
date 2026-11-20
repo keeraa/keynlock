@@ -1,7 +1,7 @@
-import { ARCHIVE_SIDE_TABLES } from './archive-ledger.js?v=single-source';
+import { ARCHIVE_SIDE_TABLES } from './archive-ledger.js';
 import { PLAYER_EYE_HEIGHT } from './player-config.js';
-import { inStationFootprint } from './station-layout.js?v=single-source';
-import { CABINET_Z, CABINET_BODY_WIDTH } from './cabinet-layout.js?v=single-source';
+import { inStationFootprint } from './station-layout.js';
+import { CABINET_Z, CABINET_BODY_WIDTH } from './cabinet-layout.js';
 
 export function createPlayerMovement(camera, bounds) {
   let stepPhase = 0;

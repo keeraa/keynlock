@@ -1,6 +1,6 @@
 import * as THREE from '../vendor/three.js';
 import { KEY_ART } from './key-art.js';
-import { createKeyModel, disposeKeySceneModel } from './key-factory.js?v=key-ring';
+import { createKeyModel, disposeKeySceneModel } from './key-factory.js';
 
 const SIZE = 160;
 const inkValue = Number.parseInt(KEY_ART.outline.ink.slice(1), 16);

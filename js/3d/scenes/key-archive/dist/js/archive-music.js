@@ -1,4 +1,4 @@
-import { createArchiveMusicMix } from './archive-music-mix.js?v=underwater-menu';
+import { createArchiveMusicMix } from './archive-music-mix.js';
 
 const VOLUME_KEY = 'keynlock-archive-music-volume-v1';
 const SPATIAL_KEY = 'keynlock-archive-music-spatial-v1';

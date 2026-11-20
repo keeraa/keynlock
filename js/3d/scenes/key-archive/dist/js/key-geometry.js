@@ -1,8 +1,8 @@
 import * as THREE from '../vendor/three.js';
 import { KEY_TEMPLATES, fixedMetal } from './key-data.js';
 import { joinedKeyShape } from './key-shapes.js';
-import { getMetalMaterial } from './key-materials.js?v=wax-and-bundles';
-import { crustWidth, dirtTriangles, getDirtMaterial } from './key-dirt.js?v=wax-and-bundles';
+import { getMetalMaterial } from './key-materials.js';
+import { crustWidth, dirtTriangles, getDirtMaterial } from './key-dirt.js';
 import { getKeyAnchors } from './key-placement.js';
 
 function extrude(shape,depth) {

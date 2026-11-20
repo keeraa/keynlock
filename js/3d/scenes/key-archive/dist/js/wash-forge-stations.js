@@ -1,13 +1,13 @@
 import * as THREE from '../vendor/three.js';
 import { RUG_TOP } from './floor-contact.js';
-import { furnitureShadow } from './world-architecture.js?v=single-source';
+import { furnitureShadow } from './world-architecture.js';
 import { createStationFinishes } from './station-finish.js';
 import { createKeyModel, createCombinedKeyGeometry, disposeKeySceneModel, getKeyDisplayScale, getKeyRustStrength,
-  getKeyCoatLayout, buildKeyCoatGeometry, getKeyCoatPoint } from './key-factory.js?v=key-ring';
-import { rustFlakingPaint } from './key-instance-finish.js?v=wax-and-bundles';
-import { bathKeyProgress, waterDip, BATH_LIFT_MS } from './station-visual-state.js?v=cleaning-cues';
-import { BATH_CAPACITY, FORGE_SURFACE_Y, FIXTURE_OFFSETS, STATIONS, SOAK_SECONDS, bathId } from './station-layout.js?v=single-source';
-import { createBathEffects, createForgeEffects, createEffectSpotTexture } from './station-visual-effects.js?v=cleaning-cues';
+  getKeyCoatLayout, buildKeyCoatGeometry, getKeyCoatPoint } from './key-factory.js';
+import { rustFlakingPaint } from './key-instance-finish.js';
+import { bathKeyProgress, waterDip, BATH_LIFT_MS } from './station-visual-state.js';
+import { BATH_CAPACITY, FORGE_SURFACE_Y, FIXTURE_OFFSETS, STATIONS, SOAK_SECONDS, bathId } from './station-layout.js';
+import { createBathEffects, createForgeEffects, createEffectSpotTexture } from './station-visual-effects.js';
 
 function block(parent, dimensions, where, material) {
   const object = new THREE.Mesh(new THREE.BoxGeometry(...dimensions), material);
@@ -33,6 +33,11 @@ function rim(parent, radius, y, x, z, material, thickness = .052) {
 
 // The rust solution sits in a low rectangular ceramic tray; keys lie flat in
 // one row under the liquid.
+// The workbench under each station. Bowls, the forge and the rust tray stand
+// on its top at surfaceY; depth runs along the player's view of the bench.
+export const BENCH = Object.freeze({ width: 5.0, depth: 1.26, thickness: .2, surfaceY: .9275, z: .08,
+  legs: Object.freeze([-.47, .47]), rails: Object.freeze([-.42, .42]) });
+
 export const RUST_TRAY = Object.freeze({ width: .94, depth: .56, wall: .045, base: .95, height: .12,
   surface: 1.035, slots: [-.31, -.105, .105, .31] });
 
@@ -278,19 +283,21 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
     const group = new THREE.Group();
     group.position.set(station.x, 0, station.z);
     scene.add(group);
-    furnitureShadow(group, benchFloor, 0, RUG_TOP + .003, .08);
-    furnitureShadow(group, fixtures, 0, .905 + .045 / 2 + .002, .08);
+    furnitureShadow(group, benchFloor, 0, RUG_TOP + .003, BENCH.z);
+    furnitureShadow(group, fixtures, 0, BENCH.surfaceY + .002, BENCH.z);
     // Low, open workbench: the hall remains readable and cabinets stay visible.
-    // The bench hides floor keys under it from aiming.
-    const apron = block(group, [5.05, .16, 1.62], [0, .81, .08], finish.benchEdge);
-    const top = block(group, [4.92, .045, 1.48], [0, .905, .08], finish.benchTop);
-    apron.castShadow = true;
+    // One solid slab, just deep enough for the widest bowl; its top face is
+    // the painted walnut, its sides the darker edge. It hides floor keys under
+    // it from aiming.
+    const { width, depth, thickness, surfaceY, z } = BENCH;
+    const edge = finish.benchEdge;
+    const top = block(group, [width, thickness, depth], [0, surfaceY - thickness / 2, z],
+      [edge, edge, finish.benchTop, edge, edge, edge]);
     top.castShadow = top.receiveShadow = true;
-    occluders.push(apron, top);
-    for (const x of [-2.29, 2.29]) for (const z of [-.55, .69])
-      block(group, [.16, .80, .16], [x, .38, z], materials.darkWood).castShadow = true;
-    block(group, [4.86, .12, .27], [0, .29, -.49], materials.blackWood);
-    block(group, [4.86, .12, .27], [0, .29, .67], materials.blackWood);
+    occluders.push(top);
+    for (const x of [-2.29, 2.29]) for (const leg of BENCH.legs)
+      block(group, [.16, .80, .16], [x, .38, z + leg], materials.darkWood).castShadow = true;
+    for (const rail of BENCH.rails) block(group, [4.86, .12, .27], [0, .29, z + rail], materials.blackWood);
     const baths = ['mud', 'rust'].map(kind => createBath(group, station, kind, spotTexture, finish.glaze));
     const forge = createForge(group, station, materials, spotTexture, finish);
     for (const bath of baths) {

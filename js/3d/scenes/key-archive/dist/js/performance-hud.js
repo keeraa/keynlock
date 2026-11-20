@@ -1,4 +1,4 @@
-import { t } from './i18n.js?v=single-source';
+import { t } from './i18n.js';
 export function createPerformanceHud(document, world) {
   const $ = id => document.getElementById(id);
   let started = performance.now();

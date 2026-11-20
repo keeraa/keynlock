@@ -137,6 +137,7 @@ export default Object.freeze({
 
   'save.unavailable': 'Browser storage is unavailable. This session will not be saved.',
   'save.damaged': 'The save is damaged. Autosave is paused. You can start over from the pause menu.',
+  'save.newer': 'This save comes from a newer version of the game. Reload the page; your progress is untouched.',
   'save.conflict': 'The save changed elsewhere. Reload the game to open the latest progress.',
   'save.writeError': 'Could not save the progress. Autosave will try again on your next action.',
   'save.backupError': 'Progress saved, but the backup copy was not updated.',
@@ -222,4 +223,7 @@ export default Object.freeze({
   'catalog.previous': "Previous",
   'catalog.next': "Next",
   'catalog.spread': "Spread {current} of {total}",
+
+  'sign.backHall': "HALL OF FORGOTTEN DOORS",
+  'sign.backHallNote': "behind the archive · closed",
 });

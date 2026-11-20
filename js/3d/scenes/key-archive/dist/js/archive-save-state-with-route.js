@@ -2,25 +2,34 @@ import {
   STORAGE_KEY, LEGACY_STORAGE_KEY, createInitialState,
   validateState, migrateLegacyState, upgradeKeyConditions, upgradeFloorDistribution,
   upgradeStationBaths, upgradeCabinetSlots, packHeldBundle,
-} from './rules.js?v=single-source';
-import { prepareFirstRoute } from './archive-first-route-guide.js?v=key-ring';
-import { separateFloorKeys } from './key-spacing.js?v=18';
-import { VISUAL_STORAGE_KEY, normalizeVisualSettings } from './visual-settings.js?v=clear-day';
+} from './rules.js';
+import { isNewerSave, migrateSave } from './save-revisions.js';
+import { prepareFirstRoute } from './archive-first-route-guide.js';
+import { separateFloorKeys } from './key-spacing.js';
+import { VISUAL_STORAGE_KEY, normalizeVisualSettings } from './visual-settings.js';
 
 export const BACKUP_STORAGE_KEY = `${STORAGE_KEY}-backup`;
 
 function readArchiveSnapshot(raw, migrate = value => value) {
   if (raw === null) return null;
   try {
-    const snapshot = migrate(JSON.parse(raw));
+    const parsed = JSON.parse(raw);
+    // A newer build wrote this save: never downgrade or overwrite it.
+    if (isNewerSave(parsed)) return null;
+    const snapshot = migrate(parsed);
     upgradeStationBaths(snapshot, Number.isFinite(snapshot?.stationTime) ? snapshot.stationTime : undefined);
     if (!validateState(snapshot)) return null;
     upgradeKeyConditions(snapshot);
     upgradeCabinetSlots(snapshot);
-    return snapshot;
+    return migrateSave(snapshot);
   } catch {
     return null;
   }
+}
+
+function writtenByNewerBuild(raw) {
+  try { return raw !== null && isNewerSave(JSON.parse(raw)); }
+  catch { return false; }
 }
 
 function prepareArchive(state) {
@@ -51,6 +60,7 @@ export function openArchiveSave(storage) {
   const migrated = current || reserve ? null : readArchiveSnapshot(legacy, migrateLegacyState);
   const found = current || reserve || migrated;
   const blocked = !readable ? 'unavailable' :
+    [primary, backup].some(writtenByNewerBuild) ? 'newer' :
     !found && [primary, backup, legacy].some(value => value !== null) ? 'damaged' : null;
   const recovered = Boolean(!current && (reserve || (migrated && primary !== null)));
   const state = prepareArchive(found || createInitialState());

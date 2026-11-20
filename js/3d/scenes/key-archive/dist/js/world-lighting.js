@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { cylinder } from './world-architecture.js?v=single-source';
+import { cylinder } from './world-architecture.js';
 
 export function makeChandeliers(scene, mat) {
   for (const z of [-13, 0, 13]) {

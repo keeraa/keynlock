@@ -1,13 +1,13 @@
 import { createCanvasWindowSky } from './archive-sky.js';
 import { windowLightPalette } from './window-light-palette.js';
-import { createWindowBirdFlight, BIRD_WIDTH, BIRD_HEIGHT } from './archive-window-bird.js?v=paused-scene';
-import { WINDOW_WASHES, WINDOW_BEAM_SLOPE, WINDOW_BEAM_HALF_WIDTH } from './window-beam-light.js?v=alchemy-candles';
+import { createWindowBirdFlight, BIRD_WIDTH, BIRD_HEIGHT } from './archive-window-bird.js';
+import { WINDOW_WASHES, WINDOW_BEAM_SLOPE, WINDOW_BEAM_HALF_WIDTH } from './window-beam-light.js';
 import { ENTRANCE_DOOR_TEXTURE_URL } from './entrance-door-texture.js';
-import { ENTRANCE_CANDLE, sampleCandleFlicker } from './archive-candles.js?v=key-catalog';
-import { ARCHIVE_DESK, ARCHIVE_LEDGER, ARCHIVE_LEDGER_URL } from './archive-ledger.js?v=single-source';
+import { ENTRANCE_CANDLE, sampleCandleFlicker } from './archive-candles.js';
+import { ARCHIVE_DESK, ARCHIVE_LEDGER, ARCHIVE_LEDGER_URL } from './archive-ledger.js';
 import { WINDOW_CENTERS, PILASTER_CENTERS, PERIMETER_BAND_Y, vaultHeight,
   WINDOW_SILL_Y, WINDOW_SPRING_Y, WINDOW_SCALE, WINDOW_VERTICAL_SCALE, windowY,
-  HALL_HEIGHT_SCALE, WINDOW_OPENING_RADIUS } from './hall-architecture.js?v=single-source';
+  HALL_HEIGHT_SCALE, WINDOW_OPENING_RADIUS } from './hall-architecture.js';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 

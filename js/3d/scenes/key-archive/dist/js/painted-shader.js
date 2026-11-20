@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { DUST_OCCLUSION_GLSL, SCENE_OUTLINE_GLSL, createSceneOutlineUniforms } from './scene-outline.js?v=readable-ink';
+import { DUST_OCCLUSION_GLSL, SCENE_OUTLINE_GLSL, createSceneOutlineUniforms } from './scene-outline.js';
 
 const vertexShader = `varying vec2 vUv;
 void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;

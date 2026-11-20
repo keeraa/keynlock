@@ -1,11 +1,12 @@
 import * as THREE from '../vendor/three.js';
-import { makeLabel } from './art.js?v=key-ring';
-import { HALL_SURFACE_TILE_METERS } from './hall-surface-textures.js?v=alchemy-candles';
-import { createMetricBoxGeometry } from './metric-box-geometry.js?v=23';
+import { makeLabel } from './art.js';
+import { t } from './i18n.js';
+import { HALL_SURFACE_TILE_METERS } from './hall-surface-textures.js';
+import { createMetricBoxGeometry } from './metric-box-geometry.js';
 import { WINDOW_CENTERS, PILASTER_CENTERS, PERIMETER_BAND_Y, HALL_HEIGHT_SCALE, HALL_END_WALL_HEIGHT,
-  addArchedWindow, addWindowedWall, addVault } from './hall-architecture.js?v=single-source';
+  addArchedWindow, addWindowedWall, addVault } from './hall-architecture.js';
 import { ENTRANCE_DOOR_TEXTURE_URL } from './entrance-door-texture.js';
-import { ARCHIVE_DESK, ARCHIVE_SIDE_TABLES } from './archive-ledger.js?v=single-source';
+import { ARCHIVE_DESK, ARCHIVE_SIDE_TABLES } from './archive-ledger.js';
 import { floorSurfaceY } from './floor-contact.js';
 
 export function box(parent, size, position, material) {
@@ -157,7 +158,7 @@ export function makeHall(scene, mat) {
   keyholeTop.position.set(0, 5.30, -22.08);
   forgottenDoor.add(keyholeTop);
   box(forgottenDoor, [.17, .38, .045], [0, 5.07, -22.07], mat.ink);
-  const backLabel = makeLabel('ЗАЛ ЗАБЫТЫХ ДВЕРЕЙ', 'за архивом · закрыто', { worldWidth: 4.45, worldHeight: .95, fontSize: 64 });
+  const backLabel = makeLabel(t('sign.backHall'), t('sign.backHallNote'), { worldWidth: 4.45, worldHeight: .95, fontSize: 64 });
   backLabel.position.set(0, 8.43, -22.85);
   forgottenDoor.add(backLabel);
 

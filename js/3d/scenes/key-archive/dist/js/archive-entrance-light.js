@@ -1,8 +1,8 @@
 import * as THREE from '../vendor/three.js';
 import { floorSurfaceY, RUG_TOP } from './floor-contact.js';
-import { WINDOW_WASHES, WINDOW_BEAM_GLSL } from './window-beam-light.js?v=alchemy-candles';
+import { WINDOW_WASHES, WINDOW_BEAM_GLSL } from './window-beam-light.js';
 
-export { WINDOW_WASHES } from './window-beam-light.js?v=alchemy-candles';
+export { WINDOW_WASHES } from './window-beam-light.js';
 
 export const birdShadowGlsl = `
   uniform sampler2D uWindowBirdMap;

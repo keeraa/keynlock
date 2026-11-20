@@ -1,16 +1,16 @@
 import * as THREE from '../vendor/three.js';
 import { floorSurfaceY, RUG_TOP } from './floor-contact.js';
-import { createLedgerCollider } from './archive-ledger.js?v=single-source';
-import { createArchiveCandles } from './archive-candles.js?v=key-catalog';
-import { KEY_TYPES } from './rules.js?v=single-source';
-import { createFallbackSurfaces } from './fallback-surfaces.js?v=key-ring';
-import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=paused-scene';
-import { samplePickupLift } from './held-key-motion.js?v=single-source';
-import { sampleThrow } from './archive-throw-trajectory.js?v=archive-foley';
-import { playMotionContact, samplePlacement, sampleDiscard } from './archive-key-motion.js?v=key-ring';
-import { CABINET_GRID_WIDTH, CABINET_Z, CABINET_CORNICE_TOP, cabinetKeyPose } from './cabinet-layout.js?v=single-source';
-import { STATIONS, FIXTURE_OFFSETS, bathId, FORGE_SURFACE_Y } from './station-layout.js?v=single-source';
-import { BATH_LIFT_MS } from './station-visual-state.js?v=cleaning-cues';
+import { createLedgerCollider } from './archive-ledger.js';
+import { createArchiveCandles } from './archive-candles.js';
+import { KEY_TYPES } from './rules.js';
+import { createFallbackSurfaces } from './fallback-surfaces.js';
+import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js';
+import { samplePickupLift } from './held-key-motion.js';
+import { sampleThrow } from './archive-throw-trajectory.js';
+import { playMotionContact, samplePlacement, sampleDiscard } from './archive-key-motion.js';
+import { CABINET_GRID_WIDTH, CABINET_Z, CABINET_CORNICE_TOP, cabinetKeyPose } from './cabinet-layout.js';
+import { STATIONS, FIXTURE_OFFSETS, bathId, FORGE_SURFACE_Y } from './station-layout.js';
+import { BATH_LIFT_MS } from './station-visual-state.js';
 import { PLAYER_EYE_HEIGHT } from './player-config.js';
 
 // A lightweight first-person perspective renderer for browsers that disable WebGL.

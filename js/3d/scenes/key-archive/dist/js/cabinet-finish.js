@@ -1,6 +1,6 @@
 import * as THREE from '../vendor/three.js';
 import { CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_GRID_HALF_WIDTH,
-  CABINET_CORNICE_TOP, CABINET_GRID_BOTTOM_Y, CABINET_GRID_TOP_Y, CABINET_ROWS } from './cabinet-layout.js?v=single-source';
+  CABINET_CORNICE_TOP, CABINET_GRID_BOTTOM_Y, CABINET_GRID_TOP_Y, CABINET_ROWS } from './cabinet-layout.js';
 
 // Round the visible edge inside the board's original dimensions. The back,
 // shelf spacing and grid stay fixed so keys and the reticle still line up.

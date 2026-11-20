@@ -1,2 +1,2 @@
 // Support cached game pages importing this entry point.
-export { createArchiveTargeting } from './archive-surface-aim.js?v=key-ring';
+export { createArchiveTargeting } from './archive-surface-aim.js';

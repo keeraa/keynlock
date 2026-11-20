@@ -1,5 +1,5 @@
-import { makePaintTexture } from './art.js?v=key-ring';
-import { HALL_SURFACE_URLS } from './hall-surface-textures.js?v=alchemy-candles';
+import { makePaintTexture } from './art.js';
+import { HALL_SURFACE_URLS } from './hall-surface-textures.js';
 import { ARCHIVE_FLOOR_TEXTURE_URL } from './archive-floor-texture.js';
 import { STATION_PAINT_URLS } from './station-finish.js';
 

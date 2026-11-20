@@ -132,6 +132,8 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
     },
   });
   for (const cabinet of cabinets) cacheHandObstacle(cabinet.collider);
+  // The held key also pulls back from the candle sconces beside the cabinets.
+  for (const collider of candleSet.colliders) cacheHandObstacle(collider);
   for (const occluder of workstations.occluders) cacheHandObstacle(occluder);
   const syncEntranceShadow = createEntranceContactShadows(scene, state.keys);
   const keysById = new Map(state.keys.map(key => [key.id, key]));

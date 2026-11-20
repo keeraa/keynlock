@@ -3,6 +3,11 @@ import { PLAYER_EYE_HEIGHT } from './player-config.js';
 import { inStationFootprint } from './station-layout.js';
 import { CABINET_Z, CABINET_BODY_WIDTH } from './cabinet-layout.js';
 
+// Wall candles beside the cabinets (archive-candles.js: CABINET_CANDLE_X and
+// z = cabinet z ± (CABINET_BODY_WIDTH / 2 - .03)); the player keeps this far away.
+export const SCONCE_X = 10.6;
+export const SCONCE_CLEARANCE = .62;
+
 export function createPlayerMovement(camera, bounds) {
   let stepPhase = 0;
 
@@ -10,6 +15,10 @@ export function createPlayerMovement(camera, bounds) {
     if (Math.abs(x) > bounds.x || Math.abs(z) > bounds.z) return true;
     // Cabinet fronts project into the hall farther than the side walls.
     if (Math.abs(x) > 10.74 && CABINET_Z.some(cz => Math.abs(z - cz) < CABINET_BODY_WIDTH / 2 + .22)) return true;
+    // The candle sconces at both edges of every cabinet stick out to x ≈ 10.4:
+    // without this the player (and the key in hand) walked into them.
+    if (Math.abs(x) > SCONCE_X - SCONCE_CLEARANCE && CABINET_Z.some(cz => [-1, 1].some(side =>
+      Math.hypot(Math.abs(x) - SCONCE_X, z - (cz + side * (CABINET_BODY_WIDTH / 2 - .03))) < SCONCE_CLEARANCE))) return true;
     // Keep the player capsule clear of the sealed doors at either end.
     if (Math.abs(z) > 21.75) return true;
     for (const { x: tx, z: tz } of ARCHIVE_SIDE_TABLES) {

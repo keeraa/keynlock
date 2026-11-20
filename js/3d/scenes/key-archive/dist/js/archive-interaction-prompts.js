@@ -1,6 +1,7 @@
 import { t, familyName } from './i18n.js';
 import {
-  KEY_TYPES, MAX_HELD, selectedKey, cabinetSlotKey, getProgress, keyCondition, BUNDLE_COST, canPickupKey, SMELT_SECONDS } from './rules.js';
+  KEY_TYPES, MAX_HELD, selectedKey, cabinetSlotKey, getProgress, keyCondition, BUNDLE_COST, canPickupKey, SMELT_SECONDS,
+  heldBatch } from './rules.js';
 
 export function createArchivePrompts(state, keyIndex, isMelting = () => false, stationNow = Date.now) {
   return function promptFor(target) {
@@ -75,6 +76,9 @@ export function createArchivePrompts(state, keyIndex, isMelting = () => false, s
     if (key.wax) return t('prompt.waxToCandle');
     if (key.mud || key.rust) return t('prompt.cleanFirst');
     if (target.assisted) return t('prompt.putAssisted', { cell });
+    // Four of this family in hand: they all go in from this cell.
+    if (key.type === target.type && heldBatch(state, target.type))
+      return t('prompt.putFour', { cell, name: familyName(target.type), count, required });
     return key.type === target.type
       ? t('prompt.put', { cell, name: familyName(target.type), count, required })
       : t('prompt.cabinetFor', { name: familyName(target.type) });

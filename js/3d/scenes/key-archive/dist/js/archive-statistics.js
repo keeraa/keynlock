@@ -98,7 +98,7 @@ export function createStatisticsPanel(document, statistics) {
       ['pickedUp', n(counts.pickedUp)], ['cleaned', n(counts.cleaned)],
       ['washed', n(counts.washed)], ['derusted', n(counts.derusted)], ['dewaxed', n(counts.dewaxed)],
       ['sorted', n(lastProgress.sorted)], ['smelted', n(lastProgress.smelted)],
-      ['progress', n(lastProgress.processed) + ' / ' + n(lastProgress.total)],
+      ['progress', n(lastProgress.processed)],
       ['stage', t('statistics.stage.' + report.stage)],
     ];
     if (completionMs !== null) metrics.push(['completion', duration(completionMs)]);

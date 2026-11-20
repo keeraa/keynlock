@@ -377,3 +377,38 @@ test('outline stays continuous across a slanted edge and yields to foreground du
   assert.ok(result.front < result.bare / 5, JSON.stringify(result));
   assert.ok(result.behind > result.bare / 2, JSON.stringify(result));
 });
+
+test('a muddy key thrown into the water starts washing', { timeout: 90000 * SLOW }, async t => {
+  const page = await browser.newPage({ viewport: { width: 960, height: 640 } });
+  t.after(() => page.close());
+  const state = createInitialState();
+  const muddy = state.keys.find(key => key.mud && !key.rust && !key.broken && !key.wax);
+  muddy.status = 'held';
+  state.held = [muddy.id];
+  state.firstRoute = false;
+  await page.addInitScript(({ key, snapshot }) => {
+    HTMLCanvasElement.prototype.requestPointerLock = undefined;
+    localStorage.setItem(key, snapshot);
+  }, { key: STORAGE_KEY, snapshot: JSON.stringify(state) });
+  await page.route('**/js/main.js*', async route => {
+    const response = await route.fetch();
+    await route.fulfill({ response, body: await response.text() + `
+      window.throwTest = { world, state, lookAt(position, target) {
+        camera.position.set(...position); camera.lookAt(...target);
+        camera.rotation.reorder('YXZ'); yaw = camera.rotation.y; pitch = camera.rotation.x;
+        edgeLook.until = 0; camera.updateMatrixWorld(true);
+      } };` });
+  });
+  const errors = await enterArchive(page, 'throw-water');
+  // Put the reticle on the middle of the water bowl and throw with R.
+  await page.evaluate(({ x }) => window.throwTest.lookAt([x + .2, 1.78, 2.4], [x, 1.216, .1]),
+    { x: FIXTURE_OFFSETS.mud });
+  await page.keyboard.press('r');
+  await page.waitForFunction(({ storageKey, id }) =>
+    JSON.parse(localStorage.getItem(storageKey)).keys.find(key => key.id === id).status === 'bath',
+  { storageKey: STORAGE_KEY, id: muddy.id });
+  const soaked = await page.evaluate(({ storageKey, id }) =>
+    JSON.parse(localStorage.getItem(storageKey)).keys.find(key => key.id === id), { storageKey: STORAGE_KEY, id: muddy.id });
+  assert.equal(soaked.bathId, 'center-mud');
+  assert.deepEqual(errors, []);
+});

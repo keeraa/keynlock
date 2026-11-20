@@ -28,7 +28,7 @@ test('dropping a key targets the right-hand release pose, not camera center', ()
   let captured;
   const actions=createArchiveActions({
     state,keyIndex,camera,world:{
-      animateThrow(key,start,end){captured={key,start,end};},
+      animateThrow(key,flight){captured={key,start:flight.path[0],flight};},
     },
     getYaw:()=>0,isPlaying:()=>true,
     save(){},updateHud(){},tone(){},toast(){},showVictory(){},invalidateHover(){},

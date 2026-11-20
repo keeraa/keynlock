@@ -211,11 +211,13 @@ export function makeHall(scene, mat) {
   // A few side worktables add scale without blocking the sorting path.
   for (const { x, z } of ARCHIVE_SIDE_TABLES) {
     furnitureShadow(scene, mat.furnitureShadows.deskFloor, x, floorSurfaceY(x, z) + .003, z);
-    const top = box(scene, [ARCHIVE_DESK.width, .18, ARCHIVE_DESK.depth], [x, .83, z], mat.wood);
+    // One solid wooden top (no separate plate laid on it), up to the height
+    // the books, candle and catalog stand at.
+    const thickness = ARCHIVE_DESK.y - .74;
+    const top = box(scene, [ARCHIVE_DESK.width, thickness, ARCHIVE_DESK.depth], [x, .74 + thickness / 2, z], mat.wood);
     top.castShadow = top.receiveShadow = true;
     for (const dx of [-.7, .7]) for (const dz of [-.9, .9])
       roomBox(scene, [.13, .8, .13], [x + dx, .35, z + dz], mat.darkWood).castShadow = true;
-    box(scene, [1.56, .05, 2.04], [x, ARCHIVE_DESK.y - .025, z], mat.darkBrass).receiveShadow = true;
   }
   return { forgottenDoor: forgotten };
 }

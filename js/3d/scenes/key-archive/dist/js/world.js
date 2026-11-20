@@ -29,6 +29,7 @@ import { createFloorKeys } from './world-floor-keys.js';
 import { createWorldHover } from './world-hover.js';
 import { createHeldKey } from './held-key.js';
 import { createAutoQuality } from './auto-quality.js';
+import { createThrowScene } from './throw-scene.js';
 
 const ROOM = { halfWidth: 12, halfLength: 23.4, height: 13.5 };
 
@@ -87,9 +88,15 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
     if (bounds.min.y > PLAYER_EYE_HEIGHT + 1.6 || bounds.max.y < -.08) return;
     handObstacles.push(bounds.expandByScalar(.018));
   }
+  // Solid hall parts as boxes, before static batching merges them: they stop
+  // the held key and, above the floor, thrown keys too (columns, trims, doors).
+  const hallThrowBoxes = [];
   hall.traverse(object => {
-    if (object.isMesh && !object.isInstancedMesh && object.material?.isMeshStandardMaterial &&
-        !object.material.transparent) cacheHandObstacle(object);
+    if (!object.isMesh || object.isInstancedMesh || !object.material?.isMeshStandardMaterial ||
+        object.material.transparent) return;
+    cacheHandObstacle(object);
+    const { min, max } = object.geometry.boundingBox.clone().applyMatrix4(object.matrixWorld);
+    if (max.y > .15 && min.y < 4) hallThrowBoxes.push({ min: { x: min.x, y: min.y, z: min.z }, max: { x: max.x, y: max.y, z: max.z } });
   });
   const limitHandReach = createHeldKeyClearance(handObstacles);
   const chandeliers = makeChandeliers(scene, mat);
@@ -195,6 +202,26 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
   }
   if (getProgress(state).processed === state.keys.length) startFinale({ instant: true });
 
+  // What a thrown key can hit: the layout's furniture and vessels, plus the
+  // cabinets and candle sconces as boxes (built once, the hall does not move).
+  let throwScene = null;
+  const throwPropBoxes = [];
+  function getThrowScene() {
+    if (throwScene) return throwScene;
+    const boxOf = mesh => {
+      mesh.updateWorldMatrix(true, false);
+      if (!mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox();
+      const { min, max } = mesh.geometry.boundingBox.clone().applyMatrix4(mesh.matrixWorld);
+      return { min: { x: min.x, y: min.y, z: min.z }, max: { x: max.x, y: max.y, z: max.z } };
+    };
+    throwScene = createThrowScene({ hallBoxes: hallThrowBoxes, boxes: [
+      ...throwPropBoxes,
+      ...cabinets.map(cabinet => boxOf(cabinet.collider)),
+      ...candleSet.colliders.filter(collider => collider.userData.id !== 'entrance-candle').map(boxOf),
+    ] });
+    return throwScene;
+  }
+
   let lastHatchPatch = 0;
   let lastFrame = sceneNow();
   function update(now, moving, playing, playSound) {
@@ -236,6 +263,13 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
     });
     if (bounds) handObstacles.push(bounds.clone().expandByScalar(.018));
     if (blocksPlayer) stoolObstacles.push(bounds);
+    // Loaded furniture stops thrown keys too: a stool's seat can hold one,
+    // books and bottles on a table knock it aside.
+    if (bounds) {
+      throwPropBoxes.push({ min: { x: bounds.min.x, y: bounds.min.y, z: bounds.min.z },
+        max: { x: bounds.max.x, y: bounds.max.y, z: bounds.max.z }, surface: Boolean(blocksPlayer) });
+      throwScene = null;
+    }
     renderer.shadowMap.needsUpdate = true;
     invalidate();
   }
@@ -293,7 +327,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
       painted.setSettings(settings);
       cabinets.forEach(cabinet => cabinet.setContour(settings));
     },
-    animateThrow, animatePlace, animateDiscard, isThrowing, cancelPlace, celebrateCabinet, startFinale,
+    animateThrow, animatePlace, animateDiscard, isThrowing, cancelPlace, celebrateCabinet, startFinale, getThrowScene,
     throwingCount: () => thrownKeys.size,
     progress: () => getProgress(state),
     bounds: { x: ROOM.halfWidth - .88, z: ROOM.halfLength - .87, stoolObstacles },

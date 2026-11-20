@@ -357,13 +357,25 @@ export function takeKeyFromCabinet(state, cabinetType, slotIndex) {
 // each becomes one unit of metal when its turn is over.
 export const SMELT_SECONDS = 30;
 
-export function trashSelectedKey(state, now = Date.now()) {
-  const key = selectedKey(state);
-  if (!key?.broken) return false;
+function queueSmelt(state, key, now) {
   const queueEnd = state.keys.reduce((latest, item) =>
     item.status === 'smelting' ? Math.max(latest, item.smeltUntil) : latest, now);
   key.status = 'smelting';
   key.smeltUntil = queueEnd + SMELT_SECONDS * 1000;
+  key.layer = 0;
+}
+
+// A broken key thrown into the forge joins the smelting queue.
+export function smeltThrownKey(state, key, now = Date.now()) {
+  if (!key?.broken || key.status !== 'floor') return false;
+  queueSmelt(state, key, now);
+  return true;
+}
+
+export function trashSelectedKey(state, now = Date.now()) {
+  const key = selectedKey(state);
+  if (!key?.broken) return false;
+  queueSmelt(state, key, now);
   state.held.splice(state.selected, 1);
   state.selected = Math.max(0, Math.min(state.selected, state.held.length - 1));
   return true;
@@ -413,16 +425,32 @@ export function describeBathContents(keys, now) {
     pending: keys.filter(key => now < key.bathUntil), space: BATH_CAPACITY - keys.length };
 }
 
-export function startSoak(state, id, kind, now = Date.now()) {
-  const key = selectedKey(state);
+// Would this bath take this key now? (By hand or thrown in.)
+export function canSoak(state, key, id, kind, now = Date.now()) {
   if (!validBathId(id, kind) || !key || key.broken || key.wax || !key[kind]) return false;
-  const { keys, space } = bathContents(state, id, now);
-  if (space <= 0) return false;
-  const occupied = reserveBathSlots(keys);
+  return bathContents(state, id, now).space > 0;
+}
+
+function soak(state, key, id, kind, now) {
+  const occupied = reserveBathSlots(bathContents(state, id, now).keys);
   key.status = 'bath';
   key.bathId = id;
   key.bathSlot = BATH_SLOTS.find(slot => !occupied.has(slot));
   key.bathUntil = now + SOAK_SECONDS[kind] * 1000;
+  key.layer = 0;
+}
+
+// A key thrown into a bath that takes it starts soaking where it fell.
+export function soakThrownKey(state, key, id, kind, now = Date.now()) {
+  if (key?.status !== 'floor' || !canSoak(state, key, id, kind, now)) return false;
+  soak(state, key, id, kind, now);
+  return true;
+}
+
+export function startSoak(state, id, kind, now = Date.now()) {
+  const key = selectedKey(state);
+  if (!canSoak(state, key, id, kind, now)) return false;
+  soak(state, key, id, kind, now);
   state.held.splice(state.selected, 1);
   state.selected = Math.max(0, Math.min(state.selected, state.held.length - 1));
   return true;

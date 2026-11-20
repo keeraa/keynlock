@@ -60,7 +60,9 @@ export function contactShadow(parent, width, depth, x, y, z, material) {
 }
 
 export function furnitureShadow(parent, { width, depth, material }, x, y, z) {
-  contactShadow(parent, width, depth, x, y, z, material).renderOrder = 2;
+  const shadow = contactShadow(parent, width, depth, x, y, z, material);
+  shadow.renderOrder = 2;
+  return shadow;
 }
 
 function addEntranceDoor(scene, mat) {

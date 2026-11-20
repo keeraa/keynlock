@@ -68,6 +68,11 @@ export function createFurnitureShadows() {
       [.18, -.08, 2.46, .62, .29, .26],
       ...legShadows(2.29, -.47, .47, .08),
     ]),
+    // The painted table has two trestles rather than four separate legs.
+    paintedBenchFloor: bakeFloorShadow(6.2, 2.6, [
+      [.18, -.08, 2.46, .62, .29, .26],
+      ...[-1.71, 1.71].map(x => [x, 0, .085, .45, .09, .49]),
+    ]),
     deskFloor: bakeFloorShadow(2.8, 3.35, [
       [.15, -.085, .845, 1.08, .31, .27],
       ...legShadows(.7, -.9, .9, .065),

@@ -29,8 +29,9 @@ float edgeAt(vec2 direction, float depth, vec3 normal, float here) {
   float there = occupied(neighborDepth);
   float silhouette = abs(here - there);
   float crease = 0.0;
+  vec3 neighborNormal = normal;
   if (here > 0.5 && there > 0.5) {
-    vec3 neighborNormal = texture2D(tNormal, uv).rgb;
+    neighborNormal = texture2D(tNormal, uv).rgb;
     float normalDifference = length(normal - neighborNormal);
     float depthDifference = abs(depth - neighborDepth);
     crease = max(
@@ -40,14 +41,17 @@ float edgeAt(vec2 direction, float depth, vec3 normal, float here) {
   }
   // Ink belongs on the farther surface, outside the foreground silhouette.
   // A two-sided depth edge can paint over almost the entire thin key shaft.
-  // Only where the depth step is decisive, though: along a fold (a face
-  // meeting a side wall) the step is near zero and its sign flickers from
-  // pixel to pixel, which broke lines into dashes. There both sides ink.
   float farther = smoothstep(-uDepthThreshold * .12, uDepthThreshold * .12,
     depth - neighborDepth);
+  // Along a fold (a face meeting a side wall) the depth step is near zero and
+  // its sign flickers from pixel to pixel, which broke lines into dashes.
+  // There the ink goes on the face turned further from the camera (smaller
+  // view-space normal z): one side, chosen the same way along the whole edge.
   float decisive = smoothstep(uDepthThreshold * .6, uDepthThreshold * 1.6,
     abs(depth - neighborDepth));
-  float outside = mix(1.0, farther, decisive);
+  float oblique = smoothstep(-.02, .02, neighborNormal.z - normal.z);
+  float fold = here * there;
+  float outside = mix(farther, mix(oblique, farther, decisive), fold);
   return max(silhouette, crease) * outside;
 }
 

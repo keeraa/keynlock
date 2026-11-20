@@ -11,6 +11,7 @@ import { createInitialState, pickupKey, STORAGE_KEY } from '../../dist/js/rules.
 import { CABINET_CELL_BACK_Z, CABINET_GRID_BOTTOM_Y, CABINET_GROUND_OFFSET, CABINET_HEADER_Y, CABINET_Z, pegForSlot } from '../../dist/js/cabinet-layout.js';
 import { FIRST_ROUTE_KEY_ID } from '../../dist/js/first-route.js';
 import { FIXTURE_OFFSETS } from '../../dist/js/station-layout.js';
+import { RUST_TRAY } from '../../dist/js/wash-forge-stations.js';
 
 const directory = resolve(fileURLToPath(new URL('../../dist/', import.meta.url)));
 const screenshots = fileURLToPath(new URL('../../test-results/', import.meta.url));
@@ -674,9 +675,9 @@ test('rust requires thirty seconds and the bath bar follows the cleaning timer',
     { key: STORAGE_KEY, snapshot: JSON.stringify(state) });
   const aim = await installTestCamera(page);
   const errors = await enterArchive(page, 'webgl-rust-timer');
-  await aim([FIXTURE_OFFSETS.rust, 1.78, 2], [FIXTURE_OFFSETS.rust, 1.28, .1]);
+  // The rust solution sits in a low tray: aim at its liquid, not above it.
+  await aim([FIXTURE_OFFSETS.rust, 1.78, 2], [FIXTURE_OFFSETS.rust, RUST_TRAY.surface, .1]);
   await page.locator('#interaction-prompt').getByText(/Погрузить ключ/).waitFor();
-  const began = await page.evaluate(() => Date.now());
   await page.keyboard.press('e');
   const progress = page.locator('#bath-progress-rust');
   await progress.waitFor({ state: 'visible' });
@@ -686,15 +687,24 @@ test('rust requires thirty seconds and the bath bar follows the cleaning timer',
   { storageKey: STORAGE_KEY, id: key.id });
   const soaking = await read();
   assert.equal(soaking.status, 'bath');
-  assert.ok(soaking.bathUntil >= began + 30000);
+  // Deadlines are in station time (it runs only during play), saved with the dip.
+  const stationTime = await page.evaluate(storageKey =>
+    JSON.parse(localStorage.getItem(storageKey)).stationTime, STORAGE_KEY);
+  const soakMs = soaking.bathUntil - stationTime;
+  assert.ok(soakMs > 29000 && soakMs <= 30000, `soak of ${soakMs} ms`);
   await aim([0, 1.78, 3], [0, 1.15, .1]);
   assert.equal(await progress.isVisible(), true, 'readiness stays visible without aiming at the bath');
   assert.equal(await page.locator('#bath-progress-mud').isVisible(), false, 'the empty bath has no bar');
   assert.equal((await page.locator('#bath-progress').innerText()).trim(), '', 'the bars have no visible text');
-  await aim([FIXTURE_OFFSETS.rust, 1.78, 2], [FIXTURE_OFFSETS.rust, 1.28, .1]);
+  await aim([FIXTURE_OFFSETS.rust, 1.78, 2], [FIXTURE_OFFSETS.rust, RUST_TRAY.surface, .1]);
   await page.keyboard.press('e');
   assert.equal((await read()).status, 'bath');
-  await page.evaluate(until => { Date.now = () => until + 5; }, soaking.bathUntil);
+  // Station timers run on performance.now during play (not on Date.now):
+  // jump that clock past the soak instead of waiting thirty seconds.
+  await page.evaluate(() => {
+    const original = performance.now.bind(performance);
+    performance.now = () => original() + 31000;
+  });
   await page.waitForFunction(() => document.querySelector('#bath-progress-rust').dataset.state === 'ready');
   await progress.waitFor({ state: 'hidden' });
   await page.keyboard.press('e');
@@ -832,7 +842,7 @@ test('completed rows and cabinets celebrate after the last key lands', { timeout
   await page.route('**/js/main.js*', async route => {
     const response = await route.fetch();
     await route.fulfill({ response, body: await response.text() + `
-      window.cabinetTest={world,state,view(position,target){camera.position.set(...position);
+      window.cabinetTest={world,state,sceneNow,view(position,target){camera.position.set(...position);
         camera.lookAt(...target);camera.rotation.reorder('YXZ');yaw=camera.rotation.y;pitch=camera.rotation.x;edgeLook.until=0;}};` });
   });
   await page.route('**/completion-seed', route => route.fulfill({ contentType: 'text/html', body: '<!doctype html>' }));
@@ -863,15 +873,16 @@ test('completed rows and cabinets celebrate after the last key lands', { timeout
     }, count);
     await page.waitForFunction(() => document.querySelector('#interaction-prompt')?.textContent.includes('Положить'));
     await page.keyboard.press('e');
-    await page.waitForFunction(() => window.cabinetTest.world.cabinets[3].completion.frame().rows.length > 0);
-    const earned = await page.evaluate(() => window.cabinetTest.world.cabinets[3].completion.frame());
+    // Celebrations run on the scene clock, which stops in menus (not on performance.now).
+    await page.waitForFunction(() => window.cabinetTest.world.cabinets[3].completion.frame(window.cabinetTest.sceneNow()).rows.length > 0);
+    const earned = await page.evaluate(() => window.cabinetTest.world.cabinets[3].completion.frame(window.cabinetTest.sceneNow()));
     assert.deepEqual(earned.rows.map(row => row.row), [count === 11 ? 0 : 7]);
     assert.equal(Boolean(earned.cabinet), count === 95);
     await page.waitForFunction(() => {
-      const frame = window.cabinetTest.world.cabinets[3].completion.frame();
+      const frame = window.cabinetTest.world.cabinets[3].completion.frame(window.cabinetTest.sceneNow());
       return !frame.rows.length && !frame.cabinet;
     });
-    const after = await page.evaluate(() => window.cabinetTest.world.cabinets[3].completion.frame());
+    const after = await page.evaluate(() => window.cabinetTest.world.cabinets[3].completion.frame(window.cabinetTest.sceneNow()));
     assert.equal(after.crownGlow > 0, count === 95);
     assert.deepEqual(errors, []);
   }

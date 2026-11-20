@@ -70,10 +70,13 @@ test('giant cabinet keys receive a local ink edge while sharing global contour c
   assert.match(painter, /object\.isPoints \|\| object\.isLine \|\| object\.isSprite/);
 });
 
-test('ink stays on both sides of a fold, so lines do not break into dashes', () => {
+test('a fold is inked on one stable side, so lines neither break into dashes nor double', () => {
   const outline = readFileSync(new URL('../dist/js/scene-outline.js', import.meta.url), 'utf8');
   assert.match(outline, /float decisive = smoothstep/);
-  assert.match(outline, /float outside = mix\(1\.0, farther, decisive\)/);
+  // Near-zero depth steps pick the side by the normal, not by the noisy depth sign.
+  assert.match(outline, /float oblique = smoothstep\(-\.02, \.02, neighborNormal\.z - normal\.z\)/);
+  assert.match(outline, /float outside = mix\(farther, mix\(oblique, farther, decisive\), fold\)/);
+  assert.doesNotMatch(outline, /mix\(1\.0, farther, decisive\)/, 'never both sides');
 });
 
 test('shadow hatching patches lit materials once and toggles without recompiling', async () => {

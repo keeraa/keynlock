@@ -2,9 +2,11 @@ import * as THREE from '../vendor/three.js';
 import { RUG_TOP } from './floor-contact.js';
 import { contactShadow } from './world-architecture.js?v=key-ring';
 import { createStationFinishes } from './station-finish.js';
-import { createKeyModel, disposeKeySceneModel, getKeyDisplayScale, getKeyRustStrength } from './key-factory.js?v=key-ring';
+import { createKeyModel, createCombinedKeyGeometry, disposeKeySceneModel, getKeyDisplayScale, getKeyRustStrength,
+  getKeyCoatLayout, buildKeyCoatGeometry, getKeyCoatPoint } from './key-factory.js?v=key-ring';
+import { rustFlakingPaint } from './key-instance-finish.js?v=wax-and-bundles';
 import { bathKeyProgress, waterDip, BATH_LIFT_MS } from './station-visual-state.js?v=cleaning-cues';
-import { BATH_CAPACITY, FORGE_SURFACE_Y, FIXTURE_OFFSETS, STATIONS, bathId } from './station-layout.js?v=working-baths';
+import { BATH_CAPACITY, FORGE_SURFACE_Y, FIXTURE_OFFSETS, STATIONS, SOAK_SECONDS, bathId } from './station-layout.js?v=working-baths';
 import { createBathEffects, createForgeEffects, createEffectSpotTexture } from './station-visual-effects.js?v=cleaning-cues';
 
 function block(parent, dimensions, where, material) {
@@ -29,7 +31,70 @@ function rim(parent, radius, y, x, z, material, thickness = .052) {
   return object;
 }
 
+// The rust solution sits in a low rectangular ceramic tray; keys lie flat in
+// one row under the liquid.
+export const RUST_TRAY = Object.freeze({ width: .94, depth: .56, wall: .045, base: .95, height: .12,
+  surface: 1.035, slots: [-.31, -.105, .105, .31] });
+
+function trayRing(outerW, outerD, wall) {
+  const shape = new THREE.Shape();
+  shape.moveTo(-outerW / 2, -outerD / 2); shape.lineTo(outerW / 2, -outerD / 2);
+  shape.lineTo(outerW / 2, outerD / 2); shape.lineTo(-outerW / 2, outerD / 2); shape.closePath();
+  const hole = new THREE.Path();
+  const w = outerW / 2 - wall, d = outerD / 2 - wall;
+  hole.moveTo(-w, -d); hole.lineTo(-w, d); hole.lineTo(w, d); hole.lineTo(w, -d); hole.closePath();
+  shape.holes.push(hole);
+  return shape;
+}
+
+function createRustTray(group, station, spotTexture, ceramic) {
+  const kind = 'rust';
+  const x = FIXTURE_OFFSETS[kind];
+  const id = bathId(station.id, kind);
+  const { width, depth, wall, base, height, surface } = RUST_TRAY;
+  const trayMaterial = new THREE.MeshStandardMaterial({ map: ceramic, color: 0x81936b, roughness: .68 });
+  const lipMaterial = new THREE.MeshStandardMaterial({ map: ceramic, color: 0xaab792, roughness: .73 });
+  const liquidMaterial = new THREE.MeshStandardMaterial({
+    color: 0xa0a76e, roughness: .42, transparent: true, opacity: .78, depthWrite: false,
+    blending: THREE.CustomBlending,
+    blendSrc: THREE.SrcAlphaFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
+    blendSrcAlpha: THREE.ZeroFactor, blendDstAlpha: THREE.OneMinusSrcAlphaFactor,
+    emissive: 0x302e16, emissiveIntensity: .17,
+  });
+  // Walls are one extruded ring (also the hover outline); base and lip apart.
+  const walls = new THREE.ExtrudeGeometry(trayRing(width, depth, wall), { depth: height, bevelEnabled: false });
+  walls.rotateX(-Math.PI / 2);
+  const shell = new THREE.Mesh(walls, trayMaterial);
+  shell.position.set(x, base - .02, .10);
+  group.add(shell);
+  block(group, [width - .01, .022, depth - .01], [x, base - .009, .10], trayMaterial);
+  const lipGeometry = new THREE.ExtrudeGeometry(trayRing(width + .016, depth + .016, wall + .016),
+    { depth: .014, bevelEnabled: false });
+  lipGeometry.rotateX(-Math.PI / 2);
+  const lip = new THREE.Mesh(lipGeometry, lipMaterial);
+  lip.position.set(x, base - .02 + height, .10);
+  group.add(lip);
+  const liquid = block(group, [width - 2 * wall, .01, depth - 2 * wall], [x, surface, .10], liquidMaterial);
+  liquid.renderOrder = 2;
+
+  const collider = new THREE.Mesh(new THREE.BoxGeometry(width + .08, base + height - .87, depth + .08),
+    new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
+  collider.position.set(x, (base + height + .87) / 2, .10);
+  collider.userData = { kind: 'bath', id, bathKind: kind, stationId: station.id };
+  group.add(collider);
+  const slots = RUST_TRAY.slots.slice(0, BATH_CAPACITY).map(offset => {
+    const holder = new THREE.Group();
+    holder.position.set(x + offset, surface, .10);
+    group.add(holder);
+    return { holder, keyId: null, keyMesh: null, paint: null, crust: null };
+  });
+  return { id, kind, shell, slots, collider, waterMaterial: liquidMaterial, group, x, surfaceY: surface,
+    lift: null, tray: true,
+    visual: createBathEffects(group, x, kind, spotTexture, surface, .3), visualKeys: null };
+}
+
 function createBath(group, station, kind, spotTexture, ceramic) {
+  if (kind === 'rust') return createRustTray(group, station, spotTexture, ceramic);
   const x = FIXTURE_OFFSETS[kind];
   const id = bathId(station.id, kind);
   const isWater = kind === 'mud';
@@ -91,6 +156,11 @@ function bindBathFinish(slot) {
   slot.paint = null;
   slot.remaining = null;
   slot.crust = null;
+  slot.original = null;
+  slot.level = 0;
+  slot.flakeDebt = 0;
+  slot.splashed = false;
+  slot.lastPuff = 0;
   slot.keyMesh.traverse(object => {
     if (!object.isMesh) return;
     const paint = object.geometry.getAttribute('instanceKeyPaint');
@@ -99,17 +169,53 @@ function bindBathFinish(slot) {
   });
 }
 
-function applyBathFinish(slot, kind, remaining, key) {
+// Mud washes off in steps: crumbs first, then the clods shrink and drop.
+const MUD_WASH_LEVELS = 6;
+const washedCoats = new Map();
+function mudBlobAlive(blob, progress) {
+  const soaked = Math.min(1, progress * (blob.kind === 'crumb' ? 1.8 : 1));
+  const shrink = 1 - soaked * soaked * (3 - 2 * soaked);
+  return soaked < 1 && blob.rx * (.2 + .8 * shrink) > .016;
+}
+function washedMud(key, level) {
+  const id = `${key.type}:${!!key.broken}:${level}`;
+  if (!washedCoats.has(id)) {
+    const layout = getKeyCoatLayout(key.type, key.broken, 'mud') || [];
+    const progress = level / MUD_WASH_LEVELS;
+    const blobs = layout.filter(blob => mudBlobAlive(blob, progress)).map(blob => {
+      const soaked = Math.min(1, progress * (blob.kind === 'crumb' ? 1.8 : 1));
+      const shrink = 1 - soaked * soaked * (3 - 2 * soaked);
+      return { ...blob, rx: blob.rx * (.2 + .8 * shrink), ry: blob.ry * (.2 + .8 * shrink) };
+    });
+    washedCoats.set(id, { layout, alive: layout.map(blob => mudBlobAlive(blob, progress)),
+      geometry: buildKeyCoatGeometry(key.type, key.broken, 'mud', { blobs, heightScale: 1 - .3 * progress }) });
+  }
+  return washedCoats.get(id);
+}
+
+function applyBathFinish(slot, kind, remaining, key, cleaning = null) {
   if (remaining === slot.remaining) return;
+  const before = slot.remaining ?? 1;
   slot.remaining = remaining;
-  if (slot.paint) {
-    if (kind === 'mud') slot.paint.setY(0, remaining);
-    else slot.paint.setX(0, remaining * getKeyRustStrength(key.type));
+  if (slot.paint && kind === 'rust') {
+    // Rust flakes off in patches while the key leaves the solution.
+    slot.paint.setX(0, remaining >= 1 ? getKeyRustStrength(key.type) :
+      remaining <= 0 ? 0 : rustFlakingPaint(1 - remaining));
     slot.paint.needsUpdate = true;
+    if (cleaning && remaining < before) cleaning.flakes(slot, key, before - remaining);
   }
   if (slot.crust && kind === 'mud') {
-    slot.crust.visible = remaining > .68;
-    slot.crust.scale.setScalar(.92 + remaining * .08);
+    slot.original ??= slot.crust.geometry;
+    const level = Math.round((1 - remaining) * MUD_WASH_LEVELS);
+    if (level === (slot.level ?? 0)) return;
+    const coat = level === 0 ? null : washedMud(key, level);
+    slot.crust.geometry = coat?.geometry ?? slot.original;
+    // Clods that just washed off fall into the water.
+    if (cleaning && coat && level > (slot.level ?? 0)) {
+      const previous = (slot.level ?? 0) === 0 ? coat.layout.map(() => true) : washedMud(key, slot.level).alive;
+      cleaning.clods(slot, key, coat.layout.filter((blob, index) => previous[index] && !coat.alive[index]));
+    }
+    slot.level = level;
   }
 }
 
@@ -158,9 +264,10 @@ function createForge(group, station, materials, spotTexture, finish) {
     visual: createForgeEffects(group, x, spotTexture, hotMetal, FORGE_SURFACE_Y) };
 }
 
-export function createWorkstations(scene, materials, keyIndex) {
+export function createWorkstations(scene, materials, keyIndex, { effects = null, onLiftDone = null } = {}) {
   const stations = [];
   const interactables = [];
+  const occluders = [];
   const bathMap = new Map();
   const forgeMap = new Map();
   const spotTexture = createEffectSpotTexture();
@@ -173,8 +280,9 @@ export function createWorkstations(scene, materials, keyIndex) {
     scene.add(group);
     contactShadow(group, 5.55, 2.25, 0, RUG_TOP + .0026, .08, tableShade);
     // Low, open workbench: the hall remains readable and cabinets stay visible.
-    block(group, [5.05, .16, 1.62], [0, .81, .08], finish.benchEdge);
-    block(group, [4.92, .045, 1.48], [0, .905, .08], finish.benchTop);
+    // The bench hides floor keys under it from aiming.
+    occluders.push(block(group, [5.05, .16, 1.62], [0, .81, .08], finish.benchEdge));
+    occluders.push(block(group, [4.92, .045, 1.48], [0, .905, .08], finish.benchTop));
     for (const x of [-2.29, 2.29]) for (const z of [-.55, .69])
       block(group, [.16, .80, .16], [x, .38, z], materials.darkWood);
     block(group, [4.86, .12, .27], [0, .29, -.49], materials.blackWood);
@@ -190,8 +298,76 @@ export function createWorkstations(scene, materials, keyIndex) {
     stations.push({ ...station, group, baths, forge });
   }
 
+  // Pieces leaving a key in a bath: mud clods and rust flakes land on the
+  // liquid of that bath with a ring.
+  function bathOf(slot) {
+    for (const bath of bathMap.values())
+      if (bath.lift === slot || bath.slots.includes(slot)) return bath;
+    return null;
+  }
+  const cleaning = effects && {
+    clods(slot, key, blobs) {
+      const bath = bathOf(slot);
+      if (!bath || !slot.keyMesh) return;
+      slot.keyMesh.updateMatrixWorld(true);
+      const worldScale = slot.keyMesh.getWorldScale(new THREE.Vector3()).x;
+      const surface = bath.group.position.y + bath.surfaceY;
+      for (const blob of blobs) {
+        const local = getKeyCoatPoint(key.type, key.broken, blob.x, blob.y, -.02);
+        if (!local) continue;
+        const pieces = blob.kind === 'crumb' ? 1 : 2;
+        for (let i = 0; i < pieces; i++) {
+          const point = slot.keyMesh.localToWorld(local.clone().add(new THREE.Vector3(
+            (Math.random() - .5) * .04, (Math.random() - .5) * .04, 0)));
+          const size = Math.max(.006, Math.min(blob.rx, blob.ry) * .3 * worldScale * (pieces > 1 ? .8 : 1));
+          effects.drop('mud', point, size, surface, { onLand: p => effects.ripple(p.x, surface, p.z, .07) });
+        }
+      }
+    },
+    flakes(slot, key, amount) {
+      const bath = bathOf(slot);
+      const metal = slot.keyMesh?.children.find(child => child.isMesh && child.geometry.getAttribute('instanceKeyPaint'));
+      const position = metal?.geometry.getAttribute('position');
+      if (!bath || !position) return;
+      metal.updateMatrixWorld(true);
+      const surface = bath.group.position.y + bath.surfaceY;
+      slot.flakeDebt = (slot.flakeDebt ?? 0) + amount * 48;
+      while (slot.flakeDebt >= 1) {
+        slot.flakeDebt--;
+        const point = metal.localToWorld(new THREE.Vector3().fromBufferAttribute(position,
+          Math.floor(Math.random() * position.count)));
+        effects.drop('rust', point, .006 + Math.random() * .008, surface,
+          { onLand: p => { if (Math.random() < .5) effects.ripple(p.x, surface, p.z, .045); } });
+      }
+    },
+  };
+
+  // The key in a bath nearest to the aiming ray (keys are thin, so this is
+  // more forgiving than an exact hit).
+  const keyCenter = new THREE.Vector3(), keyBox = new THREE.Box3();
+  function aimedBathKey(id, ray, tolerance = .13) {
+    const bath = bathMap.get(id);
+    if (!bath) return null;
+    let best = null, bestDistance = Infinity;
+    for (const slot of bath.slots) {
+      if (!slot.keyMesh || !slot.keyId) continue;
+      // Anywhere along the key counts: the ray must pass through its
+      // (slightly padded) box; the nearest centre wins between neighbours.
+      keyBox.setFromObject(slot.keyMesh).expandByScalar(tolerance * .35);
+      if (!ray.intersectsBox(keyBox)) continue;
+      const distance = ray.distanceSqToPoint(keyBox.getCenter(keyCenter));
+      if (distance < bestDistance) { bestDistance = distance; best = slot.keyId; }
+    }
+    return best;
+  }
+
   function getHoverSurface(target) {
     if (target?.kind === 'forge') return forgeMap.get(target.stationId)?.hover;
+    if (target?.kind === 'bath' && target.keyId) {
+      const slot = bathMap.get(target.id)?.slots.find(item => item.keyId === target.keyId);
+      const key = slot && keyIndex.get(target.keyId);
+      if (key) return { anchor: slot.keyMesh, geometry: createCombinedKeyGeometry(key.type, key.broken) };
+    }
     const shell = bathMap.get(target?.id)?.shell;
     return shell && { anchor: shell, geometry: shell.geometry };
   }
@@ -208,7 +384,14 @@ export function createWorkstations(scene, materials, keyIndex) {
     if (!bath) return;
     clearLift(bath);
     const keyMesh = keyForBath(key, bath.kind);
-    bath.lift = { keyMesh, key, startedAt: performance.now() };
+    // Rise from where the key was lying, in the pose it had there.
+    const slot = bath.slots.find(item => item.keyId === key.id && item.keyMesh);
+    const from = slot ? { x: slot.holder.position.x, z: slot.holder.position.z,
+      y: slot.holder.position.y + slot.keyMesh.position.y,
+      rotation: slot.keyMesh.rotation.clone() } : null;
+    bath.lift = { keyMesh, key, from, startedAt: performance.now(),
+      // The tray lift is slower so the rust can visibly flake off on the way up.
+      duration: bath.tray ? TRAY_LIFT_MS : BATH_LIFT_MS };
     bindBathFinish(bath.lift);
     bath.group.add(keyMesh);
   }
@@ -239,6 +422,44 @@ export function createWorkstations(scene, materials, keyIndex) {
     });
   }
 
+  // Rust tray: the key drops in and sinks with a splash, the solution reacts
+  // (smoke, fizzing rings), then its head floats up so it can be grabbed.
+  const TRAY_ENTRY_MS = 850, TRAY_FLOAT_MS = 1600, TRAY_LIFT_MS = 2300;
+  const slotWorld = new THREE.Vector3();
+  function trayKey(bath, slot, key, index, wallTime) {
+    const elapsed = wallTime - (key.bathUntil - SOAK_SECONDS.rust * 1000);
+    const entry = Math.max(0, Math.min(1, elapsed / TRAY_ENTRY_MS));
+    const fall = 1 - entry;
+    const floating = Math.max(0, Math.min(1, (elapsed - TRAY_ENTRY_MS - 1200) / TRAY_FLOAT_MS));
+    const float = floating * floating * (3 - 2 * floating);
+    const bob = Math.sin(wallTime * .0015 + index) * .05;
+    // Falls in tilted, lies flat under the liquid, then the head rises out.
+    slot.keyMesh.position.y = -.03 + .36 * fall * fall + .02 * float;
+    slot.keyMesh.rotation.set(-Math.PI / 2 + .9 * fall + .34 * float, 0, bob * (1 - fall));
+    if (!effects) return;
+    slot.holder.getWorldPosition(slotWorld);
+    const surface = bath.group.position.y + bath.surfaceY;
+    if (entry >= 1 && !slot.splashed) {
+      slot.splashed = elapsed < TRAY_ENTRY_MS + 600;       // no splash for keys loaded from a save
+      if (slot.splashed) {
+        effects.ripple(slotWorld.x, surface, slotWorld.z, .16);
+        effects.ripple(slotWorld.x, surface, slotWorld.z, .09);
+        // The splash sound plays when the key actually meets the solution.
+        playSound?.('rust', slotWorld.clone());
+      }
+      slot.splashed = true;
+    }
+    const soaking = entry >= 1 && wallTime < key.bathUntil;
+    if (soaking && wallTime - slot.lastPuff > 380 + index * 37) {
+      slot.lastPuff = wallTime;
+      const along = (Math.random() - .5) * .26;
+      effects.smoke(slotWorld.clone().add(new THREE.Vector3((Math.random() - .5) * .05, .02, along)),
+        .05 + Math.random() * .04);
+      if (Math.random() < .7) effects.ripple(slotWorld.x + (Math.random() - .5) * .05, surface,
+        slotWorld.z + (Math.random() - .5) * .26, .035);
+    }
+  }
+
   function animateBathKeys(bath, wallTime) {
     let drip = 0;
     for (let index = 0; index < bath.visualKeys.length; index++) {
@@ -246,17 +467,23 @@ export function createWorkstations(scene, materials, keyIndex) {
       const slot = bath.slots[index];
       const progress = bathKeyProgress(key, bath.kind, wallTime);
       const dip = bath.kind === 'mud' ? waterDip(progress) : null;
+      if (bath.tray) {
+        trayKey(bath, slot, key, index, wallTime);
+        continue;
+      }
       slot.keyMesh.position.y = dip ? dip.height : -.07;
       slot.keyMesh.rotation.set(dip ? -.53 : -1.04, .16, Math.sin(wallTime * .002 + index) * .11);
       if (dip) {
-        applyBathFinish(slot, bath.kind, dip.remaining, key);
+        applyBathFinish(slot, bath.kind, dip.remaining, key, cleaning);
         drip = Math.max(drip, dip.drip * dip.remaining);
       }
     }
     return drip;
   }
 
-  function update(now) {
+  let playSound = null;
+  function update(now, sound = null) {
+    playSound = sound;
     const wallTime = Date.now();
     // Static pigment geometry and pooled sprites keep these effects inexpensive.
     for (const station of stations) {
@@ -270,14 +497,32 @@ export function createWorkstations(scene, materials, keyIndex) {
         let drip = animateBathKeys(bath, wallTime);
         if (bath.lift) {
           const { startedAt, key, keyMesh } = bath.lift;
-          const progress = Math.max(0, (now - startedAt) / BATH_LIFT_MS);
-          if (progress >= 1) clearLift(bath);
-          else {
-            const lift = Math.min(1, progress * 2.1);
-            keyMesh.position.set(bath.x, bath.surfaceY - .06 + lift * .34, .1 + lift * .16);
-            keyMesh.rotation.set(-1 + lift * .70, .20, -.20);
+          const progress = Math.max(0, (now - startedAt) / bath.lift.duration);
+          if (progress >= 1) {
+            // Hand the key over from where it hangs now: it flies to the hand.
+            keyMesh.updateWorldMatrix(true, false);
+            const from = keyMesh.matrixWorld.clone();
+            clearLift(bath);
+            onLiftDone?.(key, from);
+          } else {
+            const lift = Math.min(1, progress * (bath.tray ? 1.5 : 2.1));
+            const from = bath.lift.from;
+            if (from) {
+              // Up from its own place, turning from its resting pose to face the player.
+              keyMesh.position.set(from.x, from.y + lift * .36, from.z + lift * .16);
+              keyMesh.rotation.set(from.rotation.x + (-.3 - from.rotation.x) * lift,
+                from.rotation.y + (.20 - from.rotation.y) * lift, from.rotation.z + (-.20 - from.rotation.z) * lift);
+            } else if (bath.tray) {
+              keyMesh.position.set(bath.x, bath.surfaceY - .03 + lift * .36, .1 + lift * .16);
+              keyMesh.rotation.set(-Math.PI / 2 + lift * 1.27, .20 * lift, -.20 * lift);
+            } else {
+              keyMesh.position.set(bath.x, bath.surfaceY - .06 + lift * .34, .1 + lift * .16);
+              keyMesh.rotation.set(-1 + lift * .70, .20, -.20);
+            }
+            // A lifted muddy key is already washed: no clods left to drop.
             applyBathFinish(bath.lift, bath.kind,
-              bath.kind === 'rust' ? Math.max(0, 1 - (progress - .16) * 1.65) : 0, key);
+              bath.kind === 'rust' ? Math.max(0, Math.min(1, 1 - (progress - .22) / .6)) : 0, key,
+              bath.kind === 'rust' ? cleaning : null);
             drip = Math.sin(progress * Math.PI);
           }
         }
@@ -286,6 +531,6 @@ export function createWorkstations(scene, materials, keyIndex) {
     }
   }
 
-  return { stations, interactables, getHoverSurface, update, liftKey, isLifting,
+  return { stations, interactables, occluders, getHoverSurface, aimedBathKey, update, liftKey, isLifting,
     startMelt(stationId = 'center') { forgeMap.get(stationId)?.visual.ignite(performance.now()); } };
 }

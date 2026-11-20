@@ -1,5 +1,8 @@
 import * as THREE from '../vendor/three.js';
-import { createArchiveCandles } from './archive-candles.js?v=candlelight';
+import { createArchiveCandles, CANDLE_WICK_Y, CANDLE_FLAME_HEIGHT } from './archive-candles.js?v=candlelight';
+import { createCleaningEffects } from './cleaning-effects.js';
+import { getKeyCoatLayout, buildKeyCoatGeometry, getKeyCoatPoint } from './key-factory.js?v=key-ring';
+import { meltWaxBlobs } from './key-wax.js?v=forge-coats';
 import { KEY_TYPES, getProgress } from './rules.js?v=key-ring';
 import {
   createKeyModel, createCombinedKeyGeometry,
@@ -107,7 +110,16 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
   setShadowHatch(visualSettings.hatchShadows);
   cabinets[0].warmEffects(renderer, camera);
   const candleSet = createArchiveCandles(scene, { drawMeshes: true });
-  const workstations = createWorkstations(scene, mat, keyIndex);
+  const cleaningEffects = createCleaningEffects(scene, camera);
+  let pendingHandShine = false;
+  const workstations = createWorkstations(scene, mat, keyIndex, {
+    effects: cleaningEffects,
+    // The key leaves the bath for the hand: glint once it is fully clean.
+    onLiftDone: (key, from) => {
+      startHandFlight(key, from);
+      if (!key.mud && !key.rust && !key.wax) pendingHandShine = true;
+    },
+  });
   const syncEntranceShadow = createEntranceContactShadows(scene, state.keys);
   const floorKeys = new Map(); // key ID -> its family batch and instance index
   const keysById = new Map(state.keys.map(key => [key.id, key]));
@@ -191,7 +203,9 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
   const hand = new THREE.Group();
   hand.position.set(.43, -.45, -.82);
   camera.add(hand);
-  const handLight = new THREE.PointLight(0xffd6a1, 1.7, 3);
+  // Soft fill for the key in hand. It sits ~0.4 m from the key, so with
+  // physical falloff a strong value washes pale metals (steel, silver) out.
+  const handLight = new THREE.PointLight(0xffd6a1, .85, 3);
   handLight.position.set(.3, -.3, -.5);
   camera.add(handLight);
   let displayedHandId = null;
@@ -234,6 +248,154 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
     heldKeyDaylight.value = lightAtHand();
     disposeHandLight = addHeldKeyWindowLight(handModel, heldKeyDaylight, windowWarmth);
   }
+
+  // Wax melting over a candle while the player holds the key to the flame.
+  // progress 0 restores the full coat; beads fall into the flame meanwhile.
+  let waxBeadAt = 0;
+  // While wax melts the key leaves the hand and lies flat over the flame,
+  // then flies back. `meltPose.blend` eases between the two poses.
+  const HAND_POSE = new THREE.Euler(-.12, -.34, -.53);
+  const meltPose = { candleId: null, blend: 0 };
+  const poseScratch = { quaternion: new THREE.Quaternion(), hand: new THREE.Quaternion(),
+    base: new THREE.Quaternion(), target: new THREE.Vector3(), yaw: new THREE.Euler() };
+  // A key taken from a bath flies from where it was raised into the hand.
+  const HAND_FLIGHT_MS = 420;
+  let handFlight = null;
+  function startHandFlight(key, from) {
+    if (!from) return;
+    const position = new THREE.Vector3(), quaternion = new THREE.Quaternion(), scale = new THREE.Vector3();
+    from.decompose(position, quaternion, scale);
+    handFlight = { keyId: key.id, position, quaternion, scale: scale.x, startedAt: performance.now() };
+  }
+  function flyToHand() {
+    if (!handFlight || displayedHandId !== handFlight.keyId) { handFlight = null; return false; }
+    const t = Math.min(1, (performance.now() - handFlight.startedAt) / HAND_FLIGHT_MS);
+    const ease = 1 - Math.pow(1 - t, 3);
+    hand.updateMatrixWorld(true);
+    const local = hand.worldToLocal(handFlight.position.clone());
+    const handTurn = hand.getWorldQuaternion(new THREE.Quaternion()).invert();
+    const localTurn = handTurn.multiply(handFlight.quaternion);
+    const localScale = handFlight.scale / hand.getWorldScale(new THREE.Vector3()).x;
+    // A small arc on the way, so it reads as a toss rather than a slide.
+    handModel.position.copy(local).multiplyScalar(1 - ease);
+    handModel.position.y += Math.sin(Math.PI * t) * .08;
+    handModel.quaternion.copy(localTurn).slerp(poseScratch.base.setFromEuler(HAND_POSE), ease);
+    handModel.scale.setScalar(localScale + (handModel.userData.handScale - localScale) * ease);
+    if (t >= 1) handFlight = null;
+    return true;
+  }
+
+  function placeHeldKey(elapsed) {
+    if (!handModel) return;
+    handModel.userData.handScale ??= handModel.scale.x;
+    if (flyToHand()) return;
+    const goal = meltPose.candleId ? 1 : 0;
+    meltPose.blend += (goal - meltPose.blend) * (1 - Math.exp(-elapsed / .12));
+    if (Math.abs(goal - meltPose.blend) < .002) meltPose.blend = goal;
+    poseScratch.base.setFromEuler(HAND_POSE);
+    const candle = candleSet.candles.find(item => item.id === meltPose.lastCandleId);
+    // The flame gutters while the wax over it melts.
+    candle?.disturb?.(meltPose.candleId ? meltPose.blend : 0);
+    if (!candle || meltPose.blend <= 0) {
+      handModel.position.set(0, 0, 0);
+      handModel.quaternion.copy(poseScratch.base);
+      handModel.scale.setScalar(handModel.userData.handScale);
+      return;
+    }
+    // Target: flat, face up, lying across the view (head left, teeth right).
+    // The wax sits in the tip of the flame.
+    poseScratch.target.set(candle.x, candle.y + CANDLE_WICK_Y + CANDLE_FLAME_HEIGHT * .8, candle.z);
+    camera.getWorldQuaternion(poseScratch.quaternion);
+    poseScratch.yaw.setFromQuaternion(poseScratch.quaternion, 'YXZ');
+    // Slide the key back and forth along its length, so the flame passes
+    // under the wax from the head to the teeth.
+    const sweep = Math.sin(performance.now() * .0042) * .14 * meltPose.blend;
+    poseScratch.target.x += Math.cos(poseScratch.yaw.y) * sweep;
+    poseScratch.target.z -= Math.sin(poseScratch.yaw.y) * sweep;
+    hand.updateMatrixWorld(true);
+    const local = hand.worldToLocal(poseScratch.target.clone());
+    // Yaw +90°: the key's length runs left to right in front of the player.
+    const flat = new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, poseScratch.yaw.y + Math.PI / 2, 0, 'YXZ'));
+    hand.getWorldQuaternion(poseScratch.hand);
+    const localTurn = poseScratch.hand.invert().multiply(flat);
+    const t = meltPose.blend * meltPose.blend * (3 - 2 * meltPose.blend);
+    handModel.position.set(0, 0, 0).lerp(local, t);
+    handModel.quaternion.copy(poseScratch.base).slerp(localTurn, t);
+    // A little smaller over the small candle than up close in the hand.
+    handModel.scale.setScalar(handModel.userData.handScale * (1 - .3 * t));
+  }
+
+  function meltHeldWax(progress, candleId, { restoreCoat = true } = {}) {
+    meltPose.candleId = progress > 0 && candleId ? candleId : null;
+    if (meltPose.candleId) meltPose.lastCandleId = meltPose.candleId;
+    if (!restoreCoat && !meltPose.candleId) return;
+    // The held model wears per-model material copies: find the wax by its tag.
+    const crust = handModel?.children.find(child => child.isMesh && child.userData.coatKind === 'wax');
+    if (!crust) return;
+    const key = keyIndex.get(displayedHandId);
+    if (!key) return;
+    crust.userData.fullCoat ??= crust.geometry;
+    const now = performance.now();
+    if (!(progress > 0)) {
+      releaseMelt(crust);
+      crust.geometry = crust.userData.fullCoat;
+      return;
+    }
+    // Heat builds up only on the wax right above the flame, so the pool the
+    // flame is under melts while the rest waits for its turn.
+    if (melt.keyId !== key.id) {
+      releaseMelt(crust);
+      const layout = getKeyCoatLayout(key.type, key.broken, 'wax') || [];
+      Object.assign(melt, { keyId: key.id, layout, heat: new Float32Array(layout.length),
+        points: layout.map(blob => getKeyCoatPoint(key.type, key.broken, blob.x, blob.y, 0)),
+        reach: layout.map(blob => Math.max(blob.rx, blob.ry)), last: now, built: 0 });
+    }
+    const dt = Math.min(.1, (now - melt.last) / 1000);
+    melt.last = now;
+    const candle = candleSet.candles.find(item => item.id === candleId);
+    if (!candle || !melt.layout.length) return;
+    crust.updateMatrixWorld(true);
+    const flame = crust.worldToLocal(new THREE.Vector3(candle.x,
+      candle.y + CANDLE_WICK_Y + CANDLE_FLAME_HEIGHT * .6, candle.z));
+    const scale = getKeyCoatPoint(key.type, key.broken, 1, 0, 0)
+      ?.distanceTo(getKeyCoatPoint(key.type, key.broken, 0, 0, 0)) || .3;
+    let hottest = -1, hottestRate = 0;
+    melt.layout.forEach((blob, index) => {
+      const point = melt.points[index];
+      if (!point) return;
+      // Distance in the key's plane, measured in Forge units.
+      const distance = Math.hypot(point.x - flame.x, point.y - flame.y) / scale;
+      const rate = 1.5 * Math.exp(-Math.pow(distance / (.35 + melt.reach[index]), 2));
+      melt.heat[index] = Math.min(1, melt.heat[index] + rate * dt);
+      if (rate > hottestRate && melt.heat[index] < 1) { hottest = index; hottestRate = rate; }
+    });
+    // The rules finish melting on a timer; make sure nothing is left by then.
+    const catchUp = Math.max(0, progress * 1.6 - .6);
+    const melted = blob => Math.min(1, melt.heat[melt.layout.indexOf(blob)] + catchUp);
+    if (now - melt.built > 60) {
+      melt.built = now;
+      const blobs = meltWaxBlobs(melt.layout, melted, { sag: false });
+      if (melt.geometry) melt.geometry.dispose();
+      melt.geometry = buildKeyCoatGeometry(key.type, key.broken, 'wax', { blobs, heightScale: 1 - .35 * progress });
+      crust.geometry = melt.geometry;
+    }
+    // Beads drip from the pool that is melting right now.
+    if (hottest >= 0 && hottestRate > .25 && now - waxBeadAt > 150) {
+      waxBeadAt = now;
+      const blob = melt.layout[hottest];
+      const local = getKeyCoatPoint(key.type, key.broken, blob.x + (Math.random() - .5) * blob.rx,
+        blob.y + (Math.random() - .5) * blob.ry, -.02);
+      if (local) cleaningEffects.drop('wax', crust.localToWorld(local), .007 + Math.random() * .006,
+        candle.y + CANDLE_WICK_Y + .05);
+    }
+  }
+  const melt = { keyId: null, geometry: null };
+  function releaseMelt(crust) {
+    if (melt.geometry && crust?.geometry === melt.geometry) crust.geometry = crust.userData.fullCoat;
+    melt.geometry?.dispose();
+    Object.assign(melt, { keyId: null, geometry: null });
+  }
+  function shineHand() { pendingHandShine = true; }
 
   function syncKey(key) {
     geometryStatsCache?.invalidate();
@@ -278,8 +440,11 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
   candleSet.update(0, cabinets);
   for (const key of state.keys) syncKey(key);
 
+  let hoverAnchor = null;
+  let outlinedKeyId = null;
   function highlight(target) {
     hovered = target;
+    hoverAnchor = null;
     const interactive = target?.kind === 'cabinet' || target?.kind === 'bath' || target?.kind === 'forge';
     objectHoverTarget = interactive ? (target.kind === 'cabinet' ? .74 : 1) : 0;
     cellHighlight.visible = false;
@@ -304,9 +469,12 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
         surface.anchor.updateWorldMatrix(true, false);
         objectMask.matrix.copy(surface.anchor.matrixWorld);
         objectMask.geometry = surface.geometry;
+        // A key in a bath bobs and dips: its outline follows it every frame.
+        hoverAnchor = target.keyId ? surface.anchor : null;
       }
     }
     keyHoverTarget = target?.kind === 'key' ? 1 : 0;
+    outlinedKeyId = keyHoverTarget ? target.id : outlinedKeyId;
     if (keyHoverTarget) {
       const key = keysById.get(target.id);
       if (key) {
@@ -335,14 +503,29 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
     const hoverFactor = 1 - Math.exp(-elapsed / .15);
     keyHoverOpacity += (keyHoverTarget - keyHoverOpacity) * hoverFactor;
     objectHoverOpacity += (objectHoverTarget - objectHoverOpacity) * hoverFactor;
+    // A picked-up key leaves the floor at once: drop its outline without the fade.
+    if (outlinedKeyId && keysById.get(outlinedKeyId)?.status !== 'floor') {
+      keyHoverOpacity = 0;
+      outlinedKeyId = null;
+    }
     keyOutline.visible = keyHoverOpacity > .005;
     objectMask.visible = objectHoverOpacity > .005;
+    if (hoverAnchor?.parent) {
+      hoverAnchor.updateWorldMatrix(true, false);
+      objectMask.matrix.copy(hoverAnchor.matrixWorld);
+      objectMask.matrixWorldNeedsUpdate = true;
+    }
     dust.update(now);
     windowBird.update(now, playing);
-    workstations.update(now);
+    workstations.update(now, playSound);
     keyAnimations.update(now, playSound);
     cabinets.forEach(cabinet => cabinet.update(now));
     candleSet.update(now, cabinets);
+    cleaningEffects.update(elapsed);
+    if (pendingHandShine && handModel && hand.visible && !handFlight) {
+      pendingHandShine = false;
+      cleaningEffects.shine(handModel, 5, { attachTo: hand });
+    }
     if (handModel) {
       hand.visible = !workstations.isLifting(displayedHandId);
       // Blend walk sway in over several frames: an instant amplitude change
@@ -351,8 +534,11 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
       hand.rotation.z = Math.sin(now * .0031) * (.012 + handMotion * .033);
       hand.position.y = -.45 + Math.sin(now * .0029) * (.012 + handMotion * .023);
       heldKeyDaylight.value += (lightAtHand() - heldKeyDaylight.value) * (1 - Math.exp(-elapsed / .065));
+      placeHeldKey(elapsed);
     } else {
       handMotion = 0;
+      // Nothing held any more: a flame left mid-melt calms down.
+      if (meltPose.lastCandleId) candleSet.candles.find(item => item.id === meltPose.lastCandleId)?.disturb?.(0);
     }
   }
 
@@ -383,10 +569,11 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
       const dustCoverage = painted.getDustCoverage();
       try { hoverOutline.render(keyHoverOpacity, dustCoverage); }
       catch (error) { console.warn('KEYNLOCK: hover silhouette unavailable', error); }
-      try { objectOutline.render(objectHoverOpacity, dustCoverage, painted.getSceneDepth()); }
+      // A key in a bath is outlined whole, even the part under the liquid.
+      try { objectOutline.render(objectHoverOpacity, hoverAnchor ? null : dustCoverage, painted.getSceneDepth()); }
       catch (error) { console.warn('KEYNLOCK: object silhouette unavailable', error); }
     } }, interactables, cabinets, workstations, floorKeys, candles: candleSet.candles,
-    refreshHand, syncKey, refreshCabinet, highlight, update, resize,
+    refreshHand, syncKey, refreshCabinet, highlight, update, resize, meltHeldWax, shineHand,
     captureKeyThumbnail, getGeometryStats,
     getVisualStatus: painted.getStatus,
     getRenderStats: () => ({ drawCalls: renderer.info.render.calls,

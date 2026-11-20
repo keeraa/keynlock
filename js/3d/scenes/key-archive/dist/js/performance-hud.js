@@ -1,3 +1,4 @@
+import { t } from './i18n.js';
 export function createPerformanceHud(document, world) {
   const $ = id => document.getElementById(id);
   let started = performance.now();
@@ -19,15 +20,16 @@ export function createPerformanceHud(document, world) {
     const duration = now - started;
     if (duration < 800) return false;
     $('fps').textContent = Math.round(frames * 1000 / duration);
-    $('cpu-count').textContent = frames ? `${(cpuTotal / frames).toFixed(1)} / ${cpuPeak.toFixed(1)} мс` : '—';
+    $('cpu-count').textContent = frames ? `${(cpuTotal / frames).toFixed(1)} / ${cpuPeak.toFixed(1)} ${t('hud.ms')}` : '—';
     $('draw-count').textContent = frames ? Math.round(callsTotal / frames).toLocaleString('ru-RU') : '2D';
     $('pass-count').textContent = frames ? (passesTotal / frames).toFixed(1) : '2D';
     const visual = world.getVisualStatus?.();
-    const states = { active: 'GPU · работает', checking: 'GPU · проверка',
-      error: 'GPU · ошибка', off: 'отключён', canvas: 'Canvas 2D' };
+    const states = { active: t('hud.gpu.active'), checking: t('hud.gpu.checking'),
+      error: t('hud.gpu.error'), off: t('hud.gpu.off'), canvas: 'Canvas 2D' };
     $('visual-status').textContent = states[visual?.mode] || '—';
-    const stageNames = { toon: 'Мультяшный свет', outline: 'Контур' };
-    const stageStates = { active: 'работает', checking: 'проверка', error: 'ошибка', off: 'выключен' };
+    const stageNames = { toon: t('hud.stage.toon'), outline: t('hud.stage.outline') };
+    const stageStates = { active: t('hud.stage.active'), checking: t('hud.stage.checking'),
+      error: t('hud.stage.error'), off: t('hud.stage.off') };
     $('visual-status').title = [
       ...Object.entries(visual?.stages || {}).map(([name, state]) =>
         `${stageNames[name] || name}: ${stageStates[state] || state}`),

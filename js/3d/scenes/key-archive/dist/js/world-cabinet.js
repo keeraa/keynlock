@@ -1,3 +1,4 @@
+import { familyName } from './i18n.js';
 import * as THREE from '../vendor/three.js';
 import { KEY_TYPES } from './rules.js?v=key-ring';
 import { makeLabel } from './art.js?v=key-ring';
@@ -110,7 +111,7 @@ export function createCabinet(scene, type, materials) {
   addTrimInstances(group, uprightInstances, mat.wood);
   addTrimInstances(group, inlayInstances, mat.darkBrass);
   box(group, [CABINET_GRID_WIDTH + .13, CABINET_HEADER_HEIGHT, .27], [0, CABINET_HEADER_Y, .39], mat.carvedWood);
-  const label = makeLabel(KEY_TYPES[type].name.toUpperCase(), '', {
+  const label = makeLabel(familyName(type).toUpperCase(), '', {
     worldWidth: CABINET_GRID_WIDTH - .46, worldHeight: .45, fontSize: 111, color: '#ead0a0',
   });
   label.position.set(0, CABINET_HEADER_Y, .531);

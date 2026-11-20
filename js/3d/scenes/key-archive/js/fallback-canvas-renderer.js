@@ -1,3 +1,4 @@
+import { familyName } from './i18n.js';
 import * as THREE from '../vendor/three.js';
 import { createCabinetCompletion } from './cabinet-completion.js?v=wax-and-bundles';
 import { PERIMETER_BAND_Y } from './hall-architecture.js?v=alchemy-candles';
@@ -176,7 +177,7 @@ export function createFallbackCanvasRenderer({
       ctx.font = `${charSize}px Georgia`;
       ctx.shadowColor = '#000';
       ctx.shadowBlur = 5;
-      ctx.fillText(KEY_TYPES[type].name.toUpperCase(), sign.x, sign.y, 220);
+      ctx.fillText(familyName(type).toUpperCase(), sign.x, sign.y, 220);
       ctx.shadowBlur = 0;
     }
     // The 2D renderer shows the same family crest above each cabinet.

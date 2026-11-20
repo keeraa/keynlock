@@ -149,7 +149,39 @@ export function createArchiveAudio(browserWindow) {
     } catch { /* sound is optional */ }
   }
 
+  // The rust solution hisses when a key touches it and the hiss slowly dies
+  // away: the real sizzle recording (CC0, see assets/cleaning/LICENSE.txt),
+  // pitched down and looped under a long decay, with a fine bubbling layer.
+  const FIZZ_SECONDS = 5.5;
+  function fizz(level = 1) {
+    const sizzle = recordings.waxStart[0];
+    if (!sizzle) return false;
+    const now = context.currentTime;
+    const layers = [
+      { buffer: sizzle, rate: .82, gain: .5, attack: .035, decay: FIZZ_SECONDS },
+      { buffer: recordings.water[0], rate: 1.7, gain: .16, attack: .25, decay: FIZZ_SECONDS * .75 },
+    ];
+    for (const layer of layers) {
+      if (!layer.buffer) continue;
+      const source = context.createBufferSource();
+      const volume = context.createGain();
+      source.buffer = layer.buffer;
+      source.loop = true;
+      source.playbackRate.value = layer.rate * (.97 + Math.random() * .06);
+      // Starts on contact, then fades out gradually (exponential tail).
+      volume.gain.setValueAtTime(0, now);
+      volume.gain.linearRampToValueAtTime(layer.gain * Math.min(1, level), now + layer.attack);
+      volume.gain.setTargetAtTime(0, now + layer.attack + .4, layer.decay / 4);
+      source.connect(volume).connect(master);
+      source.onended = () => { source.disconnect(); volume.disconnect(); };
+      source.start(now, Math.random() * Math.max(0, layer.buffer.duration - .5));
+      source.stop(now + layer.decay + 1);
+    }
+    return true;
+  }
+
   function tone(kind, level = 1) {
+    if (kind === 'rust' && !muted && playing && context?.state === 'running' && level > 0 && fizz(level)) return;
     if (muted || !playing || context?.state !== 'running' || !CLIPS[kind] || level <= 0) return;
     try {
       const now = context.currentTime;

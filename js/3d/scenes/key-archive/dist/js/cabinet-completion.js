@@ -17,13 +17,14 @@ export function createCabinetCompletion() {
   let initialized = false, complete = false, finishedAt = -Infinity;
   let filled = Array(lines).fill(false);
   const events = new Map();
+  let rowsStarted = 0;           // counts row celebrations as they begin
   function refresh(keys, now = performance.now()) {
     const slots = new Set(keys.map(key => key.cabinetSlot)
       .filter(slot => Number.isInteger(slot) && slot >= 0 && slot < CABINET_CAPACITY));
     const next = filled.map((_, row) => Array.from({ length: columns }, (_, column) => row * columns + column)
       .every(slot => slots.has(slot)));
     next.forEach((full, row) => {
-      if (initialized && full && !filled[row]) events.set(row, now);
+      if (initialized && full && !filled[row]) { events.set(row, now); rowsStarted++; }
       if (!full) events.delete(row);
     });
     const all = slots.size === CABINET_CAPACITY;
@@ -45,5 +46,5 @@ export function createCabinetCompletion() {
   function settledRows() {
     return filled.reduce((mask, full, row) => full && !events.has(row) ? mask | (1 << row) : mask, 0);
   }
-  return { refresh, frame, settledRows, isComplete: () => complete };
+  return { refresh, frame, settledRows, isComplete: () => complete, rowsStarted: () => rowsStarted };
 }

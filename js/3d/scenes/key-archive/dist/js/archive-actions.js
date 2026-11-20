@@ -1,8 +1,11 @@
+import { t, familyName } from './i18n.js';
+import { SOAK_SECONDS } from './station-layout.js?v=working-baths';
 import * as THREE from '../vendor/three.js';
 import {
   KEY_TYPES, TOTAL_KEYS, MAX_HELD, pickupKey, selectedKey, putKeyInCabinet,
   takeKeyFromCabinet, cabinetSlotKey, trashSelectedKey, dropSelectedKey, getProgress,
   startSoak, collectSoakedKey, BUNDLE_COST, buyBundle, putBundleInCabinet, meltSelectedWax,
+  SMELT_SECONDS, settleSmelting,
 } from './rules.js?v=key-ring';
 import { WAX_MELT_MS } from './archive-candles.js?v=candlelight';
 import { CABINET_CAPACITY, pegForSlot } from './cabinet-layout.js?v=cabinet-cell-glow';
@@ -23,16 +26,21 @@ export function createArchiveActions({
     const key = selectedKey(state);
     if (!isPlaying() || target?.id !== melting.candleId || !target.lit || key?.id !== melting.keyId) {
       melting = null;
+      world.meltHeldWax?.(0);
       invalidateHover();
       return;
     }
+    world.meltHeldWax?.(1 - (melting.until - now) / WAX_MELT_MS, melting.candleId);
     if (now < melting.until) return;
     melting = null;
     if (!meltSelectedWax(state)) return;
+    // Fly back to the hand; the clean model replaces the coat on its own.
+    world.meltHeldWax?.(0, null, { restoreCoat: false });
+    if (!key.mud && !key.rust) world.shineHand?.();
     updateHud();
     save();
     tone('waxDone');
-    toast(key.mud || key.rust ? 'Воск растаял · остался ещё слой' : 'Воск растаял · ключ чистый');
+    toast(t(key.mud || key.rust ? 'toast.waxMeltedLayer' : 'toast.waxMeltedClean'));
     invalidateHover();
   }
 
@@ -45,14 +53,14 @@ export function createArchiveActions({
       if (!target.lit || !key?.wax || key.broken) return;
       if (melting?.candleId === target.id && melting.keyId === key.id) return;
       melting = { candleId: target.id, keyId: key.id, until: performance.now() + WAX_MELT_MS };
-      toast('Держи ключ у пламени');
+      toast(t('toast.holdToFlame'));
       invalidateHover();
       return;
     }
     if (target.kind === 'key') {
       const picked = keyIndex.get(target.id);
       if (!pickupKey(state, target.id)) {
-        toast('В руках помещается четыре ключа', true);
+        toast(t('toast.handsFull'), true);
         tone('wrong');
         return;
       }
@@ -60,38 +68,45 @@ export function createArchiveActions({
       updateHud();
       save();
       tone(picked.status === 'bundled' ? 'bundle' : 'take');
-      toast(picked.status === 'bundled' ? 'Связка собрана · четыре ключа отдельно от инвентаря' :
-        picked.broken ? 'Сломанный ключ · отнеси к плавильне' :
-        picked.wax ? 'Ключ в воске · растопи у свечи' :
-        picked.mud && picked.rust ? 'Ключ в грязи и ржавчине · потребуется обе ванны' :
-        picked.mud ? 'Грязный ключ · отмочи в воде' : picked.rust ? 'Ржавый ключ · погрузи в раствор' :
-          `Ключ взят · ${KEY_TYPES[picked.type].name}`);
+      toast(picked.status === 'bundled' ? t('toast.bundleMade') :
+        picked.broken ? t('toast.pickedBroken') :
+        picked.wax ? t('toast.pickedWax') :
+        picked.mud && picked.rust ? t('toast.pickedMudRust') :
+        picked.mud ? t('toast.pickedMud') : picked.rust ? t('toast.pickedRust') :
+          t('toast.picked', { name: familyName(picked.type) }));
       invalidateHover();
       return;
     }
     if (target.kind === 'bath') {
       const key = selectedKey(state);
-      if (key?.wax) { toast('Ключ в воске · растопи у свечи', true); return; }
+      if (key?.wax) { toast(t('toast.pickedWax'), true); return; }
       if (key && startSoak(state, target.id, target.bathKind)) {
         updateHud();
         save();
-        if (target.bathKind === 'rust') tone('rust');
-        toast(target.bathKind === 'mud' ? 'Промываем ключ' : 'Ключ замочен · 30 секунд');
+        // The rust splash sounds from the tray once the key lands (wash-forge-stations).
+        toast(target.bathKind === 'mud' ? t('toast.washing') : t('toast.soaking', { seconds: SOAK_SECONDS.rust }));
       } else {
-        const collected = collectSoakedKey(state, target.id);
+        const aimed = target.keyId && keyIndex.get(target.keyId);
+        if (aimed && aimed.bathUntil > Date.now()) {
+          toast(t(target.bathKind === 'mud' ? 'toast.stillWashing' : 'toast.stillSoaking'), true);
+          tone('wrong');
+          invalidateHover();
+          return;
+        }
+        const collected = collectSoakedKey(state, target.id, Date.now(), target.keyId ?? null);
         if (collected) {
           world.workstations?.liftKey?.(target.id, collected);
           world.syncKey?.(collected);
           updateHud();
           save();
           tone('lift');
-          toast(collected.mud || collected.rust ? 'Один слой очищен · нужна вторая ванна' : 'Ключ очищен · можно нести к шкафу');
+          toast(t(collected.mud || collected.rust ? 'toast.layerCleaned' : 'toast.keyCleaned'));
         } else {
           const contents = keyIndex.bathContents(target.id);
-          toast(contents.ready.length && state.held.length >= MAX_HELD ? 'Освободи место для чистого ключа' :
-            contents.space === 0 ? 'Ванна заполнена · четыре ключа' :
-              contents.pending.length ? 'Подожди, пока ключи отмокнут' :
-                target.bathKind === 'mud' ? 'Здесь очищают ключи от грязи' : 'Здесь удаляют ржавчину', true);
+          toast(t(contents.ready.length && state.held.length >= MAX_HELD ? 'toast.freeHands' :
+            contents.space === 0 ? 'toast.bathFull' :
+              contents.pending.length ? 'toast.waitSoak' :
+                target.bathKind === 'mud' ? 'toast.mudBathInfo' : 'toast.rustBathInfo'), true);
           tone('wrong');
         }
       }
@@ -100,16 +115,15 @@ export function createArchiveActions({
     }
     if (target.kind === 'forge') {
       if (!selectedKey(state)?.broken) {
-        if (state.bundles) { toast('Кольцо уже куплено'); return; }
+        if (state.bundles) { toast(t('toast.ringOwned')); return; }
         if (buyBundle(state)) {
           updateHud();
           save();
           tone('bundle');
-          toast(state.activeBundle ? 'Связка готова к переноске' :
-            'Связка куплена · четыре чистых ключа одного семейства свяжутся сами');
+          toast(t(state.activeBundle ? 'toast.bundleReady' : 'toast.ringBought'));
           invalidateHover();
         } else {
-          toast(`Связка стоит ${BUNDLE_COST} металла · сейчас ${state.metal ?? 0}`, true);
+          toast(t('toast.ringPrice', { cost: BUNDLE_COST, metal: state.metal ?? 0 }), true);
           tone('wrong');
         }
         return;
@@ -119,21 +133,23 @@ export function createArchiveActions({
       updateHud();
       save();
       tone('release');
-      toast('Сломанный ключ переплавлен · +1 металл');
+      const queued = getProgress(state).smelting;
+      toast(queued > 1 ? t('toast.smeltQueued', { ahead: queued - 1 }) :
+        t('toast.smelting', { seconds: SMELT_SECONDS }));
+      // (the bar over the forge shows the countdown and the whole queue)
       invalidateHover();
-      if (getProgress(state).processed === TOTAL_KEYS) setTimeout(showVictory, 1100);
       return;
     }
     if (target.kind !== 'cabinet') return;
     if (target.slot === null || target.slot === undefined) {
-      toast(target.full ? 'Все ячейки этого шкафа заняты' : 'Наведи указатель на ячейку шкафа', true);
+      toast(t(target.full ? 'toast.cabinetFull' : 'toast.aimCell'), true);
       return;
     }
     const occupied = cabinetSlotKey(state, target.type, target.slot);
     if (occupied) {
       const taken = takeKeyFromCabinet(state, target.type, target.slot);
       if (!taken) {
-        toast('В руках помещается четыре ключа', true);
+        toast(t('toast.handsFull'), true);
         tone('wrong');
         return;
       }
@@ -142,27 +158,27 @@ export function createArchiveActions({
       updateHud();
       save();
       tone('take');
-      toast('Ключ снят с ячейки · можно переложить');
+      toast(t('toast.takenFromCell'));
       invalidateHover();
       return;
     }
     const key = selectedKey(state);
     const keyType = target.type;
     const bundle = state.activeBundle?.type === keyType;
-    if (!bundle && !key) { toast('Сначала возьми ключ с пола'); return; }
+    if (!bundle && !key) { toast(t('toast.pickFirst')); return; }
     if (!bundle && key.broken) {
-      toast('Сломанный ключ · отнеси к плавильне', true);
+      toast(t('toast.pickedBroken'), true);
       tone('wrong');
       return;
     }
-    if (!bundle && key.wax) { toast('Ключ в воске · растопи у свечи', true); return; }
+    if (!bundle && key.wax) { toast(t('toast.pickedWax'), true); return; }
     if (!bundle && (key.mud || key.rust)) {
-      toast('Сперва очисти ключ · используй ванны в центре зала', true);
+      toast(t('toast.cleanFirst'), true);
       tone('wrong');
       return;
     }
     if (!bundle && key.type !== target.type) {
-      toast('Это шкаф для ключей «' + KEY_TYPES[target.type].name + '»', true);
+      toast(t('toast.wrongCabinet', { name: familyName(target.type) }), true);
       tone('wrong');
       return;
     }
@@ -183,7 +199,7 @@ export function createArchiveActions({
       }
       const bundled = putBundleInCabinet(state, keyType, slots);
       if (!bundled) {
-        toast('Для связки нужно четыре свободные ячейки', true);
+        toast(t('toast.bundleCells'), true);
         return;
       }
       bundled.forEach((item, index) => world.animatePlace(item, slots[index], {
@@ -199,9 +215,9 @@ export function createArchiveActions({
     if (bundle) tone('bundle');
     const progress = getProgress(state);
     if (progress.sorted[keyType] === progress.required[keyType]) {
-      toast('Шкаф «' + KEY_TYPES[keyType].name + '» заполнен');
+      toast(t('toast.cabinetDone', { name: familyName(keyType) }));
     } else {
-      toast(bundle ? 'Четыре ключа на своих местах' : 'Ключ на своём месте');
+      toast(t(bundle ? 'toast.bundlePlaced' : 'toast.keyPlaced'));
     }
     invalidateHover();
     if (progress.processed === TOTAL_KEYS) setTimeout(showVictory, 1900);
@@ -228,8 +244,19 @@ export function createArchiveActions({
     updateHud();
     save();
     tone('release');
-    toast('Ключ брошен');
+    toast(t('toast.thrown'));
   }
 
-  return { interact, drop, updateWax, isMelting: () => Boolean(melting) };
+  // Metal is ready when a smelt finishes, even while the player is elsewhere.
+  function updateSmelting(now = Date.now()) {
+    const settled = settleSmelting(state, now);
+    if (!settled) return;
+    updateHud();
+    save();
+    tone('ready');
+    toast(t('toast.metalReady', { count: settled }));
+    if (getProgress(state).processed === TOTAL_KEYS) setTimeout(showVictory, 1100);
+  }
+
+  return { interact, drop, updateWax, updateSmelting, isMelting: () => Boolean(melting) };
 }

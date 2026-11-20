@@ -1,3 +1,6 @@
+import { t, applyTranslations, LANGUAGES, getLanguage, setLanguage } from './i18n.js';
+// Static texts of the page follow the chosen language before anything shows.
+applyTranslations(document);
 import { TOTAL_KEYS, getProgress } from './rules.js?v=key-ring';
 import { createWorld } from './world.js?v=cleaning-cues';
 import { installKeyAssetProvider } from './key-factory.js?v=key-ring';
@@ -41,12 +44,13 @@ const camera = world.camera;
 const movement = createPlayerMovement(camera, world.bounds);
 const clamp = (number, a, b) => Math.max(a, Math.min(b, number));
 const hud = createArchiveHud(document, world, state, keyIndex);
-const bathProgress = createBathProgress(document, world, keyIndex);
+const bathProgress = createBathProgress(document, world, keyIndex, state);
 const routeGuide = createFirstRouteGuide(document, state, keyIndex, world);
 const performanceHud = createPerformanceHud(document, world);
 const visualPanel = createVisualPanel(document, world, storage, visualSettings);
 
 let mode = 'intro';
+let lastSmeltCheck = 0;
 let yaw = 0;
 let pitch = state.firstRoute && keyIndex.get(FIRST_ROUTE_KEY_ID)?.status === 'floor' ? -.30 : -.17;
 let sensitivity = 14;
@@ -62,11 +66,11 @@ let lastHoverKey = '';
 let toastTimeout = 0;
 let announceRecovery = archiveSave.recovered;
 const saveMessages = {
-  unavailable: 'Хранилище браузера недоступно. Прогресс этой сессии не сохраняется.',
-  damaged: 'Сохранение повреждено. Автосохранение приостановлено. Начать заново можно из меню паузы.',
-  conflict: 'Сохранение изменилось. Перезагрузи игру, чтобы открыть актуальный прогресс.',
-  'write-error': 'Не удалось записать прогресс. Автосохранение попробует ещё раз при следующем действии.',
-  'backup-error': 'Прогресс записан, но резервная копия не обновилась.',
+  unavailable: t('save.unavailable'),
+  damaged: t('save.damaged'),
+  conflict: t('save.conflict'),
+  'write-error': t('save.writeError'),
+  'backup-error': t('save.backupError'),
 };
 const heldMovement = new Set();
 const MENU_FRAME_INTERVAL = 1000 / 30;
@@ -76,7 +80,7 @@ const audio = createArchiveAudio(window);
 const music = createArchiveMusic(window, storage);
 const { tone } = audio;
 const { targetInView, clearAim } = createArchiveTargeting({ camera, world, state, keyIndex });
-const { interact, drop, updateWax, isMelting } = createArchiveActions({
+const { interact, drop, updateWax, updateSmelting, isMelting } = createArchiveActions({
   state, keyIndex, world, camera, targetInView,
   getYaw: () => yaw, isPlaying: () => mode === 'play',
   save, updateHud, tone, toast, showVictory,
@@ -89,7 +93,7 @@ function save({ initial = false } = {}) {
   keyIndex.rebuild();
   const result = archiveSave.save();
   const status = $('save-status');
-  const message = saveMessages[result] || (announceRecovery ? 'Прогресс восстановлен из резервной копии.' : '');
+  const message = saveMessages[result] || (announceRecovery ? t('save.recovered') : '');
   if (status.textContent !== message) status.textContent = message;
   status.hidden = !message;
   $('save-intro').hidden = result !== 'saved';
@@ -108,6 +112,7 @@ function toast(message, error = false) {
 const promptFor = createArchivePrompts(state, keyIndex, isMelting);
 const litCabinets = world.cabinets.map(cabinet => cabinet.completion.isComplete());
 const settledRows = world.cabinets.map(cabinet => cabinet.completion.settledRows());
+const startedRows = [];
 
 function playAt(kind, position) {
   const distance = Math.hypot(camera.position.x - position.x, camera.position.z - position.z);
@@ -118,7 +123,8 @@ function updateHud() { hud.update(); }
 
 function setHovered(target) {
   const identity = target ? `${target.kind}-${target.id ?? target.stationId ?? target.type}` +
-    (target.kind === 'cabinet' ? `:${target.slot ?? '-'}:${target.assisted ? 'assisted' : 'direct'}:${Boolean(target.full)}` : target.kind === 'candle' ? `:${target.lit}` : '') : '';
+    (target.kind === 'cabinet' ? `:${target.slot ?? '-'}:${target.assisted ? 'assisted' : 'direct'}:${Boolean(target.full)}` :
+      target.kind === 'candle' ? `:${target.lit}` : target.kind === 'bath' ? `:${target.keyId ?? '-'}` : '') : '';
   if (identity === lastHoverKey) return;
   hovered = target;
   lastHoverKey = identity;
@@ -193,7 +199,7 @@ function play({ lockMouse = true } = {}) {
   music.start();
   lockUnavailable = false;
   if (lockMouse) requestMouseLock();
-  if (getProgress(state).processed === TOTAL_KEYS) toast('Архив уже разобран');
+  if (getProgress(state).processed === TOTAL_KEYS) toast(t('toast.archiveDone'));
 }
 
 function releaseMouseLock() {
@@ -222,11 +228,11 @@ function showVictory() {
 }
 
 function resetGame() {
-  if (!window.confirm('Сбросить прогресс и снова разложить все 1000 ключей?')) return;
+  if (!window.confirm(t('confirm.reset'))) return;
   try {
     clearArchiveState(storage);
   } catch {
-    toast('Не удалось сбросить прогресс', true);
+    toast(t('toast.resetFailed'), true);
     return;
   }
   window.location.reload();
@@ -243,6 +249,12 @@ visualPanel.bind();
 $('reset-btn').addEventListener('click', resetGame);
 $('victory-reset').addEventListener('click', resetGame);
 $('sensitivity').addEventListener('input', event => { sensitivity = Number(event.target.value); });
+// Language: the page reloads in the chosen language (progress is already saved).
+const languageSelect = $('language');
+if (languageSelect) {
+  for (const [code, name] of Object.entries(LANGUAGES)) languageSelect.add(new Option(name, code, false, code === getLanguage()));
+  languageSelect.addEventListener('change', event => { save(); setLanguage(event.target.value); });
+}
 $('sound').checked = !audio.isMuted();
 $('sound').addEventListener('change', event => { audio.setMuted(!event.target.checked); });
 
@@ -367,6 +379,7 @@ function tick(now) {
   camera.rotation.set(pitch, yaw, 0, 'YXZ');
   const target = mode === 'play' ? targetInView() : null;
   updateWax(now, target);
+  if (now - lastSmeltCheck > 250) { lastSmeltCheck = now; updateSmelting(); }
   audio.setWaxMelting(isMelting());
   if (mode === 'play') setHovered(target);
   if (mode === 'play' && hovered?.kind === 'bath') {
@@ -379,8 +392,11 @@ function tick(now) {
   for (const cabinet of world.cabinets) {
     const lit = cabinet.completion.isComplete();
     const rows = cabinet.completion.settledRows();
+    // The row chime starts together with the shimmer, not after it settles.
+    const started = cabinet.completion.rowsStarted?.() ?? 0;
     if (lit && !litCabinets[cabinet.type]) playAt('finish', cabinet.group.position);
-    else if (!lit && (rows & ~settledRows[cabinet.type])) playAt('row', cabinet.group.position);
+    else if (started > (startedRows[cabinet.type] ?? started)) playAt('row', cabinet.group.position);
+    startedRows[cabinet.type] = started;
     litCabinets[cabinet.type] = lit;
     settledRows[cabinet.type] = rows;
   }

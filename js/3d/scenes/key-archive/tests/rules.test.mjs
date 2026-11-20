@@ -7,8 +7,7 @@ import {
   trashSelectedKey, upgradeKeyConditions, dropSelectedKey, getProgress,
   MUD_ORDINALS, RUST_ORDINALS, BOTH_ORDINALS, keyCondition,
   startSoak, bathContents, collectSoakedKey, meltSelectedWax, buyBundle, putBundleInCabinet,
-  FLOOR_DISTRIBUTION_VERSION, upgradeFloorDistribution, upgradeStationBaths,
-} from '../dist/js/rules.js';
+  FLOOR_DISTRIBUTION_VERSION, upgradeFloorDistribution, upgradeStationBaths, settleSmelting, smeltingState, SMELT_SECONDS } from '../dist/js/rules.js';
 import {
   sampleThrow, throwFlightTime, THROW_FIRST_BOUNCE_SECONDS, THROW_SECOND_BOUNCE_SECONDS,
   THROW_BOUNCE_SECONDS, THROW_SLIDE_SECONDS,
@@ -82,13 +81,37 @@ test('damaged keys are identified and must be discarded before completion', () =
   const broken = state.keys.find(key => key.broken);
   assert.equal(pickupKey(state, broken.id), true);
   assert.equal(putKeyInCabinet(state, broken.type), false);
-  assert.equal(trashSelectedKey(state), true);
+  const now = 1_000_000;
+  assert.equal(trashSelectedKey(state, now), true);
+  // Smelting takes time: no metal until the forge is done.
+  assert.equal(broken.status, 'smelting');
+  assert.equal(state.metal, 0);
+  assert.equal(getProgress(state).processed, 0);
+  assert.equal(validateState(state), true);
+  assert.equal(settleSmelting(state, now + 1000), 0);
+  assert.equal(settleSmelting(state, now + SMELT_SECONDS * 1000), 1);
   assert.equal(broken.status, 'trashed');
   assert.equal(getProgress(state).trashed, 1);
   assert.equal(getProgress(state).processed, 1);
   assert.equal(state.metal, 1);
   assert.equal(validateState(state), true);
   assert.equal(trashSelectedKey(state), false);
+});
+
+test('broken keys queue in the forge and smelt one after another', () => {
+  const state = createInitialState();
+  const now = 2_000_000;
+  const broken = state.keys.filter(key => key.broken).slice(0, 3);
+  for (const key of broken) { assert.equal(pickupKey(state, key.id), true); assert.equal(trashSelectedKey(state, now), true); }
+  const first = smeltingState(state, now + 500);
+  assert.equal(first.waiting, 2);
+  assert.ok(first.progress > 0 && first.progress < .1);
+  assert.equal(first.totalSecondsLeft, SMELT_SECONDS * 3);
+  assert.equal(settleSmelting(state, now + SMELT_SECONDS * 1000 + 1), 1, 'only the first one is done');
+  assert.equal(smeltingState(state, now + SMELT_SECONDS * 1000 + 1).waiting, 1);
+  assert.equal(settleSmelting(state, now + SMELT_SECONDS * 3000), 2);
+  assert.equal(state.metal, 3);
+  assert.equal(smeltingState(state, now + SMELT_SECONDS * 3000), null);
 });
 
 test('the 1,000 keys include balanced layers of wax, mud, rust and breakage', () => {
@@ -401,4 +424,19 @@ test('a ring used under the old rules is restored from its recorded metal cost',
   upgradeKeyConditions(state);
   assert.equal(state.bundles, 1);
   assert.equal(state.metal, 2);
+});
+
+test('the player takes the bath key they are looking at', () => {
+  const state = createInitialState();
+  const now = 5_000_000;
+  const muddy = state.keys.filter(key => key.mud && !key.rust && !key.wax && !key.broken).slice(0, 2);
+  for (const key of muddy) {
+    assert.equal(pickupKey(state, key.id), true);
+    assert.equal(startSoak(state, 'center-mud', 'mud', now), true);
+  }
+  const later = now + 60_000;
+  const taken = collectSoakedKey(state, 'center-mud', later, muddy[1].id);
+  assert.equal(taken.id, muddy[1].id, 'the aimed key, not the first one');
+  assert.equal(muddy[0].status, 'bath');
+  assert.equal(collectSoakedKey(state, 'center-mud', later).id, muddy[0].id, 'without aim: the first ready key');
 });

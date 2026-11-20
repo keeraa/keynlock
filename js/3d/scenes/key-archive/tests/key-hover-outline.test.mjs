@@ -39,7 +39,7 @@ test('old normal-expanded silhouette rendering is fully removed', () => {
   const world = readFileSync(new URL('../dist/js/world.js', import.meta.url), 'utf8');
   assert.match(world, /createKeyHoverOutline\(renderer, camera, keyOutline\)/);
   assert.match(world, /createKeyHoverOutline\(renderer, camera, objectMask, \{ depthAware: true \}\)/);
-  assert.match(world, /objectOutline\.render\(objectHoverOpacity, dustCoverage, painted\.getSceneDepth\(\)\)/);
+  assert.match(world, /objectOutline\.render\(objectHoverOpacity, hoverAnchor \? null : dustCoverage, painted\.getSceneDepth\(\)\)/);
   assert.match(world, /objectHoverOpacity \+= \(objectHoverTarget - objectHoverOpacity\)/);
   assert.doesNotMatch(world, /createKeyHoverMaterial|hoverOpacity\.value/);
 });

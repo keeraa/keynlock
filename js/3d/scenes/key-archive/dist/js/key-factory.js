@@ -68,6 +68,16 @@ export function getKeyCrustGeometry(type, broken = false, kind = 'mud') {
   return active().getCrustGeometry?.(type, { broken, kind }) || null;
 }
 export function getKeyCrustMaterial(kind = 'mud') { return active().getCrustMaterial?.(kind) || null; }
+// Cleaning animations (optional provider features; null when unsupported).
+export function getKeyCoatLayout(type, broken = false, kind = 'mud') {
+  return active().getCoatLayout?.(type, broken, kind) || null;
+}
+export function buildKeyCoatGeometry(type, broken = false, kind = 'mud', options = {}) {
+  return active().buildCoatGeometry?.(type, broken, kind, options) || null;
+}
+export function getKeyCoatPoint(type, broken, x, y, z = 0) {
+  return active().getCoatPoint?.(type, broken, x, y, z) || null;
+}
 export function getKeyRustStrength(type) { return active().getRustStrength?.(type) ?? 1.35; }
 export function getKeyMetal(type) { return active().getMetal(type); }
 // Optional per-family pigment for new forge finishes; legacy palette remains

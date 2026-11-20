@@ -3,7 +3,7 @@ import * as THREE from '../vendor/three.js';
 import { floorSurfaceY, RUG_TOP } from './floor-contact.js';
 import { createKeyModel, disposeKeySceneModel, getKeyDisplayScale } from './key-factory.js';
 import { cabinetKeyPose } from './cabinet-layout.js';
-import { sampleThrow } from './archive-throw-trajectory.js';
+import { samplePath } from './throw-flight.js';
 import { playMotionContact, samplePlacement, sampleDiscard, cabinetContactGlow } from './archive-key-motion.js';
 import { RIGHT_HAND_RELEASE } from './held-key-motion.js';
 
@@ -17,8 +17,10 @@ export function createWorldKeyAnimations({ scene, camera, cabinets, workstations
   const bounceAxis = new THREE.Vector3(0, 1, 0);
   const bounceRotation = new THREE.Quaternion();
 
-  function animateThrow(key, start, end) {
+  // flight: a simulated throw (throw-flight.js); onLanded runs when it settles.
+  function animateThrow(key, flight, onLanded = null) {
     invalidate();
+    const start = flight.path[0];
     const model = createKeyModel(key.type, { id: key.id, variation: key.variation,
       broken: key.broken, mud: key.mud, rust: key.rust, wax: key.wax,
       scale: getKeyDisplayScale('floor', key.type) });
@@ -30,7 +32,10 @@ export function createWorldKeyAnimations({ scene, camera, cabinets, workstations
     scene.add(model);
     const floorRotation = new THREE.Quaternion().setFromEuler(
       new THREE.Euler(-Math.PI / 2, key.rotation, 0, 'YXZ'));
-    thrownKeys.set(key.id, { key, start, end, startTime: sceneNow(), model, releaseQuaternion, floorRotation });
+    // The key turns flat by its first impact, then shakes a little on each bounce.
+    const firstContact = flight.impacts[0]?.t ?? flight.duration;
+    thrownKeys.set(key.id, { key, flight, firstContact, onLanded, nextImpact: 0,
+      startTime: sceneNow(), model, releaseQuaternion, floorRotation });
     syncKey(key);
   }
   function isThrowing(keyId) { return thrownKeys.has(keyId); }
@@ -82,20 +87,31 @@ export function createWorldKeyAnimations({ scene, camera, cabinets, workstations
   function update(now, playSound) {
     for (const [id, motion] of thrownKeys) {
       const elapsed = (now - motion.startTime) / 1000;
-      const pose = sampleThrow(motion.start, motion.end, elapsed);
-      if (pose.contact && !motion.soundPlayed)
-        playMotionContact(motion, true, floorSurfaceY(pose.x, pose.z) === RUG_TOP ? 'dropRug' : 'dropWood', playSound);
-      if (pose.landed) {
+      const { flight } = motion;
+      const pose = samplePath(flight.path, elapsed);
+      // Every impact is heard once, by what the key struck.
+      while (motion.nextImpact < flight.impacts.length && flight.impacts[motion.nextImpact].t <= elapsed) {
+        const hit = flight.impacts[motion.nextImpact++];
+        if (hit.kind === 'catch' || hit.speed < .35) continue;
+        const sound = hit.kind === 'floor'
+          ? (floorSurfaceY(pose.x, pose.z) === RUG_TOP ? 'dropRug' : 'dropWood') : 'dropWood';
+        playSound?.(sound, new THREE.Vector3(pose.x, pose.y, pose.z));
+      }
+      if (elapsed >= flight.duration) {
         invalidate();
         thrownKeys.delete(id);
         scene.remove(motion.model);
         disposeKeySceneModel(motion.model);
         syncKey(motion.key);
+        motion.onLanded?.(flight.landing);
         continue;
       }
       motion.model.position.set(pose.x, pose.y, pose.z);
-      motion.model.quaternion.slerpQuaternions(motion.releaseQuaternion, motion.floorRotation, pose.settle);
-      if (pose.wobble) motion.model.quaternion.multiply(bounceRotation.setFromAxisAngle(bounceAxis, pose.wobble));
+      const settle = Math.min(1, elapsed / motion.firstContact);
+      motion.model.quaternion.slerpQuaternions(motion.releaseQuaternion, motion.floorRotation, settle * settle * (3 - 2 * settle));
+      const sinceImpact = elapsed - (flight.impacts.findLast?.(hit => hit.t <= elapsed)?.t ?? -1);
+      const wobble = sinceImpact >= 0 && sinceImpact < .25 ? .12 * Math.sin(sinceImpact / .25 * Math.PI) : 0;
+      if (wobble) motion.model.quaternion.multiply(bounceRotation.setFromAxisAngle(bounceAxis, wobble));
     }
     for (const [id, motion] of placingKeys) {
       const elapsed = (now - motion.startTime) / 1000;

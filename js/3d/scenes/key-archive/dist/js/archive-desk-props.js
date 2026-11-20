@@ -5,7 +5,7 @@ const models = [
   { name: 'books-strapped', x: .29, z: .52, yaw: -.18, scale: 1.1 },
 ];
 
-export async function addArchiveDeskProps(scene) {
+export async function addArchiveDeskProps(scene, onPlaced) {
   try {
     const { GLTFLoader } = await import('../vendor/loaders/GLTFLoader.js');
     const loader = new GLTFLoader();
@@ -23,6 +23,7 @@ export async function addArchiveDeskProps(scene) {
           object.receiveShadow = true;
         });
         scene.add(prop);
+        onPlaced(prop);
       } catch (error) {
         console.warn(`Archive desk could not load ${name}`, error);
       }

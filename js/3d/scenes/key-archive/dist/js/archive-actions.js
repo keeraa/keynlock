@@ -1,15 +1,14 @@
 import { t, familyName } from './i18n.js';
-import { SOAK_SECONDS } from './station-layout.js';
 import * as THREE from '../vendor/three.js';
 import {
   KEY_TYPES, TOTAL_KEYS, MAX_HELD, pickupKey, selectedKey, putKeyInCabinet,
   takeKeyFromCabinet, cabinetSlotKey, trashSelectedKey, dropSelectedKey, getProgress,
   startSoak, collectSoakedKey, BUNDLE_COST, buyBundle, putBundleInCabinet, meltSelectedWax,
-  SMELT_SECONDS, settleSmelting,
+  settleSmelting, canSoak, soakThrownKey, smeltThrownKey,
 } from './rules.js';
 import { WAX_MELT_MS } from './archive-candles.js';
 import { CABINET_CAPACITY, pegForSlot } from './cabinet-layout.js';
-import { findFreeFloorSpot } from './key-spacing.js';
+import { simulateThrow, reticleTarget, launchTowards } from './throw-flight.js';
 import { restingKeyY } from './floor-contact.js';
 import { BUNDLE_RELEASE_INTERVAL_MS } from './archive-key-motion.js';
 import { RIGHT_HAND_RELEASE } from './held-key-motion.js';
@@ -41,7 +40,7 @@ export function createArchiveActions({
     statistics?.record('wax', { dewaxed: 1, cleaned: key.mud || key.rust ? 0 : 1 });
     updateHud();
     save();
-    toast(t(key.mud || key.rust ? 'toast.waxMeltedLayer' : 'toast.waxMeltedClean'));
+    if (key.mud || key.rust) toast(t('toast.waxMeltedLayer'));
     invalidateHover();
   }
 
@@ -73,12 +72,8 @@ export function createArchiveActions({
       save();
       if (picked.status === 'held') world.animatePickup?.();
       tone(picked.status === 'bundled' ? 'bundle' : 'pickup');
-      toast(picked.status === 'bundled' ? t('toast.bundleMade') :
-        picked.broken ? t('toast.pickedBroken') :
-        picked.wax ? t('toast.pickedWax') :
-        picked.mud && picked.rust ? t('toast.pickedMudRust') :
-        picked.mud ? t('toast.pickedMud') : picked.rust ? t('toast.pickedRust') :
-          t('toast.picked', { name: familyName(picked.type) }));
+      // The slot shows what the key needs; only the ring's packing is news.
+      if (picked.status === 'bundled') toast(t('toast.bundleMade'));
       invalidateHover();
       return;
     }
@@ -91,7 +86,6 @@ export function createArchiveActions({
         updateHud();
         save();
         // The rust splash sounds from the tray once the key lands (wash-forge-stations).
-        toast(target.bathKind === 'mud' ? t('toast.washing') : t('toast.soaking', { seconds: SOAK_SECONDS.rust }));
       } else {
         const aimed = target.keyId && keyIndex.get(target.keyId);
         if (aimed && aimed.bathUntil > now) {
@@ -125,8 +119,8 @@ export function createArchiveActions({
           updateHud();
           save();
           tone('lift');
-          toast(taken.length > 1 ? t('toast.keysTaken', { count: taken.length }) :
-            t(shown.mud || shown.rust ? 'toast.layerCleaned' : 'toast.keyCleaned'));
+          // Still dirty after this bath: say which one it needs next.
+          if (taken.some(item => item.mud || item.rust)) toast(t('toast.layerCleaned'));
         } else {
           const contents = keyIndex.bathContents(target.id, now);
           toast(t(contents.ready.length && state.held.length >= MAX_HELD ? 'toast.freeHands' :
@@ -154,7 +148,6 @@ export function createArchiveActions({
           updateHud();
           save();
           tone('bundle');
-          if (state.activeBundle) toast(t('toast.bundleReady'));
           invalidateHover();
         } else {
           toast(t('toast.ringPrice', { cost: BUNDLE_COST, metal: state.metal ?? 0 }), true);
@@ -168,9 +161,6 @@ export function createArchiveActions({
       updateHud();
       save();
       tone('release');
-      const queued = getProgress(state).smelting;
-      toast(queued > 1 ? t('toast.smeltQueued', { ahead: queued - 1 }) :
-        t('toast.smelting', { seconds: SMELT_SECONDS }));
       // (the bar over the forge shows the countdown and the whole queue)
       invalidateHover();
       return;
@@ -194,7 +184,6 @@ export function createArchiveActions({
       updateHud();
       save();
       tone('take');
-      toast(t('toast.takenFromCell'));
       invalidateHover();
       return;
     }
@@ -257,8 +246,6 @@ export function createArchiveActions({
     const progress = getProgress(state);
     if (progress.sorted[keyType] === progress.required[keyType]) {
       toast(t('toast.cabinetDone', { name: familyName(keyType) }));
-    } else {
-      toast(t(bundle ? 'toast.bundlePlaced' : 'toast.keyPlaced'));
     }
     invalidateHover();
     if (progress.processed === TOTAL_KEYS) setTimeout(showVictory, 1900);
@@ -268,26 +255,68 @@ export function createArchiveActions({
     if (!isPlaying()) return;
     const key = selectedKey(state);
     if (!key || world.workstations?.isLifting?.(key.id)) return;
+    // The key is tossed from the hand onto the point under the reticle (the
+    // floor, a tabletop, a vessel's opening), with the strength that needs;
+    // beyond reach, onto the floor at full reach ahead. The flight is
+    // simulated now and only replayed by the animation.
     const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
-    const aimHeight = forward.y;
-    forward.y = 0;
-    forward.normalize();
     camera.updateMatrixWorld(true);
-    const releasePoint = world.getThrowRelease?.() ?? camera.localToWorld(new THREE.Vector3(
+    const release = world.getThrowRelease?.() ?? camera.localToWorld(new THREE.Vector3(
       RIGHT_HAND_RELEASE.x, RIGHT_HAND_RELEASE.y, RIGHT_HAND_RELEASE.z));
-    const reach = 3.4 + aimHeight * 1.1;
-    const { x, z } = findFreeFloorSpot(state.keys,
-      releasePoint.x + forward.x * reach, releasePoint.z + forward.z * reach);
-    const start = { x: releasePoint.x, y: releasePoint.y, z: releasePoint.z, lift: 1.15 + aimHeight * 2 };
-    const end = { x, y: restingKeyY(x, z) + (key.layer || 0), z };
-    dropSelectedKey(state, x, z, -getYaw() + .6);
+    const now = stationNow();
+    // A vessel takes the key only if it could go there by hand.
+    const accepts = vessel => vessel.kind === 'forge' ? key.broken
+      : canSoak(state, key, vessel.id, vessel.kind, now);
+    const throwScene = world.getThrowScene?.().forKey(accepts) ?? {};
+    const start = { x: release.x, y: release.y, z: release.z };
+    const eye = camera.getWorldPosition(new THREE.Vector3());
+    const target = reticleTarget({ eye, forward, floorY: restingKeyY, ...throwScene });
+    const flight = simulateThrow({ start, floorY: restingKeyY, ...throwScene,
+      velocity: launchTowards(start, target) });
+    const { landing } = flight;
+    // Until a key bound for a vessel arrives it lies on the floor in front of
+    // the workbench (only seen if the page reloads mid-flight).
+    const rest = landing.on === 'vessel'
+      ? towards(landing, release, 1.1) : landing;
+    dropSelectedKey(state, rest.x, rest.z, -getYaw() + .6);
     statistics?.keyThrown?.(key.id, camera.position.x, camera.position.z);
-    world.animateThrow(key, start, end);
+    // A key resting on a tabletop keeps its height above the floor.
+    key.layer = landing.on === 'surface' ? Math.max(0, landing.y - restingKeyY(landing.x, landing.z) + .004) : 0;
+    world.animateThrow(key, flight, landed => keyLanded(key, landed, flight));
     statistics?.record('throw', { throws: 1 });
     updateHud();
     save();
     tone('throw');
-    toast(t('toast.thrown'));
+  }
+
+  function towards(from, to, metres) {
+    const dx = to.x - from.x, dz = to.z - from.z, length = Math.hypot(dx, dz) || 1;
+    return { x: from.x + dx / length * metres, z: from.z + dz / length * metres };
+  }
+
+  // A thrown key came to rest. In a vessel that takes it, it starts there just
+  // as if put in by hand; bounced off a vessel, it says so with a dull knock.
+  function keyLanded(key, landing, flight) {
+    if (key.status !== 'floor') return;
+    const now = stationNow();
+    if (landing.on === 'vessel' && landing.kind === 'forge') {
+      if (!smeltThrownKey(state, key, now)) return;
+      world.workstations?.startMelt?.();
+      statistics?.record('forge');
+      tone('melt');
+
+    } else if (landing.on === 'vessel') {
+      if (!soakThrownKey(state, key, landing.vessel, landing.kind, now)) return;
+      statistics?.record(landing.kind === 'mud' ? 'rinse' : 'rust');
+      if (landing.kind === 'mud') tone('water');
+    } else {
+      if (flight.bouncedOff) tone('wrong');
+      return;
+    }
+    world.syncKey?.(key);
+    updateHud();
+    save();
+    invalidateHover();
   }
 
   // Metal is ready when a smelt finishes, even while the player is elsewhere.

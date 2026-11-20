@@ -9,11 +9,7 @@ import {
   startSoak, bathContents, collectSoakedKey, meltSelectedWax, buyBundle, putBundleInCabinet,
   FLOOR_DISTRIBUTION_VERSION, upgradeFloorDistribution, upgradeStationBaths, settleSmelting, smeltingState, SMELT_SECONDS,
   BUNDLE_COST } from '../dist/js/rules.js';
-import {
-  sampleThrow, throwFlightTime, THROW_FIRST_BOUNCE_SECONDS, THROW_SECOND_BOUNCE_SECONDS,
-  THROW_BOUNCE_SECONDS, THROW_SLIDE_SECONDS,
-} from '../dist/js/archive-throw-trajectory.js';
-import { separateFloorKeys, findFreeFloorSpot, KEY_CLEARANCE } from '../dist/js/key-spacing.js';
+import { separateFloorKeys, KEY_CLEARANCE } from '../dist/js/key-spacing.js';
 import {
   CABINET_GRID_HALF_WIDTH, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS, CABINET_BACK_FRONT_Z, CABINET_GROUND_OFFSET,
   CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_SHELF_DEPTH,
@@ -256,8 +252,6 @@ test('scattered and thrown keys keep enough room not to intersect', () => {
     if (!grid.has(id)) grid.set(id, []);
     grid.get(id).push(key);
   }
-  const landing = findFreeFloorSpot(state.keys, state.keys[0].x, state.keys[0].z);
-  assert.ok(state.keys.every(key => Math.hypot(key.x - landing.x, key.z - landing.z) >= KEY_CLEARANCE - 1e-6));
   assert.ok(state.keys.every(key => !inStationFootprint(key.x, key.z, .20)));
 });
 
@@ -347,38 +341,6 @@ test('old 80-key progress is retained when upgrading the hall', () => {
   assert.equal(migrated.keys.length, 1000);
   assert.equal(migrated.keys[0].status, 'sorted');
   assert.equal(getProgress(migrated).floorCount, 998);
-});
-
-test('a thrown key follows gravity, loses speed on impact and settles exactly on the floor', () => {
-  const start = { x: 0, y: 1.4, z: 0 };
-  const end = { x: 3, y: .085, z: -2 };
-  const flight = throwFlightTime(start, end);
-  const bounceEnd = flight + THROW_BOUNCE_SECONDS;
-  const stopped = bounceEnd + THROW_SLIDE_SECONDS;
-  const pose = time => sampleThrow(start, end, time);
-  assert.ok(throwFlightTime({ ...start, lift: -.65 }, end) < flight);
-  assert.ok(throwFlightTime({ ...start, lift: 2.2 }, end) > flight);
-  assert.ok(pose(.10).y > start.y);
-  assert.equal(pose(0).settle, 0);
-  assert.equal(pose(flight).settle, 1);
-  assert.equal(pose(flight).y, end.y);
-  const firstArc = pose(flight + THROW_FIRST_BOUNCE_SECONDS / 2);
-  const secondArc = pose(flight + THROW_FIRST_BOUNCE_SECONDS + THROW_SECOND_BOUNCE_SECONDS / 2);
-  assert.ok(firstArc.y > secondArc.y && secondArc.y > end.y);
-  assert.ok(Math.abs(pose(flight + THROW_FIRST_BOUNCE_SECONDS).y - end.y) < 1e-9);
-  assert.equal(pose(flight - .001).contact, false);
-  assert.equal(pose(flight).contact, true);
-  const dt = .001;
-  const speedAt = t => (pose(t + dt).x - pose(t - dt).x) / (2 * dt);
-  assert.ok(speedAt(flight - .04) > speedAt(flight + .04));
-  assert.ok(speedAt(bounceEnd + .04) > speedAt(stopped - .04));
-  let previous = pose(0);
-  for (let t = .005; t < stopped; t += .005) {
-    const current = pose(t);
-    assert.ok(current.x >= previous.x && current.y >= end.y - 1e-9);
-    previous = current;
-  }
-  assert.deepEqual(pose(stopped + .001), { ...end, settle: 1, contact: true, wobble: 0, spin: 0, landed: true });
 });
 
 test('wax blocks filing and bath soaking, then exposes the two original layers', () => {

@@ -70,22 +70,3 @@ export function separateFloorKeys(keys) {
   }
   return moved;
 }
-
-export function findFreeFloorSpot(keys, preferredX, preferredZ) {
-  const grid = new Map();
-  for (const key of keys) if (key.status === 'floor') add(grid, key);
-  const x = clamp(preferredX, LIMITS.x);
-  const z = clamp(preferredZ, LIMITS.z);
-  if (fits(grid, x, z)) return { x, z };
-  for (let ring = 1; ring <= 50; ring++) {
-    const count = 16 + ring * 5;
-    const radius = ring * .13;
-    for (let step = 0; step < count; step++) {
-      const angle = step / count * Math.PI * 2;
-      const xx = clamp(x + Math.cos(angle) * radius, LIMITS.x);
-      const zz = clamp(z + Math.sin(angle) * radius, LIMITS.z);
-      if (fits(grid, xx, zz)) return { x: xx, z: zz };
-    }
-  }
-  return { x, z };
-}

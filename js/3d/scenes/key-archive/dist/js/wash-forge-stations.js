@@ -37,13 +37,17 @@ function rim(parent, radius, y, x, z, material, thickness = .052) {
 export const BENCH = Object.freeze({ width: 5.0, depth: 1.26, thickness: .2, surfaceY: .9275, z: .08,
   legs: Object.freeze([-.47, .47]), rails: Object.freeze([-.42, .42]) });
 
+// The round water bowl and the forge, named for the throw physics as well.
+export const WATER_BATH = Object.freeze({ radius: .57, surfaceY: 1.19, lipY: 1.19 + .026, z: .10 });
+export const FORGE = Object.freeze({ bodyRadius: .55, hearthRadius: .43, z: .08 });
+
 function createBath(group, station, kind, spotTexture, ceramic) {
   if (kind === 'rust') return createRustTray(group, station, spotTexture, ceramic);
   const x = FIXTURE_OFFSETS[kind];
   const id = bathId(station.id, kind);
   const isWater = kind === 'mud';
-  const surfaceY = isWater ? 1.19 : 1.415;
-  const radius = isWater ? .57 : .39;
+  const surfaceY = isWater ? WATER_BATH.surfaceY : 1.415;
+  const radius = isWater ? WATER_BATH.radius : .39;
   const lipY = surfaceY + .026;
   const bowlMaterial = new THREE.MeshStandardMaterial({
     map: ceramic, color: isWater ? 0x548d89 : 0x81936b, roughness: .68,
@@ -186,10 +190,10 @@ function createForge(group, station, materials, spotTexture, finish) {
     color: 0xbe895e, roughness: .76, metalness: .20 });
   const ember = new THREE.MeshBasicMaterial({ color: 0xef8b45 });
   const hotMetal = new THREE.MeshBasicMaterial({ color: 0xc96d36, transparent: true, opacity: .84 });
-  const body = cylinder(group, .55, .42, .47, [x, 1.145, .08], iron, 18);
+  const body = cylinder(group, FORGE.bodyRadius, .42, .47, [x, 1.145, .08], iron, 18);
   body.castShadow = true;
   const collar = cylinder(group, .53, .49, .09, [x, FORGE_SURFACE_Y - .065, .08], materials.darkBrass, 18, true);
-  const hearth = cylinder(group, .43, .43, .022, [x, FORGE_SURFACE_Y - .007, .08], soot, 24);
+  const hearth = cylinder(group, FORGE.hearthRadius, FORGE.hearthRadius, .022, [x, FORGE_SURFACE_Y - .007, .08], soot, 24);
   cylinder(group, .33, .33, .025, [x, FORGE_SURFACE_Y + .008, .08], hotMetal, 24);
   const edge = rim(group, .53, FORGE_SURFACE_Y, x, .08, copper, .037);
   const embers = [];
@@ -222,7 +226,7 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
     const group = new THREE.Group();
     group.position.set(station.x, 0, station.z);
     scene.add(group);
-    furnitureShadow(group, benchFloor, 0, RUG_TOP + .003, BENCH.z);
+    const floorShadow = furnitureShadow(group, benchFloor, 0, RUG_TOP + .003, BENCH.z);
     furnitureShadow(group, fixtures, 0, BENCH.surfaceY + .002, BENCH.z);
     // Low, open workbench: the hall remains readable and cabinets stay visible.
     // One solid slab, just deep enough for the widest bowl; its top face is
@@ -230,13 +234,15 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
     // it from aiming.
     const { width, depth, thickness, surfaceY, z } = BENCH;
     const edge = finish.benchEdge;
-    const top = block(group, [width, thickness, depth], [0, surfaceY - thickness / 2, z],
+    const benchBody = new THREE.Group();
+    group.add(benchBody);
+    const top = block(benchBody, [width, thickness, depth], [0, surfaceY - thickness / 2, z],
       [edge, edge, finish.benchTop, edge, edge, edge]);
     top.castShadow = top.receiveShadow = true;
     occluders.push(top);
     for (const x of [-2.29, 2.29]) for (const leg of BENCH.legs)
-      block(group, [.16, .80, .16], [x, .38, z + leg], materials.darkWood).castShadow = true;
-    for (const rail of BENCH.rails) block(group, [4.86, .12, .27], [0, .29, z + rail], materials.blackWood);
+      block(benchBody, [.16, .80, .16], [x, .38, z + leg], materials.darkWood).castShadow = true;
+    for (const rail of BENCH.rails) block(benchBody, [4.86, .12, .27], [0, .29, z + rail], materials.blackWood);
     const baths = ['mud', 'rust'].map(kind => createBath(group, station, kind, spotTexture, finish.glaze));
     const forge = createForge(group, station, materials, spotTexture, finish);
     for (const bath of baths) {
@@ -246,7 +252,7 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
     }
     forgeMap.set(station.id, forge);
     interactables.push(forge.collider);
-    stations.push({ ...station, group, baths, forge });
+    stations.push({ ...station, group, benchBody, floorShadow, baths, forge });
   }
 
   // Pieces leaving a key in a bath: mud clods and rust flakes land on the
@@ -447,6 +453,6 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
     }
   }
 
-  return { stations, interactables, occluders, getHoverSurface, aimedBathKey, update, liftKey, isLifting,
+  return { stations, finish, interactables, occluders, getHoverSurface, aimedBathKey, update, liftKey, isLifting,
     startMelt(stationId = 'center') { forgeMap.get(stationId)?.visual.ignite(sceneNow()); } };
 }

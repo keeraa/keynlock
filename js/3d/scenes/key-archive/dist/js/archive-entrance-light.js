@@ -158,3 +158,51 @@ export function createEntranceKeyMaterial(source, windowDaylight, windowWarmth, 
   material.customProgramCacheKey = () => source.customProgramCacheKey() + ':archive-window-spill';
   return material;
 }
+
+const PROP_WINDOW_LIGHT = Symbol('propWindowLight');
+
+export function patchArchivePropWindowLight(material, windowDaylight, windowWarmth, birdShadow) {
+  if (!material?.isMeshStandardMaterial || material[PROP_WINDOW_LIGHT]) return;
+  material[PROP_WINDOW_LIGHT] = true;
+  const previous = material.onBeforeCompile;
+  const previousKey = material.customProgramCacheKey;
+  material.onBeforeCompile = function (shader, renderer) {
+    previous.call(this, shader, renderer);
+    shader.uniforms.uPropWindowDaylight = windowDaylight;
+    shader.uniforms.uPropWindowWarmth = windowWarmth;
+    Object.assign(shader.uniforms, birdShadow);
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vArchivePropPosition;')
+      .replace('#include <project_vertex>', `#include <project_vertex>
+        vec4 propPoint = vec4(transformed, 1.0);
+        #ifdef USE_INSTANCING
+          propPoint = instanceMatrix * propPoint;
+        #endif
+        vArchivePropPosition = (modelMatrix * propPoint).xyz;
+      `);
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', `#include <common>
+        varying vec3 vArchivePropPosition;
+        uniform float uPropWindowDaylight;
+        uniform float uPropWindowWarmth;
+        ${WINDOW_BEAM_GLSL}
+        ${birdShadowGlsl}
+      `)
+      .replace('#include <opaque_fragment>', `
+        if (uPropWindowDaylight > 0.0) {
+          float beam = archiveWindowLightAt(vArchivePropPosition) * uPropWindowDaylight;
+          if (beam > .001) {
+            vec3 worldNormal = inverseTransformDirection(normal, viewMatrix);
+            float facing = max(0.0, dot(worldNormal, normalize(vec3(-.73, .65, .24))));
+            vec3 tint = mix(vec3(.19, .29, .44), vec3(.38, .27, .16), uPropWindowWarmth);
+            outgoingLight += diffuseColor.rgb * tint * facing * beam * birdShade(vArchivePropPosition);
+          }
+        }
+        #include <opaque_fragment>
+      `);
+  };
+  material.customProgramCacheKey = function () {
+    return `${previousKey.call(this)}:archive-prop-window-light`;
+  };
+  material.needsUpdate = true;
+}

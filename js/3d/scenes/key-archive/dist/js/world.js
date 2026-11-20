@@ -7,7 +7,7 @@ import { createKeyThumbnailRenderer } from './key-thumbnails.js';
 import { createWorldKeyAnimations } from './world-key-animations.js';
 import { createWorkstations } from './wash-forge-stations.js';
 import { createPaintedRenderer } from './painted-renderer.js';
-import { patchSceneShadowHatch, setShadowHatch } from './shadow-hatch.js';
+import { patchSceneShadowHatch, patchShadowHatch, setShadowHatch } from './shadow-hatch.js';
 import { createSceneGeometryStatsCache } from './geometry-stats.js';
 import { createWindowSky } from './archive-sky.js';
 import { windowLightPalette } from './window-light-palette.js';
@@ -16,10 +16,11 @@ import { batchStaticHallMeshes } from './static-mesh-batches.js';
 import { createMaterials } from './world-materials.js';
 import { addArchiveLedger } from './archive-ledger.js';
 import { addArchiveDeskProps } from './archive-desk-props.js';
+import { addArchiveRoomProps } from './archive-room-props.js';
 import { makeHall } from './world-architecture.js';
 import { makeChandeliers } from './world-lighting.js';
 import { createCabinet } from './world-cabinet.js';
-import { addEntranceLighting, createEntranceContactShadows, createEntranceKeyMaterial } from './archive-entrance-light.js';
+import { addEntranceLighting, createEntranceContactShadows, createEntranceKeyMaterial, patchArchivePropWindowLight } from './archive-entrance-light.js';
 import { WINDOW_LIGHT_POSITION, addWindowAirLight } from './archive-window-rays.js';
 import { addWindowBird } from './archive-window-bird.js';
 import { addDust } from './world-particles.js';
@@ -28,6 +29,7 @@ import { createFloorKeys } from './world-floor-keys.js';
 import { createWorldHover } from './world-hover.js';
 import { createHeldKey } from './held-key.js';
 import { createAutoQuality } from './auto-quality.js';
+import { createThrowScene } from './throw-scene.js';
 
 const ROOM = { halfWidth: 12, halfLength: 23.4, height: 13.5 };
 
@@ -78,6 +80,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
   scene.add(hall);
   const hallParts = makeHall(hall, mat);
   const handObstacles = [];
+  const stoolObstacles = [];
   function cacheHandObstacle(mesh) {
     mesh.updateWorldMatrix(true, false);
     if (!mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox();
@@ -85,12 +88,18 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
     if (bounds.min.y > PLAYER_EYE_HEIGHT + 1.6 || bounds.max.y < -.08) return;
     handObstacles.push(bounds.expandByScalar(.018));
   }
+  // Solid hall parts as boxes, before static batching merges them: they stop
+  // the held key and, above the floor, thrown keys too (columns, trims, doors).
+  const hallThrowBoxes = [];
   hall.traverse(object => {
-    if (object.isMesh && !object.isInstancedMesh && object.material?.isMeshStandardMaterial &&
-        !object.material.transparent) cacheHandObstacle(object);
+    if (!object.isMesh || object.isInstancedMesh || !object.material?.isMeshStandardMaterial ||
+        object.material.transparent) return;
+    cacheHandObstacle(object);
+    const { min, max } = object.geometry.boundingBox.clone().applyMatrix4(object.matrixWorld);
+    if (max.y > .15 && min.y < 4) hallThrowBoxes.push({ min: { x: min.x, y: min.y, z: min.z }, max: { x: max.x, y: max.y, z: max.z } });
   });
   const limitHandReach = createHeldKeyClearance(handObstacles);
-  makeChandeliers(hall, mat);
+  const chandeliers = makeChandeliers(scene, mat);
   batchStaticHallMeshes(hall);
   const ledger = addArchiveLedger(scene, mat);
   const windowBird = addWindowBird(scene);
@@ -193,6 +202,26 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
   }
   if (getProgress(state).processed === state.keys.length) startFinale({ instant: true });
 
+  // What a thrown key can hit: the layout's furniture and vessels, plus the
+  // cabinets and candle sconces as boxes (built once, the hall does not move).
+  let throwScene = null;
+  const throwPropBoxes = [];
+  function getThrowScene() {
+    if (throwScene) return throwScene;
+    const boxOf = mesh => {
+      mesh.updateWorldMatrix(true, false);
+      if (!mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox();
+      const { min, max } = mesh.geometry.boundingBox.clone().applyMatrix4(mesh.matrixWorld);
+      return { min: { x: min.x, y: min.y, z: min.z }, max: { x: max.x, y: max.y, z: max.z } };
+    };
+    throwScene = createThrowScene({ hallBoxes: hallThrowBoxes, boxes: [
+      ...throwPropBoxes,
+      ...cabinets.map(cabinet => boxOf(cabinet.collider)),
+      ...candleSet.colliders.filter(collider => collider.userData.id !== 'entrance-candle').map(boxOf),
+    ] });
+    return throwScene;
+  }
+
   let lastHatchPatch = 0;
   let lastFrame = sceneNow();
   function update(now, moving, playing, playSound) {
@@ -223,9 +252,31 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
   }
   resize();
   geometryStatsCache = createSceneGeometryStatsCache(scene);
-  void addArchiveDeskProps(scene).then(() => {
+  const birdShadow = windowBird.shadowUniforms;
+  function refreshProps(model, bounds, blocksPlayer, { surface = false } = {}) {
+    model.traverse(object => {
+      const materials = Array.isArray(object.material) ? object.material : [object.material];
+      for (const material of materials) {
+        patchArchivePropWindowLight(material, windowDaylight, windowWarmth, birdShadow);
+        patchShadowHatch(material);
+      }
+    });
+    if (bounds) handObstacles.push(bounds.clone().expandByScalar(.018));
+    if (blocksPlayer) stoolObstacles.push(bounds);
+    // Loaded furniture stops thrown keys too: a stool's seat can hold one,
+    // books and bottles on a table knock it aside.
+    if (bounds) {
+      throwPropBoxes.push({ min: { x: bounds.min.x, y: bounds.min.y, z: bounds.min.z },
+        max: { x: bounds.max.x, y: bounds.max.y, z: bounds.max.z }, surface: Boolean(blocksPlayer) || surface });
+      throwScene = null;
+    }
     renderer.shadowMap.needsUpdate = true;
     invalidate();
+  }
+  void addArchiveDeskProps(scene, refreshProps);
+  void addArchiveRoomProps(scene, {
+    candles: candleSet.candles, chandeliers, workstations, materials: mat, onPlaced: refreshProps,
+    cornerTables: hallParts.cornerTables,
   });
 
   window.addEventListener('resize', resize);
@@ -277,9 +328,9 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
       painted.setSettings(settings);
       cabinets.forEach(cabinet => cabinet.setContour(settings));
     },
-    animateThrow, animatePlace, animateDiscard, isThrowing, cancelPlace, celebrateCabinet, startFinale,
+    animateThrow, animatePlace, animateDiscard, isThrowing, cancelPlace, celebrateCabinet, startFinale, getThrowScene,
     throwingCount: () => thrownKeys.size,
     progress: () => getProgress(state),
-    bounds: { x: ROOM.halfWidth - .88, z: ROOM.halfLength - .87 },
+    bounds: { x: ROOM.halfWidth - .88, z: ROOM.halfLength - .87, stoolObstacles },
   };
 }

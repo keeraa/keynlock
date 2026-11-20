@@ -1,24 +1,49 @@
 import * as THREE from '../vendor/three.js';
 import { ARCHIVE_LEDGER, ARCHIVE_LEDGER_URL } from './archive-ledger.js?v=key-catalog';
-import { createKeyFallbackStamp } from './key-factory.js?v=key-ring';
+import { ARCHIVE_TO_FORGE } from './key-forge-adapter.js?v=wax-and-bundles';
 import { KEY_TYPES } from './rules.js?v=key-ring';
 import { familyName, t } from './i18n.js';
 
-function projectBook(camera, canvas) {
+const KEYS_PER_PAGE = 4;
+const ease = t => t * t * t * (t * (t * 6 - 15) + 10);
+
+function bookFlight(camera, canvas, rect) {
   camera.updateMatrixWorld();
-  const rect = canvas.getBoundingClientRect();
+  const view = canvas.getBoundingClientRect();
   const { x, y, z, yaw, width, depth } = ARCHIVE_LEDGER;
-  const c = Math.cos(yaw), s = Math.sin(yaw);
-  const corners = [[-.5, -.5], [.5, -.5], [.5, .5], [-.5, .5]];
-  const points = corners.map(([col, row]) => {
-    const u = col * width, v = row * depth;
-    const point = new THREE.Vector3(x + c * u + s * v, y + .05, z - s * u + c * v);
-    if (point.clone().applyMatrix4(camera.matrixWorldInverse).z > -.06) return null;
-    point.project(camera);
-    return [rect.left + (1 + point.x) * rect.width / 2,
-      rect.top + (1 - point.y) * rect.height / 2];
-  });
-  return points.every(Boolean) ? points : null;
+  const centerOnTable = new THREE.Vector3(x, y + .05, z).applyMatrix4(camera.matrixWorldInverse);
+  const worldToEye = camera.getWorldQuaternion(new THREE.Quaternion()).invert();
+  const flatOnTable = new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, yaw, 0, 'YXZ'));
+  flatOnTable.premultiply(worldToEye);
+  const focusX = camera.projectionMatrix.elements[0] * view.width / 2;
+  const focusY = camera.projectionMatrix.elements[5] * view.height / 2;
+  const distance = width * focusX / rect.width;
+  const centerAtScreen = new THREE.Vector3(
+    (rect.left + rect.width / 2 - view.left - view.width / 2) * distance / focusX,
+    (view.top + view.height / 2 - rect.top - rect.height / 2) * distance / focusY,
+    -distance,
+  );
+  const upright = new THREE.Quaternion();
+  const lift = new THREE.Vector3(0, .23, 0).applyQuaternion(worldToEye);
+  const center = new THREE.Vector3();
+  const angle = new THREE.Quaternion();
+  const point = new THREE.Vector3();
+  const corners = [[-.5, .5], [.5, .5], [.5, -.5], [-.5, -.5]];
+  return progress => {
+    // Move one rigid plane. Reproject after rotating it so perspective never
+    // interpolates independently from the book's position.
+    const travel = ease(progress);
+    center.lerpVectors(centerOnTable, centerAtScreen, travel)
+      .addScaledVector(lift, Math.sin(progress * Math.PI));
+    angle.copy(flatOnTable).slerp(upright, ease(Math.min(1, progress / .92)));
+    const points = corners.map(([col, row]) => {
+      point.set(col * width, row * depth, 0).applyQuaternion(angle).add(center);
+      if (point.z > -.06) return null;
+      point.applyMatrix4(camera.projectionMatrix);
+      return [view.left + (1 + point.x) * view.width / 2, view.top + (1 - point.y) * view.height / 2];
+    });
+    return points.every(Boolean) ? bookTransform(points, rect.width, rect.height) : null;
+  };
 }
 
 // Project the lifting sheet onto the four corners of the world-space book.
@@ -44,28 +69,18 @@ export function createArchiveKeyCatalog(document, world, canvas, onClose) {
   const meter = $('catalog-page-number');
   const flight = $('catalog-flight');
   flight.src = ARCHIVE_LEDGER_URL;
-  const images = new Map();
-  const pageCount = Math.ceil(KEY_TYPES.length / 2);
+  const pageCount = Math.ceil(KEY_TYPES.length / KEYS_PER_PAGE);
   let page = 0;
   let moving = false;
 
   function paint() {
     spread.replaceChildren();
-    const start = page * 2;
-    for (let type = start; type < Math.min(start + 2, KEY_TYPES.length); type++) {
+    const start = page * KEYS_PER_PAGE;
+    for (let type = start; type < Math.min(start + KEYS_PER_PAGE, KEY_TYPES.length); type++) {
       const article = document.createElement('article');
       const picture = document.createElement('img');
       const name = document.createElement('h3');
-      const key = { id: `catalog-${type}`, type };
-      if (!images.has(type)) {
-        let url;
-        try { url = world.captureKeyThumbnail?.(key); }
-        catch { /* The Canvas stamp also works if WebGL loses its context. */ }
-        url ||= createKeyFallbackStamp(type, false)?.toDataURL('image/png');
-        if (url) images.set(type, url);
-      }
-      const url = images.get(type);
-      if (url) picture.src = url;
+      picture.src = new URL(`../assets/catalog/${ARCHIVE_TO_FORGE[type]}.svg`, import.meta.url).href;
       picture.alt = '';
       name.textContent = familyName(type);
       article.append(picture, name);
@@ -89,36 +104,39 @@ export function createArchiveKeyCatalog(document, world, canvas, onClose) {
     if (document.activeElement === next && next.disabled) previous.focus();
   }
 
-  async function animate(toScreen, bookPoints) {
+  async function animate(toScreen) {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const rect = spread.getBoundingClientRect();
-    const fromTable = bookTransform(bookPoints, rect.width, rect.height);
-    if (!fromTable) return;
-    const atScreen = `translate3d(${rect.left}px, ${rect.top}px, 0)`;
+    const pose = bookFlight(world.camera, canvas, rect);
+    if (!pose(0)) return;
     dialog.classList.add('is-lifting');
     flight.style.width = `${rect.width}px`;
     flight.style.height = `${rect.height}px`;
+    flight.style.transform = pose(toScreen ? 0 : 1);
     flight.hidden = false;
-    const animation = flight.animate(
-      (toScreen ? [fromTable, atScreen] : [atScreen, fromTable]).map(transform => ({ transform })),
-      { duration: toScreen ? 500 : 400, easing: 'cubic-bezier(.22,.72,.23,1)', fill: 'both' });
-    try { await animation.finished; }
-    catch (error) { if (error.name !== 'AbortError') throw error; }
-    finally {
-      flight.hidden = true;
-      animation.cancel();
-      dialog.classList.remove('is-lifting');
-    }
+    const duration = toScreen ? 850 : 680;
+    await new Promise(resolve => {
+      const startedAt = performance.now();
+      function frame(now) {
+        const progress = Math.min(1, Math.max(0, now - startedAt) / duration);
+        const transform = pose(toScreen ? progress : 1 - progress);
+        if (transform) flight.style.transform = transform;
+        if (progress < 1) requestAnimationFrame(frame);
+        else resolve();
+      }
+      requestAnimationFrame(frame);
+    });
+    flight.hidden = true;
+    dialog.classList.remove('is-lifting');
   }
 
   async function open() {
     if (dialog.open || moving) return;
     moving = true;
-    const points = projectBook(world.camera, canvas);
     paint();
     dialog.showModal();
     world.setLedgerVisible(false);
-    await animate(true, points);
+    await animate(true);
     moving = false;
     closeButton.focus({ preventScroll: true });
   }
@@ -126,7 +144,7 @@ export function createArchiveKeyCatalog(document, world, canvas, onClose) {
   async function close() {
     if (!dialog.open || moving) return;
     moving = true;
-    await animate(false, projectBook(world.camera, canvas));
+    await animate(false);
     world.setLedgerVisible(true);
     dialog.close();
     moving = false;

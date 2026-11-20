@@ -142,16 +142,16 @@ body.playing #world,body.playing #hud{cursor:none}
 .ledger-dialog[open]{display:grid;place-items:center}
 .ledger-dialog::backdrop{background:rgba(19,14,11,.74);transition:background .3s ease}
 .ledger-dialog.is-lifting::backdrop{background:rgba(19,14,11,.3)}
-.ledger-content{width:min(800px,100%);max-width:calc((100dvh - 132px) * 1.62);margin:auto}
+.ledger-content{width:min(800px,100%);max-width:calc((100dvh - 132px) * 1.51724);margin:auto}
 .ledger-dialog.is-lifting .ledger-content{visibility:hidden}
 .ledger-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
 .ledger-header h2{font:normal clamp(24px,4vw,38px) Georgia,serif;margin:0}
 .ledger-close{background:transparent;color:inherit;border:1px solid #a48666;border-radius:50%;font-size:25px;line-height:1;width:38px;height:38px}
-.ledger-spread{position:relative;aspect-ratio:1.62;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));color:#473024;border-radius:4px 7px 7px 4px;background:linear-gradient(100deg,#ca9d65 0%,#f4ddb1 9%,#efdbb7 40%,#b99265 49.8%,#c9a475 50%,#eed8ac 52%,#f4dfb7 91%,#cfab77 100%);border:1px solid #b39267;padding:12px;box-shadow:0 4px #926741,0 7px #deb785,0 10px #815a3d,0 13px #523927,0 16px #39261c,0 24px 70px #100b08b3;overflow:hidden}
-.ledger-spread article{min-width:0;min-height:0;display:grid;grid-template-rows:minmax(0,1fr) auto;justify-items:center;padding:7% 7% 10%;position:relative}
-.ledger-spread article::after{content:"";position:absolute;inset:5% 10%;border-block:1px solid #9b734d69;pointer-events:none}
-.ledger-spread img{width:100%;height:100%;min-height:0;object-fit:contain;transform:rotate(-90deg) scale(1.16);pointer-events:none;filter:drop-shadow(0 3px 2px #5b382c44)}
-.ledger-spread h3{line-height:1.12;font-size:clamp(16px,3vw,30px);font-weight:normal;margin:0;overflow-wrap:anywhere;text-align:center}
+.ledger-spread{position:relative;aspect-ratio:88/58;display:grid;grid-template:repeat(2,minmax(0,1fr))/repeat(2,minmax(0,1fr));grid-auto-flow:column;color:#473024;border-radius:4px 7px 7px 4px;background:linear-gradient(90deg,transparent 46%,#72543a38 49.5%,#60402b66 50%,#fff1ce40 50.3%,transparent 54%),#dbbf91 url("./assets/catalog/gouache-parchment.webp") center/cover;border:1px solid #b39267;padding:12px;box-shadow:0 4px #926741,0 7px #deb785,0 10px #815a3d,0 13px #523927,0 16px #39261c,0 24px 70px #100b08b3;overflow:hidden}
+.ledger-spread article{min-width:0;min-height:0;display:grid;grid-template-rows:minmax(0,1fr) auto;justify-items:center;padding:7% 10%;position:relative}
+.ledger-spread article::after{content:"";position:absolute;inset:9% 12%;border-bottom:1px solid #9b734d69;pointer-events:none}
+.ledger-spread img{width:80%;height:100%;min-height:0;object-fit:contain;pointer-events:none;filter:drop-shadow(0 3px 2px #5b382c44)}
+.ledger-spread h3{line-height:1.12;font-size:clamp(13px,2.6vw,26px);font-weight:normal;margin:0;overflow-wrap:anywhere;text-align:center}
 .ledger-navigation{display:flex;justify-content:space-between;align-items:center;gap:7px;margin-top:26px}
 .ledger-navigation button{padding:7px 12px;border:1px solid #967957;background:#443123;color:inherit}
 .ledger-navigation button:disabled{opacity:.4;cursor:default}

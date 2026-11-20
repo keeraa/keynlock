@@ -19,7 +19,7 @@ import { createArchivePrompts } from './archive-interaction-prompts.js?v=key-cat
 import { createArchiveActions } from './archive-actions.js?v=key-catalog';
 import { FIRST_ROUTE_KEY_ID, createFirstRouteGuide } from './archive-first-route-guide.js?v=key-ring';
 import { createBathProgress } from './archive-bath-progress.js?v=cleaning-cues';
-import { createArchiveKeyCatalog } from './archive-key-catalog.js';
+import { createArchiveKeyCatalog } from './archive-key-catalog.js?v=catalog-pages';
 import { createArchiveStatistics, createStatisticsPanel } from './archive-statistics.js?v=processed-count';
 import { createArchiveMusic } from './archive-music.js?v=music-resume-seek';
 import { createArchiveAudio } from './archive-audio.js?v=key-shine';

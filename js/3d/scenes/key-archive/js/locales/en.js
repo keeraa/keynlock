@@ -220,5 +220,5 @@ export default Object.freeze({
   'catalog.navigation': "Catalog pages",
   'catalog.previous': "Previous",
   'catalog.next': "Next",
-  'catalog.page': "Spread {current} of {total}",
+  'catalog.page': "Page {current} of {total}",
 });

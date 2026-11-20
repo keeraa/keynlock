@@ -203,7 +203,9 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
   const hand = new THREE.Group();
   hand.position.set(.43, -.45, -.82);
   camera.add(hand);
-  const handLight = new THREE.PointLight(0xffd6a1, 1.7, 3);
+  // Soft fill for the key in hand. It sits ~0.4 m from the key, so with
+  // physical falloff a strong value washes pale metals (steel, silver) out.
+  const handLight = new THREE.PointLight(0xffd6a1, .85, 3);
   handLight.position.set(.3, -.3, -.5);
   camera.add(handLight);
   let displayedHandId = null;

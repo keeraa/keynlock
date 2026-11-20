@@ -2,13 +2,13 @@ import { t, applyTranslations, LANGUAGES, getLanguage, setLanguage } from './i18
 // Static texts of the page follow the chosen language before anything shows.
 applyTranslations(document);
 import { TOTAL_KEYS, getProgress } from './rules.js?v=stable-pickup';
-import { createWorld } from './world.js?v=furniture-shadows';
+import { createWorld } from './world.js?v=shadow-footprints';
 import { installKeyAssetProvider } from './key-factory.js?v=key-ring';
 import { createArchiveHud } from './archive-hud.js?v=catalog-thumbnails';
 import { openArchiveSave, loadVisualSettings, clearArchiveState } from './archive-save-state-with-route.js?v=stable-pickup';
 import { createVisualPanel } from './visual-panel.js?v=key-ring';
 import externalKeyProvider from './key-provider-entry.js?v=wax-and-bundles';
-import { createFallbackWorld } from './fallback-world.js?v=furniture-shadows';
+import { createFallbackWorld } from './fallback-world.js?v=shadow-footprints';
 import { createPlayerMovement } from './player-movement.js?v=ledger-candle';
 import { createPerformanceHud } from './performance-hud.js';
 import { createInventoryWheel, logicalKey } from './controls.js?v=stable-pickup';

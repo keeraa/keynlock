@@ -24,21 +24,53 @@ function bakeShadow(width, depth, footprints) {
   return { width, depth, canvas };
 }
 
-function legShadows(x, front, back) {
-  return [-x, x].flatMap(side => [front, back].map(z => [side, z, .34, .31, .72]));
+function bakeFloorShadow(width, depth, footprints) {
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.ceil(width * 64);
+  canvas.height = Math.ceil(depth * 64);
+  const ctx = canvas.getContext('2d');
+  const image = ctx.createImageData(canvas.width, canvas.height);
+  const { data } = image;
+  for (let row = 0; row < canvas.height; row++) {
+    const z = (row + .5) * depth / canvas.height - depth / 2;
+    for (let column = 0; column < canvas.width; column++) {
+      const x = (column + .5) * width / canvas.width - width / 2;
+      let alpha = 0;
+      for (const [cx, cz, halfWidth, halfDepth, softness, opacity] of footprints) {
+        // Distance to the edge of the furniture footprint. A small radius
+        // softens the corners without turning the feet into circular spots.
+        const radius = .025;
+        const dx = Math.abs(x - cx) - halfWidth + radius;
+        const dz = Math.abs(z - cz) - halfDepth + radius;
+        const distance = Math.hypot(Math.max(dx, 0), Math.max(dz, 0)) +
+          Math.min(Math.max(dx, dz), 0) - radius;
+        const edge = Math.max(0, Math.min(1, (distance + softness * .35) / (softness * 1.35)));
+        alpha += (1 - alpha) * opacity * (1 - edge * edge * (3 - 2 * edge));
+      }
+      const pixel = (row * canvas.width + column) * 4;
+      data[pixel] = 20;
+      data[pixel + 1] = 13;
+      data[pixel + 2] = 12;
+      data[pixel + 3] = 255 * alpha;
+    }
+  }
+  ctx.putImageData(image, 0, 0);
+  return { width, depth, canvas };
+}
+
+function legShadows(x, front, back, halfSize) {
+  return [-x, x].flatMap(side => [front, back].map(z => [side, z, halfSize, halfSize, .09, .53]));
 }
 
 export function createFurnitureShadows() {
   return {
-    benchFloor: bakeShadow(6.2, 2.95, [
-      [0, 0, 3, 1.23, .42],
-      [.21, -.19, 2.75, .99, .38],
-      ...legShadows(2.29, -.63, .61),
+    benchFloor: bakeFloorShadow(6.2, 2.95, [
+      [.18, -.10, 2.46, .76, .29, .26],
+      ...legShadows(2.29, -.63, .61, .08),
     ]),
-    deskFloor: bakeShadow(2.8, 3.35, [
-      [.05, -.05, 1.22, 1.44, .50],
-      [.17, -.15, 1.05, 1.34, .24],
-      ...legShadows(.7, -.9, .9),
+    deskFloor: bakeFloorShadow(2.8, 3.35, [
+      [.15, -.085, .845, 1.08, .31, .27],
+      ...legShadows(.7, -.9, .9, .065),
     ]),
     fixtures: bakeShadow(4.92, 1.48, [
       // Each vessel gets a soft shade offset from the windows, then a tighter

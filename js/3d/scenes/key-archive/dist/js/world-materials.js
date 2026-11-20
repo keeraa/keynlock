@@ -3,7 +3,7 @@ import { makePaintTexture } from './art.js?v=key-ring';
 import { getPaintedMetalTexture } from './painted-textures.js';
 import { createHallSurfaceMaterials, createArchiveWoodTexture } from './hall-surface-textures.js?v=alchemy-candles';
 import { ARCHIVE_FLOOR_TEXTURE_URL } from './archive-floor-texture.js';
-import { createFurnitureShadows } from './furniture-shadows.js';
+import { createFurnitureShadows } from './furniture-shadows.js?v=shadow-footprints';
 
 function makeContactShadowMaterial() {
   const canvas = document.createElement('canvas');

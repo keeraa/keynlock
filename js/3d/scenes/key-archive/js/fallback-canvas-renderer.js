@@ -5,7 +5,7 @@ import { PERIMETER_BAND_Y } from './hall-architecture.js?v=alchemy-candles';
 import { CANDLE_FLAME_HEIGHT, CANDLE_FLAME_WIDTH, CANDLE_WICK_Y, sampleCandleFlicker } from './archive-candles.js?v=key-catalog';
 import { createFallbackKeyPainter } from './fallback-canvas-keys.js?v=stable-pickup';
 import { createFallbackArchitecture } from './fallback-canvas-architecture.js?v=furniture-shadows';
-import { createFurnitureShadows } from './furniture-shadows.js';
+import { createFurnitureShadows } from './furniture-shadows.js?v=shadow-footprints';
 import { getKeyFallbackHeadPoints } from './key-factory.js?v=key-ring';
 import { KEY_TYPES, getProgress } from './rules.js?v=key-ring';
 import { cabinetContactGlow } from './archive-key-motion.js?v=key-ring';

@@ -22,7 +22,7 @@ import { windowLightPalette } from './window-light-palette.js';
 import { PLAYER_EYE_HEIGHT } from './player-config.js';
 import { createKeyHoverOutline } from './key-hover-outline.js?v=readable-ink';
 import { batchStaticHallMeshes } from './static-mesh-batches.js';
-import { createMaterials } from './world-materials.js?v=furniture-shadows';
+import { createMaterials } from './world-materials.js?v=shadow-footprints';
 import { addArchiveLedger } from './archive-ledger.js?v=key-catalog';
 import { makeHall } from './world-architecture.js?v=furniture-shadows';
 import { makeChandeliers } from './world-lighting.js?v=key-ring';

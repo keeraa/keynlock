@@ -149,7 +149,7 @@ test('pause filters live playback and the saved room mix uses two ceiling speake
   assert.equal(graph.speakers.length, 2);
   browser.player.currentTime = 14;
   music.setPaused(true);
-  assert.equal(graph.filter.frequency.value, 520);
+  assert.equal(graph.filter.frequency.value, 280);
   assert.equal(browser.player.paused, false);
   music.setPaused(false);
   assert.ok(graph.filter.frequency.value > 18000);

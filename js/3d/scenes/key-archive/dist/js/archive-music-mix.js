@@ -1,4 +1,4 @@
-const MENU_CUTOFF_HZ = 520;
+const MENU_CUTOFF_HZ = 280;
 const PLAY_CUTOFF_HZ = 19500;
 const CEILING_SPEAKERS = [[-4.8, 11.4, -9], [4.8, 11.4, 9]];
 

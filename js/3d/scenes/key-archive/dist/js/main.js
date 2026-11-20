@@ -21,7 +21,7 @@ import { FIRST_ROUTE_KEY_ID, createFirstRouteGuide } from './archive-first-route
 import { createBathProgress } from './archive-bath-progress.js?v=paused-scene';
 import { createArchiveKeyCatalog } from './archive-key-catalog.js?v=catalog-spread';
 import { createArchiveStatistics, createStatisticsPanel } from './archive-statistics.js?v=processed-count';
-import { createArchiveMusic } from './archive-music.js?v=ceiling-default';
+import { createArchiveMusic } from './archive-music.js?v=underwater-menu';
 import { createArchiveAudio } from './archive-audio.js?v=soft-shine';
 import { floorSurfaceY, RUG_TOP } from './floor-contact.js';
 import { createStationClock } from './archive-station-clock.js';

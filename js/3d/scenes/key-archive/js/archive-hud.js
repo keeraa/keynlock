@@ -1,5 +1,5 @@
 import { t, familyName } from './i18n.js';
-import { KEY_TYPES, MAX_HELD, getProgress, selectedKey } from './rules.js?v=key-ring';
+import { MAX_HELD, selectedKey } from './rules.js?v=key-ring';
 import { thumbnailCacheKey } from './key-thumbnails.js?v=key-ring';
 import { createKeyFallbackStamp } from './key-factory.js?v=key-ring';
 
@@ -27,10 +27,6 @@ export function createArchiveHud(document, world, state, keyIndex) {
   }
 
   function update() {
-    const progress = getProgress(state);
-    $('hand-count').textContent = `${state.held.length} / ${MAX_HELD}`;
-    const resources = $('archive-resources');
-    if (resources) resources.textContent = t('hud.metal', { metal: state.metal ?? 0 });
     const bundle = $('carried-bundle');
     const label = $('bundle-label');
     const icons = $('bundle-keys');
@@ -47,7 +43,7 @@ export function createArchiveHud(document, world, state, keyIndex) {
       }
       label.textContent = renderedBundle ? t('hud.bundle', { name: familyName(renderedBundle.type) }) : '';
       icons.replaceChildren();
-      const positions = [[40,22,23],[47,27,9],[56,28,-9],[64,21,-25]];
+      const positions = [[35,11,23],[44,16,9],[54,16,-9],[63,11,-25]];
       renderedBundle?.ids.forEach((id,index) => {
         const key = keyIndex.get(id);
         const picture = key && thumbnail(key);

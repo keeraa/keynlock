@@ -8,7 +8,7 @@ import { createKeyIndex } from '../dist/js/key-index.js';
 import { CABINET_PLACE_SECONDS } from '../dist/js/cabinet-layout.js';
 import { RIGHT_HAND_RELEASE } from '../dist/js/held-key-motion.js';
 import { createArchiveActions } from '../dist/js/archive-actions.js';
-import { createInitialState, pickupKey } from '../dist/js/rules.js';
+import { BUNDLE_COST, createInitialState, pickupKey } from '../dist/js/rules.js';
 
 test('throw has no windup and launches immediately from the right hand', () => {
   assert.equal(RIGHT_HAND_RELEASE.x,.43);
@@ -133,4 +133,32 @@ test('visible metal wins over a nearer neighboring key with an overlapping picku
   camera.position.x = neighbor.x;
   camera.lookAt(neighbor.x, 0, 0);
   assert.deepEqual(targetInView(), { kind: 'key', id: neighbor.id });
+});
+
+
+test('the forge refuses an intact key on click and still sells a ring through the keyboard action', () => {
+  const state = createInitialState();
+  const key = state.keys.find(item => !item.broken);
+  assert.ok(pickupKey(state, key.id));
+  state.metal = BUNDLE_COST;
+  const sounds = [], notices = [];
+  const actions = createArchiveActions({
+    state, keyIndex: createKeyIndex(state.keys), world: {},
+    targetInView: () => ({ kind: 'forge' }), isPlaying: () => true,
+    save() {}, updateHud() {}, invalidateHover() {},
+    tone: sound => sounds.push(sound), toast: (message, error) => notices.push({ message, error }),
+  });
+
+  actions.interact();
+  assert.equal(key.status, 'held');
+  assert.equal(state.metal, BUNDLE_COST);
+  assert.equal(state.bundles, 0);
+  assert.deepEqual(sounds, ['wrong']);
+  assert.match(notices[0].message, /целый ключ|intact key/i);
+  assert.equal(notices[0].error, true);
+
+  actions.interact({ buyRingWithHeldKey: true });
+  assert.equal(key.status, 'held');
+  assert.equal(state.bundles, 1);
+  assert.deepEqual(sounds, ['wrong', 'bundle']);
 });

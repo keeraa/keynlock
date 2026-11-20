@@ -4,7 +4,7 @@ applyTranslations(document);
 import { TOTAL_KEYS, getProgress } from './rules.js?v=key-ring';
 import { createWorld } from './world.js?v=exterior-statistics';
 import { installKeyAssetProvider } from './key-factory.js?v=key-ring';
-import { createArchiveHud } from './archive-hud.js?v=empty-ring';
+import { createArchiveHud } from './archive-hud.js?v=hud-polish';
 import { openArchiveSave, loadVisualSettings, clearArchiveState } from './archive-save-state-with-route.js?v=key-ring';
 import { createVisualPanel } from './visual-panel.js?v=key-ring';
 import externalKeyProvider from './key-provider-entry.js?v=wax-and-bundles';
@@ -15,8 +15,8 @@ import { logicalKey } from './controls.js';
 import { edgeLookRate } from './mouse-look.js';
 import { createKeyIndex } from './key-index.js?v=key-ring';
 import { createArchiveTargeting } from './archive-surface-aim.js?v=key-ring';
-import { createArchivePrompts } from './archive-interaction-prompts.js?v=quiet-candles';
-import { createArchiveActions } from './archive-actions.js?v=exterior-statistics';
+import { createArchivePrompts } from './archive-interaction-prompts.js?v=hud-polish';
+import { createArchiveActions } from './archive-actions.js?v=hud-polish';
 import { FIRST_ROUTE_KEY_ID, createFirstRouteGuide } from './archive-first-route-guide.js?v=key-ring';
 import { createBathProgress } from './archive-bath-progress.js?v=cleaning-cues';
 import { createArchiveStatistics, createStatisticsPanel } from './archive-statistics.js?v=processed-count';
@@ -132,7 +132,8 @@ function updateHud() { hud.update(); }
 function setHovered(target) {
   const identity = target ? `${target.kind}-${target.id ?? target.stationId ?? target.type}` +
     (target.kind === 'cabinet' ? `:${target.slot ?? '-'}:${target.assisted ? 'assisted' : 'direct'}:${Boolean(target.full)}` :
-      target.kind === 'candle' ? `:${target.lit}` : target.kind === 'bath' ? `:${target.keyId ?? '-'}` : '') : '';
+      target.kind === 'candle' ? `:${target.lit}` : target.kind === 'bath' ? `:${target.keyId ?? '-'}` :
+      target.kind === 'forge' ? `:${state.metal}:${state.bundles}` : '') : '';
   if (identity === lastHoverKey) return;
   hovered = target;
   lastHoverKey = identity;
@@ -169,6 +170,7 @@ function setMode(next) {
   $('statistics').classList.toggle('is-hidden', next !== 'statistics');
   $('victory').classList.toggle('is-hidden', next !== 'victory');
   $('hud').classList.toggle('is-hidden', next === 'intro');
+  $('fps-panel').hidden = next === 'intro';
   $('interaction-prompt').classList.toggle('is-hidden', next !== 'play' || !hovered);
   heldMovement.clear();
   lastPointer = null;
@@ -321,6 +323,11 @@ document.addEventListener('pointerlockerror', onMouseLockUnavailable);
 
 document.addEventListener('mousemove', event => {
   if (mode !== 'play') return;
+  if ($('fps-panel').contains(event.target)) {
+    lastPointer = null;
+    edgeLook.until = 0;
+    return;
+  }
   if (document.pointerLockElement === canvas) {
     turn(event.movementX, event.movementY);
   } else {
@@ -343,6 +350,7 @@ canvas.addEventListener('contextmenu', event => event.preventDefault());
 
 window.addEventListener('keydown', event => {
   const key = logicalKey(event);
+  if ((key === 'enter' || key === ' ') && event.target instanceof Element && $('fps-panel').contains(event.target)) return;
   if (key === 'escape') {
     if (event.repeat) return;
     if (mode === 'statistics') setMode(statisticsReturn);
@@ -360,7 +368,7 @@ window.addEventListener('keydown', event => {
   if (['w', 'a', 's', 'd', ' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) event.preventDefault();
   if (['w', 'a', 's', 'd', 'shift', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) heldMovement.add(key);
   if (event.repeat) return;
-  if (key === 'e' || key === 'enter') interact();
+  if (key === 'e' || key === 'enter') interact({ buyRingWithHeldKey: true });
   if (key === 'v') { openVisual(); return; }
   if (key === 'r') drop();
   if (key === ' ' || key === 'p') pause();

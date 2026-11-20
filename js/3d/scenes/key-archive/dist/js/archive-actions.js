@@ -45,7 +45,7 @@ export function createArchiveActions({
     invalidateHover();
   }
 
-  function interact() {
+  function interact({ buyRingWithHeldKey = false } = {}) {
     if (!isPlaying()) return;
     const target = targetInView();
     if (!target || world.workstations?.isLifting?.(selectedKey(state)?.id)) return;
@@ -122,7 +122,14 @@ export function createArchiveActions({
       return;
     }
     if (target.kind === 'forge') {
-      if (!selectedKey(state)?.broken) {
+      const key = selectedKey(state);
+      const canBuyRing = !state.bundles && (state.metal ?? 0) >= BUNDLE_COST;
+      if (key && !key.broken && !(buyRingWithHeldKey && canBuyRing)) {
+        toast(t('toast.intactKey'), true);
+        tone('wrong');
+        return;
+      }
+      if (!key?.broken) {
         if (state.bundles) return;
         if (buyBundle(state)) {
           updateHud();
@@ -136,7 +143,7 @@ export function createArchiveActions({
         }
         return;
       }
-      world.animateDiscard(selectedKey(state), target.stationId);
+      world.animateDiscard(key, target.stationId);
       trashSelectedKey(state);
       statistics?.record('forge');
       updateHud();

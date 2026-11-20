@@ -18,7 +18,7 @@ export function createArchivePrompts(state, keyIndex, isMelting = () => false) {
     if (target.kind === 'candle') {
       if (!target.lit) return '';
       const key = selectedKey(state);
-      if (!key?.wax || key.broken) return t('prompt.candleInfo');
+      if (!key?.wax || key.broken) return '';
       return t(isMelting() ? 'prompt.candleMelting' : 'prompt.candleUse');
     }
     if (target.kind === 'bath') {
@@ -47,12 +47,11 @@ export function createArchivePrompts(state, keyIndex, isMelting = () => false) {
     }
     if (target.kind === 'forge') {
       const held = selectedKey(state);
-      if (held?.broken) return t('prompt.smelt', { seconds: SMELT_SECONDS });
-      if (state.bundles) return '';
-      const amount = state.metal ?? 0;
-      return amount >= BUNDLE_COST
-        ? t('prompt.buyRing', { cost: BUNDLE_COST })
-        : t('prompt.forgeInfo', { cost: BUNDLE_COST, metal: amount });
+      const metal = state.metal ?? 0;
+      if (held?.broken) return t('prompt.smelt', { seconds: SMELT_SECONDS, metal });
+      if (!state.bundles && metal >= BUNDLE_COST) return t('prompt.buyRing', { cost: BUNDLE_COST, metal });
+      if (held || state.bundles) return t('prompt.forgeMetal', { metal });
+      return t('prompt.forgeInfo', { cost: BUNDLE_COST, metal });
     }
     const key = selectedKey(state);
     const progress = getProgress(state);

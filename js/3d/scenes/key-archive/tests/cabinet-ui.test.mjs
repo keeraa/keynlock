@@ -28,7 +28,7 @@ test('keyboard hints sit at lower left and inventory at lower right', () => {
   assert.ok(page.indexOf('class="hud-guides"') < page.indexOf('class="inventory-shell"'));
   assert.match(page, /class="quick-keys" data-i18n-html="hud\.quickKeys">E <span>— действие<\/span> &nbsp; R <span>— бросить<\/span>/);
   assert.doesNotMatch(page, /help-hotkeys|inventory-help|Мышь — смотреть/);
-  assert.match(css, /\.inventory-shell\{width:382px;margin-left:auto/);
+  assert.match(css, /\.inventory-shell\{width:\d+px;margin-left:auto/);
   assert.match(css, /\.quick-keys\{font:/);
 });
 

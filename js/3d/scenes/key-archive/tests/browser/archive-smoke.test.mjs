@@ -47,6 +47,10 @@ after(async () => {
   if (server) await new Promise(resolve => server.close(resolve));
 });
 
+function occupiedSlots(page) {
+  return page.locator('#inventory .inventory-slot:has(.slot-name)');
+}
+
 async function enterArchive(page, label) {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
@@ -159,7 +163,7 @@ test('Canvas fallback retains keys, migrates old baths and accepts a drop action
   const aim = await installTestCamera(page);
   const errors = await enterArchive(page, 'canvas');
   assert.equal(await page.locator('#visual-status').textContent(), 'Canvas 2D');
-  assert.equal(await page.locator('#hand-count').textContent(), '1 / 4');
+  assert.equal(await occupiedSlots(page).count(), 1);
   assert.equal(await page.locator('.slot-thumbnail').count(), 1);
   const saved = await page.evaluate(key => JSON.parse(localStorage.getItem(key)), STORAGE_KEY);
   assert.equal(saved.keys.find(key => key.id === muddy.id).bathId, 'center-mud');
@@ -322,7 +326,7 @@ test('the starter key can be placed in a suggested cell, retrieved and moved by 
   await aimAtCell(suggested);
   await interaction.getByText(new RegExp(`Взять ключ из ячейки ${suggested + 1} ·`)).waitFor();
   await page.keyboard.press('e');
-  await page.locator('#hand-count').getByText('1 / 4').waitFor();
+  await occupiedSlots(page).first().waitFor();
   assert.equal(starterKey(await saved()).status, 'held');
 
   const manual = 7;
@@ -330,7 +334,7 @@ test('the starter key can be placed in a suggested cell, retrieved and moved by 
   await aimAtCell(manual, 1.225);
   await interaction.getByText(/Положить в ячейку 8 ·/).waitFor();
   await page.keyboard.press('e');
-  await page.locator('#hand-count').getByText('0 / 4').waitFor();
+  await occupiedSlots(page).first().waitFor({ state: 'hidden' });
   assert.equal(starterKey(await saved()).cabinetSlot, manual);
   assert.deepEqual(errors, []);
 });
@@ -494,7 +498,7 @@ test('a carried key brightens in a window beam and fades back in shade', { timeo
   });
   const aim = await installTestCamera(page);
   const errors = await enterArchive(page, 'webgl-held-window-light');
-  await page.locator('#hand-count').getByText('1 / 4').waitFor();
+  await occupiedSlots(page).first().waitFor();
 
   async function faceWindow(z) {
     await aim([-1.18, 1.78, z], [-5, 1.78, z]);
@@ -690,7 +694,7 @@ test('rust requires thirty seconds and the bath bar follows the cleaning timer',
   await page.waitForFunction(() => document.querySelector('#bath-progress-rust').dataset.state === 'ready');
   await progress.waitFor({ state: 'hidden' });
   await page.keyboard.press('e');
-  await page.locator('#hand-count').getByText('1 / 4').waitFor();
+  await occupiedSlots(page).first().waitFor();
   assert.equal((await read()).rust, false);
   assert.deepEqual(errors, []);
 });
@@ -769,13 +773,13 @@ test('archive recovers held progress after a corrupt primary and a failed startu
   }, { primary: STORAGE_KEY, backup: BACKUP_STORAGE_KEY, snapshot: JSON.stringify(saved) });
   await enterArchive(page, 'save-recovery');
   assert.match(await page.locator('#save-status').textContent(), /Не удалось записать прогресс/);
-  assert.equal(await page.locator('#hand-count').textContent(), '1 / 4');
+  assert.equal(await occupiedSlots(page).count(), 1);
   assert.equal(await page.evaluate(primary => localStorage.getItem(primary), STORAGE_KEY), '{');
   assert.deepEqual(await page.evaluate(backup => JSON.parse(localStorage.getItem(backup)).held, BACKUP_STORAGE_KEY), [key.id]);
   await page.reload();
   await page.getByRole('button', { name: /войти в архив/i }).click();
   assert.match(await page.locator('#save-status').textContent(), /Прогресс восстановлен/);
-  assert.equal(await page.locator('#hand-count').textContent(), '1 / 4');
+  assert.equal(await occupiedSlots(page).count(), 1);
   assert.deepEqual(await page.evaluate(primary => JSON.parse(localStorage.getItem(primary)).held, STORAGE_KEY), [key.id]);
 });
 
@@ -966,7 +970,7 @@ test('wax melts at the entrance and a bundle lights cabinet candles in both rend
     await page.keyboard.press('e');
     await page.locator('#carried-bundle').getByText('В связке · Часовой ×4').waitFor();
     assert.equal(await page.locator('#bundle-keys img').count(), 4);
-    assert.equal(await page.locator('#hand-count').textContent(), '0 / 4');
+    assert.equal(await occupiedSlots(page).count(), 0);
     await page.reload();
     await page.locator('#start-btn').click();
     await page.locator('#carried-bundle').getByText('В связке · Часовой ×4').waitFor();

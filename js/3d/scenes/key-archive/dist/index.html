@@ -6,15 +6,15 @@
   <meta name="theme-color" content="#14211f" />
   <meta name="description" data-i18n-attr="content:meta.description" content="Архив ключей — гуашевая игра: поиск, отмачивание, очистка ржавчины и переплавка брака." />
   <title data-i18n="meta.title">Архив ключей</title>
-  <link rel="stylesheet" href="./styles.css?v=exterior-statistics" />
+  <link rel="stylesheet" href="./styles.css?v=hud-polish" />
 </head>
 <body>
   <canvas id="world" data-i18n-attr="aria-label:aria.world" aria-label="Трёхмерный зал архива ключей"></canvas>
   <div id="vignette" aria-hidden="true"></div>
 
-  <div id="hud" class="is-hidden">
-    <div class="fps-counter" data-i18n-attr="aria-label:aria.performance" aria-label="Производительность сцены">
-      <div>FPS <strong id="fps">—</strong></div>
+  <details id="fps-panel" class="fps-counter" hidden>
+    <summary data-i18n-attr="title:aria.performance" title="Производительность сцены">FPS <strong id="fps">—</strong></summary>
+    <div class="fps-details">
       <div><span data-i18n="hud.polygons">ПОЛИГОНЫ</span> <strong id="poly-count">—</strong></div>
       <div><span data-i18n="hud.triangles">ТРЕУГОЛЬНИКИ</span> <strong id="triangle-count">—</strong></div>
       <div><span data-i18n="hud.cpu">CPU СР. / ПИК</span> <strong id="cpu-count">—</strong></div>
@@ -22,6 +22,9 @@
       <div><span data-i18n="hud.passes">ПРОХОДЫ</span> <strong id="pass-count">—</strong></div>
       <div><span data-i18n="hud.visual">ВИЗУАЛ</span> <strong id="visual-status">—</strong></div>
     </div>
+  </details>
+
+  <div id="hud" class="is-hidden">
     <div id="crosshair" class="crosshair" aria-hidden="true"></div>
     <div id="interaction-prompt" class="interaction-prompt is-hidden"></div>
     <div id="carried-bundle" class="carried-bundle" role="status" hidden>
@@ -35,8 +38,6 @@
         <div class="quick-keys" data-i18n-html="hud.quickKeys">E <span>— действие</span> &nbsp; R <span>— бросить</span></div>
       </div>
       <div class="inventory-shell">
-        <div class="inventory-caption"><span data-i18n="hud.inHands">В РУКАХ</span><span id="hand-count">0 / 4</span></div>
-        <div id="archive-resources" class="archive-resources"></div>
         <div id="inventory" class="inventory" role="group" data-i18n-attr="aria-label:aria.inventory" aria-label="Переносимые ключи"></div>
       </div>
     </div>
@@ -122,6 +123,6 @@
       <button id="victory-reset" class="text-button" data-i18n="victory.reset">Пройти заново</button>
     </div>
   </div>
-  <script type="module" src="./js/main.js?v=processed-count"></script>
+  <script type="module" src="./js/main.js?v=hud-polish"></script>
 </body>
 </html>

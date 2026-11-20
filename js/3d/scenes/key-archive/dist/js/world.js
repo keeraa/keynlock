@@ -268,14 +268,15 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
       handModel.scale.setScalar(handModel.userData.handScale);
       return;
     }
-    // Target: flat, face up, pointing away from the player, just above the flame.
+    // Target: flat, face up, lying across the view (head left, teeth right).
     // The wax sits in the tip of the flame.
     poseScratch.target.set(candle.x, candle.y + CANDLE_WICK_Y + CANDLE_FLAME_HEIGHT * .8, candle.z);
     hand.updateMatrixWorld(true);
     const local = hand.worldToLocal(poseScratch.target.clone());
     camera.getWorldQuaternion(poseScratch.quaternion);
     poseScratch.yaw.setFromQuaternion(poseScratch.quaternion, 'YXZ');
-    const flat = new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, poseScratch.yaw.y, 0, 'YXZ'));
+    // Yaw +90°: the key's length runs left to right in front of the player.
+    const flat = new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, poseScratch.yaw.y + Math.PI / 2, 0, 'YXZ'));
     hand.getWorldQuaternion(poseScratch.hand);
     const localTurn = poseScratch.hand.invert().multiply(flat);
     const t = meltPose.blend * meltPose.blend * (3 - 2 * meltPose.blend);

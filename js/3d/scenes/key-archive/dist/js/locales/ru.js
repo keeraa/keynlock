@@ -186,6 +186,11 @@ export default Object.freeze({
 
   'forge.queue': '{current} · в очереди {waiting} · всего {total}',
   'hud.emptyRing': "Пустое кольцо для ключей",
+  'statistics.walked': 'Пройдено',
+  'statistics.metres': 'м',
+  'statistics.stationWait': 'Ожидание у станций',
+  'statistics.wrongCabinet': 'Не тот шкаф',
+  'statistics.bundlesPlaced': 'Связок в шкафы',
   'statistics.title': "Статистика",
   'statistics.export': "Скачать отчёт JSON",
   'statistics.back': "Назад",

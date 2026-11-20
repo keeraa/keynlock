@@ -1,7 +1,8 @@
 import { t, applyTranslations } from './i18n.js';
 // Static texts of the page follow the chosen language before anything shows.
 applyTranslations(document);
-import { TOTAL_KEYS, getProgress } from './rules.js';
+import { TOTAL_KEYS, getProgress, smeltingState } from './rules.js';
+import { STATIONS, bathId } from './station-layout.js';
 import { createWorld } from './world.js';
 import { installKeyAssetProvider } from './key-factory.js';
 import { createArchiveHud } from './archive-hud.js';
@@ -174,9 +175,24 @@ function announceBathReady(kind, position) {
   if (distance > 4) toast(t(`toast.bathReady.${kind}`));
 }
 
+// Statistics: the player stands by the workbench while a key there still
+// soaks or smelts (checked twice a second; the bath index makes it cheap).
+let workbenchBusyAt = -Infinity, workbenchBusy = false;
+function waitingAtWorkbench(now, time) {
+  const near = STATIONS.some(station => Math.abs(camera.position.x - station.x) < 3.6 &&
+    Math.abs(camera.position.z - station.z) < 2.6);
+  if (!near) return false;
+  if (now - workbenchBusyAt >= 500) {
+    workbenchBusyAt = now;
+    workbenchBusy = Boolean(smeltingState(state, time)) || STATIONS.some(station => ['mud', 'rust'].some(kind =>
+      keyIndex.bathKeys(bathId(station.id, kind)).some(key => key.bathUntil > time)));
+  }
+  return workbenchBusy;
+}
+
 function updateHud() { hud.update(); }
 
-const celebrations = createCelebrations({ world, state, tone, playAt, toast,
+const celebrations = createCelebrations({ world, state, tone, playAt, toast, statistics,
   getMode: () => mode, showVictory });
 
 function setHovered(target) {
@@ -405,6 +421,8 @@ function tick(now) {
   camera.rotation.set(pitch, yaw, 0, 'YXZ');
   const target = playing ? targetInView() : null;
   const time = stationNow();
+  if (playing) statistics.frame(Math.min(frameMs, 250),
+    { walked: distance, waitingAtStation: waitingAtWorkbench(now, time) });
   if (playing) updateWax(time, target);
   if (statistics.shouldCheckpoint()) {
     statistics.checkpoint();

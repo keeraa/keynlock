@@ -6,7 +6,7 @@ import { t } from './i18n.js';
 // (the hall warms, the forgotten door opens, then the victory screen).
 const FINALE_MS = 7000;
 
-export function createCelebrations({ world, state, tone, playAt, toast, getMode, showVictory }) {
+export function createCelebrations({ world, state, tone, playAt, toast, statistics = null, getMode, showVictory }) {
   // Baselines from the loaded save: already earned rewards do not replay.
   const litCabinets = world.cabinets.map(cabinet => cabinet.completion.isComplete());
   const startedRows = world.cabinets.map(cabinet => cabinet.completion.rowsStarted());
@@ -24,6 +24,9 @@ export function createCelebrations({ world, state, tone, playAt, toast, getMode,
         tone('fanfare');
         world.celebrateCabinet?.(cabinet.type);
       }
+      // Statistics: when each row and cabinet was completed (reward pacing).
+      for (let row = startedRows[cabinet.type]; row < started; row++) statistics?.event('rowTimes');
+      if (lit && !litCabinets[cabinet.type]) statistics?.event('cabinetTimes');
       startedRows[cabinet.type] = started;
       litCabinets[cabinet.type] = lit;
     }

@@ -186,6 +186,11 @@ export default Object.freeze({
 
   'forge.queue': '{current} · {waiting} queued · {total} in all',
   'hud.emptyRing': "Empty key ring",
+  'statistics.walked': 'Walked',
+  'statistics.metres': 'm',
+  'statistics.stationWait': 'Waiting at stations',
+  'statistics.wrongCabinet': 'Wrong cabinet',
+  'statistics.bundlesPlaced': 'Bundles shelved',
   'statistics.title': "Statistics",
   'statistics.export': "Download JSON report",
   'statistics.back': "Back",

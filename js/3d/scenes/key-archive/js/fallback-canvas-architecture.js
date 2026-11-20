@@ -1,3 +1,4 @@
+import { createCanvasWindowSky } from './archive-sky.js';
 import { windowLightPalette } from './window-light-palette.js';
 import { createWindowBirdFlight, BIRD_WIDTH, BIRD_HEIGHT } from './archive-window-bird.js?v=alchemy-candles';
 import { WINDOW_WASHES, WINDOW_BEAM_SLOPE, WINDOW_BEAM_HALF_WIDTH } from './window-beam-light.js?v=alchemy-candles';
@@ -22,6 +23,7 @@ const nearVaultEdge = vaultEdge(23).reverse();
 export function createFallbackArchitecture({ ctx, camera, surfaces, project, path3, segment }) {
   let width = 0, height = 0, frameTime = 0, visualSettings = null;
   const bird = createWindowBirdFlight();
+  const paintSky = createCanvasWindowSky(ctx, camera, project, path3);
   const entrancePainting = new Image();
   entrancePainting.src = ENTRANCE_DOOR_TEXTURE_URL;
   const ledgerPainting = new Image();
@@ -193,7 +195,8 @@ export function createFallbackArchitecture({ ctx, camera, surfaces, project, pat
             WINDOW_OPENING_RADIUS * WINDOW_VERTICAL_SCALE * Math.sin(angle),
             z + radius * Math.cos(angle)]);
         }
-        path3(pane, palette.canvasGlass, '#e0c58e', 3);
+        paintSky(x, z, pane, frameTime, visualSettings.nightLighting);
+        path3(pane, null, '#e0c58e', 3);
         drawBirdInPane(x, z, pane);
         segment([x, windowY(WINDOW_SILL_Y), z], [x, windowY(WINDOW_SPRING_Y + WINDOW_OPENING_RADIUS), z], '#76573f', 3);
         for (const y of [7.43, 8.64])

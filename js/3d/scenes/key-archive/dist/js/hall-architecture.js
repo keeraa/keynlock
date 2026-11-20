@@ -89,7 +89,8 @@ export function addArchedWindow(parent, side, z, mat) {
   parent.add(group);
 
   const glass = new THREE.Mesh(paneGeometry, mat.glass);
-  glass.position.z = -.024;
+  glass.position.z = -.15;
+  glass.renderOrder = -1;
   group.add(glass);
   const glow = new THREE.Mesh(paneGeometry, mat.windowLight);
   glow.position.z = -.015;

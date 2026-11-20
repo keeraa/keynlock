@@ -3,7 +3,7 @@ import { makeLabel } from './art.js?v=key-ring';
 import { HALL_SURFACE_TILE_METERS } from './hall-surface-textures.js?v=alchemy-candles';
 import { createMetricBoxGeometry } from './metric-box-geometry.js?v=23';
 import { WINDOW_CENTERS, PILASTER_CENTERS, PERIMETER_BAND_Y, HALL_HEIGHT_SCALE, HALL_END_WALL_HEIGHT,
-  addArchedWindow, addWindowedWall, addVault } from './hall-architecture.js?v=alchemy-candles';
+  addArchedWindow, addWindowedWall, addVault } from './hall-architecture.js?v=window-sky';
 import { ENTRANCE_DOOR_TEXTURE_URL } from './entrance-door-texture.js';
 import { addArchiveLedger, ARCHIVE_DESK, ARCHIVE_SIDE_TABLES } from './archive-ledger.js?v=ledger-candle';
 

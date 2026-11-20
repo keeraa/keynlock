@@ -1,9 +1,9 @@
 import * as THREE from '../vendor/three.js';
 import { floorSurfaceY, RUG_TOP } from './floor-contact.js';
-import { createArchiveCandles } from './archive-candles.js?v=candlelight';
+import { createArchiveCandles } from './archive-candles.js?v=lower-sconces';
 import { KEY_TYPES } from './rules.js?v=key-ring';
 import { createFallbackSurfaces } from './fallback-surfaces.js?v=key-ring';
-import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=cleaning-cues';
+import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=window-sky';
 import { sampleThrow } from './archive-throw-trajectory.js?v=archive-foley';
 import { playMotionContact, samplePlacement, sampleDiscard } from './archive-key-motion.js?v=key-ring';
 import { CABINET_GRID_WIDTH, CABINET_Z, CABINET_CORNICE_TOP, cabinetKeyPose } from './cabinet-layout.js?v=cabinet-cell-glow';

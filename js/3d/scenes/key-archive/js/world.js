@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { createArchiveCandles, CANDLE_WICK_Y, CANDLE_FLAME_HEIGHT } from './archive-candles.js?v=candlelight';
+import { createArchiveCandles, CANDLE_WICK_Y, CANDLE_FLAME_HEIGHT } from './archive-candles.js?v=lower-sconces';
 import { createCleaningEffects } from './cleaning-effects.js';
 import { getKeyCoatLayout, buildKeyCoatGeometry, getKeyCoatPoint } from './key-factory.js?v=key-ring';
 import { meltWaxBlobs } from './key-wax.js?v=forge-coats';
@@ -17,12 +17,13 @@ import { createWorkstations } from './wash-forge-stations.js?v=cleaning-cues';
 import { createPaintedRenderer } from './painted-renderer.js?v=cabinet-rewards';
 import { patchSceneShadowHatch, setShadowHatch } from './shadow-hatch.js';
 import { createSceneGeometryStatsCache } from './geometry-stats.js';
+import { createWindowSky } from './archive-sky.js';
 import { windowLightPalette } from './window-light-palette.js';
 import { PLAYER_EYE_HEIGHT } from './player-config.js';
 import { createKeyHoverOutline } from './key-hover-outline.js?v=readable-ink';
 import { batchStaticHallMeshes } from './static-mesh-batches.js';
 import { createMaterials } from './world-materials.js?v=key-ring';
-import { makeHall } from './world-architecture.js?v=key-ring';
+import { makeHall } from './world-architecture.js?v=window-sky';
 import { makeChandeliers } from './world-lighting.js?v=key-ring';
 import { createCabinet } from './world-cabinet.js?v=key-ring';
 import { addEntranceLighting, createEntranceContactShadows, createEntranceKeyMaterial } from './archive-entrance-light.js?v=alchemy-candles';
@@ -76,6 +77,8 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
   scene.add(cool);
 
   const mat = createMaterials();
+  const sky = createWindowSky();
+  mat.glass = sky.material;
   const hall = new THREE.Group();
   scene.add(hall);
   makeHall(hall, mat);
@@ -93,13 +96,13 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
     windowDaylight.value = strength;
     windowWarmth.value = settings.nightLighting ? 0 : 1;
     daylight.color.setHex(palette.sun);
-    mat.glass.color.setHex(palette.glass);
+    sky.setNight(settings.nightLighting);
     mat.windowLight.color.setHex(palette.glow);
     daylight.intensity = 4.3 * strength;
     setWindowWash(strength, palette.wash);
     setWindowAirLight(strength, palette.air);
     dust.setWindowDaylight(strength, palette.dust);
-    mat.windowLight.opacity = .05 + .16 * strength;
+    mat.windowLight.opacity = .035 + .08 * strength;
   };
   applyWindowDaylight(visualSettings);
   // Key Forge's normal/depth outline is part of this single scene-wide pass.
@@ -516,6 +519,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
       objectMask.matrixWorldNeedsUpdate = true;
     }
     dust.update(now);
+    sky.update(now);
     windowBird.update(now, playing);
     workstations.update(now, playSound);
     keyAnimations.update(now, playSound);

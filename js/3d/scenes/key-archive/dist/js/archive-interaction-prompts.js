@@ -16,7 +16,7 @@ export function createArchivePrompts(state, keyIndex, isMelting = () => false) {
         : t('prompt.take', { name: familyName(key.type).toLowerCase(), note: conditionNote });
     }
     if (target.kind === 'candle') {
-      if (!target.lit) return t('prompt.candleUnlit');
+      if (!target.lit) return '';
       const key = selectedKey(state);
       if (!key?.wax || key.broken) return t('prompt.candleInfo');
       return t(isMelting() ? 'prompt.candleMelting' : 'prompt.candleUse');
@@ -48,7 +48,7 @@ export function createArchivePrompts(state, keyIndex, isMelting = () => false) {
     if (target.kind === 'forge') {
       const held = selectedKey(state);
       if (held?.broken) return t('prompt.smelt', { seconds: SMELT_SECONDS });
-      if (state.bundles) return t('prompt.ringOwned');
+      if (state.bundles) return '';
       const amount = state.metal ?? 0;
       return amount >= BUNDLE_COST
         ? t('prompt.buyRing', { cost: BUNDLE_COST })

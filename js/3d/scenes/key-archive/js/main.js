@@ -2,23 +2,24 @@ import { t, applyTranslations, LANGUAGES, getLanguage, setLanguage } from './i18
 // Static texts of the page follow the chosen language before anything shows.
 applyTranslations(document);
 import { TOTAL_KEYS, getProgress } from './rules.js?v=key-ring';
-import { createWorld } from './world.js?v=key-shine';
+import { createWorld } from './world.js?v=exterior-statistics';
 import { installKeyAssetProvider } from './key-factory.js?v=key-ring';
-import { createArchiveHud } from './archive-hud.js?v=rinse-recordings';
+import { createArchiveHud } from './archive-hud.js?v=empty-ring';
 import { openArchiveSave, loadVisualSettings, clearArchiveState } from './archive-save-state-with-route.js?v=key-ring';
 import { createVisualPanel } from './visual-panel.js?v=key-ring';
 import externalKeyProvider from './key-provider-entry.js?v=wax-and-bundles';
-import { createFallbackWorld } from './fallback-world.js?v=cleaning-cues';
+import { createFallbackWorld } from './fallback-world.js?v=exterior-statistics';
 import { createPlayerMovement } from './player-movement.js?v=ledger-candle';
 import { createPerformanceHud } from './performance-hud.js';
 import { logicalKey } from './controls.js';
 import { edgeLookRate } from './mouse-look.js';
 import { createKeyIndex } from './key-index.js?v=key-ring';
 import { createArchiveTargeting } from './archive-surface-aim.js?v=key-ring';
-import { createArchivePrompts } from './archive-interaction-prompts.js?v=key-ring';
-import { createArchiveActions } from './archive-actions.js?v=key-shine';
+import { createArchivePrompts } from './archive-interaction-prompts.js?v=quiet-candles';
+import { createArchiveActions } from './archive-actions.js?v=exterior-statistics';
 import { FIRST_ROUTE_KEY_ID, createFirstRouteGuide } from './archive-first-route-guide.js?v=key-ring';
 import { createBathProgress } from './archive-bath-progress.js?v=cleaning-cues';
+import { createArchiveStatistics, createStatisticsPanel } from './archive-statistics.js';
 import { createArchiveMusic } from './archive-music.js?v=music-resume-seek';
 import { createArchiveAudio } from './archive-audio.js?v=key-shine';
 import { floorSurfaceY, RUG_TOP } from './floor-contact.js';
@@ -32,6 +33,8 @@ const storage = (() => {
 const visualSettings = loadVisualSettings(storage);
 const archiveSave = openArchiveSave(storage);
 const { state } = archiveSave;
+const statistics = createArchiveStatistics(state);
+const statisticsPanel = createStatisticsPanel(document, statistics);
 const keyIndex = createKeyIndex(state.keys);
 let world;
 try {
@@ -83,12 +86,15 @@ const { targetInView, clearAim } = createArchiveTargeting({ camera, world, state
 const { interact, drop, updateWax, updateSmelting, isMelting } = createArchiveActions({
   state, keyIndex, world, camera, targetInView,
   getYaw: () => yaw, isPlaying: () => mode === 'play',
-  save, updateHud, tone, toast, showVictory,
+  save, updateHud, tone, toast, showVictory, statistics,
   invalidateHover: () => { lastHoverKey = '!'; },
 });
 
 function save({ initial = false } = {}) {
-  if (!initial) announceRecovery = false;
+  if (!initial) {
+    announceRecovery = false;
+    statistics.checkpoint();
+  }
   if (state.firstRoute && keyIndex.get(FIRST_ROUTE_KEY_ID)?.status === 'sorted') state.firstRoute = false;
   keyIndex.rebuild();
   const result = archiveSave.save();
@@ -154,11 +160,13 @@ function turn(dx, dy) {
 
 function setMode(next) {
   mode = next;
+  if (statistics.setActive(next === 'play' && !document.hidden)) archiveSave.save();
   audio.setPlaying(mode === 'play');
   document.body.classList.toggle('playing', next === 'play');
   $('intro').classList.toggle('is-hidden', next !== 'intro');
   $('pause').classList.toggle('is-hidden', next !== 'pause');
   $('visual').classList.toggle('is-hidden', next !== 'visual');
+  $('statistics').classList.toggle('is-hidden', next !== 'statistics');
   $('victory').classList.toggle('is-hidden', next !== 'victory');
   $('hud').classList.toggle('is-hidden', next === 'intro');
   $('interaction-prompt').classList.toggle('is-hidden', next !== 'play' || !hovered);
@@ -168,6 +176,10 @@ function setMode(next) {
   clearAim();
   setHovered(null);
   if (next === 'pause') $('resume-btn').focus({ preventScroll: true });
+  if (next === 'statistics') {
+    statisticsPanel.render();
+    $('statistics-back').focus({ preventScroll: true });
+  }
 }
 
 function onMouseLockUnavailable() {
@@ -245,6 +257,21 @@ $('start-btn').disabled = false;
 $('resume-btn').addEventListener('click', play);
 $('victory-explore').addEventListener('click', play);
 $('visual-open').addEventListener('click', openVisual);
+let statisticsReturn = 'pause';
+function openStatistics() {
+  statisticsReturn = mode;
+  setMode('statistics');
+}
+$('statistics-open').addEventListener('click', openStatistics);
+$('victory-statistics').addEventListener('click', openStatistics);
+$('statistics-back').addEventListener('click', () => setMode(statisticsReturn));
+document.addEventListener('visibilitychange', () => {
+  if (statistics.setActive(mode === 'play' && !document.hidden)) archiveSave.save();
+});
+window.addEventListener('pagehide', () => {
+  if (statistics.setActive(false)) archiveSave.save();
+});
+window.addEventListener('pageshow', () => statistics.setActive(mode === 'play' && !document.hidden));
 $('visual-resume').addEventListener('click', play);
 $('visual-back').addEventListener('click', () => setMode('pause'));
 visualPanel.bind();
@@ -318,7 +345,8 @@ window.addEventListener('keydown', event => {
   const key = logicalKey(event);
   if (key === 'escape') {
     if (event.repeat) return;
-    if (mode === 'visual') setMode('pause');
+    if (mode === 'statistics') setMode(statisticsReturn);
+    else if (mode === 'visual') setMode('pause');
     else if (mode === 'play') pause();
     else if (mode === 'pause' && performance.now() - nativePauseAt > 100) {
       // One browser Escape can both release pointer lock and reach this handler.
@@ -381,6 +409,10 @@ function tick(now) {
   camera.rotation.set(pitch, yaw, 0, 'YXZ');
   const target = mode === 'play' ? targetInView() : null;
   updateWax(now, target);
+  if (statistics.shouldCheckpoint()) {
+    statistics.checkpoint();
+    archiveSave.save();
+  }
   if (now - lastSmeltCheck > 250) { lastSmeltCheck = now; updateSmelting(); }
   audio.setWaxMelting(isMelting());
   if (mode === 'play') setHovered(target);

@@ -32,6 +32,7 @@ export function sampleCandleFlicker(now, x, z) {
 }
 
 const CABINET_CANDLE_X = 10.6;
+const CABINET_CANDLE_Y = 1.58;
 const BRACKET_START = -.045;
 const BRACKET_END = HALL_SIDE_WALL_INNER_X - CABINET_CANDLE_X + .027;
 const BRACKET_PLATE_DEPTH = .09;
@@ -44,7 +45,7 @@ export function createArchiveCandles(scene, { drawMeshes = false } = {}) {
   for (let type = 0; type < 10; type++) {
     for (const side of [-1, 1]) {
       locations.push({ id: `cabinet-candle-${type}-${side}`, type,
-        x: (type < 5 ? -1 : 1) * CABINET_CANDLE_X, mountX: (type < 5 ? -1 : 1) * HALL_SIDE_WALL_INNER_X, y: 2.10, z: CABINET_Z[type % 5] + side * (CABINET_BODY_WIDTH / 2 - .03) });
+        x: (type < 5 ? -1 : 1) * CABINET_CANDLE_X, mountX: (type < 5 ? -1 : 1) * HALL_SIDE_WALL_INNER_X, y: CABINET_CANDLE_Y, z: CABINET_Z[type % 5] + side * (CABINET_BODY_WIDTH / 2 - .03) });
     }
   }
   const colliderGeometry = new THREE.BoxGeometry(.42, .48, .42);

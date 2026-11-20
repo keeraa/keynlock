@@ -17,7 +17,7 @@ import { RIGHT_HAND_RELEASE } from './held-key-motion.js?v=2';
 // All state-changing player actions live here and work identically in both renderers.
 export function createArchiveActions({
   state, keyIndex, world, camera, targetInView, getYaw, isPlaying,
-  save, updateHud, tone, toast, showVictory, invalidateHover,
+  save, updateHud, tone, toast, showVictory, invalidateHover, statistics,
 }) {
   let melting = null;
 
@@ -38,6 +38,7 @@ export function createArchiveActions({
     world.meltHeldWax?.(0, null, { restoreCoat: false });
     if (!key.mud && !key.rust && world.shineHand) world.shineHand(key.id);
     else tone('waxDone');
+    statistics?.record('wax', { dewaxed: 1, cleaned: key.mud || key.rust ? 0 : 1 });
     updateHud();
     save();
     toast(t(key.mud || key.rust ? 'toast.waxMeltedLayer' : 'toast.waxMeltedClean'));
@@ -64,6 +65,7 @@ export function createArchiveActions({
         tone('wrong');
         return;
       }
+      statistics?.record('pickup', { pickedUp: 1 });
       world.syncKey?.(picked);
       updateHud();
       save();
@@ -81,6 +83,7 @@ export function createArchiveActions({
       const key = selectedKey(state);
       if (key?.wax) { toast(t('toast.pickedWax'), true); return; }
       if (key && startSoak(state, target.id, target.bathKind)) {
+        statistics?.record(target.bathKind === 'mud' ? 'rinse' : 'rust');
         updateHud();
         save();
         // The rust splash sounds from the tray once the key lands (wash-forge-stations).
@@ -95,6 +98,11 @@ export function createArchiveActions({
         }
         const collected = collectSoakedKey(state, target.id, Date.now(), target.keyId ?? null);
         if (collected) {
+          const washed = target.bathKind === 'mud';
+          statistics?.record(washed ? 'rinse' : 'rust', {
+            [washed ? 'washed' : 'derusted']: 1,
+            cleaned: collected.mud || collected.rust || collected.wax ? 0 : 1,
+          });
           world.workstations?.liftKey?.(target.id, collected);
           world.syncKey?.(collected);
           updateHud();
@@ -115,12 +123,12 @@ export function createArchiveActions({
     }
     if (target.kind === 'forge') {
       if (!selectedKey(state)?.broken) {
-        if (state.bundles) { toast(t('toast.ringOwned')); return; }
+        if (state.bundles) return;
         if (buyBundle(state)) {
           updateHud();
           save();
           tone('bundle');
-          toast(t(state.activeBundle ? 'toast.bundleReady' : 'toast.ringBought'));
+          if (state.activeBundle) toast(t('toast.bundleReady'));
           invalidateHover();
         } else {
           toast(t('toast.ringPrice', { cost: BUNDLE_COST, metal: state.metal ?? 0 }), true);
@@ -130,6 +138,7 @@ export function createArchiveActions({
       }
       world.animateDiscard(selectedKey(state), target.stationId);
       trashSelectedKey(state);
+      statistics?.record('forge');
       updateHud();
       save();
       tone('release');
@@ -209,6 +218,7 @@ export function createArchiveActions({
       if (!putKeyInCabinet(state, target.type, target.slot)) return;
       world.animatePlace(key, target.slot);
     }
+    statistics?.record('sorted');
     world.refreshCabinet(keyType);
     updateHud();
     save();
@@ -241,6 +251,7 @@ export function createArchiveActions({
     const end = { x, y: restingKeyY(x, z) + (key.layer || 0), z };
     dropSelectedKey(state, x, z, -getYaw() + .6);
     world.animateThrow(key, start, end);
+    statistics?.record('throw', { throws: 1 });
     updateHud();
     save();
     tone('throw');
@@ -251,6 +262,7 @@ export function createArchiveActions({
   function updateSmelting(now = Date.now()) {
     const settled = settleSmelting(state, now);
     if (!settled) return;
+    statistics?.record('forge');
     updateHud();
     save();
     tone('ready');

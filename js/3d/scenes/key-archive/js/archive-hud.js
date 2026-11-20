@@ -9,7 +9,7 @@ export function createArchiveHud(document, world, state, keyIndex) {
   const $ = id => document.getElementById(id);
   const inventoryImages = new Map();
   const bundleArt = document.querySelector('.bundle-art');
-  let renderedBundle;
+  let renderedBundle, previouslyOwned;
   let sway = 0, walkPhase = 0;
 
   function thumbnail(key) {
@@ -30,13 +30,21 @@ export function createArchiveHud(document, world, state, keyIndex) {
     const progress = getProgress(state);
     $('hand-count').textContent = `${state.held.length} / ${MAX_HELD}`;
     const resources = $('archive-resources');
-    if (resources) resources.textContent = t('hud.metal', { metal: state.metal ?? 0 }) + (state.bundles ? t('hud.ringOwned') : '');
+    if (resources) resources.textContent = t('hud.metal', { metal: state.metal ?? 0 });
     const bundle = $('carried-bundle');
     const label = $('bundle-label');
     const icons = $('bundle-keys');
-    if (bundle && label && icons && renderedBundle !== state.activeBundle) {
+    const ownsRing = state.bundles > 0;
+    if (bundle && label && icons && (renderedBundle !== state.activeBundle || previouslyOwned !== ownsRing)) {
       renderedBundle = state.activeBundle;
-      bundle.hidden = !renderedBundle;
+      previouslyOwned = ownsRing;
+      bundle.hidden = !ownsRing;
+      bundle.classList.toggle('is-empty', ownsRing && !renderedBundle);
+      bundle.setAttribute('aria-label', renderedBundle ? t('hud.bundle', { name: familyName(renderedBundle.type) }) : t('hud.emptyRing'));
+      if (!renderedBundle) {
+        bundleArt?.style.removeProperty('--bundle-tilt');
+        bundleArt?.style.removeProperty('--bundle-bob');
+      }
       label.textContent = renderedBundle ? t('hud.bundle', { name: familyName(renderedBundle.type) }) : '';
       icons.replaceChildren();
       const positions = [[40,22,23],[47,27,9],[56,28,-9],[64,21,-25]];

@@ -7,17 +7,13 @@
   <meta name="theme-color" content="#14211f" />
   <meta name="description" data-i18n-attr="content:meta.description" content="Архив ключей — гуашевая игра: поиск, отмачивание, очистка ржавчины и переплавка брака." />
   <title data-i18n="meta.title">Архив ключей</title>
-  <link rel="stylesheet" href="./styles.css?v=key-ring" />
+  <link rel="stylesheet" href="./styles.css?v=exterior-statistics" />
 </head>
 <body>
   <canvas id="world" data-i18n-attr="aria-label:aria.world" aria-label="Трёхмерный зал архива ключей"></canvas>
   <div id="vignette" aria-hidden="true"></div>
 
   <div id="hud" class="is-hidden">
-    <header class="hud-title">
-      <div class="brand-copy"><strong data-i18n="hud.brand">Архив ключей</strong></div>
-    </header>
-    <div class="top-center" data-i18n="hud.hall">ЗАЛ ДЕСЯТИ СЕМЕЙСТВ</div>
     <div class="fps-counter" data-i18n-attr="aria-label:aria.performance" aria-label="Производительность сцены">
       <div>FPS <strong id="fps">—</strong></div>
       <div><span data-i18n="hud.polygons">ПОЛИГОНЫ</span> <strong id="poly-count">—</strong></div>
@@ -78,8 +74,18 @@
       <div class="settings-row"><label for="music-volume"><span data-i18n="pause.music">Громкость музыки</span> <output id="music-volume-value" for="music-volume">28%</output></label><input id="music-volume" type="range" min="0" max="100" step="1" value="28" /></div>
       <div class="settings-row"><label for="language" data-i18n="pause.language">Язык</label><select id="language" class="language-select"></select></div>
       <button id="visual-open" class="secondary-button" data-i18n-html="pause.visual">ВИЗУАЛ · РИСОВКА И СВЕТ <span>✦</span></button>
+      <button id="statistics-open" class="secondary-button" data-i18n="statistics.title">Статистика</button>
       <button id="reset-btn" class="text-button" data-i18n="pause.reset">Начать сортировку заново</button>
     </div>
+  </div>
+
+  <div id="statistics" class="screen-overlay is-hidden">
+    <section class="menu-card compact statistics-card" aria-labelledby="statistics-title">
+      <h2 id="statistics-title" data-i18n="statistics.title">Статистика</h2>
+      <dl id="statistics-values"></dl>
+      <button id="statistics-export" class="secondary-button" data-i18n="statistics.export">Скачать отчёт JSON</button>
+      <button id="statistics-back" class="text-button" data-i18n="statistics.back">Назад</button>
+    </section>
   </div>
 
   <div id="visual" class="screen-overlay visual-overlay is-hidden">
@@ -113,9 +119,10 @@
       <h2 data-i18n-html="victory.title">Все ключи<br/><em>разобраны.</em></h2>
       <p data-i18n="victory.text">Чистые ключи висят на своих штырях, а металл сломанных ключей отправлен на переплавку.</p>
       <button id="victory-explore" class="primary-button" data-i18n-html="victory.explore">ОСМОТРЕТЬ ЗАЛ <span>→</span></button>
+      <button id="victory-statistics" class="secondary-button" data-i18n="statistics.title">Статистика</button>
       <button id="victory-reset" class="text-button" data-i18n="victory.reset">Пройти заново</button>
     </div>
   </div>
-  <script type="module" src="./js/main.js?v=key-shine"></script>
+  <script type="module" src="./js/main.js?v=exterior-statistics"></script>
 </body>
 </html>

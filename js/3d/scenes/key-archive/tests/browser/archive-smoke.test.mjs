@@ -880,17 +880,30 @@ test('completed rows and cabinets celebrate after the last key lands', { timeout
       q.view([aim.x + 2.1, 1.78, aim.z], aim.toArray());
     }, count);
     await page.waitForFunction(() => document.querySelector('#interaction-prompt')?.textContent.includes('Положить'));
+    const startedBefore = await page.evaluate(() => window.cabinetTest.world.cabinets[3].completion.rowsStarted());
     await page.keyboard.press('e');
+    // The celebration itself lasts 2.25 s of scene time; on software-rendered
+    // CI one frame can take longer than that, so check what it leaves behind:
+    // exactly one row celebration started, for the row this key completed.
+    await page.waitForFunction(before =>
+      window.cabinetTest.world.cabinets[3].completion.rowsStarted() > before, startedBefore);
+    const row = count === 11 ? 0 : 7;
+    const earned = await page.evaluate(() => {
+      const completion = window.cabinetTest.world.cabinets[3].completion;
+      return { started: completion.rowsStarted(), complete: completion.isComplete() };
+    });
+    assert.equal(earned.started, startedBefore + 1);
+    assert.equal(earned.complete, count === 95);
     // Celebrations run on the scene clock, which stops in menus (not on performance.now).
-    await page.waitForFunction(() => window.cabinetTest.world.cabinets[3].completion.frame(window.cabinetTest.sceneNow()).rows.length > 0);
-    const earned = await page.evaluate(() => window.cabinetTest.world.cabinets[3].completion.frame(window.cabinetTest.sceneNow()));
-    assert.deepEqual(earned.rows.map(row => row.row), [count === 11 ? 0 : 7]);
-    assert.equal(Boolean(earned.cabinet), count === 95);
     await page.waitForFunction(() => {
       const frame = window.cabinetTest.world.cabinets[3].completion.frame(window.cabinetTest.sceneNow());
       return !frame.rows.length && !frame.cabinet;
     });
-    const after = await page.evaluate(() => window.cabinetTest.world.cabinets[3].completion.frame(window.cabinetTest.sceneNow()));
+    const after = await page.evaluate(() => {
+      const completion = window.cabinetTest.world.cabinets[3].completion;
+      return { ...completion.frame(window.cabinetTest.sceneNow()), settled: completion.settledRows() };
+    });
+    assert.ok(after.settled & (1 << row), `row ${row} is full and its celebration finished`);
     assert.equal(after.crownGlow > 0, count === 95);
     assert.deepEqual(errors, []);
   }

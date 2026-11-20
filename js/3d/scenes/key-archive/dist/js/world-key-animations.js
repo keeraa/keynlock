@@ -8,7 +8,7 @@ import { playMotionContact, samplePlacement, sampleDiscard, cabinetContactGlow }
 import { RIGHT_HAND_RELEASE } from './held-key-motion.js?v=2';
 
 // The WebGL representation of the same trajectories used by Canvas.
-export function createWorldKeyAnimations({ scene, camera, cabinets, workstations, invalidate, syncKey, refreshCabinet }) {
+export function createWorldKeyAnimations({ scene, camera, cabinets, workstations, invalidate, syncKey, refreshCabinet, sceneNow = () => performance.now() }) {
   const thrownKeys = new Map();
   const placingKeys = new Map();
   const discardingKeys = new Map();
@@ -30,7 +30,7 @@ export function createWorldKeyAnimations({ scene, camera, cabinets, workstations
     scene.add(model);
     const floorRotation = new THREE.Quaternion().setFromEuler(
       new THREE.Euler(-Math.PI / 2, key.rotation, 0, 'YXZ'));
-    thrownKeys.set(key.id, { key, start, end, startTime: performance.now(), model, releaseQuaternion, floorRotation });
+    thrownKeys.set(key.id, { key, start, end, startTime: sceneNow(), model, releaseQuaternion, floorRotation });
     syncKey(key);
   }
   function isThrowing(keyId) { return thrownKeys.has(keyId); }
@@ -59,7 +59,7 @@ export function createWorldKeyAnimations({ scene, camera, cabinets, workstations
     pivot.add(model);
     scene.add(pivot);
     placingKeys.set(key.id, {
-      key, slotIndex, fromRing, start, end, endScale: peg.scale, cabinetDepthScale: cabinet.group.scale.z, pivot, model, startTime: performance.now() + delay,
+      key, slotIndex, fromRing, start, end, endScale: peg.scale, cabinetDepthScale: cabinet.group.scale.z, pivot, model, startTime: sceneNow() + delay,
       startRotation: camera.quaternion.clone(),
       endRotation: cabinet.group.getWorldQuaternion(new THREE.Quaternion()),
     });
@@ -76,7 +76,7 @@ export function createWorldKeyAnimations({ scene, camera, cabinets, workstations
     const end = station.group.localToWorld(new THREE.Vector3(0, FORGE_SURFACE_Y, .08));
     const model = createKeyModel(key.type, { id: key.id, variation: key.variation, broken: true });
     scene.add(model);
-    discardingKeys.set(key.id, { start, end, model, startTime: performance.now() });
+    discardingKeys.set(key.id, { start, end, model, startTime: sceneNow() });
   }
 
   function update(now, playSound) {

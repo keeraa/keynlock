@@ -61,7 +61,7 @@ export function createWindowBirdFlight() {
   function update(now, playing = true) {
     const delta = lastTime === null ? 0 : Math.max(0, (now - lastTime) / 1000);
     lastTime = now;
-    if (!playing) { pose.z = 0; return false; }
+    if (!playing) return false;
     playTime += delta;
     const elapsed = playTime - flyAt;
     if (elapsed < 0 || elapsed >= FLIGHT_SECONDS) {

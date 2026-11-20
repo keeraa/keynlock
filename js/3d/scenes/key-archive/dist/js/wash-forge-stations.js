@@ -265,7 +265,7 @@ function createForge(group, station, materials, spotTexture, finish) {
     visual: createForgeEffects(group, x, spotTexture, hotMetal, FORGE_SURFACE_Y) };
 }
 
-export function createWorkstations(scene, materials, keyIndex, { effects = null, onLiftDone = null, stationNow = Date.now } = {}) {
+export function createWorkstations(scene, materials, keyIndex, { effects = null, onLiftDone = null, stationNow = Date.now, sceneNow = () => performance.now() } = {}) {
   const stations = [];
   const interactables = [];
   const occluders = [];
@@ -394,7 +394,7 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
     const from = slot ? { x: slot.holder.position.x, z: slot.holder.position.z,
       y: slot.holder.position.y + slot.keyMesh.position.y,
       rotation: slot.keyMesh.rotation.clone() } : null;
-    bath.lift = { keyMesh, key, from, startedAt: performance.now(),
+    bath.lift = { keyMesh, key, from, startedAt: sceneNow(),
       // The tray lift is slower so the rust can visibly flake off on the way up.
       duration: bath.tray ? TRAY_LIFT_MS : BATH_LIFT_MS };
     bindBathFinish(bath.lift);
@@ -540,5 +540,5 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
   }
 
   return { stations, interactables, occluders, getHoverSurface, aimedBathKey, update, liftKey, isLifting,
-    startMelt(stationId = 'center') { forgeMap.get(stationId)?.visual.ignite(performance.now()); } };
+    startMelt(stationId = 'center') { forgeMap.get(stationId)?.visual.ignite(sceneNow()); } };
 }

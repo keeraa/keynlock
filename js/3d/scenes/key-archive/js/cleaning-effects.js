@@ -143,7 +143,7 @@ export function createCleaningEffects(scene, camera) {
     }
   }
 
-  function update(dt) {
+  function update(dt, now = performance.now()) {
     for (let i = puffs.length - 1; i >= 0; i--) {
       const puff = puffs[i];
       const data = puff.userData;
@@ -161,7 +161,7 @@ export function createCleaningEffects(scene, camera) {
       const drag = data.kind === 'rust' ? 1.1 : 6;          // flakes flutter
       data.velocity = Math.min(drag, data.velocity + GRAVITY * dt);
       piece.position.y -= data.velocity * dt;
-      if (data.kind === 'rust') piece.position.x += Math.sin(performance.now() * .005 + data.phase) * .12 * dt;
+      if (data.kind === 'rust') piece.position.x += Math.sin(now * .005 + data.phase) * .12 * dt;
       piece.rotation.x += data.spin * dt;
       piece.rotation.z += data.spin * .6 * dt;
       if (piece.position.y <= data.landY) {

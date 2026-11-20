@@ -49,6 +49,7 @@ export default Object.freeze({
   'pause.sensitivity': 'Mouse sensitivity',
   'pause.sound': 'Sound effects',
   'pause.music': 'Music volume',
+  'pause.musicSpatial': 'Music from ceiling speakers',
   'pause.language': 'Language',
   'pause.visual': 'VISUALS · DRAWING AND LIGHT <span>✦</span>',
   'pause.reset': 'Start sorting over',

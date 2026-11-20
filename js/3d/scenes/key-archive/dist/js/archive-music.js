@@ -1,4 +1,7 @@
+import { createArchiveMusicMix } from './archive-music-mix.js';
+
 const VOLUME_KEY = 'keynlock-archive-music-volume-v1';
+const SPATIAL_KEY = 'keynlock-archive-music-spatial-v1';
 const POSITION_KEY = 'keynlock-archive-music-position-v1';
 const SAVE_INTERVAL_MS = 800;
 const DEFAULT_VOLUME = 28;
@@ -10,10 +13,12 @@ const TRACKS = [
 
 export function createArchiveMusic(browserWindow, storage) {
   let volume = DEFAULT_VOLUME;
+  let spatial = false;
   try {
     const saved = storage?.getItem(VOLUME_KEY);
     if (saved !== null && saved !== undefined && /^\d+$/.test(saved))
       volume = Math.min(100, Number(saved));
+    spatial = storage?.getItem(SPATIAL_KEY) === '1';
   } catch { /* storage is optional */ }
 
   let audio, track = 0, failed = 0;
@@ -28,6 +33,8 @@ export function createArchiveMusic(browserWindow, storage) {
     }
   } catch { /* storage is optional */ }
   let enabled = false;
+  let paused = false;
+  let mix;
   const { document } = browserWindow;
 
   function savePosition(seconds) {
@@ -66,6 +73,18 @@ export function createArchiveMusic(browserWindow, storage) {
     setSource(TRACKS[track]);
   }
 
+  function initMix() {
+    const Context = browserWindow.AudioContext ?? browserWindow.webkitAudioContext;
+    if (!Context) return;
+    let context;
+    try {
+      context = new Context();
+      mix = createArchiveMusicMix(context, audio, { volume: volume / 100, paused, spatial });
+    } catch {
+      context?.close?.()?.catch(() => {});
+    }
+  }
+
   function start() {
     enabled = true;
     if (!volume || !browserWindow.Audio) return;
@@ -73,6 +92,8 @@ export function createArchiveMusic(browserWindow, storage) {
       audio = new browserWindow.Audio();
       audio.preload = 'none';
       audio.volume = volume / 100;
+      initMix();
+      mix?.resume();
       audio.addEventListener('loadedmetadata', () => {
         if (!resumeAt) return;
         const end = Number.isFinite(audio.duration) ? Math.max(0, audio.duration - .05) : resumeAt;
@@ -119,6 +140,7 @@ export function createArchiveMusic(browserWindow, storage) {
       failed = 0;
       audio.src = TRACKS[track];
     }
+    mix?.resume();
     playCurrent();
   }
 
@@ -133,12 +155,26 @@ export function createArchiveMusic(browserWindow, storage) {
   return {
     start,
     getVolume: () => volume,
+    getSpatial: () => spatial,
+    setSpatial(enabled) {
+      spatial = Boolean(enabled);
+      try { storage?.setItem(SPATIAL_KEY, spatial ? '1' : '0'); } catch { /* storage is optional */ }
+      mix?.setSpatial(spatial);
+    },
+    setPaused(value) {
+      const next = Boolean(value);
+      if (next === paused) return;
+      paused = next;
+      mix?.setPaused(paused);
+    },
+    setListener(position, forward, up) { if (spatial) mix?.setListener(position, forward, up); },
     setVolume(value) {
       const number = Number(value);
       if (!Number.isFinite(number)) return;
       volume = Math.min(100, Math.max(0, Math.round(number)));
       try { storage?.setItem(VOLUME_KEY, String(volume)); } catch { /* storage is optional */ }
-      if (audio) audio.volume = volume / 100;
+      if (mix) mix.setVolume(volume / 100);
+      else if (audio) audio.volume = volume / 100;
       if (volume && enabled) {
         if (!audio) start();
         else if (audio.paused) playCurrent();

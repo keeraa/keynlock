@@ -40,7 +40,7 @@ function addRoundedShelf(group, y, height, material) {
   group.add(shelf);
 }
 
-export function createCabinet(scene, type, materials) {
+export function createCabinet(scene, type, materials, sceneNow = () => performance.now()) {
   if (!cabinetFinishes.has(materials)) cabinetFinishes.set(materials, createCabinetFinish(materials));
   const finish = cabinetFinishes.get(materials);
   const mat = { ...materials, wood: finish.wood, darkWood: finish.darkWood,
@@ -242,7 +242,7 @@ export function createCabinet(scene, type, materials) {
   function refresh(keys, hiddenIds = new Set(), required = CABINET_CAPACITY) {
     for (const slot of cellFlashes.keys()) if (!keys.some(key => key.cabinetSlot === slot)) flashCell(slot, 0);
     const visible = keys.filter(key => !hiddenIds.has(key.id));
-    completion.refresh(visible);
+    completion.refresh(visible, sceneNow());
     if (visible.length || litKeys.length) {
       litKeys = visible;
       updateCellLights(completion.settledRows());

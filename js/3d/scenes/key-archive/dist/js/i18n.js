@@ -1,5 +1,5 @@
-import ru from './locales/ru.js?v=catalog-spread';
-import en from './locales/en.js?v=catalog-spread';
+import ru from './locales/ru.js?v=room-music';
+import en from './locales/en.js?v=room-music';
 
 // Translations for every player-facing text of the archive.
 //  * Code: t('toast.keyPlaced'), t('toast.picked', { name }) with {placeholders}.

@@ -102,3 +102,63 @@ test('a saved track can seek through a local URL on a host without byte ranges',
   assert.deepEqual(revoked, ['blob:music']);
   assert.ok(audio.url.endsWith('chopin-nocturne-b-flat-minor.mp3'));
 });
+
+test('pause filters live playback and the saved room mix uses two ceiling speakers', () => {
+  const spatialKey = 'keynlock-archive-music-spatial-v1';
+  const { browser, music, data } = setup({ [spatialKey]: '1' });
+  const parameter = () => ({ value: 0, setTargetAtTime(value) { this.value = value; } });
+  const graph = { gains: [], speakers: [] };
+  const node = () => ({ connect() {} });
+  browser.AudioContext = class {
+    sampleRate = 12000;
+    currentTime = 0;
+    destination = {};
+    listener = Object.fromEntries(['position', 'forward', 'up'].flatMap(name =>
+      ['X', 'Y', 'Z'].map(axis => [name + axis, parameter()])));
+    resume() { return Promise.resolve(); }
+    createBiquadFilter() {
+      return graph.filter = { ...node(), frequency: parameter(), Q: parameter() };
+    }
+    createGain() {
+      const gain = { ...node(), gain: parameter() };
+      graph.gains.push(gain);
+      return gain;
+    }
+    createChannelSplitter() { return node(); }
+    createConvolver() { return graph.room = node(); }
+    createBuffer(channels, length) {
+      const data = Array.from({ length: channels }, () => new Float32Array(length));
+      return { getChannelData: index => data[index] };
+    }
+    createPanner() {
+      const panner = { ...node(), positionX: parameter(), positionY: parameter(), positionZ: parameter() };
+      graph.speakers.push(panner);
+      return panner;
+    }
+    createMediaElementSource() {
+      graph.listener = this.listener;
+      return node();
+    }
+  };
+  music.start();
+  const track = browser.player.url;
+  assert.equal(music.getSpatial(), true);
+  assert.equal(graph.filter.type, 'lowpass');
+  assert.ok(graph.room.buffer.getChannelData(0).some(sample => sample !== 0));
+  assert.ok(graph.speakers.every(speaker => speaker.panningModel === 'HRTF' && speaker.positionY.value > 10));
+  assert.equal(graph.speakers.length, 2);
+  browser.player.currentTime = 14;
+  music.setPaused(true);
+  assert.ok(graph.filter.frequency.value < 1500);
+  assert.equal(browser.player.paused, false);
+  music.setPaused(false);
+  assert.ok(graph.filter.frequency.value > 18000);
+  assert.equal(browser.player.currentTime, 14);
+  assert.equal(browser.player.url, track);
+  music.setListener({ x: 4, y: 1.8, z: -2 }, { x: 0, y: 0, z: -1 }, { x: 0, y: 1, z: 0 });
+  assert.equal(graph.listener.positionX.value, 4);
+  assert.equal(graph.listener.forwardZ.value, -1);
+  music.setSpatial(false);
+  assert.equal(data.get(spatialKey), '0');
+  assert.deepEqual(graph.gains.slice(0, 3).map(node => node.gain.value), [1, 0, 0]);
+});

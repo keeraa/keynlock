@@ -1,6 +1,6 @@
 import * as THREE from '../vendor/three.js';
 import { createArchiveCandles, CANDLE_WICK_Y, CANDLE_FLAME_HEIGHT } from './archive-candles.js?v=key-catalog';
-import { createCleaningEffects } from './cleaning-effects.js';
+import { createCleaningEffects } from './cleaning-effects.js?v=paused-scene';
 import { getKeyCoatLayout, buildKeyCoatGeometry, getKeyCoatPoint } from './key-factory.js?v=key-ring';
 import { meltWaxBlobs } from './key-wax.js?v=forge-coats';
 import { KEY_TYPES, getProgress } from './rules.js?v=key-ring';
@@ -11,9 +11,9 @@ import {
 } from './key-factory.js?v=key-ring';
 import { createPaintedInstanceGeometry, setKeyInstanceFinish } from './key-instance-finish.js?v=wax-and-bundles';
 import { createKeyThumbnailRenderer } from './key-thumbnails.js?v=key-ring';
-import { createWorldKeyAnimations } from './world-key-animations.js?v=key-ring';
+import { createWorldKeyAnimations } from './world-key-animations.js?v=paused-scene';
 import { restingKeyY } from './floor-contact.js';
-import { createWorkstations } from './wash-forge-stations.js?v=paused-stations';
+import { createWorkstations } from './wash-forge-stations.js?v=paused-scene';
 import { createPaintedRenderer } from './painted-renderer.js?v=cabinet-rewards';
 import { patchSceneShadowHatch, setShadowHatch } from './shadow-hatch.js';
 import { createSceneGeometryStatsCache } from './geometry-stats.js';
@@ -26,10 +26,10 @@ import { createMaterials } from './world-materials.js?v=shadow-footprints';
 import { addArchiveLedger } from './archive-ledger.js?v=key-catalog';
 import { makeHall } from './world-architecture.js?v=furniture-shadows';
 import { makeChandeliers } from './world-lighting.js?v=key-ring';
-import { createCabinet } from './world-cabinet.js?v=key-ring';
+import { createCabinet } from './world-cabinet.js?v=paused-scene';
 import { addEntranceLighting, createEntranceContactShadows, createEntranceKeyMaterial } from './archive-entrance-light.js?v=alchemy-candles';
 import { WINDOW_LIGHT_POSITION, addWindowAirLight, windowBeamLightAt } from './archive-window-rays.js?v=alchemy-candles';
-import { addWindowBird } from './archive-window-bird.js?v=alchemy-candles';
+import { addWindowBird } from './archive-window-bird.js?v=paused-scene';
 import { addDust } from './world-particles.js?v=alchemy-candles';
 import { nextHandMotionWeight, samplePickupLift } from './held-key-motion.js?v=stable-pickup';
 import { addHeldKeyWindowLight } from './held-key-light.js?v=clear-day';
@@ -39,7 +39,7 @@ import { pegForSlot, CABINET_CELL_INNER_HALF_WIDTH, CABINET_CELL_INNER_HALF_HEIG
 
 const ROOM = { halfWidth: 12, halfLength: 23.4, height: 13.5 };
 
-export function createWorld(canvas, state, visualSettings, keyIndex, stationNow = Date.now) {
+export function createWorld(canvas, state, visualSettings, keyIndex, stationNow = Date.now, sceneNow = () => performance.now()) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
   // Keep counts from every scene/postprocess pass within a single frame.
   renderer.info.autoReset = false;
@@ -110,7 +110,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
   // Key Forge's normal/depth outline is part of this single scene-wide pass.
   // 1000 keys remain 20 geometry batches: outlines add no polygon shells.
   const painted = createPaintedRenderer(renderer, scene, camera, visualSettings);
-  const cabinets = KEY_TYPES.map((_, index) => createCabinet(scene, index, mat));
+  const cabinets = KEY_TYPES.map((_, index) => createCabinet(scene, index, mat, sceneNow));
   cabinets.forEach(cabinet => cabinet.setContour(visualSettings));
   setShadowHatch(visualSettings.hatchShadows);
   cabinets[0].warmEffects(renderer, camera);
@@ -119,7 +119,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
   let pendingHandShine = null;
   const workstations = createWorkstations(scene, mat, keyIndex, {
     effects: cleaningEffects,
-    stationNow,
+    stationNow, sceneNow,
     // The key leaves the bath for the hand: glint once it is fully clean.
     onLiftDone: (key, from) => {
       startHandFlight(key, from);
@@ -202,7 +202,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
   scene.add(cellHighlight);
   const dummy = new THREE.Object3D();
   let geometryStatsCache;
-  const keyAnimations = createWorldKeyAnimations({ scene, camera, cabinets, workstations,
+  const keyAnimations = createWorldKeyAnimations({ scene, camera, cabinets, workstations, sceneNow,
     invalidate: () => geometryStatsCache?.invalidate(), syncKey, refreshCabinet });
   const { thrownKeys, placingKeys, animateThrow, animatePlace, animateDiscard,
     isThrowing, cancelPlace } = keyAnimations;
@@ -226,7 +226,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
   let keyHoverTarget = 0;
   let objectHoverOpacity = 0;
   let objectHoverTarget = 0;
-  let lastHoverFrame = performance.now();
+  let lastHoverFrame = sceneNow();
   let highlightedShape = '0:false';
 
   function lightAtHand() {
@@ -273,11 +273,11 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
     if (!from) return;
     const position = new THREE.Vector3(), quaternion = new THREE.Quaternion(), scale = new THREE.Vector3();
     from.decompose(position, quaternion, scale);
-    handFlight = { keyId: key.id, position, quaternion, scale: scale.x, startedAt: performance.now() };
+    handFlight = { keyId: key.id, position, quaternion, scale: scale.x, startedAt: sceneNow() };
   }
   function flyToHand() {
     if (!handFlight || displayedHandId !== handFlight.keyId) { handFlight = null; return false; }
-    const t = Math.min(1, (performance.now() - handFlight.startedAt) / HAND_FLIGHT_MS);
+    const t = Math.min(1, (sceneNow() - handFlight.startedAt) / HAND_FLIGHT_MS);
     const ease = 1 - Math.pow(1 - t, 3);
     hand.updateMatrixWorld(true);
     const local = hand.worldToLocal(handFlight.position.clone());
@@ -317,7 +317,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
     poseScratch.yaw.setFromQuaternion(poseScratch.quaternion, 'YXZ');
     // Slide the key back and forth along its length, so the flame passes
     // under the wax from the head to the teeth.
-    const sweep = Math.sin(performance.now() * .0042) * .14 * meltPose.blend;
+    const sweep = Math.sin(sceneNow() * .0042) * .14 * meltPose.blend;
     poseScratch.target.x += Math.cos(poseScratch.yaw.y) * sweep;
     poseScratch.target.z -= Math.sin(poseScratch.yaw.y) * sweep;
     hand.updateMatrixWorld(true);
@@ -343,7 +343,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
     const key = keyIndex.get(displayedHandId);
     if (!key) return;
     crust.userData.fullCoat ??= crust.geometry;
-    const now = performance.now();
+    const now = sceneNow();
     if (!(progress > 0)) {
       releaseMelt(crust);
       crust.geometry = crust.userData.fullCoat;
@@ -535,7 +535,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
     keyAnimations.update(now, playSound);
     cabinets.forEach(cabinet => cabinet.update(now));
     candleSet.update(now, cabinets);
-    cleaningEffects.update(elapsed);
+    if (elapsed > 0) cleaningEffects.update(elapsed, now);
     if (pendingHandShine !== displayedHandId) pendingHandShine = null;
     if (playing && pendingHandShine !== null && handModel && hand.visible && !handFlight) {
       pendingHandShine = null;
@@ -590,7 +590,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
       try { objectOutline.render(objectHoverOpacity, hoverAnchor ? null : dustCoverage, painted.getSceneDepth()); }
       catch (error) { console.warn('KEYNLOCK: object silhouette unavailable', error); }
     } }, interactables, cabinets, workstations, floorKeys, candles: candleSet.candles,
-    animatePickup() { pickupAt = performance.now(); }, refreshHand, syncKey, refreshCabinet, highlight, update, resize, meltHeldWax, shineHand,
+    animatePickup() { pickupAt = sceneNow(); }, refreshHand, syncKey, refreshCabinet, highlight, update, resize, meltHeldWax, shineHand,
     setLedgerVisible(visible) {
       ledger.book.visible = visible;
       if (!visible) objectHoverOpacity = 0;

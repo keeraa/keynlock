@@ -1,14 +1,14 @@
-import { t, applyTranslations, LANGUAGES, getLanguage, setLanguage } from './i18n.js';
+import { t, applyTranslations, LANGUAGES, getLanguage, setLanguage } from './i18n.js?v=room-music';
 // Static texts of the page follow the chosen language before anything shows.
 applyTranslations(document);
 import { TOTAL_KEYS, getProgress } from './rules.js?v=stable-pickup';
-import { createWorld } from './world.js?v=paused-stations';
+import { createWorld } from './world.js?v=paused-scene';
 import { installKeyAssetProvider } from './key-factory.js?v=key-ring';
 import { createArchiveHud } from './archive-hud.js?v=catalog-thumbnails';
 import { openArchiveSave, loadVisualSettings, clearArchiveState } from './archive-save-state-with-route.js?v=paused-stations';
 import { createVisualPanel } from './visual-panel.js?v=key-ring';
 import externalKeyProvider from './key-provider-entry.js?v=wax-and-bundles';
-import { createFallbackWorld } from './fallback-world.js?v=paused-stations';
+import { createFallbackWorld } from './fallback-world.js?v=paused-scene';
 import { createPlayerMovement } from './player-movement.js?v=ledger-candle';
 import { createPerformanceHud } from './performance-hud.js';
 import { createInventoryWheel, logicalKey } from './controls.js?v=stable-pickup';
@@ -18,10 +18,10 @@ import { createArchiveTargeting } from './archive-surface-aim.js?v=key-ring';
 import { createArchivePrompts } from './archive-interaction-prompts.js?v=paused-stations';
 import { createArchiveActions } from './archive-actions.js?v=paused-stations';
 import { FIRST_ROUTE_KEY_ID, createFirstRouteGuide } from './archive-first-route-guide.js?v=key-ring';
-import { createBathProgress } from './archive-bath-progress.js?v=paused-stations';
+import { createBathProgress } from './archive-bath-progress.js?v=paused-scene';
 import { createArchiveKeyCatalog } from './archive-key-catalog.js?v=catalog-spread';
 import { createArchiveStatistics, createStatisticsPanel } from './archive-statistics.js?v=processed-count';
-import { createArchiveMusic } from './archive-music.js?v=music-resume-seek';
+import { createArchiveMusic } from './archive-music.js?v=room-music';
 import { createArchiveAudio } from './archive-audio.js?v=key-shine';
 import { floorSurfaceY, RUG_TOP } from './floor-contact.js';
 import { createStationClock } from './archive-station-clock.js';
@@ -37,15 +37,17 @@ const archiveSave = openArchiveSave(storage);
 const { state } = archiveSave;
 const stationClock = createStationClock(state.stationTime);
 const stationNow = stationClock.now;
+const sceneClock = createStationClock(performance.now());
+const sceneNow = sceneClock.now;
 const statistics = createArchiveStatistics(state);
 const statisticsPanel = createStatisticsPanel(document, statistics);
 const keyIndex = createKeyIndex(state.keys);
 let world;
 try {
-  world = createWorld(canvas, state, visualSettings, keyIndex, stationNow);
+  world = createWorld(canvas, state, visualSettings, keyIndex, stationNow, sceneNow);
 } catch (error) {
   console.warn('WebGL недоступен. Используется графический резервный режим.', error.message);
-  world = createFallbackWorld(canvas, state, visualSettings, keyIndex, stationNow);
+  world = createFallbackWorld(canvas, state, visualSettings, keyIndex, stationNow, sceneNow);
 }
 const camera = world.camera;
 const movement = createPlayerMovement(camera, world.bounds);
@@ -104,6 +106,8 @@ function saveSnapshot() {
 
 function syncActivity(active = isPlaying()) {
   stationClock.setActive(active);
+  sceneClock.setActive(active);
+  music.setPaused(!active);
   audio.setPlaying(active);
   if (statistics.setActive(active)) saveSnapshot();
 }
@@ -320,6 +324,10 @@ if (musicVolume && musicVolumeValue) {
   });
 }
 
+const musicSpatial = $('music-spatial');
+musicSpatial.checked = music.getSpatial();
+musicSpatial.addEventListener('change', () => music.setSpatial(musicSpatial.checked));
+
 document.addEventListener('pointerlockchange', () => {
   if (document.pointerLockElement === canvas) {
     lockRequestPending = false;
@@ -432,7 +440,7 @@ function tick(now) {
     distance = Math.hypot(camera.position.x - x, camera.position.z - z);
     audio.walk(distance, floorSurfaceY(camera.position.x, camera.position.z) === RUG_TOP, heldMovement.has('shift'));
   }
-  hud.walk(distance, delta);
+  if (playing) hud.walk(distance, delta);
   if (playing && document.pointerLockElement !== canvas && now < edgeLook.until) {
     yaw -= edgeLook.x * 1.6 * delta;
     pitch = clamp(pitch - edgeLook.y * 1.3 * delta, -1.31, 1.27);
@@ -454,11 +462,12 @@ function tick(now) {
   }
   bathProgress.update(playing, playAt);
   routeGuide.update(playing);
-  world.update(now, moving, playing, playing ? playAt : null);
-  if (audio.hasSpatialVoices()) {
+  world.update(sceneNow(), moving, playing, playing ? playAt : null);
+  if (audio.hasSpatialVoices() || music.getSpatial()) {
     soundForward.set(0, 0, -1).applyQuaternion(camera.quaternion);
     soundUp.set(0, 1, 0).applyQuaternion(camera.quaternion);
     audio.setListener(camera.position, soundForward, soundUp);
+    music.setListener(camera.position, soundForward, soundUp);
   }
   for (const cabinet of world.cabinets) {
     const lit = cabinet.completion.isComplete();

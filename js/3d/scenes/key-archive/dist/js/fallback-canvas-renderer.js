@@ -4,7 +4,7 @@ import { createCabinetCompletion } from './cabinet-completion.js?v=wax-and-bundl
 import { PERIMETER_BAND_Y } from './hall-architecture.js?v=alchemy-candles';
 import { CANDLE_FLAME_HEIGHT, CANDLE_FLAME_WIDTH, CANDLE_WICK_Y, sampleCandleFlicker } from './archive-candles.js?v=key-catalog';
 import { createFallbackKeyPainter } from './fallback-canvas-keys.js?v=stable-pickup';
-import { createFallbackArchitecture } from './fallback-canvas-architecture.js?v=furniture-shadows';
+import { createFallbackArchitecture } from './fallback-canvas-architecture.js?v=paused-scene';
 import { createFurnitureShadows } from './furniture-shadows.js?v=shadow-footprints';
 import { getKeyFallbackHeadPoints } from './key-factory.js?v=key-ring';
 import { KEY_TYPES, getProgress } from './rules.js?v=key-ring';
@@ -24,7 +24,7 @@ const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 // Canvas-only illustration code. No collision, input, save, or game-state mutation.
 export function createFallbackCanvasRenderer({
   ctx, scene, camera, surfaces, state, cabinets, workstations, keyIndex,
-  thrownKeys, placingKeys, discardingKeys, fixtureHover, keyHover, candles, stationNow = Date.now,
+  thrownKeys, placingKeys, discardingKeys, fixtureHover, keyHover, candles, stationNow = Date.now, sceneNow = () => performance.now(),
 }) {
   let width = 0, height = 0, frameTime = 0, lastDraw = -Infinity;
   let playing = false, ledgerVisible = true;
@@ -474,19 +474,19 @@ export function createFallbackCanvasRenderer({
       else drawables.push({ distance, draw: () => drawKey(key) });
     }
     for (const motion of thrownKeys.values()) {
-      const pose = sampleThrow(motion.start, motion.end, (currentTime - motion.startTime) / 1000);
+      const pose = sampleThrow(motion.start, motion.end, (frameTime - motion.startTime) / 1000);
       const airborne = { ...motion.key, x: pose.x, z: pose.z };
       drawables.push({ distance: Math.hypot(camera.position.x - pose.x, camera.position.z - pose.z),
         draw: () => drawKey(airborne, pose.y, pose.spin) });
     }
     for (const motion of placingKeys.values()) {
-      if (currentTime < motion.startTime) continue;
+      if (frameTime < motion.startTime) continue;
       const distance = camera.position.distanceTo(motion.end);
-      drawables.push({ distance, draw: () => drawPlacingKey(motion, currentTime) });
+      drawables.push({ distance, draw: () => drawPlacingKey(motion, frameTime) });
     }
     for (const motion of discardingKeys.values()) {
       const distance = camera.position.distanceTo(motion.end);
-      drawables.push({ distance, draw: () => drawDiscardingKey(motion, currentTime) });
+      drawables.push({ distance, draw: () => drawDiscardingKey(motion, frameTime) });
     }
     drawables.sort((a, b) => b.distance - a.distance);
     drawDistantKeys(distantKeys);
@@ -515,7 +515,7 @@ export function createFallbackCanvasRenderer({
 
   function refreshCabinet(type) {
     const sorted = state.keys.filter(key => key.type === type && key.status === 'sorted');
-    cabinetCompletion[type].refresh(sorted.filter(key => !placingKeys.has(key.id)));
+    cabinetCompletion[type].refresh(sorted.filter(key => !placingKeys.has(key.id)), sceneNow());
     cabinetCounts[type] = sorted.length;
     cabinetSlots[type] = new Map(sorted.map(key => [key.cabinetSlot, key.id]));
   }

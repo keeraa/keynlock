@@ -1,6 +1,6 @@
 import { t } from './i18n.js';
 import { STATIONS, FIXTURE_OFFSETS, FORGE_SURFACE_Y, bathId } from './station-layout.js';
-import { RUST_TRAY } from './wash-forge-stations.js?v=paused-stations';
+import { RUST_TRAY } from './wash-forge-stations.js?v=paused-scene';
 import { smeltingState } from './rules.js?v=key-ring';
 import { bathKeyProgress, waterDipCount } from './station-visual-state.js?v=cleaning-cues';
 

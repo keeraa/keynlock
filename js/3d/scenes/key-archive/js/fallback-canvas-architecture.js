@@ -1,6 +1,6 @@
 import { createCanvasWindowSky } from './archive-sky.js';
 import { windowLightPalette } from './window-light-palette.js';
-import { createWindowBirdFlight, BIRD_WIDTH, BIRD_HEIGHT } from './archive-window-bird.js?v=alchemy-candles';
+import { createWindowBirdFlight, BIRD_WIDTH, BIRD_HEIGHT } from './archive-window-bird.js?v=paused-scene';
 import { WINDOW_WASHES, WINDOW_BEAM_SLOPE, WINDOW_BEAM_HALF_WIDTH } from './window-beam-light.js?v=alchemy-candles';
 import { ENTRANCE_DOOR_TEXTURE_URL } from './entrance-door-texture.js';
 import { ENTRANCE_CANDLE, sampleCandleFlicker } from './archive-candles.js?v=key-catalog';

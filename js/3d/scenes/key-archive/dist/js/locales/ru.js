@@ -49,6 +49,7 @@ export default Object.freeze({
   'pause.sensitivity': 'Чувствительность мыши',
   'pause.sound': 'Звуковые эффекты',
   'pause.music': 'Громкость музыки',
+  'pause.musicSpatial': 'Музыка из динамиков под потолком',
   'pause.language': 'Язык',
   'pause.visual': 'ВИЗУАЛ · РИСОВКА И СВЕТ <span>✦</span>',
   'pause.reset': 'Начать сортировку заново',

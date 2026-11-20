@@ -11,6 +11,11 @@ import { createInitialState, pickupKey, STORAGE_KEY } from '../../dist/js/rules.
 import { CABINET_CELL_BACK_Z, CABINET_GRID_BOTTOM_Y, CABINET_GROUND_OFFSET, CABINET_HEADER_Y, CABINET_Z, pegForSlot } from '../../dist/js/cabinet-layout.js';
 import { FIRST_ROUTE_KEY_ID } from '../../dist/js/first-route.js';
 import { FIXTURE_OFFSETS } from '../../dist/js/station-layout.js';
+import { RUST_TRAY } from '../../dist/js/wash-forge-stations.js';
+
+// CI renders WebGL in software (SwiftShader, no GPU): frames are 3-60x slower
+// than on a desktop, so every wait there gets proportionally more time.
+const SLOW = process.env.CI ? 4 : 1;
 
 const directory = resolve(fileURLToPath(new URL('../../dist/', import.meta.url)));
 const screenshots = fileURLToPath(new URL('../../test-results/', import.meta.url));
@@ -43,7 +48,11 @@ before(async () => {
     args: ['--enable-webgl', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--mute-audio'] });
   // The game picks its language from the browser; these checks read Russian text.
   const newPage = browser.newPage.bind(browser);
-  browser.newPage = (options = {}) => newPage({ locale: 'ru-RU', ...options });
+  browser.newPage = async (options = {}) => {
+    const page = await newPage({ locale: 'ru-RU', ...options });
+    page.setDefaultTimeout(30000 * SLOW);
+    return page;
+  };
 });
 
 after(async () => {
@@ -71,7 +80,7 @@ async function enterArchive(page, label) {
     await page.waitForFunction(() => {
       const value = document.querySelector('#fps')?.textContent?.trim();
       return value && value !== '—';
-    }, null, { timeout: 30000 });
+    }, null, { timeout: 30000 * SLOW });
   } catch (error) {
     await page.screenshot({ path: join(screenshots, `archive-${label}-boot-error.png`) });
     const state = await page.evaluate(() => ({ title: document.title,
@@ -86,7 +95,7 @@ async function enterArchive(page, label) {
   return errors;
 }
 
-test('Chromium renders the Three.js hall and opens the visual controls', { timeout: 120000 }, async t => {
+test('Chromium renders the Three.js hall and opens the visual controls', { timeout: 120000 * SLOW }, async t => {
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   t.after(() => page.close());
   const errors = await enterArchive(page, 'webgl');
@@ -125,7 +134,7 @@ test('Chromium renders the Three.js hall and opens the visual controls', { timeo
   assert.deepEqual(errors, []);
 });
 
-test('WebGL animates soaking keys without shader errors', { timeout: 120000 }, async t => {
+test('WebGL animates soaking keys without shader errors', { timeout: 120000 * SLOW }, async t => {
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   t.after(() => page.close());
   const state = createInitialState();
@@ -144,7 +153,7 @@ test('WebGL animates soaking keys without shader errors', { timeout: 120000 }, a
   assert.deepEqual(errors, []);
 });
 
-test('Canvas fallback retains keys, migrates old baths and accepts a drop action', { timeout: 120000 }, async t => {
+test('Canvas fallback retains keys, migrates old baths and accepts a drop action', { timeout: 120000 * SLOW }, async t => {
   const page = await browser.newPage({ viewport: { width: 1024, height: 768 } });
   t.after(() => page.close());
   await page.addInitScript(() => {
@@ -211,7 +220,7 @@ async function installTestCamera(page) {
   }, { position, target });
 }
 
-test('a dirty floor key can be cleaned, filed, restored after reload and retrieved', { timeout: 120000 }, async t => {
+test('a dirty floor key can be cleaned, filed, restored after reload and retrieved', { timeout: 120000 * SLOW }, async t => {
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   t.after(() => page.close());
   const state = createInitialState();
@@ -272,12 +281,12 @@ test('a dirty floor key can be cleaned, filed, restored after reload and retriev
   await expectSaved('floor', null, false);
   const inFlight = ({ id, expected }) => import(document.querySelector('script[type="module"]').src)
     .then(module => module.throwingForTest(id) === expected);
-  await page.waitForFunction(inFlight, { id: key.id, expected: true }, { timeout: 5000 });
-  await page.waitForFunction(inFlight, { id: key.id, expected: false }, { timeout: 5000 });
+  await page.waitForFunction(inFlight, { id: key.id, expected: true }, { timeout: 5000 * SLOW });
+  await page.waitForFunction(inFlight, { id: key.id, expected: false }, { timeout: 5000 * SLOW });
   assert.deepEqual(errors, []);
 });
 
-test('the starter key can be placed in a suggested cell, retrieved and moved by hand', { timeout: 120000 }, async t => {
+test('the starter key can be placed in a suggested cell, retrieved and moved by hand', { timeout: 120000 * SLOW }, async t => {
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   t.after(() => page.close());
   await page.addInitScript(() => { HTMLCanvasElement.prototype.requestPointerLock = undefined; });
@@ -343,7 +352,7 @@ test('the starter key can be placed in a suggested cell, retrieved and moved by 
   assert.deepEqual(errors, []);
 });
 
-test('the postprocessing pipeline preserves subpixel coverage on thin silhouettes', { timeout: 45000 }, async t => {
+test('the postprocessing pipeline preserves subpixel coverage on thin silhouettes', { timeout: 45000 * SLOW }, async t => {
   const page = await browser.newPage();
   t.after(() => page.close());
   await page.route('**/coverage-fixture', route => route.fulfill({
@@ -400,7 +409,7 @@ test('the postprocessing pipeline preserves subpixel coverage on thin silhouette
   assert.ok(result.smoothed > result.sharp + 30, JSON.stringify(result));
 });
 
-test('outline stays continuous across a slanted edge and yields to foreground dust', { timeout: 45000 }, async t => {
+test('outline stays continuous across a slanted edge and yields to foreground dust', { timeout: 45000 * SLOW }, async t => {
   const page = await browser.newPage();
   t.after(() => page.close());
   await page.route('**/ink-fixture', route => route.fulfill({
@@ -485,7 +494,7 @@ test('outline stays continuous across a slanted edge and yields to foreground du
   assert.ok(result.behind > result.bare / 2, JSON.stringify(result));
 });
 
-test('a carried key brightens in a window beam and fades back in shade', { timeout: 60000 }, async t => {
+test('a carried key brightens in a window beam and fades back in shade', { timeout: 60000 * SLOW }, async t => {
   const page = await browser.newPage({ viewport: { width: 960, height: 640 } });
   t.after(() => page.close());
   const state = createInitialState();
@@ -516,7 +525,7 @@ test('a carried key brightens in a window beam and fades back in shade', { timeo
   assert.deepEqual(errors, []);
 });
 
-test('Escape resumes keyboard play after the browser itself releases pointer lock', { timeout: 60000 }, async t => {
+test('Escape resumes keyboard play after the browser itself releases pointer lock', { timeout: 60000 * SLOW }, async t => {
   const page = await browser.newPage({ viewport: { width: 960, height: 640 } });
   t.after(() => page.close());
   await page.addInitScript(() => {
@@ -550,7 +559,7 @@ test('Escape resumes keyboard play after the browser itself releases pointer loc
   assert.deepEqual(errors, []);
 });
 
-test('the bird flies across the windows and briefly shades the existing floor light', { timeout: 45000 }, async t => {
+test('the bird flies across the windows and briefly shades the existing floor light', { timeout: 45000 * SLOW }, async t => {
   const page = await browser.newPage();
   t.after(() => page.close());
   await page.route('**/bird-fixture', route => route.fulfill({
@@ -662,7 +671,7 @@ test('the bird flies across the windows and briefly shades the existing floor li
   assert.ok(result.shadedAirPixels > 5, JSON.stringify(result));
 });
 
-test('rust requires thirty seconds and the bath bar follows the cleaning timer', { timeout: 60000 }, async t => {
+test('rust requires thirty seconds and the bath bar follows the cleaning timer', { timeout: 60000 * SLOW }, async t => {
   const page = await browser.newPage({ viewport: { width: 960, height: 640 } });
   t.after(() => page.close());
   const state = createInitialState();
@@ -674,9 +683,9 @@ test('rust requires thirty seconds and the bath bar follows the cleaning timer',
     { key: STORAGE_KEY, snapshot: JSON.stringify(state) });
   const aim = await installTestCamera(page);
   const errors = await enterArchive(page, 'webgl-rust-timer');
-  await aim([FIXTURE_OFFSETS.rust, 1.78, 2], [FIXTURE_OFFSETS.rust, 1.28, .1]);
+  // The rust solution sits in a low tray: aim at its liquid, not above it.
+  await aim([FIXTURE_OFFSETS.rust, 1.78, 2], [FIXTURE_OFFSETS.rust, RUST_TRAY.surface, .1]);
   await page.locator('#interaction-prompt').getByText(/Погрузить ключ/).waitFor();
-  const began = await page.evaluate(() => Date.now());
   await page.keyboard.press('e');
   const progress = page.locator('#bath-progress-rust');
   await progress.waitFor({ state: 'visible' });
@@ -686,15 +695,24 @@ test('rust requires thirty seconds and the bath bar follows the cleaning timer',
   { storageKey: STORAGE_KEY, id: key.id });
   const soaking = await read();
   assert.equal(soaking.status, 'bath');
-  assert.ok(soaking.bathUntil >= began + 30000);
+  // Deadlines are in station time (it runs only during play), saved with the dip.
+  const stationTime = await page.evaluate(storageKey =>
+    JSON.parse(localStorage.getItem(storageKey)).stationTime, STORAGE_KEY);
+  const soakMs = soaking.bathUntil - stationTime;
+  assert.ok(soakMs > 29000 && soakMs <= 30000, `soak of ${soakMs} ms`);
   await aim([0, 1.78, 3], [0, 1.15, .1]);
   assert.equal(await progress.isVisible(), true, 'readiness stays visible without aiming at the bath');
   assert.equal(await page.locator('#bath-progress-mud').isVisible(), false, 'the empty bath has no bar');
   assert.equal((await page.locator('#bath-progress').innerText()).trim(), '', 'the bars have no visible text');
-  await aim([FIXTURE_OFFSETS.rust, 1.78, 2], [FIXTURE_OFFSETS.rust, 1.28, .1]);
+  await aim([FIXTURE_OFFSETS.rust, 1.78, 2], [FIXTURE_OFFSETS.rust, RUST_TRAY.surface, .1]);
   await page.keyboard.press('e');
   assert.equal((await read()).status, 'bath');
-  await page.evaluate(until => { Date.now = () => until + 5; }, soaking.bathUntil);
+  // Station timers run on performance.now during play (not on Date.now):
+  // jump that clock past the soak instead of waiting thirty seconds.
+  await page.evaluate(() => {
+    const original = performance.now.bind(performance);
+    performance.now = () => original() + 31000;
+  });
   await page.waitForFunction(() => document.querySelector('#bath-progress-rust').dataset.state === 'ready');
   await progress.waitFor({ state: 'hidden' });
   await page.keyboard.press('e');
@@ -703,7 +721,7 @@ test('rust requires thirty seconds and the bath bar follows the cleaning timer',
   assert.deepEqual(errors, []);
 });
 
-test('a foreground key covers the bath hover outline', { timeout: 45000 }, async t => {
+test('a foreground key covers the bath hover outline', { timeout: 45000 * SLOW }, async t => {
   const page = await browser.newPage();
   t.after(() => page.close());
   await page.route('**/bath-outline-fixture', route => route.fulfill({
@@ -758,7 +776,7 @@ test('a foreground key covers the bath hover outline', { timeout: 45000 }, async
   assert.ok(result.masked[1] > 0, JSON.stringify(result));
 });
 
-test('archive recovers held progress after a corrupt primary and a failed startup write', { timeout: 100000 }, async t => {
+test('archive recovers held progress after a corrupt primary and a failed startup write', { timeout: 100000 * SLOW }, async t => {
   const page = await browser.newPage();
   t.after(() => page.close());
   const saved = createInitialState();
@@ -787,7 +805,7 @@ test('archive recovers held progress after a corrupt primary and a failed startu
   assert.deepEqual(await page.evaluate(primary => JSON.parse(localStorage.getItem(primary)).held, STORAGE_KEY), [key.id]);
 });
 
-test('the outline preserves the metal color inside a two-pixel shaft', { timeout: 45000 }, async t => {
+test('the outline preserves the metal color inside a two-pixel shaft', { timeout: 45000 * SLOW }, async t => {
   const page = await browser.newPage();
   t.after(() => page.close());
   await page.route('**/ink-color-fixture', route => route.fulfill({
@@ -826,13 +844,13 @@ test('the outline preserves the metal color inside a two-pixel shaft', { timeout
   assert.ok(result.exteriorInk[0] < result.background[0] - 10, JSON.stringify(result));
 });
 
-test('completed rows and cabinets celebrate after the last key lands', { timeout: 120000 }, async t => {
+test('completed rows and cabinets celebrate after the last key lands', { timeout: 120000 * SLOW }, async t => {
   const page = await browser.newPage({ viewport: { width: 1200, height: 800 } });
   t.after(() => page.close());
   await page.route('**/js/main.js*', async route => {
     const response = await route.fetch();
     await route.fulfill({ response, body: await response.text() + `
-      window.cabinetTest={world,state,view(position,target){camera.position.set(...position);
+      window.cabinetTest={world,state,sceneNow,view(position,target){camera.position.set(...position);
         camera.lookAt(...target);camera.rotation.reorder('YXZ');yaw=camera.rotation.y;pitch=camera.rotation.x;edgeLook.until=0;}};` });
   });
   await page.route('**/completion-seed', route => route.fulfill({ contentType: 'text/html', body: '<!doctype html>' }));
@@ -862,22 +880,36 @@ test('completed rows and cabinets celebrate after the last key lands', { timeout
       q.view([aim.x + 2.1, 1.78, aim.z], aim.toArray());
     }, count);
     await page.waitForFunction(() => document.querySelector('#interaction-prompt')?.textContent.includes('Положить'));
+    const startedBefore = await page.evaluate(() => window.cabinetTest.world.cabinets[3].completion.rowsStarted());
     await page.keyboard.press('e');
-    await page.waitForFunction(() => window.cabinetTest.world.cabinets[3].completion.frame().rows.length > 0);
-    const earned = await page.evaluate(() => window.cabinetTest.world.cabinets[3].completion.frame());
-    assert.deepEqual(earned.rows.map(row => row.row), [count === 11 ? 0 : 7]);
-    assert.equal(Boolean(earned.cabinet), count === 95);
+    // The celebration itself lasts 2.25 s of scene time; on software-rendered
+    // CI one frame can take longer than that, so check what it leaves behind:
+    // exactly one row celebration started, for the row this key completed.
+    await page.waitForFunction(before =>
+      window.cabinetTest.world.cabinets[3].completion.rowsStarted() > before, startedBefore);
+    const row = count === 11 ? 0 : 7;
+    const earned = await page.evaluate(() => {
+      const completion = window.cabinetTest.world.cabinets[3].completion;
+      return { started: completion.rowsStarted(), complete: completion.isComplete() };
+    });
+    assert.equal(earned.started, startedBefore + 1);
+    assert.equal(earned.complete, count === 95);
+    // Celebrations run on the scene clock, which stops in menus (not on performance.now).
     await page.waitForFunction(() => {
-      const frame = window.cabinetTest.world.cabinets[3].completion.frame();
+      const frame = window.cabinetTest.world.cabinets[3].completion.frame(window.cabinetTest.sceneNow());
       return !frame.rows.length && !frame.cabinet;
     });
-    const after = await page.evaluate(() => window.cabinetTest.world.cabinets[3].completion.frame());
+    const after = await page.evaluate(() => {
+      const completion = window.cabinetTest.world.cabinets[3].completion;
+      return { ...completion.frame(window.cabinetTest.sceneNow()), settled: completion.settledRows() };
+    });
+    assert.ok(after.settled & (1 << row), `row ${row} is full and its celebration finished`);
     assert.equal(after.crownGlow > 0, count === 95);
     assert.deepEqual(errors, []);
   }
 });
 
-test('aerial perspective preserves close colors and softens distant contrast', { timeout: 45000 }, async t => {
+test('aerial perspective preserves close colors and softens distant contrast', { timeout: 45000 * SLOW }, async t => {
   const page = await browser.newPage(); t.after(() => page.close());
   await page.route('**/depth-fixture', route => route.fulfill({ contentType: 'text/html', body: '<!doctype html>' }));
   await page.goto(new URL('depth-fixture', baseUrl).href);
@@ -904,7 +936,7 @@ test('aerial perspective preserves close colors and softens distant contrast', {
   assert.ok(result.far[0] < result.near[0]-8 && result.far[2] > result.near[2]+8, JSON.stringify(result));
 });
 
-test('wax melts at the entrance and a bundle lights cabinet candles in both renderers', { timeout: 120000 }, async t => {
+test('wax melts at the entrance and a bundle lights cabinet candles in both renderers', { timeout: 120000 * SLOW }, async t => {
   for (const canvas of [false, true]) {
     const page = await browser.newPage({ viewport: { width: 1024, height: 720 } });
     t.after(() => page.close());
@@ -960,11 +992,20 @@ test('wax melts at the entrance and a bundle lights cabinet candles in both rend
     assert.equal(await litCount(), 1);
     await view([7.32, 1.78, ENTRANCE_CANDLE.z], [8.62, 1.30, ENTRANCE_CANDLE.z]);
     await prompt.getByText(/Поднести ключ к пламени/).waitFor();
+    // Hold the station clock while checking that looking away interrupts the
+    // melt: on slow software-rendered CI the melt could otherwise finish first.
+    await page.evaluate(() => {
+      const real = performance.now.bind(performance);
+      const frozenAt = real();
+      window.restoreClock = () => { performance.now = real; };
+      performance.now = () => frozenAt;
+    });
     await page.keyboard.press('e');
     await prompt.getByText(/Воск тает/).waitFor();
     await view([7.32, 1.78, ENTRANCE_CANDLE.z], [6.3, 1.30, ENTRANCE_CANDLE.z]);
     await page.waitForFunction(() => !document.querySelector('#interaction-prompt').textContent.includes('Воск тает'));
     assert.equal(await page.evaluate(() => window.candleTest.state.keys.find(key => key.wax && key.status === 'held')?.wax), true);
+    await page.evaluate(() => window.restoreClock());
     await view([7.32, 1.78, ENTRANCE_CANDLE.z], [8.62, 1.30, ENTRANCE_CANDLE.z]);
     await prompt.getByText(/Поднести ключ к пламени/).waitFor();
     await page.keyboard.press('e');

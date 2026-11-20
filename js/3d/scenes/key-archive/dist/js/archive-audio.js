@@ -35,8 +35,6 @@ const CLIPS = {
   melt: [noise(120, 1520, .33, .38), ring(130, .25, .22, 0, 72), ring(375, .19, .14),
     noise(1120, 5150, .52, .25, .09, .070), noise(2600, 6200, .035, .17, .26), noise(1900, 5200, .049, .12, .39)],
   row: [ring(660, .24, .19), ring(990, .26, .15, .09), ring(1510, .19, .046, .058)],
-  finish: [ring(392, .38, .22), ring(587, .34, .17, .105), ring(784, .43, .15, .205),
-    ring(1584, .27, .07, .210), ring(1176, .33, .075, .28)],
   wrong: [noise(180, 1040, .095, .18), ring(157, .12, .16, 0, 40), ring(289, .13, .08)],
   // A finished cabinet: a rising G-C-E-G call and a held C major chord.
   fanfare: [...chord([392, 523, 659], 0, .13, .55, .17),
@@ -241,7 +239,7 @@ export function createArchiveAudio(browserWindow) {
       const source = context.createBufferSource();
       const volume = context.createGain();
       source.buffer = clipFor(kind);
-      source.playbackRate.value = ['finish', 'row', 'ready', 'keyShine', 'fanfare', 'finale'].includes(kind)
+      source.playbackRate.value = ['row', 'ready', 'keyShine', 'fanfare', 'finale'].includes(kind)
         ? 1 : [1, .94, 1.06, .98, 1.03][variation++ % 5];
       const panner = position && context.createPanner?.();
       volume.gain.value = (panner ? 1 : Math.min(1, level)) * (EFFECT_LEVEL[kind] ?? 1);

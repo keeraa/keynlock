@@ -12,7 +12,7 @@ import {
 import {
   sampleThrow, throwFlightTime, THROW_FIRST_BOUNCE_SECONDS, THROW_SECOND_BOUNCE_SECONDS,
   THROW_BOUNCE_SECONDS, THROW_SLIDE_SECONDS,
-} from '../dist/js/throw-physics.js';
+} from '../dist/js/archive-throw-trajectory.js';
 import { separateFloorKeys, findFreeFloorSpot, KEY_CLEARANCE } from '../dist/js/key-spacing.js';
 import {
   CABINET_GRID_HALF_WIDTH, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS, CABINET_BACK_FRONT_Z, CABINET_GROUND_OFFSET,

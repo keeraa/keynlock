@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import * as THREE from '../dist/vendor/three.js';
-import { createArchiveTargeting } from '../dist/js/archive-targeting.js';
+import { createArchiveTargeting } from '../dist/js/archive-surface-aim.js';
 import { samplePlacement, sampleDiscard } from '../dist/js/archive-key-motion.js';
 import { createKeyIndex } from '../dist/js/key-index.js';
 import { CABINET_PLACE_SECONDS } from '../dist/js/cabinet-layout.js';

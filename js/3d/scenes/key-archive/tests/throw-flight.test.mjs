@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from '../dist/vendor/three.js';
-import { simulateThrow, throwVelocity, samplePath, THROW_SPEED } from '../dist/js/throw-flight.js';
+import { simulateThrow, throwVelocity, samplePath, THROW_SPEED, reticleTarget, launchTowards } from '../dist/js/throw-flight.js';
 import { createThrowScene, HALL_WALLS } from '../dist/js/throw-scene.js';
 import { restingKeyY } from '../dist/js/floor-contact.js';
 import { BENCH, WATER_BATH } from '../dist/js/wash-forge-stations.js';
@@ -136,4 +136,56 @@ test('throwing a rusty key into the rust tray puts it in the tray when it lands'
   assert.ok(landed, 'some aim lands it in the tray');
   assert.equal(landed.key.status, 'bath');
   assert.equal(landed.key.bathId, 'center-rust');
+});
+
+// A throw the way the game makes it: from the eye, the right hand releases.
+function throwFromView(eye, forward, accepts = () => false) {
+  const all = scene.forKey(accepts);
+  const target = reticleTarget({ eye, forward, floorY: restingKeyY, ...all });
+  const hand = { x: eye.x + .43, y: eye.y - .45, z: eye.z - .8 };
+  const velocity = target ? launchTowards(hand, target) : throwVelocity(forward);
+  return { target, flight: simulateThrow({ start: hand, velocity, floorY: restingKeyY, ...all }) };
+}
+const look = (degrees, yaw = 0) => {
+  const a = degrees * Math.PI / 180;
+  return { x: -Math.sin(yaw) * Math.cos(a), y: Math.sin(a), z: -Math.cos(yaw) * Math.cos(a) };
+};
+
+test('the key first lands right under the reticle and stops close to it', () => {
+  const eye = { x: 0, y: 1.78, z: 12 };
+  for (const degrees of [-12, -18, -25, -35, -50]) {
+    const { target, flight } = throwFromView(eye, look(degrees));
+    assert.ok(target, `${degrees}°: the reticle rests on the floor`);
+    const first = samplePath(flight.path, flight.impacts[0].t);
+    const miss = Math.hypot(first.x - target.x, first.z - target.z);
+    const rest = Math.hypot(flight.landing.x - target.x, flight.landing.z - target.z);
+    assert.ok(miss < .1, `${degrees}°: first touch ${miss.toFixed(2)} m from the reticle`);
+    assert.ok(rest < 1.2, `${degrees}°: rests ${rest.toFixed(2)} m from the reticle`);
+  }
+});
+
+test('looking at nothing within reach throws along the view as far as the arm can', () => {
+  const eye = { x: 0, y: 1.78, z: 12 };
+  const { target, flight } = throwFromView(eye, look(25));
+  assert.equal(target, null);
+  assert.ok(12 - flight.landing.z > 4);
+});
+
+test('aiming at a vessel lands the right key in it, and only the right key', () => {
+  const cases = [
+    { kind: 'mud', at: { x: FIXTURE_OFFSETS.mud, y: 1.216, z: .10 } },
+    { kind: 'rust', at: { x: FIXTURE_OFFSETS.rust, y: 1.05, z: .10 } },
+    { kind: 'forge', at: { x: FIXTURE_OFFSETS.forge, y: FORGE_SURFACE_Y, z: .08 } },
+  ];
+  for (const { kind, at } of cases) {
+    for (const standZ of [1.6, 2.4, 3.2]) {
+      const eye = { x: at.x + .2, y: 1.78, z: standZ };
+      const forward = { x: at.x - eye.x, y: at.y - eye.y, z: at.z - eye.z };
+      const right = throwFromView(eye, forward, vessel => vessel.kind === kind);
+      assert.equal(right.flight.landing.on, 'vessel', `${kind} from z=${standZ}`);
+      assert.equal(right.flight.landing.kind, kind);
+      const wrong = throwFromView(eye, forward, () => false);
+      assert.notEqual(wrong.flight.landing.on, 'vessel', `${kind} rejects the wrong key`);
+    }
+  }
 });

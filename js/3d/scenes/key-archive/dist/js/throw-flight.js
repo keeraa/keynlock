@@ -12,18 +12,23 @@
 // so the landing is known when the key is released and the animation only
 // replays the sampled path.
 
-export const THROW_SPEED = 6.5;          // m/s, a firm hand throw: about 7 m at best
+export const THROW_SPEED = 6.5;          // m/s, along the view when nothing is under the reticle
+export const MAX_THROW_SPEED = 8;        // m/s, the strongest arm: about 7 m on the flat
+export const MAX_REACH = 14;             // m, how far the reticle can pick a target
+const ARC_LIFT = .26;                    // rad above the straight line: a soft toss
+const VESSEL_ARC_LIFT = .7;              // ... into a vessel: a lob that clears its rim
+const AIM_STEP = .02;
 export const GRAVITY = 9.81;
 const STEP = 1 / 240;
 const SAMPLE = 1 / 60;
 const RADIUS = .035;                     // the key, seen as a ball
 const FLOOR_BOUNCE = .28;
 const FURNITURE_BOUNCE = .25;
-const KEEP_ALONG = .62;                  // horizontal speed kept on a floor impact
+const KEEP_ALONG = .32;                  // horizontal speed kept on a floor impact (carpet, wood)
 const KEEP_ALONG_WOOD = .42;             // ... on furniture: a flat key dies down fast
 const SETTLE_SPEED = .7;                 // slower vertical impacts stop bouncing
 const SETTLE_SPEED_WOOD = 1.3;
-const SLIDE_DECELERATION = 8;            // m/s² while sliding on a surface
+const SLIDE_DECELERATION = 14;           // m/s² while sliding: a flat key stops quickly
 const SHOVE_OFF = 1.1;                   // m/s, off a top the key cannot rest on
 
 const inside = (point, box, grow = RADIUS) =>
@@ -196,6 +201,51 @@ export function simulateThrow({ start, velocity, floorY = () => 0, solids = [], 
   const top = support ? support.top : floorY(p.x, p.z);
   return { path, impacts, duration: t, bouncedOff,
     landing: { on: support?.surface === 'surface' ? 'surface' : 'floor', x: p.x, y: top, z: p.z } };
+}
+
+// The point the reticle rests on: where the line of sight from the eye first
+// meets the floor, a box's top or side, or a vessel's opening. null when it
+// meets nothing within reach (looking up into the hall).
+export function reticleTarget({ eye, forward, floorY = () => 0, solids = [], vessels = [], reach = MAX_REACH }) {
+  const length = Math.hypot(forward.x, forward.y, forward.z) || 1;
+  const d = { x: forward.x / length, y: forward.y / length, z: forward.z / length };
+  const p = { x: eye.x, y: eye.y, z: eye.z };
+  let previousY = p.y;
+  for (let travelled = 0; travelled < reach; travelled += AIM_STEP) {
+    p.x = eye.x + d.x * travelled; p.y = eye.y + d.y * travelled; p.z = eye.z + d.z * travelled;
+    for (const vessel of vessels)
+      if (previousY >= vessel.y && p.y < vessel.y && overVessel(vessel, p.x, p.z)) return { ...p, y: vessel.y, vessel: vessel.id };
+    if (p.y <= floorY(p.x, p.z)) return { ...p, y: floorY(p.x, p.z) };
+    for (const box of solids) if (inside(p, box, 0)) return { ...p };
+    previousY = p.y;
+  }
+  return null;
+}
+
+// Launch velocity from `start` that lands on `target`: a gentle arc a little
+// above the straight line to it, with whatever strength that needs. Too far
+// for an arm: the strongest throw towards it.
+export function launchTowards(start, target, { lift = target.vessel ? VESSEL_ARC_LIFT : ARC_LIFT,
+  maxSpeed = MAX_THROW_SPEED } = {}) {
+  const dx = target.x - start.x, dz = target.z - start.z;
+  const horizontal = Math.hypot(dx, dz);
+  if (horizontal < .05) return { x: 0, y: 0, z: 0 };
+  const rise = target.y - start.y;
+  const angle = Math.min(1.2, Math.atan2(rise, horizontal) + lift);
+  const cos = Math.cos(angle), tan = Math.tan(angle);
+  const drop = horizontal * tan - rise;      // must be > 0 to come down on the target
+  let speed = drop > 1e-4 ? Math.sqrt(GRAVITY * horizontal ** 2 / (2 * cos * cos * drop)) : Infinity;
+  let pitch = angle;
+  if (speed > maxSpeed) {
+    // The arm's full strength: the flatter of the two arcs through the target,
+    // or, out of reach, the longest throw (45°) towards it.
+    speed = maxSpeed;
+    const v2 = speed * speed;
+    const root = v2 * v2 - GRAVITY * (GRAVITY * horizontal ** 2 + 2 * rise * v2);
+    pitch = root >= 0 ? Math.atan((v2 - Math.sqrt(root)) / (GRAVITY * horizontal)) : Math.PI / 4;
+  }
+  return { x: dx / horizontal * Math.cos(pitch) * speed, y: Math.sin(pitch) * speed,
+    z: dz / horizontal * Math.cos(pitch) * speed };
 }
 
 // Initial velocity for a throw along a (not necessarily unit) view direction.

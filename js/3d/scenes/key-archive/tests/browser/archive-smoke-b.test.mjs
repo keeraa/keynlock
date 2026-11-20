@@ -393,33 +393,16 @@ test('a muddy key thrown into the water starts washing', { timeout: 90000 * SLOW
   await page.route('**/js/main.js*', async route => {
     const response = await route.fetch();
     await route.fulfill({ response, body: await response.text() + `
-      window.throwTest = { world, state, aim(yawValue, pitchValue) {
-        camera.position.set(${FIXTURE_OFFSETS.mud}, 1.78, 2.4);
-        yaw = yawValue; pitch = pitchValue; edgeLook.until = 0;
-        camera.rotation.set(pitch, yaw, 0, 'YXZ'); camera.updateMatrixWorld(true);
+      window.throwTest = { world, state, lookAt(position, target) {
+        camera.position.set(...position); camera.lookAt(...target);
+        camera.rotation.reorder('YXZ'); yaw = camera.rotation.y; pitch = camera.rotation.x;
+        edgeLook.until = 0; camera.updateMatrixWorld(true);
       } };` });
   });
   const errors = await enterArchive(page, 'throw-water');
-  // Pick an aim at the bowl with the game's own physics, then throw with R.
-  const pitchValue = await page.evaluate(async () => {
-    const { simulateThrow, throwVelocity } = await import('/js/throw-flight.js');
-    const { restingKeyY } = await import('/js/floor-contact.js');
-    const q = window.throwTest, THREE = q.world.THREE;
-    const key = q.state.keys.find(item => item.status === 'held');
-    for (let degrees = 0; degrees <= 60; degrees += 1) {
-      q.aim(0, degrees * Math.PI / 180);
-      q.world.update(performance.now(), false, true, null);
-      const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(q.world.camera.quaternion);
-      const release = q.world.getThrowRelease();
-      const flight = simulateThrow({ start: { x: release.x, y: release.y, z: release.z },
-        velocity: throwVelocity(forward), floorY: restingKeyY,
-        ...q.world.getThrowScene().forKey(vessel => vessel.kind === 'mud' && key.mud) });
-      if (flight.landing.on === 'vessel') return degrees * Math.PI / 180;
-    }
-    return null;
-  });
-  assert.notEqual(pitchValue, null, 'an aim reaches the water');
-  await page.evaluate(pitchValue => window.throwTest.aim(0, pitchValue), pitchValue);
+  // Put the reticle on the middle of the water bowl and throw with R.
+  await page.evaluate(({ x }) => window.throwTest.lookAt([x + .2, 1.78, 2.4], [x, 1.216, .1]),
+    { x: FIXTURE_OFFSETS.mud });
   await page.keyboard.press('r');
   await page.waitForFunction(({ storageKey, id }) =>
     JSON.parse(localStorage.getItem(storageKey)).keys.find(key => key.id === id).status === 'bath',

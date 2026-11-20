@@ -66,6 +66,7 @@ export function createArchiveActions({
         tone('wrong');
         return;
       }
+      statistics?.keyPicked?.(target.id, camera.position.x, camera.position.z);
       statistics?.record('pickup', { pickedUp: 1 });
       world.syncKey?.(picked);
       updateHud();
@@ -135,6 +136,7 @@ export function createArchiveActions({
       if (!key?.broken) {
         if (state.bundles) return;
         if (buyBundle(state)) {
+          statistics?.count?.('bundlesBought');
           updateHud();
           save();
           tone('bundle');
@@ -172,6 +174,7 @@ export function createArchiveActions({
         tone('wrong');
         return;
       }
+      statistics?.count?.('takenFromCabinet');
       world.cancelPlace?.(taken.id);
       world.refreshCabinet(target.type);
       updateHud();
@@ -186,17 +189,20 @@ export function createArchiveActions({
     const bundle = state.activeBundle?.type === keyType;
     if (!bundle && !key) { toast(t('toast.pickFirst')); return; }
     if (!bundle && key.broken) {
+      statistics?.count?.('notReadyCabinet');
       toast(t('toast.pickedBroken'), true);
       tone('wrong');
       return;
     }
-    if (!bundle && key.wax) { toast(t('toast.pickedWax'), true); return; }
+    if (!bundle && key.wax) { statistics?.count?.('notReadyCabinet'); toast(t('toast.pickedWax'), true); return; }
     if (!bundle && (key.mud || key.rust)) {
+      statistics?.count?.('notReadyCabinet');
       toast(t('toast.cleanFirst'), true);
       tone('wrong');
       return;
     }
     if (!bundle && key.type !== target.type) {
+      statistics?.count?.('wrongCabinet');
       toast(t('toast.wrongCabinet', { name: familyName(target.type) }), true);
       tone('wrong');
       return;
@@ -221,6 +227,7 @@ export function createArchiveActions({
         toast(t('toast.bundleCells'), true);
         return;
       }
+      statistics?.count?.('bundlesPlaced');
       bundled.forEach((item, index) => world.animatePlace(item, slots[index], {
         fromRing: true, delay: index * BUNDLE_RELEASE_INTERVAL_MS,
       }));
@@ -260,6 +267,7 @@ export function createArchiveActions({
     const start = { x: releasePoint.x, y: releasePoint.y, z: releasePoint.z, lift: 1.15 + aimHeight * 2 };
     const end = { x, y: restingKeyY(x, z) + (key.layer || 0), z };
     dropSelectedKey(state, x, z, -getYaw() + .6);
+    statistics?.keyThrown?.(key.id, camera.position.x, camera.position.z);
     world.animateThrow(key, start, end);
     statistics?.record('throw', { throws: 1 });
     updateHud();

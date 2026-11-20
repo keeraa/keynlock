@@ -1,4 +1,5 @@
 import test, { before, after } from 'node:test';
+import { ENTRANCE_CANDLE } from '../../dist/js/archive-candles.js';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { readFile, mkdir } from 'node:fs/promises';
@@ -954,14 +955,14 @@ test('wax melts at the entrance and a bundle lights cabinet candles in both rend
     const litCount = () => page.evaluate(() => window.candleTest.world.candles
       .filter(candle => candle.collider.userData.lit).length);
     assert.equal(await litCount(), 1);
-    await view([7.32, 1.78, 20.43], [8.62, 1.30, 20.43]);
+    await view([7.32, 1.78, ENTRANCE_CANDLE.z], [8.62, 1.30, ENTRANCE_CANDLE.z]);
     await prompt.getByText(/Поднести ключ к пламени/).waitFor();
     await page.keyboard.press('e');
     await prompt.getByText(/Воск тает/).waitFor();
-    await view([7.32, 1.78, 20.43], [6.3, 1.30, 20.43]);
+    await view([7.32, 1.78, ENTRANCE_CANDLE.z], [6.3, 1.30, ENTRANCE_CANDLE.z]);
     await page.waitForFunction(() => !document.querySelector('#interaction-prompt').textContent.includes('Воск тает'));
     assert.equal(await page.evaluate(() => window.candleTest.state.keys.find(key => key.wax && key.status === 'held')?.wax), true);
-    await view([7.32, 1.78, 20.43], [8.62, 1.30, 20.43]);
+    await view([7.32, 1.78, ENTRANCE_CANDLE.z], [8.62, 1.30, ENTRANCE_CANDLE.z]);
     await prompt.getByText(/Поднести ключ к пламени/).waitFor();
     await page.keyboard.press('e');
     await page.waitForFunction(() => !window.candleTest.state.keys.some(key => key.wax && key.status === 'held'));

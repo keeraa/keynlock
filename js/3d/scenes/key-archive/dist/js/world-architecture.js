@@ -5,7 +5,7 @@ import { createMetricBoxGeometry } from './metric-box-geometry.js?v=23';
 import { WINDOW_CENTERS, PILASTER_CENTERS, PERIMETER_BAND_Y, HALL_HEIGHT_SCALE, HALL_END_WALL_HEIGHT,
   addArchedWindow, addWindowedWall, addVault } from './hall-architecture.js?v=window-sky';
 import { ENTRANCE_DOOR_TEXTURE_URL } from './entrance-door-texture.js';
-import { addArchiveLedger, ARCHIVE_DESK, ARCHIVE_SIDE_TABLES } from './archive-ledger.js?v=ledger-candle';
+import { ARCHIVE_DESK, ARCHIVE_SIDE_TABLES } from './archive-ledger.js?v=key-catalog';
 
 export function box(parent, size, position, material) {
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
@@ -163,6 +163,5 @@ export function makeHall(scene, mat) {
       roomBox(scene, [.13, .8, .13], [x + dx, .35, z + dz], mat.darkWood);
     box(scene, [1.56, .05, 2.04], [x, ARCHIVE_DESK.y - .025, z], mat.darkBrass);
   }
-  addArchiveLedger(scene, mat);
 }
 

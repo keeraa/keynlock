@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { createArchiveCandles, CANDLE_WICK_Y, CANDLE_FLAME_HEIGHT } from './archive-candles.js?v=lower-sconces';
+import { createArchiveCandles, CANDLE_WICK_Y, CANDLE_FLAME_HEIGHT } from './archive-candles.js?v=key-catalog';
 import { createCleaningEffects } from './cleaning-effects.js';
 import { getKeyCoatLayout, buildKeyCoatGeometry, getKeyCoatPoint } from './key-factory.js?v=key-ring';
 import { meltWaxBlobs } from './key-wax.js?v=forge-coats';
@@ -23,7 +23,8 @@ import { PLAYER_EYE_HEIGHT } from './player-config.js';
 import { createKeyHoverOutline } from './key-hover-outline.js?v=readable-ink';
 import { batchStaticHallMeshes } from './static-mesh-batches.js';
 import { createMaterials } from './world-materials.js?v=key-ring';
-import { makeHall } from './world-architecture.js?v=window-sky';
+import { addArchiveLedger } from './archive-ledger.js?v=key-catalog';
+import { makeHall } from './world-architecture.js?v=key-catalog';
 import { makeChandeliers } from './world-lighting.js?v=key-ring';
 import { createCabinet } from './world-cabinet.js?v=key-ring';
 import { addEntranceLighting, createEntranceContactShadows, createEntranceKeyMaterial } from './archive-entrance-light.js?v=alchemy-candles';
@@ -84,6 +85,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
   makeHall(hall, mat);
   makeChandeliers(hall, mat);
   batchStaticHallMeshes(hall);
+  const ledger = addArchiveLedger(scene, mat);
   const windowBird = addWindowBird(scene);
   const setWindowWash = addEntranceLighting(scene, windowBird.shadowUniforms);
   const setWindowAirLight = addWindowAirLight(scene, windowBird.shadowUniforms);
@@ -128,7 +130,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
   const keysById = new Map(state.keys.map(key => [key.id, key]));
   const keysByType = KEY_TYPES.map(() => []);
   for (const key of state.keys) keysByType[key.type].push(key);
-  const interactables = [...cabinets.map(cabinet => cabinet.collider), ...workstations.interactables, ...candleSet.colliders];
+  const interactables = [...cabinets.map(cabinet => cabinet.collider), ...workstations.interactables, ...candleSet.colliders, ledger.collider];
   const floorBatches = KEY_TYPES.map((_, type) => {
     const material = createEntranceKeyMaterial(getKeyMaterial(type), windowDaylight, windowWarmth, windowBird.shadowUniforms);
     // A small depth bias keeps thin metal faces stable against the painted
@@ -448,7 +450,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
   function highlight(target) {
     hovered = target;
     hoverAnchor = null;
-    const interactive = target?.kind === 'cabinet' || target?.kind === 'bath' || target?.kind === 'forge';
+    const interactive = target?.kind === 'cabinet' || target?.kind === 'bath' || target?.kind === 'forge' || target?.kind === 'ledger';
     objectHoverTarget = interactive ? (target.kind === 'cabinet' ? .74 : 1) : 0;
     cellHighlight.visible = false;
     if (interactive) {
@@ -466,6 +468,11 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
           cellHighlight.matrixWorldNeedsUpdate = true;
           cellHighlight.visible = true;
         }
+      } else if (target.kind === 'ledger') {
+        ledger.collider.updateWorldMatrix(true, false);
+        objectMask.matrix.copy(ledger.collider.matrixWorld);
+        objectMask.matrixWorldNeedsUpdate = true;
+        objectMask.geometry = ledger.collider.geometry;
       } else {
         const surface = workstations.getHoverSurface(target);
         if (!surface) { objectHoverTarget = 0; return; }
@@ -580,6 +587,10 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
       catch (error) { console.warn('KEYNLOCK: object silhouette unavailable', error); }
     } }, interactables, cabinets, workstations, floorKeys, candles: candleSet.candles,
     refreshHand, syncKey, refreshCabinet, highlight, update, resize, meltHeldWax, shineHand,
+    setLedgerVisible(visible) {
+      ledger.book.visible = visible;
+      if (!visible) objectHoverOpacity = 0;
+    },
     captureKeyThumbnail, getGeometryStats,
     getVisualStatus: painted.getStatus,
     getRenderStats: () => ({ drawCalls: renderer.info.render.calls,

@@ -2,23 +2,24 @@ import { t, applyTranslations, LANGUAGES, getLanguage, setLanguage } from './i18
 // Static texts of the page follow the chosen language before anything shows.
 applyTranslations(document);
 import { TOTAL_KEYS, getProgress } from './rules.js?v=key-ring';
-import { createWorld } from './world.js?v=exterior-statistics';
+import { createWorld } from './world.js?v=key-catalog';
 import { installKeyAssetProvider } from './key-factory.js?v=key-ring';
 import { createArchiveHud } from './archive-hud.js?v=hud-polish';
 import { openArchiveSave, loadVisualSettings, clearArchiveState } from './archive-save-state-with-route.js?v=key-ring';
 import { createVisualPanel } from './visual-panel.js?v=key-ring';
 import externalKeyProvider from './key-provider-entry.js?v=wax-and-bundles';
-import { createFallbackWorld } from './fallback-world.js?v=exterior-statistics';
+import { createFallbackWorld } from './fallback-world.js?v=key-catalog';
 import { createPlayerMovement } from './player-movement.js?v=ledger-candle';
 import { createPerformanceHud } from './performance-hud.js';
 import { logicalKey } from './controls.js';
 import { edgeLookRate } from './mouse-look.js';
 import { createKeyIndex } from './key-index.js?v=key-ring';
 import { createArchiveTargeting } from './archive-surface-aim.js?v=key-ring';
-import { createArchivePrompts } from './archive-interaction-prompts.js?v=hud-polish';
-import { createArchiveActions } from './archive-actions.js?v=hud-polish';
+import { createArchivePrompts } from './archive-interaction-prompts.js?v=key-catalog';
+import { createArchiveActions } from './archive-actions.js?v=key-catalog';
 import { FIRST_ROUTE_KEY_ID, createFirstRouteGuide } from './archive-first-route-guide.js?v=key-ring';
 import { createBathProgress } from './archive-bath-progress.js?v=cleaning-cues';
+import { createArchiveKeyCatalog } from './archive-key-catalog.js';
 import { createArchiveStatistics, createStatisticsPanel } from './archive-statistics.js?v=processed-count';
 import { createArchiveMusic } from './archive-music.js?v=music-resume-seek';
 import { createArchiveAudio } from './archive-audio.js?v=key-shine';
@@ -44,6 +45,7 @@ try {
   world = createFallbackWorld(canvas, state, visualSettings, keyIndex);
 }
 const camera = world.camera;
+const catalog = createArchiveKeyCatalog(document, world, canvas, () => play({ lockMouse: false }));
 const movement = createPlayerMovement(camera, world.bounds);
 const clamp = (number, a, b) => Math.max(a, Math.min(b, number));
 const hud = createArchiveHud(document, world, state, keyIndex);
@@ -86,7 +88,7 @@ const { targetInView, clearAim } = createArchiveTargeting({ camera, world, state
 const { interact, drop, updateWax, updateSmelting, isMelting } = createArchiveActions({
   state, keyIndex, world, camera, targetInView,
   getYaw: () => yaw, isPlaying: () => mode === 'play',
-  save, updateHud, tone, toast, showVictory, statistics,
+  save, updateHud, tone, toast, showVictory, statistics, openCatalog,
   invalidateHover: () => { lastHoverKey = '!'; },
 });
 
@@ -170,7 +172,7 @@ function setMode(next) {
   $('statistics').classList.toggle('is-hidden', next !== 'statistics');
   $('victory').classList.toggle('is-hidden', next !== 'victory');
   $('hud').classList.toggle('is-hidden', next === 'intro');
-  $('fps-panel').hidden = next === 'intro';
+  $('fps-panel').hidden = next === 'intro' || next === 'ledger';
   $('interaction-prompt').classList.toggle('is-hidden', next !== 'play' || !hovered);
   heldMovement.clear();
   lastPointer = null;
@@ -223,6 +225,13 @@ function releaseMouseLock() {
   if (!locked && !mouseWasLocked) return;
   requestedMouseRelease = true;
   if (locked) document.exitPointerLock();
+}
+
+function openCatalog() {
+  if (mode !== 'play') return;
+  setMode('ledger');
+  releaseMouseLock();
+  catalog.open();
 }
 
 function pause() {
@@ -349,6 +358,7 @@ canvas.addEventListener('pointerdown', event => {
 canvas.addEventListener('contextmenu', event => event.preventDefault());
 
 window.addEventListener('keydown', event => {
+  if (mode === 'ledger') return;
   const key = logicalKey(event);
   if ((key === 'enter' || key === ' ') && event.target instanceof Element && $('fps-panel').contains(event.target)) return;
   if (key === 'escape') {

@@ -2,9 +2,9 @@ import { familyName } from './i18n.js';
 import * as THREE from '../vendor/three.js';
 import { createCabinetCompletion } from './cabinet-completion.js?v=wax-and-bundles';
 import { PERIMETER_BAND_Y } from './hall-architecture.js?v=alchemy-candles';
-import { CANDLE_FLAME_HEIGHT, CANDLE_FLAME_WIDTH, CANDLE_WICK_Y, sampleCandleFlicker } from './archive-candles.js?v=candlelight';
+import { CANDLE_FLAME_HEIGHT, CANDLE_FLAME_WIDTH, CANDLE_WICK_Y, sampleCandleFlicker } from './archive-candles.js?v=key-catalog';
 import { createFallbackKeyPainter } from './fallback-canvas-keys.js?v=key-ring';
-import { createFallbackArchitecture } from './fallback-canvas-architecture.js?v=window-sky';
+import { createFallbackArchitecture } from './fallback-canvas-architecture.js?v=key-catalog';
 import { getKeyFallbackHeadPoints } from './key-factory.js?v=key-ring';
 import { KEY_TYPES, getProgress } from './rules.js?v=key-ring';
 import { cabinetContactGlow } from './archive-key-motion.js?v=key-ring';
@@ -26,7 +26,7 @@ export function createFallbackCanvasRenderer({
   thrownKeys, placingKeys, discardingKeys, fixtureHover, keyHover, candles,
 }) {
   let width = 0, height = 0, frameTime = 0, lastDraw = -Infinity;
-  let playing = false;
+  let playing = false, ledgerVisible = true;
   let visualSettings = null, hovered = null, carriedKey = null;
   // Frames baked from the lab shader for browsers that fall back to Canvas.
   const flameAtlas = new Image();
@@ -429,7 +429,7 @@ export function createFallbackCanvasRenderer({
     scene.updateMatrixWorld(true);
     camera.updateMatrixWorld(true);
     ctx.clearRect(0, 0, width, height);
-    architecturePainter.setFrame({ width, height, frameTime, visualSettings, playing });
+    architecturePainter.setFrame({ width, height, frameTime, playing, visualSettings, ledgerVisible, ledgerHovered: hovered?.kind === 'ledger' });
     background();
     architecture();
     const drawables = [];
@@ -501,8 +501,9 @@ export function createFallbackCanvasRenderer({
     setSize(w, h) { width = w; height = h; },
     refreshCabinet,
     completionFor: type => cabinetCompletion[type],
-    render({ hovered: currentHover, carriedKey: currentHand, frameTime: now, visualSettings: settings, playing: isPlaying }) {
+    render({ hovered: currentHover, carriedKey: currentHand, frameTime: now, visualSettings: settings, playing: isPlaying, ledgerVisible: currentLedgerVisibility }) {
       hovered = currentHover;
+      ledgerVisible = currentLedgerVisibility;
       carriedKey = currentHand;
       frameTime = now;
       playing = isPlaying;

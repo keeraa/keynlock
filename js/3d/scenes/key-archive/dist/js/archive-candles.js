@@ -2,7 +2,7 @@ import * as THREE from '../vendor/three.js';
 import { CABINET_BODY_WIDTH, CABINET_Z } from './cabinet-layout.js?v=wax-and-bundles';
 import { HALL_SIDE_WALL_INNER_X } from './hall-architecture.js?v=alchemy-candles';
 import { createCandleFlame, createCandleFlameMaterial } from './candle-flame.js?v=candlelight';
-import { ARCHIVE_DESK } from './archive-ledger.js?v=ledger-candle';
+import { ARCHIVE_DESK } from './archive-ledger.js?v=key-catalog';
 import { batchStaticHallMeshes } from './static-mesh-batches.js';
 
 export const WAX_MELT_MS = 2500;
@@ -11,7 +11,7 @@ export const CANDLE_FLAME_HEIGHT = .24;
 export const CANDLE_WICK_Y = .295;
 export const ENTRANCE_CANDLE = Object.freeze({
   id: 'entrance-candle', type: null, x: ARCHIVE_DESK.x - ARCHIVE_DESK.width / 2 + .195,
-  y: ARCHIVE_DESK.y, z: ARCHIVE_DESK.z - .27,
+  y: ARCHIVE_DESK.y, z: ARCHIVE_DESK.z + .43,
 });
 
 function candleNoise(time, seed) {

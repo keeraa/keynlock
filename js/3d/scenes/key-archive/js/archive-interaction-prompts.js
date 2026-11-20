@@ -15,6 +15,7 @@ export function createArchivePrompts(state, keyIndex, isMelting = () => false) {
         ? t('prompt.handsFull')
         : t('prompt.take', { name: familyName(key.type).toLowerCase(), note: conditionNote });
     }
+    if (target.kind === 'ledger') return t('prompt.openCatalog');
     if (target.kind === 'candle') {
       if (!target.lit) return '';
       const key = selectedKey(state);

@@ -7,7 +7,7 @@ import {
   startSoak, collectSoakedKey, BUNDLE_COST, buyBundle, putBundleInCabinet, meltSelectedWax,
   SMELT_SECONDS, settleSmelting,
 } from './rules.js?v=key-ring';
-import { WAX_MELT_MS } from './archive-candles.js?v=candlelight';
+import { WAX_MELT_MS } from './archive-candles.js?v=key-catalog';
 import { CABINET_CAPACITY, pegForSlot } from './cabinet-layout.js?v=cabinet-cell-glow';
 import { findFreeFloorSpot } from './key-spacing.js?v=18';
 import { restingKeyY } from './floor-contact.js';
@@ -17,7 +17,7 @@ import { RIGHT_HAND_RELEASE } from './held-key-motion.js?v=2';
 // All state-changing player actions live here and work identically in both renderers.
 export function createArchiveActions({
   state, keyIndex, world, camera, targetInView, getYaw, isPlaying,
-  save, updateHud, tone, toast, showVictory, invalidateHover, statistics,
+  save, updateHud, tone, toast, showVictory, invalidateHover, statistics, openCatalog,
 }) {
   let melting = null;
 
@@ -49,6 +49,7 @@ export function createArchiveActions({
     if (!isPlaying()) return;
     const target = targetInView();
     if (!target || world.workstations?.isLifting?.(selectedKey(state)?.id)) return;
+    if (target.kind === 'ledger') { openCatalog?.(); return; }
     if (target.kind === 'candle') {
       const key = selectedKey(state);
       if (!target.lit || !key?.wax || key.broken) return;

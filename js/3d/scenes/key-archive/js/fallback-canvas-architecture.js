@@ -3,8 +3,8 @@ import { windowLightPalette } from './window-light-palette.js';
 import { createWindowBirdFlight, BIRD_WIDTH, BIRD_HEIGHT } from './archive-window-bird.js?v=alchemy-candles';
 import { WINDOW_WASHES, WINDOW_BEAM_SLOPE, WINDOW_BEAM_HALF_WIDTH } from './window-beam-light.js?v=alchemy-candles';
 import { ENTRANCE_DOOR_TEXTURE_URL } from './entrance-door-texture.js';
-import { ENTRANCE_CANDLE, sampleCandleFlicker } from './archive-candles.js?v=candlelight';
-import { ARCHIVE_DESK, ARCHIVE_LEDGER, ARCHIVE_LEDGER_URL } from './archive-ledger.js?v=ledger-candle';
+import { ENTRANCE_CANDLE, sampleCandleFlicker } from './archive-candles.js?v=key-catalog';
+import { ARCHIVE_DESK, ARCHIVE_LEDGER, ARCHIVE_LEDGER_URL } from './archive-ledger.js?v=key-catalog';
 import { WINDOW_CENTERS, PILASTER_CENTERS, PERIMETER_BAND_Y, vaultHeight,
   WINDOW_SILL_Y, WINDOW_SPRING_Y, WINDOW_SCALE, WINDOW_VERTICAL_SCALE, windowY,
   HALL_HEIGHT_SCALE, WINDOW_OPENING_RADIUS } from './hall-architecture.js?v=alchemy-candles';
@@ -22,6 +22,7 @@ const nearVaultEdge = vaultEdge(23).reverse();
 // Static hall, weather, walls and entrance painting for the 2D renderer.
 export function createFallbackArchitecture({ ctx, camera, surfaces, project, path3, segment }) {
   let width = 0, height = 0, frameTime = 0, visualSettings = null;
+  let ledgerVisible = true, ledgerHovered = false;
   const bird = createWindowBirdFlight();
   const paintSky = createCanvasWindowSky(ctx, camera, project, path3);
   const entrancePainting = new Image();
@@ -97,6 +98,11 @@ export function createFallbackArchitecture({ ctx, camera, surfaces, project, pat
     const tabletop = [[left, deskY, front], [right, deskY, front],
       [right, deskY, back], [left, deskY, back]];
     if (!path3(tabletop, surfaces.wood, '#60422d', 3)) return;
+    if (ledgerVisible) drawLedger();
+    drawDeskCandleLight(tabletop);
+  }
+
+  function drawLedger() {
     const { x, y, z, yaw, width: bookWidth, depth: bookDepth } = ARCHIVE_LEDGER;
     const c = Math.cos(yaw), s = Math.sin(yaw);
     const corner = (u, v) => project(x + c * u + s * v, y + .047, z - s * u + c * v);
@@ -111,8 +117,12 @@ export function createFallbackArchitecture({ ctx, camera, surfaces, project, pat
       ctx.fillStyle = '#ccb28b';
       ctx.fillRect(0, 0, 1, 1);
     }
+    if (ledgerHovered) {
+      ctx.lineWidth = .025;
+      ctx.strokeStyle = '#fff0bb';
+      ctx.strokeRect(0, 0, 1, 1);
+    }
     ctx.restore();
-    drawDeskCandleLight(tabletop);
   }
 
   function drawDeskCandleLight(tabletop) {
@@ -256,6 +266,8 @@ export function createFallbackArchitecture({ ctx, camera, surfaces, project, pat
       frameTime = frame.frameTime;
       bird.update(frame.frameTime, frame.playing);
       visualSettings = frame.visualSettings;
+      ledgerVisible = frame.ledgerVisible;
+      ledgerHovered = frame.ledgerHovered;
     },
   };
 }

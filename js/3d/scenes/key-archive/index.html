@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#14211f" />
   <meta name="description" data-i18n-attr="content:meta.description" content="Архив ключей — гуашевая игра: поиск, отмачивание, очистка ржавчины и переплавка брака." />
   <title data-i18n="meta.title">Архив ключей</title>
-  <link rel="stylesheet" href="./styles.css?v=hud-polish" />
+  <link rel="stylesheet" href="./styles.css?v=key-catalog" />
 </head>
 <body>
   <canvas id="world" data-i18n-attr="aria-label:aria.world" aria-label="Трёхмерный зал архива ключей"></canvas>
@@ -124,6 +124,22 @@
       <button id="victory-reset" class="text-button" data-i18n="victory.reset">Пройти заново</button>
     </div>
   </div>
-  <script type="module" src="./js/main.js?v=hud-polish"></script>
+  <dialog id="archive-key-catalog" class="ledger-dialog" aria-labelledby="catalog-title">
+    <div class="ledger-content">
+      <header class="ledger-header">
+        <h2 id="catalog-title" data-i18n="catalog.title">Каталог ключей</h2>
+        <button id="catalog-close" class="ledger-close" type="button" data-i18n-attr="aria-label:catalog.close" aria-label="Закрыть книгу">×</button>
+      </header>
+      <div id="catalog-spread" class="ledger-spread"></div>
+      <nav class="ledger-navigation" data-i18n-attr="aria-label:catalog.navigation" aria-label="Страницы каталога">
+        <button id="catalog-previous" type="button" data-i18n="catalog.previous">Назад</button>
+        <output id="catalog-page-number" aria-live="polite"></output>
+        <button id="catalog-next" type="button" data-i18n="catalog.next">Дальше</button>
+      </nav>
+    </div>
+    <img id="catalog-flight" class="ledger-flight" alt="" aria-hidden="true" hidden />
+  </dialog>
+
+  <script type="module" src="./js/main.js?v=key-catalog"></script>
 </body>
 </html>

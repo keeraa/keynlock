@@ -214,4 +214,11 @@ export default Object.freeze({
   'statistics.stage.sorted': "Sorting keys",
   'statistics.stage.forge': "Smelting",
   'statistics.stage.complete': "Hall cleared",
+  'prompt.openCatalog': "<kbd>E / Click</kbd> Open the key catalog",
+  'catalog.title': "Key Catalog",
+  'catalog.close': "Close the book",
+  'catalog.navigation': "Catalog pages",
+  'catalog.previous': "Previous",
+  'catalog.next': "Next",
+  'catalog.page': "Spread {current} of {total}",
 });

@@ -214,4 +214,11 @@ export default Object.freeze({
   'statistics.stage.sorted': "Расстановка",
   'statistics.stage.forge': "Переплавка",
   'statistics.stage.complete': "Зал разобран",
+  'prompt.openCatalog': "<kbd>E / Клик</kbd> Открыть каталог ключей",
+  'catalog.title': "Каталог ключей",
+  'catalog.close': "Закрыть книгу",
+  'catalog.navigation': "Страницы каталога",
+  'catalog.previous': "Назад",
+  'catalog.next': "Дальше",
+  'catalog.page': "Разворот {current} из {total}",
 });

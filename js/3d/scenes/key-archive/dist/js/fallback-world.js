@@ -1,9 +1,10 @@
 import * as THREE from '../vendor/three.js';
 import { floorSurfaceY, RUG_TOP } from './floor-contact.js';
-import { createArchiveCandles } from './archive-candles.js?v=lower-sconces';
+import { createLedgerCollider } from './archive-ledger.js?v=key-catalog';
+import { createArchiveCandles } from './archive-candles.js?v=key-catalog';
 import { KEY_TYPES } from './rules.js?v=key-ring';
 import { createFallbackSurfaces } from './fallback-surfaces.js?v=key-ring';
-import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=window-sky';
+import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=key-catalog';
 import { sampleThrow } from './archive-throw-trajectory.js?v=archive-foley';
 import { playMotionContact, samplePlacement, sampleDiscard } from './archive-key-motion.js?v=key-ring';
 import { CABINET_GRID_WIDTH, CABINET_Z, CABINET_CORNICE_TOP, cabinetKeyPose } from './cabinet-layout.js?v=cabinet-cell-glow';
@@ -98,7 +99,10 @@ export function createFallbackWorld(canvas, state, initialVisualSettings, keyInd
   window.addEventListener('resize', resize);
 
   const candleSet = createArchiveCandles(scene);
-  interactables.push(...candleSet.colliders);
+  const ledgerCollider = createLedgerCollider();
+  scene.add(ledgerCollider);
+  interactables.push(...candleSet.colliders, ledgerCollider);
+  let ledgerVisible = true;
   const canvasRenderer = createFallbackCanvasRenderer({
     candles: candleSet.candles,
     ctx, scene, camera, surfaces, state, cabinets, workstations, keyIndex,
@@ -187,10 +191,10 @@ export function createFallbackWorld(canvas, state, initialVisualSettings, keyInd
 
   return {
     THREE, scene, camera, interactables, cabinets, workstations,
-    renderer: { render: () => canvasRenderer.render({ hovered, carriedKey: workstations.isLifting(carriedKey?.id) ? null : carriedKey, frameTime, visualSettings, playing }) },
+    renderer: { render: () => canvasRenderer.render({ hovered, carriedKey: workstations.isLifting(carriedKey?.id) ? null : carriedKey, frameTime, visualSettings, playing, ledgerVisible }) },
     getGeometryStats: () => null,
     getVisualStatus: () => ({ mode: 'canvas', error: '' }),
-    setVisualSettings,
+    setVisualSettings, setLedgerVisible(visible) { ledgerVisible = visible; },
     candles: candleSet.candles, refreshHand, refreshCabinet, highlight, update, resize,
     animateThrow, animatePlace, animateDiscard, isThrowing, cancelPlace,
     throwingCount: () => thrownKeys.size,

@@ -135,6 +135,8 @@ export default Object.freeze({
   'toast.qualityLowered': 'Resolution lowered for smoother play · {ratio}×',
   'visual.smooth': '05 · SMOOTHNESS',
   'visual.autoQuality': 'Lower resolution when FPS drops',
+  'toast.keysTaken': 'Keys taken from the bath: {count}',
+  'toast.archiveComplete': 'The archive is complete! The Hall of Forgotten Doors is open',
   'toast.metalReady': 'Metal ready · +{count}',
   'toast.archiveDone': 'The archive is already sorted',
   'toast.resetFailed': 'Could not reset the progress',
@@ -156,6 +158,7 @@ export default Object.freeze({
   'prompt.handsFull': '<kbd>4/4</kbd> Hands full · put a key in a cabinet or on the floor',
   'prompt.take': '<kbd>E</kbd> Take · {name}{note}',
   'prompt.candleMelting': 'Wax melting · keep the key in the flame',
+  'prompt.candleUnlit': 'This candle lights once its cabinet is full · melt wax at a burning candle',
   'prompt.candleUse': '<kbd>E</kbd> Hold the key in the flame',
   'prompt.labelMud': 'Water · washing',
   'prompt.labelRust': 'Solution · rust removal',
@@ -227,8 +230,11 @@ export default Object.freeze({
   'catalog.navigation': "Catalog pages",
   'catalog.previous': "Previous",
   'catalog.next': "Next",
+  'catalog.count': "{sorted} of {required} in the cabinet",
+  'catalog.complete': "Cabinet complete",
   'catalog.spread': "Spread {current} of {total}",
 
   'sign.backHall': "HALL OF FORGOTTEN DOORS",
+  'sign.backHallOpen': "open · the archive is complete",
   'sign.backHallNote': "behind the archive · closed",
 });

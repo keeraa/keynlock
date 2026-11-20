@@ -72,6 +72,7 @@ let lockRequestPending = false;
 let lockUnavailable = false;
 let lastPointer = null;
 let edgeLook = { x: 0, y: 0, until: 0 };
+const EDGE_LOOK_HOLD_MS = 300;
 let hovered = null;
 let lastHoverKey = '';
 let toastTimeout = 0;
@@ -96,7 +97,7 @@ const { targetInView, clearAim } = createArchiveTargeting({ camera, world, state
 const { interact, drop, updateWax, updateSmelting, isMelting } = createArchiveActions({
   state, keyIndex, world, camera, targetInView,
   getYaw: () => yaw, isPlaying, stationNow,
-  save, updateHud, tone, toast, showVictory, statistics, openCatalog,
+  save, updateHud, tone, toast, showVictory: celebrateCompletion, statistics, openCatalog,
   invalidateHover: () => { lastHoverKey = '!'; },
 });
 
@@ -281,6 +282,25 @@ function showVictory() {
   releaseMouseLock();
 }
 
+// The last key is in: the finale plays in the hall (world.startFinale, the
+// long fanfare), then the victory screen with the statistics. If the player
+// is in a menu by then, the screen waits for them to come back.
+const FINALE_MS = 7000;
+let finalePlayed = false;
+function celebrateCompletion() {
+  if (getProgress(state).processed !== TOTAL_KEYS) return;
+  if (finalePlayed) { showVictory(); return; }
+  finalePlayed = true;
+  world.startFinale?.();
+  tone('finale');
+  toast(t('toast.archiveComplete'));
+  const reveal = () => {
+    if (mode === 'play') showVictory();
+    else if (mode !== 'victory') setTimeout(reveal, 1000);
+  };
+  setTimeout(reveal, FINALE_MS);
+}
+
 function resetGame() {
   if (!window.confirm(t('confirm.reset'))) return;
   try {
@@ -371,12 +391,16 @@ document.addEventListener('mousemove', event => {
   } else {
     if (lastPointer) turn(event.clientX - lastPointer.x, event.clientY - lastPointer.y);
     lastPointer = { x: event.clientX, y: event.clientY };
+    // Edge turning is only for browsers that never grant Pointer Lock. A mouse
+    // merely released (Escape, keyboard resume) must not drift the camera, and
+    // a cursor resting near the edge stops turning almost at once.
+    if (!lockUnavailable) { edgeLook.until = 0; return; }
     const x = edgeLookRate(event.clientX, window.innerWidth);
     const y = edgeLookRate(event.clientY, window.innerHeight);
-    edgeLook = { x, y, until: performance.now() + (x || y ? 1100 : 0) };
+    edgeLook = { x, y, until: performance.now() + (x || y ? EDGE_LOOK_HOLD_MS : 0) };
   }
 });
-document.addEventListener('mouseleave', () => { lastPointer = null; });
+document.addEventListener('mouseleave', () => { lastPointer = null; edgeLook.until = 0; });
 
 canvas.addEventListener('pointerdown', event => {
   if (mode !== 'play' || event.button !== 0) return;
@@ -487,7 +511,11 @@ function tick(now) {
     // The row chime starts together with the shimmer, not after it settles.
     const started = cabinet.completion.rowsStarted();
     if (started > startedRows[cabinet.type]) playAt('row', cabinet.group.position);
-    if (lit && !litCabinets[cabinet.type]) playAt('finish', cabinet.group.position);
+    // A finished cabinet is heard across the hall, with a shower of stars.
+    if (lit && !litCabinets[cabinet.type]) {
+      tone('fanfare');
+      world.celebrateCabinet?.(cabinet.type);
+    }
     startedRows[cabinet.type] = started;
     litCabinets[cabinet.type] = lit;
   }

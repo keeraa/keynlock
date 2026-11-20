@@ -2,7 +2,7 @@
 const SAMPLE_RATE = 24000;
 const EFFECT_LEVEL = {
   pickup: .65, throw: .56, dropWood: .67, dropRug: .60, row: .62, keyShine: .3995,
-  water: .47, lift: .52, waxStart: .42, waxDone: .52, melt: .19,
+  water: .47, lift: .52, waxStart: .42, waxDone: .52, melt: .19, fanfare: .62, finale: .7,
 };
 const PROCEDURAL_FALLBACKS = { pickup: 'take', throw: 'release', keyShine: 'waxDone' };
 const SOUND_KEY = 'keynlock-archive-sound-v1';
@@ -38,7 +38,21 @@ const CLIPS = {
   finish: [ring(392, .38, .22), ring(587, .34, .17, .105), ring(784, .43, .15, .205),
     ring(1584, .27, .07, .210), ring(1176, .33, .075, .28)],
   wrong: [noise(180, 1040, .095, .18), ring(157, .12, .16, 0, 40), ring(289, .13, .08)],
+  // A finished cabinet: a rising G-C-E-G call and a held C major chord.
+  fanfare: [...chord([392, 523, 659], 0, .13, .55, .17),
+    ...chord([784, 1047, 523, 392], .42, 0, 1.5, .15), ...chord([1568, 2093], .42, 0, 1.1, .04),
+    noise(2400, 7600, .9, .035, .42, .03)],
+  // The whole archive: three rising phrases, then a long bright chord.
+  finale: [...chord([262, 330, 392], 0, .17, .6, .16), ...chord([349, 440, 523], .7, .17, .6, .16),
+    ...chord([392, 494, 587], 1.4, .17, .7, .17),
+    ...chord([131, 262, 330, 392, 523, 659, 784, 1047], 2.15, .025, 3.4, .12),
+    ...chord([1568, 2093, 2637], 2.2, .06, 2.6, .035), noise(2600, 8000, 2.6, .03, 2.15, .08)],
 };
+
+// Notes of a chord or arpeggio: `step` seconds apart from `at`, each `length` long.
+function chord(frequencies, at, step, length, level) {
+  return frequencies.map((frequency, index) => ring(frequency, length, level, at + index * step));
+}
 
 function makeClip(context, layers) {
   const duration = Math.max(...layers.map(layer => layer.at + layer.length));
@@ -227,7 +241,7 @@ export function createArchiveAudio(browserWindow) {
       const source = context.createBufferSource();
       const volume = context.createGain();
       source.buffer = clipFor(kind);
-      source.playbackRate.value = ['finish', 'row', 'ready', 'keyShine'].includes(kind)
+      source.playbackRate.value = ['finish', 'row', 'ready', 'keyShine', 'fanfare', 'finale'].includes(kind)
         ? 1 : [1, .94, 1.06, .98, 1.03][variation++ % 5];
       const panner = position && context.createPanner?.();
       volume.gain.value = (panner ? 1 : Math.min(1, level)) * (EFFECT_LEVEL[kind] ?? 1);

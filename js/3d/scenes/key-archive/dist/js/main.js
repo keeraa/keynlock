@@ -78,7 +78,8 @@ const saveMessages = {
   'backup-error': t('save.backupError'),
 };
 const heldMovement = new Set();
-const MENU_FRAME_INTERVAL = 1000 / 30;
+const COVERED_SCENE_MODES = new Set(['intro', 'ledger']);
+const COVERED_FRAME_INTERVAL = 1000 / 30;
 let lastRender = -Infinity;
 let lastTick = performance.now();
 const audio = createArchiveAudio(window);
@@ -172,7 +173,7 @@ function setMode(next) {
   $('statistics').classList.toggle('is-hidden', next !== 'statistics');
   $('victory').classList.toggle('is-hidden', next !== 'victory');
   $('hud').classList.toggle('is-hidden', next === 'intro');
-  $('fps-panel').hidden = next === 'intro' || next === 'ledger';
+  $('fps-panel').hidden = COVERED_SCENE_MODES.has(next);
   $('interaction-prompt').classList.toggle('is-hidden', next !== 'play' || !hovered);
   heldMovement.clear();
   lastPointer = null;
@@ -407,7 +408,7 @@ canvas.addEventListener('wheel', event => {
 
 function tick(now) {
   requestAnimationFrame(tick);
-  if (mode !== 'play' && now - lastRender < MENU_FRAME_INTERVAL - 1) return;
+  if (COVERED_SCENE_MODES.has(mode) && now - lastRender < COVERED_FRAME_INTERVAL - 1) return;
   lastRender = now;
   const cpuStart = performance.now();
   const delta = Math.min((now - lastTick) / 1000, .04);

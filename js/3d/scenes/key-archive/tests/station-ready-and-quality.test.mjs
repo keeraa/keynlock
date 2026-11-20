@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createAutoQuality, qualityLevels } from '../dist/js/auto-quality.js';
-import { readyGlowIntensity } from '../dist/js/station-visual-state.js';
 import { DEFAULT_VISUAL_SETTINGS, normalizeVisualSettings } from '../dist/js/visual-settings.js';
 
 // Feeds `seconds` of frames at `fps`; returns every ratio change.
@@ -60,21 +59,14 @@ test('the auto quality option is on by default and can be turned off', () => {
   assert.match(main, /world\.adaptQuality\?\.\(now, frameMs, playing && document\.visibilityState === 'visible'\)/);
 });
 
-test('a ready bath flashes, then keeps a steady pulse until the key is taken', () => {
-  assert.equal(readyGlowIntensity(1000, undefined), 0);
-  const flash = readyGlowIntensity(1450, 1000);
-  const steady = [3000, 5000, 9000].map(now => readyGlowIntensity(now, 1000));
-  assert.ok(flash > .8, 'bright when the key becomes ready');
-  for (const value of steady) assert.ok(value > .15 && value < .55, 'a calm pulse afterwards');
-});
-
 test('a finished bath is announced across the hall, not only next to it', async () => {
   const main = readFileSync(new URL('../dist/js/main.js', import.meta.url), 'utf8');
   assert.match(main, /tone\('ready', Math\.max\(\.35, level\)\)/, 'audible from afar');
   assert.match(main, /if \(distance > 4\) toast\(t\(`toast\.bathReady\.\$\{kind\}`\)\)/);
   assert.match(main, /bathProgress\.update\(playing, playAt, announceBathReady\)/);
+  // No glow over the bath: the player found it ugly. Sound and toast only.
   const effects = readFileSync(new URL('../dist/js/station-visual-effects.js', import.meta.url), 'utf8');
-  assert.match(effects, /updateReady\(now, keys, wallTime\)/);
+  assert.doesNotMatch(effects, /beacon|readyRing|readyGlow/);
   const { default: ru } = await import('../dist/js/locales/ru.js');
   assert.ok(ru['toast.bathReady.mud'] && ru['toast.bathReady.rust']);
 });

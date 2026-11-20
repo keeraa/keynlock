@@ -135,3 +135,11 @@ test('row chime starts with the shimmer; rust splash sounds when the key lands',
   const actions = readFileSync(new URL('../dist/js/archive-actions.js', import.meta.url), 'utf8');
   assert.doesNotMatch(actions, /tone\('rust'\)/, 'no early splash at the moment of the action');
 });
+
+test('the rust bath hisses from the real recording and fades out gradually', () => {
+  const audio = readFileSync(new URL('../dist/js/archive-audio.js', import.meta.url), 'utf8');
+  assert.match(audio, /function fizz\(level = 1\)/);
+  assert.match(audio, /const sizzle = recordings\.waxStart\[0\]/);
+  assert.match(audio, /volume\.gain\.setTargetAtTime\(0, now \+ layer\.attack \+ \.4, layer\.decay \/ 4\)/);
+  assert.match(audio, /if \(kind === 'rust' && .*fizz\(level\)\) return;/);
+});

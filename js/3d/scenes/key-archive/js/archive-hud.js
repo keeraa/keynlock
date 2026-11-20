@@ -94,5 +94,5 @@ export function createArchiveHud(document, world, state, keyIndex) {
     bundleArt.style.setProperty('--bundle-tilt', `${Math.sin(walkPhase) * sway * 1.55}deg`);
     bundleArt.style.setProperty('--bundle-bob', `${Math.sin(walkPhase * 2) * sway * .72}px`);
   }
-  return { update, walk };
+  return { update, walk, keyThumbnail: thumbnail };
 }

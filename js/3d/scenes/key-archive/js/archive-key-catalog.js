@@ -1,6 +1,5 @@
 import * as THREE from '../vendor/three.js';
 import { ARCHIVE_LEDGER, ARCHIVE_LEDGER_URL } from './archive-ledger.js?v=key-catalog';
-import { ARCHIVE_TO_FORGE } from './key-forge-adapter.js?v=wax-and-bundles';
 import { KEY_TYPES } from './rules.js?v=key-ring';
 import { familyName, t } from './i18n.js';
 
@@ -61,7 +60,7 @@ function bookTransform(points, width, height) {
     0,0,1,0,${x0},${y0},0,1)`;
 }
 
-export function createArchiveKeyCatalog(document, world, canvas, onClose) {
+export function createArchiveKeyCatalog(document, world, canvas, keyThumbnail, onClose) {
   const $ = id => document.getElementById(id);
   const dialog = $('archive-key-catalog');
   const spread = $('catalog-spread');
@@ -80,7 +79,8 @@ export function createArchiveKeyCatalog(document, world, canvas, onClose) {
       const article = document.createElement('article');
       const picture = document.createElement('img');
       const name = document.createElement('h3');
-      picture.src = new URL(`../assets/catalog/${ARCHIVE_TO_FORGE[type]}.svg`, import.meta.url).href;
+      const image = keyThumbnail({ type });
+      if (image) picture.src = image;
       picture.alt = '';
       name.textContent = familyName(type);
       article.append(picture, name);

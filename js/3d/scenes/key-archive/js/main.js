@@ -4,7 +4,7 @@ applyTranslations(document);
 import { TOTAL_KEYS, getProgress } from './rules.js?v=stable-pickup';
 import { createWorld } from './world.js?v=stable-pickup';
 import { installKeyAssetProvider } from './key-factory.js?v=key-ring';
-import { createArchiveHud } from './archive-hud.js?v=hud-polish';
+import { createArchiveHud } from './archive-hud.js?v=catalog-thumbnails';
 import { openArchiveSave, loadVisualSettings, clearArchiveState } from './archive-save-state-with-route.js?v=stable-pickup';
 import { createVisualPanel } from './visual-panel.js?v=key-ring';
 import externalKeyProvider from './key-provider-entry.js?v=wax-and-bundles';
@@ -19,7 +19,7 @@ import { createArchivePrompts } from './archive-interaction-prompts.js?v=key-cat
 import { createArchiveActions } from './archive-actions.js?v=stable-pickup';
 import { FIRST_ROUTE_KEY_ID, createFirstRouteGuide } from './archive-first-route-guide.js?v=key-ring';
 import { createBathProgress } from './archive-bath-progress.js?v=cleaning-cues';
-import { createArchiveKeyCatalog } from './archive-key-catalog.js?v=catalog-pages';
+import { createArchiveKeyCatalog } from './archive-key-catalog.js?v=catalog-thumbnails';
 import { createArchiveStatistics, createStatisticsPanel } from './archive-statistics.js?v=processed-count';
 import { createArchiveMusic } from './archive-music.js?v=music-resume-seek';
 import { createArchiveAudio } from './archive-audio.js?v=key-shine';
@@ -45,10 +45,10 @@ try {
   world = createFallbackWorld(canvas, state, visualSettings, keyIndex);
 }
 const camera = world.camera;
-const catalog = createArchiveKeyCatalog(document, world, canvas, () => play({ lockMouse: false }));
 const movement = createPlayerMovement(camera, world.bounds);
 const clamp = (number, a, b) => Math.max(a, Math.min(b, number));
 const hud = createArchiveHud(document, world, state, keyIndex);
+const catalog = createArchiveKeyCatalog(document, world, canvas, hud.keyThumbnail, () => play({ lockMouse: false }));
 const bathProgress = createBathProgress(document, world, keyIndex, state);
 const routeGuide = createFirstRouteGuide(document, state, keyIndex, world);
 const performanceHud = createPerformanceHud(document, world);

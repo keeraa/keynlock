@@ -84,7 +84,14 @@ export function createArchiveActions({
         if (target.bathKind === 'rust') tone('rust');
         toast(target.bathKind === 'mud' ? 'Промываем ключ' : 'Ключ замочен · 30 секунд');
       } else {
-        const collected = collectSoakedKey(state, target.id);
+        const aimed = target.keyId && keyIndex.get(target.keyId);
+        if (aimed && aimed.bathUntil > Date.now()) {
+          toast(target.bathKind === 'mud' ? 'Этот ключ ещё промывается' : 'Этот ключ ещё отмокает', true);
+          tone('wrong');
+          invalidateHover();
+          return;
+        }
+        const collected = collectSoakedKey(state, target.id, Date.now(), target.keyId ?? null);
         if (collected) {
           world.workstations?.liftKey?.(target.id, collected);
           world.syncKey?.(collected);
@@ -128,6 +135,7 @@ export function createArchiveActions({
       const queued = getProgress(state).smelting;
       toast(queued > 1 ? `Ключ в очереди на плавку · впереди ${queued - 1}` :
         `Ключ плавится · ${SMELT_SECONDS} секунд`);
+      // (the bar over the forge shows the countdown and the whole queue)
       invalidateHover();
       return;
     }

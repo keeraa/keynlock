@@ -29,6 +29,14 @@ export function createArchivePrompts(state, keyIndex, isMelting = () => false) {
       const count = `${contents.keys.length}/4`;
       if (held && !held.broken && held[target.bathKind] && contents.space > 0)
         return `<kbd>E / У</kbd> Погрузить ключ · ${label} · ${count}`;
+      const aimed = target.keyId && keyIndex.get(target.keyId);
+      if (aimed) {
+        const name = KEY_TYPES[aimed.type].name;
+        const left = Math.ceil((aimed.bathUntil - Date.now()) / 1000);
+        if (left > 0) return `${name} · ещё ${left} с · ${label}`;
+        return state.held.length < MAX_HELD ? `<kbd>E / У</kbd> Забрать этот ключ · ${name}`
+          : `${name} готов · освободи место в руках`;
+      }
       if (contents.ready.length && state.held.length < MAX_HELD)
         return `<kbd>E / У</kbd> Забрать очищенный ключ · ${count}`;
       if (contents.ready.length) return `Ключ готов · освободи место в руках · ${count}`;

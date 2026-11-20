@@ -59,6 +59,11 @@ export function createArchiveTargeting({ camera, world, state, keyIndex }) {
       if (hit.distance > (data.kind === 'cabinet' ? CABINET_REACH : STATION_REACH)) continue;
       nearest = data;
       nearestDistance = hit.distance;
+      // In a bath, the key under the crosshair is the one to take.
+      if (data.kind === 'bath') {
+        const keyId = world.workstations?.aimedBathKey?.(data.id, raycaster.ray);
+        if (keyId) nearest = { ...data, keyId };
+      }
       if (data.kind === 'cabinet') {
         const cabinet = world.cabinets[data.type];
         const local = cabinet.group.worldToLocal(hit.point.clone());

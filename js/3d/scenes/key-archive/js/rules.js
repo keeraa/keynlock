@@ -330,7 +330,7 @@ export function takeKeyFromCabinet(state, cabinetType, slotIndex) {
 
 // Smelting takes time. Broken keys queue in the forge one after another;
 // each becomes one unit of metal when its turn is over.
-export const SMELT_SECONDS = 8;
+export const SMELT_SECONDS = 30;
 
 export function trashSelectedKey(state, now = Date.now()) {
   const key = selectedKey(state);
@@ -400,9 +400,11 @@ export function startSoak(state, id, kind, now = Date.now()) {
   return true;
 }
 
-export function collectSoakedKey(state, id, now = Date.now()) {
+// keyId: the key the player is looking at; otherwise the first ready one.
+export function collectSoakedKey(state, id, now = Date.now(), keyId = null) {
   if (state.held.length >= MAX_HELD) return null;
-  const key = bathContents(state, id, now).ready[0];
+  const ready = bathContents(state, id, now).ready;
+  const key = keyId ? ready.find(item => item.id === keyId) : ready[0];
   if (!key) return null;
   const kind = id.endsWith('-mud') ? 'mud' : 'rust';
   key[kind] = false;

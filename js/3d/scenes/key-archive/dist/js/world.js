@@ -407,8 +407,10 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
   candleSet.update(0, cabinets);
   for (const key of state.keys) syncKey(key);
 
+  let hoverAnchor = null;
   function highlight(target) {
     hovered = target;
+    hoverAnchor = null;
     const interactive = target?.kind === 'cabinet' || target?.kind === 'bath' || target?.kind === 'forge';
     objectHoverTarget = interactive ? (target.kind === 'cabinet' ? .74 : 1) : 0;
     cellHighlight.visible = false;
@@ -433,6 +435,8 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
         surface.anchor.updateWorldMatrix(true, false);
         objectMask.matrix.copy(surface.anchor.matrixWorld);
         objectMask.geometry = surface.geometry;
+        // A key in a bath bobs and dips: its outline follows it every frame.
+        hoverAnchor = target.keyId ? surface.anchor : null;
       }
     }
     keyHoverTarget = target?.kind === 'key' ? 1 : 0;
@@ -466,6 +470,11 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
     objectHoverOpacity += (objectHoverTarget - objectHoverOpacity) * hoverFactor;
     keyOutline.visible = keyHoverOpacity > .005;
     objectMask.visible = objectHoverOpacity > .005;
+    if (hoverAnchor?.parent) {
+      hoverAnchor.updateWorldMatrix(true, false);
+      objectMask.matrix.copy(hoverAnchor.matrixWorld);
+      objectMask.matrixWorldNeedsUpdate = true;
+    }
     dust.update(now);
     windowBird.update(now, playing);
     workstations.update(now);

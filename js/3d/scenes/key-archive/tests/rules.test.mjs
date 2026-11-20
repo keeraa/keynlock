@@ -425,3 +425,18 @@ test('a ring used under the old rules is restored from its recorded metal cost',
   assert.equal(state.bundles, 1);
   assert.equal(state.metal, 2);
 });
+
+test('the player takes the bath key they are looking at', () => {
+  const state = createInitialState();
+  const now = 5_000_000;
+  const muddy = state.keys.filter(key => key.mud && !key.rust && !key.wax && !key.broken).slice(0, 2);
+  for (const key of muddy) {
+    assert.equal(pickupKey(state, key.id), true);
+    assert.equal(startSoak(state, 'center-mud', 'mud', now), true);
+  }
+  const later = now + 60_000;
+  const taken = collectSoakedKey(state, 'center-mud', later, muddy[1].id);
+  assert.equal(taken.id, muddy[1].id, 'the aimed key, not the first one');
+  assert.equal(muddy[0].status, 'bath');
+  assert.equal(collectSoakedKey(state, 'center-mud', later).id, muddy[0].id, 'without aim: the first ready key');
+});

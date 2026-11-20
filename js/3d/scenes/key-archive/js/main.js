@@ -119,7 +119,8 @@ function updateHud() { hud.update(); }
 
 function setHovered(target) {
   const identity = target ? `${target.kind}-${target.id ?? target.stationId ?? target.type}` +
-    (target.kind === 'cabinet' ? `:${target.slot ?? '-'}:${target.assisted ? 'assisted' : 'direct'}:${Boolean(target.full)}` : target.kind === 'candle' ? `:${target.lit}` : '') : '';
+    (target.kind === 'cabinet' ? `:${target.slot ?? '-'}:${target.assisted ? 'assisted' : 'direct'}:${Boolean(target.full)}` :
+      target.kind === 'candle' ? `:${target.lit}` : target.kind === 'bath' ? `:${target.keyId ?? '-'}` : '') : '';
   if (identity === lastHoverKey) return;
   hovered = target;
   lastHoverKey = identity;

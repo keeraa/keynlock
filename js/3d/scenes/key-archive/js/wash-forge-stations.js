@@ -2,7 +2,7 @@ import * as THREE from '../vendor/three.js';
 import { RUG_TOP } from './floor-contact.js';
 import { contactShadow } from './world-architecture.js?v=key-ring';
 import { createStationFinishes } from './station-finish.js';
-import { createKeyModel, disposeKeySceneModel, getKeyDisplayScale, getKeyRustStrength,
+import { createKeyModel, createCombinedKeyGeometry, disposeKeySceneModel, getKeyDisplayScale, getKeyRustStrength,
   getKeyCoatLayout, buildKeyCoatGeometry, getKeyCoatPoint } from './key-factory.js?v=key-ring';
 import { rustFlakingPaint } from './key-instance-finish.js?v=wax-and-bundles';
 import { bathKeyProgress, waterDip, BATH_LIFT_MS } from './station-visual-state.js?v=cleaning-cues';
@@ -338,8 +338,29 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
     },
   };
 
+  // The key in a bath nearest to the aiming ray (keys are thin, so this is
+  // more forgiving than an exact hit).
+  const keyCenter = new THREE.Vector3(), keyBox = new THREE.Box3();
+  function aimedBathKey(id, ray, tolerance = .13) {
+    const bath = bathMap.get(id);
+    if (!bath) return null;
+    let best = null, bestDistance = tolerance * tolerance;
+    for (const slot of bath.slots) {
+      if (!slot.keyMesh || !slot.keyId) continue;
+      keyBox.setFromObject(slot.keyMesh).getCenter(keyCenter);
+      const distance = ray.distanceSqToPoint(keyCenter);
+      if (distance < bestDistance) { bestDistance = distance; best = slot.keyId; }
+    }
+    return best;
+  }
+
   function getHoverSurface(target) {
     if (target?.kind === 'forge') return forgeMap.get(target.stationId)?.hover;
+    if (target?.kind === 'bath' && target.keyId) {
+      const slot = bathMap.get(target.id)?.slots.find(item => item.keyId === target.keyId);
+      const key = slot && keyIndex.get(target.keyId);
+      if (key) return { anchor: slot.keyMesh, geometry: createCombinedKeyGeometry(key.type, key.broken) };
+    }
     const shell = bathMap.get(target?.id)?.shell;
     return shell && { anchor: shell, geometry: shell.geometry };
   }
@@ -450,6 +471,6 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
     }
   }
 
-  return { stations, interactables, getHoverSurface, update, liftKey, isLifting,
+  return { stations, interactables, getHoverSurface, aimedBathKey, update, liftKey, isLifting,
     startMelt(stationId = 'center') { forgeMap.get(stationId)?.visual.ignite(performance.now()); } };
 }

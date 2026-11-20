@@ -97,7 +97,11 @@ export function createBathProgress(document, world, keyIndex, state = null) {
     if (forge.element.hidden) return;
     const percent = Math.round(smelt.progress * 100);
     if (forge.bar.value !== percent) forge.bar.value = percent;
-    const text = `${smelt.secondsLeft} с${smelt.waiting ? ` · ещё ${smelt.waiting}` : ''}`;
+    // Current smelt, and how many keys and how much time the queue still holds.
+    const clock = seconds => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+    const text = smelt.waiting
+      ? `${clock(smelt.secondsLeft)} · в очереди ${smelt.waiting} · всего ${clock(smelt.totalSecondsLeft)}`
+      : clock(smelt.secondsLeft);
     if (forge.timer.textContent !== text) forge.timer.textContent = text;
     const barWidth = Math.max(28, Math.min(116, focal * .95 / -eye.z));
     forge.element.style.left = `${(projected.x + 1) * width / 2}px`;

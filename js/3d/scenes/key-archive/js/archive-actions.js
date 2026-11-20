@@ -81,7 +81,7 @@ export function createArchiveActions({
       if (key && startSoak(state, target.id, target.bathKind)) {
         updateHud();
         save();
-        if (target.bathKind === 'rust') tone('rust');
+        // The rust splash sounds from the tray once the key lands (wash-forge-stations).
         toast(target.bathKind === 'mud' ? 'Промываем ключ' : 'Ключ замочен · 30 секунд');
       } else {
         const aimed = target.keyId && keyIndex.get(target.keyId);

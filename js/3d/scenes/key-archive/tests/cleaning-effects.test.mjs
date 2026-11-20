@@ -116,3 +116,20 @@ test('rust tray: smoke rises and fades; bath keys aim along their length; bench 
   assert.match(aim, /if \(hiddenBehindFurniture\(hit\.point\)\) continue;/);
   assert.match(aim, /const assisted = visibleKey\(/);
 });
+
+test('row chime starts with the shimmer; rust splash sounds when the key lands', async () => {
+  const { createCabinetCompletion } = await import('../dist/js/cabinet-completion.js');
+  const { CABINET_COLUMNS } = await import('../dist/js/cabinet-layout.js');
+  const completion = createCabinetCompletion();
+  completion.refresh([], 0);
+  assert.equal(completion.rowsStarted(), 0);
+  const row = Array.from({ length: CABINET_COLUMNS * 2 }, (_, slot) => ({ cabinetSlot: slot }));
+  completion.refresh(row, 100);
+  assert.equal(completion.rowsStarted(), 1, 'counted the moment the row fills');
+  const main = readFileSync(new URL('../dist/js/main.js', import.meta.url), 'utf8');
+  assert.match(main, /started > \(startedRows\[cabinet\.type\] \?\? started\)\) playAt\('row'/);
+  const stations = readFileSync(new URL('../dist/js/wash-forge-stations.js', import.meta.url), 'utf8');
+  assert.match(stations, /playSound\?\.\('rust', slotWorld\.clone\(\)\)/);
+  const actions = readFileSync(new URL('../dist/js/archive-actions.js', import.meta.url), 'utf8');
+  assert.doesNotMatch(actions, /tone\('rust'\)/, 'no early splash at the moment of the action');
+});

@@ -331,7 +331,7 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
       if (!bath || !position) return;
       metal.updateMatrixWorld(true);
       const surface = bath.group.position.y + bath.surfaceY;
-      slot.flakeDebt = (slot.flakeDebt ?? 0) + amount * 26;
+      slot.flakeDebt = (slot.flakeDebt ?? 0) + amount * 48;
       while (slot.flakeDebt >= 1) {
         slot.flakeDebt--;
         const point = metal.localToWorld(new THREE.Vector3().fromBufferAttribute(position,
@@ -389,7 +389,9 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
     const from = slot ? { x: slot.holder.position.x, z: slot.holder.position.z,
       y: slot.holder.position.y + slot.keyMesh.position.y,
       rotation: slot.keyMesh.rotation.clone() } : null;
-    bath.lift = { keyMesh, key, from, startedAt: performance.now() };
+    bath.lift = { keyMesh, key, from, startedAt: performance.now(),
+      // The tray lift is slower so the rust can visibly flake off on the way up.
+      duration: bath.tray ? TRAY_LIFT_MS : BATH_LIFT_MS };
     bindBathFinish(bath.lift);
     bath.group.add(keyMesh);
   }
@@ -422,7 +424,7 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
 
   // Rust tray: the key drops in and sinks with a splash, the solution reacts
   // (smoke, fizzing rings), then its head floats up so it can be grabbed.
-  const TRAY_ENTRY_MS = 850, TRAY_FLOAT_MS = 1600;
+  const TRAY_ENTRY_MS = 850, TRAY_FLOAT_MS = 1600, TRAY_LIFT_MS = 2300;
   const slotWorld = new THREE.Vector3();
   function trayKey(bath, slot, key, index, wallTime) {
     const elapsed = wallTime - (key.bathUntil - SOAK_SECONDS.rust * 1000);
@@ -442,6 +444,8 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
       if (slot.splashed) {
         effects.ripple(slotWorld.x, surface, slotWorld.z, .16);
         effects.ripple(slotWorld.x, surface, slotWorld.z, .09);
+        // The splash sound plays when the key actually meets the solution.
+        playSound?.('rust', slotWorld.clone());
       }
       slot.splashed = true;
     }
@@ -477,7 +481,9 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
     return drip;
   }
 
-  function update(now) {
+  let playSound = null;
+  function update(now, sound = null) {
+    playSound = sound;
     const wallTime = Date.now();
     // Static pigment geometry and pooled sprites keep these effects inexpensive.
     for (const station of stations) {
@@ -491,12 +497,12 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
         let drip = animateBathKeys(bath, wallTime);
         if (bath.lift) {
           const { startedAt, key, keyMesh } = bath.lift;
-          const progress = Math.max(0, (now - startedAt) / BATH_LIFT_MS);
+          const progress = Math.max(0, (now - startedAt) / bath.lift.duration);
           if (progress >= 1) {
             clearLift(bath);
             onLiftDone?.(key);
           } else {
-            const lift = Math.min(1, progress * 2.1);
+            const lift = Math.min(1, progress * (bath.tray ? 1.5 : 2.1));
             const from = bath.lift.from;
             if (from) {
               // Up from its own place, turning from its resting pose to face the player.
@@ -512,7 +518,7 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
             }
             // A lifted muddy key is already washed: no clods left to drop.
             applyBathFinish(bath.lift, bath.kind,
-              bath.kind === 'rust' ? Math.max(0, 1 - (progress - .16) * 1.65) : 0, key,
+              bath.kind === 'rust' ? Math.max(0, Math.min(1, 1 - (progress - .22) / .6)) : 0, key,
               bath.kind === 'rust' ? cleaning : null);
             drip = Math.sin(progress * Math.PI);
           }

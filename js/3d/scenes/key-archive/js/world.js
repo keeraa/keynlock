@@ -477,7 +477,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
     }
     dust.update(now);
     windowBird.update(now, playing);
-    workstations.update(now);
+    workstations.update(now, playSound);
     keyAnimations.update(now, playSound);
     cabinets.forEach(cabinet => cabinet.update(now));
     candleSet.update(now, cabinets);

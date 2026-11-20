@@ -109,6 +109,7 @@ function toast(message, error = false) {
 const promptFor = createArchivePrompts(state, keyIndex, isMelting);
 const litCabinets = world.cabinets.map(cabinet => cabinet.completion.isComplete());
 const settledRows = world.cabinets.map(cabinet => cabinet.completion.settledRows());
+const startedRows = [];
 
 function playAt(kind, position) {
   const distance = Math.hypot(camera.position.x - position.x, camera.position.z - position.z);
@@ -382,8 +383,11 @@ function tick(now) {
   for (const cabinet of world.cabinets) {
     const lit = cabinet.completion.isComplete();
     const rows = cabinet.completion.settledRows();
+    // The row chime starts together with the shimmer, not after it settles.
+    const started = cabinet.completion.rowsStarted?.() ?? 0;
     if (lit && !litCabinets[cabinet.type]) playAt('finish', cabinet.group.position);
-    else if (!lit && (rows & ~settledRows[cabinet.type])) playAt('row', cabinet.group.position);
+    else if (started > (startedRows[cabinet.type] ?? started)) playAt('row', cabinet.group.position);
+    startedRows[cabinet.type] = started;
     litCabinets[cabinet.type] = lit;
     settledRows[cabinet.type] = rows;
   }

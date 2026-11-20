@@ -24,6 +24,10 @@ export function createPlayerMovement(camera, bounds) {
     for (const { x: tx, z: tz } of ARCHIVE_SIDE_TABLES) {
       if (Math.abs(x - tx) < 1.15 && Math.abs(z - tz) < 1.34) return true;
     }
+    for (const { min, max } of bounds.stoolObstacles ?? []) {
+      if (x > min.x - .22 && x < max.x + .22 &&
+          z > min.z - .22 && z < max.z + .22) return true;
+    }
     return inStationFootprint(x, z, .22);
   }
 

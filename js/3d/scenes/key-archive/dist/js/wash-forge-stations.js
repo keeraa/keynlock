@@ -222,7 +222,7 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
     const group = new THREE.Group();
     group.position.set(station.x, 0, station.z);
     scene.add(group);
-    furnitureShadow(group, benchFloor, 0, RUG_TOP + .003, BENCH.z);
+    const floorShadow = furnitureShadow(group, benchFloor, 0, RUG_TOP + .003, BENCH.z);
     furnitureShadow(group, fixtures, 0, BENCH.surfaceY + .002, BENCH.z);
     // Low, open workbench: the hall remains readable and cabinets stay visible.
     // One solid slab, just deep enough for the widest bowl; its top face is
@@ -230,13 +230,15 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
     // it from aiming.
     const { width, depth, thickness, surfaceY, z } = BENCH;
     const edge = finish.benchEdge;
-    const top = block(group, [width, thickness, depth], [0, surfaceY - thickness / 2, z],
+    const benchBody = new THREE.Group();
+    group.add(benchBody);
+    const top = block(benchBody, [width, thickness, depth], [0, surfaceY - thickness / 2, z],
       [edge, edge, finish.benchTop, edge, edge, edge]);
     top.castShadow = top.receiveShadow = true;
     occluders.push(top);
     for (const x of [-2.29, 2.29]) for (const leg of BENCH.legs)
-      block(group, [.16, .80, .16], [x, .38, z + leg], materials.darkWood).castShadow = true;
-    for (const rail of BENCH.rails) block(group, [4.86, .12, .27], [0, .29, z + rail], materials.blackWood);
+      block(benchBody, [.16, .80, .16], [x, .38, z + leg], materials.darkWood).castShadow = true;
+    for (const rail of BENCH.rails) block(benchBody, [4.86, .12, .27], [0, .29, z + rail], materials.blackWood);
     const baths = ['mud', 'rust'].map(kind => createBath(group, station, kind, spotTexture, finish.glaze));
     const forge = createForge(group, station, materials, spotTexture, finish);
     for (const bath of baths) {
@@ -246,7 +248,7 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
     }
     forgeMap.set(station.id, forge);
     interactables.push(forge.collider);
-    stations.push({ ...station, group, baths, forge });
+    stations.push({ ...station, group, benchBody, floorShadow, baths, forge });
   }
 
   // Pieces leaving a key in a bath: mud clods and rust flakes land on the
@@ -447,6 +449,6 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
     }
   }
 
-  return { stations, interactables, occluders, getHoverSurface, aimedBathKey, update, liftKey, isLifting,
+  return { stations, finish, interactables, occluders, getHoverSurface, aimedBathKey, update, liftKey, isLifting,
     startMelt(stationId = 'center') { forgeMap.get(stationId)?.visual.ignite(sceneNow()); } };
 }

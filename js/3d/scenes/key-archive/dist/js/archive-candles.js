@@ -45,7 +45,7 @@ export function createArchiveCandles(scene, { drawMeshes = false } = {}) {
   for (let type = 0; type < 10; type++) {
     for (const side of [-1, 1]) {
       locations.push({ id: `cabinet-candle-${type}-${side}`, type,
-        x: (type < 5 ? -1 : 1) * CABINET_CANDLE_X, mountX: (type < 5 ? -1 : 1) * HALL_SIDE_WALL_INNER_X, y: CABINET_CANDLE_Y, z: CABINET_Z[type % 5] + side * (CABINET_BODY_WIDTH / 2 - .03) });
+        x: (type < 5 ? -1 : 1) * CABINET_CANDLE_X, mountX: (type < 5 ? -1 : 1) * HALL_SIDE_WALL_INNER_X, y: CABINET_CANDLE_Y, z: CABINET_Z[type % 5] + side * (CABINET_BODY_WIDTH / 2 - .03), variant: side === -1 ? 0 : 1 });
     }
   }
   const colliderGeometry = new THREE.BoxGeometry(.42, .48, .42);
@@ -73,11 +73,11 @@ export function createArchiveCandles(scene, { drawMeshes = false } = {}) {
     collider.userData = { kind: 'candle', id, lit: type === null };
     group.add(collider);
     colliders.push(collider);
-    let flame, halo, deskLight;
+    let flame, halo, deskLight, bodyGroup, holder;
     if (drawMeshes) {
       const body = new THREE.Mesh(candleGeometry, wax);
       body.position.y = .15;
-      const holder = new THREE.Mesh(holderGeometry, brass);
+      holder = new THREE.Mesh(holderGeometry, brass);
       holder.position.y = .025;
       const wick = new THREE.Mesh(wickGeometry, wickMaterial);
       wick.position.y = CANDLE_WICK_Y - .008;
@@ -102,7 +102,12 @@ export function createArchiveCandles(scene, { drawMeshes = false } = {}) {
         plate.position.set(candle.mountX - x - Math.sign(x) * .035, -.027, 0);
         group.add(bracket, plate);
       }
-      group.add(holder, body, wick, halo, flame);
+      bodyGroup = new THREE.Group();
+      // Keep only these replaceable pieces out of the hall's static batches.
+      body.userData.replaceable = wick.userData.replaceable = true;
+      if (type === null) holder.userData.replaceable = true;
+      bodyGroup.add(body, wick);
+      group.add(holder, bodyGroup, halo, flame);
     }
     // 0..1: something is melting over this flame, so it gutters and jumps.
     let disturbance = 0;
@@ -121,7 +126,7 @@ export function createArchiveCandles(scene, { drawMeshes = false } = {}) {
       }
     }
     update(type === null, 0);
-    return { ...candle, collider, update, disturb(amount) { disturbance = Math.max(0, Math.min(1, amount)); } };
+    return { ...candle, collider, body: bodyGroup, holder, update, disturb(amount) { disturbance = Math.max(0, Math.min(1, amount)); } };
   });
   if (drawMeshes) batchStaticHallMeshes(root);
   function update(now, cabinets) {

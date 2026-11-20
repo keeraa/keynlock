@@ -12,7 +12,7 @@ const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
 // Key paint, stains, carrying pose, and movement thumbnails for Canvas 2D.
 export function createFallbackKeyPainter({ ctx, project, keyHover }) {
-  let width = 0, height = 0, frameTime = 0, carriedKey = null, daylight = 0, heldKeyLight = 0;
+  let width = 0, height = 0, frameTime = 0, carriedKey = null, daylight = 0, heldKeyLight = 0, pickupLift = 0;
   const headShapes = KEY_TYPES.map((_, type) => getKeyFallbackHeadPoints(type));
   const providedStamps = KEY_TYPES.map((_, type) => [
     createKeyFallbackStamp(type, false), createKeyFallbackStamp(type, true),
@@ -211,7 +211,7 @@ export function createFallbackKeyPainter({ ctx, project, keyHover }) {
   function drawHand() {
     if (!carriedKey) return;
     const handX = width * .67;
-    const handY = height * .77 + Math.sin(frameTime * .003) * 6;
+    const handY = height * (.77 + .055 * pickupLift) + Math.sin(frameTime * .003) * 6;
     ctx.save();
     ctx.translate(handX, handY);
     ctx.rotate(-.45);
@@ -326,6 +326,7 @@ export function createFallbackKeyPainter({ ctx, project, keyHover }) {
       frameTime = frame.frameTime; carriedKey = frame.carriedKey;
       daylight = frame.daylight;
       heldKeyLight = frame.heldKeyLight;
+      pickupLift = frame.pickupLift;
     },
     drawKey, drawHand, drawPlacingKey, drawDiscardingKey, drawDistantKeys,
   };

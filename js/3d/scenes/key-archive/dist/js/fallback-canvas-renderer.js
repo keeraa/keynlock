@@ -3,7 +3,7 @@ import * as THREE from '../vendor/three.js';
 import { createCabinetCompletion } from './cabinet-completion.js?v=wax-and-bundles';
 import { PERIMETER_BAND_Y } from './hall-architecture.js?v=alchemy-candles';
 import { CANDLE_FLAME_HEIGHT, CANDLE_FLAME_WIDTH, CANDLE_WICK_Y, sampleCandleFlicker } from './archive-candles.js?v=key-catalog';
-import { createFallbackKeyPainter } from './fallback-canvas-keys.js?v=key-ring';
+import { createFallbackKeyPainter } from './fallback-canvas-keys.js?v=stable-pickup';
 import { createFallbackArchitecture } from './fallback-canvas-architecture.js?v=key-catalog';
 import { getKeyFallbackHeadPoints } from './key-factory.js?v=key-ring';
 import { KEY_TYPES, getProgress } from './rules.js?v=key-ring';
@@ -16,7 +16,7 @@ import { CABINET_Z, CABINET_GRID_HALF_WIDTH, CABINET_BODY_WIDTH, CABINET_CAPACIT
   pegForSlot, CABINET_CELL_INNER_HALF_WIDTH,
   CABINET_CELL_INNER_HALF_HEIGHT } from './cabinet-layout.js?v=cabinet-cell-glow';
 import { FIXTURE_OFFSETS, bathId, FORGE_SURFACE_Y } from './station-layout.js?v=working-baths';
-import { drawBathActivity, drawBathKeys, drawForgeActivity } from './station-canvas-effects.js?v=cleaning-cues';
+import { drawBathActivity, drawBathKeys, drawForgeActivity } from './station-canvas-effects.js?v=stable-pickup';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -501,7 +501,7 @@ export function createFallbackCanvasRenderer({
     setSize(w, h) { width = w; height = h; },
     refreshCabinet,
     completionFor: type => cabinetCompletion[type],
-    render({ hovered: currentHover, carriedKey: currentHand, frameTime: now, visualSettings: settings, playing: isPlaying, ledgerVisible: currentLedgerVisibility }) {
+    render({ hovered: currentHover, carriedKey: currentHand, pickupLift, frameTime: now, visualSettings: settings, playing: isPlaying, ledgerVisible: currentLedgerVisibility }) {
       hovered = currentHover;
       ledgerVisible = currentLedgerVisibility;
       carriedKey = currentHand;
@@ -515,7 +515,7 @@ export function createFallbackCanvasRenderer({
         camera.localToWorld(handWorldPosition.set(x, y, z));
         heldKeyLight = daylight * windowBeamLightAt(handWorldPosition.x, handWorldPosition.y, handWorldPosition.z);
       }
-      keyPainter.setFrame({ width, height, frameTime, carriedKey, daylight, heldKeyLight });
+      keyPainter.setFrame({ width, height, frameTime, carriedKey, daylight, heldKeyLight, pickupLift });
       return draw();
     },
   };

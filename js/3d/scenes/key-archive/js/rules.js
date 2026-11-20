@@ -132,6 +132,25 @@ export function upgradeCabinetSlots(state) {
   return state;
 }
 
+const BATH_SLOTS = Array.from({ length: BATH_CAPACITY }, (_, index) => index);
+
+function reserveBathSlots(keys) {
+  const occupied = new Set();
+  const unassigned = [];
+  for (const key of keys) {
+    if (BATH_SLOTS.includes(key.bathSlot) && !occupied.has(key.bathSlot)) {
+      occupied.add(key.bathSlot);
+    } else {
+      unassigned.push(key);
+    }
+  }
+  for (const key of unassigned) {
+    key.bathSlot = BATH_SLOTS.find(slot => !occupied.has(slot));
+    occupied.add(key.bathSlot);
+  }
+  return occupied;
+}
+
 // Earlier builds had two additional workstations. Preserve soaking keys when
 // those stations disappear, keeping the original completion times whenever a
 // central bath has room. Overflow returns to the floor; finished keys are clean.
@@ -153,9 +172,11 @@ export function upgradeStationBaths(state, now = Date.now()) {
         if (now >= key.bathUntil) key[kind] = false;
         key.status = 'floor';
         delete key.bathId;
+        delete key.bathSlot;
         delete key.bathUntil;
       }
     });
+    reserveBathSlots(state.keys.filter(key => key.status === 'bath' && key.bathId === centralId));
   }
   return migrated;
 }
@@ -390,10 +411,13 @@ export function describeBathContents(keys, now) {
 
 export function startSoak(state, id, kind, now = Date.now()) {
   const key = selectedKey(state);
-  if (!validBathId(id, kind) || !key || key.broken || key.wax || !key[kind] ||
-    bathContents(state, id, now).space <= 0) return false;
+  if (!validBathId(id, kind) || !key || key.broken || key.wax || !key[kind]) return false;
+  const { keys, space } = bathContents(state, id, now);
+  if (space <= 0) return false;
+  const occupied = reserveBathSlots(keys);
   key.status = 'bath';
   key.bathId = id;
+  key.bathSlot = BATH_SLOTS.find(slot => !occupied.has(slot));
   key.bathUntil = now + SOAK_SECONDS[kind] * 1000;
   state.held.splice(state.selected, 1);
   state.selected = Math.max(0, Math.min(state.selected, state.held.length - 1));
@@ -410,6 +434,7 @@ export function collectSoakedKey(state, id, now = Date.now(), keyId = null) {
   key[kind] = false;
   key.status = 'held';
   delete key.bathId;
+  delete key.bathSlot;
   delete key.bathUntil;
   state.held.push(key.id);
   state.selected = state.held.length - 1;

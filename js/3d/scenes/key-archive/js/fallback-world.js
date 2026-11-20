@@ -4,7 +4,8 @@ import { createLedgerCollider } from './archive-ledger.js?v=key-catalog';
 import { createArchiveCandles } from './archive-candles.js?v=key-catalog';
 import { KEY_TYPES } from './rules.js?v=key-ring';
 import { createFallbackSurfaces } from './fallback-surfaces.js?v=key-ring';
-import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=key-catalog';
+import { createFallbackCanvasRenderer } from './fallback-canvas-renderer.js?v=stable-pickup';
+import { samplePickupLift } from './held-key-motion.js?v=stable-pickup';
 import { sampleThrow } from './archive-throw-trajectory.js?v=archive-foley';
 import { playMotionContact, samplePlacement, sampleDiscard } from './archive-key-motion.js?v=key-ring';
 import { CABINET_GRID_WIDTH, CABINET_Z, CABINET_CORNICE_TOP, cabinetKeyPose } from './cabinet-layout.js?v=cabinet-cell-glow';
@@ -32,6 +33,7 @@ export function createFallbackWorld(canvas, state, initialVisualSettings, keyInd
   const keyHover = { id: null, opacity: 0, target: 0 };
   let lastHoverFrame = performance.now();
   let carriedKey = null;
+  let pickupAt = -Infinity;
   let frameTime = 0;
   let playing = false;
   let width = 0;
@@ -140,7 +142,10 @@ export function createFallbackWorld(canvas, state, initialVisualSettings, keyInd
     if (target?.kind === 'key') keyHover.id = target.id;
     keyHover.target = target?.kind === 'key' ? 1 : 0;
   }
-  function refreshHand(key) { carriedKey = key; }
+  function refreshHand(key) {
+    if (carriedKey?.id !== key?.id) pickupAt = -Infinity;
+    carriedKey = key;
+  }
   function update(now, _moving, isPlaying, playSound) {
     const elapsed = Math.max(0, Math.min(.1, (now - lastHoverFrame) / 1000));
     lastHoverFrame = now;
@@ -191,11 +196,15 @@ export function createFallbackWorld(canvas, state, initialVisualSettings, keyInd
 
   return {
     THREE, scene, camera, interactables, cabinets, workstations,
-    renderer: { render: () => canvasRenderer.render({ hovered, carriedKey: workstations.isLifting(carriedKey?.id) ? null : carriedKey, frameTime, visualSettings, playing, ledgerVisible }) },
+    renderer: { render: () => canvasRenderer.render({
+      hovered, carriedKey: workstations.isLifting(carriedKey?.id) ? null : carriedKey,
+      pickupLift: samplePickupLift((frameTime - pickupAt) / 1000),
+      frameTime, visualSettings, playing, ledgerVisible,
+    }) },
     getGeometryStats: () => null,
     getVisualStatus: () => ({ mode: 'canvas', error: '' }),
     setVisualSettings, setLedgerVisible(visible) { ledgerVisible = visible; },
-    candles: candleSet.candles, refreshHand, refreshCabinet, highlight, update, resize,
+    candles: candleSet.candles, animatePickup() { pickupAt = performance.now(); }, refreshHand, refreshCabinet, highlight, update, resize,
     animateThrow, animatePlace, animateDiscard, isThrowing, cancelPlace,
     throwingCount: () => thrownKeys.size,
     bounds: { x: 11.12, z: 22.53 },

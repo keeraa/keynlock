@@ -1,22 +1,22 @@
 import { t, applyTranslations, LANGUAGES, getLanguage, setLanguage } from './i18n.js';
 // Static texts of the page follow the chosen language before anything shows.
 applyTranslations(document);
-import { TOTAL_KEYS, getProgress } from './rules.js?v=key-ring';
-import { createWorld } from './world.js?v=key-catalog';
+import { TOTAL_KEYS, getProgress } from './rules.js?v=stable-pickup';
+import { createWorld } from './world.js?v=stable-pickup';
 import { installKeyAssetProvider } from './key-factory.js?v=key-ring';
 import { createArchiveHud } from './archive-hud.js?v=hud-polish';
-import { openArchiveSave, loadVisualSettings, clearArchiveState } from './archive-save-state-with-route.js?v=key-ring';
+import { openArchiveSave, loadVisualSettings, clearArchiveState } from './archive-save-state-with-route.js?v=stable-pickup';
 import { createVisualPanel } from './visual-panel.js?v=key-ring';
 import externalKeyProvider from './key-provider-entry.js?v=wax-and-bundles';
-import { createFallbackWorld } from './fallback-world.js?v=key-catalog';
+import { createFallbackWorld } from './fallback-world.js?v=stable-pickup';
 import { createPlayerMovement } from './player-movement.js?v=ledger-candle';
 import { createPerformanceHud } from './performance-hud.js';
-import { logicalKey } from './controls.js';
+import { createInventoryWheel, logicalKey } from './controls.js?v=stable-pickup';
 import { edgeLookRate } from './mouse-look.js';
 import { createKeyIndex } from './key-index.js?v=key-ring';
 import { createArchiveTargeting } from './archive-surface-aim.js?v=key-ring';
 import { createArchivePrompts } from './archive-interaction-prompts.js?v=key-catalog';
-import { createArchiveActions } from './archive-actions.js?v=key-catalog';
+import { createArchiveActions } from './archive-actions.js?v=stable-pickup';
 import { FIRST_ROUTE_KEY_ID, createFirstRouteGuide } from './archive-first-route-guide.js?v=key-ring';
 import { createBathProgress } from './archive-bath-progress.js?v=cleaning-cues';
 import { createArchiveKeyCatalog } from './archive-key-catalog.js?v=catalog-pages';
@@ -397,11 +397,12 @@ window.addEventListener('blur', () => {
   heldMovement.clear();
   if (mode === 'play') pause();
 });
+const inventoryWheelStep = createInventoryWheel();
 canvas.addEventListener('wheel', event => {
-  if (mode !== 'play' || !state.held.length) return;
+  if (mode !== 'play' || state.held.length < 2) return;
   event.preventDefault();
-  const delta = event.deltaY > 0 ? 1 : -1;
-  selectSlot((state.selected + delta + state.held.length) % state.held.length);
+  const step = inventoryWheelStep(event);
+  if (step) selectSlot((state.selected + step + state.held.length) % state.held.length);
 }, { passive: false });
 
 function tick(now) {

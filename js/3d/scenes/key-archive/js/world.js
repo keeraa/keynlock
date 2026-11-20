@@ -13,7 +13,7 @@ import { createPaintedInstanceGeometry, setKeyInstanceFinish } from './key-insta
 import { createKeyThumbnailRenderer } from './key-thumbnails.js?v=key-ring';
 import { createWorldKeyAnimations } from './world-key-animations.js?v=key-ring';
 import { restingKeyY } from './floor-contact.js';
-import { createWorkstations } from './wash-forge-stations.js?v=cleaning-cues';
+import { createWorkstations } from './wash-forge-stations.js?v=stable-pickup';
 import { createPaintedRenderer } from './painted-renderer.js?v=cabinet-rewards';
 import { patchSceneShadowHatch, setShadowHatch } from './shadow-hatch.js';
 import { createSceneGeometryStatsCache } from './geometry-stats.js';
@@ -31,7 +31,7 @@ import { addEntranceLighting, createEntranceContactShadows, createEntranceKeyMat
 import { WINDOW_LIGHT_POSITION, addWindowAirLight, windowBeamLightAt } from './archive-window-rays.js?v=alchemy-candles';
 import { addWindowBird } from './archive-window-bird.js?v=alchemy-candles';
 import { addDust } from './world-particles.js?v=alchemy-candles';
-import { nextHandMotionWeight } from './held-key-motion.js';
+import { nextHandMotionWeight, samplePickupLift } from './held-key-motion.js?v=stable-pickup';
 import { addHeldKeyWindowLight } from './held-key-light.js?v=clear-day';
 import { pegForSlot, CABINET_CELL_INNER_HALF_WIDTH, CABINET_CELL_INNER_HALF_HEIGHT,
   CABINET_CELL_BACK_Z, CABINET_COLUMNS, CABINET_COLUMN_WIDTH, CABINET_GRID_BOTTOM_Y,
@@ -219,6 +219,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
   const heldKeyDaylight = { value: 0 };
   const handWorldPosition = new THREE.Vector3();
   let handMotion = 0;
+  let pickupAt = -Infinity;
   let hovered = null;
   let keyHoverOpacity = 0;
   let keyHoverTarget = 0;
@@ -242,6 +243,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
       disposeHandLight();
       disposeKeySceneModel(handModel);
     }
+    if (displayedHandId !== (key?.id || null)) pickupAt = -Infinity;
     displayedHandId = key?.id || null;
     handModel = null;
     geometryStatsCache?.invalidate();
@@ -545,7 +547,8 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
       // on the first step looked like a one-frame key flicker.
       handMotion = nextHandMotionWeight(handMotion, moving, elapsed);
       hand.rotation.z = Math.sin(now * .0031) * (.012 + handMotion * .033);
-      hand.position.y = -.45 + Math.sin(now * .0029) * (.012 + handMotion * .023);
+      const pickupOffset = .12 * samplePickupLift((now - pickupAt) / 1000);
+      hand.position.y = -.45 + Math.sin(now * .0029) * (.012 + handMotion * .023) - pickupOffset;
       heldKeyDaylight.value += (lightAtHand() - heldKeyDaylight.value) * (1 - Math.exp(-elapsed / .065));
       placeHeldKey(elapsed);
     } else {
@@ -586,7 +589,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
       try { objectOutline.render(objectHoverOpacity, hoverAnchor ? null : dustCoverage, painted.getSceneDepth()); }
       catch (error) { console.warn('KEYNLOCK: object silhouette unavailable', error); }
     } }, interactables, cabinets, workstations, floorKeys, candles: candleSet.candles,
-    refreshHand, syncKey, refreshCabinet, highlight, update, resize, meltHeldWax, shineHand,
+    animatePickup() { pickupAt = performance.now(); }, refreshHand, syncKey, refreshCabinet, highlight, update, resize, meltHeldWax, shineHand,
     setLedgerVisible(visible) {
       ledger.book.visible = visible;
       if (!visible) objectHoverOpacity = 0;

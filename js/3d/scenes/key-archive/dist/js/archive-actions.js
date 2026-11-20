@@ -6,7 +6,7 @@ import {
   takeKeyFromCabinet, cabinetSlotKey, trashSelectedKey, dropSelectedKey, getProgress,
   startSoak, collectSoakedKey, BUNDLE_COST, buyBundle, putBundleInCabinet, meltSelectedWax,
   SMELT_SECONDS, settleSmelting,
-} from './rules.js?v=key-ring';
+} from './rules.js?v=stable-pickup';
 import { WAX_MELT_MS } from './archive-candles.js?v=key-catalog';
 import { CABINET_CAPACITY, pegForSlot } from './cabinet-layout.js?v=cabinet-cell-glow';
 import { findFreeFloorSpot } from './key-spacing.js?v=18';
@@ -70,6 +70,7 @@ export function createArchiveActions({
       world.syncKey?.(picked);
       updateHud();
       save();
+      if (picked.status === 'held') world.animatePickup?.();
       tone(picked.status === 'bundled' ? 'bundle' : 'pickup');
       toast(picked.status === 'bundled' ? t('toast.bundleMade') :
         picked.broken ? t('toast.pickedBroken') :

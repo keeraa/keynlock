@@ -6,6 +6,11 @@ export function nextHandMotionWeight(current, moving, seconds) {
   return current + (target - current) * (1 - Math.exp(-elapsed / .19));
 }
 
+export function samplePickupLift(seconds) {
+  const t = Math.max(0, Math.min(1, seconds / .26));
+  return 1 - t * t * (3 - 2 * t);
+}
+
 // The throw starts immediately from this camera-local right-hand position.
 export const RIGHT_HAND_RELEASE = Object.freeze({
   x: .43, y: -.45, z: -.82,

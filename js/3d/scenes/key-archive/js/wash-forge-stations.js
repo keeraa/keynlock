@@ -405,8 +405,10 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
   function bindBathKeys(bath, keys) {
     if (keys === bath.visualKeys) return;
     bath.visualKeys = keys;
+    const keysBySlot = new Map(keys.map(key => [key.bathSlot, key]));
     bath.slots.forEach((slot, index) => {
-      const key = keys[index];
+      const key = keysBySlot.get(index);
+      slot.key = key;
       const id = key?.id ?? null;
       if (slot.keyId === id) return;
       if (slot.keyMesh) {
@@ -462,9 +464,10 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
 
   function animateBathKeys(bath, wallTime) {
     let drip = 0;
-    for (let index = 0; index < bath.visualKeys.length; index++) {
-      const key = bath.visualKeys[index];
+    for (let index = 0; index < bath.slots.length; index++) {
       const slot = bath.slots[index];
+      const { key } = slot;
+      if (!key) continue;
       const progress = bathKeyProgress(key, bath.kind, wallTime);
       const dip = bath.kind === 'mud' ? waterDip(progress) : null;
       if (bath.tray) {

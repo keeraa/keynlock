@@ -78,13 +78,15 @@ export function drawBathKeys(ctx, center, radius, kind, keys, wallTime, lift, no
     }
     ctx.globalAlpha = 1;
   }
-  keys.forEach((key, index) => {
+  keys.forEach(key => {
+    const index = key.bathSlot;
     const progress = bathKeyProgress(key, kind, wallTime);
     const dip = kind === 'mud' ? waterDip(progress) : null;
     if (dip && dip.height < -.05) return;
     ctx.globalAlpha = dip ? Math.min(1, .45 + dip.height * 3) : .55;
-    paint(center.x + (index % 2 ? .32 : -.32) * radius,
-      center.y + ((index < 2 ? -.09 : .09) - (dip?.height || 0) * 2.5) * radius,
+    const x = kind === 'rust' ? (index - 1.5) * .41 : (index % 2 ? .32 : -.32);
+    const y = kind === 'rust' ? 0 : (index < 2 ? -.09 : .09) - (dip?.height || 0) * 2.5;
+    paint(center.x + x * radius, center.y + y * radius,
       dip?.remaining ?? 1, dip?.drip || 0);
   });
   if (lift) {

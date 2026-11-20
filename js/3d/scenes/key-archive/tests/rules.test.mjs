@@ -150,6 +150,29 @@ test('water and rust solution each hold four keys and release only after soaking
   assert.equal(validateState(state), true);
 });
 
+test('rust tray keeps keys in their spots across insertion, collection and reload', () => {
+  const state = createInitialState();
+  const id = bathId('center', 'rust');
+  const [early, late, last] = state.keys.filter(key => key.rust && !key.wax).slice(0, 3);
+  for (const key of [late, early]) {
+    assert.equal(pickupKey(state, key.id), true);
+    assert.equal(startSoak(state, id, 'rust', 1000), true);
+  }
+  assert.deepEqual([late.bathSlot, early.bathSlot], [0, 1]);
+  assert.equal(collectSoakedKey(state, id, 31000, late.id), late);
+  assert.equal(late.bathSlot, undefined);
+  assert.equal(pickupKey(state, last.id), true);
+  assert.equal(startSoak(state, id, 'rust', 31000), true);
+  assert.deepEqual([last.bathSlot, early.bathSlot], [0, 1]);
+  const reloaded = loadArchiveState({ getItem: () => JSON.stringify(state) });
+  assert.deepEqual(bathContents(reloaded, id).keys.map(key => key.bathSlot), [1, 0]);
+
+  delete early.bathSlot;
+  delete last.bathSlot;
+  const legacy = loadArchiveState({ getItem: () => JSON.stringify(state) });
+  assert.deepEqual(bathContents(legacy, id).keys.map(key => key.bathSlot), [0, 1]);
+});
+
 test('mud-and-rust keys need both baths before they can be shelved', () => {
   const state = createInitialState();
   const both = state.keys.find(key => key.mud && key.rust && !key.wax);

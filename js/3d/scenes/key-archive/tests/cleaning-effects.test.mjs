@@ -71,7 +71,9 @@ test('baths and candle drive the new cleaning animations', () => {
   assert.match(stations, /cleaning\.clods\(slot, key/);
   assert.match(stations, /cleaning\.flakes\(slot, key/);
   assert.match(stations, /onLiftDone\?\.\(key\)/);
-  assert.match(world, /function meltHeldWax\(progress, candleId\)/);
+  assert.match(world, /function meltHeldWax\(progress, candleId/);
+  assert.match(world, /function placeHeldKey\(elapsed\)/, 'the key leaves the hand for the flame');
+  assert.match(actions, /world\.meltHeldWax\?\.\(0, null, \{ restoreCoat: false \}\)/);
   assert.match(world, /child\.userData\.coatKind === 'wax'/, 'held wax is found even with copied materials');
   assert.match(actions, /world\.meltHeldWax\?\.\(1 - \(melting\.until - now\) \/ WAX_MELT_MS/);
   assert.match(actions, /world\.shineHand\?\.\(\)/);

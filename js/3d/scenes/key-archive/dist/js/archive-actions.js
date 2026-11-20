@@ -31,6 +31,8 @@ export function createArchiveActions({
     if (now < melting.until) return;
     melting = null;
     if (!meltSelectedWax(state)) return;
+    // Fly back to the hand; the clean model replaces the coat on its own.
+    world.meltHeldWax?.(0, null, { restoreCoat: false });
     if (!key.mud && !key.rust) world.shineHand?.();
     updateHud();
     save();

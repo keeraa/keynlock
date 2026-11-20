@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { createArchiveCandles, CANDLE_WICK_Y } from './archive-candles.js?v=candlelight';
+import { createArchiveCandles, CANDLE_WICK_Y, CANDLE_FLAME_HEIGHT } from './archive-candles.js?v=candlelight';
 import { createCleaningEffects } from './cleaning-effects.js';
 import { getKeyCoatLayout, buildKeyCoatGeometry, getKeyCoatPoint } from './key-factory.js?v=key-ring';
 import { meltWaxBlobs } from './key-wax.js?v=forge-coats';
@@ -248,7 +248,47 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
   // progress 0 restores the full coat; beads fall into the flame meanwhile.
   const meltedWax = new Map();
   let waxBeadAt = 0;
-  function meltHeldWax(progress, candleId) {
+  // While wax melts the key leaves the hand and lies flat over the flame,
+  // then flies back. `meltPose.blend` eases between the two poses.
+  const HAND_POSE = new THREE.Euler(-.12, -.34, -.53);
+  const meltPose = { candleId: null, blend: 0 };
+  const poseScratch = { quaternion: new THREE.Quaternion(), hand: new THREE.Quaternion(),
+    base: new THREE.Quaternion(), target: new THREE.Vector3(), yaw: new THREE.Euler() };
+  function placeHeldKey(elapsed) {
+    if (!handModel) return;
+    handModel.userData.handScale ??= handModel.scale.x;
+    const goal = meltPose.candleId ? 1 : 0;
+    meltPose.blend += (goal - meltPose.blend) * (1 - Math.exp(-elapsed / .12));
+    if (Math.abs(goal - meltPose.blend) < .002) meltPose.blend = goal;
+    poseScratch.base.setFromEuler(HAND_POSE);
+    const candle = candleSet.candles.find(item => item.id === meltPose.lastCandleId);
+    if (!candle || meltPose.blend <= 0) {
+      handModel.position.set(0, 0, 0);
+      handModel.quaternion.copy(poseScratch.base);
+      handModel.scale.setScalar(handModel.userData.handScale);
+      return;
+    }
+    // Target: flat, face up, pointing away from the player, just above the flame.
+    // The wax sits in the tip of the flame.
+    poseScratch.target.set(candle.x, candle.y + CANDLE_WICK_Y + CANDLE_FLAME_HEIGHT * .8, candle.z);
+    hand.updateMatrixWorld(true);
+    const local = hand.worldToLocal(poseScratch.target.clone());
+    camera.getWorldQuaternion(poseScratch.quaternion);
+    poseScratch.yaw.setFromQuaternion(poseScratch.quaternion, 'YXZ');
+    const flat = new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, poseScratch.yaw.y, 0, 'YXZ'));
+    hand.getWorldQuaternion(poseScratch.hand);
+    const localTurn = poseScratch.hand.invert().multiply(flat);
+    const t = meltPose.blend * meltPose.blend * (3 - 2 * meltPose.blend);
+    handModel.position.set(0, 0, 0).lerp(local, t);
+    handModel.quaternion.copy(poseScratch.base).slerp(localTurn, t);
+    // A little smaller over the small candle than up close in the hand.
+    handModel.scale.setScalar(handModel.userData.handScale * (1 - .3 * t));
+  }
+
+  function meltHeldWax(progress, candleId, { restoreCoat = true } = {}) {
+    meltPose.candleId = progress > 0 && candleId ? candleId : null;
+    if (meltPose.candleId) meltPose.lastCandleId = meltPose.candleId;
+    if (!restoreCoat && !meltPose.candleId) return;
     // The held model wears per-model material copies: find the wax by its tag.
     const crust = handModel?.children.find(child => child.isMesh && child.userData.coatKind === 'wax');
     if (!crust) return;
@@ -407,6 +447,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
       hand.rotation.z = Math.sin(now * .0031) * (.012 + handMotion * .033);
       hand.position.y = -.45 + Math.sin(now * .0029) * (.012 + handMotion * .023);
       heldKeyDaylight.value += (lightAtHand() - heldKeyDaylight.value) * (1 - Math.exp(-elapsed / .065));
+      placeHeldKey(elapsed);
     } else {
       handMotion = 0;
     }

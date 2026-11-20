@@ -1,28 +1,28 @@
-import { t, applyTranslations, LANGUAGES, getLanguage, setLanguage } from './i18n.js?v=single-source';
+import { t, applyTranslations, LANGUAGES, getLanguage, setLanguage } from './i18n.js';
 // Static texts of the page follow the chosen language before anything shows.
 applyTranslations(document);
-import { TOTAL_KEYS, getProgress } from './rules.js?v=single-source';
-import { createWorld } from './world.js?v=held-key-clearance';
-import { installKeyAssetProvider } from './key-factory.js?v=key-ring';
-import { createArchiveHud } from './archive-hud.js?v=catalog-thumbnails';
-import { openArchiveSave, loadVisualSettings, clearArchiveState } from './archive-save-state-with-route.js?v=single-source';
-import { createVisualPanel } from './visual-panel.js?v=key-ring';
-import externalKeyProvider from './key-provider-entry.js?v=wax-and-bundles';
-import { createFallbackWorld } from './fallback-world.js?v=paused-scene';
-import { createPlayerMovement } from './player-movement.js?v=ledger-candle';
+import { TOTAL_KEYS, getProgress } from './rules.js';
+import { createWorld } from './world.js';
+import { installKeyAssetProvider } from './key-factory.js';
+import { createArchiveHud } from './archive-hud.js';
+import { openArchiveSave, loadVisualSettings, clearArchiveState } from './archive-save-state-with-route.js';
+import { createVisualPanel } from './visual-panel.js';
+import externalKeyProvider from './key-provider-entry.js';
+import { createFallbackWorld } from './fallback-world.js';
+import { createPlayerMovement } from './player-movement.js';
 import { createPerformanceHud } from './performance-hud.js';
-import { createInventoryWheel, logicalKey } from './controls.js?v=stable-pickup';
+import { createInventoryWheel, logicalKey } from './controls.js';
 import { edgeLookRate } from './mouse-look.js';
-import { createKeyIndex } from './key-index.js?v=key-ring';
-import { createArchiveTargeting } from './archive-surface-aim.js?v=key-ring';
-import { createArchivePrompts } from './archive-interaction-prompts.js?v=paused-stations';
-import { createArchiveActions } from './archive-actions.js?v=held-key-clearance';
-import { FIRST_ROUTE_KEY_ID, createFirstRouteGuide } from './archive-first-route-guide.js?v=key-ring';
-import { createBathProgress } from './archive-bath-progress.js?v=paused-scene';
-import { createArchiveKeyCatalog } from './archive-key-catalog.js?v=catalog-spread';
-import { createArchiveStatistics, createStatisticsPanel } from './archive-statistics.js?v=processed-count';
-import { createArchiveMusic } from './archive-music.js?v=underwater-menu';
-import { createArchiveAudio } from './archive-audio.js?v=soft-shine';
+import { createKeyIndex } from './key-index.js';
+import { createArchiveTargeting } from './archive-surface-aim.js';
+import { createArchivePrompts } from './archive-interaction-prompts.js';
+import { createArchiveActions } from './archive-actions.js';
+import { FIRST_ROUTE_KEY_ID, createFirstRouteGuide } from './archive-first-route-guide.js';
+import { createBathProgress } from './archive-bath-progress.js';
+import { createArchiveKeyCatalog } from './archive-key-catalog.js';
+import { createArchiveStatistics, createStatisticsPanel } from './archive-statistics.js';
+import { createArchiveMusic } from './archive-music.js';
+import { createArchiveAudio } from './archive-audio.js';
 import { floorSurfaceY, RUG_TOP } from './floor-contact.js';
 import { createStationClock } from './archive-station-clock.js';
 
@@ -79,6 +79,7 @@ let announceRecovery = archiveSave.recovered;
 const saveMessages = {
   unavailable: t('save.unavailable'),
   damaged: t('save.damaged'),
+  newer: t('save.newer'),
   conflict: t('save.conflict'),
   'write-error': t('save.writeError'),
   'backup-error': t('save.backupError'),

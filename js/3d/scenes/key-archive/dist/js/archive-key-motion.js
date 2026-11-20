@@ -1,4 +1,4 @@
-import { CABINET_PLACE_SECONDS } from './cabinet-layout.js?v=single-source';
+import { CABINET_PLACE_SECONDS } from './cabinet-layout.js';
 
 export const BUNDLE_RELEASE_INTERVAL_MS = 330;
 export const CABINET_CONTACT_SECONDS = .30;

@@ -1,9 +1,9 @@
 import * as THREE from '../vendor/three.js';
-import { makePaintTexture } from './art.js?v=key-ring';
+import { makePaintTexture } from './art.js';
 import { getPaintedMetalTexture } from './painted-textures.js';
-import { createHallSurfaceMaterials, createArchiveWoodTexture } from './hall-surface-textures.js?v=alchemy-candles';
+import { createHallSurfaceMaterials, createArchiveWoodTexture } from './hall-surface-textures.js';
 import { ARCHIVE_FLOOR_TEXTURE_URL } from './archive-floor-texture.js';
-import { createFurnitureShadows } from './furniture-shadows.js?v=shadow-footprints';
+import { createFurnitureShadows } from './furniture-shadows.js';
 
 function makeContactShadowMaterial() {
   const canvas = document.createElement('canvas');

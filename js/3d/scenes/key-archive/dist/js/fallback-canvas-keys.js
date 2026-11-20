@@ -1,12 +1,12 @@
-import { CABINET_KEY_SCALE_FACTOR } from './cabinet-layout.js?v=single-source';
-import { KEY_TYPES, keyCondition } from './rules.js?v=single-source';
-import { getKeyFallbackHeadPoints, createKeyFallbackStamp, getKeyMetal } from './key-factory.js?v=key-ring';
+import { CABINET_KEY_SCALE_FACTOR } from './cabinet-layout.js';
+import { KEY_TYPES, keyCondition } from './rules.js';
+import { getKeyFallbackHeadPoints, createKeyFallbackStamp, getKeyMetal } from './key-factory.js';
 import { PAINTED_METALS } from './painted-textures.js';
 import { keyAssetUrl, RUST_TEXTURE } from './key-data.js';
-import { dirtPaint, stableNoise } from './key-dirt.js?v=wax-and-bundles';
+import { dirtPaint, stableNoise } from './key-dirt.js';
 import { RUG_TOP, restingKeyY } from './floor-contact.js';
-import { windowBeamLightAt } from './window-beam-light.js?v=alchemy-candles';
-import { samplePlacement, sampleDiscard } from './archive-key-motion.js?v=key-ring';
+import { windowBeamLightAt } from './window-beam-light.js';
+import { samplePlacement, sampleDiscard } from './archive-key-motion.js';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 

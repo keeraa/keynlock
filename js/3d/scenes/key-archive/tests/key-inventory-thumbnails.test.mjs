@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import * as THREE from '../dist/vendor/three.js';
 import { createPaintedInstanceGeometry, setKeyInstanceFinish } from '../dist/js/key-instance-finish.js';
 import { thumbnailCacheKey } from '../dist/js/key-thumbnails.js';
+import { worldSource } from './helpers/world-source.mjs';
 
 test('all condition variants reuse one metal mesh with independent per-key paint', () => {
   const metal=new THREE.BoxGeometry(1,2,.12);
@@ -34,7 +35,7 @@ test('inventory uses cached 3D photographs and removes the archive patina overla
   assert.equal(thumbnailCacheKey(key),thumbnailCacheKey({...key}));
   const hud=readFileSync(new URL('../dist/js/archive-hud.js',import.meta.url),'utf8');
   const thumbnail=readFileSync(new URL('../dist/js/key-thumbnails.js',import.meta.url),'utf8');
-  const world=readFileSync(new URL('../dist/js/world.js',import.meta.url),'utf8');
+  const world=worldSource();
   const fallback=readFileSync(new URL('../dist/js/fallback-world.js',import.meta.url),'utf8');
   assert.match(hud,/slot-thumbnail/);
   assert.match(hud,/inventoryImages\.size > 48/);

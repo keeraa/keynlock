@@ -1,6 +1,6 @@
 import * as THREE from '../vendor/three.js';
-import { windowY, WINDOW_SILL_Y, WINDOW_CROWN_Y } from './hall-architecture.js?v=single-source';
-import { WINDOW_BEAM_SLOPE } from './archive-window-rays.js?v=alchemy-candles';
+import { windowY, WINDOW_SILL_Y, WINDOW_CROWN_Y } from './hall-architecture.js';
+import { WINDOW_BEAM_SLOPE } from './archive-window-rays.js';
 import { RUG_TOP } from './floor-contact.js';
 
 export const BIRD_X = -11.95;

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import * as THREE from '../dist/vendor/three.js';
 import { readFileSync } from 'node:fs';
 import { createKeyHoverOutline } from '../dist/js/key-hover-outline.js';
+import { worldSource } from './helpers/world-source.mjs';
 
 test('hover outline renders an exact key silhouette mask and a continuous 2.5px ring', () => {
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(.4, 1, .05));
@@ -36,7 +37,7 @@ test('hover outline renders an exact key silhouette mask and a continuous 2.5px 
 });
 
 test('old normal-expanded silhouette rendering is fully removed', () => {
-  const world = readFileSync(new URL('../dist/js/world.js', import.meta.url), 'utf8');
+  const world = worldSource();
   assert.match(world, /createKeyHoverOutline\(renderer, camera, keyOutline\)/);
   assert.match(world, /createKeyHoverOutline\(renderer, camera, objectMask, \{ depthAware: true \}\)/);
   assert.match(world, /objectOutline\.render\(objectHoverOpacity, hoverAnchor \? null : dustCoverage, painted\.getSceneDepth\(\)\)/);
@@ -50,14 +51,14 @@ test('cabinet and workstation hover use continuous mask outlines instead of geom
   assert.doesNotMatch(cabinets, /border\.visible|setHovered\(/);
   assert.doesNotMatch(stations, /addHoverRim|hoverFixtures/);
   assert.match(stations, /forgeHoverGeometry\(\[body, collar, hearth, edge\]\)/);
-  const world = readFileSync(new URL('../dist/js/world.js', import.meta.url), 'utf8');
+  const world = worldSource();
   assert.match(world, /getHoverSurface\(target\)/);
   assert.doesNotMatch(world, /forgeMaskGeometry/);
   assert.doesNotMatch(stations, /СТАНЦИЯ ·/);
 });
 
 test('cabinet hover restores a grid outline and highlights its aimed cell', () => {
-  const world = readFileSync(new URL('../dist/js/world.js', import.meta.url), 'utf8');
+  const world = worldSource();
   const canvas = readFileSync(new URL('../dist/js/fallback-canvas-renderer.js', import.meta.url), 'utf8');
   assert.match(world, /target\?\.kind === 'cabinet' \|\| target\?\.kind === 'bath'/);
   assert.match(world, /cabinetMaskGeometry/);

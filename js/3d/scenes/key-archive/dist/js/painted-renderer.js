@@ -1,6 +1,6 @@
 import * as THREE from '../vendor/three.js';
-import { applySceneOutlineSettings } from './scene-outline.js?v=readable-ink';
-import { createToonShader, createOutlineShader, createCopyShader, createDistanceBlurShader } from './painted-shader.js?v=cabinet-rewards';
+import { applySceneOutlineSettings } from './scene-outline.js';
+import { createToonShader, createOutlineShader, createCopyShader, createDistanceBlurShader } from './painted-shader.js';
 
 // Independent GPU passes: toon -> contours. Failure in one stage
 // cannot disable the others. The scene itself is always the final fallback.

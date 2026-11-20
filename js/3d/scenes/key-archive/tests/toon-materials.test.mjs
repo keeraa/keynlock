@@ -2,9 +2,10 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
 import { createToonShader } from '../dist/js/painted-shader.js';
+import { worldSource } from './helpers/world-source.mjs';
 
 test('toon controls operate through one GPU stage without changing scene materials or exposure', () => {
-  const world = readFileSync(new URL('../dist/js/world.js', import.meta.url), 'utf8');
+  const world = worldSource();
   const renderer = readFileSync(new URL('../dist/js/painted-renderer.js', import.meta.url), 'utf8');
   const { shader, uniforms } = createToonShader();
   try {

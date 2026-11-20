@@ -1,4 +1,4 @@
-import { bathVisualState, meltVisualIntensity, bathKeyProgress, waterDip, BATH_LIFT_MS } from './station-visual-state.js?v=cleaning-cues';
+import { bathVisualState, meltVisualIntensity, bathKeyProgress, waterDip, BATH_LIFT_MS } from './station-visual-state.js';
 
 // Matching small gouache strokes for the emergency Canvas renderer.
 export function drawBathActivity(ctx, center, radius, kind, keys, now, wallTime) {

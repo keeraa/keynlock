@@ -1,4 +1,4 @@
-import { describeBathContents } from './rules.js?v=single-source';
+import { describeBathContents } from './rules.js';
 
 const EMPTY = Object.freeze([]);
 const EMPTY_BATH = Object.freeze(describeBathContents(EMPTY, 0));

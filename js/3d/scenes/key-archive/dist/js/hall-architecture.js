@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { createMetricBoxGeometry } from './metric-box-geometry.js?v=23';
+import { createMetricBoxGeometry } from './metric-box-geometry.js';
 
 export const WINDOW_CENTERS = Object.freeze([-17, -8.5, 0, 8.5, 17]);
 export const PILASTER_CENTERS = Object.freeze([-21.5, -12.75, -4.25, 4.25, 12.75, 21.5]);

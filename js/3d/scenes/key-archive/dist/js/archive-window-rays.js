@@ -1,12 +1,12 @@
 import * as THREE from '../vendor/three.js';
-import { WINDOW_CENTERS } from './hall-architecture.js?v=single-source';
-import { birdShadowGlsl } from './archive-entrance-light.js?v=alchemy-candles';
+import { WINDOW_CENTERS } from './hall-architecture.js';
+import { birdShadowGlsl } from './archive-entrance-light.js';
 import { RUG_TOP } from './floor-contact.js';
 import { WINDOW_WALL_X as WALL_X, WINDOW_BEAM_SILL as SILL, WINDOW_BEAM_SPRING as SPRING,
   WINDOW_BEAM_CROWN as CROWN, WINDOW_BEAM_HALF_WIDTH as HALF_WIDTH,
-  WINDOW_BEAM_SLOPE } from './window-beam-light.js?v=alchemy-candles';
+  WINDOW_BEAM_SLOPE } from './window-beam-light.js';
 
-export { WINDOW_BEAM_SLOPE, windowBeamLightAt } from './window-beam-light.js?v=alchemy-candles';
+export { WINDOW_BEAM_SLOPE, windowBeamLightAt } from './window-beam-light.js';
 
 const { y: SLOPE_Y, z: SLOPE_Z } = WINDOW_BEAM_SLOPE;
 export const WINDOW_LIGHT_POSITION = [-24, 24 * SLOPE_Y, 24 * SLOPE_Z];

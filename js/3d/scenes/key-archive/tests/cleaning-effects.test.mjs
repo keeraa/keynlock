@@ -5,6 +5,7 @@ import * as THREE from '../dist/vendor/three.js';
 import { createCleaningEffects } from '../dist/js/cleaning-effects.js';
 import { rustFlakingPaint, RUST_FLAKING_BASE } from '../dist/js/key-instance-finish.js';
 import { createForgeKeyProvider } from '../dist/js/key-forge-adapter.js';
+import { worldSource } from './helpers/world-source.mjs';
 
 const source = JSON.parse(readFileSync(new URL('../dist/assets/key-design-profiles.json', import.meta.url), 'utf8'));
 
@@ -66,17 +67,20 @@ test('coat API rebuilds washed or melted coats in the family model space', () =>
 
 test('baths and candle drive the new cleaning animations', () => {
   const stations = readFileSync(new URL('../dist/js/wash-forge-stations.js', import.meta.url), 'utf8');
-  const world = readFileSync(new URL('../dist/js/world.js', import.meta.url), 'utf8');
+  const world = worldSource();
+  const pose = readFileSync(new URL('../dist/js/held-key-pose.js', import.meta.url), 'utf8');
+  const wax = readFileSync(new URL('../dist/js/held-wax-melt.js', import.meta.url), 'utf8');
   const actions = readFileSync(new URL('../dist/js/archive-actions.js', import.meta.url), 'utf8');
   assert.match(stations, /cleaning\.clods\(slot, key/);
   assert.match(stations, /cleaning\.flakes\(slot, key/);
   assert.match(stations, /onLiftDone\?\.\(key, from\)/);
-  assert.match(world, /function startHandFlight\(key, from\)/, 'a bath key flies into the hand');
+  assert.match(world, /heldKey\.startHandFlight\(key, from\)/, 'a bath key flies into the hand');
+  assert.match(pose, /function startHandFlight\(key, from\)/);
   assert.match(world, /status !== 'floor'\) \{\s*keyHoverOpacity = 0;/, 'a picked-up key loses its outline at once');
   assert.match(world, /function meltHeldWax\(progress, candleId/);
-  assert.match(world, /function placeHeldKey\(elapsed\)/, 'the key leaves the hand for the flame');
+  assert.match(world, /heldPose\.place\(handModel, displayedHandId, elapsed\)/, 'the key leaves the hand for the flame');
   assert.match(actions, /world\.meltHeldWax\?\.\(0, null, \{ restoreCoat: false \}\)/);
-  assert.match(world, /child\.userData\.coatKind === 'wax'/, 'held wax is found even with copied materials');
+  assert.match(wax, /child\.userData\.coatKind === 'wax'/, 'held wax is found even with copied materials');
   assert.match(actions, /world\.meltHeldWax\?\.\(1 - \(melting\.until - now\) \/ WAX_MELT_MS/);
   assert.match(actions, /world\.shineHand\(key\.id\)/);
   assert.match(world, /cleaningEffects\.shine\(handModel, 5, \{ attachTo: hand \}\);\s*playSound\?\.\('keyShine', camera\.position\)/);
@@ -93,9 +97,10 @@ test('coat meshes are tagged so a held key with copied materials still finds its
 });
 
 test('wax melts where the flame is, and the flame gutters meanwhile', async () => {
-  const world = readFileSync(new URL('../dist/js/world.js', import.meta.url), 'utf8');
-  assert.match(world, /melt\.heat\[index\] = Math\.min\(1, melt\.heat\[index\] \+ rate \* dt\)/);
-  assert.match(world, /candle\?\.disturb\?\.\(meltPose\.candleId \? meltPose\.blend : 0\)/);
+  const wax = readFileSync(new URL('../dist/js/held-wax-melt.js', import.meta.url), 'utf8');
+  assert.match(wax, /melt\.heat\[index\] = Math\.min\(1, melt\.heat\[index\] \+ rate \* dt\)/);
+  const pose = readFileSync(new URL('../dist/js/held-key-pose.js', import.meta.url), 'utf8');
+  assert.match(pose, /candle\?\.disturb\?\.\(meltPose\.candleId \? meltPose\.blend : 0\)/);
   const { createArchiveCandles } = await import('../dist/js/archive-candles.js');
   const scene = new THREE.Scene();
   const { candles } = createArchiveCandles(scene);
@@ -115,8 +120,9 @@ test('rust tray: smoke rises and fades; bath keys aim along their length; bench 
   const aim = readFileSync(new URL('../dist/js/archive-surface-aim.js', import.meta.url), 'utf8');
   assert.match(stations, /function trayKey\(bath, slot, key, index, wallTime\)/);
   assert.match(stations, /ray\.intersectsBox\(keyBox\)/);
-  assert.match(stations, /const top = block\(group, \[4\.92/);
-  assert.match(stations, /occluders\.push\(apron, top\)/);
+  // One slab (no separate board on top) that still hides floor keys under it.
+  assert.match(stations, /occluders\.push\(top\)/);
+  assert.doesNotMatch(stations, /apron/);
   assert.match(aim, /if \(hiddenBehindFurniture\(hit\.point\)\) continue;/);
   assert.match(aim, /const assisted = visibleKey\(/);
 });
@@ -145,4 +151,47 @@ test('the rust bath hisses from the real recording and fades out gradually', () 
   assert.match(audio, /const sizzle = recordings\.waxStart\[0\]/);
   assert.match(audio, /volume\.gain\.setTargetAtTime\(0, now \+ layer\.attack \+ \.4, layer\.decay \/ 4\)/);
   assert.match(audio, /if \(kind === 'rust' && .*fizz\(level\)\) return;/);
+});
+
+test('the held key flies into the hand, lies over the candle, and the flame calms after', async () => {
+  const { createHeldKeyPose } = await import('../dist/js/held-key-pose.js');
+  let now = 0;
+  const camera = new THREE.PerspectiveCamera();
+  const hand = new THREE.Group();
+  camera.add(hand);
+  const disturbed = [];
+  const candles = [{ id: 'c1', x: 1, y: 0, z: -2, disturb: level => disturbed.push(level) }];
+  const pose = createHeldKeyPose({ hand, camera, candles, sceneNow: () => now });
+  const model = new THREE.Object3D();
+  assert.ok(pose.resting);
+  pose.startHandFlight({ id: 'k' }, new THREE.Matrix4().makeTranslation(0, -1, -1));
+  pose.place(model, 'k', .016);
+  assert.ok(pose.flying && !pose.resting);
+  assert.ok(model.position.length() > .5, 'starts where the bath lifted it');
+  now = 500;
+  pose.place(model, 'k', .016);
+  assert.ok(!pose.flying);
+  pose.holdOverCandle('c1');
+  for (let i = 0; i < 60; i++) pose.place(model, 'k', .05);
+  assert.ok(disturbed.at(-1) > .9, 'the flame gutters under the melting wax');
+  assert.ok(model.position.length() > 1, 'the key has left the hand for the flame');
+  pose.holdOverCandle(null);
+  for (let i = 0; i < 60; i++) pose.place(model, 'k', .05);
+  assert.ok(pose.resting);
+  assert.equal(model.position.length(), 0);
+  pose.release();
+  assert.equal(disturbed.at(-1), 0);
+});
+
+test('the workbench is one narrow slab that still holds the widest bowl', async () => {
+  const { BENCH, RUST_TRAY } = await import('../dist/js/wash-forge-stations.js');
+  const { FORGE_SURFACE_Y } = await import('../dist/js/station-layout.js');
+  assert.ok(BENCH.depth <= 1.3, 'narrower than the old 1.48 m top');
+  const waterBowl = .57, forge = .55;
+  assert.ok(BENCH.depth >= 2 * waterBowl, 'the water bowl stands on the wood');
+  assert.ok(BENCH.depth >= 2 * forge && BENCH.depth >= RUST_TRAY.depth);
+  // Legs and rails stay under the slab.
+  for (const offset of [...BENCH.legs, ...BENCH.rails]) assert.ok(Math.abs(offset) + .08 < BENCH.depth / 2);
+  assert.ok(Math.abs(BENCH.surfaceY - .9275) < 1e-9, 'vessels keep standing where they did');
+  assert.ok(FORGE_SURFACE_Y > BENCH.surfaceY);
 });

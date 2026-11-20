@@ -1,4 +1,4 @@
-import { FIXTURE_OFFSETS } from './station-layout.js?v=single-source';
+import { FIXTURE_OFFSETS } from './station-layout.js';
 
 // Bake the broad shade and the darker contact at the feet into one image
 // per surface. The same artwork is projected in both renderers.
@@ -64,15 +64,15 @@ function legShadows(x, front, back, halfSize) {
 
 export function createFurnitureShadows() {
   return {
-    benchFloor: bakeFloorShadow(6.2, 2.95, [
-      [.18, -.10, 2.46, .76, .29, .26],
-      ...legShadows(2.29, -.63, .61, .08),
+    benchFloor: bakeFloorShadow(6.2, 2.6, [
+      [.18, -.08, 2.46, .62, .29, .26],
+      ...legShadows(2.29, -.47, .47, .08),
     ]),
     deskFloor: bakeFloorShadow(2.8, 3.35, [
       [.15, -.085, .845, 1.08, .31, .27],
       ...legShadows(.7, -.9, .9, .065),
     ]),
-    fixtures: bakeShadow(4.92, 1.48, [
+    fixtures: bakeShadow(5.0, 1.26, [
       // Each vessel gets a soft shade offset from the windows, then a tighter
       // band where its base meets the wood.
       [FIXTURE_OFFSETS.mud + .19, -.045, .73, .60, .58],

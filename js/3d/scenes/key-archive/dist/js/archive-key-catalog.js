@@ -1,7 +1,7 @@
 import * as THREE from '../vendor/three.js';
-import { ARCHIVE_LEDGER, ARCHIVE_LEDGER_URL } from './archive-ledger.js?v=single-source';
-import { KEY_TYPES } from './rules.js?v=single-source';
-import { familyName, t } from './i18n.js?v=single-source';
+import { ARCHIVE_LEDGER, ARCHIVE_LEDGER_URL } from './archive-ledger.js';
+import { KEY_TYPES } from './rules.js';
+import { familyName, t } from './i18n.js';
 
 const KEYS_PER_SPREAD = 8;
 const ease = t => t * t * t * (t * (t * 6 - 15) + 10);

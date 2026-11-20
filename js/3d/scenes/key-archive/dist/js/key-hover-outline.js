@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { DUST_OCCLUSION_GLSL } from './scene-outline.js?v=readable-ink';
+import { DUST_OCCLUSION_GLSL } from './scene-outline.js';
 
 // The hovered key is drawn into a flat silhouette mask. A screen-space edge
 // around that mask is continuous even at sharp corners and inside key holes.

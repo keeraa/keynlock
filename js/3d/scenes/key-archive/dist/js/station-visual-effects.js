@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { bathVisualState, meltVisualIntensity } from './station-visual-state.js?v=cleaning-cues';
+import { bathVisualState, meltVisualIntensity } from './station-visual-state.js';
 
 // Small reusable brush dabs; all effects are local to one workstation, without
 // point lights, shadow maps, per-frame allocations or additional render passes.

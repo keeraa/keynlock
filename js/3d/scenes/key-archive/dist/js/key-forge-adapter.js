@@ -3,16 +3,16 @@
 // all display variants are derived from those same ten designs on page load.
 import * as THREE from '../vendor/three.js';
 import { KEY_TEMPLATES, METALS, defaultDesign, normalizeKeyDesign } from './key-data.js';
-import { createKeyModel as createForgeModel, disposeKeyModel } from './key-geometry.js?v=wax-and-bundles';
+import { createKeyModel as createForgeModel, disposeKeyModel } from './key-geometry.js';
 import { bowPoints, createBowShape, joinedKeyShape, keyBounds } from './key-shapes.js';
-import { getMetalMaterial } from './key-materials.js?v=wax-and-bundles';
+import { getMetalMaterial } from './key-materials.js';
 import { mudGeometry, getMudMaterial, mudBlobLayout } from './key-mud.js';
 import { waxGeometry, getWaxMaterial, waxBlobLayout } from './key-wax.js';
 
 // Hall keys are small on screen: a coarser coat grid keeps clods and wax
 // readable at about half the triangles of the Key Forge preview.
 const HALL_COAT_CELL=Object.freeze({mud:.085,wax:.095});
-import { createPaintedInstanceGeometry, setKeyInstanceFinish } from './key-instance-finish.js?v=wax-and-bundles';
+import { createPaintedInstanceGeometry, setKeyInstanceFinish } from './key-instance-finish.js';
 
 // Old archive: circle, triangle, square, diamond, pentagon, hexagon, star,
 // clover, oval, crown. Seven silhouettes match; three become new families.

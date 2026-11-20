@@ -6,6 +6,7 @@ import {
   SCENE_OUTLINE_GLSL, createSceneOutlineUniforms, applySceneOutlineSettings,
 } from '../dist/js/scene-outline.js';
 import { normalizeVisualSettings } from '../dist/js/visual-settings.js';
+import { worldSource } from './helpers/world-source.mjs';
 
 test('Key Forge eight-direction silhouette and crease shader is shared by the full scene', () => {
   assert.equal((SCENE_OUTLINE_GLSL.match(/edgeAt\(vec2\(/g) || []).length, 8);
@@ -46,7 +47,7 @@ test('contour controls preserve Forge pigment and fix width and tune strength an
 test('outline uses its own GPU pass without allocating key or room hulls', () => {
   const painter = readFileSync(new URL('../dist/js/painted-renderer.js', import.meta.url), 'utf8');
   const shader = readFileSync(new URL('../dist/js/painted-shader.js', import.meta.url), 'utf8');
-  const world = readFileSync(new URL('../dist/js/world.js', import.meta.url), 'utf8');
+  const world = worldSource();
   const page = readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8');
   assert.match(shader, /\$\{SCENE_OUTLINE_GLSL\}/);
   assert.match(painter, /applySceneOutlineSettings\(stages\.outline\.uniforms, next, renderer\.getPixelRatio\(\)\)/);
@@ -60,7 +61,7 @@ test('outline uses its own GPU pass without allocating key or room hulls', () =>
 
 test('giant cabinet keys receive a local ink edge while sharing global contour controls', () => {
   const cabinets = readFileSync(new URL('../dist/js/world-cabinet.js', import.meta.url), 'utf8');
-  const world = readFileSync(new URL('../dist/js/world.js', import.meta.url), 'utf8');
+  const world = worldSource();
   const painter = readFileSync(new URL('../dist/js/painted-renderer.js', import.meta.url), 'utf8');
   assert.match(cabinets, /color: KEY_ART\.outline\.ink/);
   assert.match(cabinets, /crownContour\.visible = Boolean\(settings\.outlineEnabled\)/);
@@ -108,6 +109,6 @@ test('shadow hatching patches lit materials once and toggles without recompiling
   scene.add(new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshLambertMaterial()));
   scene.add(new THREE.Mesh(new THREE.BoxGeometry(), metal));
   assert.equal(patchSceneShadowHatch(scene), 1);
-  const world = readFileSync(new URL('../dist/js/world.js', import.meta.url), 'utf8');
+  const world = worldSource();
   assert.match(world, /setShadowHatch\(settings\.hatchShadows\)/);
 });

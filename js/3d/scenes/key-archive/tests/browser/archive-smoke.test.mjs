@@ -41,6 +41,9 @@ before(async () => {
   await mkdir(screenshots, { recursive: true });
   browser = await chromium.launch({ headless: true,
     args: ['--enable-webgl', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--mute-audio'] });
+  // The game picks its language from the browser; these checks read Russian text.
+  const newPage = browser.newPage.bind(browser);
+  browser.newPage = (options = {}) => newPage({ locale: 'ru-RU', ...options });
 });
 
 after(async () => {

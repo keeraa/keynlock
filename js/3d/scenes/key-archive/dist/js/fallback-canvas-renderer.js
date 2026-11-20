@@ -1,23 +1,23 @@
-import { familyName } from './i18n.js?v=single-source';
+import { familyName } from './i18n.js';
 import * as THREE from '../vendor/three.js';
-import { createCabinetCompletion } from './cabinet-completion.js?v=wax-and-bundles';
-import { PERIMETER_BAND_Y } from './hall-architecture.js?v=single-source';
-import { CANDLE_FLAME_HEIGHT, CANDLE_FLAME_WIDTH, CANDLE_WICK_Y, sampleCandleFlicker } from './archive-candles.js?v=key-catalog';
-import { createFallbackKeyPainter } from './fallback-canvas-keys.js?v=stable-pickup';
-import { createFallbackArchitecture } from './fallback-canvas-architecture.js?v=paused-scene';
-import { createFurnitureShadows } from './furniture-shadows.js?v=shadow-footprints';
-import { getKeyFallbackHeadPoints } from './key-factory.js?v=key-ring';
-import { KEY_TYPES, getProgress } from './rules.js?v=single-source';
-import { cabinetContactGlow } from './archive-key-motion.js?v=key-ring';
-import { sampleThrow } from './archive-throw-trajectory.js?v=archive-foley';
-import { RIGHT_HAND_RELEASE } from './held-key-motion.js?v=single-source';
-import { windowBeamLightAt } from './archive-window-rays.js?v=alchemy-candles';
+import { createCabinetCompletion } from './cabinet-completion.js';
+import { PERIMETER_BAND_Y } from './hall-architecture.js';
+import { CANDLE_FLAME_HEIGHT, CANDLE_FLAME_WIDTH, CANDLE_WICK_Y, sampleCandleFlicker } from './archive-candles.js';
+import { createFallbackKeyPainter } from './fallback-canvas-keys.js';
+import { createFallbackArchitecture } from './fallback-canvas-architecture.js';
+import { createFurnitureShadows } from './furniture-shadows.js';
+import { getKeyFallbackHeadPoints } from './key-factory.js';
+import { KEY_TYPES, getProgress } from './rules.js';
+import { cabinetContactGlow } from './archive-key-motion.js';
+import { sampleThrow } from './archive-throw-trajectory.js';
+import { RIGHT_HAND_RELEASE } from './held-key-motion.js';
+import { windowBeamLightAt } from './archive-window-rays.js';
 import { CABINET_Z, CABINET_GRID_HALF_WIDTH, CABINET_BODY_WIDTH, CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS,
   CABINET_CROWN_SCALE_FACTOR, CABINET_DEPTH_FACTOR, CABINET_KEY_OFFSET_Y, CABINET_KEY_SCALE_FACTOR, CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_GRID_BOTTOM_Y, CABINET_GRID_TOP_Y, CABINET_HEADER_Y, CABINET_CORNICE_TOP,
   pegForSlot, CABINET_CELL_INNER_HALF_WIDTH,
-  CABINET_CELL_INNER_HALF_HEIGHT } from './cabinet-layout.js?v=single-source';
-import { FIXTURE_OFFSETS, bathId, FORGE_SURFACE_Y } from './station-layout.js?v=single-source';
-import { drawBathActivity, drawBathKeys, drawForgeActivity } from './station-canvas-effects.js?v=stable-pickup';
+  CABINET_CELL_INNER_HALF_HEIGHT } from './cabinet-layout.js';
+import { FIXTURE_OFFSETS, bathId, FORGE_SURFACE_Y } from './station-layout.js';
+import { drawBathActivity, drawBathKeys, drawForgeActivity } from './station-canvas-effects.js';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -355,8 +355,8 @@ export function createFallbackCanvasRenderer({
 
   function drawStation(station) {
     const { x, z } = station;
-    const table = [[x - 2.52, .88, z - .74], [x + 2.52, .88, z - .74],
-      [x + 2.52, .88, z + .87], [x - 2.52, .88, z + .87]];
+    const table = [[x - 2.5, .88, z - .55], [x + 2.5, .88, z - .55],
+      [x + 2.5, .88, z + .71], [x - 2.5, .88, z + .71]];
     if (path3(table, surfaces.bench, '#cba774', 3)) {
       ctx.save();
       ctx.clip();

@@ -165,3 +165,7 @@ body.playing #world,body.playing #hud{cursor:none}
 .ledger-dialog button:focus-visible{outline:2px solid #ffe7ae;outline-offset:3px}
 .ledger-flight{position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:none;will-change:transform;border-radius:3px;box-shadow:0 4px #654328,0 8px 20px #20130f55}
 @media(max-width:450px){.ledger-spread{padding:7px}.ledger-navigation output{font-size:13px}.ledger-navigation button{padding-inline:8px}}
+
+#webgl-required{position:fixed;inset:0;z-index:100;display:grid;place-content:center;gap:12px;padding:24px;text-align:center;background:#14211f;color:#f1e3c4}
+#webgl-required h1{margin:0;font-size:clamp(22px,4vw,36px);font-weight:normal;color:#f5d69b}
+#webgl-required p{margin:0 auto;max-width:34em;line-height:1.5;color:#d9c9a8}

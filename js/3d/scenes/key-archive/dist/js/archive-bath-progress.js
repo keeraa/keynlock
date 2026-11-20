@@ -1,7 +1,9 @@
 import { t } from './i18n.js';
 import { STATIONS, FIXTURE_OFFSETS, FORGE_SURFACE_Y, bathId } from './station-layout.js';
-import { RUST_TRAY } from './wash-forge-stations.js';
-import { smeltingState } from './rules.js';
+import { RUST_TRAY } from './rust-tray.js';
+import { smeltingState, SMELT_SECONDS } from './rules.js';
+
+const SMELT_SCAN_MS = 250;
 import { bathKeyProgress, waterDipCount } from './station-visual-state.js';
 
 // Membership comes from the existing bath index.
@@ -89,9 +91,26 @@ export function createBathProgress(document, world, keyIndex, state = null, stat
       element.style.height = `${Math.max(4, Math.min(8, barWidth * .065))}px`;
     }
   }
+  // The smelting queue is found by scanning all 1000 keys, so do that a few
+  // times a second and recompute the countdown from the cached queue each frame.
+  let smeltQueue = null, smeltQueueAt = -Infinity;
+  function currentSmelt(now) {
+    const wall = performance.now();
+    if (wall - smeltQueueAt >= SMELT_SCAN_MS || (smeltQueue && smeltQueue.key.smeltUntil <= now)) {
+      smeltQueueAt = wall;
+      smeltQueue = smeltingState(state, now);
+    }
+    if (!smeltQueue) return null;
+    const { key, waiting, lastUntil } = smeltQueue;
+    return { key, waiting,
+      progress: Math.max(0, Math.min(1, 1 - (key.smeltUntil - now) / (SMELT_SECONDS * 1000))),
+      secondsLeft: Math.ceil((key.smeltUntil - now) / 1000),
+      totalSecondsLeft: Math.ceil((lastUntil - now) / 1000) };
+  }
+
   function updateForge(now, width, height, focal) {
     if (!forge.element || !state) return;
-    const smelt = smeltingState(state, now);
+    const smelt = currentSmelt(now);
     eye.copy(forge.position).applyMatrix4(camera.matrixWorldInverse);
     projected.copy(forge.position).project(camera);
     const visible = eye.z < -.1 && Math.abs(projected.x) < 1.05 && Math.abs(projected.y) < 1.05;

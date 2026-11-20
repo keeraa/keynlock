@@ -6,8 +6,10 @@ import { createArchiveActions } from '../dist/js/archive-actions.js';
 import { createKeyIndex } from '../dist/js/key-index.js';
 import { BUNDLE_COST, MAX_HELD, createInitialState, upgradeKeyConditions } from '../dist/js/rules.js';
 import { createCleaningEffects } from '../dist/js/cleaning-effects.js';
+import { mainSource } from './helpers/main-source.mjs';
 
-const source = file => readFileSync(new URL(`../dist/js/${file}`, import.meta.url), 'utf8');
+const source = file => file === 'main.js' ? mainSource()
+  : readFileSync(new URL(`../dist/js/${file}`, import.meta.url), 'utf8');
 
 function rustBathWith(readyCount, { aimedIndex = 0, held = 0 } = {}) {
   const state = createInitialState();
@@ -44,7 +46,7 @@ test('taking from the tray stops when the hands are full', () => {
 });
 
 test('the rust tray lift is short', () => {
-  const [, ms] = source('wash-forge-stations.js').match(/TRAY_LIFT_MS = (\d+)/);
+  const [, ms] = source('rust-tray.js').match(/TRAY_LIFT_MS = (\d+)/);
   assert.ok(Number(ms) <= 1500, `tray lift ${ms} ms`);
 });
 
@@ -59,7 +61,7 @@ test('the ring costs 25 metal; rings bought for 15 under the old price are kept'
 
 test('edge turning only runs where the browser never grants pointer lock', () => {
   const main = source('main.js');
-  assert.match(main, /if \(!lockUnavailable\) \{ edgeLook\.until = 0; return; \}/);
+  assert.match(main, /if \(!pointerLock\.unavailable\) \{ edgeLook\.until = 0; return; \}/);
   assert.match(main, /const EDGE_LOOK_HOLD_MS = 300;/);
   assert.match(main, /'mouseleave', \(\) => \{ lastPointer = null; edgeLook\.until = 0; \}/);
 });
@@ -82,7 +84,7 @@ test('the catalog shows each cabinet\'s fill and lights up finished ones', async
 test('a finished cabinet gets a fanfare and stars; the finale opens the forgotten door', () => {
   const main = source('main.js');
   assert.match(main, /tone\('fanfare'\);\s*world\.celebrateCabinet\?\.\(cabinet\.type\);/);
-  assert.match(main, /showVictory: celebrateCompletion/);
+  assert.match(main, /showVictory: \(\) => celebrations\.celebrateCompletion\(\)/);
   assert.match(main, /world\.startFinale\?\.\(\);\s*tone\('finale'\);/);
   const audio = source('archive-audio.js');
   assert.match(audio, /fanfare: \[/);

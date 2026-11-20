@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { mainSource } from './helpers/main-source.mjs';
 
 test('cabinet face uses individual cubbies, a painted family name and no hooks', () => {
   const source = readFileSync(new URL('../dist/js/world-cabinet.js', import.meta.url), 'utf8');
@@ -34,7 +35,7 @@ test('keyboard hints sit at lower left and inventory at lower right', () => {
 
 test('game HUD hides the status strip and mouse-lock warning', () => {
   const page = readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8');
-  const main = readFileSync(new URL('../dist/js/main.js', import.meta.url), 'utf8');
+  const main = mainSource();
   assert.doesNotMatch(page, /telemetry-panel|capture-hint/);
   assert.doesNotMatch(main, /capture-retry|floor-count|symbols\[target\.type\]/);
 });

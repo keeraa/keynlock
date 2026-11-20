@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import {
   createCombinedKeyGeometry, createKeyModel, getKeyColliderSize,
   getKeyDisplayScale, getKeyMetal, getKeyProviderName,
-  getKeyFallbackHeadPoints,
 } from '../dist/js/key-factory.js';
 
 test('legacy key provider preserves archive asset conventions', () => {
@@ -14,7 +13,6 @@ test('legacy key provider preserves archive asset conventions', () => {
   assert.equal(getKeyDisplayScale('cabinet', 0), .185);
   assert.equal(getKeyDisplayScale('bath', 0), .22);
   assert.equal(typeof getKeyMetal(0), 'string');
-  assert.ok(getKeyFallbackHeadPoints(0).length >= 3);
   assert.ok(createCombinedKeyGeometry(0).isBufferGeometry);
   assert.ok(createKeyModel(0, { scale: .52 }).isObject3D);
 });

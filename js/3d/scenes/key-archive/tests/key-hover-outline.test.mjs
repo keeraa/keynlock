@@ -59,14 +59,9 @@ test('cabinet and workstation hover use continuous mask outlines instead of geom
 
 test('cabinet hover restores a grid outline and highlights its aimed cell', () => {
   const world = worldSource();
-  const canvas = readFileSync(new URL('../dist/js/fallback-canvas-renderer.js', import.meta.url), 'utf8');
   assert.match(world, /target\?\.kind === 'cabinet' \|\| target\?\.kind === 'bath'/);
   assert.match(world, /cabinetMaskGeometry/);
   assert.match(world, /pegForSlot\(target\.slot\)/);
   assert.match(world, /makeTranslation\(0, cabinetGridCenterY, cabinetGridFrontZ\)/);
   assert.match(world, /makeTranslation\(peg\.x, peg\.y, CABINET_CELL_BACK_Z \+ \.002\)/);
-  assert.doesNotMatch(canvas, /CABINET_OUTLINE/);
-  assert.match(canvas, /hovered\?\.kind === 'cabinet'/);
-  assert.match(canvas, /path3\(cornersAt\(rearX\), null, null\)/);
-  assert.match(canvas, /getKeyFallbackHeadPoints\(type\)/);
 });

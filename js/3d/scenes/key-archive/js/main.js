@@ -2,7 +2,7 @@ import { t, applyTranslations, LANGUAGES, getLanguage, setLanguage } from './i18
 // Static texts of the page follow the chosen language before anything shows.
 applyTranslations(document);
 import { TOTAL_KEYS, getProgress } from './rules.js?v=stable-pickup';
-import { createWorld } from './world.js?v=paused-scene';
+import { createWorld } from './world.js?v=held-key-clearance';
 import { installKeyAssetProvider } from './key-factory.js?v=key-ring';
 import { createArchiveHud } from './archive-hud.js?v=catalog-thumbnails';
 import { openArchiveSave, loadVisualSettings, clearArchiveState } from './archive-save-state-with-route.js?v=paused-stations';
@@ -16,13 +16,13 @@ import { edgeLookRate } from './mouse-look.js';
 import { createKeyIndex } from './key-index.js?v=key-ring';
 import { createArchiveTargeting } from './archive-surface-aim.js?v=key-ring';
 import { createArchivePrompts } from './archive-interaction-prompts.js?v=paused-stations';
-import { createArchiveActions } from './archive-actions.js?v=paused-stations';
+import { createArchiveActions } from './archive-actions.js?v=held-key-clearance';
 import { FIRST_ROUTE_KEY_ID, createFirstRouteGuide } from './archive-first-route-guide.js?v=key-ring';
 import { createBathProgress } from './archive-bath-progress.js?v=paused-scene';
 import { createArchiveKeyCatalog } from './archive-key-catalog.js?v=catalog-spread';
 import { createArchiveStatistics, createStatisticsPanel } from './archive-statistics.js?v=processed-count';
-import { createArchiveMusic } from './archive-music.js?v=room-music';
-import { createArchiveAudio } from './archive-audio.js?v=key-shine';
+import { createArchiveMusic } from './archive-music.js?v=ceiling-default';
+import { createArchiveAudio } from './archive-audio.js?v=soft-shine';
 import { floorSurfaceY, RUG_TOP } from './floor-contact.js';
 import { createStationClock } from './archive-station-clock.js';
 

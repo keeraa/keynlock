@@ -1,10 +1,10 @@
-import { createArchiveMusicMix } from './archive-music-mix.js';
+import { createArchiveMusicMix } from './archive-music-mix.js?v=ceiling-default';
 
 const VOLUME_KEY = 'keynlock-archive-music-volume-v1';
 const SPATIAL_KEY = 'keynlock-archive-music-spatial-v1';
 const POSITION_KEY = 'keynlock-archive-music-position-v1';
 const SAVE_INTERVAL_MS = 800;
-const DEFAULT_VOLUME = 28;
+const DEFAULT_VOLUME = 25;
 const TRACKS = [
   new URL('../assets/music/chopin-nocturne-op9-no1.mp3', import.meta.url).href,
   new URL('../assets/music/chopin-nocturne-op9-no2.mp3', import.meta.url).href,
@@ -13,12 +13,12 @@ const TRACKS = [
 
 export function createArchiveMusic(browserWindow, storage) {
   let volume = DEFAULT_VOLUME;
-  let spatial = false;
+  let spatial = true;
   try {
     const saved = storage?.getItem(VOLUME_KEY);
     if (saved !== null && saved !== undefined && /^\d+$/.test(saved))
       volume = Math.min(100, Number(saved));
-    spatial = storage?.getItem(SPATIAL_KEY) === '1';
+    spatial = storage?.getItem(SPATIAL_KEY) !== '0';
   } catch { /* storage is optional */ }
 
   let audio, track = 0, failed = 0;

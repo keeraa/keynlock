@@ -149,7 +149,7 @@ test('pause filters live playback and the saved room mix uses two ceiling speake
   assert.equal(graph.speakers.length, 2);
   browser.player.currentTime = 14;
   music.setPaused(true);
-  assert.ok(graph.filter.frequency.value < 1500);
+  assert.equal(graph.filter.frequency.value, 520);
   assert.equal(browser.player.paused, false);
   music.setPaused(false);
   assert.ok(graph.filter.frequency.value > 18000);
@@ -161,4 +161,13 @@ test('pause filters live playback and the saved room mix uses two ceiling speake
   music.setSpatial(false);
   assert.equal(data.get(spatialKey), '0');
   assert.deepEqual(graph.gains.slice(0, 3).map(node => node.gain.value), [1, 0, 0]);
+});
+
+test('music defaults to 25 percent through ceiling speakers and honors existing preferences', () => {
+  const defaults = setup().music;
+  assert.equal(defaults.getVolume(), 25);
+  assert.equal(defaults.getSpatial(), true);
+  const saved = setup({ [volumeKey]: '71', 'keynlock-archive-music-spatial-v1': '0' }).music;
+  assert.equal(saved.getVolume(), 71);
+  assert.equal(saved.getSpatial(), false);
 });

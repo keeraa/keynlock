@@ -252,7 +252,7 @@ export function createArchiveActions({
     forward.y = 0;
     forward.normalize();
     camera.updateMatrixWorld(true);
-    const releasePoint = camera.localToWorld(new THREE.Vector3(
+    const releasePoint = world.getThrowRelease?.() ?? camera.localToWorld(new THREE.Vector3(
       RIGHT_HAND_RELEASE.x, RIGHT_HAND_RELEASE.y, RIGHT_HAND_RELEASE.z));
     const reach = 3.4 + aimHeight * 1.1;
     const { x, z } = findFreeFloorSpot(state.keys,

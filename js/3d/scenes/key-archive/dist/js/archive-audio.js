@@ -1,7 +1,7 @@
 // Short, procedural Foley. Clips are generated once per session and reused.
 const SAMPLE_RATE = 24000;
 const EFFECT_LEVEL = {
-  pickup: .65, throw: .56, dropWood: .67, dropRug: .60, row: .62, keyShine: .47,
+  pickup: .65, throw: .56, dropWood: .67, dropRug: .60, row: .62, keyShine: .3995,
   water: .47, lift: .52, waxStart: .42, waxDone: .52, melt: .19,
 };
 const PROCEDURAL_FALLBACKS = { pickup: 'take', throw: 'release', keyShine: 'waxDone' };

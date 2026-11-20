@@ -1,3 +1,5 @@
+const MENU_CUTOFF_HZ = 520;
+const PLAY_CUTOFF_HZ = 19500;
 const CEILING_SPEAKERS = [[-4.8, 11.4, -9], [4.8, 11.4, 9]];
 
 function roomImpulse(context) {
@@ -22,7 +24,7 @@ export function createArchiveMusicMix(context, audio, { volume, paused, spatial 
   const filter = context.createBiquadFilter();
   filter.type = 'lowpass';
   filter.Q.value = .4;
-  filter.frequency.value = paused ? 1050 : 19500;
+  filter.frequency.value = paused ? MENU_CUTOFF_HZ : PLAY_CUTOFF_HZ;
   filter.channelCount = 2;
   filter.channelCountMode = 'explicit';
   const dry = context.createGain();
@@ -70,7 +72,7 @@ export function createArchiveMusicMix(context, audio, { volume, paused, spatial 
   return {
     resume() { context.resume()?.catch(() => {}); },
     setVolume(value) { ramp(master.gain, value, .035); },
-    setPaused(paused) { ramp(filter.frequency, paused ? 1050 : 19500, .08); },
+    setPaused(paused) { ramp(filter.frequency, paused ? MENU_CUTOFF_HZ : PLAY_CUTOFF_HZ, .08); },
     setSpatial(enabled) {
       ramp(dry.gain, enabled ? .08 : 1, .12);
       ramp(speakers.gain, enabled ? .93 : 0, .12);

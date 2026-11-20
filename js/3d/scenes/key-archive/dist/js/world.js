@@ -31,7 +31,8 @@ import { addEntranceLighting, createEntranceContactShadows, createEntranceKeyMat
 import { WINDOW_LIGHT_POSITION, addWindowAirLight, windowBeamLightAt } from './archive-window-rays.js?v=alchemy-candles';
 import { addWindowBird } from './archive-window-bird.js?v=paused-scene';
 import { addDust } from './world-particles.js?v=alchemy-candles';
-import { nextHandMotionWeight, samplePickupLift } from './held-key-motion.js?v=stable-pickup';
+import { createHeldKeyClearance } from './held-key-clearance.js';
+import { nextHandMotionWeight, samplePickupLift, RIGHT_HAND_RELEASE } from './held-key-motion.js?v=stable-pickup';
 import { addHeldKeyWindowLight } from './held-key-light.js?v=clear-day';
 import { pegForSlot, CABINET_CELL_INNER_HALF_WIDTH, CABINET_CELL_INNER_HALF_HEIGHT,
   CABINET_CELL_BACK_Z, CABINET_COLUMNS, CABINET_COLUMN_WIDTH, CABINET_GRID_BOTTOM_Y,
@@ -83,6 +84,19 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
   const hall = new THREE.Group();
   scene.add(hall);
   makeHall(hall, mat);
+  const handObstacles = [];
+  function cacheHandObstacle(mesh) {
+    mesh.updateWorldMatrix(true, false);
+    if (!mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox();
+    const bounds = mesh.geometry.boundingBox.clone().applyMatrix4(mesh.matrixWorld);
+    if (bounds.min.y > PLAYER_EYE_HEIGHT + 1.6 || bounds.max.y < -.08) return;
+    handObstacles.push(bounds.expandByScalar(.018));
+  }
+  hall.traverse(object => {
+    if (object.isMesh && !object.isInstancedMesh && object.material?.isMeshStandardMaterial &&
+        !object.material.transparent) cacheHandObstacle(object);
+  });
+  const limitHandReach = createHeldKeyClearance(handObstacles);
   makeChandeliers(hall, mat);
   batchStaticHallMeshes(hall);
   const ledger = addArchiveLedger(scene, mat);
@@ -126,6 +140,8 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
       if (!key.mud && !key.rust && !key.wax) shineHand(key.id);
     },
   });
+  for (const cabinet of cabinets) cacheHandObstacle(cabinet.collider);
+  for (const occluder of workstations.occluders) cacheHandObstacle(occluder);
   const syncEntranceShadow = createEntranceContactShadows(scene, state.keys);
   const floorKeys = new Map(); // key ID -> its family batch and instance index
   const keysById = new Map(state.keys.map(key => [key.id, key]));
@@ -207,7 +223,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
   const { thrownKeys, placingKeys, animateThrow, animatePlace, animateDiscard,
     isThrowing, cancelPlace } = keyAnimations;
   const hand = new THREE.Group();
-  hand.position.set(.43, -.45, -.82);
+  hand.position.set(RIGHT_HAND_RELEASE.x, RIGHT_HAND_RELEASE.y, RIGHT_HAND_RELEASE.z);
   camera.add(hand);
   // Soft fill for the key in hand. It sits ~0.4 m from the key, so with
   // physical falloff a strong value washes pale metals (steel, silver) out.
@@ -219,6 +235,10 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
   let disposeHandLight = null;
   const heldKeyDaylight = { value: 0 };
   const handWorldPosition = new THREE.Vector3();
+  const carryBounds = new THREE.Box3();
+  const carryWorldBounds = new THREE.Box3();
+  const carryEye = new THREE.Vector3();
+  let handReach = 1;
   let handMotion = 0;
   let pickupAt = -Infinity;
   let hovered = null;
@@ -252,6 +272,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
     handModel = createKeyModel(key.type, { id: key.id, scale: getKeyDisplayScale('hand', key.type),
       variation: key.variation, broken: key.broken, mud: key.mud, rust: key.rust, wax: key.wax });
     handModel.rotation.set(-.12, -.34, -.53);
+    carryBounds.setFromObject(handModel);
     hand.add(handModel);
     heldKeyDaylight.value = lightAtHand();
     disposeHandLight = addHeldKeyWindowLight(handModel, heldKeyDaylight, windowWarmth);
@@ -549,11 +570,28 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
       handMotion = nextHandMotionWeight(handMotion, moving, elapsed);
       hand.rotation.z = Math.sin(now * .0031) * (.012 + handMotion * .033);
       const pickupOffset = .12 * samplePickupLift((now - pickupAt) / 1000);
-      hand.position.y = -.45 + Math.sin(now * .0029) * (.012 + handMotion * .023) - pickupOffset;
+      hand.position.set(RIGHT_HAND_RELEASE.x,
+        RIGHT_HAND_RELEASE.y + Math.sin(now * .0029) * (.012 + handMotion * .023) - pickupOffset,
+        RIGHT_HAND_RELEASE.z);
+      hand.scale.setScalar(1);
+      if (!handFlight && !meltPose.candleId && meltPose.blend === 0) {
+        hand.updateWorldMatrix(true, false);
+        carryEye.setFromMatrixPosition(camera.matrixWorld);
+        carryWorldBounds.copy(carryBounds).applyMatrix4(hand.matrixWorld);
+        const safeReach = limitHandReach(carryEye, carryWorldBounds);
+        handReach = Math.min(safeReach, handReach + elapsed * 4.5);
+        hand.position.multiplyScalar(handReach);
+        hand.scale.setScalar(handReach);
+      } else handReach = 1;
+      handLight.position.set(.3 * handReach, -.3 * handReach, -.5 * handReach);
+      handLight.intensity = .85 * handReach * handReach;
       heldKeyDaylight.value += (lightAtHand() - heldKeyDaylight.value) * (1 - Math.exp(-elapsed / .065));
       placeHeldKey(elapsed);
     } else {
       handMotion = 0;
+      handReach = 1;
+      handLight.position.set(.3, -.3, -.5);
+      handLight.intensity = .85;
       // Nothing held any more: a flame left mid-melt calms down.
       if (meltPose.lastCandleId) candleSet.candles.find(item => item.id === meltPose.lastCandleId)?.disturb?.(0);
     }
@@ -590,6 +628,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
       try { objectOutline.render(objectHoverOpacity, hoverAnchor ? null : dustCoverage, painted.getSceneDepth()); }
       catch (error) { console.warn('KEYNLOCK: object silhouette unavailable', error); }
     } }, interactables, cabinets, workstations, floorKeys, candles: candleSet.candles,
+    getThrowRelease() { return hand.getWorldPosition(new THREE.Vector3()); },
     animatePickup() { pickupAt = sceneNow(); }, refreshHand, syncKey, refreshCabinet, highlight, update, resize, meltHeldWax, shineHand,
     setLedgerVisible(visible) {
       ledger.book.visible = visible;

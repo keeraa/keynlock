@@ -2,7 +2,7 @@ import { t, applyTranslations, LANGUAGES, getLanguage, setLanguage } from './i18
 // Static texts of the page follow the chosen language before anything shows.
 applyTranslations(document);
 import { TOTAL_KEYS, getProgress } from './rules.js?v=key-ring';
-import { createWorld } from './world.js?v=cleaning-cues';
+import { createWorld } from './world.js?v=key-shine';
 import { installKeyAssetProvider } from './key-factory.js?v=key-ring';
 import { createArchiveHud } from './archive-hud.js?v=rinse-recordings';
 import { openArchiveSave, loadVisualSettings, clearArchiveState } from './archive-save-state-with-route.js?v=key-ring';
@@ -16,11 +16,11 @@ import { edgeLookRate } from './mouse-look.js';
 import { createKeyIndex } from './key-index.js?v=key-ring';
 import { createArchiveTargeting } from './archive-surface-aim.js?v=key-ring';
 import { createArchivePrompts } from './archive-interaction-prompts.js?v=key-ring';
-import { createArchiveActions } from './archive-actions.js?v=key-foley';
+import { createArchiveActions } from './archive-actions.js?v=key-shine';
 import { FIRST_ROUTE_KEY_ID, createFirstRouteGuide } from './archive-first-route-guide.js?v=key-ring';
 import { createBathProgress } from './archive-bath-progress.js?v=cleaning-cues';
 import { createArchiveMusic } from './archive-music.js?v=music-resume-seek';
-import { createArchiveAudio } from './archive-audio.js?v=key-foley';
+import { createArchiveAudio } from './archive-audio.js?v=key-shine';
 import { floorSurfaceY, RUG_TOP } from './floor-contact.js';
 
 const $ = id => document.getElementById(id);

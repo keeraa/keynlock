@@ -36,10 +36,10 @@ export function createArchiveActions({
     if (!meltSelectedWax(state)) return;
     // Fly back to the hand; the clean model replaces the coat on its own.
     world.meltHeldWax?.(0, null, { restoreCoat: false });
-    if (!key.mud && !key.rust) world.shineHand?.();
+    if (!key.mud && !key.rust && world.shineHand) world.shineHand(key.id);
+    else tone('waxDone');
     updateHud();
     save();
-    tone('waxDone');
     toast(t(key.mud || key.rust ? 'toast.waxMeltedLayer' : 'toast.waxMeltedClean'));
     invalidateHover();
   }

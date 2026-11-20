@@ -78,7 +78,8 @@ test('baths and candle drive the new cleaning animations', () => {
   assert.match(actions, /world\.meltHeldWax\?\.\(0, null, \{ restoreCoat: false \}\)/);
   assert.match(world, /child\.userData\.coatKind === 'wax'/, 'held wax is found even with copied materials');
   assert.match(actions, /world\.meltHeldWax\?\.\(1 - \(melting\.until - now\) \/ WAX_MELT_MS/);
-  assert.match(actions, /world\.shineHand\?\.\(\)/);
+  assert.match(actions, /world\.shineHand\(key\.id\)/);
+  assert.match(world, /cleaningEffects\.shine\(handModel, 5, \{ attachTo: hand \}\);\s*playSound\?\.\('keyShine', camera\.position\)/);
 });
 
 test('coat meshes are tagged so a held key with copied materials still finds its wax', () => {

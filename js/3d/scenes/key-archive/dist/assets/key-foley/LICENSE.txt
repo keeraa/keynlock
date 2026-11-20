@@ -10,8 +10,8 @@ https://freesound.org/people/cribbler/sounds/440439/
 impact-wood.wav and impact-rug.wav: Metal Trinket Fall 4.mp3 by Pancakebees
 https://freesound.org/people/Pancakebees/sounds/706843/
 
-row-bells.wav: Small bell by Throndronis
+key-shine.wav and row-bells.wav: Small bell by Throndronis
 https://freesound.org/people/Throndronis/sounds/799520/
-The first strike is from approximately 14.45 s. Three pitched copies form the following chime.
+The first strike is from approximately 14.45 s. In row-bells.wav three pitched copies form the following chime.
 
 The clips are trimmed, downmixed and gain-adjusted. The rug impact is low-pass filtered.

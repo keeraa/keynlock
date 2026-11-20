@@ -1,9 +1,10 @@
 // Short, procedural Foley. Clips are generated once per session and reused.
 const SAMPLE_RATE = 24000;
 const EFFECT_LEVEL = {
-  pickup: .65, throw: .56, dropWood: .67, dropRug: .60, row: .62,
+  pickup: .65, throw: .56, dropWood: .67, dropRug: .60, row: .62, keyShine: .47,
   water: .47, lift: .52, waxStart: .42, waxDone: .52, melt: .19,
 };
+const PROCEDURAL_FALLBACKS = { pickup: 'take', throw: 'release', keyShine: 'waxDone' };
 const SOUND_KEY = 'keynlock-archive-sound-v1';
 
 // Each layer is a decaying impact or a filtered burst of noise. Offsets give
@@ -93,6 +94,7 @@ export function createArchiveAudio(browserWindow) {
     dropWood: ['key-foley/impact-wood.wav'],
     dropRug: ['key-foley/impact-rug.wav'],
     row: ['key-foley/row-bells.wav'],
+    keyShine: ['key-foley/key-shine.wav'],
   };
   const recordings = Object.fromEntries(Object.keys(paths).map(kind => [kind, []]));
   function loadRecordings() {
@@ -130,7 +132,7 @@ export function createArchiveAudio(browserWindow) {
   }
 
   function proceduralLayers(kind) {
-    return CLIPS[kind === 'pickup' ? 'take' : kind === 'throw' ? 'release' : kind];
+    return CLIPS[PROCEDURAL_FALLBACKS[kind] ?? kind];
   }
 
   function clipFor(kind) {
@@ -225,7 +227,7 @@ export function createArchiveAudio(browserWindow) {
       const source = context.createBufferSource();
       const volume = context.createGain();
       source.buffer = clipFor(kind);
-      source.playbackRate.value = ['finish', 'row', 'ready'].includes(kind)
+      source.playbackRate.value = ['finish', 'row', 'ready', 'keyShine'].includes(kind)
         ? 1 : [1, .94, 1.06, .98, 1.03][variation++ % 5];
       const panner = position && context.createPanner?.();
       volume.gain.value = (panner ? 1 : Math.min(1, level)) * (EFFECT_LEVEL[kind] ?? 1);

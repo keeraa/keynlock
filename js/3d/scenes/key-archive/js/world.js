@@ -111,13 +111,13 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
   cabinets[0].warmEffects(renderer, camera);
   const candleSet = createArchiveCandles(scene, { drawMeshes: true });
   const cleaningEffects = createCleaningEffects(scene, camera);
-  let pendingHandShine = false;
+  let pendingHandShine = null;
   const workstations = createWorkstations(scene, mat, keyIndex, {
     effects: cleaningEffects,
     // The key leaves the bath for the hand: glint once it is fully clean.
     onLiftDone: (key, from) => {
       startHandFlight(key, from);
-      if (!key.mud && !key.rust && !key.wax) pendingHandShine = true;
+      if (!key.mud && !key.rust && !key.wax) shineHand(key.id);
     },
   });
   const syncEntranceShadow = createEntranceContactShadows(scene, state.keys);
@@ -395,7 +395,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
     melt.geometry?.dispose();
     Object.assign(melt, { keyId: null, geometry: null });
   }
-  function shineHand() { pendingHandShine = true; }
+  function shineHand(keyId) { pendingHandShine = keyId; }
 
   function syncKey(key) {
     geometryStatsCache?.invalidate();
@@ -522,9 +522,11 @@ export function createWorld(canvas, state, visualSettings, keyIndex) {
     cabinets.forEach(cabinet => cabinet.update(now));
     candleSet.update(now, cabinets);
     cleaningEffects.update(elapsed);
-    if (pendingHandShine && handModel && hand.visible && !handFlight) {
-      pendingHandShine = false;
+    if (pendingHandShine !== displayedHandId) pendingHandShine = null;
+    if (playing && pendingHandShine !== null && handModel && hand.visible && !handFlight) {
+      pendingHandShine = null;
       cleaningEffects.shine(handModel, 5, { attachTo: hand });
+      playSound?.('keyShine', camera.position);
     }
     if (handModel) {
       hand.visible = !workstations.isLifting(displayedHandId);

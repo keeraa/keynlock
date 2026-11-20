@@ -438,7 +438,8 @@ export function createWorkstations(scene, materials, keyIndex, { effects = null,
 
   // Rust tray: the key drops in and sinks with a splash, the solution reacts
   // (smoke, fizzing rings), then its head floats up so it can be grabbed.
-  const TRAY_ENTRY_MS = 850, TRAY_FLOAT_MS = 1600, TRAY_LIFT_MS = 2300;
+  // The lift is short: players collect several keys in a row (tester feedback).
+  const TRAY_ENTRY_MS = 850, TRAY_FLOAT_MS = 1600, TRAY_LIFT_MS = 1400;
   const slotWorld = new THREE.Vector3();
   function trayKey(bath, slot, key, index, wallTime) {
     const elapsed = wallTime - (key.bathUntil - SOAK_SECONDS.rust * 1000);

@@ -7,7 +7,7 @@ import { extname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { BACKUP_STORAGE_KEY } from '../../dist/js/archive-save-state-with-route.js';
-import { createInitialState, pickupKey, STORAGE_KEY } from '../../dist/js/rules.js';
+import { BUNDLE_COST, createInitialState, pickupKey, STORAGE_KEY } from '../../dist/js/rules.js';
 import { CABINET_CELL_BACK_Z, CABINET_GRID_BOTTOM_Y, CABINET_GROUND_OFFSET, CABINET_HEADER_Y, CABINET_Z, pegForSlot } from '../../dist/js/cabinet-layout.js';
 import { FIRST_ROUTE_KEY_ID } from '../../dist/js/first-route.js';
 import { FIXTURE_OFFSETS } from '../../dist/js/station-layout.js';
@@ -909,6 +909,54 @@ test('completed rows and cabinets celebrate after the last key lands', { timeout
   }
 });
 
+test('wax also melts at the lit candles beside a completed cabinet', { timeout: 90000 * SLOW }, async t => {
+  const page = await browser.newPage({ viewport: { width: 1024, height: 720 } });
+  t.after(() => page.close());
+  await page.addInitScript(() => {
+    HTMLCanvasElement.prototype.requestPointerLock = undefined;
+    HTMLMediaElement.prototype.play = async () => {};
+  });
+  await page.route('**/shelf-candle-seed', route => route.fulfill({ contentType: 'text/html', body: '<!doctype html>' }));
+  await page.route('**/js/main.js*', async route => {
+    const response = await route.fetch();
+    await route.fulfill({ response, body: await response.text() + `
+      window.shelfCandleTest = { world, state, view(position, target) {
+        camera.position.set(...position); camera.lookAt(...target);
+        camera.rotation.reorder('YXZ'); yaw = camera.rotation.y; pitch = camera.rotation.x;
+        edgeLook.until = 0;
+      }};` });
+  });
+  await page.goto(new URL('shelf-candle-seed', baseUrl).href);
+  await page.evaluate(async () => {
+    const { createInitialState, STORAGE_KEY } = await import('/js/rules.js');
+    const state = createInitialState();
+    // Cabinet 3 is complete, so both of its wall candles burn.
+    state.keys.filter(key => key.type === 3 && !key.broken).forEach((key, slot) =>
+      Object.assign(key, { status: 'sorted', cabinetSlot: slot, mud: false, rust: false, wax: false }));
+    const waxed = state.keys.find(key => key.type !== 3 && key.wax && !key.broken && key.status === 'floor');
+    waxed.status = 'held';
+    state.held = [waxed.id];
+    state.firstRoute = false;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  });
+  const errors = await enterArchive(page, 'shelf-candle');
+  const candle = await page.evaluate(() => {
+    const lit = window.shelfCandleTest.world.candles.filter(item => item.type === 3 && item.collider.userData.lit);
+    const target = lit[0].collider.getWorldPosition(new window.shelfCandleTest.world.THREE.Vector3());
+    return { count: lit.length, id: lit[0].id, target: target.toArray() };
+  });
+  assert.equal(candle.count, 2, 'both candles of the finished cabinet are lit');
+  const [x, y, z] = candle.target;
+  // Stand in the hall, a step away from the wall candle, and look at it.
+  await page.evaluate(([x, y, z]) => window.shelfCandleTest.view([x + Math.sign(-x) * 1.25, 1.78, z], [x, y, z]), [x, y, z]);
+  const prompt = page.locator('#interaction-prompt');
+  await prompt.getByText(/Поднести ключ к пламени/).waitFor();
+  await page.keyboard.press('e');
+  await prompt.getByText(/Воск тает/).waitFor();
+  await page.waitForFunction(() => !window.shelfCandleTest.state.keys.some(key => key.wax && key.status === 'held'));
+  assert.deepEqual(errors, []);
+});
+
 test('aerial perspective preserves close colors and softens distant contrast', { timeout: 45000 * SLOW }, async t => {
   const page = await browser.newPage(); t.after(() => page.close());
   await page.route('**/depth-fixture', route => route.fulfill({ contentType: 'text/html', body: '<!doctype html>' }));
@@ -971,7 +1019,7 @@ test('wax melts at the entrance and a bundle lights cabinet candles in both rend
         }};` });
     });
     await page.goto(new URL('candle-seed', baseUrl).href);
-    await page.evaluate(async () => {
+    await page.evaluate(async cost => {
       const { createInitialState, STORAGE_KEY } = await import('/js/rules.js');
       const state = createInitialState();
       const family = state.keys.filter(key => key.type === 3 && !key.broken);
@@ -980,10 +1028,10 @@ test('wax melts at the entrance and a bundle lights cabinet candles in both rend
       state.held = family.slice(92).map(key => key.id);
       state.selected = 3;
       state.firstRoute = false;
-      state.metal = 15;
-      state.keys.filter(key => key.broken).slice(0, 15).forEach(key => { key.status = 'trashed'; });
+      state.metal = cost;
+      state.keys.filter(key => key.broken).slice(0, cost).forEach(key => { key.status = 'trashed'; });
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    });
+    }, BUNDLE_COST);
     const errors = await enterArchive(page, canvas ? 'canvas' : 'candle-webgl');
     const prompt = page.locator('#interaction-prompt');
     const view = (position, target) => page.evaluate(([position, target]) => window.candleTest.view(position, target), [position, target]);

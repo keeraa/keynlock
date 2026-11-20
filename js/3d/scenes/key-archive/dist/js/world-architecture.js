@@ -147,20 +147,64 @@ export function makeHall(scene, mat) {
   forgottenDoor.position.y = .05; // Keep its bottom planted on the floor.
   scene.add(forgottenDoor);
   box(forgottenDoor, [5.5, 7.15, .4], [0, 3.67, -23.04], mat.darkBrass);
-  box(forgottenDoor, [4.67, 6.45, .43], [0, 3.39, -22.77], mat.blackWood);
+  // The leaf swings open on its left hinge when the archive is finished. It is
+  // its own uniformly scaled group (a turning child of the squashed door group
+  // would shear) and its meshes are tagged so static batching leaves them alone.
+  const HINGE_X = -2.335, HINGE_Z = -22.77;
+  const leafRoot = new THREE.Group();
+  leafRoot.position.set(HINGE_X * .5, .05, HINGE_Z);
+  const leaf = new THREE.Group();
+  leaf.scale.setScalar(.5);
+  leafRoot.add(leaf);
+  scene.add(leafRoot);
+  const onLeaf = ([x, y, z]) => [x - HINGE_X, y, (z - HINGE_Z) * 2];
+  const leafPart = mesh => { mesh.userData.forgottenDoorLeaf = true; return mesh; };
+  leafPart(box(leaf, [4.67, 6.45, .43], onLeaf([0, 3.39, -22.77]), mat.blackWood));
   for (const x of [-1.6, -.8, 0, .8, 1.6])
-    roomBox(forgottenDoor, [.11, 6.15, .48], [x, 3.35, -22.51], mat.darkWood);
-  for (const y of [1.1, 3.9, 6.3]) box(forgottenDoor, [4.49, .12, .49], [0, y, -22.5], mat.brass);
-  const keyholePlate = cylinder(forgottenDoor, .42, .075, [0, 5.25, -22.14], mat.brass, 24);
+    leafPart(roomBox(leaf, [.11, 6.15, .48], onLeaf([x, 3.35, -22.51]), mat.darkWood));
+  for (const y of [1.1, 3.9, 6.3]) leafPart(box(leaf, [4.49, .12, .49], onLeaf([0, y, -22.5]), mat.brass));
+  const keyholePlate = leafPart(cylinder(leaf, .42, .075, onLeaf([0, 5.25, -22.14]), mat.brass, 24));
   keyholePlate.rotation.x = Math.PI / 2;
-  const keyholeTop = new THREE.Mesh(new THREE.SphereGeometry(.145, 12, 8), mat.ink);
+  const keyholeTop = leafPart(new THREE.Mesh(new THREE.SphereGeometry(.145, 12, 8), mat.ink));
   keyholeTop.scale.z = .18;
-  keyholeTop.position.set(0, 5.30, -22.08);
-  forgottenDoor.add(keyholeTop);
-  box(forgottenDoor, [.17, .38, .045], [0, 5.07, -22.07], mat.ink);
-  const backLabel = makeLabel(t('sign.backHall'), t('sign.backHallNote'), { worldWidth: 4.45, worldHeight: .95, fontSize: 64 });
+  keyholeTop.position.set(...onLeaf([0, 5.30, -22.08]));
+  leaf.add(keyholeTop);
+  leafPart(box(leaf, [.17, .38, .045], onLeaf([0, 5.07, -22.07]), mat.ink));
+  // Warm light waiting behind the leaf: hidden by it until the door opens.
+  const glowMaterial = new THREE.MeshBasicMaterial({ color: 0xffe2a8, transparent: true, opacity: 0, depthWrite: false });
+  const glow = new THREE.Mesh(new THREE.PlaneGeometry(4.6 * .5, 6.4 * .5), glowMaterial);
+  glow.position.set(0, .05 + 3.39 * .5, -22.83);
+  glow.userData.forgottenDoorGlow = true;
+  glow.visible = false;
+  scene.add(glow);
+  const doorLight = new THREE.PointLight(0xffd9a0, 0, 14, 1.4);
+  doorLight.position.set(0, 1.9, -21.6);
+  scene.add(doorLight);
+  const signFor = open => makeLabel(t('sign.backHall'), t(open ? 'sign.backHallOpen' : 'sign.backHallNote'),
+    { worldWidth: 4.45, worldHeight: .95, fontSize: 64 });
+  let backLabel = signFor(false);
   backLabel.position.set(0, 8.43, -22.85);
   forgottenDoor.add(backLabel);
+  let signOpen = false;
+  const forgotten = {
+    // amount 0 = sealed, 1 = wide open with the hall behind it alight.
+    setOpen(amount) {
+      const open = Math.max(0, Math.min(1, amount));
+      const ease = open * open * (3 - 2 * open);
+      leafRoot.rotation.y = -1.25 * ease;
+      glow.visible = open > 0;
+      glowMaterial.opacity = Math.min(1, open * 1.6);
+      doorLight.intensity = 9 * ease;
+      if ((open > .5) !== signOpen) {
+        signOpen = open > .5;
+        const next = signFor(signOpen);
+        next.position.copy(backLabel.position);
+        forgottenDoor.remove(backLabel);
+        backLabel = next;
+        forgottenDoor.add(backLabel);
+      }
+    },
+  };
 
   // A few side worktables add scale without blocking the sorting path.
   for (const { x, z } of ARCHIVE_SIDE_TABLES) {
@@ -171,5 +215,6 @@ export function makeHall(scene, mat) {
       roomBox(scene, [.13, .8, .13], [x + dx, .35, z + dz], mat.darkWood).castShadow = true;
     box(scene, [1.56, .05, 2.04], [x, ARCHIVE_DESK.y - .025, z], mat.darkBrass).receiveShadow = true;
   }
+  return { forgottenDoor: forgotten };
 }
 

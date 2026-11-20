@@ -150,6 +150,15 @@ function playAt(kind, position) {
   tone(kind, level, kind === 'dropRug' || kind === 'dropWood' ? position : null);
 }
 
+// A bath finished a key. Nearby it is just the chime at the bath; from across
+// the hall the chime stays audible and a toast says which bath to visit.
+function announceBathReady(kind, position) {
+  const distance = Math.hypot(camera.position.x - position.x, camera.position.z - position.z);
+  const level = Math.max(0, 1 - Math.max(0, distance - 2) / 8);
+  tone('ready', Math.max(.35, level));
+  if (distance > 4) toast(t(`toast.bathReady.${kind}`));
+}
+
 function updateHud() { hud.update(); }
 
 function setHovered(target) {
@@ -431,7 +440,8 @@ function tick(now) {
   lastRender = now;
   const cpuStart = performance.now();
   const playing = isPlaying();
-  const delta = Math.min((now - lastTick) / 1000, .04);
+  const frameMs = now - lastTick;
+  const delta = Math.min(frameMs / 1000, .04);
   lastTick = now;
   let moving = false;
   let distance = 0;
@@ -461,9 +471,11 @@ function tick(now) {
     const currentPrompt = promptFor(hovered);
     if ($('interaction-prompt').innerHTML !== currentPrompt) $('interaction-prompt').innerHTML = currentPrompt;
   }
-  bathProgress.update(playing, playAt);
+  bathProgress.update(playing, playAt, announceBathReady);
   routeGuide.update(playing);
   world.update(sceneNow(), moving, playing, playing ? playAt : null);
+  const loweredTo = world.adaptQuality?.(now, frameMs, playing && document.visibilityState === 'visible');
+  if (loweredTo) toast(t('toast.qualityLowered', { ratio: loweredTo }));
   if (audio.hasSpatialVoices() || music.getSpatial()) {
     soundForward.set(0, 0, -1).applyQuaternion(camera.quaternion);
     soundUp.set(0, 1, 0).applyQuaternion(camera.quaternion);

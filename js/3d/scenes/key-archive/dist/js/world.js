@@ -26,6 +26,7 @@ import { createHeldKeyClearance } from './held-key-clearance.js';
 import { createFloorKeys } from './world-floor-keys.js';
 import { createWorldHover } from './world-hover.js';
 import { createHeldKey } from './held-key.js';
+import { createAutoQuality } from './auto-quality.js';
 
 const ROOM = { halfWidth: 12, halfLength: 23.4, height: 13.5 };
 
@@ -34,7 +35,9 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
   // Keep counts from every scene/postprocess pass within a single frame.
   renderer.info.autoReset = false;
   // Preserve native Retina detail: the old 1.35 cap enlarged thin key silhouettes.
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  const autoQuality = createAutoQuality({ devicePixelRatio: window.devicePixelRatio || 1 });
+  let autoQualityEnabled = visualSettings.autoQuality !== false;
+  renderer.setPixelRatio(autoQuality.pixelRatio);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   // Window geometry is static, so render the costly sunlight shadow map once.
@@ -220,7 +223,21 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
     getRenderStats: () => ({ drawCalls: renderer.info.render.calls,
       renderedTriangles: renderer.info.render.triangles,
       passes: painted.getPassCount() + hover.getPassCount() }),
+    // Called every rendered frame; returns the new pixel ratio when it drops.
+    adaptQuality(now, frameMs, active) {
+      if (!autoQualityEnabled) return null;
+      const ratio = autoQuality.sample(now, frameMs, active);
+      if (ratio) { renderer.setPixelRatio(ratio); resize(); }
+      return ratio;
+    },
+    getPixelRatio: () => renderer.getPixelRatio(),
     setVisualSettings(settings) {
+      const enabled = settings.autoQuality !== false;
+      if (enabled !== autoQualityEnabled || (!enabled && autoQuality.lowered)) {
+        autoQualityEnabled = enabled;
+        renderer.setPixelRatio(autoQuality.reset(performance.now()));
+        resize();
+      }
       applyWindowDaylight(settings);
       patchSceneShadowHatch(scene);
       setShadowHatch(settings.hatchShadows);

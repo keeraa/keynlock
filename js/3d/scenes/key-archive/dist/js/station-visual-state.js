@@ -48,3 +48,14 @@ export function meltVisualIntensity(now, impactAt) {
   const attack = Math.min(1, elapsed / 140);
   return attack * Math.pow(1 - elapsed / 1500, 1.45);
 }
+
+// Glow over a bath with a finished key waiting: a bright flash when the key
+// becomes ready, then a slow steady pulse until it is taken. readySince is
+// the scene time the bath turned ready (undefined while nothing is ready).
+export function readyGlowIntensity(now, readySince) {
+  if (!Number.isFinite(readySince)) return 0;
+  const elapsed = Math.max(0, now - readySince);
+  const flash = elapsed < 900 ? Math.sin(Math.PI * elapsed / 900) * .65 : 0;
+  const pulse = (.34 + .14 * Math.sin(elapsed * .0035)) * Math.min(1, elapsed / 250);
+  return Math.min(1, pulse + flash);
+}

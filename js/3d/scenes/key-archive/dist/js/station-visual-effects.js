@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.js';
-import { bathVisualState, meltVisualIntensity } from './station-visual-state.js';
+import { bathVisualState, meltVisualIntensity, readyGlowIntensity } from './station-visual-state.js';
 
 // Small reusable brush dabs; all effects are local to one workstation, without
 // point lights, shadow maps, per-frame allocations or additional render passes.
@@ -64,7 +64,38 @@ export function createBathEffects(group, x, kind, spotTexture, waterY, radius) {
     return sprite;
   });
 
+  // A finished key waits: a warm beacon over the bath and a ring on the
+  // liquid, visible from across the hall.
+  const beacon = new THREE.Sprite(new THREE.SpriteMaterial({ map: spotTexture, color: 0xffd98a,
+    transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
+  beacon.position.set(x, surfaceY + .42, .10);
+  beacon.renderOrder = 6;
+  beacon.visible = false;
+  const readyRing = new THREE.Mesh(new THREE.TorusGeometry(radius * .82, .012, 4, 36),
+    new THREE.MeshBasicMaterial({ color: 0xffe2a6, transparent: true, opacity: 0, depthWrite: false }));
+  readyRing.rotation.x = -Math.PI / 2;
+  readyRing.position.set(x, surfaceY + .007, .10);
+  readyRing.renderOrder = 4;
+  readyRing.visible = false;
+  group.add(beacon, readyRing);
+  let readySince;
+
+  function updateReady(now, keys, wallTime) {
+    const ready = Boolean(keys?.some(key => wallTime >= key.bathUntil));
+    if (!ready) readySince = undefined;
+    else readySince ??= now;
+    const glow = readyGlowIntensity(now, readySince);
+    beacon.visible = readyRing.visible = glow > .001;
+    if (!beacon.visible) return;
+    // Large and bright enough to catch the eye from the far end of the hall.
+    beacon.material.opacity = Math.min(1, glow * 1.15);
+    beacon.scale.set(.62 + glow * .42, .86 + glow * .56, 1);
+    readyRing.material.opacity = glow * .7;
+    readyRing.scale.setScalar(1 + glow * .08);
+  }
+
   function update(now, keys, wallTime, drip) {
+    updateReady(now, keys, wallTime);
     const state = bathVisualState(keys, kind, wallTime);
     const active = state.active > 0;
     patches.forEach((patch, index) => {

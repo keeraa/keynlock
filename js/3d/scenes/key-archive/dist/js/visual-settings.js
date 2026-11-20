@@ -13,6 +13,8 @@ export const DEFAULT_VISUAL_SETTINGS = Object.freeze({
   windowDaylight: 75,
   // Trial look: deep shadows drawn as pen hatching instead of solid black.
   hatchShadows: false,
+  // Lower the rendering resolution while the hall runs below ~40 FPS.
+  autoQuality: true,
 });
 
 const BOUNDS = Object.freeze({
@@ -32,7 +34,7 @@ export function normalizeVisualSettings(values) {
     if (input[key] != null && Number.isFinite(number))
       settings[key] = Math.min(max, Math.max(min, Math.round(number)));
   }
-  for (const key of ['toonEnabled', 'outlineEnabled', 'nightLighting', 'hatchShadows']) {
+  for (const key of ['toonEnabled', 'outlineEnabled', 'nightLighting', 'hatchShadows', 'autoQuality']) {
     if (typeof input[key] === 'boolean') settings[key] = input[key];
   }
   return settings;

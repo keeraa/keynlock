@@ -209,16 +209,21 @@ export function makeHall(scene, mat) {
   };
 
   // A few side worktables add scale without blocking the sorting path.
+  // These boxes stand in until the painted corner table model has loaded;
+  // their meshes are tagged so static batching leaves them hideable.
+  const cornerTableFallback = [];
+  const fallbackPart = mesh => { mesh.userData.cornerTableFallback = true; cornerTableFallback.push(mesh); return mesh; };
   for (const { x, z } of ARCHIVE_SIDE_TABLES) {
     furnitureShadow(scene, mat.furnitureShadows.deskFloor, x, floorSurfaceY(x, z) + .003, z);
     // One solid wooden top (no separate plate laid on it), up to the height
     // the books, candle and catalog stand at.
     const thickness = ARCHIVE_DESK.y - .74;
-    const top = box(scene, [ARCHIVE_DESK.width, thickness, ARCHIVE_DESK.depth], [x, .74 + thickness / 2, z], mat.wood);
+    const top = fallbackPart(box(scene, [ARCHIVE_DESK.width, thickness, ARCHIVE_DESK.depth], [x, .74 + thickness / 2, z], mat.wood));
     top.castShadow = top.receiveShadow = true;
     for (const dx of [-.7, .7]) for (const dz of [-.9, .9])
-      roomBox(scene, [.13, .8, .13], [x + dx, .35, z + dz], mat.darkWood).castShadow = true;
+      fallbackPart(roomBox(scene, [.13, .8, .13], [x + dx * .8, .35, z + dz], mat.darkWood)).castShadow = true;
   }
-  return { forgottenDoor: forgotten };
+  const cornerTables = { hideFallback() { for (const mesh of cornerTableFallback) mesh.visible = false; } };
+  return { forgottenDoor: forgotten, cornerTables };
 }
 

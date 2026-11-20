@@ -202,8 +202,9 @@ test('aiming at a vessel lands the right key in it, and only the right key', () 
 test('hall columns stop a thrown key; table parts do not hide the tabletop', async () => {
   const { ARCHIVE_DESK } = await import('../dist/js/archive-ledger.js');
   const pilaster = { min: { x: 11.345, y: 0, z: 3.935 }, max: { x: 12.175, y: 8, z: 4.565 } };
-  const tableTop = { min: { x: ARCHIVE_DESK.x - .875, y: .74, z: ARCHIVE_DESK.z - 1.125 },
-    max: { x: ARCHIVE_DESK.x + .875, y: ARCHIVE_DESK.y, z: ARCHIVE_DESK.z + 1.125 } };
+  const half = ARCHIVE_DESK.width / 2;
+  const tableTop = { min: { x: ARCHIVE_DESK.x - half, y: .74, z: ARCHIVE_DESK.z - 1.125 },
+    max: { x: ARCHIVE_DESK.x + half, y: ARCHIVE_DESK.y, z: ARCHIVE_DESK.z + 1.125 } };
   const withHall = createThrowScene({ hallBoxes: [pilaster, tableTop] });
   assert.ok(withHall.solids.includes(pilaster), 'the column is an obstacle');
   assert.ok(!withHall.solids.includes(tableTop), 'the table is already a surface');

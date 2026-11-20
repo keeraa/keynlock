@@ -253,7 +253,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
   resize();
   geometryStatsCache = createSceneGeometryStatsCache(scene);
   const birdShadow = windowBird.shadowUniforms;
-  function refreshProps(model, bounds, blocksPlayer) {
+  function refreshProps(model, bounds, blocksPlayer, { surface = false } = {}) {
     model.traverse(object => {
       const materials = Array.isArray(object.material) ? object.material : [object.material];
       for (const material of materials) {
@@ -267,7 +267,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
     // books and bottles on a table knock it aside.
     if (bounds) {
       throwPropBoxes.push({ min: { x: bounds.min.x, y: bounds.min.y, z: bounds.min.z },
-        max: { x: bounds.max.x, y: bounds.max.y, z: bounds.max.z }, surface: Boolean(blocksPlayer) });
+        max: { x: bounds.max.x, y: bounds.max.y, z: bounds.max.z }, surface: Boolean(blocksPlayer) || surface });
       throwScene = null;
     }
     renderer.shadowMap.needsUpdate = true;
@@ -276,6 +276,7 @@ export function createWorld(canvas, state, visualSettings, keyIndex, stationNow 
   void addArchiveDeskProps(scene, refreshProps);
   void addArchiveRoomProps(scene, {
     candles: candleSet.candles, chandeliers, workstations, materials: mat, onPlaced: refreshProps,
+    cornerTables: hallParts.cornerTables,
   });
 
   window.addEventListener('resize', resize);

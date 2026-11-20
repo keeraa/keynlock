@@ -1,4 +1,4 @@
-import { ARCHIVE_SIDE_TABLES } from './archive-ledger.js';
+import { ARCHIVE_DESK, ARCHIVE_SIDE_TABLES } from './archive-ledger.js';
 import { PLAYER_EYE_HEIGHT } from './player-config.js';
 import { inStationFootprint } from './station-layout.js';
 import { CABINET_Z, CABINET_BODY_WIDTH } from './cabinet-layout.js';
@@ -22,7 +22,7 @@ export function createPlayerMovement(camera, bounds) {
     // Keep the player capsule clear of the sealed doors at either end.
     if (Math.abs(z) > 21.75) return true;
     for (const { x: tx, z: tz } of ARCHIVE_SIDE_TABLES) {
-      if (Math.abs(x - tx) < 1.15 && Math.abs(z - tz) < 1.34) return true;
+      if (Math.abs(x - tx) < ARCHIVE_DESK.width / 2 + .27 && Math.abs(z - tz) < ARCHIVE_DESK.depth / 2 + .22) return true;
     }
     for (const { min, max } of bounds.stoolObstacles ?? []) {
       if (x > min.x - .22 && x < max.x + .22 &&

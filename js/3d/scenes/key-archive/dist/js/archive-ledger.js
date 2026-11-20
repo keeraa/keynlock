@@ -1,7 +1,8 @@
 import * as THREE from '../vendor/three.js';
 
 export const ARCHIVE_LEDGER_URL = new URL('../assets/gouache-archive-ledger-v1.webp', import.meta.url).href;
-export const ARCHIVE_DESK = Object.freeze({ x: 9.3, y: .968, z: 20.7, width: 1.75, depth: 2.25 });
+// Corner tables (Poly Haven wooden_table_02, 2.25 m long at its own proportions).
+export const ARCHIVE_DESK = Object.freeze({ x: 9.3, y: .968, z: 20.7, width: 1.40, depth: 2.25 });
 export const ARCHIVE_SIDE_TABLES = Object.freeze([
   ARCHIVE_DESK,
   { x: -ARCHIVE_DESK.x, z: -ARCHIVE_DESK.z },

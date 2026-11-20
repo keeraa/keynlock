@@ -5,6 +5,9 @@ Poly Haven, CC0 1.0
 https://polyhaven.com/a/painted_wooden_table
 https://polyhaven.com/a/painted_wooden_stool
 https://polyhaven.com/a/wooden_candlestick
+https://polyhaven.com/a/wooden_table_02
 
 The table uses the Archive's existing gouache walnut material. The candlestick
 uses the wooden holder from the base mesh together with the Quaternius candle.
+The corner tables (wooden_table_02) are stored as geometry only, without the
+2k source textures, and painted with the same gouache walnut.

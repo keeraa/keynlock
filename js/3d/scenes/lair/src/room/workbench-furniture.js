@@ -1,6 +1,6 @@
 // @ts-check
 import * as THREE from 'three';
-import { WORKBENCH_Z } from './layout.js';
+import { WORKBENCH_Z } from '../room-layout.js';
 
 // The key workbench beside the laboratory, with its tool wall.
 export function buildWorkbench(kit, wallX) {

@@ -1,6 +1,6 @@
 import { ALCHEMY_LAIR_SCALE, ALCHEMY_TABLE } from '@keynlock/alchemy/src/table-dimensions.js';
 
-// Depth increases from the window wall toward the entrance.
+// Shared room dimensions and placement along the axis from window to entrance.
 export const WORKSHOP_SHIFT = 1.5 * ALCHEMY_TABLE.width * ALCHEMY_LAIR_SCALE;
 export const ROOM_START = -5.72;
 export const ROOM_END = 26.42 - WORKSHOP_SHIFT;

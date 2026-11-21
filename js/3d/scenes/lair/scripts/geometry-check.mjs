@@ -6,7 +6,7 @@ import { buildLair } from '../src/room/build.js';
 import { createRoomOutlines } from '../src/ui/visual-settings.js';
 import { windowLightAt, FLOOR_Y, WINDOW_LIGHT_SLOPE } from '../src/room/window-light.js';
 import { WINDOW_OPENING } from '../src/room/window.js';
-import { ALCHEMY_Z, ATELIER_Z, ROOM_END, ROOM_LENGTH, WORKBENCH_Z } from '../src/room/layout.js';
+import { ALCHEMY_Z, ATELIER_Z, ROOM_END, ROOM_LENGTH, WORKBENCH_Z } from '../src/room-layout.js';
 
 // Exercise the scene graph without a GPU or browser canvas.
 const noop = () => {};

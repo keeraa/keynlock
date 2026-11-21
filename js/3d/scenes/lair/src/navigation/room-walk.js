@@ -1,7 +1,7 @@
 // @ts-check
 import * as THREE from 'three';
 import { t } from '../i18n.js';
-import { ROOM_END } from '../room/layout.js';
+import { ROOM_END } from '../room-layout.js';
 
 const eyeHeight = 1.70;
 // Match the Key Archive's player-movement.js in world units per second.

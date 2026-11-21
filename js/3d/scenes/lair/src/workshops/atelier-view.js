@@ -2,7 +2,7 @@ import { getWorkshopApi } from '../../../../core/host/workshop-host.js';
 import * as THREE from 'three';
 import { createCameraTransition } from '@keynlock/atelier/src/navigation/camera-transition.js';
 import { t } from '../i18n.js';
-import { ROOM_CENTER_Z } from '../room/layout.js';
+import { ROOM_CENTER_Z } from '../room-layout.js';
 
 export function createAtelierView({
   camera, controls, canvas, interaction, rendererHost, atelierFilter, host, easelPose, roomMinDistance, navigation,

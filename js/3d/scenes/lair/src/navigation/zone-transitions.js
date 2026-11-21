@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { WORKSHOPS } from '../workshops/workshop-overlay.js';
 import { t } from '../i18n.js';
 import { ALCHEMY_LOOK } from '@keynlock/alchemy/src/look/alchemy-look.js';
-import { ALCHEMY_Z, ATELIER_Z, WORKBENCH_Z } from '../room/layout.js';
+import { ALCHEMY_Z, ATELIER_Z, WORKBENCH_Z } from '../room-layout.js';
 
 export const ATELIER_EASELS = { position: [1.56, 3.22, ATELIER_Z], target: [-7.05, 2.48, ATELIER_Z] };
 

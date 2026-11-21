@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { canvasTexture } from './materials.js';
 import { WINDOW_CUTOUT } from './window.js';
-import { CEILING_BEAM_Z, ROOM_CENTER_Z, ROOM_END, ROOM_LENGTH, ROOM_START } from './layout.js';
+import { CEILING_BEAM_Z, ROOM_CENTER_Z, ROOM_END, ROOM_LENGTH, ROOM_START } from '../room-layout.js';
 
 // The long room itself: floor, walls, ceiling, rug and the right-wall finish.
 export function buildShell(kit) {

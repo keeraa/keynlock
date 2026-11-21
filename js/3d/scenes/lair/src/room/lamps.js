@@ -1,6 +1,6 @@
 // @ts-check
 import * as THREE from 'three';
-import { CEILING_BEAM_Z, ROOM_END } from './layout.js';
+import { CEILING_BEAM_Z, ROOM_END } from '../room-layout.js';
 
 // The Lair's lamps: three candle chandeliers in the middle of the room and
 // eight wall sconces. Only the chandeliers are real lights; each sconce paints

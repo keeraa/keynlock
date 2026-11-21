@@ -4,7 +4,7 @@ import { makeGouacheWallTexture } from '@keynlock/alchemy/src/wall-tiles.js';
 import { ALCHEMY_LAIR_SCALE } from '@keynlock/alchemy/src/table-dimensions.js';
 import { atelierWallpaperSource } from '@keynlock/atelier/src/painted-assets.js';
 import { t } from '../i18n.js';
-import { ROOM_LENGTH } from './layout.js';
+import { ROOM_LENGTH } from '../room-layout.js';
 
 const alchemyWood = name =>
   new URL(`../../../../workshops/alchemy/src/assets/wood-gouache-${name}.webp`, import.meta.url).href;

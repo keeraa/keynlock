@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createMaterials } from './room/materials.js';
 import { buildLair } from './room/build.js';
-import { ROOM_CENTER_Z, ROOM_END } from './room/layout.js';
+import { ROOM_CENTER_Z, ROOM_END } from './room-layout.js';
 import { createRoomOutlines, mountVisualSettings } from './ui/visual-settings.js';
 import { mountWorkshopOverlay } from './workshops/workshop-overlay.js';
 import { mountAtelierInRoom } from './workshops/atelier-in-room.js';

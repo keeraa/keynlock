@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { ALCHEMY_LAIR_SCALE, ALCHEMY_TABLE } from '@keynlock/alchemy/src/table-dimensions.js';
-import { ALCHEMY_Z, ATELIER_Z, WORKBENCH_Z } from '../room/layout.js';
+import { ALCHEMY_Z, ATELIER_Z, WORKBENCH_Z } from '../room-layout.js';
 
 const LAIR_FLOOR_TOP = .0385;
 

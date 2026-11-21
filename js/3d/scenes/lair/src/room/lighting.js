@@ -1,5 +1,5 @@
 // @ts-check
-import { ROOM_CENTER_Z, ROOM_LENGTH } from './layout.js';
+import { ROOM_CENTER_Z, ROOM_LENGTH } from '../room-layout.js';
 
 /** Warm side lighting with short, nearly vertical object shadows. */
 export function addRoomLighting({ THREE, scene }) {

@@ -26,7 +26,7 @@ export function mountWorkshopOverlay({onExit = () => {},onReady = () => {}, rend
   const firstFrame = document.querySelector('#workshop-frame');
   const title = document.querySelector('#workshop-title');
   const external = document.querySelector('#workshop-external');
-  const returnButton = document.querySelector('#workshop-return');
+  const returnButton = document.querySelector('#reset-camera');
   const loader = document.querySelector('#workshop-loading');
   const loadingTitle = document.querySelector('#workshop-loading-title');
   const warning = document.querySelector('#workshop-warning');
@@ -152,7 +152,6 @@ export function mountWorkshopOverlay({onExit = () => {},onReady = () => {}, rend
     frame.addEventListener('load',listener);
     loadListeners.set(id,listener);
   }
-  returnButton.addEventListener('click', close);
   return {
     preload, open, close, isOpen: () => opened,
     isReady: id => readyWorkshops.has(id),
@@ -165,7 +164,6 @@ export function mountWorkshopOverlay({onExit = () => {},onReady = () => {}, rend
         if(frame!==firstFrame)frame.remove();
       }
       unsubscribe.forEach(stop => stop());
-      returnButton.removeEventListener('click', close);
       opened = false;
       rendererHost?.deactivate(workshopId);
     },

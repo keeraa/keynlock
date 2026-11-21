@@ -11,9 +11,9 @@ import { CEILING_BEAM_Z, ROOM_END } from '../room-layout.js';
 // Glows and wall patches are light, not surfaces: userData.atmosphere keeps
 // them out of the Atelier's ink outlines.
 
-/** Chandeliers along the middle of the room, hanging low enough to light the floor. */
+/** Chandeliers along the middle of the room; the ring hangs above the window's arch. */
 export const CHANDELIERS = Object.freeze([1, 3, 5].map(index =>
-  Object.freeze({ x: 0, y: 7.7, z: CEILING_BEAM_Z[index] })));
+  Object.freeze({ x: 0, y: 9.8, z: CEILING_BEAM_Z[index] })));
 /** Wall sconces on both long walls, with space around the tool board. */
 export const SCONCES = Object.freeze([-1, 1].flatMap(side =>
   [-1.10, 4.70, 11.0, ROOM_END - 1.77].map(z => Object.freeze({ side, y: 3.1, z }))));
@@ -21,7 +21,7 @@ const WALL_X = 8.39;
 const CEILING_Y = 13.26;
 /** Day and night values; setNight blends between them. */
 const LEVELS = Object.freeze({
-  chandelier: { day: 14, night: 75 },
+  chandelier: { day: 22, night: 120 },   // hung higher: more light to reach the floor
   glow: { day: .32, night: 1.1 },
   wall: { day: .14, night: .95 },
 });
@@ -81,40 +81,47 @@ function createWallPatch(side, y, z) {
   return { patch, uniforms };
 }
 
+// The Key Archive's chandelier (key-archive/dist/js/world-lighting.js), which
+// the Lair cannot import: a forged outer and inner ring, eight curved braces
+// from a hub above, candle dishes, candles and flames. Sized for the Lair.
+const RING = 1.2, INNER = .94, HUB = .94;
 function buildChandelier(kit, { x, y, z }, flames) {
   const { m, staticGroup, cylinder, rod } = kit;
   const group = new THREE.Group();
   group.name = 'lair-chandelier';
   group.position.set(x, y, z);
   staticGroup.add(group);
-  // Chain from the ceiling beam, a forged ring and four hangers.
-  rod(group, [0, CEILING_Y - y, 0], [0, 1.25, 0], .022, m.iron, 6);
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(.62, .035, 8, 40), m.iron);
-  ring.rotation.x = Math.PI / 2;
-  group.add(ring);
-  for (let i = 0; i < 4; i++) {
-    const a = i * Math.PI / 2 + Math.PI / 4;
-    rod(group, [Math.cos(a) * .6, 0, Math.sin(a) * .6], [0, 1.25, 0], .014, m.iron, 5);
+  rod(group, [0, CEILING_Y - y, 0], [0, HUB, 0], .04, m.oldBrass, 8);
+  for (const [radius, tube, segments, height] of [[RING, .048, 48, 0], [INNER, .022, 40, .06]]) {
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(radius, tube, 6, segments), m.oldBrass);
+    ring.rotation.x = Math.PI / 2;
+    ring.position.y = height;
+    ring.castShadow = true;
+    group.add(ring);
   }
-  // Eight candles on dishes around the ring.
   for (let i = 0; i < 8; i++) {
-    const a = i * Math.PI / 4;
-    const cx = Math.cos(a) * .62, cz = Math.sin(a) * .62;
-    cylinder(group, .075, .06, .025, m.oldBrass, cx, .046, cz, 12);
-    cylinder(group, .038, .042, .22, m.paper, cx, .168, cz, 10);
-    const flame = new THREE.Mesh(new THREE.ConeGeometry(.032, .11, 8), new THREE.MeshBasicMaterial({
+    const a = i / 8 * Math.PI * 2;
+    const cx = Math.cos(a) * RING, cz = Math.sin(a) * RING;
+    const brace = new THREE.QuadraticBezierCurve3(
+      new THREE.Vector3(0, HUB, 0),
+      new THREE.Vector3(Math.cos(a) * RING * .6, .27, Math.sin(a) * RING * .6),
+      new THREE.Vector3(cx, .01, cz));
+    group.add(new THREE.Mesh(new THREE.TubeGeometry(brace, 14, .021, 5, false), m.oldBrass));
+    cylinder(group, .15, .075, .055, m.oldBrass, cx, .1, cz, 12);
+    cylinder(group, .048, .048, .23, m.paper, cx, .24, cz, 10);
+    const flame = new THREE.Mesh(new THREE.SphereGeometry(.044, 8, 8), new THREE.MeshBasicMaterial({
       color: '#ffd391', transparent: true, opacity: .92, blending: THREE.AdditiveBlending, depthWrite: false }));
-    flame.position.set(cx, .324, cz);
+    flame.scale.set(.75, 1.65, .75);
+    flame.position.set(cx, .42, cz);
     group.add(flame);
     flames.push(flame);
   }
-  const { glow, uniforms } = createGlow(2.8, WARM);
-  glow.position.y = .32;
+  const { glow, uniforms } = createGlow(3.6, WARM);
+  glow.position.y = .4;
   group.add(glow);
-  // The one real light: low enough to reach the floor and the furniture.
   const light = new THREE.PointLight(WARM, LEVELS.chandelier.day, 19, 2);
   light.name = 'lair-chandelier-light';
-  light.position.y = .1;
+  light.position.y = .05;
   group.add(light);
   return { light, glow: uniforms };
 }
@@ -151,7 +158,9 @@ export function buildLamps(kit) {
   const sconces = SCONCES.map(place => buildSconce(kit, place));
   kit.animated.push(time => {
     flames.forEach((flame, i) => {
-      flame.scale.set(.92 + Math.sin(time * 6 + i) * .09, 1 + Math.sin(time * 9 + i * 1.7) * .15, .92);
+      // Tall, narrow candle flames that waver a little.
+      const sway = .92 + Math.sin(time * 6 + i) * .09;
+      flame.scale.set(.75 * sway, 1.65 * (1 + Math.sin(time * 9 + i * 1.7) * .15), .75 * .92);
     });
   });
   /** 0 = day (lamps dim), 1 = night (lamps are the main light); in between while it changes. */

@@ -1,7 +1,7 @@
 import { Clock } from 'three';
 
 export function startLairFrames({ scene, camera, controls, renderer, rendererHost, atelierFilter,
-  room, dayNight, zoneTransitions, zoneInteraction, cameraInput, atelierView, workshopOverlay,
+  room, dayNight, zoneTransitions, zoneInteraction, cameraInput, atelierView, workshopOverlay, returnButton,
   visualUI, performancePanel }) {
   const clock = new Clock();
   const drawn = { triangles: 0, calls: 0 };
@@ -37,6 +37,7 @@ export function startLairFrames({ scene, camera, controls, renderer, rendererHos
     for (const update of room.animated) update(clock.elapsedTime);
     const currentZone = zoneTransitions.current();
     room.windowLight?.setAirHidden(currentZone === 'atelier');
+    returnButton?.update({ zone: currentZone, walking: cameraInput.isWalking(), overlayOpen: workshopOverlay.isOpen() });
     const overlayOpen = workshopOverlay.isOpen();
     zoneInteraction.update(currentZone);
     atelierView.updateInterface({ zone: currentZone, visualOpen: visualUI.isOpen(), overlayOpen });

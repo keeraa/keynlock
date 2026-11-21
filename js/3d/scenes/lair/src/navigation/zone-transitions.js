@@ -27,8 +27,11 @@ export function createZoneTransitions({
     if (currentZone !== 'alchemy' || transitioning) return;
     const offset = camera.position.clone().sub(controls.target);
     const spherical = new THREE.Spherical().setFromVector3(offset);
-    spherical.theta -= rotateX * .0055;
-    spherical.phi = THREE.MathUtils.clamp(spherical.phi + rotateY * .0045, .13, Math.PI - .13);
+    // Turn exactly like the room's OrbitControls (same direction and speed),
+    // so dragging feels the same everywhere in the Lair.
+    const perPixel = 2 * Math.PI * controls.rotateSpeed / Math.max(1, canvas.clientHeight);
+    spherical.theta -= rotateX * perPixel;
+    spherical.phi = THREE.MathUtils.clamp(spherical.phi - rotateY * perPixel, .13, Math.PI - .13);
     spherical.radius = THREE.MathUtils.clamp(spherical.radius * zoom, 2, 28);
     if (panX || panY) {
       const units = 2 * spherical.radius * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) / Math.max(1, canvas.clientHeight);

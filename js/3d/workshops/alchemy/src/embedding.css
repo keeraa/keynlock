@@ -23,22 +23,6 @@
   pointer-events: none;
 }
 #alchemy-embedded-app.is-active {display: block}
-#alchemy-embedded-app .lair-alchemy-exit {
-  position: absolute;
-  z-index: 1000;
-  top: 101px;
-  left: 22px;
-  padding: 10px 14px;
-  border: 1px solid rgba(223, 193, 133, .65);
-  border-radius: 5px;
-  background: rgba(15, 24, 22, .94);
-  color: #ead3a1;
-  font: 700 11px Arial, sans-serif;
-  letter-spacing: .12em;
-  pointer-events: auto;
-  cursor: pointer;
-}
-#alchemy-embedded-app .lair-alchemy-exit:hover {background: #344238}
 #alchemy-embedded-app .lair-alchemy-runtime-error {
   position:absolute;
   z-index:1001;

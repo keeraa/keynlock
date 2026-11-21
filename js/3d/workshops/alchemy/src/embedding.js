@@ -3,7 +3,7 @@ import styles from './styles.css?inline';
 import embeddedStyles from './embedding.css?inline';
 import { createWorkshopStatus, publishWorkshopApi } from '../../../core/host/workshop-host.js';
 
-export function createAlchemyEmbedding({ host, t, onExit }) {
+export function createAlchemyEmbedding({ host, t }) {
   const { status, update } = createWorkshopStatus();
   let root;
   let inputPlane;
@@ -32,13 +32,7 @@ export function createAlchemyEmbedding({ host, t, onExit }) {
     inputPlane = document.createElement('div');
     inputPlane.id = 'alchemy-input-plane';
     inputPlane.setAttribute('aria-hidden', 'true');
-    const exit = document.createElement('button');
-    exit.type = 'button';
-    exit.className = 'lair-alchemy-exit';
-    exit.textContent = t('← В ЛОГОВО');
-    exit.setAttribute('aria-label', t('Выйти из алхимии в логово'));
-    exit.addEventListener('click', onExit);
-    root.append(exit);
+    // Leaving the lab is the Lair's one return button (#reset-camera).
 
     const style = document.createElement('style');
     style.textContent = `${embeddedStyles}\n@scope (#alchemy-embedded-app) {\n${styles}\n}`;

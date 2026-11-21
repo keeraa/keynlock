@@ -2,12 +2,27 @@ import assert from 'node:assert/strict';
 import { after, before, test } from 'node:test';
 import { chromium } from 'playwright';
 import { preview } from 'vite';
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
-const timeout = process.env.CI ? 90_000 : 30_000;
+// CI renders WebGL in software, about 20 times slower than a desktop GPU. The
+// camera flights and pouring advance per frame, so their waits stretch with it.
+const timeout = process.env.CI ? 240_000 : 30_000;
 const viewport = { width: 1280, height: 860 };
 let server;
 let browser;
 let baseUrl;
+
+// The catalog loads paintings from GitHub. Serve them from this checkout so the
+// tests neither wait on the network nor depend on what is on the remote branch.
+const repoRoot = fileURLToPath(new URL('../../../../../../', import.meta.url));
+async function servePaintingsLocally(context) {
+  await context.route(/^https:\/\/raw\.githubusercontent\.com\/keeraa\/keynlock\/[^/]+\/(assets\/restoration\/.+)$/, route => {
+    const path = repoRoot + decodeURIComponent(new URL(route.request().url()).pathname.split('/').slice(4).join('/'));
+    if (!existsSync(path)) return route.fulfill({ status: 404 });
+    return route.fulfill({ path, headers: { 'access-control-allow-origin': '*' } });
+  });
+}
 
 function readRoom() {
   const camera = window.__keynlockDebug.host.camera;
@@ -50,6 +65,7 @@ after(async () => {
 async function openRoom(t, { locale = 'ru-RU' } = {}) {
   const context = await browser.newContext({ viewport, locale });
   t.after(() => context.close());
+  await servePaintingsLocally(context);
   const page = await context.newPage();
   page.setDefaultTimeout(timeout);
   const response = await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout });

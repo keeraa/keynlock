@@ -73,8 +73,10 @@ export function createMaterials() {
     green: mat('#435d4a', .93),
     slate: mat('#4e6468', .89),
     charcoal: mat('#242b28', .99),
-    glass: new THREE.MeshPhysicalMaterial({ color: '#e9edcf', metalness: .05, roughness: .1, transmission: .48, transparent: true, opacity: .48, thickness: .13, depthWrite: false }),
-    glassBlue: new THREE.MeshPhysicalMaterial({ color: '#c9dedc', roughness: .1, transmission: .28, transparent: true, opacity: .52, depthWrite: false }),
+    // Plain see-through glass. Any material with transmission makes Three.js
+    // draw every opaque object once more per frame (~500 draw calls here).
+    glass: new THREE.MeshPhysicalMaterial({ color: '#e9edcf', metalness: .05, roughness: .1, transparent: true, opacity: .48, depthWrite: false }),
+    glassBlue: new THREE.MeshPhysicalMaterial({ color: '#c9dedc', roughness: .1, transparent: true, opacity: .52, depthWrite: false }),
     liquidGreen: new THREE.MeshStandardMaterial({ color: '#758e71', emissive: '#526444', emissiveIntensity: .16, roughness: .3, transparent: true, opacity: .87 }),
     liquidAmber: new THREE.MeshStandardMaterial({ color: '#b87f41', emissive: '#6d3d1d', emissiveIntensity: .21, roughness: .27, transparent: true, opacity: .88 }),
     liquidBlue: new THREE.MeshStandardMaterial({ color: '#668b8c', emissive: '#3b696d', emissiveIntensity: .18, roughness: .25, transparent: true, opacity: .87 }),

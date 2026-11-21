@@ -149,7 +149,9 @@ export function buildWindow(kit) {
     cloth.name = `window-curtain-${sideName}`;
     cloth.userData.windAnimated = true;
     cloth.position.set(sign * 3.78, (curtainTop + curtainBottom) / 2, poleDepth + .01);
-    cloth.castShadow = true;
+    // The cloth sways every frame, but the shadow map is refreshed about once
+    // a second (lair-frame-loop.js): a casting curtain would leave a stepping shadow.
+    cloth.castShadow = false;
     cloth.receiveShadow = true;
     cloth.frustumCulled = false;
     window.add(cloth);

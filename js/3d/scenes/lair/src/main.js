@@ -67,6 +67,10 @@ function setup() {
   renderer.toneMappingExposure = 1.10;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  // Almost nothing in the room moves, so the shadow map is not redrawn every
+  // frame; lair-frame-loop refreshes it (see refreshShadows there).
+  renderer.shadowMap.autoUpdate = false;
+  renderer.shadowMap.needsUpdate = true;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
 
   const homePosition = new THREE.Vector3(.25, 8.35, ROOM_END + 4.78);

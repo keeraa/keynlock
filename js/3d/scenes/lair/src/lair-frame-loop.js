@@ -5,6 +5,17 @@ export function startLairFrames({ scene, camera, controls, renderer, rendererHos
   visualUI, performancePanel }) {
   const clock = new Clock();
   const drawn = { triangles: 0, calls: 0 };
+  // The shadow map (317 casters) is redrawn when the zone changes and once a
+  // second, not every frame: only the lab's bottles and the Atelier's
+  // paintings ever move, and the lab asks for its own refresh when it needs one.
+  const SHADOW_REFRESH_MS = 1000;
+  let lastShadowRefresh = -Infinity, shadowZone;
+  function refreshShadows(now, zone) {
+    if (zone === shadowZone && now - lastShadowRefresh < SHADOW_REFRESH_MS) return;
+    shadowZone = zone;
+    lastShadowRefresh = now;
+    renderer.shadowMap.needsUpdate = true;
+  }
 
   function render(currentZone) {
     rendererHost.prepareWorldLightsForRender();
@@ -44,6 +55,7 @@ export function startLairFrames({ scene, camera, controls, renderer, rendererHos
     rendererHost.updateWorld();
     // Embedded renderers can leave autoReset disabled for their passes.
     renderer.info.reset();
+    refreshShadows(now, currentZone);
     if (!overlayOpen || zoneTransitions.isTransitioning()) render(currentZone);
     performancePanel.frame(frameDelta, performance.now() - now, drawn);
   }

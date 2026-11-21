@@ -135,8 +135,10 @@ export function createWorkshopRoom({ THREE, scene, mats, includeWallTrim = true,
       box(.08, .52, .50, mats.roomEdge, -4.45, y - .309, wallZ + .24);
     }
     const colors = ['#9a5342', '#b68d52', '#6a8477', '#b6a48c', '#4f6570', '#bd8557', '#6b4934', '#7c7763'];
+    // No transmission: in the Lair it makes Three.js draw every opaque object
+    // once more per frame, for eight small jars.
     const jarGlass = new THREE.MeshPhysicalMaterial({ color: '#d9d3bd', roughness: .18,
-      transmission: .65, transparent: true, opacity: .65, thickness: .08 });
+      transparent: true, opacity: .65 });
     for (let i = 0; i < 8; i++) {
       const row = Math.floor(i / 4), col = i % 4;
       const x = -6 + col * .5, baseY = 1.5025 + row, z = shelfZ + .025;

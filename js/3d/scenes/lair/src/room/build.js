@@ -7,6 +7,7 @@ import { buildWorkbench } from './workbench-furniture.js';
 import { buildGramophone, buildDetails } from './details.js';
 import { createWindowLight } from './window-light.js';
 import { buildLamps } from './lamps.js';
+import { mergeStaticMeshes } from './merge-static.js';
 import { ALCHEMY_Z, ATELIER_Z } from '../room-layout.js';
 
 /** A single continuous room, using the proportions and gouache materials of the existing ateliers. */
@@ -26,6 +27,8 @@ export function buildLair(scene, m) {
   const ambientParticles = buildDetails(kit, { windowLight });
   const lamps = buildLamps(kit);
   zoneTarget('alchemy', [6.86, 1.15, ALCHEMY_Z], [3.05, 2.3, 5.22]);
+  // Hundreds of small static parts become a few meshes (draw calls).
+  mergeStaticMeshes(kit.staticGroup);
   const wallpapers = {
     tile: m.alchemyTile,
     ochre: m.wallpaperOchre,

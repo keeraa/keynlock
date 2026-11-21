@@ -171,3 +171,39 @@ test('music defaults to 25 percent through ceiling speakers and honors existing 
   assert.equal(saved.getVolume(), 71);
   assert.equal(saved.getSpatial(), false);
 });
+
+test('tracks switch both ways, wrap around and save the new track from its start', () => {
+  const { browser, music, data } = setup();
+  music.start();
+  const seen = [];
+  music.subscribe(state => seen.push(state.file));
+  music.next();
+  assert.ok(browser.player.url.endsWith(second));
+  music.previous();
+  music.previous();
+  assert.ok(browser.player.url.endsWith('chopin-nocturne-b-flat-minor.mp3'));
+  assert.deepEqual(JSON.parse(data.get(positionKey)), { track: 'chopin-nocturne-b-flat-minor.mp3', seconds: 0 });
+  music.select(0);
+  assert.equal(music.getState().file, first);
+  assert.deepEqual(seen, [first, second, first, 'chopin-nocturne-b-flat-minor.mp3', first]);
+  assert.equal(music.tracks.length, 3);
+  assert.equal(music.getState().title.en, 'Chopin · Nocturne Op. 9 No. 1');
+});
+
+test('pause is the player\'s choice: saved, and start() does not override it', () => {
+  const { browser, music, data } = setup();
+  music.start();
+  music.pause();
+  assert.equal(browser.player.paused, true);
+  assert.equal(data.get('keynlock-music-stopped-v1'), '1');
+  const reloaded = setup(Object.fromEntries(data)).music;
+  reloaded.start();
+  assert.equal(reloaded.getState().stopped, true);
+  reloaded.play();
+  assert.equal(reloaded.getState().stopped, false);
+});
+
+test('one page has one player, so an embedded scene keeps the music that plays', () => {
+  const { browser, music } = setup();
+  assert.equal(createArchiveMusic(browser, undefined), music);
+});

@@ -12,6 +12,7 @@ const sourcePaths = [
   'js/3d/scenes/lair',
   'js/3d/core',
   'js/3d/workshops',
+  'js/3d/scenes/key-archive/dist/assets/music',   // the shared player's recordings
   'js/3d/package.json',
   'js/3d/package-lock.json',
 ];

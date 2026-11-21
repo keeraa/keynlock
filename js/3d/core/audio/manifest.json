@@ -1,0 +1,4 @@
+{
+  "modules": ["music-player.js", "music-tracks.js", "music-controls.js"],
+  "consumers": ["js/3d/scenes/key-archive/dist/js"]
+}

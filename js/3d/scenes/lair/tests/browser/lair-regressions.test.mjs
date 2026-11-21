@@ -628,3 +628,34 @@ test('an English browser gets the Lair in English, with a language switch', asyn
   assert.equal(await page.locator('#lair-language').inputValue(), 'en');
   assert.deepEqual(await page.locator('#lair-language option').evaluateAll(options => options.map(o => o.value)), ['ru', 'en']);
 });
+
+test('one music player follows the Lair into its workshops and switches tracks', async t => {
+  const page = await openRoom(t);
+  const title = page.locator('#lair-music .music-controls__title');
+  assert.equal(await title.innerText(), 'Шопен · Ноктюрн op. 9 № 1');
+  await page.locator('#lair-music').getByRole('button', { name: 'Следующий трек' }).click();
+  assert.equal(await title.innerText(), 'Шопен · Ноктюрн op. 9 № 2');
+  assert.equal(JSON.parse(await page.evaluate(() => localStorage.getItem('keynlock-archive-music-position-v1'))).track,
+    'chopin-nocturne-op9-no2.mp3', 'the Key Archive resumes the same record');
+  await page.locator('#lair-music').getByRole('button', { name: 'Пауза' }).click();
+  assert.equal(await page.evaluate(() => localStorage.getItem('keynlock-music-stopped-v1')), '1');
+
+  // The gramophone's panel shows the same player, with volume.
+  await page.locator('.zone-nav [data-zone="gramophone"]').click();
+  await page.locator('#panel-music').waitFor();
+  assert.equal(await page.locator('#panel-music .music-controls__title').innerText(), 'Шопен · Ноктюрн op. 9 № 2');
+  assert.equal(await page.locator('#panel-music .music-controls__volume').inputValue(), '25');
+  await page.locator('#panel-music').getByRole('button', { name: 'Предыдущий трек' }).click();
+  assert.equal(await title.innerText(), 'Шопен · Ноктюрн op. 9 № 1');
+
+  // The lab is the same page: the player and its state stay.
+  await enterAlchemy(page);
+  assert.equal(await title.isVisible(), true);
+  assert.equal(await title.innerText(), 'Шопен · Ноктюрн op. 9 № 1');
+});
+
+test('an English page shows the player in English', async t => {
+  const page = await openRoom(t, { locale: 'en-US' });
+  assert.equal(await page.locator('#lair-music .music-controls__title').innerText(), 'Chopin · Nocturne Op. 9 No. 1');
+  assert.equal(await page.locator('#lair-music').getByRole('button', { name: 'Next track' }).count(), 1);
+});

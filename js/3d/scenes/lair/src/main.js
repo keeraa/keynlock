@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createMaterials } from './room/materials.js';
 import { buildLair } from './room/build.js';
+import { ROOM_CENTER_Z, ROOM_END } from './room/layout.js';
 import { createRoomOutlines, mountVisualSettings } from './ui/visual-settings.js';
 import { mountWorkshopOverlay } from './workshops/workshop-overlay.js';
 import { mountAtelierInRoom } from './workshops/atelier-in-room.js';
@@ -13,6 +14,7 @@ import { createDayNight } from './room/day-night.js';
 import { mountPerformancePanel } from './ui/performance-panel.js';
 import './ui/performance.css';
 import { createZoneTransitions, ATELIER_EASELS } from './navigation/zone-transitions.js';
+import { createRoomWalk } from './navigation/room-walk.js';
 import { createAtelierView } from './workshops/atelier-view.js';
 import { createInitialLoadingGate } from './ui/initial-loading.js';
 import { getWorkshopApi, setWorkshopHost } from '../../../core/host/workshop-host.js';
@@ -20,6 +22,7 @@ import { bindLanguageSelect, t, translator } from './i18n.js';
 import './style.css';
 import './ui/initial-loading.css';
 import './ui/visual.css';
+import './ui/room-walk.css';
 import './workshops/workshop-overlay.css';
 
 // The page is written in Russian; translate the Lair's own markup before the
@@ -39,14 +42,14 @@ const loading = document.querySelector('#loading');
 const fallback = document.querySelector('#fallback');
 const panel = document.querySelector('#zone-panel');
 let renderer, scene, camera, controls, room, rendererHost, atelierFilter;
-let visualUI, workshopOverlay, zoneTransitions, atelierView, dayNight;
+let visualUI, workshopOverlay, zoneTransitions, atelierView, dayNight, roomWalk;
 let lastFrameTriangles = 0;
 let lastDrawCalls = 0;
 let performancePanel = null;
 let startPointer = null;
 let hoveredZone = null;
-const homePosition = new THREE.Vector3(.25, 8.35, 31.2);
-const homeTarget = new THREE.Vector3(0, 4.70, 9.60);
+const homePosition = new THREE.Vector3(.25, 8.35, ROOM_END + 4.78);
+const homeTarget = new THREE.Vector3(0, 4.70, ROOM_CENTER_Z - .75);
 const roomMinDistance = 3;
 const clock = new THREE.Clock();
 const raycaster = new THREE.Raycaster();
@@ -97,12 +100,21 @@ function setup() {
   });
   window.addEventListener('keynlock:atelier', (event) => {
     const { type, loaded, total } = event.detail || {};
+    if (type === 'models-ready') {
+      const worktable = scene.getObjectByName('restoration-worktable');
+      if (worktable) room.windowLight.addFurniture(worktable);
+      roomWalk?.refreshObstacles();
+    }
     if (type === 'initial-gallery-progress') initialLoading.progress(loaded, total);
     if (type === 'initial-gallery-ready') {galleryLoaded = true;completeInitialLoad();}
     if (type === 'error') initialLoading.finish('error');
   });
   window.addEventListener('keynlock:alchemy:v1',event => {
-    if (event.detail?.type === 'ready') {alchemyLoaded = true;completeInitialLoad();}
+    if (event.detail?.type === 'ready') {
+      roomWalk?.refreshObstacles();
+      alchemyLoaded = true;
+      completeInitialLoad();
+    }
     if (event.detail?.type === 'error') initialLoading.finish('error');
   });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
@@ -159,6 +171,11 @@ function setup() {
   dayNight = createDayNight(night => { room.setNight(night); lighting.setNight(night); });
   visualUI = mountVisualSettings({ visual, room, setNight: night => dayNight.set(night), outlines, atelierFilter,
     grain: document.querySelector('.grain'), onOpen: () => { panel.hidden = true; } });
+  roomWalk = createRoomWalk({
+    scene, camera, controls, interaction,
+    onExit: () => zoneTransitions.reset(),
+    onInteract: openWalkTarget,
+  });
   atelierView = createAtelierView({
     camera, controls, canvas, interaction, rendererHost, atelierFilter, host,
     easelPose: ATELIER_EASELS, roomMinDistance,
@@ -172,10 +189,19 @@ function setup() {
   zoneTransitions = createZoneTransitions({
     scene, camera, controls, canvas, interaction, renderer, rendererHost, atelierFilter,
     workshopOverlay, atelierView, visualUI, homePosition, homeTarget, roomMinDistance,
-    roomLights,
+    roomLights, beforeCameraTransition: roomWalk.stop,
   });
   host.alchemy.manipulate = zoneTransitions.manipulateAlchemy;
   host.alchemy.resetCamera = zoneTransitions.resetAlchemyCamera;
+  document.querySelector('#room-walk-toggle').addEventListener('click', () => {
+    if (workshopOverlay.isOpen()) return;
+    const returning = roomWalk.isActive();
+    if (visualUI.isOpen()) visualUI.close();
+    zoneTransitions.reset();
+    if (returning) return;
+    zoneTransitions.stopApproach();
+    roomWalk.start();
+  });
 
   window.addEventListener('resize', resize);
   interaction.addEventListener('pointerdown', e => { startPointer = [e.clientX, e.clientY]; });
@@ -201,22 +227,32 @@ function resize() {
   const w = canvas.clientWidth, h = canvas.clientHeight;
   camera.aspect = w / Math.max(h, 1);
   zoneTransitions.resizeCamera(w);
+  roomWalk.resize();
   camera.updateProjectionMatrix();
   renderer.setSize(w, h, false);
   atelierFilter?.resize(w,h,renderer.getPixelRatio());
   atelierView.resize();
 }
 
-function hitZone(e) {
-  const bounds = canvas.getBoundingClientRect();
-  pointer.x = ((e.clientX - bounds.left) / bounds.width) * 2 - 1;
-  pointer.y = -((e.clientY - bounds.top) / bounds.height) * 2 + 1;
+function hitZone(event) {
+  if (event) {
+    const bounds = canvas.getBoundingClientRect();
+    pointer.set(((event.clientX - bounds.left) / bounds.width) * 2 - 1,
+      -((event.clientY - bounds.top) / bounds.height) * 2 + 1);
+  } else pointer.set(0, 0);
+  raycaster.far = event ? Infinity : 4.5;
   raycaster.setFromCamera(pointer, camera);
   const hit = raycaster.intersectObjects(room.hitTargets, false)[0];
   return hit?.object?.userData?.zone || null;
 }
 
+function openWalkTarget() {
+  const id = hitZone();
+  if (id) zoneTransitions.open(id);
+}
+
 function hover3D(e) {
+  if (roomWalk.isActive()) return;
   if (workshopOverlay?.isOpen()) return;
   if (zoneTransitions.current() === 'atelier') return;
   if (e.buttons) return;
@@ -232,6 +268,10 @@ function click3D(e) {
   if (zoneTransitions.current() === 'atelier') return;
   if (e.metaKey) return;
   if (startPointer && Math.hypot(e.clientX - startPointer[0], e.clientY - startPointer[1]) > 7) return;
+  if (roomWalk.isActive()) {
+    openWalkTarget();
+    return;
+  }
   const id = hitZone(e);
   if (id) zoneTransitions.open(id);
 }
@@ -270,14 +310,18 @@ function animate() {
   const delta = Math.min(frameDelta, .05);
   const time = clock.elapsedTime;
   zoneTransitions.updateApproach(delta);
-  if (!atelierView.updateFlight(now) && zoneTransitions.current() !== 'alchemy') controls.update();
+  if (roomWalk.isActive()) roomWalk.update(delta);
+  else if (!atelierView.updateFlight(now) && zoneTransitions.current() !== 'alchemy') controls.update();
   rendererHost.stepWorldRuntime(now);
   atelierView.updateGalleryCamera();
 
   for (const update of room.animated) update(time);
   const currentZone = zoneTransitions.current();
   const overlayOpen = workshopOverlay.isOpen();
-  updateHotspots(currentZone);
+  if (roomWalk.isActive()) {
+    camera.updateMatrixWorld();
+    roomWalk.setTarget(zoneTransitions.title(hitZone()));
+  } else updateHotspots(currentZone);
   atelierView.updateInterface({ zone: currentZone, visualOpen: visualUI.isOpen(), overlayOpen });
   rendererHost.updateWorld();
   // Embedded modules may disable WebGLRenderer.info.autoReset for multi-pass

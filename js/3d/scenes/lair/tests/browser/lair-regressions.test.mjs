@@ -332,6 +332,62 @@ test('the room hosts both workshops on one canvas through the host contract', as
   assert.equal(await page.evaluate(() => window.__keynlockDebug.host.renderer.getUnifiedScene()
     .getObjectByName('extended-back-wall').visible), false);
   assert.equal(await page.locator('#alchemy-embedded-app .wall-choices').isHidden(), true);
+  const supports = await page.evaluate(() => {
+    const scene = window.__keynlockDebug.host.renderer.getUnifiedScene();
+    scene.updateMatrixWorld(true);
+    const point = scene.position.clone();
+    function range(object, axis) {
+      let min = Infinity, max = -Infinity;
+      object.traverseVisible(mesh => {
+        const positions = mesh.geometry?.getAttribute('position');
+        if (!mesh.isMesh || !positions) return;
+        for (let i = 0; i < positions.count; i++) {
+          const coordinate = point.fromBufferAttribute(positions, i).applyMatrix4(mesh.matrixWorld)[axis];
+          min = Math.min(min, coordinate);
+          max = Math.max(max, coordinate);
+        }
+      });
+      return { min, max };
+    }
+    const galleryWall = scene.getObjectByName('atelier-side-wall');
+    const leftWall = galleryWall.position.x;
+    const gallerySpan = range(galleryWall, 'z');
+    const rightWall = scene.getObjectByName('alchemy-right-wall').position.x;
+    const shelf = range(scene.getObjectByName('alchemy-wall-shelf'), 'y');
+    const brackets = scene.getObjectsByProperty('name', 'alchemy-shelf-bracket');
+    const paintings = scene.getObjectByName('restored-frames').children;
+    const alchemyFeet = scene.getObjectsByProperty('name', 'table-foot');
+    const alchemyTable = scene.getObjectByName('alchemy-main-tabletop');
+    const alchemyTop = range(alchemyTable, 'y').max;
+    const alchemySpan = range(alchemyTable, 'z');
+    const shift = 1.5 * (alchemySpan.max - alchemySpan.min);
+    const center = name => scene.getObjectByName(name).getWorldPosition(point).z;
+    const easelCenter = (center('restoration-left-easel') + center('restoration-right-easel')) / 2;
+    const insideGalleryWall = object => {
+      const span = range(object, 'z');
+      return span.min > gallerySpan.min && span.max < gallerySpan.max;
+    };
+    return {
+      shelfBrackets: brackets.length === 2
+        && brackets.every(bracket => range(bracket, 'x').max >= rightWall && range(bracket, 'y').max >= shelf.min),
+      galleryMounted: paintings.length > 0
+        && paintings.every(painting => range(painting, 'x').min <= leftWall + .001 && insideGalleryWall(painting))
+        && insideGalleryWall(scene.getObjectByName('twelve-art-history-column-headings')),
+      atelierShelfMounted: range(scene.getObjectByName('restoration-wall-shelf'), 'x').min <= leftWall,
+      atelierTableOnFloor: Math.abs(range(scene.getObjectByName('restoration-worktable'), 'y').min - .0385) < .005,
+      alchemyTableOnFloor: alchemyFeet.length === 4
+        && alchemyFeet.every(foot => Math.abs(range(foot, 'y').min - .0385) < .005),
+      alchemyTableLowered: Math.abs(alchemyTop - .0385 - .95) < .005,
+      stationsMovedTogether: Math.abs(easelCenter - (10.35 - shift)) < .01
+        && Math.abs(center('alchemy-main-tabletop') - (10.10 - shift)) < .01
+        && Math.abs(center('workbench-right-of-alchemy') - (20.07 - shift)) < .01,
+      roomShortened: Math.abs(range(scene.getObjectByName('lair-floor-base'), 'z').max - (26.42 - shift)) < .01,
+    };
+  });
+  assert.deepEqual(supports, {
+    shelfBrackets: true, galleryMounted: true, atelierShelfMounted: true, atelierTableOnFloor: true,
+    alchemyTableOnFloor: true, alchemyTableLowered: true, stationsMovedTogether: true, roomShortened: true,
+  });
 
   // The FPS button opens the performance panel; the triangle row shows where they are.
   await page.locator('#perf-toggle').click();
@@ -364,6 +420,89 @@ test('the room hosts both workshops on one canvas through the host contract', as
   await page.locator('#gallery-easels').click();
   await page.waitForFunction(() => window.__keynlockDebug.host.atelier.galleryActive === false);
   assert.equal(await page.locator('#lair-gallery-controls').isVisible(), false);
+});
+
+test('first-person walking slides against furniture and walls, interacts, and restores orbit controls', async t => {
+  const page = await openRoom(t);
+  await page.evaluate(() => {
+    Object.defineProperty(document.querySelector('#scene-interaction'), 'requestPointerLock', { value: undefined });
+  });
+  const toggle = page.locator('#room-walk-toggle');
+  await toggle.click();
+  assert.equal(await toggle.getAttribute('aria-pressed'), 'true');
+  assert.equal(await page.locator('#room-walk-look').textContent(), 'Перетаскивай для обзора');
+  const spawn = await page.evaluate(() => window.__keynlockDebug.host.camera.position.toArray());
+  assert.ok(Math.abs(spawn[1] - .0385 - 1.70) < .001, 'the camera starts at eye level');
+  assert.equal((await page.evaluate(readRoom)).controls.enabled, false);
+
+  const measured = await page.evaluate(async spawnZ => {
+    const camera = window.__keynlockDebug.host.camera;
+    const nextFrame = () => new Promise(resolve => requestAnimationFrame(resolve));
+    const key = (type, code) => document.dispatchEvent(new KeyboardEvent(type, { code }));
+    async function sample(sprint) {
+      camera.position.z = spawnZ;
+      if (sprint) key('keydown', 'ShiftLeft');
+      key('keydown', 'KeyW');
+      let previous = await nextFrame();
+      const start = camera.position.z;
+      let elapsed = 0;
+      for (let i = 0; i < 8; i++) {
+        const now = await nextFrame();
+        elapsed += Math.min((now - previous) / 1000, .05);
+        previous = now;
+      }
+      key('keyup', 'KeyW');
+      key('keyup', 'ShiftLeft');
+      return (start - camera.position.z) / elapsed;
+    }
+    const walk = await sample(false);
+    const sprint = await sample(true);
+    camera.position.z = spawnZ;
+    return { walk, sprint };
+  }, spawn[2]);
+  assert.ok(Math.abs(measured.walk - 4.4) < .5, 'walking matches the Key Archive speed');
+  assert.ok(Math.abs(measured.sprint - 7.4) < .8, 'holding Shift matches the Key Archive sprint speed');
+
+  await page.keyboard.down('KeyW');
+  await page.waitForFunction(z => window.__keynlockDebug.host.camera.position.z < z - .45, spawn[2]);
+  await page.keyboard.up('KeyW');
+  await page.evaluate(y => window.__keynlockDebug.host.camera.position.set(.25, y, 4.16), spawn[1]);
+  await page.keyboard.down('KeyW');
+  await page.waitForFunction(() => window.__keynlockDebug.host.camera.position.z < 4.05);
+  // Walk closer than the collision distance would permit without the chair.
+  await page.evaluate(async () => {
+    for (let i = 0; i < 12; i++) await new Promise(requestAnimationFrame);
+  });
+  await page.keyboard.up('KeyW');
+  const position = await page.evaluate(() => window.__keynlockDebug.host.camera.position.toArray());
+  assert.ok(position[2] > 3.7, 'the chair stops the player within the room');
+  assert.equal(position[1], spawn[1], 'the eye height remains level');
+  await page.getByText('E · Карта и дела', { exact: true }).waitFor();
+  await page.keyboard.press('KeyE');
+  await page.locator('#zone-panel').waitFor();
+  assert.equal(await page.locator('#panel-title').textContent(), 'Карта и дела');
+  assert.equal(await toggle.getAttribute('aria-pressed'), 'false');
+  assert.equal((await page.evaluate(readRoom)).controls.enabled, true);
+
+  await toggle.click();
+  await page.evaluate(() => window.__keynlockDebug.host.camera.position.x = 7.85);
+  await page.keyboard.down('KeyD');
+  await page.waitForFunction(() => window.__keynlockDebug.host.camera.position.x > 7.90);
+  await page.evaluate(async () => {
+    for (let i = 0; i < 12; i++) await new Promise(requestAnimationFrame);
+  });
+  await page.keyboard.up('KeyD');
+  assert.ok(await page.evaluate(() => window.__keynlockDebug.host.camera.position.x < 7.95), 'the wall blocks sideways movement');
+
+  const yaw = await page.evaluate(() => window.__keynlockDebug.host.camera.quaternion.y);
+  await page.mouse.move(620, 400);
+  await page.mouse.down();
+  await page.mouse.move(680, 415, { steps: 4 });
+  await page.mouse.up();
+  assert.ok(await page.evaluate(before => Math.abs(window.__keynlockDebug.host.camera.quaternion.y - before) > .03, yaw));
+  await page.keyboard.press('Escape');
+  await page.locator('#room-walk-hud').waitFor({ state: 'hidden' });
+  assert.equal((await page.evaluate(readRoom)).controls.enabled, true);
 });
 
 test('an English browser gets the Lair in English, with a language switch', async t => {

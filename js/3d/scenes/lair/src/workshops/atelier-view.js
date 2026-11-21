@@ -2,6 +2,7 @@ import { getWorkshopApi } from '../../../../core/host/workshop-host.js';
 import * as THREE from 'three';
 import { createCameraTransition } from '@keynlock/atelier/src/navigation/camera-transition.js';
 import { t } from '../i18n.js';
+import { ROOM_CENTER_Z } from '../room/layout.js';
 
 export function createAtelierView({
   camera, controls, canvas, interaction, rendererHost, atelierFilter, host, easelPose, roomMinDistance, navigation,
@@ -15,8 +16,8 @@ export function createAtelierView({
   const easelLabels = document.querySelector('#lair-easel-labels');
   const easelCameraControls = document.querySelector('#lair-easel-camera-controls');
   const galleryHover = document.querySelector('#lair-wall-art-hover');
-  // Below the original salon's thirty frames on the left wall of the Lair.
-  const galleryWallAnchor = new THREE.Vector3(-8.10, 3.35, 15.90);
+  // Below the entrance half of the exhibition on the left wall.
+  const galleryWallAnchor = new THREE.Vector3(-8.10, 3.35, ROOM_CENTER_Z + 5.55);
   const atelierFlight = createCameraTransition({ camera, controls });
   let queuedGallery = false;
   let galleryActive = false;

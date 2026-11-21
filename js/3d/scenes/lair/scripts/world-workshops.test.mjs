@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
+import { ALCHEMY_TABLE } from '@keynlock/alchemy/src/table-dimensions.js';
 import {createWorldWorkshopRegistry, WORKSHOP_PLACEMENTS} from '../src/rendering/world-workshops.js';
 
 test('three unchanged source scenes occupy one physically connected world',()=>{
@@ -40,15 +41,6 @@ test('three unchanged source scenes occupy one physically connected world',()=>{
   assert.ok(sources.atelier.camera.getWorldPosition(new THREE.Vector3()).x>0,
     'Atelier editing camera faces the left Lair wall from INSIDE the building');
   assert.ok(sources.atelier.camera.getWorldPosition(new THREE.Vector3()).x<8.55);
-  const galleryWall=new THREE.Mesh(new THREE.BoxGeometry(32,14.21,.2),new THREE.MeshStandardMaterial());
-  galleryWall.position.set(0,5.555,-4.7);
-  sources.atelier.original.add(galleryWall);
-  world.updateMatrixWorld(true);
-  const wallBounds=new THREE.Box3().setFromObject(galleryWall);
-  assert.ok(wallBounds.min.x < -8.39 && wallBounds.max.x > -8.41,
-    'the exact original gallery wall overlays the left Lair plaster');
-  assert.ok(wallBounds.min.z > -5.8 && wallBounds.max.z < 26.5,
-    'the whole original 32m gallery fits the original Lair room without doors');
   assert.ok(sources.alchemy.camera.getWorldPosition(new THREE.Vector3()).x<8.39,
     'the source alchemy camera must be inside the Lair, facing the right tiled wall');
   const sourceAlchemyWallX=WORKSHOP_PLACEMENTS.alchemy.position[0]
@@ -95,9 +87,12 @@ test('alchemy furniture feet rest on the Lair floor and the camera uses the orig
   camera.lookAt(localTarget);
   camera.userData.keynlockLocalTarget=localTarget;
   const root=registry.roots.get('alchemy');
-  const bottom=root.localToWorld(new THREE.Vector3(0,-9.525,0));
+  const bottom=root.localToWorld(new THREE.Vector3(0,ALCHEMY_TABLE.lairFootY,0));
+  const tabletop=root.localToWorld(new THREE.Vector3(0,ALCHEMY_TABLE.topY,0));
   assert.ok(Math.abs(bottom.y-.0385)<1e-6,
-    'the original metal foot caps touch the common Lair timber floor');
+    'the shortened table feet touch the common Lair timber floor');
+  assert.ok(Math.abs(tabletop.y-bottom.y-.95)<1e-6,
+    'the embedded tabletop is .95 m above the floor');
   const pose=registry.pose('alchemy');
   const expectedPosition=root.localToWorld(new THREE.Vector3(0,5.2,13.6));
   const expectedTarget=root.localToWorld(localTarget.clone());

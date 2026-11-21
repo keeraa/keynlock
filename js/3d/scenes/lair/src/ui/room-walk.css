@@ -1,0 +1,79 @@
+#room-walk-toggle[aria-pressed="true"] {
+  border-color: #d7b680;
+  background: #604a2d;
+  color: #fff0d6;
+}
+
+#room-walk-hud {
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  pointer-events: none;
+}
+
+.room-walk-crosshair {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border: 1px solid #fff0d6;
+  border-radius: 50%;
+  background: #30271f;
+  box-shadow: 0 0 0 1px #17140e9c;
+  transform: translate(-50%, -50%);
+}
+
+.has-target .room-walk-crosshair {
+  background: #e7c388;
+  border-color: #2f2116;
+}
+
+#room-walk-target {
+  position: absolute;
+  top: calc(50% + 17px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 10px;
+  color: #f8e7c8;
+  background: #1b221ee8;
+  border: 1px solid #b69b6a;
+  border-radius: 5px;
+  white-space: nowrap;
+  font: 14px Georgia, serif;
+}
+
+#room-walk-instructions:not([hidden]) {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  padding: 8px 12px;
+  max-width: 100%;
+  border: 1px solid #99815a80;
+  border-radius: 5px;
+  background: #1b221ee8;
+  color: #e9d9bc;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.room-walking .scene-hotspots,
+.room-walking .interaction-hint,
+.room-walking .zone-nav,
+.room-walking #wall-collection-entry {
+  display: none;
+}
+
+.room-walking #scene-interaction {
+  cursor: grab !important;
+}
+
+.room-walk-locked #scene-interaction {
+  cursor: none !important;
+}
+
+@media (max-width: 730px) {
+  #room-walk-toggle { font-size: 9px; }
+  #room-walk-instructions:not([hidden]) { font-size: 10px; }
+}

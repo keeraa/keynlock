@@ -1,23 +1,21 @@
 import * as THREE from 'three';
+import { ALCHEMY_LAIR_SCALE, ALCHEMY_TABLE } from '@keynlock/alchemy/src/table-dimensions.js';
+import { ALCHEMY_Z, ATELIER_Z, WORKBENCH_Z } from '../room/layout.js';
 
-// The laboratory's metal foot caps end at local y=-9.525. Its original
-// furniture is scaled into the Lair, where the timber floor ends at y=.0385.
-const ALCHEMY_SCALE = .28;
-const ALCHEMY_FEET_BOTTOM = -9.525;
 const LAIR_FLOOR_TOP = .0385;
 
 // These coordinates belong to the same building as the Lair. Every source
 // THREE.Scene is retained as an actual child of this world, with all of its
 // existing meshes, materials, interactions and camera preserved.
 export const WORKSHOP_PLACEMENTS = Object.freeze({
-  // The Atelier's 32 m rear wall becomes the Lair's own 32 m left wall.
-  // Both original easels, paintings and tools sit INSIDE the Lair corridor.
-  atelier: {position: [-3.7, 0, 10.35], yaw: Math.PI / 2},
+  // Both original easels and their tools share this placement. The exhibition
+  // independently measures the left wall so it can fill the shortened room.
+  atelier: {position: [-3.7, 0, ATELIER_Z], yaw: Math.PI / 2},
   // Original lab wall sits just in front of the Lair's right tiled wall;
   // its two-tier table has four actual feet resting on the shared floor.
-  alchemy: {position: [6.86, LAIR_FLOOR_TOP - ALCHEMY_FEET_BOTTOM * ALCHEMY_SCALE, 10.1],
-    yaw: -Math.PI / 2, scale: ALCHEMY_SCALE},
-  workbench: {position: [17.5, 3.8, 20.07], yaw: -Math.PI / 2},
+  alchemy: {position: [6.86, LAIR_FLOOR_TOP - ALCHEMY_TABLE.lairFootY * ALCHEMY_LAIR_SCALE, ALCHEMY_Z],
+    yaw: -Math.PI / 2, scale: ALCHEMY_LAIR_SCALE},
+  workbench: {position: [17.5, 3.8, WORKBENCH_Z], yaw: -Math.PI / 2},
 });
 
 export function createWorldWorkshopRegistry(worldScene) {

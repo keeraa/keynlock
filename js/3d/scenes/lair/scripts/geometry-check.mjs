@@ -6,6 +6,7 @@ import { buildLair } from '../src/room/build.js';
 import { createRoomOutlines } from '../src/ui/visual-settings.js';
 import { windowLightAt, FLOOR_Y, WINDOW_LIGHT_SLOPE } from '../src/room/window-light.js';
 import { WINDOW_OPENING } from '../src/room/window.js';
+import { ALCHEMY_Z, ATELIER_Z, ROOM_END, ROOM_LENGTH, WORKBENCH_Z } from '../src/room/layout.js';
 
 // Exercise the scene graph without a GPU or browser canvas.
 const noop = () => {};
@@ -23,8 +24,8 @@ THREE.TextureLoader.prototype.load = () => new THREE.Texture();
 const scene = new THREE.Scene();
 const { materials, visual } = createMaterials();
 const world = buildLair(scene, materials);
-assert.equal(scene.getObjectByName('atelier-side-wall')?.material, materials.atelierSideWall,
-  'the Atelier wall uses a gouache-mapped material while the source wallpaper loads');
+assert.equal(scene.getObjectByName('atelier-side-wall')?.material, materials.galleryPlaster,
+  'the gallery wall uses its own sand-colored gouache plaster');
 assert.equal(scene.getObjectByName('restoration-easel-reference'),undefined,
   'the room never builds its own easels: the real Atelier owns them');
 assert.ok(world.anchors.atelier,'the atelier interaction target is retained');
@@ -39,29 +40,90 @@ const ceilingRibs = [];
 scene.traverse(object => {
   if (object.name.startsWith('lair-ceiling-beam-')) ceilingRibs.push(object);
 });
-assert.ok(ceilingRibs.length >= 8, 'the long room retains its complete timber ceiling');
+assert.equal(ceilingRibs.length, 6, 'six widely spaced ribs support the ceiling');
+assert.ok(ceilingRibs.every(beam => beam.material === materials.roomTimber),
+  'the ceiling ribs use the subdued architectural timber finish');
 assert.ok(ceilingRibs.every(beam => !beam.castShadow),
   'the roof ribs do not project long diagonal stripes onto the gallery and floor');
+const ceilingUnderside = bounds('lair-ceiling').min.y;
+for (const beam of [...ceilingRibs, ...['left', 'right', 'back'].map(side => unique(`lair-wall-beam-${side}`))]) {
+  assert.ok(new THREE.Box3().setFromObject(beam).max.y > ceilingUnderside, 'beams meet the ceiling without a gap');
+}
+const beamGrainOffsets = ceilingRibs.map(beam => {
+  const uv = beam.geometry.getAttribute('uv');
+  return `${uv.getX(0)},${uv.getY(0)}`;
+});
+assert.equal(new Set(beamGrainOffsets).size, ceilingRibs.length, 'each rib samples a different part of the timber');
+const post = unique('lair-wall-post-1');
+const postPositions = post.geometry.getAttribute('position');
+const postUV = post.geometry.getAttribute('uv');
+const postIndices = post.geometry.getIndex();
+const front = post.geometry.groups[4];
+const frontFace = Array.from({ length: front.count }, (_, i) => postIndices.getX(front.start + i));
+const verticalGrain = frontFace.filter(i => postPositions.getX(i) < 0);
+assert.ok(new Set(verticalGrain.map(i => postUV.getX(i))).size > 1,
+  'wood grain follows the height of the wall posts');
 assert.equal(unique('atelier-side-wall').castShadow, false,
   'structural wall facing does not cast shadows across the room');
+for (const side of ['back-left', 'back-right', 'left', 'right']) {
+  const panel = unique(`lair-wainscot-${side}-panel`);
+  assert.equal(panel.material, materials.roomTimber);
+  assert.equal(panel.position.y, unique('lair-wainscot-back-left-panel').position.y);
+  assert.ok(bounds(`lair-wainscot-${side}-cap`).max.y > 1.5, 'lower wall trim reaches the raised height');
+}
 assert.ok(unique('planning-main-table').children.some(child => child.castShadow),
   'furniture retains its local contact shadows');
 const restWall = bounds('atelier-side-wall');
 const alchemyWall = bounds('alchemy-right-wall');
+for (const name of ['planning-wall-board', 'planning-wall-shelf']) {
+  assert.ok(bounds(name).min.z <= WINDOW_OPENING.wallZ, `${name} touches the finished wall`);
+}
+const planningRug = bounds('planning-rug');
+assert.ok(Math.abs(planningRug.min.y - .0385) < .001, 'the rug lies flat on the floor');
+for (const [name, surface, height] of [
+  ['planning-desk-mat', planningRug.max.y, .92],
+  ['planning-chair-seat', .0385, .5215],
+  ['gramophone-tabletop', .0385, .88],
+  ['workbench-tabletop', .0385, .94],
+]) {
+  assert.ok(Math.abs(bounds(name).max.y - surface - height) < .003, `${name} is at its intended height`);
+}
+for (const [name, surface] of [
+  ['planning-main-table', planningRug.max.y],
+  ['gramophone-table', .0385],
+  ['workbench-right-of-alchemy', .0385],
+]) {
+  assert.ok(Math.abs(bounds(name).min.y - surface) < .003, `${name} meets its support`);
+}
+for (const foot of unique('planning-chair').children.filter(object => object.name === 'planning-chair-leg')) {
+  const footBounds = new THREE.Box3().setFromObject(foot, true);
+  const surface = foot.position.z < 0 ? planningRug.max.y : .0385;
+  assert.ok(Math.abs(footBounds.min.y - surface) < .003, 'each chair foot reaches the rug or the floor');
+}
+assert.ok(bounds('workbench-tool-wall').max.x >= alchemyWall.min.x, 'the workbench board is mounted to the tiled wall');
+scene.traverse(object => {
+  if (object.name !== 'lair-sconce-backplate') return;
+  const plate = new THREE.Box3().setFromObject(object);
+  assert.ok(plate.min.x <= restWall.max.x || plate.max.x >= alchemyWall.min.x, 'the sconce backplate touches the wall');
+  assert.ok(plate.min.z > restWall.min.z && plate.max.z < restWall.max.z, 'the sconce stays inside the room');
+});
 const portalRay = (x,z,direction,object) => new THREE.Raycaster(
   new THREE.Vector3(x,2.8,z),new THREE.Vector3(direction,0,0)).intersectObject(object).length;
-assert.ok(portalRay(0,12.1,-1,unique('atelier-side-wall'))>0,'atelier side is once again one uninterrupted wall');
-assert.ok(portalRay(0,10.1,1,unique('alchemy-right-wall'))>0,'alchemy side remains solid without a doorway');
-assert.ok(portalRay(0,20.07,1,unique('alchemy-right-wall'))>0,'workbench side remains solid without a doorway');
+assert.ok(portalRay(0,ATELIER_Z,-1,unique('atelier-side-wall'))>0,'atelier side is one uninterrupted wall');
+assert.ok(portalRay(0,ALCHEMY_Z,1,unique('alchemy-right-wall'))>0,'alchemy side remains solid without a doorway');
+assert.ok(portalRay(0,WORKBENCH_Z,1,unique('alchemy-right-wall'))>0,'workbench side remains solid without a doorway');
 assert.equal(scene.getObjectByName('lair-left-portal-masonry'),undefined,'no invented left door frame');
 assert.equal(scene.getObjectByName('lair-right-portal-masonry'),undefined,'no invented right door frame');
 const archedWindow = bounds('main-arched-window');
 const workbench = bounds('workbench-right-of-alchemy');
 
 assert.ok(restWall.max.y > 13.4, 'left wall reaches the double-height ceiling');
-assert.ok(restWall.max.x < -8.3, 'ochre plaster lies on left wall');
-assert.ok(restWall.max.z - restWall.min.z > 31.9, 'restoration gallery wing spans original 30m wall');
-assert.ok(alchemyWall.max.z - alchemyWall.min.z > 31.9, 'opposite work wing grows symmetrically');
+assert.ok(restWall.max.x < -8.3, 'gallery plaster lies on the left wall');
+assert.ok(Math.abs(restWall.max.z - restWall.min.z - (ROOM_LENGTH - .12)) < .001,
+  'the gallery wall fits the shortened room');
+for (const name of ['lair-floor-base', 'lair-ceiling']) {
+  assert.ok(Math.abs(bounds(name).max.z - ROOM_END) < .001, `${name} reaches the new entrance`);
+}
 assert.ok(Math.abs((restWall.max.z-restWall.min.z)-(alchemyWall.max.z-alchemyWall.min.z))<.1,
   'left and right wing have matching depth');
 assert.ok(alchemyWall.min.x > 8.25 && alchemyWall.max.x < 8.45, 'sage tiles lie against right wall');
@@ -76,13 +138,26 @@ assert.ok(unique('main-arched-window-frame').geometry.type === 'TubeGeometry', '
 assert.ok(unique('main-arched-window-glass').geometry.type === 'ShapeGeometry', 'glass fits inside the arch');
 assert.equal(unique('main-arched-window-glass').material.transparent, true, 'the exterior is visible through the glazing');
 assert.equal(unique('main-arched-window-sill').geometry.userData.paintedWoodUV, true, 'wood uses physical-scale UV mapping');
-const curtainPole = unique('curtain-pole-full-width');
-assert.ok(new THREE.Box3().setFromObject(curtainPole).max.x - new THREE.Box3().setFromObject(curtainPole).min.x > 8.2, 'curtain pole spans the window');
+const sillBounds = bounds('main-arched-window-sill');
+assert.ok(Math.abs(sillBounds.max.y - .0385 - 1.05) < .005, 'the sill reaches waist height');
+assert.ok(sillBounds.max.z - sillBounds.min.z < .4, 'the shallow sill leaves space for the curtains');
+const curtainPole = bounds('curtain-pole-full-width');
+assert.ok(curtainPole.max.x - curtainPole.min.x > 9, 'curtain pole extends past the window on both sides');
+for (const side of ['left', 'right']) {
+  const bracket = bounds(`curtain-bracket-${side}`);
+  assert.ok(bracket.min.z < WINDOW_OPENING.wallZ && bracket.intersectsBox(curtainPole), 'curtain bracket joins the pole to the wall');
+  for (let i = 0; i <= 5; i++) {
+    assert.ok(bounds(`curtain-ring-${side}-${i}`).intersectsBox(curtainPole), 'ring wraps the curtain pole');
+  }
+}
 assert.equal(unique('main-arched-window').children.filter(child => child.geometry?.type === 'SphereGeometry').length, 0, 'window-edge ball finials removed');
 const wall = unique('back-wall-arched-cutout');
 assert.equal(wall.geometry.type, 'ExtrudeGeometry', 'the masonry has a dimensional arched reveal');
 const openingRay = new THREE.Raycaster(new THREE.Vector3(0, 5.6, 0), new THREE.Vector3(0, 0, -1));
 assert.equal(openingRay.intersectObject(wall).length, 0, 'the window opening is actually open');
+const lowerPaneRay = new THREE.Raycaster(new THREE.Vector3(.65, 1.28, 0), new THREE.Vector3(0, 0, -1));
+assert.equal(lowerPaneRay.intersectObjects([wall, unique('lair-wainscot')], true).length, 0,
+  'masonry and timber trim leave the lowered window pane open');
 const masonryRay = new THREE.Raycaster(new THREE.Vector3(6, 5.6, 0), new THREE.Vector3(0, 0, -1));
 assert.ok(masonryRay.intersectObject(wall).length > 0, 'the plaster remains solid beside the window');
 const roomWindow = unique('main-arched-window');
@@ -100,22 +175,28 @@ assert.ok(middle.position.z - distant.position.z >= 30, 'the sky is farther behi
 const hangingCloths = [];
 for (const side of ['left', 'right']) {
   const curtain = unique(`window-curtain-${side}`);
+  assert.equal(curtain.geometry.parameters.width, 1.92, 'each curtain is twice as wide');
   assert.ok(curtain.geometry.getAttribute('position').count > 1200, 'linen is a subdivided cloth mesh');
   assert.ok(curtain.material.isMeshPhysicalMaterial && curtain.material.sheen > 0, 'linen reacts to physical lighting');
   assert.equal(curtain.userData.windAnimated, true, 'curtain is registered for wind animation');
+  const clothBounds = bounds(curtain.name);
+  assert.ok(clothBounds.min.y > FLOOR_Y && clothBounds.min.y < FLOOR_Y + .055, 'hem reaches the floor without clipping');
+  assert.ok(clothBounds.min.z > sillBounds.max.z, 'the curtains hang in front of the sill');
   const positions = curtain.geometry.getAttribute('position');
   const topBefore = positions.getZ(0);
-  const hemBefore = Array.from({ length: 29 }, (_, i) => positions.getZ(positions.count - 29 + i));
+  const hemCount = curtain.geometry.parameters.widthSegments + 1;
+  const hemBefore = Array.from({ length: hemCount }, (_, i) => positions.getZ(positions.count - hemCount + i));
   hangingCloths.push({ positions, topBefore, hemBefore });
 }
 world.animated.forEach(update => update(2.9));
 for (const { positions, topBefore, hemBefore } of hangingCloths) {
   assert.ok(Math.abs(positions.getZ(0) - topBefore) < .00001, 'the upper seam remains fixed');
-  assert.ok(hemBefore.some((value, i) => Math.abs(positions.getZ(positions.count - 29 + i) - value) > .01), 'wind moves the free hem');
+  assert.ok(hemBefore.some((value, i) => Math.abs(positions.getZ(positions.count - hemBefore.length + i) - value) > .01), 'wind moves the free hem');
 }
-assert.ok(workbench.min.z > 15, 'workbench stays beyond the original alchemy workshop');
+assert.ok(workbench.min.z > ALCHEMY_Z + 3 && workbench.max.z < ROOM_END,
+  'workbench stays between the alchemy station and the new entrance');
 assert.ok(workbench.max.x < alchemyWall.min.x, 'workbench does not enter the tile wall');
-assert.ok(unique('workbench-tool-wall').position.z > 3.5, 'tool wall moved with the workbench');
+assert.equal(unique('workbench-tool-wall').position.z, WORKBENCH_Z, 'tool wall moved with the workbench');
 assert.equal(Object.keys(world.anchors).length, 5, 'all five hotspots retained');
 const wallpaper = unique('alchemy-right-wall');
 assert.equal(wallpaper.material, materials.alchemyTile, 'green tile remains the default right-wall finish');
@@ -170,6 +251,35 @@ assert.equal(windowLightAt(WINDOW_OPENING.centerX + 7, FLOOR_Y, landing), 0, 'no
 const underMullion = WINDOW_OPENING.centerX + WINDOW_OPENING.mullionOffsets[2] - (landing - WINDOW_OPENING.wallZ) * WINDOW_LIGHT_SLOPE.x;
 assert.ok(windowLightAt(underMullion, FLOOR_Y, landing) < .6 * windowLightAt(sideways, FLOOR_Y, landing),
   'the window frame casts its shadow into the light');
+const furnitureUniform = world.windowLight.shaderUniforms.uWindowFurnitureMap;
+assert.equal(unique('window-light-floor').material.uniforms.uWindowFurnitureMap, furnitureUniform);
+assert.equal(unique('window-light-air').material.uniforms.uWindowFurnitureMap, furnitureUniform);
+assert.equal(unique('ambient-dust-engine').material.uniforms.uWindowFurnitureMap, furnitureUniform);
+const { width, height, data } = furnitureUniform.value.image;
+const apertureBottom = WINDOW_OPENING.sill - .16;
+const apertureHeight = WINDOW_OPENING.crown + .12 - apertureBottom;
+function windowDepthAt(point) {
+  const distance = point.z - WINDOW_OPENING.wallZ;
+  const offset = point.x + distance * WINDOW_LIGHT_SLOPE.x - WINDOW_OPENING.centerX;
+  const rayHeight = point.y + distance * WINDOW_LIGHT_SLOPE.y;
+  const x = Math.floor(width * (.5 + offset / (2.16 * WINDOW_OPENING.halfWidth)));
+  const y = Math.floor(height * (rayHeight - apertureBottom) / apertureHeight);
+  return data[y * width + x] * 26 / 255;
+}
+// The lowered gramophone stand is below the sill, but the horn still catches sunlight.
+const deskMat = unique('planning-desk-mat');
+const hornStem = unique('gramophone-horn-stem');
+for (const [name, point] of [
+  ['planning-main-table', deskMat.localToWorld(new THREE.Vector3(0, .03, 0))],
+  ['gramophone-table', hornStem.localToWorld(new THREE.Vector3(0, .25, 0))],
+]) {
+  const distance = (point.y - FLOOR_Y) / WINDOW_LIGHT_SLOPE.y;
+  const floorShadow = point.clone().add(new THREE.Vector3(-distance * WINDOW_LIGHT_SLOPE.x, FLOOR_Y - point.y, distance));
+  assert.ok(windowLightAt(floorShadow.x, floorShadow.y, floorShadow.z) > .4, `${name} is in the window light`);
+  const furnitureDepth = windowDepthAt(floorShadow);
+  assert.ok(Math.abs(furnitureDepth - (point.z - WINDOW_OPENING.wallZ)) < 1.4, `${name} records a shadow at the furniture depth`);
+  assert.ok(furnitureDepth + .1 < floorShadow.z - WINDOW_OPENING.wallZ, `${name} interrupts the ray before it meets the floor`);
+}
 world.windowLight.setStrength(0);
 assert.equal(unique('window-light-air').visible, false, 'the window light can be switched off');
 world.windowLight.setStrength(1);
@@ -214,9 +324,11 @@ scene.traverse(object => {
 assert.equal(chandelierLights.length, 3, 'three chandeliers');
 assert.equal(scene.children.flatMap(c => c.children).filter(o => o.name === 'lair-wall-sconce').length, 8, 'eight wall sconces');
 assert.ok(pointLights.length <= 6, `the room keeps few point lights, got ${pointLights.length}`);
-for (const light of chandelierLights) {
+for (const [index, light] of chandelierLights.entries()) {
   const height = light.getWorldPosition(new THREE.Vector3()).y;
   assert.ok(light.distance > height + 2, 'chandelier light reaches the floor');
+  assert.equal(light.parent.position.z, unique(`lair-ceiling-beam-${index * 2 + 1}`).position.z,
+    'the chandelier hangs from a ceiling beam');
 }
 assert.ok(lampLight.length >= 11 && lampLight.every(o => o.userData.atmosphere), 'lamp glows are never ink-outlined');
 const dayLamp = chandelierLights[0].intensity;

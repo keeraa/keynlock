@@ -7,18 +7,19 @@ import { paintingCategory } from './painting-catalog.js';
 
 /** A compact, high-mounted salon wall. Preview textures are separate from the easel LRU. */
 export function createWallGallery({ THREE, scene, camera, renderer, frameWood,
-  pointerElement = renderer.domElement, onLayout = () => {} }) {
+  wallZ, wallLayout = undefined, pointerElement = renderer.domElement, onLayout = () => {} }) {
   const root = new THREE.Group();
   root.name = 'rear-wall-paintings';
-  // Wallpaper's front face is z=-4.6. The canvas backs are only 4–5 cm away.
-  root.position.z = -4.555;
+  // The 22 mm backings sit flush to the host's finished wall.
+  root.position.z = wallZ == null ? -4.555 : wallZ - .003;
   scene.add(root);
 
   const paintingsRoot = new THREE.Group();
   paintingsRoot.name = 'restored-frames';
   root.add(paintingsRoot);
+  const galleryWidth = wallLayout?.width ?? WALL_WIDTH;
   const labelCanvas = document.createElement('canvas');
-  labelCanvas.width = 4096;
+  labelCanvas.width = Math.round(4096 * galleryWidth / WALL_WIDTH);
   labelCanvas.height = 192;
   const labelContext = labelCanvas.getContext('2d');
   const labelStep = labelCanvas.width / WALL_COLUMNS.length;
@@ -40,13 +41,13 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood,
   const labelTexture = new THREE.CanvasTexture(labelCanvas);
   labelTexture.colorSpace = THREE.SRGBColorSpace;
   const labelStrip = new THREE.Mesh(
-    new THREE.PlaneGeometry(WALL_WIDTH, .81),
+    new THREE.PlaneGeometry(galleryWidth, .81),
     new THREE.MeshBasicMaterial({ map: labelTexture, transparent: true, depthWrite: false,
       toneMapped: false }),
   );
   labelStrip.name = 'twelve-art-history-column-headings';
   labelStrip.userData.excludeFromInk = true;
-  labelStrip.position.set(0, WALL_TOP - .42, .035);
+  labelStrip.position.set(wallLayout?.centerX ?? 0, WALL_TOP - .42, .035);
   root.add(labelStrip);
 
   const previewCache = createWallPreviewCache({ THREE, renderer });
@@ -59,7 +60,7 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood,
   let focusedId = null;
   let fullTexture = null;
   let focusRequest = 0;
-  let layout = layoutWallPaintings([]);
+  let layout = layoutWallPaintings([], wallLayout);
 
   function clearFocus() {
     focusRequest++;
@@ -196,7 +197,7 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood,
     }));
 
     // Mount all frames immediately; load images into them independently.
-    reconcile(layoutWallPaintings([...sources.values()]), sources);
+    reconcile(layoutWallPaintings([...sources.values()], wallLayout), sources);
     onLayout(layout);
     let loaded = selected.filter((art) => Boolean(sources.get(art.id).texture)).length;
     onProgress({ loaded, total: selected.length });
@@ -225,7 +226,7 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood,
       if (remaining.get(category) === 0) {
         // Column dimensions depend on each other's aspect ratios. Reflow one
         // finished column at a time, reusing every existing mesh/material.
-        reconcile(layoutWallPaintings([...sources.values()]), sources);
+        reconcile(layoutWallPaintings([...sources.values()], wallLayout), sources);
         onLayout(layout);
       }
     }));
@@ -241,7 +242,7 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood,
       clearFocus();
       for (const id of artworks.keys()) removeArtwork(id);
       imageMeshes.length = 0;
-      layout = layoutWallPaintings([]);
+      layout = layoutWallPaintings([], wallLayout);
       previewCache.clear();
     },
   };

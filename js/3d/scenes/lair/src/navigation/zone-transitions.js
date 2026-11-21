@@ -2,8 +2,9 @@ import * as THREE from 'three';
 import { WORKSHOPS } from '../workshops/workshop-overlay.js';
 import { t } from '../i18n.js';
 import { ALCHEMY_LOOK } from '@keynlock/alchemy/src/look/alchemy-look.js';
+import { ALCHEMY_Z, ATELIER_Z, WORKBENCH_Z } from '../room/layout.js';
 
-export const ATELIER_EASELS = { position: [1.56, 3.22, 10.35], target: [-7.05, 2.48, 10.35] };
+export const ATELIER_EASELS = { position: [1.56, 3.22, ATELIER_Z], target: [-7.05, 2.48, ATELIER_Z] };
 
 const zoneDefinitions = {
   atelier: {
@@ -17,14 +18,14 @@ const zoneDefinitions = {
     number: '02', kicker: t('БАЗА КОМАНДЫ'), title: t('Карта и дела'),
     description: t('Карта каналов и кварталов Киенлока, заметки о заказах и стол, за которым Кай, Сай и Тик готовят очередную вылазку. Сюда команда возвращается с добычей.'),
     status: t('Штаб связывает мастерские, коллекцию и будущие сюжетные задания.'),
-    link: null, camera: [.15, 3.80, 7.75], target: [0, 1.75, -.7],
+    link: null, camera: [.15, 3.32, 7.75], target: [0, 1.27, -.7],
   },
   workbench: {
     number: '03', kicker: t('МАСТЕРСКАЯ ТИКА'), title: t('Верстак'),
     description: t('Справа от алхимического стола, вдоль зелёной стены, стоит отдельный верстак с тисками, заготовками, замочными цилиндрами и инструментальной доской.'),
     status: t('Полная исходная мастерская: опиловка, сборка замка, песочница механизмов.'),
     link: WORKSHOPS.workbench.sourceUrl,
-    camera: [1.22, 3.15, 20.07], target: [7.40, 1.68, 20.07],
+    camera: [1.22, 2.89, WORKBENCH_Z], target: [7.40, 1.42, WORKBENCH_Z],
   },
   alchemy: {
     number: '04', kicker: t('СОСТАВЫ И РЕАГЕНТЫ'), title: t('Алхимия'),
@@ -33,13 +34,13 @@ const zoneDefinitions = {
     link: WORKSHOPS.alchemy.sourceUrl,
     // Fallback only. The loaded source laboratory supplies its actual orbit
     // position, pivot and 37° field of view when entering this workshop.
-    camera: [3.08, 4.18, 10.10], target: [6.99, 3.18, 10.10],
+    camera: [3.08, 2.45, ALCHEMY_Z], target: [6.99, 1.45, ALCHEMY_Z],
   },
   gramophone: {
     number: '05', kicker: t('СКРЫТАЯ КОЛЛЕКЦИЯ'), title: t('Музыка в Логове'),
     description: t('Старый граммофон хранит запрещённые иностранные пластинки. Для будущего саундтрека отобраны три исполнения ноктюрнов Шопена: Op. 9 № 2 и два варианта Op. 9 № 1.'),
     status: t('Фонотека задумана; сами записи пока не включены в опубликованную сцену.'),
-    link: null, camera: [1.95, 3.38, 3.60], target: [1.96, 2.26, -3.71],
+    link: null, camera: [1.95, 2.95, 3.60], target: [1.96, 1.83, -3.71],
   },
 };
 
@@ -48,7 +49,7 @@ const zoneOrder = ['atelier', 'planning', 'workbench', 'alchemy', 'gramophone'];
 export function createZoneTransitions({
   scene, camera, controls, canvas, interaction, renderer, rendererHost, atelierFilter,
   workshopOverlay, atelierView, visualUI, homePosition, homeTarget, roomMinDistance,
-  roomLights,
+  roomLights, beforeCameraTransition,
 }) {
   const zones = Object.fromEntries(Object.entries(zoneDefinitions).map(([id, zone]) => [id, { ...zone }]));
   const panel = document.querySelector('#zone-panel');
@@ -236,6 +237,7 @@ export function createZoneTransitions({
 
   function openZone(id) {
     if (!zones[id]) return;
+    beforeCameraTransition();
     pendingWorkshopOpen = null;
     atelierView.leaveGallery();
     if (visualUI.isOpen()) visualUI.close();
@@ -287,6 +289,7 @@ export function createZoneTransitions({
   }
 
   function resetView() {
+    beforeCameraTransition();
     if (workshopOverlay?.isOpen()) { workshopOverlay.close(); return; }
     closePanel();
     rendererHost?.setWorldLighting(null);
@@ -357,6 +360,7 @@ export function createZoneTransitions({
     precompileWorkshopLighting,
     manipulateAlchemy, resetAlchemyCamera,
     current: () => currentZone,
+    title: id => zones[id]?.title,
     isTransitioning: () => transitioning,
     stopApproach: () => { transitioning = false; },
     roomFov: () => roomFov,

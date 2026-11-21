@@ -1,25 +1,34 @@
 // @ts-check
 import * as THREE from 'three';
 import { canvasTexture } from './materials.js';
+import { WINDOW_CUTOUT } from './window.js';
+import { CEILING_BEAM_Z, ROOM_CENTER_Z, ROOM_END, ROOM_LENGTH, ROOM_START } from './layout.js';
 
 // The long room itself: floor, walls, ceiling, rug and the right-wall finish.
 export function buildShell(kit) {
   const { m, scene, staticGroup, box, plane } = kit;
   scene.background = new THREE.Color('#2f3834');
   scene.fog = new THREE.Fog('#514d40', 39, 94);
-  // Thirty metres of exhibition space on the left, with a matching full-
-  // length workshop wing on the right. The arched window stays on the far end.
-  const longRoomStart = -5.72;
-  const longRoomEnd = 26.42;
-  const longRoomLength = longRoomEnd - longRoomStart;
-  const longRoomCenter = (longRoomEnd + longRoomStart) / 2;
-  const floorBase = box(staticGroup, 17.3, .22, longRoomLength + .3, m.darkWood, 0, -.14, longRoomCenter);
+  const ceilingBottom = 13.52;
+  const floorBase = box(staticGroup, 17.3, .22, ROOM_LENGTH, m.darkWood, 0, -.14, ROOM_CENTER_Z);
+  floorBase.name = 'lair-floor-base';
   floorBase.castShadow = false;
-  for (let i = 0; i < 99; i++) {
-    const z = -5.64 + i * .325;
-    const plank = box(staticGroup, 17.1, .047, .312, i % 6 === 0 ? m.floorAlternate : m.floor, 0, .015, z);
+  const plankStep = .325;
+  const plankCount = Math.ceil(ROOM_LENGTH / plankStep);
+  for (let i = 0; i < plankCount; i++) {
+    const start = ROOM_START + i * plankStep;
+    const span = Math.min(plankStep, ROOM_END - start);
+    const z = start + span / 2;
+    const plank = box(staticGroup, 17.1, .047, span * .96, i % 6 === 0 ? m.floorAlternate : m.floor, 0, .015, z);
     plank.castShadow = false;
-    if (i % 5 === 0) box(staticGroup, 17.1, .006, .009, m.darkWood, 0, .045, z - .155).castShadow = false;
+    // Give adjoining boards different parts of the same painted grain.
+    const uv = plank.geometry.getAttribute('uv');
+    const grainX = (i % 7) * .23;
+    const grainY = (i % 11) * .57;
+    for (let j = 0; j < uv.count; j++) {
+      uv.setXY(j, uv.getX(j) + grainX, uv.getY(j) + grainY);
+    }
+    if (i % 5 === 0) box(staticGroup, 17.1, .006, .009, m.darkWood, 0, .045, start + .0075).castShadow = false;
   }
   // Double-height room, measured from the same floor datum as the original.
   // The arched opening runs all the way through the plaster. A solid box
@@ -31,8 +40,8 @@ export function buildShell(kit) {
   backOutline.lineTo(-8.7, 13.66);
   backOutline.closePath();
   const opening = new THREE.Path();
-  const openingX = -.05, openingHalf = 4.23, openingBottom = 2.13;
-  const openingSpring = 7.43, openingRise = 2.15;
+  const { centerX: openingX, halfWidth: openingHalf, bottom: openingBottom,
+    spring: openingSpring, rise: openingRise } = WINDOW_CUTOUT;
   opening.moveTo(openingX - openingHalf, openingBottom);
   opening.lineTo(openingX - openingHalf, openingSpring);
   for (let i = 1; i <= 64; i++) {
@@ -59,45 +68,81 @@ export function buildShell(kit) {
   staticGroup.add(backWall);
   // Preserve the original uninterrupted painted walls. The existing
   // workstations are reached by a camera focus, without new architecture.
-  box(staticGroup, .27, 13.8, longRoomLength, m.plaster, -8.55, 6.76, longRoomCenter).castShadow = false;
-  box(staticGroup, .27, 13.8, longRoomLength, m.plaster, 8.55, 6.76, longRoomCenter).castShadow = false;
-  box(staticGroup, 17.5, .20, longRoomLength, m.darkWood, 0, 13.62, longRoomCenter).castShadow = false;
-  // The left wall keeps the exact ochre gouache wallpaper from the atelier.
-  const leftFinish = plane(staticGroup, longRoomLength - .12, 13.55, m.atelierSideWall, -8.391, 6.72, longRoomCenter);
+  box(staticGroup, .27, 13.8, ROOM_LENGTH, m.plaster, -8.55, 6.76, ROOM_CENTER_Z).castShadow = false;
+  box(staticGroup, .27, 13.8, ROOM_LENGTH, m.plaster, 8.55, 6.76, ROOM_CENTER_Z).castShadow = false;
+  box(staticGroup, 17.5, .20, ROOM_LENGTH, m.ceiling, 0, ceilingBottom + .10, ROOM_CENTER_Z)
+    .name = 'lair-ceiling';
+  const leftFinish = plane(staticGroup, ROOM_LENGTH - .12, 13.55, m.galleryPlaster, -8.391, 6.72, ROOM_CENTER_Z);
+  // Keep the brushwork at the same physical scale along the gallery wall.
+  const galleryUV = leftFinish.geometry.getAttribute('uv');
+  for (let i = 0; i < galleryUV.count; i++) {
+    galleryUV.setX(i, galleryUV.getX(i) * leftFinish.geometry.parameters.width / 17.4);
+  }
   leftFinish.rotation.y = Math.PI / 2;
   leftFinish.name = 'atelier-side-wall';
   // One continuous sage-green tiled finish covers the entire right wall.
   // It sits just in front of the plaster, from the floor to the ceiling.
-  const rightFinish = plane(staticGroup, longRoomLength - .08, 13.54, m.alchemyTile, 8.392, 6.77, longRoomCenter);
+  const rightFinish = plane(staticGroup, ROOM_LENGTH - .08, 13.54, m.alchemyTile, 8.392, 6.77, ROOM_CENTER_Z);
   rightFinish.rotation.y = -Math.PI / 2;
   rightFinish.castShadow = false;
   rightFinish.name = 'alchemy-right-wall';
 
-  // Wainscot panels, framed with dark timber; the left wall is kept free for the restoration easel.
-  box(staticGroup, 17.25, 1.65, .08, m.agedWood, 0, .9, -5.39);
-  box(staticGroup, 17.25, .12, .17, m.darkWood, 0, 1.76, -5.28);
-  box(staticGroup, 17.25, .2, .23, m.walnut, 0, .18, -5.26);
-  for (let i = -7; i <= 7; i++) {
-    box(staticGroup, .09, 1.45, .09, m.darkWood, i * 1.18, .93, -5.31);
-    if (i < 7) box(staticGroup, .92, .04, .045, m.oldBrass, i * 1.18 + .59, 1.49, -5.23);
+  // Match the height and profile of the lower timber finish on all three walls.
+  const wainscot = new THREE.Group();
+  wainscot.name = 'lair-wainscot';
+  staticGroup.add(wainscot);
+  const innerHalf = 8.39, insideBack = -5.48;
+  const timber = m.roomTimber;
+  const leftJamb = openingX - openingHalf;
+  const rightJamb = openingX + openingHalf;
+  const capHeight = .065;
+  for (const { part, height, y, depth } of [
+    { part: 'panel', height: 1.47, y: .76, depth: .10 },
+    { part: 'cap', height: capHeight, y: 1.505, depth: .15 },
+    { part: 'base', height: .12, y: .10, depth: .14 },
+  ]) {
+    const backZ = insideBack + depth / 2;
+    if (part === 'base') {
+      box(wainscot, innerHalf * 2, height, depth, timber, 0, y, backZ)
+        .name = 'lair-wainscot-back-base';
+    } else {
+      box(wainscot, leftJamb + innerHalf, height, depth, timber, (leftJamb - innerHalf) / 2, y, backZ)
+        .name = `lair-wainscot-back-left-${part}`;
+      box(wainscot, innerHalf - rightJamb, height, depth, timber, (rightJamb + innerHalf) / 2, y, backZ)
+        .name = `lair-wainscot-back-right-${part}`;
+      const sectionTop = part === 'cap' ? openingBottom : openingBottom - capHeight;
+      const sectionBottom = part === 'cap' ? sectionTop - capHeight : y - height / 2;
+      box(wainscot, openingHalf * 2, sectionTop - sectionBottom, depth, timber,
+        openingX, (sectionTop + sectionBottom) / 2, backZ).name = `lair-wainscot-back-${part}`;
+    }
+    const start = insideBack + depth;
+    for (const side of [-1, 1]) {
+      box(wainscot, depth, height, ROOM_END - start, timber,
+        side * (innerHalf - depth / 2), y, (start + ROOM_END) / 2)
+        .name = `lair-wainscot-${side < 0 ? 'left' : 'right'}-${part}`;
+    }
   }
-  // The restoration side retains its wood wainscot. Keep the tiled side clear.
-  box(staticGroup, .08, 1.66, longRoomLength - .1, m.agedWood, -8.35, .88, longRoomCenter);
-  box(staticGroup, .19, .15, longRoomLength - .1, m.darkWood, -8.23, 1.77, longRoomCenter);
-  box(staticGroup, .22, .20, longRoomLength - .1, m.walnut, -8.20, .17, longRoomCenter);
-  // No timber line across the middle of the double-height room.
-  for (const side of [-1, 1]) box(staticGroup, .22, .20, longRoomLength - .1, m.walnut, side * 8.29, 13.30, longRoomCenter);
+  // Set all ceiling timbers into the surface so light cannot show at the seam.
+  const timberTop = ceilingBottom + .02;
+  const wallBeamHeight = .24;
+  const wallBeamY = timberTop - wallBeamHeight / 2;
+  for (const side of [-1, 1]) {
+    box(staticGroup, .22, wallBeamHeight, ROOM_LENGTH - .1, timber,
+      side * 8.29, wallBeamY, ROOM_CENTER_Z).name = `lair-wall-beam-${side < 0 ? 'left' : 'right'}`;
+  }
   // Leave the centre of the back wall open for the enlarged arched window.
-  for (const x of [-8.25, -4.68, 4.68, 8.25]) {
-    box(staticGroup, .31, 13.35, .32, m.darkWood, x, 6.64, -5.32);
-    box(staticGroup, .45, .22, .48, m.walnut, x, 12.70, -5.31);
+  for (const [index, x] of [-8.25, -4.68, 4.68, 8.25].entries()) {
+    box(staticGroup, .26, 13.35, .27, timber, x, 6.64, -5.32).name = `lair-wall-post-${index}`;
+    box(staticGroup, .37, .20, .39, timber, x, timberTop - wallBeamHeight - .09, -5.31);
   }
-  for (let z = -4.8, beamIndex = 0; z < longRoomEnd; z += 3.1, beamIndex++) {
-    box(staticGroup, 17.15, .30, .34, m.darkWood, 0, 13.37, z)
+  // Alternate ribs carry the three chandeliers.
+  for (const [beamIndex, z] of CEILING_BEAM_Z.entries()) {
+    box(staticGroup, 17.15, .30, .33, timber, 0, timberTop - .15, z)
       .name = `lair-ceiling-beam-${beamIndex}`;
-    for (const x of [-8.15, 8.15]) box(staticGroup, .42, .44, .52, m.walnut, x, 13.22, z);
+    for (const x of [-8.22, 8.22]) box(staticGroup, .39, .40, .48, timber, x, 13.22, z);
   }
-  box(staticGroup, 17.22, .25, .32, m.walnut, 0, 13.24, -5.29);
+  box(staticGroup, 17.22, wallBeamHeight, .30, timber, 0, wallBeamY, -5.39)
+    .name = 'lair-wall-beam-back';
   // The chandeliers are in lamps.js.
   // A worn, woven carpet beneath the central table.
   const rugTex = canvasTexture((ctx, w, h) => {
@@ -109,8 +154,9 @@ export function buildShell(kit) {
       ctx.moveTo(x, y - 30); ctx.lineTo(x + 30, y); ctx.lineTo(x, y + 30); ctx.lineTo(x - 30, y); ctx.closePath(); ctx.stroke();
     }
   });
-  const rug = new THREE.Mesh(new THREE.PlaneGeometry(6.4, 4.3), new THREE.MeshStandardMaterial({ map: rugTex, roughness: 1 }));
-  rug.rotation.x = -Math.PI / 2; rug.position.set(-.1, .05, 1.2); rug.receiveShadow = true; staticGroup.add(rug);
+  const rug = new THREE.Mesh(new THREE.BoxGeometry(6.4, .012, 4.3), new THREE.MeshStandardMaterial({ map: rugTex, roughness: 1 }));
+  rug.name = 'planning-rug';
+  rug.position.set(-.1, .0445, 1.2); rug.receiveShadow = true; staticGroup.add(rug);
 
   // Roof joists, tall posts and perimeter trim used to project enormous
   // diagonal shadow bars onto the gallery wall and floor. The architecture

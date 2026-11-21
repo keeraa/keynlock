@@ -3,11 +3,20 @@ import { makeCurtainLinenTexture } from './materials.js';
 import { loadCityWindowTextures } from './window-city-art.js';
 
 // The arched window on the far wall, the city behind it and the curtains.
-const WINDOW_POSITION = Object.freeze([-.05, 2.23, -5.65]);
+const WINDOW_POSITION = Object.freeze([-.05, 1.00, -5.65]);
 const halfWidth = 4.15, straightHeight = 5.20, archRise = 2.10;
 // The window frame: upright mullions and horizontal transoms (window-local).
 const MULLION_X = Object.freeze([-2.02, 0, 2.02]);
 const TRANSOM_Y = Object.freeze([2.68, straightHeight - .04]);
+
+// The masonry cutout extends under the frame on all sides.
+export const WINDOW_CUTOUT = Object.freeze({
+  centerX: WINDOW_POSITION[0],
+  halfWidth: halfWidth + .08,
+  bottom: WINDOW_POSITION[1] - .10,
+  spring: WINDOW_POSITION[1] + straightHeight,
+  rise: archRise + .05,
+});
 
 /** The glazed opening in world units; the window light is cast through it. */
 export const WINDOW_OPENING = Object.freeze({
@@ -102,7 +111,7 @@ export function buildWindow(kit) {
   }
   makeArchTrim(halfWidth - .05, straightHeight, archRise, .15, m.walnut, .19).name = 'main-arched-window-frame';
   makeArchTrim(halfWidth - .22, straightHeight - .05, archRise - .16, .048, m.oldBrass, .32);
-  box(window, 8.65, .22, .48, m.walnut, 0, -.02, .37, .035).name = 'main-arched-window-sill';
+  box(window, 8.65, .22, .38, m.walnut, 0, -.02, .32, .035).name = 'main-arched-window-sill';
   box(window, 8.01, .085, .13, m.oldBrass, 0, .13, .35);
   // All mullions meet the arched glazing: no floating rectangular top rail.
   for (const x of MULLION_X) {
@@ -112,7 +121,8 @@ export function buildWindow(kit) {
   for (const y of TRANSOM_Y) box(window, 7.94, .11, .14, m.darkWood, 0, y, .24);
   // Dense woven linen with actual pleated geometry. The fixed top edge is
   // suspended from a wall-wide brass pole level with the upper crossbar.
-  rod(window, [-4.13, straightHeight - .04, .55], [4.13, straightHeight - .04, .55], .043, m.oldBrass, 12)
+  const poleY = straightHeight - .04, poleDepth = .81, poleHalfWidth = 4.60;
+  rod(window, [-poleHalfWidth, poleY, poleDepth], [poleHalfWidth, poleY, poleDepth], .043, m.oldBrass, 12)
     .name = 'curtain-pole-full-width';
   const curtainMap = makeCurtainLinenTexture();
   const curtainMaterial = new THREE.MeshPhysicalMaterial({
@@ -121,17 +131,24 @@ export function buildWindow(kit) {
     side: THREE.DoubleSide,
   });
   curtainMaterial.userData.inkSkipOutline = true; // the cloth deforms every frame
+  const curtainTop = poleY - .05;
+  // Leave enough room for the animated hem to graze the floor.
+  const curtainBottom = .085 - WINDOW_POSITION[1];
+  const width = 1.92, pleats = 5, gather = .81;
   for (const sign of [-1, 1]) {
-    const width = .96, height = 5.10;
-    const geometry = new THREE.PlaneGeometry(width, height, 28, 42);
+    const sideName = sign < 0 ? 'left' : 'right';
+    const bracketX = sign * (poleHalfWidth - .07);
+    rod(window, [bracketX, poleY, .13], [bracketX, poleY, poleDepth], .039, m.oldBrass, 10)
+      .name = `curtain-bracket-${sideName}`;
+    const height = curtainTop - curtainBottom;
+    const geometry = new THREE.PlaneGeometry(width, height, 36, 42);
     const positions = geometry.getAttribute('position');
     positions.setUsage(THREE.DynamicDrawUsage);
     const rest = new Float32Array(positions.array);
-    const sideName = sign < 0 ? 'left' : 'right';
     const cloth = new THREE.Mesh(geometry, curtainMaterial);
     cloth.name = `window-curtain-${sideName}`;
     cloth.userData.windAnimated = true;
-    cloth.position.set(sign * 3.78, 2.57, .56);
+    cloth.position.set(sign * 3.78, (curtainTop + curtainBottom) / 2, poleDepth + .01);
     cloth.castShadow = true;
     cloth.receiveShadow = true;
     cloth.frustumCulled = false;
@@ -143,10 +160,10 @@ export function buildWindow(kit) {
         const height01 = THREE.MathUtils.clamp((y + height / 2) / height, 0, 1);
         const freedom = (1 - height01) ** 1.7; // the sewn upper seam stays fixed
         const u = (x + width / 2) / width;
-        const pleat = .105 * Math.sin(u * Math.PI * 6.0 + .28 * (1 - height01));
+        const pleat = .105 * Math.sin(u * Math.PI * 2 * pleats + .28 * (1 - height01));
         const wind = Math.sin(phase + u * 1.8) * .12 + Math.sin(time * .53 + u * 3.8) * .045;
         positions.setXYZ(i,
-          x * (.81 + .19 * freedom) + sign * freedom * wind,
+          x * (gather + (1 - gather) * freedom) + sign * freedom * wind,
           y - freedom * (.018 + .015 * Math.sin(phase + u * 5.0)),
           pleat + freedom * (.17 * Math.sin(phase * .83 + u * 1.5) + .054 * Math.sin(time * 2.1 + u * 4.0)));
       }
@@ -155,9 +172,11 @@ export function buildWindow(kit) {
     };
     updateCloth(0);
     animated.push(updateCloth);
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i <= pleats; i++) {
       const ring = new THREE.Mesh(new THREE.TorusGeometry(.056, .015, 6, 12), m.oldBrass);
-      ring.position.set(sign * 3.78 + (i - 2) * .18, straightHeight - .078, .62);
+      ring.position.set(cloth.position.x + (i / pleats - .5) * width * gather, poleY, cloth.position.z);
+      ring.rotation.y = Math.PI / 2;
+      ring.name = `curtain-ring-${sideName}-${i}`;
       ring.castShadow = false;
       window.add(ring);
     }

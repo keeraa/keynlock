@@ -112,12 +112,12 @@ function paintedTexture(THREE, kind) {
   return tex;
 }
 
-export function createHouseModel(THREE, initialConfig, {detail='high'}={}) {
+export function createHouseModel(THREE, initialConfig, {detail='high',glass}={}) {
   if(!['high','medium','low'].includes(detail))throw new Error(`Неизвестный уровень детализации дома: ${detail}`);
   const simplified=detail!=='high', minimal=detail==='low';
   const group = new THREE.Group();
   group.name = 'KEYNLOCK — параметрический дом';
-  const resources = createHouseResourceManager(THREE,paintedTexture);
+  const resources = createHouseResourceManager(THREE,paintedTexture,glass);
   const mats = resources.materials;
   let disposed = false;
 

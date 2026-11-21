@@ -8,21 +8,10 @@ import {createSky} from '../js/sky.js';
 // Scene geometry can be checked without a browser, canvas or WebGL context.
 const cityFile=resolve('js/city.js');
 const source=readFileSync(cityFile,'utf8')
-  .replace("from 'three'",`from "${pathToFileURL(resolve('vendor/three-core.js')).href}"`)
-  .replace("from './world-data.js'",`from "${pathToFileURL(resolve('js/world-data.js')).href}"`)
-  .replace("from './water.js'",`from "${pathToFileURL(resolve('js/water.js')).href}"`)
-  .replace("from './terrain.js'",`from "${pathToFileURL(resolve('js/terrain.js')).href}"`)
-  .replace("from './navigation/house-paths.js'",`from "${pathToFileURL(resolve('js/navigation/house-paths.js')).href}"`)
-  .replace("from './buildings/house-model.js'",`from "${pathToFileURL(resolve('js/buildings/house-model.js')).href}"`)
-  .replace("from './buildings/house-batch.js'",`from "${pathToFileURL(resolve('js/buildings/house-batch.js')).href}"`)
-  .replace("from './buildings/house-materials.js'",`from "${pathToFileURL(resolve('js/buildings/house-materials.js')).href}"`)
-  .replace("from './buildings/house-atmosphere.js'",`from "${pathToFileURL(resolve('js/buildings/house-atmosphere.js')).href}"`)
-  .replace("from '../modules/house-builder/core/building-smoke-batch.js'",`from "${pathToFileURL(resolve('modules/house-builder/core/building-smoke-batch.js')).href}"`)
-  .replace("from './city/city-house-lots.js'",`from "${pathToFileURL(resolve('js/city/city-house-lots.js')).href}"`)
-  .replace("from './buildings/house-layout.js'",`from "${pathToFileURL(resolve('js/buildings/house-layout.js')).href}"`)
-  .replace("from './landmarks/landmark-model.js'",`from "${pathToFileURL(resolve('js/landmarks/landmark-model.js')).href}"`)
-  .replace("from './landmarks/landmark-atmosphere.js'",`from "${pathToFileURL(resolve('js/landmarks/landmark-atmosphere.js')).href}"`)
-  .replace("from './street/district-profiles.js'",`from "${pathToFileURL(resolve('js/street/district-profiles.js')).href}"`)
+  .replace(/from ['"]three['"]/g,`from "${pathToFileURL(resolve('vendor/three-core.js')).href}"`)
+  // Resolve any current or newly extracted city submodule relative to js/city.js.
+  .replace(/from ['"](\.{1,2}\/[^'"]+)['"]/g,(_,specifier)=>
+    `from "${pathToFileURL(resolve('js',specifier)).href}"`)
   .replace('const occupiedLots=[];','const occupiedLots=globalThis.__keynlockTestLots=[];');
 const {createCity}=await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
 const scene=new THREE.Scene(),materialCache=new Map();
@@ -99,6 +88,23 @@ for(const route of city.housePaths) {
   const destination=route[route.length-1];
   assert.ok(city.roadNetwork.some(road=>distanceToPolyline(destination[0],destination[1],road.p)<.01),
     'A house path must finish on an actual street');
+}
+assert.equal(city.landmarkPaths.length,6,'Every landmark needs a registered entrance approach');
+assert.equal(city.publicPaths.length,2,'Market and public garden must join pedestrian paving');
+const walking=city.pedestrianNetwork;
+assert.ok(walking.nodes.length>100&&walking.edges.length>100,'Pedestrian junctions must form a real graph');
+const routeTargets=['landmark-palace','landmark-museum','landmark-theater',
+  'landmark-townhall','landmark-church','landmark-tower','market','upper-garden',
+  'windmill','factory-0','field-66--63'];
+for(const destination of routeTargets){
+  assert.ok(walking.anchors.some(anchor=>anchor.id===destination&&anchor.nodeId!==null),
+    `Object ${destination} must have a walkable entrance node`);
+  assert.ok(walking.findRoute('house-0',destination)?.length>1,
+    `Residents must be able to walk from a house to ${destination}`);
+}
+for(let i=0;i<city.housePaths.length;i++){
+  assert.ok(walking.findRoute(`house-${i}`,'landmark-theater')?.length>1,
+    `House ${i} must reach the shared pedestrian network`);
 }
 assert.equal(roadDeadEnds.length,0,'Every road should connect to another road or leave the map');
 assert.equal(city.roadNetwork[4].p.length,2,'The uphill road should have no triangular dogleg');
@@ -192,16 +198,20 @@ assert.ok(city.heightAt(5,-57)>=26.39,'The palace plateau must rise twice as hig
 assert.ok(city.stairRuns.length>800,'Steep uphill roads should have frequent, shallow stone treads');
 assert.ok(city.stairRuns.some(step=>step.grade>.4&&step.top>city.heightAt(step.x,step.z)),
   'The stair treads must stand above the slope they replace');
-const stairRoad=streets[0].geometry,stairCoords=stairRoad.getAttribute('position'),stairIndices=stairRoad.index;
 let uphillRoadFaces=0,clippedUphillFaces=0;
-for(let i=0;i<stairIndices.count;i+=3){
-  const a=stairIndices.getX(i),b=stairIndices.getX(i+1),c=stairIndices.getX(i+2);
-  const x=(stairCoords.getX(a)+stairCoords.getX(b)+stairCoords.getX(c))/3;
-  const z=(stairCoords.getZ(a)+stairCoords.getZ(b)+stairCoords.getZ(c))/3;
-  if(z< -48||z> -32||x< -29||x>37)continue;
-  const y=(stairCoords.getY(a)+stairCoords.getY(b)+stairCoords.getY(c))/3;
-  uphillRoadFaces++;
-  if(y<city.terrainSurfaceHeight(x,z)-.06)clippedUphillFaces++;
+// Courtyard approaches now use stonePath, while landmark plazas use paving.
+for(const surface of combinedSurfaces.filter(mesh=>
+  [materials.get('road'),materials.get('stonePath'),materials.get('paving')].includes(mesh.material))){
+  const geometry=surface.geometry,coords=geometry.getAttribute('position'),indices=geometry.index;
+  for(let i=0;i<indices.count;i+=3){
+    const a=indices.getX(i),b=indices.getX(i+1),c=indices.getX(i+2);
+    const x=(coords.getX(a)+coords.getX(b)+coords.getX(c))/3;
+    const z=(coords.getZ(a)+coords.getZ(b)+coords.getZ(c))/3;
+    if(z< -48||z> -32||x< -29||x>37)continue;
+    const y=(coords.getY(a)+coords.getY(b)+coords.getY(c))/3;
+    uphillRoadFaces++;
+    if(y<city.terrainSurfaceHeight(x,z)-.06)clippedUphillFaces++;
+  }
 }
 assert.ok(uphillRoadFaces>1000&&clippedUphillFaces/uphillRoadFaces<.015,
   'Uphill road ribbons must stay on top of the actual triangulated terrain');

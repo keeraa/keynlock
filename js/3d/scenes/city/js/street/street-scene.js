@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from '../../vendor/OrbitControls.js';
 import { createHouseModel } from '../buildings/house-model.js';
-import {setHouseGlassAppearance} from '../buildings/house-materials.js';
+import {createHouseGlass} from '../buildings/house-materials.js';
 import {createHouseAtmosphere,loadBuildingAtmosphereSettings,makePaintedGlassEnvironment} from '../buildings/house-atmosphere.js';
 import {createBuildingSmokeBatch} from '../../modules/house-builder/core/building-smoke-batch.js';
 import {buildStreetSmokeParticles} from './street-smoke.js';
@@ -149,11 +149,11 @@ export function createStreetScene(canvas,{onMetrics=()=>{},onPick=()=>{},visual=
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.55));
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure=1.31;
   const scene=new THREE.Scene();scene.background=new THREE.Color('#e9e2cd');
   scene.fog=new THREE.Fog('#e9e2cd',105,250);
   const camera=new THREE.PerspectiveCamera(45,1,.2,390);
   camera.position.set(42,41,51);
+  const houseGlass=createHouseGlass(THREE);
   const glassEnvironment=makePaintedGlassEnvironment(THREE,renderer);
   visual?.connect({THREE,renderer,scene,camera});
   const controls=new OrbitControls(camera,canvas);
@@ -224,7 +224,7 @@ export function createStreetScene(canvas,{onMetrics=()=>{},onPick=()=>{},visual=
     clearLamps();
   }
   function makeHouse(house,detail) {
-    const instance=createHouseModel(THREE,house.config,{detail});
+    const instance=createHouseModel(THREE,house.config,{detail,glass:houseGlass});
     batchHouseGeometry(THREE,instance.group);
     instance.group.position.set(house.x,0,house.z);
     instance.group.rotation.y=house.rotation;
@@ -413,7 +413,7 @@ export function createStreetScene(canvas,{onMetrics=()=>{},onPick=()=>{},visual=
     atmosphereSettings.night=night;
     for(const model of models)model.atmosphere?.setSettings(atmosphereSettings);
     streetSmoke?.setSettings(atmosphereSettings);
-    setHouseGlassAppearance(THREE,{gloss:atmosphereSettings.glassGloss,
+    houseGlass.setAppearance({gloss:atmosphereSettings.glassGloss,
       reflection:atmosphereSettings.glassReflection,night,glow:atmosphereSettings.windowGlow,
       envMap:glassEnvironment?.texture??null});
     scene.background.set(night?'#283a4a':'#e9e2cd');
@@ -424,7 +424,8 @@ export function createStreetScene(canvas,{onMetrics=()=>{},onPick=()=>{},visual=
     lightMats.glass.emissiveIntensity=night?3.6:.55;
     lightMats.bulb.emissiveIntensity=night?4:.9;
     for(const light of pointLights)light.intensity=night?9:0;
-    renderer.toneMappingExposure=night?.96:1.31;
+    if(visual)visual.setExposureScale(night?.96/1.31:1);
+    else renderer.toneMappingExposure=night?.96:1.31;
   }
   function setAtmosphereSettings(settings={}){
     atmosphereSettings={...atmosphereSettings,...settings};
@@ -488,6 +489,6 @@ export function createStreetScene(canvas,{onMetrics=()=>{},onPick=()=>{},visual=
     if(++frames>25 && now-last>950){onMetrics({fps:Math.round(frames*1000/(now-last)),triangles:frameStats.sceneTriangles??frameStats.triangles,drawCalls:frameStats.calls});frames=0;last=now;}
   }
   animationId=requestAnimationFrame(render);
-  function dispose(){disposed=true;cancelAnimationFrame(animationId);canvas.removeEventListener('click',onCanvasClick);observer.disconnect();controls.dispose();clear();glassEnvironment?.dispose();Object.values(lightMats).forEach(m=>m.dispose());visual?.dispose();renderer.dispose();}
+  function dispose(){disposed=true;cancelAnimationFrame(animationId);canvas.removeEventListener('click',onCanvasClick);observer.disconnect();controls.dispose();clear();houseGlass.dispose();glassEnvironment?.dispose();Object.values(lightMats).forEach(m=>m.dispose());visual?.dispose();renderer.dispose();}
   return {setPlan,setNight,setAtmosphereSettings,setView,dispose};
 }

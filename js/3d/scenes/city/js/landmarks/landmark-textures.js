@@ -1,24 +1,15 @@
 // The six landmarks reuse the house-builder paintings. Keep one GPU copy of
 // each painting while any landmark is alive, including during LOD switches.
+import {LANDMARK_TEXTURE_ASSETS,gouacheAssetUrlByFile} from '../../modules/keynlock-materials/index.js';
+export {LANDMARK_TEXTURE_ASSETS} from '../../modules/keynlock-materials/index.js';
 const cacheByThree = new WeakMap();
-
-export const LANDMARK_TEXTURE_ASSETS = Object.freeze({
-  plaster: 'gouache-plaster.webp',
-  stone: 'gouache-landmark-stone-v1.webp',
-  moss: 'gouache-landmark-moss-v1.webp',
-  roof: 'gouache-roof-tiles-dense-v3.webp',
-  door: 'gouache-entry-door-carved-v1.webp',
-  glass: 'gouache-window-glass-v2.webp',
-  sill: 'gouache-window-sill-v2.webp',
-  copper: 'landmark-copper-gouache.webp',
-});
 
 function makeBucket(THREE) {
   const bucket = {refs: 0, maps: {}, loads: 0};
   if (typeof document === 'undefined') return bucket;
   const loader = new THREE.TextureLoader();
   for (const [kind, filename] of Object.entries(LANDMARK_TEXTURE_ASSETS)) {
-    const map = loader.load(new URL(`../../assets/house-textures/${filename}`, import.meta.url).href);
+    const map = loader.load(gouacheAssetUrlByFile('house',filename));
     map.colorSpace = THREE.SRGBColorSpace;
     // Roof UVs are expressed in real-world metres, so big theatre/palace
     // pitches repeat the painting instead of enlarging its individual tiles.

@@ -1,4 +1,5 @@
 import {HOUSE_TEXTURE_DEFINITIONS} from './house-texture-assets.js';
+import {gouacheAssetUrlByFile} from '../../keynlock-materials/index.js';
 
 // All reference houses in a scene share one set of painted and loaded maps.
 // Materials remain per building so each facade can have its own tint.
@@ -24,7 +25,7 @@ function createBucket(THREE, createFallback) {
   if (typeof document !== 'undefined') {
     const loader = new THREE.TextureLoader();
     for (const [key, filename, repeat] of HOUSE_TEXTURE_DEFINITIONS) {
-      const url = new URL(`../../../assets/house-textures/${filename}`, import.meta.url).href;
+      const url = gouacheAssetUrlByFile('house',filename);
       const texture = loader.load(url, loaded => {
         if (bucket.disposed) return;
         bucket.active[key] = loaded;

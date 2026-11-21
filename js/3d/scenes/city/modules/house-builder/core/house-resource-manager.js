@@ -1,5 +1,5 @@
 import { acquireHouseTextures } from './house-textures.js';
-import { acquireFixedHouseMaterials } from './house-materials.js';
+import { acquireFixedHouseMaterials, createHouseGlass } from './house-materials.js';
 
 // Geometry belongs to a model instance; paint textures and fixed materials
 // remain reference-counted across every house using the same Three.js runtime.
@@ -12,9 +12,10 @@ export function disposeHouseGeometry(group) {
   group.clear();
 }
 
-export function createHouseResourceManager(THREE, paintedTexture) {
+export function createHouseResourceManager(THREE, paintedTexture, glass) {
   const sharedTextures = acquireHouseTextures(THREE, paintedTexture);
   const sharedMaterials = acquireFixedHouseMaterials(THREE);
+  const ownedGlass = glass ? null : createHouseGlass(THREE);
   const mats = {
     plaster: new THREE.MeshStandardMaterial({color:'#dec8a4', roughness:.98}),
     roof: new THREE.MeshStandardMaterial({color:'#a8604b', roughness:.94, side:THREE.DoubleSide}),
@@ -23,6 +24,7 @@ export function createHouseResourceManager(THREE, paintedTexture) {
     shutter: new THREE.MeshStandardMaterial({color:'#675340', roughness:.98}),
     door: new THREE.MeshStandardMaterial({color:'#e2d1be', roughness:.97}),
     ...sharedMaterials.materials,
+    glass: (glass ?? ownedGlass).material,
   };
   const ownedMaterials = [mats.plaster,mats.roof,mats.roofEdge,mats.wood,mats.shutter,mats.door];
   let disposed = false;
@@ -41,6 +43,7 @@ export function createHouseResourceManager(THREE, paintedTexture) {
       if(disposed)return;
       disposed=true;
       for(const material of ownedMaterials)material.dispose();
+      ownedGlass?.dispose();
       sharedTextures.release();
       sharedMaterials.release();
     },

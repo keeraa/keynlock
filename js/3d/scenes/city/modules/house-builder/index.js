@@ -9,4 +9,5 @@ export { windowLayout } from './core/house-layout.js';
 export { createHouseModel, housePolygonCount, gableRoofProfile, roofSurfaceUV } from './core/house-model.js';
 export { batchHouseGeometry } from './core/house-batch.js';
 export { houseTextureCacheStats } from './core/house-textures.js';
-export { houseMaterialCacheStats } from './core/house-materials.js';
+export { createHouseGlass, houseMaterialCacheStats } from './core/house-materials.js';
+export {createHouseAtmosphere,BUILDING_ATMOSPHERE_DEFAULTS} from './core/house-atmosphere.js';

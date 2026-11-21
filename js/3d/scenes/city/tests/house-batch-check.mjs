@@ -63,7 +63,7 @@ assert.ok(nextBatch.after<=30,'Edited houses can be batched again after a shape 
 editable.dispose();
 assert.equal(houseTextureCacheStats(THREE).houses,3);
 assert.equal(houseMaterialCacheStats(THREE).houses,3);
-assert.equal(houseMaterialCacheStats(THREE).materials,11);
+assert.equal(houseMaterialCacheStats(THREE).materials,10);
 models[0].dispose();
 assert.equal(houseTextureCacheStats(THREE).houses,2);
 assert.equal(houseMaterialCacheStats(THREE).houses,2);

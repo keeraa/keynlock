@@ -12,10 +12,15 @@ const target=resolve(exportRoot,'keynlock-house-builder');
 await mkdir(exportRoot,{recursive:true});
 await rm(target,{recursive:true,force:true});
 
-const folders=['js/buildings','modules/house-builder','house-builder'];
+const folders=['js/buildings','modules/house-builder','modules/keynlock-materials','house-builder'];
 for(const folder of folders){
   await mkdir(resolve(target,dirname(folder)),{recursive:true});
   await cp(resolve(root,folder),resolve(target,folder),{recursive:true});
+}
+for(const file of ['js/effects/editor-visual.js','js/effects/cartoon-filter.js',
+  'js/effects/drawing-shader.js','css/editor-visual.css','assets/cormorant-garamond-cyrillic.woff2']){
+  await mkdir(resolve(target,dirname(file)),{recursive:true});
+  await cp(resolve(root,file),resolve(target,file));
 }
 await mkdir(resolve(target,'assets/house-textures'),{recursive:true});
 const usedTextures=new Set([...HOUSE_TEXTURE_DEFINITIONS.map(([,file])=>file),
@@ -32,8 +37,8 @@ for(const file of ['three.js','three-core.js','OrbitControls.js']){
 const pagePath=resolve(target,'house-builder/index.html');
 const page=await readFile(pagePath,'utf8');
 await writeFile(pagePath,page
-  .replace(/\s*<a href="\.\.\/street-lab\/" class="back-button">[^<]*<\/a>/g,'')
-  .replace(/\s*<a href="\.\.\/landmark-lab\/" class="back-button">[^<]*<\/a>/g,''));
+  .replace('<html lang="ru">','<html lang="ru" data-standalone-house>')
+  .replace(/\s*<a href="\.\.\/(?:street-lab|landmark-lab|path-builder)\/" class="back-button">[^<]*<\/a>/g,''));
 await writeFile(resolve(target,'index.html'),`<!doctype html><html lang="ru"><meta charset="utf-8"><title>KEYNLOCK — Конструктор домов</title><meta http-equiv="refresh" content="0;url=./house-builder/"><script>location.replace('./house-builder/')</script><a href="./house-builder/">Открыть редактор</a></html>\n`);
 await writeFile(resolve(target,'package.json'),JSON.stringify({
   name:'@keynlock/house-builder',version:'1.0.0',private:true,type:'module',

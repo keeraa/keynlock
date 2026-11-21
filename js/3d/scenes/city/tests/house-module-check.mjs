@@ -16,5 +16,11 @@ assert(!(await readdir(new URL('assets/house-textures/',exportPath))).includes('
 await stat(new URL('vendor/three.js',exportPath));
 const page=await readFile(new URL('house-builder/index.html',exportPath),'utf8');
 assert.match(page,/modules\/house-builder\/editor\.js/);
-assert.doesNotMatch(page,/street-lab|landmark-lab/);
+assert.match(page,/data-standalone-house/);
+assert.doesNotMatch(page,/street-lab|landmark-lab|path-builder/);
+for(const file of ['css/editor-visual.css','js/effects/editor-visual.js',
+  'js/effects/cartoon-filter.js','js/effects/drawing-shader.js','assets/cormorant-garamond-cyrillic.woff2']){
+  await stat(new URL(file,exportPath));
+}
+await import(new URL('js/effects/editor-visual.js',exportPath));
 console.log('Portable house builder: model API, textures, vendor and standalone page OK');

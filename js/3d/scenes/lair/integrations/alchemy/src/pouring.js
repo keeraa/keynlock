@@ -1,4 +1,4 @@
-// World-space pouring pose for upright-y containers rotated around the Z axis.
+// Pouring pose in laboratory coordinates for upright-y containers rotated around the Z axis.
 // The open rim must be lower than the sealed bottom for liquid to pour.
 export const POUR_ANGLE = 1.97; // ~113°, measured from the upright position.
 

@@ -28,6 +28,9 @@ let rendererHost = null;
 try {rendererHost = (lairWindow !== window || directRoot) ? lairWindow.__keynlockRendererHost : null;}
 catch {rendererHost = null;} // The standalone Atelier may be cross-origin framed.
 const embedded = Boolean(rendererHost);
+let inRoomActive = false;
+const isRestorationActive = () => !embedded ||
+  (directRoot ? inRoomActive : Boolean(lairWindow.__keynlockRestorationActive));
 if (embedded && !directRoot) document.documentElement.classList.add('lair-embedded');
 const stage = $('scene');
 const performanceHUD = createPerformanceHUD({ fpsElement: $('fps-value'), polygonsElement: $('poly-value') });
@@ -190,6 +193,7 @@ const collectionUI = createPaintingCollectionUI({
 let activeTexture = null;
 let activeSurface = null;
 let paintingRequest = 0;
+let displayedPaintingRequest = 0;
 let surfaceSaveTimer = null;
 let workshopUI;
 
@@ -235,7 +239,6 @@ async function flushAtelier() {
   await restorationStore.flush();
   notifyLair('flushed');
 }
-if (directRoot) window.__keynlockAtelierFlush = flushAtelier;
 window.addEventListener('message', async (event) => {
   if (event.origin !== LAIR_ORIGIN || event.source !== window.parent) return;
   if (event.data?.bridge !== EMBED_BRIDGE || event.data.type !== 'flush') return;
@@ -263,7 +266,7 @@ restorationInput = createRestorationInput({
   interactionCamera: embedded ? lairWindow.__keynlockLairCamera : camera,
   roomControls: embedded ? lairWindow.__keynlockLairControls : null,
   onPaintingFocus: embedded ? focusLairArtwork : (side) => navigation.focusOn(side),
-  isInteractive: () => !embedded || Boolean(lairWindow.__keynlockRestorationActive),
+  isInteractive: isRestorationActive,
   embeddedEditing: embedded,
   getTexture: () => activeTexture, getSurface: () => activeSurface,
   onStrokeFinished: () => { restorationFeedback.updateRestorationStatus(true); scheduleSurfaceSave(); },
@@ -297,7 +300,7 @@ restorationInput = createRestorationInput({
   $,
 });
 workshopUI = wireWorkshopUI({ cartoonFilter, navigation, restorationInput, collectionUI, $,
-  isEnabled: () => (!embedded || Boolean(lairWindow.__keynlockRestorationActive))
+  isEnabled: () => isRestorationActive()
     && (!embedded || !lairWindow.__keynlockLairGalleryActive),
   focusEasel: embedded ? focusLairArtwork : side => navigation.focusOn(side),
   leaveEaselFocus: embedded ? leaveLairArtworkFocus : () => navigation.leaveFocus() });
@@ -457,6 +460,8 @@ async function showPainting(index) {
     showToast('Не удалось подготовить полотно для реставрации');
     return;
   }
+  // A pending image selection must not invalidate the surface of the painting still on display.
+  displayedPaintingRequest = request;
   // Color correction is available immediately; aging/saved brush layers can
   // take longer to reconstruct without holding the actual painting hostage.
   try { restorationFeedback.updateUI(); }
@@ -491,7 +496,7 @@ async function showPainting(index) {
   }
   try {
     const surface = await restorationSessions.get(art, width, height);
-    if (request !== paintingRequest) return;
+    if (request !== displayedPaintingRequest) return;
     activeSurface = surface;
     surface.mount(rightEasel.artwork);
     activeSurface.setUVPointer(null);
@@ -499,7 +504,7 @@ async function showPainting(index) {
     restorationSessions.trim(art.id);
     restorationFeedback.updateRestorationStatus();
   } catch (error) {
-    if (request !== paintingRequest) return;
+    if (request !== displayedPaintingRequest) return;
     console.error('Ошибка слоя реставрации:', art.id, error);
     showToast('Не удалось восстановить слой повреждений картины');
   }
@@ -520,15 +525,20 @@ $('reset-button').addEventListener('click', () => {
 
 let previousTime = performance.now();
 let dustTime = 0;
+function updateAtelier(now) {
+  const cameraMoved = navigation.animate(now);
+  exhibition.updateViewedArtwork(now);
+  activeSurface?.update(now * .001);
+  return cameraMoved;
+}
+
 function animate(now) {
   const dt = Math.min(0.05, (now - previousTime) / 1000);
   previousTime = now;
   if (embedded) {
     // Texture restoration, exhibition and camera-local animation continue.
     // The parent always renders their geometry with its freely orbiting camera.
-    navigation.animate(now);
-    exhibition.updateViewedArtwork(now);
-    activeSurface?.update(now * .001);
+    updateAtelier(now);
     requestAnimationFrame(animate);
     return;
   }
@@ -566,7 +576,18 @@ function animate(now) {
 // initial veil until the visible gallery previews have all been prepared.
 if (embedded) {
   navigation.resize();
-  requestAnimationFrame(animate);
+  if (directRoot) {
+    rendererHost.registerWorldWorkshop('restoration', {
+      enter() { inRoomActive = true; },
+      exit() {
+        inRoomActive = false;
+        restorationInput.hide();
+        restorationInput.clearUV();
+        void flushAtelier();
+      },
+      update: updateAtelier,
+    });
+  } else requestAnimationFrame(animate);
   notifyLair('ready');
 }
 

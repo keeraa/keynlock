@@ -26,15 +26,16 @@ test('in-room gallery picks paintings using the visible Lair pointer area', () =
 
 test('gallery entry, separate camera controls and collapsible in-room Atelier are wired', () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-  const lair = readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  const transitions = readFileSync(new URL('../src/zone-transitions.js', import.meta.url), 'utf8');
+  const view = readFileSync(new URL('../src/restoration-view.js', import.meta.url), 'utf8');
   const atelier = readFileSync(new URL('../integrations/atelier/src/main.js', import.meta.url), 'utf8');
   const stylesheet = readFileSync(new URL('../src/original-stations.css', import.meta.url), 'utf8');
   for (const id of ['wall-collection-entry','lair-gallery-controls','gallery-prev',
     'gallery-next','gallery-easels','gallery-select']) assert.ok(html.includes(`id="${id}"`));
-  assert.ok(lair.includes("const sourcePose = id === 'alchemy' ? rendererHost?.getWorldPose('alchemy') : null") &&
-    lair.includes('const stationPosition = sourcePose?.position.toArray() || zone.camera'),
+  assert.ok(transitions.includes("const sourcePose = id === 'alchemy' ? rendererHost?.getWorldPose('alchemy') : null") &&
+    transitions.includes('const stationPosition = sourcePose?.position.toArray() || zone.camera'),
     'restoration entry must keep its preset easel view rather than inheriting the wall gallery pose');
-  assert.ok(lair.includes("rendererHost.getWorldPose('restoration')"),
+  assert.ok(view.includes("rendererHost.getWorldPose('restoration')"),
     'the room renderer must follow the real gallery camera');
   assert.ok(atelier.includes('window.__keynlockAtelierGallery'));
   assert.ok(atelier.includes('__keynlockLairGalleryActive'));

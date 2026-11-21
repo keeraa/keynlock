@@ -4,30 +4,42 @@ import * as THREE from 'three';
 import {createAlchemyRuntime} from '../integrations/alchemy/src/runtime-host.js';
 import {readFileSync} from 'node:fs';
 
-test('in-room alchemy updates physics at 30 Hz while retaining its live controls',()=>{
-  const previousEvent=globalThis.CustomEvent;
-  globalThis.CustomEvent=class {constructor(type,{detail}={}){this.type=type;this.detail=detail;}};
-  let tick;
-  const renderer={setAnimationLoop:fn=>{tick=fn;}};
-  const events=[];
-  const win={dispatchEvent:event=>events.push(event.type)};
-  win.parent=win;
-  const host={createRenderer:()=>renderer,registerWorldScene:()=>{}};
-  const runtime=createAlchemyRuntime({THREE,canvas:{},win,host});
-  let updates=0;
-  runtime.start(()=>updates++);
-  for(let t=1000;t<1100;t+=10)tick(t);
-  assert.ok(updates>=2 && updates<=4,`expected 30 Hz, got ${updates} updates per 100 ms`);
+test('embedded alchemy registers the room lifecycle and pauses between visits', () => {
+  const win = new EventTarget();
+  win.parent = win;
+  const calls = [];
+  let workshop;
+  const host = {
+    createRenderer: () => ({
+      setAnimationLoop: callback => assert.equal(callback, null, 'the room owns the frame loop'),
+    }),
+    registerWorldWorkshop(id, lifecycle, options) {
+      assert.equal(id, 'alchemy');
+      assert.equal(options.interval, 25);
+      workshop = lifecycle;
+      return () => calls.push('unregister');
+    },
+  };
+  const runtime = createAlchemyRuntime({ THREE, canvas: {}, win, host });
   runtime.setActive(false);
-  tick(1150);
-  assert.equal(updates<=4,true,'inactive station does not consume simulation frames');
+  runtime.start(() => calls.push('update'), {
+    enter: () => calls.push('enter'),
+    exit: () => calls.push('exit'),
+  });
+  workshop.update();
+  workshop.enter();
+  workshop.update();
+  workshop.exit();
+  workshop.update();
   runtime.dispose();
-  globalThis.CustomEvent=previousEvent;
+  assert.deepEqual(calls, ['enter', 'update', 'exit', 'unregister']);
 });
 
 test('entering alchemy changes exposure without switching the shared shadow shader',()=>{
   const code=readFileSync(new URL('../src/main.js',import.meta.url),'utf8');
-  const stationLook=code.slice(code.indexOf('function applyWorldAlchemyLook('),code.indexOf('function leaveGalleryCamera('));
+  const transitions = readFileSync(new URL('../src/zone-transitions.js', import.meta.url), 'utf8');
+  const stationLook = transitions.slice(transitions.indexOf('function applyWorldAlchemyLook('),
+    transitions.indexOf('function setInRoomWorkshop('));
   assert.match(stationLook,/renderer\.toneMappingExposure = ALCHEMY_LOOK\.renderer\.exposure/);
   assert.match(stationLook,/renderer\.shadowMap\.autoUpdate = false/);
   assert.match(stationLook,/light\.visible = !enabled && visible/,
@@ -36,16 +48,18 @@ test('entering alchemy changes exposure without switching the shared shadow shad
     'alchemy lowers retina fill cost without changing the other stations');
   assert.match(code,/rendererHost\.prepareWorldLightsForRender\(\)/);
   assert.match(code,/rendererHost\.restoreWorldLightsAfterRender\(\)/);
-  assert.match(code,/originalStations\.open\(id\);\s*if \(id === 'alchemy'\) applyWorldAlchemyLook\(true\)/);
+  assert.match(transitions,/setInRoomWorkshop\(pendingStationOpen\)/);
+  assert.match(transitions,/applyWorldAlchemyLook\(id === 'alchemy' && ready\)/);
   assert.doesNotMatch(stationLook,/applyAlchemyRendererLook\(/);
 });
 
 test('alchemy keeps the Lair camera as the sole visible camera during interactions',()=>{
   const code=readFileSync(new URL('../src/main.js',import.meta.url),'utf8');
+  const transitions = readFileSync(new URL('../src/zone-transitions.js', import.meta.url), 'utf8');
   assert.match(code,/window\.__keynlockLairManipulateAlchemy =/);
-  assert.match(code,/rendererHost\?\.getWorldPose\('alchemy'\)/,
+  assert.match(transitions,/rendererHost\.getWorldPose\('alchemy'\)/,
     'station entry should use the original camera pose');
-  assert.match(code,/focus\(stationPosition, stationTarget, sourcePose\?\.fov/,
+  assert.match(transitions,/focus\(stationPosition, stationTarget, sourcePose\?\.fov/,
     'the station transition preserves the source camera field of view');
   assert.match(code,/window\.__keynlockLairResetAlchemyCamera =/);
   const source=readFileSync(new URL('../integrations/alchemy/src/alchemy.js',import.meta.url),'utf8');

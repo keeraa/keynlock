@@ -11,7 +11,7 @@ export function createVisualPanel({$, queryAll, visuals, woodAssets, selectWallF
 
   function setOpen(open) {
     $('experience').classList[open ? 'add' : 'remove']('visual-open');
-    $('visual-toggle').setAttribute('aria-expanded', String(open));
+    $('alchemy-visual-toggle').setAttribute('aria-expanded', String(open));
     onResize();
   }
 
@@ -72,7 +72,7 @@ export function createVisualPanel({$, queryAll, visuals, woodAssets, selectWallF
       $(`sunbeam-${side}`).addEventListener('click',()=>setSunbeam(side,!isSunbeamVisible(side)));
     $('background-blur').addEventListener('click',()=>setBackgroundBlur(!isBlurred()));
     $('camera-reset').addEventListener('click',resetCamera);
-    $('visual-toggle').addEventListener('click',()=>setOpen(!$('experience').classList.contains('visual-open')));
+    $('alchemy-visual-toggle').addEventListener('click',()=>setOpen(!$('experience').classList.contains('visual-open')));
 
     selectWallFinish('sage');selectWoodFinish('walnut');
     setLightDirection('right');setLightStrength(100);

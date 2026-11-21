@@ -43,8 +43,8 @@ export function createRoomOutlines(scene) {
 
 /** Compact live materials lab. All controls affect materials, geometry or Three.js particles. */
 export function mountVisualSettings({ visual, room, outlines, grain, atelierFilter, onOpen = () => {} }) {
-  const panel = document.querySelector('#visual-panel');
-  const toggle = document.querySelector('#visual-toggle');
+  const panel = document.querySelector('#lair-visual-panel');
+  const toggle = document.querySelector('#lair-visual-toggle');
   const inputs = [...document.querySelectorAll('[data-visual-setting]')];
   const papers = [...document.querySelectorAll('[data-wallpaper]')];
   const allowedPapers = new Set(papers.map(button => button.dataset.wallpaper));
@@ -129,7 +129,7 @@ export function mountVisualSettings({ visual, room, outlines, grain, atelierFilt
     onOpen(); panel.hidden = false; toggle.setAttribute('aria-expanded', 'true');
   };
   toggle.addEventListener('click', () => panel.hidden ? open() : close());
-  document.querySelector('#visual-close').addEventListener('click', close);
+  document.querySelector('#lair-visual-close').addEventListener('click', close);
   document.querySelector('#visual-reset').addEventListener('click', () => {
     state = { ...DEFAULTS }; apply(); persist();
   });

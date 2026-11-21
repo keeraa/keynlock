@@ -1,8 +1,7 @@
 /**
  * Coordinate the original KEYNLOCK workshops from the Lair.
  *
- * The original Atelier source runs in this document, including its UI and
- * input handling. Alchemy currently uses its isolated standalone runtime.
+ * Atelier and alchemy mount their original interfaces inside this document.
  */
 export const ORIGINAL_STATIONS = Object.freeze({
   restoration: {
@@ -52,8 +51,7 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
   }
   let station = null;
   let opened = false;
-  let restorationInRoom = false;
-  let alchemyInRoom = false;
+  let inRoomStation = null;
   let warningTimer = null;
   let atelierStartTimer = null;
   let atelierFailure = null;
@@ -115,6 +113,8 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
   }
 
   function showCurrentFrame() {
+    const restorationInRoom = inRoomStation === 'restoration';
+    const alchemyInRoom = inRoomStation === 'alchemy';
     for(const [id,frame] of frames) {
       const selected = opened && id === station;
       frame.classList.toggle('is-active',selected);
@@ -137,33 +137,13 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
     document.querySelector('#alchemy-input-plane')?.classList.toggle('is-active',alchemyInRoom);
   }
 
-  function showRestorationInRoom() {
-    restorationInRoom = true;
-    showCurrentFrame();
-  }
-
-  function hideRestorationInRoom() {
-    restorationInRoom = false;
-    const atelier = document.querySelector('#atelier-embedded-app');
-    atelier?.querySelector('#collection-modal:not([hidden]) #collection-close')?.click();
-    atelier?.classList.remove('collection-expanded');
-    void window.__keynlockAtelierFlush?.();
-    showCurrentFrame();
-  }
-
-  function hideAlchemyInRoom() {
-    alchemyInRoom = false;
-    rendererHost?.setWorldRuntimeActive('alchemy',false);
-    window.__alchemy?.lifecycle?.setActive(false);
-    if (window.__keynlockLairControls) window.__keynlockLairControls.enabled = true;
-    showCurrentFrame();
-  }
-
-  function showAlchemyInRoom() {
-    alchemyInRoom = true;
-    if (window.__keynlockLairControls) window.__keynlockLairControls.enabled = false;
-    rendererHost?.setWorldRuntimeActive('alchemy', true);
-    window.__alchemy?.lifecycle?.setActive(true);
+  function setInRoomStation(id) {
+    if (inRoomStation === 'restoration' && id !== 'restoration') {
+      const atelier = document.querySelector('#atelier-embedded-app');
+      atelier?.querySelector('#collection-modal:not([hidden]) #collection-close')?.click();
+      atelier?.classList.remove('collection-expanded');
+    }
+    inRoomStation = id;
     showCurrentFrame();
   }
 
@@ -187,8 +167,7 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
 
   function open(id) {
     if (!ORIGINAL_STATIONS[id]) return;
-    if (id === 'restoration') {showRestorationInRoom();return;}
-    if (id === 'alchemy') {showAlchemyInRoom();return;}
+    if (id === 'restoration' || id === 'alchemy') return;
     if (station !== id) preload(id);
     opened = true;
     overlay.dataset.station = id;
@@ -272,7 +251,7 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
   return {
     preload, open, close, isOpen: () => opened,
     isReady: id => readyStations.has(id),
-    showRestorationInRoom, hideRestorationInRoom, showAlchemyInRoom, hideAlchemyInRoom,
+    setInRoomStation,
     dispose() {
       clearTimers();
       clearTimeout(atelierStartTimer);

@@ -57,7 +57,8 @@ const cameraTarget = new THREE.Vector3(0, 1.7, -.45);
 // orbit target, not reconstruct one from a potentially stale camera quaternion.
 camera.userData.keynlockLocalTarget = cameraTarget;
 const orbit = { yaw: 0, pitch: .251, zoom: 1, distance: 14.05 };
-const clock = new THREE.Clock();
+const timer = new THREE.Timer();
+timer.connect(document);
 const raycaster = new THREE.Raycaster();
 const ndc = new THREE.Vector2();
 const tmpVec = new THREE.Vector3();
@@ -228,7 +229,18 @@ window.addEventListener('keydown', e => {
   if (e.key.toLowerCase() === 'r' || e.key.toLowerCase() === 'к') resetAll();
 });
 
-runtime.start(render);
+timer.reset();
+runtime.start(render, {
+  enter: () => timer.reset(),
+  exit() {
+    const pointerId = press?.id;
+    onPointerCancel();
+    if (pointerId !== undefined && inputSurface.hasPointerCapture(pointerId)) {
+      inputSurface.releasePointerCapture(pointerId);
+    }
+    closeRecipeBook();
+  },
+});
 
 // A tiny readable state hook makes the prototype testable without coupling UI to tests.
 window.__alchemy = {
@@ -236,7 +248,14 @@ window.__alchemy = {
     sunbeams:sunbeams.getState(),filters:visuals.getState()}),
     setDirection:setLightDirection,setStrength:setLightStrength,
     setBackgroundBlur,setSunbeam,setFilter:visuals.set},
-  lifecycle: {setActive: runtime.setActive, isActive: runtime.isActive, dispose: runtime.dispose},
+  lifecycle: {
+    setActive: runtime.setActive,
+    isActive: runtime.isActive,
+    dispose() {
+      timer.dispose();
+      runtime.dispose();
+    },
+  },
   getState: () => ({
     receivers: receivers.map(r => ({ id: r.id, volume: r.state.volume, color: mixtureInfo(r.state).hex, additions: r.state.additions.length })),
     sources: sourceObjects.map(s => ({ id: s.data.id, name: s.data.name, symbol: s.data.symbol, color: s.color, volume: s.amount })),
@@ -1893,13 +1912,13 @@ function updateJetSkin(a) {
   const points = [];
   const mouthRadius = source.data.kind === 'tube' ? .209 : .132;
   if (jet.flowing && jet.parcels.length) {
-    source.root.updateMatrixWorld(true);
+    source.root.updateMatrix();
     const insideY = source.data.kind === 'tube'
       ? source.height - .17
       : source.height - .18;
     const liquidRadius = liquidRadiusAt(source.fluid.kind, insideY, source.fluid.radius, source.fluid.bottom);
-    points.push({ point: source.root.localToWorld(new THREE.Vector3(0, insideY, 0)), radius: Math.min(mouthRadius, liquidRadius) });
-    points.push({ point: source.root.localToWorld(new THREE.Vector3(0, source.height + .013, 0)), radius: mouthRadius });
+    points.push({ point: new THREE.Vector3(0, insideY, 0).applyMatrix4(source.root.matrix), radius: Math.min(mouthRadius, liquidRadius) });
+    points.push({ point: new THREE.Vector3(0, source.height + .013, 0).applyMatrix4(source.root.matrix), radius: mouthRadius });
   }
   for (let i = jet.parcels.length - 1; i >= 0; i--) {
     const p = jet.parcels[i];
@@ -2003,9 +2022,10 @@ function updatePour(dt) {
     s.root.position.copy(a.to);
     s.root.rotation.z = a.angle;
     positionPourLiquid(s, 1);
-    s.root.updateMatrixWorld(true);
-    const mouth = s.root.localToWorld(new THREE.Vector3(0, s.height + .009, 0));
-    const outside = s.root.localToWorld(new THREE.Vector3(0, s.height + 1.009, 0));
+    // Both the jet and the receiving vessel are expressed in laboratory coordinates.
+    s.root.updateMatrix();
+    const mouth = new THREE.Vector3(0, s.height + .009, 0).applyMatrix4(s.root.matrix);
+    const outside = new THREE.Vector3(0, s.height + 1.009, 0).applyMatrix4(s.root.matrix);
     const direction = outside.sub(mouth).normalize();
     const head = s.amount / Math.max(1, s.initial);
     // A gentle exit speed keeps the gravity-curved stream inside the glass
@@ -2157,8 +2177,8 @@ function resetAll() {
 }
 
 function render() {
-  const frameDelta = clock.getDelta();
   if (document.hidden) return; // No GPU or particle updates behind a hidden tab.
+  const frameDelta = timer.update().getDelta();
   const dt = Math.min(frameDelta, .045);
   elapsed += dt;
   // Heating uses wall-clock frame time, not the capped physics delta: at a

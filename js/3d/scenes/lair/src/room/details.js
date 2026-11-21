@@ -27,7 +27,7 @@ export function buildGramophone(kit) {
   zoneTarget('gramophone', [1.97, 2.42, -3.68], [1.58, 2.65, 1.12]);
 }
 
-/** @param {any} kit @param {{ windowLight?: { dustStrength: { value: number } } }} [options] */
+/** @param {any} kit @param {{ windowLight?: { shaderUniforms: Record<string, { value: any }> } }} [options] */
 export function buildDetails(kit, { windowLight } = {}) {
   const { m, staticGroup, animated, box, sphere } = kit;
   // Keep the tall window wall free from pictures and the former upper gallery.

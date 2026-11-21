@@ -38,5 +38,18 @@ export function addRoomLighting({ THREE, scene }) {
   leftLight.position.set(-5.8, 3.65, .3);
   scene.add(leftLight);
 
-  return { sideSun, contactSun, windowLight, leftLight };
+  // Night: the window side turns to cool moonlight; the lamps stay warm.
+  const hemisphere = scene.children.find(light => light.isHemisphereLight);
+  const day = { sky: hemisphere.color.clone(), hemi: hemisphere.intensity, side: sideSun.color.clone(),
+    sideIntensity: sideSun.intensity, window: windowLight.color.clone(), windowIntensity: windowLight.intensity };
+  function setNight(/** @type {boolean} */ night) {
+    hemisphere.color.copy(night ? new THREE.Color('#9fb1d6') : day.sky);
+    hemisphere.intensity = night ? day.hemi * .62 : day.hemi;
+    sideSun.color.copy(night ? new THREE.Color('#9db4dc') : day.side);
+    sideSun.intensity = night ? day.sideIntensity * .4 : day.sideIntensity;
+    windowLight.color.copy(night ? new THREE.Color('#8fa9d6') : day.window);
+    windowLight.intensity = night ? day.windowIntensity * .55 : day.windowIntensity;
+  }
+
+  return { sideSun, contactSun, windowLight, leftLight, setNight };
 }

@@ -125,7 +125,7 @@ function setup() {
   controls.zoomSpeed = .70;
 
 
-  addRoomLighting({ THREE, scene });
+  const lighting = addRoomLighting({ THREE, scene });
   // Keep the source laboratory's original lighting legible in this shared room.
   // The source rig is registered separately and activated only at its workshop.
   const roomLights = scene.children.filter(child => child.isLight);
@@ -146,7 +146,7 @@ function setup() {
     onReady: id => zoneTransitions.onWorkshopReady(id),
   });
   const outlines = createRoomOutlines(scene);
-  visualUI = mountVisualSettings({ visual, room, outlines, atelierFilter,
+  visualUI = mountVisualSettings({ visual, room, lighting, outlines, atelierFilter,
     grain: document.querySelector('.grain'), onOpen: () => { panel.hidden = true; } });
   atelierView = createAtelierView({
     camera, controls, canvas, interaction, rendererHost, atelierFilter, host,

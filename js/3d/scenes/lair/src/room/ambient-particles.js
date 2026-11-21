@@ -37,9 +37,9 @@ export function createAmbientParticles(parent, { count = 420, density = .64, win
   geometry.setAttribute('aPhase', new THREE.BufferAttribute(phases, 1));
   geometry.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
   const uniforms = { uTime: { value: 0 }, uScale: { value: .95 }, uOpacity: { value: .48 },
-    // Specks drifting through the window beam catch the daylight.
-    uWindowLight: windowLight?.dustStrength ?? { value: 0 },
-    uWindowTint: { value: new THREE.Color(WINDOW_LIGHT_TINT.dust) } };
+    // Specks drifting through the window beam catch its light (and the bird's shadow).
+    uWindowLight: { value: 0 }, uWindowTint: { value: new THREE.Color(WINDOW_LIGHT_TINT.dust) },
+    ...windowLight?.shaderUniforms };
   const material = new THREE.ShaderMaterial({
     uniforms, transparent: true, depthTest: true, depthWrite: false,
     blending: THREE.AdditiveBlending,

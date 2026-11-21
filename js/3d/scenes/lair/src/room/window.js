@@ -155,8 +155,14 @@ export function buildWindow(kit) {
       window.add(ring);
     }
   }
-  // Broad translucent sunlight falls across the central table.
-  const beamMat = new THREE.MeshBasicMaterial({ color: '#f7d3a0', transparent: true, opacity: .036, depthWrite: false, side: THREE.DoubleSide });
-  const beam = new THREE.Mesh(new THREE.ConeGeometry(4.4, 8.4, 4, 1, true), beamMat);
-  beam.rotation.x = -.55; beam.position.set(-.25, 3.85, -2.5); staticGroup.add(beam);
+  // The sunlight through the window is room/window-light.js.
+
+  // At night the painted city outside turns to deep blue dusk.
+  const cityMaterials = exterior.children.map(plane => plane.material);
+  return {
+    setNight(/** @type {boolean} */ night) {
+      for (const material of cityMaterials) material.color.set(night ? '#4f5f86' : '#ffffff');
+      glass.material.color.set(night ? '#8ea3c4' : '#c7d7d0');
+    },
+  };
 }

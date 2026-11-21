@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import { mergeStaticMeshes } from '../src/room/merge-static.js';
+import { mergeStaticMeshes } from '../../../core/rendering/merge-static.js';
 
 test('static siblings with one material become one mesh; named, moving and see-through ones stay', () => {
   const root = new THREE.Group();

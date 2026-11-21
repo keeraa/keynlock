@@ -1,0 +1,20 @@
+/* The FPS button in the header and its performance panel (ui/performance-panel.js). */
+.perf{position:relative}
+.perf-toggle{display:flex;align-items:center;gap:6px;height:34px;padding:0 11px;border:1px solid rgba(205,174,122,.27);background:rgba(16,20,17,.55);color:#aaa596;font-size:9px;font-weight:700;letter-spacing:.12em;white-space:nowrap}
+.perf-toggle b{font-size:13px;color:#eee1c8;font-variant-numeric:tabular-nums}
+.perf-toggle:hover,.perf-toggle[aria-expanded="true"]{border-color:rgba(230,189,123,.65);color:#e6d3ad}
+.perf-panel{position:absolute;top:calc(100% + 8px);right:0;z-index:30;min-width:292px;padding:10px 14px 12px;background:rgba(18,22,19,.94);border:1px solid rgba(205,174,122,.32);box-shadow:0 14px 34px #0009;color:#d9cdb6;font-size:11px}
+.perf-row{display:flex;justify-content:space-between;gap:18px;padding:6px 0;border-bottom:1px solid rgba(205,180,148,.12);letter-spacing:.04em}
+.perf-row:last-child{border-bottom:0}
+.perf-row strong{color:#f1e3c6;font-variant-numeric:tabular-nums;font-weight:600}
+.perf-row-hover{cursor:help}
+.perf-row-hover:hover,.perf-row-hover:focus-visible{color:#f3d9a6}
+.perf-breakdown{margin:2px 0 6px;padding:8px 10px;background:rgba(205,174,122,.08);border-left:2px solid #c9a46a}
+.perf-breakdown h4{margin:0 0 6px;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#c5a879}
+.perf-breakdown ol{margin:0;padding-left:18px}
+.perf-breakdown li{padding:2px 0}
+.perf-breakdown li::marker{color:#9d8a68}
+.perf-breakdown li>div{display:flex;gap:10px}
+.perf-breakdown li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.perf-breakdown li strong{flex:none;color:#f1e3c6;font-weight:600;font-variant-numeric:tabular-nums}
+@media(max-width:730px){.perf{display:none}}

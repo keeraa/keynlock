@@ -1,4 +1,4 @@
-import { ALCHEMY_LOOK } from '@keynlock/alchemy/src/look/alchemy-look.js';
+import { ALCHEMY_LOOK } from '@keynlock/alchemy/room-assets';
 
 export function createWorkshopLighting({ scene, camera, canvas, renderer, rendererHost, atelierFilter, roomLights }) {
   const roomLightDefaults = roomLights.map(light => ({ light, intensity: light.intensity, visible: light.visible }));

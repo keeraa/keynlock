@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import {createAlchemyRuntime} from '@keynlock/alchemy/src/runtime-host.js';
+import {createAlchemyRuntime} from '../../../workshops/alchemy/src/runtime-host.js';
 
 test('embedded alchemy registers the room lifecycle and pauses between visits', () => {
   const win = new EventTarget();

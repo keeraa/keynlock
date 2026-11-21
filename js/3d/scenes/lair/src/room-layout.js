@@ -1,4 +1,4 @@
-import { ALCHEMY_LAIR_SCALE, ALCHEMY_TABLE } from '@keynlock/alchemy/src/table-dimensions.js';
+import { ALCHEMY_LAIR_SCALE, ALCHEMY_TABLE } from '@keynlock/alchemy/room-assets';
 
 // Shared room dimensions and placement along the axis from window to entrance.
 export const WORKSHOP_SHIFT = 1.5 * ALCHEMY_TABLE.width * ALCHEMY_LAIR_SCALE;

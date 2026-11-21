@@ -8,7 +8,7 @@ import { mountWorkshopOverlay } from './workshops/workshop-overlay.js';
 import { mountAtelierInRoom } from './workshops/atelier-in-room.js';
 import { mountAlchemyInRoom } from './workshops/alchemy-in-room.js';
 import { createSharedRendererHost } from './rendering/shared-renderer-host.js';
-import { createCartoonFilter } from '@keynlock/atelier/src/effects/cartoon-filter.js';
+import { createCartoonFilter } from '@keynlock/atelier/room-assets';
 import { addRoomLighting } from './room/lighting.js';
 import { createDayNight } from './room/day-night.js';
 import { mountPerformancePanel } from './ui/performance-panel.js';

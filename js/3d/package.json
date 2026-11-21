@@ -15,6 +15,7 @@
     "typescript": "^7.0.2"
   },
   "scripts": {
+    "check": "npm run lint && npm run typecheck && npm run check -w keynlock-lair && npm run check:sources -w keynlock-lair && npm test -w @keynlock/atelier",
     "lint": "eslint scenes/lair workshops core scenes/key-archive",
     "typecheck": "tsc -p jsconfig.json"
   }

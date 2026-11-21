@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createRestorationFeedback } from '@keynlock/atelier/src/restoration-feedback.js';
-import { createWoodStyle } from '@keynlock/atelier/src/wood-style.js';
+import { createRestorationFeedback } from '../../../workshops/atelier/src/restoration-feedback.js';
+import { createWoodStyle } from '../../../workshops/atelier/src/wood-style.js';
 
 function element() {
   const listeners = new Map();

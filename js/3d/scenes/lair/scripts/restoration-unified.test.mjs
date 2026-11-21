@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { paintings } from '@keynlock/atelier/src/atelier-config.js';
-import { applyRestorationStamp } from '@keynlock/atelier/src/restoration-operations.js';
-import { paintingSeed } from '@keynlock/atelier/src/restoration-sessions.js';
-import { calculateColorAccuracy } from '@keynlock/atelier/src/restoration-feedback.js';
-import { getPaintingLore } from '@keynlock/atelier/src/lore/painting-lore.js';
+import { paintings } from '../../../workshops/atelier/src/atelier-config.js';
+import { applyRestorationStamp } from '../../../workshops/atelier/src/restoration-operations.js';
+import { paintingSeed } from '../../../workshops/atelier/src/restoration-sessions.js';
+import { calculateColorAccuracy } from '../../../workshops/atelier/src/restoration-feedback.js';
+import { getPaintingLore } from '../../../workshops/atelier/src/lore/painting-lore.js';
 
 const removedPaintingIds = [
   'kameyama', 'sun-moon-peaks', 'yokkaichi', 'mishima', 'water-lilies',

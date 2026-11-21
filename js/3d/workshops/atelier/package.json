@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "exports": {
+    "./embedding": "./src/embedding.js",
+    "./room-assets": "./src/room-assets.js"
+  },
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",

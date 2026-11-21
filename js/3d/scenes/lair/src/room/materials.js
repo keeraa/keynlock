@@ -1,13 +1,10 @@
 // @ts-check
 import * as THREE from 'three';
-import { makeGouacheWallTexture } from '@keynlock/alchemy/src/wall-tiles.js';
-import { ALCHEMY_LAIR_SCALE } from '@keynlock/alchemy/src/table-dimensions.js';
-import { atelierWallpaperSource } from '@keynlock/atelier/src/painted-assets.js';
+import { ALCHEMY_LAIR_SCALE, makeGouacheWallTexture, WOOD_FINISH_ASSETS } from '@keynlock/alchemy/room-assets';
+import { atelierWallpaperSource } from '@keynlock/atelier/room-assets';
 import { t } from '../i18n.js';
 import { ROOM_LENGTH } from '../room-layout.js';
 
-const alchemyWood = name =>
-  new URL(`../../../../workshops/alchemy/src/assets/wood-gouache-${name}.webp`, import.meta.url).href;
 const roomWalnutSource = new URL('./assets/surfaces/walnut-floor-gouache.jpg', import.meta.url).href;
 
 export function createMaterials() {
@@ -22,9 +19,9 @@ export function createMaterials() {
   };
   const mat = (color, roughness = .9, metalness = 0) => new THREE.MeshStandardMaterial({ color, roughness, metalness });
   // Furniture still uses the shared workshop finishes.
-  const walnutMap = load(alchemyWood('walnut'));
-  const ashMap = load(alchemyWood('ash'));
-  const oakMap = load(alchemyWood('oak'));
+  const walnutMap = load(WOOD_FINISH_ASSETS.walnut);
+  const ashMap = load(WOOD_FINISH_ASSETS.ash);
+  const oakMap = load(WOOD_FINISH_ASSETS.oak);
   const plasterMap = load(new URL('./assets/surfaces/sand-plaster-gouache.jpg', import.meta.url).href, 1.7, 1.4);
   const ochreMap = load(atelierWallpaperSource);
   const floorMap = load(roomWalnutSource, 3.25, .17);

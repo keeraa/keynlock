@@ -1,5 +1,7 @@
 # KEYNLOCK — v372
 
+[Карта архитектуры и команды разработки](docs/architecture.md) · [Реестр 3D-сцен](js/3d/SCENES.md)
+
 Browser lockpicking puzzle game. v372 expands the journal to every supported mission, ordered by difficulty (27 / 21 / 21), with configurable multi-puzzle jobs and recovery of three starter picks. See [campaign notes](docs/first-chapter.md) for configuration, saves and validation.
 
 Release planning: [first episode roadmap and acceptance criteria](docs/release-roadmap.md).

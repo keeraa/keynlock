@@ -1,12 +1,10 @@
 /** Mount the actual Atelier application in the Lair document and WebGL world.
  * The artwork, brushes, catalogue and persistence are the preserved sources.
  * No iframe or second WebGL context is created for restoration. */
-import atelierHTML from '@keynlock/atelier/index.html?raw';
-import atelierCSS from '@keynlock/atelier/src/style.css?inline';
-import restorationFeedbackCSS from '@keynlock/atelier/src/styles/restoration.css?inline';
+import { markup, restorationFeedbackStyles, startAtelier, styles } from '@keynlock/atelier/embedding';
 
 export function mountAtelierInRoom(host) {
-  const documentSource = new DOMParser().parseFromString(atelierHTML,'text/html');
+  const documentSource = new DOMParser().parseFromString(markup,'text/html');
   const atelier = documentSource.querySelector('#app');
   if (!atelier) throw new Error('Не найден оригинальный интерфейс Ателье цвета');
   atelier.id = 'atelier-embedded-app';
@@ -16,7 +14,7 @@ export function mountAtelierInRoom(host) {
   // visual settings and other selectors with the same names.
   const scopedStyle = document.createElement('style');
   scopedStyle.dataset.atelierStyle = 'original';
-  scopedStyle.textContent = `@scope (#atelier-embedded-app) {\n${atelierCSS.replace(/@import\s+url\([^)]*\)\s*;/g,'')}\n}`;
+  scopedStyle.textContent = `@scope (#atelier-embedded-app) {\n${styles.replace(/@import\s+url\([^)]*\)\s*;/g,'')}\n}`;
   document.head.appendChild(scopedStyle);
   document.querySelector('#app').appendChild(atelier);
   host.atelier.root = atelier;
@@ -30,12 +28,12 @@ export function mountAtelierInRoom(host) {
   feedback.append(atelier.querySelector('#restoration-cursor'), atelier.querySelector('#damage-hint'));
   document.querySelector('#app').appendChild(feedback);
   const feedbackStyle = document.createElement('style');
-  feedbackStyle.textContent = restorationFeedbackCSS;
+  feedbackStyle.textContent = restorationFeedbackStyles;
   document.head.appendChild(feedbackStyle);
 
   // Start the real workshop once, on the same page and shared renderer.
   // The original module will announce models-ready and ready separately.
-  void import('@keynlock/atelier/src/main.js').catch(error => {
+  void startAtelier().catch(error => {
     console.error('Не удалось встроить исходную реставрацию:',error);
     window.dispatchEvent(new CustomEvent('keynlock:atelier',{
       detail:{type:'error',message:error.message},

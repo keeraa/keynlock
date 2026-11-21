@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import * as THREE from 'three';
-import { createCameraFraming } from '@keynlock/atelier/src/navigation/camera-framing.js';
-import { createCartoonFilter } from '@keynlock/atelier/src/effects/cartoon-filter.js';
+import { createCameraFraming } from '../../../workshops/atelier/src/navigation/camera-framing.js';
+import { createCartoonFilter } from '@keynlock/atelier/room-assets';
 
 test('in-room easel close-ups use the original framing with the easel depth offset', () => {
   const camera = new THREE.PerspectiveCamera(39, 16 / 9, .1, 65);

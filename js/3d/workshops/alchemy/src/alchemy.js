@@ -21,8 +21,12 @@ import { BOTTLE_STICKER_IMAGES, createBottleStickerGeometry } from './bottle-sti
 import { generateRecipe, evaluateRecipe, observeRecipeStages, RECIPE_LEVELS, PIGMENT_SWATCHES, PLANETARY_METALS, METAL_REFERENCE_ORDER } from './recipes.js';
 import { createRecipeSheetTexture } from './recipe-sheet.js';
 import { createAlchemyRuntime } from './runtime-host.js';
+import { getWorkshopHost, publishWorkshopApi } from '../../../core/host/workshop-host.js';
 
-const alchemyRoot = window.__keynlockAlchemyEmbedRoot || document;
+// Inside the Lair the host mounts this markup into the room and shares its
+// renderer, camera and input (core/host/workshop-host.js).
+const lair = getWorkshopHost();
+const alchemyRoot = lair?.alchemy.root || document;
 // The Lair renames the source #experience root to avoid an ID collision.
 // All original UI modules still address that root through $('experience').
 const $ = id => id === 'experience' && alchemyRoot !== document
@@ -32,7 +36,7 @@ const queryAll = selector => alchemyRoot.querySelectorAll(selector);
 const canvas = $('scene');
 const runtime = createAlchemyRuntime({ THREE, canvas });
 const inputSurface = runtime.embedded
-  ? window.__keynlockAlchemyInputPlane || canvas
+  ? lair?.alchemy.inputPlane || canvas
   : canvas;
 const renderer = runtime.renderer;
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, ALCHEMY_LOOK.renderer.pixelRatioCap));
@@ -205,7 +209,7 @@ const visualPanel = createVisualPanel({$,queryAll,visuals,woodAssets:WOOD_FINISH
     orbit.yaw=0;orbit.pitch=.251;orbit.zoom=1;
     cameraTarget.set(0,1.7,-.45);
     applyCamera();
-    if (runtime.embedded) window.__keynlockLairResetAlchemyCamera?.();
+    if (runtime.embedded) lair?.alchemy.resetCamera?.();
   },
   onResize,viewportWidth:()=>innerWidth});
 visualPanel.bind();
@@ -242,8 +246,8 @@ runtime.start(render, {
   },
 });
 
-// A tiny readable state hook makes the prototype testable without coupling UI to tests.
-window.__alchemy = {
+// A small readable state API, published for the Lair and its browser tests.
+const alchemyApi = {
   look: {profile:ALCHEMY_LOOK,getState:()=>({...look.getState(),backgroundBlur:blurBackground,
     sunbeams:sunbeams.getState(),filters:visuals.getState()}),
     setDirection:setLightDirection,setStrength:setLightStrength,
@@ -309,6 +313,7 @@ window.__alchemy = {
     return true;
   }
 };
+publishWorkshopApi('alchemy', alchemyApi);
 
 function ensureGlassTexture(id) {
   const entry = glassTextureCache.get(id);
@@ -1548,7 +1553,7 @@ function buildDust() {
 }
 
 function project(x, y, z) {
-  const displayCamera = runtime.embedded ? window.__keynlockLairCamera || camera : camera;
+  const displayCamera = runtime.embedded ? lair?.camera || camera : camera;
   const vec = scene.localToWorld(new THREE.Vector3(x, y, z)).project(displayCamera);
   return { x: (vec.x * .5 + .5) * canvas.clientWidth, y: (-vec.y * .5 + .5) * canvas.clientHeight };
 }
@@ -1581,8 +1586,8 @@ function applyCamera() {
 function onWheel(event) {
   if (!runtime.isActive()) return;
   event.preventDefault();
-  if (runtime.embedded && window.__keynlockLairManipulateAlchemy) {
-    window.__keynlockLairManipulateAlchemy({zoom: Math.exp(event.deltaY * .001)});
+  if (runtime.embedded && lair?.alchemy.manipulate) {
+    lair.alchemy.manipulate({zoom: Math.exp(event.deltaY * .001)});
     return;
   }
   orbit.zoom = THREE.MathUtils.clamp(orbit.zoom * Math.exp(event.deltaY * .001), .7, 1.75);
@@ -1593,7 +1598,7 @@ function mouseToNdc(event) {
   const rect = inputSurface.getBoundingClientRect();
   ndc.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
   ndc.y = 1 - ((event.clientY - rect.top) / rect.height) * 2;
-  raycaster.setFromCamera(ndc, runtime.embedded ? window.__keynlockLairCamera || camera : camera);
+  raycaster.setFromCamera(ndc, runtime.embedded ? lair?.camera || camera : camera);
 }
 
 function getHit(event, mode = 'any') {
@@ -1658,8 +1663,8 @@ function onPointerDown(event) {
 function onPointerMove(event) {
   if (!runtime.isActive()) return;
   if (press?.kind === 'pan' && press.id === event.pointerId) {
-    if (runtime.embedded && window.__keynlockLairManipulateAlchemy) {
-      window.__keynlockLairManipulateAlchemy({panX: event.clientX - press.x, panY: event.clientY - press.y});
+    if (runtime.embedded && lair?.alchemy.manipulate) {
+      lair.alchemy.manipulate({panX: event.clientX - press.x, panY: event.clientY - press.y});
       press.x = event.clientX; press.y = event.clientY;
       return;
     }
@@ -1674,8 +1679,8 @@ function onPointerMove(event) {
     return;
   }
   if (press && press.kind === 'orbit' && press.id === event.pointerId) {
-    if (runtime.embedded && window.__keynlockLairManipulateAlchemy) {
-      window.__keynlockLairManipulateAlchemy({rotateX: event.clientX - press.x, rotateY: event.clientY - press.y});
+    if (runtime.embedded && lair?.alchemy.manipulate) {
+      lair.alchemy.manipulate({rotateX: event.clientX - press.x, rotateY: event.clientY - press.y});
       press.x = event.clientX; press.y = event.clientY;
       return;
     }
@@ -2244,7 +2249,7 @@ function render() {
   camera.updateMatrixWorld(true);
   const movingVessel = Boolean(animation || press || sourceObjects.some(source =>
     source.motion.dragging || source.motion.returning));
-  const displayCamera = runtime.embedded ? window.__keynlockLairCamera || camera : camera;
+  const displayCamera = runtime.embedded ? lair?.camera || camera : camera;
   displayCamera.updateMatrixWorld(true);
   if (!contoursInitialized || movingVessel || !lastContourCameraMatrix.equals(displayCamera.matrixWorld)) {
     for (const contour of glassContours) contour.updateCamera(displayCamera);

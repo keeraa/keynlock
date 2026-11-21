@@ -1,9 +1,13 @@
+import { getWorkshopApi } from '../../../core/host/workshop-host.js';
 import * as THREE from 'three';
 import { createCameraTransition } from '@keynlock/atelier/src/navigation/camera-transition.js';
 
 export function createRestorationView({
-  camera, controls, canvas, interaction, rendererHost, atelierFilter, easelPose, roomMinDistance, navigation,
+  camera, controls, canvas, interaction, rendererHost, atelierFilter, host, easelPose, roomMinDistance, navigation,
 }) {
+  // The Atelier publishes its gallery and restoration controls once it has loaded.
+  const atelierGallery = () => getWorkshopApi('restoration')?.gallery;
+  const atelierBridge = () => getWorkshopApi('restoration')?.bridge;
   const galleryEntry = document.querySelector('#wall-collection-entry');
   const galleryControls = document.querySelector('#lair-gallery-controls');
   const artworkInfoPanel = document.querySelector('#restoration-art-info');
@@ -71,15 +75,15 @@ export function createRestorationView({
     atelierFilter?.setBlurSuspended(false);
     galleryDrag = null;
     galleryHover.hidden = true;
-    window.__keynlockLairGalleryActive = false;
-    window.__keynlockAtelierGallery?.leave();
+    host.atelier.galleryActive = false;
+    atelierGallery()?.leave();
     controls.enabled = true;
     interaction.style.cursor = 'grab';
     galleryControls.hidden = true;
   }
 
   function enterGallery() {
-    const gallery = window.__keynlockAtelierGallery;
+    const gallery = atelierGallery();
     if (!gallery || !rendererHost?.getWorldPose('restoration')) {
       queuedGallery = true;
       return;
@@ -91,7 +95,7 @@ export function createRestorationView({
     galleryActive = true;
     atelierFilter?.setBlurSuspended(true);
     navigation.stopApproach();
-    window.__keynlockLairGalleryActive = true;
+    host.atelier.galleryActive = true;
     controls.enabled = false;
     gallery.open(canvas.clientWidth / Math.max(1, canvas.clientHeight));
     galleryControls.hidden = false;
@@ -111,11 +115,11 @@ export function createRestorationView({
 
   function resize() {
     const w = canvas.clientWidth, h = canvas.clientHeight;
-    window.__keynlockRestorationBridge?.setViewportAspect?.(w / Math.max(h, 1));
+    atelierBridge()?.setViewportAspect?.(w / Math.max(h, 1));
     if (galleryActive) {
       // The source gallery camera's projection is already synchronized with the
       // Lair's screen; its perspective is also used for artwork picking.
-      window.__keynlockAtelierGallery?.setAspect(w / Math.max(h, 1));
+      atelierGallery()?.setAspect(w / Math.max(h, 1));
     }
   }
 
@@ -135,7 +139,7 @@ export function createRestorationView({
   function updateGalleryCamera() {
     // Choosing a work in the full catalogue closes the source gallery.
     // Resume the two-easel view and its restoration controls immediately.
-    if (galleryActive && window.__keynlockAtelierGallery && !window.__keynlockAtelierGallery.isActive())
+    if (galleryActive && atelierGallery() && !atelierGallery().isActive())
       returnToEasels();
     if (galleryActive) {
       const pose = rendererHost.getWorldPose('restoration');
@@ -148,7 +152,7 @@ export function createRestorationView({
           camera.updateProjectionMatrix();
         }
       }
-      const gallery = window.__keynlockAtelierGallery;
+      const gallery = atelierGallery();
       const focusedArt = gallery?.mode() === 'art';
       document.querySelector('#gallery-art-back').hidden = !focusedArt;
       document.querySelector('.lair-gallery-panner').hidden = focusedArt;
@@ -170,7 +174,7 @@ export function createRestorationView({
       }
       if (['ArrowLeft','KeyA','ArrowRight','KeyD'].includes(e.code)) {
         e.preventDefault();
-        window.__keynlockAtelierGallery?.step(['ArrowRight','KeyD'].includes(e.code) ? 1 : -1);
+        atelierGallery()?.step(['ArrowRight','KeyD'].includes(e.code) ? 1 : -1);
         return true;
       }
     }
@@ -178,7 +182,7 @@ export function createRestorationView({
   }
 
   function updateRestorationArtInfo(currentZone, blocked) {
-    const bridge = window.__keynlockRestorationBridge;
+    const bridge = atelierBridge();
     const info = currentZone === 'restoration'
       ? (galleryActive ? bridge?.wallArtworkInfo?.() : bridge?.artworkInfo?.()) : null;
     const collectionOpen = document.querySelector('#atelier-embedded-app #collection-modal')?.hidden === false;
@@ -201,7 +205,7 @@ export function createRestorationView({
   }
 
   function updateRestorationEaselHUD(currentZone, overlayOpen) {
-    const bridge = window.__keynlockRestorationBridge;
+    const bridge = atelierBridge();
     const collectionOpen = document.querySelector('#atelier-embedded-app #collection-modal')?.hidden === false;
     const showing = currentZone === 'restoration' && !galleryActive && Boolean(bridge)
       && !collectionOpen && !overlayOpen;
@@ -248,7 +252,7 @@ export function createRestorationView({
   }
 
   function resetEaselFocus() {
-    window.__keynlockRestorationBridge?.resetEaselFocus?.();
+    atelierBridge()?.resetEaselFocus?.();
     easelFocusSide = null;
     savedEaselView = null;
   }
@@ -265,9 +269,9 @@ export function createRestorationView({
   }
 
   function bind() {
-    window.__keynlockLairFocusArtwork = focusArtwork;
-    window.__keynlockLairFocusEasels = focusEasels;
-    window.__keynlockLairHoverGalleryArtwork = hoverArtwork;
+    host.atelier.focusArtwork = focusArtwork;
+    host.atelier.focusEasels = focusEasels;
+    host.atelier.hoverGalleryArtwork = hoverArtwork;
     interaction.addEventListener('pointerdown', e => {
       if (galleryActive && e.button === 0) galleryDrag = { pointerId: e.pointerId, x: e.clientX };
     });
@@ -275,7 +279,7 @@ export function createRestorationView({
       if (!galleryActive || !galleryDrag || galleryDrag.pointerId !== e.pointerId || !(e.buttons & 1)) return;
       const delta = e.clientX - galleryDrag.x;
       galleryDrag.x = e.clientX;
-      window.__keynlockAtelierGallery?.pan(-delta / Math.max(1, canvas.clientWidth));
+      atelierGallery()?.pan(-delta / Math.max(1, canvas.clientWidth));
     });
     for (const eventName of ['pointerup','pointercancel','lostpointercapture']) {
       interaction.addEventListener(eventName, () => { galleryDrag = null; });
@@ -283,23 +287,23 @@ export function createRestorationView({
     interaction.addEventListener('wheel', e => {
       if (!galleryActive) return;
       e.preventDefault();
-      window.__keynlockAtelierGallery?.zoom(e.deltaY);
+      atelierGallery()?.zoom(e.deltaY);
     }, { passive: false });
 
     galleryEntry.addEventListener('click', openWallGallery);
     document.querySelector('#gallery-easels').addEventListener('click', returnToEasels);
-    document.querySelector('#gallery-prev').addEventListener('click', () => window.__keynlockAtelierGallery?.step(-1));
-    document.querySelector('#gallery-next').addEventListener('click', () => window.__keynlockAtelierGallery?.step(1));
-    document.querySelector('#gallery-art-back').addEventListener('click', () => window.__keynlockAtelierGallery?.backFromArt());
-    document.querySelector('#gallery-switch').addEventListener('click', () => window.__keynlockAtelierGallery?.switchDisplay());
-    document.querySelector('#gallery-shuffle').addEventListener('click', () => window.__keynlockAtelierGallery?.shuffle());
-    document.querySelector('#gallery-select').addEventListener('click', () => window.__keynlockAtelierGallery?.select());
+    document.querySelector('#gallery-prev').addEventListener('click', () => atelierGallery()?.step(-1));
+    document.querySelector('#gallery-next').addEventListener('click', () => atelierGallery()?.step(1));
+    document.querySelector('#gallery-art-back').addEventListener('click', () => atelierGallery()?.backFromArt());
+    document.querySelector('#gallery-switch').addEventListener('click', () => atelierGallery()?.switchDisplay());
+    document.querySelector('#gallery-shuffle').addEventListener('click', () => atelierGallery()?.shuffle());
+    document.querySelector('#gallery-select').addEventListener('click', () => atelierGallery()?.select());
     document.querySelector('#lair-focus-original').addEventListener('click', () =>
-      window.__keynlockRestorationBridge?.focusEasel?.('original'));
+      atelierBridge()?.focusEasel?.('original'));
     document.querySelector('#lair-focus-copy').addEventListener('click', () =>
-      window.__keynlockRestorationBridge?.focusEasel?.('copy'));
+      atelierBridge()?.focusEasel?.('copy'));
     document.querySelector('#lair-focus-exit').addEventListener('click', () =>
-      window.__keynlockRestorationBridge?.returnToEasels?.());
+      atelierBridge()?.returnToEasels?.());
     document.querySelector('#restoration-info-toggle').addEventListener('click', e => {
       const body = document.querySelector('#restoration-info-body');
       body.hidden = !body.hidden;

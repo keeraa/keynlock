@@ -10,9 +10,9 @@ let browser;
 let baseUrl;
 
 function readRoom() {
-  const camera = window.__keynlockLairCamera;
-  const controls = window.__keynlockLairControls;
-  const scene = window.__keynlockRendererHost.getUnifiedScene();
+  const camera = window.__keynlockDebug.host.camera;
+  const controls = window.__keynlockDebug.host.controls;
+  const scene = window.__keynlockDebug.host.renderer.getUnifiedScene();
   const activeStationLights = id => {
     let count = 0;
     scene.getObjectByName(`keynlock-world-${id}`).traverse(object => {
@@ -61,7 +61,7 @@ async function openRoom(t) {
 
 async function enterAlchemy(page) {
   await page.locator('.zone-nav [data-zone="alchemy"]').click();
-  await page.waitForFunction(() => window.__alchemy?.lifecycle.isActive());
+  await page.waitForFunction(() => window.__keynlockDebug.workshop('alchemy')?.lifecycle.isActive());
   await page.getByRole('button', { name: 'Выйти из алхимии в логово' }).waitFor();
   const visualToggle = page.locator('#alchemy-visual-toggle');
   if (await visualToggle.getAttribute('aria-expanded') === 'true') await visualToggle.click();
@@ -69,8 +69,8 @@ async function enterAlchemy(page) {
 
 async function clickAlchemyObject(page, kind, id) {
   const point = await page.evaluate(({ kind, id }) => {
-    const camera = window.__keynlockLairCamera;
-    const scene = window.__keynlockRendererHost.getUnifiedScene();
+    const camera = window.__keynlockDebug.host.camera;
+    const scene = window.__keynlockDebug.host.renderer.getUnifiedScene();
     const station = scene.getObjectByName('keynlock-world-alchemy:main');
     const object = station.getObjectsByProperty('isMesh', true).find(mesh => {
       const interaction = mesh.userData.interaction;
@@ -91,8 +91,8 @@ async function clickAlchemyObject(page, kind, id) {
 
 async function settleAlchemyCamera(page) {
   await page.waitForFunction(() => {
-    const pose = window.__keynlockRendererHost.getWorldPose('alchemy');
-    return window.__keynlockLairCamera.position.distanceTo(pose.position) < .04;
+    const pose = window.__keynlockDebug.host.renderer.getWorldPose('alchemy');
+    return window.__keynlockDebug.host.camera.position.distanceTo(pose.position) < .04;
   });
 }
 
@@ -121,10 +121,10 @@ test('the built Lair pours reagents into a vessel on its transformed alchemy tab
   await clickAlchemyObject(page, 'source', 'red');
   await clickAlchemyObject(page, 'receiver', 'left');
   await page.waitForFunction(() => {
-    const { receivers } = window.__alchemy.getState();
+    const { receivers } = window.__keynlockDebug.workshop('alchemy').getState();
     return receivers.find(vessel => vessel.id === 'left').volume >= 24.9;
   });
-  const { receivers, sources } = await page.evaluate(() => window.__alchemy.getState());
+  const { receivers, sources } = await page.evaluate(() => window.__keynlockDebug.workshop('alchemy').getState());
   assert.equal(receivers.find(vessel => vessel.id === 'right').volume, 0);
   assert.ok(Math.abs(sources.find(source => source.id === 'red').volume - 75) < .1);
 });
@@ -132,19 +132,19 @@ test('the built Lair pours reagents into a vessel on its transformed alchemy tab
 test('the burner accounts for active time when returning to the lab', async t => {
   const page = await openRoom(t);
   await enterAlchemy(page);
-  await page.evaluate(() => window.__alchemy.toggleBurner());
-  assert.equal(await page.evaluate(() => window.__alchemy.getState().burnerOn), true);
-  await page.waitForFunction(() => window.__alchemy.getState().recipeHeatSeconds > .1);
+  await page.evaluate(() => window.__keynlockDebug.workshop('alchemy').toggleBurner());
+  assert.equal(await page.evaluate(() => window.__keynlockDebug.workshop('alchemy').getState().burnerOn), true);
+  await page.waitForFunction(() => window.__keynlockDebug.workshop('alchemy').getState().recipeHeatSeconds > .1);
   await page.getByRole('button', { name: 'Выйти из алхимии в логово' }).click();
-  assert.equal(await page.evaluate(() => window.__alchemy.lifecycle.isActive()), false);
-  const pausedHeat = await page.evaluate(() => window.__alchemy.getState().recipeHeatSeconds);
+  assert.equal(await page.evaluate(() => window.__keynlockDebug.workshop('alchemy').lifecycle.isActive()), false);
+  const pausedHeat = await page.evaluate(() => window.__keynlockDebug.workshop('alchemy').getState().recipeHeatSeconds);
 
   await page.waitForTimeout(600);
-  assert.equal(await page.evaluate(() => window.__alchemy.getState().recipeHeatSeconds), pausedHeat);
+  assert.equal(await page.evaluate(() => window.__keynlockDebug.workshop('alchemy').getState().recipeHeatSeconds), pausedHeat);
   // Observe the first simulation step rather than sampling an arbitrary rendered frame.
   await page.evaluate(() => {
-    const api = window.__alchemy;
-    const host = window.__keynlockRendererHost;
+    const api = window.__keynlockDebug.workshop('alchemy');
+    const host = window.__keynlockDebug.host.renderer;
     const step = host.stepWorldRuntime;
     window.addEventListener('keynlock:alchemy:v1', function onResume(event) {
       if (event.detail.type !== 'resume') return;
@@ -170,8 +170,8 @@ test('an image load failure leaves the current painting editable', async t => {
   const page = await openRoom(t);
   const atelier = page.locator('#atelier-embedded-app');
   await page.locator('.zone-nav [data-zone="restoration"]').click();
-  await page.waitForFunction(() => window.__keynlockRestorationBridge?.isReady());
-  const bridge = await page.evaluateHandle(() => window.__keynlockRestorationBridge);
+  await page.waitForFunction(() => window.__keynlockDebug.workshop('restoration')?.bridge?.isReady());
+  const bridge = await page.evaluateHandle(() => window.__keynlockDebug.workshop('restoration')?.bridge);
   const catalogue = await bridge.evaluate(api => api.catalog());
   const previous = 1;
   const broken = 2;
@@ -192,7 +192,7 @@ test('an image load failure leaves the current painting editable', async t => {
   const artItems = atelier.locator('.art-item');
   await artItems.nth(previous).click();
   await page.waitForFunction(index => Boolean(window.releaseRestorationRead) &&
-    window.__keynlockRestorationBridge.snapshot().selected === index, previous);
+    window.__keynlockDebug.workshop('restoration')?.bridge.snapshot().selected === index, previous);
   assert.equal(await bridge.evaluate(api => api.isReady()), false, 'the current painting must be waiting on its editable layer');
 
   const imageUrl = new URL(catalogue[broken].image, baseUrl).href;
@@ -205,7 +205,7 @@ test('an image load failure leaves the current painting editable', async t => {
   catalogue[previous].title);
   assert.equal(await bridge.evaluate(api => api.snapshot().selected), previous);
   await page.evaluate(() => window.releaseRestorationRead());
-  await page.waitForFunction(() => window.__keynlockRestorationBridge.isReady());
+  await page.waitForFunction(() => window.__keynlockDebug.workshop('restoration')?.bridge.isReady());
   await atelier.locator('[data-tool="brush"]').click();
   assert.equal(await bridge.evaluate(api => api.snapshot().tool), 'brush');
 });
@@ -219,8 +219,8 @@ test('switching workshops returns the shared camera, input, and lights to the ro
 
   async function assertHome() {
     await page.waitForFunction(({ position, target, fov }) => {
-      const camera = window.__keynlockLairCamera;
-      const controls = window.__keynlockLairControls;
+      const camera = window.__keynlockDebug.host.camera;
+      const controls = window.__keynlockDebug.host.controls;
       return camera.position.toArray().every((value, axis) => Math.abs(value - position[axis]) < .025) &&
         controls.target.toArray().every((value, axis) => Math.abs(value - target[axis]) < .025) &&
         Math.abs(camera.fov - fov) < .08;
@@ -231,16 +231,16 @@ test('switching workshops returns the shared camera, input, and lights to the ro
     assert.equal(restored.restorationLights, 0);
     assert.equal(restored.alchemyLights, 0);
     assert.equal(await page.locator('#alchemy-input-plane').isVisible(), false);
-    assert.equal(await page.evaluate(() => window.__alchemy.lifecycle.isActive()), false);
+    assert.equal(await page.evaluate(() => window.__keynlockDebug.workshop('alchemy').lifecycle.isActive()), false);
   }
 
   const reset = page.locator('#reset-camera');
   await page.locator('.zone-nav [data-zone="restoration"]').click();
   await page.waitForFunction(position =>
-    window.__keynlockLairCamera.position.toArray().some((value, axis) => Math.abs(value - position[axis]) > 3),
+    window.__keynlockDebug.host.camera.position.toArray().some((value, axis) => Math.abs(value - position[axis]) > 3),
   home.position);
   await page.locator('#lair-focus-copy').click();
-  await page.waitForFunction(() => window.__keynlockLairControls.minDistance < 2);
+  await page.waitForFunction(() => window.__keynlockDebug.host.controls.minDistance < 2);
   const closeUp = await page.evaluate(readRoom);
   assert.ok(closeUp.restorationLights > 0);
   assert.equal(closeUp.alchemyLights, 0);
@@ -287,6 +287,52 @@ test('switching workshops returns the shared camera, input, and lights to the ro
   await page.mouse.move(orbitPoint.x + 100, orbitPoint.y + 30, { steps: 8 });
   await page.mouse.up();
   await page.waitForFunction(position =>
-    window.__keynlockLairCamera.position.toArray().some((value, axis) => Math.abs(value - position[axis]) > .1),
+    window.__keynlockDebug.host.camera.position.toArray().some((value, axis) => Math.abs(value - position[axis]) > .1),
   home.position);
+});
+
+test('the room hosts both workshops on one canvas through the host contract', async t => {
+  const page = await openRoom(t);
+  const debug = 'window.__keynlockDebug';
+  await page.waitForFunction(() => window.__keynlockDebug.workshop('restoration')?.bridge?.isReady()
+    && window.__keynlockDebug.workshop('alchemy'));
+  // One visible WebGL canvas: the workshops draw through the room's renderer.
+  const visibleCanvases = await page.evaluate(() => [...document.querySelectorAll('canvas')].filter(canvas => {
+    const box = canvas.getBoundingClientRect();
+    const style = getComputedStyle(canvas);
+    return box.width > 0 && box.height > 0 && style.visibility !== 'hidden' && Number(style.opacity) > 0;
+  }).length);
+  assert.equal(visibleCanvases, 1, `${debug}: only the room canvas is visible`);
+  // The Atelier's own angled sun would throw long stripes across the shared room.
+  const atelierShadowLights = await page.evaluate(() => {
+    let count = 0;
+    window.__keynlockDebug.host.renderer.getUnifiedScene().getObjectByName('keynlock-world-restoration')
+      .traverse(object => { if (object.isDirectionalLight && object.castShadow) count++; });
+    return count;
+  });
+  assert.equal(atelierShadowLights, 0);
+
+  // The Atelier's own tools work inside the room.
+  await page.locator('.zone-nav [data-zone="restoration"]').click();
+  await page.locator('#lair-focus-copy').click();
+  await page.waitForFunction(() => window.__keynlockDebug.host.controls.minDistance < 2);
+  for (const tool of ['brush', 'swab', 'uv', 'reagent', 'retouch']) {
+    const button = page.locator(`#atelier-embedded-app [data-tool="${tool}"]`);
+    await button.click();
+    assert.equal(await button.getAttribute('aria-pressed'), 'true', `${tool} is selected`);
+  }
+  // In a close-up the easel switcher sits right of the Atelier's panel toggle.
+  const stepper = await page.locator('#lair-easel-camera-controls').boundingBox();
+  const toggle = await page.locator('#atelier-embedded-app #workbench-toggle').boundingBox();
+  assert.ok(stepper && toggle && stepper.x >= toggle.x + toggle.width, 'the easel switcher does not cover the toggle');
+
+  // The painting wall opens from the room and returns to the easels.
+  await page.locator('#reset-camera').click();
+  await page.locator('.zone-nav [data-zone="restoration"]').click();
+  await page.locator('#wall-collection-entry').click();
+  await page.waitForFunction(() => window.__keynlockDebug.host.atelier.galleryActive === true);
+  assert.equal(await page.locator('#lair-gallery-controls').isVisible(), true);
+  await page.locator('#gallery-easels').click();
+  await page.waitForFunction(() => window.__keynlockDebug.host.atelier.galleryActive === false);
+  assert.equal(await page.locator('#lair-gallery-controls').isVisible(), false);
 });

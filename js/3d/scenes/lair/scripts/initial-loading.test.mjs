@@ -1,6 +1,5 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { readFileSync } from 'node:fs';
 import { createInitialLoadingGate } from '../src/initial-loading.js';
 
 function fakeClock() {
@@ -65,16 +64,4 @@ test('a failed Atelier module cannot trap the visitor under the loading veil', (
   });
   clock.advance(30);
   assert.deepEqual(finishes, ['timeout']);
-});
-
-test('the initial Lair loading waits for the Atelier exhibition completion event', () => {
-  const room = readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
-  const atelier = readFileSync(new URL('../../../workshops/atelier/src/main.js', import.meta.url), 'utf8');
-  assert.match(atelier, /const galleryReady = await exhibition\.refresh/);
-  assert.match(atelier, /if \(!galleryReady\) throw/);
-  assert.match(atelier, /notifyLair\('initial-gallery-ready'\)/);
-  assert.match(room, /if \(type === 'initial-gallery-ready'\) \{galleryLoaded = true;completeInitialLoad\(\);\}/);
-  assert.match(room, /galleryLoaded && alchemyLoaded/,
-    'the original laboratory should finish initialization during the initial loading screen');
-  assert.doesNotMatch(room, /setTimeout\(\(\) => loading\.classList\.add\('done'\), 900\)/);
 });

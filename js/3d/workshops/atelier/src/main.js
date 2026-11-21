@@ -18,20 +18,19 @@ import { createPaintingCollectionUI } from './painting-collection-ui.js';
 import { createPerformanceHUD } from './performance-hud.js';
 import { createRestorationFeedback } from './restoration-feedback.js';
 import { getPaintingLore, getPaintingLoreLabels } from './lore/painting-lore.js';
-// The standalone Atelier loads its stylesheet normally; the Lair imports the
-// exact same stylesheet into a scoped root, preserving its own application CSS.
-const directRoot = window.__keynlockAtelierEmbedRoot || null;
+import { getWorkshopHost, publishWorkshopApi } from '../../../core/host/workshop-host.js';
+// Inside the Lair the host mounts this markup into the room and shares its
+// renderer, camera and input (core/host/workshop-host.js). On its own site the
+// Atelier has no host and loads its stylesheet normally; the Lair imports the
+// same stylesheet into a scoped root.
+const lair = getWorkshopHost();
+const directRoot = lair?.atelier.root || null;
 if (!directRoot) void import('./style.css');
 const $ = (id) => directRoot?.querySelector(`#${CSS.escape(id)}`) || document.getElementById(id);
-const lairWindow = directRoot ? window : window.parent;
-let rendererHost = null;
-try {rendererHost = (lairWindow !== window || directRoot) ? lairWindow.__keynlockRendererHost : null;}
-catch {rendererHost = null;} // The standalone Atelier may be cross-origin framed.
+const rendererHost = directRoot ? lair.renderer : null;
 const embedded = Boolean(rendererHost);
 let inRoomActive = false;
-const isRestorationActive = () => !embedded ||
-  (directRoot ? inRoomActive : Boolean(lairWindow.__keynlockRestorationActive));
-if (embedded && !directRoot) document.documentElement.classList.add('lair-embedded');
+const isRestorationActive = () => !embedded || inRoomActive;
 const stage = $('scene');
 const performanceHUD = createPerformanceHUD({ fpsElement: $('fps-value'), polygonsElement: $('poly-value') });
 const playerProgress = createPlayerProgress({ paintings });
@@ -120,7 +119,7 @@ const woodStyle = createWoodStyle({ THREE, renderer, loader: textureLoader, mats
   floorWoodMaterials, variants: woodVariants });
 const wallGallery = createWallGallery({
   THREE, scene, camera, renderer, frameWood: mats.frameWood,
-  pointerElement: embedded ? lairWindow.__keynlockLairInteractionElement : renderer.domElement,
+  pointerElement: embedded ? lair?.interactionElement : renderer.domElement,
   onLayout: (layout) => navigation.updateWallLayout(layout),
 });
 const easelX = 1.28;
@@ -150,14 +149,14 @@ function focusLairArtwork(side) {
   const worldPosition = scene.localToWorld(destination.position.clone());
   const worldTarget = scene.localToWorld(destination.target.clone());
   navigation.focusOn(side);
-  lairWindow.__keynlockLairFocusArtwork?.({
+  lair?.atelier.focusArtwork?.({
     side, position: worldPosition.toArray(), target: worldTarget.toArray(),
     fov: camera.fov,
   });
 }
 function leaveLairArtworkFocus() {
   navigation.leaveFocus();
-  lairWindow.__keynlockLairFocusEasels?.();
+  lair?.atelier.focusEasels?.();
 }
 
 // Shared Keynlock post-processing: depth/normal outlines and softly stepped light.
@@ -213,17 +212,10 @@ function flushSurfaceSave() {
   if (artId) void restorationSessions.save(artId);
 }
 
-// When viewed from the Lair, the actual Atelier remains the editing surface.
-// Only signal readiness and finish pending local saves before the Lair unloads
-// the iframe; paintings and restoration state stay in this origin's storage.
-const LAIR_ORIGIN = window.location.origin;
-const EMBED_BRIDGE = 'keynlock:atelier-embed:v1';
+// Inside the Lair the Atelier reports its loading progress and state as
+// 'keynlock:atelier' events; paintings and restoration state stay in its storage.
 function notifyLair(type, detail = {}) {
-  if (directRoot) {
-    window.dispatchEvent(new CustomEvent('keynlock:atelier',{detail:{type,...detail}}));
-  } else if (window.parent !== window) {
-    window.parent.postMessage({ bridge: EMBED_BRIDGE, type, ...detail }, LAIR_ORIGIN);
-  }
+  if (directRoot) window.dispatchEvent(new CustomEvent('keynlock:atelier',{detail:{type,...detail}}));
 }
 if (embedded) {
   // The original collection modal temporarily expands its existing panel.
@@ -239,11 +231,6 @@ async function flushAtelier() {
   await restorationStore.flush();
   notifyLair('flushed');
 }
-window.addEventListener('message', async (event) => {
-  if (event.origin !== LAIR_ORIGIN || event.source !== window.parent) return;
-  if (event.data?.bridge !== EMBED_BRIDGE || event.data.type !== 'flush') return;
-  await flushAtelier();
-});
 
 let restorationInput;
 let restorationFeedback;
@@ -258,13 +245,13 @@ const navigation = createSceneNavigation({
 });
 restorationInput = createRestorationInput({
   THREE, renderer, camera, controls, scene,
-  stage: embedded ? lairWindow.__keynlockLairInteractionElement : stage,
+  stage: embedded ? lair?.interactionElement : stage,
   leftEasel, rightEasel, navigation,
   // The Lair canvas owns camera movement and restoration brush input. The
   // source iframe is only a retained model/state controller, never a viewport.
-  inputElement: embedded ? lairWindow.__keynlockLairInteractionElement : renderer.domElement,
-  interactionCamera: embedded ? lairWindow.__keynlockLairCamera : camera,
-  roomControls: embedded ? lairWindow.__keynlockLairControls : null,
+  inputElement: embedded ? lair?.interactionElement : renderer.domElement,
+  interactionCamera: embedded ? lair?.camera : camera,
+  roomControls: embedded ? lair?.controls : null,
   onPaintingFocus: embedded ? focusLairArtwork : (side) => navigation.focusOn(side),
   isInteractive: isRestorationActive,
   embeddedEditing: embedded,
@@ -279,7 +266,7 @@ restorationInput = createRestorationInput({
   onWallArtworkClick: (art) => navigation.focusWallArt(art),
   onWallArtworkHover: (art, event) => {
     if (embedded) {
-      lairWindow.__keynlockLairHoverGalleryArtwork?.(
+      lair?.atelier.hoverGalleryArtwork?.(
         art && navigation.isWallGallery() && !navigation.focusedWallId()
           ? { label: `${art.columnLabel} · ${art.title}`, x: event.clientX, y: event.clientY }
           : null,
@@ -301,7 +288,7 @@ restorationInput = createRestorationInput({
 });
 workshopUI = wireWorkshopUI({ cartoonFilter, navigation, restorationInput, collectionUI, $,
   isEnabled: () => isRestorationActive()
-    && (!embedded || !lairWindow.__keynlockLairGalleryActive),
+    && (!embedded || !lair?.atelier.galleryActive),
   focusEasel: embedded ? focusLairArtwork : side => navigation.focusOn(side),
   leaveEaselFocus: embedded ? leaveLairArtworkFocus : () => navigation.leaveFocus() });
 exhibition = createWallExhibitionController({ paintings, playerProgress, wallGallery, collectionUI,
@@ -309,7 +296,7 @@ exhibition = createWallExhibitionController({ paintings, playerProgress, wallGal
 exhibition.bind();
 // The Lair's single renderer follows the original gallery camera. These
 // controls retain the Atelier's 30-frame layout, movements and artwork focus.
-if (directRoot) window.__keynlockAtelierGallery = {
+if (directRoot) publishWorkshopApi('restoration', { gallery: {
   setAspect(aspect) {
     if (Number.isFinite(aspect) && aspect > 0) {
       camera.aspect = aspect;
@@ -331,7 +318,7 @@ if (directRoot) window.__keynlockAtelierGallery = {
   select: () => $('wall-gallery-select').click(),
   switchDisplay: () => $('wall-gallery-demo').click(),
   shuffle: () => $('wall-gallery-shuffle').click(),
-};
+} });
 restorationFeedback = createRestorationFeedback({ paintings, getSelectedIndex: () => selected,
   getSurface: () => activeSurface, getCopyMaterial: () => copyMaterial,
   getCurrentTool: () => restorationInput.currentTool(), playerProgress,
@@ -365,7 +352,7 @@ function artworkInfo(art) {
     banLabel: labels.banned, policy: labels.policy,
   };
 }
-if (embedded) window.__keynlockRestorationBridge = {
+if (embedded) publishWorkshopApi('restoration', { bridge: {
   isReady: () => Boolean(activeTexture && activeSurface),
   setViewportAspect: aspect => {
     if (!Number.isFinite(aspect) || aspect <= 0) return;
@@ -410,7 +397,7 @@ if (embedded) window.__keynlockRestorationBridge = {
     input.dispatchEvent(new Event('input',{bubbles:true}));
   },
   reset:() => $('reset-button').click(),
-};
+} });
 
 async function showPainting(index) {
   restorationInput.hide();
@@ -442,7 +429,7 @@ async function showPainting(index) {
   try {
     if (navigation.focusedSide()) {
       navigation.leaveFocus({ immediate: true });
-      if (embedded) lairWindow.__keynlockLairFocusEasels?.();
+      if (embedded) lair?.atelier.focusEasels?.();
     }
     restorationInput.finishStroke();
     flushSurfaceSave();
@@ -539,10 +526,6 @@ function animate(now) {
     // Texture restoration, exhibition and camera-local animation continue.
     // The parent always renders their geometry with its freely orbiting camera.
     updateAtelier(now);
-    requestAnimationFrame(animate);
-    return;
-  }
-  if (window.parent !== window && rendererHost?.current() !== 'restoration') {
     requestAnimationFrame(animate);
     return;
   }

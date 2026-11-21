@@ -5,7 +5,7 @@ import atelierHTML from '@keynlock/atelier/index.html?raw';
 import atelierCSS from '@keynlock/atelier/src/style.css?inline';
 import restorationFeedbackCSS from '@keynlock/atelier/src/styles/restoration.css?inline';
 
-export function mountAtelierInRoom() {
+export function mountAtelierInRoom(host) {
   const documentSource = new DOMParser().parseFromString(atelierHTML,'text/html');
   const atelier = documentSource.querySelector('#app');
   if (!atelier) throw new Error('Не найден оригинальный интерфейс Ателье цвета');
@@ -19,7 +19,7 @@ export function mountAtelierInRoom() {
   scopedStyle.textContent = `@scope (#atelier-embedded-app) {\n${atelierCSS.replace(/@import\s+url\([^)]*\)\s*;/g,'')}\n}`;
   document.head.appendChild(scopedStyle);
   document.querySelector('#app').appendChild(atelier);
-  window.__keynlockAtelierEmbedRoot = atelier;
+  host.atelier.root = atelier;
   window.dispatchEvent(new CustomEvent('keynlock:atelier',{detail:{type:'mounted'}}));
 
   // These are the ORIGINAL tool cursor and damage hint, placed over the Lair

@@ -9,19 +9,9 @@
 @import './styles/restoration.css';
 @import './styles/wall-gallery.css';
 
-/* Only in the Lair: display the unchanged original Atelier controls below
-   the shared scene. Its own canvas is invisible because meshes live in the
-   parent Three.js world, not in a second workshop viewport. */
-html.lair-embedded .main, html.lair-embedded .stage, html.lair-embedded #scene {
-  background: transparent !important;
-}
-html.lair-embedded #scene canvas {opacity: 0 !important}
-html.lair-embedded, html.lair-embedded body, html.lair-embedded #app {
-  height: 100%;
-  min-height: 0 !important;
-  overflow: hidden !important;
-  background: transparent !important;
-}
+/* Only in the Lair (the room mounts #app with .lair-embedded): show the
+   original Atelier controls below the shared scene. The Atelier's own stage is
+   hidden because its meshes live in the room's Three.js world. */
 .lair-embedded .topbar,
 .lair-embedded .stage,
 .lair-embedded .loading {display: none !important}

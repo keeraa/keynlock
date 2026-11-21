@@ -30,6 +30,49 @@ export default [
       'no-empty': ['error', { allowEmptyCatch: true }],
     },
   },
+  // Architecture: the Lair and the workshops talk through core/host/workshop-host.js.
+  {
+    files: ['workshops/**/src/**/*.js'],
+    rules: {
+      'no-restricted-syntax': ['error', {
+        selector: "MemberExpression[object.name='window'][property.name=/^__/]",
+        message: 'Workshops get what the Lair offers from core/host/workshop-host.js, not from window globals.',
+      }, {
+        selector: "MemberExpression[object.name='window'][property.name='parent']",
+        message: 'Workshops are mounted in the room, not in an iframe: use core/host/workshop-host.js.',
+      }],
+      'no-restricted-imports': ['error', { patterns: [{
+        group: ['**/scenes/**'],
+        message: 'A workshop must not depend on the Lair or another scene; the Lair offers it what it needs through the host.',
+      }] }],
+    },
+  },
+  {
+    // bridge.html: the published Atelier's storage page, which the published Lair
+    // site opens in a cross-origin iframe. Talking to window.parent is its job.
+    files: ['workshops/atelier/src/lair-bridge.js'],
+    rules: { 'no-restricted-syntax': 'off' },
+  },
+  {
+    files: ['scenes/lair/src/**/*.js'],
+    rules: {
+      'no-restricted-syntax': ['error', {
+        // Two documented exceptions: the workbench iframe finds the shared renderer
+        // through __keynlockRendererHost, and tests read __keynlockDebug.
+        selector: "MemberExpression[object.name='window'][property.name=/^__/]:not([property.name=/^__keynlock(RendererHost|Debug)$/])",
+        message: 'Offer workshops what they need through core/host/workshop-host.js, not window globals.',
+      }],
+    },
+  },
+  {
+    files: ['core/**/*.js'],
+    rules: {
+      'no-restricted-imports': ['error', { patterns: [{
+        group: ['**/scenes/**', '**/workshops/**'],
+        message: 'core/ is shared by every scene and must not depend on one.',
+      }] }],
+    },
+  },
   {
     // Node scripts, tests and build configs.
     files: ['**/scripts/**', '**/tests/**', '**/test/**', '**/*.config.js', '**/*.mjs'],

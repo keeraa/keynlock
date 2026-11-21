@@ -12,10 +12,16 @@ import { addRoomLighting } from './room-lighting.js';
 import { createZoneTransitions, RESTORATION_EASELS } from './zone-transitions.js';
 import { createRestorationView } from './restoration-view.js';
 import { createInitialLoadingGate } from './initial-loading.js';
+import { getWorkshopApi, setWorkshopHost } from '../../../core/host/workshop-host.js';
 import './style.css';
 import './initial-loading.css';
 import './visual.css';
 import './original-stations.css';
+
+// What the Lair offers the workshops it mounts (see core/host/workshop-host.js).
+const host = setWorkshopHost({ atelier: {}, alchemy: {} });
+// Read-only handles for browser tests and debugging in the console.
+window.__keynlockDebug = { host, workshop: getWorkshopApi };
 
 const canvas = document.querySelector('#scene');
 const interaction = document.querySelector('#scene-interaction');
@@ -88,10 +94,10 @@ function setup() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(47, 1, .06, 115);
   camera.position.copy(homePosition);
-  window.__keynlockLairCamera = camera;
-  window.__keynlockLairInteractionElement = interaction;
+  host.camera = camera;
+  host.interactionElement = interaction;
   controls = new OrbitControls(camera, interaction);
-  window.__keynlockLairControls = controls;
+  host.controls = controls;
   controls.target.copy(homeTarget);
   controls.enabled = true;
   controls.enableRotate = true;
@@ -123,6 +129,9 @@ function setup() {
   // what the visitor sees through this common viewport.
   atelierFilter = createCartoonFilter({ THREE, renderer, scene, camera });
   rendererHost = createSharedRendererHost({renderer,canvas,worldScene:scene});
+  host.renderer = rendererHost;
+  // The workbench runs in an iframe (it is developed separately) and finds the
+  // shared renderer here; the Atelier and the lab use the host module instead.
   window.__keynlockRendererHost = rendererHost;
   originalStations = mountOriginalStations({
     rendererHost,
@@ -133,7 +142,7 @@ function setup() {
   visualUI = mountVisualSettings({ visual, room, outlines, atelierFilter,
     grain: document.querySelector('.grain'), onOpen: () => { panel.hidden = true; } });
   restorationView = createRestorationView({
-    camera, controls, canvas, interaction, rendererHost, atelierFilter,
+    camera, controls, canvas, interaction, rendererHost, atelierFilter, host,
     easelPose: RESTORATION_EASELS, roomMinDistance,
     navigation: {
       isRestoring: () => zoneTransitions.current() === 'restoration',
@@ -147,14 +156,14 @@ function setup() {
     originalStations, restorationView, visualUI, homePosition, homeTarget, roomMinDistance,
     roomLights,
   });
-  window.__keynlockLairManipulateAlchemy = zoneTransitions.manipulateAlchemy;
-  window.__keynlockLairResetAlchemyCamera = zoneTransitions.resetAlchemyCamera;
+  host.alchemy.manipulate = zoneTransitions.manipulateAlchemy;
+  host.alchemy.resetCamera = zoneTransitions.resetAlchemyCamera;
 
   window.addEventListener('resize', resize);
   interaction.addEventListener('pointerdown', e => { startPointer = [e.clientX, e.clientY]; });
   restorationView.bind();
-  const atelierElement = mountAtelierInRoom();
-  const alchemyElement = mountAlchemyInRoom();
+  const atelierElement = mountAtelierInRoom(host);
+  const alchemyElement = mountAlchemyInRoom(host);
   alchemyElement.querySelector('.lair-alchemy-exit')?.addEventListener('click', zoneTransitions.reset);
   const observeAtelierMenu = () => document.querySelector('#app').style.setProperty(
     '--atelier-panel-height', `${Math.round(atelierElement.getBoundingClientRect().height)}px`);

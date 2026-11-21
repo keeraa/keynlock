@@ -277,3 +277,20 @@ test('the bird flies across the windows and briefly shades the existing floor li
   assert.ok(result.silhouettePixels > 8 && result.maskedByWall, JSON.stringify(result));
   assert.ok(result.shadedAirPixels > 5, JSON.stringify(result));
 });
+
+test('the pause menu switches the shared music player\'s tracks', { timeout: 60000 * SLOW }, async t => {
+  const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+  t.after(() => page.close());
+  const errors = await enterArchive(page, 'music-controls');
+  await page.keyboard.press('Escape');
+  const controls = page.locator('#music-controls');
+  await controls.waitFor({ state: 'visible' });
+  const title = controls.locator('.music-controls__title');
+  assert.equal(await title.innerText(), 'Шопен · Ноктюрн op. 9 № 1');
+  await controls.getByRole('button', { name: 'Следующий трек' }).click();
+  assert.equal(await title.innerText(), 'Шопен · Ноктюрн op. 9 № 2');
+  assert.equal(JSON.parse(await page.evaluate(() => localStorage.getItem('keynlock-archive-music-position-v1'))).track,
+    'chopin-nocturne-op9-no2.mp3');
+  await page.locator('#pause .menu-card').screenshot({ path: `${process.cwd()}/test-results/pause-music.png` });
+  assert.deepEqual(errors, []);
+});

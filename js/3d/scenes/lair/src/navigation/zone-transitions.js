@@ -157,6 +157,7 @@ export function createZoneTransitions({
     const link = document.querySelector('#panel-link');
     link.hidden = !zone.link;
     if (zone.link) link.href = zone.link;
+    document.querySelector('#panel-music').hidden = id !== 'gramophone';
     // Source geometry remains visible in the Lair during this camera flight.
     // The existing Atelier UI takes over only after the original has initialized.
     panel.hidden = hasOriginal;

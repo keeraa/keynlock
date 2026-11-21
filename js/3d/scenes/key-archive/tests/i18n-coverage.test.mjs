@@ -49,6 +49,8 @@ const NOT_PLAYER_TEXT = new Map([
   ['station-layout.js', 'internal station names'],
   ['cabinet-layout.js', 'developer error'],
   ['key-shapes.js', 'developer error'],
+  ['music-controls.js', 'shared player; the archive passes translated labels'],
+  ['music-tracks.js', 'shared track titles in both languages; the archive picks one'],
 ]);
 
 test('player-facing modules have no hard-coded Russian left', () => {

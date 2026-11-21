@@ -3,12 +3,14 @@ on:
   push:
     paths:
       - 'js/3d/shared/keys/**'
+      - 'js/3d/core/audio/**'
       - 'js/3d/scenes/key-forge/dist/js/**'
       - 'js/3d/scenes/key-archive/dist/js/**'
       - '.github/workflows/shared-keys.yml'
   pull_request:
     paths:
       - 'js/3d/shared/keys/**'
+      - 'js/3d/core/audio/**'
       - 'js/3d/scenes/key-forge/dist/js/**'
       - 'js/3d/scenes/key-archive/dist/js/**'
       - '.github/workflows/shared-keys.yml'
@@ -22,6 +24,8 @@ jobs:
           node-version: '22'
       - name: Shared key modules are mirrored unchanged into every scene
         run: node js/3d/shared/keys/sync.mjs --check
+      - name: The music player is mirrored unchanged into the Key Archive
+        run: node js/3d/core/audio/sync.mjs --check
       - name: Key Forge tests
         working-directory: js/3d/scenes/key-forge
         run: npm test

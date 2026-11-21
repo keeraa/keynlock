@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#14211f" />
   <meta name="description" data-i18n-attr="content:meta.description" content="Архив ключей — гуашевая игра: поиск, отмачивание, очистка ржавчины и переплавка брака." />
   <title data-i18n="meta.title">Архив ключей</title>
-  <link rel="stylesheet" href="./styles.css?v=d0557f2d2a" />
+  <link rel="stylesheet" href="./styles.css?v=ccee23ab01" />
   <!-- import-map:start -->
   <script type="importmap">
   {
@@ -27,11 +27,11 @@
       "./js/archive-key-motion.js": "./js/archive-key-motion.js?v=0346e2f6fb",
       "./js/archive-ledger.js": "./js/archive-ledger.js?v=8bde7c9659",
       "./js/archive-music-mix.js": "./js/archive-music-mix.js?v=8498cf4037",
-      "./js/archive-music.js": "./js/archive-music.js?v=d41ebcc1af",
+      "./js/archive-music.js": "./js/archive-music.js?v=430f7fb1f6",
       "./js/archive-pointer-lock.js": "./js/archive-pointer-lock.js?v=970ca7868b",
       "./js/archive-room-props.js": "./js/archive-room-props.js?v=6c17dc5889",
       "./js/archive-save-state-with-route.js": "./js/archive-save-state-with-route.js?v=246fcfd3b5",
-      "./js/archive-settings-controls.js": "./js/archive-settings-controls.js?v=2358c0f97a",
+      "./js/archive-settings-controls.js": "./js/archive-settings-controls.js?v=8bfe150115",
       "./js/archive-sky.js": "./js/archive-sky.js?v=b2c9019cad",
       "./js/archive-station-clock.js": "./js/archive-station-clock.js?v=3b21c5e24f",
       "./js/archive-statistics.js": "./js/archive-statistics.js?v=5b27d1c79b",
@@ -79,11 +79,14 @@
       "./js/key-spacing.js": "./js/key-spacing.js?v=4ec06b52c2",
       "./js/key-thumbnails.js": "./js/key-thumbnails.js?v=de79a4c562",
       "./js/key-wax.js": "./js/key-wax.js?v=5719cedd27",
-      "./js/locales/en.js": "./js/locales/en.js?v=6b777e7b14",
-      "./js/locales/ru.js": "./js/locales/ru.js?v=2387e9eca6",
+      "./js/locales/en.js": "./js/locales/en.js?v=c08b487f57",
+      "./js/locales/ru.js": "./js/locales/ru.js?v=685a25ea3c",
       "./js/main.js": "./js/main.js?v=5b45485fa3",
       "./js/metric-box-geometry.js": "./js/metric-box-geometry.js?v=e8639d1237",
       "./js/mouse-look.js": "./js/mouse-look.js?v=5fb762b3a7",
+      "./js/music-controls.js": "./js/music-controls.js?v=1a27c30ede",
+      "./js/music-player.js": "./js/music-player.js?v=3f6ebd725b",
+      "./js/music-tracks.js": "./js/music-tracks.js?v=c9fef5d791",
       "./js/painted-renderer.js": "./js/painted-renderer.js?v=3e54a0ffc4",
       "./js/painted-shader.js": "./js/painted-shader.js?v=ee77372bdd",
       "./js/painted-textures.js": "./js/painted-textures.js?v=32619be5ef",
@@ -189,6 +192,7 @@
       <button id="resume-btn" class="primary-button" data-i18n-html="pause.resume">ПРОДОЛЖИТЬ <span>→</span></button>
       <div class="settings-row"><label for="sensitivity" data-i18n="pause.sensitivity">Чувствительность мыши</label><input id="sensitivity" type="range" min="6" max="28" step="1" value="14" /></div>
       <div class="settings-row"><label for="sound" data-i18n="pause.sound">Звуковые эффекты</label><input id="sound" type="checkbox" checked /></div>
+      <div class="settings-row"><span data-i18n="pause.track">Музыка</span><div id="music-controls" class="archive-music-controls"></div></div>
       <div class="settings-row"><label for="music-volume"><span data-i18n="pause.music">Громкость музыки</span> <output id="music-volume-value" for="music-volume">25%</output></label><input id="music-volume" type="range" min="0" max="100" step="1" value="25" /></div>
       <div class="settings-row"><label for="music-spatial" data-i18n="pause.musicSpatial">Музыка из динамиков под потолком</label><input id="music-spatial" type="checkbox" checked /></div>
       <div class="settings-row"><label for="language" data-i18n="pause.language">Язык</label><select id="language" class="language-select"></select></div>

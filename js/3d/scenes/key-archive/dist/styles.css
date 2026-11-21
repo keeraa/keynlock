@@ -71,6 +71,7 @@ body.playing #world,body.playing #hud{cursor:none}
 .menu-card.compact{max-width:420px;padding:41px 40px 34px}.compact .primary-button{margin-top:3px}.compact p{margin:20px 0 26px}
 .settings-row{display:flex;align-items:center;justify-content:space-between;margin:17px 0;color:#c1b49a;font:12px Arial,sans-serif;gap:15px}
 .settings-row input[type=range]{width:114px;accent-color:#cfaf74}.settings-row input[type=checkbox]{accent-color:#cfaf74;width:17px;height:17px}
+.archive-music-controls{display:flex;align-items:center;gap:6px;min-width:0;max-width:230px}.archive-music-controls .music-controls__button{width:28px;height:28px;flex:none;border:1px solid #6d5d43;border-radius:50%;background:rgba(30,33,28,.7);color:#e0c78f;font-size:11px;line-height:1;padding:0;cursor:pointer}.archive-music-controls .music-controls__button:hover{background:#3a3326}.archive-music-controls .music-controls__toggle[aria-pressed=true]{background:#bd9b65;color:#1c241f}.archive-music-controls .music-controls__title{font-size:11px;color:#d8c9a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .text-button{border:0;background:none;color:#bdad8e;font:11px Arial,sans-serif;text-decoration:underline;text-underline-offset:4px;padding:9px 16px;margin-top:8px}
 .text-button:hover{color:#f1d199}
 .secondary-button{background:rgba(24,37,36,.8);color:#e0c597;border:1px solid rgba(204,170,105,.38);padding:13px 15px;font:10px Arial,sans-serif;letter-spacing:1.6px;transition:background .2s,border-color .2s}

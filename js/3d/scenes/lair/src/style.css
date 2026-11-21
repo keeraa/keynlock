@@ -11,3 +11,9 @@
   user-select:none;
 }
 #scene-interaction.command-pan{cursor:move!important}
+/* The shared music player (core/audio/music-controls.js): compact in the top bar, with volume in the gramophone's panel. */
+.music-controls{display:flex;align-items:center;gap:5px;min-width:0}.music-controls__button{width:28px;height:28px;flex:none;border:1px solid #68583e;border-radius:50%;background:rgba(30,36,30,.65);color:#d5b77b;font-size:10px;line-height:1;padding:0}.music-controls__button:hover{background:#342c21}.music-controls__toggle[aria-pressed=true]{background:#bd9b65;color:#1c241f}.music-controls__title{font-family:Georgia,serif;font-size:12px;color:#d9c7a3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.lair-music .music-controls__title{max-width:190px;margin-left:4px}
+.panel-music{margin-bottom:18px;flex-wrap:wrap;row-gap:10px}.panel-music[hidden]{display:none}.panel-music .music-controls__title{flex:1 1 140px}.panel-music .music-controls__volume{flex:1 1 100%;accent-color:#c1a26d}
+@media (max-width:1100px){.lair-music .music-controls__title{display:none}}
+@media (max-width:720px){.lair-music{display:none}}

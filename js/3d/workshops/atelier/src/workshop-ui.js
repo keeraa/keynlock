@@ -1,5 +1,6 @@
 /** Independent visual settings panel, collapsible workbench and shortcuts. */
 export function wireWorkshopUI({ cartoonFilter, navigation, restorationInput, collectionUI, $,
+  bindKeyboard = true,
   isEnabled = () => true,
   focusEasel = side => navigation.focusOn(side),
   leaveEaselFocus = () => navigation.leaveFocus() }) {
@@ -57,7 +58,7 @@ export function wireWorkshopUI({ cartoonFilter, navigation, restorationInput, co
   }
   toggle.addEventListener('click', () => setWorkbenchVisible(workbenchContent.hidden));
 
-  window.addEventListener('keydown', (event) => {
+  function handleKey(event) {
     if (!isEnabled()) return;
     if (collectionUI.isOpen()) return;
     if (navigation.isWallGallery()) {
@@ -104,6 +105,7 @@ export function wireWorkshopUI({ cartoonFilter, navigation, restorationInput, co
     if (event.code === 'Escape' && restorationInput.currentTool()) {
       event.preventDefault(); event.stopPropagation(); restorationInput.selectTool(restorationInput.currentTool());
     }
-  }, { capture: true });
-  return { setWorkbenchVisible, isWorkbenchVisible: () => !workbenchContent.hidden };
+  }
+  if (bindKeyboard) window.addEventListener('keydown', handleKey, { capture: true });
+  return { handleKey, setWorkbenchVisible, isWorkbenchVisible: () => !workbenchContent.hidden };
 }

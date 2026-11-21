@@ -228,11 +228,23 @@ inputSurface.addEventListener('pointerleave', () => { if (runtime.isActive() && 
 inputSurface.addEventListener('contextmenu', e => { if (runtime.isActive()) e.preventDefault(); });
 inputSurface.addEventListener('wheel', onWheel, { passive: false });
 $('reset').addEventListener('click', resetAll);
-window.addEventListener('keydown', e => {
-  if (!runtime.isActive()) return;
-  if (e.key === 'Escape') { closeRecipeBook(); selected = null; restoreAllSources(); setHover(null); updateHighlights(); }
-  if (e.key.toLowerCase() === 'r' || e.key.toLowerCase() === 'к') resetAll();
-});
+function handleKey(event) {
+  if (!runtime.isActive()) return false;
+  if (event.key === 'Escape') {
+    if (runtime.embedded && $('recipe-overlay').hidden) return false;
+    closeRecipeBook();
+    selected = null;
+    restoreAllSources();
+    setHover(null);
+    updateHighlights();
+    return true;
+  }
+  const key = event.key.toLowerCase();
+  if (key !== 'r' && key !== 'к') return false;
+  resetAll();
+  return true;
+}
+if (!runtime.embedded) window.addEventListener('keydown', handleKey);
 
 timer.reset();
 runtime.start(render, {
@@ -249,6 +261,7 @@ runtime.start(render, {
 
 // A small readable state API, published for the Lair and its browser tests.
 const alchemyApi = {
+  input: { handleKey },
   look: {profile:ALCHEMY_LOOK,getState:()=>({...look.getState(),backgroundBlur:blurBackground,
     sunbeams:sunbeams.getState(),filters:visuals.getState()}),
     setDirection:setLightDirection,setStrength:setLightStrength,

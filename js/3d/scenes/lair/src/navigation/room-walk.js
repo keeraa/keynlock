@@ -59,10 +59,9 @@ function moveWithCollisions(position, dx, dz, area) {
 
 /**
  * @param {{scene: THREE.Scene, camera: THREE.PerspectiveCamera,
- *   controls: import('three/addons/controls/OrbitControls.js').OrbitControls,
  *   interaction: HTMLElement, onExit: () => void, onInteract: () => void}} options
  */
-export function createRoomWalk({ scene, camera, controls, interaction, onExit, onInteract }) {
+export function createRoomWalk({ scene, camera, interaction, onExit, onInteract }) {
   const app = document.querySelector('#app');
   const toggle = document.querySelector('#room-walk-toggle');
   const hud = document.getElementById('room-walk-hud');
@@ -71,7 +70,6 @@ export function createRoomWalk({ scene, camera, controls, interaction, onExit, o
   const targetHint = document.getElementById('room-walk-target');
   const keys = new Set();
   const rotation = new THREE.Euler(0, 0, 0, 'YXZ');
-  const forward = new THREE.Vector3();
   const hasLock = () => document.pointerLockElement === interaction;
   let active = false;
   let hadLock = false;
@@ -97,7 +95,6 @@ export function createRoomWalk({ scene, camera, controls, interaction, onExit, o
   function start() {
     active = true;
     refreshObstacles();
-    controls.enabled = false;
     camera.position.set(.25, .0385 + eyeHeight, ROOM_END - 2.22);
     rotation.set(0, 0, 0);
     camera.quaternion.setFromEuler(rotation);
@@ -135,9 +132,6 @@ export function createRoomWalk({ scene, camera, controls, interaction, onExit, o
     clearInput();
     setTarget(null);
     if (hasLock()) document.exitPointerLock();
-    camera.getWorldDirection(forward);
-    controls.target.copy(camera.position).addScaledVector(forward, Math.max(3, controls.minDistance));
-    controls.enabled = true;
     updateInterface();
   }
 
@@ -179,20 +173,20 @@ export function createRoomWalk({ scene, camera, controls, interaction, onExit, o
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) clearInput();
   });
-  document.addEventListener('keydown', event => {
-    if (!active || event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
+  function handleKey(event) {
+    if (event.altKey || event.ctrlKey || event.metaKey) return false;
     if (event.key === 'Escape') {
       event.preventDefault();
       onExit();
     } else if (movementKeys.has(event.code) || sprintKeys.has(event.code)) {
       event.preventDefault();
       keys.add(event.code);
-    } else if (event.code === 'KeyE' && !event.repeat) {
+    } else if (event.code === 'KeyE') {
       event.preventDefault();
-      onInteract();
-    }
-  }, true);
-  document.addEventListener('keyup', event => keys.delete(event.code));
+      if (!event.repeat) onInteract();
+    } else return false;
+    return true;
+  }
 
   function update(delta) {
     const forward = Number(keys.has('KeyW') || keys.has('ArrowUp')) - Number(keys.has('KeyS') || keys.has('ArrowDown'));
@@ -206,5 +200,7 @@ export function createRoomWalk({ scene, camera, controls, interaction, onExit, o
       (-right * Math.sin(yaw) - forward * Math.cos(yaw)) * step, area);
   }
 
-  return { start, stop, resize, update, refreshObstacles, setTarget, isActive: () => active };
+  return { start, stop, resize, update, refreshObstacles, setTarget, handleKey,
+    releaseKey: code => keys.delete(code),
+  };
 }

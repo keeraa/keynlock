@@ -257,7 +257,7 @@ restorationInput = createRestorationInput({
   // source iframe is only a retained model/state controller, never a viewport.
   inputElement: embedded ? lair?.interactionElement : renderer.domElement,
   interactionCamera: embedded ? lair?.camera : camera,
-  roomControls: embedded ? lair?.controls : null,
+  setStrokeInputBlocked: lair?.atelier.setStrokeInputBlocked,
   onPaintingFocus: embedded ? focusLairArtwork : (side) => navigation.focusOn(side),
   isInteractive: isRestorationActive,
   embeddedEditing: embedded,
@@ -293,10 +293,12 @@ restorationInput = createRestorationInput({
   $,
 });
 workshopUI = wireWorkshopUI({ cartoonFilter, navigation, restorationInput, collectionUI, $,
+  bindKeyboard: !embedded,
   isEnabled: () => isRestorationActive()
     && (!embedded || !lair?.atelier.galleryActive),
   focusEasel: embedded ? focusLairArtwork : side => navigation.focusOn(side),
   leaveEaselFocus: embedded ? leaveLairArtworkFocus : () => navigation.leaveFocus() });
+if (embedded) publishWorkshopApi('atelier', { input: { handleKey: workshopUI.handleKey } });
 exhibition = createWallExhibitionController({ paintings, playerProgress, wallGallery, collectionUI,
   getNavigation: () => navigation, getWorkshopUI: () => workshopUI, showToast, $ });
 exhibition.bind();
@@ -570,6 +572,7 @@ if (embedded) {
       enter() { inRoomActive = true; },
       exit() {
         inRoomActive = false;
+        restorationInput.finishStroke();
         restorationInput.hide();
         restorationInput.clearUV();
         void flushAtelier();

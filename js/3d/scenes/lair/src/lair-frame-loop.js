@@ -1,7 +1,7 @@
 import { Clock } from 'three';
 
 export function startLairFrames({ scene, camera, controls, renderer, rendererHost, atelierFilter,
-  room, dayNight, zoneTransitions, zoneInteraction, roomWalk, atelierView, workshopOverlay,
+  room, dayNight, zoneTransitions, zoneInteraction, cameraInput, atelierView, workshopOverlay,
   visualUI, performancePanel }) {
   const clock = new Clock();
   const drawn = { triangles: 0, calls: 0 };
@@ -30,11 +30,9 @@ export function startLairFrames({ scene, camera, controls, renderer, rendererHos
     const frameDelta = clock.getDelta();
     const delta = Math.min(frameDelta, .05);
     dayNight.update(frameDelta);
-    zoneTransitions.updateApproach(delta);
-    if (roomWalk.isActive()) roomWalk.update(delta);
-    else if (!atelierView.updateFlight(now) && zoneTransitions.current() !== 'alchemy') controls.update();
+    cameraInput.update(delta, now);
     rendererHost.stepWorldRuntime(now);
-    atelierView.updateGalleryCamera();
+    cameraInput.syncGalleryCamera();
 
     for (const update of room.animated) update(clock.elapsedTime);
     const currentZone = zoneTransitions.current();

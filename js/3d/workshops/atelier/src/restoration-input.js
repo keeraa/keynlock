@@ -5,7 +5,7 @@ export function createRestorationInput({ THREE, renderer, camera, controls, scen
   onWallArtworkClick = () => {}, onWallArtworkHover = () => {},
   onPaintingFocus = (side) => navigation.focusOn(side),
   inputElement = renderer.domElement, interactionCamera = camera,
-  roomControls = null,
+  setStrokeInputBlocked = () => {},
   isInteractive = () => true, embeddedEditing = false, $ }) {
   let activeTool = null;
   let stroke = null;
@@ -112,7 +112,7 @@ export function createRestorationInput({ THREE, renderer, camera, controls, scen
     if (!stroke || (event && event.pointerId !== stroke.pointerId)) return false;
     const finished = stroke;
     stroke = null;
-    if (roomControls) roomControls.enabled = true;
+    setStrokeInputBlocked(false);
     toolCursor.classList.remove('is-working');
     try { inputElement.releasePointerCapture(finished.pointerId); } catch {}
     if (finished.affected) onStrokeFinished();
@@ -147,7 +147,7 @@ export function createRestorationInput({ THREE, renderer, camera, controls, scen
         outside: false, lastTime: event.timeStamp, lastAngle: null, lastHudUpdate: event.timeStamp };
       // The Lair's OrbitControls sees pointerdown first. Suppress the camera
       // during a brush stroke, then restore its free orbit on pointerup.
-      if (roomControls) roomControls.enabled = false;
+      setStrokeInputBlocked(true);
       stroke.affected = surface.apply(activeTool, hit.uv);
       inputElement.setPointerCapture(event.pointerId);
       if (activeTool === 'reagent' && !stroke.affected) {

@@ -153,7 +153,7 @@ export function createZoneTransitions({
     atelierView.onReady();
   }
 
-  function applyWorldAlchemyLook(enabled) {
+  function setRoomLightsForAlchemy(enabled) {
     for (const {light,intensity,visible} of roomLightDefaults) {
       light.intensity = intensity;
       // The laboratory has its own complete lighting rig. Leaving the Lair's
@@ -161,6 +161,10 @@ export function createZoneTransitions({
       // and makes every lit material evaluate unnecessary light sources.
       light.visible = !enabled && visible;
     }
+  }
+
+  function applyWorldAlchemyLook(enabled) {
+    setRoomLightsForAlchemy(enabled);
     // The original lab is much closer to the camera than the full Lair. Keep
     // its pixel cost bounded on retina screens, without lowering other rooms.
     const pixelRatio = Math.min(window.devicePixelRatio || 1, enabled ? 1.35 : 1.75);
@@ -185,6 +189,32 @@ export function createZoneTransitions({
       renderer.shadowMap.autoUpdate = originalRoomRenderLook.shadowAutoUpdate;
     }
     renderer.shadowMap.needsUpdate = true;
+  }
+
+  /**
+   * Entering a workshop switches the room's lights for the workshop's own, and
+   * Three.js keys every material's shader on the number and kind of lights. The
+   * first visit used to recompile every material in the scene at once (seconds
+   * of a frozen screen). This compiles those variants up front, during the
+   * initial loading screen: the light state is read when compileAsync() is
+   * called, so the lights are switched only for that call and restored at once.
+   */
+  async function precompileWorkshopLighting() {
+    if (!renderer.compileAsync) return;
+    const lit = inRoomWorkshop && workshopOverlay.isReady(inRoomWorkshop) ? inRoomWorkshop : null;
+    for (const id of ['alchemy', 'atelier']) {
+      if (!workshopOverlay.isReady(id) || id === lit) continue;
+      if (id === 'alchemy') setRoomLightsForAlchemy(true);
+      rendererHost.setWorldLighting(id);
+      let compiled;
+      try {
+        compiled = renderer.compileAsync(scene, camera);
+      } finally {
+        if (id === 'alchemy') setRoomLightsForAlchemy(inRoomWorkshop === 'alchemy');
+        rendererHost.setWorldLighting(lit);
+      }
+      await compiled;
+    }
   }
 
   function setInRoomWorkshop(id) {
@@ -324,6 +354,7 @@ export function createZoneTransitions({
 
   return {
     open: openZone, reset: resetView, onWorkshopReady, resizeCamera, updateApproach,
+    precompileWorkshopLighting,
     manipulateAlchemy, resetAlchemyCamera,
     current: () => currentZone,
     isTransitioning: () => transitioning,

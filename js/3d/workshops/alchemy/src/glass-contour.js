@@ -1,5 +1,8 @@
 import * as THREE from 'three';
 
+/** Outline tube resolution: segments along the silhouette, sides around it, rim segments. */
+const OUTLINE_ALONG = 56, OUTLINE_AROUND = 6, RIM_SEGMENTS = 64;
+
 // The old vertical tube strokes would show through transparent vessels from
 // above. Fade only those strokes, replacing them with a real 3D silhouette.
 export function sideContourVisibility(elevation) {
@@ -64,15 +67,16 @@ export function createGlassContour(parent, profile, rimRadius, rimY, { thickness
       new THREE.Vector3(side * radius * 1.008, height, 0)), false, 'centripetal');
     // The solid-object outline shader uses screen-space pixels. At the
     // default tabletop camera a .007 world-radius tube reads as about 1 px.
-    // Slightly fuller 10-sided tubes stay continuous at shallow camera angles.
-    const line = new THREE.Mesh(new THREE.TubeGeometry(curve, 72, .007 * thicknessScale, 10, false), material);
+    // Six sides still keep it continuous at shallow camera angles (ten were
+    // indistinguishable at this size and cost 40 % more triangles).
+    const line = new THREE.Mesh(new THREE.TubeGeometry(curve, OUTLINE_ALONG, .007 * thicknessScale, OUTLINE_AROUND, false), material);
     line.renderOrder = 11;
     line.castShadow = line.receiveShadow = false;
     group.add(line);
     return { curve, line };
   });
   const rimMaterial = material.clone();
-  const rim = drawRim ? new THREE.Mesh(new THREE.TorusGeometry(rimRadius, .0064 * thicknessScale, 10, 80), rimMaterial) : null;
+  const rim = drawRim ? new THREE.Mesh(new THREE.TorusGeometry(rimRadius, .0064 * thicknessScale, OUTLINE_AROUND, RIM_SEGMENTS), rimMaterial) : null;
   if (rim) {
     rim.position.y = rimY + .006;
     rim.rotation.x = Math.PI / 2;
@@ -118,11 +122,11 @@ export function createGlassContour(parent, profile, rimRadius, rimY, { thickness
       const radius = .007 * width * thicknessScale;
       for (const { curve, line } of lines) {
         line.geometry.dispose();
-        line.geometry = new THREE.TubeGeometry(curve, 72, radius, 10, false);
+        line.geometry = new THREE.TubeGeometry(curve, OUTLINE_ALONG, radius, OUTLINE_AROUND, false);
       }
       if (rim) {
         rim.geometry.dispose();
-        rim.geometry = new THREE.TorusGeometry(rimRadius, radius * .92, 10, 80);
+        rim.geometry = new THREE.TorusGeometry(rimRadius, radius * .92, OUTLINE_AROUND, RIM_SEGMENTS);
       }
     }
   };

@@ -281,7 +281,9 @@ runtime.start(render, {
 // A small readable state API, published for the Lair and its browser tests.
 const alchemyApi = {
   input: { handleKey },
-  look: {profile:ALCHEMY_LOOK,getState:()=>({...look.getState(),backgroundBlur:blurBackground,
+  look: {profile:ALCHEMY_LOOK,
+    // Wood, metal, cork and wall finishes: the Lair applies its gouache settings to these.
+    paintedMaterials:()=>[iron,oldBrass,brass,polishedBrass,wood,darkWood,blackWood,corkMat,wallMaterial],getState:()=>({...look.getState(),backgroundBlur:blurBackground,
     sunbeams:sunbeams.getState(),filters:visuals.getState()}),
     setDirection:setLightDirection,setStrength:setLightStrength,
     setBackgroundBlur,setSunbeam,setFilter:visuals.set},

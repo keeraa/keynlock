@@ -5,7 +5,7 @@ import { createWorkshopLighting } from '../rendering/workshop-lighting.js';
 import { zoneDefinitions, zoneOrder } from './zone-definitions.js';
 
 export function createZoneTransitions({
-  scene, camera, controls, canvas, interaction, renderer, rendererHost, atelierFilter,
+  scene, camera, controls, canvas, interaction, renderer, rendererHost,
   workshopOverlay, atelierView, visualUI, homePosition, homeTarget, roomMinDistance,
   roomLights, cameraInput,
 }) {
@@ -13,7 +13,7 @@ export function createZoneTransitions({
   const panel = document.querySelector('#zone-panel');
   const desiredPosition = new THREE.Vector3();
   const desiredTarget = new THREE.Vector3();
-  const workshopLighting = createWorkshopLighting({ scene, camera, canvas, renderer, rendererHost, atelierFilter, roomLights });
+  const workshopLighting = createWorkshopLighting({ scene, camera, canvas, renderer, rendererHost, roomLights });
   const zoneButtons = document.querySelectorAll('[data-zone]');
   let desiredFov = 47;
   let roomFov = 47;

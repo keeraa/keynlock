@@ -86,8 +86,11 @@ export function createMaterials() {
   const pigment = { saturation: { value: 1 }, contrast: { value: 1 } };
   const painted = ['walnut', 'agedWood', 'darkWood', 'roomTimber', 'ash', 'oak', 'plaster', 'galleryPlaster',
     'floor', 'floorAlternate', 'ceiling', 'alchemyTile', 'wallpaperOchre', 'wallpaperBotanical', 'wallpaperDamask'];
-  for (const name of painted) {
-    const material = materials[name];
+  /** Gouache saturation and contrast in the material's own shader, no texture regeneration. */
+  const adopted = new WeakSet();
+  function paint(material) {
+    if (!material || adopted.has(material) || !(material.isMeshStandardMaterial || material.isMeshPhysicalMaterial)) return;
+    adopted.add(material);
     const oldCompile = material.onBeforeCompile;
     material.onBeforeCompile = function (shader, ...args) {
       oldCompile.call(this, shader, ...args);
@@ -104,8 +107,11 @@ export function createMaterials() {
         void main() {
       `);
     };
-    material.customProgramCacheKey = () => 'keynlock-painted-v1';
+    const oldKey = material.customProgramCacheKey.bind(material);
+    material.customProgramCacheKey = () => `${oldKey()}|keynlock-painted-v1`;
+    material.needsUpdate = true;
   }
+  for (const name of painted) paint(materials[name]);
   const scaledTextures = [walnutMap, ashMap, oakMap, plasterMap, timberMap,
     floorMap, ceilingMap, ochreMap, botanicalMap, damaskMap];
   const originalRepeats = scaledTextures.map(map => map.repeat.clone());
@@ -134,7 +140,12 @@ export function createMaterials() {
       else base.material.color.copy(base.color);
     });
   }
-  return { materials, load, textureLoader, visual: { setPaintSettings, setMetalSettings } };
+  /**
+   * A workshop's painted surfaces (wood, metal, walls; never the paintings)
+   * follow the same gouache saturation and contrast as the room.
+   */
+  const adoptPaintedMaterials = list => { for (const material of list ?? []) paint(material); };
+  return { materials, load, textureLoader, visual: { setPaintSettings, setMetalSettings, adoptPaintedMaterials } };
 }
 
 export function canvasTexture(draw, width = 1024, height = 1024) {

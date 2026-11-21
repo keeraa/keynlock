@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { createInkOutlines } from '../rendering/ink-outlines.js';
-import { t } from '../i18n.js';
 
 const STORAGE_KEY = 'keynlock-lair-visual-v1';
 const DEFAULTS = Object.freeze({
@@ -8,41 +7,45 @@ const DEFAULTS = Object.freeze({
   'metal-finish': 'original', 'metal-roughness': 50, 'metal-metalness': 65,
   wallpaper: 'tile', 'outline-enabled': true, 'outline-width': 65,
   'dust-enabled': true, 'dust-density': 65, 'window-light': 100, 'night-lighting': false,
-  'atelier-toon-enabled': true, 'atelier-toon-strength': 80, 'atelier-toon-bands': 4,
-  'atelier-ink-enabled': true, 'atelier-ink-strength': 70, 'atelier-ink-width': 1,
-  'atelier-blur-enabled': true, 'atelier-blur-strength': 72, 'atelier-blur-radius': 6.5,
 });
 
 /** Reuse Village Engine's ink silhouette shader on room objects of manageable size. */
 export function createRoomOutlines(scene) {
   const ink = createInkOutlines(THREE, { enabled: true, color: 0x2b241d, screenWidth: .0031 });
-  const targetNames = [
-    // The Atelier and the laboratory are mounted from js/3d/workshops with their own look.
-    'main-arched-window', 'planning-main-table', 'workbench-right-of-alchemy', 'gramophone-table',
-  ];
-  for (const name of targetNames) {
-    const object = scene.getObjectByName(name);
-    if (object) ink.attach(object, { registrationOffset: [.00008, -.00011], strokeScale: .65 });
-  }
   const shells = [];
-  scene.traverse(object => {
-    if (object.userData?.inkOutlineShell && object.isMesh) shells.push(object);
-  });
+  let enabled = true, width = .65;
+  const applyShell = shell => {
+    shell.visible = enabled;
+    if (shell.material?.uniforms?.strokeScale) shell.material.uniforms.strokeScale.value = width;
+  };
+  /** Outline these named objects too, with the current settings (the Atelier's furniture loads later). */
+  function attach(names) {
+    for (const name of names) {
+      const object = scene.getObjectByName(name);
+      if (!object || !ink.attach(object, { registrationOffset: [.00008, -.00011], strokeScale: .65 })) continue;
+      object.traverse(child => {
+        if (child.userData?.inkOutlineShell && child.isMesh && !shells.includes(child)) {
+          shells.push(child);
+          applyShell(child);
+        }
+      });
+    }
+  }
+  attach(['main-arched-window', 'planning-main-table', 'workbench-right-of-alchemy', 'gramophone-table']);
   return {
     shells,
-    setEnabled(value) { shells.forEach(shell => { shell.visible = Boolean(value); }); },
+    attach,
+    setEnabled(value) { enabled = Boolean(value); shells.forEach(applyShell); },
     setWidth(percent) {
-      const width = THREE.MathUtils.clamp(Number(percent) || 0, 20, 140) / 100;
-      for (const shell of shells) if (shell.material?.uniforms?.strokeScale) {
-        shell.material.uniforms.strokeScale.value = width;
-      }
+      width = THREE.MathUtils.clamp(Number(percent) || 0, 20, 140) / 100;
+      shells.forEach(applyShell);
     },
     dispose() { ink.dispose(); },
   };
 }
 
 /** Compact live materials lab. All controls affect materials, geometry or Three.js particles. */
-export function mountVisualSettings({ visual, room, setNight = null, outlines, grain, atelierFilter, onOpen = () => {} }) {
+export function mountVisualSettings({ visual, room, setNight = null, outlines, grain, onOpen = () => {} }) {
   const panel = document.querySelector('#lair-visual-panel');
   const toggle = document.querySelector('#lair-visual-toggle');
   const inputs = [...document.querySelectorAll('[data-visual-setting]')];
@@ -72,16 +75,7 @@ export function mountVisualSettings({ visual, room, setNight = null, outlines, g
       if (input.type === 'checkbox') input.checked = state[input.id];
       else input.value = state[input.id];
       const output = document.querySelector(`#${input.id}-output`);
-      if (output) {
-        const unit = input.id === 'atelier-toon-bands' ? ' ' + t('ступ.')
-          : input.id === 'atelier-ink-width' || input.id === 'atelier-blur-radius' ? ' px' : '%';
-        output.textContent = `${state[input.id]}${unit}`;
-      }
-      if (input.id.startsWith('atelier-') && input.type === 'range') {
-        const group = input.id.startsWith('atelier-toon-') ? 'atelier-toon-enabled'
-          : input.id.startsWith('atelier-ink-') ? 'atelier-ink-enabled' : 'atelier-blur-enabled';
-        input.disabled = !state[group];
-      }
+      if (output) output.textContent = `${state[input.id]}%`;
     }
     papers.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.wallpaper === state.wallpaper)));
   };
@@ -99,20 +93,6 @@ export function mountVisualSettings({ visual, room, setNight = null, outlines, g
     setNight?.(state['night-lighting']);
     outlines.setEnabled(state['outline-enabled']);
     outlines.setWidth(state['outline-width']);
-    atelierFilter?.setOptions({
-      toon: state['atelier-toon-enabled'],
-      toonStrength: state['atelier-toon-strength'] / 100,
-      bands: state['atelier-toon-bands'],
-      outline: state['atelier-ink-enabled'],
-      outlineStrength: state['atelier-ink-strength'] / 100,
-      outlineWidth: state['atelier-ink-width'],
-      backgroundBlur: state['atelier-blur-enabled'] ? state['atelier-blur-strength'] / 100 : 0,
-      backgroundRadius: state['atelier-blur-radius'],
-      // The Lair's physical wall is ~1.3 m behind the focus plane, versus
-      // ~4 m in the standalone Atelier. Keep both shader passes in sync.
-      backgroundBlurNear: .25,
-      backgroundBlurFar: 1.25,
-    });
     grain.style.opacity = `${state['paint-grain'] / 100}`;
     refreshControls();
   };

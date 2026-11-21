@@ -1,50 +1,8 @@
 import * as THREE from 'three';
 import { WORKSHOPS } from '../workshops/workshop-overlay.js';
 import { t } from '../i18n.js';
-import { ALCHEMY_LOOK } from '@keynlock/alchemy/src/look/alchemy-look.js';
-import { ALCHEMY_Z, ATELIER_Z, WORKBENCH_Z } from '../room-layout.js';
-
-export const ATELIER_EASELS = { position: [1.56, 3.22, ATELIER_Z], target: [-7.05, 2.48, ATELIER_Z] };
-
-const zoneDefinitions = {
-  atelier: {
-    number: '01', kicker: t('АТЕЛЬЕ САЙ'), title: t('Реставрация'),
-    description: t('Оригинальное Ателье цвета размещено вдоль левой стены логова: 12 художественных направлений, 30 рам, действующие инструменты реставрации.'),
-    status: t('Мольберты и картины находятся в общей 3D-сцене логова.'),
-    link: WORKSHOPS.atelier.sourceUrl,
-    camera: ATELIER_EASELS.position, target: ATELIER_EASELS.target,
-  },
-  planning: {
-    number: '02', kicker: t('БАЗА КОМАНДЫ'), title: t('Карта и дела'),
-    description: t('Карта каналов и кварталов Киенлока, заметки о заказах и стол, за которым Кай, Сай и Тик готовят очередную вылазку. Сюда команда возвращается с добычей.'),
-    status: t('Штаб связывает мастерские, коллекцию и будущие сюжетные задания.'),
-    link: null, camera: [.15, 3.32, 7.75], target: [0, 1.27, -.7],
-  },
-  workbench: {
-    number: '03', kicker: t('МАСТЕРСКАЯ ТИКА'), title: t('Верстак'),
-    description: t('Справа от алхимического стола, вдоль зелёной стены, стоит отдельный верстак с тисками, заготовками, замочными цилиндрами и инструментальной доской.'),
-    status: t('Полная исходная мастерская: опиловка, сборка замка, песочница механизмов.'),
-    link: WORKSHOPS.workbench.sourceUrl,
-    camera: [1.22, 2.89, WORKBENCH_Z], target: [7.40, 1.42, WORKBENCH_Z],
-  },
-  alchemy: {
-    number: '04', kicker: t('СОСТАВЫ И РЕАГЕНТЫ'), title: t('Алхимия'),
-    description: t('Вся правая стена от пола до потолка покрыта зелёной гуашевой плиткой. У стены стоит алхимический стол с двумя ярусами, семью реагентами, пигментами, стеклом и свечами; над ним рецепт и часы.'),
-    status: t('Исходная лаборатория: переливание, физика жидкостей, рецепты и все настройки.'),
-    link: WORKSHOPS.alchemy.sourceUrl,
-    // Fallback only. The loaded source laboratory supplies its actual orbit
-    // position, pivot and 37° field of view when entering this workshop.
-    camera: [3.08, 2.45, ALCHEMY_Z], target: [6.99, 1.45, ALCHEMY_Z],
-  },
-  gramophone: {
-    number: '05', kicker: t('СКРЫТАЯ КОЛЛЕКЦИЯ'), title: t('Музыка в Логове'),
-    description: t('Старый граммофон хранит запрещённые иностранные пластинки. Для будущего саундтрека отобраны три исполнения ноктюрнов Шопена: Op. 9 № 2 и два варианта Op. 9 № 1.'),
-    status: t('Фонотека задумана; сами записи пока не включены в опубликованную сцену.'),
-    link: null, camera: [1.95, 2.95, 3.60], target: [1.96, 1.83, -3.71],
-  },
-};
-
-const zoneOrder = ['atelier', 'planning', 'workbench', 'alchemy', 'gramophone'];
+import { createWorkshopLighting } from '../rendering/workshop-lighting.js';
+import { zoneDefinitions, zoneOrder } from './zone-definitions.js';
 
 export function createZoneTransitions({
   scene, camera, controls, canvas, interaction, renderer, rendererHost, atelierFilter,
@@ -55,15 +13,8 @@ export function createZoneTransitions({
   const panel = document.querySelector('#zone-panel');
   const desiredPosition = new THREE.Vector3();
   const desiredTarget = new THREE.Vector3();
-  const roomLightDefaults = roomLights.map(light => ({ light, intensity: light.intensity, visible: light.visible }));
-  const originalRoomRenderLook = {
-    outputColorSpace: renderer.outputColorSpace,
-    toneMapping: renderer.toneMapping,
-    toneMappingExposure: renderer.toneMappingExposure,
-    shadowEnabled: renderer.shadowMap.enabled,
-    shadowType: renderer.shadowMap.type,
-    shadowAutoUpdate: renderer.shadowMap.autoUpdate,
-  };
+  const workshopLighting = createWorkshopLighting({ scene, camera, canvas, renderer, rendererHost, atelierFilter, roomLights });
+  const zoneButtons = document.querySelectorAll('[data-zone]');
   let desiredFov = 47;
   let roomFov = 47;
   let currentZone = null;
@@ -134,7 +85,7 @@ export function createZoneTransitions({
         }
       }
       if (inRoomWorkshop === 'alchemy') {
-        applyWorldAlchemyLook(true);
+        workshopLighting.setAlchemyLook(true);
         rendererHost.setWorldLighting('alchemy');
       }
       return;
@@ -154,76 +105,12 @@ export function createZoneTransitions({
     atelierView.onReady();
   }
 
-  function setRoomLightsForAlchemy(enabled) {
-    for (const {light,intensity,visible} of roomLightDefaults) {
-      light.intensity = intensity;
-      // The laboratory has its own complete lighting rig. Leaving the Lair's
-      // six ambient, directional and point lights active doubles the brightness
-      // and makes every lit material evaluate unnecessary light sources.
-      light.visible = !enabled && visible;
-    }
-  }
-
-  function applyWorldAlchemyLook(enabled) {
-    setRoomLightsForAlchemy(enabled);
-    // The original lab is much closer to the camera than the full Lair. Keep
-    // its pixel cost bounded on retina screens, without lowering other rooms.
-    const pixelRatio = Math.min(window.devicePixelRatio || 1, enabled ? 1.35 : 1.75);
-    if (Math.abs(renderer.getPixelRatio() - pixelRatio) > .001) {
-      renderer.setPixelRatio(pixelRatio);
-      atelierFilter?.resize(canvas.clientWidth,canvas.clientHeight,pixelRatio);
-    }
-    if (enabled) {
-      // Both scenes already use ACES/sRGB. Changing the global shadow-map type
-      // here would invalidate every material program in the large shared scene
-      // and produce a multi-second shader compilation stall on workshop entry.
-      renderer.toneMappingExposure = ALCHEMY_LOOK.renderer.exposure;
-      // The original laboratory caches its mostly static 2048px shadow atlas.
-      // Avoid re-rendering all workshop shadows during every Lair frame.
-      renderer.shadowMap.autoUpdate = false;
-    } else {
-      renderer.outputColorSpace = originalRoomRenderLook.outputColorSpace;
-      renderer.toneMapping = originalRoomRenderLook.toneMapping;
-      renderer.toneMappingExposure = originalRoomRenderLook.toneMappingExposure;
-      renderer.shadowMap.enabled = originalRoomRenderLook.shadowEnabled;
-      renderer.shadowMap.type = originalRoomRenderLook.shadowType;
-      renderer.shadowMap.autoUpdate = originalRoomRenderLook.shadowAutoUpdate;
-    }
-    renderer.shadowMap.needsUpdate = true;
-  }
-
-  /**
-   * Entering a workshop switches the room's lights for the workshop's own, and
-   * Three.js keys every material's shader on the number and kind of lights. The
-   * first visit used to recompile every material in the scene at once (seconds
-   * of a frozen screen). This compiles those variants up front, during the
-   * initial loading screen: the light state is read when compileAsync() is
-   * called, so the lights are switched only for that call and restored at once.
-   */
-  async function precompileWorkshopLighting() {
-    if (!renderer.compileAsync) return;
-    const lit = inRoomWorkshop && workshopOverlay.isReady(inRoomWorkshop) ? inRoomWorkshop : null;
-    for (const id of ['alchemy', 'atelier']) {
-      if (!workshopOverlay.isReady(id) || id === lit) continue;
-      if (id === 'alchemy') setRoomLightsForAlchemy(true);
-      rendererHost.setWorldLighting(id);
-      let compiled;
-      try {
-        compiled = renderer.compileAsync(scene, camera);
-      } finally {
-        if (id === 'alchemy') setRoomLightsForAlchemy(inRoomWorkshop === 'alchemy');
-        rendererHost.setWorldLighting(lit);
-      }
-      await compiled;
-    }
-  }
-
   function setInRoomWorkshop(id) {
     if (inRoomWorkshop === id) return;
     rendererHost.setWorldWorkshop(null);
     const ready = id && workshopOverlay.isReady(id);
     if (id === 'alchemy' || inRoomWorkshop === 'alchemy') {
-      applyWorldAlchemyLook(id === 'alchemy' && ready);
+      workshopLighting.setAlchemyLook(id === 'alchemy' && ready);
     }
     inRoomWorkshop = id;
     workshopOverlay.setInRoomWorkshopId(id);
@@ -233,6 +120,14 @@ export function createZoneTransitions({
     interaction.style.cursor = 'grab';
     rendererHost.setWorldLighting(ready ? id : null);
     rendererHost.setWorldWorkshop(id);
+  }
+
+  function selectZoneButtons(id) {
+    for (const button of zoneButtons) {
+      const selected = button.dataset.zone === id;
+      button.classList.toggle('active', selected);
+      if (button.closest('.zone-nav')) button.setAttribute('aria-pressed', String(selected));
+    }
   }
 
   function openZone(id) {
@@ -263,10 +158,7 @@ export function createZoneTransitions({
     // Source geometry remains visible in the Lair during this camera flight.
     // The existing Atelier UI takes over only after the original has initialized.
     panel.hidden = hasOriginal;
-    document.querySelectorAll('[data-zone]').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.zone === id);
-      if (btn.closest('.zone-nav')) btn.setAttribute('aria-pressed', String(btn.dataset.zone === id));
-    });
+    selectZoneButtons(id);
     // Keep the room visible while the camera approaches the laboratory.
     if (id === 'alchemy') pendingWorkshopOpen = id;
     else if (hasOriginal && id !== 'atelier') {
@@ -282,10 +174,7 @@ export function createZoneTransitions({
     interaction.style.cursor = 'grab';
     panel.hidden = true;
     currentZone = null;
-    document.querySelectorAll('[data-zone]').forEach(button => {
-      button.classList.remove('active');
-      if (button.closest('.zone-nav')) button.setAttribute('aria-pressed', 'false');
-    });
+    selectZoneButtons(null);
   }
 
   function resetView() {
@@ -345,7 +234,7 @@ export function createZoneTransitions({
     transitioning = false;
     if (currentZone !== 'atelier' && currentZone !== 'alchemy') rendererHost.setWorldLighting(null);
   });
-  document.querySelectorAll('[data-zone]').forEach(button => {
+  zoneButtons.forEach(button => {
     button.addEventListener('click', event => {
       event.stopPropagation();
       openZone(button.dataset.zone);
@@ -357,7 +246,7 @@ export function createZoneTransitions({
 
   return {
     open: openZone, reset: resetView, onWorkshopReady, resizeCamera, updateApproach,
-    precompileWorkshopLighting,
+    precompileWorkshopLighting: () => workshopLighting.precompile(workshopOverlay.isReady, () => inRoomWorkshop),
     manipulateAlchemy, resetAlchemyCamera,
     current: () => currentZone,
     title: id => zones[id]?.title,

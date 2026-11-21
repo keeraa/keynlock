@@ -26,15 +26,15 @@
 
 ## Устройство `src/`
 
-`main.js` только связывает части. Каждая папка отвечает за одно:
+`main.js` создаёт сцену и подключает её части. `lair-frame-loop.js` задаёт порядок обновления камеры, симуляций мастерских, анимаций и отрисовки кадра.
 
 | Папка | Что внутри | Может зависеть от |
 | --- | --- | --- |
 | `room/` | Геометрия и материалы комнаты: `build.js` собирает её из `kit.js`, `shell.js`, `window.js`, `planning.js`, `workbench-furniture.js`, `details.js`; `materials.js`, `lighting.js`, `ambient-particles.js` | только `i18n.js`, three.js и пакеты мастерских (текстуры) |
-| `rendering/` | Общий рендерер (`shared-renderer-host.js`), мир мастерских (`world-workshops.js`), контуры (`ink-outlines.js`) | ничего из логова |
+| `rendering/` | Общий рендерер (`shared-renderer-host.js`), мир мастерских (`world-workshops.js`), настройки света и прогрев шейдеров мастерских (`workshop-lighting.js`), контуры (`ink-outlines.js`) | общие координаты и настройки освещения мастерских |
 | `workshops/` | Подключение мастерских к комнате: `atelier-in-room.js`, `alchemy-in-room.js`, камера у мольбертов и стена картин (`atelier-view.js`), встроенный документ верстака и экраны загрузки (`workshop-overlay.js`) | пакеты мастерских, `core/host` и `i18n.js`; не другие папки логова |
-| `navigation/` | Полёты камеры между зонами (`zone-transitions.js`) | `workshops/` |
-| `ui/` | Экран загрузки, панель «Визуал» | `rendering/` |
+| `navigation/` | Данные зон (`zone-definitions.js`), переходы (`zone-transitions.js`), выбор объекта мышью и прицелом (`zone-interaction.js`), прогулка (`room-walk.js`) | `workshops/`, `rendering/`, общие координаты |
+| `ui/` | Экран загрузки, панель «Визуал», статистика кадра, переключатель звукового окружения | `rendering/`, `i18n.js` |
 | `locales/`, `i18n.js` | Переводы интерфейса логова | — |
 
 Размеры зала и координаты мастерских хранятся в общем модуле `room-layout.js`. Геометрия, размещение мастерских и навигация используют эти данные напрямую. Границы папок проверяет ESLint (`js/3d/eslint.config.js`).

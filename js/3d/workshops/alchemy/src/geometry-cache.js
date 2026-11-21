@@ -35,11 +35,14 @@ export function createGeometryCache(THREE) {
     // (+Z). Move it behind every post, valve, cage and burner component (-Z).
     cylinder: (top, bottom, height, segments = 32) => get(`cylinder:${top}:${bottom}:${height}:${segments}`,
       () => new THREE.CylinderGeometry(top, bottom, height, segments, 1, false, Math.PI)),
-    torus: (radius, tube, segments = 64) => get(`torus:${radius}:${tube}:${segments}`,
+    // Small rings and flasks are seen from a tabletop distance: 40 x 6 ring
+    // segments and 48 around a flask read the same as 64 x 8 and 64, with
+    // about 40 % fewer triangles (the lab was ~74 % of the Lair's triangles).
+    torus: (radius, tube, segments = 40) => get(`torus:${radius}:${tube}:${segments}`,
       // Rings are rotated upright by the caller; their UV joins stay at -Z.
-      () => new THREE.TorusGeometry(radius, tube, 8, segments).rotateZ(-Math.PI / 2)),
+      () => new THREE.TorusGeometry(radius, tube, 6, Math.min(segments, 40)).rotateZ(-Math.PI / 2)),
     glass: (radius, height, shape, profile) => get(`glass:${radius}:${height}:${shape}`,
-      () => new THREE.LatheGeometry(profile.map(([r, y]) => new THREE.Vector2(r, y)), 64, Math.PI)),
+      () => new THREE.LatheGeometry(profile.map(([r, y]) => new THREE.Vector2(r, y)), 48, Math.PI)),
     glassStreak: (shape, radius, height) => get(`streak:${shape}:${radius}:${height}`,
       () => new THREE.CylinderGeometry(
         shape === 'bottle' ? .412 : radius * 1.008,

@@ -2,19 +2,43 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import * as T from '../vendor/three.js';
 import {createHouseModel} from '../modules/house-builder/core/house-model.js';
-import {setHouseGlassAppearance} from '../modules/house-builder/core/house-materials.js';
+import {createHouseGlass} from '../modules/house-builder/core/house-materials.js';
 import {createHouseAtmosphere,createHouseMossGeometry,houseChimneyOutlet,
   BUILDING_ATMOSPHERE_DEFAULTS,loadBuildingAtmosphereSettings,
   BUILDING_SMOKE_RISE,BUILDING_SMOKE_RATE,buildingSmokeFade} from '../modules/house-builder/core/house-atmosphere.js';
 
 const config={floors:3,width:8,depth:7,chimney:true,frontWindows:3};
-const model=createHouseModel(T,config);
+const firstStandalone=createHouseModel(T,config);
+const secondStandalone=createHouseModel(T,config);
+function windowMaterial(model){
+  let material;
+  model.group.traverse(mesh=>{if(mesh.userData.glassPane)material=mesh.material;});
+  return material;
+}
+assert.notEqual(windowMaterial(firstStandalone),windowMaterial(secondStandalone),
+  'Models outside a shared scene scope get their own window materials');
+firstStandalone.dispose();secondStandalone.dispose();
+
+const daytime=new T.Scene(),nighttime=new T.Scene();
+const dayGlass=createHouseGlass(T),nightGlass=createHouseGlass(T);
+const model=createHouseModel(T,config,{glass:nightGlass});
+const secondNightModel=createHouseModel(T,config,{glass:nightGlass});
+const dayModel=createHouseModel(T,config,{glass:dayGlass});
+nighttime.add(model.group,secondNightModel.group);daytime.add(dayModel.group);
 const glass=[];
 model.group.traverse(mesh=>{if(mesh.userData.glassPane)glass.push(mesh);});
 assert(glass.length>=3);
 assert(glass.every(mesh=>mesh.material.isMeshPhysicalMaterial),'Painted panes need glossy physical glass');
 const originalMap=glass[0].material.map;
-setHouseGlassAppearance(T,{gloss:93,reflection:75,night:true,glow:80});
+const nightEnvironment=new T.Texture();
+nightGlass.setAppearance({gloss:93,reflection:75,night:true,glow:80,envMap:nightEnvironment});
+const paneIn=model=>model.group.getObjectByProperty('material',nightGlass.material);
+assert.ok(paneIn(secondNightModel),'Houses in one scene reuse its glass material');
+assert.equal(dayGlass.material.map,originalMap,'The paint texture remains shared between scenes');
+assert.equal(dayGlass.material.emissiveIntensity,.045);
+assert.equal(dayGlass.material.envMap,null);
+assert.equal(nightGlass.material.envMap,nightEnvironment);
+assert.ok(dayModel.group.getObjectByProperty('material',dayGlass.material));
 assert.equal(glass[0].material.clearcoat,.93);
 assert(glass[0].material.emissiveIntensity>1);
 assert.equal(glass[0].material.map,originalMap,'Gloss must preserve the gouache glass painting');
@@ -85,5 +109,13 @@ for(const page of ['house-builder/index.html','landmark-lab/index.html','street-
     }else assert(html.includes(`data-atmo="${key}"`),`${page}: ${key} control missing`);
   }
 }
-noChimney.dispose();a.dispose();b.dispose();model.dispose();
+noChimney.dispose();a.dispose();b.dispose();
+let nightDisposals=0;
+nightGlass.material.addEventListener('dispose',()=>nightDisposals++);
+model.dispose();
+assert.equal(nightDisposals,0,'Disposing a house must preserve its scene glass');
+secondNightModel.dispose();
+nightGlass.dispose();
+assert.equal(nightDisposals,1);
+dayModel.dispose();dayGlass.dispose();nightEnvironment.dispose();
 console.log('Ordinary homes: gouache moss, glass, smoke and night glow work with all shared controls and caches');

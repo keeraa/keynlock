@@ -7,18 +7,21 @@ import { createHouseModel } from './house-model.js';
 import { batchHouseGeometry } from './house-batch.js';
 import { createHouseFallback } from './house-fallback.js';
 import { HOUSE_DEFAULTS, createHouseBlueprint, getHouseDimensions, normalizeHouseConfig } from './house-config.js';
-import {setHouseGlassAppearance} from './house-materials.js';
+import {createHouseGlass} from './house-materials.js';
 import {createHouseAtmosphere,loadBuildingAtmosphereSettings,saveBuildingAtmosphereSettings,makePaintedGlassEnvironment} from './house-atmosphere.js';
 import { mountEditorVisual } from '../effects/editor-visual.js';
 
 const $ = id => document.getElementById(id);
+const embeddedCity=new URLSearchParams(window.location.search).get('embedded')==='city';
+if(embeddedCity)document.body.classList.add('embedded-city');
 let config=loadHouseEditorConfig();
 let atmosphereSettings=loadBuildingAtmosphereSettings();
+let stageActive=true;
 
 let renderer, scene, camera, controls, house, stage;
-let atmosphere,glassEnvironment,lighting;
+let atmosphere,houseGlass,glassEnvironment,lighting;
 let fallback, fallbackModel;
-const visual=mountEditorVisual();
+const visual=mountEditorVisual({standalone:document.documentElement.hasAttribute('data-standalone-house')});
 let pendingRender=false;
 let pendingGeometryChange=false;
 let batchTimer=null;
@@ -35,7 +38,7 @@ function syncAtmosphereControls(){
 function applyAtmosphere(){
   const s=atmosphereSettings,night=Boolean(s.night);
   atmosphere?.setSettings(s);
-  setHouseGlassAppearance(THREE,{gloss:s.glassGloss,reflection:s.glassReflection,
+  houseGlass?.setAppearance({gloss:s.glassGloss,reflection:s.glassReflection,
     night,glow:s.windowGlow,envMap:glassEnvironment?.texture??null});
   document.querySelector('.viewer').classList.toggle('is-night',night);
   if(!renderer||!lighting)return;
@@ -46,7 +49,7 @@ function applyAtmosphere(){
   lighting.fill.intensity=night?.27:.85;
   lighting.floor.material.color.set(night?'#586575':'#d9c9ad');
   lighting.platform.material.color.set(night?'#64717b':'#c4b89e');
-  renderer.toneMappingExposure=night?.93:1.28;
+  visual.setExposureScale(night?.93/1.28:1);
   renderer.shadowMap.needsUpdate=true;
 }
 function rebuildAtmosphere(){
@@ -183,7 +186,6 @@ function initStage() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.7));
     renderer.outputColorSpace=THREE.SRGBColorSpace;
     renderer.toneMapping=THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure=1.28;
     renderer.shadowMap.enabled=true;
     renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   } catch(error) {
@@ -215,13 +217,21 @@ function initStage() {
   controls.addEventListener('start',()=>{cameraController.cancelAnimation();document.querySelectorAll('[data-view]').forEach(b=>b.classList.remove('active'));});
   lighting=makeEnvironment();
   visual.connect({THREE,renderer,scene,camera});
-  house=createHouseModel(THREE,config);scene.add(house.group);
+  houseGlass=createHouseGlass(THREE);
+  house=createHouseModel(THREE,config,{glass:houseGlass});scene.add(house.group);
   batchHouseGeometry(THREE,house.group);
   glassEnvironment=makePaintedGlassEnvironment(THREE,renderer);
   rebuildAtmosphere();
   syncPolygonCount(house.group.userData.metrics);
   fitView(true);
   const observer=new ResizeObserver(()=>fitView(false));
+  window.addEventListener('pagehide',event=>{
+    if(event.persisted)return;
+    observer.disconnect();
+    house.dispose();
+    houseGlass.dispose();
+    glassEnvironment?.dispose();
+  });
   observer.observe(stage.parentElement);
   stage.addEventListener('webglcontextlost',e=>{e.preventDefault();$('stageError').hidden=false;});
   let previous=performance.now();
@@ -229,6 +239,7 @@ function initStage() {
   function frame(now) {
     requestAnimationFrame(frame);
     const dt=Math.min(.1,(now-previous)/1000);previous=now;
+    if(!stageActive)return;
     frames++;
     if(now-fpsStart>=750) {
       $('fpsValue').textContent=String(Math.round(frames*1000/(now-fpsStart)));
@@ -244,3 +255,15 @@ function initStage() {
 
 initInputs();
 initStage();
+if(embeddedCity){
+  window.addEventListener('message',event=>{
+    if(event.origin!==location.origin||event.source!==window.parent)return;
+    if(event.data?.type==='keynlock:request-house'){
+      window.parent.postMessage({type:'keynlock:house-blueprint',
+        blueprint:createHouseBlueprint(config),atmosphere:{...atmosphereSettings}},location.origin);
+    }else if(event.data?.type==='keynlock:house-active'){
+      stageActive=Boolean(event.data.active);
+      if(stageActive)requestAnimationFrame(()=>fitView(false));
+    }
+  });
+}

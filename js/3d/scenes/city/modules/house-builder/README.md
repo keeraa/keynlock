@@ -16,6 +16,8 @@ scene.add(house.group);
 // Release with the model's existing dispose() lifecycle when removing it.
 ```
 
+When a scene controls window lighting, create one `createHouseGlass(THREE)` from the public API and pass it as the `glass` option to every `createHouseModel` in that scene. Call `glass.setAppearance(settings)` to update the windows, then `glass.dispose()` after disposing the scene's houses. Models created without a scene scope own their own window material. Texture resources stay shared.
+
 ## Internal architecture
 
 | Source | Responsibility |
@@ -25,8 +27,9 @@ scene.add(house.group);
 | `modules/house-builder/core/house-model.js` | Model assembly and detail variants |
 | `modules/house-builder/core/geometry/{primitives,roof,openings,details}.js` | Isolated mesh-building subsystems |
 | `modules/house-builder/core/house-resource-manager.js` | Owned GPU geometry/materials and shared resource lifecycle |
-| `modules/house-builder/core/house-materials.js` | Shared fixed materials and reference counting |
+| `modules/house-builder/core/house-materials.js` | Shared fixed materials and scene-owned window glass |
 | `modules/house-builder/core/house-textures.js` | Painted textures and cache lifecycle |
+| `modules/keynlock-materials/` | Shared, versioned KEYNLOCK gouache material registry |
 | `modules/house-builder/core/house-batch.js` | Mesh batching for city-scale rendering |
 | `modules/house-builder/core/house-fallback.js` | Canvas fallback without WebGL |
 | `js/buildings/editor/{ui,camera,persistence}.js` | Editor-specific interface, camera, and saved blueprints |

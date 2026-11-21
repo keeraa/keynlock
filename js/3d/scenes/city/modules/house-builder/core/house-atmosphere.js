@@ -1,6 +1,7 @@
 import {getHouseDimensions,normalizeHouseConfig} from './house-config.js';
 import {windowLayout} from './house-layout.js';
 import {HOUSE_MOSS_TEXTURE} from './house-texture-assets.js';
+import {gouacheAssetUrlByFile} from '../../keynlock-materials/index.js';
 
 // One atmosphere vocabulary for ordinary houses, districts and landmarks.
 export const BUILDING_ATMOSPHERE_DEFAULTS=Object.freeze({
@@ -75,7 +76,7 @@ export function acquireHouseAtmosphereResources(T){
   if(!resource){
     let mossMap=null;
     if(typeof document!=='undefined'){
-      mossMap=new T.TextureLoader().load(new URL(`../../../assets/house-textures/${HOUSE_MOSS_TEXTURE}`,import.meta.url).href);
+      mossMap=new T.TextureLoader().load(gouacheAssetUrlByFile('house',HOUSE_MOSS_TEXTURE));
       mossMap.colorSpace=T.SRGBColorSpace;
       mossMap.wrapS=T.MirroredRepeatWrapping;mossMap.wrapT=T.ClampToEdgeWrapping;
       mossMap.anisotropy=4;

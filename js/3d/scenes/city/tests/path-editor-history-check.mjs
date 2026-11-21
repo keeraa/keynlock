@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import {createEditorHistory} from '../js/path-builder/editor-history.js';
+
+const history=createEditorHistory(3);
+const initial={buildings:[{id:'a',x:2}],landscape:{rivers:[]},pavingMode:'walk',groundSettings:{grass:50}};
+history.record(initial);
+initial.buildings[0].x=9;
+assert.equal(history.canUndo,true);
+assert.equal(history.canRedo,false);
+let current={...initial,buildings:[{id:'a',x:9}]};
+current=history.undo(current);
+assert.equal(current.buildings[0].x,2,'Undo restores a deep copy of the prior state');
+assert.equal(history.canRedo,true);
+current=history.redo(current);
+assert.equal(current.buildings[0].x,9,'Redo reapplies the undone building movement');
+history.undo(current);
+history.record({...current,pavingMode:'street'});
+assert.equal(history.canRedo,false,'A new edit clears the alternate redo branch');
+assert.equal(history.canUndo,true);
+console.log('Editor history: deep undo/redo, branch invalidation and controls OK');

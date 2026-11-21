@@ -152,7 +152,7 @@ function applyAtmosphereSettings(){
   lights.bounce.intensity=night?.25:.64;
   ground.material.color.set(night?'#687483':'#f4ebda');
   plinth.material.color.set(night?'#68707d':'#d4c5a8');
-  renderer.toneMappingExposure=night?.92:1.31;
+  visual.setExposureScale(night?.92/1.31:1);
   document.body.classList.toggle('night-mode',night);
   if(renderer.shadowMap)renderer.shadowMap.needsUpdate=true;
 }
@@ -189,7 +189,7 @@ function initialize(){
   renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'high-performance'});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.6));
   renderer.outputColorSpace=THREE.SRGBColorSpace;
-  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.31;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
   renderer.shadowMap.enabled=true;
   renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   renderer.shadowMap.autoUpdate=false;

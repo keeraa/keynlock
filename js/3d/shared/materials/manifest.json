@@ -50,9 +50,7 @@
       "path": "js/3d/shared/materials/architecture/gouache-plaster-chipped-v2.webp",
       "gitBlobSha": "bd74c7fdd9cbfc2ae560331cfcbbc5630d78208c",
       "bytes": 63516,
-      "consumers": [
-        "js/3d/scenes/city/assets/house-textures/gouache-plaster-chipped-v2.webp"
-      ]
+      "consumers": []
     },
     {
       "id": "gouache-plaster-chipped-v3",
@@ -108,9 +106,7 @@
       "path": "js/3d/shared/materials/architecture/gouache-roof-tiles-finer-v2.webp",
       "gitBlobSha": "fbefdd1f3a08216bd0dcc9314137c3f735c9a8d0",
       "bytes": 113318,
-      "consumers": [
-        "js/3d/scenes/city/assets/house-textures/gouache-roof-tiles-finer-v2.webp"
-      ]
+      "consumers": []
     },
     {
       "id": "gouache-roof-tiles",
@@ -118,9 +114,7 @@
       "path": "js/3d/shared/materials/architecture/gouache-roof-tiles.webp",
       "gitBlobSha": "3856a0a79a8267d716257c2bb7041f4ad1befc97",
       "bytes": 95096,
-      "consumers": [
-        "js/3d/scenes/city/assets/house-textures/gouache-roof-tiles.webp"
-      ]
+      "consumers": []
     },
     {
       "id": "gouache-shutters-horizontal-v4",
@@ -128,9 +122,7 @@
       "path": "js/3d/shared/materials/architecture/gouache-shutters-horizontal-v4.webp",
       "gitBlobSha": "80548fb20d8ebe26a6a00d68a1458b42566601c8",
       "bytes": 193232,
-      "consumers": [
-        "js/3d/scenes/city/assets/house-textures/gouache-shutters-horizontal-v4.webp"
-      ]
+      "consumers": []
     },
     {
       "id": "gouache-shutters-oak-louver-v5",
@@ -148,9 +140,7 @@
       "path": "js/3d/shared/materials/architecture/gouache-shutters-v2.webp",
       "gitBlobSha": "7ef0b47d65e4232ab6b0965cda7cde4dddef8057",
       "bytes": 57812,
-      "consumers": [
-        "js/3d/scenes/city/assets/house-textures/gouache-shutters-v2.webp"
-      ]
+      "consumers": []
     },
     {
       "id": "gouache-shutters-v3",
@@ -158,9 +148,7 @@
       "path": "js/3d/shared/materials/architecture/gouache-shutters-v3.webp",
       "gitBlobSha": "e57904f7190a7c6c882ed63de4f43addf88c737f",
       "bytes": 96612,
-      "consumers": [
-        "js/3d/scenes/city/assets/house-textures/gouache-shutters-v3.webp"
-      ]
+      "consumers": []
     },
     {
       "id": "gouache-shutters",
@@ -168,9 +156,7 @@
       "path": "js/3d/shared/materials/architecture/gouache-shutters.webp",
       "gitBlobSha": "733defd1a2641c57a7be2a7b958976ee4a123aec",
       "bytes": 51980,
-      "consumers": [
-        "js/3d/scenes/city/assets/house-textures/gouache-shutters.webp"
-      ]
+      "consumers": []
     },
     {
       "id": "gouache-stone-band",
@@ -206,9 +192,7 @@
       "path": "js/3d/shared/materials/architecture/gouache-window-glass.webp",
       "gitBlobSha": "406bf7a31ffd9aa6b98918546abe35b697ce8e2c",
       "bytes": 35346,
-      "consumers": [
-        "js/3d/scenes/city/assets/house-textures/gouache-window-glass.webp"
-      ]
+      "consumers": []
     },
     {
       "id": "gouache-window-sill-v2",
@@ -226,9 +210,7 @@
       "path": "js/3d/shared/materials/architecture/gouache-window-sill.webp",
       "gitBlobSha": "79487f33424063382cde74d9de0387256cfc5cbb",
       "bytes": 62938,
-      "consumers": [
-        "js/3d/scenes/city/assets/house-textures/gouache-window-sill.webp"
-      ]
+      "consumers": []
     },
     {
       "id": "landmark-copper-gouache",
@@ -236,9 +218,7 @@
       "path": "js/3d/shared/materials/architecture/landmark-copper-gouache.png",
       "gitBlobSha": "ea52d1b4ae8268b1b07ab707d5458cff6b348fa2",
       "bytes": 786445,
-      "consumers": [
-        "js/3d/scenes/city/assets/house-textures/landmark-copper-gouache.png"
-      ]
+      "consumers": []
     },
     {
       "id": "landmark-copper-gouache",
@@ -256,9 +236,7 @@
       "path": "js/3d/shared/materials/architecture/landmark-slate-gouache.png",
       "gitBlobSha": "638c440c2765355bca3f6f3b0b6257beefd42498",
       "bytes": 786445,
-      "consumers": [
-        "js/3d/scenes/city/assets/house-textures/landmark-slate-gouache.png"
-      ]
+      "consumers": []
     },
     {
       "id": "glass-antique",

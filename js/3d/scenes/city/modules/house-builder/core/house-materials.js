@@ -2,6 +2,21 @@
 // created with the same Three.js module. Tinted facade materials stay private.
 const buckets = new WeakMap();
 
+function makeGlassMaterial(THREE) {
+  return new THREE.MeshPhysicalMaterial({color:'#e5eeeb',metalness:.09,roughness:.2,
+    clearcoat:.74,clearcoatRoughness:.13,emissive:'#133b42',emissiveIntensity:.045});
+}
+
+// The scene owns its glass and can share it across every house it renders.
+export function createHouseGlass(THREE) {
+  const material=makeGlassMaterial(THREE);
+  return {
+    material,
+    setAppearance(settings){applyGlassAppearance(material,settings);},
+    dispose(){material.dispose();},
+  };
+}
+
 export function acquireFixedHouseMaterials(THREE) {
   let bucket=buckets.get(THREE);
   if(!bucket) {
@@ -18,11 +33,6 @@ export function acquireFixedHouseMaterials(THREE) {
       stone:standard({color:'#8c8d82',roughness:1,flatShading:true}),
       stoneLight:standard({color:'#bbb5a5',roughness:1}),
       highlight:standard({color:'#e6d7b5',roughness:.94}),
-      // Clear varnish and restrained reflections preserve the gouache map;
-      // all house instances share one configurable physical material.
-      glass:new THREE.MeshPhysicalMaterial({color:'#e5eeeb',metalness:.09,roughness:.2,
-        clearcoat:.74,clearcoatRoughness:.13,
-        emissive:'#133b42',emissiveIntensity:.045}),
       sill:standard({color:'#f6f0e7',roughness:.98}),
       stoneBand:standard({color:'#f1e9dd',roughness:.98}),
       brass:standard({color:'#c4a36b',roughness:.46,metalness:.38}),
@@ -45,9 +55,7 @@ export function acquireFixedHouseMaterials(THREE) {
   };
 }
 
-export function setHouseGlassAppearance(THREE,{gloss=74,reflection=46,night=false,glow=67,envMap=null}={}){
-  const glass=buckets.get(THREE)?.materials.glass;
-  if(!glass)return;
+function applyGlassAppearance(glass,{gloss=74,reflection=46,night=false,glow=67,envMap=null}={}){
   const g=Math.max(0,Math.min(100,Number(gloss)||0))/100;
   const r=Math.max(0,Math.min(100,Number(reflection)||0))/100;
   glass.roughness=.87-g*.73;

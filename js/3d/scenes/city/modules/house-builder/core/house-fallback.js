@@ -1,6 +1,7 @@
 import { getHouseDimensions, normalizeHouseConfig } from './house-config.js';
 import { windowLayout } from './house-layout.js';
 import {HOUSE_FALLBACK_TEXTURES} from './house-texture-assets.js';
+import {gouacheAssetUrlByFile} from '../../keynlock-materials/index.js';
 
 // A small canvas preview for browsers with WebGL disabled. It follows the
 // same blueprint as the Three.js model and supports drag rotation / zoom.
@@ -27,7 +28,7 @@ export function createHouseFallback(canvas, initial) {
   for (const [key,file] of HOUSE_FALLBACK_TEXTURES) {
     const image=new Image();
     image.onload=()=>{paintedImages[key]=image;if(!disposed)draw();};
-    image.src=new URL(`../../../assets/house-textures/${file}`,import.meta.url).href;
+    image.src=gouacheAssetUrlByFile('house',file);
   }
   const p=(x,y,z)=>project(x,y,z);
   const path=(coords,fill,stroke='#6d6556',lineWidth=1,painted=null)=>{

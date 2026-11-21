@@ -44,7 +44,7 @@ const toggleMarkup=(id,title,hint)=>`<div class="keynlock-visual-row">
   <button type="button" id="${id}" class="keynlock-visual-switch" aria-label="${title}" aria-pressed="false"><span aria-hidden="true"></span></button>
 </div>`;
 
-export function mountEditorVisual(){
+export function mountEditorVisual({standalone=false}={}){
   const header=document.querySelector('.site-header, .topbar');
   if(!header)throw new Error('Не найдена шапка архитектурной мастерской');
   const host=document.createElement('div');host.className='keynlock-visual';
@@ -65,21 +65,25 @@ export function mountEditorVisual(){
         ${rangeMarkup(rangeFields[4])}${rangeMarkup(rangeFields[5])}
       </div>
       <div class="keynlock-visual-foot"><span>Гуашевые текстуры зданий сохранены.</span><button type="button" id="resetVisual">Сбросить</button></div>
-      <nav class="keynlock-visual-nav" aria-label="Разделы редактора"><a href="../house-builder/">Дома</a><a href="../street-lab/">Кварталы</a><a href="../landmark-lab/">Особые здания</a></nav>
+      ${standalone?'':'<nav class="keynlock-visual-nav" aria-label="Разделы редактора"><a href="../house-builder/">Дома</a><a href="../street-lab/">Кварталы</a><a href="../landmark-lab/">Особые здания</a></nav>'}
     </section>`;
   const firstNavigation=[...header.children].find(child=>child.matches('nav, .top-links, .back-button'))||null;
   header.insertBefore(host,firstNavigation);
   const q=id=>host.querySelector(`#${id}`);
   const grain=document.getElementById('stageGrain');
   const state=loadState();
-  let renderer=null,filter=null;
+  let renderer=null,filter=null,exposureScale=1;
+
+  function applyExposure(){
+    if(renderer)renderer.toneMappingExposure=state.exposure/100*exposureScale;
+  }
 
   function apply(){
     if(filter)filter.setOptions({
       toon:state.toon,toonStrength:state.toonStrength/100,bands:state.bands,
       outline:state.outline,outlineStrength:state.outlineStrength/100,outlineWidth:state.outlineWidth,
     });
-    if(renderer)renderer.toneMappingExposure=state.exposure/100;
+    applyExposure();
     if(grain)grain.style.opacity=String(state.grain/100);
   }
   function save(){
@@ -128,6 +132,7 @@ export function mountEditorVisual(){
       filter=createCartoonFilter({THREE,renderer,scene,camera});
       apply();
     },
+    setExposureScale(scale){exposureScale=scale;applyExposure();},
     resize(width,height,pixelRatio){filter?.resize(width,height,pixelRatio);},
     render(){return filter?.render()||{calls:0,triangles:0};},
     dispose(){filter?.dispose();filter=null;renderer=null;},

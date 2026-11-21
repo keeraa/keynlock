@@ -1,5 +1,6 @@
 // @ts-check
 import * as THREE from 'three';
+import { CEILING_BEAM_Z, ROOM_END } from '../room-layout.js';
 
 // The Lair's lamps: three candle chandeliers in the middle of the room and
 // eight wall sconces. Only the chandeliers are real lights; each sconce paints
@@ -11,12 +12,13 @@ import * as THREE from 'three';
 // them out of the Atelier's ink outlines.
 
 /** Chandeliers along the middle of the room, hanging low enough to light the floor. */
-export const CHANDELIERS = Object.freeze([1.0, 10.6, 20.2].map(z => Object.freeze({ x: 0, y: 7.7, z })));
-/** Wall sconces: both long walls, at the former column lamp positions. */
+export const CHANDELIERS = Object.freeze([1, 3, 5].map(index =>
+  Object.freeze({ x: 0, y: 7.7, z: CEILING_BEAM_Z[index] })));
+/** Wall sconces on both long walls, with space around the tool board. */
 export const SCONCES = Object.freeze([-1, 1].flatMap(side =>
-  [-1.10, 8.15, 17.35, 24.65].map(z => Object.freeze({ side, y: 3.1, z }))));
+  [-1.10, 4.70, 11.0, ROOM_END - 1.77].map(z => Object.freeze({ side, y: 3.1, z }))));
 const WALL_X = 8.39;
-const CEILING_Y = 13.2;
+const CEILING_Y = 13.26;
 /** Day and night values; setNight blends between them. */
 const LEVELS = Object.freeze({
   chandelier: { day: 14, night: 75 },
@@ -98,11 +100,11 @@ function buildChandelier(kit, { x, y, z }, flames) {
   for (let i = 0; i < 8; i++) {
     const a = i * Math.PI / 4;
     const cx = Math.cos(a) * .62, cz = Math.sin(a) * .62;
-    cylinder(group, .075, .06, .025, m.oldBrass, cx, .05, cz, 12);
-    cylinder(group, .038, .042, .22, m.paper, cx, .17, cz, 10);
+    cylinder(group, .075, .06, .025, m.oldBrass, cx, .046, cz, 12);
+    cylinder(group, .038, .042, .22, m.paper, cx, .168, cz, 10);
     const flame = new THREE.Mesh(new THREE.ConeGeometry(.032, .11, 8), new THREE.MeshBasicMaterial({
       color: '#ffd391', transparent: true, opacity: .92, blending: THREE.AdditiveBlending, depthWrite: false }));
-    flame.position.set(cx, .34, cz);
+    flame.position.set(cx, .324, cz);
     group.add(flame);
     flames.push(flame);
   }
@@ -121,9 +123,9 @@ function buildSconce(kit, { side, y, z }) {
   const { m, staticGroup, box, rod } = kit;
   const group = new THREE.Group();
   group.name = 'lair-wall-sconce';
-  group.position.set(side * (WALL_X - .03), y, z);
+  group.position.set(side * (WALL_X - .015), y, z);
   staticGroup.add(group);
-  box(group, .04, .34, .16, m.oldBrass, 0, 0, 0);
+  box(group, .04, .34, .16, m.oldBrass, 0, 0, 0).name = 'lair-sconce-backplate';
   rod(group, [0, -.05, 0], [-side * .3, .05, 0], .016, m.oldBrass, 6);
   // A frosted glass tulip, open at the top, lit from inside.
   const shade = new THREE.Mesh(new THREE.CylinderGeometry(.14, .07, .24, 16, 1, true), new THREE.MeshStandardMaterial({

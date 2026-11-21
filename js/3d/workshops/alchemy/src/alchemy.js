@@ -21,6 +21,7 @@ import { BOTTLE_STICKER_IMAGES, createBottleStickerGeometry } from './bottle-sti
 import { generateRecipe, evaluateRecipe, observeRecipeStages, RECIPE_LEVELS, PIGMENT_SWATCHES, PLANETARY_METALS, METAL_REFERENCE_ORDER } from './recipes.js';
 import { createRecipeSheetTexture } from './recipe-sheet.js';
 import { createAlchemyRuntime } from './runtime-host.js';
+import { ALCHEMY_TABLE } from './table-dimensions.js';
 import { getWorkshopHost, publishWorkshopApi } from '../../../core/host/workshop-host.js';
 
 // Inside the Lair the host mounts this markup into the room and shares its
@@ -185,7 +186,7 @@ const {sunbeams,backgroundEffects} = look;
 
 buildRoom();
 buildTable();
-stopwatch = createStopwatch(THREE, scene, { brass, darkWood }, [2.58, 3.58, -4.20]);
+stopwatch = createStopwatch(THREE, scene, { brass, darkWood }, [2.58, 3.555, -4.20]);
 buildDecor();
 buildRack();
 buildBigVessel('left', -3.95);
@@ -496,10 +497,17 @@ function buildRoom() {
   tiledWall.receiveShadow = false;
   // Full-wall painting has its own low-contrast grout and no repeating joins.
   // The shelf uses the selected tabletop wood, including its brushwork.
-  box(22, .25, 1.05, wood, room, 0, 2.85, -4.33);
+  box(22, .25, 1.05, wood, room, 0, 2.85, -4.33).name = 'alchemy-wall-shelf';
+  const lairWall = runtime.embedded && lair?.renderer.getUnifiedScene()?.getObjectByName('alchemy-right-wall');
+  const wallZ = lairWall ? room.worldToLocal(lairWall.getWorldPosition(new THREE.Vector3())).z : -5.11;
+  const bracketBack = wallZ - .02, bracketFront = -4.29;
+  for (const x of [-8.65, 8.65]) {
+    box(.22, .35, bracketFront - bracketBack, darkWood, room,
+      x, 2.56, (bracketBack + bracketFront) / 2).name = 'alchemy-shelf-bracket';
+  }
   // The recipe is printed on a real piece of parchment in the room.
   const parchmentFrame = new THREE.Group();
-  parchmentFrame.position.set(0, 3.92, -4.38);
+  parchmentFrame.position.set(0, 3.915, -4.38);
   parchmentFrame.rotation.x = -.065;
   // Paintings in the foreground scene bypass the room's adjustable defocus;
   // the formula stays readable even when background blur is enabled.
@@ -528,25 +536,27 @@ function buildTable() {
   // Two physically separate tiers: the seven metal bottles stand on the
   // lowered front bench, while mixing flasks keep their original level.
   // A deeper slab, grown downwards so all flasks stay at their original height.
-  const workingTop = box(14.4, .72, 4.68, wood, scene, 0, -.32, -1.16);
+  const workingTop = box(ALCHEMY_TABLE.width, .72, 4.68, wood, scene, 0, ALCHEMY_TABLE.topY - .36, -1.16);
+  workingTop.name = 'alchemy-main-tabletop';
   workingTop.receiveShadow = true;
   box(14.6, .13, 4.72, brass, scene, 0, -.745, -1.16);
-  const lowTop = box(14.4, .40, 1.82, wood, scene, 0, -.70, 2.09);
+  const lowTop = box(ALCHEMY_TABLE.width, .40, 1.82, wood, scene, 0, -.70, 2.09);
+  lowTop.name = 'alchemy-lower-tabletop';
   lowTop.receiveShadow = true;
   box(14.6, .12, 1.9, brass, scene, 0, -.99, 2.09);
   box(14.2, .54, .13, darkWood, scene, 0, -1.13, 3.04);
   box(14.2, .046, .14, polishedBrass, scene, 0, -.925, 3.04);
   box(14.25, .73, .10, darkWood, scene, 0, -.325, 1.19);
   box(14.3, .035, .10, polishedBrass, scene, 0, -.68, 1.20);
-  // Four full-height legs share one ground line. The original 2.2-unit
-  // front legs are now 8.8 units (4x); rear legs reach the same floor.
+  const footY = runtime.embedded ? ALCHEMY_TABLE.lairFootY : ALCHEMY_TABLE.standaloneFootY;
+  const legBase = footY + ALCHEMY_TABLE.footHeight - .005;
   for (const x of [-6.2, 6.2]) {
     for (const [z, top] of [[2.1, -.60], [-3.15, -.40]]) {
-      const floor = -9.40;
-      const length = top - floor;
-      const leg = box(.6, length, .65, darkWood, scene, x, (top + floor) / 2, z);
+      const length = top - legBase;
+      const leg = box(.6, length, .65, darkWood, scene, x, (top + legBase) / 2, z);
       leg.name = 'table-leg';
-      const foot = box(.66, .13, .7, oldBrass, scene, x, floor - .06, z);
+      const foot = box(.66, ALCHEMY_TABLE.footHeight, .7, oldBrass, scene,
+        x, footY + ALCHEMY_TABLE.footHeight / 2, z);
       foot.name = 'table-foot';
     }
   }

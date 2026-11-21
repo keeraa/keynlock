@@ -37,6 +37,7 @@
               <div class="perf-row"><span>Разрешение</span><strong id="perf-resolution">—</strong></div>
             </div>
           </div>
+          <button id="room-walk-toggle" class="visual-toggle room-walk-toggle" type="button" aria-pressed="false" title="От первого лица">ПРОГУЛКА</button>
           <button id="lair-visual-toggle" class="visual-toggle" type="button" aria-controls="lair-visual-panel" aria-expanded="false">⚙ <span>ВИЗУАЛ</span></button>
           <button id="sound-toggle" class="icon-button" type="button" aria-label="Звуковое окружение" aria-pressed="false" title="Звуковое окружение">♪</button>
         </div>
@@ -184,8 +185,15 @@
           <a id="workshop-fallback" href="https://atelier-restoration-1115.k1r11111.chatgpt.site/" target="_blank" rel="noopener noreferrer" hidden>Открыть оригинальную мастерскую ↗</a>
         </div>
       </section>
+      <div id="room-walk-hud" hidden>
+        <div class="room-walk-crosshair" aria-hidden="true"></div>
+        <span id="room-walk-target" hidden></span>
+      </div>
       <div class="bottom-ui">
         <div class="interaction-hint"><span class="mouse-icon">◌</span> ПЕРЕТАСКИВАЙ — ОСМОТР <span class="dot">·</span> ⌘ + ПЕРЕТАСКИВАЙ — ПЕРЕМЕЩЕНИЕ <span class="dot">·</span> КОЛЕСО — МАСШТАБ <span class="dot">·</span> КЛИК — ВЗАИМОДЕЙСТВИЕ</div>
+        <div id="room-walk-instructions" hidden>
+          <span>WASD / ↑↓←→ — ходьба</span><span>Shift — бег</span><span id="room-walk-look"></span><span>E — взаимодействие</span><span>Esc — общий вид</span>
+        </div>
         <nav class="zone-nav" aria-label="Локации логова">
           <button type="button" data-zone="atelier"><span class="zone-number">01</span><span>Реставрация</span></button>
           <button type="button" data-zone="planning"><span class="zone-number">02</span><span>Штаб</span></button>

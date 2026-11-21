@@ -98,7 +98,12 @@ const mats = {
   metal: new THREE.MeshStandardMaterial({ color: '#8c7957', metalness: 0.76, roughness: 0.34 }),
 };
 const framedArtwork = createArtworkRenderer({ THREE, frameWood: mats.frameWood });
-const { dust, makeEasel, wallpaperMaterial, floorWoodMaterials } = createWorkshopRoom({ THREE, scene, mats });
+const galleryWall = embedded && rendererHost.getUnifiedScene()?.getObjectByName('atelier-side-wall');
+const galleryWallCenter = galleryWall && scene.worldToLocal(galleryWall.getWorldPosition(new THREE.Vector3()));
+const wallZ = galleryWallCenter ? galleryWallCenter.z : -4.6;
+const { dust, makeEasel, wallpaperMaterial, floorWoodMaterials } = createWorkshopRoom({
+  THREE, scene, mats, includeWallTrim: !embedded, wallZ, floorY: embedded ? .0385 : -.0285,
+});
 if (embedded) {
   // The standalone Atelier's angled sun is useful for its own room, but in
   // the shared Lair its shadow map throws giant diagonal stripes across the
@@ -106,9 +111,7 @@ if (embedded) {
   scene.traverse(object => {
     if (object.isDirectionalLight) object.castShadow = false;
   });
-  // The original Atelier is mounted inside the existing Lair. Its painted
-  // walls, easels, tools and art remain; the duplicate floor cannot cover the
-  // Lair's continuous planks.
+  // The shared room supplies the Atelier's floor and wall surfaces.
   for (const object of scene.children) {
     if (object.name.startsWith('atelier-original-floor-')) object.visible = false;
     if (object.name === 'atelier-original-wallpaper') object.visible = false;
@@ -118,7 +121,8 @@ const textureLoader = new THREE.TextureLoader();
 const woodStyle = createWoodStyle({ THREE, renderer, loader: textureLoader, mats, wallpaperMaterial,
   floorWoodMaterials, variants: woodVariants });
 const wallGallery = createWallGallery({
-  THREE, scene, camera, renderer, frameWood: mats.frameWood,
+  THREE, scene, camera, renderer, frameWood: mats.frameWood, wallZ: galleryWall ? wallZ : undefined,
+  wallLayout: galleryWall ? { width: galleryWall.geometry.parameters.width - 2, centerX: galleryWallCenter.x } : undefined,
   pointerElement: embedded ? lair?.interactionElement : renderer.domElement,
   onLayout: (layout) => navigation.updateWallLayout(layout),
 });
@@ -126,6 +130,8 @@ const easelX = 1.28;
 const leftEasel = makeEasel(-easelX, .045);
 const rightEasel = makeEasel(easelX, -.045);
 if (embedded) {
+  leftEasel.root.name = 'restoration-left-easel';
+  rightEasel.root.name = 'restoration-right-easel';
   // Align the only live pair of Atelier easels with the Lair's left wall.
   // Their original tools and painting meshes stay in the same coordinate space.
   leftEasel.root.position.z = -3.25;

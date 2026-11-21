@@ -7,6 +7,7 @@ import { buildWorkbench } from './workbench-furniture.js';
 import { buildGramophone, buildDetails } from './details.js';
 import { createWindowLight } from './window-light.js';
 import { buildLamps } from './lamps.js';
+import { ALCHEMY_Z, ATELIER_Z } from '../room-layout.js';
 
 /** A single continuous room, using the proportions and gouache materials of the existing ateliers. */
 export function buildLair(scene, m) {
@@ -17,18 +18,18 @@ export function buildLair(scene, m) {
   // their furniture; the room keeps only their picking targets.
   const rightWallFinish = buildShell(kit);
   const windowView = buildWindow(kit);
-  const windowLight = createWindowLight(kit.staticGroup);
+  zoneTarget('atelier', [-6.93, 2.28, ATELIER_Z + 1.75], [3.28, 4.9, 7.20]);
+  const planningFurniture = buildPlanning(kit);
+  buildWorkbench(kit, rightWallFinish.position.x);
+  const gramophoneTable = buildGramophone(kit);
+  const windowLight = createWindowLight(kit.staticGroup, [...planningFurniture, gramophoneTable]);
   animated.push(windowLight.update);
-  zoneTarget('atelier', [-6.93, 2.28, 12.10], [3.28, 4.9, 7.20]);
-  buildPlanning(kit);
-  buildWorkbench(kit);
-  buildGramophone(kit);
   const ambientParticles = buildDetails(kit, { windowLight });
   const lamps = buildLamps(kit);
-  zoneTarget('alchemy', [6.86, 2.34, 10.10], [3.05, 5.8, 5.22]);
+  zoneTarget('alchemy', [6.86, 1.15, ALCHEMY_Z], [3.05, 2.3, 5.22]);
   const wallpapers = {
     tile: m.alchemyTile,
-    ochre: m.atelierSideWall,
+    ochre: m.wallpaperOchre,
     botanical: m.wallpaperBotanical,
     damask: m.wallpaperDamask,
   };

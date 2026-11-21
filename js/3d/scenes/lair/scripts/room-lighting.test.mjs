@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import * as THREE from 'three';
 import { addRoomLighting } from '../src/room/lighting.js';
+import { ROOM_END, ROOM_START } from '../src/room-layout.js';
 
 test('the salon keeps warm modelling but only short overhead contact shadows', () => {
   const scene = new THREE.Scene();
@@ -17,8 +18,9 @@ test('the salon keeps warm modelling but only short overhead contact shadows', (
   const maxShadowRunFromCeiling = 13.6 * horizontal / direction.y;
   assert.ok(maxShadowRunFromCeiling < .10,
     `ceiling-height shadows must fall almost straight down, got ${maxShadowRunFromCeiling.toFixed(2)} m`);
-  assert.ok(contactSun.shadow.camera.top - contactSun.shadow.camera.bottom >= 40,
-    'the shadow camera includes both halves of the long room');
+  assert.ok(targetPosition.z + contactSun.shadow.camera.bottom < ROOM_START
+    && targetPosition.z + contactSun.shadow.camera.top > ROOM_END,
+    'the shadow camera covers the room from the window to the entrance');
 });
 
 test('at night the window side turns to dim moonlight and the lamps stay warm', () => {

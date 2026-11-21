@@ -1,11 +1,14 @@
 // @ts-check
 import * as THREE from 'three';
 import { makeGouacheWallTexture } from '@keynlock/alchemy/src/wall-tiles.js';
+import { ALCHEMY_LAIR_SCALE } from '@keynlock/alchemy/src/table-dimensions.js';
 import { atelierWallpaperSource } from '@keynlock/atelier/src/painted-assets.js';
 import { t } from '../i18n.js';
+import { ROOM_LENGTH } from '../room-layout.js';
 
 const alchemyWood = name =>
   new URL(`../../../../workshops/alchemy/src/assets/wood-gouache-${name}.webp`, import.meta.url).href;
+const roomWalnutSource = new URL('./assets/surfaces/walnut-floor-gouache.jpg', import.meta.url).href;
 
 export function createMaterials() {
   const textureLoader = new THREE.TextureLoader();
@@ -18,20 +21,15 @@ export function createMaterials() {
     return texture;
   };
   const mat = (color, roughness = .9, metalness = 0) => new THREE.MeshStandardMaterial({ color, roughness, metalness });
-  // These are the painted wood finishes already used in the alchemy scene.
-  // Their broad brushwork is deliberately quieter than the earlier swirled grain.
-  // The room paints with the workshops' own gouache files (one copy of each).
+  // Furniture still uses the shared workshop finishes.
   const walnutMap = load(alchemyWood('walnut'));
   const ashMap = load(alchemyWood('ash'));
   const oakMap = load(alchemyWood('oak'));
-  const plasterMap = load(atelierWallpaperSource, 1.3, 2.15);
-  const atelierPlasterMap = load(atelierWallpaperSource, 1, 1);
-  const floorMap = walnutMap.clone();
-  floorMap.repeat.set(5.2, .68);
-  floorMap.needsUpdate = true;
-  const floorAlternateMap = floorMap.clone();
-  floorAlternateMap.offset.set(.17, .14);
-  floorAlternateMap.needsUpdate = true;
+  const plasterMap = load(new URL('./assets/surfaces/sand-plaster-gouache.jpg', import.meta.url).href, 1.7, 1.4);
+  const ochreMap = load(atelierWallpaperSource);
+  const floorMap = load(roomWalnutSource, 3.25, .17);
+  const timberMap = load(roomWalnutSource);
+  const ceilingMap = load(new URL('./assets/surfaces/taupe-ceiling-gouache.jpg', import.meta.url).href, 2.2, 4);
   const botanicalMap = makeWallpaperTexture('botanical');
   const damaskMap = makeWallpaperTexture('damask');
   for (const texture of [botanicalMap, damaskMap]) {
@@ -43,18 +41,27 @@ export function createMaterials() {
     walnut: new THREE.MeshStandardMaterial({ map: walnutMap, color: '#ffffff', roughness: .96 }),
     agedWood: new THREE.MeshStandardMaterial({ map: walnutMap, color: '#d0b8a5', roughness: .96 }),
     darkWood: new THREE.MeshStandardMaterial({ map: walnutMap, color: '#917c6e', roughness: .98 }),
+    roomTimber: new THREE.MeshStandardMaterial({
+      map: timberMap, roughness: 1, emissiveMap: timberMap, emissive: '#eee8df', emissiveIntensity: .18,
+    }),
     ash: new THREE.MeshStandardMaterial({ map: ashMap, color: '#ffffff', roughness: .95 }),
     oak: new THREE.MeshStandardMaterial({ map: oakMap, color: '#ffffff', roughness: .96 }),
-    plaster: new THREE.MeshStandardMaterial({ map: plasterMap, color: '#e0d8d0', roughness: 1 }),
-    atelierSideWall: new THREE.MeshStandardMaterial({ map: atelierPlasterMap, color: '#ffffff', roughness: 1, side: THREE.DoubleSide }),
-    // Preserve the tile's physical size after mirroring the 30m gallery wing.
-    // The whole right wall is one tiled surface. Its tiles match the laboratory's
-    // own (~0.52 x 0.56 m: 62 across the 32 m wall, 24 rows up its 13.5 m).
-    alchemyTile: new THREE.MeshStandardMaterial({ map: makeGouacheWallTexture(THREE, 'sage', { width: 114.5, height: 48.4, textureWidth: 2560, textureHeight: 1024 }), roughness: 1, metalness: 0, side: THREE.DoubleSide }),
+    plaster: new THREE.MeshStandardMaterial({ map: plasterMap, roughness: 1 }),
+    galleryPlaster: new THREE.MeshStandardMaterial({ map: plasterMap, roughness: 1, side: THREE.DoubleSide }),
+    wallpaperOchre: new THREE.MeshStandardMaterial({ map: ochreMap, roughness: 1, side: THREE.DoubleSide }),
+    // Match the laboratory's tile size along the entire right wall.
+    alchemyTile: new THREE.MeshStandardMaterial({ map: makeGouacheWallTexture(THREE, 'sage', {
+      width: ROOM_LENGTH / ALCHEMY_LAIR_SCALE, height: 48.4, textureWidth: 2560, textureHeight: 1024,
+    }), roughness: 1, metalness: 0, side: THREE.DoubleSide }),
     wallpaperBotanical: new THREE.MeshStandardMaterial({ map: botanicalMap, color: '#e8e6d8', roughness: .99, side: THREE.DoubleSide }),
     wallpaperDamask: new THREE.MeshStandardMaterial({ map: damaskMap, color: '#f1e9d6', roughness: .99, side: THREE.DoubleSide }),
-    floor: new THREE.MeshStandardMaterial({ map: floorMap, color: '#fff4e8', roughness: 1 }),
-    floorAlternate: new THREE.MeshStandardMaterial({ map: floorAlternateMap, color: '#e0c5b7', roughness: 1 }),
+    floor: new THREE.MeshStandardMaterial({ map: floorMap, roughness: 1 }),
+    floorAlternate: new THREE.MeshStandardMaterial({ map: floorMap, color: '#f2efeb', roughness: 1 }),
+    // A little local fill on the downward-facing plaster keeps the gouache
+    // legible above the beams without lifting the room's ambient light.
+    ceiling: new THREE.MeshStandardMaterial({
+      map: ceilingMap, roughness: 1, emissiveMap: ceilingMap, emissive: '#ffffff', emissiveIntensity: .3,
+    }),
     brass: mat('#b49459', .36, .63),
     oldBrass: mat('#806e4d', .56, .52),
     copper: mat('#986547', .46, .64),
@@ -78,8 +85,8 @@ export function createMaterials() {
   // Share one pair of uniforms across every painted wood/plaster finish. These
   // modify the real Three.js fragment shader, with no texture regeneration.
   const pigment = { saturation: { value: 1 }, contrast: { value: 1 } };
-  const painted = ['walnut', 'agedWood', 'darkWood', 'ash', 'oak', 'plaster',
-    'atelierSideWall', 'floor', 'floorAlternate', 'alchemyTile', 'wallpaperBotanical', 'wallpaperDamask'];
+  const painted = ['walnut', 'agedWood', 'darkWood', 'roomTimber', 'ash', 'oak', 'plaster', 'galleryPlaster',
+    'floor', 'floorAlternate', 'ceiling', 'alchemyTile', 'wallpaperOchre', 'wallpaperBotanical', 'wallpaperDamask'];
   for (const name of painted) {
     const material = materials[name];
     const oldCompile = material.onBeforeCompile;
@@ -100,8 +107,8 @@ export function createMaterials() {
     };
     material.customProgramCacheKey = () => 'keynlock-painted-v1';
   }
-  const scaledTextures = [walnutMap, ashMap, oakMap, plasterMap, atelierPlasterMap,
-    floorMap, floorAlternateMap, botanicalMap, damaskMap];
+  const scaledTextures = [walnutMap, ashMap, oakMap, plasterMap, timberMap,
+    floorMap, ceilingMap, ochreMap, botanicalMap, damaskMap];
   const originalRepeats = scaledTextures.map(map => map.repeat.clone());
   function setPaintSettings({ saturation = 100, contrast = 100, scale = 100 } = {}) {
     pigment.saturation.value = THREE.MathUtils.clamp(saturation / 100, .35, 1.75);

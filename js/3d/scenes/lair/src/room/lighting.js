@@ -1,4 +1,6 @@
 // @ts-check
+import { ROOM_CENTER_Z, ROOM_LENGTH } from '../room-layout.js';
+
 /** Warm side lighting with short, nearly vertical object shadows. */
 export function addRoomLighting({ THREE, scene }) {
   scene.add(new THREE.HemisphereLight('#ffe5bb', '#36453f', 2.0));
@@ -17,16 +19,16 @@ export function addRoomLighting({ THREE, scene }) {
   // projecting those long diagonal bars over the paintings.
   const contactSun = new THREE.DirectionalLight('#ffe2c0', .55);
   contactSun.name = 'lair-overhead-shadow-light';
-  contactSun.position.set(0, 28, 10.3);
-  contactSun.target.position.set(0, 0, 10.3);
+  contactSun.position.set(0, 28, ROOM_CENTER_Z);
+  contactSun.target.position.set(0, 0, ROOM_CENTER_Z);
   contactSun.castShadow = true;
   contactSun.shadow.mapSize.set(2048, 2048);
   contactSun.shadow.camera.near = .4;
   contactSun.shadow.camera.far = 50;
   contactSun.shadow.camera.left = -12;
   contactSun.shadow.camera.right = 12;
-  contactSun.shadow.camera.top = 20;
-  contactSun.shadow.camera.bottom = -20;
+  contactSun.shadow.camera.top = ROOM_LENGTH / 2 + 4;
+  contactSun.shadow.camera.bottom = -contactSun.shadow.camera.top;
   contactSun.shadow.bias = -.00022;
   contactSun.shadow.normalBias = .02;
   scene.add(contactSun, contactSun.target);

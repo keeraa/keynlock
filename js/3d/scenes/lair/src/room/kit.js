@@ -15,19 +15,25 @@ export function createRoomKit(scene, m) {
   const woodPeriod = 1.45;
   // Scale each face by real-world dimensions so narrow rails don't squeeze an
   // entire gouache texture into a few centimetres of timber.
-  const sizeWoodBoxUV = (geometry, w, h, d) => {
+  const sizeWoodBoxUV = (geometry, w, h, d, { period = woodPeriod, grainAxis, offsetU = 0, offsetV = 0 } = {}) => {
     const uv = geometry.getAttribute('uv');
     const index = geometry.getIndex();
-    const faces = [[d, h], [d, h], [w, d], [w, d], [w, h], [w, h]];
+    const dimensions = { x: w, y: h, z: d };
+    const axes = [['z', 'y'], ['z', 'y'], ['x', 'z'], ['x', 'z'], ['x', 'y'], ['x', 'y']];
     const visited = new Set();
-    for (let face = 0; face < Math.min(6, geometry.groups.length); face++) {
+    for (let face = 0; face < Math.min(axes.length, geometry.groups.length); face++) {
       const { start, count } = geometry.groups[face];
-      const [width, height] = faces[face];
+      const [uAxis, vAxis] = axes[face];
+      const width = dimensions[uAxis], height = dimensions[vAxis];
+      const turn = vAxis === grainAxis;
       for (let i = start; i < start + count; i++) {
         const vertex = index ? index.getX(i) : i;
         if (visited.has(vertex)) continue;
         visited.add(vertex);
-        uv.setXY(vertex, uv.getX(vertex) * width / woodPeriod, uv.getY(vertex) * height / woodPeriod);
+        const u = uv.getX(vertex), v = uv.getY(vertex);
+        uv.setXY(vertex,
+          (turn ? v * height : u * width) / period + offsetU,
+          (turn ? (1 - u) * width : v * height) / period + offsetV);
       }
     }
     uv.needsUpdate = true;
@@ -35,7 +41,18 @@ export function createRoomKit(scene, m) {
   };
   const box = (parent, w, h, d, material, x = 0, y = 0, z = 0, bevel = 0) => {
     const geometry = bevel ? new RoundedBoxGeometry(w, h, d, 2, bevel) : new THREE.BoxGeometry(w, h, d);
-    if (paintedWood.has(material)) sizeWoodBoxUV(geometry, w, h, d);
+    if (material === m.roomTimber) {
+      // Architecture uses the long axis as the grain direction. World positions
+      // select different parts of the same texture without new materials.
+      const grainAxis = w >= h && w >= d ? 'x' : h >= d ? 'y' : 'z';
+      sizeWoodBoxUV(geometry, w, h, d, {
+        period: 3.8, grainAxis,
+        offsetU: THREE.MathUtils.euclideanModulo(.125 * x + .11 * y + .13 * z, 1),
+        offsetV: THREE.MathUtils.euclideanModulo(.19 * x + .07 * y + .09 * z, 1),
+      });
+    } else if (paintedWood.has(material)) {
+      sizeWoodBoxUV(geometry, w, h, d);
+    }
     const mesh = shadow(new THREE.Mesh(geometry, material));
     mesh.position.set(x, y, z); parent.add(mesh); return mesh;
   };
@@ -74,7 +91,10 @@ export function createRoomKit(scene, m) {
       ctx.fillStyle = '#382d20'; ctx.font = `bold ${Math.min(88, Math.floor(1420 / text.length))}px Georgia`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, w / 2, h / 2 + 2);
     }, 1024, 180);
-    return plane(parent, width, height, new THREE.MeshStandardMaterial({ map: texture, roughness: 1 }), x, y, z);
+    const paper = new THREE.MeshStandardMaterial({
+      map: texture, roughness: 1, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2,
+    });
+    return plane(parent, width, height, paper, x, y, z);
   };
   const zoneTarget = (id, position, size) => {
     anchors[id] = new THREE.Vector3(...position);
@@ -84,19 +104,20 @@ export function createRoomKit(scene, m) {
     scene.add(collider); hitTargets.push(collider);
   };
 
-  function makeTable(parent, w, d, x, z, topY = .94) {
-    const table = new THREE.Group(); table.position.set(x, 0, z); parent.add(table);
+  function makeTable(parent, w, d, x, z, topY, floorY = .0385) {
+    const table = new THREE.Group(); table.position.set(x, floorY, z); parent.add(table);
     box(table, w, .2, d, m.walnut, 0, topY, 0, .04);
     box(table, w - .16, .12, d - .16, m.darkWood, 0, topY - .15, 0);
     for (const xx of [-w / 2 + .19, w / 2 - .19]) for (const zz of [-d / 2 + .19, d / 2 - .19]) {
       box(table, .16, topY - .1, .18, m.agedWood, xx, (topY - .1) / 2, zz);
-      box(table, .22, .12, .21, m.darkWood, xx, .07, zz);
+      box(table, .22, .12, .21, m.darkWood, xx, .06, zz);
     }
     box(table, w - .27, .13, .08, m.darkWood, 0, topY - .38, d / 2 - .20);
     return table;
   }
 
-  function bottle(parent, x, y, z, color, height = .42, radius = .14) {
+  function bottle(parent, x, baseY, z, color, height = .42, radius = .14) {
+    const y = baseY + height / 2;
     cylinder(parent, radius, radius * 1.07, height, m.glass, x, y, z, 16);
     cylinder(parent, radius * .86, radius * .87, height * .44, color, x, y - height * .22, z, 16).castShadow = false;
     cylinder(parent, radius * .38, radius * .44, .11, m.oldBrass, x, y + height / 2 + .05, z, 12);

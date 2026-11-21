@@ -2,7 +2,7 @@
 import { createFrameGeometry } from './frame-geometry.js';
 
 /** Builds the static atelier and exposes its easel factory and wood surfaces. */
-export function createWorkshopRoom({ THREE, scene, mats }) {
+export function createWorkshopRoom({ THREE, scene, mats, includeWallTrim = true, wallZ = -4.6, floorY = -.0285 }) {
   const floorWoodMaterials = [];
   // Static furniture repeats the same primitives dozens of times. Reuse their
   // immutable GPU buffers across both easels, planks, shelves and tools.
@@ -90,11 +90,13 @@ export function createWorkshopRoom({ THREE, scene, mats }) {
     // Mask fixed room architecture out of the normal/ink pass. Distance-based
     // fading alone fails when the camera zooms into the gallery wall.
     wall.userData.excludeFromInk = true;
-    const noInk = (mesh) => { mesh.userData.excludeFromInk = true; return mesh; };
-    noInk(box(32, .12, .18, mats.roomWood, 0, 12.35, -4.47));
-    noInk(box(32, .26, .31, mats.roomWood, 0, 1.24, -4.48));
-    noInk(box(32, 1.22, .15, new THREE.MeshStandardMaterial({ color: '#69513e', roughness: .92 }), 0, .58, -4.53));
-    for (let i = -13; i <= 13; i++) noInk(box(.033, 1.16, .03, mats.roomWood, i * 1.12, .59, -4.43));
+    if (includeWallTrim) {
+      const noInk = (mesh) => { mesh.userData.excludeFromInk = true; return mesh; };
+      noInk(box(32, .12, .18, mats.roomWood, 0, 12.35, -4.47));
+      noInk(box(32, .26, .31, mats.roomWood, 0, 1.24, -4.48));
+      noInk(box(32, 1.22, .15, new THREE.MeshStandardMaterial({ color: '#69513e', roughness: .92 }), 0, .58, -4.53));
+      for (let i = -13; i <= 13; i++) noInk(box(.033, 1.16, .03, mats.roomWood, i * 1.12, .59, -4.43));
+    }
 
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 35), new THREE.MeshStandardMaterial({ color: '#57412f', roughness: .95 }));
     floor.name = 'atelier-original-floor-base';
@@ -126,32 +128,39 @@ export function createWorkshopRoom({ THREE, scene, mats }) {
     // The entire rear wall is kept clear for optional hanging artworks.
 
     // Tool shelving and glass pigment jars.
+    const shelfZ = wallZ + .285;
     for (const y of [1.45, 2.45, 3.45]) {
-      box(2.15, .105, .58, mats.roomWood, -5.25, y, -3.9);
-      box(.08, .52, .46, mats.roomEdge, -6.1, y - .28, -4.06);
-      box(.08, .52, .46, mats.roomEdge, -4.45, y - .28, -4.06);
+      box(2.15, .105, .58, mats.roomWood, -5.25, y, shelfZ).name = 'restoration-wall-shelf';
+      box(.08, .52, .50, mats.roomEdge, -6.1, y - .309, wallZ + .24);
+      box(.08, .52, .50, mats.roomEdge, -4.45, y - .309, wallZ + .24);
     }
     const colors = ['#9a5342', '#b68d52', '#6a8477', '#b6a48c', '#4f6570', '#bd8557', '#6b4934', '#7c7763'];
     const jarGlass = new THREE.MeshPhysicalMaterial({ color: '#d9d3bd', roughness: .18,
       transmission: .65, transparent: true, opacity: .65, thickness: .08 });
     for (let i = 0; i < 8; i++) {
       const row = Math.floor(i / 4), col = i % 4;
-      const x = -6 + col * .5, y = 1.6 + row * 1.03;
-      cylinder(.12, .13, .37, jarGlass, x, y + .04, -3.75);
-      const pigment = cylinder(.103, .103, .23, new THREE.MeshStandardMaterial({ color: colors[i], roughness: .91 }), x, y - .01, -3.75);
+      const x = -6 + col * .5, baseY = 1.5025 + row, z = shelfZ + .025;
+      cylinder(.12, .13, .37, jarGlass, x, baseY + .185, z);
+      const pigment = cylinder(.103, .103, .23, new THREE.MeshStandardMaterial({ color: colors[i], roughness: .91 }), x, baseY + .13, z);
       pigment.userData.excludeFromInk = true;
       pigment.castShadow = false;
-      cylinder(.125, .125, .075, mats.roomWood, x, y + .275, -3.75);
+      cylinder(.125, .125, .075, mats.roomWood, x, baseY + .40, z);
     }
 
     // Work table, scattered brushes, palette and restoration paraphernalia.
     const tabletopY = .91 + .13 / 2;
-    const worktable = box(2.75, .13, 1.15, mats.roomWood, 5.17, .91, 1.0);
+    const tableFrame = new THREE.Group();
+    tableFrame.name = 'restoration-worktable';
+    scene.add(tableFrame);
+    const worktable = box(2.75, .13, 1.15, mats.roomWood, 5.17, .91, 1.0, tableFrame);
     worktable.name = 'restoration-worktable-top';
-    for (const x of [4.07, 6.21]) for (const z of [.59, 1.43]) box(.11, .85, .11, mats.roomEdge, x, .42, z);
-    const brushPad = box(1.1, .06, .72, mats.linen, 5.13, 1.02, 1.03);
+    const legBottom = floorY - .003, legTop = .848;
+    for (const x of [4.07, 6.21]) for (const z of [.59, 1.43]) {
+      box(.11, legTop - legBottom, .11, mats.roomEdge, x, (legTop + legBottom) / 2, z, tableFrame);
+    }
+    const brushPad = box(1.1, .06, .72, mats.linen, 5.13, tabletopY + .03, 1.03);
     brushPad.name = 'restoration-brush-pad';
-    const brushPadY = 1.02 + .06 / 2;
+    const brushPadY = tabletopY + .06;
     for (let i = 0; i < 7; i++) {
       const x = 4.63 + i * .15;
       const handle = rod([x, brushPadY + .016, .77], [x + .10, brushPadY + .016, 1.21],
@@ -196,9 +205,8 @@ export function createWorkshopRoom({ THREE, scene, mats }) {
       const { x, z, width, height, lean, yaw, roll } = item;
       const canvas = new THREE.Group();
       canvas.name = `leaning-canvas-back-${index + 1}`;
-      canvas.position.set(x, .10 + height / 2 * Math.cos(lean), z);
+      canvas.position.set(x, 0, z);
       canvas.rotation.set(lean, yaw, roll);
-      scene.add(canvas);
       box(width, height, .045, canvasBack, 0, 0, .033, canvas);
       const edge = new THREE.Mesh(createFrameGeometry(THREE, width, height, .075, .068), mats.frameWood);
       edge.position.z = .015;
@@ -208,6 +216,10 @@ export function createWorkshopRoom({ THREE, scene, mats }) {
       for (const y of [-height * .35, height * .35]) box(width * .79, .075, .052, mats.easelEdge, 0, y, .101, canvas);
       for (const railX of [-width * .35, width * .35]) box(.075, height * .74, .052, mats.easelEdge, railX, 0, .101, canvas);
       box(.06, height * .62, .055, mats.easel, 0, 0, .143, canvas);
+      const canvasBounds = new THREE.Box3().setFromObject(canvas, true);
+      canvas.position.y += floorY - canvasBounds.min.y - .002;
+      canvas.position.z += wallZ - canvasBounds.min.z - .003;
+      scene.add(canvas);
     }
 
     const dustPositions = new Float32Array(95 * 3);

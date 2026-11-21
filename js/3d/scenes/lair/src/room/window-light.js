@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { WINDOW_OPENING } from './window.js';
 import { BIRD_SIZE, BIRD_Z, createWindowBird } from './window-bird.js';
+import { bakeWindowFurnitureShadows } from './window-furniture-shadows.js';
 
 // Daylight through the arched window, made the same way as in the Key Archive
 // (js/3d/scenes/key-archive/dist/js/archive-window-rays.js): parallel rays
@@ -10,7 +11,7 @@ import { BIRD_SIZE, BIRD_Z, createWindowBird } from './window-bird.js';
 // point back along the rays onto the arched opening. That keeps the air beams,
 // the patch on the floor and the lit dust in exactly the same place.
 //
-// No shadow-casting sun: the Lair keeps short overhead contact shadows only.
+// Static furniture also occludes this light. Its projected depth is baked once.
 
 const { centerX, wallZ, sill, spring, crown, halfWidth, mullionOffsets, transomHeights } = WINDOW_OPENING;
 /** Top of the floor planks (and the rug lies a little above it). */
@@ -30,6 +31,8 @@ export const WINDOW_LIGHT_TINT = WINDOW_LIGHT_PALETTES.day;
 const bottom = sill - .16;
 const top = crown + .12;
 const rise = crown - spring;
+const shadowHalfWidth = halfWidth * 1.08;
+const shadowRange = 26;
 const smooth = (a, b, value) => {
   const t = Math.max(0, Math.min(1, (value - a) / (b - a)));
   return t * t * (3 - 2 * t);
@@ -60,12 +63,28 @@ export function windowLightAt(x, y, z) {
 const f = (/** @type {number} */ x) => x.toFixed(6);
 /**
  * The same function for shaders: float lairWindowLightAt(vec3 point). It also
- * darkens the light where the passing bird's shadow falls, so a material that
- * uses it needs the bird's uniforms (createWindowLight().shaderUniforms).
+ * includes the bird and furniture shadows from createWindowLight().shaderUniforms.
  */
 export const WINDOW_LIGHT_GLSL = `
   uniform sampler2D uWindowBirdMap;
   uniform vec4 uWindowBirdPose;
+  uniform sampler2D uWindowFurnitureMap;
+  float lairFurnitureShadowTap(vec2 uv, float depth) {
+    return step(texture2D(uWindowFurnitureMap, uv).r + .006, depth);
+  }
+  float lairFurnitureShade(float offset, float height, float distance) {
+    vec2 uv = vec2(offset / ${f(shadowHalfWidth * 2)} + .5,
+      (height - ${f(bottom)}) / ${f(top - bottom)});
+    if (min(uv.x, uv.y) <= 0.0 || max(uv.x, uv.y) >= 1.0) return 1.0;
+    float depth = distance / ${f(shadowRange)};
+    float blur = .004 + distance * .00033;
+    float shadow = lairFurnitureShadowTap(uv, depth) * .4;
+    shadow += lairFurnitureShadowTap(uv + vec2(blur, blur), depth) * .15;
+    shadow += lairFurnitureShadowTap(uv + vec2(-blur, blur), depth) * .15;
+    shadow += lairFurnitureShadowTap(uv + vec2(blur, -blur), depth) * .15;
+    shadow += lairFurnitureShadowTap(uv - vec2(blur, blur), depth) * .15;
+    return 1.0 - shadow * .89;
+  }
   float lairBirdShade(vec3 point) {
     if (uWindowBirdPose.z == 0.0) return 1.0;
     // Follow the ray from the point back to the bird's plane outside the glass.
@@ -97,7 +116,8 @@ ${transomHeights.map(bar => `    shade *= .45 + .55 * smoothstep(.04, .04 + blur
     float arch = max(0.0, (height - ${f(spring)}) / ${f(rise)});
     return smoothstep(${f(bottom)}, ${f(sill + .22)}, height) *
       (1.0 - smoothstep(.72, 1.08, length(vec2(offset / ${f(halfWidth)}, arch)))) *
-      lairWindowFrameShade(offset, height, distance) * lairBirdShade(point);
+      lairWindowFrameShade(offset, height, distance) * lairBirdShade(point) *
+      lairFurnitureShade(offset, height, distance);
   }`;
 
 /** Distance from the window at which a ray leaving at this height meets the floor. */
@@ -112,7 +132,7 @@ const rayPoint = (offset, height, distance) => [
 // Two families of translucent slices give the beam depth as the camera turns:
 // upright ones (fixed sideways offset) and flat ones (fixed height). Each ends
 // where it meets the floor.
-function createAirBeams(birdUniforms) {
+function createAirBeams(shadowUniforms) {
   const positions = [], aperture = [], families = [], indices = [];
   const near = .18, width = halfWidth * 1.08, slices = 7;
   function addSlice(a, b, family) {
@@ -140,7 +160,7 @@ function createAirBeams(birdUniforms) {
   const uniforms = {
     uAirStrength: { value: 0 },
     uAirTint: { value: new THREE.Color(WINDOW_LIGHT_TINT.air) },
-    ...birdUniforms,
+    ...shadowUniforms,
   };
   // Normals of the two slice families, used to fade slices seen edge-on.
   const upright = new THREE.Vector3(1, 0, WINDOW_LIGHT_SLOPE.x).normalize();
@@ -184,7 +204,7 @@ function createAirBeams(birdUniforms) {
         facing *= facing;
         float layerWeight = mix(facing.x, facing.y, vFamily) / max(.14, facing.x + facing.y);
         float frame = lairWindowFrameShade(offset * ${f(halfWidth)}, height, distanceFromWindow) *
-          lairBirdShade(vBeamPosition);
+          lairBirdShade(vBeamPosition) * lairFurnitureShade(offset * ${f(halfWidth)}, height, distanceFromWindow);
         gl_FragColor = vec4(uAirTint, uAirStrength * air * apertureEdge * frame * layerWeight);
         #include <colorspace_fragment>
       }`,
@@ -198,7 +218,7 @@ function createAirBeams(birdUniforms) {
 }
 
 // The arched patch of sunlight on the floor (and across the rug).
-function createFloorPatch(birdUniforms) {
+function createFloorPatch(shadowUniforms) {
   const near = floorAt(top), far = floorAt(bottom);
   const zFrom = wallZ + floorAt(bottom) - 0.5, zTo = wallZ + floorAt(top) + .5;
   const drift = [near, far].map(d => -d * WINDOW_LIGHT_SLOPE.x);
@@ -208,7 +228,7 @@ function createFloorPatch(birdUniforms) {
   const uniforms = {
     uStrength: { value: 0 },
     uTint: { value: new THREE.Color(WINDOW_LIGHT_TINT.floor) },
-    ...birdUniforms,
+    ...shadowUniforms,
   };
   const material = new THREE.ShaderMaterial({
     uniforms, transparent: true, depthWrite: false, toneMapped: false, fog: false,
@@ -241,18 +261,26 @@ function createFloorPatch(birdUniforms) {
 
 /**
  * Adds the window light and the passing bird to `parent`. `shaderUniforms`
- * (dust strength, dust tint and the bird's shadow) are shared with the
+ * (dust strength, dust tint and shadows) are shared with the
  * floating dust (room/ambient-particles.js), which lights up in the beam.
  */
-export function createWindowLight(parent) {
+export function createWindowLight(parent, furniture = []) {
   const bird = createWindowBird(parent);
-  const air = createAirBeams(bird.uniforms);
-  const floor = createFloorPatch(bird.uniforms);
+  const casters = new Set(furniture);
+  const projection = {
+    x: centerX, z: wallZ, halfWidth: shadowHalfWidth, bottom, top, range: shadowRange, slope: WINDOW_LIGHT_SLOPE,
+  };
+  const shadowUniforms = {
+    ...bird.uniforms,
+    uWindowFurnitureMap: { value: bakeWindowFurnitureShadows(furniture, projection) },
+  };
+  const air = createAirBeams(shadowUniforms);
+  const floor = createFloorPatch(shadowUniforms);
   parent.add(air.beams, floor.patch);
   const shaderUniforms = {
     uWindowLight: { value: 0 },
     uWindowTint: { value: new THREE.Color(WINDOW_LIGHT_TINT.dust) },
-    ...bird.uniforms,
+    ...shadowUniforms,
   };
   let strength = 1;
   let night = 0;
@@ -272,6 +300,14 @@ export function createWindowLight(parent) {
   apply();
   return {
     shaderUniforms, beams: air.beams, floor: floor.patch, bird: bird.bird,
+    /** Register furniture from a workshop once it joins the common scene. */
+    addFurniture(/** @type {THREE.Object3D} */ object) {
+      if (casters.has(object)) return;
+      casters.add(object);
+      const previous = shadowUniforms.uWindowFurnitureMap.value;
+      shadowUniforms.uWindowFurnitureMap.value = bakeWindowFurnitureShadows([...casters], projection);
+      previous.dispose();
+    },
     /** 0 = off, 1 = the default light, up to 1.5. */
     setStrength(/** @type {number} */ value) { strength = Math.max(0, value); apply(); },
     /** 0 = warm sunlight, 1 = cool moonlight, or in between. */

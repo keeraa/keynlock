@@ -13,13 +13,14 @@ export function createWallExhibitionController({ paintings, playerProgress, wall
   let viewedId = null;
   let lastAutoPickAt = -Infinity;
   const artworkInfo = createWallArtworkInfo({ $ });
+  const displaySwitchLabel = () => showingDemo ? 'МОИ КАРТИНЫ' : 'ДЕМО · 30';
 
   function updateCounters() {
     const count = playerProgress.getWallIds().length;
     $('wall-count').textContent = showingDemo ? `${demoArtworks.length} ДЕМО` : `${count} / 30`;
     $('wall-select-count').textContent = `${count}/30`;
     $('collection-wall-count').textContent = `${count}/30`;
-    $('wall-gallery-demo').textContent = showingDemo ? 'МОИ КАРТИНЫ' : 'ДЕМО · 30';
+    $('wall-gallery-demo').textContent = displaySwitchLabel();
     $('wall-gallery-demo').setAttribute('aria-pressed', String(showingDemo));
     $('wall-gallery-shuffle').hidden = !showingDemo;
   }
@@ -115,18 +116,22 @@ export function createWallExhibitionController({ paintings, playerProgress, wall
     void refresh();
   }
 
+  function switchDisplay() {
+    showingDemo = !showingDemo;
+    refreshModeHeader();
+  }
+
+  function shuffle() {
+    demoArtworks = chooseDemoWallPaintings(paintings);
+    refreshModeHeader();
+  }
+
   function bind() {
     $('wall-gallery-open').addEventListener('click', () => getNavigation().enterWallGallery(wallGallery.getLayout().bounds));
     $('wall-gallery-back').addEventListener('click', () => getNavigation().leaveWallGallery());
     $('wall-gallery-select').addEventListener('click', () => collectionUI.open('wall'));
-    $('wall-gallery-demo').addEventListener('click', () => {
-      showingDemo = !showingDemo;
-      refreshModeHeader();
-    });
-    $('wall-gallery-shuffle').addEventListener('click', () => {
-      demoArtworks = chooseDemoWallPaintings(paintings);
-      refreshModeHeader();
-    });
+    $('wall-gallery-demo').addEventListener('click', switchDisplay);
+    $('wall-gallery-shuffle').addEventListener('click', shuffle);
     $('wall-art-back').addEventListener('click', () => getNavigation().leaveWallArt());
     $('wall-gallery-next').addEventListener('click', () => getNavigation().moveAlongWall(1));
     $('wall-gallery-prev').addEventListener('click', () => getNavigation().moveAlongWall(-1));
@@ -135,5 +140,6 @@ export function createWallExhibitionController({ paintings, playerProgress, wall
 
   return { bind, refresh, toggleWall, onNewRestoration,
     handleModeChange, updateViewedArtwork, updateCounters, refreshAfterWallChange,
+    switchDisplay, shuffle, displaySwitchLabel, canShuffle: () => showingDemo,
     viewedId: () => viewedId };
 }

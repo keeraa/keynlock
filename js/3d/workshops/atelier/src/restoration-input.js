@@ -6,7 +6,7 @@ export function createRestorationInput({ THREE, renderer, camera, controls, scen
   onPaintingFocus = (side) => navigation.focusOn(side),
   inputElement = renderer.domElement, interactionCamera = camera,
   setStrokeInputBlocked = () => {},
-  isInteractive = () => true, embeddedEditing = false, $ }) {
+  isInteractive = () => true, embeddedEditing = false, uiRoot = document, $ }) {
   let activeTool = null;
   let stroke = null;
   let pointerStart = null;
@@ -123,7 +123,7 @@ export function createRestorationInput({ THREE, renderer, camera, controls, scen
     finishStroke();
     updateUVIllumination(null);
     activeTool = activeTool === nextTool ? null : nextTool;
-    document.querySelectorAll('.restoration-tool').forEach((button) => {
+    uiRoot.querySelectorAll('.restoration-tool').forEach((button) => {
       button.setAttribute('aria-pressed', String(button.dataset.tool === activeTool));
     });
     controls.enableRotate = true;
@@ -238,7 +238,7 @@ export function createRestorationInput({ THREE, renderer, camera, controls, scen
     updateUVIllumination(null);
     onWallArtworkHover(null);
   });
-  document.querySelectorAll('.restoration-tool').forEach((button) => {
+  uiRoot.querySelectorAll('.restoration-tool').forEach((button) => {
     button.addEventListener('click', () => selectTool(button.dataset.tool));
   });
 

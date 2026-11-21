@@ -7,7 +7,7 @@ import {createWorldWorkshopRegistry} from './world-workshops.js';
  * controls and UI. All GPU work is submitted to the one WebGLRenderer/canvas
  * owned by the Keynlock room. No embedded document can create a GPU context.
  */
-export function createSharedRendererHost({renderer,canvas,worldScene}) {
+export function createSharedRendererHost({renderer,canvas,worldScene, onWorkshopError = (id, error) => {}}) {
   const instances = new Map();
   const workshopSettings = new Map();
   const workshops = new Map();
@@ -240,10 +240,7 @@ export function createSharedRendererHost({renderer,canvas,worldScene}) {
     } catch (error) {
       setWorldWorkshop(null);
       console.error(`KEYNLOCK ${workshopId} simulation failed`, error);
-      const event = workshopId === 'atelier' ? 'keynlock:atelier' : 'keynlock:alchemy:v1';
-      window.dispatchEvent(new CustomEvent(event, {
-        detail: { type: 'error', message: error?.message || String(error) },
-      }));
+      onWorkshopError(workshopId, error);
       return;
     }
     if (state.interval) state.nextAt = now + Math.max(state.interval, (performance.now() - started) * 1.6);

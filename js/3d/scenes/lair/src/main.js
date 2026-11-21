@@ -5,8 +5,8 @@ import { buildLair } from './room/build.js';
 import { ROOM_CENTER_Z, ROOM_END } from './room-layout.js';
 import { createRoomOutlines, mountVisualSettings } from './ui/visual-settings.js';
 import { mountWorkshopOverlay } from './workshops/workshop-overlay.js';
-import { mountAtelierInRoom } from './workshops/atelier-in-room.js';
-import { mountAlchemyInRoom } from './workshops/alchemy-in-room.js';
+import { createAtelierEmbedding } from '@keynlock/atelier/embedding';
+import { createAlchemyEmbedding } from '@keynlock/alchemy/embedding';
 import { createSharedRendererHost } from './rendering/shared-renderer-host.js';
 import { createCartoonFilter } from '@keynlock/atelier/room-assets';
 import { addRoomLighting } from './room/lighting.js';
@@ -23,7 +23,7 @@ import { mountZoneInteraction } from './navigation/zone-interaction.js';
 import { createAtelierView } from './workshops/atelier-view.js';
 import { mountInitialLoading } from './ui/initial-loading.js';
 import { getWorkshopApi, setWorkshopHost } from '../../../core/host/workshop-host.js';
-import { bindLanguageSelect, translator } from './i18n.js';
+import { bindLanguageSelect, t, translator } from './i18n.js';
 import './style.css';
 import './ui/initial-loading.css';
 import './ui/visual.css';
@@ -36,6 +36,7 @@ bindLanguageSelect(document.querySelector('#lair-language'));
 mountAmbience(document.querySelector('#sound-toggle'));
 
 function setup() {
+  const app = document.querySelector('#app');
   const canvas = document.querySelector('#scene');
   const interaction = document.querySelector('#scene-interaction');
   const loading = document.querySelector('#loading');
@@ -91,13 +92,20 @@ function setup() {
   const { materials, visual } = createMaterials();
   const room = buildLair(scene, materials);
   const atelierFilter = createCartoonFilter({ THREE, renderer, scene, camera });
-  const rendererHost = createSharedRendererHost({ renderer, canvas, worldScene: scene });
+  const atelier = createAtelierEmbedding({ host: host.atelier, t,
+    onPanelHeight: height => app.style.setProperty('--atelier-panel-height', `${height}px`),
+  });
+  const alchemy = createAlchemyEmbedding({ host: host.alchemy, t, onExit: () => zoneTransitions.reset() });
+  const inRoomWorkshops = { atelier, alchemy };
+  const rendererHost = createSharedRendererHost({ renderer, canvas, worldScene: scene,
+    onWorkshopError: (id, error) => inRoomWorkshops[id]?.reportError(error),
+  });
   host.renderer = rendererHost;
   // The separately developed workbench finds the shared renderer in its iframe.
   window.__keynlockRendererHost = rendererHost;
 
   const workshopOverlay = mountWorkshopOverlay({
-    rendererHost,
+    rendererHost, inRoomWorkshops,
     onExit: () => zoneTransitions.reset(),
     onReady: id => zoneTransitions.onWorkshopReady(id),
   });
@@ -145,6 +153,8 @@ function setup() {
   // starts warming up their shaders.
   mountInitialLoading({
     loading,
+    atelierStatus: atelier.status,
+    alchemyStatus: alchemy.status,
     onAtelierModelsReady() {
       const worktable = scene.getObjectByName('restoration-worktable');
       if (worktable) room.windowLight.addFurniture(worktable);
@@ -158,13 +168,8 @@ function setup() {
     canvas, camera, interaction, roomWalk, cameraInput, zoneTransitions, workshopOverlay,
     anchors: room.anchors, hitTargets: room.hitTargets,
   });
-  const atelierElement = mountAtelierInRoom(host);
-  const alchemyElement = mountAlchemyInRoom(host);
-  alchemyElement.querySelector('.lair-alchemy-exit')?.addEventListener('click', zoneTransitions.reset);
-  const observeAtelierMenu = () => document.querySelector('#app').style.setProperty(
-    '--atelier-panel-height', `${Math.round(atelierElement.getBoundingClientRect().height)}px`);
-  new ResizeObserver(observeAtelierMenu).observe(atelierElement);
-  observeAtelierMenu();
+  atelier.mount(app);
+  alchemy.mount(app);
 
   function resize() {
     const width = canvas.clientWidth, height = canvas.clientHeight;

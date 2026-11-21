@@ -162,13 +162,10 @@ export default Object.freeze({
   "Выключить звуковое окружение": "Turn off ambient sound",
   "Включить звуковое окружение": "Turn on ambient sound",
   "KEYNLOCK — оригинальная мастерская «{title}»": "KEYNLOCK — the original “{title}” workshop",
-  "Редактор не завершил запуск": "The editor did not finish starting",
   "ПОВТОРИТЬ ЗАПУСК": "TRY AGAIN",
   "Реставрация не запустилась: {reason}": "Restoration did not start: {reason}",
   "превышено время ожидания": "it took too long",
-  "ошибка запуска": "start-up error",
   "Ошибка лаборатории: {reason}": "Laboratory error: {reason}",
-  "неизвестная ошибка": "unknown error",
   "← В ЛОГОВО": "← TO THE LAIR",
   "Выйти из алхимии в логово": "Leave alchemy for the Lair",
 });

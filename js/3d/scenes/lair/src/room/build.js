@@ -13,8 +13,7 @@ import { ALCHEMY_Z, ATELIER_Z } from '../room-layout.js';
 export function buildLair(scene, m) {
   const kit = createRoomKit(scene, m);
   const { anchors, hitTargets, animated, zoneTarget } = kit;
-  // The Atelier (@keynlock/atelier, mounted by atelier-in-room.js) and the
-  // laboratory (@keynlock/alchemy, mounted by alchemy-in-room.js) own all
+  // The Atelier and the laboratory, mounted by their packages, own all
   // their furniture; the room keeps only their picking targets.
   const rightWallFinish = buildShell(kit);
   const windowView = buildWindow(kit);

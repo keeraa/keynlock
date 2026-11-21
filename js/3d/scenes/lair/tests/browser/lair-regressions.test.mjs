@@ -63,7 +63,7 @@ after(async () => {
   if (server) await new Promise(resolve => server.httpServer.close(resolve));
 });
 
-async function openRoom(t, { locale = 'ru-RU', pointerLock = false } = {}) {
+async function openRoom(t, { locale = 'ru-RU', pointerLock = false, beforeLoad } = {}) {
   // The headless shell rejects native pointer lock. Use full Chromium for that case.
   const roomBrowser = pointerLock && !channel
     ? await chromium.launch({ channel: 'chromium', args: browserArgs })
@@ -74,6 +74,7 @@ async function openRoom(t, { locale = 'ru-RU', pointerLock = false } = {}) {
   await servePaintingsLocally(context);
   const page = await context.newPage();
   page.setDefaultTimeout(timeout);
+  await beforeLoad?.(page);
   const response = await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout });
   assert.equal(response.status(), 200);
   await page.locator('#app > #loading').waitFor({ state: 'hidden' });
@@ -83,7 +84,7 @@ async function openRoom(t, { locale = 'ru-RU', pointerLock = false } = {}) {
 
 async function enterAlchemy(page) {
   await page.locator('.zone-nav [data-zone="alchemy"]').click();
-  await page.waitForFunction(() => window.__keynlockDebug.workshop('alchemy')?.lifecycle.isActive());
+  await page.waitForFunction(() => window.__keynlockDebug.workshop('alchemy')?.lifecycle?.isActive());
   await page.getByRole('button', { name: 'Выйти из алхимии в логово' }).waitFor();
   const visualToggle = page.locator('#alchemy-visual-toggle');
   if (await visualToggle.getAttribute('aria-expanded') === 'true') await visualToggle.click();
@@ -168,9 +169,9 @@ test('the burner accounts for active time when returning to the lab', async t =>
     const api = window.__keynlockDebug.workshop('alchemy');
     const host = window.__keynlockDebug.host.renderer;
     const step = host.stepWorldRuntime;
-    window.addEventListener('keynlock:alchemy:v1', function onResume(event) {
-      if (event.detail.type !== 'resume') return;
-      window.removeEventListener('keynlock:alchemy:v1', onResume);
+    const unsubscribe = api.status.subscribe((status, previous) => {
+      if (!status.active || previous?.active !== false) return;
+      unsubscribe();
       const resumedAt = performance.now();
       const previousHeat = api.getState().recipeHeatSeconds;
       host.stepWorldRuntime = now => {
@@ -317,7 +318,8 @@ test('the room hosts both workshops on one canvas through the host contract', as
   const page = await openRoom(t);
   const debug = 'window.__keynlockDebug';
   await page.waitForFunction(() => window.__keynlockDebug.workshop('atelier')?.bridge?.isReady()
-    && window.__keynlockDebug.workshop('alchemy'));
+    && window.__keynlockDebug.workshop('atelier')?.status.get().galleryReady
+    && window.__keynlockDebug.workshop('alchemy')?.status.get().ready);
   // One visible WebGL canvas: the workshops draw through the room's renderer.
   const visibleCanvases = await page.evaluate(() => [...document.querySelectorAll('canvas')].filter(canvas => {
     const box = canvas.getBoundingClientRect();
@@ -423,10 +425,51 @@ test('the room hosts both workshops on one canvas through the host contract', as
   await page.locator('#wall-collection-entry').click();
   await page.waitForFunction(() => window.__keynlockDebug.host.atelier.galleryActive === true);
   assert.equal(await page.locator('#lair-gallery-controls').isVisible(), true);
+  const gallery = await page.evaluateHandle(() => window.__keynlockDebug.workshop('atelier').gallery);
+  assert.equal(await gallery.evaluate(api => api.getState().canShuffle), true);
+  await page.locator('#gallery-switch').click();
+  await page.locator('#gallery-switch').and(page.getByText('ДЕМО · 30', { exact: true })).waitFor();
+  assert.equal(await gallery.evaluate(api => api.getState().canShuffle), false);
+  assert.equal(await page.locator('#gallery-shuffle').isHidden(), true);
+  await page.locator('#gallery-select').click();
+  await page.locator('#atelier-embedded-app #collection-modal').waitFor();
+  assert.equal(await gallery.evaluate(api => api.getState().collectionOpen), true);
+  await page.keyboard.press('Escape');
+  await page.locator('#atelier-embedded-app #collection-modal').waitFor({ state: 'hidden' });
+  assert.equal(await gallery.evaluate(api => api.getState().collectionOpen), false);
+  assert.equal(await gallery.evaluate(api => api.getState().active), true);
   await page.locator('#gallery-easels').click();
   await page.waitForFunction(() => window.__keynlockDebug.host.atelier.galleryActive === false);
   assert.equal(await page.locator('#lair-gallery-controls').isVisible(), false);
 });
+
+for (const [id, healthy, chunk, message] of [
+  ['atelier', 'alchemy', /\/assets\/main-[\w-]+\.js$/, 'Реставрация не запустилась'],
+  ['alchemy', 'atelier', /\/assets\/alchemy-[\w-]+\.js$/, 'Ошибка лаборатории'],
+]) {
+  test(`a failed ${id} import reports an error without blocking ${healthy}`, async t => {
+    const page = await openRoom(t, { beforeLoad: page => page.route(chunk, route => route.abort()) });
+    await page.waitForFunction(({ id, healthy }) => {
+      const workshop = window.__keynlockDebug.workshop;
+      return workshop(id)?.status.get().error && workshop(healthy)?.status.get().ready;
+    }, { id, healthy });
+    const failed = await page.evaluate(id => window.__keynlockDebug.workshop(id).status.get(), id);
+    assert.equal(failed.ready, false);
+    assert.ok(failed.error);
+
+    await page.locator(`.zone-nav [data-zone="${id}"]`).click();
+    await page.locator(`#${id}-embedded-app`).getByRole('alert').filter({ hasText: message }).waitFor();
+    if (id === 'alchemy') await page.getByRole('button', { name: 'Выйти из алхимии в логово' }).click();
+    else await page.locator('#reset-camera').click();
+    assert.equal(await page.locator(`#${id}-embedded-app`).isHidden(), true);
+
+    if (healthy === 'alchemy') await enterAlchemy(page);
+    else {
+      await page.locator('.zone-nav [data-zone="atelier"]').click();
+      await page.locator('#lair-easel-camera-controls').waitFor();
+    }
+  });
+}
 
 test('first-person walking slides against furniture and walls, interacts, and restores orbit controls', async t => {
   const page = await openRoom(t);
@@ -529,8 +572,8 @@ test('E hands off a pointer-locked walk to alchemy exactly once', async t => {
     document.addEventListener('pointerlockchange', () => {
       if (!document.pointerLockElement) handoff.releases++;
     });
-    window.addEventListener('keynlock:alchemy:v1', event => {
-      if (event.detail.type === 'resume') handoff.resumes++;
+    window.__keynlockDebug.workshop('alchemy').status.subscribe((status, previous) => {
+      if (status.active && previous?.active === false) handoff.resumes++;
     });
     let enabled = controls.enabled;
     Object.defineProperty(controls, 'enabled', {

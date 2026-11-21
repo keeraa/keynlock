@@ -1,4 +1,4 @@
-import { t } from './i18n.js';
+import { t } from '../i18n.js';
 /**
  * Coordinate the original KEYNLOCK workshops from the Lair.
  *

@@ -1,10 +1,10 @@
 // @ts-check
-import { createRoomKit } from './room/kit.js';
-import { buildShell } from './room/shell.js';
-import { buildWindow } from './room/window.js';
-import { buildPlanning } from './room/planning.js';
-import { buildWorkbench } from './room/workbench.js';
-import { buildGramophone, buildDetails } from './room/details.js';
+import { createRoomKit } from './kit.js';
+import { buildShell } from './shell.js';
+import { buildWindow } from './window.js';
+import { buildPlanning } from './planning.js';
+import { buildWorkbench } from './workbench-furniture.js';
+import { buildGramophone, buildDetails } from './details.js';
 
 /** A single continuous room, using the proportions and gouache materials of the existing ateliers. */
 export function buildLair(scene, m) {

@@ -1,23 +1,23 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { createMaterials } from './materials.js';
-import { buildLair } from './room.js';
-import { createRoomOutlines, mountVisualSettings } from './visual-settings.js';
-import { mountWorkshopOverlay } from './workshop-overlay.js';
-import { mountAtelierInRoom } from './atelier-in-room.js';
-import { mountAlchemyInRoom } from './alchemy-in-room.js';
-import { createSharedRendererHost } from './shared-renderer-host.js';
+import { createMaterials } from './room/materials.js';
+import { buildLair } from './room/build.js';
+import { createRoomOutlines, mountVisualSettings } from './ui/visual-settings.js';
+import { mountWorkshopOverlay } from './workshops/workshop-overlay.js';
+import { mountAtelierInRoom } from './workshops/atelier-in-room.js';
+import { mountAlchemyInRoom } from './workshops/alchemy-in-room.js';
+import { createSharedRendererHost } from './rendering/shared-renderer-host.js';
 import { createCartoonFilter } from '@keynlock/atelier/src/effects/cartoon-filter.js';
-import { addRoomLighting } from './room-lighting.js';
-import { createZoneTransitions, ATELIER_EASELS } from './zone-transitions.js';
-import { createAtelierView } from './atelier-view.js';
-import { createInitialLoadingGate } from './initial-loading.js';
+import { addRoomLighting } from './room/lighting.js';
+import { createZoneTransitions, ATELIER_EASELS } from './navigation/zone-transitions.js';
+import { createAtelierView } from './workshops/atelier-view.js';
+import { createInitialLoadingGate } from './ui/initial-loading.js';
 import { getWorkshopApi, setWorkshopHost } from '../../../core/host/workshop-host.js';
 import { bindLanguageSelect, t, translator } from './i18n.js';
 import './style.css';
-import './initial-loading.css';
-import './visual.css';
-import './workshop-overlay.css';
+import './ui/initial-loading.css';
+import './ui/visual.css';
+import './workshops/workshop-overlay.css';
 
 // The page is written in Russian; translate the Lair's own markup before the
 // workshops mount theirs (their interfaces are not translated yet).

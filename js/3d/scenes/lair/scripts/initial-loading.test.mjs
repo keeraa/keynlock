@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createInitialLoadingGate } from '../src/initial-loading.js';
+import { createInitialLoadingGate } from '../src/ui/initial-loading.js';
 
 function fakeClock() {
   let time = 0;

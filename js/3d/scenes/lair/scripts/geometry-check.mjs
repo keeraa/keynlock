@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import * as THREE from 'three';
-import { createMaterials } from '../src/materials.js';
-import { buildLair } from '../src/room.js';
-import { createRoomOutlines } from '../src/visual-settings.js';
+import { createMaterials } from '../src/room/materials.js';
+import { buildLair } from '../src/room/build.js';
+import { createRoomOutlines } from '../src/ui/visual-settings.js';
 
 // Exercise the scene graph without a GPU or browser canvas.
 const noop = () => {};

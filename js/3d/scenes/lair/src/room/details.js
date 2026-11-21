@@ -1,6 +1,6 @@
 // @ts-check
 import * as THREE from 'three';
-import { createAmbientParticles } from '../engine/ambient-particles.js';
+import { createAmbientParticles } from './ambient-particles.js';
 
 // The gramophone corner, hanging lamps and the floating dust.
 export function buildGramophone(kit) {

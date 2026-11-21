@@ -1,6 +1,6 @@
 // @ts-check
 import * as THREE from 'three';
-import { makeMapTexture } from '../materials.js';
+import { makeMapTexture } from './materials.js';
 
 // The planning table in the middle of the room.
 export function buildPlanning(kit) {

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import {createWorldWorkshopRegistry, WORKSHOP_PLACEMENTS} from '../src/world-workshops.js';
+import {createWorldWorkshopRegistry, WORKSHOP_PLACEMENTS} from '../src/rendering/world-workshops.js';
 
 test('three unchanged source scenes occupy one physically connected world',()=>{
   const world=new THREE.Scene();

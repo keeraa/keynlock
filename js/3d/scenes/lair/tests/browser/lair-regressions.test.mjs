@@ -15,7 +15,7 @@ let baseUrl;
 
 // The catalog loads paintings from GitHub. Serve them from this checkout so the
 // tests neither wait on the network nor depend on what is on the remote branch.
-const repoRoot = fileURLToPath(new URL('../../../../../../', import.meta.url));
+const repoRoot = fileURLToPath(new URL('../../../../../..', import.meta.url));
 async function servePaintingsLocally(context) {
   await context.route(/^https:\/\/raw\.githubusercontent\.com\/keeraa\/keynlock\/[^/]+\/(assets\/restoration\/.+)$/, route => {
     const path = repoRoot + decodeURIComponent(new URL(route.request().url()).pathname.split('/').slice(4).join('/'));

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { WORKSHOPS } from './workshop-overlay.js';
-import { t } from './i18n.js';
+import { WORKSHOPS } from '../workshops/workshop-overlay.js';
+import { t } from '../i18n.js';
 import { ALCHEMY_LOOK } from '@keynlock/alchemy/src/look/alchemy-look.js';
 
 export const ATELIER_EASELS = { position: [1.56, 3.22, 10.35], target: [-7.05, 2.48, 10.35] };

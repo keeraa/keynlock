@@ -2,10 +2,10 @@
 import * as THREE from 'three';
 import { makeGouacheWallTexture } from '@keynlock/alchemy/src/wall-tiles.js';
 import { atelierWallpaperSource } from '@keynlock/atelier/src/painted-assets.js';
-import { t } from './i18n.js';
+import { t } from '../i18n.js';
 
 const alchemyWood = name =>
-  new URL(`../../../workshops/alchemy/src/assets/wood-gouache-${name}.webp`, import.meta.url).href;
+  new URL(`../../../../workshops/alchemy/src/assets/wood-gouache-${name}.webp`, import.meta.url).href;
 
 export function createMaterials() {
   const textureLoader = new THREE.TextureLoader();

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import * as THREE from 'three';
-import { addRoomLighting } from '../src/room-lighting.js';
+import { addRoomLighting } from '../src/room/lighting.js';
 
 test('the salon keeps warm modelling but only short overhead contact shadows', () => {
   const scene = new THREE.Scene();

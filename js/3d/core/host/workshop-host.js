@@ -14,7 +14,7 @@
 
 /**
  * @typedef {object} RendererHost The Lair's one WebGLRenderer, shared by all workshops
- *   (see js/3d/scenes/lair/src/shared-renderer-host.js).
+ *   (see js/3d/scenes/lair/src/rendering/shared-renderer-host.js).
  * @property {(workshopId: string, canvas: HTMLCanvasElement) => any} createRenderer
  * @property {(workshopId: string, world: { scene: any, camera: any, additionalScenes?: any[], slot?: string }) => any} registerWorldScene
  * @property {(workshopId: string, workshop: { enter?: () => void, exit?: () => void, update?: (now: number) => void }, options?: object) => () => void} [registerWorldWorkshop]

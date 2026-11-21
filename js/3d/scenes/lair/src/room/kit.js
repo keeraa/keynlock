@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { canvasTexture } from '../materials.js';
+import { canvasTexture } from './materials.js';
 
 // Shared building blocks for the room's parts: primitives with physical-scale
 // wood UVs, painted labels, the zones' picking targets, tables and bottles.

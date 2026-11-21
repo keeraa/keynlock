@@ -1,7 +1,7 @@
 /** Run the original alchemy application in the Lair DOM and 3D world. */
 import alchemyHTML from '@keynlock/alchemy/index.html?raw';
 import alchemyCSS from '@keynlock/alchemy/src/styles.css?inline';
-import { t } from './i18n.js';
+import { t } from '../i18n.js';
 
 export function mountAlchemyInRoom(host) {
   const source = new DOMParser().parseFromString(alchemyHTML, 'text/html');

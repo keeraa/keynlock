@@ -1,6 +1,6 @@
 // @ts-check
 import * as THREE from 'three';
-import { canvasTexture } from '../materials.js';
+import { canvasTexture } from './materials.js';
 
 // The long room itself: floor, walls, ceiling, rug and the right-wall finish.
 export function buildShell(kit) {

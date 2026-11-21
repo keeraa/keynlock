@@ -21,16 +21,11 @@ THREE.TextureLoader.prototype.load = () => new THREE.Texture();
 const scene = new THREE.Scene();
 const { materials, visual } = createMaterials();
 const world = buildLair(scene, materials);
-const nativeAtelierScene = new THREE.Scene();
-const nativeAtelierWorld = buildLair(nativeAtelierScene, materials, {useOriginalRestoration:true});
-assert.equal(nativeAtelierScene.getObjectByName('restoration-left-wall')?.material, materials.restorationWall,
-  'the native Atelier wall uses a gouache-mapped material while the source wallpaper loads');
-assert.equal(nativeAtelierScene.getObjectByName('lair-restoration-preview'),undefined,
-  'native Atelier mode never creates the temporary duplicate easels');
-assert.equal(nativeAtelierScene.getObjectByName('restoration-easel-reference'),undefined,
-  'native Atelier mode has no static reference painting in front of the real one');
-assert.ok(nativeAtelierWorld.anchors.restoration,
-  'the restoration interaction target is retained without the duplicate scene');
+assert.equal(scene.getObjectByName('restoration-left-wall')?.material, materials.restorationWall,
+  'the Atelier wall uses a gouache-mapped material while the source wallpaper loads');
+assert.equal(scene.getObjectByName('restoration-easel-reference'),undefined,
+  'the room never builds its own easels: the real Atelier owns them');
+assert.ok(world.anchors.restoration,'the restoration interaction target is retained');
 scene.updateMatrixWorld(true);
 const unique = name => {
   const found = scene.getObjectByName(name);
@@ -67,21 +62,11 @@ assert.ok(restWall.max.z - restWall.min.z > 31.9, 'restoration gallery wing span
 assert.ok(alchemyWall.max.z - alchemyWall.min.z > 31.9, 'opposite work wing grows symmetrically');
 assert.ok(Math.abs((restWall.max.z-restWall.min.z)-(alchemyWall.max.z-alchemyWall.min.z))<.1,
   'left and right wing have matching depth');
-const salonWall = unique('atelier-original-salon-wall');
-assert.ok(Math.abs(salonWall.rotation.y-Math.PI/2)<1e-6,'original gallery turns ninety degrees onto left wall');
-assert.ok(salonWall.position.x < -8.2 && salonWall.position.z > 9,
-  'original 30m exhibition occupies expanded left wing');
-assert.equal(unique('twelve-art-history-column-headings').geometry.type,'PlaneGeometry',
-  'the source gallery column strip is present');
-assert.ok(world.atelierWall && world.atelierWall.getArtCount()===0,
-  "the salon gallery accepts the player's real paintings from the bridge");
 assert.ok(alchemyWall.min.x > 8.25 && alchemyWall.max.x < 8.45, 'sage tiles lie against right wall');
 assert.ok(alchemyWall.max.y > 13.4 && alchemyWall.min.y < .1, 'tiles cover the entire wall height');
 assert.ok(alchemyWall.min.z < -5.6 && alchemyWall.max.z > 7.1, 'tiles cover the entire wall width');
 assert.equal(scene.getObjectByName('alchemy-facing-wall-table'),undefined,
   'the legacy imitated laboratory is absent: the original module owns every bottle and table');
-assert.equal(world.alchemyVials.size,0,'no duplicated bottles occupy the source laboratory space');
-assert.equal(world.alchemyInteractive.length,0,'only the original lab owns its interactions');
 assert.ok(world.anchors.alchemy,'the original laboratory still has a navigation hotspot');
 assert.ok(archedWindow.max.x - archedWindow.min.x > 8.20, 'new window is twice as wide');
 assert.ok(archedWindow.max.y - archedWindow.min.y > 7.20, 'new window is twice as tall');
@@ -124,17 +109,6 @@ for (const { positions, topBefore, hemBefore } of hangingCloths) {
 assert.ok(workbench.min.z > 15, 'workbench stays beyond the original alchemy station');
 assert.ok(workbench.max.x < alchemyWall.min.x, 'workbench does not enter the tile wall');
 assert.ok(unique('workbench-tool-wall').position.z > 3.5, 'tool wall moved with the workbench');
-assert.ok(unique('restoration-easel-reference').position.x < -7.0);
-assert.ok(unique('restoration-easel-work').position.x < -7.0);
-const reference = unique('restoration-easel-reference');
-const work = unique('restoration-easel-work');
-assert.equal(reference.position.x, work.position.x, 'paintings align at the same wall depth');
-assert.ok(reference.position.z > work.position.z, 'reference appears to the left of the restoration');
-assert.equal(reference.rotation.y, Math.PI / 2, 'the reference faces the restoration camera');
-assert.equal(work.rotation.y, reference.rotation.y, 'both paintings face the same direction');
-assert.ok(unique('restoration-weathered-patina'), 'the right painting is visibly aged');
-assert.ok(unique('restoration-caption-reference').position.y > 3.4, 'reference caption sits above the easel');
-assert.ok(unique('restoration-caption-work').position.y > 3.4, 'work caption sits above the easel');
 assert.equal(Object.keys(world.anchors).length, 5, 'all five hotspots retained');
 const wallpaper = unique('alchemy-right-wall');
 assert.equal(wallpaper.material, materials.alchemyTile, 'green tile remains the default right-wall finish');
@@ -164,7 +138,7 @@ world.ambientParticles.setEnabled(false);
 assert.equal(motes.visible, false, 'air particles are switchable');
 world.ambientParticles.setEnabled(true);
 const outlines = createRoomOutlines(scene);
-assert.ok(outlines.shells.length >= 6, 'shared Village Engine outlines attach to key 3D structures');
+assert.ok(outlines.shells.length >= 4, 'shared Village Engine outlines attach to the room\'s own furniture');
 const paintShader = { uniforms: {}, fragmentShader: THREE.ShaderLib.standard.fragmentShader };
 materials.walnut.onBeforeCompile(paintShader);
 assert.ok(paintShader.fragmentShader.includes('pigmentGray') && paintShader.uniforms.uPigmentContrast, 'painted pigments are adjustable in a Three.js shader');

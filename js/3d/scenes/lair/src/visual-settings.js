@@ -16,9 +16,8 @@ const DEFAULTS = Object.freeze({
 export function createRoomOutlines(scene) {
   const ink = createInkOutlines(THREE, { enabled: true, color: 0x2b241d, screenWidth: .0031 });
   const targetNames = [
-    'main-arched-window', 'restoration-easel-reference', 'restoration-easel-work',
-    'restoration-paint-table', 'planning-main-table', 'workbench-right-of-alchemy',
-    'alchemy-facing-wall-table', 'gramophone-table',
+    // The Atelier and the laboratory are mounted from integrations/ with their own look.
+    'main-arched-window', 'planning-main-table', 'workbench-right-of-alchemy', 'gramophone-table',
   ];
   for (const name of targetNames) {
     const object = scene.getObjectByName(name);

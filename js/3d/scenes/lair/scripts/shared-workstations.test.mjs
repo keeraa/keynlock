@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { ORIGINAL_STATIONS } from '../src/original-stations.js';
-import { REAGENTS, emptyMixture, addDose } from '../src/alchemy-core/mixing.js';
-import { generateRecipe, evaluateRecipe } from '../src/alchemy-core/recipes.js';
+import { REAGENTS, emptyMixture, addDose } from '../integrations/alchemy/src/mixing.js';
+import { generateRecipe, evaluateRecipe } from '../integrations/alchemy/src/recipes.js';
 import { assistedFilingStroke, cutLayout, generateBlueprint,
   inspectKey, keyTopOutline, targetGuideSegments } from '../src/workbench-core/logic.js';
 
@@ -86,8 +86,9 @@ test('restoration edits the original artwork in-room; remaining stations retain 
   'the camera rotates when dragging the dedicated scene interaction layer');
   assert.ok(main.includes("interaction.addEventListener('pointermove', hover3D)"),
     'room hit testing and camera events use the same input surface');
-  assert.ok(main.includes('buildLair(scene, materials, {useOriginalRestoration:true})'),
-    'the mock restoration easels are never created next to the source easels');
+  assert.ok(main.includes('buildLair(scene, materials)')
+    && !readFileSync(new URL('../src/room.js',import.meta.url),'utf8').includes('restoration-easel'),
+    'the room never builds mock restoration easels next to the source easels');
   assert.ok(transitions.includes("scene.getObjectByName('atelier-original-wallpaper')")
     && transitions.includes('atelierWall.visible = false')
     && !transitions.includes('lairWall.material = atelierWall.material'),
@@ -146,7 +147,8 @@ test('restoration edits the original artwork in-room; remaining stations retain 
     assert.match(ORIGINAL_STATIONS[id].sourceUrl,/^https:\/\/[^/]+\.k1r11111\.chatgpt\.site\/$/);
     assert.ok(!html.includes(`id="${id}-workspace"`),`no imitation ${id} UI remains`);
   }
-  assert.ok(readFileSync(new URL('../public/stations/alchemy/alchemy.js',import.meta.url),'utf8').includes("createRenderer('alchemy', canvas)"));
+  // The lab asks the room's shared renderer for its canvas (no second GPU context).
+  assert.ok(readFileSync(new URL('../integrations/alchemy/src/runtime-host.js',import.meta.url),'utf8').includes("host.createRenderer('alchemy', canvas)"));
   const alchemySource=readFileSync(new URL('../integrations/alchemy/src/alchemy.js',import.meta.url),'utf8');
   const alchemyVisualPanel=readFileSync(new URL('../integrations/alchemy/src/ui/visual-panel.js',import.meta.url),'utf8');
   assert.ok(alchemySource.includes("id === 'experience' && alchemyRoot !== document")

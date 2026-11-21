@@ -117,7 +117,7 @@ function setup() {
   // The source rig is registered separately and activated only at its station.
   const roomLights = scene.children.filter(child => child.isLight);
   const { materials, visual } = createMaterials();
-  room = buildLair(scene, materials, {useOriginalRestoration:true});
+  room = buildLair(scene, materials);
   // Render the preserved Atelier shader against the room's real canvas and
   // camera. The embedded source renderer is a proxy and cannot post-process
   // what the visitor sees through this common viewport.

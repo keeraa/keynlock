@@ -284,12 +284,14 @@ export function createWindowLight(parent, furniture = []) {
   };
   let strength = 1;
   let night = 0;
+  let airHidden = false;
   const { day: d, night: n } = WINDOW_LIGHT_PALETTES;
   const blend = (/** @type {THREE.Color} */ color, a, b) =>
     color.lerpColors(new THREE.Color(a), new THREE.Color(b), night);
   function apply() {
     const value = strength * (d.strength + (n.strength - d.strength) * night);
-    air.beams.visible = floor.patch.visible = value > 0;
+    floor.patch.visible = value > 0;
+    air.beams.visible = value > 0 && !airHidden;
     air.uniforms.uAirStrength.value = value * .12;
     floor.uniforms.uStrength.value = value * .42;
     shaderUniforms.uWindowLight.value = value;
@@ -312,6 +314,16 @@ export function createWindowLight(parent, furniture = []) {
     setStrength(/** @type {number} */ value) { strength = Math.max(0, value); apply(); },
     /** 0 = warm sunlight, 1 = cool moonlight, or in between. */
     setNight(/** @type {number | boolean} */ value) { night = Math.max(0, Math.min(1, Number(value))); apply(); },
+    /**
+     * Hide the beams in the air (not the floor patch or the dust). The Atelier's
+     * easels stand inside the beam: its haze in front of the camera would wash
+     * out the paintings whose colours the player is restoring.
+     */
+    setAirHidden(/** @type {boolean} */ hidden) {
+      if (airHidden === Boolean(hidden)) return;
+      airHidden = Boolean(hidden);
+      apply();
+    },
     /** Once per frame, time in seconds: moves the bird. */
     update: bird.update,
   };

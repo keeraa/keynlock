@@ -3,3 +3,4 @@ asset-manifest.json
 .vercel
 .env*
 .DS_Store
+node_modules/

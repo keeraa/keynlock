@@ -23,6 +23,7 @@ import { createRecipeSheetTexture } from './recipe-sheet.js';
 import { createAlchemyRuntime } from './runtime-host.js';
 import { ALCHEMY_TABLE } from './table-dimensions.js';
 import { getWorkshopHost, publishWorkshopApi } from '../../../core/host/workshop-host.js';
+import { mergeStaticMeshes } from '../../../core/rendering/merge-static.js';
 import { t, translator } from './i18n.js';
 
 // The standalone page translates itself; in the Lair the embedding has
@@ -207,6 +208,14 @@ for (let i = 0; i < 4; i++) buildSourceTube(REAGENTS[i], [-1.38, -.46, .46, 1.38
 for (let i = 0; i < 7; i++) buildBottle(REAGENTS[i + 4], (i - 3) * 1.17);
 const animatedLiquidTextures = [...pigmentAppearanceCache.values(), ...metalAppearanceCache.values()].map(appearance => appearance.texture);
 buildDust();
+// Fixed parts sharing a material become one mesh each (fewer draw calls);
+// before the filters, which add an outline shell per mesh.
+// Most part names only describe; these are found by code and the Lair's tests.
+const FOUND_BY_NAME = new Set(['alchemy-main-tabletop', 'alchemy-lower-tabletop', 'table-foot',
+  'alchemy-wall-shelf', 'alchemy-shelf-bracket', 'extended-back-wall', 'recipe-parchment']);
+const keep = part => FOUND_BY_NAME.has(part.name);
+mergeStaticMeshes(scene, { keep });
+mergeStaticMeshes(backgroundScene, { keep });
 const visuals = createAlchemyFilters({scene,renderer,
   materials:{iron,oldBrass,brass,polishedBrass,wood,darkWood,blackWood,corkMat},
   document,textureLoader:new THREE.TextureLoader(),contours:[...glassContours,...liquidContours]});
@@ -901,6 +910,8 @@ function addFluid(parent, radius, maxHeight, maxAmount, initialAmount, colorHex,
     ? mesh(new THREE.CircleGeometry(liquidRadiusAt(kind, bottom, radius, bottom), segments), fluidMaterial, parent, 0, bottom, 0, false)
     : null;
   if (bottomCap) { bottomCap.geometry.rotateX(Math.PI / 2); bottomCap.renderOrder = 3; }
+  // The liquid is rebuilt every frame: keep it out of the static merge.
+  for (const part of [inner, top, meniscus, sideOutline, bottomCap]) if (part) part.userData.dynamic = true;
   const state = {
     inner, top, meniscus, sideOutline, bottomCap, parent, kind, radius, maxHeight, maxAmount, bottom,
     amount: initialAmount, shown: -1, hex: colorHex, fluidMaterial, appearance,

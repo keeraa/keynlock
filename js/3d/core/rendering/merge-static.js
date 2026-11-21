@@ -2,13 +2,14 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
-// The room is built from hundreds of small boxes and cylinders: floor planks,
-// table legs, chandelier braces. Each is a draw call in the colour pass, the
-// shadow pass and the ink outline. Siblings that never move and share a
+// Scenes are built from hundreds of small boxes and cylinders: floor planks,
+// table legs, chandelier braces, rack posts. Each is a draw call in the colour
+// pass, the shadow pass and the ink outline. Used by the Lair's room and the
+// alchemy table; call it after building and before outlines are attached. Siblings that never move and share a
 // material are merged into one mesh in their parent, so named groups (picking,
 // walking bounds, outlines, visibility switches) keep working.
 //
-// Left alone: named meshes (code finds them by name), meshes with children,
+// Left alone: named meshes (code finds them by name; options.keep narrows this), meshes with children,
 // transparent or multi-material ones, light patches (userData.atmosphere),
 // anything marked userData.dynamic (moved by an animation) and the inside of a
 // dynamic or named-for-animation subtree.
@@ -18,10 +19,10 @@ const isDynamic = object => Boolean(object.userData.dynamic || object.userData.w
 /** @param {THREE.Object3D} object */
 const isMesh = object => /** @type {any} */ (object).isMesh === true;
 
-/** @param {THREE.Mesh} mesh */
-function mergeable(mesh) {
+/** @param {THREE.Mesh} mesh @param {(mesh: THREE.Mesh) => boolean} keep */
+function mergeable(mesh, keep) {
   if (!mesh.isMesh || /** @type {any} */ (mesh).isInstancedMesh || /** @type {any} */ (mesh).isSkinnedMesh) return false;
-  if (mesh.name || mesh.children.length || isDynamic(mesh) || mesh.userData.atmosphere) return false;
+  if (keep(mesh) || mesh.children.length || isDynamic(mesh) || mesh.userData.atmosphere) return false;
   if (!mesh.visible || mesh.onBeforeRender !== THREE.Object3D.prototype.onBeforeRender) return false;
   const material = /** @type {THREE.Material} */ (mesh.material);
   if (!material || Array.isArray(mesh.material) || material.transparent) return false;
@@ -39,9 +40,11 @@ function bucketKey(mesh) {
 /**
  * Merges static sibling meshes under root, in place.
  * @param {THREE.Object3D} root
+ * @param {{ keep?: (mesh: THREE.Mesh) => boolean }} [options] keep: meshes code or tests
+ *   find by name; by default every named mesh is kept.
  * @returns {{ before: number, after: number }} mesh counts
  */
-export function mergeStaticMeshes(root) {
+export function mergeStaticMeshes(root, { keep = mesh => Boolean(mesh.name) } = {}) {
   let before = 0, after = 0;
   /** @param {THREE.Object3D} parent */
   function visit(parent) {
@@ -49,7 +52,7 @@ export function mergeStaticMeshes(root) {
     const buckets = new Map();
     for (const child of parent.children) {
       if (isMesh(child)) before++;
-      if (!mergeable(/** @type {THREE.Mesh} */ (child))) continue;
+      if (!mergeable(/** @type {THREE.Mesh} */ (child), keep)) continue;
       const key = bucketKey(child);
       if (!buckets.has(key)) buckets.set(key, []);
       buckets.get(key).push(child);

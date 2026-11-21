@@ -7,7 +7,7 @@ import { buildWorkbench } from './workbench-furniture.js';
 import { buildGramophone, buildDetails } from './details.js';
 import { createWindowLight } from './window-light.js';
 import { buildLamps } from './lamps.js';
-import { mergeStaticMeshes } from './merge-static.js';
+import { mergeStaticMeshes } from '../../../../core/rendering/merge-static.js';
 import { ALCHEMY_Z, ATELIER_Z } from '../room-layout.js';
 
 /** A single continuous room, using the proportions and gouache materials of the existing ateliers. */

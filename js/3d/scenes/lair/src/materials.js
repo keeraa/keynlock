@@ -1,11 +1,14 @@
 import * as THREE from 'three';
-import { makeAlchemyTileTexture } from './wall-tiles.js';
+import { makeGouacheWallTexture } from '../integrations/alchemy/src/wall-tiles.js';
 import { atelierWallpaperSource } from '../integrations/atelier/src/painted-assets.js';
+
+const alchemyWood = name =>
+  new URL(`../integrations/alchemy/src/assets/wood-gouache-${name}.webp`, import.meta.url).href;
 
 export function createMaterials() {
   const textureLoader = new THREE.TextureLoader();
-  const load = (name, rx = 1, ry = 1) => {
-    const texture = textureLoader.load(name.startsWith('data:') || name.startsWith('/') ? name : `/assets/${name}`);
+  const load = (url, rx = 1, ry = 1) => {
+    const texture = textureLoader.load(url);
     texture.colorSpace = THREE.SRGBColorSpace;
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.set(rx, ry);
@@ -15,10 +18,11 @@ export function createMaterials() {
   const mat = (color, roughness = .9, metalness = 0) => new THREE.MeshStandardMaterial({ color, roughness, metalness });
   // These are the painted wood finishes already used in the alchemy scene.
   // Their broad brushwork is deliberately quieter than the earlier swirled grain.
-  const walnutMap = load('wood-gouache-walnut.webp');
-  const ashMap = load('wood-gouache-ash.webp');
-  const oakMap = load('wood-gouache-oak.webp');
-  const plasterMap = load('atelier-wallpaper-gouache.webp', 1.3, 2.15);
+  // The room paints with the workshops' own gouache files (one copy of each).
+  const walnutMap = load(alchemyWood('walnut'));
+  const ashMap = load(alchemyWood('ash'));
+  const oakMap = load(alchemyWood('oak'));
+  const plasterMap = load(atelierWallpaperSource, 1.3, 2.15);
   const restorationPlasterMap = load(atelierWallpaperSource, 1, 1);
   const floorMap = walnutMap.clone();
   floorMap.repeat.set(5.2, .68);
@@ -42,7 +46,7 @@ export function createMaterials() {
     plaster: new THREE.MeshStandardMaterial({ map: plasterMap, color: '#e0d8d0', roughness: 1 }),
     restorationWall: new THREE.MeshStandardMaterial({ map: restorationPlasterMap, color: '#ffffff', roughness: 1, side: THREE.DoubleSide }),
     // Preserve the tile's physical size after mirroring the 30m gallery wing.
-    alchemyTile: new THREE.MeshStandardMaterial({ map: makeAlchemyTileTexture(THREE, { width: 105, height: 29, textureWidth: 2048, textureHeight: 1024 }), roughness: 1, metalness: 0, side: THREE.DoubleSide }),
+    alchemyTile: new THREE.MeshStandardMaterial({ map: makeGouacheWallTexture(THREE, 'sage', { width: 105, height: 29, textureWidth: 2048, textureHeight: 1024 }), roughness: 1, metalness: 0, side: THREE.DoubleSide }),
     wallpaperBotanical: new THREE.MeshStandardMaterial({ map: botanicalMap, color: '#e8e6d8', roughness: .99, side: THREE.DoubleSide }),
     wallpaperDamask: new THREE.MeshStandardMaterial({ map: damaskMap, color: '#f1e9d6', roughness: .99, side: THREE.DoubleSide }),
     floor: new THREE.MeshStandardMaterial({ map: floorMap, color: '#fff4e8', roughness: 1 }),

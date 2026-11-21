@@ -1,0 +1,43 @@
+name: Lair checks
+on:
+  push:
+    paths:
+      - 'js/3d/scenes/lair/**'
+      - '.github/workflows/lair.yml'
+  pull_request:
+    paths:
+      - 'js/3d/scenes/lair/**'
+      - '.github/workflows/lair.yml'
+
+jobs:
+  lair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: js/3d/scenes/lair
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: js/3d/scenes/lair/package-lock.json
+      - name: Install
+        run: npm ci --no-audit --no-fund
+      - name: Syntax, unit and geometry checks
+        run: npm run check
+      - name: Single source per workshop
+        run: npm run check:sources
+      # `npm run dev` serves public/ as is, so the Atelier bundle is committed.
+      # It must match what its source builds to.
+      - name: Committed Atelier bundle is up to date
+        run: |
+          npm run build:atelier
+          git add -A --intent-to-add public/stations/atelier
+          git diff --exit-code --stat public/stations/atelier \
+            || { echo "::error::Run 'npm run build:atelier' and commit public/stations/atelier"; exit 1; }
+      - name: Install Chromium and system libraries
+        run: npx playwright install --with-deps chromium
+      - name: Browser tests
+        run: npm run test:browser

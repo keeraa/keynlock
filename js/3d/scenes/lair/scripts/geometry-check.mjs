@@ -149,11 +149,8 @@ outlines.setEnabled(true);
 outlines.setWidth(110);
 assert.ok(outlines.shells.every(shell => shell.material.uniforms.strokeScale.value === 1.1), 'outline width is adjustable');
 
-for (const name of ['sardanapalus.jpg', 'starry-night.jpg', 'wood-gouache-walnut.webp', 'wood-gouache-ash.webp', 'wood-gouache-oak.webp']) {
-  assert.ok(existsSync(new URL(`../public/assets/${name}`, import.meta.url)), `${name} available`);
-}
-for (const metal of ['aurum', 'argentum', 'ferrum', 'cuprum', 'stannum', 'plumbum', 'hydrargyrum']) {
-  assert.ok(existsSync(new URL(`../public/assets/label-${metal}.png`, import.meta.url)), `${metal} label available`);
+for (const name of ['wood-gouache-walnut.webp', 'wood-gouache-ash.webp', 'wood-gouache-oak.webp']) {
+  assert.ok(existsSync(new URL(`../integrations/alchemy/src/assets/${name}`, import.meta.url)), `${name} available`);
 }
 let objects = 0, triangles = 0;
 scene.traverse(obj => {

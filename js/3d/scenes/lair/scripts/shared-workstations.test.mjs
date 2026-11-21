@@ -5,7 +5,7 @@ import { ORIGINAL_STATIONS } from '../src/original-stations.js';
 import { REAGENTS, emptyMixture, addDose } from '../integrations/alchemy/src/mixing.js';
 import { generateRecipe, evaluateRecipe } from '../integrations/alchemy/src/recipes.js';
 import { assistedFilingStroke, cutLayout, generateBlueprint,
-  inspectKey, keyTopOutline, targetGuideSegments } from '../src/workbench-core/logic.js';
+  inspectKey, keyTopOutline, targetGuideSegments } from '../public/stations/workbench/js/logic.js';
 
 test('all three original alchemy difficulties can achieve perfect scores on the shared table',()=>{
   for(const level of [1,2,3]){

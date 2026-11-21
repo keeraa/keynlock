@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { ORIGINAL_STATIONS } from './original-stations.js';
-import { ALCHEMY_LOOK } from '../integrations/alchemy/src/look/alchemy-look.js';
+import { ALCHEMY_LOOK } from '@keynlock/alchemy/src/look/alchemy-look.js';
 
 export const RESTORATION_EASELS = { position: [1.56, 3.22, 10.35], target: [-7.05, 2.48, 10.35] };
 

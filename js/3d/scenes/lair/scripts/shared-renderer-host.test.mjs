@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import {createSharedRendererHost} from '../src/shared-renderer-host.js';
-import {createCartoonFilter} from '../integrations/atelier/src/effects/cartoon-filter.js';
+import {createCartoonFilter} from '@keynlock/atelier/src/effects/cartoon-filter.js';
 
 test('original stations share one GPU renderer, clip to their UI stage and restore the room',()=>{
   const records=[];

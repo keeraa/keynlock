@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createRestorationFeedback } from '../integrations/atelier/src/restoration-feedback.js';
-import { createWoodStyle } from '../integrations/atelier/src/wood-style.js';
+import { createRestorationFeedback } from '@keynlock/atelier/src/restoration-feedback.js';
+import { createWoodStyle } from '@keynlock/atelier/src/wood-style.js';
 
 function element() {
   const listeners = new Map();
@@ -82,7 +82,7 @@ test('each wood swatch works despite another failed asset; wallpaper initializes
     style.setVariant('easel', 0);
     assert.equal(materials.easel.color.value, '#c38e58', 'fallback swatches work before image downloads');
     await style.initialize();
-    assert.equal(wallpaperMaterial.map.name, '/stations/atelier/textures/atelier-wallpaper-gouache.webp');
+    assert.ok(wallpaperMaterial.map.name.endsWith('/atelier/src/assets/textures/atelier-wallpaper-gouache.webp'));
     assert.equal(wallpaperMaterial.color.value, '#ffffff');
     style.setVariant('easel',1);
     assert.equal(materials.easel.map, null, 'missing walnut uses safe fallback');

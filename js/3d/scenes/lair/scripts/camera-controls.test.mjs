@@ -46,7 +46,7 @@ test('a left-button drag actually changes the Lair orbit direction', () => {
 test('the Lair and preserved Atelier share one pointer surface', () => {
   const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
   const main=readFileSync(new URL('../src/main.js',import.meta.url),'utf8');
-  const atelier=readFileSync(new URL('../integrations/atelier/src/main.js',import.meta.url),'utf8');
+  const atelier=readFileSync(new URL('../../../workshops/atelier/src/main.js',import.meta.url),'utf8');
   assert.ok(html.includes('id="scene-interaction"'));
   assert.ok(main.includes('new OrbitControls(camera, interaction)'));
   assert.ok(main.includes('window.__keynlockLairInteractionElement = interaction'));

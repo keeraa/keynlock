@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import {createAlchemyRuntime} from '../integrations/alchemy/src/runtime-host.js';
+import {createAlchemyRuntime} from '@keynlock/alchemy/src/runtime-host.js';
 import {readFileSync} from 'node:fs';
 
 test('embedded alchemy registers the room lifecycle and pauses between visits', () => {
@@ -62,7 +62,7 @@ test('alchemy keeps the Lair camera as the sole visible camera during interactio
   assert.match(transitions,/focus\(stationPosition, stationTarget, sourcePose\?\.fov/,
     'the station transition preserves the source camera field of view');
   assert.match(code,/window\.__keynlockLairResetAlchemyCamera =/);
-  const source=readFileSync(new URL('../integrations/alchemy/src/alchemy.js',import.meta.url),'utf8');
+  const source=readFileSync(new URL('../../../workshops/alchemy/src/alchemy.js',import.meta.url),'utf8');
   assert.match(source,/if \(runtime\.embedded\) window\.__keynlockLairResetAlchemyCamera\?\.\(\)/,
     'the original visual-panel camera reset also resets the visible Lair camera');
   assert.doesNotMatch(code,/alchemyCameraInteracted/);

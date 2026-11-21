@@ -16,7 +16,7 @@ const DEFAULTS = Object.freeze({
 export function createRoomOutlines(scene) {
   const ink = createInkOutlines(THREE, { enabled: true, color: 0x2b241d, screenWidth: .0031 });
   const targetNames = [
-    // The Atelier and the laboratory are mounted from integrations/ with their own look.
+    // The Atelier and the laboratory are mounted from js/3d/workshops with their own look.
     'main-arched-window', 'planning-main-table', 'workbench-right-of-alchemy', 'gramophone-table',
   ];
   for (const name of targetNames) {

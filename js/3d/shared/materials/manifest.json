@@ -267,8 +267,7 @@
       "gitBlobSha": "c787292f6f5401e6237c886e862db6018c9dc698",
       "bytes": 631824,
       "consumers": [
-        "js/3d/scenes/alchemy/lab/assets/glass-antique.webp",
-        "js/3d/scenes/alchemy/src/assets/glass-antique.webp"
+        "js/3d/workshops/alchemy/src/assets/glass-antique.webp"
       ]
     },
     {
@@ -278,8 +277,7 @@
       "gitBlobSha": "99e1845c238c7290489e62b899f901d3c7ea0fbe",
       "bytes": 928344,
       "consumers": [
-        "js/3d/scenes/alchemy/lab/assets/glass-frosted.webp",
-        "js/3d/scenes/alchemy/src/assets/glass-frosted.webp"
+        "js/3d/workshops/alchemy/src/assets/glass-frosted.webp"
       ]
     },
     {
@@ -289,8 +287,7 @@
       "gitBlobSha": "f2c174e3ed128353f90bd6307bad62c910aa1f97",
       "bytes": 424338,
       "consumers": [
-        "js/3d/scenes/alchemy/lab/assets/glass-watercolor.webp",
-        "js/3d/scenes/alchemy/src/assets/glass-watercolor.webp"
+        "js/3d/workshops/alchemy/src/assets/glass-watercolor.webp"
       ]
     },
     {
@@ -334,10 +331,10 @@
       "gitBlobSha": "26686028c0b9aeed8ed3e8554f8b9b964ac40b0b",
       "bytes": 58548,
       "consumers": [
-        "js/3d/scenes/alchemy/lab/assets/painted-brass.webp",
         "js/3d/scenes/lair/public/stations/workbench/assets/painted-brass.webp",
         "js/3d/scenes/locks/lab/assets/painted-brass.webp",
-        "js/3d/scenes/workbench/public/assets/painted-brass.webp"
+        "js/3d/scenes/workbench/public/assets/painted-brass.webp",
+        "js/3d/workshops/alchemy/src/assets/painted-brass.webp"
       ]
     },
     {
@@ -347,8 +344,8 @@
       "gitBlobSha": "36cbbcf6323d6d1ac880e5750d454e5d366c7ec8",
       "bytes": 28738,
       "consumers": [
-        "js/3d/scenes/alchemy/lab/assets/painted-copper.webp",
-        "js/3d/scenes/locks/lab/assets/painted-copper.webp"
+        "js/3d/scenes/locks/lab/assets/painted-copper.webp",
+        "js/3d/workshops/alchemy/src/assets/painted-copper.webp"
       ]
     },
     {
@@ -358,8 +355,8 @@
       "gitBlobSha": "c5f4937b8d9b9a44d7b27a3d3bbf8d2ecb189736",
       "bytes": 28838,
       "consumers": [
-        "js/3d/scenes/alchemy/lab/assets/painted-enamel.webp",
-        "js/3d/scenes/locks/lab/assets/painted-enamel.webp"
+        "js/3d/scenes/locks/lab/assets/painted-enamel.webp",
+        "js/3d/workshops/alchemy/src/assets/painted-enamel.webp"
       ]
     },
     {
@@ -369,8 +366,8 @@
       "gitBlobSha": "7083f345f8c98abac49add3a2358d7f8da7a2997",
       "bytes": 19024,
       "consumers": [
-        "js/3d/scenes/alchemy/lab/assets/painted-graphite.webp",
-        "js/3d/scenes/locks/lab/assets/painted-graphite.webp"
+        "js/3d/scenes/locks/lab/assets/painted-graphite.webp",
+        "js/3d/workshops/alchemy/src/assets/painted-graphite.webp"
       ]
     },
     {
@@ -380,10 +377,10 @@
       "gitBlobSha": "0d334a3ec28ccd1efc1ca7076f92f386463aa712",
       "bytes": 67612,
       "consumers": [
-        "js/3d/scenes/alchemy/lab/assets/painted-steel.webp",
         "js/3d/scenes/lair/public/stations/workbench/assets/painted-steel.webp",
         "js/3d/scenes/locks/lab/assets/painted-steel.webp",
-        "js/3d/scenes/workbench/public/assets/painted-steel.webp"
+        "js/3d/scenes/workbench/public/assets/painted-steel.webp",
+        "js/3d/workshops/alchemy/src/assets/painted-steel.webp"
       ]
     },
     {
@@ -393,7 +390,7 @@
       "gitBlobSha": "8609cbbc12608d7974ff6d8cb1558af635bef70c",
       "bytes": 269760,
       "consumers": [
-        "js/3d/scenes/lair/integrations/atelier/public/textures/atelier-wallpaper-gouache.webp"
+        "js/3d/workshops/atelier/src/assets/textures/atelier-wallpaper-gouache.webp"
       ]
     },
     {
@@ -411,8 +408,7 @@
       "gitBlobSha": "61596eafd0611c7070c9b3846f07f580a651b224",
       "bytes": 50826,
       "consumers": [
-        "js/3d/scenes/alchemy/lab/assets/painted-cork.webp",
-        "js/3d/scenes/alchemy/src/assets/painted-cork.webp"
+        "js/3d/workshops/alchemy/src/assets/painted-cork.webp"
       ]
     },
     {
@@ -422,7 +418,7 @@
       "gitBlobSha": "f54640095b993982717e6cda16d8e00d1148a4d6",
       "bytes": 208532,
       "consumers": [
-        "js/3d/scenes/lair/integrations/atelier/public/textures/wood-ash-gouache-v2.webp"
+        "js/3d/workshops/atelier/src/assets/textures/wood-ash-gouache-v2.webp"
       ]
     },
     {
@@ -432,9 +428,7 @@
       "gitBlobSha": "8dc28e7813984ef49aa6609e7f918e2fcfb9a6da",
       "bytes": 131988,
       "consumers": [
-        "js/3d/scenes/alchemy/lab/assets/wood-gouache-ash.webp",
-        "js/3d/scenes/alchemy/src/assets/wood-gouache-ash.webp",
-        "js/3d/scenes/lair/integrations/alchemy/src/assets/wood-gouache-ash.webp"
+        "js/3d/workshops/alchemy/src/assets/wood-gouache-ash.webp"
       ]
     },
     {
@@ -444,9 +438,7 @@
       "gitBlobSha": "d3a1692511bdfb398a8b92ad86cacc56e36cbef6",
       "bytes": 156078,
       "consumers": [
-        "js/3d/scenes/alchemy/lab/assets/wood-gouache-oak.webp",
-        "js/3d/scenes/alchemy/src/assets/wood-gouache-oak.webp",
-        "js/3d/scenes/lair/integrations/alchemy/src/assets/wood-gouache-oak.webp"
+        "js/3d/workshops/alchemy/src/assets/wood-gouache-oak.webp"
       ]
     },
     {
@@ -456,9 +448,7 @@
       "gitBlobSha": "d3c8e7d5c22a8f947af56a3b953ae0126aebf93b",
       "bytes": 124110,
       "consumers": [
-        "js/3d/scenes/alchemy/lab/assets/wood-gouache-walnut.webp",
-        "js/3d/scenes/alchemy/src/assets/wood-gouache-walnut.webp",
-        "js/3d/scenes/lair/integrations/alchemy/src/assets/wood-gouache-walnut.webp"
+        "js/3d/workshops/alchemy/src/assets/wood-gouache-walnut.webp"
       ]
     },
     {
@@ -468,7 +458,7 @@
       "gitBlobSha": "b89fab255fdc95ac199da0f6b65d6f8c2c70a9ca",
       "bytes": 270450,
       "consumers": [
-        "js/3d/scenes/lair/integrations/atelier/public/textures/wood-oak-gouache-v2.webp"
+        "js/3d/workshops/atelier/src/assets/textures/wood-oak-gouache-v2.webp"
       ]
     },
     {
@@ -478,7 +468,7 @@
       "gitBlobSha": "a36d2a49f8343be3763bf2df392ccb5b281969f4",
       "bytes": 170242,
       "consumers": [
-        "js/3d/scenes/lair/integrations/atelier/public/textures/wood-walnut-gouache-v2.webp"
+        "js/3d/workshops/atelier/src/assets/textures/wood-walnut-gouache-v2.webp"
       ]
     }
   ]

@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { createCameraFraming } from '../integrations/atelier/src/navigation/camera-framing.js';
-import { createCartoonFilter } from '../integrations/atelier/src/effects/cartoon-filter.js';
+import { createCameraFraming } from '@keynlock/atelier/src/navigation/camera-framing.js';
+import { createCartoonFilter } from '@keynlock/atelier/src/effects/cartoon-filter.js';
 
 test('in-room easel close-ups use the original framing with the easel depth offset', () => {
   const camera = new THREE.PerspectiveCamera(39, 16 / 9, .1, 65);
@@ -70,7 +70,7 @@ test('the Lair exposes the five transferred Atelier controls with a separate shu
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const main = readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
   const view = readFileSync(new URL('../src/restoration-view.js', import.meta.url), 'utf8');
-  const source = readFileSync(new URL('../integrations/atelier/src/main.js', import.meta.url), 'utf8');
+  const source = readFileSync(new URL('../../../workshops/atelier/src/main.js', import.meta.url), 'utf8');
   for (const id of ['atelier-toon-enabled','atelier-ink-enabled','atelier-blur-enabled',
     'atelier-toon-bands','atelier-ink-width','atelier-blur-radius',
     'lair-easel-labels','lair-easel-camera-controls','lair-focus-exit',
@@ -84,9 +84,9 @@ test('the Lair exposes the five transferred Atelier controls with a separate shu
 });
 
 test('the Lair defocuses its nearer wall without changing the standalone Atelier blur', () => {
-  const filter = readFileSync(new URL('../integrations/atelier/src/effects/cartoon-filter.js', import.meta.url), 'utf8');
-  const draw = readFileSync(new URL('../integrations/atelier/src/effects/drawing-shader.js', import.meta.url), 'utf8');
-  const blur = readFileSync(new URL('../integrations/atelier/src/effects/background-blur-shader.js', import.meta.url), 'utf8');
+  const filter = readFileSync(new URL('../../../workshops/atelier/src/effects/cartoon-filter.js', import.meta.url), 'utf8');
+  const draw = readFileSync(new URL('../../../workshops/atelier/src/effects/drawing-shader.js', import.meta.url), 'utf8');
+  const blur = readFileSync(new URL('../../../workshops/atelier/src/effects/background-blur-shader.js', import.meta.url), 'utf8');
   const settings = readFileSync(new URL('../src/visual-settings.js', import.meta.url), 'utf8');
   assert.match(filter, /backgroundBlurNear:\s*1\.1,\s*backgroundBlurFar:\s*2\.7/);
   assert.match(settings, /backgroundBlurNear:\s*\.25,\s*backgroundBlurFar:\s*1\.25/);

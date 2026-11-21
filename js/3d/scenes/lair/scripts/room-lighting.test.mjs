@@ -23,6 +23,6 @@ test('the salon keeps warm modelling but only short overhead contact shadows', (
 });
 
 test('the embedded Atelier does not re-enable its original angled shadow light', () => {
-  const source = readFileSync(new URL('../integrations/atelier/src/main.js', import.meta.url), 'utf8');
+  const source = readFileSync(new URL('../../../workshops/atelier/src/main.js', import.meta.url), 'utf8');
   assert.match(source, /if \(embedded\) \{\s*\/\/[^]*?scene\.traverse\(object => \{\s*if \(object\.isDirectionalLight\) object\.castShadow = false;/);
 });

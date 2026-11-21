@@ -1,9 +1,9 @@
 /** Mount the actual Atelier application in the Lair document and WebGL world.
  * The artwork, brushes, catalogue and persistence are the preserved sources.
  * No iframe or second WebGL context is created for restoration. */
-import atelierHTML from '../integrations/atelier/index.html?raw';
-import atelierCSS from '../integrations/atelier/src/style.css?inline';
-import restorationFeedbackCSS from '../integrations/atelier/src/styles/restoration.css?inline';
+import atelierHTML from '@keynlock/atelier/index.html?raw';
+import atelierCSS from '@keynlock/atelier/src/style.css?inline';
+import restorationFeedbackCSS from '@keynlock/atelier/src/styles/restoration.css?inline';
 
 export function mountAtelierInRoom() {
   const documentSource = new DOMParser().parseFromString(atelierHTML,'text/html');
@@ -35,7 +35,7 @@ export function mountAtelierInRoom() {
 
   // Start the real workshop once, on the same page and shared renderer.
   // The original module will announce models-ready and ready separately.
-  void import('../integrations/atelier/src/main.js').catch(error => {
+  void import('@keynlock/atelier/src/main.js').catch(error => {
     console.error('Не удалось встроить исходную реставрацию:',error);
     window.dispatchEvent(new CustomEvent('keynlock:atelier',{
       detail:{type:'error',message:error.message},

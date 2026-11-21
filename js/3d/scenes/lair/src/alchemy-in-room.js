@@ -1,6 +1,6 @@
 /** Run the original alchemy application in the Lair DOM and 3D world. */
-import alchemyHTML from '../integrations/alchemy/index.html?raw';
-import alchemyCSS from '../integrations/alchemy/src/styles.css?inline';
+import alchemyHTML from '@keynlock/alchemy/index.html?raw';
+import alchemyCSS from '@keynlock/alchemy/src/styles.css?inline';
 
 export function mountAlchemyInRoom() {
   const source = new DOMParser().parseFromString(alchemyHTML, 'text/html');
@@ -29,7 +29,7 @@ export function mountAlchemyInRoom() {
   document.querySelector('#app').append(inputPlane, root);
   window.__keynlockAlchemyEmbedRoot = root;
   window.__keynlockAlchemyInputPlane = inputPlane;
-  void import('../integrations/alchemy/src/alchemy.js').catch(error => {
+  void import('@keynlock/alchemy/src/alchemy.js').catch(error => {
     console.error('Не удалось встроить исходную алхимию:', error);
     root.dataset.error = error.message;
     window.dispatchEvent(new CustomEvent('keynlock:alchemy:v1', {

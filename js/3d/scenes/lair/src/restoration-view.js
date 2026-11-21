@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { createCameraTransition } from '../integrations/atelier/src/navigation/camera-transition.js';
+import { createCameraTransition } from '@keynlock/atelier/src/navigation/camera-transition.js';
 
 export function createRestorationView({
   camera, controls, canvas, interaction, rendererHost, atelierFilter, easelPose, roomMinDistance, navigation,

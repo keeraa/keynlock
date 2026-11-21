@@ -1,0 +1,10 @@
+{
+  "name": "keynlock-3d",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "scenes/lair",
+    "workshops/alchemy",
+    "workshops/atelier"
+  ]
+}

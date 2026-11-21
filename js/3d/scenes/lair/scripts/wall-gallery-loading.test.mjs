@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import * as THREE from 'three';
-import { createWallGallery } from '../integrations/atelier/src/wall-gallery.js';
+import { createWallGallery } from '@keynlock/atelier/src/wall-gallery.js';
 
 test('the initial exhibition resolves after every image or fallback is mounted', async () => {
   const originalDocument = globalThis.document;

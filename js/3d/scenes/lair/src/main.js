@@ -7,7 +7,7 @@ import { mountOriginalStations } from './original-stations.js';
 import { mountAtelierInRoom } from './atelier-in-room.js';
 import { mountAlchemyInRoom } from './alchemy-in-room.js';
 import { createSharedRendererHost } from './shared-renderer-host.js';
-import { createCartoonFilter } from '../integrations/atelier/src/effects/cartoon-filter.js';
+import { createCartoonFilter } from '@keynlock/atelier/src/effects/cartoon-filter.js';
 import { addRoomLighting } from './room-lighting.js';
 import { createZoneTransitions, RESTORATION_EASELS } from './zone-transitions.js';
 import { createRestorationView } from './restoration-view.js';

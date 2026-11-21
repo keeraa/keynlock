@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700&display=swap');
+
+@import './styles/foundation.css';
+@import './styles/scene.css';
+@import './styles/loading-and-breakpoints.css';
+@import './styles/visual-controls.css';
+@import './styles/focus-and-wood.css';
+@import './styles/collection.css';
+@import './styles/restoration.css';
+@import './styles/wall-gallery.css';
+
+/* Only in the Lair: display the unchanged original Atelier controls below
+   the shared scene. Its own canvas is invisible because meshes live in the
+   parent Three.js world, not in a second workshop viewport. */
+html.lair-embedded .main, html.lair-embedded .stage, html.lair-embedded #scene {
+  background: transparent !important;
+}
+html.lair-embedded #scene canvas {opacity: 0 !important}
+html.lair-embedded, html.lair-embedded body, html.lair-embedded #app {
+  height: 100%;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+.lair-embedded .topbar,
+.lair-embedded .stage,
+.lair-embedded .loading {display: none !important}
+.lair-embedded .main {
+  display: block;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+.lair-embedded .workbench {
+  display: block;
+  height: 100%;
+  overflow: auto;
+  border-top: 0;
+  box-shadow: none;
+}
+.lair-embedded .workbench-toggle {display: none}
+.lair-embedded .workbench.is-collapsed {height: 100%}

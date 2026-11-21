@@ -9,8 +9,8 @@ import { buildGramophone, buildDetails } from './room/details.js';
 export function buildLair(scene, m) {
   const kit = createRoomKit(scene, m);
   const { anchors, hitTargets, animated, station } = kit;
-  // The Atelier (integrations/atelier, mounted by atelier-in-room.js) and the
-  // laboratory (integrations/alchemy, mounted by alchemy-in-room.js) own all
+  // The Atelier (@keynlock/atelier, mounted by atelier-in-room.js) and the
+  // laboratory (@keynlock/alchemy, mounted by alchemy-in-room.js) own all
   // their furniture; the room keeps only their picking targets.
   const rightWallFinish = buildShell(kit);
   buildWindow(kit);

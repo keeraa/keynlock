@@ -150,7 +150,7 @@ outlines.setWidth(110);
 assert.ok(outlines.shells.every(shell => shell.material.uniforms.strokeScale.value === 1.1), 'outline width is adjustable');
 
 for (const name of ['wood-gouache-walnut.webp', 'wood-gouache-ash.webp', 'wood-gouache-oak.webp']) {
-  assert.ok(existsSync(new URL(`../integrations/alchemy/src/assets/${name}`, import.meta.url)), `${name} available`);
+  assert.ok(existsSync(new URL(`../../../workshops/alchemy/src/assets/${name}`, import.meta.url)), `${name} available`);
 }
 let objects = 0, triangles = 0;
 scene.traverse(obj => {

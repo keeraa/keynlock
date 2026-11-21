@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { createWallArtworkPicker } from '../integrations/atelier/src/wall-artwork-picker.js';
+import { createWallArtworkPicker } from '@keynlock/atelier/src/wall-artwork-picker.js';
 
 test('in-room gallery picks paintings using the visible Lair pointer area', () => {
   const camera = new THREE.PerspectiveCamera(45, 1, .1, 20);
@@ -28,7 +28,7 @@ test('gallery entry, separate camera controls and collapsible in-room Atelier ar
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const transitions = readFileSync(new URL('../src/zone-transitions.js', import.meta.url), 'utf8');
   const view = readFileSync(new URL('../src/restoration-view.js', import.meta.url), 'utf8');
-  const atelier = readFileSync(new URL('../integrations/atelier/src/main.js', import.meta.url), 'utf8');
+  const atelier = readFileSync(new URL('../../../workshops/atelier/src/main.js', import.meta.url), 'utf8');
   const stylesheet = readFileSync(new URL('../src/original-stations.css', import.meta.url), 'utf8');
   for (const id of ['wall-collection-entry','lair-gallery-controls','gallery-prev',
     'gallery-next','gallery-easels','gallery-select']) assert.ok(html.includes(`id="${id}"`));

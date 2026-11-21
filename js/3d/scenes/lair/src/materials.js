@@ -1,9 +1,9 @@
 import * as THREE from 'three';
-import { makeGouacheWallTexture } from '../integrations/alchemy/src/wall-tiles.js';
-import { atelierWallpaperSource } from '../integrations/atelier/src/painted-assets.js';
+import { makeGouacheWallTexture } from '@keynlock/alchemy/src/wall-tiles.js';
+import { atelierWallpaperSource } from '@keynlock/atelier/src/painted-assets.js';
 
 const alchemyWood = name =>
-  new URL(`../integrations/alchemy/src/assets/wood-gouache-${name}.webp`, import.meta.url).href;
+  new URL(`../../../workshops/alchemy/src/assets/wood-gouache-${name}.webp`, import.meta.url).href;
 
 export function createMaterials() {
   const textureLoader = new THREE.TextureLoader();

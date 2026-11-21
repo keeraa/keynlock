@@ -6,12 +6,14 @@
 | Сцена | Опубликованный прототип | Исходники в `main` | Состояние |
 | --- | --- | --- | --- |
 | Замки | [Лаборатория замков](https://keynlock-pin-lab-1114.k1r11111.chatgpt.site/) | [`scenes/locks/`](scenes/locks/) | Модульная сцена и сохранённая версия лаборатории |
-| Алхимия | [Алхимический стол](https://keynlock-alchemy-lab-1115.k1r11111.chatgpt.site/) | [`scenes/alchemy/`](scenes/alchemy/) | Модульная сцена и сохранённая версия лаборатории |
-| Реставрация | [Мастерская реставрации](https://atelier-restoration-1115.k1r11111.chatgpt.site/) | [`scenes/restoration/`](scenes/restoration/) | Исходники добавлены в `main`; интеграция общих эффектов частичная |
+| Алхимия | [Алхимический стол](https://keynlock-alchemy-lab-1115.k1r11111.chatgpt.site/) | [`workshops/alchemy/`](workshops/alchemy/) | Единый пакет `@keynlock/alchemy`: отдельный сайт (`npm run build`) и встраивание в Логово |
+| Реставрация | [Мастерская реставрации](https://atelier-restoration-1115.k1r11111.chatgpt.site/) | [`workshops/atelier/`](workshops/atelier/) | Единый пакет `@keynlock/atelier`: отдельный сайт (`npm run build`) и встраивание в Логово; 28 тестов |
 | Верстак | [3D-мастерская](https://keynlock-workbench-1116.k1r11111.chatgpt.site/) | [`scenes/workbench/`](scenes/workbench/) | Версия от **17.11.2026**, исходники и 87 проверок: выпиливание ключа, штифтовый механизм, песочница и шестизначная кодовая шкатулка с гуашевым металлом; отложенный WebGL, остановка фоновой анимации, кеш текстур и разделённые модули. [Статус и план](../../docs/3d-workbench-roadmap.md) |
 | Логово | [3D-Логово команды](https://keynlock-lair-1116.k1r11111.chatgpt.site/) | [`scenes/lair/`](scenes/lair/) | Версия от **17.11.2026**: общая 3D-комната, встроенное ателье с общим рендерером, галерея 30 картин (начальная предзагрузка и отключение размытия при просмотре), локальные алхимия и верстак, исправленные тени; **29 тестов** | 
 | Город | [Карта города](https://keynlock-world-map-1115.k1r11111.chatgpt.site/) · [Особые здания](https://keynlock-world-map-1115.k1r11111.chatgpt.site/landmark-lab/) · [Схема районов](https://keynlock-world-map-1115.k1r11111.chatgpt.site/district-zones/) | [`scenes/city/`](scenes/city/) | Карта, географическое зонирование, конструктор домов, улицы и кварталы, особые здания, тесты и локальные 3D-ресурсы |
 
 Общие 3D-модули: [`core/`](core/) и [`shared/`](shared/).
+
+Мастерские, которые встраиваются в Логово, живут в [`workshops/`](workshops/) — по одному пакету на мастерскую. `js/3d` — npm-workspace: `npm install` в `js/3d` ставит зависимости Логова и мастерских один раз.
 
 При переносе очередной сцены в репозиторий обновляйте путь и состояние в этой таблице.

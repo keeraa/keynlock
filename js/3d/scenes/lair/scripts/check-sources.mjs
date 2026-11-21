@@ -1,34 +1,35 @@
-// One source per workshop inside the Lair.
+// One source per workshop.
 //
-// Each workshop lives in exactly one folder (WORKSHOPS). The room's own code in
-// src/ imports from there instead of keeping a copy: copies drift (the old
-// src/alchemy-core, src/atelier-core, src/workbench-core and public/stations/
-// alchemy all had). This check fails when
-//   - two files in the Lair have the same content (outside ALLOWED_COPIES), or
-//   - src/ has a module with the same name as a workshop module.
+// Each workshop lives in exactly one folder (WORKSHOPS, relative to js/3d). The
+// Lair's own code in src/ imports from there instead of keeping a copy: copies
+// drift (the old src/alchemy-core, src/atelier-core, src/workbench-core and the
+// standalone scene snapshots all had). This check fails when
+//   - two files in the Lair or the workshops have the same content (outside
+//     ALLOWED_COPIES), or
+//   - the Lair's src/ has a module with the same name as a workshop module.
 import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = fileURLToPath(new URL('..', import.meta.url));
+const root = fileURLToPath(new URL('../../..', import.meta.url));
+const SCANNED = ['scenes/lair', 'workshops'];
 
 export const WORKSHOPS = {
-  alchemy: 'integrations/alchemy',
-  atelier: 'integrations/atelier',
-  workbench: 'public/stations/workbench',
+  alchemy: 'workshops/alchemy',
+  atelier: 'workshops/atelier',
+  // Still developed separately in js/3d/scenes/workbench; this is the Lair's copy.
+  workbench: 'scenes/lair/public/stations/workbench',
 };
 
 // Generated or installed folders, not sources.
-const SKIP = new Set(['node_modules', 'dist', '.git', 'test-results',
-  // `npm run build:atelier` output of integrations/atelier (CI keeps it fresh).
-  'public/stations/atelier']);
+const SKIP = new Set(['node_modules', 'dist', '.git', 'test-results']);
 
 // The workbench is a static page served from public/ without a bundler, so it
 // cannot import the alchemy's Vite assets and keeps its own copies.
 const ALLOWED_COPIES = [
-  ['integrations/alchemy/src/assets/painted-brass.webp', 'public/stations/workbench/assets/painted-brass.webp'],
-  ['integrations/alchemy/src/assets/painted-steel.webp', 'public/stations/workbench/assets/painted-steel.webp'],
+  ['workshops/alchemy/src/assets/painted-brass.webp', 'scenes/lair/public/stations/workbench/assets/painted-brass.webp'],
+  ['workshops/alchemy/src/assets/painted-steel.webp', 'scenes/lair/public/stations/workbench/assets/painted-steel.webp'],
 ];
 // Entry points that every app has under the same name.
 const COMMON_NAMES = new Set(['main.js']);
@@ -49,7 +50,7 @@ export function findProblems() {
   for (const [id, home] of Object.entries(WORKSHOPS))
     if (!existsSync(join(root, home))) problems.push(`workshop ${id}: ${home} is missing`);
 
-  const files = walk(root);
+  const files = SCANNED.flatMap(dir => walk(join(root, dir)));
   const byHash = new Map();
   for (const file of files) {
     const data = readFileSync(join(root, file));
@@ -71,7 +72,7 @@ export function findProblems() {
       workshopModules.set(basename(file), file);
   }
   for (const file of files) {
-    if (!file.startsWith('src/') || !/\.m?js$/.test(file) || COMMON_NAMES.has(basename(file))) continue;
+    if (!file.startsWith('scenes/lair/src/') || !/\.m?js$/.test(file) || COMMON_NAMES.has(basename(file))) continue;
     const original = workshopModules.get(basename(file));
     if (original) problems.push(`${file} looks like a copy of ${original}: import the workshop's module instead`);
   }

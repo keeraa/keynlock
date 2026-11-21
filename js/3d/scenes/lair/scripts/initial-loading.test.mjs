@@ -69,7 +69,7 @@ test('a failed Atelier module cannot trap the visitor under the loading veil', (
 
 test('the initial Lair loading waits for the Atelier exhibition completion event', () => {
   const room = readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
-  const atelier = readFileSync(new URL('../integrations/atelier/src/main.js', import.meta.url), 'utf8');
+  const atelier = readFileSync(new URL('../../../workshops/atelier/src/main.js', import.meta.url), 'utf8');
   assert.match(atelier, /const galleryReady = await exhibition\.refresh/);
   assert.match(atelier, /if \(!galleryReady\) throw/);
   assert.match(atelier, /notifyLair\('initial-gallery-ready'\)/);

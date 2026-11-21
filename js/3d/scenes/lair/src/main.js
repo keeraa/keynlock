@@ -40,7 +40,7 @@ const fallback = document.querySelector('#fallback');
 const panel = document.querySelector('#zone-panel');
 let renderer, scene, camera, controls, room, rendererHost, atelierFilter;
 let visualUI, workshopOverlay, zoneTransitions, atelierView, dayNight;
-let lastSceneTriangles = 0;
+let lastFrameTriangles = 0;
 let lastDrawCalls = 0;
 let performancePanel = null;
 let startPointer = null;
@@ -290,11 +290,11 @@ function animate() {
       if (currentZone === 'atelier') {
         atelierFilter.setFocus(camera.position.distanceTo(controls.target));
         const frame = atelierFilter.render();
-        lastSceneTriangles = frame.sceneTriangles ?? frame.triangles ?? 0;
+        lastFrameTriangles = frame.triangles ?? renderer.info.render.triangles;
         lastDrawCalls = frame.calls ?? renderer.info.render.calls;
       } else {
         renderer.render(scene, camera);
-        lastSceneTriangles = renderer.info.render.triangles;
+        lastFrameTriangles = renderer.info.render.triangles;
         lastDrawCalls = renderer.info.render.calls;
       }
     } finally {
@@ -302,7 +302,7 @@ function animate() {
     }
   }
   performancePanel?.frame(frameDelta, performance.now() - now,
-    { triangles: lastSceneTriangles, calls: lastDrawCalls });
+    { triangles: lastFrameTriangles, calls: lastDrawCalls });
 }
 
 // Gentle room ambience is original procedural sound. The selected Chopin recordings are not embedded here.

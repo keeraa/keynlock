@@ -184,52 +184,6 @@ export function makeWallpaperTexture(kind = 'botanical') {
   }, 512, 512);
 }
 
-export function makeCityWindowTexture() {
-  return canvasTexture((ctx, w, h) => {
-    const sky = ctx.createLinearGradient(0, 0, 0, h);
-    sky.addColorStop(0, '#67818b'); sky.addColorStop(.42, '#b2a79c');
-    sky.addColorStop(.68, '#d0a478'); sky.addColorStop(1, '#526c72');
-    ctx.fillStyle = sky; ctx.fillRect(0, 0, w, h);
-    let seed = 13; const rnd = () => ((seed = (1664525 * seed + 1013904223) >>> 0) / 4294967296);
-    for (let i = 0; i < 60; i++) {
-      const x = rnd() * w, y = 160 + rnd() * 270;
-      ctx.strokeStyle = `rgba(255,231,184,${.02 + rnd() * .08})`;
-      ctx.lineWidth = 1 + rnd() * 6; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + rnd() * 70, y + rnd() * 12); ctx.stroke();
-    }
-    const silhouette = (back, low, high) => {
-      ctx.fillStyle = back;
-      let x = -20;
-      while (x < w + 30) {
-        const width = 32 + rnd() * 80, top = high + rnd() * low;
-        ctx.fillRect(x, top, width, 630 - top);
-        ctx.beginPath(); ctx.moveTo(x - 5, top); ctx.lineTo(x + width / 2, top - 25 - rnd() * 50); ctx.lineTo(x + width + 5, top); ctx.fill();
-        for (let k = 0; k < 3; k++) {
-          ctx.fillStyle = rnd() > .55 ? 'rgba(247,200,120,.58)' : 'rgba(43,62,65,.65)';
-          ctx.fillRect(x + 8 + k * 15, top + 28, 5, 12);
-        }
-        ctx.fillStyle = back;
-        x += width + 3;
-      }
-    };
-    silhouette('#687779', 170, 380);
-    silhouette('#43585a', 130, 460);
-    const water = ctx.createLinearGradient(0, 590, 0, h);
-    water.addColorStop(0, '#637f7d'); water.addColorStop(1, '#2c5057');
-    ctx.fillStyle = water; ctx.fillRect(0, 598, w, h);
-    ctx.strokeStyle = '#374e50'; ctx.lineWidth = 30; ctx.beginPath(); ctx.moveTo(-50, 665); ctx.quadraticCurveTo(460, 595, w + 40, 668); ctx.stroke();
-    for (let i = 0; i < 110; i++) {
-      const x = rnd() * w, y = 630 + rnd() * 390;
-      ctx.strokeStyle = `rgba(${rnd() > .45 ? '242,190,124' : '169,205,205'},${.08 + rnd() * .34})`;
-      ctx.lineWidth = .5 + rnd() * 4; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + rnd() * 75, y); ctx.stroke();
-    }
-    // Painterly, uneven contours retain the watercolor character of the workshops.
-    for (let i = 0; i < 700; i++) {
-      ctx.fillStyle = `rgba(255,240,220,${.01 + rnd() * .045})`;
-      ctx.fillRect(rnd() * w, rnd() * h, .8 + rnd() * 16, .5 + rnd() * 3);
-    }
-  });
-}
-
 /** Woven, painterly linen. The texture stays fixed while the cloth mesh deforms. */
 export function makeCurtainLinenTexture() {
   return canvasTexture((ctx, w, h) => {
@@ -259,71 +213,6 @@ export function makeCurtainLinenTexture() {
     ctx.fillStyle = 'rgba(28,53,51,.17)'; ctx.fillRect(0, h - 28, w, 8);
     ctx.fillStyle = 'rgba(221,217,175,.22)'; ctx.fillRect(0, h - 19, w, 3);
   }, 512, 1024);
-}
-
-/** Transparent city silhouettes on two physically separated parallax planes. */
-export function makeCityDepthTexture(layer = 'middle') {
-  return canvasTexture((ctx, w, h) => {
-    ctx.clearRect(0, 0, w, h);
-    let seed = layer === 'near' ? 776 : 241;
-    const random = () => ((seed = (1664525 * seed + 1013904223) >>> 0) / 4294967296);
-    const near = layer === 'near';
-    const drawBuilding = (x, width, top, index) => {
-      const paint = near
-        ? ['#62564c', '#635f58', '#675b50', '#4c5654'][index % 4]
-        : ['#798183', '#778184', '#6b7578', '#897d73'][index % 4];
-      ctx.globalAlpha = near ? .98 : .84;
-      ctx.fillStyle = paint;
-      ctx.fillRect(x, top, width, h - top);
-      ctx.beginPath();
-      ctx.moveTo(x - 7, top + 3);
-      ctx.lineTo(x + width * (.42 + random() * .18), top - 29 - random() * 44);
-      ctx.lineTo(x + width + 7, top + 3);
-      ctx.closePath();
-      ctx.fillStyle = near ? '#594237' : '#786b66'; ctx.fill();
-      ctx.strokeStyle = near ? 'rgba(198,159,118,.32)' : 'rgba(234,208,169,.38)';
-      ctx.lineWidth = near ? 5 : 3;
-      ctx.beginPath(); ctx.moveTo(x + 5, top + 5); ctx.lineTo(x + width - 5, top + 5); ctx.stroke();
-      // Irregular luminous sash windows, arranged in quiet stacked rows.
-      for (let row = 0; row < 4; row++) for (let col = 0; col < Math.floor((width - 12) / 25); col++) {
-        const wx = x + 11 + col * 25, wy = top + 28 + row * (near ? 70 : 62);
-        if (wy > h - 23) continue;
-        const lit = random() > .43;
-        ctx.fillStyle = lit ? 'rgba(239,195,128,.56)' : 'rgba(38,58,60,.72)';
-        ctx.fillRect(wx, wy, near ? 11 : 9, near ? 21 : 17);
-        ctx.fillStyle = 'rgba(49,48,43,.64)'; ctx.fillRect(wx + 5, wy, 2, near ? 21 : 17);
-      }
-      ctx.globalAlpha = 1;
-    };
-    if (near) {
-      // Two nearby buildings frame the canal; the center remains clear.
-      drawBuilding(-15, 184, 204, 0);
-      drawBuilding(163, 136, 279, 1);
-      drawBuilding(800, 142, 236, 2);
-      drawBuilding(929, 121, 291, 3);
-      ctx.strokeStyle = 'rgba(55,62,56,.72)'; ctx.lineWidth = 7;
-      for (const x of [80, 222, 863, 977]) {
-        ctx.beginPath(); ctx.moveTo(x, 164); ctx.lineTo(x, 211); ctx.stroke();
-      }
-    } else {
-      let x = -23, index = 0;
-      while (x < w + 25) {
-        const width = 70 + random() * 82;
-        const top = 215 + random() * 130;
-        drawBuilding(x, width, top, index++);
-        x += width + 9 + random() * 24;
-      }
-      // Pier posts and an occasional tower create landmarks while panning.
-      ctx.fillStyle = '#697578'; ctx.fillRect(510, 148, 30, 380);
-      ctx.beginPath(); ctx.moveTo(496, 148); ctx.lineTo(525, 102); ctx.lineTo(554, 148); ctx.fill();
-    }
-    // Fine guache flecks soften the edges without hiding the transparent sky.
-    ctx.fillStyle = near ? 'rgba(231,197,155,.1)' : 'rgba(235,225,189,.13)';
-    for (let i = 0; i < 220; i++) {
-      const x = random() * w, y = 320 + random() * (h - 340);
-      ctx.fillRect(x, y, 1 + random() * 10, 1 + random() * 3);
-    }
-  }, 1024, 768);
 }
 
 export function makeMapTexture() {

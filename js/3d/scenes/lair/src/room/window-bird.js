@@ -11,7 +11,8 @@ const { centerX, wallZ, sill, crown } = WINDOW_OPENING;
 /** The bird's plane, just outside the glass. */
 export const BIRD_Z = wallZ - .9;
 export const BIRD_SIZE = Object.freeze({ width: 1.7, height: 1.27 });
-const FLIGHT_SECONDS = 6.5;
+const FLIGHT_SECONDS = 3.25;
+const FLIGHT_LEVELS = [.56, .39, .65, .47, .62, .43];
 const FIRST_FLIGHT_DELAY = 6;
 const SPAN = 9.5;                      // half the path along the wall, from the window centre
 
@@ -25,6 +26,7 @@ function createFlight() {
   const pose = new THREE.Vector4(0, 0, 0, 1);
   let flyAt = FIRST_FLIGHT_DELAY;
   let direction = 1;
+  let passage = 0;
   let lastFrame = -1;
 
   function paint(time) {
@@ -70,12 +72,15 @@ function createFlight() {
       if (elapsed >= FLIGHT_SECONDS) {
         flyAt = time + 30 + Math.random() * 20;
         direction *= -1;
+        passage++;
         lastFrame = -1;
       }
       return false;
     }
     const phase = elapsed / FLIGHT_SECONDS;
-    const altitude = (sill + crown) / 2 + Math.sin(elapsed * 1.9) * .25;
+    const level = FLIGHT_LEVELS[passage % FLIGHT_LEVELS.length];
+    const pitch = (passage % 2 ? -.38 : .38) * (phase - .5);
+    const altitude = sill + (crown - sill) * level + pitch + Math.sin(phase * Math.PI * 2) * .19;
     pose.set(centerX + (phase * 2 - 1) * SPAN * direction, altitude, 1, direction);
     return paint(elapsed);
   }

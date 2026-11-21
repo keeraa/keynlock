@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { makeCityWindowTexture, makeCityDepthTexture, makeCurtainLinenTexture } from './materials.js';
+import { makeCurtainLinenTexture } from './materials.js';
+import { loadCityWindowTextures } from './window-city-art.js';
 
 // The arched window on the far wall, the city behind it and the curtains.
 const WINDOW_POSITION = Object.freeze([-.05, 2.23, -5.65]);
@@ -33,14 +34,20 @@ export function buildWindow(kit) {
       transparent: translucent, depthWrite: !translucent,
     }));
     mesh.name = name;
+    mesh.userData.atmosphere = true; // Transparent artwork has no solid edges in the ink pass.
     mesh.position.set(x, y, z);
     mesh.frustumCulled = true;
     exterior.add(mesh);
     return mesh;
   };
-  addCityPlane('city-distant-panorama', makeCityWindowTexture(), 48, 24, -.05, 5.7, -32);
-  addCityPlane('city-middle-rooftops', makeCityDepthTexture('middle'), 25, 10.5, -.35, 3.6, -17.5, true);
-  addCityPlane('city-near-canalside', makeCityDepthTexture('near'), 14.4, 8.0, -.15, 2.05, -9.4, true);
+  const city = loadCityWindowTextures();
+  addCityPlane('city-distant-panorama', city.sky, 116, 61, 0, 17, -58);
+  const water = addCityPlane('city-canal-water', city.water, 95, 51.8, 0, -1.03, -32);
+  water.rotation.x = -Math.PI / 2;
+  // The two shore plates were projected from the same level camera. Their
+  // different distances move the waterfront relative to the opposite bank.
+  addCityPlane('city-middle-rooftops', city.middle, 37, 18, 0, 4.7, -26, true);
+  addCityPlane('city-near-canalside', city.near, 24, 15, 0, 4, -10.75, true);
 
   const window = new THREE.Group();
   window.name = 'main-arched-window';

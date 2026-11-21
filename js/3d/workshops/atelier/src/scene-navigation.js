@@ -1,6 +1,6 @@
 /** Navigation state: easels → focused painting → wall overview → wall artwork. */
 import { createCameraFraming } from './navigation/camera-framing.js';
-import { createCameraTransition } from './navigation/camera-transition.js';
+import { createCameraTransition } from '../../../core/navigation/camera-transition.js';
 import { createEaselOverlay } from './navigation/easel-overlay.js';
 
 const MODES = Object.freeze({ EASELS: 'easels', FOCUS: 'focus', GALLERY: 'gallery', ART: 'art' });

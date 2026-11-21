@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createPaintingTextureCache } from '@keynlock/atelier/src/painting-texture-cache.js';
+import { createPaintingTextureCache } from '../../../workshops/atelier/src/painting-texture-cache.js';
 
 const renderer = { capabilities: { getMaxAnisotropy: () => 8 } };
 const THREE = { SRGBColorSpace: 'srgb' };

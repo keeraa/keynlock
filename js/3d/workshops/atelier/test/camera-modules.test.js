@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import { createCameraFraming } from '../src/navigation/camera-framing.js';
-import { createCameraTransition } from '../src/navigation/camera-transition.js';
+import { createCameraTransition } from '../../../core/navigation/camera-transition.js';
 
 test('gallery framing stays close and clamps both edges on a portrait viewport', () => {
   const camera = new THREE.PerspectiveCamera(44, .8, .1, 65);

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import { createWallArtworkPicker } from '@keynlock/atelier/src/wall-artwork-picker.js';
+import { createWallArtworkPicker } from '../../../workshops/atelier/src/wall-artwork-picker.js';
 
 test('in-room gallery picks paintings using the visible Lair pointer area', () => {
   const camera = new THREE.PerspectiveCamera(45, 1, .1, 20);

@@ -5,8 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/write-build-info.mjs && node scripts/write-asset-manifest.mjs && node scripts/serve.mjs",
+    "dev:lair": "npm --prefix js/3d run dev -w keynlock-lair --",
+    "dev:atelier": "npm --prefix js/3d run dev -w @keynlock/atelier --",
+    "dev:alchemy": "npm --prefix js/3d run dev -w @keynlock/alchemy --",
     "build": "node scripts/write-build-info.mjs && node scripts/write-asset-manifest.mjs",
     "check": "node scripts/check.mjs",
+    "check:3d-workspace": "npm --prefix js/3d run check",
     "scenarios": "node scripts/scenario-check.mjs",
     "test": "npm run check && npm run scenarios",
     "smoke": "node scripts/smoke.mjs"

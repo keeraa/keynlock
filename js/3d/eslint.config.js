@@ -1,6 +1,12 @@
 import js from '@eslint/js';
 import globals from 'globals';
 
+const workshopPackage = '@keynlock/(?:alchemy|atelier)';
+const privateWorkshopImports = {
+  regex: `^(?:${workshopPackage}(?:$|/(?!embedding$|room-assets$))|(?:\\.\\./)+(?:[^/]+/)*workshops/(?:alchemy|atelier)(?:/|$))`,
+  message: 'Use the workshop package exports: /embedding or /room-assets.',
+};
+
 // One set of rules for the 3D code. `npm run lint` in js/3d checks the parts
 // that are maintained together: the Lair, the workshop packages, core/ and the
 // Key Archive. Other scenes can opt in by being added to the lint script.
@@ -42,8 +48,9 @@ export default [
         message: 'Workshops are mounted in the room, not in an iframe: use core/host/workshop-host.js.',
       }],
       'no-restricted-imports': ['error', { patterns: [{
-        group: ['**/scenes/**'],
-        message: 'A workshop must not depend on the Lair or another scene; the Lair offers it what it needs through the host.',
+        group: ['**/scenes/**', '@keynlock/alchemy', '@keynlock/alchemy/**', '@keynlock/atelier', '@keynlock/atelier/**',
+          '**/workshops/alchemy/**', '**/workshops/atelier/**', '**/../alchemy/**', '**/../atelier/**'],
+        message: 'Workshops are independent applications. Shared code belongs in core/; scene services go through the host.',
       }] }],
     },
   },
@@ -56,11 +63,15 @@ export default [
   {
     files: ['scenes/lair/src/**/*.js'],
     rules: {
+      'no-restricted-imports': ['error', { patterns: [privateWorkshopImports] }],
       'no-restricted-syntax': ['error', {
         // Two documented exceptions: the workbench iframe finds the shared renderer
         // through __keynlockRendererHost, and tests read __keynlockDebug.
         selector: "MemberExpression[object.name='window'][property.name=/^__/]:not([property.name=/^__keynlock(RendererHost|Debug)$/])",
         message: 'Offer workshops what they need through core/host/workshop-host.js, not window globals.',
+      }, {
+        selector: String.raw`ImportExpression[source.value=/^(?:@keynlock\u002F(?:alchemy|atelier)|\.\..*\u002Fworkshops\u002F(?:alchemy|atelier))(?:\u002F|$)/]`,
+        message: 'Load a workshop through the start function exported by its /embedding entry point.',
       }],
     },
   },
@@ -73,7 +84,7 @@ export default [
   ].map(([folder, forbidden]) => ({
     files: [`scenes/lair/src/${folder}/**/*.js`],
     rules: {
-      'no-restricted-imports': ['error', { patterns: [{
+      'no-restricted-imports': ['error', { patterns: [privateWorkshopImports, {
         group: forbidden.map(name => `../${name}/*`),
         message: `scenes/lair/src/${folder}/ must not depend on ${forbidden.join(', ')}; see the Lair README.`,
       }] }],
@@ -83,7 +94,7 @@ export default [
     files: ['core/**/*.js'],
     rules: {
       'no-restricted-imports': ['error', { patterns: [{
-        group: ['**/scenes/**', '**/workshops/**'],
+        group: ['**/scenes/**', '**/workshops/**', '@keynlock/alchemy', '@keynlock/alchemy/**', '@keynlock/atelier', '@keynlock/atelier/**'],
         message: 'core/ is shared by every scene and must not depend on one.',
       }] }],
     },

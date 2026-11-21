@@ -1,5 +1,5 @@
 // @ts-check
-/** One flight controller for focus, wall overview, gallery details and returns. */
+/** Interpolate a camera and its orbit target while the host handles input. */
 export function createCameraTransition({ camera, controls, onStart = () => {},
   setInputBlocked = blocked => { controls.enabled = !blocked; } }) {
   let travel = null;

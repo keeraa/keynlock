@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { REAGENTS, emptyMixture, addDose } from '@keynlock/alchemy/src/mixing.js';
-import { generateRecipe, evaluateRecipe } from '@keynlock/alchemy/src/recipes.js';
+import { REAGENTS, emptyMixture, addDose } from '../../../workshops/alchemy/src/mixing.js';
+import { generateRecipe, evaluateRecipe } from '../../../workshops/alchemy/src/recipes.js';
 import { assistedFilingStroke, cutLayout, generateBlueprint,
   inspectKey, keyTopOutline, targetGuideSegments } from '../public/stations/workbench/js/logic.js';
 

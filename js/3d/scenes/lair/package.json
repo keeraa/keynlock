@@ -12,6 +12,8 @@
     "test:browser": "npm run build && node --test tests/browser/*.test.mjs"
   },
   "dependencies": {
+    "@keynlock/alchemy": "0.1.0",
+    "@keynlock/atelier": "0.1.0",
     "three": "0.187.0"
   },
   "devDependencies": {

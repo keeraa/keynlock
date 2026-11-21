@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import { ALCHEMY_TABLE } from '@keynlock/alchemy/src/table-dimensions.js';
+import { ALCHEMY_TABLE } from '@keynlock/alchemy/room-assets';
 import {createWorldWorkshopRegistry, WORKSHOP_PLACEMENTS} from '../src/rendering/world-workshops.js';
 
 test('three unchanged source scenes occupy one physically connected world',()=>{

@@ -295,7 +295,10 @@ workshopUI = wireWorkshopUI({ cartoonFilter, navigation, restorationInput, colle
     && (!embedded || !lair?.atelier.galleryActive),
   focusEasel: embedded ? focusLairArtwork : side => navigation.focusOn(side),
   leaveEaselFocus: embedded ? leaveLairArtworkFocus : () => navigation.leaveFocus() });
-if (embedded) publishWorkshopApi('atelier', { input: { handleKey: workshopUI.handleKey } });
+if (embedded) publishWorkshopApi('atelier', { input: { handleKey: workshopUI.handleKey },
+  // Wood, metal, floor and wall finishes, never the paintings: the Lair applies
+  // its own gouache settings to these.
+  look: { paintedMaterials: () => [...Object.values(mats), ...floorWoodMaterials, wallpaperMaterial].filter(Boolean) } });
 exhibition = createWallExhibitionController({ paintings, playerProgress, wallGallery, collectionUI,
   getNavigation: () => navigation, getWorkshopUI: () => workshopUI, showToast, $ });
 exhibition.bind();

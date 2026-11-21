@@ -5,7 +5,7 @@ import { t } from '../i18n.js';
 import { ROOM_CENTER_Z } from '../room-layout.js';
 
 export function createAtelierView({
-  camera, controls, canvas, interaction, rendererHost, atelierFilter, host, easelPose, roomMinDistance,
+  camera, controls, canvas, interaction, rendererHost, host, easelPose, roomMinDistance,
   navigation, setFlightInputBlocked,
 }) {
   // The Atelier publishes its gallery and restoration controls once it has loaded.
@@ -75,7 +75,6 @@ export function createAtelierView({
     queuedGallery = false;
     if (!galleryActive) return;
     galleryActive = false;
-    atelierFilter?.setBlurSuspended(false);
     galleryDrag = null;
     galleryHover.hidden = true;
     host.atelier.galleryActive = false;
@@ -95,7 +94,6 @@ export function createAtelierView({
     easelFocusSide = null;
     savedEaselView = null;
     galleryActive = true;
-    atelierFilter?.setBlurSuspended(true);
     navigation.openGalleryCamera();
     host.atelier.galleryActive = true;
     gallery.open(canvas.clientWidth / Math.max(1, canvas.clientHeight));

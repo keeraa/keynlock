@@ -1,6 +1,6 @@
 import { ALCHEMY_LOOK } from '@keynlock/alchemy/room-assets';
 
-export function createWorkshopLighting({ scene, camera, canvas, renderer, rendererHost, atelierFilter, roomLights }) {
+export function createWorkshopLighting({ scene, camera, canvas, renderer, rendererHost, roomLights }) {
   const roomLightDefaults = roomLights.map(light => ({ light, intensity: light.intensity, visible: light.visible }));
   const originalRoomRenderLook = {
     outputColorSpace: renderer.outputColorSpace,
@@ -28,7 +28,6 @@ export function createWorkshopLighting({ scene, camera, canvas, renderer, render
     const pixelRatio = Math.min(window.devicePixelRatio || 1, enabled ? 1.35 : 1.75);
     if (Math.abs(renderer.getPixelRatio() - pixelRatio) > .001) {
       renderer.setPixelRatio(pixelRatio);
-      atelierFilter?.resize(canvas.clientWidth,canvas.clientHeight,pixelRatio);
     }
     if (enabled) {
       // Both scenes already use ACES/sRGB. Changing the global shadow-map type

@@ -8,7 +8,6 @@ import { mountWorkshopOverlay } from './workshops/workshop-overlay.js';
 import { createAtelierEmbedding } from '@keynlock/atelier/embedding';
 import { createAlchemyEmbedding } from '@keynlock/alchemy/embedding';
 import { createSharedRendererHost } from './rendering/shared-renderer-host.js';
-import { createCartoonFilter } from '@keynlock/atelier/room-assets';
 import { addRoomLighting } from './room/lighting.js';
 import { createDayNight } from './room/day-night.js';
 import { mountPerformancePanel } from './ui/performance-panel.js';
@@ -103,7 +102,6 @@ function setup() {
   const roomLights = scene.children.filter(child => child.isLight);
   const { materials, visual } = createMaterials();
   const room = buildLair(scene, materials);
-  const atelierFilter = createCartoonFilter({ THREE, renderer, scene, camera });
   const atelier = createAtelierEmbedding({ host: host.atelier, t,
     onPanelHeight: height => app.style.setProperty('--atelier-panel-height', `${height}px`),
   });
@@ -124,7 +122,7 @@ function setup() {
   const outlines = createRoomOutlines(scene);
   const performancePanel = mountPerformancePanel({ document, renderer, scene, canvas });
   const dayNight = createDayNight(night => { room.setNight(night); lighting.setNight(night); });
-  const visualUI = mountVisualSettings({ visual, room, setNight: night => dayNight.set(night), outlines, atelierFilter,
+  const visualUI = mountVisualSettings({ visual, room, setNight: night => dayNight.set(night), outlines,
     grain: document.querySelector('.grain'), onOpen: () => { panel.hidden = true; } });
   const roomWalk = createRoomWalk({
     scene, camera, interaction,
@@ -132,7 +130,7 @@ function setup() {
     onInteract: () => zoneInteraction.openWalkTarget(),
   });
   const atelierView = createAtelierView({
-    camera, controls, canvas, interaction, rendererHost, atelierFilter, host,
+    camera, controls, canvas, interaction, rendererHost, host,
     easelPose: ATELIER_EASELS, roomMinDistance,
     setFlightInputBlocked: blocked => cameraInput.setAtelierInputBlocked('flight', blocked),
     navigation: {
@@ -155,7 +153,7 @@ function setup() {
   });
   host.atelier.setStrokeInputBlocked = blocked => cameraInput.setAtelierInputBlocked('stroke', blocked);
   const zoneTransitions = createZoneTransitions({
-    scene, camera, controls, canvas, interaction, renderer, rendererHost, atelierFilter,
+    scene, camera, controls, canvas, interaction, renderer, rendererHost,
     workshopOverlay, atelierView, visualUI, homePosition, homeTarget, roomMinDistance,
     roomLights, cameraInput,
   });
@@ -171,8 +169,15 @@ function setup() {
       const worktable = scene.getObjectByName('restoration-worktable');
       if (worktable) room.windowLight.addFurniture(worktable);
       roomWalk.refreshObstacles();
+      // One look for the whole room: the Atelier's furniture takes the room's
+      // outlines and gouache settings (the paintings keep their true colours).
+      outlines.attach(['restoration-left-easel', 'restoration-right-easel', 'restoration-worktable', 'restoration-wall-shelf']);
+      visual.adoptPaintedMaterials(getWorkshopApi('atelier')?.look?.paintedMaterials?.());
     },
-    onAlchemyReady: roomWalk.refreshObstacles,
+    onAlchemyReady() {
+      roomWalk.refreshObstacles();
+      visual.adoptPaintedMaterials(getWorkshopApi('alchemy')?.look?.paintedMaterials?.());
+    },
     precompileWorkshopLighting: zoneTransitions.precompileWorkshopLighting,
   });
   atelierView.bind();
@@ -189,13 +194,12 @@ function setup() {
     cameraInput.resize(zoneTransitions.resizeCamera(width));
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
-    atelierFilter.resize(width, height, renderer.getPixelRatio());
     atelierView.resize();
   }
   window.addEventListener('resize', resize);
   resize();
   const returnButton = createReturnButton({ button: document.querySelector('#reset-camera'), t });
-  startLairFrames({ scene, camera, controls, renderer, rendererHost, atelierFilter, room, dayNight,
+  startLairFrames({ scene, camera, controls, renderer, rendererHost, room, dayNight,
     zoneTransitions, zoneInteraction, cameraInput, atelierView, workshopOverlay, visualUI, performancePanel,
     returnButton });
 }

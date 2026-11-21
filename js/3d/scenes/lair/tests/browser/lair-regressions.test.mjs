@@ -686,3 +686,19 @@ test('the room draws once per frame: no transmission pass and no per-frame shado
   });
   assert.ok(passes.offscreenPerFrame < 60, `offscreen draws per frame: ${passes.offscreenPerFrame}`);
 });
+
+test('the workshops share the room look: one gouache setting, no Atelier-only effects', async t => {
+  const page = await openRoom(t);
+  assert.equal(await page.locator('.atelier-effects, #atelier-toon-enabled').count(), 0, 'no separate Atelier effects');
+  await page.waitForFunction(() => {
+    const api = window.__keynlockDebug.workshop;
+    return api('atelier')?.look?.paintedMaterials && api('alchemy')?.look?.paintedMaterials;
+  });
+  // Wait for the Lair to adopt them (on the workshops' ready events).
+  const painted = await page.waitForFunction(() => {
+    const api = window.__keynlockDebug.workshop;
+    const adopted = list => list.every(material => material.customProgramCacheKey().includes('keynlock-painted'));
+    return adopted(api('atelier').look.paintedMaterials()) && adopted(api('alchemy').look.paintedMaterials());
+  }, null, { timeout: 30000 });
+  assert.ok(await painted.jsonValue());
+});

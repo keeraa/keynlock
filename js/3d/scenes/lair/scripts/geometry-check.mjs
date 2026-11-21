@@ -178,6 +178,30 @@ assert.ok(airTint.b > airTint.r && city.color.getHex() !== 0xffffff, 'moonlight 
 world.setNight(false);
 assert.equal(airTint.getHex(), dayTint);
 assert.equal(city.color.getHex(), 0xffffff, 'day comes back exactly');
+// Lamps: three chandeliers are the only real lamp lights, and they reach the
+// floor; the sconces paint their light on the wall. Glows and patches are light.
+const chandelierLights = [], pointLights = [], lampLight = [];
+scene.traverse(object => {
+  if (object.isPointLight) pointLights.push(object);
+  if (object.name === 'lair-chandelier-light') chandelierLights.push(object);
+  if (object.parent?.name === 'lair-wall-sconce' || object.parent?.name === 'lair-chandelier')
+    if (object.material?.isShaderMaterial) lampLight.push(object);
+});
+assert.equal(chandelierLights.length, 3, 'three chandeliers');
+assert.equal(scene.children.flatMap(c => c.children).filter(o => o.name === 'lair-wall-sconce').length, 8, 'eight wall sconces');
+assert.ok(pointLights.length <= 6, `the room keeps few point lights, got ${pointLights.length}`);
+for (const light of chandelierLights) {
+  const height = light.getWorldPosition(new THREE.Vector3()).y;
+  assert.ok(light.distance > height + 2, 'chandelier light reaches the floor');
+}
+assert.ok(lampLight.length >= 11 && lampLight.every(o => o.userData.atmosphere), 'lamp glows are never ink-outlined');
+const dayLamp = chandelierLights[0].intensity;
+world.setNight(1);
+assert.ok(chandelierLights[0].intensity > 3 * dayLamp, 'at night the lamps are the main light');
+world.setNight(.5);
+assert.ok(chandelierLights[0].intensity > dayLamp && chandelierLights[0].intensity < 3 * dayLamp * 2, 'night comes in gradually');
+world.setNight(0);
+assert.equal(chandelierLights[0].intensity, dayLamp, 'day comes back exactly');
 // One tiled surface for the whole right wall, with the laboratory's tile size.
 const tiles = materials.alchemyTile.map.image;
 assert.ok(tiles.width >= 2048 && tiles.height >= 1024, 'the right wall tiles are sharp enough');

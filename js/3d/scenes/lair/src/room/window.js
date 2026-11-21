@@ -159,10 +159,14 @@ export function buildWindow(kit) {
 
   // At night the painted city outside turns to deep blue dusk.
   const cityMaterials = exterior.children.map(plane => plane.material);
+  const cityDay = new THREE.Color('#ffffff'), cityNight = new THREE.Color('#4f5f86');
+  const glassDay = new THREE.Color('#c7d7d0'), glassNight = new THREE.Color('#8ea3c4');
   return {
-    setNight(/** @type {boolean} */ night) {
-      for (const material of cityMaterials) material.color.set(night ? '#4f5f86' : '#ffffff');
-      glass.material.color.set(night ? '#8ea3c4' : '#c7d7d0');
+    /** 0 = day, 1 = night, or in between. */
+    setNight(/** @type {number | boolean} */ night) {
+      const amount = Math.max(0, Math.min(1, Number(night)));
+      for (const material of cityMaterials) material.color.lerpColors(cityDay, cityNight, amount);
+      glass.material.color.lerpColors(glassDay, glassNight, amount);
     },
   };
 }

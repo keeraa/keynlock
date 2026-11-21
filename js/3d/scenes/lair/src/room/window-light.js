@@ -255,25 +255,27 @@ export function createWindowLight(parent) {
     ...bird.uniforms,
   };
   let strength = 1;
-  /** @type {{ air: number, floor: number, dust: number, strength: number }} */
-  let palette = WINDOW_LIGHT_PALETTES.day;
+  let night = 0;
+  const { day: d, night: n } = WINDOW_LIGHT_PALETTES;
+  const blend = (/** @type {THREE.Color} */ color, a, b) =>
+    color.lerpColors(new THREE.Color(a), new THREE.Color(b), night);
   function apply() {
-    const value = strength * palette.strength;
+    const value = strength * (d.strength + (n.strength - d.strength) * night);
     air.beams.visible = floor.patch.visible = value > 0;
     air.uniforms.uAirStrength.value = value * .12;
     floor.uniforms.uStrength.value = value * .42;
     shaderUniforms.uWindowLight.value = value;
-    air.uniforms.uAirTint.value.setHex(palette.air);
-    floor.uniforms.uTint.value.setHex(palette.floor);
-    shaderUniforms.uWindowTint.value.setHex(palette.dust);
+    blend(air.uniforms.uAirTint.value, d.air, n.air);
+    blend(floor.uniforms.uTint.value, d.floor, n.floor);
+    blend(shaderUniforms.uWindowTint.value, d.dust, n.dust);
   }
   apply();
   return {
     shaderUniforms, beams: air.beams, floor: floor.patch, bird: bird.bird,
     /** 0 = off, 1 = the default light, up to 1.5. */
     setStrength(/** @type {number} */ value) { strength = Math.max(0, value); apply(); },
-    /** Warm sunlight or cool moonlight. */
-    setNight(/** @type {boolean} */ night) { palette = night ? WINDOW_LIGHT_PALETTES.night : WINDOW_LIGHT_PALETTES.day; apply(); },
+    /** 0 = warm sunlight, 1 = cool moonlight, or in between. */
+    setNight(/** @type {number | boolean} */ value) { night = Math.max(0, Math.min(1, Number(value))); apply(); },
     /** Once per frame, time in seconds: moves the bird. */
     update: bird.update,
   };

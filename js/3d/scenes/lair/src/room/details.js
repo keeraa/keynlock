@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { createAmbientParticles } from './ambient-particles.js';
 
-// The gramophone corner, hanging lamps and the floating dust.
+// The gramophone corner and the floating dust.
 export function buildGramophone(kit) {
   const { m, staticGroup, animated, box, cylinder, rod, zoneTarget, makeTable } = kit;
   const chest = makeTable(staticGroup, 1.37, .76, 1.97, -3.67, 1.17);
@@ -29,15 +29,8 @@ export function buildGramophone(kit) {
 
 /** @param {any} kit @param {{ windowLight?: { shaderUniforms: Record<string, { value: any }> } }} [options] */
 export function buildDetails(kit, { windowLight } = {}) {
-  const { m, staticGroup, animated, box, sphere } = kit;
-  // Keep the tall window wall free from pictures and the former upper gallery.
-  // Column lamps create pools of warm light around the room.
-  for (const x of [-7.98, 7.98]) for (const z of [-1.10, 8.15, 17.35, 24.65]) {
-    const lamp = new THREE.Group(); lamp.position.set(x, 3.10, z); staticGroup.add(lamp);
-    box(lamp, .14, .65, .22, m.oldBrass);
-    sphere(lamp, .22, new THREE.MeshBasicMaterial({ color: '#f0c591', transparent: true, opacity: .65 }), 0, 0, .19);
-    const light = new THREE.PointLight('#ffc183', 3.5, 5.5, 2); light.position.set(0, 0, .35); lamp.add(light);
-  }
+  const { staticGroup, animated } = kit;
+  // The wall sconces are in lamps.js.
   const ambientParticles = createAmbientParticles(staticGroup, { windowLight });
   animated.push(t => ambientParticles.update(t));
   return ambientParticles;

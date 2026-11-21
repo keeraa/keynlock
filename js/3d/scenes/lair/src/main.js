@@ -9,6 +9,7 @@ import { mountAlchemyInRoom } from './workshops/alchemy-in-room.js';
 import { createSharedRendererHost } from './rendering/shared-renderer-host.js';
 import { createCartoonFilter } from '@keynlock/atelier/src/effects/cartoon-filter.js';
 import { addRoomLighting } from './room/lighting.js';
+import { createDayNight } from './room/day-night.js';
 import { createZoneTransitions, ATELIER_EASELS } from './navigation/zone-transitions.js';
 import { createAtelierView } from './workshops/atelier-view.js';
 import { createInitialLoadingGate } from './ui/initial-loading.js';
@@ -38,7 +39,7 @@ const fpsLabel = document.querySelector('#fps');
 const triangleLabel = document.querySelector('#triangles');
 const panel = document.querySelector('#zone-panel');
 let renderer, scene, camera, controls, room, rendererHost, atelierFilter;
-let visualUI, workshopOverlay, zoneTransitions, atelierView;
+let visualUI, workshopOverlay, zoneTransitions, atelierView, dayNight;
 let lastSceneTriangles = 0;
 let startPointer = null;
 let hoveredZone = null;
@@ -146,7 +147,9 @@ function setup() {
     onReady: id => zoneTransitions.onWorkshopReady(id),
   });
   const outlines = createRoomOutlines(scene);
-  visualUI = mountVisualSettings({ visual, room, lighting, outlines, atelierFilter,
+  // The window, the city, the room light and the lamps change together, gradually.
+  dayNight = createDayNight(night => { room.setNight(night); lighting.setNight(night); });
+  visualUI = mountVisualSettings({ visual, room, setNight: night => dayNight.set(night), outlines, atelierFilter,
     grain: document.querySelector('.grain'), onOpen: () => { panel.hidden = true; } });
   atelierView = createAtelierView({
     camera, controls, canvas, interaction, rendererHost, atelierFilter, host,
@@ -255,6 +258,7 @@ function animate() {
   requestAnimationFrame(animate);
   const now = performance.now();
   const frameDelta = clock.getDelta();
+  dayNight?.update(frameDelta);
   const delta = Math.min(frameDelta, .05);
   const time = clock.elapsedTime;
   zoneTransitions.updateApproach(delta);

@@ -6,6 +6,7 @@ import { buildPlanning } from './planning.js';
 import { buildWorkbench } from './workbench-furniture.js';
 import { buildGramophone, buildDetails } from './details.js';
 import { createWindowLight } from './window-light.js';
+import { buildLamps } from './lamps.js';
 
 /** A single continuous room, using the proportions and gouache materials of the existing ateliers. */
 export function buildLair(scene, m) {
@@ -23,6 +24,7 @@ export function buildLair(scene, m) {
   buildWorkbench(kit);
   buildGramophone(kit);
   const ambientParticles = buildDetails(kit, { windowLight });
+  const lamps = buildLamps(kit);
   zoneTarget('alchemy', [6.86, 2.34, 10.10], [3.05, 5.8, 5.22]);
   const wallpapers = {
     tile: m.alchemyTile,
@@ -32,10 +34,14 @@ export function buildLair(scene, m) {
   };
   return {
     anchors, hitTargets, animated, ambientParticles, windowLight,
-    /** Day: warm sun through the window. Night: moonlight and a dark city outside. */
-    setNight(/** @type {boolean} */ night) {
+    /**
+     * 0 = day: warm sun through the window, dim lamps. 1 = night: moonlight, a
+     * dark city outside and the lamps as the main light. In between while it changes.
+     */
+    setNight(/** @type {number | boolean} */ night) {
       windowView.setNight(night);
       windowLight.setNight(night);
+      lamps.setNight(night);
     },
     setRightWallpaper(name) {
       if (!Object.hasOwn(wallpapers, name) || !rightWallFinish) return false;

@@ -47,8 +47,8 @@ after(async () => {
   if (server) await new Promise(resolve => server.httpServer.close(resolve));
 });
 
-async function openRoom(t) {
-  const context = await browser.newContext({ viewport, locale: 'ru-RU' });
+async function openRoom(t, { locale = 'ru-RU' } = {}) {
+  const context = await browser.newContext({ viewport, locale });
   t.after(() => context.close());
   const page = await context.newPage();
   page.setDefaultTimeout(timeout);
@@ -335,4 +335,13 @@ test('the room hosts both workshops on one canvas through the host contract', as
   await page.locator('#gallery-easels').click();
   await page.waitForFunction(() => window.__keynlockDebug.host.atelier.galleryActive === false);
   assert.equal(await page.locator('#lair-gallery-controls').isVisible(), false);
+});
+
+test('an English browser gets the Lair in English, with a language switch', async t => {
+  const page = await openRoom(t, { locale: 'en-US' });
+  assert.equal(await page.title(), "KEYNLOCK · The team's lair");
+  assert.equal(await page.evaluate(() => document.documentElement.lang), 'en');
+  assert.equal(await page.locator('.zone-nav [data-zone="workbench"] span:last-child').innerText(), 'Workbench');
+  assert.equal(await page.locator('#lair-language').inputValue(), 'en');
+  assert.deepEqual(await page.locator('#lair-language option').evaluateAll(options => options.map(o => o.value)), ['ru', 'en']);
 });

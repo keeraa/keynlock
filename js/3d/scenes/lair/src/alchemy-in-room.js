@@ -1,6 +1,7 @@
 /** Run the original alchemy application in the Lair DOM and 3D world. */
 import alchemyHTML from '@keynlock/alchemy/index.html?raw';
 import alchemyCSS from '@keynlock/alchemy/src/styles.css?inline';
+import { t } from './i18n.js';
 
 export function mountAlchemyInRoom(host) {
   const source = new DOMParser().parseFromString(alchemyHTML, 'text/html');
@@ -18,8 +19,8 @@ export function mountAlchemyInRoom(host) {
   const exit = document.createElement('button');
   exit.type = 'button';
   exit.className = 'lair-alchemy-exit';
-  exit.textContent = '← В ЛОГОВО';
-  exit.setAttribute('aria-label', 'Выйти из алхимии в логово');
+  exit.textContent = t('← В ЛОГОВО');
+  exit.setAttribute('aria-label', t('Выйти из алхимии в логово'));
   root.appendChild(exit);
   root.querySelectorAll('script').forEach(script => script.remove());
   const style = document.createElement('style');

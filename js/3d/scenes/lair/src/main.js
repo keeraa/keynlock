@@ -13,10 +13,17 @@ import { createZoneTransitions, RESTORATION_EASELS } from './zone-transitions.js
 import { createRestorationView } from './restoration-view.js';
 import { createInitialLoadingGate } from './initial-loading.js';
 import { getWorkshopApi, setWorkshopHost } from '../../../core/host/workshop-host.js';
+import { bindLanguageSelect, t, translator } from './i18n.js';
 import './style.css';
 import './initial-loading.css';
 import './visual.css';
 import './original-stations.css';
+
+// The page is written in Russian; translate the Lair's own markup before the
+// workshops mount theirs (their interfaces are not translated yet).
+document.documentElement.lang = translator.language;
+translator.translateTree(document);
+bindLanguageSelect(document.querySelector('#lair-language'));
 
 // What the Lair offers the workshops it mounts (see core/host/workshop-host.js).
 const host = setWorkshopHost({ atelier: {}, alchemy: {} });
@@ -64,14 +71,14 @@ function setup() {
   const completeInitialLoad = () => {
     if (galleryLoaded && alchemyLoaded) initialLoading.finish();
     else if (galleryLoaded) {
-      loadingStatus.textContent = 'ПОДГОТАВЛИВАЕМ АЛХИМИЧЕСКУЮ ЛАБОРАТОРИЮ';
+      loadingStatus.textContent = t('ПОДГОТАВЛИВАЕМ АЛХИМИЧЕСКУЮ ЛАБОРАТОРИЮ');
       loadingBar.style.width = '94%';
     }
   };
   const initialLoading = createInitialLoadingGate({
     onProgress: ({ loaded, total }) => {
       loading.classList.add('is-tracking');
-      loadingStatus.textContent = `ЗАГРУЖАЕМ КАРТИНЫ · ${loaded} / ${total}`;
+      loadingStatus.textContent = t('ЗАГРУЖАЕМ КАРТИНЫ · {loaded} / {total}', { loaded, total });
       loadingBar.style.width = `${total ? loaded / total * 100 : 100}%`;
     },
     onDone: (reason) => {
@@ -294,7 +301,7 @@ async function toggleAmbience() {
   const button = document.querySelector('#sound-toggle');
   const enable = button.getAttribute('aria-pressed') !== 'true';
   button.setAttribute('aria-pressed', String(enable));
-  button.title = enable ? 'Выключить звуковое окружение' : 'Включить звуковое окружение';
+  button.title = enable ? t('Выключить звуковое окружение') : t('Включить звуковое окружение');
   if (!ambientContext) {
     ambientContext = new AudioContext();
     const length = ambientContext.sampleRate * 3;

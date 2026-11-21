@@ -1,6 +1,7 @@
 import { getWorkshopApi } from '../../../core/host/workshop-host.js';
 import * as THREE from 'three';
 import { createCameraTransition } from '@keynlock/atelier/src/navigation/camera-transition.js';
+import { t } from './i18n.js';
 
 export function createRestorationView({
   camera, controls, canvas, interaction, rendererHost, atelierFilter, host, easelPose, roomMinDistance, navigation,
@@ -195,7 +196,7 @@ export function createRestorationView({
     if (key === artworkInfoKey) return;
     artworkInfoKey = key;
     document.querySelector('#restoration-info-index').textContent = galleryActive
-      ? 'КОЛЛЕКЦИЯ КАРТИН' : `ЭКСПОНАТ № ${String(info.index).padStart(2, '0')} / ${info.total}`;
+      ? t('КОЛЛЕКЦИЯ КАРТИН') : t('ЭКСПОНАТ № {index} / {total}', { index: String(info.index).padStart(2, '0'), total: info.total });
     document.querySelector('#restoration-info-title').textContent = info.title;
     document.querySelector('#restoration-info-author').textContent = `${info.artist} · ${info.year}`;
     document.querySelector('#restoration-info-description').textContent = info.description;
@@ -214,7 +215,7 @@ export function createRestorationView({
     easelLabels.hidden = !showing || Boolean(focusedSide);
     if (!showing) return;
     document.querySelector('#lair-easel-camera-state').textContent = focusedSide === 'original'
-      ? 'ОРИГИНАЛ' : focusedSide === 'copy' ? 'КОПИЯ' : 'СРАВНЕНИЕ';
+      ? t('ОРИГИНАЛ') : focusedSide === 'copy' ? t('КОПИЯ') : t('СРАВНЕНИЕ');
     document.querySelector('#lair-focus-original').disabled = focusedSide === 'original';
     document.querySelector('#lair-focus-copy').disabled = focusedSide === 'copy';
     document.querySelector('#lair-focus-exit').hidden = !focusedSide;
@@ -309,7 +310,7 @@ export function createRestorationView({
       body.hidden = !body.hidden;
       e.currentTarget.textContent = body.hidden ? '+' : '−';
       e.currentTarget.setAttribute('aria-expanded', String(!body.hidden));
-      e.currentTarget.setAttribute('aria-label', body.hidden ? 'Развернуть описание картины' : 'Свернуть описание картины');
+      e.currentTarget.setAttribute('aria-label', body.hidden ? t('Развернуть описание картины') : t('Свернуть описание картины'));
     });
   }
 

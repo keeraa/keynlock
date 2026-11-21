@@ -32,7 +32,7 @@
 | --- | --- | --- |
 | `room/` | Геометрия и материалы комнаты: `build.js` собирает её из `kit.js`, `shell.js`, `window.js`, `planning.js`, `workbench-furniture.js`, `details.js`; `materials.js`, `lighting.js`, `ambient-particles.js` | только `i18n.js`, three.js и пакеты мастерских (текстуры) |
 | `rendering/` | Общий рендерер (`shared-renderer-host.js`), мир мастерских (`world-workshops.js`), настройки света и прогрев шейдеров мастерских (`workshop-lighting.js`), контуры (`ink-outlines.js`) | общие координаты и настройки освещения мастерских |
-| `workshops/` | Подключение мастерских к комнате: `atelier-in-room.js`, `alchemy-in-room.js`, камера у мольбертов и стена картин (`atelier-view.js`), встроенный документ верстака и экраны загрузки (`workshop-overlay.js`) | пакеты мастерских, `core/host` и `i18n.js`; не другие папки логова |
+| `workshops/` | Камера у мольбертов и стена картин (`atelier-view.js`), переключение мастерских и встроенный документ верстака (`workshop-overlay.js`) | пакеты мастерских, `core/host` и `i18n.js`; не другие папки логова |
 | `navigation/` | Данные зон (`zone-definitions.js`), переходы (`zone-transitions.js`), переключение камеры и ввода (`camera-input.js`), выбор объекта мышью и прицелом (`zone-interaction.js`), прогулка (`room-walk.js`) | `workshops/`, `rendering/`, общие координаты |
 | `ui/` | Экран загрузки, панель «Визуал», статистика кадра, переключатель звукового окружения | `rendering/`, `i18n.js` |
 | `locales/`, `i18n.js` | Переводы интерфейса логова | — |
@@ -45,8 +45,8 @@
 
 | Мастерская | Единственный источник | Подключение | Опубликованный оригинал |
 | --- | --- | --- | --- |
-| Ателье (`atelier`) | пакет `@keynlock/atelier` — `js/3d/workshops/atelier/` | `src/workshops/atelier-in-room.js` | [Ателье](https://atelier-restoration-1115.k1r11111.chatgpt.site/) |
-| Алхимия (`alchemy`) | пакет `@keynlock/alchemy` — `js/3d/workshops/alchemy/` | `src/workshops/alchemy-in-room.js` | [Лаборатория](https://keynlock-alchemy-lab-1115.k1r11111.chatgpt.site/) |
+| Ателье (`atelier`) | пакет `@keynlock/atelier` — `js/3d/workshops/atelier/` | `@keynlock/atelier/embedding` | [Ателье](https://atelier-restoration-1115.k1r11111.chatgpt.site/) |
+| Алхимия (`alchemy`) | пакет `@keynlock/alchemy` — `js/3d/workshops/alchemy/` | `@keynlock/alchemy/embedding` | [Лаборатория](https://keynlock-alchemy-lab-1115.k1r11111.chatgpt.site/) |
 | Верстак (`workbench`) | копия в `public/stations/workbench/` (сам верстак дорабатывается отдельно в `js/3d/scenes/workbench`) | встроенный документ, `src/workshops/workshop-overlay.js` | [Верстак](https://keynlock-workbench-1116.k1r11111.chatgpt.site/) |
 
 Из тех же пакетов собираются и отдельные сайты мастерских (`npm run build` в папке пакета).
@@ -61,13 +61,15 @@
 
 - логово перед загрузкой мастерских вызывает `setWorkshopHost(...)` и кладёт туда общий рендерер, камеру, OrbitControls, слой ввода и обработчики для Ателье (`host.atelier`) и лаборатории (`host.alchemy`); все поля описаны в JSDoc модуля;
 - мастерская вызывает `getWorkshopHost()`: внутри логова получает хост, на отдельном сайте — `null`;
-- мастерские публикуют своё API через `publishWorkshopApi('atelier' | 'alchemy', ...)`, логово читает его `getWorkshopApi(...)`.
+- мастерские публикуют своё API через `publishWorkshopApi('atelier' | 'alchemy', ...)`, логово читает его `getWorkshopApi(...)`;
+- `status.get()` и `status.subscribe(...)` дают состояние запуска и ошибки. Экран загрузки дополнительно читает готовность моделей и прогресс первых репродукций Ателье;
+- `gallery.getState()` сообщает режим стены, состояние каталога и доступность перемешивания. Кнопки Логова вызывают методы галереи.
 
 Глобальных переменных две, обе описаны в коде: `window.__keynlockRendererHost` — для верстака во встроенном документе, `window.__keynlockDebug` — для браузерных тестов и консоли. ESLint запрещает новые `window.__*` в коде логова и мастерских, а мастерским — импорт из логова.
 
 ### Одна копия каждого файла
 
-Логово импортирует мастерские через `@keynlock/alchemy/embedding` и `@keynlock/atelier/embedding`. Эти точки входа предоставляют разметку, оформление и отложенный запуск оригинального приложения. Текстуры, размеры и визуальные настройки комнаты доступны через `/room-assets` соответствующего пакета. Общий перелёт камеры находится в `js/3d/core/navigation/camera-transition.js`.
+Логово импортирует мастерские через `@keynlock/alchemy/embedding` и `@keynlock/atelier/embedding`. Эти точки входа монтируют интерфейс в переданный контейнер, добавляют свои встроенные стили и запускают оригинальное приложение. Текстуры, размеры и визуальные настройки комнаты доступны через `/room-assets` соответствующего пакета. Общий перелёт камеры находится в `js/3d/core/navigation/camera-transition.js`.
 
 `npm run check:sources` (`scripts/check-sources.mjs`) сверяет исходники логова и мастерских, чтобы находить копии файлов. Исключения перечислены в скрипте. Верстак остаётся отдельной статической страницей со своими текстурами металла.
 

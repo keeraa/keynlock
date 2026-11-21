@@ -20,6 +20,11 @@ function htmlTexts(html) {
   return texts.map(text => normalizeText(decode(text))).filter(text => CYRILLIC.test(text));
 }
 
+function codeFileTexts(path) {
+  return [...readFileSync(path, 'utf8').matchAll(/\bt\('((?:[^'\\]|\\.)*)'/g)]
+    .map(([, text]) => normalizeText(text));
+}
+
 /** Every t('…') call in the Lair's code. */
 function codeTexts(dir = join(root, 'src')) {
   const texts = [];
@@ -27,13 +32,16 @@ function codeTexts(dir = join(root, 'src')) {
     const path = join(dir, name);
     if (statSync(path).isDirectory()) { if (name !== 'locales') texts.push(...codeTexts(path)); continue; }
     if (!name.endsWith('.js')) continue;
-    for (const [, text] of readFileSync(path, 'utf8').matchAll(/\bt\('((?:[^'\\]|\\.)*)'/g)) texts.push(normalizeText(text));
+    texts.push(...codeFileTexts(path));
   }
   return texts;
 }
 
 test('every Russian text of the Lair page and code has an English translation', () => {
-  const texts = new Set([...htmlTexts(readFileSync(join(root, 'index.html'), 'utf8')), ...codeTexts()]);
+  // The embedded workshop shells use the Lair's translator as well.
+  const embeddedTexts = ['atelier', 'alchemy'].flatMap(id =>
+    codeFileTexts(join(root, '../../workshops', id, 'src/embedding.js')));
+  const texts = new Set([...htmlTexts(readFileSync(join(root, 'index.html'), 'utf8')), ...codeTexts(), ...embeddedTexts]);
   assert.ok(texts.size > 100, 'the extraction finds the page texts');
   const missing = [...texts].filter(text => !(text in en));
   assert.deepEqual(missing, [], 'add these to src/locales/en.js');

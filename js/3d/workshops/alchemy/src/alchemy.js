@@ -24,18 +24,20 @@ import { createAlchemyRuntime } from './runtime-host.js';
 import { ALCHEMY_TABLE } from './table-dimensions.js';
 import { getWorkshopHost, publishWorkshopApi } from '../../../core/host/workshop-host.js';
 
-// Inside the Lair the host mounts this markup into the room and shares its
-// renderer, camera and input (core/host/workshop-host.js).
+// The embedded interface is mounted before the workshop starts. The room
+// supplies the renderer, camera and input via its host.
 const lair = getWorkshopHost();
 const alchemyRoot = lair?.alchemy.root || document;
-// The Lair renames the source #experience root to avoid an ID collision.
+// The embedding renames #experience to avoid an ID collision.
 // All original UI modules still address that root through $('experience').
 const $ = id => id === 'experience' && alchemyRoot !== document
   ? alchemyRoot
   : alchemyRoot.querySelector(`#${id}`);
 const queryAll = selector => alchemyRoot.querySelectorAll(selector);
 const canvas = $('scene');
-const runtime = createAlchemyRuntime({ THREE, canvas });
+const runtime = createAlchemyRuntime({ THREE, canvas,
+  onActiveChange: active => lair?.alchemy.reportStatus?.({ active }),
+});
 const inputSurface = runtime.embedded
   ? lair?.alchemy.inputPlane || canvas
   : canvas;
@@ -328,6 +330,7 @@ const alchemyApi = {
   }
 };
 publishWorkshopApi('alchemy', alchemyApi);
+lair?.alchemy.reportStatus?.({ ready: true, active: runtime.isActive() });
 
 function ensureGlassTexture(id) {
   const entry = glassTextureCache.get(id);

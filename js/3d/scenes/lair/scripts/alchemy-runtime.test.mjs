@@ -4,8 +4,6 @@ import * as THREE from 'three';
 import {createAlchemyRuntime} from '../../../workshops/alchemy/src/runtime-host.js';
 
 test('embedded alchemy registers the room lifecycle and pauses between visits', () => {
-  const win = new EventTarget();
-  win.parent = win;
   const calls = [];
   let workshop;
   const host = {
@@ -19,7 +17,7 @@ test('embedded alchemy registers the room lifecycle and pauses between visits', 
       return () => calls.push('unregister');
     },
   };
-  const runtime = createAlchemyRuntime({ THREE, canvas: {}, win, host });
+  const runtime = createAlchemyRuntime({ THREE, canvas: {}, host });
   runtime.setActive(false);
   runtime.start(() => calls.push('update'), {
     enter: () => calls.push('enter'),

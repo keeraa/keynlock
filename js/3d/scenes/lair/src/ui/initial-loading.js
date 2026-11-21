@@ -1,6 +1,8 @@
 // @ts-check
 import { t } from '../i18n.js';
 
+/** @typedef {ReturnType<typeof import('../../../../core/host/workshop-host.js').createWorkshopStatus>['status']} Status */
+
 /** Keep the initial room veil up until its visible paintings are ready. */
 export function createInitialLoadingGate({
   onProgress, onDone, minimumMs = 900, timeoutMs = 90000,
@@ -31,10 +33,11 @@ export function createInitialLoadingGate({
 }
 
 /**
- * @param {{ loading: HTMLElement, onAtelierModelsReady: () => void,
+ * @param {{ loading: HTMLElement, atelierStatus: Status, alchemyStatus: Status, onAtelierModelsReady: () => void,
  *   onAlchemyReady: () => void, precompileWorkshopLighting: () => Promise<void> }} options
  */
-export function mountInitialLoading({ loading, onAtelierModelsReady, onAlchemyReady, precompileWorkshopLighting }) {
+export function mountInitialLoading({ loading, atelierStatus, alchemyStatus,
+  onAtelierModelsReady, onAlchemyReady, precompileWorkshopLighting }) {
   const bar = /** @type {HTMLElement} */ (loading.querySelector('.loading-line i'));
   const status = loading.querySelector('small');
   let galleryLoaded = false;
@@ -64,22 +67,22 @@ export function mountInitialLoading({ loading, onAtelierModelsReady, onAlchemyRe
       .finally(() => gate.finish());
   }
 
-  window.addEventListener('keynlock:atelier', (/** @type {CustomEvent} */ event) => {
-    const { type, loaded, total } = event.detail || {};
-    if (type === 'models-ready') onAtelierModelsReady();
-    if (type === 'initial-gallery-progress') gate.progress(loaded, total);
-    if (type === 'initial-gallery-ready') {
+  atelierStatus.subscribe((current, previous) => {
+    if (current.modelsReady && !previous?.modelsReady) onAtelierModelsReady();
+    const progress = current.galleryProgress;
+    if (progress && progress !== previous?.galleryProgress) gate.progress(progress.loaded, progress.total);
+    if (current.galleryReady && !previous?.galleryReady) {
       galleryLoaded = true;
       completeInitialLoad();
     }
-    if (type === 'error') gate.finish('error');
+    if (current.error) gate.finish('error');
   });
-  window.addEventListener('keynlock:alchemy:v1', (/** @type {CustomEvent} */ event) => {
-    if (event.detail?.type === 'ready') {
+  alchemyStatus.subscribe((current, previous) => {
+    if (current.ready && !previous?.ready) {
       onAlchemyReady();
       alchemyLoaded = true;
       completeInitialLoad();
     }
-    if (event.detail?.type === 'error') gate.finish('error');
+    if (current.error) gate.finish('error');
   });
 }

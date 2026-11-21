@@ -140,9 +140,9 @@ export function createAtelierView({
   function updateGalleryCamera() {
     // Choosing a work in the full catalogue closes the source gallery.
     // Resume the two-easel view and its restoration controls immediately.
-    if (galleryActive && atelierGallery() && !atelierGallery().isActive())
-      returnToEasels();
-    if (galleryActive) {
+    const gallery = atelierGallery()?.getState();
+    if (gallery && !gallery.active) returnToEasels();
+    if (galleryActive && gallery) {
       const pose = rendererHost.getWorldPose('atelier');
       if (pose) {
         camera.position.copy(pose.position);
@@ -153,21 +153,17 @@ export function createAtelierView({
           camera.updateProjectionMatrix();
         }
       }
-      const gallery = atelierGallery();
-      const focusedArt = gallery?.mode() === 'art';
+      const focusedArt = gallery.mode === 'art';
       document.querySelector('#gallery-art-back').hidden = !focusedArt;
       document.querySelector('.lair-gallery-panner').hidden = focusedArt;
-      const sourceSwitch = document.querySelector('#atelier-embedded-app #wall-gallery-demo');
-      if (sourceSwitch) document.querySelector('#gallery-switch').textContent = sourceSwitch.textContent;
-      const sourceShuffle = document.querySelector('#atelier-embedded-app #wall-gallery-shuffle');
-      if (sourceShuffle) document.querySelector('#gallery-shuffle').hidden = sourceShuffle.hidden;
+      document.querySelector('#gallery-switch').textContent = gallery.displaySwitchLabel;
+      document.querySelector('#gallery-shuffle').hidden = !gallery.canShuffle;
     }
   }
 
   function handleGalleryKey(e) {
     if (galleryActive) {
-      const collectionOpen = document.querySelector('#atelier-embedded-app #collection-modal')?.hidden === false;
-      if (collectionOpen) return true;
+      if (atelierGallery()?.getState().collectionOpen) return true;
       if (e.code === 'Escape') {
         e.preventDefault();
         returnToEasels();
@@ -186,8 +182,7 @@ export function createAtelierView({
     const bridge = atelierBridge();
     const info = currentZone === 'atelier'
       ? (galleryActive ? bridge?.wallArtworkInfo?.() : bridge?.artworkInfo?.()) : null;
-    const collectionOpen = document.querySelector('#atelier-embedded-app #collection-modal')?.hidden === false;
-    if (!info || collectionOpen || blocked) {
+    if (!info || blocked) {
       artworkInfoPanel.hidden = true;
       return;
     }
@@ -205,11 +200,9 @@ export function createAtelierView({
     document.querySelector('#atelier-info-policy').textContent = info.policy;
   }
 
-  function updateAtelierEaselHUD(currentZone, overlayOpen) {
+  function updateAtelierEaselHUD(currentZone, blocked) {
     const bridge = atelierBridge();
-    const collectionOpen = document.querySelector('#atelier-embedded-app #collection-modal')?.hidden === false;
-    const showing = currentZone === 'atelier' && !galleryActive && Boolean(bridge)
-      && !collectionOpen && !overlayOpen;
+    const showing = currentZone === 'atelier' && !galleryActive && Boolean(bridge) && !blocked;
     easelCameraControls.hidden = !showing;
     const focusedSide = showing ? bridge.focusedSide?.() : null;
     easelLabels.hidden = !showing || Boolean(focusedSide);
@@ -264,9 +257,10 @@ export function createAtelierView({
   }
 
   function updateInterface({ zone, visualOpen, overlayOpen }) {
+    const collectionOpen = atelierGallery()?.getState().collectionOpen;
     updateGalleryEntry(zone);
-    updateAtelierArtInfo(zone, visualOpen || overlayOpen);
-    updateAtelierEaselHUD(zone, overlayOpen);
+    updateAtelierArtInfo(zone, visualOpen || overlayOpen || collectionOpen);
+    updateAtelierEaselHUD(zone, overlayOpen || collectionOpen);
   }
 
   function bind() {
@@ -298,7 +292,7 @@ export function createAtelierView({
     document.querySelector('#gallery-art-back').addEventListener('click', () => atelierGallery()?.backFromArt());
     document.querySelector('#gallery-switch').addEventListener('click', () => atelierGallery()?.switchDisplay());
     document.querySelector('#gallery-shuffle').addEventListener('click', () => atelierGallery()?.shuffle());
-    document.querySelector('#gallery-select').addEventListener('click', () => atelierGallery()?.select());
+    document.querySelector('#gallery-select').addEventListener('click', () => atelierGallery()?.openCollection());
     document.querySelector('#lair-focus-original').addEventListener('click', () =>
       atelierBridge()?.focusEasel?.('original'));
     document.querySelector('#lair-focus-copy').addEventListener('click', () =>

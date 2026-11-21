@@ -1,15 +1,15 @@
 import { collectionCategories, paintingCategory } from './painting-catalog.js';
 import { getPaintingLore, getPaintingLoreLabels } from './lore/painting-lore.js';
 
-export function createPaintingCollectionUI({ paintings, onSelect, isRestored = () => false,
-  getWallIds = () => [], onToggleWall = () => {} }) {
-  const modal = document.getElementById('collection-modal');
-  const search = document.getElementById('collection-search');
-  const filters = document.getElementById('collection-filters');
-  const grid = document.getElementById('collection-grid');
-  const count = document.getElementById('collection-results');
-  const more = document.getElementById('collection-more');
-  const allCount = document.querySelectorAll('.collection-total');
+export function createPaintingCollectionUI({ paintings, onSelect, $, root, isRestored = () => false,
+  getWallIds = () => [], onToggleWall = () => {}, onOpenChange = (open) => {} }) {
+  const modal = $('collection-modal');
+  const search = $('collection-search');
+  const filters = $('collection-filters');
+  const grid = $('collection-grid');
+  const count = $('collection-results');
+  const more = $('collection-more');
+  const allCount = root.querySelectorAll('.collection-total');
   const loreLabels = getPaintingLoreLabels();
   const normalize = (text) => String(text || '').toLocaleLowerCase('ru').replaceAll('ё', 'е');
   let category = 'all';
@@ -20,9 +20,9 @@ export function createPaintingCollectionUI({ paintings, onSelect, isRestored = (
   let activeId = paintings[0]?.id;
 
   allCount.forEach((element) => { element.textContent = String(paintings.length); });
-  document.getElementById('collection-policy-department').textContent = loreLabels.policyDepartment;
-  document.getElementById('collection-policy-motto').textContent = loreLabels.policy;
-  document.getElementById('collection-policy-explanation').textContent = loreLabels.policyExplanation;
+  $('collection-policy-department').textContent = loreLabels.policyDepartment;
+  $('collection-policy-motto').textContent = loreLabels.policy;
+  $('collection-policy-explanation').textContent = loreLabels.policyExplanation;
 
   function candidates() {
     return mode === 'wall' ? paintings.filter((art) => isRestored(art.id)) : paintings;
@@ -30,13 +30,13 @@ export function createPaintingCollectionUI({ paintings, onSelect, isRestored = (
 
   function renderMode() {
     const selected = new Set(getWallIds());
-    document.getElementById('collection-wall-count').textContent = `${selected.size}/30`;
+    $('collection-wall-count').textContent = `${selected.size}/30`;
     for (const [id, tab] of [['all', 'collection-tab-all'], ['wall', 'collection-tab-wall']]) {
-      const button = document.getElementById(tab);
+      const button = $(tab);
       button.classList.toggle('active', mode === id);
       button.setAttribute('aria-pressed', String(mode === id));
     }
-    document.getElementById('collection-description').textContent = mode === 'wall'
+    $('collection-description').textContent = mode === 'wall'
       ? `Готовые картины: ${candidates().length}. Выберите до 30 работ для стены над мольбертами.`
       : 'Произведения из собрания Keynlock. Выберите полотно для реставрации.';
   }
@@ -156,14 +156,16 @@ export function createPaintingCollectionUI({ paintings, onSelect, isRestored = (
   function open(initialMode = 'all') {
     focusedBeforeOpen = document.activeElement;
     modal.hidden = false;
-    document.body.classList.add('collection-is-open');
+    onOpenChange(true);
+    if (root === document) document.body.classList.add('collection-is-open');
     setMode(initialMode);
     search.focus();
   }
 
   function close() {
     modal.hidden = true;
-    document.body.classList.remove('collection-is-open');
+    onOpenChange(false);
+    if (root === document) document.body.classList.remove('collection-is-open');
     focusedBeforeOpen?.focus?.();
   }
 
@@ -179,11 +181,11 @@ export function createPaintingCollectionUI({ paintings, onSelect, isRestored = (
     renderGallery();
   }
 
-  document.getElementById('collection-open').addEventListener('click', () => open('all'));
-  document.getElementById('collection-footer').addEventListener('click', () => open('all'));
-  document.getElementById('collection-tab-all').addEventListener('click', () => setMode('all'));
-  document.getElementById('collection-tab-wall').addEventListener('click', () => setMode('wall'));
-  document.getElementById('collection-close').addEventListener('click', close);
+  $('collection-open').addEventListener('click', () => open('all'));
+  $('collection-footer').addEventListener('click', () => open('all'));
+  $('collection-tab-all').addEventListener('click', () => setMode('all'));
+  $('collection-tab-wall').addEventListener('click', () => setMode('wall'));
+  $('collection-close').addEventListener('click', close);
   modal.querySelector('.collection-shade').addEventListener('click', close);
   search.addEventListener('input', () => { shown = 36; renderGallery(); });
   more.addEventListener('click', () => { shown += 36; renderGallery(); });

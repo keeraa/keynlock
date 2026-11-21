@@ -19,14 +19,16 @@ import { createPerformanceHUD } from './performance-hud.js';
 import { createRestorationFeedback } from './restoration-feedback.js';
 import { getPaintingLore, getPaintingLoreLabels } from './lore/painting-lore.js';
 import { getWorkshopHost, publishWorkshopApi } from '../../../core/host/workshop-host.js';
-// Inside the Lair the host mounts this markup into the room and shares its
-// renderer, camera and input (core/host/workshop-host.js). On its own site the
-// Atelier has no host and loads its stylesheet normally; the Lair imports the
-// same stylesheet into a scoped root.
+// The embedding entry mounts the interface before starting the workshop.
+// A standalone visit supplies its own renderer and stylesheet.
 const lair = getWorkshopHost();
 const directRoot = lair?.atelier.root || null;
 if (!directRoot) void import('./style.css');
-const $ = (id) => directRoot?.querySelector(`#${CSS.escape(id)}`) || document.getElementById(id);
+const $ = (id) => {
+  if (!directRoot) return document.getElementById(id);
+  const selector = `#${CSS.escape(id)}`;
+  return directRoot.querySelector(selector) || lair.atelier.feedback?.querySelector(selector);
+};
 const rendererHost = directRoot ? lair.renderer : null;
 const embedded = Boolean(rendererHost);
 let inRoomActive = false;
@@ -186,7 +188,8 @@ const restorationStore = createRestorationStore({
 const restorationSessions = createRestorationSessions({ THREE, store: restorationStore });
 let exhibition;
 const collectionUI = createPaintingCollectionUI({
-  paintings,
+  paintings, $, root: directRoot || document,
+  onOpenChange: open => directRoot?.classList.toggle('collection-expanded', open),
   isRestored: (id) => playerProgress.isRestored(id),
   getWallIds: () => playerProgress.getWallIds(),
   onToggleWall: (id) => exhibition.toggleWall(id),
@@ -218,24 +221,10 @@ function flushSurfaceSave() {
   if (artId) void restorationSessions.save(artId);
 }
 
-// Inside the Lair the Atelier reports its loading progress and state as
-// 'keynlock:atelier' events; paintings and restoration state stay in its storage.
-function notifyLair(type, detail = {}) {
-  if (directRoot) window.dispatchEvent(new CustomEvent('keynlock:atelier',{detail:{type,...detail}}));
-}
-if (embedded) {
-  // The original collection modal temporarily expands its existing panel.
-  // Nothing here creates a new workshop or duplicates restoration controls.
-  const modal = $('collection-modal');
-  const sendCollectionState = () => notifyLair('collection-open',{open: !modal.hidden});
-  new MutationObserver(sendCollectionState).observe(modal,{attributes:true,attributeFilter:['hidden']});
-  sendCollectionState();
-}
 async function flushAtelier() {
   restorationInput.finishStroke();
   flushSurfaceSave();
   await restorationStore.flush();
-  notifyLair('flushed');
 }
 
 let restorationInput;
@@ -259,6 +248,7 @@ restorationInput = createRestorationInput({
   interactionCamera: embedded ? lair?.camera : camera,
   setStrokeInputBlocked: lair?.atelier.setStrokeInputBlocked,
   onPaintingFocus: embedded ? focusLairArtwork : (side) => navigation.focusOn(side),
+  uiRoot: directRoot || document,
   isInteractive: isRestorationActive,
   embeddedEditing: embedded,
   getTexture: () => activeTexture, getSurface: () => activeSurface,
@@ -321,11 +311,17 @@ if (directRoot) publishWorkshopApi('atelier', { gallery: {
   pan: (fraction) => navigation.panAlongWall(fraction),
   zoom: (deltaY) => navigation.zoomWall(deltaY),
   backFromArt: () => navigation.leaveWallArt(),
-  isActive: () => navigation.isWallGallery(),
-  mode: () => navigation.mode(),
-  select: () => $('wall-gallery-select').click(),
-  switchDisplay: () => $('wall-gallery-demo').click(),
-  shuffle: () => $('wall-gallery-shuffle').click(),
+  getState: () => ({
+    active: navigation.isWallGallery(),
+    mode: navigation.mode(),
+    collectionOpen: collectionUI.isOpen(),
+    displaySwitchLabel: exhibition.displaySwitchLabel(),
+    canShuffle: exhibition.canShuffle(),
+  }),
+  openCollection: () => collectionUI.open('wall'),
+  closeCollection: () => { if (collectionUI.isOpen()) collectionUI.close(); },
+  switchDisplay: exhibition.switchDisplay,
+  shuffle: exhibition.shuffle,
 } });
 restorationFeedback = createRestorationFeedback({ paintings, getSelectedIndex: () => selected,
   getSurface: () => activeSurface, getCopyMaterial: () => copyMaterial,
@@ -580,7 +576,7 @@ if (embedded) {
       update: updateAtelier,
     });
   } else requestAnimationFrame(animate);
-  notifyLair('ready');
+  lair.atelier.reportStatus?.({ ready: true });
 }
 
 async function init() {
@@ -594,9 +590,9 @@ async function init() {
     await showPainting(playerProgress.getSelectedIndex());
     if (embedded) {
       const galleryReady = await exhibition.refresh({ onProgress: ({ loaded, total }) =>
-        notifyLair('initial-gallery-progress', { loaded, total }) });
+        lair.atelier.reportStatus?.({ galleryProgress: { loaded, total } }) });
       if (!galleryReady) throw new Error('Не удалось подготовить настенную галерею');
-      notifyLair('initial-gallery-ready');
+      lair.atelier.reportStatus?.({ galleryReady: true });
     } else {
       void exhibition.refresh();
       await materialsReady;
@@ -607,10 +603,10 @@ async function init() {
   } catch (error) {
     console.error('Ошибка загрузки репродукций:', error);
     if (!embedded) $('loading').querySelector('small').textContent = 'НЕ УДАЛОСЬ ЗАГРУЗИТЬ КАРТИНЫ';
-    notifyLair('error',{message:error?.message || 'Не удалось загрузить картину'});
+    lair?.atelier.reportStatus?.({ error: error?.message || 'Не удалось загрузить картину' });
   }
 }
 // The source Three.js meshes are already attached to the Lair scene here;
 // artwork textures continue loading asynchronously in this same application.
-if (embedded) notifyLair('models-ready');
+if (embedded) lair.atelier.reportStatus?.({ modelsReady: true });
 init();

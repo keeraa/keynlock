@@ -21,7 +21,7 @@ export const WORKSHOPS = Object.freeze({
   },
 });
 
-export function mountWorkshopOverlay({onExit = () => {},onReady = () => {},rendererHost} = {}) {
+export function mountWorkshopOverlay({onExit = () => {},onReady = () => {}, rendererHost, inRoomWorkshops} = {}) {
   const overlay = document.querySelector('#workshop-overlay');
   const firstFrame = document.querySelector('#workshop-frame');
   const title = document.querySelector('#workshop-title');
@@ -32,9 +32,7 @@ export function mountWorkshopOverlay({onExit = () => {},onReady = () => {},rende
   const warning = document.querySelector('#workshop-warning');
   const fallback = document.querySelector('#workshop-fallback');
 
-  // The Atelier and the laboratory are mounted directly in the room
-  // (atelier-in-room.js, alchemy-in-room.js); only the workbench, which is
-  // still developed separately, opens as an embedded page.
+  // The workbench opens in the frame. The packages manage the in-room workshops.
   const frames = new Map();
   const readyWorkshops = new Set();
   const names = ['workbench'];
@@ -52,36 +50,7 @@ export function mountWorkshopOverlay({onExit = () => {},onReady = () => {},rende
   }
   let workshopId = null;
   let opened = false;
-  let inRoomWorkshop = null;
   let warningTimer = null;
-  let atelierStartTimer = null;
-  let atelierFailure = null;
-
-  // Loading artwork is independent of using the correction panel. A failed
-  // dynamic import must also be visible instead of leaving a permanent veil.
-  function showAtelierFailure(message) {
-    if (readyWorkshops.has('atelier')) return;
-    atelierFailure = message || t('Редактор не завершил запуск');
-    const atelier = document.querySelector('#atelier-embedded-app');
-    if (!atelier) return;
-    atelier.classList.add('load-error');
-    let status = atelier.querySelector('.atelier-start-error');
-    if (!status) {
-      status = document.createElement('div');
-      status.className = 'atelier-start-error';
-      status.setAttribute('role','alert');
-      const description = document.createElement('span');
-      const reload = document.createElement('button');
-      reload.type = 'button';
-      reload.textContent = t('ПОВТОРИТЬ ЗАПУСК');
-      reload.addEventListener('click', () => window.location.reload());
-      status.append(description,reload);
-      atelier.appendChild(status);
-    }
-    status.firstElementChild.textContent = t('Реставрация не запустилась: {reason}', { reason: atelierFailure });
-    showCurrentFrame();
-  }
-
   function clearTimers() {
     clearTimeout(warningTimer);
     warningTimer = null;
@@ -98,14 +67,6 @@ export function mountWorkshopOverlay({onExit = () => {},onReady = () => {},rende
       clearTimeout(warningTimer);
     }
     if (!wasReady) onReady(id);
-    if (id === 'atelier') {
-      clearTimeout(atelierStartTimer);
-      atelierStartTimer = null;
-      atelierFailure = null;
-      document.querySelector('#atelier-embedded-app')?.classList.remove('load-error');
-      document.querySelector('#atelier-embedded-app .atelier-start-error')?.remove();
-      showCurrentFrame();
-    }
   }
 
   function ensureFrame(id) {
@@ -114,38 +75,17 @@ export function mountWorkshopOverlay({onExit = () => {},onReady = () => {},rende
   }
 
   function showCurrentFrame() {
-    const atelierInRoom = inRoomWorkshop === 'atelier';
-    const alchemyInRoom = inRoomWorkshop === 'alchemy';
     for(const [id,frame] of frames) {
       const selected = opened && id === workshopId;
       frame.classList.toggle('is-active',selected);
       frame.inert = !selected;
     }
-    const atelier = document.querySelector('#atelier-embedded-app');
-    if (atelier) {
-      atelier.classList.toggle('is-active',atelierInRoom);
-      const controlsReady = readyWorkshops.has('atelier');
-      atelier.classList.toggle('controls-ready',controlsReady);
-      // The original range inputs respond while images/materials stream. They
-      // must remain available if optional startup work fails.
-      atelier.inert = !atelierInRoom;
-    }
-    const alchemy = document.querySelector('#alchemy-embedded-app');
-    if (alchemy) {
-      alchemy.classList.toggle('is-active',alchemyInRoom);
-      alchemy.inert = !alchemyInRoom;
-    }
-    document.querySelector('#alchemy-input-plane')?.classList.toggle('is-active',alchemyInRoom);
   }
 
   function setInRoomWorkshopId(id) {
-    if (inRoomWorkshop === 'atelier' && id !== 'atelier') {
-      const atelier = document.querySelector('#atelier-embedded-app');
-      atelier?.querySelector('#collection-modal:not([hidden]) #collection-close')?.click();
-      atelier?.classList.remove('collection-expanded');
+    for (const [workshopId, workshop] of Object.entries(inRoomWorkshops)) {
+      workshop.setActive(workshopId === id);
     }
-    inRoomWorkshop = id;
-    showCurrentFrame();
   }
 
   function preload(id) {
@@ -202,52 +142,16 @@ export function mountWorkshopOverlay({onExit = () => {},onReady = () => {},rende
     markReady(id);
   }
 
-  function onAtelierEvent(event) {
-    const {type,open} = event.detail || {};
-    // Model geometry is registered before texture decoding and control setup.
-    // Only the final ready event unlocks the visible editing panel.
-    if (type === 'ready') markReady('atelier');
-    if (type === 'mounted') {
-      clearTimeout(atelierStartTimer);
-      atelierStartTimer = setTimeout(() => {
-        if (!readyWorkshops.has('atelier')) showAtelierFailure(t('превышено время ожидания'));
-      }, 12000);
-    }
-    if (type === 'collection-open') {
-      document.querySelector('#atelier-embedded-app')?.classList.toggle('collection-expanded',Boolean(open));
-    }
-    if (type === 'error') {
-      console.error('Исходное ателье не готово:',event.detail?.message || 'Неизвестная ошибка');
-      showAtelierFailure(event.detail?.message || t('ошибка запуска'));
-    }
-  }
-
-  function onAlchemyEvent(event) {
-    if (event.detail?.type === 'ready') markReady('alchemy');
-    if (event.detail?.type === 'error') {
-      console.error('Алхимия:',event.detail.message);
-      const root = document.querySelector('#alchemy-embedded-app');
-      if (root) {
-        let failure = root.querySelector('.lair-alchemy-runtime-error');
-        if (!failure) {
-          failure = document.createElement('div');
-          failure.className = 'lair-alchemy-runtime-error';
-          failure.setAttribute('role','alert');
-          root.appendChild(failure);
-        }
-        failure.textContent = t('Ошибка лаборатории: {reason}', { reason: event.detail.message || t('неизвестная ошибка') });
-      }
-    }
-  }
-
+  const unsubscribe = Object.entries(inRoomWorkshops).map(([id, workshop]) =>
+    workshop.status.subscribe((current, previous) => {
+      if (current.ready && !previous?.ready) markReady(id);
+    }));
   const loadListeners = new Map();
   for (const [id,frame] of frames) {
     const listener = () => onLoad(id);
     frame.addEventListener('load',listener);
     loadListeners.set(id,listener);
   }
-  window.addEventListener('keynlock:atelier', onAtelierEvent);
-  window.addEventListener('keynlock:alchemy:v1', onAlchemyEvent);
   returnButton.addEventListener('click', close);
   return {
     preload, open, close, isOpen: () => opened,
@@ -255,14 +159,12 @@ export function mountWorkshopOverlay({onExit = () => {},onReady = () => {},rende
     setInRoomWorkshopId,
     dispose() {
       clearTimers();
-      clearTimeout(atelierStartTimer);
       for (const [id,frame] of frames) {
         frame.removeEventListener('load',loadListeners.get(id));
         frame.src='about:blank';
         if(frame!==firstFrame)frame.remove();
       }
-      window.removeEventListener('keynlock:atelier', onAtelierEvent);
-      window.removeEventListener('keynlock:alchemy:v1', onAlchemyEvent);
+      unsubscribe.forEach(stop => stop());
       returnButton.removeEventListener('click', close);
       opened = false;
       rendererHost?.deactivate(workshopId);

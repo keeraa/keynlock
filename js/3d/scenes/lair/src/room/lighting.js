@@ -42,13 +42,16 @@ export function addRoomLighting({ THREE, scene }) {
   const hemisphere = scene.children.find(light => light.isHemisphereLight);
   const day = { sky: hemisphere.color.clone(), hemi: hemisphere.intensity, side: sideSun.color.clone(),
     sideIntensity: sideSun.intensity, window: windowLight.color.clone(), windowIntensity: windowLight.intensity };
-  function setNight(/** @type {boolean} */ night) {
-    hemisphere.color.copy(night ? new THREE.Color('#9fb1d6') : day.sky);
-    hemisphere.intensity = night ? day.hemi * .62 : day.hemi;
-    sideSun.color.copy(night ? new THREE.Color('#9db4dc') : day.side);
-    sideSun.intensity = night ? day.sideIntensity * .4 : day.sideIntensity;
-    windowLight.color.copy(night ? new THREE.Color('#8fa9d6') : day.window);
-    windowLight.intensity = night ? day.windowIntensity * .55 : day.windowIntensity;
+  const night = { sky: new THREE.Color('#9fb1d6'), side: new THREE.Color('#9db4dc'), window: new THREE.Color('#8fa9d6') };
+  /** 0 = day, 1 = night, or in between while it changes. */
+  function setNight(/** @type {number | boolean} */ value) {
+    const a = Math.max(0, Math.min(1, Number(value)));
+    hemisphere.color.lerpColors(day.sky, night.sky, a);
+    hemisphere.intensity = day.hemi * (1 - .38 * a);
+    sideSun.color.lerpColors(day.side, night.side, a);
+    sideSun.intensity = day.sideIntensity * (1 - .6 * a);
+    windowLight.color.lerpColors(day.window, night.window, a);
+    windowLight.intensity = day.windowIntensity * (1 - .45 * a);
   }
 
   return { sideSun, contactSun, windowLight, leftLight, setNight };

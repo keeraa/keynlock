@@ -4,7 +4,7 @@ import { canvasTexture } from './materials.js';
 
 // The long room itself: floor, walls, ceiling, rug and the right-wall finish.
 export function buildShell(kit) {
-  const { m, scene, staticGroup, box, cylinder, sphere, plane } = kit;
+  const { m, scene, staticGroup, box, plane } = kit;
   scene.background = new THREE.Color('#2f3834');
   scene.fog = new THREE.Fog('#514d40', 39, 94);
   // Thirty metres of exhibition space on the left, with a matching full-
@@ -98,15 +98,7 @@ export function buildShell(kit) {
     for (const x of [-8.15, 8.15]) box(staticGroup, .42, .44, .52, m.walnut, x, 13.22, z);
   }
   box(staticGroup, 17.22, .25, .32, m.walnut, 0, 13.24, -5.29);
-  // Small warm chandeliers make the extra storey visually legible.
-  for (const z of [-2.6, 4.2, 11.8, 19.8]) {
-    cylinder(staticGroup, .042, .042, 1.25, m.oldBrass, 0, 12.54, z, 10);
-    cylinder(staticGroup, .34, .27, .15, m.oldBrass, 0, 11.89, z, 16);
-    const globe = sphere(staticGroup, .25, new THREE.MeshBasicMaterial({ color: '#ffdfaa' }), 0, 11.75, z);
-    globe.castShadow = false;
-    const light = new THREE.PointLight('#ffd6a3', 6, 9, 2);
-    light.position.set(0, 11.75, z); staticGroup.add(light);
-  }
+  // The chandeliers are in lamps.js.
   // A worn, woven carpet beneath the central table.
   const rugTex = canvasTexture((ctx, w, h) => {
     ctx.fillStyle = '#625d4c'; ctx.fillRect(0, 0, w, h);

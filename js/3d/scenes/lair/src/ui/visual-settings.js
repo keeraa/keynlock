@@ -42,7 +42,7 @@ export function createRoomOutlines(scene) {
 }
 
 /** Compact live materials lab. All controls affect materials, geometry or Three.js particles. */
-export function mountVisualSettings({ visual, room, lighting = null, outlines, grain, atelierFilter, onOpen = () => {} }) {
+export function mountVisualSettings({ visual, room, setNight = null, outlines, grain, atelierFilter, onOpen = () => {} }) {
   const panel = document.querySelector('#lair-visual-panel');
   const toggle = document.querySelector('#lair-visual-toggle');
   const inputs = [...document.querySelectorAll('[data-visual-setting]')];
@@ -96,8 +96,7 @@ export function mountVisualSettings({ visual, room, lighting = null, outlines, g
     room.ambientParticles.setEnabled(state['dust-enabled']);
     room.ambientParticles.setDensity(state['dust-density'] / 100);
     room.windowLight?.setStrength(state['window-light'] / 100);
-    room.setNight?.(state['night-lighting']);
-    lighting?.setNight(state['night-lighting']);
+    setNight?.(state['night-lighting']);
     outlines.setEnabled(state['outline-enabled']);
     outlines.setWidth(state['outline-width']);
     atelierFilter?.setOptions({

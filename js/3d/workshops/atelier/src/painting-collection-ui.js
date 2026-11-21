@@ -1,5 +1,6 @@
 import { collectionCategories, paintingCategory } from './painting-catalog.js';
 import { getPaintingLore, getPaintingLoreLabels } from './lore/painting-lore.js';
+import { t } from './i18n.js';
 
 export function createPaintingCollectionUI({ paintings, onSelect, $, root, isRestored = () => false,
   getWallIds = () => [], onToggleWall = () => {}, onOpenChange = (open) => {} }) {
@@ -37,8 +38,8 @@ export function createPaintingCollectionUI({ paintings, onSelect, $, root, isRes
       button.setAttribute('aria-pressed', String(mode === id));
     }
     $('collection-description').textContent = mode === 'wall'
-      ? `Готовые картины: ${candidates().length}. Выберите до 30 работ для стены над мольбертами.`
-      : 'Произведения из собрания Keynlock. Выберите полотно для реставрации.';
+      ? t('Готовые картины: {count}. Выберите до 30 работ для стены над мольбертами.', { count: candidates().length })
+      : t('Произведения из собрания Keynlock. Выберите полотно для реставрации.');
   }
 
   function setMode(next) {
@@ -78,7 +79,8 @@ export function createPaintingCollectionUI({ paintings, onSelect, $, root, isRes
       (category === 'all' || paintingCategory(art) === category)
       && (!query || normalize(`${art.title} ${art.artist} ${art.year}`).includes(query))
     );
-    count.textContent = `${mode === 'wall' ? 'ГОТОВЫЕ РАБОТЫ' : 'НАЙДЕНО'} ${filtered.length} · ПОКАЗАНО ${Math.min(shown, filtered.length)}`;
+    const counts = { found: filtered.length, shown: Math.min(shown, filtered.length) };
+    count.textContent = mode === 'wall' ? t('ГОТОВЫЕ РАБОТЫ {found} · ПОКАЗАНО {shown}', counts) : t('НАЙДЕНО {found} · ПОКАЗАНО {shown}', counts);
     grid.replaceChildren();
     const fragment = document.createDocumentFragment();
     for (const art of filtered.slice(0, shown)) {
@@ -86,7 +88,7 @@ export function createPaintingCollectionUI({ paintings, onSelect, $, root, isRes
       if (mode !== 'wall') card.type = 'button';
       card.className = 'collection-card';
       card.classList.toggle('current', art.id === activeId);
-      if (mode !== 'wall') card.setAttribute('aria-label', `Выбрать картину: ${art.title}, ${art.artist}`);
+      if (mode !== 'wall') card.setAttribute('aria-label', t('Выбрать картину: {title}, {artist}', { title: art.title, artist: art.artist }));
       const image = document.createElement('img');
       image.src = art.image;
       image.loading = 'lazy';
@@ -115,7 +117,7 @@ export function createPaintingCollectionUI({ paintings, onSelect, $, root, isRes
       if (mode === 'all' && isRestored(art.id)) {
         const status = document.createElement('span');
         status.className = 'collection-restored';
-        status.textContent = '✦ РЕСТАВРАЦИЯ ЗАВЕРШЕНА';
+        status.textContent = t('✦ РЕСТАВРАЦИЯ ЗАВЕРШЕНА');
         details.appendChild(status);
       }
       card.append(image, details);
@@ -125,7 +127,7 @@ export function createPaintingCollectionUI({ paintings, onSelect, $, root, isRes
         action.type = 'button';
         action.className = `collection-wall-action${selected ? ' on-wall' : ''}`;
         action.setAttribute('aria-pressed', String(selected));
-        action.textContent = selected ? '✓ НА СТЕНЕ · СНЯТЬ' : '+ ПОВЕСИТЬ НА СТЕНУ';
+        action.textContent = selected ? t('✓ НА СТЕНЕ · СНЯТЬ') : t('+ ПОВЕСИТЬ НА СТЕНУ');
         action.addEventListener('click', () => {
           onToggleWall(art.id);
           renderMode();
@@ -145,8 +147,8 @@ export function createPaintingCollectionUI({ paintings, onSelect, $, root, isRes
       const blank = document.createElement('p');
       blank.className = 'collection-empty';
       blank.textContent = mode === 'wall' && !candidates().length
-        ? 'Пока нет завершённых работ. Очистите полотно и восстановите его цвет — после этого картину можно повесить на стену.'
-        : 'По вашему запросу картины не найдены.';
+        ? t('Пока нет завершённых работ. Очистите полотно и восстановите его цвет — после этого картину можно повесить на стену.')
+        : t('По вашему запросу картины не найдены.');
       fragment.appendChild(blank);
     }
     grid.appendChild(fragment);

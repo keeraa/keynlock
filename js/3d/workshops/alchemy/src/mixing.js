@@ -1,18 +1,19 @@
 // @ts-check
+import { t } from './i18n.js';
 // Four pigment channels: red, yellow, blue, and opaque white.
 // A trilinear RYB cube produces familiar paint mixtures instead of grey RGB averages.
 export const REAGENTS = [
-  { id: 'red', name: 'Красная', short: 'КРАСНЫЙ', parts: [1, 0, 0, 0], amount: 100, dose: 25, kind: 'tube' },
-  { id: 'blue', name: 'Синяя', short: 'СИНИЙ', parts: [0, 0, 1, 0], amount: 100, dose: 25, kind: 'tube' },
-  { id: 'yellow', name: 'Жёлтая', short: 'ЖЁЛТЫЙ', parts: [0, 1, 0, 0], amount: 100, dose: 25, kind: 'tube' },
-  { id: 'white', name: 'Белая', short: 'БЕЛЫЙ', parts: [0, 0, 0, 1], amount: 100, dose: 25, kind: 'tube' },
-  { id: 'stannum', name: 'Олово', latin: 'Stannum', symbol: 'Sn', short: 'Stannum', hex: '#cbbba6', darkHex: '#77746b', lightHex: '#f5efdf', parts: [.08, .09, .09, .90], metalness: .43, amount: 91, dose: 20, kind: 'bottle' },
-  { id: 'plumbum', name: 'Свинец', latin: 'Plumbum', symbol: 'Pb', short: 'Plumbum', hex: '#626c86', darkHex: '#252e43', lightHex: '#acb5c6', parts: [.17, .18, .35, .10], metalness: .32, amount: 91, dose: 20, kind: 'bottle' },
-  { id: 'aurum', name: 'Золото', latin: 'Aurum', symbol: 'Au', short: 'Aurum', hex: '#e5b54c', darkHex: '#90602c', lightHex: '#fff0a0', parts: [.25, 1, 0, .04], metalness: .64, amount: 91, dose: 20, kind: 'bottle' },
-  { id: 'cuprum', name: 'Медь', latin: 'Cuprum', symbol: 'Cu', short: 'Cuprum', hex: '#bf6e4f', darkHex: '#65322d', lightHex: '#efb57b', parts: [1, .24, .05, .05], metalness: .51, amount: 91, dose: 20, kind: 'bottle' },
-  { id: 'hydrargyrum', name: 'Ртуть', latin: 'Hydrargyrum', symbol: 'Hg', short: 'Hydrargyrum', hex: '#d5e0e3', darkHex: '#18242d', lightHex: '#fbffff', parts: [0, .07, .15, .83], metalness: .81, amount: 91, dose: 20, kind: 'bottle' },
-  { id: 'argentum', name: 'Серебро', latin: 'Argentum', symbol: 'Ag', short: 'Argentum', hex: '#dae9f0', darkHex: '#7490a5', lightHex: '#ffffff', parts: [0, 0, .04, 1], metalness: .69, amount: 91, dose: 20, kind: 'bottle' },
-  { id: 'ferrum', name: 'Железо', latin: 'Ferrum', symbol: 'Fe', short: 'Ferrum', hex: '#66615b', darkHex: '#272e32', lightHex: '#af977a', parts: [.29, .21, .32, .06], metalness: .35, amount: 91, dose: 20, kind: 'bottle' },
+  { id: 'red', name: t('Красная'), short: t('КРАСНЫЙ'), parts: [1, 0, 0, 0], amount: 100, dose: 25, kind: 'tube' },
+  { id: 'blue', name: t('Синяя'), short: t('СИНИЙ'), parts: [0, 0, 1, 0], amount: 100, dose: 25, kind: 'tube' },
+  { id: 'yellow', name: t('Жёлтая'), short: t('ЖЁЛТЫЙ'), parts: [0, 1, 0, 0], amount: 100, dose: 25, kind: 'tube' },
+  { id: 'white', name: t('Белая'), short: t('БЕЛЫЙ'), parts: [0, 0, 0, 1], amount: 100, dose: 25, kind: 'tube' },
+  { id: 'stannum', name: t('Олово'), latin: 'Stannum', symbol: 'Sn', short: 'Stannum', hex: '#cbbba6', darkHex: '#77746b', lightHex: '#f5efdf', parts: [.08, .09, .09, .90], metalness: .43, amount: 91, dose: 20, kind: 'bottle' },
+  { id: 'plumbum', name: t('Свинец'), latin: 'Plumbum', symbol: 'Pb', short: 'Plumbum', hex: '#626c86', darkHex: '#252e43', lightHex: '#acb5c6', parts: [.17, .18, .35, .10], metalness: .32, amount: 91, dose: 20, kind: 'bottle' },
+  { id: 'aurum', name: t('Золото'), latin: 'Aurum', symbol: 'Au', short: 'Aurum', hex: '#e5b54c', darkHex: '#90602c', lightHex: '#fff0a0', parts: [.25, 1, 0, .04], metalness: .64, amount: 91, dose: 20, kind: 'bottle' },
+  { id: 'cuprum', name: t('Медь'), latin: 'Cuprum', symbol: 'Cu', short: 'Cuprum', hex: '#bf6e4f', darkHex: '#65322d', lightHex: '#efb57b', parts: [1, .24, .05, .05], metalness: .51, amount: 91, dose: 20, kind: 'bottle' },
+  { id: 'hydrargyrum', name: t('Ртуть'), latin: 'Hydrargyrum', symbol: 'Hg', short: 'Hydrargyrum', hex: '#d5e0e3', darkHex: '#18242d', lightHex: '#fbffff', parts: [0, .07, .15, .83], metalness: .81, amount: 91, dose: 20, kind: 'bottle' },
+  { id: 'argentum', name: t('Серебро'), latin: 'Argentum', symbol: 'Ag', short: 'Argentum', hex: '#dae9f0', darkHex: '#7490a5', lightHex: '#ffffff', parts: [0, 0, .04, 1], metalness: .69, amount: 91, dose: 20, kind: 'bottle' },
+  { id: 'ferrum', name: t('Железо'), latin: 'Ferrum', symbol: 'Fe', short: 'Ferrum', hex: '#66615b', darkHex: '#272e32', lightHex: '#af977a', parts: [.29, .21, .32, .06], metalness: .35, amount: 91, dose: 20, kind: 'bottle' },
 ];
 
 const rybCube = {
@@ -48,7 +49,7 @@ export function addDose(mixture, reagent, requestedAmount = reagent.dose, { merg
 export function pigmentColor(pigment) {
   const [red, yellow, blue, white] = pigment;
   const peak = Math.max(red, yellow, blue);
-  if (peak < 0.0001) return { hex: '#e9e8df', rgb: [233, 232, 223], name: 'Белый' };
+  if (peak < 0.0001) return { hex: '#e9e8df', rgb: [233, 232, 223], name: t('Белый') };
   const r = clamp(red / peak), y = clamp(yellow / peak), b = clamp(blue / peak);
   const rgb = [0, 0, 0];
   for (let ir = 0; ir < 2; ir++) for (let iy = 0; iy < 2; iy++) for (let ib = 0; ib < 2; ib++) {
@@ -63,19 +64,19 @@ export function pigmentColor(pigment) {
 }
 
 function namePigment(r, y, b, white) {
-  if (white > .52) return 'Пастельный';
+  if (white > .52) return t('Пастельный');
   const count = [r, y, b].filter(v => v > .5).length;
-  if (count === 3) return 'Тёмная охра';
-  if (r > .65 && b > .65) return 'Фиолетовый';
-  if (y > .65 && b > .65) return 'Зелёный';
-  if (r > .65 && y > .65) return 'Оранжевый';
-  if (r >= y && r >= b) return white > .22 ? 'Розовый' : 'Красный';
-  if (y >= r && y >= b) return white > .22 ? 'Кремовый' : 'Жёлтый';
-  return white > .22 ? 'Голубой' : 'Синий';
+  if (count === 3) return t('Тёмная охра');
+  if (r > .65 && b > .65) return t('Фиолетовый');
+  if (y > .65 && b > .65) return t('Зелёный');
+  if (r > .65 && y > .65) return t('Оранжевый');
+  if (r >= y && r >= b) return white > .22 ? t('Розовый') : t('Красный');
+  if (y >= r && y >= b) return white > .22 ? t('Кремовый') : t('Жёлтый');
+  return white > .22 ? t('Голубой') : t('Синий');
 }
 
 export function mixtureInfo(mixture) {
-  if (mixture.volume === 0) return { hex: '#344446', name: 'Пустой', formula: 'Ожидает эссенцию' };
+  if (mixture.volume === 0) return { hex: '#344446', name: t('Пустой'), formula: t('Ожидает эссенцию') };
   const color = pigmentColor(mixture.pigment);
   const names = [...new Set(mixture.additions.map(a => a.symbol || a.name.toLowerCase().replace(/ая$/, 'ый').replace(/яя$/, 'ий')))];
   const formula = names.slice(-3).join(' + ');
@@ -96,7 +97,7 @@ export function mixtureInfo(mixture) {
   const rgb = allMetal ? metalRgb : color.rgb.map((value, i) => mix(value, metalRgb[i], metalVolume / mixture.volume));
   const metalId = allMetal && metals.every(a => a.id === metals[0].id) ? metals[0].id : null;
   return {
-    hex: rgbToHex(rgb), rgb, name: metalId ? metals[0].name : allMetal ? 'Сплав' : 'Смесь',
+    hex: rgbToHex(rgb), rgb, name: metalId ? metals[0].name : allMetal ? t('Сплав') : t('Смесь'),
     formula: visibleFormula, metalId
   };
 }

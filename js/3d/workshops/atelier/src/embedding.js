@@ -3,8 +3,9 @@ import styles from './style.css?inline';
 import embeddedStyles from './styles/embedding.css?inline';
 import feedbackStyles from './styles/restoration.css?inline';
 import { createWorkshopStatus, getWorkshopApi, publishWorkshopApi } from '../../../core/host/workshop-host.js';
+import { t, translator } from './i18n.js';
 
-export function createAtelierEmbedding({ host, t, onPanelHeight }) {
+export function createAtelierEmbedding({ host, onPanelHeight }) {
   const { status, update } = createWorkshopStatus();
   let root;
   let feedback;
@@ -46,6 +47,7 @@ export function createAtelierEmbedding({ host, t, onPanelHeight }) {
     root.classList.add('lair-embedded');
     root.inert = true;
     root.querySelectorAll('script').forEach(script => script.remove());
+    translator.translateTree(root);
 
     feedback = document.createElement('div');
     feedback.id = 'atelier-scene-feedback';
@@ -65,7 +67,7 @@ export function createAtelierEmbedding({ host, t, onPanelHeight }) {
     new ResizeObserver(reportHeight).observe(root);
     reportHeight();
     if (!source) {
-      reportError(new Error('Не найден оригинальный интерфейс Ателье цвета'));
+      reportError(new Error(t('Не найден оригинальный интерфейс Ателье цвета')));
       return;
     }
     startTimer = setTimeout(() => reportStatus({ error: t('превышено время ожидания') }), 12000);

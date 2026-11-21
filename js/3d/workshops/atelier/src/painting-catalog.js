@@ -1,4 +1,5 @@
 // @ts-check
+import { t } from './i18n.js';
 // The reproductions live in the repository's assets/restoration (130 MB, too much
 // to bundle). They load from one commit, not from a branch, so the game never
 // depends on whatever is on main right now. After adding or changing paintings
@@ -178,11 +179,11 @@ const japaneseIds = new Set([
 ]);
 
 export const collectionCategories = [
-  ['all', 'Все'], ['japan', 'Япония · укиё-э'], ['china', 'Китай'],
-  ['korea', 'Корея'], ['india', 'Индия'], ['renaissance', 'Возрождение'],
-  ['baroque', 'Барокко'], ['rococo', 'Рококо'], ['romanticism', 'Романтизм'],
-  ['impressionism', 'Импрессионизм'], ['modern', 'Модерн'],
-  ['symbolism', 'Символизм'], ['surrealism', 'Сюрреализм'],
+  ['all', t('Все')], ['japan', t('Япония · укиё-э')], ['china', t('Китай')],
+  ['korea', t('Корея')], ['india', t('Индия')], ['renaissance', t('Возрождение')],
+  ['baroque', t('Барокко')], ['rococo', t('Рококо')], ['romanticism', t('Романтизм')],
+  ['impressionism', t('Импрессионизм')], ['modern', t('Модерн')],
+  ['symbolism', t('Символизм')], ['surrealism', t('Сюрреализм')],
 ];
 
 export function paintingCategory(art) {

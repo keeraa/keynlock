@@ -1,3 +1,4 @@
+import { t } from './i18n.js';
 /** Pointer hit-testing, drag capture, tool cursor and UV spotlight. */
 export function createRestorationInput({ THREE, renderer, camera, controls, scene, stage,
   leftEasel, rightEasel, navigation, getSurface, getTexture, onStrokeFinished,
@@ -151,7 +152,7 @@ export function createRestorationInput({ THREE, renderer, camera, controls, scen
       stroke.affected = surface.apply(activeTool, hit.uv);
       inputElement.setPointerCapture(event.pointerId);
       if (activeTool === 'reagent' && !stroke.affected) {
-        $('restoration-description').textContent = 'Сначала найдите этот участок УФ-фонарём';
+        $('restoration-description').textContent = t('Сначала найдите этот участок УФ-фонарём');
       }
       updateToolCursor(event, hit);
       event.preventDefault();
@@ -194,7 +195,7 @@ export function createRestorationInput({ THREE, renderer, camera, controls, scen
         stroke.previousUv = null;
         stroke.lastAngle = null;
         if (!stroke.outside) {
-          $('restoration-description').textContent = 'Кнопка зажата — продолжите обработку, вернувшись на картину';
+          $('restoration-description').textContent = t('Кнопка зажата — продолжите обработку, вернувшись на картину');
         }
         stroke.outside = true;
       }

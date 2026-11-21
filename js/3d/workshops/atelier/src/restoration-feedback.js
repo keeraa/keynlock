@@ -1,10 +1,11 @@
 // @ts-check
+import { t } from './i18n.js';
 const TOOL_INSTRUCTIONS = {
-  brush: 'Щётка: зажмите ЛКМ и ведите по картине · стойкие пятна — тампон (7)',
-  swab: 'Тампон: зажмите ЛКМ и медленно очищайте пятна круговыми движениями',
-  uv: 'УФ: наведите фонарь, затем зажмите ЛКМ и просканируйте повреждения',
-  reagent: 'Реагент: зажмите ЛКМ и проведите по участкам, отмеченным УФ',
-  retouch: 'Кисть: аккуратно закрашивайте светлые сколы на полотне · размер кисти маленький',
+  brush: t('Щётка: зажмите ЛКМ и ведите по картине · стойкие пятна — тампон (7)'),
+  swab: t('Тампон: зажмите ЛКМ и медленно очищайте пятна круговыми движениями'),
+  uv: t('УФ: наведите фонарь, затем зажмите ЛКМ и просканируйте повреждения'),
+  reagent: t('Реагент: зажмите ЛКМ и проведите по участкам, отмеченным УФ'),
+  retouch: t('Кисть: аккуратно закрашивайте светлые сколы на полотне · размер кисти маленький'),
 };
 
 /** Deterministic scoring can be tested without a renderer or browser. */
@@ -38,25 +39,25 @@ export function createRestorationFeedback({ paintings, getSelectedIndex, getSurf
     const progress = surface.progress();
     $('restoration-progress').firstChild.textContent = `${progress.cleaning}% `;
     $('restoration-description').textContent = TOOL_INSTRUCTIONS[getCurrentTool()] ||
-      'Наведите курсор на пятно — игра подскажет подходящий инструмент';
+      t('Наведите курсор на пятно — игра подскажет подходящий инструмент');
     if (!checkCompletion) return;
     const { art, player } = current();
     let message = null;
     if (progress.dirt >= 91 && !player.dustMilestone) {
       player.dustMilestone = true;
-      message = 'Пыль и грязь удалены — проявились детали картины';
+      message = t('Пыль и грязь удалены — проявились детали картины');
     }
     if (progress.varnish >= 91 && !player.varnishMilestone) {
       player.varnishMilestone = true;
-      message = 'Пожелтевший лак снят — цвета раскрываются';
+      message = t('Пожелтевший лак снят — цвета раскрываются');
     }
     if (progress.retouch >= 94 && !player.retouchMilestone) {
       player.retouchMilestone = true;
-      message = 'Сколы восстановлены — живопись снова цельная';
+      message = t('Сколы восстановлены — живопись снова цельная');
     }
     if (progress.cleaning >= 96 && !player.surfaceComplete) {
       player.surfaceComplete = true;
-      message = `«${art.short}» — реставрация завершена!`;
+      message = t('«{title}» — реставрация завершена!', { title: art.short });
       onRestorationComplete(art.id);
     }
     if (message) { showToast(message); playerProgress.save(); }
@@ -74,13 +75,13 @@ export function createRestorationFeedback({ paintings, getSelectedIndex, getSurf
     const score = calculateColorAccuracy(art, player);
     $('score-number').textContent = score;
     $('score-fill').style.width = `${score}%`;
-    $('score-comment').textContent = score >= 97 ? 'Цвет почти восстановлен ✦'
-      : score >= 83 ? 'Очень близко к эталону' : score >= 63 ? 'Уже похоже, продолжайте' : 'Нужно восстановить баланс';
+    $('score-comment').textContent = score >= 97 ? t('Цвет почти восстановлен ✦')
+      : score >= 83 ? t('Очень близко к эталону') : score >= 63 ? t('Уже похоже, продолжайте') : t('Нужно восстановить баланс');
     $('score-fill').style.background = score >= 97 ? '#688264' : '#a88b54';
     if (score >= 98 && !player.completed) {
       player.completed = true;
       playerProgress.save();
-      showToast(`«${art.short}» — цвет восстановлен!`);
+      showToast(t('«{title}» — цвет восстановлен!', { title: art.short }));
       onRestorationComplete(art.id);
     }
   }

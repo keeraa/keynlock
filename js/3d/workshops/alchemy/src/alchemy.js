@@ -23,6 +23,14 @@ import { createRecipeSheetTexture } from './recipe-sheet.js';
 import { createAlchemyRuntime } from './runtime-host.js';
 import { ALCHEMY_TABLE } from './table-dimensions.js';
 import { getWorkshopHost, publishWorkshopApi } from '../../../core/host/workshop-host.js';
+import { t, translator } from './i18n.js';
+
+// The standalone page translates itself; in the Lair the embedding has
+// already translated the lab's markup.
+if (!document.querySelector('#alchemy-embedded-app')) {
+  document.documentElement.lang = translator.language;
+  translator.translateTree(document);
+}
 
 // The embedded interface is mounted before the workshop starts. The room
 // supplies the renderer, camera and input via its host.
@@ -1283,7 +1291,7 @@ function drainRightVessel() {
   if (animation || drainValve.draining) return false;
   const vessel = drainValve.vessel;
   if (vessel.state.volume < .5) {
-    showToast('Правый сосуд уже пуст');
+    showToast(t('Правый сосуд уже пуст'));
     return false;
   }
   drainValve.fromVolume = vessel.state.volume;
@@ -1301,7 +1309,7 @@ function drainRightVessel() {
   drainValve.catchLiquid.material.color.copy(drainValve.stream.material.color);
   drainValve.stream.visible = true;
   drainValve.catchLiquid.visible = true;
-  showToast('Открыт слив правого сосуда');
+  showToast(t('Открыт слив правого сосуда'));
   return true;
 }
 
@@ -1323,7 +1331,7 @@ function updateDrain(dt) {
     vessel.glow.intensity = 0;
     valve.draining = false;
     valve.stream.visible = false;
-    showToast('Правый сосуд опустошён · 0 мл');
+    showToast(t('Правый сосуд опустошён · 0 мл'));
   }
 }
 
@@ -1333,12 +1341,12 @@ function toggleBurner() {
   if (finishedHeating && recipeHeatSeconds > 0 && drainValve.vessel.state.volume > 0) {
     const stages = observeRecipeStages(recipeTimeline, REAGENTS);
     if (recipeLevel === 3 && stages.length < currentRecipe.stages.length) {
-      showToast('Промежуточный нагрев завершён · теперь добавь ингредиенты этапа II');
+      showToast(t('Промежуточный нагрев завершён · теперь добавь ингредиенты этапа II'));
     } else {
       const result = evaluatePotion();
-      showToast(`Зелье сварено на ${result.score}% · ${result.grade.toLowerCase()}`);
+      showToast(t('Зелье сварено на {score}% · {grade}', { score: result.score, grade: result.grade.toLowerCase() }));
     }
-  } else showToast(burner.active ? 'Горелка зажжена' : 'Горелка погашена');
+  } else showToast(burner.active ? t('Горелка зажжена') : t('Горелка погашена'));
 }
 
 function setBurner(active) {
@@ -1357,7 +1365,7 @@ function setBurner(active) {
 }
 
 function bindRecipeBook() {
-  const pigmentNames = { red: 'Красный', blue: 'Синий', yellow: 'Жёлтый', white: 'Белый' };
+  const pigmentNames = { red: t('Красный'), blue: t('Синий'), yellow: t('Жёлтый'), white: t('Белый') };
   $('recipe-key-pigments').innerHTML = REAGENTS.filter(item => item.kind === 'tube').map(item =>
     `<span><i class="recipe-key-dot" style="--pigment:${PIGMENT_SWATCHES[item.id]}"></i>${pigmentNames[item.id]}</span>`
   ).join('');
@@ -1407,9 +1415,9 @@ function renderRecipeBook() {
     return `<span class="recipe-dose"><span class="recipe-value">${ingredient.count}</span>${icon}</span>`;
   };
   const heatItem = seconds => `<span class="recipe-dose"><span class="recipe-value">${seconds}</span>` +
-    '<svg class="recipe-fire" viewBox="0 0 100 100" role="img" aria-label="Огонь">' +
+    `<svg class="recipe-fire" viewBox="0 0 100 100" role="img" aria-label="${t('Огонь')}">` +
     '<path d="M50 8 L8 94 L92 94 Z" fill="none" stroke="currentColor" stroke-width="8" stroke-linejoin="round"/></svg></span>';
-  $('recipe-number').textContent = `ОПЫТ № ${String(currentRecipe.number).padStart(2, '0')}`;
+  $('recipe-number').textContent = t('ОПЫТ № {number}', { number: String(currentRecipe.number).padStart(2, '0') });
   $('recipe-level-description').textContent = RECIPE_LEVELS[recipeLevel].caption;
   for (const level of [1, 2, 3]) {
     const button = $('recipe-level-' + level);
@@ -1422,30 +1430,30 @@ function renderRecipeBook() {
   $('recipe-equation').innerHTML = currentRecipe.stages.map((stage, index) => {
     const terms = [...stage.ingredients.map(formulaItem), heatItem(stage.heatSeconds)];
     return `<div class="recipe-step">` +
-      (recipeLevel === 3 ? `<div class="recipe-step-label">ЭТАП ${index + 1} · ${index === 0 ? 'ПРОМЕЖУТОЧНЫЙ НАГРЕВ' : 'ЗАВЕРШЕНИЕ'}</div>` : '') +
+      (recipeLevel === 3 ? `<div class="recipe-step-label">${t('ЭТАП {number}', { number: index + 1 })} · ${index === 0 ? t('ПРОМЕЖУТОЧНЫЙ НАГРЕВ') : t('ЗАВЕРШЕНИЕ')}</div>` : '') +
       `<div class="recipe-step-formula">${terms.join('<span class="recipe-plus" aria-hidden="true">+</span>')}</div></div>`;
   }).join('');
   $('recipe-legend').innerHTML = currentRecipe.stages.map((stage, index) => {
     const ingredients = stage.ingredients.map(item => {
       const reagent = byId.get(item.id);
-      return `${reagent.name} (${item.count} × ${reagent.dose} мл)`;
+      return t('{name} ({count} × {dose} мл)', { name: reagent.name, count: item.count, dose: reagent.dose });
     });
-    return `<div>${recipeLevel === 3 ? `Этап ${index + 1} · ` : ''}${ingredients.join(' · ')} · нагрев ${stage.heatSeconds} с</div>`;
+    return `<div>${recipeLevel === 3 ? `${t('Этап {number}', { number: index + 1 })} · ` : ''}${ingredients.join(' · ')} · ${t('нагрев {seconds} с', { seconds: stage.heatSeconds })}</div>`;
   }).join('');
   const state = drainValve.vessel.state;
   const measured = evaluateRecipe(currentRecipe, state, recipeHeatSeconds, REAGENTS, recipeTimeline);
-  const format = n => Number(n.toFixed(1)).toLocaleString('ru-RU');
+  const format = n => Number(n.toFixed(1)).toLocaleString(translator.language === 'ru' ? 'ru-RU' : 'en-GB');
   $('recipe-progress').innerHTML = measured.stageDetails.map((stage, index) =>
-    (recipeLevel === 3 ? `<div class="recipe-progress-heading">ЭТАП ${index + 1}</div>` : '') +
+    (recipeLevel === 3 ? `<div class="recipe-progress-heading">${t('ЭТАП {number}', { number: index + 1 })}</div>` : '') +
     stage.ingredients.map(item =>
       `<div><span>${byId.get(item.id).name}</span><b>${format(item.actual)} / ${item.expected}</b></div>`
     ).join('') +
-    `<div><span>Нагрев</span><b>${format(stage.heatSeconds)} / ${stage.expectedHeatSeconds} с</b></div>`
+    `<div><span>${t('Нагрев')}</span><b>${t('{heat} / {expected} с', { heat: format(stage.heatSeconds), expected: stage.expectedHeatSeconds })}</b></div>`
   ).join('') +
-    `<div><span>Лишние компоненты</span><b>${format(measured.extras)}</b></div>`;
+    `<div><span>${t('Лишние компоненты')}</span><b>${format(measured.extras)}</b></div>`;
   $('recipe-result').innerHTML = recipeResult
     ? `<strong>${recipeResult.score}%</strong><span>${recipeResult.grade}</span>`
-    : '<small>Результат появится после варки или проверки состава.</small>';
+    : `<small>${t('Результат появится после варки или проверки состава.')}</small>`;
 }
 
 const bubbleDummy = new THREE.Object3D();
@@ -1693,7 +1701,7 @@ function onPointerDown(event) {
   } else if (selected) {
     pour(selected, object);
   } else {
-    showToast('Выберите пигмент или металл в центре или внизу');
+    showToast(t('Выберите пигмент или металл в центре или внизу'));
   }
 }
 
@@ -1772,7 +1780,7 @@ function onPointerUp(event) {
   try { inputSurface.releasePointerCapture(event.pointerId); } catch {}
   if (!dragged) {
     selected = source;
-    showToast(`${source.data.name} · нажми на большой сосуд`);
+    showToast(t('{name} · нажми на большой сосуд', { name: source.data.name }));
     updateHighlights();
     return;
   }
@@ -1850,15 +1858,15 @@ function setHover(object, event) {
   const tooltip = $('tooltip');
   if (object && event) {
     if (object.data) {
-      tooltip.textContent = `${object.data.name} · ${Math.round(object.amount)} мл · ${object.amount ? 'перелить' : 'закончилась'}`;
+      tooltip.textContent = t(object.amount ? '{name} · {amount} мл · перелить' : '{name} · {amount} мл · закончилась', { name: object.data.name, amount: Math.round(object.amount) });
     } else if (object === burner) {
-      tooltip.textContent = burner.active ? 'Ручка горелки · выключить' : 'Ручка горелки · включить';
+      tooltip.textContent = burner.active ? t('Ручка горелки · выключить') : t('Ручка горелки · включить');
     } else if (object === drainValve) {
-      tooltip.textContent = drainValve.draining ? 'Рычаг слива · сливается' : 'Рычаг слива · опустошить правый сосуд';
+      tooltip.textContent = drainValve.draining ? t('Рычаг слива · сливается') : t('Рычаг слива · опустошить правый сосуд');
     } else if (object === recipeBookHit) {
-      tooltip.textContent = 'Лист рецепта · открыть книгу';
+      tooltip.textContent = t('Лист рецепта · открыть книгу');
     } else {
-      tooltip.textContent = `${object.id === 'left' ? 'Левый' : 'Правый'} сосуд · ${Math.round(object.state.volume)} / 160 мл`;
+      tooltip.textContent = t(object.id === 'left' ? 'Левый сосуд · {volume} / 160 мл' : 'Правый сосуд · {volume} / 160 мл', { volume: Math.round(object.state.volume) });
     }
     tooltip.classList.add('visible');
     moveTooltip(event);
@@ -1884,8 +1892,8 @@ function updateHighlights(dragTarget = null) {
 
 function pour(source, target) {
   if (animation || drainValve.draining) return;
-  if (source.amount < 1) { showToast('Реагент закончился — сброс обновит запас'); return; }
-  if (target.state.volume >= target.state.capacity) { showToast('Сосуд заполнен'); restoreSource(source); return; }
+  if (source.amount < 1) { showToast(t('Реагент закончился — сброс обновит запас')); return; }
+  if (target.state.volume >= target.state.capacity) { showToast(t('Сосуд заполнен')); restoreSource(source); return; }
   const available = Math.min(source.data.dose, source.amount, target.state.capacity - target.state.volume);
   const side = target.x < 0 ? 1 : -1;
   const pose = pouringPose({
@@ -2137,8 +2145,8 @@ function updatePour(dt) {
   updateJetSkin(a);
   if (a.phase === 'settle' && a.jet.parcels.length === 0) {
     const color = mixtureInfo(r.state);
-    if (a.jet.received > 0) showToast(`${s.data.name} → ${color.name.toLowerCase()} · ${Math.round(a.jet.received)} мл`);
-    else showToast('Эссенция пролилась мимо сосуда');
+    if (a.jet.received > 0) showToast(t('{source} → {colour} · {amount} мл', { source: s.data.name, colour: color.name.toLowerCase(), amount: Math.round(a.jet.received) }));
+    else showToast(t('Эссенция пролилась мимо сосуда'));
     cleanPour(a);
     animation = null;
     $('experience').classList.remove('pouring');
@@ -2200,7 +2208,7 @@ function setRecipeLevel(level) {
   recipeLevel = level;
   currentRecipe = recipesByLevel.get(level);
   showCurrentRecipe();
-  showToast(`Страница ${level} · ${RECIPE_LEVELS[level].title.toLowerCase()}`);
+  showToast(t('Страница {level} · {title}', { level, title: RECIPE_LEVELS[level].title.toLowerCase() }));
   return true;
 }
 
@@ -2215,7 +2223,7 @@ function resetAll() {
   currentRecipe = next;
   recipesByLevel.set(recipeLevel, next);
   showCurrentRecipe();
-  showToast(`Новый рецепт уровня ${recipeLevel} · стол подготовлен`);
+  showToast(t('Новый рецепт уровня {level} · стол подготовлен', { level: recipeLevel }));
 }
 
 function render() {
@@ -2334,7 +2342,7 @@ function render() {
   if (fpsWindow >= .55) {
     $('scene-fps').textContent = String(Math.round(fpsFrames / fpsWindow));
     const triangles = renderer.info?.render?.triangles ?? 0;
-    $('scene-triangles').textContent = Math.round(triangles).toLocaleString('ru-RU');
+    $('scene-triangles').textContent = Math.round(triangles).toLocaleString(translator.language === 'ru' ? 'ru-RU' : 'en-GB');
     fpsWindow = fpsFrames = 0;
   }
 }

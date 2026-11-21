@@ -1,4 +1,5 @@
 // @ts-check
+import { t } from './i18n.js';
 // Three increasingly demanding alchemical recipes. Their doses fit the right
 // receiver's 160 ml capacity and the quantities in the source vessels.
 export const PIGMENT_SWATCHES = Object.freeze({
@@ -7,21 +8,21 @@ export const PIGMENT_SWATCHES = Object.freeze({
 
 // Traditional planetary signs, used on the parchment and in the recipe book.
 export const PLANETARY_METALS = Object.freeze({
-  aurum: Object.freeze({ glyph: '☉', planet: 'Солнце', atomicNumber: 79 }),
-  argentum: Object.freeze({ glyph: '☽', planet: 'Луна', atomicNumber: 47 }),
-  cuprum: Object.freeze({ glyph: '♀', planet: 'Венера', atomicNumber: 29 }),
-  ferrum: Object.freeze({ glyph: '♂', planet: 'Марс', atomicNumber: 26 }),
-  stannum: Object.freeze({ glyph: '♃', planet: 'Юпитер', atomicNumber: 50 }),
-  hydrargyrum: Object.freeze({ glyph: '☿', planet: 'Меркурий', atomicNumber: 80 }),
-  plumbum: Object.freeze({ glyph: '♄', planet: 'Сатурн', atomicNumber: 82 })
+  aurum: Object.freeze({ glyph: '☉', planet: t('Солнце'), atomicNumber: 79 }),
+  argentum: Object.freeze({ glyph: '☽', planet: t('Луна'), atomicNumber: 47 }),
+  cuprum: Object.freeze({ glyph: '♀', planet: t('Венера'), atomicNumber: 29 }),
+  ferrum: Object.freeze({ glyph: '♂', planet: t('Марс'), atomicNumber: 26 }),
+  stannum: Object.freeze({ glyph: '♃', planet: t('Юпитер'), atomicNumber: 50 }),
+  hydrargyrum: Object.freeze({ glyph: '☿', planet: t('Меркурий'), atomicNumber: 80 }),
+  plumbum: Object.freeze({ glyph: '♄', planet: t('Сатурн'), atomicNumber: 82 })
 });
 export const METAL_REFERENCE_ORDER = Object.freeze([
   'aurum', 'argentum', 'cuprum', 'ferrum', 'stannum', 'hydrargyrum', 'plumbum'
 ]);
 export const RECIPE_LEVELS = Object.freeze({
-  1: Object.freeze({ title: 'Начальный', caption: 'Один цвет · один металл · один нагрев' }),
-  2: Object.freeze({ title: 'Смешение', caption: 'Два цвета · один металл · один нагрев' }),
-  3: Object.freeze({ title: 'Мастерство', caption: 'Два этапа · два металла · промежуточный нагрев' })
+  1: Object.freeze({ title: t('Начальный'), caption: t('Один цвет · один металл · один нагрев') }),
+  2: Object.freeze({ title: t('Смешение'), caption: t('Два цвета · один металл · один нагрев') }),
+  3: Object.freeze({ title: t('Мастерство'), caption: t('Два этапа · два металла · промежуточный нагрев') })
 });
 
 const clamp = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
@@ -155,8 +156,8 @@ export function evaluateRecipe(recipe, mixture, heatSeconds, reagents, timeline 
   const heatAccuracy = stageDetails.reduce((sum, entry) => sum + entry.heatAccuracy, 0) / stageDetails.length;
   const purity = clamp(1 - extras * .28, 0, 1);
   const score = Math.round(100 * (ingredientAccuracy * .74 + heatAccuracy * .26) * purity);
-  const grade = score >= 98 ? 'Идеальное зелье' : score >= 80 ? 'Отличное зелье'
-    : score >= 60 ? 'Хорошая варка' : score >= 35 ? 'Нестабильное зелье' : 'Неудачная варка';
+  const grade = t(score >= 98 ? 'Идеальное зелье' : score >= 80 ? 'Отличное зелье'
+    : score >= 60 ? 'Хорошая варка' : score >= 35 ? 'Нестабильное зелье' : 'Неудачная варка');
   return {
     score, grade, extras, heatSeconds, ingredientAccuracy, heatAccuracy, purity, stageDetails,
     pigment: overallDoses[recipe.pigmentId], metal: overallDoses[recipe.metalId],

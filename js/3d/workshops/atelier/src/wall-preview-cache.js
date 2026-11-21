@@ -1,4 +1,5 @@
 // @ts-check
+import { t } from './i18n.js';
 /** Small wall thumbnails are independent of the easel texture cache. */
 export function createWallPreviewCache({ THREE, renderer, maxConcurrent = 5 }) {
   const previews = new Map();
@@ -38,7 +39,7 @@ export function createWallPreviewCache({ THREE, renderer, maxConcurrent = 5 }) {
       context.fillStyle = '#685c49';
       context.font = 'bold 12px sans-serif';
       context.textAlign = 'center';
-      context.fillText?.('РЕПРОДУКЦИЯ', canvas.width / 2, canvas.height / 2);
+      context.fillText?.(t('РЕПРОДУКЦИЯ'), canvas.width / 2, canvas.height / 2);
     }
     const texture = new THREE.CanvasTexture(canvas);
     texture.colorSpace = THREE.SRGBColorSpace;

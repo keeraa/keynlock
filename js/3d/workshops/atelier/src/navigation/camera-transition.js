@@ -1,6 +1,7 @@
 // @ts-check
 /** One flight controller for focus, wall overview, gallery details and returns. */
-export function createCameraTransition({ camera, controls, onStart = () => {} }) {
+export function createCameraTransition({ camera, controls, onStart = () => {},
+  setInputBlocked = blocked => { controls.enabled = !blocked; } }) {
   let travel = null;
 
   function start(destination, duration = 780, onComplete = null) {
@@ -17,7 +18,7 @@ export function createCameraTransition({ camera, controls, onStart = () => {} })
     camera.lookAt(fromTarget);
     travel = { started: performance.now(), duration, onComplete, fromPosition, fromTarget,
       toPosition: destination.position.clone(), toTarget: destination.target.clone() };
-    controls.enabled = false;
+    setInputBlocked(true);
   }
 
   function retarget(destination) {
@@ -28,7 +29,7 @@ export function createCameraTransition({ camera, controls, onStart = () => {} })
 
   function cancel() {
     travel = null;
-    controls.enabled = true;
+    setInputBlocked(false);
   }
 
   function update(now) {
@@ -41,7 +42,7 @@ export function createCameraTransition({ camera, controls, onStart = () => {} })
     if (progress >= 1) {
       const onComplete = travel.onComplete;
       travel = null;
-      controls.enabled = true;
+      setInputBlocked(false);
       const damping = controls.enableDamping;
       controls.enableDamping = false;
       controls.update();

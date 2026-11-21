@@ -7,7 +7,7 @@ import { zoneDefinitions, zoneOrder } from './zone-definitions.js';
 export function createZoneTransitions({
   scene, camera, controls, canvas, interaction, renderer, rendererHost, atelierFilter,
   workshopOverlay, atelierView, visualUI, homePosition, homeTarget, roomMinDistance,
-  roomLights, beforeCameraTransition,
+  roomLights, cameraInput,
 }) {
   const zones = Object.fromEntries(Object.entries(zoneDefinitions).map(([id, zone]) => [id, { ...zone }]));
   const panel = document.querySelector('#zone-panel');
@@ -60,7 +60,7 @@ export function createZoneTransitions({
       ? rendererHost?.getWorldPose('alchemy')?.fov ?? 37
       : roomFov;
     desiredFov = sourceFov;
-    camera.fov = sourceFov;
+    return sourceFov;
   }
 
   function focus(position, target, fov = roomFov) {
@@ -115,7 +115,6 @@ export function createZoneTransitions({
     inRoomWorkshop = id;
     workshopOverlay.setInRoomWorkshopId(id);
     document.querySelector('#app').classList.toggle('atelier-mode', id === 'atelier');
-    controls.enabled = id !== 'alchemy';
     controls.minDistance = roomMinDistance;
     interaction.style.cursor = 'grab';
     rendererHost.setWorldLighting(ready ? id : null);
@@ -132,11 +131,11 @@ export function createZoneTransitions({
 
   function openZone(id) {
     if (!zones[id]) return;
-    beforeCameraTransition();
     pendingWorkshopOpen = null;
     atelierView.leaveGallery();
     if (visualUI.isOpen()) visualUI.close();
     currentZone = id;
+    cameraInput.setMode(id === 'alchemy' || id === 'atelier' ? id : 'room');
     const zone = zones[id];
     const hasOriginal = Boolean(WORKSHOPS[id]);
     atelierView.resetEaselFocus();
@@ -167,9 +166,10 @@ export function createZoneTransitions({
     }
   }
 
-  function closePanel() {
+  function closePanel(nextMode = 'room') {
     pendingWorkshopOpen = null;
     atelierView.leaveGallery();
+    cameraInput.setMode(nextMode);
     setInRoomWorkshop(null);
     interaction.style.cursor = 'grab';
     panel.hidden = true;
@@ -178,25 +178,33 @@ export function createZoneTransitions({
   }
 
   function resetView() {
-    beforeCameraTransition();
     if (workshopOverlay?.isOpen()) { workshopOverlay.close(); return; }
     closePanel();
     rendererHost?.setWorldLighting(null);
     focus(homePosition.toArray(), homeTarget.toArray());
   }
 
+  function toggleWalk() {
+    if (workshopOverlay.isOpen()) return;
+    if (visualUI.isOpen()) visualUI.close();
+    if (cameraInput.isWalking()) {
+      resetView();
+      return;
+    }
+    transitioning = false;
+    closePanel('walk');
+    atelierView.cancelFlight();
+    rendererHost.setWorldLighting(null);
+  }
+
   function handleKey(e) {
-    if (e.defaultPrevented) return;
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
     if (workshopOverlay?.isOpen()) {
       if(e.key === 'Escape')workshopOverlay.close();
       return;
     }
-    if (atelierView.handleGalleryKey(e)) return;
     // The original Atelier owns number keys 4–8 in restoration mode.
     if (currentZone === 'atelier' && /^Digit[4-8]$/.test(e.code)) return;
-    if (currentZone === 'alchemy' && e.key === 'Escape' &&
-        !document.querySelector('#alchemy-embedded-app #recipe-overlay')?.hidden) return;
     if (e.key === 'Escape') { if (visualUI?.isOpen()) visualUI.close(); else resetView(); return; }
     if (e.key === '0') { resetView(); return; }
     const number = Number(e.key);
@@ -204,7 +212,7 @@ export function createZoneTransitions({
   }
 
   function updateApproach(delta) {
-    if (transitioning && !atelierView.isGalleryActive()) {
+    if (transitioning && !cameraInput.isGallery()) {
       const factor = 1 - Math.exp(-4.8 * delta);
       camera.position.lerp(desiredPosition, factor);
       controls.target.lerp(desiredTarget, factor);
@@ -240,12 +248,12 @@ export function createZoneTransitions({
       openZone(button.dataset.zone);
     });
   });
-  document.querySelector('#close-panel').addEventListener('click', closePanel);
+  document.querySelector('#close-panel').addEventListener('click', () => closePanel());
   document.querySelector('#reset-camera').addEventListener('click', resetView);
-  document.addEventListener('keydown', handleKey);
+  document.querySelector('#room-walk-toggle').addEventListener('click', toggleWalk);
 
   return {
-    open: openZone, reset: resetView, onWorkshopReady, resizeCamera, updateApproach,
+    open: openZone, reset: resetView, onWorkshopReady, resizeCamera, updateApproach, handleKey,
     precompileWorkshopLighting: () => workshopLighting.precompile(workshopOverlay.isReady, () => inRoomWorkshop),
     manipulateAlchemy, resetAlchemyCamera,
     current: () => currentZone,

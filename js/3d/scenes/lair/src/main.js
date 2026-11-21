@@ -18,6 +18,7 @@ import './ui/performance.css';
 import { createZoneTransitions } from './navigation/zone-transitions.js';
 import { ATELIER_EASELS } from './navigation/zone-definitions.js';
 import { createRoomWalk } from './navigation/room-walk.js';
+import { createCameraInput } from './navigation/camera-input.js';
 import { mountZoneInteraction } from './navigation/zone-interaction.js';
 import { createAtelierView } from './workshops/atelier-view.js';
 import { mountInitialLoading } from './ui/initial-loading.js';
@@ -68,7 +69,6 @@ function setup() {
   const controls = new OrbitControls(camera, interaction);
   Object.assign(host, { camera, controls, interactionElement: interaction });
   controls.target.copy(homeTarget);
-  controls.enabled = true;
   controls.enableRotate = true;
   controls.enableDamping = true;
   controls.dampingFactor = .075;
@@ -107,24 +107,37 @@ function setup() {
   const visualUI = mountVisualSettings({ visual, room, setNight: night => dayNight.set(night), outlines, atelierFilter,
     grain: document.querySelector('.grain'), onOpen: () => { panel.hidden = true; } });
   const roomWalk = createRoomWalk({
-    scene, camera, controls, interaction,
+    scene, camera, interaction,
     onExit: () => zoneTransitions.reset(),
     onInteract: () => zoneInteraction.openWalkTarget(),
   });
   const atelierView = createAtelierView({
     camera, controls, canvas, interaction, rendererHost, atelierFilter, host,
     easelPose: ATELIER_EASELS, roomMinDistance,
+    setFlightInputBlocked: blocked => cameraInput.setAtelierInputBlocked('flight', blocked),
     navigation: {
       isInAtelier: () => zoneTransitions.current() === 'atelier',
       roomFov: () => zoneTransitions.roomFov(),
       stopApproach: () => zoneTransitions.stopApproach(),
+      openGalleryCamera() {
+        zoneTransitions.stopApproach();
+        cameraInput.setMode('gallery');
+      },
       openAtelier: () => zoneTransitions.open('atelier'),
     },
   });
+  const cameraInput = createCameraInput({
+    camera, controls, roomWalk, atelierView,
+    handleZoneKey: event => zoneTransitions.handleKey(event),
+    handleAtelierKey: event => getWorkshopApi('atelier')?.input?.handleKey(event),
+    handleAlchemyKey: event => getWorkshopApi('alchemy')?.input?.handleKey(event),
+    updateApproach: delta => zoneTransitions.updateApproach(delta),
+  });
+  host.atelier.setStrokeInputBlocked = blocked => cameraInput.setAtelierInputBlocked('stroke', blocked);
   const zoneTransitions = createZoneTransitions({
     scene, camera, controls, canvas, interaction, renderer, rendererHost, atelierFilter,
     workshopOverlay, atelierView, visualUI, homePosition, homeTarget, roomMinDistance,
-    roomLights, beforeCameraTransition: roomWalk.stop,
+    roomLights, cameraInput,
   });
   host.alchemy.manipulate = zoneTransitions.manipulateAlchemy;
   host.alchemy.resetCamera = zoneTransitions.resetAlchemyCamera;
@@ -142,7 +155,7 @@ function setup() {
   });
   atelierView.bind();
   const zoneInteraction = mountZoneInteraction({
-    canvas, camera, interaction, roomWalk, zoneTransitions, workshopOverlay, visualUI,
+    canvas, camera, interaction, roomWalk, cameraInput, zoneTransitions, workshopOverlay,
     anchors: room.anchors, hitTargets: room.hitTargets,
   });
   const atelierElement = mountAtelierInRoom(host);
@@ -156,8 +169,7 @@ function setup() {
   function resize() {
     const width = canvas.clientWidth, height = canvas.clientHeight;
     camera.aspect = width / Math.max(height, 1);
-    zoneTransitions.resizeCamera(width);
-    roomWalk.resize();
+    cameraInput.resize(zoneTransitions.resizeCamera(width));
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
     atelierFilter.resize(width, height, renderer.getPixelRatio());
@@ -166,7 +178,7 @@ function setup() {
   window.addEventListener('resize', resize);
   resize();
   startLairFrames({ scene, camera, controls, renderer, rendererHost, atelierFilter, room, dayNight,
-    zoneTransitions, zoneInteraction, roomWalk, atelierView, workshopOverlay, visualUI, performancePanel });
+    zoneTransitions, zoneInteraction, cameraInput, atelierView, workshopOverlay, visualUI, performancePanel });
 }
 
 setup();

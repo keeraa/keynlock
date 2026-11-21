@@ -5,7 +5,8 @@ import { t } from '../i18n.js';
 import { ROOM_CENTER_Z } from '../room-layout.js';
 
 export function createAtelierView({
-  camera, controls, canvas, interaction, rendererHost, atelierFilter, host, easelPose, roomMinDistance, navigation,
+  camera, controls, canvas, interaction, rendererHost, atelierFilter, host, easelPose, roomMinDistance,
+  navigation, setFlightInputBlocked,
 }) {
   // The Atelier publishes its gallery and restoration controls once it has loaded.
   const atelierGallery = () => getWorkshopApi('atelier')?.gallery;
@@ -18,7 +19,7 @@ export function createAtelierView({
   const galleryHover = document.querySelector('#lair-wall-art-hover');
   // Below the entrance half of the exhibition on the left wall.
   const galleryWallAnchor = new THREE.Vector3(-8.10, 3.35, ROOM_CENTER_Z + 5.55);
-  const atelierFlight = createCameraTransition({ camera, controls });
+  const atelierFlight = createCameraTransition({ camera, controls, setInputBlocked: setFlightInputBlocked });
   let queuedGallery = false;
   let galleryActive = false;
   let galleryDrag = null;
@@ -79,7 +80,6 @@ export function createAtelierView({
     galleryHover.hidden = true;
     host.atelier.galleryActive = false;
     atelierGallery()?.leave();
-    controls.enabled = true;
     interaction.style.cursor = 'grab';
     galleryControls.hidden = true;
   }
@@ -96,9 +96,8 @@ export function createAtelierView({
     savedEaselView = null;
     galleryActive = true;
     atelierFilter?.setBlurSuspended(true);
-    navigation.stopApproach();
+    navigation.openGalleryCamera();
     host.atelier.galleryActive = true;
-    controls.enabled = false;
     gallery.open(canvas.clientWidth / Math.max(1, canvas.clientHeight));
     galleryControls.hidden = false;
     galleryEntry.hidden = true;
@@ -318,7 +317,6 @@ export function createAtelierView({
   return {
     bind, resize, cancelFlight, resetEaselFocus, leaveGallery, updateFlight, updateGalleryCamera,
     updateInterface, handleGalleryKey,
-    isGalleryActive: () => galleryActive,
     onReady: () => { if (queuedGallery) enterGallery(); },
   };
 }

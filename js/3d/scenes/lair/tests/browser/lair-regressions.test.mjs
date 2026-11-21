@@ -12,6 +12,11 @@ const viewport = { width: 1280, height: 860 };
 let server;
 let browser;
 let baseUrl;
+const channel = process.env.PLAYWRIGHT_CHROMIUM_CHANNEL;
+const webglArgs = process.platform === 'darwin'
+  ? ['--enable-gpu', '--use-angle=metal']
+  : ['--enable-webgl', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'];
+const browserArgs = [...webglArgs, '--mute-audio'];
 
 // The catalog loads paintings from GitHub. Serve them from this checkout so the
 // tests neither wait on the network nor depend on what is on the remote branch.
@@ -50,11 +55,7 @@ function readRoom() {
 before(async () => {
   server = await preview({ preview: { host: '127.0.0.1', port: 0 } });
   baseUrl = `http://127.0.0.1:${server.httpServer.address().port}/`;
-  const channel = process.env.PLAYWRIGHT_CHROMIUM_CHANNEL;
-  const webglArgs = process.platform === 'darwin'
-    ? ['--enable-gpu', '--use-angle=metal']
-    : ['--enable-webgl', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'];
-  browser = await chromium.launch({ channel, args: [...webglArgs, '--mute-audio'] });
+  browser = await chromium.launch({ channel, args: browserArgs });
 });
 
 after(async () => {
@@ -62,9 +63,14 @@ after(async () => {
   if (server) await new Promise(resolve => server.httpServer.close(resolve));
 });
 
-async function openRoom(t, { locale = 'ru-RU' } = {}) {
-  const context = await browser.newContext({ viewport, locale });
-  t.after(() => context.close());
+async function openRoom(t, { locale = 'ru-RU', pointerLock = false } = {}) {
+  // The headless shell rejects native pointer lock. Use full Chromium for that case.
+  const roomBrowser = pointerLock && !channel
+    ? await chromium.launch({ channel: 'chromium', args: browserArgs })
+    : browser;
+  if (roomBrowser !== browser) t.after(() => roomBrowser.close());
+  const context = await roomBrowser.newContext({ viewport, locale });
+  if (roomBrowser === browser) t.after(() => context.close());
   await servePaintingsLocally(context);
   const page = await context.newPage();
   page.setDefaultTimeout(timeout);
@@ -503,6 +509,58 @@ test('first-person walking slides against furniture and walls, interacts, and re
   await page.keyboard.press('Escape');
   await page.locator('#room-walk-hud').waitFor({ state: 'hidden' });
   assert.equal((await page.evaluate(readRoom)).controls.enabled, true);
+});
+
+test('E hands off a pointer-locked walk to alchemy exactly once', async t => {
+  const page = await openRoom(t, { pointerLock: true });
+  await page.bringToFront();
+  const toggle = page.locator('#room-walk-toggle');
+  await toggle.click();
+  await page.waitForFunction(() => document.pointerLockElement === document.querySelector('#scene-interaction'));
+  await page.evaluate(() => {
+    const { camera, controls, renderer } = window.__keynlockDebug.host;
+    const tabletop = renderer.getUnifiedScene().getObjectByName('alchemy-main-tabletop');
+    const position = tabletop.getWorldPosition(camera.position.clone());
+    camera.position.set(position.x - 3, camera.position.y, position.z);
+    camera.lookAt(position.x, camera.position.y, position.z);
+
+    const handoff = { releases: 0, resumes: 0, orbitChanges: [] };
+    window.walkHandoff = handoff;
+    document.addEventListener('pointerlockchange', () => {
+      if (!document.pointerLockElement) handoff.releases++;
+    });
+    window.addEventListener('keynlock:alchemy:v1', event => {
+      if (event.detail.type === 'resume') handoff.resumes++;
+    });
+    let enabled = controls.enabled;
+    Object.defineProperty(controls, 'enabled', {
+      get: () => enabled,
+      set(value) {
+        if (value !== enabled) handoff.orbitChanges.push(value);
+        enabled = value;
+      },
+      configurable: true,
+    });
+  });
+  await page.getByText('E · Алхимия', { exact: true }).waitFor();
+  await page.keyboard.down('KeyE');
+  await page.keyboard.down('KeyE'); // Repeated keydown while E is still held.
+  await page.keyboard.up('KeyE');
+  await page.waitForFunction(() => document.pointerLockElement === null
+    && window.__keynlockDebug.workshop('alchemy').lifecycle.isActive());
+  await settleAlchemyCamera(page);
+
+  assert.equal(await toggle.getAttribute('aria-pressed'), 'false');
+  assert.equal(await page.locator('#alchemy-input-plane').isVisible(), true);
+  assert.equal((await page.evaluate(readRoom)).controls.enabled, false);
+  await page.evaluate(() => window.__keynlockDebug.workshop('alchemy').openRecipeBook());
+  const recipe = page.locator('#alchemy-embedded-app #recipe-overlay');
+  await recipe.waitFor();
+  await page.keyboard.press('Escape');
+  await recipe.waitFor({ state: 'hidden' });
+  assert.equal(await page.locator('#alchemy-input-plane').isVisible(), true);
+  assert.deepEqual(await page.evaluate(() => window.walkHandoff),
+    { releases: 1, resumes: 1, orbitChanges: [] });
 });
 
 test('an English browser gets the Lair in English, with a language switch', async t => {

@@ -6,7 +6,7 @@ const HOTSPOT_HEIGHT = {
 
 /** Connect room picking and projected labels to the current navigation mode. */
 export function mountZoneInteraction({ canvas, camera, interaction, anchors, hitTargets, roomWalk,
-  zoneTransitions, workshopOverlay, visualUI }) {
+  cameraInput, zoneTransitions, workshopOverlay }) {
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   const point = new THREE.Vector3();
@@ -32,7 +32,7 @@ export function mountZoneInteraction({ canvas, camera, interaction, anchors, hit
   }
 
   function update(currentZone) {
-    if (roomWalk.isActive()) {
+    if (cameraInput.isWalking()) {
       camera.updateMatrixWorld();
       roomWalk.setTarget(zoneTransitions.title(hitZone()));
       return;
@@ -56,33 +56,24 @@ export function mountZoneInteraction({ canvas, camera, interaction, anchors, hit
     }
   }
 
-  const workshopOwnsPointer = () => workshopOverlay.isOpen() || zoneTransitions.current() === 'atelier';
+  const canPickZone = () => !workshopOverlay.isOpen() && cameraInput.canPickZone();
   interaction.addEventListener('pointerdown', event => { startPointer = [event.clientX, event.clientY]; });
   interaction.addEventListener('pointermove', event => {
-    if (roomWalk.isActive() || workshopOwnsPointer() || event.buttons) return;
+    if (!canPickZone() || cameraInput.isWalking() || event.buttons) return;
     const id = hitZone(event);
     if (id === hoveredZone) return;
     hoveredZone = id;
     interaction.style.cursor = id ? 'pointer' : 'grab';
   });
   interaction.addEventListener('click', event => {
-    if (workshopOwnsPointer() || event.metaKey) return;
+    if (!canPickZone() || event.metaKey) return;
     if (startPointer && Math.hypot(event.clientX - startPointer[0], event.clientY - startPointer[1]) > 7) return;
-    if (roomWalk.isActive()) {
+    if (cameraInput.isWalking()) {
       openWalkTarget();
       return;
     }
     const id = hitZone(event);
     if (id) zoneTransitions.open(id);
-  });
-  document.querySelector('#room-walk-toggle').addEventListener('click', () => {
-    if (workshopOverlay.isOpen()) return;
-    const returning = roomWalk.isActive();
-    if (visualUI.isOpen()) visualUI.close();
-    zoneTransitions.reset();
-    if (returning) return;
-    zoneTransitions.stopApproach();
-    roomWalk.start();
   });
   window.addEventListener('keydown', event => {
     if (event.key === 'Meta') interaction.classList.add('command-pan');

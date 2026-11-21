@@ -1,5 +1,6 @@
 // @ts-check
 import * as THREE from 'three';
+import { WINDOW_LIGHT_GLSL, WINDOW_LIGHT_TINT } from './window-light.js';
 
 // Wind sampling comes from the shared Village Engine wind-field module.
 export function sampleGardenWind(time, power = .55) {
@@ -11,7 +12,7 @@ export function sampleGardenWind(time, power = .55) {
 }
 
 /** Soft drifting dust, rendered as a single Three.js Points draw call. */
-export function createAmbientParticles(parent, { count = 420, density = .64 } = {}) {
+export function createAmbientParticles(parent, { count = 420, density = .64, windowLight = null } = {}) {
   let seed = 42;
   const random = () => ((seed = (1664525 * seed + 1013904223) >>> 0) / 4294967296);
   const base = new Float32Array(count * 3);
@@ -35,7 +36,10 @@ export function createAmbientParticles(parent, { count = 420, density = .64 } = 
   geometry.setAttribute('position', position);
   geometry.setAttribute('aPhase', new THREE.BufferAttribute(phases, 1));
   geometry.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
-  const uniforms = { uTime: { value: 0 }, uScale: { value: .95 }, uOpacity: { value: .48 } };
+  const uniforms = { uTime: { value: 0 }, uScale: { value: .95 }, uOpacity: { value: .48 },
+    // Specks drifting through the window beam catch the daylight.
+    uWindowLight: windowLight?.dustStrength ?? { value: 0 },
+    uWindowTint: { value: new THREE.Color(WINDOW_LIGHT_TINT.dust) } };
   const material = new THREE.ShaderMaterial({
     uniforms, transparent: true, depthTest: true, depthWrite: false,
     blending: THREE.AdditiveBlending,
@@ -44,8 +48,12 @@ export function createAmbientParticles(parent, { count = 420, density = .64 } = 
       attribute float aSize;
       uniform float uTime;
       uniform float uScale;
+      uniform float uWindowLight;
       varying float vFade;
+      varying float vBeam;
+      ${WINDOW_LIGHT_GLSL}
       void main() {
+        vBeam = uWindowLight > 0.0 ? uWindowLight * lairWindowLightAt((modelMatrix * vec4(position, 1.0)).xyz) : 0.0;
         vec4 eye = modelViewMatrix * vec4(position, 1.0);
         gl_Position = projectionMatrix * eye;
         gl_PointSize = clamp(uScale * (70.0 / max(1.0, -eye.z)) * aSize, 1.0, 7.5);
@@ -54,11 +62,14 @@ export function createAmbientParticles(parent, { count = 420, density = .64 } = 
     `,
     fragmentShader: `
       uniform float uOpacity;
+      uniform vec3 uWindowTint;
       varying float vFade;
+      varying float vBeam;
       void main() {
         float r = length(gl_PointCoord - .5) * 2.0;
         float halo = 1.0 - smoothstep(.08, 1.0, r);
-        gl_FragColor = vec4(.95, .81, .60, halo * halo * uOpacity * vFade);
+        vec3 color = mix(vec3(.95, .81, .60), uWindowTint, min(1.0, vBeam));
+        gl_FragColor = vec4(color, halo * halo * uOpacity * vFade * (1.0 + 1.8 * vBeam));
       }
     `,
   });

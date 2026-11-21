@@ -481,6 +481,17 @@ function buildRoom() {
   backgroundScene.add(room);
   const tiledWall = box(WALL_SIZE.width, WALL_SIZE.height, .28, wallMaterial, room, 0, 3.2, -5.25);
   tiledWall.name = 'extended-back-wall';
+  // Inside the Lair the room's own right wall is tiled from floor to ceiling;
+  // a second, shorter wall here would show as a separate green panel.
+  // The wall finish is then chosen in the Lair's own visual panel, so the
+  // lab's tile colour buttons, which only paint this hidden wall, are hidden too.
+  if (runtime.embedded) {
+    tiledWall.visible = false;
+    for (const choices of queryAll('.wall-choices')) {
+      choices.hidden = true;
+      if (choices.previousElementSibling?.tagName === 'H3') choices.previousElementSibling.hidden = true;
+    }
+  }
   tiledWall.castShadow = false;
   tiledWall.receiveShadow = false;
   // Full-wall painting has its own low-contrast grout and no repeating joins.

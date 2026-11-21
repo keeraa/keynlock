@@ -27,7 +27,8 @@ export function buildGramophone(kit) {
   zoneTarget('gramophone', [1.97, 2.42, -3.68], [1.58, 2.65, 1.12]);
 }
 
-export function buildDetails(kit) {
+/** @param {any} kit @param {{ windowLight?: { dustStrength: { value: number } } }} [options] */
+export function buildDetails(kit, { windowLight } = {}) {
   const { m, staticGroup, animated, box, sphere } = kit;
   // Keep the tall window wall free from pictures and the former upper gallery.
   // Column lamps create pools of warm light around the room.
@@ -37,7 +38,7 @@ export function buildDetails(kit) {
     sphere(lamp, .22, new THREE.MeshBasicMaterial({ color: '#f0c591', transparent: true, opacity: .65 }), 0, 0, .19);
     const light = new THREE.PointLight('#ffc183', 3.5, 5.5, 2); light.position.set(0, 0, .35); lamp.add(light);
   }
-  const ambientParticles = createAmbientParticles(staticGroup);
+  const ambientParticles = createAmbientParticles(staticGroup, { windowLight });
   animated.push(t => ambientParticles.update(t));
   return ambientParticles;
 }

@@ -5,6 +5,7 @@ import { buildWindow } from './window.js';
 import { buildPlanning } from './planning.js';
 import { buildWorkbench } from './workbench-furniture.js';
 import { buildGramophone, buildDetails } from './details.js';
+import { createWindowLight } from './window-light.js';
 
 /** A single continuous room, using the proportions and gouache materials of the existing ateliers. */
 export function buildLair(scene, m) {
@@ -15,11 +16,12 @@ export function buildLair(scene, m) {
   // their furniture; the room keeps only their picking targets.
   const rightWallFinish = buildShell(kit);
   buildWindow(kit);
+  const windowLight = createWindowLight(kit.staticGroup);
   zoneTarget('atelier', [-6.93, 2.28, 12.10], [3.28, 4.9, 7.20]);
   buildPlanning(kit);
   buildWorkbench(kit);
   buildGramophone(kit);
-  const ambientParticles = buildDetails(kit);
+  const ambientParticles = buildDetails(kit, { windowLight });
   zoneTarget('alchemy', [6.86, 2.34, 10.10], [3.05, 5.8, 5.22]);
   const wallpapers = {
     tile: m.alchemyTile,
@@ -28,7 +30,7 @@ export function buildLair(scene, m) {
     damask: m.wallpaperDamask,
   };
   return {
-    anchors, hitTargets, animated, ambientParticles,
+    anchors, hitTargets, animated, ambientParticles, windowLight,
     setRightWallpaper(name) {
       if (!Object.hasOwn(wallpapers, name) || !rightWallFinish) return false;
       rightWallFinish.material = wallpapers[name];

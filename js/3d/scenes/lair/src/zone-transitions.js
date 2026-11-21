@@ -1,17 +1,17 @@
 import * as THREE from 'three';
-import { ORIGINAL_STATIONS } from './original-stations.js';
+import { WORKSHOPS } from './workshop-overlay.js';
 import { t } from './i18n.js';
 import { ALCHEMY_LOOK } from '@keynlock/alchemy/src/look/alchemy-look.js';
 
-export const RESTORATION_EASELS = { position: [1.56, 3.22, 10.35], target: [-7.05, 2.48, 10.35] };
+export const ATELIER_EASELS = { position: [1.56, 3.22, 10.35], target: [-7.05, 2.48, 10.35] };
 
 const zoneDefinitions = {
-  restoration: {
+  atelier: {
     number: '01', kicker: t('АТЕЛЬЕ САЙ'), title: t('Реставрация'),
     description: t('Оригинальное Ателье цвета размещено вдоль левой стены логова: 12 художественных направлений, 30 рам, действующие инструменты реставрации.'),
     status: t('Мольберты и картины находятся в общей 3D-сцене логова.'),
-    link: ORIGINAL_STATIONS.restoration.sourceUrl,
-    camera: RESTORATION_EASELS.position, target: RESTORATION_EASELS.target,
+    link: WORKSHOPS.atelier.sourceUrl,
+    camera: ATELIER_EASELS.position, target: ATELIER_EASELS.target,
   },
   planning: {
     number: '02', kicker: t('БАЗА КОМАНДЫ'), title: t('Карта и дела'),
@@ -23,16 +23,16 @@ const zoneDefinitions = {
     number: '03', kicker: t('МАСТЕРСКАЯ ТИКА'), title: t('Верстак'),
     description: t('Справа от алхимического стола, вдоль зелёной стены, стоит отдельный верстак с тисками, заготовками, замочными цилиндрами и инструментальной доской.'),
     status: t('Полная исходная мастерская: опиловка, сборка замка, песочница механизмов.'),
-    link: ORIGINAL_STATIONS.workbench.sourceUrl,
+    link: WORKSHOPS.workbench.sourceUrl,
     camera: [1.22, 3.15, 20.07], target: [7.40, 1.68, 20.07],
   },
   alchemy: {
     number: '04', kicker: t('СОСТАВЫ И РЕАГЕНТЫ'), title: t('Алхимия'),
     description: t('Вся правая стена от пола до потолка покрыта зелёной гуашевой плиткой. У стены стоит алхимический стол с двумя ярусами, семью реагентами, пигментами, стеклом и свечами; над ним рецепт и часы.'),
     status: t('Исходная лаборатория: переливание, физика жидкостей, рецепты и все настройки.'),
-    link: ORIGINAL_STATIONS.alchemy.sourceUrl,
+    link: WORKSHOPS.alchemy.sourceUrl,
     // Fallback only. The loaded source laboratory supplies its actual orbit
-    // position, pivot and 37° field of view when entering this station.
+    // position, pivot and 37° field of view when entering this workshop.
     camera: [3.08, 4.18, 10.10], target: [6.99, 3.18, 10.10],
   },
   gramophone: {
@@ -43,11 +43,11 @@ const zoneDefinitions = {
   },
 };
 
-const zoneOrder = ['restoration', 'planning', 'workbench', 'alchemy', 'gramophone'];
+const zoneOrder = ['atelier', 'planning', 'workbench', 'alchemy', 'gramophone'];
 
 export function createZoneTransitions({
   scene, camera, controls, canvas, interaction, renderer, rendererHost, atelierFilter,
-  originalStations, restorationView, visualUI, homePosition, homeTarget, roomMinDistance,
+  workshopOverlay, atelierView, visualUI, homePosition, homeTarget, roomMinDistance,
   roomLights,
 }) {
   const zones = Object.fromEntries(Object.entries(zoneDefinitions).map(([id, zone]) => [id, { ...zone }]));
@@ -68,7 +68,7 @@ export function createZoneTransitions({
   let currentZone = null;
   let inRoomWorkshop = null;
   let transitioning = false;
-  let pendingStationOpen = null;
+  let pendingWorkshopOpen = null;
   let alchemyApproachDistance = 0;
 
   function manipulateAlchemy({ rotateX = 0, rotateY = 0, panX = 0, panY = 0, zoom = 1 } = {}) {
@@ -93,7 +93,7 @@ export function createZoneTransitions({
     if (currentZone !== 'alchemy') return;
     const pose = rendererHost.getWorldPose('alchemy');
     if (!pose) return;
-    restorationView.cancelFlight();
+    atelierView.cancelFlight();
     transitioning = false;
     camera.position.copy(pose.position);
     controls.target.copy(pose.target);
@@ -112,7 +112,7 @@ export function createZoneTransitions({
   }
 
   function focus(position, target, fov = roomFov) {
-    restorationView.cancelFlight();
+    atelierView.cancelFlight();
     desiredPosition.set(...position);
     desiredTarget.set(...target);
     desiredFov = fov;
@@ -122,10 +122,10 @@ export function createZoneTransitions({
     controls.maxAzimuthAngle = Infinity;
   }
 
-  function onStationReady(id) {
+  function onWorkshopReady(id) {
     if (id === 'alchemy') {
       zones.alchemy.status = t('Алхимическая лаборатория работает внутри общей сцены логова.');
-      if (currentZone === 'alchemy' && pendingStationOpen === 'alchemy') {
+      if (currentZone === 'alchemy' && pendingWorkshopOpen === 'alchemy') {
         const pose = rendererHost?.getWorldPose('alchemy');
         if (pose) {
           alchemyApproachDistance = camera.position.distanceTo(pose.position);
@@ -138,9 +138,9 @@ export function createZoneTransitions({
       }
       return;
     }
-    if (id !== 'restoration') return;
-    restorationView.resize();
-    zones.restoration.status = t('Исходная реставрация встроена в логово. Картины и инструменты доступны здесь.');
+    if (id !== 'atelier') return;
+    atelierView.resize();
+    zones.atelier.status = t('Исходная реставрация встроена в логово. Картины и инструменты доступны здесь.');
     // The original painting room is rotated along the Lair's left wall. Both
     // finishes contain the same gouache image, but the Lair wall retains its
     // own independently loaded material so a slow Atelier import cannot turn
@@ -149,8 +149,8 @@ export function createZoneTransitions({
     if (atelierWall) {
       atelierWall.visible = false;
     }
-    if (inRoomWorkshop === 'restoration') rendererHost.setWorldLighting('restoration');
-    restorationView.onReady();
+    if (inRoomWorkshop === 'atelier') rendererHost.setWorldLighting('atelier');
+    atelierView.onReady();
   }
 
   function applyWorldAlchemyLook(enabled) {
@@ -171,7 +171,7 @@ export function createZoneTransitions({
     if (enabled) {
       // Both scenes already use ACES/sRGB. Changing the global shadow-map type
       // here would invalidate every material program in the large shared scene
-      // and produce a multi-second shader compilation stall on station entry.
+      // and produce a multi-second shader compilation stall on workshop entry.
       renderer.toneMappingExposure = ALCHEMY_LOOK.renderer.exposure;
       // The original laboratory caches its mostly static 2048px shadow atlas.
       // Avoid re-rendering all workshop shadows during every Lair frame.
@@ -190,13 +190,13 @@ export function createZoneTransitions({
   function setInRoomWorkshop(id) {
     if (inRoomWorkshop === id) return;
     rendererHost.setWorldWorkshop(null);
-    const ready = id && originalStations.isReady(id);
+    const ready = id && workshopOverlay.isReady(id);
     if (id === 'alchemy' || inRoomWorkshop === 'alchemy') {
       applyWorldAlchemyLook(id === 'alchemy' && ready);
     }
     inRoomWorkshop = id;
-    originalStations.setInRoomStation(id);
-    document.querySelector('#app').classList.toggle('restoration-mode', id === 'restoration');
+    workshopOverlay.setInRoomWorkshopId(id);
+    document.querySelector('#app').classList.toggle('atelier-mode', id === 'atelier');
     controls.enabled = id !== 'alchemy';
     controls.minDistance = roomMinDistance;
     interaction.style.cursor = 'grab';
@@ -206,21 +206,21 @@ export function createZoneTransitions({
 
   function openZone(id) {
     if (!zones[id]) return;
-    pendingStationOpen = null;
-    restorationView.leaveGallery();
+    pendingWorkshopOpen = null;
+    atelierView.leaveGallery();
     if (visualUI.isOpen()) visualUI.close();
     currentZone = id;
     const zone = zones[id];
-    const hasOriginal = Boolean(ORIGINAL_STATIONS[id]);
-    restorationView.resetEaselFocus();
-    setInRoomWorkshop(id === 'restoration' ? id : null);
+    const hasOriginal = Boolean(WORKSHOPS[id]);
+    atelierView.resetEaselFocus();
+    setInRoomWorkshop(id === 'atelier' ? id : null);
     // Restoration always starts at the two easels, regardless of the source
     // Atelier's last camera pose (which could be up at the salon gallery).
     const sourcePose = id === 'alchemy' ? rendererHost?.getWorldPose('alchemy') : null;
-    const stationPosition = sourcePose?.position.toArray() || zone.camera;
-    const stationTarget = sourcePose?.target.toArray() || zone.target;
-    if (id === 'alchemy') alchemyApproachDistance = camera.position.distanceTo(new THREE.Vector3(...stationPosition));
-    focus(stationPosition, stationTarget, sourcePose?.fov ?? (id === 'alchemy' ? 37 : roomFov));
+    const workshopPosition = sourcePose?.position.toArray() || zone.camera;
+    const workshopTarget = sourcePose?.target.toArray() || zone.target;
+    if (id === 'alchemy') alchemyApproachDistance = camera.position.distanceTo(new THREE.Vector3(...workshopPosition));
+    focus(workshopPosition, workshopTarget, sourcePose?.fov ?? (id === 'alchemy' ? 37 : roomFov));
     document.querySelector('#panel-kicker').textContent = `${zone.number} / ${zone.kicker}`;
     document.querySelector('#panel-title').textContent = zone.title;
     document.querySelector('#panel-description').textContent = zone.description;
@@ -236,16 +236,16 @@ export function createZoneTransitions({
       if (btn.closest('.zone-nav')) btn.setAttribute('aria-pressed', String(btn.dataset.zone === id));
     });
     // Keep the room visible while the camera approaches the laboratory.
-    if (id === 'alchemy') pendingStationOpen = id;
-    else if (hasOriginal && id !== 'restoration') {
-      originalStations.preload(id);
-      originalStations.open(id);
+    if (id === 'alchemy') pendingWorkshopOpen = id;
+    else if (hasOriginal && id !== 'atelier') {
+      workshopOverlay.preload(id);
+      workshopOverlay.open(id);
     }
   }
 
   function closePanel() {
-    pendingStationOpen = null;
-    restorationView.leaveGallery();
+    pendingWorkshopOpen = null;
+    atelierView.leaveGallery();
     setInRoomWorkshop(null);
     interaction.style.cursor = 'grab';
     panel.hidden = true;
@@ -257,7 +257,7 @@ export function createZoneTransitions({
   }
 
   function resetView() {
-    if (originalStations?.isOpen()) { originalStations.close(); return; }
+    if (workshopOverlay?.isOpen()) { workshopOverlay.close(); return; }
     closePanel();
     rendererHost?.setWorldLighting(null);
     focus(homePosition.toArray(), homeTarget.toArray());
@@ -266,13 +266,13 @@ export function createZoneTransitions({
   function handleKey(e) {
     if (e.defaultPrevented) return;
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-    if (originalStations?.isOpen()) {
-      if(e.key === 'Escape')originalStations.close();
+    if (workshopOverlay?.isOpen()) {
+      if(e.key === 'Escape')workshopOverlay.close();
       return;
     }
-    if (restorationView.handleGalleryKey(e)) return;
+    if (atelierView.handleGalleryKey(e)) return;
     // The original Atelier owns number keys 4–8 in restoration mode.
-    if (currentZone === 'restoration' && /^Digit[4-8]$/.test(e.code)) return;
+    if (currentZone === 'atelier' && /^Digit[4-8]$/.test(e.code)) return;
     if (currentZone === 'alchemy' && e.key === 'Escape' &&
         !document.querySelector('#alchemy-embedded-app #recipe-overlay')?.hidden) return;
     if (e.key === 'Escape') { if (visualUI?.isOpen()) visualUI.close(); else resetView(); return; }
@@ -282,7 +282,7 @@ export function createZoneTransitions({
   }
 
   function updateApproach(delta) {
-    if (transitioning && !restorationView.isGalleryActive()) {
+    if (transitioning && !atelierView.isGalleryActive()) {
       const factor = 1 - Math.exp(-4.8 * delta);
       camera.position.lerp(desiredPosition, factor);
       controls.target.lerp(desiredTarget, factor);
@@ -299,18 +299,18 @@ export function createZoneTransitions({
     }
     // Reveal the loaded laboratory while the camera is still moving towards it.
     // During the overlay fade the room keeps rendering underneath.
-    const approachingAlchemy = pendingStationOpen === 'alchemy' &&
-      currentZone === 'alchemy' && originalStations.isReady('alchemy') &&
+    const approachingAlchemy = pendingWorkshopOpen === 'alchemy' &&
+      currentZone === 'alchemy' && workshopOverlay.isReady('alchemy') &&
       camera.position.distanceTo(desiredPosition) < alchemyApproachDistance * .55;
-    if (pendingStationOpen && (!transitioning || approachingAlchemy) && currentZone === pendingStationOpen) {
-      setInRoomWorkshop(pendingStationOpen);
-      pendingStationOpen = null;
+    if (pendingWorkshopOpen && (!transitioning || approachingAlchemy) && currentZone === pendingWorkshopOpen) {
+      setInRoomWorkshop(pendingWorkshopOpen);
+      pendingWorkshopOpen = null;
     }
   }
 
   controls.addEventListener('start', () => {
     transitioning = false;
-    if (currentZone !== 'restoration' && currentZone !== 'alchemy') rendererHost.setWorldLighting(null);
+    if (currentZone !== 'atelier' && currentZone !== 'alchemy') rendererHost.setWorldLighting(null);
   });
   document.querySelectorAll('[data-zone]').forEach(button => {
     button.addEventListener('click', event => {
@@ -323,7 +323,7 @@ export function createZoneTransitions({
   document.addEventListener('keydown', handleKey);
 
   return {
-    open: openZone, reset: resetView, onStationReady, resizeCamera, updateApproach,
+    open: openZone, reset: resetView, onWorkshopReady, resizeCamera, updateApproach,
     manipulateAlchemy, resetAlchemyCamera,
     current: () => currentZone,
     isTransitioning: () => transitioning,

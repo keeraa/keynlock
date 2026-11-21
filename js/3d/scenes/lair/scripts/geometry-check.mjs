@@ -21,11 +21,11 @@ THREE.TextureLoader.prototype.load = () => new THREE.Texture();
 const scene = new THREE.Scene();
 const { materials, visual } = createMaterials();
 const world = buildLair(scene, materials);
-assert.equal(scene.getObjectByName('restoration-left-wall')?.material, materials.restorationWall,
+assert.equal(scene.getObjectByName('atelier-side-wall')?.material, materials.atelierSideWall,
   'the Atelier wall uses a gouache-mapped material while the source wallpaper loads');
 assert.equal(scene.getObjectByName('restoration-easel-reference'),undefined,
   'the room never builds its own easels: the real Atelier owns them');
-assert.ok(world.anchors.restoration,'the restoration interaction target is retained');
+assert.ok(world.anchors.atelier,'the atelier interaction target is retained');
 scene.updateMatrixWorld(true);
 const unique = name => {
   const found = scene.getObjectByName(name);
@@ -40,15 +40,15 @@ scene.traverse(object => {
 assert.ok(ceilingRibs.length >= 8, 'the long room retains its complete timber ceiling');
 assert.ok(ceilingRibs.every(beam => !beam.castShadow),
   'the roof ribs do not project long diagonal stripes onto the gallery and floor');
-assert.equal(unique('restoration-left-wall').castShadow, false,
+assert.equal(unique('atelier-side-wall').castShadow, false,
   'structural wall facing does not cast shadows across the room');
 assert.ok(unique('planning-main-table').children.some(child => child.castShadow),
   'furniture retains its local contact shadows');
-const restWall = bounds('restoration-left-wall');
+const restWall = bounds('atelier-side-wall');
 const alchemyWall = bounds('alchemy-right-wall');
 const portalRay = (x,z,direction,object) => new THREE.Raycaster(
   new THREE.Vector3(x,2.8,z),new THREE.Vector3(direction,0,0)).intersectObject(object).length;
-assert.ok(portalRay(0,12.1,-1,unique('restoration-left-wall'))>0,'atelier side is once again one uninterrupted wall');
+assert.ok(portalRay(0,12.1,-1,unique('atelier-side-wall'))>0,'atelier side is once again one uninterrupted wall');
 assert.ok(portalRay(0,10.1,1,unique('alchemy-right-wall'))>0,'alchemy side remains solid without a doorway');
 assert.ok(portalRay(0,20.07,1,unique('alchemy-right-wall'))>0,'workbench side remains solid without a doorway');
 assert.equal(scene.getObjectByName('lair-left-portal-masonry'),undefined,'no invented left door frame');
@@ -106,7 +106,7 @@ for (const { positions, topBefore, hemBefore } of hangingCloths) {
   assert.ok(Math.abs(positions.getZ(0) - topBefore) < .00001, 'the upper seam remains fixed');
   assert.ok(hemBefore.some((value, i) => Math.abs(positions.getZ(positions.count - 29 + i) - value) > .01), 'wind moves the free hem');
 }
-assert.ok(workbench.min.z > 15, 'workbench stays beyond the original alchemy station');
+assert.ok(workbench.min.z > 15, 'workbench stays beyond the original alchemy workshop');
 assert.ok(workbench.max.x < alchemyWall.min.x, 'workbench does not enter the tile wall');
 assert.ok(unique('workbench-tool-wall').position.z > 3.5, 'tool wall moved with the workbench');
 assert.equal(Object.keys(world.anchors).length, 5, 'all five hotspots retained');

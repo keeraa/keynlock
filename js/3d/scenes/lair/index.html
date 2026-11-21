@@ -91,7 +91,7 @@
       <div class="chapter-caption"><span class="eyebrow">ГЛАВА I · МЕСТО, ГДЕ СОХРАНЯЮТ ИСКУССТВО</span><h1>Тихое убежище</h1><p>Вещи обретают вторую жизнь. У каждой находки здесь своя история.</p></div>
 
       <div id="scene-hotspots" class="scene-hotspots" aria-label="Интерактивные зоны комнаты">
-        <button type="button" class="hotspot" data-zone="restoration"><span class="pulse"></span><span>Реставрация</span></button>
+        <button type="button" class="hotspot" data-zone="atelier"><span class="pulse"></span><span>Реставрация</span></button>
         <button type="button" class="hotspot" data-zone="planning"><span class="pulse"></span><span>Карта и дела</span></button>
         <button type="button" class="hotspot" data-zone="workbench"><span class="pulse"></span><span>Верстак</span></button>
         <button type="button" class="hotspot" data-zone="alchemy"><span class="pulse"></span><span>Алхимия</span></button>
@@ -113,19 +113,19 @@
         <button id="lair-focus-copy" type="button" aria-label="Приблизить реставрацию" title="Реставрация · → / D">›</button>
         <button id="lair-focus-exit" type="button" hidden>↙ К ДВУМ МОЛЬБЕРТАМ <small>ESC · S / ↓</small></button>
       </nav>
-      <aside id="restoration-art-info" class="restoration-art-info" aria-label="Описание выбранной картины" hidden>
-        <div class="restoration-art-heading">
-          <div><span id="restoration-info-index"></span><h2 id="restoration-info-title"></h2>
-            <small id="restoration-info-author"></small></div>
-          <button id="restoration-info-toggle" type="button" aria-controls="restoration-info-body"
+      <aside id="atelier-art-info" class="atelier-art-info" aria-label="Описание выбранной картины" hidden>
+        <div class="atelier-art-heading">
+          <div><span id="atelier-info-index"></span><h2 id="atelier-info-title"></h2>
+            <small id="atelier-info-author"></small></div>
+          <button id="atelier-info-toggle" type="button" aria-controls="atelier-info-body"
             aria-expanded="true" aria-label="Свернуть описание картины">−</button>
         </div>
-        <div id="restoration-info-body">
-          <p id="restoration-info-description"></p>
-          <div class="restoration-info-ban">
-            <span id="restoration-info-ban-label"></span>
-            <p id="restoration-info-ban-reason"></p>
-            <small id="restoration-info-policy"></small>
+        <div id="atelier-info-body">
+          <p id="atelier-info-description"></p>
+          <div class="atelier-info-ban">
+            <span id="atelier-info-ban-label"></span>
+            <p id="atelier-info-ban-reason"></p>
+            <small id="atelier-info-policy"></small>
           </div>
         </div>
       </aside>
@@ -153,25 +153,25 @@
         <a id="panel-link" class="panel-link" href="#" target="_blank" rel="noopener" hidden>Открыть мастерскую <span>↗</span></a>
       </aside>
 
-      <section id="original-station-overlay" class="original-station-overlay" aria-label="Исходные мастерские KEYNLOCK" aria-hidden="true">
-        <div class="original-station-bar">
-          <button id="original-station-return" class="original-station-return" type="button" aria-label="Вернуться в логово">← <span>В ЛОГОВО</span></button>
-          <div class="original-station-title"><span>KEYNLOCK</span><b id="original-station-title">РЕСТАВРАЦИЯ</b></div>
-          <a id="original-station-external" class="original-station-external" href="https://atelier-restoration-1115.k1r11111.chatgpt.site/" target="_blank" rel="noopener noreferrer">ОТКРЫТЬ ОТДЕЛЬНО ↗</a>
+      <section id="workshop-overlay" class="workshop-overlay" aria-label="Исходные мастерские KEYNLOCK" aria-hidden="true">
+        <div class="workshop-bar">
+          <button id="workshop-return" class="workshop-return" type="button" aria-label="Вернуться в логово">← <span>В ЛОГОВО</span></button>
+          <div class="workshop-title"><span>KEYNLOCK</span><b id="workshop-title">РЕСТАВРАЦИЯ</b></div>
+          <a id="workshop-external" class="workshop-external" href="https://atelier-restoration-1115.k1r11111.chatgpt.site/" target="_blank" rel="noopener noreferrer">ОТКРЫТЬ ОТДЕЛЬНО ↗</a>
         </div>
-        <iframe id="original-station-frame" title="Оригинальная мастерская KEYNLOCK" allow="fullscreen; clipboard-read; clipboard-write" referrerpolicy="strict-origin-when-cross-origin"></iframe>
-        <div id="original-station-loading" class="original-station-loading" role="status" aria-busy="true">
-          <div class="original-station-loading-symbol" aria-hidden="true">❧</div>
-          <span id="original-station-loading-title">ЗАГРУЖАЕМ ОРИГИНАЛЬНУЮ МАСТЕРСКУЮ</span>
-          <div class="original-station-loading-rule"><i></i></div>
-          <p id="original-station-warning" class="original-station-warning" hidden>Загрузка занимает больше времени. Мастерскую можно открыть в отдельной вкладке.</p>
-          <a id="original-station-fallback" href="https://atelier-restoration-1115.k1r11111.chatgpt.site/" target="_blank" rel="noopener noreferrer" hidden>Открыть оригинальную мастерскую ↗</a>
+        <iframe id="workshop-frame" title="Оригинальная мастерская KEYNLOCK" allow="fullscreen; clipboard-read; clipboard-write" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        <div id="workshop-loading" class="workshop-loading" role="status" aria-busy="true">
+          <div class="workshop-loading-symbol" aria-hidden="true">❧</div>
+          <span id="workshop-loading-title">ЗАГРУЖАЕМ ОРИГИНАЛЬНУЮ МАСТЕРСКУЮ</span>
+          <div class="workshop-loading-rule"><i></i></div>
+          <p id="workshop-warning" class="workshop-warning" hidden>Загрузка занимает больше времени. Мастерскую можно открыть в отдельной вкладке.</p>
+          <a id="workshop-fallback" href="https://atelier-restoration-1115.k1r11111.chatgpt.site/" target="_blank" rel="noopener noreferrer" hidden>Открыть оригинальную мастерскую ↗</a>
         </div>
       </section>
       <div class="bottom-ui">
         <div class="interaction-hint"><span class="mouse-icon">◌</span> ПЕРЕТАСКИВАЙ — ОСМОТР <span class="dot">·</span> ⌘ + ПЕРЕТАСКИВАЙ — ПЕРЕМЕЩЕНИЕ <span class="dot">·</span> КОЛЕСО — МАСШТАБ <span class="dot">·</span> КЛИК — ВЗАИМОДЕЙСТВИЕ</div>
         <nav class="zone-nav" aria-label="Локации логова">
-          <button type="button" data-zone="restoration"><span class="zone-number">01</span><span>Реставрация</span></button>
+          <button type="button" data-zone="atelier"><span class="zone-number">01</span><span>Реставрация</span></button>
           <button type="button" data-zone="planning"><span class="zone-number">02</span><span>Штаб</span></button>
           <button type="button" data-zone="workbench"><span class="zone-number">03</span><span>Верстак</span></button>
           <button type="button" data-zone="alchemy"><span class="zone-number">04</span><span>Алхимия</span></button>

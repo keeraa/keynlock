@@ -4,7 +4,7 @@ import { createAmbientParticles } from '../engine/ambient-particles.js';
 
 // The gramophone corner, hanging lamps and the floating dust.
 export function buildGramophone(kit) {
-  const { m, staticGroup, animated, box, cylinder, rod, station, makeTable } = kit;
+  const { m, staticGroup, animated, box, cylinder, rod, zoneTarget, makeTable } = kit;
   const chest = makeTable(staticGroup, 1.37, .76, 1.97, -3.67, 1.17);
   chest.name = 'gramophone-table';
   box(chest, 1.43, .12, .78, m.ash, 0, 1.29, 0, .025);
@@ -24,7 +24,7 @@ export function buildGramophone(kit) {
   bell.position.y = .44; bell.rotation.z = -.45; bell.castShadow = true; horn.add(bell);
   cylinder(horn, .54, .54, .018, m.oldBrass, -.31, 1.13, 0, 32).rotation.z = -.45;
   animated.push(t => { vinyl.rotation.y = t * .12; });
-  station('gramophone', [1.97, 2.42, -3.68], [1.58, 2.65, 1.12]);
+  zoneTarget('gramophone', [1.97, 2.42, -3.68], [1.58, 2.65, 1.12]);
 }
 
 export function buildDetails(kit) {

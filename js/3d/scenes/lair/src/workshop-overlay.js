@@ -5,8 +5,8 @@ import { t } from './i18n.js';
  * Atelier and alchemy mount their original interfaces inside this document;
  * the workbench opens in an embedded page.
  */
-export const ORIGINAL_STATIONS = Object.freeze({
-  restoration: {
+export const WORKSHOPS = Object.freeze({
+  atelier: {
     title: t('Реставрация'),
     sourceUrl: 'https://atelier-restoration-1115.k1r11111.chatgpt.site/',
   },
@@ -21,22 +21,22 @@ export const ORIGINAL_STATIONS = Object.freeze({
   },
 });
 
-export function mountOriginalStations({onExit = () => {},onReady = () => {},rendererHost} = {}) {
-  const overlay = document.querySelector('#original-station-overlay');
-  const firstFrame = document.querySelector('#original-station-frame');
-  const title = document.querySelector('#original-station-title');
-  const external = document.querySelector('#original-station-external');
-  const returnButton = document.querySelector('#original-station-return');
-  const loader = document.querySelector('#original-station-loading');
-  const loadingTitle = document.querySelector('#original-station-loading-title');
-  const warning = document.querySelector('#original-station-warning');
-  const fallback = document.querySelector('#original-station-fallback');
+export function mountWorkshopOverlay({onExit = () => {},onReady = () => {},rendererHost} = {}) {
+  const overlay = document.querySelector('#workshop-overlay');
+  const firstFrame = document.querySelector('#workshop-frame');
+  const title = document.querySelector('#workshop-title');
+  const external = document.querySelector('#workshop-external');
+  const returnButton = document.querySelector('#workshop-return');
+  const loader = document.querySelector('#workshop-loading');
+  const loadingTitle = document.querySelector('#workshop-loading-title');
+  const warning = document.querySelector('#workshop-warning');
+  const fallback = document.querySelector('#workshop-fallback');
 
   // The Atelier and the laboratory are mounted directly in the room
   // (atelier-in-room.js, alchemy-in-room.js); only the workbench, which is
   // still developed separately, opens as an embedded page.
   const frames = new Map();
-  const readyStations = new Set();
+  const readyWorkshops = new Set();
   const names = ['workbench'];
   for (const [index,id] of names.entries()) {
     const frame = index === 0 ? firstFrame : firstFrame.cloneNode(false);
@@ -44,15 +44,15 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
       frame.removeAttribute('id');
       firstFrame.parentElement.insertBefore(frame,firstFrame.nextSibling);
     }
-    frame.classList.add('original-station-frame');
-    frame.dataset.station = id;
-    frame.title = t('KEYNLOCK — оригинальная мастерская «{title}»', { title: ORIGINAL_STATIONS[id].title });
+    frame.classList.add('workshop-frame');
+    frame.dataset.workshop = id;
+    frame.title = t('KEYNLOCK — оригинальная мастерская «{title}»', { title: WORKSHOPS[id].title });
     frame.inert = true;
     frames.set(id,frame);
   }
-  let station = null;
+  let workshopId = null;
   let opened = false;
-  let inRoomStation = null;
+  let inRoomWorkshop = null;
   let warningTimer = null;
   let atelierStartTimer = null;
   let atelierFailure = null;
@@ -60,7 +60,7 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
   // Loading artwork is independent of using the correction panel. A failed
   // dynamic import must also be visible instead of leaving a permanent veil.
   function showAtelierFailure(message) {
-    if (readyStations.has('restoration')) return;
+    if (readyWorkshops.has('atelier')) return;
     atelierFailure = message || t('Редактор не завершил запуск');
     const atelier = document.querySelector('#atelier-embedded-app');
     if (!atelier) return;
@@ -88,17 +88,17 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
   }
 
   function markReady(id) {
-    const wasReady = readyStations.has(id);
-    readyStations.add(id);
-    if (opened && station === id) {
-      overlay.classList.add('station-ready');
+    const wasReady = readyWorkshops.has(id);
+    readyWorkshops.add(id);
+    if (opened && workshopId === id) {
+      overlay.classList.add('workshop-ready');
       loader.setAttribute('aria-busy', 'false');
       warning.hidden = true;
       fallback.hidden = true;
       clearTimeout(warningTimer);
     }
     if (!wasReady) onReady(id);
-    if (id === 'restoration') {
+    if (id === 'atelier') {
       clearTimeout(atelierStartTimer);
       atelierStartTimer = null;
       atelierFailure = null;
@@ -110,25 +110,25 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
 
   function ensureFrame(id) {
     const frame = frames.get(id);
-    if (frame && !frame.getAttribute('src')) frame.src = ORIGINAL_STATIONS[id].url;
+    if (frame && !frame.getAttribute('src')) frame.src = WORKSHOPS[id].url;
   }
 
   function showCurrentFrame() {
-    const restorationInRoom = inRoomStation === 'restoration';
-    const alchemyInRoom = inRoomStation === 'alchemy';
+    const atelierInRoom = inRoomWorkshop === 'atelier';
+    const alchemyInRoom = inRoomWorkshop === 'alchemy';
     for(const [id,frame] of frames) {
-      const selected = opened && id === station;
+      const selected = opened && id === workshopId;
       frame.classList.toggle('is-active',selected);
       frame.inert = !selected;
     }
     const atelier = document.querySelector('#atelier-embedded-app');
     if (atelier) {
-      atelier.classList.toggle('is-active',restorationInRoom);
-      const controlsReady = readyStations.has('restoration');
+      atelier.classList.toggle('is-active',atelierInRoom);
+      const controlsReady = readyWorkshops.has('atelier');
       atelier.classList.toggle('controls-ready',controlsReady);
       // The original range inputs respond while images/materials stream. They
       // must remain available if optional startup work fails.
-      atelier.inert = !restorationInRoom;
+      atelier.inert = !atelierInRoom;
     }
     const alchemy = document.querySelector('#alchemy-embedded-app');
     if (alchemy) {
@@ -138,28 +138,28 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
     document.querySelector('#alchemy-input-plane')?.classList.toggle('is-active',alchemyInRoom);
   }
 
-  function setInRoomStation(id) {
-    if (inRoomStation === 'restoration' && id !== 'restoration') {
+  function setInRoomWorkshopId(id) {
+    if (inRoomWorkshop === 'atelier' && id !== 'atelier') {
       const atelier = document.querySelector('#atelier-embedded-app');
       atelier?.querySelector('#collection-modal:not([hidden]) #collection-close')?.click();
       atelier?.classList.remove('collection-expanded');
     }
-    inRoomStation = id;
+    inRoomWorkshop = id;
     showCurrentFrame();
   }
 
   function preload(id) {
-    const next = ORIGINAL_STATIONS[id];
+    const next = WORKSHOPS[id];
     if (!next) return;
-    if (id === 'restoration' || id === 'alchemy') return;
+    if (id === 'atelier' || id === 'alchemy') return;
     clearTimers();
-    station = id;
-    overlay.classList.remove('station-ready');
+    workshopId = id;
+    overlay.classList.remove('workshop-ready');
     loader.setAttribute('aria-busy', 'true');
     title.textContent = next.title.toUpperCase();
     loadingTitle.textContent = t('ЗАГРУЖАЕМ ОРИГИНАЛЬНУЮ МАСТЕРСКУЮ');
     external.href = next.sourceUrl;
-    external.hidden = id === 'restoration';
+    external.hidden = id === 'atelier';
     fallback.href = next.sourceUrl;
     warning.hidden = true;
     fallback.hidden = true;
@@ -167,19 +167,19 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
   }
 
   function open(id) {
-    if (!ORIGINAL_STATIONS[id]) return;
-    if (id === 'restoration' || id === 'alchemy') return;
-    if (station !== id) preload(id);
+    if (!WORKSHOPS[id]) return;
+    if (id === 'atelier' || id === 'alchemy') return;
+    if (workshopId !== id) preload(id);
     opened = true;
-    overlay.dataset.station = id;
+    overlay.dataset.workshop = id;
     if (id !== 'alchemy') rendererHost?.activate(id);
-    overlay.classList.add('station-open');
+    overlay.classList.add('workshop-open');
     overlay.setAttribute('aria-hidden', 'false');
     showCurrentFrame();
     ensureFrame(id);
-    if (readyStations.has(id)) markReady(id);
+    if (readyWorkshops.has(id)) markReady(id);
     warningTimer = setTimeout(() => {
-      if (!opened || readyStations.has(id) || station!==id) return;
+      if (!opened || readyWorkshops.has(id) || workshopId!==id) return;
       warning.hidden = false;
       fallback.hidden = false;
     }, 11000);
@@ -189,11 +189,11 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
   function close() {
     if (!opened) return;
     opened = false;
-    overlay.classList.remove('station-open');
+    overlay.classList.remove('workshop-open');
     overlay.setAttribute('aria-hidden', 'true');
     showCurrentFrame();
     clearTimers();
-    rendererHost?.deactivate(station);
+    rendererHost?.deactivate(workshopId);
     onExit();
   }
 
@@ -206,11 +206,11 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
     const {type,open} = event.detail || {};
     // Model geometry is registered before texture decoding and control setup.
     // Only the final ready event unlocks the visible editing panel.
-    if (type === 'ready') markReady('restoration');
+    if (type === 'ready') markReady('atelier');
     if (type === 'mounted') {
       clearTimeout(atelierStartTimer);
       atelierStartTimer = setTimeout(() => {
-        if (!readyStations.has('restoration')) showAtelierFailure(t('превышено время ожидания'));
+        if (!readyWorkshops.has('atelier')) showAtelierFailure(t('превышено время ожидания'));
       }, 12000);
     }
     if (type === 'collection-open') {
@@ -251,8 +251,8 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
   returnButton.addEventListener('click', close);
   return {
     preload, open, close, isOpen: () => opened,
-    isReady: id => readyStations.has(id),
-    setInRoomStation,
+    isReady: id => readyWorkshops.has(id),
+    setInRoomWorkshopId,
     dispose() {
       clearTimers();
       clearTimeout(atelierStartTimer);
@@ -265,7 +265,7 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
       window.removeEventListener('keynlock:alchemy:v1', onAlchemyEvent);
       returnButton.removeEventListener('click', close);
       opened = false;
-      rendererHost?.deactivate(station);
+      rendererHost?.deactivate(workshopId);
     },
   };
 }

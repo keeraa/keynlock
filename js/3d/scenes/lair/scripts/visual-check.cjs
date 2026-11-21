@@ -14,7 +14,7 @@ const { chromium } = require('/opt/codex/runtimes/codex-primary-runtime/dependen
   await page.waitForTimeout(2500);
   const fps = await page.locator('#fps').innerText();
   await page.screenshot({ path: 'preview-lair.png' });
-  await page.locator('.zone-nav button[data-zone="restoration"]').click();
+  await page.locator('.zone-nav button[data-zone="atelier"]').click();
   const panel = await page.locator('#panel-title').innerText();
   const panelVisible = await page.locator('#zone-panel').isVisible();
   console.log(JSON.stringify({ fps, panel, panelVisible, errors }, null, 2));

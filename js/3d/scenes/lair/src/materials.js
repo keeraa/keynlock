@@ -25,7 +25,7 @@ export function createMaterials() {
   const ashMap = load(alchemyWood('ash'));
   const oakMap = load(alchemyWood('oak'));
   const plasterMap = load(atelierWallpaperSource, 1.3, 2.15);
-  const restorationPlasterMap = load(atelierWallpaperSource, 1, 1);
+  const atelierPlasterMap = load(atelierWallpaperSource, 1, 1);
   const floorMap = walnutMap.clone();
   floorMap.repeat.set(5.2, .68);
   floorMap.needsUpdate = true;
@@ -46,7 +46,7 @@ export function createMaterials() {
     ash: new THREE.MeshStandardMaterial({ map: ashMap, color: '#ffffff', roughness: .95 }),
     oak: new THREE.MeshStandardMaterial({ map: oakMap, color: '#ffffff', roughness: .96 }),
     plaster: new THREE.MeshStandardMaterial({ map: plasterMap, color: '#e0d8d0', roughness: 1 }),
-    restorationWall: new THREE.MeshStandardMaterial({ map: restorationPlasterMap, color: '#ffffff', roughness: 1, side: THREE.DoubleSide }),
+    atelierSideWall: new THREE.MeshStandardMaterial({ map: atelierPlasterMap, color: '#ffffff', roughness: 1, side: THREE.DoubleSide }),
     // Preserve the tile's physical size after mirroring the 30m gallery wing.
     alchemyTile: new THREE.MeshStandardMaterial({ map: makeGouacheWallTexture(THREE, 'sage', { width: 105, height: 29, textureWidth: 2048, textureHeight: 1024 }), roughness: 1, metalness: 0, side: THREE.DoubleSide }),
     wallpaperBotanical: new THREE.MeshStandardMaterial({ map: botanicalMap, color: '#e8e6d8', roughness: .99, side: THREE.DoubleSide }),
@@ -77,7 +77,7 @@ export function createMaterials() {
   // modify the real Three.js fragment shader, with no texture regeneration.
   const pigment = { saturation: { value: 1 }, contrast: { value: 1 } };
   const painted = ['walnut', 'agedWood', 'darkWood', 'ash', 'oak', 'plaster',
-    'restorationWall', 'floor', 'floorAlternate', 'alchemyTile', 'wallpaperBotanical', 'wallpaperDamask'];
+    'atelierSideWall', 'floor', 'floorAlternate', 'alchemyTile', 'wallpaperBotanical', 'wallpaperDamask'];
   for (const name of painted) {
     const material = materials[name];
     const oldCompile = material.onBeforeCompile;
@@ -98,7 +98,7 @@ export function createMaterials() {
     };
     material.customProgramCacheKey = () => 'keynlock-painted-v1';
   }
-  const scaledTextures = [walnutMap, ashMap, oakMap, plasterMap, restorationPlasterMap,
+  const scaledTextures = [walnutMap, ashMap, oakMap, plasterMap, atelierPlasterMap,
     floorMap, floorAlternateMap, botanicalMap, damaskMap];
   const originalRepeats = scaledTextures.map(map => map.repeat.clone());
   function setPaintSettings({ saturation = 100, contrast = 100, scale = 100 } = {}) {

@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import {createSharedRendererHost} from '../src/shared-renderer-host.js';
 import {createCartoonFilter} from '@keynlock/atelier/src/effects/cartoon-filter.js';
 
-test('original stations share one GPU renderer, clip to their UI stage and restore the room',()=>{
+test('original workshops share one GPU renderer, clip to their UI stage and restore the room',()=>{
   const records=[];
   const renderer={
     outputColorSpace:THREE.SRGBColorSpace,toneMapping:1,toneMappingExposure:1.1,
@@ -37,7 +37,7 @@ test('original stations share one GPU renderer, clip to their UI stage and resto
     ownerDocument:{defaultView:{frameElement:{getBoundingClientRect:()=>({left:50,top:50})}}},
     getBoundingClientRect:()=>({left:0,top:0,width:500,height:400})};
   const host=createSharedRendererHost({renderer,canvas});
-  const original=host.createRenderer('restoration',localCanvas);
+  const original=host.createRenderer('atelier',localCanvas);
   assert.equal(original.domElement,localCanvas);
   assert.equal(typeof original.getPixelRatio,'function','the Atelier expects a WebGLRenderer method');
   assert.equal(original.getPixelRatio(),1);
@@ -53,9 +53,9 @@ test('original stations share one GPU renderer, clip to their UI stage and resto
   atelierFilter.dispose();
   assert.equal(canvas.width,1200);
   original.render(new THREE.Scene(),new THREE.Camera());
-  assert.equal(records.some(record=>record.type==='render'),false,'inactive stations cannot draw');
+  assert.equal(records.some(record=>record.type==='render'),false,'inactive workshops cannot draw');
 
-  host.activate('restoration');
+  host.activate('atelier');
   original.toneMappingExposure=1.45;
   original.autoClear=false;
   const scene=new THREE.Scene(),camera=new THREE.Camera();
@@ -67,11 +67,11 @@ test('original stations share one GPU renderer, clip to their UI stage and resto
   assert.deepEqual(renderer.viewport.toArray(),[0,0,1200,800]);
   original.clearDepth();
   assert.equal(records.at(-1).enabled,true);
-  host.deactivate('restoration');
+  host.deactivate('atelier');
   assert.equal(renderer.autoClear,true);
   assert.equal(renderer.toneMappingExposure,1.1);
-  host.activate('restoration');
+  host.activate('atelier');
   assert.equal(renderer.autoClear,false,'restored workshop keeps its original composer settings');
   assert.equal(renderer.toneMappingExposure,1.45);
-  host.deactivate('restoration');
+  host.deactivate('atelier');
 });

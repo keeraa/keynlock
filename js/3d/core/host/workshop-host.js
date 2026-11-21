@@ -15,9 +15,9 @@
 /**
  * @typedef {object} RendererHost The Lair's one WebGLRenderer, shared by all workshops
  *   (see js/3d/scenes/lair/src/shared-renderer-host.js).
- * @property {(station: string, canvas: HTMLCanvasElement) => any} createRenderer
- * @property {(station: string, world: { scene: any, camera: any, additionalScenes?: any[], slot?: string }) => any} registerWorldScene
- * @property {(station: string, workshop: { enter?: () => void, exit?: () => void, update?: (now: number) => void }, options?: object) => () => void} [registerWorldWorkshop]
+ * @property {(workshopId: string, canvas: HTMLCanvasElement) => any} createRenderer
+ * @property {(workshopId: string, world: { scene: any, camera: any, additionalScenes?: any[], slot?: string }) => any} registerWorldScene
+ * @property {(workshopId: string, workshop: { enter?: () => void, exit?: () => void, update?: (now: number) => void }, options?: object) => () => void} [registerWorldWorkshop]
  * @property {() => any} [getUnifiedScene]
  * @property {() => string | null} [current]
  */
@@ -69,7 +69,7 @@ export function getWorkshopHost() {
 }
 
 /**
- * A workshop offers the Lair an API under its station id ('restoration',
+ * A workshop offers the Lair an API under its workshop id ('atelier',
  * 'alchemy'). Several calls for the same id are merged.
  */
 export function publishWorkshopApi(/** @type {string} */ id, /** @type {Record<string, any>} */ api) {

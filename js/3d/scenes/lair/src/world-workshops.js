@@ -12,7 +12,7 @@ const LAIR_FLOOR_TOP = .0385;
 export const WORKSHOP_PLACEMENTS = Object.freeze({
   // The Atelier's 32 m rear wall becomes the Lair's own 32 m left wall.
   // Both original easels, paintings and tools sit INSIDE the Lair corridor.
-  restoration: {position: [-3.7, 0, 10.35], yaw: Math.PI / 2},
+  atelier: {position: [-3.7, 0, 10.35], yaw: Math.PI / 2},
   // Original lab wall sits just in front of the Lair's right tiled wall;
   // its two-tier table has four actual feet resting on the shared floor.
   alchemy: {position: [6.86, LAIR_FLOOR_TOP - ALCHEMY_FEET_BOTTOM * ALCHEMY_SCALE, 10.1],
@@ -20,62 +20,62 @@ export const WORKSHOP_PLACEMENTS = Object.freeze({
   workbench: {position: [17.5, 3.8, 20.07], yaw: -Math.PI / 2},
 });
 
-export function createWorldStationRegistry(worldScene) {
+export function createWorldWorkshopRegistry(worldScene) {
   const roots = new Map();
   const entries = new Map();
   const activeSlots = new Map();
   const originalLightVisibility = new WeakMap();
   const scaledLights = new Map();
-  let lightedStation = null;
+  let litWorkshop = null;
 
   function forEachSourceLight(callback) {
     for (const entry of entries.values()) for (const light of entry.lights)
-      callback(light,entry.station,entry.backgroundLights?.has(light));
+      callback(light,entry.workshopId,entry.backgroundLights?.has(light));
   }
 
   function syncLighting() {
-    forEachSourceLight((light,station,backgroundOnly) => {
+    forEachSourceLight((light,workshopId,backgroundOnly) => {
       if(!originalLightVisibility.has(light))originalLightVisibility.set(light,light.visible);
       // A standalone Alchemy scene renders its backdrop separately. In the
       // shared world that second ambient/key rig would light everything twice.
-      if(station!==lightedStation || backgroundOnly)light.visible=false;
+      if(workshopId!==litWorkshop || backgroundOnly)light.visible=false;
     });
   }
 
-  function setLighting(station=null) {
-    if(lightedStation===station)return;
-    if(lightedStation)forEachSourceLight((light,id,backgroundOnly) => {
-      if(id===lightedStation && !backgroundOnly)originalLightVisibility.set(light,light.visible);
+  function setLighting(workshopId=null) {
+    if(litWorkshop===workshopId)return;
+    if(litWorkshop)forEachSourceLight((light,id,backgroundOnly) => {
+      if(id===litWorkshop && !backgroundOnly)originalLightVisibility.set(light,light.visible);
     });
-    lightedStation=station;
+    litWorkshop=workshopId;
     // The source Atelier and Alchemy furniture remain visible in the room
-    // between visits; only their interactive simulation is paused off-station.
-    for (const [id,root] of roots) root.visible = id === 'restoration' || id === 'alchemy' || id === station;
+    // between visits; only their interactive simulation is paused off-workshop.
+    for (const [id,root] of roots) root.visible = id === 'atelier' || id === 'alchemy' || id === workshopId;
     forEachSourceLight((light,id,backgroundOnly) => {
       if(!originalLightVisibility.has(light))originalLightVisibility.set(light,light.visible);
-      light.visible=id===station&&!backgroundOnly&&originalLightVisibility.get(light);
+      light.visible=id===workshopId&&!backgroundOnly&&originalLightVisibility.get(light);
     });
   }
 
-  function rootFor(station) {
-    if (roots.has(station)) return roots.get(station);
-    const placement = WORKSHOP_PLACEMENTS[station];
-    if (!placement) throw new Error(`Unknown workshop: ${station}`);
+  function rootFor(workshopId) {
+    if (roots.has(workshopId)) return roots.get(workshopId);
+    const placement = WORKSHOP_PLACEMENTS[workshopId];
+    if (!placement) throw new Error(`Unknown workshop: ${workshopId}`);
     const root = new THREE.Group();
-    root.name = `keynlock-world-${station}`;
+    root.name = `keynlock-world-${workshopId}`;
     root.position.set(...placement.position);
     root.rotation.y = placement.yaw;
     root.scale.setScalar(placement.scale || 1);
-    root.visible = station === 'restoration' || station === 'alchemy';
+    root.visible = workshopId === 'atelier' || workshopId === 'alchemy';
     worldScene.add(root);
-    roots.set(station, root);
+    roots.set(workshopId, root);
     return root;
   }
 
-  function register(station, {scene, camera, additionalScenes = [], slot = 'main'}) {
+  function register(workshopId, {scene, camera, additionalScenes = [], slot = 'main'}) {
     if (!scene?.isScene || !camera?.isCamera) throw new Error('Original THREE.Scene and camera required');
-    const root = rootFor(station);
-    const slotKey = `${station}:${slot}`;
+    const root = rootFor(workshopId);
+    const slotKey = `${workshopId}:${slot}`;
     const previous = entries.get(slotKey);
     if (previous?.scene === scene) return previous;
 
@@ -103,7 +103,7 @@ export function createWorldStationRegistry(worldScene) {
 
     // A DirectionalLight's target is normally left parentless at (0,0,0).
     // Give it the same coordinate space as the unchanged original light.
-    const entry = {station, slot, scene, camera, root: slotRoot,
+    const entry = {workshopId, slot, scene, camera, root: slotRoot,
       scenes:[scene,...additionalScenes],lights:[],backgroundLights:new WeakSet(),lightsUpdated:false};
     entry.updateLights = () => {
       const found=[];
@@ -121,7 +121,7 @@ export function createWorldStationRegistry(worldScene) {
     entry.updateLights();
     entry.lightsUpdated=false;
     entries.set(slotKey, entry);
-    slotRoot.visible = slot === (activeSlots.get(station) || 'main');
+    slotRoot.visible = slot === (activeSlots.get(workshopId) || 'main');
     root.updateWorldMatrix(true, true);
     // Source scripts finish constructing their original light rigs during
     // the same JavaScript turn; only then collect them for Lair lighting.
@@ -133,8 +133,8 @@ export function createWorldStationRegistry(worldScene) {
     return entry;
   }
 
-  function pose(station, slot = 'main') {
-    const entry = entries.get(`${station}:${slot}`);
+  function pose(workshopId, slot = 'main') {
+    const entry = entries.get(`${workshopId}:${slot}`);
     if (!entry) return null;
     // Only the camera ancestry is needed for its world pose. Recursively
     // updating the entire imported laboratory every frame can stall the UI.
@@ -154,11 +154,11 @@ export function createWorldStationRegistry(worldScene) {
     };
   }
 
-  function selectSlot(station, slot = 'main') {
-    if (station !== 'workbench') return;
-    activeSlots.set(station,slot);
+  function selectSlot(workshopId, slot = 'main') {
+    if (workshopId !== 'workbench') return;
+    activeSlots.set(workshopId,slot);
     for (const entry of entries.values()) {
-      if (entry.station === station) entry.root.visible = entry.slot === slot;
+      if (entry.workshopId === workshopId) entry.root.visible = entry.slot === slot;
     }
   }
 
@@ -175,14 +175,14 @@ export function createWorldStationRegistry(worldScene) {
   }
 
   function prepareLightsForRender() {
-    if(lightedStation!=='alchemy')return;
+    if(litWorkshop!=='alchemy')return;
     // Imported point lights are physically close together because the whole
     // lab is scaled to 28%. Three.js does not scale their inverse-square
     // intensities or cutoff distances with Object3D.scale. Correct those for
     // the render only, leaving original flicker/heat simulation values intact.
     const scale=WORKSHOP_PLACEMENTS.alchemy.scale;
-    forEachSourceLight((light,station,backgroundOnly) => {
-      if(station!=='alchemy'||backgroundOnly||!light.visible||
+    forEachSourceLight((light,workshopId,backgroundOnly) => {
+      if(workshopId!=='alchemy'||backgroundOnly||!light.visible||
         (!light.isPointLight&&!light.isSpotLight))return;
       scaledLights.set(light,{intensity:light.intensity,distance:light.distance});
       light.intensity*=scale*scale;
@@ -200,5 +200,5 @@ export function createWorldStationRegistry(worldScene) {
 
   return {register, pose, selectSlot, update, setLighting,
     prepareLightsForRender,restoreLightsAfterRender,roots, entries,
-    has: station => entries.has(`${station}:main`)};
+    has: workshopId => entries.has(`${workshopId}:main`)};
 }

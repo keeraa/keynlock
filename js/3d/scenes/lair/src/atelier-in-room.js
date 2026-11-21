@@ -25,7 +25,7 @@ export function mountAtelierInRoom(host) {
   // These are the ORIGINAL tool cursor and damage hint, placed over the Lair
   // canvas rather than inside the original Atelier's hidden viewport.
   const feedback = document.createElement('div');
-  feedback.id = 'restoration-scene-feedback';
+  feedback.id = 'atelier-scene-feedback';
   feedback.setAttribute('aria-hidden','true');
   feedback.append(atelier.querySelector('#restoration-cursor'), atelier.querySelector('#damage-hint'));
   document.querySelector('#app').appendChild(feedback);

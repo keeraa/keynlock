@@ -12,12 +12,12 @@ test('a workshop finds no host on its own site, and the Lair host once it is set
 });
 
 test('a workshop API is null until published, and parts published separately merge', () => {
-  assert.equal(getWorkshopApi('restoration'), null);
+  assert.equal(getWorkshopApi('atelier'), null);
   const gallery = { open() {} };
   const bridge = { isReady: () => true };
-  publishWorkshopApi('restoration', { gallery });
-  publishWorkshopApi('restoration', { bridge });
-  assert.equal(getWorkshopApi('restoration').gallery, gallery);
-  assert.equal(getWorkshopApi('restoration').bridge, bridge);
+  publishWorkshopApi('atelier', { gallery });
+  publishWorkshopApi('atelier', { bridge });
+  assert.equal(getWorkshopApi('atelier').gallery, gallery);
+  assert.equal(getWorkshopApi('atelier').bridge, bridge);
   assert.equal(getWorkshopApi('alchemy'), null);
 });

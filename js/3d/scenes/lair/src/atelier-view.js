@@ -3,15 +3,15 @@ import * as THREE from 'three';
 import { createCameraTransition } from '@keynlock/atelier/src/navigation/camera-transition.js';
 import { t } from './i18n.js';
 
-export function createRestorationView({
+export function createAtelierView({
   camera, controls, canvas, interaction, rendererHost, atelierFilter, host, easelPose, roomMinDistance, navigation,
 }) {
   // The Atelier publishes its gallery and restoration controls once it has loaded.
-  const atelierGallery = () => getWorkshopApi('restoration')?.gallery;
-  const atelierBridge = () => getWorkshopApi('restoration')?.bridge;
+  const atelierGallery = () => getWorkshopApi('atelier')?.gallery;
+  const atelierBridge = () => getWorkshopApi('atelier')?.bridge;
   const galleryEntry = document.querySelector('#wall-collection-entry');
   const galleryControls = document.querySelector('#lair-gallery-controls');
-  const artworkInfoPanel = document.querySelector('#restoration-art-info');
+  const artworkInfoPanel = document.querySelector('#atelier-art-info');
   const easelLabels = document.querySelector('#lair-easel-labels');
   const easelCameraControls = document.querySelector('#lair-easel-camera-controls');
   const galleryHover = document.querySelector('#lair-wall-art-hover');
@@ -27,7 +27,7 @@ export function createRestorationView({
   let atelierFovTravel = null;
 
   function focusArtwork({side, position, target, fov}) {
-    if (!navigation.isRestoring() || galleryActive) return;
+    if (!navigation.isInAtelier() || galleryActive) return;
     const destination = { position: new THREE.Vector3(...position), target: new THREE.Vector3(...target) };
     if (!easelFocusSide) {
       savedEaselView = { position: camera.position.clone(), target: controls.target.clone(), fov: camera.fov };
@@ -42,7 +42,7 @@ export function createRestorationView({
   }
 
   function focusEasels() {
-    if (!navigation.isRestoring() || galleryActive) return;
+    if (!navigation.isInAtelier() || galleryActive) return;
     const destination = savedEaselView || {
       position: new THREE.Vector3(...easelPose.position),
       target: new THREE.Vector3(...easelPose.target), fov: navigation.roomFov(),
@@ -85,7 +85,7 @@ export function createRestorationView({
 
   function enterGallery() {
     const gallery = atelierGallery();
-    if (!gallery || !rendererHost?.getWorldPose('restoration')) {
+    if (!gallery || !rendererHost?.getWorldPose('atelier')) {
       queuedGallery = true;
       return;
     }
@@ -105,13 +105,13 @@ export function createRestorationView({
   }
 
   function openWallGallery() {
-    if (!navigation.isRestoring()) navigation.openRestoration();
+    if (!navigation.isInAtelier()) navigation.openAtelier();
     enterGallery();
   }
 
   function returnToEasels() {
     leaveGallery();
-    navigation.openRestoration();
+    navigation.openAtelier();
   }
 
   function resize() {
@@ -143,7 +143,7 @@ export function createRestorationView({
     if (galleryActive && atelierGallery() && !atelierGallery().isActive())
       returnToEasels();
     if (galleryActive) {
-      const pose = rendererHost.getWorldPose('restoration');
+      const pose = rendererHost.getWorldPose('atelier');
       if (pose) {
         camera.position.copy(pose.position);
         controls.target.copy(pose.target);
@@ -182,9 +182,9 @@ export function createRestorationView({
     return false;
   }
 
-  function updateRestorationArtInfo(currentZone, blocked) {
+  function updateAtelierArtInfo(currentZone, blocked) {
     const bridge = atelierBridge();
-    const info = currentZone === 'restoration'
+    const info = currentZone === 'atelier'
       ? (galleryActive ? bridge?.wallArtworkInfo?.() : bridge?.artworkInfo?.()) : null;
     const collectionOpen = document.querySelector('#atelier-embedded-app #collection-modal')?.hidden === false;
     if (!info || collectionOpen || blocked) {
@@ -195,20 +195,20 @@ export function createRestorationView({
     const key = `${galleryActive ? 'gallery' : 'easel'}:${info.id}`;
     if (key === artworkInfoKey) return;
     artworkInfoKey = key;
-    document.querySelector('#restoration-info-index').textContent = galleryActive
+    document.querySelector('#atelier-info-index').textContent = galleryActive
       ? t('КОЛЛЕКЦИЯ КАРТИН') : t('ЭКСПОНАТ № {index} / {total}', { index: String(info.index).padStart(2, '0'), total: info.total });
-    document.querySelector('#restoration-info-title').textContent = info.title;
-    document.querySelector('#restoration-info-author').textContent = `${info.artist} · ${info.year}`;
-    document.querySelector('#restoration-info-description').textContent = info.description;
-    document.querySelector('#restoration-info-ban-label').textContent = info.banLabel;
-    document.querySelector('#restoration-info-ban-reason').textContent = info.banReason;
-    document.querySelector('#restoration-info-policy').textContent = info.policy;
+    document.querySelector('#atelier-info-title').textContent = info.title;
+    document.querySelector('#atelier-info-author').textContent = `${info.artist} · ${info.year}`;
+    document.querySelector('#atelier-info-description').textContent = info.description;
+    document.querySelector('#atelier-info-ban-label').textContent = info.banLabel;
+    document.querySelector('#atelier-info-ban-reason').textContent = info.banReason;
+    document.querySelector('#atelier-info-policy').textContent = info.policy;
   }
 
-  function updateRestorationEaselHUD(currentZone, overlayOpen) {
+  function updateAtelierEaselHUD(currentZone, overlayOpen) {
     const bridge = atelierBridge();
     const collectionOpen = document.querySelector('#atelier-embedded-app #collection-modal')?.hidden === false;
-    const showing = currentZone === 'restoration' && !galleryActive && Boolean(bridge)
+    const showing = currentZone === 'atelier' && !galleryActive && Boolean(bridge)
       && !collectionOpen && !overlayOpen;
     easelCameraControls.hidden = !showing;
     const focusedSide = showing ? bridge.focusedSide?.() : null;
@@ -236,11 +236,11 @@ export function createRestorationView({
 
   function updateGalleryEntry(currentZone) {
     const width = canvas.clientWidth, height = canvas.clientHeight;
-    const showEntry = !galleryActive && (currentZone === null || currentZone === 'restoration');
+    const showEntry = !galleryActive && (currentZone === null || currentZone === 'atelier');
     if (!showEntry) { galleryEntry.hidden = true; return; }
     const point = galleryWallAnchor.clone().project(camera);
     const onScreen = point.z >= -1 && point.z <= 1 && Math.abs(point.x) < .91 && Math.abs(point.y) < .86;
-    const pinned = !onScreen && currentZone === 'restoration';
+    const pinned = !onScreen && currentZone === 'atelier';
     galleryEntry.hidden = !onScreen && !pinned;
     galleryEntry.classList.toggle('pinned', pinned);
     if (onScreen) {
@@ -265,8 +265,8 @@ export function createRestorationView({
 
   function updateInterface({ zone, visualOpen, overlayOpen }) {
     updateGalleryEntry(zone);
-    updateRestorationArtInfo(zone, visualOpen || overlayOpen);
-    updateRestorationEaselHUD(zone, overlayOpen);
+    updateAtelierArtInfo(zone, visualOpen || overlayOpen);
+    updateAtelierEaselHUD(zone, overlayOpen);
   }
 
   function bind() {
@@ -305,8 +305,8 @@ export function createRestorationView({
       atelierBridge()?.focusEasel?.('copy'));
     document.querySelector('#lair-focus-exit').addEventListener('click', () =>
       atelierBridge()?.returnToEasels?.());
-    document.querySelector('#restoration-info-toggle').addEventListener('click', e => {
-      const body = document.querySelector('#restoration-info-body');
+    document.querySelector('#atelier-info-toggle').addEventListener('click', e => {
+      const body = document.querySelector('#atelier-info-body');
       body.hidden = !body.hidden;
       e.currentTarget.textContent = body.hidden ? '+' : '−';
       e.currentTarget.setAttribute('aria-expanded', String(!body.hidden));

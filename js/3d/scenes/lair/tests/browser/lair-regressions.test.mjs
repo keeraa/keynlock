@@ -659,3 +659,30 @@ test('an English page shows the player in English', async t => {
   assert.equal(await page.locator('#lair-music .music-controls__title').innerText(), 'Chopin · Nocturne Op. 9 No. 1');
   assert.equal(await page.locator('#lair-music').getByRole('button', { name: 'Next track' }).count(), 1);
 });
+
+test('the room draws once per frame: no transmission pass and no per-frame shadow map', async t => {
+  const page = await openRoom(t);
+  const state = await page.evaluate(() => {
+    const scene = window.__keynlockDebug.host.renderer.getUnifiedScene();
+    const transmissive = [];
+    scene.traverse(object => {
+      const materials = [object.material].flat().filter(Boolean);
+      if (object.isMesh && materials.some(material => material.transmission > 0)) transmissive.push(object.name || object.parent?.name);
+    });
+    return { transmissive };
+  });
+  // Any transmission material makes Three.js draw every opaque object again each frame.
+  assert.deepEqual(state.transmissive, []);
+  // The shadow map is refreshed about once a second, so most frames draw only to the screen.
+  const passes = await page.evaluate(async () => {
+    const gl = document.querySelector('#scene').getContext('webgl2');
+    let target = null, offscreen = 0, frames = 0;
+    const bind = gl.bindFramebuffer, draw = gl.drawElements;
+    gl.bindFramebuffer = function (kind, framebuffer) { target = framebuffer; return bind.call(this, kind, framebuffer); };
+    gl.drawElements = function (...args) { if (target) offscreen++; return draw.apply(this, args); };
+    for (; frames < 20; frames++) await new Promise(resolve => requestAnimationFrame(resolve));
+    Object.assign(gl, { bindFramebuffer: bind, drawElements: draw });
+    return { offscreenPerFrame: offscreen / frames };
+  });
+  assert.ok(passes.offscreenPerFrame < 60, `offscreen draws per frame: ${passes.offscreenPerFrame}`);
+});

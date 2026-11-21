@@ -95,6 +95,7 @@ export function createWindowBird(parent) {
     new THREE.MeshBasicMaterial({ map: texture, color: 0x262e34, transparent: true, opacity: .88,
       depthWrite: false, side: THREE.DoubleSide, toneMapped: false, fog: false }));
   bird.name = 'window-bird';
+  bird.userData.atmosphere = true;        // outside the glass: no ink outline
   bird.position.z = BIRD_Z;
   bird.renderOrder = 2;
   bird.visible = false;

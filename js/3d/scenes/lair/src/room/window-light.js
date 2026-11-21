@@ -191,6 +191,7 @@ function createAirBeams(birdUniforms) {
   });
   const beams = new THREE.Mesh(geometry, material);
   beams.name = 'window-light-air';
+  beams.userData.atmosphere = true;       // light, not a surface: never outlined
   beams.renderOrder = 3;
   beams.frustumCulled = false;
   return { beams, uniforms };
@@ -231,6 +232,7 @@ function createFloorPatch(birdUniforms) {
   });
   const patch = new THREE.Mesh(geometry, material);
   patch.name = 'window-light-floor';
+  patch.userData.atmosphere = true;
   // Just above the rug in the middle of the room, so the patch crosses it.
   patch.position.set((xFrom + xTo) / 2, .062, (zFrom + zTo) / 2);
   patch.renderOrder = 1;

@@ -20,3 +20,18 @@ test('the salon keeps warm modelling but only short overhead contact shadows', (
   assert.ok(contactSun.shadow.camera.top - contactSun.shadow.camera.bottom >= 40,
     'the shadow camera includes both halves of the long room');
 });
+
+test('at night the window side turns to dim moonlight and the lamps stay warm', () => {
+  const scene = new THREE.Scene();
+  const lighting = addRoomLighting({ THREE, scene });
+  const day = { side: lighting.sideSun.intensity, window: lighting.windowLight.intensity,
+    lamp: lighting.leftLight.color.getHex(), windowColor: lighting.windowLight.color.getHex() };
+  lighting.setNight(true);
+  assert.ok(lighting.sideSun.intensity < day.side && lighting.windowLight.intensity < day.window);
+  const { r, b } = lighting.windowLight.color;
+  assert.ok(b > r, 'moonlight is cool');
+  assert.equal(lighting.leftLight.color.getHex(), day.lamp, 'the lamps keep their warm light');
+  lighting.setNight(false);
+  assert.equal(lighting.sideSun.intensity, day.side);
+  assert.equal(lighting.windowLight.color.getHex(), day.windowColor, 'day comes back exactly');
+});

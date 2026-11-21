@@ -168,6 +168,16 @@ assert.ok(windowLightAt(underMullion, FLOOR_Y, landing) < .6 * windowLightAt(sid
 world.windowLight.setStrength(0);
 assert.equal(unique('window-light-air').visible, false, 'the window light can be switched off');
 world.windowLight.setStrength(1);
+// The bird only appears while it flies past; night swaps sun for moonlight.
+assert.equal(unique('window-bird').visible, false, 'no bird between its flights');
+const city = unique('city-distant-panorama').material;
+const airTint = unique('window-light-air').material.uniforms.uAirTint.value;
+const dayTint = airTint.getHex();
+world.setNight(true);
+assert.ok(airTint.b > airTint.r && city.color.getHex() !== 0xffffff, 'moonlight and a dark city at night');
+world.setNight(false);
+assert.equal(airTint.getHex(), dayTint);
+assert.equal(city.color.getHex(), 0xffffff, 'day comes back exactly');
 // One tiled surface for the whole right wall, with the laboratory's tile size.
 const tiles = materials.alchemyTile.map.image;
 assert.ok(tiles.width >= 2048 && tiles.height >= 1024, 'the right wall tiles are sharp enough');

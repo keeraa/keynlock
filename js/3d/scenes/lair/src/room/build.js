@@ -15,8 +15,9 @@ export function buildLair(scene, m) {
   // laboratory (@keynlock/alchemy, mounted by alchemy-in-room.js) own all
   // their furniture; the room keeps only their picking targets.
   const rightWallFinish = buildShell(kit);
-  buildWindow(kit);
+  const windowView = buildWindow(kit);
   const windowLight = createWindowLight(kit.staticGroup);
+  animated.push(windowLight.update);
   zoneTarget('atelier', [-6.93, 2.28, 12.10], [3.28, 4.9, 7.20]);
   buildPlanning(kit);
   buildWorkbench(kit);
@@ -31,6 +32,11 @@ export function buildLair(scene, m) {
   };
   return {
     anchors, hitTargets, animated, ambientParticles, windowLight,
+    /** Day: warm sun through the window. Night: moonlight and a dark city outside. */
+    setNight(/** @type {boolean} */ night) {
+      windowView.setNight(night);
+      windowLight.setNight(night);
+    },
     setRightWallpaper(name) {
       if (!Object.hasOwn(wallpapers, name) || !rightWallFinish) return false;
       rightWallFinish.material = wallpapers[name];

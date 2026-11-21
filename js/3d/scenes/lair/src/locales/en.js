@@ -43,6 +43,8 @@ export default Object.freeze({
   "Частицы Three.js": "Three.js particles",
   "Плотность частиц": "Particle density",
   "Свет из окна": "Window light",
+  "Ночь": "Night",
+  "Лунный свет из окна": "Moonlight through the window",
   "Эффекты Ателье цвета": "Colour Atelier effects",
   "В зоне реставрации": "In the restoration area",
   "Рисованный свет": "Painted light",

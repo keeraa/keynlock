@@ -7,7 +7,7 @@ const DEFAULTS = Object.freeze({
   'paint-saturation': 100, 'paint-contrast': 100, 'paint-scale': 100, 'paint-grain': 13,
   'metal-finish': 'original', 'metal-roughness': 50, 'metal-metalness': 65,
   wallpaper: 'tile', 'outline-enabled': true, 'outline-width': 65,
-  'dust-enabled': true, 'dust-density': 65, 'window-light': 100,
+  'dust-enabled': true, 'dust-density': 65, 'window-light': 100, 'night-lighting': false,
   'atelier-toon-enabled': true, 'atelier-toon-strength': 80, 'atelier-toon-bands': 4,
   'atelier-ink-enabled': true, 'atelier-ink-strength': 70, 'atelier-ink-width': 1,
   'atelier-blur-enabled': true, 'atelier-blur-strength': 72, 'atelier-blur-radius': 6.5,
@@ -42,7 +42,7 @@ export function createRoomOutlines(scene) {
 }
 
 /** Compact live materials lab. All controls affect materials, geometry or Three.js particles. */
-export function mountVisualSettings({ visual, room, outlines, grain, atelierFilter, onOpen = () => {} }) {
+export function mountVisualSettings({ visual, room, lighting = null, outlines, grain, atelierFilter, onOpen = () => {} }) {
   const panel = document.querySelector('#lair-visual-panel');
   const toggle = document.querySelector('#lair-visual-toggle');
   const inputs = [...document.querySelectorAll('[data-visual-setting]')];
@@ -96,6 +96,8 @@ export function mountVisualSettings({ visual, room, outlines, grain, atelierFilt
     room.ambientParticles.setEnabled(state['dust-enabled']);
     room.ambientParticles.setDensity(state['dust-density'] / 100);
     room.windowLight?.setStrength(state['window-light'] / 100);
+    room.setNight?.(state['night-lighting']);
+    lighting?.setNight(state['night-lighting']);
     outlines.setEnabled(state['outline-enabled']);
     outlines.setWidth(state['outline-width']);
     atelierFilter?.setOptions({

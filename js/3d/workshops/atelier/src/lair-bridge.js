@@ -7,6 +7,7 @@ import { paintings } from './atelier-config.js';
 import { chooseDemoWallPaintings } from './wall-demo.js';
 import { layoutWallPaintings } from './wall-layout.js';
 import { createIndexedDBAdapter } from './restoration-store.js';
+import { t } from './i18n.js';
 
 const LAIR_ORIGIN='https://keynlock-lair-1116.k1r11111.chatgpt.site';
 const PLAYER_KEY='atelier-restoration:player:v1';
@@ -101,7 +102,7 @@ async function refresh(force=false) {
     post({type:'snapshot',id:activePainting.id,snapshot:
       snapshot?.version===1?snapshot:null});
   }catch(error) {
-    post({type:'error',message:'Не удалось прочитать сохранение мастерской'});
+    post({type:'error',message:t('Не удалось прочитать сохранение мастерской')});
     console.warn('Atelier bridge:',error);
   }finally {
     busy=false;
@@ -126,7 +127,7 @@ window.addEventListener('message',event=>{
     const settings=Object.fromEntries(Object.entries(save.settings).filter(([id,value])=>
       byId.has(id)&&value&&typeof value==='object'));
     try{localStorage.setItem(PLAYER_KEY,JSON.stringify({version:1,selectedId:save.selectedId,settings,wallIds}));}
-    catch(error){post({type:'error',message:'Сохранение каталога недоступно'});return;}
+    catch(error){post({type:'error',message:t('Сохранение каталога недоступно')});return;}
     void refresh(true);
     return;
   }
@@ -137,7 +138,7 @@ window.addEventListener('message',event=>{
       ||snapshot.width>2048||snapshot.height>2048
       ||!keys.every(key=>snapshot.layers?.[key] instanceof Blob))return;
     void store.put(data.id,snapshot).then(saved=>{
-      if(saved!==true){post({type:'error',message:'Не удалось сохранить холст'});return;}
+      if(saved!==true){post({type:'error',message:t('Не удалось сохранить холст')});return;}
       try{localStorage.setItem(REVISION_KEY,JSON.stringify({id:data.id,at:Date.now()}));}catch{}
       void refresh(true);
     });

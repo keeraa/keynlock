@@ -1,10 +1,11 @@
 // @ts-check
+import { t } from './i18n.js';
 // Three hand-painted wood finishes. Their grain and pigment washes wrap on both
 // axes, so a shelf and a tabletop can share a texture without visible seams.
 const FINISHES = Object.freeze({
-  walnut: { name: 'Тёмный орех', shadow: [46, 27, 23], base: [91, 57, 40], highlight: [151, 101, 62], seed: 9 },
-  oak: { name: 'Медовый дуб', shadow: [103, 61, 35], base: [166, 114, 68], highlight: [215, 161, 102], seed: 22 },
-  ash: { name: 'Светлый ясень', shadow: [100, 99, 84], base: [163, 154, 127], highlight: [216, 202, 163], seed: 37 }
+  walnut: { name: t('Тёмный орех'), shadow: [46, 27, 23], base: [91, 57, 40], highlight: [151, 101, 62], seed: 9 },
+  oak: { name: t('Медовый дуб'), shadow: [103, 61, 35], base: [166, 114, 68], highlight: [215, 161, 102], seed: 22 },
+  ash: { name: t('Светлый ясень'), shadow: [100, 99, 84], base: [163, 154, 127], highlight: [216, 202, 163], seed: 37 }
 });
 
 export const WOOD_FINISHES = Object.freeze(Object.keys(FINISHES));

@@ -2,8 +2,9 @@ import markup from '../index.html?raw';
 import styles from './styles.css?inline';
 import embeddedStyles from './embedding.css?inline';
 import { createWorkshopStatus, publishWorkshopApi } from '../../../core/host/workshop-host.js';
+import { t, translator } from './i18n.js';
 
-export function createAlchemyEmbedding({ host, t }) {
+export function createAlchemyEmbedding({ host }) {
   const { status, update } = createWorkshopStatus();
   let root;
   let inputPlane;
@@ -28,6 +29,7 @@ export function createAlchemyEmbedding({ host, t }) {
     root.classList.add('lair-alchemy-embedded');
     root.inert = true;
     root.querySelectorAll('script').forEach(script => script.remove());
+    translator.translateTree(root);
 
     inputPlane = document.createElement('div');
     inputPlane.id = 'alchemy-input-plane';
@@ -42,7 +44,7 @@ export function createAlchemyEmbedding({ host, t }) {
     publishWorkshopApi('alchemy', { status });
 
     if (source) void import('./alchemy.js').catch(reportError);
-    else reportError(new Error('Не найден оригинальный интерфейс алхимии'));
+    else reportError(new Error(t('Не найден оригинальный интерфейс алхимии')));
   }
 
   function setActive(active) {

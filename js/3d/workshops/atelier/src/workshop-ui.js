@@ -1,3 +1,4 @@
+import { t } from './i18n.js';
 /** Independent visual settings panel, collapsible workbench and shortcuts. */
 export function wireWorkshopUI({ cartoonFilter, navigation, restorationInput, collectionUI, $,
   bindKeyboard = true,
@@ -13,7 +14,7 @@ export function wireWorkshopUI({ cartoonFilter, navigation, restorationInput, co
     for (const id of ['toon-strength', 'toon-steps']) $(id).disabled = !toonOn;
     for (const id of ['outline-saturation', 'outline-thickness']) $(id).disabled = !outlineOn;
     $('toon-strength-value').textContent = `${$('toon-strength').value}%`;
-    $('toon-steps-value').textContent = `${$('toon-steps').value} ступ.`;
+    $('toon-steps-value').textContent = t('{steps} ступ.', { steps: $('toon-steps').value });
     $('outline-saturation-value').textContent = `${$('outline-saturation').value}%`;
     $('outline-thickness-value').textContent = `${$('outline-thickness').value} px`;
     cartoonFilter.setOptions({
@@ -50,10 +51,10 @@ export function wireWorkshopUI({ cartoonFilter, navigation, restorationInput, co
     workbenchContent.hidden = !visible;
     workbench.classList.toggle('is-collapsed', !visible);
     toggle.setAttribute('aria-expanded', String(visible));
-    const label = visible ? 'Скрыть нижнее меню' : 'Показать нижнее меню';
+    const label = visible ? t('Скрыть нижнее меню') : t('Показать нижнее меню');
     toggle.setAttribute('aria-label', label);
     toggle.title = label;
-    toggle.querySelector('.workbench-toggle-label').textContent = visible ? 'СКРЫТЬ ПАНЕЛЬ' : 'ПОКАЗАТЬ ПАНЕЛЬ';
+    toggle.querySelector('.workbench-toggle-label').textContent = visible ? t('СКРЫТЬ ПАНЕЛЬ') : t('ПОКАЗАТЬ ПАНЕЛЬ');
     toggle.querySelector('.workbench-toggle-symbol').textContent = visible ? '⌄' : '⌃';
   }
   toggle.addEventListener('click', () => setWorkbenchVisible(workbenchContent.hidden));

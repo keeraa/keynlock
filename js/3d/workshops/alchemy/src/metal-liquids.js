@@ -1,4 +1,5 @@
 // @ts-check
+import { t } from './i18n.js';
 // Seven visibly different metal fluids. Each has its own painted surface and
 // physical finish; mercury and silver also reflect the workshop environment.
 // Procedural DataTextures are ready immediately, without async dark frames.
@@ -7,13 +8,13 @@ const smooth = t => t * t * (3 - 2 * t);
 const TAU = Math.PI * 2;
 
 export const METAL_LIQUID_FINISHES = Object.freeze({
-  stannum: Object.freeze({ name: 'сатиновое олово', roughness: .88, metalness: .18, clearcoat: .06, clearcoatRoughness: .8, envMapIntensity: .2 }),
-  plumbum: Object.freeze({ name: 'зернистый свинец', roughness: .97, metalness: .08, clearcoat: 0, clearcoatRoughness: 1, envMapIntensity: .1 }),
-  aurum: Object.freeze({ name: 'тёплое полированное золото', roughness: .31, metalness: .72, clearcoat: .4, clearcoatRoughness: .20, envMapIntensity: .72, reflective: true }),
-  cuprum: Object.freeze({ name: 'медная патина', roughness: .48, metalness: .53, clearcoat: .2, clearcoatRoughness: .38, envMapIntensity: .52, reflective: true }),
-  hydrargyrum: Object.freeze({ name: 'зеркальная ртуть', roughness: .025, metalness: 1, clearcoat: 1, clearcoatRoughness: .018, envMapIntensity: 2.45, reflective: true, mirror: true }),
-  argentum: Object.freeze({ name: 'глянцевое серебро', roughness: .16, metalness: .85, clearcoat: .82, clearcoatRoughness: .08, envMapIntensity: 1.12, reflective: true }),
-  ferrum: Object.freeze({ name: 'тёмное окисленное железо', roughness: .84, metalness: .22, clearcoat: .015, clearcoatRoughness: .85, envMapIntensity: .16 })
+  stannum: Object.freeze({ name: t('сатиновое олово'), roughness: .88, metalness: .18, clearcoat: .06, clearcoatRoughness: .8, envMapIntensity: .2 }),
+  plumbum: Object.freeze({ name: t('зернистый свинец'), roughness: .97, metalness: .08, clearcoat: 0, clearcoatRoughness: 1, envMapIntensity: .1 }),
+  aurum: Object.freeze({ name: t('тёплое полированное золото'), roughness: .31, metalness: .72, clearcoat: .4, clearcoatRoughness: .20, envMapIntensity: .72, reflective: true }),
+  cuprum: Object.freeze({ name: t('медная патина'), roughness: .48, metalness: .53, clearcoat: .2, clearcoatRoughness: .38, envMapIntensity: .52, reflective: true }),
+  hydrargyrum: Object.freeze({ name: t('зеркальная ртуть'), roughness: .025, metalness: 1, clearcoat: 1, clearcoatRoughness: .018, envMapIntensity: 2.45, reflective: true, mirror: true }),
+  argentum: Object.freeze({ name: t('глянцевое серебро'), roughness: .16, metalness: .85, clearcoat: .82, clearcoatRoughness: .08, envMapIntensity: 1.12, reflective: true }),
+  ferrum: Object.freeze({ name: t('тёмное окисленное железо'), roughness: .84, metalness: .22, clearcoat: .015, clearcoatRoughness: .85, envMapIntensity: .16 })
 });
 
 // A tiny, shared equirectangular reflection of the workshop: tall diffuse

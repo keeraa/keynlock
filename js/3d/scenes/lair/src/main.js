@@ -103,7 +103,7 @@ function setup() {
   const atelier = createAtelierEmbedding({ host: host.atelier, t,
     onPanelHeight: height => app.style.setProperty('--atelier-panel-height', `${height}px`),
   });
-  const alchemy = createAlchemyEmbedding({ host: host.alchemy, t });
+  const alchemy = createAlchemyEmbedding({ host: host.alchemy });
   const inRoomWorkshops = { atelier, alchemy };
   const rendererHost = createSharedRendererHost({ renderer, canvas, worldScene: scene,
     onWorkshopError: (id, error) => inRoomWorkshops[id]?.reportError(error),

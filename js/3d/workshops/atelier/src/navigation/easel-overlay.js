@@ -1,3 +1,4 @@
+import { t } from '../i18n.js';
 /** 2D easel labels and focus controls, independent of camera motion. */
 export function createEaselOverlay({ THREE, camera, stage, easelX, labelLayer,
   getPaintingCenterY, getTexture, getTool, inWallMode, $ }) {
@@ -18,23 +19,23 @@ export function createEaselOverlay({ THREE, camera, stage, easelX, labelLayer,
     const next = $('next-painting');
     stepper.classList.add('focused');
     if (activeSide) {
-      $('step-number').textContent = activeSide === 'original' ? 'ОРИГИНАЛ' : 'КОПИЯ';
+      $('step-number').textContent = activeSide === 'original' ? t('ОРИГИНАЛ') : t('КОПИЯ');
       previous.disabled = activeSide === 'original';
       next.disabled = activeSide === 'copy';
-      previous.setAttribute('aria-label', 'Перейти к оригиналу');
-      next.setAttribute('aria-label', 'Перейти к изменённой копии');
+      previous.setAttribute('aria-label', t('Перейти к оригиналу'));
+      next.setAttribute('aria-label', t('Перейти к изменённой копии'));
     } else {
-      $('step-number').textContent = 'СРАВНЕНИЕ';
+      $('step-number').textContent = t('СРАВНЕНИЕ');
       previous.disabled = next.disabled = false;
-      previous.setAttribute('aria-label', 'Приблизить оригинал');
-      next.setAttribute('aria-label', 'Приблизить изменённую копию');
+      previous.setAttribute('aria-label', t('Приблизить оригинал'));
+      next.setAttribute('aria-label', t('Приблизить изменённую копию'));
     }
   }
 
   function updateFocusedHint() {
     $('scene-hint-text').textContent = getTool()
-      ? 'Зажмите на копии — реставрация · S/↓ — общий вид · A/D — картины'
-      : '← / A — оригинал · → / D — копия · Пробел — сменить · S / ↓ — общий вид';
+      ? t('Зажмите на копии — реставрация · S/↓ — общий вид · A/D — картины')
+      : t('← / A — оригинал · → / D — копия · Пробел — сменить · S / ↓ — общий вид');
   }
 
   function enterFocus(side) {
@@ -49,7 +50,8 @@ export function createEaselOverlay({ THREE, camera, stage, easelX, labelLayer,
     document.querySelector('.stage').classList.remove('focused');
     labelLayer.classList.remove('is-focused');
     $('focus-exit').hidden = true;
-    $('scene-hint-text').innerHTML = 'Клик / W / ↑ — приблизить <span class="hint-divider">·</span> S / ↓ — общий вид <span class="hint-divider">·</span> A/D, ←/→ — картины';
+    $('scene-hint-text').innerHTML = [t('Клик / W / ↑ — приблизить'), t('S / ↓ — общий вид'), t('A/D, ←/→ — картины')]
+      .join(' <span class="hint-divider">·</span> ');
     updateStepper(null);
   }
 

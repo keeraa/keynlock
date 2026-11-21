@@ -523,7 +523,7 @@ test('first-person walking slides against furniture and walls, interacts, and re
     camera.position.z = spawnZ;
     return { walk, sprint };
   }, spawn[2]);
-  assert.ok(Math.abs(measured.walk - 4.4) < .5, 'walking matches the Key Archive speed');
+  assert.ok(Math.abs(measured.walk - 4.4) < .5, `walking matches the Key Archive speed (${JSON.stringify(measured)})`);
   assert.ok(Math.abs(measured.sprint - 7.4) < .8, 'holding Shift matches the Key Archive sprint speed');
 
   await page.keyboard.down('KeyW');

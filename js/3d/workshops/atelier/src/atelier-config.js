@@ -1,10 +1,11 @@
 // @ts-check
 import { keynlockPaintings, paintingCategory, restorationTint } from './painting-catalog.js';
+import { localizePainting, t } from './i18n.js';
 
 // Bundled with the workshop, so it works on its own site and inside the Lair.
 // Literal paths: Vite can follow only those into the build.
 
-export const featuredPaintings = [
+export const featuredPaintings = /** @type {any[]} */ ([
   {
     id: 'girl-pearl', category: 'baroque', title: 'Девушка с жемчужной серёжкой', short: 'Девушка с серьгой', artist: 'Ян Вермеер', year: 'около 1665',
     image: new URL('./assets/paintings/vermeer-girl.jpg', import.meta.url).href, hue: 22, saturation: 0.73, brightness: 1.15,
@@ -25,18 +26,18 @@ export const featuredPaintings = [
     id: 'mona-lisa', category: 'renaissance', title: 'Мона Лиза', short: 'Мона Лиза', artist: 'Леонардо да Винчи', year: '1503–1519',
     image: new URL('./assets/paintings/leonardo-mona.jpg', import.meta.url).href, hue: 14, saturation: 1.31, brightness: 0.79,
   },
-];
+]).map(localizePainting);
 
 const featuredIds = new Set(featuredPaintings.map((art) => art.id));
 export const paintings = [
   ...featuredPaintings,
   ...keynlockPaintings.filter((art) => !featuredIds.has(art.id)).map((art) => ({
     ...art, short: art.title, category: paintingCategory(art), ...restorationTint(art.id),
-  })),
+  })).map(localizePainting),
 ];
 
 export const woodVariants = [
-  { name: 'Охра', image: new URL('./assets/textures/wood-oak-gouache-v2.webp', import.meta.url).href, grade: { contrast: .94, saturation: .71, tint: [-8, -2, 14] } },
-  { name: 'Орех', image: new URL('./assets/textures/wood-walnut-gouache-v2.webp', import.meta.url).href, grade: { contrast: .72, saturation: .91, tint: [0, 2, 4] } },
-  { name: 'Пепел', image: new URL('./assets/textures/wood-ash-gouache-v2.webp', import.meta.url).href },
+  { name: t('Охра'), image: new URL('./assets/textures/wood-oak-gouache-v2.webp', import.meta.url).href, grade: { contrast: .94, saturation: .71, tint: [-8, -2, 14] } },
+  { name: t('Орех'), image: new URL('./assets/textures/wood-walnut-gouache-v2.webp', import.meta.url).href, grade: { contrast: .72, saturation: .91, tint: [0, 2, 4] } },
+  { name: t('Пепел'), image: new URL('./assets/textures/wood-ash-gouache-v2.webp', import.meta.url).href },
 ];

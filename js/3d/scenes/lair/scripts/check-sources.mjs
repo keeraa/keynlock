@@ -32,7 +32,8 @@ const ALLOWED_COPIES = [
   ['workshops/alchemy/src/assets/painted-steel.webp', 'scenes/lair/public/stations/workbench/assets/painted-steel.webp'],
 ];
 // Entry points that every app has under the same name.
-const COMMON_NAMES = new Set(['main.js']);
+// Every package has its own entry, translator and dictionaries under these names.
+const COMMON_NAMES = new Set(['main.js', 'i18n.js', 'en.js', 'ru.js']);
 
 function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {

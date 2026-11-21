@@ -1,5 +1,6 @@
 import { chooseDemoWallPaintings } from './wall-demo.js';
 import { createWallArtworkInfo } from './wall-artwork-info.js';
+import { t } from './i18n.js';
 
 const CLOSE_UP_FRAME_FRACTION = .48;
 
@@ -13,11 +14,11 @@ export function createWallExhibitionController({ paintings, playerProgress, wall
   let viewedId = null;
   let lastAutoPickAt = -Infinity;
   const artworkInfo = createWallArtworkInfo({ $ });
-  const displaySwitchLabel = () => showingDemo ? 'МОИ КАРТИНЫ' : 'ДЕМО · 30';
+  const displaySwitchLabel = () => showingDemo ? t('МОИ КАРТИНЫ') : t('ДЕМО · 30');
 
   function updateCounters() {
     const count = playerProgress.getWallIds().length;
-    $('wall-count').textContent = showingDemo ? `${demoArtworks.length} ДЕМО` : `${count} / 30`;
+    $('wall-count').textContent = showingDemo ? t('{count} ДЕМО', { count: demoArtworks.length }) : `${count} / 30`;
     $('wall-select-count').textContent = `${count}/30`;
     $('collection-wall-count').textContent = `${count}/30`;
     $('wall-gallery-demo').textContent = displaySwitchLabel();
@@ -40,7 +41,7 @@ export function createWallExhibitionController({ paintings, playerProgress, wall
   function toggleWall(id) {
     const result = playerProgress.toggleWall(id);
     if (!result.changed && result.reason === 'full') {
-      showToast('На стене уже 30 картин. Снимите одну, чтобы повесить другую.');
+      showToast(t('На стене уже 30 картин. Снимите одну, чтобы повесить другую.'));
     }
     if (result.changed) {
       refreshAfterWallChange();

@@ -1,5 +1,6 @@
 // @ts-check
 import { PIGMENT_SWATCHES, PLANETARY_METALS, RECIPE_LEVELS } from './recipes.js';
+import { t } from './i18n.js';
 
 // High-resolution parchment, kept sharp as the camera moves. All layout
 // coordinates use a 1024 × 626 virtual page rendered at double resolution.
@@ -111,9 +112,9 @@ export function createRecipeSheetTexture(THREE, document) {
     ctx.font = '26px Georgia, serif';
     ctx.fillText(`ALCHEMIA · ${String(recipe.number).padStart(2, '0')}`, 512, 96);
     ctx.font = 'bold 58px Georgia, serif';
-    ctx.fillText('РЕЦЕПТ ЗЕЛЬЯ', 512, 171);
+    ctx.fillText(t('РЕЦЕПТ ЗЕЛЬЯ'), 512, 171);
     ctx.font = '25px Georgia, serif';
-    ctx.fillText(`ЛИСТ ${level} ИЗ 3 · ${RECIPE_LEVELS[level].title.toUpperCase()}`, 512, 215);
+    ctx.fillText(t('ЛИСТ {level} ИЗ 3 · {title}', { level, title: RECIPE_LEVELS[level].title.toUpperCase() }), 512, 215);
     ctx.strokeStyle = 'rgba(103,67,36,.57)';
     ctx.beginPath();
     ctx.moveTo(140, 229);
@@ -125,7 +126,7 @@ export function createRecipeSheetTexture(THREE, document) {
     } else {
       ctx.fillStyle = '#865c36';
       ctx.font = 'bold 24px Georgia, serif';
-      ctx.fillText('I · СМЕШАТЬ И НАГРЕТЬ', 512, 268);
+      ctx.fillText(t('I · СМЕШАТЬ И НАГРЕТЬ'), 512, 268);
       paintStage(stages[0], 335, 72);
       ctx.strokeStyle = 'rgba(103,67,36,.33)';
       ctx.beginPath();
@@ -133,12 +134,12 @@ export function createRecipeSheetTexture(THREE, document) {
       ctx.lineTo(782, 400);
       ctx.stroke();
       ctx.fillStyle = '#865c36';
-      ctx.fillText('II · ДОБАВИТЬ И НАГРЕТЬ', 512, 438);
+      ctx.fillText(t('II · ДОБАВИТЬ И НАГРЕТЬ'), 512, 438);
       paintStage(stages[1], 502, 72);
     }
     ctx.fillStyle = '#875435';
     ctx.font = '26px Georgia, serif';
-    ctx.fillText('нажми на лист · открыть книгу', 512, 569);
+    ctx.fillText(t('нажми на лист · открыть книгу'), 512, 569);
     ctx.restore();
     texture.needsUpdate = true;
   }

@@ -19,11 +19,18 @@ import { createPerformanceHUD } from './performance-hud.js';
 import { createRestorationFeedback } from './restoration-feedback.js';
 import { getPaintingLore, getPaintingLoreLabels } from './lore/painting-lore.js';
 import { getWorkshopHost, publishWorkshopApi } from '../../../core/host/workshop-host.js';
+import { t, translator } from './i18n.js';
 // The embedding entry mounts the interface before starting the workshop.
 // A standalone visit supplies its own renderer and stylesheet.
 const lair = getWorkshopHost();
 const directRoot = lair?.atelier.root || null;
 if (!directRoot) void import('./style.css');
+// The standalone page translates itself; in the Lair the embedding has already
+// translated the Atelier's markup.
+if (!directRoot) {
+  document.documentElement.lang = translator.language;
+  translator.translateTree(document);
+}
 const $ = (id) => {
   if (!directRoot) return document.getElementById(id);
   const selector = `#${CSS.escape(id)}`;
@@ -47,7 +54,7 @@ featuredPaintings.forEach((art, i) => {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'art-item';
-  button.setAttribute('aria-label', `Выбрать картину: ${art.title}`);
+  button.setAttribute('aria-label', t('Выбрать картину: {title}', { title: art.title }));
   button.innerHTML = `<img src="${art.image}" alt="" loading="eager"/><span><strong>${art.short}</strong><small>${art.artist}</small></span>`;
   button.addEventListener('click', () => showPainting(i));
   $('art-list').appendChild(button);
@@ -181,7 +188,7 @@ const restorationStore = createRestorationStore({
     console.warn(message, error);
     if (!persistenceWarningShown) {
       persistenceWarningShown = true;
-      showToast('Браузер не сохранил реставрацию — хранилище недоступно');
+      showToast(t('Браузер не сохранил реставрацию — хранилище недоступно'));
     }
   },
 });
@@ -409,7 +416,7 @@ async function showPainting(index) {
   const art = paintings[next];
   const request = ++paintingRequest;
   if (next !== selected || !activeTexture) {
-    $('art-title').textContent = 'Загружаем репродукцию…';
+    $('art-title').textContent = t('Загружаем репродукцию…');
   }
   let texture;
   // Only a failed image request warrants the "image unavailable" message.
@@ -421,8 +428,8 @@ async function showPainting(index) {
     console.error('Не удалось скачать репродукцию:', art.image, error);
     $('art-title').textContent = paintings[selected].title;
     showToast(error?.message?.startsWith('Timed out loading artwork:')
-      ? 'Загрузка затянулась. Пока покажем картину из локальной коллекции.'
-      : 'Изображение недоступно. Выберите другую картину.');
+      ? t('Загрузка затянулась. Пока покажем картину из локальной коллекции.')
+      : t('Изображение недоступно. Выберите другую картину.'));
     if (!activeTexture && next !== 0) void showPainting(0);
     return;
   }
@@ -448,7 +455,7 @@ async function showPainting(index) {
     paintingTextureCache.trim(art.image);
   } catch (error) {
     console.error('Ошибка подготовки 3D-полотна:', art.id, error);
-    showToast('Не удалось подготовить полотно для реставрации');
+    showToast(t('Не удалось подготовить полотно для реставрации'));
     return;
   }
   // A pending image selection must not invalidate the surface of the painting still on display.
@@ -497,7 +504,7 @@ async function showPainting(index) {
   } catch (error) {
     if (request !== displayedPaintingRequest) return;
     console.error('Ошибка слоя реставрации:', art.id, error);
-    showToast('Не удалось восстановить слой повреждений картины');
+    showToast(t('Не удалось восстановить слой повреждений картины'));
   }
 }
 
@@ -591,7 +598,7 @@ async function init() {
     if (embedded) {
       const galleryReady = await exhibition.refresh({ onProgress: ({ loaded, total }) =>
         lair.atelier.reportStatus?.({ galleryProgress: { loaded, total } }) });
-      if (!galleryReady) throw new Error('Не удалось подготовить настенную галерею');
+      if (!galleryReady) throw new Error(t('Не удалось подготовить настенную галерею'));
       lair.atelier.reportStatus?.({ galleryReady: true });
     } else {
       void exhibition.refresh();
@@ -602,8 +609,8 @@ async function init() {
     }
   } catch (error) {
     console.error('Ошибка загрузки репродукций:', error);
-    if (!embedded) $('loading').querySelector('small').textContent = 'НЕ УДАЛОСЬ ЗАГРУЗИТЬ КАРТИНЫ';
-    lair?.atelier.reportStatus?.({ error: error?.message || 'Не удалось загрузить картину' });
+    if (!embedded) $('loading').querySelector('small').textContent = t('НЕ УДАЛОСЬ ЗАГРУЗИТЬ КАРТИНЫ');
+    lair?.atelier.reportStatus?.({ error: error?.message || t('Не удалось загрузить картину') });
   }
 }
 // The source Three.js meshes are already attached to the Lair scene here;

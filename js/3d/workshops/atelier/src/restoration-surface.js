@@ -7,6 +7,7 @@
 import { paintAgingTextures } from './aging-textures.js';
 import { createUVFluorescence } from './uv-fluorescence.js';
 import { applyRestorationStamp, RESTORATION_TOOLS } from './restoration-operations.js';
+import { t } from './i18n.js';
 
 // These layers contain the actual edits. UV is recomputed from scan + uvSource.
 export const RESTORATION_SNAPSHOT_LAYERS = ['dust', 'dirt', 'cracks', 'loss', 'varnish', 'uvSource', 'scan'];
@@ -238,20 +239,20 @@ export function createRestorationSurface({ THREE, width, height, seed = 1 }) {
     }
 
     if (nearbyAlpha(loss.context) > 28) {
-      return { type: 'loss', title: 'СКОЛ КРАСКИ', action: 'Кисть · 8', tool: 'retouch' };
+      return { type: 'loss', title: t('СКОЛ КРАСКИ'), action: t('Кисть · 8'), tool: 'retouch' };
     }
     if (nearbyAlpha(varnish.context) > 17 || nearbyAlpha(cracks.context) > 35) {
       const scanned = nearbyAlpha(scan.context) > 12;
-      return { type: 'varnish', title: 'СТАРЫЙ ЛАК ИЛИ ТРЕЩИНЫ',
-        action: scanned ? 'Реагент · 6' : 'УФ · 5 → реагент · 6', tool: scanned ? 'reagent' : 'uv' };
+      return { type: 'varnish', title: t('СТАРЫЙ ЛАК ИЛИ ТРЕЩИНЫ'),
+        action: scanned ? t('Реагент · 6') : t('УФ · 5 → реагент · 6'), tool: scanned ? 'reagent' : 'uv' };
     }
     if (nearbyAlpha(dirt.context) > 20) {
-      return { type: 'dirt', title: 'ГРЯЗЬ И ПЯТНА', action: 'Тампон · 7', tool: 'swab' };
+      return { type: 'dirt', title: t('ГРЯЗЬ И ПЯТНА'), action: t('Тампон · 7'), tool: 'swab' };
     }
     if (nearbyAlpha(dust.context) > 12) {
-      return { type: 'dust', title: 'СЛОЙ ПЫЛИ', action: 'Щётка · 4', tool: 'brush' };
+      return { type: 'dust', title: t('СЛОЙ ПЫЛИ'), action: t('Щётка · 4'), tool: 'brush' };
     }
-    return { type: 'clean', title: 'УЧАСТОК ОЧИЩЕН', action: 'Фактура оригинала сохранена', tool: null };
+    return { type: 'clean', title: t('УЧАСТОК ОЧИЩЕН'), action: t('Фактура оригинала сохранена'), tool: null };
   }
 
   function mount(group) {

@@ -1,4 +1,5 @@
 // @ts-check
+import { t } from '../i18n.js';
 /** DOM adapter for the reusable alchemy look. No scene creation here. */
 export function createVisualPanel({$, queryAll, visuals, woodAssets, selectWallFinish,
   selectWoodFinish, setLightDirection, setLightStrength, setSunbeam,
@@ -30,7 +31,7 @@ export function createVisualPanel({$, queryAll, visuals, woodAssets, selectWallF
       });
     }
     for (const [id,key,unit] of [
-      ['toon-strength','toonStrength','%'],['toon-steps','toonSteps',' ступ.'],
+      ['toon-strength','toonStrength','%'],['toon-steps','toonSteps',` ${t('ступ.')}`],
       ['outline-saturation','outlineSaturation','%'],['outline-width','outlineWidth',' px'],
       ['brush-expression','brushExpression','%'],['cartoon-material','cartoonMaterial','%'],
     ]) {

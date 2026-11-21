@@ -30,6 +30,7 @@ export function buildGramophone(kit) {
   rim.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), bellAxis);
   rim.castShadow = true;
   horn.add(rim);
+  vinyl.userData.dynamic = true;   // spins: keep it out of the static merge
   animated.push(t => { vinyl.rotation.y = t * .12; });
   zoneTarget('gramophone', [1.97, 1.55, -3.68], [1.58, 2.25, 1.12]);
   return chest;

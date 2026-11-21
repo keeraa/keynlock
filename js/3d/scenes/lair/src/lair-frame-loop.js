@@ -36,6 +36,7 @@ export function startLairFrames({ scene, camera, controls, renderer, rendererHos
 
     for (const update of room.animated) update(clock.elapsedTime);
     const currentZone = zoneTransitions.current();
+    room.windowLight?.setAirHidden(currentZone === 'atelier');
     const overlayOpen = workshopOverlay.isOpen();
     zoneInteraction.update(currentZone);
     atelierView.updateInterface({ zone: currentZone, visualOpen: visualUI.isOpen(), overlayOpen });

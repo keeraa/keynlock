@@ -280,6 +280,11 @@ for (const [name, point] of [
   assert.ok(Math.abs(furnitureDepth - (point.z - WINDOW_OPENING.wallZ)) < 1.4, `${name} records a shadow at the furniture depth`);
   assert.ok(furnitureDepth + .1 < floorShadow.z - WINDOW_OPENING.wallZ, `${name} interrupts the ray before it meets the floor`);
 }
+world.windowLight.setAirHidden(true);
+assert.equal(unique('window-light-air').visible, false, 'the Atelier view hides the haze in the air');
+assert.equal(unique('window-light-floor').visible, true, 'but keeps the sunlit floor');
+world.windowLight.setAirHidden(false);
+assert.equal(unique('window-light-air').visible, true);
 world.windowLight.setStrength(0);
 assert.equal(unique('window-light-air').visible, false, 'the window light can be switched off');
 world.windowLight.setStrength(1);

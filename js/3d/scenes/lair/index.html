@@ -21,7 +21,22 @@
         </div>
         <div class="location"><span class="gold-line"></span> СТАРЫЙ КВАРТАЛ <span class="gold-line"></span></div>
         <div class="top-actions">
-          <div class="stats" aria-label="Производительность"><span><b id="fps">—</b> FPS</span><i></i><span><b id="triangles">—</b> ТРЕУГ.</span></div>
+          <div class="perf">
+            <button id="perf-toggle" class="perf-toggle" type="button" aria-expanded="false" aria-controls="perf-panel" title="Производительность сцены"><b id="fps">—</b> FPS</button>
+            <div id="perf-panel" class="perf-panel" hidden>
+              <div id="perf-triangles-row" class="perf-row perf-row-hover" tabindex="0" title="Все проходы кадра: сцена, карта теней и контуры"><span>Треугольники в кадре</span><strong id="triangles">—</strong></div>
+              <div id="perf-breakdown" class="perf-breakdown" hidden>
+                <h4>Где больше всего треугольников</h4>
+                <ol id="perf-breakdown-list"></ol>
+              </div>
+              <div class="perf-row"><span>Треугольники в сцене</span><strong id="perf-scene-triangles">—</strong></div>
+              <div class="perf-row"><span>Вызовы отрисовки</span><strong id="perf-calls">—</strong></div>
+              <div class="perf-row"><span>CPU кадра ср. / пик</span><strong id="perf-cpu">—</strong></div>
+              <div class="perf-row"><span>Точечный свет</span><strong id="perf-lights">—</strong></div>
+              <div class="perf-row"><span>Геометрии / текстуры</span><strong id="perf-memory">—</strong></div>
+              <div class="perf-row"><span>Разрешение</span><strong id="perf-resolution">—</strong></div>
+            </div>
+          </div>
           <button id="lair-visual-toggle" class="visual-toggle" type="button" aria-controls="lair-visual-panel" aria-expanded="false">⚙ <span>ВИЗУАЛ</span></button>
           <button id="sound-toggle" class="icon-button" type="button" aria-label="Звуковое окружение" aria-pressed="false" title="Звуковое окружение">♪</button>
         </div>

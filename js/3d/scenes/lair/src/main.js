@@ -10,6 +10,8 @@ import { createSharedRendererHost } from './rendering/shared-renderer-host.js';
 import { createCartoonFilter } from '@keynlock/atelier/src/effects/cartoon-filter.js';
 import { addRoomLighting } from './room/lighting.js';
 import { createDayNight } from './room/day-night.js';
+import { mountPerformancePanel } from './ui/performance-panel.js';
+import './ui/performance.css';
 import { createZoneTransitions, ATELIER_EASELS } from './navigation/zone-transitions.js';
 import { createAtelierView } from './workshops/atelier-view.js';
 import { createInitialLoadingGate } from './ui/initial-loading.js';
@@ -35,12 +37,12 @@ const canvas = document.querySelector('#scene');
 const interaction = document.querySelector('#scene-interaction');
 const loading = document.querySelector('#loading');
 const fallback = document.querySelector('#fallback');
-const fpsLabel = document.querySelector('#fps');
-const triangleLabel = document.querySelector('#triangles');
 const panel = document.querySelector('#zone-panel');
 let renderer, scene, camera, controls, room, rendererHost, atelierFilter;
 let visualUI, workshopOverlay, zoneTransitions, atelierView, dayNight;
 let lastSceneTriangles = 0;
+let lastDrawCalls = 0;
+let performancePanel = null;
 let startPointer = null;
 let hoveredZone = null;
 const homePosition = new THREE.Vector3(.25, 8.35, 31.2);
@@ -49,7 +51,6 @@ const roomMinDistance = 3;
 const clock = new THREE.Clock();
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
-let frames = 0, fpsTime = 0;
 
 function setup() {
   try {
@@ -148,6 +149,7 @@ function setup() {
   });
   const outlines = createRoomOutlines(scene);
   // The window, the city, the room light and the lamps change together, gradually.
+  performancePanel = mountPerformancePanel({ document, renderer, scene, canvas });
   dayNight = createDayNight(night => { room.setNight(night); lighting.setNight(night); });
   visualUI = mountVisualSettings({ visual, room, setNight: night => dayNight.set(night), outlines, atelierFilter,
     grain: document.querySelector('.grain'), onOpen: () => { panel.hidden = true; } });
@@ -283,20 +285,18 @@ function animate() {
         atelierFilter.setFocus(camera.position.distanceTo(controls.target));
         const frame = atelierFilter.render();
         lastSceneTriangles = frame.sceneTriangles ?? frame.triangles ?? 0;
+        lastDrawCalls = frame.calls ?? renderer.info.render.calls;
       } else {
         renderer.render(scene, camera);
         lastSceneTriangles = renderer.info.render.triangles;
+        lastDrawCalls = renderer.info.render.calls;
       }
     } finally {
       rendererHost.restoreWorldLightsAfterRender();
     }
   }
-  frames++; fpsTime += frameDelta;
-  if (fpsTime >= .65) {
-    fpsLabel.textContent = Math.round(frames / fpsTime).toString();
-    triangleLabel.textContent = new Intl.NumberFormat('ru-RU').format(lastSceneTriangles);
-    frames = 0; fpsTime = 0;
-  }
+  performancePanel?.frame(frameDelta, performance.now() - now,
+    { triangles: lastSceneTriangles, calls: lastDrawCalls });
 }
 
 // Gentle room ambience is original procedural sound. The selected Chopin recordings are not embedded here.

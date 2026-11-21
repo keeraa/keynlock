@@ -333,6 +333,14 @@ test('the room hosts both workshops on one canvas through the host contract', as
     .getObjectByName('extended-back-wall').visible), false);
   assert.equal(await page.locator('#alchemy-embedded-app .wall-choices').isHidden(), true);
 
+  // The FPS button opens the performance panel; the triangle row shows where they are.
+  await page.locator('#perf-toggle').click();
+  await page.waitForFunction(() => /\d/.test(document.querySelector('#perf-calls').textContent));
+  await page.locator('#perf-triangles-row').hover();
+  assert.ok(await page.locator('#perf-breakdown-list li').count() >= 3, 'the largest triangle owners are listed');
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('#perf-panel').isHidden(), true);
+
   // The Atelier's own tools work inside the room.
   await page.locator('.zone-nav [data-zone="atelier"]').click();
   await page.locator('#lair-focus-copy').click();

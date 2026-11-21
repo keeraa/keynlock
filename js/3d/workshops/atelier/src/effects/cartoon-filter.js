@@ -162,8 +162,9 @@ export function createCartoonFilter({ THREE, renderer, scene, camera, renderScen
     const swapped = [];
     // Transparent casings should not cover the internal pins in the normal buffer.
     scene.traverse(object => {
-      // Atmospheric sprites belong only to the color pass, never the metal outline.
-      if (object.isPoints && object.userData.atmosphere && object.visible) {
+      // Atmosphere (dust, light beams, sunlit patches) belongs only to the color
+      // pass: drawn here as solid surfaces, its edges would be outlined in ink.
+      if (object.userData.atmosphere && object.visible) {
         object.visible = false;
         hidden.push(object);
         return;

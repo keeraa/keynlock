@@ -302,7 +302,6 @@
 #atelier-embedded-app.collection-expanded .main,
 #atelier-embedded-app.collection-expanded .workbench {height:100%}
 #atelier-embedded-app.collection-expanded .workbench {overflow: hidden}
-.atelier-mode .chapter-caption,
 .atelier-mode .scene-hotspots,
 .atelier-mode .bottom-ui .interaction-hint,
 .atelier-mode .bottom-ui .zone-nav {display:none}

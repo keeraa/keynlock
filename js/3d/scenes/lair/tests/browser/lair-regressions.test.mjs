@@ -327,6 +327,11 @@ test('the room hosts both workshops on one canvas through the host contract', as
     return count;
   });
   assert.equal(atelierShadowLights, 0);
+  // The room's right wall is tiled from floor to ceiling; the lab's own shorter
+  // wall and its tile colour buttons (which only paint that wall) are hidden.
+  assert.equal(await page.evaluate(() => window.__keynlockDebug.host.renderer.getUnifiedScene()
+    .getObjectByName('extended-back-wall').visible), false);
+  assert.equal(await page.locator('#alchemy-embedded-app .wall-choices').isHidden(), true);
 
   // The Atelier's own tools work inside the room.
   await page.locator('.zone-nav [data-zone="atelier"]').click();

@@ -4,6 +4,8 @@ import * as THREE from 'three';
 import { createMaterials } from '../src/room/materials.js';
 import { buildLair } from '../src/room/build.js';
 import { createRoomOutlines } from '../src/ui/visual-settings.js';
+import { windowLightAt, FLOOR_Y, WINDOW_LIGHT_SLOPE } from '../src/room/window-light.js';
+import { WINDOW_OPENING } from '../src/room/window.js';
 
 // Exercise the scene graph without a GPU or browser canvas.
 const noop = () => {};
@@ -152,6 +154,24 @@ assert.ok(outlines.shells.every(shell => shell.material.uniforms.strokeScale.val
 for (const name of ['wood-gouache-walnut.webp', 'wood-gouache-ash.webp', 'wood-gouache-oak.webp']) {
   assert.ok(existsSync(new URL(`../../../workshops/alchemy/src/assets/${name}`, import.meta.url)), `${name} available`);
 }
+// Window light: one function places the beams, the floor patch and the lit dust.
+assert.ok(unique('window-light-air').visible && unique('window-light-floor').visible, 'window light is on by default');
+// A ray through the middle of the lower pane: between the sill and the first transom.
+const landing = WINDOW_OPENING.wallZ + ((WINDOW_OPENING.sill + WINDOW_OPENING.transomHeights[0]) / 2 - FLOOR_Y) / WINDOW_LIGHT_SLOPE.y;
+const sideways = WINDOW_OPENING.centerX + 1.0 - (landing - WINDOW_OPENING.wallZ) * WINDOW_LIGHT_SLOPE.x;
+assert.ok(windowLightAt(sideways, FLOOR_Y, landing) > .8, 'sunlight lands on the floor inside the room');
+assert.equal(windowLightAt(sideways, FLOOR_Y, WINDOW_OPENING.wallZ - 1), 0, 'no light behind the window wall');
+assert.equal(windowLightAt(WINDOW_OPENING.centerX + 7, FLOOR_Y, landing), 0, 'no light beside the window');
+const underMullion = WINDOW_OPENING.centerX + WINDOW_OPENING.mullionOffsets[2] - (landing - WINDOW_OPENING.wallZ) * WINDOW_LIGHT_SLOPE.x;
+assert.ok(windowLightAt(underMullion, FLOOR_Y, landing) < .6 * windowLightAt(sideways, FLOOR_Y, landing),
+  'the window frame casts its shadow into the light');
+world.windowLight.setStrength(0);
+assert.equal(unique('window-light-air').visible, false, 'the window light can be switched off');
+world.windowLight.setStrength(1);
+// One tiled surface for the whole right wall, with the laboratory's tile size.
+const tiles = materials.alchemyTile.map.image;
+assert.ok(tiles.width >= 2048 && tiles.height >= 1024, 'the right wall tiles are sharp enough');
+
 let objects = 0, triangles = 0;
 scene.traverse(obj => {
   if (!obj.isMesh || !obj.geometry) return;

@@ -42,6 +42,7 @@ export default Object.freeze({
   "Пыль в лучах света": "Dust in the light beams",
   "Частицы Three.js": "Three.js particles",
   "Плотность частиц": "Particle density",
+  "Свет из окна": "Window light",
   "Эффекты Ателье цвета": "Colour Atelier effects",
   "В зоне реставрации": "In the restoration area",
   "Рисованный свет": "Painted light",

@@ -48,7 +48,9 @@ export function createMaterials() {
     plaster: new THREE.MeshStandardMaterial({ map: plasterMap, color: '#e0d8d0', roughness: 1 }),
     atelierSideWall: new THREE.MeshStandardMaterial({ map: atelierPlasterMap, color: '#ffffff', roughness: 1, side: THREE.DoubleSide }),
     // Preserve the tile's physical size after mirroring the 30m gallery wing.
-    alchemyTile: new THREE.MeshStandardMaterial({ map: makeGouacheWallTexture(THREE, 'sage', { width: 105, height: 29, textureWidth: 2048, textureHeight: 1024 }), roughness: 1, metalness: 0, side: THREE.DoubleSide }),
+    // The whole right wall is one tiled surface. Its tiles match the laboratory's
+    // own (~0.52 x 0.56 m: 62 across the 32 m wall, 24 rows up its 13.5 m).
+    alchemyTile: new THREE.MeshStandardMaterial({ map: makeGouacheWallTexture(THREE, 'sage', { width: 114.5, height: 48.4, textureWidth: 2560, textureHeight: 1024 }), roughness: 1, metalness: 0, side: THREE.DoubleSide }),
     wallpaperBotanical: new THREE.MeshStandardMaterial({ map: botanicalMap, color: '#e8e6d8', roughness: .99, side: THREE.DoubleSide }),
     wallpaperDamask: new THREE.MeshStandardMaterial({ map: damaskMap, color: '#f1e9d6', roughness: .99, side: THREE.DoubleSide }),
     floor: new THREE.MeshStandardMaterial({ map: floorMap, color: '#fff4e8', roughness: 1 }),

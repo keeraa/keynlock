@@ -2,6 +2,24 @@ import * as THREE from 'three';
 import { makeCityWindowTexture, makeCityDepthTexture, makeCurtainLinenTexture } from './materials.js';
 
 // The arched window on the far wall, the city behind it and the curtains.
+const WINDOW_POSITION = Object.freeze([-.05, 2.23, -5.65]);
+const halfWidth = 4.15, straightHeight = 5.20, archRise = 2.10;
+// The window frame: upright mullions and horizontal transoms (window-local).
+const MULLION_X = Object.freeze([-2.02, 0, 2.02]);
+const TRANSOM_Y = Object.freeze([2.68, straightHeight - .04]);
+
+/** The glazed opening in world units; the window light is cast through it. */
+export const WINDOW_OPENING = Object.freeze({
+  centerX: WINDOW_POSITION[0],
+  wallZ: -5.485,                                   // front face of the masonry
+  sill: WINDOW_POSITION[1] + .08,                  // bottom of the glass
+  spring: WINDOW_POSITION[1] + straightHeight - .05, // where the arch begins
+  crown: WINDOW_POSITION[1] + straightHeight - .05 + archRise - .16,
+  halfWidth: halfWidth - .18,
+  mullionOffsets: MULLION_X,                     // across the opening, from its centre
+  transomHeights: TRANSOM_Y.map(y => WINDOW_POSITION[1] + y),
+});
+
 export function buildWindow(kit) {
   const { m, staticGroup, animated, shadow, paintedWood, woodPeriod, box, rod } = kit;
   // A real recessed opening with three painted exterior planes at different
@@ -27,9 +45,8 @@ export function buildWindow(kit) {
   const window = new THREE.Group();
   window.name = 'main-arched-window';
   // Timber sits within the 27 cm masonry, behind its front face at z=-5.485.
-  window.position.set(-.05, 2.23, -5.65);
+  window.position.set(...WINDOW_POSITION);
   staticGroup.add(window);
-  const halfWidth = 4.15, straightHeight = 5.20, archRise = 2.10;
   const archProfile = (half, spring, rise, base = 0) => {
     const shape = new THREE.Shape();
     shape.moveTo(-half, base);
@@ -81,11 +98,11 @@ export function buildWindow(kit) {
   box(window, 8.65, .22, .48, m.walnut, 0, -.02, .37, .035).name = 'main-arched-window-sill';
   box(window, 8.01, .085, .13, m.oldBrass, 0, .13, .35);
   // All mullions meet the arched glazing: no floating rectangular top rail.
-  for (const x of [-2.02, 0, 2.02]) {
+  for (const x of MULLION_X) {
     const roof = straightHeight - .05 + (archRise - .16) * Math.sqrt(1 - (x / (halfWidth - .18)) ** 2);
     box(window, .115, roof - .08, .13, m.darkWood, x, (roof + .08) / 2, .25);
   }
-  for (const y of [2.68, straightHeight - .04]) box(window, 7.94, .11, .14, m.darkWood, 0, y, .24);
+  for (const y of TRANSOM_Y) box(window, 7.94, .11, .14, m.darkWood, 0, y, .24);
   // Dense woven linen with actual pleated geometry. The fixed top edge is
   // suspended from a wall-wide brass pole level with the upper crossbar.
   rod(window, [-4.13, straightHeight - .04, .55], [4.13, straightHeight - .04, .55], .043, m.oldBrass, 12)

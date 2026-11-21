@@ -15,7 +15,8 @@ export const zoneDefinitions = {
   planning: {
     number: '02', kicker: t('БАЗА КОМАНДЫ'), title: t('Карта и дела'),
     description: t('Карта каналов и кварталов Киенлока, заметки о заказах и стол, за которым Кай, Сай и Тик готовят очередную вылазку. Сюда команда возвращается с добычей.'),
-    status: t('Штаб связывает мастерские, коллекцию и будущие сюжетные задания.'),
+    // A placeholder until the campaign has jobs and outings to show here.
+    status: t('Скоро здесь: заказы, вылазки и выход в город. Раздел в разработке.'),
     link: null, camera: [.15, 3.32, 7.75], target: [0, 1.27, -.7],
   },
   workbench: {

@@ -29,6 +29,7 @@ import './ui/initial-loading.css';
 import './ui/visual.css';
 import './ui/room-walk.css';
 import './workshops/workshop-overlay.css';
+import { createReturnButton } from './ui/return-button.js';
 
 document.documentElement.lang = translator.language;
 translator.translateTree(document);
@@ -95,7 +96,7 @@ function setup() {
   const atelier = createAtelierEmbedding({ host: host.atelier, t,
     onPanelHeight: height => app.style.setProperty('--atelier-panel-height', `${height}px`),
   });
-  const alchemy = createAlchemyEmbedding({ host: host.alchemy, t, onExit: () => zoneTransitions.reset() });
+  const alchemy = createAlchemyEmbedding({ host: host.alchemy, t });
   const inRoomWorkshops = { atelier, alchemy };
   const rendererHost = createSharedRendererHost({ renderer, canvas, worldScene: scene,
     onWorkshopError: (id, error) => inRoomWorkshops[id]?.reportError(error),
@@ -182,8 +183,10 @@ function setup() {
   }
   window.addEventListener('resize', resize);
   resize();
+  const returnButton = createReturnButton({ button: document.querySelector('#reset-camera'), t });
   startLairFrames({ scene, camera, controls, renderer, rendererHost, atelierFilter, room, dayNight,
-    zoneTransitions, zoneInteraction, cameraInput, atelierView, workshopOverlay, visualUI, performancePanel });
+    zoneTransitions, zoneInteraction, cameraInput, atelierView, workshopOverlay, visualUI, performancePanel,
+    returnButton });
 }
 
 setup();

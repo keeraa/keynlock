@@ -79,13 +79,17 @@ async function openRoom(t, { locale = 'ru-RU', pointerLock = false, beforeLoad }
   assert.equal(response.status(), 200);
   await page.locator('#app > #loading').waitFor({ state: 'hidden' });
   assert.equal(await page.locator('#app > #fallback').isVisible(), false, 'WebGL must render the room');
+  assert.equal(await page.locator('#reset-camera').isHidden(), true, 'nothing to return to at the overview');
   return page;
 }
 
 async function enterAlchemy(page) {
   await page.locator('.zone-nav [data-zone="alchemy"]').click();
   await page.waitForFunction(() => window.__keynlockDebug.workshop('alchemy')?.lifecycle?.isActive());
-  await page.getByRole('button', { name: 'Выйти из алхимии в логово' }).waitFor();
+  await page.getByRole('button', { name: 'Вернуться в логово' }).waitFor();
+  // One way back for every mode, in one place: no second exit inside the lab.
+  assert.equal(await page.getByRole('button', { name: /в логово/i }).count(), 1);
+  assert.equal((await page.locator('#reset-camera span').innerText()).trim(), 'В ЛОГОВО');
   const visualToggle = page.locator('#alchemy-visual-toggle');
   if (await visualToggle.getAttribute('aria-expanded') === 'true') await visualToggle.click();
 }
@@ -158,7 +162,7 @@ test('the burner accounts for active time when returning to the lab', async t =>
   await page.evaluate(() => window.__keynlockDebug.workshop('alchemy').toggleBurner());
   assert.equal(await page.evaluate(() => window.__keynlockDebug.workshop('alchemy').getState().burnerOn), true);
   await page.waitForFunction(() => window.__keynlockDebug.workshop('alchemy').getState().recipeHeatSeconds > .1);
-  await page.getByRole('button', { name: 'Выйти из алхимии в логово' }).click();
+  await page.getByRole('button', { name: 'Вернуться в логово' }).click();
   assert.equal(await page.evaluate(() => window.__keynlockDebug.workshop('alchemy').lifecycle.isActive()), false);
   const pausedHeat = await page.evaluate(() => window.__keynlockDebug.workshop('alchemy').getState().recipeHeatSeconds);
 
@@ -258,6 +262,14 @@ test('switching workshops returns the shared camera, input, and lights to the ro
   }
 
   const reset = page.locator('#reset-camera');
+  // The planning corner is a placeholder: a panel, but no workshop to open.
+  await page.locator('.zone-nav [data-zone="planning"]').click();
+  await page.locator('#zone-panel').waitFor();
+  assert.equal(await page.locator('#panel-link').isVisible(), false, 'no workshop link without a workshop');
+  assert.equal((await page.locator('#reset-camera span').innerText()).trim(), 'ОБЩИЙ ВИД');
+  await reset.click();
+  await assertHome();
+
   await page.locator('.zone-nav [data-zone="atelier"]').click();
   await page.waitForFunction(position =>
     window.__keynlockDebug.host.camera.position.toArray().some((value, axis) => Math.abs(value - position[axis]) > 3),
@@ -293,7 +305,7 @@ test('switching workshops returns the shared camera, input, and lights to the ro
   await assertHome();
 
   await enterAlchemy(page);
-  await page.getByRole('button', { name: 'Выйти из алхимии в логово' }).click();
+  await page.getByRole('button', { name: 'Вернуться в логово' }).click();
   await assertHome();
 
   const orbitPoint = await page.evaluate(() => {
@@ -462,8 +474,7 @@ for (const [id, healthy, chunk, message] of [
 
     await page.locator(`.zone-nav [data-zone="${id}"]`).click();
     await page.locator(`#${id}-embedded-app`).getByRole('alert').filter({ hasText: message }).waitFor();
-    if (id === 'alchemy') await page.getByRole('button', { name: 'Выйти из алхимии в логово' }).click();
-    else await page.locator('#reset-camera').click();
+    await page.locator('#reset-camera').click();
     assert.equal(await page.locator(`#${id}-embedded-app`).isHidden(), true);
 
     if (healthy === 'alchemy') await enterAlchemy(page);

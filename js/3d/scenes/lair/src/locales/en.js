@@ -1,6 +1,7 @@
 // English for the Lair's own texts. Keys are the Russian texts exactly as they
 // appear (whitespace collapsed); a missing entry falls back to Russian.
 export default Object.freeze({
+  "Общий вид": "Overview",
   "Все проходы кадра: сцена, карта теней и контуры": "Every pass of the frame: the scene, the shadow map and the outlines",
   "Производительность сцены": "Scene performance",
   "Треугольники в кадре": "Triangles in the frame",
@@ -144,7 +145,7 @@ export default Object.freeze({
   "Мольберты и картины находятся в общей 3D-сцене логова.": "The easels and paintings are part of the Lair's shared 3D scene.",
   "БАЗА КОМАНДЫ": "TEAM BASE",
   "Карта каналов и кварталов Киенлока, заметки о заказах и стол, за которым Кай, Сай и Тик готовят очередную вылазку. Сюда команда возвращается с добычей.": "A map of Keynlock's canals and quarters, notes on jobs and the table where Kai, Sai and Tik plan their next outing. The team comes back here with their finds.",
-  "Штаб связывает мастерские, коллекцию и будущие сюжетные задания.": "The base ties together the workshops, the collection and future story quests.",
+  "Скоро здесь: заказы, вылазки и выход в город. Раздел в разработке.": "Coming soon: jobs, outings and the way out into the city. This section is in progress.",
   "МАСТЕРСКАЯ ТИКА": "TIK'S WORKSHOP",
   "Справа от алхимического стола, вдоль зелёной стены, стоит отдельный верстак с тисками, заготовками, замочными цилиндрами и инструментальной доской.": "To the right of the alchemy table, along the green wall, stands a workbench with a vice, key blanks, lock cylinders and a tool board.",
   "Полная исходная мастерская: опиловка, сборка замка, песочница механизмов.": "The full original workshop: key filing, lock assembly and a mechanism sandbox.",
@@ -166,6 +167,4 @@ export default Object.freeze({
   "Реставрация не запустилась: {reason}": "Restoration did not start: {reason}",
   "превышено время ожидания": "it took too long",
   "Ошибка лаборатории: {reason}": "Laboratory error: {reason}",
-  "← В ЛОГОВО": "← TO THE LAIR",
-  "Выйти из алхимии в логово": "Leave alchemy for the Lair",
 });

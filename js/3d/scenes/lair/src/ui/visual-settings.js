@@ -11,30 +11,45 @@ const DEFAULTS = Object.freeze({
 
 /** Reuse Village Engine's ink silhouette shader on room objects of manageable size. */
 export function createRoomOutlines(scene) {
-  const ink = createInkOutlines(THREE, { enabled: true, color: 0x2b241d, screenWidth: .0031 });
+  // The floor planks' top is at 3.85 cm; nothing is inked below it (see minWorldY).
+  const ink = createInkOutlines(THREE, { enabled: true, color: 0x2b241d, screenWidth: .0031, minWorldY: .03 });
   const shells = [];
   let enabled = true, width = .65;
   const applyShell = shell => {
     shell.visible = enabled;
     if (shell.material?.uniforms?.strokeScale) shell.material.uniforms.strokeScale.value = width;
   };
-  /** Outline these named objects too, with the current settings (the Atelier's furniture loads later). */
-  function attach(names) {
+  const adopt = object => object.traverse(child => {
+    if (child.userData?.inkOutlineShell && child.isMesh && !shells.includes(child)) {
+      shells.push(child);
+      applyShell(child);
+    }
+  });
+  const style = { registrationOffset: [.00008, -.00011], strokeScale: .65 };
+  /**
+   * Outline these named objects too, with the current settings (the Atelier's
+   * furniture loads later). skip(mesh) leaves out parts that change later.
+   */
+  function attach(names, { skip = null } = {}) {
     for (const name of names) {
       const object = scene.getObjectByName(name);
-      if (!object || !ink.attach(object, { registrationOffset: [.00008, -.00011], strokeScale: .65 })) continue;
-      object.traverse(child => {
-        if (child.userData?.inkOutlineShell && child.isMesh && !shells.includes(child)) {
-          shells.push(child);
-          applyShell(child);
-        }
-      });
+      if (object && ink.attach(object, { ...style, skip })) adopt(object);
+    }
+  }
+  /** Outline every mesh under root that passes test and has no outline yet (frames come and go). */
+  function attachEach(root, test) {
+    const found = [];
+    root?.traverse(child => { if (child.isMesh && !child.userData.inkOutlineShell && test(child)) found.push(child); });
+    for (const mesh of found) if (ink.attach(mesh, style)) adopt(mesh);
+    for (let i = shells.length - 1; i >= 0; i--) {
+      if (!shells[i].parent) shells.splice(i, 1);           // its frame was taken down
     }
   }
   attach(['main-arched-window', 'planning-main-table', 'workbench-right-of-alchemy', 'gramophone-table']);
   return {
     shells,
     attach,
+    attachEach,
     setEnabled(value) { enabled = Boolean(value); shells.forEach(applyShell); },
     setWidth(percent) {
       width = THREE.MathUtils.clamp(Number(percent) || 0, 20, 140) / 100;

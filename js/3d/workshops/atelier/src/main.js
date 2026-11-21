@@ -298,7 +298,9 @@ workshopUI = wireWorkshopUI({ cartoonFilter, navigation, restorationInput, colle
 if (embedded) publishWorkshopApi('atelier', { input: { handleKey: workshopUI.handleKey },
   // Wood, metal, floor and wall finishes, never the paintings: the Lair applies
   // its own gouache settings to these.
-  look: { paintedMaterials: () => [...Object.values(mats), ...floorWoodMaterials, wallpaperMaterial].filter(Boolean) } });
+  look: { paintedMaterials: () => [...Object.values(mats), ...floorWoodMaterials, wallpaperMaterial].filter(Boolean),
+    // Every painting frame, on the easels and on the wall, uses this material.
+    frameMaterial: mats.frameWood } });
 exhibition = createWallExhibitionController({ paintings, playerProgress, wallGallery, collectionUI,
   getNavigation: () => navigation, getWorkshopUI: () => workshopUI, showToast, $ });
 exhibition.bind();

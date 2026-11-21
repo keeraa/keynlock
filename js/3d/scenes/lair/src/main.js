@@ -171,8 +171,21 @@ function setup() {
       roomWalk.refreshObstacles();
       // One look for the whole room: the Atelier's furniture takes the room's
       // outlines and gouache settings (the paintings keep their true colours).
-      outlines.attach(['restoration-left-easel', 'restoration-right-easel', 'restoration-worktable', 'restoration-wall-shelf']);
-      visual.adoptPaintedMaterials(getWorkshopApi('atelier')?.look?.paintedMaterials?.());
+      const atelierLook = getWorkshopApi('atelier')?.look;
+      outlines.attach(['restoration-worktable', 'restoration-wall-shelf']);
+      // The easels resize to each painting and the frames come and go with
+      // the paintings: one merged hull would stay behind (black bars on the
+      // floor). Each of their parts gets its own outline that moves with it,
+      // checked once a second for new frames.
+      const atelierRoot = scene.getObjectByName('keynlock-world-atelier');
+      const easels = ['restoration-left-easel', 'restoration-right-easel'].map(name => scene.getObjectByName(name));
+      const outlineMovingParts = () => {
+        for (const easel of easels) outlines.attachEach(easel, mesh => mesh.material?.isMeshStandardMaterial);
+        if (atelierLook?.frameMaterial) outlines.attachEach(atelierRoot, mesh => mesh.material === atelierLook.frameMaterial);
+      };
+      outlineMovingParts();
+      setInterval(outlineMovingParts, 1000);
+      visual.adoptPaintedMaterials(atelierLook?.paintedMaterials?.());
     },
     onAlchemyReady() {
       roomWalk.refreshObstacles();

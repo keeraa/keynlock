@@ -5,7 +5,9 @@ import { preview } from 'vite';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-const timeout = process.env.CI ? 90_000 : 30_000;
+// CI renders WebGL in software, about 20 times slower than a desktop GPU. The
+// camera flights and pouring advance per frame, so their waits stretch with it.
+const timeout = process.env.CI ? 240_000 : 30_000;
 const viewport = { width: 1280, height: 860 };
 let server;
 let browser;

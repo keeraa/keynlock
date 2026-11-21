@@ -1,3 +1,4 @@
+// @ts-check
 export const VISUAL_STORAGE_KEY = 'keynlock-key-archive-visual-v1';
 
 // The shared KEYNLOCK painted/locks preset: gouache, stepped light, fine ink.

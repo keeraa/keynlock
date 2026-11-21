@@ -1,3 +1,4 @@
+// @ts-check
 import { DEFAULT_VISUAL_SETTINGS, normalizeVisualSettings } from './visual-settings.js';
 import { saveVisualSettings } from './archive-save-state-with-route.js';
 

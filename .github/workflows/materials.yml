@@ -4,11 +4,13 @@ on:
     paths:
       - 'js/3d/shared/materials/**'
       - 'js/3d/scenes/**/assets/**'
+      - 'js/3d/workshops/**/assets/**'
       - '.github/workflows/materials.yml'
   pull_request:
     paths:
       - 'js/3d/shared/materials/**'
       - 'js/3d/scenes/**/assets/**'
+      - 'js/3d/workshops/**/assets/**'
       - '.github/workflows/materials.yml'
 jobs:
   verify:

@@ -1,3 +1,4 @@
+// @ts-check
 import { describeBathContents } from './rules.js';
 
 const EMPTY = Object.freeze([]);

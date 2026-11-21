@@ -1,3 +1,4 @@
+// @ts-check
 /** Warm side lighting with short, nearly vertical object shadows. */
 export function addRoomLighting({ THREE, scene }) {
   scene.add(new THREE.HemisphereLight('#ffe5bb', '#36453f', 2.0));

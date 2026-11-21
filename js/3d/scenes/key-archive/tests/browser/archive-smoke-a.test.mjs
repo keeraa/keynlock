@@ -2,15 +2,10 @@
 // The three parts are balanced by CI run time so they run as parallel shards.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { join } from 'node:path';
-import { ENTRANCE_CANDLE } from '../../dist/js/archive-candles.js';
-import { BACKUP_STORAGE_KEY } from '../../dist/js/archive-save-state-with-route.js';
-import { BUNDLE_COST, createInitialState, pickupKey, STORAGE_KEY } from '../../dist/js/rules.js';
-import { CABINET_CELL_BACK_Z, CABINET_GRID_BOTTOM_Y, CABINET_GROUND_OFFSET, CABINET_HEADER_Y, CABINET_Z, pegForSlot } from '../../dist/js/cabinet-layout.js';
-import { FIRST_ROUTE_KEY_ID } from '../../dist/js/archive-first-route-guide.js';
+import { createInitialState, STORAGE_KEY } from '../../dist/js/rules.js';
+import { CABINET_CELL_BACK_Z, CABINET_GROUND_OFFSET, CABINET_Z, pegForSlot } from '../../dist/js/cabinet-layout.js';
 import { FIXTURE_OFFSETS } from '../../dist/js/station-layout.js';
-import { RUST_TRAY } from '../../dist/js/rust-tray.js';
-import { SLOW, screenshots, browser, baseUrl, occupiedSlots, enterArchive, installTestCamera } from './harness.mjs';
+import { SLOW, browser, baseUrl, enterArchive, installTestCamera } from './harness.mjs';
 
 test('a dirty floor key can be cleaned, filed, restored after reload and retrieved', { timeout: 120000 * SLOW }, async t => {
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });

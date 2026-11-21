@@ -1,7 +1,8 @@
+// @ts-check
 import { t, familyName } from './i18n.js';
 import * as THREE from '../vendor/three.js';
 import {
-  KEY_TYPES, TOTAL_KEYS, MAX_HELD, pickupKey, selectedKey, putKeyInCabinet,
+  TOTAL_KEYS, MAX_HELD, pickupKey, selectedKey, putKeyInCabinet,
   takeKeyFromCabinet, cabinetSlotKey, trashSelectedKey, dropSelectedKey, getProgress,
   startSoak, collectSoakedKey, BUNDLE_COST, buyBundle, putBundleInCabinet, meltSelectedWax,
   heldBatch, putHeldBatchInCabinet,

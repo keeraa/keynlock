@@ -1,3 +1,4 @@
+// @ts-check
 import { CABINET_PLACE_SECONDS } from './cabinet-layout.js';
 
 export const BUNDLE_RELEASE_INTERVAL_MS = 330;

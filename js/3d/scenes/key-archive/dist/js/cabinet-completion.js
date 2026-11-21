@@ -1,3 +1,4 @@
+// @ts-check
 import { CABINET_CAPACITY, CABINET_COLUMNS, CABINET_ROWS } from './cabinet-layout.js';
 
 export const COMPLETION_SECONDS = 2.25;

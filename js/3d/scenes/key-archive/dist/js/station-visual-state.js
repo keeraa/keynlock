@@ -1,3 +1,4 @@
+// @ts-check
 import { SOAK_SECONDS } from './station-layout.js';
 
 const clamp01 = value => Math.max(0, Math.min(1, value));

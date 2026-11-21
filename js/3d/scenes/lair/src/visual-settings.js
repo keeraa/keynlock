@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { createInkOutlines } from './engine/ink-outlines.js';
+import { t } from './i18n.js';
 
 const STORAGE_KEY = 'keynlock-lair-visual-v1';
 const DEFAULTS = Object.freeze({
@@ -16,7 +17,7 @@ const DEFAULTS = Object.freeze({
 export function createRoomOutlines(scene) {
   const ink = createInkOutlines(THREE, { enabled: true, color: 0x2b241d, screenWidth: .0031 });
   const targetNames = [
-    // The Atelier and the laboratory are mounted from integrations/ with their own look.
+    // The Atelier and the laboratory are mounted from js/3d/workshops with their own look.
     'main-arched-window', 'planning-main-table', 'workbench-right-of-alchemy', 'gramophone-table',
   ];
   for (const name of targetNames) {
@@ -72,7 +73,7 @@ export function mountVisualSettings({ visual, room, outlines, grain, atelierFilt
       else input.value = state[input.id];
       const output = document.querySelector(`#${input.id}-output`);
       if (output) {
-        const unit = input.id === 'atelier-toon-bands' ? ' ступ.'
+        const unit = input.id === 'atelier-toon-bands' ? ' ' + t('ступ.')
           : input.id === 'atelier-ink-width' || input.id === 'atelier-blur-radius' ? ' px' : '%';
         output.textContent = `${state[input.id]}${unit}`;
       }

@@ -1,3 +1,4 @@
+// @ts-check
 // Give only the carried model this light. Forge materials are also shared by
 // floor keys, inserted keys and thumbnails.
 export function addHeldKeyWindowLight(model, strength, warmth = { value: 0 }) {

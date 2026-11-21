@@ -1,3 +1,4 @@
+// @ts-check
 import * as THREE from '../vendor/three.js';
 
 // BoxGeometry normally stretches one entire image across each face, whether

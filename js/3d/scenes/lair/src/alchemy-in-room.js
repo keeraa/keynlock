@@ -1,8 +1,9 @@
 /** Run the original alchemy application in the Lair DOM and 3D world. */
-import alchemyHTML from '../integrations/alchemy/index.html?raw';
-import alchemyCSS from '../integrations/alchemy/src/styles.css?inline';
+import alchemyHTML from '@keynlock/alchemy/index.html?raw';
+import alchemyCSS from '@keynlock/alchemy/src/styles.css?inline';
+import { t } from './i18n.js';
 
-export function mountAlchemyInRoom() {
+export function mountAlchemyInRoom(host) {
   const source = new DOMParser().parseFromString(alchemyHTML, 'text/html');
   const root = source.querySelector('#experience');
   if (!root) throw new Error('Не найден оригинальный интерфейс алхимии');
@@ -18,8 +19,8 @@ export function mountAlchemyInRoom() {
   const exit = document.createElement('button');
   exit.type = 'button';
   exit.className = 'lair-alchemy-exit';
-  exit.textContent = '← В ЛОГОВО';
-  exit.setAttribute('aria-label', 'Выйти из алхимии в логово');
+  exit.textContent = t('← В ЛОГОВО');
+  exit.setAttribute('aria-label', t('Выйти из алхимии в логово'));
   root.appendChild(exit);
   root.querySelectorAll('script').forEach(script => script.remove());
   const style = document.createElement('style');
@@ -27,9 +28,9 @@ export function mountAlchemyInRoom() {
   style.textContent = `@scope (#alchemy-embedded-app) {\n${alchemyCSS}\n}`;
   document.head.appendChild(style);
   document.querySelector('#app').append(inputPlane, root);
-  window.__keynlockAlchemyEmbedRoot = root;
-  window.__keynlockAlchemyInputPlane = inputPlane;
-  void import('../integrations/alchemy/src/alchemy.js').catch(error => {
+  host.alchemy.root = root;
+  host.alchemy.inputPlane = inputPlane;
+  void import('@keynlock/alchemy/src/alchemy.js').catch(error => {
     console.error('Не удалось встроить исходную алхимию:', error);
     root.dataset.error = error.message;
     window.dispatchEvent(new CustomEvent('keynlock:alchemy:v1', {

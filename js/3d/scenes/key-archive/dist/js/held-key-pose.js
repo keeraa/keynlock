@@ -1,3 +1,4 @@
+// @ts-check
 import * as THREE from '../vendor/three.js';
 import { CANDLE_WICK_Y, CANDLE_FLAME_HEIGHT } from './archive-candles.js';
 

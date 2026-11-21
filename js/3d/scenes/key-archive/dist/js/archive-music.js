@@ -1,3 +1,4 @@
+// @ts-check
 import { createArchiveMusicMix } from './archive-music-mix.js';
 
 const VOLUME_KEY = 'keynlock-archive-music-volume-v1';

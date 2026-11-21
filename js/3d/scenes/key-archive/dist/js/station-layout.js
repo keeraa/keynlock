@@ -1,3 +1,4 @@
+// @ts-check
 // The cleaning baths and forge share one central work island.
 export const STATIONS = Object.freeze([
   { id: 'center', name: 'ЦЕНТРАЛЬНАЯ', x: 0, z: 0 },

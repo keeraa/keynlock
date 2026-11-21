@@ -1,22 +1,22 @@
+import { t } from './i18n.js';
 /**
  * Coordinate the original KEYNLOCK workshops from the Lair.
  *
- * Atelier and alchemy mount their original interfaces inside this document.
+ * Atelier and alchemy mount their original interfaces inside this document;
+ * the workbench opens in an embedded page.
  */
 export const ORIGINAL_STATIONS = Object.freeze({
   restoration: {
-    title: 'Реставрация',
-    url: '/stations/atelier/',
+    title: t('Реставрация'),
     sourceUrl: 'https://atelier-restoration-1115.k1r11111.chatgpt.site/',
   },
   workbench: {
-    title: 'Верстак',
+    title: t('Верстак'),
     url: '/stations/workbench/',
     sourceUrl: 'https://keynlock-workbench-1116.k1r11111.chatgpt.site/',
   },
   alchemy: {
-    title: 'Алхимия',
-    url: '/integrations/alchemy/src/index.html?standalone=1',
+    title: t('Алхимия'),
     sourceUrl: 'https://keynlock-alchemy-lab-1115.k1r11111.chatgpt.site/',
   },
 });
@@ -32,11 +32,12 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
   const warning = document.querySelector('#original-station-warning');
   const fallback = document.querySelector('#original-station-fallback');
 
-  // Restoration is mounted directly by atelier-in-room.js; no restoration
-  // iframe, second workshop page or detached menu exists.
+  // The Atelier and the laboratory are mounted directly in the room
+  // (atelier-in-room.js, alchemy-in-room.js); only the workbench, which is
+  // still developed separately, opens as an embedded page.
   const frames = new Map();
   const readyStations = new Set();
-  const names = ['workbench','alchemy'];
+  const names = ['workbench'];
   for (const [index,id] of names.entries()) {
     const frame = index === 0 ? firstFrame : firstFrame.cloneNode(false);
     if (index) {
@@ -45,7 +46,7 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
     }
     frame.classList.add('original-station-frame');
     frame.dataset.station = id;
-    frame.title = `KEYNLOCK — оригинальная мастерская «${ORIGINAL_STATIONS[id].title}»`;
+    frame.title = t('KEYNLOCK — оригинальная мастерская «{title}»', { title: ORIGINAL_STATIONS[id].title });
     frame.inert = true;
     frames.set(id,frame);
   }
@@ -60,7 +61,7 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
   // dynamic import must also be visible instead of leaving a permanent veil.
   function showAtelierFailure(message) {
     if (readyStations.has('restoration')) return;
-    atelierFailure = message || 'Редактор не завершил запуск';
+    atelierFailure = message || t('Редактор не завершил запуск');
     const atelier = document.querySelector('#atelier-embedded-app');
     if (!atelier) return;
     atelier.classList.add('load-error');
@@ -72,12 +73,12 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
       const description = document.createElement('span');
       const reload = document.createElement('button');
       reload.type = 'button';
-      reload.textContent = 'ПОВТОРИТЬ ЗАПУСК';
+      reload.textContent = t('ПОВТОРИТЬ ЗАПУСК');
       reload.addEventListener('click', () => window.location.reload());
       status.append(description,reload);
       atelier.appendChild(status);
     }
-    status.firstElementChild.textContent = `Реставрация не запустилась: ${atelierFailure}`;
+    status.firstElementChild.textContent = t('Реставрация не запустилась: {reason}', { reason: atelierFailure });
     showCurrentFrame();
   }
 
@@ -156,7 +157,7 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
     overlay.classList.remove('station-ready');
     loader.setAttribute('aria-busy', 'true');
     title.textContent = next.title.toUpperCase();
-    loadingTitle.textContent = 'ЗАГРУЖАЕМ ОРИГИНАЛЬНУЮ МАСТЕРСКУЮ';
+    loadingTitle.textContent = t('ЗАГРУЖАЕМ ОРИГИНАЛЬНУЮ МАСТЕРСКУЮ');
     external.href = next.sourceUrl;
     external.hidden = id === 'restoration';
     fallback.href = next.sourceUrl;
@@ -209,7 +210,7 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
     if (type === 'mounted') {
       clearTimeout(atelierStartTimer);
       atelierStartTimer = setTimeout(() => {
-        if (!readyStations.has('restoration')) showAtelierFailure('превышено время ожидания');
+        if (!readyStations.has('restoration')) showAtelierFailure(t('превышено время ожидания'));
       }, 12000);
     }
     if (type === 'collection-open') {
@@ -217,7 +218,7 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
     }
     if (type === 'error') {
       console.error('Исходное ателье не готово:',event.detail?.message || 'Неизвестная ошибка');
-      showAtelierFailure(event.detail?.message || 'ошибка запуска');
+      showAtelierFailure(event.detail?.message || t('ошибка запуска'));
     }
   }
 
@@ -234,7 +235,7 @@ export function mountOriginalStations({onExit = () => {},onReady = () => {},rend
           failure.setAttribute('role','alert');
           root.appendChild(failure);
         }
-        failure.textContent = `Ошибка лаборатории: ${event.detail.message || 'неизвестная ошибка'}`;
+        failure.textContent = t('Ошибка лаборатории: {reason}', { reason: event.detail.message || t('неизвестная ошибка') });
       }
     }
   }

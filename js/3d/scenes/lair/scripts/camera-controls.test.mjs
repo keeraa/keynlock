@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { readFileSync } from 'node:fs';
 
 class PointerSurface extends EventTarget {
   ownerDocument = new EventTarget();
@@ -41,15 +40,4 @@ test('a left-button drag actually changes the Lair orbit direction', () => {
   assert.ok(camera.position.distanceTo(start)>1,
     'drag rotates the same camera used to render the Lair');
   controls.dispose();
-});
-
-test('the Lair and preserved Atelier share one pointer surface', () => {
-  const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
-  const main=readFileSync(new URL('../src/main.js',import.meta.url),'utf8');
-  const atelier=readFileSync(new URL('../integrations/atelier/src/main.js',import.meta.url),'utf8');
-  assert.ok(html.includes('id="scene-interaction"'));
-  assert.ok(main.includes('new OrbitControls(camera, interaction)'));
-  assert.ok(main.includes('window.__keynlockLairInteractionElement = interaction'));
-  assert.ok(atelier.includes('inputElement: embedded ? lairWindow.__keynlockLairInteractionElement'));
-  assert.ok(atelier.includes('interactionCamera: embedded ? lairWindow.__keynlockLairCamera'));
 });

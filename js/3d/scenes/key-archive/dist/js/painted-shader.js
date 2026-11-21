@@ -1,3 +1,4 @@
+// @ts-check
 import * as THREE from '../vendor/three.js';
 import { DUST_OCCLUSION_GLSL, SCENE_OUTLINE_GLSL, createSceneOutlineUniforms } from './scene-outline.js';
 

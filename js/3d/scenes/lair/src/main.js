@@ -7,15 +7,28 @@ import { mountOriginalStations } from './original-stations.js';
 import { mountAtelierInRoom } from './atelier-in-room.js';
 import { mountAlchemyInRoom } from './alchemy-in-room.js';
 import { createSharedRendererHost } from './shared-renderer-host.js';
-import { createCartoonFilter } from '../integrations/atelier/src/effects/cartoon-filter.js';
+import { createCartoonFilter } from '@keynlock/atelier/src/effects/cartoon-filter.js';
 import { addRoomLighting } from './room-lighting.js';
 import { createZoneTransitions, RESTORATION_EASELS } from './zone-transitions.js';
 import { createRestorationView } from './restoration-view.js';
 import { createInitialLoadingGate } from './initial-loading.js';
+import { getWorkshopApi, setWorkshopHost } from '../../../core/host/workshop-host.js';
+import { bindLanguageSelect, t, translator } from './i18n.js';
 import './style.css';
 import './initial-loading.css';
 import './visual.css';
 import './original-stations.css';
+
+// The page is written in Russian; translate the Lair's own markup before the
+// workshops mount theirs (their interfaces are not translated yet).
+document.documentElement.lang = translator.language;
+translator.translateTree(document);
+bindLanguageSelect(document.querySelector('#lair-language'));
+
+// What the Lair offers the workshops it mounts (see core/host/workshop-host.js).
+const host = setWorkshopHost({ atelier: {}, alchemy: {} });
+// Read-only handles for browser tests and debugging in the console.
+window.__keynlockDebug = { host, workshop: getWorkshopApi };
 
 const canvas = document.querySelector('#scene');
 const interaction = document.querySelector('#scene-interaction');
@@ -58,14 +71,14 @@ function setup() {
   const completeInitialLoad = () => {
     if (galleryLoaded && alchemyLoaded) initialLoading.finish();
     else if (galleryLoaded) {
-      loadingStatus.textContent = 'ПОДГОТАВЛИВАЕМ АЛХИМИЧЕСКУЮ ЛАБОРАТОРИЮ';
+      loadingStatus.textContent = t('ПОДГОТАВЛИВАЕМ АЛХИМИЧЕСКУЮ ЛАБОРАТОРИЮ');
       loadingBar.style.width = '94%';
     }
   };
   const initialLoading = createInitialLoadingGate({
     onProgress: ({ loaded, total }) => {
       loading.classList.add('is-tracking');
-      loadingStatus.textContent = `ЗАГРУЖАЕМ КАРТИНЫ · ${loaded} / ${total}`;
+      loadingStatus.textContent = t('ЗАГРУЖАЕМ КАРТИНЫ · {loaded} / {total}', { loaded, total });
       loadingBar.style.width = `${total ? loaded / total * 100 : 100}%`;
     },
     onDone: (reason) => {
@@ -88,10 +101,10 @@ function setup() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(47, 1, .06, 115);
   camera.position.copy(homePosition);
-  window.__keynlockLairCamera = camera;
-  window.__keynlockLairInteractionElement = interaction;
+  host.camera = camera;
+  host.interactionElement = interaction;
   controls = new OrbitControls(camera, interaction);
-  window.__keynlockLairControls = controls;
+  host.controls = controls;
   controls.target.copy(homeTarget);
   controls.enabled = true;
   controls.enableRotate = true;
@@ -123,6 +136,9 @@ function setup() {
   // what the visitor sees through this common viewport.
   atelierFilter = createCartoonFilter({ THREE, renderer, scene, camera });
   rendererHost = createSharedRendererHost({renderer,canvas,worldScene:scene});
+  host.renderer = rendererHost;
+  // The workbench runs in an iframe (it is developed separately) and finds the
+  // shared renderer here; the Atelier and the lab use the host module instead.
   window.__keynlockRendererHost = rendererHost;
   originalStations = mountOriginalStations({
     rendererHost,
@@ -133,7 +149,7 @@ function setup() {
   visualUI = mountVisualSettings({ visual, room, outlines, atelierFilter,
     grain: document.querySelector('.grain'), onOpen: () => { panel.hidden = true; } });
   restorationView = createRestorationView({
-    camera, controls, canvas, interaction, rendererHost, atelierFilter,
+    camera, controls, canvas, interaction, rendererHost, atelierFilter, host,
     easelPose: RESTORATION_EASELS, roomMinDistance,
     navigation: {
       isRestoring: () => zoneTransitions.current() === 'restoration',
@@ -147,14 +163,14 @@ function setup() {
     originalStations, restorationView, visualUI, homePosition, homeTarget, roomMinDistance,
     roomLights,
   });
-  window.__keynlockLairManipulateAlchemy = zoneTransitions.manipulateAlchemy;
-  window.__keynlockLairResetAlchemyCamera = zoneTransitions.resetAlchemyCamera;
+  host.alchemy.manipulate = zoneTransitions.manipulateAlchemy;
+  host.alchemy.resetCamera = zoneTransitions.resetAlchemyCamera;
 
   window.addEventListener('resize', resize);
   interaction.addEventListener('pointerdown', e => { startPointer = [e.clientX, e.clientY]; });
   restorationView.bind();
-  const atelierElement = mountAtelierInRoom();
-  const alchemyElement = mountAlchemyInRoom();
+  const atelierElement = mountAtelierInRoom(host);
+  const alchemyElement = mountAlchemyInRoom(host);
   alchemyElement.querySelector('.lair-alchemy-exit')?.addEventListener('click', zoneTransitions.reset);
   const observeAtelierMenu = () => document.querySelector('#app').style.setProperty(
     '--atelier-panel-height', `${Math.round(atelierElement.getBoundingClientRect().height)}px`);
@@ -281,12 +297,11 @@ function animate() {
 
 // Gentle room ambience is original procedural sound. The selected Chopin recordings are not embedded here.
 let ambientContext = null;
-let ambientSource = null;
 async function toggleAmbience() {
   const button = document.querySelector('#sound-toggle');
   const enable = button.getAttribute('aria-pressed') !== 'true';
   button.setAttribute('aria-pressed', String(enable));
-  button.title = enable ? 'Выключить звуковое окружение' : 'Включить звуковое окружение';
+  button.title = enable ? t('Выключить звуковое окружение') : t('Включить звуковое окружение');
   if (!ambientContext) {
     ambientContext = new AudioContext();
     const length = ambientContext.sampleRate * 3;
@@ -301,7 +316,7 @@ async function toggleAmbience() {
     const filter = ambientContext.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 340;
     const gain = ambientContext.createGain(); gain.gain.value = .028;
     source.connect(filter).connect(gain).connect(ambientContext.destination);
-    source.start(); ambientSource = source;
+    source.start();
   }
   if (enable && !document.hidden) await ambientContext.resume(); else await ambientContext.suspend();
 }

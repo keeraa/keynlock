@@ -1,43 +1,44 @@
 import * as THREE from 'three';
 import { ORIGINAL_STATIONS } from './original-stations.js';
-import { ALCHEMY_LOOK } from '../integrations/alchemy/src/look/alchemy-look.js';
+import { t } from './i18n.js';
+import { ALCHEMY_LOOK } from '@keynlock/alchemy/src/look/alchemy-look.js';
 
 export const RESTORATION_EASELS = { position: [1.56, 3.22, 10.35], target: [-7.05, 2.48, 10.35] };
 
 const zoneDefinitions = {
   restoration: {
-    number: '01', kicker: 'АТЕЛЬЕ САЙ', title: 'Реставрация',
-    description: 'Оригинальное Ателье цвета размещено вдоль левой стены логова: 12 художественных направлений, 30 рам, действующие инструменты реставрации.',
-    status: 'Мольберты и картины находятся в общей 3D-сцене логова.',
+    number: '01', kicker: t('АТЕЛЬЕ САЙ'), title: t('Реставрация'),
+    description: t('Оригинальное Ателье цвета размещено вдоль левой стены логова: 12 художественных направлений, 30 рам, действующие инструменты реставрации.'),
+    status: t('Мольберты и картины находятся в общей 3D-сцене логова.'),
     link: ORIGINAL_STATIONS.restoration.sourceUrl,
     camera: RESTORATION_EASELS.position, target: RESTORATION_EASELS.target,
   },
   planning: {
-    number: '02', kicker: 'БАЗА КОМАНДЫ', title: 'Карта и дела',
-    description: 'Карта каналов и кварталов Киенлока, заметки о заказах и стол, за которым Кай, Сай и Тик готовят очередную вылазку. Сюда команда возвращается с добычей.',
-    status: 'Штаб связывает мастерские, коллекцию и будущие сюжетные задания.',
+    number: '02', kicker: t('БАЗА КОМАНДЫ'), title: t('Карта и дела'),
+    description: t('Карта каналов и кварталов Киенлока, заметки о заказах и стол, за которым Кай, Сай и Тик готовят очередную вылазку. Сюда команда возвращается с добычей.'),
+    status: t('Штаб связывает мастерские, коллекцию и будущие сюжетные задания.'),
     link: null, camera: [.15, 3.80, 7.75], target: [0, 1.75, -.7],
   },
   workbench: {
-    number: '03', kicker: 'МАСТЕРСКАЯ ТИКА', title: 'Верстак',
-    description: 'Справа от алхимического стола, вдоль зелёной стены, стоит отдельный верстак с тисками, заготовками, замочными цилиндрами и инструментальной доской.',
-    status: 'Полная исходная мастерская: опиловка, сборка замка, песочница механизмов.',
+    number: '03', kicker: t('МАСТЕРСКАЯ ТИКА'), title: t('Верстак'),
+    description: t('Справа от алхимического стола, вдоль зелёной стены, стоит отдельный верстак с тисками, заготовками, замочными цилиндрами и инструментальной доской.'),
+    status: t('Полная исходная мастерская: опиловка, сборка замка, песочница механизмов.'),
     link: ORIGINAL_STATIONS.workbench.sourceUrl,
     camera: [1.22, 3.15, 20.07], target: [7.40, 1.68, 20.07],
   },
   alchemy: {
-    number: '04', kicker: 'СОСТАВЫ И РЕАГЕНТЫ', title: 'Алхимия',
-    description: 'Вся правая стена от пола до потолка покрыта зелёной гуашевой плиткой. У стены стоит алхимический стол с двумя ярусами, семью реагентами, пигментами, стеклом и свечами; над ним рецепт и часы.',
-    status: 'Исходная лаборатория: переливание, физика жидкостей, рецепты и все настройки.',
+    number: '04', kicker: t('СОСТАВЫ И РЕАГЕНТЫ'), title: t('Алхимия'),
+    description: t('Вся правая стена от пола до потолка покрыта зелёной гуашевой плиткой. У стены стоит алхимический стол с двумя ярусами, семью реагентами, пигментами, стеклом и свечами; над ним рецепт и часы.'),
+    status: t('Исходная лаборатория: переливание, физика жидкостей, рецепты и все настройки.'),
     link: ORIGINAL_STATIONS.alchemy.sourceUrl,
     // Fallback only. The loaded source laboratory supplies its actual orbit
     // position, pivot and 37° field of view when entering this station.
     camera: [3.08, 4.18, 10.10], target: [6.99, 3.18, 10.10],
   },
   gramophone: {
-    number: '05', kicker: 'СКРЫТАЯ КОЛЛЕКЦИЯ', title: 'Музыка в Логове',
-    description: 'Старый граммофон хранит запрещённые иностранные пластинки. Для будущего саундтрека отобраны три исполнения ноктюрнов Шопена: Op. 9 № 2 и два варианта Op. 9 № 1.',
-    status: 'Фонотека задумана; сами записи пока не включены в опубликованную сцену.',
+    number: '05', kicker: t('СКРЫТАЯ КОЛЛЕКЦИЯ'), title: t('Музыка в Логове'),
+    description: t('Старый граммофон хранит запрещённые иностранные пластинки. Для будущего саундтрека отобраны три исполнения ноктюрнов Шопена: Op. 9 № 2 и два варианта Op. 9 № 1.'),
+    status: t('Фонотека задумана; сами записи пока не включены в опубликованную сцену.'),
     link: null, camera: [1.95, 3.38, 3.60], target: [1.96, 2.26, -3.71],
   },
 };
@@ -123,7 +124,7 @@ export function createZoneTransitions({
 
   function onStationReady(id) {
     if (id === 'alchemy') {
-      zones.alchemy.status = 'Алхимическая лаборатория работает внутри общей сцены логова.';
+      zones.alchemy.status = t('Алхимическая лаборатория работает внутри общей сцены логова.');
       if (currentZone === 'alchemy' && pendingStationOpen === 'alchemy') {
         const pose = rendererHost?.getWorldPose('alchemy');
         if (pose) {
@@ -139,7 +140,7 @@ export function createZoneTransitions({
     }
     if (id !== 'restoration') return;
     restorationView.resize();
-    zones.restoration.status = 'Исходная реставрация встроена в логово. Картины и инструменты доступны здесь.';
+    zones.restoration.status = t('Исходная реставрация встроена в логово. Картины и инструменты доступны здесь.');
     // The original painting room is rotated along the Lair's left wall. Both
     // finishes contain the same gouache image, but the Lair wall retains its
     // own independently loaded material so a slow Atelier import cannot turn

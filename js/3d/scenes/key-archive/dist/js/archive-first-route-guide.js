@@ -1,7 +1,7 @@
+// @ts-check
 import { t, familyName } from './i18n.js';
 import { CABINET_HEADER_Y } from './cabinet-layout.js';
 import * as THREE from '../vendor/three.js';
-import { KEY_TYPES } from './rules.js';
 import { restingKeyY } from './floor-contact.js';
 
 export const FIRST_ROUTE_KEY_ID = '9-0';

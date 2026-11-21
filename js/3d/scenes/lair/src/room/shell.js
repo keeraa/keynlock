@@ -1,9 +1,10 @@
+// @ts-check
 import * as THREE from 'three';
 import { canvasTexture } from '../materials.js';
 
 // The long room itself: floor, walls, ceiling, rug and the right-wall finish.
 export function buildShell(kit) {
-  const { m, scene, staticGroup, shadow, box, cylinder, sphere, plane } = kit;
+  const { m, scene, staticGroup, box, cylinder, sphere, plane } = kit;
   scene.background = new THREE.Color('#2f3834');
   scene.fog = new THREE.Fog('#514d40', 39, 94);
   // Thirty metres of exhibition space on the left, with a matching full-

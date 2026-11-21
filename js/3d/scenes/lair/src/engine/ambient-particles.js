@@ -1,3 +1,4 @@
+// @ts-check
 import * as THREE from 'three';
 
 // Wind sampling comes from the shared Village Engine wind-field module.

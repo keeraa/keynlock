@@ -1,3 +1,4 @@
+// @ts-check
 import * as THREE from 'three';
 import { createAmbientParticles } from '../engine/ambient-particles.js';
 

@@ -1,9 +1,11 @@
+// @ts-check
 import * as THREE from 'three';
-import { makeGouacheWallTexture } from '../integrations/alchemy/src/wall-tiles.js';
-import { atelierWallpaperSource } from '../integrations/atelier/src/painted-assets.js';
+import { makeGouacheWallTexture } from '@keynlock/alchemy/src/wall-tiles.js';
+import { atelierWallpaperSource } from '@keynlock/atelier/src/painted-assets.js';
+import { t } from './i18n.js';
 
 const alchemyWood = name =>
-  new URL(`../integrations/alchemy/src/assets/wood-gouache-${name}.webp`, import.meta.url).href;
+  new URL(`../../../workshops/alchemy/src/assets/wood-gouache-${name}.webp`, import.meta.url).href;
 
 export function createMaterials() {
   const textureLoader = new THREE.TextureLoader();
@@ -345,6 +347,6 @@ export function makeMapTexture() {
       ctx.fillStyle = '#9c4338'; ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
     }
     ctx.fillStyle = '#463d30'; ctx.font = 'bold 52px Georgia'; ctx.fillText('KIENLOCK', 305, 82);
-    ctx.font = '20px Georgia'; ctx.fillText('ПЛАН ГОРОДА · КАНАЛЫ И КВАРТАЛЫ', 230, 116);
+    ctx.font = '20px Georgia'; ctx.fillText(t('ПЛАН ГОРОДА · КАНАЛЫ И КВАРТАЛЫ'), 230, 116);
   });
 }

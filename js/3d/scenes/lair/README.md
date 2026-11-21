@@ -8,23 +8,33 @@
 
 | Мастерская | Единственный источник в логове | Подключение | Опубликованный оригинал |
 | --- | --- | --- | --- |
-| Реставрация | `integrations/atelier/` (собирается в `public/stations/atelier/`) | `src/atelier-in-room.js` | [Ателье](https://atelier-restoration-1115.k1r11111.chatgpt.site/) |
-| Алхимия | `integrations/alchemy/` | `src/alchemy-in-room.js` | [Лаборатория](https://keynlock-alchemy-lab-1115.k1r11111.chatgpt.site/) |
-| Верстак | `public/stations/workbench/` | встроенный документ, `src/original-stations.js` | [Верстак](https://keynlock-workbench-1116.k1r11111.chatgpt.site/) |
+| Реставрация | пакет `@keynlock/atelier` — `js/3d/workshops/atelier/` | `src/atelier-in-room.js` | [Ателье](https://atelier-restoration-1115.k1r11111.chatgpt.site/) |
+| Алхимия | пакет `@keynlock/alchemy` — `js/3d/workshops/alchemy/` | `src/alchemy-in-room.js` | [Лаборатория](https://keynlock-alchemy-lab-1115.k1r11111.chatgpt.site/) |
+| Верстак | копия в `public/stations/workbench/` (сам верстак ещё дорабатывается отдельно в `js/3d/scenes/workbench`) | встроенный документ, `src/original-stations.js` | [Верстак](https://keynlock-workbench-1116.k1r11111.chatgpt.site/) |
+
+Из тех же пакетов собираются и отдельные сайты мастерских (`npm run build` в папке пакета).
 
 - **Один рендерер.** Все три мастерские рисуют через один `WebGLRenderer` комнаты (`src/shared-renderer-host.js`); их сцены подключаются к общему миру как группы `keynlock-world-<станция>` (`src/world-stations.js`). Верстак обращается к нему из встроенного документа через `window.parent.__keynlockRendererHost`, своего GPU-контекста не создаёт.
-- **Реставрация:** Ателье само хранит картины и прогресс (IndexedDB, `integrations/atelier/src/restoration-store.js`). `bridge.html` с `src/lair-bridge.js` — мост к хранилищу опубликованного Ателье; код комнаты его сейчас не вызывает.
-- **Алхимия:** камера и симуляция подключены к миру логова; при выходе симуляция приостанавливается. Свет и гуашевые фильтры вынесены в `integrations/alchemy/src/look/` (`ALCHEMY_LOOK`), панель настроек — в `src/ui/visual-panel.js`.
+- **Реставрация:** Ателье само хранит картины и прогресс (IndexedDB, `restoration-store.js`). `bridge.html` с `src/lair-bridge.js` в пакете Ателье — мост к хранилищу опубликованного Ателье; код комнаты его сейчас не вызывает.
+- **Алхимия:** камера и симуляция подключены к миру логова; при выходе симуляция приостанавливается. Свет и гуашевые фильтры вынесены в `src/look/` пакета (`ALCHEMY_LOOK`), панель настроек — в `src/ui/visual-panel.js`.
+
+### Связь логова и мастерских
+
+Логово и пакеты мастерских собираются в один граф модулей, поэтому общаются через модуль `js/3d/core/host/workshop-host.js`, а не через глобальные переменные `window`:
+
+- логово перед загрузкой мастерских вызывает `setWorkshopHost(...)` и кладёт туда общий рендерер, камеру, OrbitControls, слой ввода и обработчики для Ателье (`host.atelier`) и лаборатории (`host.alchemy`); все поля описаны в JSDoc этого модуля;
+- мастерская вызывает `getWorkshopHost()`: внутри логова получает хост, на отдельном сайте — `null`;
+- мастерские публикуют своё API через `publishWorkshopApi('restoration' | 'alchemy', ...)`, логово читает его `getWorkshopApi(...)`.
+
+Глобальных переменных осталось две, обе описаны в коде: `window.__keynlockRendererHost` — для верстака во встроенном документе, `window.__keynlockDebug` — для браузерных тестов и консоли. ESLint (`js/3d/eslint.config.js`) запрещает новые `window.__*` в коде логова и мастерских, а мастерским — импорт из логова.
 
 ### Одна копия каждого файла
 
-Код комнаты в `src/` импортирует модули и текстуры мастерских из их папок и не держит своих копий: копии расходятся. `npm run check:sources` (`scripts/check-sources.mjs`) падает, если в логове два файла с одинаковым содержимым или в `src/` появился модуль с именем модуля мастерской. Исключения перечислены в скрипте: верстак — статическая страница без сборщика и хранит две свои текстуры металла.
+Код комнаты импортирует модули и текстуры мастерских из их пакетов (`@keynlock/alchemy/...`, `@keynlock/atelier/...`) и не держит своих копий: копии расходятся. `npm run check:sources` (`scripts/check-sources.mjs`) проверяет Логово и `js/3d/workshops` вместе и падает, если два файла совпадают по содержимому или в `src/` появился модуль с именем модуля мастерской. Исключения перечислены в скрипте: верстак — статическая страница без сборщика и хранит две свои текстуры металла.
 
-Папки `js/3d/scenes/alchemy`, `restoration` и `workbench` — отдельные снимки опубликованных Site других версий. Логово их не импортирует; изменения переносятся вручную.
+### Установка
 
-### Собранное Ателье
-
-`public/stations/atelier/` — результат `npm run build:atelier`. Он лежит в репозитории, потому что `npm run dev` отдаёт `public/` как есть. После правок в `integrations/atelier/` пересоберите его и закоммитьте; CI проверяет, что он совпадает с исходниками.
+`js/3d` — npm-workspace (Логово и пакеты мастерских). `npm install` в `js/3d` ставит всё один раз; `three` в проекте один.
 
 ## Комната
 
@@ -37,12 +47,12 @@
 - `workbench.js` — верстак и стена с инструментами;
 - `details.js` — граммофон, лампы и пыль в воздухе.
 
-Материалы — `src/materials.js`: дерево берёт гуашевые текстуры алхимии, стены — обои Ателье и плитку алхимии (`integrations/alchemy/src/wall-tiles.js`).
+Материалы — `src/materials.js`: дерево берёт гуашевые текстуры алхимии, стены — обои Ателье и плитку алхимии (`@keynlock/alchemy/src/wall-tiles.js`).
 
 ## Команды
 
-- Запуск: `npm install && npm run dev`.
-- Проверка: `npm run check` (синтаксис, модульные тесты, геометрия комнаты) и `npm run check:sources`.
+- Запуск: `npm install` в `js/3d`, затем здесь `npm run dev`.
+- Проверка: `npm run check` (синтаксис, модульные тесты, геометрия комнаты) и `npm run check:sources`; тесты Ателье — `npm test` в `js/3d/workshops/atelier`.
 - Браузерные тесты: `npx playwright install chromium`, затем `npm run test:browser` — собирает production-версию и проверяет переливание, паузу нагрева, сбой загрузки картины и возврат из мастерских.
 
 Всё это запускается в CI: `.github/workflows/lair.yml`.

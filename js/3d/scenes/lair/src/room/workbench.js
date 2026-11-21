@@ -1,3 +1,4 @@
+// @ts-check
 import * as THREE from 'three';
 
 // The key workbench beside the laboratory, with its tool wall.

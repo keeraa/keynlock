@@ -1,3 +1,4 @@
+// @ts-check
 import { TOTAL_KEYS, getProgress } from './rules.js';
 import { t } from './i18n.js';
 

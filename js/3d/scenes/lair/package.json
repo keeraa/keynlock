@@ -5,10 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build:atelier": "vite build --config integrations/atelier/vite.config.js",
-    "build": "npm run build:atelier && vite build",
+    "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "check": "node --check src/main.js && node --check src/original-stations.js && node --check src/shared-renderer-host.js && node --check integrations/alchemy/src/alchemy.js && node --check public/stations/workbench/js/scene.js && node --check public/stations/workbench/js/mechanism-3d.js && node --test scripts/*.test.mjs && node scripts/geometry-check.mjs",
+    "check": "node --check src/main.js && node --check src/original-stations.js && node --check src/shared-renderer-host.js && node --check ../../workshops/alchemy/src/alchemy.js && node --check public/stations/workbench/js/scene.js && node --check public/stations/workbench/js/mechanism-3d.js && node --test scripts/*.test.mjs ../../core/host/*.test.mjs && node scripts/geometry-check.mjs",
     "check:sources": "node scripts/check-sources.mjs",
     "test:browser": "npm run build && node --test tests/browser/*.test.mjs"
   },

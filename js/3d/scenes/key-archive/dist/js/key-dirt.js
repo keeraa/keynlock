@@ -1,3 +1,4 @@
+// @ts-check
 import * as THREE from '../vendor/three.js';
 import { bowPoints, holesFor, bladeSections, shaftStartX, shaftHalfHeight } from './key-shapes.js';
 

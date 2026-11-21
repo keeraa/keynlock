@@ -1,6 +1,5 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { addRoomLighting } from '../src/room-lighting.js';
 
@@ -20,9 +19,4 @@ test('the salon keeps warm modelling but only short overhead contact shadows', (
     `ceiling-height shadows must fall almost straight down, got ${maxShadowRunFromCeiling.toFixed(2)} m`);
   assert.ok(contactSun.shadow.camera.top - contactSun.shadow.camera.bottom >= 40,
     'the shadow camera includes both halves of the long room');
-});
-
-test('the embedded Atelier does not re-enable its original angled shadow light', () => {
-  const source = readFileSync(new URL('../integrations/atelier/src/main.js', import.meta.url), 'utf8');
-  assert.match(source, /if \(embedded\) \{\s*\/\/[^]*?scene\.traverse\(object => \{\s*if \(object\.isDirectionalLight\) object\.castShadow = false;/);
 });

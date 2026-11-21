@@ -1,3 +1,4 @@
+// @ts-check
 import * as THREE from '../vendor/three.js';
 
 // Each mesh gets only a tiny per-instance paint attribute. The indexed metal

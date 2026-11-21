@@ -1,3 +1,4 @@
+// @ts-check
 import { createForgeKeyProvider } from './key-forge-adapter.js';
 import { preloadKeyTextures } from './key-materials.js';
 

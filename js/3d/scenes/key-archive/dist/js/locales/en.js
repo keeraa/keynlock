@@ -1,3 +1,4 @@
+// @ts-check
 // English. Same keys as ru.js; keep {placeholders} and markup intact.
 export default Object.freeze({
   'webgl.title': 'A browser with WebGL is needed',

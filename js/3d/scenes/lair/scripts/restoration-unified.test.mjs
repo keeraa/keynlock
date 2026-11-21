@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { paintings } from '../src/atelier-core/atelier-config.js';
-import { applyRestorationStamp } from '../src/atelier-core/restoration-operations.js';
-import { paintingSeed } from '../src/atelier-core/restoration-sessions.js';
-import { calculateColorAccuracy } from '../src/atelier-core/restoration-feedback.js';
+import { paintings } from '../integrations/atelier/src/atelier-config.js';
+import { applyRestorationStamp } from '../integrations/atelier/src/restoration-operations.js';
+import { paintingSeed } from '../integrations/atelier/src/restoration-sessions.js';
+import { calculateColorAccuracy } from '../integrations/atelier/src/restoration-feedback.js';
 import { getPaintingLore } from '../integrations/atelier/src/lore/painting-lore.js';
 
 const removedPaintingIds = [

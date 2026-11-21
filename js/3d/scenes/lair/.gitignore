@@ -2,3 +2,4 @@ node_modules/
 *.log
 preview-lair.png
 *.tar.gz
+dist/

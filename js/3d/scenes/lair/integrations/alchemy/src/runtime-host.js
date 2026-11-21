@@ -25,12 +25,23 @@ export function createAlchemyRuntime({THREE, canvas, win = window, host = resolv
   let disposed = false;
   let frame = null;
   let ready = false;
+  let unregisterWorkshop;
+  let onEnter;
+  let onExit;
 
   const announce = (type, detail = {}) => {
     const message = {bridge: ALCHEMY_BRIDGE, type, ...detail};
     win.dispatchEvent(new CustomEvent(ALCHEMY_BRIDGE, {detail: message}));
     if (host && win.parent !== win) win.parent.postMessage(message, win.location.origin);
   };
+  function setActive(value) {
+    const next = Boolean(value);
+    if (disposed || active === next) return;
+    if (next) onEnter?.();
+    else onExit?.();
+    active = next;
+    announce(active ? 'resume' : 'pause');
+  }
 
   return {
     renderer,
@@ -38,14 +49,16 @@ export function createAlchemyRuntime({THREE, canvas, win = window, host = resolv
     registerScene(scene, camera, additionalScenes = []) {
       if (host) host.registerWorldScene('alchemy', {scene, camera, additionalScenes});
     },
-    start(render) {
+    start(render, { enter, exit } = {}) {
       frame = render;
-      if (host?.registerWorldFrame) {
-        // Embedded workshops are advanced by the Lair's single frame loop.
-        // Never schedule a second requestAnimationFrame for the same scene.
-        host.registerWorldFrame('alchemy', () => {
-          if (active && !disposed) frame();
-        });
+      onEnter = enter;
+      onExit = exit;
+      if (host?.registerWorldWorkshop) {
+        unregisterWorkshop = host.registerWorldWorkshop('alchemy', {
+          enter: () => setActive(true),
+          exit: () => setActive(false),
+          update() { if (active && !disposed) frame(); },
+        }, { interval: 25 });
         if (!ready) {ready = true; announce('ready');}
         return;
       }
@@ -60,13 +73,13 @@ export function createAlchemyRuntime({THREE, canvas, win = window, host = resolv
       });
       if (!ready) {ready = true; announce('ready');}
     },
-    setActive(value) { active = Boolean(value); announce(active ? 'resume' : 'pause'); },
+    setActive,
     isActive() { return active && !disposed; },
     announce,
     dispose() {
       if (disposed) return;
+      unregisterWorkshop?.();
       disposed = true;
-      host?.registerWorldFrame?.('alchemy', null);
       renderer.setAnimationLoop(null);
       if (!host) renderer.dispose();
       announce('disposed');

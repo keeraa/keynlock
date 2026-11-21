@@ -69,17 +69,18 @@ test('Atelier cartoon filter can post-process the real room renderer and restore
 test('the Lair exposes the five transferred Atelier controls with a separate shuffle button', () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const main = readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  const view = readFileSync(new URL('../src/restoration-view.js', import.meta.url), 'utf8');
   const source = readFileSync(new URL('../integrations/atelier/src/main.js', import.meta.url), 'utf8');
   for (const id of ['atelier-toon-enabled','atelier-ink-enabled','atelier-blur-enabled',
     'atelier-toon-bands','atelier-ink-width','atelier-blur-radius',
     'lair-easel-labels','lair-easel-camera-controls','lair-focus-exit',
     'gallery-shuffle','lair-wall-art-hover']) assert.ok(html.includes(`id="${id}"`), id);
   assert.ok(main.includes('atelierFilter.render()'));
-  assert.ok(main.includes('createCameraTransition'));
+  assert.ok(view.includes('createCameraTransition'));
   assert.ok(source.includes('exhibition.viewedId()'));
   assert.ok(source.includes("shuffle: () => $('wall-gallery-shuffle').click()"));
-  assert.ok(main.includes('atelierFilter?.setBlurSuspended(true)'));
-  assert.ok(main.includes('atelierFilter?.setBlurSuspended(false)'));
+  assert.ok(view.includes('atelierFilter?.setBlurSuspended(true)'));
+  assert.ok(view.includes('atelierFilter?.setBlurSuspended(false)'));
 });
 
 test('the Lair defocuses its nearer wall without changing the standalone Atelier blur', () => {

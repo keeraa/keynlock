@@ -25,8 +25,9 @@ export const WALL_TILE_PALETTES = Object.freeze(Object.keys(PALETTES));
 export function makeGouacheWallTexture(THREE, style = 'sage', span = { width: 24, height: 12 }) {
   if (!PALETTES[style]) throw new Error(`Unknown wall tile style: ${style}`);
   const palette = PALETTES[style];
-  const width = span.width > 24 ? 1152 : 768;
-  const height = span.height > 12 ? 768 : 512;
+  // A host room may ask for a finer texture for a much longer wall.
+  const width = span.textureWidth ?? (span.width > 24 ? 1152 : 768);
+  const height = span.textureHeight ?? (span.height > 12 ? 768 : 512);
   const pixels = new Uint8Array(width * height * 4);
   const seed = WALL_TILE_PALETTES.indexOf(style) + 21;
   for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {

@@ -2,10 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { ORIGINAL_STATIONS } from '../src/original-stations.js';
-import { REAGENTS, emptyMixture, addDose } from '../src/alchemy-core/mixing.js';
-import { generateRecipe, evaluateRecipe } from '../src/alchemy-core/recipes.js';
+import { REAGENTS, emptyMixture, addDose } from '../integrations/alchemy/src/mixing.js';
+import { generateRecipe, evaluateRecipe } from '../integrations/alchemy/src/recipes.js';
 import { assistedFilingStroke, cutLayout, generateBlueprint,
-  inspectKey, keyTopOutline, targetGuideSegments } from '../src/workbench-core/logic.js';
+  inspectKey, keyTopOutline, targetGuideSegments } from '../public/stations/workbench/js/logic.js';
 
 test('all three original alchemy difficulties can achieve perfect scores on the shared table',()=>{
   for(const level of [1,2,3]){
@@ -44,29 +44,28 @@ test('workbench geometry and key inspection reuse the exact source cutting rules
 test('restoration edits the original artwork in-room; remaining stations retain source integrations',()=>{
   const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
   const main=readFileSync(new URL('../src/main.js',import.meta.url),'utf8');
+  const transitions = readFileSync(new URL('../src/zone-transitions.js', import.meta.url), 'utf8');
+  const view = readFileSync(new URL('../src/restoration-view.js', import.meta.url), 'utf8');
   const source=readFileSync(new URL('../src/original-stations.js',import.meta.url),'utf8');
   const nativeAtelier=readFileSync(new URL('../src/atelier-in-room.js',import.meta.url),'utf8');
   const bridge=readFileSync(new URL('../src/shared-renderer-host.js',import.meta.url),'utf8');
   assert.equal((html.match(/<canvas\s+id="scene"/g)||[]).length,1);
   assert.ok(html.includes('id="scene-interaction"'),'a stable input layer covers the 3D scene');
   assert.ok(html.includes('id="original-station-frame"'),'original app preserves its full DOM');
-  assert.ok(main.includes('originalStations.preload(id)'),'original app is prepared when its zone is clicked');
-  assert.ok(main.includes("if (currentZone === 'alchemy') camera.lookAt(controls.target)"),
+  assert.ok(transitions.includes('originalStations.preload(id)'),'original app is prepared when its zone is clicked');
+  assert.ok(transitions.includes("if (currentZone === 'alchemy') camera.lookAt(controls.target)"),
     'alchemy camera flight must rotate toward the table even while OrbitControls is paused');
-  assert.ok(main.includes("camera.position.distanceTo(desiredPosition) < alchemyApproachDistance * .55")
-    && main.includes('!originalStations?.isOpen() || transitioning'),
+  assert.ok(transitions.includes("camera.position.distanceTo(desiredPosition) < alchemyApproachDistance * .55")
+    && main.includes('!overlayOpen || zoneTransitions.isTransitioning()'),
     'the laboratory activates during the camera approach while the room keeps rendering');
-  assert.ok(main.includes('originalStations.showRestorationInRoom()'),
+  assert.ok(transitions.includes("setInRoomWorkshop(id === 'restoration' ? id : null)"),
     'original Atelier workbench controls are shown in the Lair itself');
-  assert.match(main,/if \(restoring\) \{[\s\S]*?originalStations\.showRestorationInRoom\(\);[\s\S]*?\} else originalStations\.open\(id\);/,
-    'restoration never opens a different full-screen workshop');
   assert.ok(main.includes('mountAtelierInRoom()')
     && nativeAtelier.includes("document.querySelector('#app').appendChild(atelier)"),
     'the exact original Atelier DOM is mounted into the Lair document');
   assert.ok(nativeAtelier.includes("import('../integrations/atelier/src/main.js')"),
     'the original Atelier source runs directly in the Lair page');
-  assert.ok(source.includes("if (id === 'alchemy') {showAlchemyInRoom();return;}")
-    && source.includes("if (id === 'restoration' || id === 'alchemy') return;")
+  assert.ok(source.includes("if (id === 'restoration' || id === 'alchemy') return;")
     && !source.includes("ensureFrame('restoration')"),
     'alchemy and restoration activate their original in-room integrations');
   const nativeAlchemy=readFileSync(new URL('../src/alchemy-in-room.js',import.meta.url),'utf8');
@@ -79,7 +78,7 @@ test('restoration edits the original artwork in-room; remaining stations retain 
     'unvisited workshops do not start detached documents during Lair startup');
   assert.ok(!html.includes('id="restoration-dock"'),
     'no replacement tools or imitation painting panel are created');
-  assert.ok(main.includes('controls.minAzimuthAngle = -Infinity'),
+  assert.ok(transitions.includes('controls.minAzimuthAngle = -Infinity'),
     'free orbiting remains possible at every viewpoint');
   assert.ok(main.includes('new OrbitControls(camera, interaction)')
     && main.includes('controls.mouseButtons.LEFT = THREE.MOUSE.ROTATE')
@@ -87,17 +86,19 @@ test('restoration edits the original artwork in-room; remaining stations retain 
   'the camera rotates when dragging the dedicated scene interaction layer');
   assert.ok(main.includes("interaction.addEventListener('pointermove', hover3D)"),
     'room hit testing and camera events use the same input surface');
-  assert.ok(main.includes('window.__keynlockRestorationActive = restoring'),
-    'original painting tools only receive the parent canvas pointer in restoration mode');
-  assert.ok(main.includes('buildLair(scene, materials, {useOriginalRestoration:true})'),
-    'the mock restoration easels are never created next to the source easels');
-  assert.ok(main.includes("scene.getObjectByName('atelier-original-wallpaper')")
-    && main.includes('atelierWall.visible = false')
-    && !main.includes('lairWall.material = atelierWall.material'),
+  assert.ok(main.includes('buildLair(scene, materials)')
+    && !readFileSync(new URL('../src/room.js',import.meta.url),'utf8').includes('restoration-easel'),
+    'the room never builds mock restoration easels next to the source easels');
+  assert.ok(transitions.includes("scene.getObjectByName('atelier-original-wallpaper')")
+    && transitions.includes('atelierWall.visible = false')
+    && !transitions.includes('lairWall.material = atelierWall.material'),
     'the Lair keeps its independently loaded original gouache wallpaper instead of an unfinished Atelier placeholder');
-  assert.ok(!main.includes("originalStations.open(workspace)"),
+  assert.ok(!transitions.includes("originalStations.open(workspace)"),
     'the old portal/iframe workspace swap no longer drives Atelier transitions');
   const atelierMain=readFileSync(new URL('../integrations/atelier/src/main.js',import.meta.url),'utf8');
+  assert.ok(atelierMain.includes('isInteractive: isRestorationActive')
+    && atelierMain.includes("registerWorldWorkshop('restoration'"),
+    'the painting tools receive the parent canvas pointer only while restoration is active');
   const atelierInput=readFileSync(new URL('../integrations/atelier/src/restoration-input.js',import.meta.url),'utf8');
   const atelierMarkup=readFileSync(new URL('../integrations/atelier/index.html',import.meta.url),'utf8');
   const atelierUI=readFileSync(new URL('../integrations/atelier/src/workshop-ui.js',import.meta.url),'utf8');
@@ -117,7 +118,7 @@ test('restoration edits the original artwork in-room; remaining stations retain 
     && atelierMain.includes('stage: embedded ? lairWindow.__keynlockLairInteractionElement : stage'),
     'painting cursor and damage hints follow the actual shared canvas');
   assert.ok(atelierMain.includes('onPaintingFocus: embedded ? focusLairArtwork')
-    && main.includes('window.__keynlockLairFocusArtwork'),
+    && view.includes('window.__keynlockLairFocusArtwork'),
     'clicks on the original artwork focus the visible Lair camera');
   assert.ok(atelierMain.includes('roomControls: embedded ? lairWindow.__keynlockLairControls')
     && atelierInput.includes('roomControls.enabled = false')
@@ -146,7 +147,8 @@ test('restoration edits the original artwork in-room; remaining stations retain 
     assert.match(ORIGINAL_STATIONS[id].sourceUrl,/^https:\/\/[^/]+\.k1r11111\.chatgpt\.site\/$/);
     assert.ok(!html.includes(`id="${id}-workspace"`),`no imitation ${id} UI remains`);
   }
-  assert.ok(readFileSync(new URL('../public/stations/alchemy/alchemy.js',import.meta.url),'utf8').includes("createRenderer('alchemy', canvas)"));
+  // The lab asks the room's shared renderer for its canvas (no second GPU context).
+  assert.ok(readFileSync(new URL('../integrations/alchemy/src/runtime-host.js',import.meta.url),'utf8').includes("host.createRenderer('alchemy', canvas)"));
   const alchemySource=readFileSync(new URL('../integrations/alchemy/src/alchemy.js',import.meta.url),'utf8');
   const alchemyVisualPanel=readFileSync(new URL('../integrations/alchemy/src/ui/visual-panel.js',import.meta.url),'utf8');
   assert.ok(alchemySource.includes("id === 'experience' && alchemyRoot !== document")
@@ -161,8 +163,7 @@ test('restoration edits the original artwork in-room; remaining stations retain 
     && nativeAlchemy.includes("inputPlane.id = 'alchemy-input-plane'")
     && source.includes("classList.toggle('is-active',alchemyInRoom)"),
     'alchemy receives input on a dedicated layer above the Lair controls only while active');
-  assert.ok(source.includes('window.__keynlockLairControls.enabled = false')
-    && source.includes('window.__keynlockLairControls.enabled = true'),
+  assert.ok(transitions.includes("controls.enabled = id !== 'alchemy'"),
     'OrbitControls is suspended during laboratory manipulation and restored on exit');
   assert.ok(readFileSync(new URL('../public/stations/workbench/js/scene.js',import.meta.url),'utf8').includes("createRenderer('workbench',canvas)"));
   assert.ok(readFileSync(new URL('../public/stations/workbench/js/mechanism-3d.js',import.meta.url),'utf8').includes("createRenderer('workbench',canvas)"));

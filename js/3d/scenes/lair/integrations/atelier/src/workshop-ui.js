@@ -26,11 +26,11 @@ export function wireWorkshopUI({ cartoonFilter, navigation, restorationInput, co
   }
 
   function setVisualPanelOpen(open) {
-    $('visual-panel').hidden = !open;
-    $('visual-trigger').setAttribute('aria-expanded', String(open));
+    $('atelier-visual-panel').hidden = !open;
+    $('atelier-visual-trigger').setAttribute('aria-expanded', String(open));
   }
-  $('visual-trigger').addEventListener('click', () => setVisualPanelOpen($('visual-panel').hidden));
-  $('visual-close').addEventListener('click', () => setVisualPanelOpen(false));
+  $('atelier-visual-trigger').addEventListener('click', () => setVisualPanelOpen($('atelier-visual-panel').hidden));
+  $('atelier-visual-close').addEventListener('click', () => setVisualPanelOpen(false));
   $('visual-master').addEventListener('input', () => {
     const enabled = $('visual-master').checked;
     $('toon-enabled').checked = enabled;
@@ -84,7 +84,7 @@ export function wireWorkshopUI({ cartoonFilter, navigation, restorationInput, co
         event.preventDefault(); event.stopPropagation(); leaveEaselFocus(); return;
       }
     }
-    if (event.code === 'Escape' && !$('visual-panel').hidden) {
+    if (event.code === 'Escape' && !$('atelier-visual-panel').hidden) {
       event.preventDefault(); event.stopPropagation(); setVisualPanelOpen(false); return;
     }
     const target = event.target;

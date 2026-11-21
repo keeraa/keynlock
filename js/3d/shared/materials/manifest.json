@@ -393,7 +393,7 @@
       "gitBlobSha": "8609cbbc12608d7974ff6d8cb1558af635bef70c",
       "bytes": 269760,
       "consumers": [
-        "js/3d/scenes/lair/public/assets/atelier-wallpaper-gouache.webp"
+        "js/3d/scenes/lair/integrations/atelier/public/textures/atelier-wallpaper-gouache.webp"
       ]
     },
     {
@@ -422,7 +422,7 @@
       "gitBlobSha": "f54640095b993982717e6cda16d8e00d1148a4d6",
       "bytes": 208532,
       "consumers": [
-        "js/3d/scenes/lair/public/assets/wood-ash-gouache-v2.webp"
+        "js/3d/scenes/lair/integrations/atelier/public/textures/wood-ash-gouache-v2.webp"
       ]
     },
     {
@@ -434,7 +434,7 @@
       "consumers": [
         "js/3d/scenes/alchemy/lab/assets/wood-gouache-ash.webp",
         "js/3d/scenes/alchemy/src/assets/wood-gouache-ash.webp",
-        "js/3d/scenes/lair/public/assets/wood-gouache-ash.webp"
+        "js/3d/scenes/lair/integrations/alchemy/src/assets/wood-gouache-ash.webp"
       ]
     },
     {
@@ -446,7 +446,7 @@
       "consumers": [
         "js/3d/scenes/alchemy/lab/assets/wood-gouache-oak.webp",
         "js/3d/scenes/alchemy/src/assets/wood-gouache-oak.webp",
-        "js/3d/scenes/lair/public/assets/wood-gouache-oak.webp"
+        "js/3d/scenes/lair/integrations/alchemy/src/assets/wood-gouache-oak.webp"
       ]
     },
     {
@@ -458,7 +458,7 @@
       "consumers": [
         "js/3d/scenes/alchemy/lab/assets/wood-gouache-walnut.webp",
         "js/3d/scenes/alchemy/src/assets/wood-gouache-walnut.webp",
-        "js/3d/scenes/lair/public/assets/wood-gouache-walnut.webp"
+        "js/3d/scenes/lair/integrations/alchemy/src/assets/wood-gouache-walnut.webp"
       ]
     },
     {
@@ -468,7 +468,7 @@
       "gitBlobSha": "b89fab255fdc95ac199da0f6b65d6f8c2c70a9ca",
       "bytes": 270450,
       "consumers": [
-        "js/3d/scenes/lair/public/assets/wood-oak-gouache-v2.webp"
+        "js/3d/scenes/lair/integrations/atelier/public/textures/wood-oak-gouache-v2.webp"
       ]
     },
     {
@@ -478,7 +478,7 @@
       "gitBlobSha": "a36d2a49f8343be3763bf2df392ccb5b281969f4",
       "bytes": 170242,
       "consumers": [
-        "js/3d/scenes/lair/public/assets/wood-walnut-gouache-v2.webp"
+        "js/3d/scenes/lair/integrations/atelier/public/textures/wood-walnut-gouache-v2.webp"
       ]
     }
   ]

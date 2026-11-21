@@ -9,8 +9,8 @@ import {createWorldStationRegistry} from './world-stations.js';
 export function createSharedRendererHost({renderer,canvas,worldScene}) {
   const instances = new Map();
   const stationSettings = new Map();
-  const worldRuntimeActive = new Set();
-  const worldFrameCallbacks = new Map();
+  const workshops = new Map();
+  let activeWorkshop = null;
   const world = worldScene ? createWorldStationRegistry(worldScene) : null;
   let active = null;
   const captureSettings = () => ({
@@ -132,7 +132,7 @@ export function createSharedRendererHost({renderer,canvas,worldScene}) {
         if(!fn)return;
         const tick=now=>{
           if(!local.loop)return;
-          if(active===station || worldRuntimeActive.has(station))local.loop(now);
+          if(active===station || activeWorkshop===station)local.loop(now);
           local.raf=requestAnimationFrame(tick);
         };
         local.raf=requestAnimationFrame(tick);
@@ -206,38 +206,50 @@ export function createSharedRendererHost({renderer,canvas,worldScene}) {
     renderer.setViewport(0,0,canvas.width,canvas.height);
   }
 
+  // An in-room workshop implements enter(), exit(), and update(now).
+  // Its geometry stays mounted, including while the workshop is inactive.
+  function registerWorldWorkshop(station, lifecycle, { interval = 0 } = {}) {
+    workshops.set(station, { lifecycle, interval, nextAt: 0 });
+    if (activeWorkshop === station) lifecycle.enter();
+    return () => {
+      if (workshops.get(station)?.lifecycle !== lifecycle) return;
+      if (activeWorkshop === station) setWorldWorkshop(null);
+      workshops.delete(station);
+    };
+  }
+
+  function setWorldWorkshop(station) {
+    if (activeWorkshop === station) return;
+    const previous = workshops.get(activeWorkshop);
+    activeWorkshop = station;
+    previous?.lifecycle.exit();
+    const next = workshops.get(station);
+    if (!next) return; // The source module may still be loading.
+    next.nextAt = 0;
+    next.lifecycle.enter();
+  }
+
   function stepWorldRuntime(now) {
-    for (const station of worldRuntimeActive) {
-      const state = worldFrameCallbacks.get(station);
-      if (!state || now < state.nextAt) continue;
-      // One simulation step per room frame. A costly step backs off instead
-      // of competing with the scene renderer in another animation loop.
-      const started = performance.now();
-      try {
-        state.callback(now);
-      } catch (error) {
-        // A broken imported workshop must never abort the Lair's own frame.
-        worldRuntimeActive.delete(station);
-        console.error(`KEYNLOCK ${station} simulation failed`, error);
-        window.dispatchEvent(new CustomEvent(`keynlock:${station}:v1`, {
-          detail:{type:'error',message:error?.message || String(error)},
-        }));
-        continue;
-      }
-      const cost = performance.now() - started;
-      // Responsive object dragging and fluid motion need more than the
-      // previous 12 Hz. Adapt only when the simulation is genuinely costly.
-      state.nextAt = now + Math.max(25, cost * 1.6);
+    const station = activeWorkshop;
+    const state = workshops.get(station);
+    if (!state || now < state.nextAt) return;
+    const started = performance.now();
+    try {
+      state.lifecycle.update(now);
+    } catch (error) {
+      setWorldWorkshop(null);
+      console.error(`KEYNLOCK ${station} simulation failed`, error);
+      const event = station === 'restoration' ? 'keynlock:atelier' : 'keynlock:alchemy:v1';
+      window.dispatchEvent(new CustomEvent(event, {
+        detail: { type: 'error', message: error?.message || String(error) },
+      }));
+      return;
     }
+    if (state.interval) state.nextAt = now + Math.max(state.interval, (performance.now() - started) * 1.6);
   }
 
   return {createRenderer:makeRenderer,activate,deactivate,
-    registerWorldFrame:(station,callback)=>{
-      if (callback) worldFrameCallbacks.set(station,{callback,nextAt:0});
-      else worldFrameCallbacks.delete(station);
-    },
-    stepWorldRuntime,
-    setWorldRuntimeActive:(station,enabled)=>enabled?worldRuntimeActive.add(station):worldRuntimeActive.delete(station),
+    registerWorldWorkshop,setWorldWorkshop,stepWorldRuntime,
     registerWorldScene:(station,options)=>world?.register(station,options),
     getWorldPose:station=>world?.pose(station)||null,
     setWorldSlotActive:(station,slot)=>world?.selectSlot(station,slot),

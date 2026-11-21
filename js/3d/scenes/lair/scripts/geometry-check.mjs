@@ -92,6 +92,11 @@ const middle = unique('city-middle-rooftops');
 const near = unique('city-near-canalside');
 assert.ok(distant.position.z < middle.position.z && middle.position.z < near.position.z, 'three exterior depth planes create real orbit parallax');
 assert.ok(near.position.z < roomWindow.position.z - 2, 'nearest buildings remain outside the room');
+const canal = unique('city-canal-water');
+assert.equal(canal.rotation.x, -Math.PI / 2, 'canal water is a horizontal world-space surface');
+assert.ok(near.position.z - middle.position.z > 15, 'the banks have distinct depths for lateral camera moves');
+assert.ok(middle.position.z - distant.position.z >= 30, 'the sky is farther behind the houses');
+
 const hangingCloths = [];
 for (const side of ['left', 'right']) {
   const curtain = unique(`window-curtain-${side}`);
@@ -170,6 +175,25 @@ assert.equal(unique('window-light-air').visible, false, 'the window light can be
 world.windowLight.setStrength(1);
 // The bird only appears while it flies past; night swaps sun for moonlight.
 assert.equal(unique('window-bird').visible, false, 'no bird between its flights');
+const bird = unique('window-bird');
+world.windowLight.update(6);
+assert.equal(bird.visible, true);
+world.windowLight.update(7.625);
+const firstAltitude = bird.position.y;
+assert.ok(Math.abs(bird.position.x - WINDOW_OPENING.centerX) < .0001, 'the first flight reaches the middle in 1.625 s');
+const random = Math.random;
+try {
+  Math.random = () => .5; // 40-second pause before the return trip.
+  world.windowLight.update(9.25);
+} finally {
+  Math.random = random;
+}
+assert.equal(bird.visible, false, 'one flight lasts 3.25 s');
+world.windowLight.update(50.875);
+assert.equal(bird.visible, true);
+assert.equal(bird.scale.x, -1, 'the return flight reverses direction');
+assert.ok(Math.abs(bird.position.y - firstAltitude) > .8, 'successive flights cross the window at visibly different heights');
+
 const city = unique('city-distant-panorama').material;
 const airTint = unique('window-light-air').material.uniforms.uAirTint.value;
 const dayTint = airTint.getHex();

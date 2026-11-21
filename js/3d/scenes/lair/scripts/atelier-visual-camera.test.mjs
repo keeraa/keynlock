@@ -13,14 +13,14 @@ test('in-room easel close-ups use the original framing with the easel depth offs
     getPaintingCenterY: () => 1.91, getWallBounds: () => ({ width: 30, minY: 3, maxY: 12 }),
     easelOffsetZ: -3.25 });
   const original = framing.easelFocus('original');
-  const restoration = framing.easelFocus('copy');
+  const atelier = framing.easelFocus('copy');
   assert.equal(original.target.x, -1.28);
-  assert.equal(restoration.target.x, 1.28);
+  assert.equal(atelier.target.x, 1.28);
   assert.ok(Math.abs(original.target.z + 2.86) < 1e-9);
-  assert.ok(Math.abs(restoration.position.z - 1.18) < 1e-9);
+  assert.ok(Math.abs(atelier.position.z - 1.18) < 1e-9);
   const overview = framing.easelOverview();
   assert.equal(overview.target.z, -3.25);
-  assert.ok(overview.position.z > restoration.position.z);
+  assert.ok(overview.position.z > atelier.position.z);
 });
 
 test('Atelier cartoon filter can post-process the real room renderer and restore the direct path', () => {

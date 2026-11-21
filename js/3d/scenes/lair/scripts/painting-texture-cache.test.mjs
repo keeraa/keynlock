@@ -5,7 +5,7 @@ import { createPaintingTextureCache } from '@keynlock/atelier/src/painting-textu
 const renderer = { capabilities: { getMaxAnisotropy: () => 8 } };
 const THREE = { SRGBColorSpace: 'srgb' };
 
-test('a stalled artwork image does not indefinitely block the restoration editor', async () => {
+test('a stalled artwork image does not indefinitely block the atelier editor', async () => {
   const paths = [];
   const cache = createPaintingTextureCache({
     THREE, renderer, timeoutMs: 20,

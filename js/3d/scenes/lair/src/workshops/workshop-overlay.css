@@ -1,4 +1,4 @@
-.original-station-overlay {
+.workshop-overlay {
   position: absolute;
   inset: 0;
   z-index: 140;
@@ -11,19 +11,19 @@
   pointer-events: none;
   transition: opacity .36s ease, visibility 0s linear .36s;
 }
-.original-station-overlay.station-open {
+.workshop-overlay.workshop-open {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
   transition: opacity .36s ease, visibility 0s;
 }
-.original-station-overlay[data-station="alchemy"] {
+.workshop-overlay[data-workshop="alchemy"] {
   transition-duration: 1.15s, 0s;
 }
-.original-station-overlay[data-station="alchemy"].station-open {
+.workshop-overlay[data-workshop="alchemy"].workshop-open {
   transition-duration: 1.15s, 0s;
 }
-.original-station-bar {
+.workshop-bar {
   z-index: 2;
   display: flex;
   align-items: center;
@@ -35,7 +35,7 @@
   background: #1a221e;
   color: #e3d7bd;
 }
-.original-station-return {
+.workshop-return {
   display: flex;
   align-items: center;
   gap: 9px;
@@ -49,16 +49,16 @@
   white-space: nowrap;
   cursor: pointer;
 }
-.original-station-return:hover, .original-station-return:focus-visible {
+.workshop-return:hover, .workshop-return:focus-visible {
   background: #304038;
   border-color: #e1c48d;
 }
-.original-station-title {
+.workshop-title {
   font: 500 15px Georgia, 'Times New Roman', serif;
   letter-spacing: .16em;
   text-align: center;
 }
-.original-station-title span {
+.workshop-title span {
   font-family: system-ui, sans-serif;
   font-size: 10px;
   letter-spacing: .17em;
@@ -67,15 +67,15 @@
   padding-right: 17px;
   border-right: 1px solid #69624e;
 }
-.original-station-external {
+.workshop-external {
   color: #c3b093;
   font-size: 10px;
   letter-spacing: .09em;
   text-decoration: none;
   white-space: nowrap;
 }
-.original-station-external:hover {color: #f2dba9}
-.original-station-frame {
+.workshop-external:hover {color: #f2dba9}
+.workshop-frame {
   position: absolute;
   inset: 47px 0 0;
   display: block;
@@ -87,7 +87,7 @@
   visibility: hidden;
   pointer-events: none;
 }
-.original-station-frame.is-active {
+.workshop-frame.is-active {
   visibility: visible;
   pointer-events: auto;
 }
@@ -277,14 +277,14 @@
 #atelier-embedded-app .workbench.is-collapsed {height:0;overflow:visible}
 #atelier-embedded-app .workbench.is-collapsed .workbench-toggle {top:-29px}
 #atelier-embedded-app .collection-modal[hidden] {display:none!important}
-#restoration-scene-feedback {
+#atelier-scene-feedback {
   display: none;
   position: absolute;
   inset: 0;
   z-index: 17;
   pointer-events: none;
 }
-.restoration-mode #restoration-scene-feedback {display:block}
+.atelier-mode #atelier-scene-feedback {display:block}
 #atelier-embedded-app.collection-expanded {
   position: absolute;
   z-index: 150;
@@ -302,12 +302,12 @@
 #atelier-embedded-app.collection-expanded .main,
 #atelier-embedded-app.collection-expanded .workbench {height:100%}
 #atelier-embedded-app.collection-expanded .workbench {overflow: hidden}
-.restoration-mode .chapter-caption,
-.restoration-mode .scene-hotspots,
-.restoration-mode .bottom-ui .interaction-hint,
-.restoration-mode .bottom-ui .zone-nav {display:none}
-.restoration-mode .bottom-ui {background:none;pointer-events:none}
-.restoration-mode #reset-camera {
+.atelier-mode .chapter-caption,
+.atelier-mode .scene-hotspots,
+.atelier-mode .bottom-ui .interaction-hint,
+.atelier-mode .bottom-ui .zone-nav {display:none}
+.atelier-mode .bottom-ui {background:none;pointer-events:none}
+.atelier-mode #reset-camera {
   position: fixed;
   top: 101px;
   right: 21px;
@@ -398,7 +398,7 @@
 }
 /* Exact artwork notes and prohibition lore, mirrored from the Atelier source.
    The source stage remains hidden because the Lair owns the single 3D canvas. */
-.restoration-art-info {
+.atelier-art-info {
   position:absolute;
   top:155px;
   right:22px;
@@ -412,32 +412,32 @@
   color:#f2e4c8;
   pointer-events:auto;
 }
-.restoration-art-info[hidden],.restoration-art-info #restoration-info-body[hidden] {display:none!important}
-.restoration-art-heading {
+.atelier-art-info[hidden],.atelier-art-info #atelier-info-body[hidden] {display:none!important}
+.atelier-art-heading {
   display:flex;
   justify-content:space-between;
   align-items:flex-start;
   gap:13px;
   padding:15px 16px 14px;
 }
-.restoration-art-heading > div {min-width:0}
-#restoration-info-index {
+.atelier-art-heading > div {min-width:0}
+#atelier-info-index {
   display:block;
   margin-bottom:5px;
   color:#c8a675;
   font:700 9px/1.5 Manrope,Arial,sans-serif;
   letter-spacing:.15em;
 }
-#restoration-info-title {
+#atelier-info-title {
   margin:0 0 4px;
   color:#f7e5c7;
   font:500 22px/1.15 Georgia,'Times New Roman',serif;
 }
-#restoration-info-author {
+#atelier-info-author {
   color:#c9b494;
   font:11px/1.5 Manrope,Arial,sans-serif;
 }
-#restoration-info-toggle {
+#atelier-info-toggle {
   display:grid;
   place-items:center;
   flex:none;
@@ -449,28 +449,28 @@
   font:19px/1 Georgia,serif;
   cursor:pointer;
 }
-#restoration-info-toggle:hover {background:#71553a}
-#restoration-info-body {padding:0 16px 15px}
-#restoration-info-description {
+#atelier-info-toggle:hover {background:#71553a}
+#atelier-info-body {padding:0 16px 15px}
+#atelier-info-description {
   margin:0 0 13px;
   font:12px/1.58 Manrope,Arial,sans-serif;
   color:#e5d8c0;
 }
-.restoration-info-ban {
+.atelier-info-ban {
   padding-top:11px;
   border-top:1px solid #806c4b;
 }
-#restoration-info-ban-label {
+#atelier-info-ban-label {
   color:#d0aa77;
   font:700 9px/1.45 Manrope,Arial,sans-serif;
   letter-spacing:.11em;
 }
-#restoration-info-ban-reason {
+#atelier-info-ban-reason {
   margin:5px 0 7px;
   color:#f0dbc0;
   font:600 12px/1.48 Manrope,Arial,sans-serif;
 }
-#restoration-info-policy {
+#atelier-info-policy {
   color:#b49b79;
   font:10px/1.4 Georgia,serif;
 }
@@ -526,7 +526,7 @@
 }
 .lair-gallery-controls #gallery-select {background:#dbc5a3;color:#47331f}
 .lair-gallery-controls #gallery-select:hover {background:#f5dbb0}
-.original-station-loading {
+.workshop-loading {
   position: absolute;
   z-index: 1;
   inset: 47px 0 0;
@@ -543,38 +543,38 @@
   letter-spacing: .15em;
   transition: opacity .45s ease, visibility 0s linear .45s;
 }
-.original-station-overlay.station-ready .original-station-loading {
+.workshop-overlay.workshop-ready .workshop-loading {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
 }
-.original-station-loading-symbol {
+.workshop-loading-symbol {
   font: 56px Georgia, serif;
   color: #bfa66f;
 }
-.original-station-loading-rule {
+.workshop-loading-rule {
   width: 186px;
   height: 2px;
   overflow: hidden;
   background: #3c453c;
 }
-.original-station-loading-rule i {
+.workshop-loading-rule i {
   display: block;
   width: 40%;
   height: 100%;
   background: #d5bb87;
-  animation: original-station-scan 1.5s ease-in-out infinite alternate;
+  animation: workshop-scan 1.5s ease-in-out infinite alternate;
 }
-.original-station-warning {
+.workshop-warning {
   max-width: 470px;
   line-height: 1.7;
   font-size: 13px;
   letter-spacing: 0;
   color: #e0c7a6;
 }
-.original-station-loading a {font-size: 13px; color: #f1d8a6; letter-spacing: 0}
-.original-station-loading [hidden] {display: none !important}
-@keyframes original-station-scan {
+.workshop-loading a {font-size: 13px; color: #f1d8a6; letter-spacing: 0}
+.workshop-loading [hidden] {display: none !important}
+@keyframes workshop-scan {
   from {transform: translateX(-110%)}
   to {transform: translateX(360%)}
 }
@@ -587,13 +587,13 @@
   #atelier-embedded-app .workbench-content {max-height:60vh}
   #atelier-embedded-app .restoration-row {padding:8px 10px}
   #atelier-embedded-app .workbench-footer {padding:8px 10px}
-  .restoration-mode #reset-camera {top:75px;right:10px}
+  .atelier-mode #reset-camera {top:75px;right:10px}
   .wall-collection-entry {font-size:8px;padding:7px 9px;gap:6px}
   .wall-collection-mark {width:25px;height:25px;font-size:16px}
-  .restoration-art-info {top:118px;right:10px;width:min(318px,calc(100vw - 20px));max-height:34vh}
-  .restoration-art-heading {padding:10px 12px}
-  #restoration-info-title {font-size:18px}
-  #restoration-info-body {padding:0 12px 11px}
+  .atelier-art-info {top:118px;right:10px;width:min(318px,calc(100vw - 20px));max-height:34vh}
+  .atelier-art-heading {padding:10px 12px}
+  #atelier-info-title {font-size:18px}
+  #atelier-info-body {padding:0 12px 11px}
   .lair-gallery-controls {bottom:52px;flex-wrap:wrap;width:calc(100% - 16px);gap:4px;padding:5px}
   .lair-gallery-controls button {font-size:9px;padding:8px 9px}
   .lair-gallery-panner {order:-1;width:100%;justify-content:center;gap:6px}
@@ -602,13 +602,13 @@
   .lair-easel-camera-controls {right:8px;max-width:calc(100vw - 16px);gap:3px;padding:4px;bottom:min(calc(var(--atelier-panel-height,0px) + 48px),calc(100vh - 146px))}
   #lair-easel-camera-state {min-width:100px;font-size:9px}
   .lair-easel-camera-controls > button {font-size:9px;padding:6px}
-  .original-station-bar {padding: 0 8px; gap: 6px}
-  .original-station-return {font-size: 10px; gap: 4px; padding: 8px}
-  .original-station-title {font-size: 12px}
-  .original-station-title span {display: none}
-  .original-station-external {font-size: 9px}
+  .workshop-bar {padding: 0 8px; gap: 6px}
+  .workshop-return {font-size: 10px; gap: 4px; padding: 8px}
+  .workshop-title {font-size: 12px}
+  .workshop-title span {display: none}
+  .workshop-external {font-size: 9px}
 }
 @media (prefers-reduced-motion: reduce) {
-  .original-station-overlay, .original-station-loading,
-  .original-station-loading-rule i {transition: none; animation: none}
+  .workshop-overlay, .workshop-loading,
+  .workshop-loading-rule i {transition: none; animation: none}
 }

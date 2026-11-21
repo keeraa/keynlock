@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { canvasTexture } from '../materials.js';
+import { canvasTexture } from './materials.js';
 
 // Shared building blocks for the room's parts: primitives with physical-scale
-// wood UVs, painted labels, the station picking targets, tables and bottles.
+// wood UVs, painted labels, the zones' picking targets, tables and bottles.
 export function createRoomKit(scene, m) {
   const anchors = {};
   const hitTargets = [];
@@ -76,7 +76,7 @@ export function createRoomKit(scene, m) {
     }, 1024, 180);
     return plane(parent, width, height, new THREE.MeshStandardMaterial({ map: texture, roughness: 1 }), x, y, z);
   };
-  const station = (id, position, size) => {
+  const zoneTarget = (id, position, size) => {
     anchors[id] = new THREE.Vector3(...position);
     const collider = new THREE.Mesh(new THREE.BoxGeometry(...size), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
     collider.position.set(...position);
@@ -106,6 +106,6 @@ export function createRoomKit(scene, m) {
   return {
     m, scene, staticGroup, anchors, hitTargets, animated,
     shadow, paintedWood, woodPeriod, sizeWoodBoxUV,
-    box, cylinder, sphere, rod, plane, label, station, makeTable, bottle,
+    box, cylinder, sphere, rod, plane, label, zoneTarget, makeTable, bottle,
   };
 }

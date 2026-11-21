@@ -59,9 +59,9 @@ const camera = new THREE.PerspectiveCamera(39, 1, 0.1, 65);
 camera.position.set(0, 2.27, 7.65);
 // Keep the complete original Atelier, including its exact paintings and tools,
 // in the same spatial world as KEYNLOCK's Lair.
-rendererHost?.registerWorldScene('restoration', {scene, camera});
+rendererHost?.registerWorldScene('atelier', {scene, camera});
 const renderer = embedded
-  ? rendererHost.createRenderer('restoration', document.createElement('canvas'))
+  ? rendererHost.createRenderer('atelier', document.createElement('canvas'))
   : new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.45));
 renderer.shadowMap.enabled = true;
@@ -296,7 +296,7 @@ exhibition = createWallExhibitionController({ paintings, playerProgress, wallGal
 exhibition.bind();
 // The Lair's single renderer follows the original gallery camera. These
 // controls retain the Atelier's 30-frame layout, movements and artwork focus.
-if (directRoot) publishWorkshopApi('restoration', { gallery: {
+if (directRoot) publishWorkshopApi('atelier', { gallery: {
   setAspect(aspect) {
     if (Number.isFinite(aspect) && aspect > 0) {
       camera.aspect = aspect;
@@ -352,7 +352,7 @@ function artworkInfo(art) {
     banLabel: labels.banned, policy: labels.policy,
   };
 }
-if (embedded) publishWorkshopApi('restoration', { bridge: {
+if (embedded) publishWorkshopApi('atelier', { bridge: {
   isReady: () => Boolean(activeTexture && activeSurface),
   setViewportAspect: aspect => {
     if (!Number.isFinite(aspect) || aspect <= 0) return;
@@ -560,7 +560,7 @@ function animate(now) {
 if (embedded) {
   navigation.resize();
   if (directRoot) {
-    rendererHost.registerWorldWorkshop('restoration', {
+    rendererHost.registerWorldWorkshop('atelier', {
       enter() { inRoomActive = true; },
       exit() {
         inRoomActive = false;

@@ -1,13 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import {createWorldStationRegistry, WORKSHOP_PLACEMENTS} from '../src/world-stations.js';
+import {createWorldWorkshopRegistry, WORKSHOP_PLACEMENTS} from '../src/rendering/world-workshops.js';
 
 test('three unchanged source scenes occupy one physically connected world',()=>{
   const world=new THREE.Scene();
-  const registry=createWorldStationRegistry(world);
+  const registry=createWorldWorkshopRegistry(world);
   const sources={};
-  for (const id of ['restoration','alchemy','workbench']) {
+  for (const id of ['atelier','alchemy','workbench']) {
     const original=new THREE.Scene(),camera=new THREE.PerspectiveCamera(40,1,.1,100);
     const mesh=new THREE.Mesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshStandardMaterial());
     original.add(mesh);
@@ -19,7 +19,7 @@ test('three unchanged source scenes occupy one physically connected world',()=>{
   registry.update();
   assert.equal(world.children.length,3);
   assert.equal(registry.entries.size,3);
-  assert.equal(registry.roots.get('restoration').visible,true,
+  assert.equal(registry.roots.get('atelier').visible,true,
     'the original Atelier is visible inside the main Lair renderer');
   assert.equal(registry.roots.get('alchemy').visible,true,
     'the original laboratory must remain visible from the common Lair camera');
@@ -37,12 +37,12 @@ test('three unchanged source scenes occupy one physically connected world',()=>{
     const actual=camera.getWorldDirection(new THREE.Vector3());
     assert.ok(actual.dot(toward)>.999,'original local lookAt works in translated/rotated room');
   }
-  assert.ok(sources.restoration.camera.getWorldPosition(new THREE.Vector3()).x>0,
+  assert.ok(sources.atelier.camera.getWorldPosition(new THREE.Vector3()).x>0,
     'Atelier editing camera faces the left Lair wall from INSIDE the building');
-  assert.ok(sources.restoration.camera.getWorldPosition(new THREE.Vector3()).x<8.55);
+  assert.ok(sources.atelier.camera.getWorldPosition(new THREE.Vector3()).x<8.55);
   const galleryWall=new THREE.Mesh(new THREE.BoxGeometry(32,14.21,.2),new THREE.MeshStandardMaterial());
   galleryWall.position.set(0,5.555,-4.7);
-  sources.restoration.original.add(galleryWall);
+  sources.atelier.original.add(galleryWall);
   world.updateMatrixWorld(true);
   const wallBounds=new THREE.Box3().setFromObject(galleryWall);
   assert.ok(wallBounds.min.x < -8.39 && wallBounds.max.x > -8.41,
@@ -59,7 +59,7 @@ test('three unchanged source scenes occupy one physically connected world',()=>{
 });
 
 test('alchemy backdrop and both workbench tools persist under one parent',()=>{
-  const registry=createWorldStationRegistry(new THREE.Scene());
+  const registry=createWorldWorkshopRegistry(new THREE.Scene());
   const alchemy=new THREE.Scene(),background=new THREE.Scene(),camera=new THREE.PerspectiveCamera();
   registry.register('alchemy',{scene:alchemy,additionalScenes:[background],camera});
   assert.equal(alchemy.parent,background.parent,'the original two-stage room has one world transform');
@@ -86,7 +86,7 @@ test('alchemy backdrop and both workbench tools persist under one parent',()=>{
 });
 
 test('alchemy furniture feet rest on the Lair floor and the camera uses the original orbit pivot',()=>{
-  const registry=createWorldStationRegistry(new THREE.Scene());
+  const registry=createWorldWorkshopRegistry(new THREE.Scene());
   const original=new THREE.Scene();
   const camera=new THREE.PerspectiveCamera(37,1.6,.1,100);
   registry.register('alchemy',{scene:original,camera});
@@ -108,7 +108,7 @@ test('alchemy furniture feet rest on the Lair floor and the camera uses the orig
 });
 
 test('embedded lab suppresses its second background rig and scales point lights only during drawing',()=>{
-  const registry=createWorldStationRegistry(new THREE.Scene());
+  const registry=createWorldWorkshopRegistry(new THREE.Scene());
   const foreground=new THREE.Scene(),background=new THREE.Scene();
   const bulb=new THREE.PointLight(0xffffff,10,4,2);
   const backdrop=new THREE.HemisphereLight(0xffffff,0x222222,2.5);

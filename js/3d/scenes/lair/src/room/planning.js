@@ -1,10 +1,10 @@
 // @ts-check
 import * as THREE from 'three';
-import { makeMapTexture } from '../materials.js';
+import { makeMapTexture } from './materials.js';
 
 // The planning table in the middle of the room.
 export function buildPlanning(kit) {
-  const { m, staticGroup, animated, box, cylinder, sphere, rod, plane, station, makeTable, bottle } = kit;
+  const { m, staticGroup, animated, box, cylinder, sphere, rod, plane, zoneTarget, makeTable, bottle } = kit;
   function makePaper(parent, x, y, z, rotation = 0, size = [.53, .76]) {
     const sheet = box(parent, size[0], .013, size[1], m.paper, x, y, z);
     sheet.rotation.y = rotation;
@@ -58,5 +58,5 @@ export function buildPlanning(kit) {
   const shelf = box(staticGroup, 1.9, .12, .52, m.walnut, 5.45, 1.98, -4.96);
   shelf.castShadow = false;
   for (let i = 0; i < 5; i++) box(staticGroup, .15 + i * .022, .54 + (i % 2) * .16, .3, i % 2 ? m.ruby : m.leather, 4.71 + i * .24, 2.32 + (i % 2) * .08, -4.90);
-  station('planning', [0, 1.42, 1.28], [3.4, 2.8, 2.6]);
+  zoneTarget('planning', [0, 1.42, 1.28], [3.4, 2.8, 2.6]);
 }

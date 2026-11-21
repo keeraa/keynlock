@@ -64,6 +64,21 @@ export default [
       }],
     },
   },
+  // Lair folders: room/ and rendering/ stand alone; workshops/ knows only the
+  // host contract; navigation/ and ui/ sit on top. main.js wires them together.
+  ...[
+    ['room', ['workshops', 'navigation', 'ui', 'rendering']],
+    ['rendering', ['room', 'workshops', 'navigation', 'ui']],
+    ['workshops', ['room', 'navigation', 'ui', 'rendering']],
+  ].map(([folder, forbidden]) => ({
+    files: [`scenes/lair/src/${folder}/**/*.js`],
+    rules: {
+      'no-restricted-imports': ['error', { patterns: [{
+        group: forbidden.map(name => `../${name}/*`),
+        message: `scenes/lair/src/${folder}/ must not depend on ${forbidden.join(', ')}; see the Lair README.`,
+      }] }],
+    },
+  })),
   {
     files: ['core/**/*.js'],
     rules: {

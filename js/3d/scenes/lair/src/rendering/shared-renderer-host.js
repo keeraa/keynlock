@@ -1,6 +1,6 @@
 // @ts-check
 import * as THREE from 'three';
-import {createWorldStationRegistry} from './world-stations.js';
+import {createWorldWorkshopRegistry} from './world-workshops.js';
 
 /**
  * The three preserved workshops use their exact source files and their own
@@ -9,10 +9,10 @@ import {createWorldStationRegistry} from './world-stations.js';
  */
 export function createSharedRendererHost({renderer,canvas,worldScene}) {
   const instances = new Map();
-  const stationSettings = new Map();
+  const workshopSettings = new Map();
   const workshops = new Map();
   let activeWorkshop = null;
-  const world = worldScene ? createWorldStationRegistry(worldScene) : null;
+  const world = worldScene ? createWorldWorkshopRegistry(worldScene) : null;
   let active = null;
   const captureSettings = () => ({
     outputColorSpace:renderer.outputColorSpace,
@@ -57,15 +57,15 @@ export function createSharedRendererHost({renderer,canvas,worldScene}) {
     return {x,y:Math.max(0,canvasHeight-top-h),w,h};
   }
 
-  function makeRenderer(station,localCanvas) {
-    if (!['restoration','alchemy','workbench'].includes(station))
-      throw new Error('Unknown KEYNLOCK station');
+  function makeRenderer(workshopId,localCanvas) {
+    if (!['atelier','alchemy','workbench'].includes(workshopId))
+      throw new Error('Unknown KEYNLOCK workshop');
     const local = {
       canvas:localCanvas, pixelRatio:Math.min(localCanvas.ownerDocument.defaultView.devicePixelRatio||1,1.65),
       width:localCanvas.clientWidth||1, height:localCanvas.clientHeight||1,
-      loop:null,raf:0,scene:null,camera:null,settings:snapshot(stationSettings.get(station)||hostSettings),
+      loop:null,raf:0,scene:null,camera:null,settings:snapshot(workshopSettings.get(workshopId)||hostSettings),
     };
-    instances.set(station,local);
+    instances.set(workshopId,local);
     const shadowMap = new Proxy(renderer.shadowMap,{
       get(target,key){
         if(key==='enabled')return local.settings.shadowEnabled;
@@ -77,7 +77,7 @@ export function createSharedRendererHost({renderer,canvas,worldScene}) {
         const setting = key==='enabled'?'shadowEnabled':key==='type'?'shadowType':
           key==='autoUpdate'?'shadowAutoUpdate':null;
         if(setting)local.settings[setting]=value;
-        if(active===station||!setting)Reflect.set(target,key,value,target);
+        if(active===workshopId||!setting)Reflect.set(target,key,value,target);
         return true;
       },
     });
@@ -98,12 +98,12 @@ export function createSharedRendererHost({renderer,canvas,worldScene}) {
       setClearColor:()=>(color,alpha=1)=>{
         local.settings.clearColor.set(color);
         local.settings.clearAlpha=alpha;
-        if(active===station)renderer.setClearColor(color,alpha);
+        if(active===workshopId)renderer.setClearColor(color,alpha);
       },
       getClearColor:()=>(target)=>target.copy(local.settings.clearColor),
       getClearAlpha:()=>()=>local.settings.clearAlpha,
       clear:()=> (...args)=>{
-        if(active!==station)return;
+        if(active!==workshopId)return;
         if(renderer.getRenderTarget()){renderer.clear(...args);return;}
         const oldScissor=renderer.getScissor(new THREE.Vector4()).clone();
         const oldEnabled=renderer.getScissorTest();
@@ -115,7 +115,7 @@ export function createSharedRendererHost({renderer,canvas,worldScene}) {
         renderer.setScissor(oldScissor);
       },
       clearDepth:()=>()=>{
-        if(active!==station)return;
+        if(active!==workshopId)return;
         if(renderer.getRenderTarget()){renderer.clearDepth();return;}
         const oldScissor=renderer.getScissor(new THREE.Vector4()).clone();
         const oldEnabled=renderer.getScissorTest();
@@ -133,13 +133,13 @@ export function createSharedRendererHost({renderer,canvas,worldScene}) {
         if(!fn)return;
         const tick=now=>{
           if(!local.loop)return;
-          if(active===station || activeWorkshop===station)local.loop(now);
+          if(active===workshopId || activeWorkshop===workshopId)local.loop(now);
           local.raf=requestAnimationFrame(tick);
         };
         local.raf=requestAnimationFrame(tick);
       },
       render:()=> (scene,camera)=>{
-        if(active!==station)return;
+        if(active!==workshopId)return;
         local.scene=scene;local.camera=camera;
         world?.update();
         const target=renderer.getRenderTarget();
@@ -171,7 +171,7 @@ export function createSharedRendererHost({renderer,canvas,worldScene}) {
       set(target,key,value){
         if(key==='outputColorSpace'||key==='toneMapping'||key==='toneMappingExposure'||key==='autoClear'){
           local.settings[key]=value;
-          if(active===station)Reflect.set(target,key,value,target);
+          if(active===workshopId)Reflect.set(target,key,value,target);
           return true;
         }
         Reflect.set(target,key,value,target);
@@ -180,23 +180,23 @@ export function createSharedRendererHost({renderer,canvas,worldScene}) {
     });
   }
 
-  function activate(station) {
-    active=station;
-    world?.setLighting(station);
-    const local=instances.get(station);
-    applySettings(stationSettings.get(station)||local?.settings||hostSettings);
-    // Stop carrying the former station's stencil / render target into this one.
+  function activate(workshopId) {
+    active=workshopId;
+    world?.setLighting(workshopId);
+    const local=instances.get(workshopId);
+    applySettings(workshopSettings.get(workshopId)||local?.settings||hostSettings);
+    // Stop carrying the former workshop's stencil / render target into this one.
     renderer.setRenderTarget(null);
     renderer.setScissorTest(false);
     renderer.setViewport(0,0,canvas.width,canvas.height);
     renderer.shadowMap.needsUpdate=true;
     renderer.clear();
   }
-  function deactivate(station) {
-    if(active!==station)return;
-    stationSettings.set(station,captureSettings());
-    const local=instances.get(station);
-    if(local)local.settings=snapshot(stationSettings.get(station));
+  function deactivate(workshopId) {
+    if(active!==workshopId)return;
+    workshopSettings.set(workshopId,captureSettings());
+    const local=instances.get(workshopId);
+    if(local)local.settings=snapshot(workshopSettings.get(workshopId));
     active=null;
     world?.setLighting(null);
     // Keep the original workshop application alive in its document. On return,
@@ -209,38 +209,38 @@ export function createSharedRendererHost({renderer,canvas,worldScene}) {
 
   // An in-room workshop implements enter(), exit(), and update(now).
   // Its geometry stays mounted, including while the workshop is inactive.
-  function registerWorldWorkshop(station, lifecycle, { interval = 0 } = {}) {
-    workshops.set(station, { lifecycle, interval, nextAt: 0 });
-    if (activeWorkshop === station) lifecycle.enter();
+  function registerWorldWorkshop(workshopId, lifecycle, { interval = 0 } = {}) {
+    workshops.set(workshopId, { lifecycle, interval, nextAt: 0 });
+    if (activeWorkshop === workshopId) lifecycle.enter();
     return () => {
-      if (workshops.get(station)?.lifecycle !== lifecycle) return;
-      if (activeWorkshop === station) setWorldWorkshop(null);
-      workshops.delete(station);
+      if (workshops.get(workshopId)?.lifecycle !== lifecycle) return;
+      if (activeWorkshop === workshopId) setWorldWorkshop(null);
+      workshops.delete(workshopId);
     };
   }
 
-  function setWorldWorkshop(station) {
-    if (activeWorkshop === station) return;
+  function setWorldWorkshop(workshopId) {
+    if (activeWorkshop === workshopId) return;
     const previous = workshops.get(activeWorkshop);
-    activeWorkshop = station;
+    activeWorkshop = workshopId;
     previous?.lifecycle.exit();
-    const next = workshops.get(station);
+    const next = workshops.get(workshopId);
     if (!next) return; // The source module may still be loading.
     next.nextAt = 0;
     next.lifecycle.enter();
   }
 
   function stepWorldRuntime(now) {
-    const station = activeWorkshop;
-    const state = workshops.get(station);
+    const workshopId = activeWorkshop;
+    const state = workshops.get(workshopId);
     if (!state || now < state.nextAt) return;
     const started = performance.now();
     try {
       state.lifecycle.update(now);
     } catch (error) {
       setWorldWorkshop(null);
-      console.error(`KEYNLOCK ${station} simulation failed`, error);
-      const event = station === 'restoration' ? 'keynlock:atelier' : 'keynlock:alchemy:v1';
+      console.error(`KEYNLOCK ${workshopId} simulation failed`, error);
+      const event = workshopId === 'atelier' ? 'keynlock:atelier' : 'keynlock:alchemy:v1';
       window.dispatchEvent(new CustomEvent(event, {
         detail: { type: 'error', message: error?.message || String(error) },
       }));
@@ -251,17 +251,17 @@ export function createSharedRendererHost({renderer,canvas,worldScene}) {
 
   return {createRenderer:makeRenderer,activate,deactivate,
     registerWorldWorkshop,setWorldWorkshop,stepWorldRuntime,
-    registerWorldScene:(station,options)=>world?.register(station,options),
-    getWorldPose:station=>world?.pose(station)||null,
-    setWorldSlotActive:(station,slot)=>world?.selectSlot(station,slot),
-    setWorldLighting:station=>world?.setLighting(station),
+    registerWorldScene:(workshopId,options)=>world?.register(workshopId,options),
+    getWorldPose:workshopId=>world?.pose(workshopId)||null,
+    setWorldSlotActive:(workshopId,slot)=>world?.selectSlot(workshopId,slot),
+    setWorldLighting:workshopId=>world?.setLighting(workshopId),
     prepareWorldLightsForRender:()=>world?.prepareLightsForRender(),
     restoreWorldLightsAfterRender:()=>world?.restoreLightsAfterRender(),
     // The preserved Atelier postprocessor renders this same THREE.Scene,
     // including the Lair architecture and original art meshes.
     getUnifiedScene:()=>worldScene,
     updateWorld:()=>world?.update(),
-    hasWorldScene:station=>Boolean(world?.has(station)),
+    hasWorldScene:workshopId=>Boolean(world?.has(workshopId)),
     world,
     current:()=>active,stats:()=>[...instances.keys()]};
 }

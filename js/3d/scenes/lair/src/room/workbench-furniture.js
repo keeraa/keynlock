@@ -3,7 +3,7 @@ import * as THREE from 'three';
 
 // The key workbench beside the laboratory, with its tool wall.
 export function buildWorkbench(kit) {
-  const { m, staticGroup, box, cylinder, sphere, rod, label, station, makeTable, bottle } = kit;
+  const { m, staticGroup, box, cylinder, sphere, rod, label, zoneTarget, makeTable, bottle } = kit;
   function toolPegboard() {
     // The tool wall belongs to the workbench along the right-hand tiled wall.
     const pegboard = new THREE.Group(); pegboard.position.set(8.18, 3.22, 20.07);
@@ -61,5 +61,5 @@ export function buildWorkbench(kit) {
     box(work, .13, .13, .12, m.iron, 1.14 + Math.cos(a) * .29, 1.29 + Math.sin(a) * .29, -.20);
   }
   bottle(work, 1.40, 1.39, .35, m.liquidAmber, .31, .13);
-  station('workbench', [7.17, 1.58, 20.07], [2.25, 2.9, 3.65]);
+  zoneTarget('workbench', [7.17, 1.58, 20.07], [2.25, 2.9, 3.65]);
 }

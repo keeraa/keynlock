@@ -31,7 +31,7 @@ test('every retained work has its original Atelier description and ban reason', 
   }
 });
 
-test('all five restoration tools reuse the original operations', () => {
+test('all five atelier tools reuse the original operations', () => {
   const events = [];
   const layers = Object.fromEntries(['dust','dirt','cracks','loss','varnish','uvSource','scan']
     .map(key => [key, { getImageData: () => ({ data: [0,0,0,255] }), key }]));

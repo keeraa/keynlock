@@ -1,23 +1,23 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { createMaterials } from './materials.js';
-import { buildLair } from './room.js';
-import { createRoomOutlines, mountVisualSettings } from './visual-settings.js';
-import { mountOriginalStations } from './original-stations.js';
-import { mountAtelierInRoom } from './atelier-in-room.js';
-import { mountAlchemyInRoom } from './alchemy-in-room.js';
-import { createSharedRendererHost } from './shared-renderer-host.js';
+import { createMaterials } from './room/materials.js';
+import { buildLair } from './room/build.js';
+import { createRoomOutlines, mountVisualSettings } from './ui/visual-settings.js';
+import { mountWorkshopOverlay } from './workshops/workshop-overlay.js';
+import { mountAtelierInRoom } from './workshops/atelier-in-room.js';
+import { mountAlchemyInRoom } from './workshops/alchemy-in-room.js';
+import { createSharedRendererHost } from './rendering/shared-renderer-host.js';
 import { createCartoonFilter } from '@keynlock/atelier/src/effects/cartoon-filter.js';
-import { addRoomLighting } from './room-lighting.js';
-import { createZoneTransitions, RESTORATION_EASELS } from './zone-transitions.js';
-import { createRestorationView } from './restoration-view.js';
-import { createInitialLoadingGate } from './initial-loading.js';
+import { addRoomLighting } from './room/lighting.js';
+import { createZoneTransitions, ATELIER_EASELS } from './navigation/zone-transitions.js';
+import { createAtelierView } from './workshops/atelier-view.js';
+import { createInitialLoadingGate } from './ui/initial-loading.js';
 import { getWorkshopApi, setWorkshopHost } from '../../../core/host/workshop-host.js';
 import { bindLanguageSelect, t, translator } from './i18n.js';
 import './style.css';
-import './initial-loading.css';
-import './visual.css';
-import './original-stations.css';
+import './ui/initial-loading.css';
+import './ui/visual.css';
+import './workshops/workshop-overlay.css';
 
 // The page is written in Russian; translate the Lair's own markup before the
 // workshops mount theirs (their interfaces are not translated yet).
@@ -38,7 +38,7 @@ const fpsLabel = document.querySelector('#fps');
 const triangleLabel = document.querySelector('#triangles');
 const panel = document.querySelector('#zone-panel');
 let renderer, scene, camera, controls, room, rendererHost, atelierFilter;
-let visualUI, originalStations, zoneTransitions, restorationView;
+let visualUI, workshopOverlay, zoneTransitions, atelierView;
 let lastSceneTriangles = 0;
 let startPointer = null;
 let hoveredZone = null;
@@ -127,7 +127,7 @@ function setup() {
 
   addRoomLighting({ THREE, scene });
   // Keep the source laboratory's original lighting legible in this shared room.
-  // The source rig is registered separately and activated only at its station.
+  // The source rig is registered separately and activated only at its workshop.
   const roomLights = scene.children.filter(child => child.isLight);
   const { materials, visual } = createMaterials();
   room = buildLair(scene, materials);
@@ -140,27 +140,27 @@ function setup() {
   // The workbench runs in an iframe (it is developed separately) and finds the
   // shared renderer here; the Atelier and the lab use the host module instead.
   window.__keynlockRendererHost = rendererHost;
-  originalStations = mountOriginalStations({
+  workshopOverlay = mountWorkshopOverlay({
     rendererHost,
     onExit: () => zoneTransitions.reset(),
-    onReady: id => zoneTransitions.onStationReady(id),
+    onReady: id => zoneTransitions.onWorkshopReady(id),
   });
   const outlines = createRoomOutlines(scene);
   visualUI = mountVisualSettings({ visual, room, outlines, atelierFilter,
     grain: document.querySelector('.grain'), onOpen: () => { panel.hidden = true; } });
-  restorationView = createRestorationView({
+  atelierView = createAtelierView({
     camera, controls, canvas, interaction, rendererHost, atelierFilter, host,
-    easelPose: RESTORATION_EASELS, roomMinDistance,
+    easelPose: ATELIER_EASELS, roomMinDistance,
     navigation: {
-      isRestoring: () => zoneTransitions.current() === 'restoration',
+      isInAtelier: () => zoneTransitions.current() === 'atelier',
       roomFov: () => zoneTransitions.roomFov(),
       stopApproach: () => zoneTransitions.stopApproach(),
-      openRestoration: () => zoneTransitions.open('restoration'),
+      openAtelier: () => zoneTransitions.open('atelier'),
     },
   });
   zoneTransitions = createZoneTransitions({
     scene, camera, controls, canvas, interaction, renderer, rendererHost, atelierFilter,
-    originalStations, restorationView, visualUI, homePosition, homeTarget, roomMinDistance,
+    workshopOverlay, atelierView, visualUI, homePosition, homeTarget, roomMinDistance,
     roomLights,
   });
   host.alchemy.manipulate = zoneTransitions.manipulateAlchemy;
@@ -168,7 +168,7 @@ function setup() {
 
   window.addEventListener('resize', resize);
   interaction.addEventListener('pointerdown', e => { startPointer = [e.clientX, e.clientY]; });
-  restorationView.bind();
+  atelierView.bind();
   const atelierElement = mountAtelierInRoom(host);
   const alchemyElement = mountAlchemyInRoom(host);
   alchemyElement.querySelector('.lair-alchemy-exit')?.addEventListener('click', zoneTransitions.reset);
@@ -193,7 +193,7 @@ function resize() {
   camera.updateProjectionMatrix();
   renderer.setSize(w, h, false);
   atelierFilter?.resize(w,h,renderer.getPixelRatio());
-  restorationView.resize();
+  atelierView.resize();
 }
 
 function hitZone(e) {
@@ -206,8 +206,8 @@ function hitZone(e) {
 }
 
 function hover3D(e) {
-  if (originalStations?.isOpen()) return;
-  if (zoneTransitions.current() === 'restoration') return;
+  if (workshopOverlay?.isOpen()) return;
+  if (zoneTransitions.current() === 'atelier') return;
   if (e.buttons) return;
   const id = hitZone(e);
   if (id !== hoveredZone) {
@@ -217,8 +217,8 @@ function hover3D(e) {
 }
 
 function click3D(e) {
-  if (originalStations?.isOpen()) return;
-  if (zoneTransitions.current() === 'restoration') return;
+  if (workshopOverlay?.isOpen()) return;
+  if (zoneTransitions.current() === 'atelier') return;
   if (e.metaKey) return;
   if (startPointer && Math.hypot(e.clientX - startPointer[0], e.clientY - startPointer[1]) > 7) return;
   const id = hitZone(e);
@@ -236,7 +236,7 @@ function updateHotspots(currentZone) {
     const anchor = room.anchors[button.dataset.zone];
     const point = anchor.clone();
     // Position scene labels above the object surface, never at floor level.
-    if (button.dataset.zone === 'restoration') point.y += 1.35;
+    if (button.dataset.zone === 'atelier') point.y += 1.35;
     if (button.dataset.zone === 'planning') point.y += .55;
     if (button.dataset.zone === 'workbench') point.y += .54;
     if (button.dataset.zone === 'alchemy') point.y += .42;
@@ -258,15 +258,15 @@ function animate() {
   const delta = Math.min(frameDelta, .05);
   const time = clock.elapsedTime;
   zoneTransitions.updateApproach(delta);
-  if (!restorationView.updateFlight(now) && zoneTransitions.current() !== 'alchemy') controls.update();
+  if (!atelierView.updateFlight(now) && zoneTransitions.current() !== 'alchemy') controls.update();
   rendererHost.stepWorldRuntime(now);
-  restorationView.updateGalleryCamera();
+  atelierView.updateGalleryCamera();
 
   for (const update of room.animated) update(time);
   const currentZone = zoneTransitions.current();
-  const overlayOpen = originalStations.isOpen();
+  const overlayOpen = workshopOverlay.isOpen();
   updateHotspots(currentZone);
-  restorationView.updateInterface({ zone: currentZone, visualOpen: visualUI.isOpen(), overlayOpen });
+  atelierView.updateInterface({ zone: currentZone, visualOpen: visualUI.isOpen(), overlayOpen });
   rendererHost.updateWorld();
   // Embedded modules may disable WebGLRenderer.info.autoReset for multi-pass
   // rendering. Our counter is per frame, never a lifetime accumulation.
@@ -275,7 +275,7 @@ function animate() {
   if (!overlayOpen || zoneTransitions.isTransitioning()) {
     rendererHost.prepareWorldLightsForRender();
     try {
-      if (currentZone === 'restoration') {
+      if (currentZone === 'atelier') {
         atelierFilter.setFocus(camera.position.distanceTo(controls.target));
         const frame = atelierFilter.render();
         lastSceneTriangles = frame.sceneTriangles ?? frame.triangles ?? 0;

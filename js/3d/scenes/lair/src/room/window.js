@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { makeCityWindowTexture, makeCityDepthTexture, makeCurtainLinenTexture } from '../materials.js';
+import { makeCityWindowTexture, makeCityDepthTexture, makeCurtainLinenTexture } from './materials.js';
 
 // The arched window on the far wall, the city behind it and the curtains.
 export function buildWindow(kit) {

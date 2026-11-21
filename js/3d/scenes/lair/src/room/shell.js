@@ -1,6 +1,6 @@
 // @ts-check
 import * as THREE from 'three';
-import { canvasTexture } from '../materials.js';
+import { canvasTexture } from './materials.js';
 
 // The long room itself: floor, walls, ceiling, rug and the right-wall finish.
 export function buildShell(kit) {
@@ -63,9 +63,9 @@ export function buildShell(kit) {
   box(staticGroup, .27, 13.8, longRoomLength, m.plaster, 8.55, 6.76, longRoomCenter).castShadow = false;
   box(staticGroup, 17.5, .20, longRoomLength, m.darkWood, 0, 13.62, longRoomCenter).castShadow = false;
   // The left wall keeps the exact ochre gouache wallpaper from the atelier.
-  const leftFinish = plane(staticGroup, longRoomLength - .12, 13.55, m.restorationWall, -8.391, 6.72, longRoomCenter);
+  const leftFinish = plane(staticGroup, longRoomLength - .12, 13.55, m.atelierSideWall, -8.391, 6.72, longRoomCenter);
   leftFinish.rotation.y = Math.PI / 2;
-  leftFinish.name = 'restoration-left-wall';
+  leftFinish.name = 'atelier-side-wall';
   // One continuous sage-green tiled finish covers the entire right wall.
   // It sits just in front of the plaster, from the floor to the ceiling.
   const rightFinish = plane(staticGroup, longRoomLength - .08, 13.54, m.alchemyTile, 8.392, 6.77, longRoomCenter);

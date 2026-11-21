@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { createInkOutlines } from './engine/ink-outlines.js';
-import { t } from './i18n.js';
+import { createInkOutlines } from '../rendering/ink-outlines.js';
+import { t } from '../i18n.js';
 
 const STORAGE_KEY = 'keynlock-lair-visual-v1';
 const DEFAULTS = Object.freeze({

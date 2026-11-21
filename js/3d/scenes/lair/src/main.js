@@ -71,7 +71,13 @@ function setup() {
   let galleryLoaded = false;
   let alchemyLoaded = false;
   const completeInitialLoad = () => {
-    if (galleryLoaded && alchemyLoaded) initialLoading.finish();
+    if (galleryLoaded && alchemyLoaded) {
+      // Compile the shaders for the workshops' lighting before the veil lifts,
+      // so the first visit to the lab or the Atelier does not freeze.
+      void Promise.resolve(zoneTransitions?.precompileWorkshopLighting())
+        .catch(error => console.warn('Shader warm-up failed:', error))
+        .finally(() => initialLoading.finish());
+    }
     else if (galleryLoaded) {
       loadingStatus.textContent = t('ПОДГОТАВЛИВАЕМ АЛХИМИЧЕСКУЮ ЛАБОРАТОРИЮ');
       loadingBar.style.width = '94%';

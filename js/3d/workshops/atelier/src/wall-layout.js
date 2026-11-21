@@ -1,3 +1,4 @@
+// @ts-check
 import { collectionCategories, paintingCategory } from './painting-catalog.js';
 
 /** Twelve art movements run from left to right as tall columns of restored paintings. */

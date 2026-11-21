@@ -177,7 +177,7 @@ const lastContourCameraMatrix = new THREE.Matrix4();
 let contoursInitialized = false;
 
 const look = createAlchemyLook(THREE,{scene,backgroundScene,renderer});
-const {keyLight,backgroundLight,sunbeams,backgroundEffects} = look;
+const {sunbeams,backgroundEffects} = look;
 
 buildRoom();
 buildTable();

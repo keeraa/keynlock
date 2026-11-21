@@ -1,0 +1,33 @@
+name: 3D lint and types
+on:
+  push:
+    paths:
+      - 'js/3d/**'
+      - '.github/workflows/js3d-lint.yml'
+  pull_request:
+    paths:
+      - 'js/3d/**'
+      - '.github/workflows/js3d-lint.yml'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: js/3d
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: js/3d/package-lock.json
+      - name: Install
+        run: npm ci --no-audit --no-fund
+      # The Lair, the workshop packages, core/ and the Key Archive.
+      - name: ESLint
+        run: npm run lint
+      # Files marked `// @ts-check` are type-checked against three.js and DOM types.
+      - name: Type check
+        run: npm run typecheck

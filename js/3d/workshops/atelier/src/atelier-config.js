@@ -1,3 +1,4 @@
+// @ts-check
 import { keynlockPaintings, paintingCategory, restorationTint } from './painting-catalog.js';
 
 // Bundled with the workshop, so it works on its own site and inside the Lair.

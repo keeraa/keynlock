@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * A projected UV inspection lamp. Both the indigo pool of light and the
  * fluorescent halo are shaded on the actual canvas plane, so they follow

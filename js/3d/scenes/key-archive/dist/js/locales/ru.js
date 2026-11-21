@@ -1,3 +1,4 @@
+// @ts-check
 // Русский — основной язык архива. Ключи совпадают во всех словарях.
 export default Object.freeze({
   'webgl.title': 'Нужен браузер с WebGL',

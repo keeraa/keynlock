@@ -1,3 +1,4 @@
+// @ts-check
 // Use physical key positions so WASD/E/R work on both Latin and Cyrillic layouts.
 const BY_CODE = {
   KeyW: 'w', KeyA: 'a', KeyS: 's', KeyD: 'd', KeyE: 'e', KeyR: 'r',

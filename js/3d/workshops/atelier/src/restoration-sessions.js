@@ -1,3 +1,4 @@
+// @ts-check
 import { createRestorationSurface } from './restoration-surface.js';
 
 export function paintingSeed(id) {

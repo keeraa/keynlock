@@ -1,3 +1,4 @@
+// @ts-check
 import { createVisualSystem } from '../visuals.js';
 import { ALCHEMY_LOOK } from './alchemy-look.js';
 

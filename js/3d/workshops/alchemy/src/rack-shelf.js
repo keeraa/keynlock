@@ -1,3 +1,4 @@
+// @ts-check
 // A real pierced shelf, with four through-holes for the test-tube necks.
 // The geometry faces upward after a 90-degree rotation around the X axis.
 export function makePerforatedRackShelf(THREE, width, depth, thickness, tubeXs, shelfZ = -.07, holeRadius = .29) {

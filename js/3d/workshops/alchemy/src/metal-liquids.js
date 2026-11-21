@@ -1,3 +1,4 @@
+// @ts-check
 // Seven visibly different metal fluids. Each has its own painted surface and
 // physical finish; mercury and silver also reflect the workshop environment.
 // Procedural DataTextures are ready immediately, without async dark frames.

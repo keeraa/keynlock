@@ -1,3 +1,4 @@
+// @ts-check
 /** Apply one stamp to the appropriate damage layers. Pure orchestration keeps
  * the five tools testable independently of WebGL and canvas rendering. */
 export const RESTORATION_TOOLS = new Set(['brush', 'swab', 'uv', 'reagent', 'retouch']);

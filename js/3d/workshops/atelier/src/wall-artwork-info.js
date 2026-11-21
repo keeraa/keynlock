@@ -1,3 +1,4 @@
+// @ts-check
 import { getPaintingLore, getPaintingLoreLabels } from './lore/painting-lore.js';
 
 /** One presenter for gallery overview, auto-selected artwork and zoomed artwork. */

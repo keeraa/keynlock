@@ -1,3 +1,4 @@
+// @ts-check
 import { ARCHIVE_DESK } from './archive-ledger.js';
 
 const models = [

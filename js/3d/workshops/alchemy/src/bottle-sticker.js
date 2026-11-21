@@ -1,3 +1,4 @@
+// @ts-check
 // The seven supplied illustrated crests replace the old text labels. All
 // decals share one curved mesh following the actual rounded glass silhouette.
 export const BOTTLE_STICKER_IMAGES = Object.freeze({

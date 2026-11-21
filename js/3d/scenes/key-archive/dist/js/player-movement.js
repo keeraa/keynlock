@@ -1,3 +1,4 @@
+// @ts-check
 import { ARCHIVE_DESK, ARCHIVE_SIDE_TABLES } from './archive-ledger.js';
 import { PLAYER_EYE_HEIGHT } from './player-config.js';
 import { inStationFootprint } from './station-layout.js';

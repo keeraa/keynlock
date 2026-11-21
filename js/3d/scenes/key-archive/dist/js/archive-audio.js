@@ -1,3 +1,4 @@
+// @ts-check
 // Short, procedural Foley. Clips are generated once per session and reused.
 const SAMPLE_RATE = 24000;
 const EFFECT_LEVEL = {

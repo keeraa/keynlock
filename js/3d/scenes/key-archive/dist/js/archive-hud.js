@@ -1,3 +1,4 @@
+// @ts-check
 import { t, familyName } from './i18n.js';
 import { MAX_HELD, selectedKey } from './rules.js';
 import { thumbnailCacheKey } from './key-thumbnails.js';

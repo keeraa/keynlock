@@ -1,3 +1,4 @@
+// @ts-check
 /** Frame geometry and color-correction shader for both easels. */
 import { createFrameGeometry } from './frame-geometry.js';
 

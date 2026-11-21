@@ -1,3 +1,4 @@
+// @ts-check
 // Keep the point initially grabbed under the pointer. Each vessel uses its
 // own depth plane, so the bottle can be lowered back into its original rack.
 export function beginSourceDrag(THREE, source, ray) {

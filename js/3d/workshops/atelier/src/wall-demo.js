@@ -1,3 +1,4 @@
+// @ts-check
 import { paintingCategory } from './painting-catalog.js';
 import { WALL_CAPACITY, WALL_COLUMNS } from './wall-layout.js';
 

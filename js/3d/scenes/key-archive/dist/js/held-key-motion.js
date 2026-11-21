@@ -1,3 +1,4 @@
+// @ts-check
 // Hand sway should respond to walking over several frames, never jump on the
 // first step. This also smooths the return to idle after releasing movement.
 export function nextHandMotionWeight(current, moving, seconds) {

@@ -1,3 +1,4 @@
+// @ts-check
 // Scene geometry counts, independent of extra outline and fullscreen passes.
 export function getSceneGeometryStats(scene) {
   let triangles = 0;

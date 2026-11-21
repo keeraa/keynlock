@@ -1,6 +1,5 @@
 import { familyName } from './i18n.js';
 import * as THREE from '../vendor/three.js';
-import { KEY_TYPES } from './rules.js';
 import { makeLabel } from './art.js';
 import { createCombinedKeyGeometry, getKeyMaterial, getKeyDisplayScale } from './key-factory.js';
 import { createPaintedInstanceGeometry } from './key-instance-finish.js';

@@ -1,3 +1,4 @@
+// @ts-check
 /** Keep the initial room veil up until its visible paintings are ready. */
 export function createInitialLoadingGate({
   onProgress, onDone, minimumMs = 900, timeoutMs = 90000,

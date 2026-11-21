@@ -1,3 +1,4 @@
+// @ts-check
 // Three hand-painted wood finishes. Their grain and pigment washes wrap on both
 // axes, so a shelf and a tabletop can share a texture without visible seams.
 const FINISHES = Object.freeze({

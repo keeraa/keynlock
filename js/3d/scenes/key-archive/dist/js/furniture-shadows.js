@@ -1,3 +1,4 @@
+// @ts-check
 import { FIXTURE_OFFSETS } from './station-layout.js';
 
 // Bake the broad shade and the darker contact at the feet into one image

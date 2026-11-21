@@ -1,3 +1,4 @@
+// @ts-check
 import {
   STORAGE_KEY, LEGACY_STORAGE_KEY, createInitialState,
   validateState, migrateLegacyState, upgradeKeyConditions, upgradeFloorDistribution,

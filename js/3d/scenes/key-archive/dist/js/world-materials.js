@@ -1,3 +1,4 @@
+// @ts-check
 import * as THREE from '../vendor/three.js';
 import { makePaintTexture } from './art.js';
 import { getPaintedMetalTexture } from './painted-textures.js';

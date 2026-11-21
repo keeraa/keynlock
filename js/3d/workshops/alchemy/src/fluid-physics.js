@@ -1,3 +1,4 @@
+// @ts-check
 // Lightweight fixed-step liquid inertia for small vessels. A damped free-surface
 // spring reacts to the vessel's acceleration and gravity projected into its
 // local axes. Falling droplets use ballistic integration instead of a timed fill.

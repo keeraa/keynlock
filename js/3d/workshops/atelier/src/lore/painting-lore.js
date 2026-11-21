@@ -1,3 +1,4 @@
+// @ts-check
 import { paintingLoreRu, paintingLoreLabelsRu } from './locales/ru.js';
 
 // Add a new language in locales/ and register it here. An untranslated entry

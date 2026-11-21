@@ -1,3 +1,4 @@
+// @ts-check
 import { Box3 } from '../vendor/three.js';
 
 const AXES = ['x', 'y', 'z'];

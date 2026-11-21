@@ -1,3 +1,4 @@
+// @ts-check
 /** Shared KEYNLOCK canvas-texture preparation; pigment recipes stay scene-specific. */
 export const PAINTED_FINISHES = Object.freeze(['steel', 'graphite', 'enamel', 'brass', 'copper']);
 

@@ -1,3 +1,4 @@
+// @ts-check
 import * as THREE from '../vendor/three.js';
 
 export const STATION_PAINT_URLS = Object.freeze({

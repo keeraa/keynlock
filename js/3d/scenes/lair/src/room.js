@@ -1,3 +1,4 @@
+// @ts-check
 import { createRoomKit } from './room/kit.js';
 import { buildShell } from './room/shell.js';
 import { buildWindow } from './room/window.js';

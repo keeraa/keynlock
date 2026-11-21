@@ -1,3 +1,4 @@
+// @ts-check
 // A single, non-repeating gouache painting covers the whole back wall.
 // Individual tiles have variation, while the canvas has no UV tile seams.
 const PALETTES = Object.freeze({

@@ -1,3 +1,4 @@
+// @ts-check
 // A mass-conserving flow of coherent, gravitationally moving liquid parcels.
 // The renderer skins them into a single continuous jet; parcels are removed
 // only after crossing the receiver's open rim or spilling onto the table.

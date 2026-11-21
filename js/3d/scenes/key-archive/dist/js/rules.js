@@ -1,3 +1,4 @@
+// @ts-check
 import { BATH_CAPACITY, SOAK_SECONDS, bathId, validBathId } from './station-layout.js';
 import { CABINET_CAPACITY } from './cabinet-layout.js';
 import { SAVE_REVISION } from './save-revisions.js';

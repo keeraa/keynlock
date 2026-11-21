@@ -1,3 +1,4 @@
+// @ts-check
 // Reuse immutable GPU buffers for repeated furniture, stands and glass.
 // Animated liquids and meshes that deform their geometry stay uncached.
 export function createGeometryCache(THREE) {

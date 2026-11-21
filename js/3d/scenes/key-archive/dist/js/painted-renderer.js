@@ -1,3 +1,4 @@
+// @ts-check
 import * as THREE from '../vendor/three.js';
 import { applySceneOutlineSettings } from './scene-outline.js';
 import { createToonShader, createOutlineShader, createCopyShader, createDistanceBlurShader } from './painted-shader.js';

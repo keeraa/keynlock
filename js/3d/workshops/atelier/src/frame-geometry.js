@@ -1,3 +1,4 @@
+// @ts-check
 /** One continuous wooden profile, without overlapping rails or decorative lips. */
 export function createFrameGeometry(THREE, width, height, rim = .135, depth = .095) {
   const outerW = width + rim * 2;

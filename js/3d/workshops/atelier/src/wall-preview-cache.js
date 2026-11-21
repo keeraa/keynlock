@@ -1,3 +1,4 @@
+// @ts-check
 /** Small wall thumbnails are independent of the easel texture cache. */
 export function createWallPreviewCache({ THREE, renderer, maxConcurrent = 5 }) {
   const previews = new Map();

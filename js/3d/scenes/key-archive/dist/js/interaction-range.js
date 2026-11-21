@@ -1,3 +1,4 @@
+// @ts-check
 // Reach is measured from the player's eye, in world metres.
 // Every interaction has half its former usable range.
 export const KEY_REACH = 2.35;

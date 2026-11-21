@@ -1,3 +1,4 @@
+// @ts-check
 import * as THREE from '../vendor/three.js';
 
 // Join only opaque, immobile hall parts sharing the exact same material and

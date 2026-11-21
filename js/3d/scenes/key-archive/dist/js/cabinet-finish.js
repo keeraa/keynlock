@@ -1,3 +1,4 @@
+// @ts-check
 import * as THREE from '../vendor/three.js';
 import { CABINET_COLUMN_WIDTH, CABINET_ROW_HEIGHT, CABINET_GRID_HALF_WIDTH,
   CABINET_CORNICE_TOP, CABINET_GRID_BOTTOM_Y, CABINET_GRID_TOP_Y, CABINET_ROWS } from './cabinet-layout.js';

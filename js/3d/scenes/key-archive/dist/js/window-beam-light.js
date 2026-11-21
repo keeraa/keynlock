@@ -1,3 +1,4 @@
+// @ts-check
 import { WINDOW_CENTERS, WINDOW_SILL_Y, WINDOW_SPRING_Y, WINDOW_CROWN_Y,
   WINDOW_OPENING_RADIUS, WINDOW_SCALE, windowY } from './hall-architecture.js';
 import { RUG_TOP } from './floor-contact.js';

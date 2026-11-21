@@ -1,3 +1,4 @@
+// @ts-check
 /** One flight controller for focus, wall overview, gallery details and returns. */
 export function createCameraTransition({ camera, controls, onStart = () => {} }) {
   let travel = null;

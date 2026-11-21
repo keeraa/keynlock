@@ -1,3 +1,4 @@
+// @ts-check
 /** Reusable painted-wood grading and material assignment. */
 export function gradeWoodTexture({ THREE, texture, grade }) {
   if (!grade) return texture;

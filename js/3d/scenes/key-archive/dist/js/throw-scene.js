@@ -1,3 +1,4 @@
+// @ts-check
 import { BENCH, WATER_BATH, FORGE } from './wash-forge-stations.js';
 import { RUST_TRAY } from './rust-tray.js';
 import { STATIONS, FIXTURE_OFFSETS, FORGE_SURFACE_Y, bathId } from './station-layout.js';

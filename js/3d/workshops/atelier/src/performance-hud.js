@@ -1,3 +1,4 @@
+// @ts-check
 /** Lightweight, throttled renderer diagnostics for the workshop header. */
 export function createPerformanceHUD({ fpsElement, polygonsElement }) {
   const formatPolygons = new Intl.NumberFormat('ru-RU');

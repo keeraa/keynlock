@@ -1,3 +1,4 @@
+// @ts-check
 // The room is blurred separately, then the entire real scene is captured for
 // a final refractive lens pass. Glass samples what is actually BEHIND it:
 // shelves, supports, other bottles, and liquid, not just the wall texture.

@@ -1,3 +1,4 @@
+// @ts-check
 import * as THREE from '../vendor/three.js';
 
 // Original painted metal albedos shared with Keynlock's lock and workbench scenes.

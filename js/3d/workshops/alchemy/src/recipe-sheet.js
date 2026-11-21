@@ -1,3 +1,4 @@
+// @ts-check
 import { PIGMENT_SWATCHES, PLANETARY_METALS, RECIPE_LEVELS } from './recipes.js';
 
 // High-resolution parchment, kept sharp as the camera moves. All layout

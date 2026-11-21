@@ -1,3 +1,4 @@
+// @ts-check
 /** Bounded LRU cache for painting textures, including in-flight loads. */
 export function createPaintingTextureCache({ THREE, loader, renderer, limit = 8, timeoutMs = 9000 }) {
   const entries = new Map();

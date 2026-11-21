@@ -1,3 +1,4 @@
+// @ts-check
 import * as THREE from 'three';
 import { makeGouacheWallTexture } from '@keynlock/alchemy/src/wall-tiles.js';
 import { atelierWallpaperSource } from '@keynlock/atelier/src/painted-assets.js';

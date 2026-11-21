@@ -1,3 +1,4 @@
+// @ts-check
 // A lathed liquid surface whose lower portion fits the vessel's rounded glass.
 // Source tubes use a hemispherical bottom. The bottle liquid is sampled from
 // the same lathe outline as its glass, with clearance for wall thickness.

@@ -1,3 +1,4 @@
+// @ts-check
 import { LANGUAGES, getLanguage, setLanguage } from './i18n.js';
 
 // The pause menu's player settings: mouse sensitivity, sound, music volume and

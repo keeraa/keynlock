@@ -1,3 +1,4 @@
+// @ts-check
 /** Pointer hits and camera-driven artwork selection share the same framed meshes. */
 export function createWallArtworkPicker({ THREE, camera, renderer, artworks, imageMeshes,
   pointerElement = renderer.domElement }) {

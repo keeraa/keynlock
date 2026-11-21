@@ -6,5 +6,16 @@
     "scenes/lair",
     "workshops/alchemy",
     "workshops/atelier"
-  ]
+  ],
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@types/three": "^0.187.0",
+    "eslint": "^9.39.5",
+    "globals": "^17.14.0",
+    "typescript": "^7.0.2"
+  },
+  "scripts": {
+    "lint": "eslint scenes/lair workshops core scenes/key-archive",
+    "typecheck": "tsc -p jsconfig.json"
+  }
 }

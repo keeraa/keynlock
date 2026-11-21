@@ -1,3 +1,4 @@
+// @ts-check
 import { createFrameGeometry } from './frame-geometry.js';
 
 /** Builds the static atelier and exposes its easel factory and wood surfaces. */

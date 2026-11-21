@@ -1,3 +1,4 @@
+// @ts-check
 import * as THREE from 'three';
 import { createPaintedTextureSurface } from '../../../core/rendering/painted-texture.js';
 import { ALCHEMY_LOOK } from './look/alchemy-look.js';

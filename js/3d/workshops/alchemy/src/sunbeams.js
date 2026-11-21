@@ -1,3 +1,4 @@
+// @ts-check
 // Soft sun shafts originate in the *room*. Their projected vanishing points
 // and travel directions are refreshed with the orbit camera every frame.
 // The screen quad only draws the haze; the beams track real 3D anchors.

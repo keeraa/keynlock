@@ -1,3 +1,4 @@
+// @ts-check
 // Pointer Lock for first-person mouse look.
 //
 // The browser can refuse it (embedded browsers), grant it late, or release it

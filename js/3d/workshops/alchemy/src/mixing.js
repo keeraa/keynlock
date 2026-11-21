@@ -1,3 +1,4 @@
+// @ts-check
 // Four pigment channels: red, yellow, blue, and opaque white.
 // A trilinear RYB cube produces familiar paint mixtures instead of grey RGB averages.
 export const REAGENTS = [

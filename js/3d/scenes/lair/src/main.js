@@ -281,7 +281,6 @@ function animate() {
 
 // Gentle room ambience is original procedural sound. The selected Chopin recordings are not embedded here.
 let ambientContext = null;
-let ambientSource = null;
 async function toggleAmbience() {
   const button = document.querySelector('#sound-toggle');
   const enable = button.getAttribute('aria-pressed') !== 'true';
@@ -301,7 +300,7 @@ async function toggleAmbience() {
     const filter = ambientContext.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 340;
     const gain = ambientContext.createGain(); gain.gain.value = .028;
     source.connect(filter).connect(gain).connect(ambientContext.destination);
-    source.start(); ambientSource = source;
+    source.start();
   }
   if (enable && !document.hidden) await ambientContext.resume(); else await ambientContext.suspend();
 }

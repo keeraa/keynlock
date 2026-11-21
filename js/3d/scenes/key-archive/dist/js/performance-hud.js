@@ -1,3 +1,4 @@
+// @ts-check
 import { t } from './i18n.js';
 export function createPerformanceHud(document, world) {
   const $ = id => document.getElementById(id);

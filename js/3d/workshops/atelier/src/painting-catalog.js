@@ -1,3 +1,4 @@
+// @ts-check
 /** Paintings curated in keeraa/keynlock (main/js/data/paintings.js).
  * Images are loaded on selection; the full collection is never preloaded into WebGL.
  */

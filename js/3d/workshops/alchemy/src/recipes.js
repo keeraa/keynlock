@@ -1,3 +1,4 @@
+// @ts-check
 // Three increasingly demanding alchemical recipes. Their doses fit the right
 // receiver's 160 ml capacity and the quantities in the source vessels.
 export const PIGMENT_SWATCHES = Object.freeze({

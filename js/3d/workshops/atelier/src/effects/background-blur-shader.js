@@ -1,3 +1,4 @@
+// @ts-check
 /** Separable Gaussian blur of the room, stored as premultiplied background color. */
 export const backgroundBlurFragmentShader = `
   uniform sampler2D tSource;

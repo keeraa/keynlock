@@ -1,3 +1,4 @@
+// @ts-check
 import { drawingVertexShader, drawingFragmentShader } from './drawing-shader.js';
 import { backgroundBlurFragmentShader } from './background-blur-shader.js';
 

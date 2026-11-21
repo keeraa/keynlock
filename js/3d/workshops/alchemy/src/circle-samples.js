@@ -1,3 +1,4 @@
+// @ts-check
 // Stable circular samples avoid repeated trigonometry in every fluid vertex.
 const cached = new Map();
 

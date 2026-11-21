@@ -1,3 +1,4 @@
+// @ts-check
 export const CABINET_Z = [-17, -8.5, 0, 8.5, 17];
 
 // Four main rows of six compartments; each contains four standing slots.

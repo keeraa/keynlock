@@ -1,3 +1,4 @@
+// @ts-check
 // Fictional accusations of the Keynlock Chamber of Images.
 // Keys match stable painting IDs in painting-catalog.js. Each record can be
 // translated independently in another locale without touching scene logic.

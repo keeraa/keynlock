@@ -1,3 +1,4 @@
+// @ts-check
 // Revisions of the version-2 save format.
 //
 // Most save upgrades in rules.js (upgradeKeyConditions, upgradeCabinetSlots,

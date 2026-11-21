@@ -1,3 +1,4 @@
+// @ts-check
 // Fallback for embedded browsers that do not grant Pointer Lock.
 // Near a screen edge, keep the camera turning briefly instead of hitting a hard stop.
 export function edgeLookRate(position, size, threshold = 56) {

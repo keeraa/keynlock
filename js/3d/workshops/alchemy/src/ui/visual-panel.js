@@ -1,3 +1,4 @@
+// @ts-check
 /** DOM adapter for the reusable alchemy look. No scene creation here. */
 export function createVisualPanel({$, queryAll, visuals, woodAssets, selectWallFinish,
   selectWoodFinish, setLightDirection, setLightStrength, setSunbeam,

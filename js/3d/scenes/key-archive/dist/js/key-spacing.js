@@ -1,3 +1,4 @@
+// @ts-check
 // A small spatial hash makes it inexpensive to keep 1,000 floor keys separated.
 import { inStationFootprint } from './station-layout.js';
 export const KEY_CLEARANCE = .62;

@@ -1,3 +1,4 @@
+// @ts-check
 // Trial look (settings: «Штриховка теней»): deep shadow drawn as pen hatching,
 // the Key Forge style, on every lit material in the room. It is decided per
 // material from how much light actually reaches the surface (lit colour

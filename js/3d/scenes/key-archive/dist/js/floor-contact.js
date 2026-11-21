@@ -1,3 +1,4 @@
+// @ts-check
 // Heights agree with the actual hall mesh, so keys and furniture rest on it.
 export const HALL_FLOOR_TOP = -.19 + .28 / 2;
 export const RUG_TOP = -.038 + .024 / 2;

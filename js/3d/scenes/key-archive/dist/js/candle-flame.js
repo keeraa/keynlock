@@ -1,3 +1,4 @@
+// @ts-check
 // From the Alchemy Lab candle effect.
 // Soft procedural flame in genuine Three.js shader planes. Crossing quads
 // give the flame volume at oblique angles without geometry-heavy particles.

@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * Semi-transparent, seeded canvas textures for aged paintings.
  * The layers are independent so restoration tools can remove them separately.

@@ -1,3 +1,4 @@
+// @ts-check
 // Station deadlines use a persisted clock that advances only while playing.
 export function createStationClock(savedTime, elapsedNow = () => performance.now()) {
   let time = Number.isFinite(savedTime) ? savedTime : Date.now();

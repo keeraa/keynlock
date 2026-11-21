@@ -1,3 +1,4 @@
+// @ts-check
 /** Camera destinations and framing bounds shared by every navigation mode. */
 export function createCameraFraming({ THREE, camera, controls, easelX,
   getPaintingCenterY, getWallBounds, easelOffsetZ = 0 }) {

@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * Interactive restoration layers for the right-hand painting.
  * Brush and swab remove dust and grime; UV identifies oxidized varnish.

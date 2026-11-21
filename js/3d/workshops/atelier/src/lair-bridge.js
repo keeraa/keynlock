@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * Origin-checked storage bridge shared by the standalone Atelier and the Lair's
  * single Three.js scene. The only accepted writer is the Lair's own origin.

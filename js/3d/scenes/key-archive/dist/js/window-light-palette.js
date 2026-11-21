@@ -1,3 +1,4 @@
+// @ts-check
 export function windowLightPalette(night) {
   return night ? NIGHT : DAY;
 }

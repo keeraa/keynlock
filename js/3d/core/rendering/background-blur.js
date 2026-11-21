@@ -1,3 +1,4 @@
+// @ts-check
 /** Shared KEYNLOCK GLSL blur kernels. Each scene owns its render targets and passes. */
 
 // The alchemy room is a separately cached render target. Keep its original nine taps.

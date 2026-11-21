@@ -1,3 +1,4 @@
+// @ts-check
 /** Two optional illustration layers, composited after the ordinary 3D render. */
 export const drawingVertexShader = `
   varying vec2 vUv;

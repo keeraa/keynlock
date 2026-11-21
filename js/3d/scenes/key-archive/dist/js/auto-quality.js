@@ -1,3 +1,4 @@
+// @ts-check
 // Automatic quality: when the hall runs slowly, render fewer pixels.
 //
 // The painted look is several full-screen passes (toon light, ink outline,

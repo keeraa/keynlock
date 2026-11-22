@@ -89,9 +89,9 @@
   padding: 10px 15px 10px 10px;
   border: 0;
   border-radius: 3px;
-  box-shadow: 0 7px 23px #1a120ccc;
   color: #f6dcae;
-  background: #2b261eea;
+  background: transparent;
+  text-shadow: 0 1px 3px #160e0bf0, 0 2px 12px #160e0b;
   font: 700 10px/1.3 Manrope, Arial, sans-serif;
   letter-spacing: .10em;
   white-space: nowrap;
@@ -99,7 +99,7 @@
 }
 .wall-collection-entry[hidden], .lair-gallery-controls[hidden],
 .lair-gallery-panner[hidden], #gallery-art-back[hidden] {display:none!important}
-.wall-collection-entry:hover {background:#51402d}
+.wall-collection-entry:hover {color:#fff0cf}
 .wall-collection-entry.pinned {transform:none}
 .wall-collection-entry small {
   display:block;
@@ -117,6 +117,7 @@
   border:1px solid #9f865a;
   color:#e7c58c;
   font:20px Georgia,serif;
+  box-shadow:0 1px 6px #160e0b99;
 }
 /* The Atelier's original reference/copy markers and easel stepper, projected
    onto its preserved meshes by the common Lair camera. */
@@ -138,17 +139,42 @@
   bottom:min(calc(var(--atelier-panel-height,0px) + 12px),calc(100vh - 164px));
   transform:none;
   display:flex;align-items:center;justify-content:center;gap:7px;
-  padding:5px 7px;border:1px solid #a38a65;
-  background:#29231ed9;box-shadow:0 7px 24px #160e0b88;
-  backdrop-filter:blur(7px);white-space:nowrap;
+  padding:0;border:0;background:transparent;white-space:nowrap;
+  text-shadow:0 1px 3px #160e0bf0,0 2px 10px #160e0b;
 }
 .lair-easel-camera-controls > button {
-  border:1px solid #92734e;background:#4c3b2b;color:#f0dab7;
+  border:1px solid #c9a97a99;background:transparent;color:#f0dab7;text-shadow:inherit;
   cursor:pointer;font:700 11px Manrope,Arial,sans-serif;
   padding:9px 12px;letter-spacing:.04em;
 }
 .lair-easel-camera-controls > button:not(#lair-focus-exit){min-width:35px;font:24px/1 Georgia,serif;padding:2px 10px 6px}
-.lair-easel-camera-controls > button:hover{background:#70573b}
+.lair-easel-camera-controls > button:hover{background:#70573b55}
+/* In the Atelier's panel, between «ВСЯ КОЛЛЕКЦИЯ» and the control hints. */
+.lair-easel-camera-controls.in-panel{position:static;margin-left:auto;text-shadow:none;gap:5px}
+.lair-easel-camera-controls.in-panel > button{border-color:#c3aa84;color:#6d5940;padding:6px 10px;font-size:9px}
+.lair-easel-camera-controls.in-panel > button:not(#lair-focus-exit){font-size:18px;padding:0 8px 3px}
+.lair-easel-camera-controls.in-panel > button:hover{background:#e5d8c0}
+.lair-easel-camera-controls.in-panel #lair-easel-camera-state{min-width:96px;color:#806f55;font-size:9px}
+.lair-easel-camera-controls.in-panel #lair-focus-exit small{display:inline;margin:0 0 0 5px;color:#a2927b;font-size:7px}
+/* The easel and frame colours and the colour reset (top right). */
+.lair-atelier-corner{position:absolute;z-index:24;top:84px;right:36px;display:flex;align-items:flex-start;gap:16px;
+  color:#f3e1c0;text-shadow:0 1px 3px #160e0bf0,0 2px 10px #160e0b}
+.lair-atelier-corner[hidden]{display:none!important}
+.lair-atelier-corner .wood-pickers{display:flex;gap:14px}
+.lair-atelier-corner .wood-picker{display:flex;flex-direction:column;gap:4px;padding:0;border:0}
+.lair-atelier-corner .wood-picker-title{font:700 8px/1.3 Manrope,Arial,sans-serif;letter-spacing:.13em;color:#e2c595;padding:0}
+.lair-atelier-corner .wood-options{display:flex;gap:4px}
+.lair-atelier-corner .wood-option{display:flex;flex-direction:column;align-items:center;gap:3px;padding:0;border:0;background:none;
+  color:#d7c3a2;opacity:.62;cursor:pointer;text-shadow:inherit;transition:opacity .17s}
+.lair-atelier-corner .wood-option:hover,.lair-atelier-corner .wood-option.selected{opacity:1}
+.lair-atelier-corner .wood-option.selected small{color:#fff0d0;font-weight:700}
+.lair-atelier-corner .wood-option img{display:block;width:30px;height:24px;object-fit:cover;border:0;box-shadow:0 1px 5px #160e0b99}
+.lair-atelier-corner .wood-option[data-wood="0"] img{filter:saturate(.71) contrast(.94)}
+.lair-atelier-corner .wood-option[data-wood="1"] img{filter:saturate(.91) contrast(.72) brightness(1.03)}
+.lair-atelier-corner .wood-option small{font:8px/1 Manrope,Arial,sans-serif}
+.lair-atelier-corner #reset-button{align-self:center;border:0;background:none;padding:4px 0;color:#f0dab7;text-shadow:inherit;
+  font:700 9px Manrope,Arial,sans-serif;letter-spacing:.12em;cursor:pointer}
+.lair-atelier-corner #reset-button:hover{color:#fff0cf;text-decoration:underline}
 .lair-easel-camera-controls > button:disabled{opacity:.35;cursor:default}
 #lair-easel-camera-state{min-width:131px;text-align:center;color:#f2dfc0;font:700 10px Manrope,Arial,sans-serif;letter-spacing:.11em}
 #lair-focus-exit small{display:block;margin-top:3px;color:#c4a67f;font-size:8px}
@@ -163,16 +189,17 @@
    The source stage remains hidden because the Lair owns the single 3D canvas. */
 .atelier-art-info {
   position:absolute;
-  top:138px;
-  right:22px;
+  top:192px;
+  left:38px;
   z-index:23;
-  width:min(348px,calc(100vw - 44px));
-  max-height:calc(100vh - 255px);
+  width:min(244px,calc(100vw - 44px));
+  max-height:calc(100vh - var(--atelier-panel-height,0px) - 220px);
   overflow-y:auto;
   border:0;
-  box-shadow:0 12px 32px #130d07a8;
-  background:#28251eea;
+  background:transparent;
   color:#f2e4c8;
+  text-shadow:0 1px 3px #160e0bf0,0 2px 12px #160e0b;
+  scrollbar-width:none;
   pointer-events:auto;
 }
 .atelier-art-info[hidden],.atelier-art-info #atelier-info-body[hidden] {display:none!important}
@@ -180,8 +207,8 @@
   display:flex;
   justify-content:space-between;
   align-items:flex-start;
-  gap:13px;
-  padding:15px 16px 14px;
+  gap:10px;
+  padding:0 0 10px;
 }
 .atelier-art-heading > div {min-width:0}
 #atelier-info-index {
@@ -206,14 +233,15 @@
   flex:none;
   width:28px;
   height:28px;
-  border:1px solid #957850;
-  background:#4b3a2b;
+  border:1px solid #c9a97a99;
+  background:transparent;
   color:#efd8b0;
   font:19px/1 Georgia,serif;
+  text-shadow:inherit;
   cursor:pointer;
 }
-#atelier-info-toggle:hover {background:#71553a}
-#atelier-info-body {padding:0 16px 15px}
+#atelier-info-toggle:hover {background:#71553a55}
+#atelier-info-body {padding:0}
 #atelier-info-description {
   margin:0 0 13px;
   font:12px/1.58 Manrope,Arial,sans-serif;
@@ -344,10 +372,11 @@
 @media (max-width: 660px) {
   .wall-collection-entry {font-size:8px;padding:7px 9px;gap:6px}
   .wall-collection-mark {width:25px;height:25px;font-size:16px}
-  .atelier-art-info {top:105px;right:10px;width:min(318px,calc(100vw - 20px));max-height:34vh}
-  .atelier-art-heading {padding:10px 12px}
+  .atelier-art-info {top:150px;left:14px;width:min(222px,calc(100vw - 28px));max-height:30vh}
   #atelier-info-title {font-size:18px}
-  #atelier-info-body {padding:0 12px 11px}
+  .lair-atelier-corner {top:62px;right:12px;gap:8px}
+  .lair-atelier-corner .wood-pickers {gap:8px}
+  .lair-atelier-corner .wood-option img {width:24px;height:19px}
   .lair-gallery-controls {bottom:52px;flex-wrap:wrap;width:calc(100% - 16px);gap:4px;padding:5px}
   .lair-gallery-controls button {font-size:9px;padding:8px 9px}
   .lair-gallery-panner {order:-1;width:100%;justify-content:center;gap:6px}

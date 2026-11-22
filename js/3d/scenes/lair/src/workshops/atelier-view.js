@@ -6,7 +6,7 @@ import { ROOM_CENTER_Z } from '../room-layout.js';
 
 export function createAtelierView({
   camera, controls, canvas, interaction, rendererHost, host, easelPose, roomMinDistance,
-  navigation, setFlightInputBlocked,
+  navigation, setFlightInputBlocked, panelHeight = () => 0,
 }) {
   // The Atelier publishes its gallery and restoration controls once it has loaded.
   const atelierGallery = () => getWorkshopApi('atelier')?.gallery;
@@ -17,6 +17,11 @@ export function createAtelierView({
   const easelLabels = document.querySelector('#lair-easel-labels');
   const easelCameraControls = document.querySelector('#lair-easel-camera-controls');
   const galleryHover = document.querySelector('#lair-wall-art-hover');
+  const corner = document.querySelector('#lair-atelier-corner');
+  const easelControlsHome = easelCameraControls.parentElement;
+  // The camera's view is lifted by half the open panel's height: the easels
+  // and the painting in focus sit in the middle of the space above the panel.
+  let viewLift = 0;
   // Below the entrance half of the exhibition on the left wall.
   const galleryWallAnchor = new THREE.Vector3(-8.10, 3.35, ROOM_CENTER_Z + 5.55);
   const atelierFlight = createCameraTransition({ camera, controls, setInputBlocked: setFlightInputBlocked });
@@ -198,9 +203,51 @@ export function createAtelierView({
     document.querySelector('#atelier-info-policy').textContent = info.policy;
   }
 
+  /**
+   * The Atelier's panel in the Lair: the easel and frame colours and the
+   * colour reset go to the top right corner; the original/copy stepper sits
+   * by the control hints in the panel's footer (on the stage while the panel
+   * is hidden). The nodes move with their listeners.
+   */
+  function placeAtelierControls() {
+    const app = document.querySelector('#atelier-embedded-app');
+    if (!app) return;
+    if (!corner.childElementCount) {
+      const pickers = app.querySelector('.wood-pickers');
+      const reset = app.querySelector('#reset-button');
+      if (pickers) corner.append(pickers);
+      if (reset) corner.append(reset);
+    }
+    const footer = app.querySelector('.workbench-footer');
+    const collapsed = app.querySelector('.workbench.is-collapsed');
+    const home = footer && !collapsed ? footer : easelControlsHome;
+    if (easelCameraControls.parentElement !== home) {
+      if (home === footer) footer.insertBefore(easelCameraControls, footer.querySelector('.keyboard-tip'));
+      else home.append(easelCameraControls);
+      easelCameraControls.classList.toggle('in-panel', home === footer);
+    }
+  }
+
+  function updateViewLift(currentZone) {
+    const goal = currentZone === 'atelier' && !galleryActive ? panelHeight() / 2 : 0;
+    if (Math.abs(goal - viewLift) < .5) viewLift = goal;
+    else viewLift += (goal - viewLift) * .16;
+    const width = canvas.clientWidth, height = canvas.clientHeight;
+    if (viewLift < .5) {
+      if (camera.view?.enabled) camera.clearViewOffset();
+      return;
+    }
+    // The bottom of a taller picture whose centre is `viewLift` px higher.
+    const view = camera.view;
+    if (view?.enabled && view.fullWidth === width && Math.abs(view.offsetY - viewLift * 2) < .01 && view.height === height) return;
+    camera.setViewOffset(width, height + viewLift * 2, 0, viewLift * 2, width, height);
+  }
+
   function updateAtelierEaselHUD(currentZone, blocked) {
     const bridge = atelierBridge();
     const showing = currentZone === 'atelier' && !galleryActive && Boolean(bridge) && !blocked;
+    if (bridge) placeAtelierControls();
+    corner.hidden = !showing;
     easelCameraControls.hidden = !showing;
     const focusedSide = showing ? bridge.focusedSide?.() : null;
     easelLabels.hidden = !showing || Boolean(focusedSide);
@@ -258,6 +305,7 @@ export function createAtelierView({
   function updateInterface({ zone, visualOpen, overlayOpen }) {
     const collectionOpen = atelierGallery()?.getState().collectionOpen;
     updateGalleryEntry(zone);
+    updateViewLift(zone);
     updateAtelierArtInfo(zone, visualOpen || overlayOpen || collectionOpen);
     updateAtelierEaselHUD(zone, overlayOpen || collectionOpen);
   }

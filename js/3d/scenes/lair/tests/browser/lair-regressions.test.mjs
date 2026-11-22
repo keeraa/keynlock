@@ -229,8 +229,10 @@ test('an image load failure leaves the current painting editable', async t => {
       },
     });
   });
+  // The thumbnails are hidden in the Lair (the collection chooses); their
+  // buttons still select a painting.
   const artItems = atelier.locator('.art-item');
-  await artItems.nth(previous).click();
+  await artItems.nth(previous).dispatchEvent('click');
   await page.waitForFunction(index => Boolean(window.releaseRestorationRead) &&
     window.__keynlockDebug.workshop('atelier')?.bridge.snapshot().selected === index, previous);
   assert.equal(await bridge.evaluate(api => api.isReady()), false, 'the current painting must be waiting on its editable layer');
@@ -238,7 +240,7 @@ test('an image load failure leaves the current painting editable', async t => {
   const imageUrl = new URL(catalogue[broken].image, baseUrl).href;
   await page.route(imageUrl, route => route.abort('failed'));
   const failedRequest = page.waitForEvent('requestfailed', request => request.url() === imageUrl);
-  await artItems.nth(broken).click();
+  await artItems.nth(broken).dispatchEvent('click');
   await failedRequest;
   await page.waitForFunction(title =>
     document.querySelector('#atelier-embedded-app #art-title').textContent === title,
@@ -265,6 +267,7 @@ test('switching workshops returns the shared camera, input, and lights to the ro
         controls.target.toArray().every((value, axis) => Math.abs(value - target[axis]) < .025) &&
         Math.abs(camera.fov - fov) < .08;
     }, home);
+    await page.waitForFunction(() => !window.__keynlockDebug.host.camera.view?.enabled);
     const restored = await page.evaluate(readRoom);
     assert.deepEqual(restored.controls, home.controls);
     assert.deepEqual(restored.roomLights, home.roomLights);
@@ -317,6 +320,12 @@ test('switching workshops returns the shared camera, input, and lights to the ro
   await labApp.locator('.wall-choice[data-wall="sage"]').dispatchEvent('click');
   await page.keyboard.press('1');
   await page.locator('#lair-easel-camera-controls').waitFor();
+  // The colours and the reset in the top right corner; the easels centred
+  // above the open panel (the camera's view is lifted by half its height).
+  assert.equal(await page.locator('#lair-atelier-corner .wood-pickers').count(), 1);
+  assert.equal(await page.locator('#lair-atelier-corner #reset-button').count(), 1);
+  await page.waitForFunction(() => window.__keynlockDebug.host.camera.view?.enabled &&
+    window.__keynlockDebug.host.camera.view.offsetY > 50);
   const atelier = await page.evaluate(readRoom);
   assert.equal(atelier.controls.enabled, true);
   assert.deepEqual(atelier.roomLights, home.roomLights);

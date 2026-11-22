@@ -465,7 +465,19 @@
         "key-archive"
       ],
       "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/wooden_table_02.gltf",
-      "geometryCountSource": "glTF indices/accessors verified in committed binary or JSON"
+      "geometryCountSource": "glTF indices/accessors verified in committed binary or JSON",
+      "variants": [
+        {
+          "id": "polyhaven-2k-textured",
+          "format": "gltf",
+          "resolution": "2k",
+          "triangles": 196,
+          "license": "CC0-1.0",
+          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/shared/models/assets/wooden-table-02/wooden_table_02_2k.gltf",
+          "assetPath": "js/3d/shared/models/assets/wooden-table-02/wooden_table_02_2k.gltf",
+          "description": "Full Poly Haven 2K PBR material variant; original lightweight gouache model remains default"
+        }
+      ]
     },
     {
       "id": "kitchen-table",
@@ -581,11 +593,11 @@
           "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/shared/models/assets/shelf-01/Shelf_01_2k.gltf"
         }
       ],
-      "status": "import-pending",
+      "status": "in-repository",
       "usedInScenes": [],
       "uploadedArchiveName": "Shelf_01_2k.gltf.zip",
       "geometryCountSource": "verified from supplied 2K glTF ZIP",
-      "notes": "New model from uploaded 2k glTF archive; imported by Poly Haven GitHub Actions task"
+      "notes": "2K glTF, geometry, bin and PBR textures imported and binary-verified byte-for-byte against supplied ZIP"
     },
     {
       "id": "armchair-01",
@@ -609,11 +621,11 @@
           "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/shared/models/assets/armchair-01/ArmChair_01_2k.gltf"
         }
       ],
-      "status": "import-pending",
+      "status": "in-repository",
       "usedInScenes": [],
       "uploadedArchiveName": "ArmChair_01_2k.gltf.zip",
       "geometryCountSource": "verified from supplied 2K glTF ZIP",
-      "notes": "New model from uploaded 2k glTF archive; imported by Poly Haven GitHub Actions task"
+      "notes": "2K glTF, geometry, bin and PBR textures imported and binary-verified byte-for-byte against supplied ZIP"
     },
     {
       "id": "painted-wooden-cabinet-02",
@@ -637,11 +649,11 @@
           "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/shared/models/assets/painted-wooden-cabinet-02/painted_wooden_cabinet_02_2k.gltf"
         }
       ],
-      "status": "import-pending",
+      "status": "in-repository",
       "usedInScenes": [],
       "uploadedArchiveName": "painted_wooden_cabinet_02_2k.gltf.zip",
       "geometryCountSource": "verified from supplied 2K glTF ZIP",
-      "notes": "New model from uploaded 2k glTF archive; imported by Poly Haven GitHub Actions task"
+      "notes": "2K glTF, geometry, bin and PBR textures imported and binary-verified byte-for-byte against supplied ZIP"
     }
   ]
 }

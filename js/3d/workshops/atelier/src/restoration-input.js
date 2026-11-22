@@ -168,6 +168,14 @@ export function createRestorationInput({ THREE, renderer, camera, controls, scen
     const painting = paintingHit(event);
     const hit = stroke && painting?.side !== 'copy' ? copyFrameHit() || painting : painting;
     if (stroke && event.pointerId === stroke.pointerId) {
+      // The paintbrush only touches: one dab where it was pressed, however
+      // long it is held or moved (careful touches on each chip).
+      if (activeTool === 'retouch') {
+        updateToolCursor(event, hit);
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        return;
+      }
       if (hit?.side === 'copy') {
         let strength = .35;
         if (activeTool === 'swab' && stroke.previousUv) {

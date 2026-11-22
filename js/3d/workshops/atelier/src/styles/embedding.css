@@ -55,7 +55,7 @@
   min-height: 0;
 }
 #atelier-embedded-app .main {overflow: visible}
-#atelier-embedded-app .workbench {overflow: visible; border: 0; box-shadow: none}
+#atelier-embedded-app .workbench {position: relative; overflow: visible; border: 0; box-shadow: none}
 #atelier-embedded-app .workbench-toggle {display: flex !important; top:-29px}
 #atelier-embedded-app .workbench-content {
   display: block;
@@ -66,16 +66,52 @@
 #atelier-embedded-app .workbench-content[hidden] {display: none !important}
 #atelier-embedded-app .workbench-intro {display: none}
 #atelier-embedded-app .workbench-main {
-  grid-template-columns: repeat(3,minmax(0,1fr)) minmax(150px,.6fr);
-  gap: 18px;
-  padding: 13px 2.1% 14px;
-  /* The three colour sliders at half their former width. */
-  width: 58%;
+  /* Three colour sliders, the likeness and the overall readiness (moved here
+     from the restoration row by the Lair, atelier-view.js). */
+  grid-template-columns: repeat(3,minmax(0,1fr)) minmax(150px,.55fr) minmax(120px,.45fr);
+  gap: 22px;
+  padding: 8px 2.1% 9px;
+  width: 82%;
 }
+#atelier-embedded-app .slider-panel {padding-top: 2px}
+#atelier-embedded-app .slider-header {margin-bottom: 10px}
+#atelier-embedded-app .slider-ends {display: none}
+#atelier-embedded-app .score-line {margin: 3px 0 5px}
+#atelier-embedded-app .score-line strong {font-size: 34px}
+#atelier-embedded-app .score-comment {margin-top: 4px}
+#atelier-embedded-app .workbench-main .restoration-feedback {
+  align-self: stretch;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  min-width: 0;
+  padding-left: 22px;
+  border-left: 1px solid #d7c8ad;
+}
+#atelier-embedded-app .workbench-main .restoration-feedback strong {font-size: 34px; line-height: .9}
+#atelier-embedded-app .restoration-feedback small,
+#atelier-embedded-app .restoration-row-heading {display: none}
+/* The tab sits behind the panel: the panel's top edge runs across its foot. */
+#atelier-embedded-app {border-top: 0}
+#atelier-embedded-app .workbench::before {
+  content: "";
+  position: absolute;
+  z-index: 7;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #c9ae7b;
+  box-shadow: 0 -3px 9px #2b1b1430;
+  pointer-events: none;
+}
+#atelier-embedded-app .workbench.is-collapsed::before {display: none}
 /* In the Lair: no painting thumbnails (the collection chooses); the colours
    and the reset live in the top right corner; the hints are 20 % smaller and
    the Lair's original/copy stepper sits beside them. */
-#atelier-embedded-app .art-list {display: none}
+#atelier-embedded-app .art-list, #atelier-embedded-app .workbench-footer {display: none}
+#atelier-embedded-app .restoration-row .keyboard-tip {margin-left: auto}
 #atelier-embedded-app .keyboard-tip {gap: 8px; font-size: 8px}
 #atelier-embedded-app .keyboard-tip .keycap {padding: 3px 6px; font-size: 7px}
 #atelier-embedded-app .restoration-row {padding: 8px 2.1%; gap: 12px; min-height: 0}
@@ -120,6 +156,7 @@
     width: 100%;
   }
   #atelier-embedded-app .workbench-main {grid-template-columns: repeat(2,minmax(0,1fr));gap:12px;padding:12px 10px;width:100%}
+  #atelier-embedded-app .workbench-main .restoration-feedback {padding-left:12px}
   #atelier-embedded-app .workbench-content {max-height:60vh}
   #atelier-embedded-app .restoration-row {padding:8px 10px}
   #atelier-embedded-app .workbench-footer {padding:8px 10px}

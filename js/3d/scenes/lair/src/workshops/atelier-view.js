@@ -18,7 +18,7 @@ export function createAtelierView({
   const easelCameraControls = document.querySelector('#lair-easel-camera-controls');
   const galleryHover = document.querySelector('#lair-wall-art-hover');
   const corner = document.querySelector('#lair-atelier-corner');
-  const easelControlsHome = easelCameraControls.parentElement;
+  const headerSlot = document.querySelector('#lair-atelier-header');
   // The camera's view is lifted by half the open panel's height: the easels
   // and the painting in focus sit in the middle of the space above the panel.
   let viewLift = 0;
@@ -204,10 +204,11 @@ export function createAtelierView({
   }
 
   /**
-   * The Atelier's panel in the Lair: the easel and frame colours and the
-   * colour reset go to the top right corner; the original/copy stepper sits
-   * by the control hints in the panel's footer (on the stage while the panel
-   * is hidden). The nodes move with their listeners.
+   * The Atelier's panel in the Lair. The easel and frame colours and the
+   * colour reset go to the top right corner, «ВСЯ КОЛЛЕКЦИЯ» next to «В
+   * ЛОГОВО», the overall readiness beside the likeness and the control hints
+   * into the tools row. The original/copy stepper shows only while the panel
+   * is hidden. The nodes move with their listeners.
    */
   function placeAtelierControls() {
     const app = document.querySelector('#atelier-embedded-app');
@@ -218,14 +219,22 @@ export function createAtelierView({
       if (pickers) corner.append(pickers);
       if (reset) corner.append(reset);
     }
-    const footer = app.querySelector('.workbench-footer');
-    const collapsed = app.querySelector('.workbench.is-collapsed');
-    const home = footer && !collapsed ? footer : easelControlsHome;
-    if (easelCameraControls.parentElement !== home) {
-      if (home === footer) footer.insertBefore(easelCameraControls, footer.querySelector('.keyboard-tip'));
-      else home.append(easelCameraControls);
-      easelCameraControls.classList.toggle('in-panel', home === footer);
-    }
+    const collection = app.querySelector('#collection-footer');
+    if (collection) headerSlot.append(collection);
+    const readiness = app.querySelector('.restoration-feedback');
+    if (readiness) app.querySelector('.workbench-main')?.append(readiness);
+    const hints = app.querySelector('.workbench-footer .keyboard-tip');
+    if (hints) app.querySelector('.restoration-row')?.append(hints);
+  }
+
+  /** «ВСЯ КОЛЛЕКЦИЯ» stands right of the «В ЛОГОВО» button. */
+  function placeHeaderSlot() {
+    const back = document.querySelector('#reset-camera');
+    const bounds = back && !back.hidden ? back.getBoundingClientRect() : null;
+    if (!bounds?.width) { headerSlot.hidden = true; return; }
+    headerSlot.style.left = `${Math.round(bounds.right + 10)}px`;
+    headerSlot.style.top = `${Math.round(bounds.top)}px`;
+    headerSlot.style.height = `${Math.round(bounds.height)}px`;
   }
 
   function updateViewLift(currentZone) {
@@ -248,7 +257,10 @@ export function createAtelierView({
     const showing = currentZone === 'atelier' && !galleryActive && Boolean(bridge) && !blocked;
     if (bridge) placeAtelierControls();
     corner.hidden = !showing;
-    easelCameraControls.hidden = !showing;
+    headerSlot.hidden = !showing;
+    if (showing) placeHeaderSlot();
+    const panelOpen = !document.querySelector('#atelier-embedded-app .workbench.is-collapsed');
+    easelCameraControls.hidden = !showing || panelOpen;
     const focusedSide = showing ? bridge.focusedSide?.() : null;
     easelLabels.hidden = !showing || Boolean(focusedSide);
     if (!showing) return;

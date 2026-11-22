@@ -149,13 +149,13 @@
 }
 .lair-easel-camera-controls > button:not(#lair-focus-exit){min-width:35px;font:24px/1 Georgia,serif;padding:2px 10px 6px}
 .lair-easel-camera-controls > button:hover{background:#70573b55}
-/* In the Atelier's panel, between «ВСЯ КОЛЛЕКЦИЯ» and the control hints. */
-.lair-easel-camera-controls.in-panel{position:static;margin-left:auto;text-shadow:none;gap:5px}
-.lair-easel-camera-controls.in-panel > button{border-color:#c3aa84;color:#6d5940;padding:6px 10px;font-size:9px}
-.lair-easel-camera-controls.in-panel > button:not(#lair-focus-exit){font-size:18px;padding:0 8px 3px}
-.lair-easel-camera-controls.in-panel > button:hover{background:#e5d8c0}
-.lair-easel-camera-controls.in-panel #lair-easel-camera-state{min-width:96px;color:#806f55;font-size:9px}
-.lair-easel-camera-controls.in-panel #lair-focus-exit small{display:inline;margin:0 0 0 5px;color:#a2927b;font-size:7px}
+/* «ВСЯ КОЛЛЕКЦИЯ», in the look of «В ЛОГОВО» beside it (position: atelier-view.js). */
+.lair-atelier-header{position:fixed;z-index:150;display:flex}
+.lair-atelier-header[hidden]{display:none!important}
+.lair-atelier-header #collection-footer{border:1px solid rgba(223,195,144,.32);color:#e2ceaa;background:rgba(16,24,21,.78);
+  padding:0 15px;font:700 10px Manrope,Arial,sans-serif;letter-spacing:.10em;white-space:nowrap;cursor:pointer}
+.lair-atelier-header #collection-footer:hover{background:#342c21}
+.lair-atelier-header #collection-footer .collection-total{color:#bc9a68;margin:0 3px}
 /* The easel and frame colours and the colour reset (top right). */
 .lair-atelier-corner{position:absolute;z-index:24;top:84px;right:36px;display:flex;align-items:flex-start;gap:16px;
   color:#f3e1c0;text-shadow:0 1px 3px #160e0bf0,0 2px 10px #160e0b}

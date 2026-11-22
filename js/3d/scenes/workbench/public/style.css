@@ -427,3 +427,9 @@
 #gearOilButton.active{border-color:#e2c284;background:rgba(174,133,68,.22);color:#f5e2be}
 #gearProgressFill{background:linear-gradient(90deg,#c5a16a,#e5d5a5)}
 @media(max-width:760px){.visual-options{position:absolute;right:10px;top:9px}.visual-options>summary{padding:5px 8px;font-size:10px}.visual-options label{background:#16252b}}
+
+/* Key cutting and lock assembly: keep the shared control panel in the top-left corner. */
+.app.workbench-panel-left .side-panel{left:24px;right:auto}
+.app.workbench-panel-left .scene-label{left:390px;right:24px;max-width:calc(100% - 414px)}
+@media(max-width:1080px){.app.workbench-panel-left .scene-label{display:none}}
+@media(max-width:760px){.app.workbench-panel-left .side-panel{left:8px;right:auto}}

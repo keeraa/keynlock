@@ -1,6 +1,6 @@
 // @ts-check
 import { drawingVertexShader, drawingFragmentShader } from './drawing-shader.js';
-import { backgroundBlurFragmentShader } from './background-blur-shader.js';
+import { createDepthBlur } from '../../../../core/rendering/depth-blur.js';
 
 /** Optional post-processing. The normal buffer exists only while contours are enabled. */
 export function createCartoonFilter({ THREE, renderer, scene, camera, renderScene = scene }) {
@@ -37,37 +37,14 @@ export function createCartoonFilter({ THREE, renderer, scene, camera, renderScen
     depth.minFilter = THREE.NearestFilter;
     depth.magFilter = THREE.NearestFilter;
     target.depthTexture = depth;
-    const blurWidth = Math.ceil(width / 2);
-    const blurHeight = Math.ceil(height / 2);
-    const makeBlurTarget = () => new THREE.WebGLRenderTarget(blurWidth, blurHeight, {
-      depthBuffer: false, stencilBuffer: false,
-      minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,
-    });
-    const blurHorizontal = makeBlurTarget();
-    const blurVertical = makeBlurTarget();
-    const blurUniforms = {
-      tSource: { value: target.texture },
-      tDepth: { value: depth },
-      uTexel: { value: new THREE.Vector2(1 / blurWidth, 1 / blurHeight) },
-      uDirection: { value: new THREE.Vector2(1, 0) },
-      uNear: { value: camera.near },
-      uFar: { value: camera.far },
-      uFocus: { value: options.focus },
-      uBlurRadius: { value: options.backgroundRadius * renderer.getPixelRatio() },
-      uBlurNear: { value: options.backgroundBlurNear },
-      uBlurFar: { value: options.backgroundBlurFar },
-      uPremultiplied: { value: 0 },
-    };
-    const blurMaterial = new THREE.ShaderMaterial({
-      uniforms: blurUniforms, vertexShader: drawingVertexShader,
-      fragmentShader: backgroundBlurFragmentShader,
-      depthTest: false, depthWrite: false,
-    });
+    // The game's one background blur (core/rendering/depth-blur.js).
+    const depthBlur = createDepthBlur({ renderer });
+    depthBlur.setSize(width, height);
     const uniforms = {
       tColor: { value: target.texture },
       tDepth: { value: depth },
       tNormal: { value: target.texture },
-      tBlur: { value: blurVertical.texture },
+      tBlur: { value: depthBlur.texture },
       uTexel: { value: new THREE.Vector2(1 / width, 1 / height) },
       uNear: { value: camera.near },
       uFar: { value: camera.far },
@@ -88,15 +65,11 @@ export function createCartoonFilter({ THREE, renderer, scene, camera, renderScen
     const quadGeometry = new THREE.PlaneGeometry(2, 2);
     const quad = new THREE.Mesh(quadGeometry, material);
     quad.frustumCulled = false;
-    const blurQuad = new THREE.Mesh(quadGeometry, blurMaterial);
-    blurQuad.frustumCulled = false;
     const screen = new THREE.Scene();
     screen.add(quad);
-    const blurScene = new THREE.Scene();
-    blurScene.add(blurQuad);
     resources = {
       target, uniforms, material, quadGeometry, screen,
-      blurScene, blurMaterial, blurUniforms, blurHorizontal, blurVertical,
+      depthBlur,
       screenCamera: new THREE.Camera(),
     };
     updateUniforms();
@@ -145,11 +118,6 @@ export function createCartoonFilter({ THREE, renderer, scene, camera, renderScen
     u.uBlurNear.value = options.backgroundBlurNear;
     u.uBlurFar.value = options.backgroundBlurFar;
     u.uFocus.value = options.focus;
-    const blur = resources.blurUniforms;
-    blur.uFocus.value = options.focus;
-    blur.uBlurRadius.value = options.backgroundRadius * renderer.getPixelRatio();
-    blur.uBlurNear.value = options.backgroundBlurNear;
-    blur.uBlurFar.value = options.backgroundBlurFar;
   }
 
   function renderNormalBuffer() {
@@ -202,12 +170,10 @@ export function createCartoonFilter({ THREE, renderer, scene, camera, renderScen
     }
     const {
       target, screen, screenCamera, uniforms,
-      blurScene, blurUniforms, blurHorizontal, blurVertical,
+      depthBlur,
     } = ensureResources();
     uniforms.uNear.value = camera.near;
     uniforms.uFar.value = camera.far;
-    blurUniforms.uNear.value = camera.near;
-    blurUniforms.uFar.value = camera.far;
     const previousTarget = renderer.getRenderTarget();
     try {
       renderer.setRenderTarget(target);
@@ -215,20 +181,11 @@ export function createCartoonFilter({ THREE, renderer, scene, camera, renderScen
       const frame = { ...renderer.info.render };
       const normalFrame = options.outline && options.outlineStrength > 0 ?
         renderNormalBuffer() : { calls: 0, triangles: 0 };
-      const blurPasses = effectiveBackgroundBlur() > 0 ? 2 : 0;
-      if (blurPasses) {
-        blurUniforms.tSource.value = target.texture;
-        blurUniforms.uDirection.value.set(1, 0);
-        blurUniforms.uPremultiplied.value = 0;
-        renderer.setRenderTarget(blurHorizontal);
-        renderer.render(blurScene, screenCamera);
-
-        blurUniforms.tSource.value = blurHorizontal.texture;
-        blurUniforms.uDirection.value.set(0, 1);
-        blurUniforms.uPremultiplied.value = 1;
-        renderer.setRenderTarget(blurVertical);
-        renderer.render(blurScene, screenCamera);
-      }
+      const blurPasses = effectiveBackgroundBlur() > 0 ? resources.depthBlur.passes : 0;
+      if (blurPasses) depthBlur.render({
+        color: target.texture, depth: target.depthTexture, camera, focus: options.focus,
+        radius: options.backgroundRadius, near: options.backgroundBlurNear, far: options.backgroundBlurFar,
+      });
       renderer.setRenderTarget(previousTarget);
       renderer.render(screen, screenCamera);
       return {
@@ -248,12 +205,7 @@ export function createCartoonFilter({ THREE, renderer, scene, camera, renderScen
     if (resources) {
       resources.target.setSize(width, height);
       resources.uniforms.uTexel.value.set(1 / width, 1 / height);
-      const blurWidth = Math.ceil(width / 2);
-      const blurHeight = Math.ceil(height / 2);
-      resources.blurHorizontal.setSize(blurWidth, blurHeight);
-      resources.blurVertical.setSize(blurWidth, blurHeight);
-      resources.blurUniforms.uTexel.value.set(1 / blurWidth, 1 / blurHeight);
-      resources.blurUniforms.uBlurRadius.value = options.backgroundRadius * pixelRatio;
+      resources.depthBlur.setSize(width, height);
     }
     if (normalTarget) normalTarget.setSize(width, height);
   }
@@ -290,7 +242,6 @@ export function createCartoonFilter({ THREE, renderer, scene, camera, renderScen
     options.focus = distance;
     if (resources) {
       resources.uniforms.uFocus.value = distance;
-      resources.blurUniforms.uFocus.value = distance;
     }
   }
 
@@ -299,9 +250,7 @@ export function createCartoonFilter({ THREE, renderer, scene, camera, renderScen
     if (!resources) return;
     resources.target.dispose();
     resources.target.depthTexture.dispose();
-    resources.blurHorizontal.dispose();
-    resources.blurVertical.dispose();
-    resources.blurMaterial.dispose();
+    resources.depthBlur.dispose();
     resources.material.dispose();
     resources.quadGeometry.dispose();
     resources = null;

@@ -1,5 +1,6 @@
 // @ts-check
 import * as THREE from 'three';
+import { createDepthBlur, DEPTH_BLUR_GLSL } from '../../../../core/rendering/depth-blur.js';
 
 // The Lair's ink outline, ported from the Key Archive's full-screen contour
 // (key-archive/dist/js/scene-outline.js, itself from Key Forge). One pass over
@@ -12,7 +13,7 @@ import * as THREE from 'three';
 // (frame sides, easel legs) straight lines. It roughly doubles the draw
 // calls of a frame; normals rebuilt from depth were cheaper but jagged.
 
-const INK = Object.freeze({ color: '#2b241d', radius: 1.35, opacity: .82, normalThreshold: .42, depthThreshold: .018 });
+const INK = Object.freeze({ color: '#2b241d', radius: 1.35, opacity: .82, normalThreshold: .42, depthThreshold: .018, planeThreshold: .0035 });
 
 const vertexShader = /* glsl */`
   varying vec2 vUv;
@@ -25,11 +26,18 @@ const fragmentShader = /* glsl */`
   uniform vec2 uResolution;
   uniform mat4 uProjectionInverse;
   uniform vec3 uViewUp;
-  uniform float uNear, uFar, uWidth, uInk, uNormalThreshold, uDepthThreshold, uFadeNear, uFadeFar, uUseNormals;
+  uniform float uNear, uFar, uWidth, uInk, uNormalThreshold, uDepthThreshold, uPlaneThreshold, uFadeNear, uFadeFar, uUseNormals;
   uniform vec3 uInkColor;
+  uniform sampler2D tBlur;
+  uniform float uBlur, uBlurFocus, uBlurNear, uBlurFar;
   varying vec2 vUv;
+  ${DEPTH_BLUR_GLSL}
 
   float rawDepth(vec2 uv) { return texture2D(tDepth, uv).r; }
+  vec3 viewPosition(vec2 uv, float depth) {
+    vec4 view = uProjectionInverse * vec4(uv * 2.0 - 1.0, depth * 2.0 - 1.0, 1.0);
+    return view.xyz / view.w;
+  }
   float occupied(float depth) { return 1.0 - step(0.99995, depth); }
   float viewDistance(float depth) { return (uNear * uFar) / max(.0001, uFar - depth * (uFar - uNear)); }
   // View-space normal from the normal pass (MeshNormalMaterial packs it 0..1).
@@ -53,9 +61,15 @@ const fragmentShader = /* glsl */`
     vec3 neighborNormal = normal;
     if (here > .5 && there > .5) {
       neighborNormal = normalAt(uv);
-      crease = max(
+      // A small step off this face's plane: a frame's 4 cm off the wall. Measured
+      // against the plane (real normals), so a wall seen at a slant is no step.
+      float planeGap = uUseNormals > .5
+        ? abs(dot(viewPosition(uv, neighborDepth) - viewPosition(vUv, depth), normal)) / max(.05, distance)
+        : 0.0;
+      crease = max(max(
         smoothstep(uNormalThreshold, uNormalThreshold + .15, length(normal - neighborNormal)),
-        smoothstep(uDepthThreshold, uDepthThreshold * 1.8, jump));
+        smoothstep(uDepthThreshold, uDepthThreshold * 1.8, jump)),
+        smoothstep(uPlaneThreshold, uPlaneThreshold * 1.8, planeGap));
       // Floor boards, table tops and papers: two upward faces with only a small
       // step between them (plank seams, ruled lines) get no ink. A real drop,
       // like a table top over the floor, keeps it.
@@ -96,6 +110,12 @@ const fragmentShader = /* glsl */`
   void main() {
     vec4 color = texture2D(tColor, vUv);
     float ink = uInk > 0.0 ? inkEdge() * uInk : 0.0;
+    // The background blur (the open lab): the room behind softens, and so do its lines.
+    if (uBlur > 0.0) {
+      float background = uBlur * keynlockBackgroundMask(viewDistance(rawDepth(vUv)), uBlurFocus, uBlurNear, uBlurFar);
+      color.rgb = keynlockDepthBlur(color.rgb, tBlur, vUv, background);
+      ink *= 1.0 - .6 * background;
+    }
     // Glass in front (the normal buffer's alpha is 0 there): the lines behind
     // it stay faint instead of showing through the tubes and flasks.
     float glass = uUseNormals > .5 ? 1.0 - texture2D(tNormal, vUv).a : 0.0;
@@ -140,10 +160,16 @@ export function createSceneOutline({ renderer, scene, camera }) {
     uWidth: { value: /** @type {number} */ (INK.radius) }, uInk: { value: /** @type {number} */ (INK.opacity) },
     uInkColor: { value: new THREE.Color(INK.color) },
     uNormalThreshold: { value: INK.normalThreshold }, uDepthThreshold: { value: INK.depthThreshold },
+    uPlaneThreshold: { value: INK.planeThreshold },
     // The room is large: ink fades a little with distance, not to nothing.
     uFadeNear: { value: 9 }, uFadeFar: { value: 40 },
     uUseNormals: { value: 1 },
+    tBlur: { value: null }, uBlur: { value: 0 }, uBlurFocus: { value: 0 }, uBlurNear: { value: 1 }, uBlurFar: { value: 3 },
   };
+  /** @type {ReturnType<typeof createDepthBlur> | null} */
+  let depthBlur = null;
+  /** @type {null | (() => { amount: number, focus: number, radius: number, near: number, far: number })} */
+  let blurPass = null;
   const material = new THREE.ShaderMaterial({ uniforms, vertexShader, fragmentShader, depthTest: false, depthWrite: false });
   const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
   quad.frustumCulled = false;
@@ -224,6 +250,17 @@ export function createSceneOutline({ renderer, scene, camera }) {
     renderer.setRenderTarget(frame);
     renderer.render(scene, camera);
     if (normals) renderNormals();
+    const blur = blurPass?.();
+    uniforms.uBlur.value = blur?.amount ?? 0;
+    if (blur && blur.amount > 0) {
+      depthBlur ??= createDepthBlur({ renderer });
+      depthBlur.setSize(size.x, size.y);
+      depthBlur.render({ color: frame.texture, depth: frame.depthTexture, camera, ...blur });
+      uniforms.tBlur.value = depthBlur.texture;
+      uniforms.uBlurFocus.value = blur.focus;
+      uniforms.uBlurNear.value = blur.near;
+      uniforms.uBlurFar.value = blur.far;
+    }
     renderer.setRenderTarget(previous);
     renderer.render(screen, screenCamera);
   }
@@ -234,6 +271,9 @@ export function createSceneOutline({ renderer, scene, camera }) {
     /** The visual panel's 20–140 % stroke width. */
     setWidth(percent) { widthScale = THREE.MathUtils.clamp((Number(percent) || 0) / 65, .3, 2.2); },
     isEnabled: () => enabled,
+    /** Background blur by depth, read each frame from `pass` (null: none). */
+    setBackgroundBlur(pass) { blurPass = typeof pass === 'function' ? pass : null; },
+    isBackgroundBlurred: () => uniforms.uBlur.value > 0,
     /** Quality level (rendering/quality.js): MSAA samples and the normal pass. */
     setQuality(options) {
       samples = options.samples;
@@ -242,7 +282,7 @@ export function createSceneOutline({ renderer, scene, camera }) {
     },
     dispose() {
       target?.depthTexture?.dispose(); target?.dispose(); normalTarget?.dispose();
-      material.dispose(); normalMaterial.dispose(); glassMask.dispose(); quad.geometry.dispose();
+      depthBlur?.dispose(); material.dispose(); normalMaterial.dispose(); glassMask.dispose(); quad.geometry.dispose();
     },
   };
 }

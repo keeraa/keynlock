@@ -5,7 +5,8 @@ import { t } from './i18n.js';
 const FINISHES = Object.freeze({
   walnut: { name: t('Тёмный орех'), shadow: [46, 27, 23], base: [91, 57, 40], highlight: [151, 101, 62], seed: 9 },
   oak: { name: t('Медовый дуб'), shadow: [103, 61, 35], base: [166, 114, 68], highlight: [215, 161, 102], seed: 22 },
-  ash: { name: t('Светлый ясень'), shadow: [100, 99, 84], base: [163, 154, 127], highlight: [216, 202, 163], seed: 37 }
+  ash: { name: t('Светлый ясень'), shadow: [100, 99, 84], base: [163, 154, 127], highlight: [216, 202, 163], seed: 37 },
+  dark: { name: t('Тёмная гуашь'), shadow: [28, 17, 14], base: [58, 35, 26], highlight: [104, 66, 44], seed: 51 },
 });
 
 export const WOOD_FINISHES = Object.freeze(Object.keys(FINISHES));
@@ -14,7 +15,9 @@ export const WOOD_FINISHES = Object.freeze(Object.keys(FINISHES));
 export const WOOD_FINISH_ASSETS = Object.freeze({
   walnut: new URL('./assets/wood-gouache-walnut.webp', import.meta.url).href,
   oak: new URL('./assets/wood-gouache-oak.webp', import.meta.url).href,
-  ash: new URL('./assets/wood-gouache-ash.webp', import.meta.url).href
+  ash: new URL('./assets/wood-gouache-ash.webp', import.meta.url).href,
+  // The Atelier's dark walnut gouache (its easels), for a darker table: one file for both.
+  dark: new URL('../../atelier/src/assets/textures/wood-walnut-gouache-v2.webp', import.meta.url).href,
 });
 
 const fract = x => x - Math.floor(x);

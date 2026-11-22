@@ -10,13 +10,14 @@ const WALK_FOV = 56;
 export function createZoneTransitions({
   scene, camera, controls, canvas, interaction, renderer, rendererHost,
   workshopOverlay, atelierView, visualUI, homePosition, homeTarget, roomMinDistance,
-  roomLights, cameraInput, quality = null,
+  roomLights, cameraInput, quality = null, outlines = null,
 }) {
   const zones = Object.fromEntries(Object.entries(zoneDefinitions).map(([id, zone]) => [id, { ...zone }]));
   const panel = document.querySelector('#zone-panel');
   const desiredPosition = new THREE.Vector3();
   const desiredTarget = new THREE.Vector3();
-  const workshopLighting = createWorkshopLighting({ scene, camera, canvas, renderer, rendererHost, roomLights, quality });
+  const workshopLighting = createWorkshopLighting({ scene, camera, canvas, renderer, rendererHost, roomLights, quality,
+    outlines, focusTarget: controls.target });
   const zoneButtons = document.querySelectorAll('[data-zone]');
   let desiredFov = 47;
   let roomFov = 47;
@@ -318,6 +319,8 @@ export function createZoneTransitions({
     returnsToWalk: () => returnToWalk,
     precompileWorkshopLighting: () => workshopLighting.precompile(workshopOverlay.isReady, () => inRoomWorkshop),
     manipulateAlchemy, resetAlchemyCamera,
+    /** The lab's «Размытие фона» switch. */
+    setAlchemyBackgroundBlur: workshopLighting.setLabBlur,
     current: () => currentZone,
     title: id => zones[id]?.title,
     isTransitioning: () => transitioning,

@@ -1,4 +1,5 @@
 // @ts-check
+import { DEPTH_BLUR_GLSL } from '../../../../core/rendering/depth-blur.js';
 /** Two optional illustration layers, composited after the ordinary 3D render. */
 export const drawingVertexShader = `
   varying vec2 vUv;
@@ -31,10 +32,11 @@ export const drawingFragmentShader = `
     return (2.0 * uNear * uFar) / (uFar + uNear - z * (uFar - uNear));
   }
 
+  ${DEPTH_BLUR_GLSL}
   float backgroundMask(float distance) {
     // The paintings and their tools remain in focus. Background objects at
     // different depths may blend together, so shelves and frames also defocus.
-    return smoothstep(uBlurNear, uBlurFar, distance - uFocus);
+    return keynlockBackgroundMask(distance, uFocus, uBlurNear, uBlurFar);
   }
 
   float outlineForeground(float distance) {
@@ -90,14 +92,7 @@ export const drawingFragmentShader = `
   void main() {
     vec4 center = texture2D(tColor, vUv);
     if (uBackgroundBlur > 0.0) {
-      float centerDepth = eyeDepth(vUv);
-      float background = backgroundMask(centerDepth) * uBackgroundBlur;
-      if (background > 0.001) {
-        // Blur texture is Gaussian-filtered and premultiplied by background
-        // coverage. Division removes foreground-edge halos from the wall.
-        vec4 soft = texture2D(tBlur, vUv);
-        if (soft.a > .001) center.rgb = mix(center.rgb, soft.rgb / soft.a, background);
-      }
+      center.rgb = keynlockDepthBlur(center.rgb, tBlur, vUv, backgroundMask(eyeDepth(vUv)) * uBackgroundBlur);
     }
     gl_FragColor = center;
     #include <tonemapping_fragment>

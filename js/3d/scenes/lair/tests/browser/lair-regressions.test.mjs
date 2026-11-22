@@ -299,9 +299,22 @@ test('switching workshops returns the shared camera, input, and lights to the ro
   await settleAlchemyCamera(page);
   const lab = await page.evaluate(readRoom);
   assert.equal(lab.controls.enabled, false);
-  assert.ok(lab.roomLights.every(light => !light.visible));
+  assert.deepEqual(lab.roomLights, home.roomLights, "the room lights the lab too (one set of lights)");
   assert.ok(lab.alchemyLights > 0);
   assert.equal(lab.atelierLights, 0);
+  // The lab's «Размытие фона» is the shared depth blur of the Lair's outline pass.
+  const blurred = () => window.__keynlockDebug.outlines.isBackgroundBlurred();
+  await page.waitForFunction(blurred);
+  const labApp = page.locator('#alchemy-embedded-app');
+  await labApp.locator('#background-blur').dispatchEvent('click');
+  await page.waitForFunction(on => window.__keynlockDebug.outlines.isBackgroundBlurred() === on, false);
+  await labApp.locator('#background-blur').dispatchEvent('click');
+  await page.waitForFunction(blurred);
+  // «Фон мастерской» paints the Lair's right wall.
+  await labApp.locator('.wall-choice[data-wall="ochre"]').dispatchEvent('click');
+  assert.equal(await page.evaluate(() => window.__keynlockDebug.host.alchemy.getWallFinish()), 'ochre');
+  assert.equal(await labApp.locator('.wall-choice[data-wall="ochre"]').getAttribute('aria-pressed'), 'true');
+  await labApp.locator('.wall-choice[data-wall="sage"]').dispatchEvent('click');
   await page.keyboard.press('1');
   await page.locator('#lair-easel-camera-controls').waitFor();
   const atelier = await page.evaluate(readRoom);

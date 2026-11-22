@@ -37,7 +37,7 @@
     <aside class="visual-panel" id="alchemy-visual-panel" aria-label="Настройки визуала">
       <div class="visual-panel-title"><span>НАСТРОЙКИ ВИЗУАЛА</span><small>KEYNLOCK / THREE.JS R187</small></div>
       <section class="visual-section">
-        <div class="visual-section-heading"><strong>Мультяшная рисовка</strong><span>2 эффекта</span><button class="visual-switch active" type="button" id="draw-master" role="switch" aria-label="Мультяшная рисовка" aria-checked="true"><i></i></button></div>
+        <div class="visual-section-heading"><strong>Мультяшная рисовка</strong><span>2 эффекта</span></div>
         <div class="effect-card" id="toon-card">
           <div class="effect-heading"><strong>01 · Мультяшный свет</strong><button class="visual-switch" type="button" id="toon-switch" role="switch" aria-label="Мультяшный свет" aria-checked="false"><i></i></button></div>
           <label class="visual-range-label" for="toon-strength">Сила эффекта <output id="toon-strength-output">80%</output></label>
@@ -55,7 +55,7 @@
         <p class="visual-hint">Включай эффекты по одному или совмещай.</p>
       </section>
       <section class="visual-section">
-        <div class="visual-section-heading"><strong>Рисованные материалы</strong><span>5 вариантов</span><button class="visual-switch active" type="button" id="paint-master" role="switch" aria-label="Рисованные материалы" aria-checked="true"><i></i></button></div>
+        <div class="visual-section-heading"><strong>Рисованные материалы</strong><span>5 вариантов</span></div>
         <div id="paint-content">
           <h3>Стойки и каркас</h3>
           <div class="metal-choices" role="group" aria-label="Материал каркаса">
@@ -77,11 +77,12 @@
         </div>
       </section>
       <section class="visual-section">
-        <div class="visual-section-heading"><strong>Дерево стола и полки</strong><span>3 гуашевые фактуры</span></div>
+        <div class="visual-section-heading"><strong>Дерево стола и полки</strong><span>4 гуашевые фактуры</span></div>
         <div class="wood-choices" role="group" aria-label="Гуашевая текстура дерева">
           <button type="button" class="wood-choice active" data-wood="walnut" aria-pressed="true"><span class="wood-swatch wood-walnut"></span>Тёмный орех</button>
           <button type="button" class="wood-choice" data-wood="oak" aria-pressed="false"><span class="wood-swatch wood-oak"></span>Медовый дуб</button>
           <button type="button" class="wood-choice" data-wood="ash" aria-pressed="false"><span class="wood-swatch wood-ash"></span>Светлый ясень</button>
+          <button type="button" class="wood-choice" data-wood="dark" aria-pressed="false"><span class="wood-swatch wood-dark"></span>Тёмная гуашь</button>
         </div>
       </section>
       <section class="visual-section">
@@ -94,7 +95,7 @@
           </div>
         </div>
       </section>
-      <section class="visual-section">
+      <section class="visual-section lighting-section">
         <div class="visual-section-heading"><strong>Освещение</strong><span>направление и лучи</span></div>
         <h3>Основной источник света</h3>
         <div class="light-choices" role="group" aria-label="Направление основного освещения">

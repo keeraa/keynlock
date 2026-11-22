@@ -1,20 +1,28 @@
-# KEYNLOCK — общая библиотека 3D-моделей
+# KEYNLOCK — общий реестр 3D-моделей
 
-Единый реестр внешних геометрических моделей. Каталог: [catalog.json](./catalog.json). В нём сейчас **16 файловых моделей** (GLB/glTF): 15 уже использовавшихся в Архиве ключей и 1 новая модель стеллажа.
+В репозитории Keynlock подтверждены **40 записей моделей и модельных семейств**:
 
-## Состав
+| Раздел | Записей | Файл |
+| --- | ---: | --- |
+| Импортированные GLB/glTF из Архива ключей | 15 | [catalog.json](./catalog.json) |
+| Новый шкаф Library Oak Bookcase, внешний GLB | 1 | [catalog.json](./catalog.json) |
+| Процедурные ключи | 10 | [procedural-models.json](./procedural-models.json) |
+| Процедурные городские здания (4 варианта домов, 6 особых зданий) | 10 | [procedural-models.json](./procedural-models.json) |
+| Семейства процедурных замков | 4 | [procedural-models.json](./procedural-models.json) |
 
-- **Книги:** 5 (Books Strapped, Book 7, Book Group Medium 1–3).
-- **Мебель:** 4 (Peg Rack, Painted Wooden Stool, Painted Wooden Table, Wooden Table 02).
-- **Освещение:** 4 (Candle 1–2, Chandelier, Wooden Candle Holder).
-- **Прочее:** 2 (Scroll Red, Bottle 1).
-- **Новый объект:** 1 (Library Oak Bookcase).
+Каталог не подменяет исходники сцен и не переносит их. GLB/glTF остаются по прежним путям; у файлов glTF сохранены соседние `.bin` и текстуры. Процедурные модели описаны ссылками на реальные фабрики, конфигурации и источники.
 
-Пятнадцать существующих GLB/glTF хранятся в `js/3d/scenes/key-archive/dist/assets/` и подключаются из общего реестра по URL исходного файла с сохранением относительных ссылок на `.bin` и текстуры. Это **реестр существующих ассетов**, а не перенос или дублирование файлов. Авторство и условия использования указаны в `key-archive/dist/assets/selected-archive-props/SOURCES.txt` и `quaternius-fantasy-props/LICENSE.txt`. Модели Quaternius и Poly Haven: CC0 1.0.
+**Важное ограничение:** 40 — количество подтверждённых каталогизированных записей, а не полный подсчёт всех нарисованных в коде предметов. Отдельные детали замков, рукояти инструментов, мебель логова, алхимические предметы, мосты, здания-экземпляры и прочие элементы сцен пока не проинвентаризированы как самостоятельные записи. Чужие коллекции (например, Village Engine) сюда не включены.
 
-**Library Oak Bookcase:** https://tevy.dev/models/library-oak-bookcase — CC0 1.0, версия v1. Габариты 1,62 × 3 × 0,48 м; LOD0 1 474 треугольника. Подключён к каталогу, но в сценах ещё не размещён. Его файлы загружаются с сайта источника, не сохранены в репозитории. Для всех внешних URL доступность и CORS следует проверить в целевой сцене.
+## Источники сторонних моделей
 
-## Использование
+- **Quaternius Fantasy Props MegaKit**, CC0 1.0 — https://quaternius.com/packs/fantasypropsmegakit.html
+- **Poly Haven**, CC0 1.0 — https://polyhaven.com
+- **Library Oak Bookcase** — https://tevy.dev/models/library-oak-bookcase, CC0 1.0; v1, 1,62 × 3 × 0,48 м, LOD0: 1474 треугольника. Модель зарегистрирована, но в сценах не размещена.
+
+Сведения о лицензиях исходных архивных файлов: [SOURCES.txt](../../scenes/key-archive/dist/assets/selected-archive-props/SOURCES.txt), [LICENSE.txt](../../scenes/key-archive/dist/assets/quaternius-fantasy-props/LICENSE.txt).
+
+## Подключение GLB/glTF в Three.js
 
 ```js
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
@@ -23,4 +31,4 @@ const gltf=await loadModel('painted-wooden-table',{loader:new GLTFLoader()});
 scene.add(gltf.scene);
 ```
 
-Каталог описывает только импортированные GLB/glTF. **Процедурные модели** (дома, особые здания, механизмы замков, инструменты, десять семейств ключей) существуют в исходных JS-модулях соответствующих сцен и здесь пока не перечислены. Их необходимо индексировать отдельно по фабрикам и параметрам, чтобы не путать с файловыми ресурсами.
+Процедурные модели импортируются из указанных в `procedural-models.json` модулей и требуют своих фабрик (например, `createBuildingModel` и `createKeyModel`). Не передавайте идентификаторы процедурных моделей в `loadModel`: он рассчитан только на GLB/glTF.

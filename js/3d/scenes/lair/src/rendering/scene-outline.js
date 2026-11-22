@@ -7,8 +7,10 @@ import * as THREE from 'three';
 // object (room, Atelier, lab, frames, easels) with no hulls, no per-object
 // draw calls and nothing to fall behind when furniture moves or resizes.
 //
-// The Archive reads normals from a second scene pass. Here they are rebuilt
-// from depth, so the whole frame is still drawn once (plus one screen quad).
+// Like the Archive, normals come from a second pass that draws the opaque
+// scene with MeshNormalMaterial: true per-face normals make straight folds
+// (frame sides, easel legs) straight lines. It roughly doubles the draw
+// calls of a frame; normals rebuilt from depth were cheaper but jagged.
 
 const INK = Object.freeze({ color: '#2b241d', radius: 1.35, opacity: .82, normalThreshold: .42, depthThreshold: .018 });
 
@@ -19,6 +21,7 @@ const vertexShader = /* glsl */`
 const fragmentShader = /* glsl */`
   uniform sampler2D tColor;
   uniform sampler2D tDepth;
+  uniform sampler2D tNormal;
   uniform vec2 uResolution;
   uniform mat4 uProjectionInverse;
   uniform vec3 uViewUp;
@@ -29,27 +32,8 @@ const fragmentShader = /* glsl */`
   float rawDepth(vec2 uv) { return texture2D(tDepth, uv).r; }
   float occupied(float depth) { return 1.0 - step(0.99995, depth); }
   float viewDistance(float depth) { return (uNear * uFar) / max(.0001, uFar - depth * (uFar - uNear)); }
-  vec3 viewPosition(vec2 uv, float depth) {
-    vec4 clip = vec4(uv * 2.0 - 1.0, depth * 2.0 - 1.0, 1.0);
-    vec4 view = uProjectionInverse * clip;
-    return view.xyz / view.w;
-  }
-  // A face's normal from its depth and its neighbours'. On each axis the side
-  // with the smaller depth change is used, so an edge next to the pixel does
-  // not bend its normal (that noise drew dashes along plank seams).
-  vec3 normalAt(vec2 uv, float depth) {
-    vec2 pixel = 1.0 / uResolution;
-    vec3 here = viewPosition(uv, depth);
-    float right = rawDepth(uv + vec2(pixel.x, 0.0)), left = rawDepth(uv - vec2(pixel.x, 0.0));
-    float above = rawDepth(uv + vec2(0.0, pixel.y)), below = rawDepth(uv - vec2(0.0, pixel.y));
-    vec3 across = abs(right - depth) < abs(depth - left)
-      ? viewPosition(uv + vec2(pixel.x, 0.0), right) - here
-      : here - viewPosition(uv - vec2(pixel.x, 0.0), left);
-    vec3 up = abs(above - depth) < abs(depth - below)
-      ? viewPosition(uv + vec2(0.0, pixel.y), above) - here
-      : here - viewPosition(uv - vec2(0.0, pixel.y), below);
-    return normalize(cross(across, up));
-  }
+  // View-space normal from the normal pass (MeshNormalMaterial packs it 0..1).
+  vec3 normalAt(vec2 uv) { return normalize(texture2D(tNormal, uv).rgb * 2.0 - 1.0); }
 
   float closestInkDepth;
   float edgeAt(vec2 direction, float depth, float distance, vec3 normal, float here) {
@@ -64,7 +48,7 @@ const fragmentShader = /* glsl */`
     float crease = 0.0;
     vec3 neighborNormal = normal;
     if (here > .5 && there > .5) {
-      neighborNormal = normalAt(uv, neighborDepth);
+      neighborNormal = normalAt(uv);
       crease = max(
         smoothstep(uNormalThreshold, uNormalThreshold + .15, length(normal - neighborNormal)),
         smoothstep(uDepthThreshold, uDepthThreshold * 1.8, jump));
@@ -75,14 +59,13 @@ const fragmentShader = /* glsl */`
       crease *= 1.0 - upward * (1.0 - smoothstep(.06, .14, jump));
     }
     // Ink goes on the farther surface, outside the nearer silhouette. Along a
-    // fold (no real depth step) the side cannot be told reliably from normals
-    // rebuilt from depth: choosing one flipped from pixel to pixel and drew a
-    // saw edge. There the line is centred on the fold, on both faces, at
-    // half strength each, so it stays one straight line.
+    // fold (no real depth step) it goes on the face turned further from the
+    // camera (smaller view-space normal z): one side, the same along the edge.
     float relative = (distance - neighborDistance) / max(.05, distance);
     float farther = smoothstep(-uDepthThreshold * .12, uDepthThreshold * .12, relative);
     float decisive = smoothstep(uDepthThreshold * .6, uDepthThreshold * 1.6, jump);
-    float outside = mix(farther, mix(.62, farther, decisive), here * there);
+    float oblique = smoothstep(-.02, .02, neighborNormal.z - normal.z);
+    float outside = mix(farther, mix(oblique, farther, decisive), here * there);
     return max(silhouette, crease) * outside;
   }
 
@@ -91,7 +74,7 @@ const fragmentShader = /* glsl */`
     float here = occupied(depth);
     closestInkDepth = depth;
     float distance = viewDistance(depth);
-    vec3 normal = here > .5 ? normalAt(vUv, depth) : vec3(0.0, 0.0, 1.0);
+    vec3 normal = here > .5 ? normalAt(vUv) : vec3(0.0, 0.0, 1.0);
     vec4 cardinal = vec4(
       edgeAt(vec2( 1.0,  0.0), depth, distance, normal, here), edgeAt(vec2(-1.0,  0.0), depth, distance, normal, here),
       edgeAt(vec2( 0.0,  1.0), depth, distance, normal, here), edgeAt(vec2( 0.0, -1.0), depth, distance, normal, here));
@@ -117,10 +100,18 @@ const fragmentShader = /* glsl */`
 /** Renders the scene through the outline: render() replaces renderer.render(scene, camera). */
 export function createSceneOutline({ renderer, scene, camera }) {
   let enabled = true, widthScale = 1;
-  let target = null;
+  let target = null, normalTarget = null;
   const size = new THREE.Vector2();
+  const normalMaterial = new THREE.MeshNormalMaterial();
+  const clearColor = new THREE.Color();
+  // See-through things (glass, glows, flames, dust) stay out of the normal
+  // pass: the depth buffer does not hold them either. Found again each second.
+  let hidden = [], hiddenFoundAt = -Infinity;
+  const seeThrough = object => object.visible && (object.isPoints || object.isLine || object.isSprite ||
+    (object.isMesh && ([object.material].flat().some(material => material?.transparent || material?.depthWrite === false) ||
+      object.userData.atmosphere)));
   const uniforms = {
-    tColor: { value: null }, tDepth: { value: null },
+    tColor: { value: null }, tDepth: { value: null }, tNormal: { value: null },
     uResolution: { value: new THREE.Vector2(1, 1) },
     uProjectionInverse: { value: new THREE.Matrix4() },
     uViewUp: { value: new THREE.Vector3(0, 1, 0) },
@@ -143,7 +134,10 @@ export function createSceneOutline({ renderer, scene, camera }) {
     if (target && target.width === size.x && target.height === size.y) return target;
     target?.depthTexture?.dispose();
     target?.dispose();
-    // 32-bit float depth: smoother rebuilt normals than 24-bit integer depth.
+    normalTarget?.dispose();
+    normalTarget = new THREE.WebGLRenderTarget(size.x, size.y, { type: THREE.HalfFloatType });
+    uniforms.tNormal.value = normalTarget.texture;
+    // 32-bit float depth for steady distance steps.
     const depthTexture = new THREE.DepthTexture(size.x, size.y, THREE.FloatType);
     target = new THREE.WebGLRenderTarget(size.x, size.y, {
       samples: 4, type: THREE.HalfFloatType, depthTexture,
@@ -153,6 +147,34 @@ export function createSceneOutline({ renderer, scene, camera }) {
     uniforms.tDepth.value = depthTexture;
     uniforms.uResolution.value.set(size.x, size.y);
     return target;
+  }
+
+  function renderNormals() {
+    const now = performance.now();
+    if (now - hiddenFoundAt > 1000) {
+      hidden = [];
+      scene.traverseVisible(object => { if (seeThrough(object)) hidden.push(object); });
+      hiddenFoundAt = now;
+    }
+    const shown = hidden.filter(object => object.visible);
+    for (const object of shown) object.visible = false;
+    const { background, overrideMaterial } = scene;
+    const shadows = renderer.shadowMap.autoUpdate;
+    renderer.getClearColor(clearColor);
+    const clearAlpha = renderer.getClearAlpha();
+    scene.background = null;
+    scene.overrideMaterial = normalMaterial;
+    renderer.shadowMap.autoUpdate = false;
+    renderer.shadowMap.needsUpdate = false;              // the colour pass has drawn the shadows
+    renderer.setRenderTarget(normalTarget);
+    renderer.setClearColor(0x8080ff, 1);
+    renderer.clear();
+    renderer.render(scene, camera);
+    scene.background = background;
+    scene.overrideMaterial = overrideMaterial;
+    renderer.shadowMap.autoUpdate = shadows;
+    renderer.setClearColor(clearColor, clearAlpha);
+    for (const object of shown) object.visible = true;
   }
 
   function render() {
@@ -167,6 +189,7 @@ export function createSceneOutline({ renderer, scene, camera }) {
     const previous = renderer.getRenderTarget();
     renderer.setRenderTarget(frame);
     renderer.render(scene, camera);
+    renderNormals();
     renderer.setRenderTarget(previous);
     renderer.render(screen, screenCamera);
   }
@@ -177,6 +200,9 @@ export function createSceneOutline({ renderer, scene, camera }) {
     /** The visual panel's 20–140 % stroke width. */
     setWidth(percent) { widthScale = THREE.MathUtils.clamp((Number(percent) || 0) / 65, .3, 2.2); },
     isEnabled: () => enabled,
-    dispose() { target?.depthTexture?.dispose(); target?.dispose(); material.dispose(); quad.geometry.dispose(); },
+    dispose() {
+      target?.depthTexture?.dispose(); target?.dispose(); normalTarget?.dispose();
+      material.dispose(); normalMaterial.dispose(); quad.geometry.dispose();
+    },
   };
 }

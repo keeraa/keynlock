@@ -214,7 +214,10 @@ export function createRoomWalk({ scene, camera, interaction, onExit, onInteract 
       (-right * Math.sin(yaw) - forward * Math.cos(yaw)) * step, area);
   }
 
-  return { start, stop, getPose, resize, update, refreshObstacles, setTarget, handleKey,
+  /** Turn the walker to a heading (tests and scripted views). */
+  function face(yaw = 0, pitch = 0) { rotation.set(pitch, yaw, 0); }
+
+  return { start, stop, getPose, face, resize, update, refreshObstacles, setTarget, handleKey,
     releaseKey: code => keys.delete(code),
   };
 }

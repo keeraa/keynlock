@@ -494,7 +494,11 @@ test('first-person walking slides against furniture and walls, interacts, and re
   await toggle.click();
   assert.equal(await toggle.getAttribute('aria-pressed'), 'true');
   assert.equal(await page.locator('#room-walk-look').textContent(), 'Перетаскивай для обзора');
-  const spawn = await page.evaluate(() => window.__keynlockDebug.host.camera.position.toArray());
+  // The walk starts turned a little left; these checks walk straight ahead.
+  const spawn = await page.evaluate(() => {
+    window.__keynlockDebug.walk.face(0, 0);
+    return window.__keynlockDebug.host.camera.position.toArray();
+  });
   assert.ok(Math.abs(spawn[1] - .0385 - 1.70) < .001, 'the camera starts at eye level');
   assert.equal((await page.evaluate(readRoom)).controls.enabled, false);
 
@@ -674,8 +678,8 @@ test('the room draws once per frame: no transmission pass and no per-frame shado
   });
   // Any transmission material makes Three.js draw every opaque object again each frame.
   assert.deepEqual(state.transmissive, []);
-  // The scene is drawn once, into the ink outline's buffer; the shadow map is
-  // refreshed about once a second. So besides that one pass, almost nothing.
+  // The scene is drawn into the ink outline's buffer, the opaque part once more
+  // for its normals; the shadow map is refreshed about once a second.
   const passes = await page.evaluate(async () => {
     const gl = document.querySelector('#scene').getContext('webgl2');
     let target = null, frames = 0;
@@ -688,9 +692,11 @@ test('the room draws once per frame: no transmission pass and no per-frame shado
     for (; frames < 20; frames++) await new Promise(resolve => requestAnimationFrame(resolve));
     Object.assign(gl, { bindFramebuffer: bind, drawElements: draw, drawArrays });
     const perTarget = [...draws.values()].map(total => total / frames).sort((a, b) => b - a);
-    return { scenePass: perTarget[0], others: perTarget.slice(1).reduce((sum, value) => sum + value, 0) };
+    return { scenePass: perTarget[0], normalPass: perTarget[1], others: perTarget.slice(2).reduce((sum, value) => sum + value, 0) };
   });
-  assert.ok(passes.others < 60, `draws per frame outside the scene pass: ${passes.others}`);
+  // Two passes: the colour pass and the outline's normal pass (opaque only).
+  assert.ok(passes.normalPass <= passes.scenePass, `normal pass ${passes.normalPass} vs scene ${passes.scenePass}`);
+  assert.ok(passes.others < 60, `draws per frame outside the two scene passes: ${passes.others}`);
 });
 
 test('the workshops share the room look: one gouache setting, no Atelier-only effects', async t => {

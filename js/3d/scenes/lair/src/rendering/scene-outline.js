@@ -74,13 +74,15 @@ const fragmentShader = /* glsl */`
       float upward = smoothstep(.82, .94, dot(normal, uViewUp)) * smoothstep(.82, .94, dot(neighborNormal, uViewUp));
       crease *= 1.0 - upward * (1.0 - smoothstep(.06, .14, jump));
     }
-    // Ink goes on the farther surface, outside the nearer silhouette; along a
-    // fold (no depth step) on the face turned further from the camera.
+    // Ink goes on the farther surface, outside the nearer silhouette. Along a
+    // fold (no real depth step) the side cannot be told reliably from normals
+    // rebuilt from depth: choosing one flipped from pixel to pixel and drew a
+    // saw edge. There the line is centred on the fold, on both faces, at
+    // half strength each, so it stays one straight line.
     float relative = (distance - neighborDistance) / max(.05, distance);
     float farther = smoothstep(-uDepthThreshold * .12, uDepthThreshold * .12, relative);
     float decisive = smoothstep(uDepthThreshold * .6, uDepthThreshold * 1.6, jump);
-    float oblique = smoothstep(-.02, .02, neighborNormal.z - normal.z);
-    float outside = mix(farther, mix(oblique, farther, decisive), here * there);
+    float outside = mix(farther, mix(.62, farther, decisive), here * there);
     return max(silhouette, crease) * outside;
   }
 
@@ -141,7 +143,8 @@ export function createSceneOutline({ renderer, scene, camera }) {
     if (target && target.width === size.x && target.height === size.y) return target;
     target?.depthTexture?.dispose();
     target?.dispose();
-    const depthTexture = new THREE.DepthTexture(size.x, size.y, THREE.UnsignedIntType);
+    // 32-bit float depth: smoother rebuilt normals than 24-bit integer depth.
+    const depthTexture = new THREE.DepthTexture(size.x, size.y, THREE.FloatType);
     target = new THREE.WebGLRenderTarget(size.x, size.y, {
       samples: 4, type: THREE.HalfFloatType, depthTexture,
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,

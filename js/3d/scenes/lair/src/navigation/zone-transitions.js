@@ -104,7 +104,6 @@ export function createZoneTransitions({
     if (atelierWall) {
       atelierWall.visible = false;
     }
-    if (inRoomWorkshop === 'atelier') rendererHost.setWorldLighting('atelier');
     atelierView.onReady();
   }
 
@@ -120,7 +119,9 @@ export function createZoneTransitions({
     document.querySelector('#app').classList.toggle('atelier-mode', id === 'atelier');
     controls.minDistance = roomMinDistance;
     interaction.style.cursor = 'grab';
-    rendererHost.setWorldLighting(ready ? id : null);
+    // The Atelier is lit by the room (one look, no jump in brightness on entry);
+    // only the lab switches to its own darker lighting.
+    rendererHost.setWorldLighting(ready && id !== 'atelier' ? id : null);
     rendererHost.setWorldWorkshop(id);
   }
 

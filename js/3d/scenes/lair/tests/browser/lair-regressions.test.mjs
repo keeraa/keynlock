@@ -277,7 +277,7 @@ test('switching workshops returns the shared camera, input, and lights to the ro
   await page.locator('#lair-focus-copy').click();
   await page.waitForFunction(() => window.__keynlockDebug.host.controls.minDistance < 2);
   const closeUp = await page.evaluate(readRoom);
-  assert.ok(closeUp.atelierLights > 0);
+  assert.equal(closeUp.atelierLights, 0, 'the Atelier is lit by the room: no jump in brightness');
   assert.equal(closeUp.alchemyLights, 0);
   await reset.click();
   await assertHome();
@@ -294,7 +294,7 @@ test('switching workshops returns the shared camera, input, and lights to the ro
   const atelier = await page.evaluate(readRoom);
   assert.equal(atelier.controls.enabled, true);
   assert.deepEqual(atelier.roomLights, home.roomLights);
-  assert.ok(atelier.atelierLights > 0);
+  assert.equal(atelier.atelierLights, 0);
   assert.equal(atelier.alchemyLights, 0);
   assert.equal(await page.locator('#alchemy-input-plane').isVisible(), false);
 

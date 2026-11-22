@@ -181,7 +181,9 @@ function setup() {
       const easels = ['restoration-left-easel', 'restoration-right-easel'].map(name => scene.getObjectByName(name));
       const outlineMovingParts = () => {
         for (const easel of easels) outlines.attachEach(easel, mesh => mesh.material?.isMeshStandardMaterial);
-        if (atelierLook?.frameMaterial) outlines.attachEach(atelierRoot, mesh => mesh.material === atelierLook.frameMaterial);
+        // Wall frames opt out (userData.excludeFromInk): they are resized in place.
+        if (atelierLook?.frameMaterial) outlines.attachEach(atelierRoot,
+          mesh => mesh.material === atelierLook.frameMaterial && !mesh.userData.excludeFromInk);
       };
       outlineMovingParts();
       setInterval(outlineMovingParts, 1000);

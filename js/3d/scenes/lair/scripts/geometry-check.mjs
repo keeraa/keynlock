@@ -197,7 +197,9 @@ assert.ok(workbench.min.z > ALCHEMY_Z + 3 && workbench.max.z < ROOM_END,
   'workbench stays between the alchemy station and the new entrance');
 assert.ok(workbench.max.x < alchemyWall.min.x, 'workbench does not enter the tile wall');
 assert.equal(unique('workbench-tool-wall').position.z, WORKBENCH_Z, 'tool wall moved with the workbench');
-assert.equal(Object.keys(world.anchors).length, 5, 'all five hotspots retained');
+assert.deepEqual(Object.keys(world.anchors).sort(),
+  ['alchemy', 'atelier', 'gramophone', 'keyArchive', 'paintingArchive', 'planning', 'workbench'],
+  'the five zones and the entrance wall\'s two doors');
 const wallpaper = unique('alchemy-right-wall');
 assert.equal(wallpaper.material, materials.alchemyTile, 'green tile remains the default right-wall finish');
 assert.equal(world.setRightWallpaper('botanical'), true);

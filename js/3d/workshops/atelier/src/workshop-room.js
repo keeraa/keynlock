@@ -1,9 +1,10 @@
 // @ts-check
 import { createFrameGeometry } from './frame-geometry.js';
+import { createDust } from '../../../core/rendering/dust.js';
 
 /** Builds the static atelier and exposes its easel factory and wood surfaces. */
 // includeShelf: the wall shelf with pigment jars (the standalone Atelier; the Lair has none).
-export function createWorkshopRoom({ THREE, scene, mats, includeWallTrim = true, includeShelf = true, wallZ = -4.6, floorY = -.0285 }) {
+export function createWorkshopRoom({ THREE, scene, mats, includeWallTrim = true, includeShelf = true, includeDust = true, wallZ = -4.6, floorY = -.0285 }) {
   const floorWoodMaterials = [];
   // Static furniture repeats the same primitives dozens of times. Reuse their
   // immutable GPU buffers across both easels, planks, shelves and tools.
@@ -24,11 +25,6 @@ export function createWorkshopRoom({ THREE, scene, mats, includeWallTrim = true,
     return geometry(cylinderGeometries, `${rTop}/${rBottom}/${h}/${segments}`,
       () => new THREE.CylinderGeometry(rTop, rBottom, h, segments));
   }
-
-  const seeded = (seed) => () => {
-    seed = (1664525 * seed + 1013904223) | 0;
-    return (seed >>> 0) / 4294967296;
-  };
 
   function box(w, h, d, material, x, y, z, parent = scene) {
     const mesh = new THREE.Mesh(boxGeometry(w, h, d), material);
@@ -227,35 +223,11 @@ export function createWorkshopRoom({ THREE, scene, mats, includeWallTrim = true,
       scene.add(canvas);
     }
 
-    const dustPositions = new Float32Array(95 * 3);
-    const rng = seeded(122);
-    for (let i = 0; i < 95; i++) {
-      dustPositions[i * 3] = (rng() - .5) * 12;
-      dustPositions[i * 3 + 1] = rng() * 4.4 + .35;
-      dustPositions[i * 3 + 2] = rng() * 6 - 1.4;
-    }
-    const dustGeometry = new THREE.BufferGeometry();
-    dustGeometry.setAttribute('position', new THREE.BufferAttribute(dustPositions, 3).setUsage(THREE.DynamicDrawUsage));
-    const dustCanvas = document.createElement('canvas');
-    dustCanvas.width = dustCanvas.height = 64;
-    const dustContext = dustCanvas.getContext('2d');
-    const dustGlow = dustContext.createRadialGradient(32, 32, 0, 32, 32, 31);
-    dustGlow.addColorStop(0, 'rgba(255,255,255,1)');
-    dustGlow.addColorStop(.45, 'rgba(255,255,255,.9)');
-    dustGlow.addColorStop(.8, 'rgba(255,255,255,.25)');
-    dustGlow.addColorStop(1, 'rgba(255,255,255,0)');
-    dustContext.fillStyle = dustGlow;
-    dustContext.fillRect(0, 0, 64, 64);
-    const dustTexture = new THREE.CanvasTexture(dustCanvas);
-    dustTexture.colorSpace = THREE.SRGBColorSpace;
-    const dust = new THREE.Points(dustGeometry, new THREE.PointsMaterial({
-      color: '#fff2c8', map: dustTexture, size: .033, opacity: .5,
-      transparent: true, alphaTest: .015, depthWrite: false, sizeAttenuation: true,
-    }));
-    dust.name = 'dust';
-    dust.userData.atmosphere = true;
-    scene.add(dust);
-    return dust;
+    // The game's one dust (core/rendering/dust.js); in the Lair the room's
+    // dust fills this corner, so the Atelier adds none there.
+    return includeDust
+      ? createDust(scene, { min: [-6, .35, -1.4], max: [6, 4.75, 4.6], count: 95, seed: 122, scale: .7, opacity: .42 })
+      : null;
   }
 
   function makeEasel(x, facing) {

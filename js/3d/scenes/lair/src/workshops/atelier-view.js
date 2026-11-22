@@ -238,8 +238,9 @@ export function createAtelierView({
       galleryEntry.style.left = `${(point.x * .5 + .5) * width}px`;
       galleryEntry.style.top = `${(-point.y * .5 + .5) * height}px`;
     } else if (pinned) {
-      galleryEntry.style.left = '16px';
-      galleryEntry.style.top = width < 730 ? '78px' : '106px';
+      // Below «← В ЛОГОВО», which holds the top left corner.
+      galleryEntry.style.left = width < 730 ? '14px' : '38px';
+      galleryEntry.style.top = width < 730 ? '104px' : '140px';
     }
   }
 

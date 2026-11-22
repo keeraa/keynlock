@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "models": [
+    {
+      "id": "library-oak-bookcase",
+      "name": "Library Oak Bookcase",
+      "category": "interior/furniture/bookcase",
+      "tags": [
+        "library",
+        "oak",
+        "books",
+        "interior",
+        "furniture"
+      ],
+      "source": "https://tevy.dev/models/library-oak-bookcase",
+      "creator": "tevy",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "version": "v1",
+      "dimensionsMeters": {
+        "width": 1.62,
+        "height": 3,
+        "depth": 0.48
+      },
+      "lods": [
+        {
+          "level": 0,
+          "triangles": 1474,
+          "bytesApprox": 235000,
+          "url": "https://tevy.dev/models/library-oak-bookcase/v1/lod0.glb"
+        },
+        {
+          "level": 1,
+          "triangles": 1192,
+          "bytesApprox": 84000,
+          "url": "https://tevy.dev/models/library-oak-bookcase/v1/lod1.glb"
+        },
+        {
+          "level": 2,
+          "triangles": 136,
+          "bytesApprox": 20000,
+          "url": "https://tevy.dev/models/library-oak-bookcase/v1/lod2.glb"
+        }
+      ],
+      "status": "source",
+      "style": "Original model; KEYNLOCK gouache material adaptation pending",
+      "usedInScenes": []
+    }
+  ]
+}

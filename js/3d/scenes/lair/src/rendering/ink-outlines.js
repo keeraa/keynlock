@@ -6,7 +6,9 @@
 const OUTLINE_NAME='Ukiyo-e ink silhouette';
 const MAX_HULL_TRIANGLES=45000;
 
-export function createInkOutlines(THREE,{enabled=true,color=0x17191a,screenWidth=.0042}={}){
+// minWorldY: no ink below this height. Legs sunk a little into the floor
+// otherwise show their widened outline through the gaps between the planks.
+export function createInkOutlines(THREE,{enabled=true,color=0x17191a,screenWidth=.0042,minWorldY=-1e9}={}){
  if(!enabled){
   const noop=()=>{};
   return {attach:()=>false,attachInstanced:()=>null,attachCanopyBand:()=>null,
@@ -22,12 +24,14 @@ export function createInkOutlines(THREE,{enabled=true,color=0x17191a,screenWidth
  // between the Basic and lit Three.js materials.
  const shellMaterial=new THREE.ShaderMaterial({
   uniforms:{inkColor:{value:new THREE.Color(color)},maxExtrusion:{value:1},
-   inkShift:{value:new THREE.Vector2()},strokeScale:{value:1}},
+   inkShift:{value:new THREE.Vector2()},strokeScale:{value:1},minWorldY:{value:minWorldY}},
   vertexShader:`
+   varying float vWorldY;
    uniform float maxExtrusion;
    uniform vec2 inkShift;
    uniform float strokeScale;
    void main(){
+    vWorldY = (modelMatrix * vec4(position,1.0)).y;
     vec4 eye = modelViewMatrix * vec4(position,1.0);
     vec3 outward = normalize(normalMatrix * normal);
     vec4 projected = projectionMatrix * eye;
@@ -48,7 +52,12 @@ export function createInkOutlines(THREE,{enabled=true,color=0x17191a,screenWidth
    }
   `,
   fragmentShader:`uniform vec3 inkColor;
-   void main(){gl_FragColor=vec4(inkColor,1.0);}`,
+   uniform float minWorldY;
+   varying float vWorldY;
+   void main(){
+    if(vWorldY<minWorldY)discard;
+    gl_FragColor=vec4(inkColor,1.0);
+   }`,
   side:THREE.BackSide,depthTest:true,depthWrite:false,toneMapped:false
  });
  shellMaterial.userData.inkOutlineShell=true;
@@ -82,7 +91,8 @@ export function createInkOutlines(THREE,{enabled=true,color=0x17191a,screenWidth
   });
  };
 
- const attach=(root,{includeInstanced=false,registrationOffset=[0,0],strokeScale=1}={})=>{
+ // skip(mesh): leave a mesh out of this hull (e.g. parts that change and get their own).
+ const attach=(root,{includeInstanced=false,registrationOffset=[0,0],strokeScale=1,skip=null}={})=>{
   if(!root||outlined.has(root)||root.userData.inkOutlineAttached)return false;
   root.updateWorldMatrix(true,true);
   const toLocal=root.matrixWorld.clone().invert();
@@ -91,7 +101,7 @@ export function createInkOutlines(THREE,{enabled=true,color=0x17191a,screenWidth
   root.traverse(mesh=>{
    if(!mesh.isMesh||mesh.isSkinnedMesh||mesh.userData.inkOutlineShell||
       Array.isArray(mesh.material)||mesh.material?.transparent||mesh.material?.opacity<.98||
-      mesh.material?.userData?.inkSkipOutline)return;
+      mesh.material?.userData?.inkSkipOutline||skip?.(mesh))return;
    const geometry=mesh.geometry;
    if(!geometry?.getAttribute('position'))return;
    if(mesh.isInstancedMesh){

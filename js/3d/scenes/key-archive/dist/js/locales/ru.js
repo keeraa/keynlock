@@ -57,6 +57,7 @@ export default Object.freeze({
   'music.previous': 'Предыдущий трек',
   'music.next': 'Следующий трек',
   'music.play': 'Включить музыку',
+  'music.playlist': 'Плейлист',
   'music.pause': 'Пауза',
   'pause.language': 'Язык',
   'pause.visual': 'ВИЗУАЛ · РИСОВКА И СВЕТ <span>✦</span>',

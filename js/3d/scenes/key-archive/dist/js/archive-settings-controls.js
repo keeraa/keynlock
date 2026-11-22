@@ -35,7 +35,8 @@ export function bindSettingsControls(document, { audio, music, save, onSensitivi
   if (musicControls) mountMusicControls(musicControls, music, {
     language: getLanguage(),
     labels: { region: t('pause.track'), previous: t('music.previous'), next: t('music.next'),
-      play: t('music.play'), pause: t('music.pause') },
+      play: t('music.play'), pause: t('music.pause'), playlist: t('music.playlist') },
+    playlist: 'menu',
   });
 
   const musicSpatial = $('music-spatial');

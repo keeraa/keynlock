@@ -13,7 +13,11 @@
 #scene-interaction.command-pan{cursor:move!important}
 /* The shared music player (core/audio/music-controls.js): compact in the top bar, with volume in the gramophone's panel. */
 .music-controls{display:flex;align-items:center;gap:5px;min-width:0}.music-controls__button{width:28px;height:28px;flex:none;border:1px solid #68583e;border-radius:50%;background:rgba(30,36,30,.65);color:#d5b77b;font-size:10px;line-height:1;padding:0}.music-controls__button:hover{background:#342c21}.music-controls__toggle[aria-pressed=true]{background:#bd9b65;color:#1c241f}.music-controls__title{font-family:Georgia,serif;font-size:12px;color:#d9c7a3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.lair-music .music-controls__title{max-width:190px;margin-left:4px}
+.lair-music .music-controls__title{max-width:210px;margin-left:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .panel-music{margin-bottom:18px;flex-wrap:wrap;row-gap:10px}.panel-music[hidden]{display:none}.panel-music .music-controls__title{flex:1 1 140px}.panel-music .music-controls__volume{flex:1 1 100%;accent-color:#c1a26d}
-@media (max-width:1100px){.lair-music .music-controls__title{display:none}}
+.lair-music{position:relative}.music-controls__title{background:none;border:0;padding:0;font:inherit}button.music-controls__title{cursor:pointer;color:#d9c7a3;font-family:Georgia,serif;font-size:12px}button.music-controls__title:hover{color:#ffe2a7}
+.music-controls__playlist{list-style:none;margin:0;padding:0}.music-controls__playlist[hidden]{display:none}.music-controls__track-button{width:100%;display:flex;align-items:center;gap:8px;text-align:left;background:none;border:0;padding:7px 10px;color:#d9c7a3;font-family:Georgia,serif;font-size:13px;cursor:pointer}.music-controls__track-button:hover{background:rgba(188,148,91,.18);color:#ffe2a7}.music-controls__track-button::before{content:"♪";color:#8f7a55;width:12px}.music-controls__track[aria-current=true] .music-controls__track-button{color:#ffe2a7}.music-controls__track[aria-current=true] .music-controls__track-button::before{content:"▶";color:#e4c28b;font-size:9px}
+.music-controls__playlist--menu{position:absolute;top:calc(100% + 10px);right:0;z-index:40;min-width:290px;padding:6px 0;background:linear-gradient(150deg,rgba(24,31,29,.97),rgba(14,22,20,.98));border:1px solid #796847;box-shadow:0 14px 40px #07130ed6}
+.music-controls__playlist--list{flex:1 1 100%;border-top:1px solid rgba(182,151,93,.22);border-bottom:1px solid rgba(182,151,93,.22);padding:4px 0}
+@media (max-width:1100px){.lair-music .music-controls__title{max-width:110px}}
 @media (max-width:720px){.lair-music{display:none}}

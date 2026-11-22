@@ -41,9 +41,11 @@ export function startLairFrames({ scene, camera, controls, renderer, rendererHos
     cameraInput.syncGalleryCamera();
 
     for (const update of room.animated) update(clock.elapsedTime);
+    room.entranceWall?.update(camera);
     const currentZone = zoneTransitions.current();
     room.windowLight?.setAirHidden(currentZone === 'atelier');
-    returnButton?.update({ zone: currentZone, walking: cameraInput.isWalking(), overlayOpen: workshopOverlay.isOpen() });
+    returnButton?.update({ zone: currentZone, walking: cameraInput.isWalking(), overlayOpen: workshopOverlay.isOpen(),
+      backToWalk: zoneTransitions.returnsToWalk() });
     const overlayOpen = workshopOverlay.isOpen();
     zoneInteraction.update(currentZone);
     atelierView.updateInterface({ zone: currentZone, visualOpen: visualUI.isOpen(), overlayOpen });

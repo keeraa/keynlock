@@ -22,7 +22,8 @@ export function mountZoneInteraction({ canvas, camera, interaction, anchors, hit
     } else pointer.set(0, 0);
     raycaster.far = event ? Infinity : 4.5;
     raycaster.setFromCamera(pointer, camera);
-    const hit = raycaster.intersectObjects(hitTargets, false)[0];
+    // Hidden targets (the entrance doors seen from outside) cannot be picked.
+    const hit = raycaster.intersectObjects(hitTargets.filter(target => target.visible), false)[0];
     return hit?.object?.userData?.zone || null;
   }
 

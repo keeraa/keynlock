@@ -92,11 +92,22 @@ export function createRoomWalk({ scene, camera, interaction, onExit, onInteract 
     if (active) area = measureRoom(scene);
   }
 
-  function start() {
+  /** Where the walker stands and looks, to come back to after a workshop. */
+  function getPose() {
+    return { position: camera.position.clone(), pitch: rotation.x, yaw: rotation.y };
+  }
+
+  /** Start at the door, or at a pose from getPose() (back from a workshop). */
+  function start(pose = null) {
     active = true;
     refreshObstacles();
-    camera.position.set(.25, .0385 + eyeHeight, ROOM_END - 2.22);
-    rotation.set(0, 0, 0);
+    if (pose) {
+      camera.position.copy(pose.position);
+      rotation.set(pose.pitch, pose.yaw, 0);
+    } else {
+      camera.position.set(.25, .0385 + eyeHeight, ROOM_END - 2.22);
+      rotation.set(0, 0, 0);
+    }
     camera.quaternion.setFromEuler(rotation);
     resize();
     camera.updateProjectionMatrix();
@@ -200,7 +211,7 @@ export function createRoomWalk({ scene, camera, interaction, onExit, onInteract 
       (-right * Math.sin(yaw) - forward * Math.cos(yaw)) * step, area);
   }
 
-  return { start, stop, resize, update, refreshObstacles, setTarget, handleKey,
+  return { start, stop, getPose, resize, update, refreshObstacles, setTarget, handleKey,
     releaseKey: code => keys.delete(code),
   };
 }

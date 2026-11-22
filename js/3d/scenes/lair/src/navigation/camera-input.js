@@ -18,17 +18,20 @@ export function createCameraInput({ camera, controls, roomWalk, atelierView, han
     syncOrbit();
   }
 
-  function setMode(next) {
+  let walkPose = null;
+  /** walkPose: resume walking where the walker left off (back from a zone). */
+  function setMode(next, { resumeWalk = false } = {}) {
     if (mode === next) return;
     const previous = mode;
     mode = next;
     if (previous === 'walk') {
+      walkPose = roomWalk.getPose();
       roomWalk.stop();
       camera.getWorldDirection(forward);
       controls.target.copy(camera.position).addScaledVector(forward, Math.max(3, controls.minDistance));
     }
     syncOrbit();
-    if (mode === 'walk') roomWalk.start();
+    if (mode === 'walk') roomWalk.start(resumeWalk ? walkPose : null);
   }
 
   function update(delta, now) {

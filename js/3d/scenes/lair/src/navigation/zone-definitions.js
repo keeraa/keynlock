@@ -1,6 +1,6 @@
 import { WORKSHOPS } from '../workshops/workshop-overlay.js';
 import { t } from '../i18n.js';
-import { ALCHEMY_Z, ATELIER_Z, WORKBENCH_Z } from '../room-layout.js';
+import { ALCHEMY_Z, ATELIER_Z, ROOM_END, WORKBENCH_Z } from '../room-layout.js';
 
 export const ATELIER_EASELS = { position: [1.56, 3.22, ATELIER_Z], target: [-7.05, 2.48, ATELIER_Z] };
 
@@ -40,6 +40,20 @@ export const zoneDefinitions = {
     description: t('Старый граммофон хранит запрещённые иностранные пластинки: ноктюрны Шопена. Пластинка играет по всему Логову и не замолкает в мастерских.'),
     status: t('Переключайте пластинки здесь или в панели сверху.'),
     link: null, camera: [1.95, 2.95, 3.60], target: [1.96, 1.83, -3.71],
+  },
+  // The entrance wall's two doors (room/entrance-wall.js). Placeholders: they
+  // are reached in a walk or by flying to them, not from the zone bar.
+  keyArchive: {
+    number: '→', kicker: t('ДВЕРЬ'), title: t('Архив ключей'),
+    description: t('Дверь со стороны алхимии и верстака ведёт в Архив ключей: стеллажи, ванны для очистки и картотека найденных ключей.'),
+    status: t('Скоро эта дверь откроется прямо в Архив ключей. Пока переход в разработке.'),
+    link: null, camera: [4.6, 2.3, ROOM_END - 5.2], target: [4.6, 2.05, ROOM_END],
+  },
+  paintingArchive: {
+    number: '←', kicker: t('ДВЕРЬ'), title: t('Архив картин'),
+    description: t('Дверь со стороны Ателье ведёт в Архив картин: хранилище полотен, спасённых от Палаты Образов.'),
+    status: t('Скоро здесь откроется Архив картин. Пока переход в разработке.'),
+    link: null, camera: [-4.6, 2.3, ROOM_END - 5.2], target: [-4.6, 2.05, ROOM_END],
   },
 };
 

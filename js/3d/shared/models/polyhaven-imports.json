@@ -23,15 +23,24 @@
       "gltfFile": "painted_wooden_cabinet_02_2k.gltf",
       "triangles": 966,
       "uploadedFile": "painted_wooden_cabinet_02_2k.gltf.zip"
+    },
+    {
+      "id": "wooden-table-02",
+      "sourceId": "wooden_table_02",
+      "gltfFile": "wooden_table_02_2k.gltf",
+      "triangles": 196,
+      "uploadedFile": "wooden_table_02_2k.gltf.zip",
+      "note": "PBR 2k texture variant of existing shared wooden-table-02 model; not a new catalog entry"
     }
   ],
   "audit": {
     "date": "2026-11-22",
-    "result": "three unique 2K glTF models from uploaded ZIPs; wooden_table_02 duplicate already in shared catalog",
+    "result": "three new models plus the 2K textured version of already cataloged wooden-table-02; no duplicate model ID",
     "originalGeometryTriangles": [
       182,
       5626,
-      966
+      966,
+      196
     ]
   }
 }

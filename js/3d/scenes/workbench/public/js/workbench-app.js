@@ -132,6 +132,7 @@ function setMode(mode){
   scene.setSuspended(!foreground||mode==='mechanism'||mode==='code');
   root.classList.toggle('mechanism-active',mode==='mechanism');
   root.classList.toggle('code-active',mode==='code');
+  root.classList.toggle('workbench-panel-left',mode==='key'||mode==='assembly');
   $('codeWorkspace').hidden=mode!=='code';
   if(foreground)next.enter();
   query('.workspace-tab').forEach(button=>{

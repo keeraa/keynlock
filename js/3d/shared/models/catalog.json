@@ -44,7 +44,8 @@
       ],
       "status": "source",
       "style": "Original model; KEYNLOCK gouache material adaptation pending",
-      "usedInScenes": []
+      "usedInScenes": [],
+      "geometryCountSource": "tevy.dev published LOD triangle counts"
     },
     {
       "id": "books-strapped",
@@ -62,7 +63,8 @@
       "lods": [
         {
           "level": 0,
-          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/quaternius-fantasy-props/books-strapped.glb"
+          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/quaternius-fantasy-props/books-strapped.glb",
+          "triangles": 446
         }
       ],
       "format": "glb",
@@ -70,7 +72,8 @@
       "usedInScenes": [
         "key-archive"
       ],
-      "assetPath": "js/3d/scenes/key-archive/dist/assets/quaternius-fantasy-props/books-strapped.glb"
+      "assetPath": "js/3d/scenes/key-archive/dist/assets/quaternius-fantasy-props/books-strapped.glb",
+      "geometryCountSource": "glTF indices/accessors verified in committed binary or JSON"
     },
     {
       "id": "scroll-red",
@@ -88,7 +91,8 @@
       "lods": [
         {
           "level": 0,
-          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/quaternius-fantasy-props/scroll-red.glb"
+          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/quaternius-fantasy-props/scroll-red.glb",
+          "triangles": 672
         }
       ],
       "format": "glb",
@@ -96,7 +100,8 @@
       "usedInScenes": [
         "key-archive"
       ],
-      "assetPath": "js/3d/scenes/key-archive/dist/assets/quaternius-fantasy-props/scroll-red.glb"
+      "assetPath": "js/3d/scenes/key-archive/dist/assets/quaternius-fantasy-props/scroll-red.glb",
+      "geometryCountSource": "glTF indices/accessors verified in committed binary or JSON"
     },
     {
       "id": "bookgroup-medium-1",
@@ -114,7 +119,8 @@
       "lods": [
         {
           "level": 0,
-          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/BookGroup_Medium_1.gltf"
+          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/BookGroup_Medium_1.gltf",
+          "triangles": 416
         }
       ],
       "format": "gltf",
@@ -122,7 +128,8 @@
       "usedInScenes": [
         "key-archive"
       ],
-      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/BookGroup_Medium_1.gltf"
+      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/BookGroup_Medium_1.gltf",
+      "geometryCountSource": "glTF indices/accessors verified in committed binary or JSON"
     },
     {
       "id": "bookgroup-medium-2",
@@ -140,7 +147,8 @@
       "lods": [
         {
           "level": 0,
-          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/BookGroup_Medium_2.gltf"
+          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/BookGroup_Medium_2.gltf",
+          "triangles": 468
         }
       ],
       "format": "gltf",
@@ -148,7 +156,8 @@
       "usedInScenes": [
         "key-archive"
       ],
-      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/BookGroup_Medium_2.gltf"
+      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/BookGroup_Medium_2.gltf",
+      "geometryCountSource": "glTF indices/accessors verified in committed binary or JSON"
     },
     {
       "id": "bookgroup-medium-3",
@@ -166,7 +175,8 @@
       "lods": [
         {
           "level": 0,
-          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/BookGroup_Medium_3.gltf"
+          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/BookGroup_Medium_3.gltf",
+          "triangles": 468
         }
       ],
       "format": "gltf",
@@ -174,7 +184,8 @@
       "usedInScenes": [
         "key-archive"
       ],
-      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/BookGroup_Medium_3.gltf"
+      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/BookGroup_Medium_3.gltf",
+      "geometryCountSource": "glTF indices/accessors verified in committed binary or JSON"
     },
     {
       "id": "book-7",
@@ -192,7 +203,8 @@
       "lods": [
         {
           "level": 0,
-          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/Book_7.gltf"
+          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/Book_7.gltf",
+          "triangles": 724
         }
       ],
       "format": "gltf",
@@ -200,7 +212,8 @@
       "usedInScenes": [
         "key-archive"
       ],
-      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/Book_7.gltf"
+      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/Book_7.gltf",
+      "geometryCountSource": "glTF indices/accessors verified in committed binary or JSON"
     },
     {
       "id": "bottle-1",
@@ -218,7 +231,8 @@
       "lods": [
         {
           "level": 0,
-          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/Bottle_1.gltf"
+          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/Bottle_1.gltf",
+          "triangles": 312
         }
       ],
       "format": "gltf",
@@ -226,7 +240,8 @@
       "usedInScenes": [
         "key-archive"
       ],
-      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/Bottle_1.gltf"
+      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/Bottle_1.gltf",
+      "geometryCountSource": "glTF indices/accessors verified in committed binary or JSON"
     },
     {
       "id": "candle-1",
@@ -244,7 +259,8 @@
       "lods": [
         {
           "level": 0,
-          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/Candle_1.gltf"
+          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/Candle_1.gltf",
+          "triangles": 212
         }
       ],
       "format": "gltf",
@@ -252,7 +268,8 @@
       "usedInScenes": [
         "key-archive"
       ],
-      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/Candle_1.gltf"
+      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/Candle_1.gltf",
+      "geometryCountSource": "glTF indices/accessors verified in committed binary or JSON"
     },
     {
       "id": "candle-2",
@@ -270,7 +287,8 @@
       "lods": [
         {
           "level": 0,
-          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/Candle_2.gltf"
+          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/Candle_2.gltf",
+          "triangles": 210
         }
       ],
       "format": "gltf",
@@ -278,7 +296,8 @@
       "usedInScenes": [
         "key-archive"
       ],
-      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/Candle_2.gltf"
+      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/Candle_2.gltf",
+      "geometryCountSource": "glTF indices/accessors verified in committed binary or JSON"
     },
     {
       "id": "chandelier",
@@ -296,7 +315,8 @@
       "lods": [
         {
           "level": 0,
-          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/Chandelier.gltf"
+          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/Chandelier.gltf",
+          "triangles": 5680
         }
       ],
       "format": "gltf",
@@ -304,7 +324,8 @@
       "usedInScenes": [
         "key-archive"
       ],
-      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/Chandelier.gltf"
+      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/Chandelier.gltf",
+      "geometryCountSource": "glTF indices/accessors verified in committed binary or JSON"
     },
     {
       "id": "peg-rack",
@@ -322,7 +343,8 @@
       "lods": [
         {
           "level": 0,
-          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/Peg_Rack.gltf"
+          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/Peg_Rack.gltf",
+          "triangles": 712
         }
       ],
       "format": "gltf",
@@ -330,7 +352,8 @@
       "usedInScenes": [
         "key-archive"
       ],
-      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/Peg_Rack.gltf"
+      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/Peg_Rack.gltf",
+      "geometryCountSource": "glTF indices/accessors verified in committed binary or JSON"
     },
     {
       "id": "painted-wooden-stool",
@@ -348,7 +371,8 @@
       "lods": [
         {
           "level": 0,
-          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/painted_wooden_stool.glb"
+          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/painted_wooden_stool.glb",
+          "triangles": 676
         }
       ],
       "format": "glb",
@@ -356,7 +380,8 @@
       "usedInScenes": [
         "key-archive"
       ],
-      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/painted_wooden_stool.glb"
+      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/painted_wooden_stool.glb",
+      "geometryCountSource": "glTF indices/accessors verified in committed binary or JSON"
     },
     {
       "id": "painted-wooden-table",
@@ -374,7 +399,8 @@
       "lods": [
         {
           "level": 0,
-          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/painted_wooden_table.glb"
+          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/painted_wooden_table.glb",
+          "triangles": 600
         }
       ],
       "format": "glb",
@@ -382,7 +408,8 @@
       "usedInScenes": [
         "key-archive"
       ],
-      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/painted_wooden_table.glb"
+      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/painted_wooden_table.glb",
+      "geometryCountSource": "glTF indices/accessors verified in committed binary or JSON"
     },
     {
       "id": "wooden-candle-holder",
@@ -400,7 +427,8 @@
       "lods": [
         {
           "level": 0,
-          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/wooden-candle-holder.glb"
+          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/wooden-candle-holder.glb",
+          "triangles": 2376
         }
       ],
       "format": "glb",
@@ -408,7 +436,8 @@
       "usedInScenes": [
         "key-archive"
       ],
-      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/wooden-candle-holder.glb"
+      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/wooden-candle-holder.glb",
+      "geometryCountSource": "glTF indices/accessors verified in committed binary or JSON"
     },
     {
       "id": "wooden-table-02",
@@ -426,7 +455,8 @@
       "lods": [
         {
           "level": 0,
-          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/wooden_table_02.gltf"
+          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/scenes/key-archive/dist/assets/selected-archive-props/wooden_table_02.gltf",
+          "triangles": 196
         }
       ],
       "format": "gltf",
@@ -434,7 +464,100 @@
       "usedInScenes": [
         "key-archive"
       ],
-      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/wooden_table_02.gltf"
+      "assetPath": "js/3d/scenes/key-archive/dist/assets/selected-archive-props/wooden_table_02.gltf",
+      "geometryCountSource": "glTF indices/accessors verified in committed binary or JSON"
+    },
+    {
+      "id": "kitchen-table",
+      "name": "Pine Kitchen Table",
+      "category": "interior/furniture/table",
+      "tags": [
+        "pine",
+        "kitchen",
+        "table",
+        "furniture",
+        "nordic"
+      ],
+      "source": "https://tevy.dev/models/kitchen-table",
+      "creator": "tevy",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "version": "v1",
+      "dimensionsMeters": {
+        "width": 1.2,
+        "height": 0.75,
+        "depth": 0.8
+      },
+      "lods": [
+        {
+          "level": 0,
+          "triangles": 2220,
+          "bytesApprox": 649000,
+          "url": "https://tevy.dev/models/kitchen-table/v1/lod0.glb"
+        },
+        {
+          "level": 1,
+          "triangles": 604,
+          "bytesApprox": 198000,
+          "url": "https://tevy.dev/models/kitchen-table/v1/lod1.glb"
+        },
+        {
+          "level": 2,
+          "triangles": 198,
+          "bytesApprox": 64000,
+          "url": "https://tevy.dev/models/kitchen-table/v1/lod2.glb"
+        }
+      ],
+      "status": "source",
+      "style": "Original model; KEYNLOCK gouache material adaptation pending",
+      "usedInScenes": [],
+      "geometryCountSource": "tevy.dev published LOD triangle counts"
+    },
+    {
+      "id": "coffee-table",
+      "name": "Coffee Table",
+      "category": "interior/furniture/table",
+      "tags": [
+        "oak",
+        "coffee",
+        "table",
+        "furniture",
+        "books"
+      ],
+      "source": "https://tevy.dev/models/coffee-table",
+      "creator": "tevy",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "version": "v1",
+      "dimensionsMeters": {
+        "width": 1.1,
+        "height": 0.42,
+        "depth": 0.6
+      },
+      "lods": [
+        {
+          "level": 0,
+          "triangles": 2208,
+          "bytesApprox": 838000,
+          "url": "https://tevy.dev/models/coffee-table/v1/lod0.glb"
+        },
+        {
+          "level": 1,
+          "triangles": 948,
+          "bytesApprox": 250000,
+          "url": "https://tevy.dev/models/coffee-table/v1/lod1.glb"
+        },
+        {
+          "level": 2,
+          "triangles": 384,
+          "bytesApprox": 73000,
+          "url": "https://tevy.dev/models/coffee-table/v1/lod2.glb"
+        }
+      ],
+      "status": "source",
+      "style": "Original model; KEYNLOCK gouache material adaptation pending",
+      "usedInScenes": [],
+      "geometryCountSource": "tevy.dev published LOD triangle counts"
     }
   ]
 }

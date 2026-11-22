@@ -558,6 +558,90 @@
       "style": "Original model; KEYNLOCK gouache material adaptation pending",
       "usedInScenes": [],
       "geometryCountSource": "tevy.dev published LOD triangle counts"
+    },
+    {
+      "id": "shelf-01",
+      "name": "Shelf 01",
+      "category": "interior/furniture/bookcase",
+      "creator": "Poly Haven · Gabriel Radić",
+      "source": "https://polyhaven.com/a/Shelf_01",
+      "assetPath": "js/3d/shared/models/assets/shelf-01/Shelf_01_2k.gltf",
+      "version": "2k",
+      "tags": [
+        "furniture",
+        "wood",
+        "Poly Haven"
+      ],
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "lods": [
+        {
+          "level": 0,
+          "triangles": 182,
+          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/shared/models/assets/shelf-01/Shelf_01_2k.gltf"
+        }
+      ],
+      "status": "import-pending",
+      "usedInScenes": [],
+      "uploadedArchiveName": "Shelf_01_2k.gltf.zip",
+      "geometryCountSource": "verified from supplied 2K glTF ZIP",
+      "notes": "New model from uploaded 2k glTF archive; imported by Poly Haven GitHub Actions task"
+    },
+    {
+      "id": "armchair-01",
+      "name": "Arm Chair 01",
+      "category": "interior/furniture/chair",
+      "creator": "Poly Haven · Kirill Sannikov",
+      "source": "https://polyhaven.com/a/ArmChair_01",
+      "assetPath": "js/3d/shared/models/assets/armchair-01/ArmChair_01_2k.gltf",
+      "version": "2k",
+      "tags": [
+        "furniture",
+        "wood",
+        "Poly Haven"
+      ],
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "lods": [
+        {
+          "level": 0,
+          "triangles": 5626,
+          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/shared/models/assets/armchair-01/ArmChair_01_2k.gltf"
+        }
+      ],
+      "status": "import-pending",
+      "usedInScenes": [],
+      "uploadedArchiveName": "ArmChair_01_2k.gltf.zip",
+      "geometryCountSource": "verified from supplied 2K glTF ZIP",
+      "notes": "New model from uploaded 2k glTF archive; imported by Poly Haven GitHub Actions task"
+    },
+    {
+      "id": "painted-wooden-cabinet-02",
+      "name": "Painted Wooden Cabinet 02",
+      "category": "interior/furniture/cabinet",
+      "creator": "Poly Haven · Kirill Sannikov",
+      "source": "https://polyhaven.com/a/painted_wooden_cabinet_02",
+      "assetPath": "js/3d/shared/models/assets/painted-wooden-cabinet-02/painted_wooden_cabinet_02_2k.gltf",
+      "version": "2k",
+      "tags": [
+        "furniture",
+        "wood",
+        "Poly Haven"
+      ],
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "lods": [
+        {
+          "level": 0,
+          "triangles": 966,
+          "url": "https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/shared/models/assets/painted-wooden-cabinet-02/painted_wooden_cabinet_02_2k.gltf"
+        }
+      ],
+      "status": "import-pending",
+      "usedInScenes": [],
+      "uploadedArchiveName": "painted_wooden_cabinet_02_2k.gltf.zip",
+      "geometryCountSource": "verified from supplied 2K glTF ZIP",
+      "notes": "New model from uploaded 2k glTF archive; imported by Poly Haven GitHub Actions task"
     }
   ]
 }

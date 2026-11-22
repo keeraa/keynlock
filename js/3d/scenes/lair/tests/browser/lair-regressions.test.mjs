@@ -632,9 +632,10 @@ test('an English browser gets the Lair in English, with a language switch', asyn
 test('one music player follows the Lair into its workshops and switches tracks', async t => {
   const page = await openRoom(t);
   const title = page.locator('#lair-music .music-controls__title');
-  assert.equal(await title.innerText(), 'Шопен · Ноктюрн op. 9 № 1');
+  const titleText = async () => (await title.innerText()).replace(/\s*▾$/, '');
+  assert.equal(await titleText(), 'Шопен · Ноктюрн op. 9 № 1');
   await page.locator('#lair-music').getByRole('button', { name: 'Следующий трек' }).click();
-  assert.equal(await title.innerText(), 'Шопен · Ноктюрн op. 9 № 2');
+  assert.equal(await titleText(), 'Шопен · Ноктюрн op. 9 № 2');
   assert.equal(JSON.parse(await page.evaluate(() => localStorage.getItem('keynlock-archive-music-position-v1'))).track,
     'chopin-nocturne-op9-no2.mp3', 'the Key Archive resumes the same record');
   await page.locator('#lair-music').getByRole('button', { name: 'Пауза' }).click();
@@ -646,17 +647,17 @@ test('one music player follows the Lair into its workshops and switches tracks',
   assert.equal(await page.locator('#panel-music .music-controls__title').innerText(), 'Шопен · Ноктюрн op. 9 № 2');
   assert.equal(await page.locator('#panel-music .music-controls__volume').inputValue(), '25');
   await page.locator('#panel-music').getByRole('button', { name: 'Предыдущий трек' }).click();
-  assert.equal(await title.innerText(), 'Шопен · Ноктюрн op. 9 № 1');
+  assert.equal(await titleText(), 'Шопен · Ноктюрн op. 9 № 1');
 
   // The lab is the same page: the player and its state stay.
   await enterAlchemy(page);
   assert.equal(await title.isVisible(), true);
-  assert.equal(await title.innerText(), 'Шопен · Ноктюрн op. 9 № 1');
+  assert.equal(await titleText(), 'Шопен · Ноктюрн op. 9 № 1');
 });
 
 test('an English page shows the player in English', async t => {
   const page = await openRoom(t, { locale: 'en-US' });
-  assert.equal(await page.locator('#lair-music .music-controls__title').innerText(), 'Chopin · Nocturne Op. 9 No. 1');
+  assert.equal((await page.locator('#lair-music .music-controls__title').innerText()).replace(/\s*▾$/, ''), 'Chopin · Nocturne Op. 9 No. 1');
   assert.equal(await page.locator('#lair-music').getByRole('button', { name: 'Next track' }).count(), 1);
 });
 
@@ -701,4 +702,31 @@ test('the workshops share the room look: one gouache setting, no Atelier-only ef
     return adopted(api('atelier').look.paintedMaterials()) && adopted(api('alchemy').look.paintedMaterials());
   }, null, { timeout: 30000 });
   assert.ok(await painted.jsonValue());
+});
+
+test('a zone opened while walking returns to the walk; the entrance wall shows only inside', async t => {
+  const page = await openRoom(t);
+  const wallVisible = () => page.evaluate(() =>
+    window.__keynlockDebug.host.renderer.getUnifiedScene().getObjectByName('lair-entrance-wall').visible);
+  assert.equal(await wallVisible(), false, 'the overview camera stands outside the entrance wall');
+  await page.locator('#room-walk-toggle').click();
+  await page.waitForFunction(() => document.querySelector('#room-walk-toggle').getAttribute('aria-pressed') === 'true');
+  const before = await page.evaluate(() => {
+    const camera = window.__keynlockDebug.host.camera;
+    camera.position.x += 1.2;
+    return camera.position.toArray();
+  });
+  assert.equal(await wallVisible(), true, 'inside the room the doors are visible');
+  await page.keyboard.press('5');            // the zone bar is hidden while walking
+  await page.locator('#zone-panel').waitFor();
+  assert.equal((await page.locator('#reset-camera span').innerText()).trim(), 'К ПРОГУЛКЕ');
+  await page.locator('#reset-camera').click();
+  await page.waitForFunction(() => document.querySelector('#room-walk-toggle').getAttribute('aria-pressed') === 'true');
+  const after = await page.evaluate(() => window.__keynlockDebug.host.camera.position.toArray());
+  assert.ok(after.every((value, axis) => Math.abs(value - before[axis]) < .05), 'back where the walker stood');
+  // The playlist lists every track and can switch to one.
+  await page.locator('#lair-music .music-controls__title').click();
+  await page.locator('#lair-music .music-controls__track-button').nth(2).click();
+  assert.equal(await page.locator('#lair-music .music-controls__track[aria-current="true"]').count(), 1);
+  assert.match(await page.locator('#lair-music .music-controls__track[aria-current="true"]').innerText(), /си-бемоль/);
 });

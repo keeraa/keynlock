@@ -132,8 +132,12 @@ export function createZoneTransitions({
     }
   }
 
+  // A zone opened while walking returns to the walk, where the walker stood.
+  let returnToWalk = false;
+
   function openZone(id) {
     if (!zones[id]) return;
+    if (cameraInput.isWalking()) returnToWalk = true;
     pendingWorkshopOpen = null;
     atelierView.leaveGallery();
     if (visualUI.isOpen()) visualUI.close();
@@ -170,10 +174,10 @@ export function createZoneTransitions({
     }
   }
 
-  function closePanel(nextMode = 'room') {
+  function closePanel(nextMode = 'room', { resumeWalk = false } = {}) {
     pendingWorkshopOpen = null;
     atelierView.leaveGallery();
-    cameraInput.setMode(nextMode);
+    cameraInput.setMode(nextMode, { resumeWalk });
     setInRoomWorkshop(null);
     interaction.style.cursor = 'grab';
     panel.hidden = true;
@@ -183,6 +187,15 @@ export function createZoneTransitions({
 
   function resetView() {
     if (workshopOverlay?.isOpen()) { workshopOverlay.close(); return; }
+    if (returnToWalk && currentZone) {
+      returnToWalk = false;
+      transitioning = false;
+      closePanel('walk', { resumeWalk: true });
+      atelierView.cancelFlight();
+      rendererHost?.setWorldLighting(null);
+      return;
+    }
+    returnToWalk = false;
     closePanel();
     rendererHost?.setWorldLighting(null);
     focus(homePosition.toArray(), homeTarget.toArray());
@@ -196,7 +209,8 @@ export function createZoneTransitions({
       return;
     }
     transitioning = false;
-    closePanel('walk');
+    closePanel('walk', { resumeWalk: returnToWalk });
+    returnToWalk = false;
     atelierView.cancelFlight();
     rendererHost.setWorldLighting(null);
   }
@@ -252,12 +266,14 @@ export function createZoneTransitions({
       openZone(button.dataset.zone);
     });
   });
-  document.querySelector('#close-panel').addEventListener('click', () => closePanel());
+  // Closing a zone's panel opened from a walk goes back to the walk too.
+  document.querySelector('#close-panel').addEventListener('click', () => (returnToWalk ? resetView() : closePanel()));
   document.querySelector('#reset-camera').addEventListener('click', resetView);
   document.querySelector('#room-walk-toggle').addEventListener('click', toggleWalk);
 
   return {
     open: openZone, reset: resetView, onWorkshopReady, resizeCamera, updateApproach, handleKey,
+    returnsToWalk: () => returnToWalk,
     precompileWorkshopLighting: () => workshopLighting.precompile(workshopOverlay.isReady, () => inRoomWorkshop),
     manipulateAlchemy, resetAlchemyCamera,
     current: () => currentZone,

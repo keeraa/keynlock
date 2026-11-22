@@ -7,6 +7,7 @@ import { buildWorkbench } from './workbench-furniture.js';
 import { buildGramophone, buildDetails } from './details.js';
 import { createWindowLight } from './window-light.js';
 import { buildLamps } from './lamps.js';
+import { buildEntranceWall } from './entrance-wall.js';
 import { mergeStaticMeshes } from '../../../../core/rendering/merge-static.js';
 import { ALCHEMY_Z, ATELIER_Z } from '../room-layout.js';
 
@@ -27,6 +28,7 @@ export function buildLair(scene, m) {
   const ambientParticles = buildDetails(kit, { windowLight });
   const lamps = buildLamps(kit);
   zoneTarget('alchemy', [6.86, 1.15, ALCHEMY_Z], [3.05, 2.3, 5.22]);
+  const entranceWall = buildEntranceWall(kit);
   // Hundreds of small static parts become a few meshes (draw calls).
   mergeStaticMeshes(kit.staticGroup);
   const wallpapers = {
@@ -36,7 +38,7 @@ export function buildLair(scene, m) {
     damask: m.wallpaperDamask,
   };
   return {
-    anchors, hitTargets, animated, ambientParticles, windowLight,
+    anchors, hitTargets, animated, ambientParticles, windowLight, entranceWall,
     /**
      * 0 = day: warm sun through the window, dim lamps. 1 = night: moonlight, a
      * dark city outside and the lamps as the main light. In between while it changes.

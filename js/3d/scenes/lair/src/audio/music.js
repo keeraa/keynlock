@@ -16,20 +16,21 @@ const URLS = Object.freeze({
 
 const labels = () => ({
   region: t('Музыка'), previous: t('Предыдущий трек'), next: t('Следующий трек'),
-  play: t('Включить музыку'), pause: t('Пауза'), volume: t('Громкость музыки'),
+  play: t('Включить музыку'), pause: t('Пауза'), volume: t('Громкость музыки'), playlist: t('Плейлист'),
 });
 
 /**
  * Creates the page's player, mounts its controls into each given element and
  * lets the music start on the first click or key press (browsers need one).
- * @param {{ window: Window, storage?: Storage | null, mounts: { element: HTMLElement | null, volume?: boolean }[] }} options
+ * @param {{ window: Window, storage?: Storage | null,
+ *   mounts: { element: HTMLElement | null, volume?: boolean, playlist?: false | 'list' | 'menu' }[] }} options
  */
 export function mountLairMusic({ window: browserWindow, storage, mounts }) {
   const music = getSharedMusicPlayer(browserWindow, storage, {
     tracks: musicTracksWithUrls(file => URLS[file]),
   });
-  for (const { element, volume } of mounts)
-    if (element) mountMusicControls(element, music, { labels: labels(), language: translator.language, volume });
+  for (const { element, volume, playlist } of mounts)
+    if (element) mountMusicControls(element, music, { labels: labels(), language: translator.language, volume, playlist });
   const begin = event => {
     // The controls start the player themselves (a click on pause must not play first).
     if (event.target instanceof Element && event.target.closest('.music-controls')) return;

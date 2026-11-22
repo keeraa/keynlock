@@ -38,8 +38,8 @@ mountAmbience(document.querySelector('#sound-toggle'));
 let musicStorage = null;
 try { musicStorage = window.localStorage; } catch { /* music then forgets its place */ }
 mountLairMusic({ window, storage: musicStorage, mounts: [
-  { element: document.querySelector('#lair-music') },
-  { element: document.querySelector('#panel-music'), volume: true },     // the gramophone's panel
+  { element: document.querySelector('#lair-music'), playlist: 'menu' },
+  { element: document.querySelector('#panel-music'), volume: true, playlist: 'list' },     // the gramophone's panel
 ] });
 
 function setup() {

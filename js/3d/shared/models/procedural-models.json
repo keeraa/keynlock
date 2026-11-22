@@ -1,0 +1,308 @@
+{
+  "schemaVersion": 1,
+  "description": "Procedural 3D model families with confirmed source code; these are not downloadable GLB files.",
+  "models": [
+    {
+      "id": "key-cellar",
+      "name": "Ключ «Подвальный»",
+      "kind": "procedural",
+      "category": "keys",
+      "presetId": "cellar",
+      "definitionPath": "js/3d/shared/keys/key-data.js",
+      "factoryPath": "js/3d/scenes/key-forge/dist/js/key-model.js",
+      "usedInScenes": [
+        "key-forge",
+        "key-archive"
+      ]
+    },
+    {
+      "id": "key-tower",
+      "name": "Ключ «Башенный»",
+      "kind": "procedural",
+      "category": "keys",
+      "presetId": "tower",
+      "definitionPath": "js/3d/shared/keys/key-data.js",
+      "factoryPath": "js/3d/scenes/key-forge/dist/js/key-model.js",
+      "usedInScenes": [
+        "key-forge",
+        "key-archive"
+      ]
+    },
+    {
+      "id": "key-archive",
+      "name": "Ключ «Архивный»",
+      "kind": "procedural",
+      "category": "keys",
+      "presetId": "archive",
+      "definitionPath": "js/3d/shared/keys/key-data.js",
+      "factoryPath": "js/3d/scenes/key-forge/dist/js/key-model.js",
+      "usedInScenes": [
+        "key-forge",
+        "key-archive"
+      ]
+    },
+    {
+      "id": "key-astral",
+      "name": "Ключ «Астролябия»",
+      "kind": "procedural",
+      "category": "keys",
+      "presetId": "astral",
+      "definitionPath": "js/3d/shared/keys/key-data.js",
+      "factoryPath": "js/3d/scenes/key-forge/dist/js/key-model.js",
+      "usedInScenes": [
+        "key-forge",
+        "key-archive"
+      ]
+    },
+    {
+      "id": "key-garden",
+      "name": "Ключ «Садовый»",
+      "kind": "procedural",
+      "category": "keys",
+      "presetId": "garden",
+      "definitionPath": "js/3d/shared/keys/key-data.js",
+      "factoryPath": "js/3d/scenes/key-forge/dist/js/key-model.js",
+      "usedInScenes": [
+        "key-forge",
+        "key-archive"
+      ]
+    },
+    {
+      "id": "key-clock",
+      "name": "Ключ «Часовой»",
+      "kind": "procedural",
+      "category": "keys",
+      "presetId": "clock",
+      "definitionPath": "js/3d/shared/keys/key-data.js",
+      "factoryPath": "js/3d/scenes/key-forge/dist/js/key-model.js",
+      "usedInScenes": [
+        "key-forge",
+        "key-archive"
+      ]
+    },
+    {
+      "id": "key-palace",
+      "name": "Ключ «Дворцовый»",
+      "kind": "procedural",
+      "category": "keys",
+      "presetId": "palace",
+      "definitionPath": "js/3d/shared/keys/key-data.js",
+      "factoryPath": "js/3d/scenes/key-forge/dist/js/key-model.js",
+      "usedInScenes": [
+        "key-forge",
+        "key-archive"
+      ]
+    },
+    {
+      "id": "key-forge",
+      "name": "Ключ «Кузнечный»",
+      "kind": "procedural",
+      "category": "keys",
+      "presetId": "forge",
+      "definitionPath": "js/3d/shared/keys/key-data.js",
+      "factoryPath": "js/3d/scenes/key-forge/dist/js/key-model.js",
+      "usedInScenes": [
+        "key-forge",
+        "key-archive"
+      ]
+    },
+    {
+      "id": "key-alchemy",
+      "name": "Ключ «Алхимический»",
+      "kind": "procedural",
+      "category": "keys",
+      "presetId": "alchemy",
+      "definitionPath": "js/3d/shared/keys/key-data.js",
+      "factoryPath": "js/3d/scenes/key-forge/dist/js/key-model.js",
+      "usedInScenes": [
+        "key-forge",
+        "key-archive"
+      ]
+    },
+    {
+      "id": "key-brotherhood",
+      "name": "Ключ «Братства»",
+      "kind": "procedural",
+      "category": "keys",
+      "presetId": "brotherhood",
+      "definitionPath": "js/3d/shared/keys/key-data.js",
+      "factoryPath": "js/3d/scenes/key-forge/dist/js/key-model.js",
+      "usedInScenes": [
+        "key-forge",
+        "key-archive"
+      ]
+    },
+    {
+      "id": "city-house",
+      "name": "Городской дом",
+      "kind": "procedural",
+      "category": "buildings/houses",
+      "presetId": "house",
+      "definitionPath": "js/3d/scenes/city/js/path-builder/model-types.js",
+      "factoryPath": "js/3d/scenes/city/modules/building-models.js",
+      "usedInScenes": [
+        "city"
+      ]
+    },
+    {
+      "id": "city-custom-house",
+      "name": "Дом из конструктора",
+      "kind": "procedural",
+      "category": "buildings/houses",
+      "presetId": "custom-house",
+      "definitionPath": "js/3d/scenes/city/js/path-builder/model-types.js",
+      "factoryPath": "js/3d/scenes/city/modules/building-models.js",
+      "usedInScenes": [
+        "city"
+      ]
+    },
+    {
+      "id": "city-townhouse",
+      "name": "Высокий дом",
+      "kind": "procedural",
+      "category": "buildings/houses",
+      "presetId": "townhouse",
+      "definitionPath": "js/3d/scenes/city/js/path-builder/model-types.js",
+      "factoryPath": "js/3d/scenes/city/modules/building-models.js",
+      "usedInScenes": [
+        "city"
+      ]
+    },
+    {
+      "id": "city-workshop",
+      "name": "Мастерская",
+      "kind": "procedural",
+      "category": "buildings/houses",
+      "presetId": "workshop",
+      "definitionPath": "js/3d/scenes/city/js/path-builder/model-types.js",
+      "factoryPath": "js/3d/scenes/city/modules/building-models.js",
+      "usedInScenes": [
+        "city"
+      ]
+    },
+    {
+      "id": "city-church",
+      "name": "Церковь",
+      "kind": "procedural",
+      "category": "buildings/landmarks",
+      "presetId": "church",
+      "definitionPath": "js/3d/scenes/city/js/path-builder/model-types.js",
+      "factoryPath": "js/3d/scenes/city/modules/building-models.js",
+      "usedInScenes": [
+        "city"
+      ]
+    },
+    {
+      "id": "city-theater",
+      "name": "Театр",
+      "kind": "procedural",
+      "category": "buildings/landmarks",
+      "presetId": "theater",
+      "definitionPath": "js/3d/scenes/city/js/path-builder/model-types.js",
+      "factoryPath": "js/3d/scenes/city/modules/building-models.js",
+      "usedInScenes": [
+        "city"
+      ]
+    },
+    {
+      "id": "city-museum",
+      "name": "Музей",
+      "kind": "procedural",
+      "category": "buildings/landmarks",
+      "presetId": "museum",
+      "definitionPath": "js/3d/scenes/city/js/path-builder/model-types.js",
+      "factoryPath": "js/3d/scenes/city/modules/building-models.js",
+      "usedInScenes": [
+        "city"
+      ]
+    },
+    {
+      "id": "city-townhall",
+      "name": "Ратуша",
+      "kind": "procedural",
+      "category": "buildings/landmarks",
+      "presetId": "townhall",
+      "definitionPath": "js/3d/scenes/city/js/path-builder/model-types.js",
+      "factoryPath": "js/3d/scenes/city/modules/building-models.js",
+      "usedInScenes": [
+        "city"
+      ]
+    },
+    {
+      "id": "city-palace",
+      "name": "Дворец",
+      "kind": "procedural",
+      "category": "buildings/landmarks",
+      "presetId": "palace",
+      "definitionPath": "js/3d/scenes/city/js/path-builder/model-types.js",
+      "factoryPath": "js/3d/scenes/city/modules/building-models.js",
+      "usedInScenes": [
+        "city"
+      ]
+    },
+    {
+      "id": "city-tower",
+      "name": "Башня",
+      "kind": "procedural",
+      "category": "buildings/landmarks",
+      "presetId": "tower",
+      "definitionPath": "js/3d/scenes/city/js/path-builder/model-types.js",
+      "factoryPath": "js/3d/scenes/city/modules/building-models.js",
+      "usedInScenes": [
+        "city"
+      ]
+    },
+    {
+      "id": "lock-pin",
+      "name": "Штифтовый замок",
+      "kind": "procedural",
+      "category": "mechanisms/locks",
+      "presetId": "pin",
+      "definitionPath": "js/3d/scenes/locks/src/js/runtime/scenario-model.js",
+      "factoryPath": "js/3d/scenes/locks/src/js",
+      "usedInScenes": [
+        "locks"
+      ],
+      "note": "Documented mechanism family, configurable variants are not counted as separate models"
+    },
+    {
+      "id": "lock-disc",
+      "name": "Дисковый замок",
+      "kind": "procedural",
+      "category": "mechanisms/locks",
+      "presetId": "disc",
+      "definitionPath": "js/3d/scenes/locks/src/js/runtime/scenario-model.js",
+      "factoryPath": "js/3d/scenes/locks/src/js",
+      "usedInScenes": [
+        "locks"
+      ],
+      "note": "Documented mechanism family, configurable variants are not counted as separate models"
+    },
+    {
+      "id": "lock-code",
+      "name": "Кодовый замок",
+      "kind": "procedural",
+      "category": "mechanisms/locks",
+      "presetId": "code",
+      "definitionPath": "js/3d/scenes/locks/src/js/runtime/scenario-model.js",
+      "factoryPath": "js/3d/scenes/locks/src/js",
+      "usedInScenes": [
+        "locks"
+      ],
+      "note": "Documented mechanism family, configurable variants are not counted as separate models"
+    },
+    {
+      "id": "lock-plate",
+      "name": "Пластинчатый замок",
+      "kind": "procedural",
+      "category": "mechanisms/locks",
+      "presetId": "plate",
+      "definitionPath": "js/3d/scenes/locks/src/js/runtime/scenario-model.js",
+      "factoryPath": "js/3d/scenes/locks/src/js",
+      "usedInScenes": [
+        "locks"
+      ],
+      "note": "Documented mechanism family, configurable variants are not counted as separate models"
+    }
+  ]
+}

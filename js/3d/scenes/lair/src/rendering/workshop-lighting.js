@@ -1,6 +1,6 @@
 import { ALCHEMY_LOOK } from '@keynlock/alchemy/room-assets';
 
-export function createWorkshopLighting({ scene, camera, canvas, renderer, rendererHost, roomLights }) {
+export function createWorkshopLighting({ scene, camera, canvas, renderer, rendererHost, roomLights, quality = null }) {
   const roomLightDefaults = roomLights.map(light => ({ light, intensity: light.intensity, visible: light.visible }));
   const originalRoomRenderLook = {
     outputColorSpace: renderer.outputColorSpace,
@@ -23,12 +23,9 @@ export function createWorkshopLighting({ scene, camera, canvas, renderer, render
 
   function setAlchemyLook(enabled) {
     setRoomLightsForAlchemy(enabled);
-    // The original lab is much closer to the camera than the full Lair. Keep
-    // its pixel cost bounded on retina screens, without lowering other rooms.
-    const pixelRatio = Math.min(window.devicePixelRatio || 1, enabled ? 1.35 : 1.75);
-    if (Math.abs(renderer.getPixelRatio() - pixelRatio) > .001) {
-      renderer.setPixelRatio(pixelRatio);
-    }
+    // The lab is much closer to the camera than the full Lair: the quality
+    // settings keep its pixel cost bounded on retina screens.
+    quality?.setLabOpen(enabled);
     if (enabled) {
       // Both scenes already use ACES/sRGB. Changing the global shadow-map type
       // here would invalidate every material program in the large shared scene

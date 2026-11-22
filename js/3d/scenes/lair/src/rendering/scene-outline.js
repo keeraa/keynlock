@@ -25,7 +25,7 @@ const fragmentShader = /* glsl */`
   uniform vec2 uResolution;
   uniform mat4 uProjectionInverse;
   uniform vec3 uViewUp;
-  uniform float uNear, uFar, uWidth, uInk, uNormalThreshold, uDepthThreshold, uFadeNear, uFadeFar;
+  uniform float uNear, uFar, uWidth, uInk, uNormalThreshold, uDepthThreshold, uFadeNear, uFadeFar, uUseNormals;
   uniform vec3 uInkColor;
   varying vec2 vUv;
 
@@ -33,7 +33,11 @@ const fragmentShader = /* glsl */`
   float occupied(float depth) { return 1.0 - step(0.99995, depth); }
   float viewDistance(float depth) { return (uNear * uFar) / max(.0001, uFar - depth * (uFar - uNear)); }
   // View-space normal from the normal pass (MeshNormalMaterial packs it 0..1).
-  vec3 normalAt(vec2 uv) { return normalize(texture2D(tNormal, uv).rgb * 2.0 - 1.0); }
+  // Without the normal pass (low quality) every face reads as facing the
+  // camera: folds then come only from depth steps.
+  vec3 normalAt(vec2 uv) {
+    return uUseNormals > .5 ? normalize(texture2D(tNormal, uv).rgb * 2.0 - 1.0) : vec3(0.0, 0.0, 1.0);
+  }
 
   float closestInkDepth;
   float edgeAt(vec2 direction, float depth, float distance, vec3 normal, float here) {
@@ -55,7 +59,7 @@ const fragmentShader = /* glsl */`
       // Floor boards, table tops and papers: two upward faces with only a small
       // step between them (plank seams, ruled lines) get no ink. A real drop,
       // like a table top over the floor, keeps it.
-      float upward = smoothstep(.82, .94, dot(normal, uViewUp)) * smoothstep(.82, .94, dot(neighborNormal, uViewUp));
+      float upward = uUseNormals * smoothstep(.82, .94, dot(normal, uViewUp)) * smoothstep(.82, .94, dot(neighborNormal, uViewUp));
       crease *= 1.0 - upward * (1.0 - smoothstep(.06, .14, jump));
     }
     // Ink goes on the farther surface, outside the nearer silhouette. Along a
@@ -99,7 +103,7 @@ const fragmentShader = /* glsl */`
 
 /** Renders the scene through the outline: render() replaces renderer.render(scene, camera). */
 export function createSceneOutline({ renderer, scene, camera }) {
-  let enabled = true, widthScale = 1;
+  let enabled = true, widthScale = 1, samples = 4, normals = true;
   let target = null, normalTarget = null;
   const size = new THREE.Vector2();
   const normalMaterial = new THREE.MeshNormalMaterial();
@@ -121,6 +125,7 @@ export function createSceneOutline({ renderer, scene, camera }) {
     uNormalThreshold: { value: INK.normalThreshold }, uDepthThreshold: { value: INK.depthThreshold },
     // The room is large: ink fades a little with distance, not to nothing.
     uFadeNear: { value: 9 }, uFadeFar: { value: 40 },
+    uUseNormals: { value: 1 },
   };
   const material = new THREE.ShaderMaterial({ uniforms, vertexShader, fragmentShader, depthTest: false, depthWrite: false });
   const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
@@ -131,7 +136,7 @@ export function createSceneOutline({ renderer, scene, camera }) {
 
   function ensureTarget() {
     renderer.getDrawingBufferSize(size);
-    if (target && target.width === size.x && target.height === size.y) return target;
+    if (target && target.width === size.x && target.height === size.y && target.samples === samples) return target;
     target?.depthTexture?.dispose();
     target?.dispose();
     normalTarget?.dispose();
@@ -140,7 +145,7 @@ export function createSceneOutline({ renderer, scene, camera }) {
     // 32-bit float depth for steady distance steps.
     const depthTexture = new THREE.DepthTexture(size.x, size.y, THREE.FloatType);
     target = new THREE.WebGLRenderTarget(size.x, size.y, {
-      samples: 4, type: THREE.HalfFloatType, depthTexture,
+      samples, type: THREE.HalfFloatType, depthTexture,
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,
     });
     uniforms.tColor.value = target.texture;
@@ -189,7 +194,7 @@ export function createSceneOutline({ renderer, scene, camera }) {
     const previous = renderer.getRenderTarget();
     renderer.setRenderTarget(frame);
     renderer.render(scene, camera);
-    renderNormals();
+    if (normals) renderNormals();
     renderer.setRenderTarget(previous);
     renderer.render(screen, screenCamera);
   }
@@ -200,6 +205,12 @@ export function createSceneOutline({ renderer, scene, camera }) {
     /** The visual panel's 20–140 % stroke width. */
     setWidth(percent) { widthScale = THREE.MathUtils.clamp((Number(percent) || 0) / 65, .3, 2.2); },
     isEnabled: () => enabled,
+    /** Quality level (rendering/quality.js): MSAA samples and the normal pass. */
+    setQuality(options) {
+      samples = options.samples;
+      normals = Boolean(options.normals);
+      uniforms.uUseNormals.value = normals ? 1 : 0;
+    },
     dispose() {
       target?.depthTexture?.dispose(); target?.dispose(); normalTarget?.dispose();
       material.dispose(); normalMaterial.dispose(); quad.geometry.dispose();

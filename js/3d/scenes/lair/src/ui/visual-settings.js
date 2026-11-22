@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { t } from '../i18n.js';
 
 const STORAGE_KEY = 'keynlock-lair-visual-v1';
 const DEFAULTS = Object.freeze({
@@ -6,10 +7,11 @@ const DEFAULTS = Object.freeze({
   'metal-finish': 'original', 'metal-roughness': 50, 'metal-metalness': 65,
   wallpaper: 'tile', 'outline-enabled': true, 'outline-width': 65,
   'dust-enabled': true, 'dust-density': 65, 'window-light': 100, 'night-lighting': false,
+  'quality-mode': 'auto', 'fps-cap': false,
 });
 
 /** Compact live materials lab. All controls affect materials, geometry or Three.js particles. */
-export function mountVisualSettings({ visual, room, setNight = null, outlines, grain, onOpen = () => {} }) {
+export function mountVisualSettings({ visual, room, quality = null, setNight = null, outlines, grain, onOpen = () => {} }) {
   const panel = document.querySelector('#lair-visual-panel');
   const toggle = document.querySelector('#lair-visual-toggle');
   const inputs = [...document.querySelectorAll('[data-visual-setting]')];
@@ -55,6 +57,8 @@ export function mountVisualSettings({ visual, room, setNight = null, outlines, g
     room.ambientParticles.setDensity(state['dust-density'] / 100);
     room.windowLight?.setStrength(state['window-light'] / 100);
     setNight?.(state['night-lighting']);
+    quality?.setMode(state['quality-mode']);
+    quality?.setFpsCap(state['fps-cap']);
     outlines.setEnabled(state['outline-enabled']);
     outlines.setWidth(state['outline-width']);
     grain.style.opacity = `${state['paint-grain'] / 100}`;
@@ -81,6 +85,14 @@ export function mountVisualSettings({ visual, room, setNight = null, outlines, g
   });
   document.addEventListener('pointerdown', event => {
     if (!panel.hidden && !panel.contains(event.target) && !toggle.contains(event.target)) close();
+  });
+  // What auto (or the chosen level) is drawing right now.
+  const levelNames = { high: t('Высокое'), medium: t('Среднее'), low: t('Низкое'), minimal: t('Минимальное') };
+  const qualityNow = document.querySelector('#quality-now');
+  quality?.subscribe(current => {
+    if (!qualityNow) return;
+    const ratio = Math.round(current.pixelRatio * 100) / 100;
+    qualityNow.textContent = `${levelNames[current.level]} · ${ratio}×`;
   });
   apply();
   return { close, isOpen: () => !panel.hidden, state: () => ({ ...state }) };

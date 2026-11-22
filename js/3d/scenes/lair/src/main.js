@@ -5,6 +5,7 @@ import { buildLair } from './room/build.js';
 import { ROOM_CENTER_Z, ROOM_END } from './room-layout.js';
 import { mountVisualSettings } from './ui/visual-settings.js';
 import { createSceneOutline } from './rendering/scene-outline.js';
+import { createQuality } from './rendering/quality.js';
 import { mountWorkshopOverlay } from './workshops/workshop-overlay.js';
 import { createAtelierEmbedding } from '@keynlock/atelier/embedding';
 import { createAlchemyEmbedding } from '@keynlock/alchemy/embedding';
@@ -69,7 +70,6 @@ function setup() {
   // frame; lair-frame-loop refreshes it (see refreshShadows there).
   renderer.shadowMap.autoUpdate = false;
   renderer.shadowMap.needsUpdate = true;
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
 
   const homePosition = new THREE.Vector3(.25, 8.35, ROOM_END + 4.78);
   const homeTarget = new THREE.Vector3(0, 4.70, ROOM_CENTER_Z - .75);
@@ -120,9 +120,12 @@ function setup() {
   });
   // One full-screen ink pass for everything on screen (the Key Archive's outline).
   const outlines = createSceneOutline({ renderer, scene, camera });
+  // Pixel ratio, smoothing, the outline's normal pass and the 60 FPS cap.
+  const quality = createQuality({ renderer, outline: outlines });
+  quality.apply();
   const performancePanel = mountPerformancePanel({ document, renderer, scene, canvas });
   const dayNight = createDayNight(night => { room.setNight(night); lighting.setNight(night); });
-  const visualUI = mountVisualSettings({ visual, room, setNight: night => dayNight.set(night), outlines,
+  const visualUI = mountVisualSettings({ visual, room, quality, setNight: night => dayNight.set(night), outlines,
     grain: document.querySelector('.grain'), onOpen: () => { panel.hidden = true; } });
   const roomWalk = createRoomWalk({
     scene, camera, interaction,
@@ -156,7 +159,7 @@ function setup() {
   const zoneTransitions = createZoneTransitions({
     scene, camera, controls, canvas, interaction, renderer, rendererHost,
     workshopOverlay, atelierView, visualUI, homePosition, homeTarget, roomMinDistance,
-    roomLights, cameraInput,
+    roomLights, cameraInput, quality,
   });
   host.alchemy.manipulate = zoneTransitions.manipulateAlchemy;
   host.alchemy.resetCamera = zoneTransitions.resetAlchemyCamera;
@@ -204,7 +207,7 @@ function setup() {
   window.addEventListener('resize', resize);
   resize();
   const returnButton = createReturnButton({ button: document.querySelector('#reset-camera'), t });
-  startLairFrames({ scene, camera, controls, renderer, rendererHost, room, outlines, dayNight,
+  startLairFrames({ scene, camera, controls, renderer, rendererHost, room, outlines, quality, dayNight,
     zoneTransitions, zoneInteraction, cameraInput, atelierView, workshopOverlay, visualUI, performancePanel,
     returnButton });
 }

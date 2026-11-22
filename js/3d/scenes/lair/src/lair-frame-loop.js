@@ -1,6 +1,7 @@
 import { Clock } from 'three';
+import { createFrameCap } from './rendering/quality.js';
 
-export function startLairFrames({ scene, camera, controls, renderer, rendererHost, outlines,
+export function startLairFrames({ scene, camera, controls, renderer, rendererHost, outlines, quality,
   room, dayNight, zoneTransitions, zoneInteraction, cameraInput, atelierView, workshopOverlay, returnButton,
   visualUI, performancePanel }) {
   const clock = new Clock();
@@ -30,9 +31,13 @@ export function startLairFrames({ scene, camera, controls, renderer, rendererHos
     }
   }
 
+  // The optional 60 FPS cap (rendering/quality.js).
+  const capped = createFrameCap(() => quality?.fpsCap() || 0);
+
   function frame() {
     requestAnimationFrame(frame);
     const now = performance.now();
+    if (capped(now)) return;
     const frameDelta = clock.getDelta();
     const delta = Math.min(frameDelta, .05);
     dayNight.update(frameDelta);
@@ -55,6 +60,7 @@ export function startLairFrames({ scene, camera, controls, renderer, rendererHos
     refreshShadows(now, currentZone);
     if (!overlayOpen || zoneTransitions.isTransitioning()) render(currentZone);
     performancePanel.frame(frameDelta, performance.now() - now, drawn);
+    quality?.sample(now, frameDelta * 1000, !document.hidden);
   }
 
   frame();

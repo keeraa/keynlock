@@ -225,7 +225,9 @@ for (const id of Object.keys(GLASS_FINISHES)) $('glass-' + id).addEventListener(
   selectGlassFinish(id);
 });
 const visualPanel = createVisualPanel({$,queryAll,visuals,woodAssets:WOOD_FINISH_ASSETS,
-  selectWallFinish,selectWoodFinish,setLightDirection,setLightStrength,setSunbeam,setBackgroundBlur,
+  selectWallFinish,selectWoodFinish,
+  // In the Lair the tile buttons paint the room's right wall too.
+  chooseWallFinish:id=>{selectWallFinish(id);if(runtime.embedded)lair?.alchemy.setWallFinish?.(id);},setLightDirection,setLightStrength,setSunbeam,setBackgroundBlur,
   isSunbeamVisible:side=>sunbeams[side].visible,isBlurred:()=>blurBackground,
   resetCamera:()=>{
     orbit.yaw=0;orbit.pitch=.251;orbit.zoom=1;
@@ -235,13 +237,17 @@ const visualPanel = createVisualPanel({$,queryAll,visuals,woodAssets:WOOD_FINISH
   },
   onResize,viewportWidth:()=>innerWidth});
 visualPanel.bind();
+if (runtime.embedded) selectWallFinish(lair?.alchemy.getWallFinish?.() ?? 'sage');
 bindRecipeBook();
-// In the Lair the window is on the lab's left (seen from the lab's camera):
-// the key light and the sunbeams come from that side, not the standalone right.
+// In the Lair the room is lit once, by the room: the lab keeps only the light
+// of its own things (candles, burner) and drops its key, fill and sky lights
+// and its sunbeams; the room's window light comes in from the side it is on.
 if (runtime.embedded) {
-  setLightDirection('left');
-  setSunbeam('left', true);
+  setSunbeam('left', false);
   setSunbeam('right', false);
+  for (const root of [scene, backgroundScene]) root.traverse(object => {
+    if (object.isLight && !object.isPointLight) object.visible = false;
+  });
 }
 selectGlassFinish('watercolor');
 for (const id of Object.keys(GLASS_FINISHES)) ensureGlassTexture(id);
@@ -467,6 +473,8 @@ function setSunbeam(side, visible) {
 function setBackgroundBlur(active) {
   blurBackground = Boolean(active);
   backgroundEffects.setBlur(blurBackground);
+  // In the Lair the room behind the lab is the Lair's: its outline pass blurs it.
+  if (runtime.embedded) lair?.alchemy.setBackgroundBlur?.(blurBackground);
   const button = $('background-blur');
   button.classList[blurBackground ? 'add' : 'remove']('active');
   button.setAttribute('aria-checked', String(blurBackground));
@@ -530,13 +538,9 @@ function buildRoom() {
   // a second, shorter wall here would show as a separate green panel.
   // The wall finish is then chosen in the Lair's own visual panel, so the
   // lab's tile colour buttons, which only paint this hidden wall, are hidden too.
-  if (runtime.embedded) {
-    tiledWall.visible = false;
-    for (const choices of queryAll('.wall-choices')) {
-      choices.hidden = true;
-      if (choices.previousElementSibling?.tagName === 'H3') choices.previousElementSibling.hidden = true;
-    }
-  }
+  // In the Lair the lab's background is the room's right wall: the tile
+  // buttons paint that wall (lair.alchemy.setWallFinish) instead of this one.
+  if (runtime.embedded) tiledWall.visible = false;
   tiledWall.castShadow = false;
   tiledWall.receiveShadow = false;
   // Full-wall painting has its own low-contrast grout and no repeating joins.

@@ -1,6 +1,18 @@
-import { ALCHEMY_LOOK } from '@keynlock/alchemy/room-assets';
 
-export function createWorkshopLighting({ scene, camera, canvas, renderer, rendererHost, roomLights, quality = null }) {
+// The open lab's background blur (core/rendering/depth-blur.js, the Atelier's):
+// the strength and radius of the Atelier; the soft edge scales with the
+// distance to what the camera looks at, since the lab view zooms.
+const LAB_BLUR = Object.freeze({ amount: .72, radius: 6.5, near: .12, far: .42 });
+
+export function createWorkshopLighting({ scene, camera, canvas, renderer, rendererHost, roomLights, quality = null,
+  outlines = null, focusTarget = null }) {
+  let labLook = false, labBlur = true;
+  const labBlurPass = () => {
+    const focus = focusTarget ? camera.position.distanceTo(focusTarget) : 6;
+    return { amount: LAB_BLUR.amount, radius: LAB_BLUR.radius, focus, near: focus * LAB_BLUR.near, far: focus * LAB_BLUR.far };
+  };
+  const applyLabBlur = () => outlines?.setBackgroundBlur?.(labLook && labBlur ? labBlurPass : null);
+  function setLabBlur(enabled) { labBlur = Boolean(enabled); applyLabBlur(); }
   const roomLightDefaults = roomLights.map(light => ({ light, intensity: light.intensity, visible: light.visible }));
   const originalRoomRenderLook = {
     outputColorSpace: renderer.outputColorSpace,
@@ -22,15 +34,18 @@ export function createWorkshopLighting({ scene, camera, canvas, renderer, render
   }
 
   function setAlchemyLook(enabled) {
-    setRoomLightsForAlchemy(enabled);
+    // One set of lights for the whole Lair: the room stays lit in the lab, and
+    // the lab adds only its candles and burner (see the alchemy package).
+    setRoomLightsForAlchemy(false);
     // The lab is much closer to the camera than the full Lair: the quality
     // settings keep its pixel cost bounded on retina screens.
     quality?.setLabOpen(enabled);
+    labLook = Boolean(enabled);
+    applyLabBlur();
     if (enabled) {
       // Both scenes already use ACES/sRGB. Changing the global shadow-map type
       // here would invalidate every material program in the large shared scene
       // and produce a multi-second shader compilation stall on workshop entry.
-      renderer.toneMappingExposure = ALCHEMY_LOOK.renderer.exposure;
       // The original laboratory caches its mostly static 2048px shadow atlas.
       // Avoid re-rendering all workshop shadows during every Lair frame.
       renderer.shadowMap.autoUpdate = false;
@@ -72,5 +87,5 @@ export function createWorkshopLighting({ scene, camera, canvas, renderer, render
     }
   }
 
-  return { setAlchemyLook, precompile };
+  return { setAlchemyLook, setLabBlur, precompile };
 }

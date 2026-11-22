@@ -91,3 +91,5 @@
 /* Inside @scope the root's own .visual-open class does not reach
    `.visual-open .visual-panel`, so the panel stayed off screen. */
 #alchemy-embedded-app.visual-open .visual-panel { transform: translateX(0); }
+/* The room lights the lab in the Lair: no light direction or sunbeam controls. */
+#alchemy-embedded-app .lighting-section { display: none; }

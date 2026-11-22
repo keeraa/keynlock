@@ -5,7 +5,7 @@ const STORAGE_KEY = 'keynlock-lair-visual-v1';
 const DEFAULTS = Object.freeze({
   'paint-saturation': 100, 'paint-contrast': 100, 'paint-scale': 100, 'paint-grain': 13,
   'metal-finish': 'original', 'metal-roughness': 50, 'metal-metalness': 65,
-  wallpaper: 'tile', 'outline-enabled': true, 'outline-width': 65,
+  wallpaper: 'tile', 'wall-tile': 'sage', 'outline-enabled': true, 'outline-width': 65,
   'dust-enabled': true, 'dust-density': 65, 'window-light': 100, 'night-lighting': false,
   'quality-mode': 'auto', 'fps-cap': false,
 });
@@ -30,6 +30,7 @@ export function mountVisualSettings({ visual, room, quality = null, setNight = n
         }
       }
       if (allowedPapers.has(saved.wallpaper)) state.wallpaper = saved.wallpaper;
+      if (['sage', 'ochre', 'slate'].includes(saved['wall-tile'])) state['wall-tile'] = saved['wall-tile'];
     }
   } catch { /* Private mode can prohibit storage; live controls still work. */ }
 
@@ -52,6 +53,7 @@ export function mountVisualSettings({ visual, room, quality = null, setNight = n
     visual.setMetalSettings({
       roughness: state['metal-roughness'], metalness: state['metal-metalness'], palette: state['metal-finish'],
     });
+    visual.setTileColour?.(state['wall-tile']);
     room.setRightWallpaper(state.wallpaper);
     room.ambientParticles.setEnabled(state['dust-enabled']);
     room.ambientParticles.setDensity(state['dust-density'] / 100);
@@ -95,5 +97,12 @@ export function mountVisualSettings({ visual, room, quality = null, setNight = n
     qualityNow.textContent = `${levelNames[current.level]} · ${ratio}×`;
   });
   apply();
-  return { close, isOpen: () => !panel.hidden, state: () => ({ ...state }) };
+  /** The lab's «Фон мастерской»: the right wall in that tile colour (saved). */
+  function setWallTile(colour) {
+    if (!['sage', 'ochre', 'slate'].includes(colour)) return;
+    state['wall-tile'] = colour;
+    state.wallpaper = 'tile';
+    apply(); refreshControls(); persist();
+  }
+  return { close, isOpen: () => !panel.hidden, state: () => ({ ...state }), setWallTile };
 }

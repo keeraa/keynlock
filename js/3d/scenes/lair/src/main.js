@@ -120,6 +120,7 @@ function setup() {
   });
   // One full-screen ink pass for everything on screen (the Key Archive's outline).
   const outlines = createSceneOutline({ renderer, scene, camera });
+  window.__keynlockDebug.outlines = outlines;
   // Pixel ratio, smoothing, the outline's normal pass and the 60 FPS cap.
   const quality = createQuality({ renderer, outline: outlines });
   quality.apply();
@@ -127,6 +128,9 @@ function setup() {
   const dayNight = createDayNight(night => { room.setNight(night); lighting.setNight(night); });
   const visualUI = mountVisualSettings({ visual, room, quality, setNight: night => dayNight.set(night), outlines,
     grain: document.querySelector('.grain'), onOpen: () => { panel.hidden = true; } });
+  // The lab's background choice paints the Lair's right wall (its real background).
+  host.alchemy.setWallFinish = colour => visualUI.setWallTile(colour);
+  host.alchemy.getWallFinish = () => visualUI.state()['wall-tile'];
   const roomWalk = createRoomWalk({
     scene, camera, interaction,
     onExit: () => zoneTransitions.reset(),
@@ -159,10 +163,11 @@ function setup() {
   const zoneTransitions = createZoneTransitions({
     scene, camera, controls, canvas, interaction, renderer, rendererHost,
     workshopOverlay, atelierView, visualUI, homePosition, homeTarget, roomMinDistance,
-    roomLights, cameraInput, quality,
+    roomLights, cameraInput, quality, outlines,
   });
   window.__keynlockDebug.zones = zoneTransitions;
   host.alchemy.manipulate = zoneTransitions.manipulateAlchemy;
+  host.alchemy.setBackgroundBlur = zoneTransitions.setAlchemyBackgroundBlur;
   host.alchemy.resetCamera = zoneTransitions.resetAlchemyCamera;
   // Let the overlay register workshop readiness before the loading screen
   // starts warming up their shaders.

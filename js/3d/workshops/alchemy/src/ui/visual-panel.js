@@ -1,7 +1,7 @@
 // @ts-check
 import { t } from '../i18n.js';
 /** DOM adapter for the reusable alchemy look. No scene creation here. */
-export function createVisualPanel({$, queryAll, visuals, woodAssets, selectWallFinish,
+export function createVisualPanel({$, queryAll, visuals, woodAssets, selectWallFinish, chooseWallFinish = selectWallFinish,
   selectWoodFinish, setLightDirection, setLightStrength, setSunbeam,
   setBackgroundBlur, isSunbeamVisible, isBlurred, resetCamera, onResize,
   viewportWidth = () => innerWidth}) {
@@ -19,8 +19,7 @@ export function createVisualPanel({$, queryAll, visuals, woodAssets, selectWallF
 
   function bind() {
     for (const [id,key] of [
-      ['draw-master','drawing'],['toon-switch','toon'],
-      ['outline-switch','outline'],['paint-master','painted'],
+      ['toon-switch','toon'],['outline-switch','outline'],
     ]) {
       $(id).addEventListener('click',()=>{
         const next = !visuals.state[key];
@@ -61,7 +60,7 @@ export function createVisualPanel({$, queryAll, visuals, woodAssets, selectWallF
       });
     }
     for(const button of queryAll('.wall-choice'))
-      button.addEventListener('click',()=>selectWallFinish(button.dataset.wall));
+      button.addEventListener('click',()=>chooseWallFinish(button.dataset.wall));
     for(const button of queryAll('.wood-choice')){
       button.addEventListener('click',()=>selectWoodFinish(button.dataset.wood));
       const asset=woodAssets[button.dataset.wood];
@@ -76,6 +75,8 @@ export function createVisualPanel({$, queryAll, visuals, woodAssets, selectWallF
     $('camera-reset').addEventListener('click',resetCamera);
     $('alchemy-visual-toggle').addEventListener('click',()=>setOpen(!$('experience').classList.contains('visual-open')));
 
+    // Cartoon drawing and painted materials are always on (no switches).
+    visuals.set('drawing',true);visuals.set('painted',true);
     selectWallFinish('sage');selectWoodFinish('walnut');
     setLightDirection('right');setLightStrength(100);
     setSunbeam('left',false);setSunbeam('right',true);

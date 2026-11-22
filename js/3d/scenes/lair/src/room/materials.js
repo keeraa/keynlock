@@ -34,6 +34,15 @@ export function createMaterials() {
     texture.repeat.set(12.4, 5.4);
     texture.anisotropy = 4;
   }
+  // The right wall's gouache tiles, in the lab's colours (sage, ochre, slate):
+  // the lab's «Фон мастерской» picks one (setTileColour), made on first use.
+  const tileTextures = new Map();
+  function tileTexture(colour) {
+    if (!tileTextures.has(colour)) tileTextures.set(colour, makeGouacheWallTexture(THREE, colour, {
+      width: ROOM_LENGTH / ALCHEMY_LAIR_SCALE, height: 48.4, textureWidth: 2560, textureHeight: 1024,
+    }));
+    return tileTextures.get(colour);
+  }
   const materials = {
     walnut: new THREE.MeshStandardMaterial({ map: walnutMap, color: '#ffffff', roughness: .96 }),
     agedWood: new THREE.MeshStandardMaterial({ map: walnutMap, color: '#d0b8a5', roughness: .96 }),
@@ -47,9 +56,7 @@ export function createMaterials() {
     galleryPlaster: new THREE.MeshStandardMaterial({ map: plasterMap, roughness: 1, side: THREE.DoubleSide }),
     wallpaperOchre: new THREE.MeshStandardMaterial({ map: ochreMap, roughness: 1, side: THREE.DoubleSide }),
     // Match the laboratory's tile size along the entire right wall.
-    alchemyTile: new THREE.MeshStandardMaterial({ map: makeGouacheWallTexture(THREE, 'sage', {
-      width: ROOM_LENGTH / ALCHEMY_LAIR_SCALE, height: 48.4, textureWidth: 2560, textureHeight: 1024,
-    }), roughness: 1, metalness: 0, side: THREE.DoubleSide }),
+    alchemyTile: new THREE.MeshStandardMaterial({ map: tileTexture('sage'), roughness: 1, metalness: 0, side: THREE.DoubleSide }),
     wallpaperBotanical: new THREE.MeshStandardMaterial({ map: botanicalMap, color: '#e8e6d8', roughness: .99, side: THREE.DoubleSide }),
     wallpaperDamask: new THREE.MeshStandardMaterial({ map: damaskMap, color: '#f1e9d6', roughness: .99, side: THREE.DoubleSide }),
     floor: new THREE.MeshStandardMaterial({ map: floorMap, roughness: 1 }),
@@ -145,7 +152,15 @@ export function createMaterials() {
    * follow the same gouache saturation and contrast as the room.
    */
   const adoptPaintedMaterials = list => { for (const material of list ?? []) paint(material); };
-  return { materials, load, textureLoader, visual: { setPaintSettings, setMetalSettings, adoptPaintedMaterials } };
+  function setTileColour(colour) {
+    let map;
+    try { map = tileTexture(colour); } catch { return false; }       // unknown colour
+    if (materials.alchemyTile.map === map) return true;
+    materials.alchemyTile.map = map;
+    materials.alchemyTile.needsUpdate = true;
+    return true;
+  }
+  return { materials, load, textureLoader, visual: { setPaintSettings, setMetalSettings, adoptPaintedMaterials, setTileColour } };
 }
 
 export function canvasTexture(draw, width = 1024, height = 1024) {

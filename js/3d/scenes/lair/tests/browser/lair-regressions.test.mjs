@@ -752,6 +752,9 @@ test('a zone opened while walking returns to the walk; the entrance wall shows o
     camera.position.x += 1.2;
     return camera.position.toArray();
   });
+  // The wall follows the camera on the next frame (slow on software WebGL).
+  await page.waitForFunction(() =>
+    window.__keynlockDebug.host.renderer.getUnifiedScene().getObjectByName('lair-entrance-wall').visible);
   assert.equal(await wallVisible(), true, 'inside the room the doors are visible');
   await page.keyboard.press('5');            // the zone bar is hidden while walking
   await page.locator('#zone-panel').waitFor();

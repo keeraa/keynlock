@@ -47,13 +47,13 @@ export const zoneDefinitions = {
     number: '→', kicker: t('ДВЕРЬ'), title: t('Архив ключей'),
     description: t('Дверь со стороны алхимии и верстака ведёт в Архив ключей: стеллажи, ванны для очистки и картотека найденных ключей.'),
     status: t('Скоро эта дверь откроется прямо в Архив ключей. Пока переход в разработке.'),
-    link: null, camera: [4.6, 2.3, ROOM_END - 5.2], target: [4.6, 2.05, ROOM_END],
+    link: null, camera: [4.6, 1.95, ROOM_END - 4.6], target: [4.6, 1.55, ROOM_END],
   },
   paintingArchive: {
     number: '←', kicker: t('ДВЕРЬ'), title: t('Архив картин'),
     description: t('Дверь со стороны Ателье ведёт в Архив картин: хранилище полотен, спасённых от Палаты Образов.'),
     status: t('Скоро здесь откроется Архив картин. Пока переход в разработке.'),
-    link: null, camera: [-4.6, 2.3, ROOM_END - 5.2], target: [-4.6, 2.05, ROOM_END],
+    link: null, camera: [-4.6, 1.95, ROOM_END - 4.6], target: [-4.6, 1.55, ROOM_END],
   },
 };
 

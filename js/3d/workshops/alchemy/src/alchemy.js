@@ -44,8 +44,14 @@ const $ = id => id === 'experience' && alchemyRoot !== document
   : alchemyRoot.querySelector(`#${id}`);
 const queryAll = selector => alchemyRoot.querySelectorAll(selector);
 const canvas = $('scene');
+// In the Lair the lab only runs while it is open; its floating dust would
+// hang frozen over the table in the room, so it shows only while active.
+let dustPoints = null;
 const runtime = createAlchemyRuntime({ THREE, canvas,
-  onActiveChange: active => lair?.alchemy.reportStatus?.({ active }),
+  onActiveChange: active => {
+    if (dustPoints && runtime?.embedded) dustPoints.visible = active;
+    lair?.alchemy.reportStatus?.({ active });
+  },
 });
 const inputSurface = runtime.embedded
   ? lair?.alchemy.inputPlane || canvas
@@ -1607,6 +1613,8 @@ function buildDust() {
   const points = new THREE.Points(geo, material);
   points.frustumCulled = false;
   scene.add(points);
+  dustPoints = points;
+  if (runtime.embedded) points.visible = runtime.isActive();
   particles.push({ coords, baseX, geo, count });
 }
 

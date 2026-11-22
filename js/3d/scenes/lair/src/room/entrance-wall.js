@@ -12,7 +12,8 @@ import { t } from '../i18n.js';
 
 const WALL_Z = ROOM_END + .135;
 const HALF_WIDTH = 8.7, HEIGHT = 13.8, THICKNESS = .27;
-const DOOR = { width: 2.1, height: 3.55, arch: .55 };
+// Human scale: the walker's eyes are 1.70 m above the floor (room-walk.js).
+const DOOR = { width: 1.5, height: 2.75, arch: .4, handle: 1.05 };
 export const ENTRANCE_DOORS = Object.freeze([
   Object.freeze({ id: 'paintingArchive', x: -4.6, label: t('АРХИВ КАРТИН') }),
   Object.freeze({ id: 'keyArchive', x: 4.6, label: t('АРХИВ КЛЮЧЕЙ') }),
@@ -45,7 +46,7 @@ function buildDoor(kit, group, { id, x, label }) {
   leaf.position.z = -.02;
   leaf.castShadow = leaf.receiveShadow = true;
   door.add(leaf);
-  for (const y of [1.05, 2.55]) box(door, DOOR.width - .62, 1.05, .05, m.walnut, 0, y, -.04, .02);
+  for (const y of [.72, 1.82]) box(door, DOOR.width - .5, .9, .05, m.walnut, 0, y, -.04, .02);
   // Frame: jambs and an arch-shaped trim on the room side.
   const half = DOOR.width / 2;
   for (const side of [-1, 1]) box(door, .16, DOOR.height - DOOR.arch + .02, .34, m.roomTimber, side * (half + .06), FLOOR_Y + (DOOR.height - DOOR.arch) / 2, -.09);
@@ -54,13 +55,13 @@ function buildDoor(kit, group, { id, x, label }) {
   const arch = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(archPoints), 32, .08, 6), m.roomTimber);
   door.add(arch);
   // A brass handle and keyhole plate.
-  cylinder(door, .035, .035, .22, m.oldBrass, half - .32, 1.72, -.12, 10).rotation.x = Math.PI / 2;
-  box(door, .1, .26, .02, m.oldBrass, half - .32, 1.5, -.08);
+  cylinder(door, .03, .03, .2, m.oldBrass, half - .22, DOOR.handle, -.12, 10).rotation.x = Math.PI / 2;
+  box(door, .08, .22, .02, m.oldBrass, half - .22, DOOR.handle - .14, -.08);
   // The painted sign above the door (the room side faces -z).
   // The wall's room-side face is at z = -.135; the sign hangs just in front.
-  const sign = plate(door, label, 0, FLOOR_Y + DOOR.height + .42, -.16, 2.1, .36);
+  const sign = plate(door, label, 0, FLOOR_Y + DOOR.height + .38, -.16, 1.8, .32);
   sign.rotation.y = Math.PI;
-  zoneTarget(id, [x, 1.9, WALL_Z - .45], [DOOR.width + .3, DOOR.height + .4, .6]);
+  zoneTarget(id, [x, 1.45, WALL_Z - .45], [DOOR.width + .3, DOOR.height + .3, .6]);
   return door;
 }
 

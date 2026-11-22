@@ -101,7 +101,7 @@ export function createInkOutlines(THREE,{enabled=true,color=0x17191a,screenWidth
   root.traverse(mesh=>{
    if(!mesh.isMesh||mesh.isSkinnedMesh||mesh.userData.inkOutlineShell||
       Array.isArray(mesh.material)||mesh.material?.transparent||mesh.material?.opacity<.98||
-      mesh.material?.userData?.inkSkipOutline||skip?.(mesh))return;
+      mesh.material?.userData?.inkSkipOutline||mesh.userData.excludeFromInk||skip?.(mesh))return;
    const geometry=mesh.geometry;
    if(!geometry?.getAttribute('position'))return;
    if(mesh.isInstancedMesh){

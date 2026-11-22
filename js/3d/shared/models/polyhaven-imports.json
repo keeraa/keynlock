@@ -24,5 +24,14 @@
       "triangles": 966,
       "uploadedFile": "painted_wooden_cabinet_02_2k.gltf.zip"
     }
-  ]
+  ],
+  "audit": {
+    "date": "2026-11-22",
+    "result": "three unique 2K glTF models from uploaded ZIPs; wooden_table_02 duplicate already in shared catalog",
+    "originalGeometryTriangles": [
+      182,
+      5626,
+      966
+    ]
+  }
 }

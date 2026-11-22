@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/license",
+  "models": [
+    {
+      "id": "shelf-01",
+      "sourceId": "Shelf_01",
+      "gltfFile": "Shelf_01_2k.gltf",
+      "triangles": 182,
+      "uploadedFile": "Shelf_01_2k.gltf.zip"
+    },
+    {
+      "id": "armchair-01",
+      "sourceId": "ArmChair_01",
+      "gltfFile": "ArmChair_01_2k.gltf",
+      "triangles": 5626,
+      "uploadedFile": "ArmChair_01_2k.gltf.zip"
+    },
+    {
+      "id": "painted-wooden-cabinet-02",
+      "sourceId": "painted_wooden_cabinet_02",
+      "gltfFile": "painted_wooden_cabinet_02_2k.gltf",
+      "triangles": 966,
+      "uploadedFile": "painted_wooden_cabinet_02_2k.gltf.zip"
+    }
+  ]
+}

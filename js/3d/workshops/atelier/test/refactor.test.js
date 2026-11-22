@@ -99,7 +99,7 @@ test('workshop factory creates the original room and two compatible easels', () 
       'roomWood', 'roomEdge', 'frameWood', 'easel', 'easelEdge', 'deepWood', 'metal', 'linen',
     ].map(key => [key, material()]));
     const workshop = createWorkshopRoom({ THREE, scene, mats });
-    assert.ok(workshop.dust.isPoints);
+    assert.ok(workshop.dust.points.isPoints, "the shared dust (core/rendering/dust.js)");
     // Planks share a few tinted materials instead of one material each.
     assert.equal(workshop.floorWoodMaterials.length, 5);
     assert.ok(workshop.wallpaperMaterial.isMeshStandardMaterial);

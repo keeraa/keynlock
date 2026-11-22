@@ -111,7 +111,7 @@ const galleryWall = embedded && rendererHost.getUnifiedScene()?.getObjectByName(
 const galleryWallCenter = galleryWall && scene.worldToLocal(galleryWall.getWorldPosition(new THREE.Vector3()));
 const wallZ = galleryWallCenter ? galleryWallCenter.z : -4.6;
 const { dust, makeEasel, wallpaperMaterial, floorWoodMaterials } = createWorkshopRoom({
-  THREE, scene, mats, includeWallTrim: !embedded, includeShelf: !embedded, wallZ, floorY: embedded ? .0385 : -.0285,
+  THREE, scene, mats, includeWallTrim: !embedded, includeShelf: !embedded, includeDust: !embedded, wallZ, floorY: embedded ? .0385 : -.0285,
 });
 if (embedded) {
   // The standalone Atelier's angled sun is useful for its own room, but in
@@ -526,8 +526,6 @@ $('reset-button').addEventListener('click', () => {
   scheduleSurfaceSave();
 });
 
-let previousTime = performance.now();
-let dustTime = 0;
 function updateAtelier(now) {
   const cameraMoved = navigation.animate(now);
   exhibition.updateViewedArtwork(now);
@@ -536,8 +534,6 @@ function updateAtelier(now) {
 }
 
 function animate(now) {
-  const dt = Math.min(0.05, (now - previousTime) / 1000);
-  previousTime = now;
   if (embedded) {
     // Texture restoration, exhibition and camera-local animation continue.
     // The parent always renders their geometry with its freely orbiting camera.
@@ -548,20 +544,7 @@ function animate(now) {
   const cameraMoved = navigation.animate(now);
   exhibition.updateViewedArtwork(now);
   if (!collectionUI.isOpen()) {
-    // Floating dust only needs 30 updates per second; this avoids uploading
-    // its vertex buffer on every frame on high-refresh displays.
-    dustTime += dt;
-    if (dustTime >= 1 / 30) {
-      dust.rotation.y += dustTime * .003;
-      const positions = dust.geometry.attributes.position;
-      for (let i = 0; i < positions.count; i++) {
-        let y = positions.getY(i) + dustTime * (.01 + (i % 5) * .009);
-        if (y > 5.4) y = .3;
-        positions.setY(i, y);
-      }
-      positions.needsUpdate = true;
-      dustTime = 0;
-    }
+    dust?.update(now * .001);
     activeSurface?.update(now * .001);
     cartoonFilter.setFocus(camera.position.distanceTo(controls.target));
     const stats = cartoonFilter.render();

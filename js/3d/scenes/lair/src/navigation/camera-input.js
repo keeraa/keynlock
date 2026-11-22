@@ -71,6 +71,8 @@ export function createCameraInput({ camera, controls, roomWalk, atelierView, han
 
   return { setMode, setAtelierInputBlocked, update, syncGalleryCamera, resize,
     isWalking: () => mode === 'walk',
+    /** Where the walker stood and looked when walking last stopped. */
+    walkPose: () => walkPose,
     isGallery: () => mode === 'gallery',
     canPickZone: () => mode === 'room' || mode === 'walk',
   };

@@ -262,7 +262,7 @@ function createFloorPatch(shadowUniforms) {
 /**
  * Adds the window light and the passing bird to `parent`. `shaderUniforms`
  * (dust strength, dust tint and shadows) are shared with the
- * floating dust (room/ambient-particles.js), which lights up in the beam.
+ * floating dust (core/rendering/dust.js, set up in room/details.js), which lights up in the beam.
  */
 export function createWindowLight(parent, furniture = []) {
   const bird = createWindowBird(parent);

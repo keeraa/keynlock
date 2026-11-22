@@ -1,6 +1,8 @@
 // @ts-check
 import * as THREE from 'three';
-import { createAmbientParticles } from './ambient-particles.js';
+import { createDust } from '../../../../core/rendering/dust.js';
+import { WINDOW_LIGHT_GLSL, WINDOW_LIGHT_TINT } from './window-light.js';
+import { ROOM_END, ROOM_LENGTH, ROOM_START } from '../room-layout.js';
 
 // The gramophone corner and the floating dust.
 export function buildGramophone(kit) {
@@ -40,7 +42,17 @@ export function buildGramophone(kit) {
 export function buildDetails(kit, { windowLight } = {}) {
   const { staticGroup, animated } = kit;
   // The wall sconces are in lamps.js.
-  const ambientParticles = createAmbientParticles(staticGroup, { windowLight });
+  // The game's one dust (core/rendering/dust.js) fills the whole room, the
+  // Atelier's and the lab's corners included; specks in the window beam
+  // catch its light (and the bird's shadow).
+  const ambientParticles = createDust(staticGroup, {
+    min: [-7.8, .3, ROOM_START + .3], max: [7.8, 12.9, ROOM_END - .3],
+    count: Math.round(420 * ROOM_LENGTH / 11.9),
+    light: windowLight && {
+      glsl: `uniform float uWindowLight;\n${WINDOW_LIGHT_GLSL}\nfloat dustLightAt(vec3 p) { return uWindowLight * lairWindowLightAt(p); }`,
+      uniforms: windowLight.shaderUniforms, tint: WINDOW_LIGHT_TINT.dust, strength: 1,
+    },
+  });
   animated.push(t => ambientParticles.update(t));
   return ambientParticles;
 }

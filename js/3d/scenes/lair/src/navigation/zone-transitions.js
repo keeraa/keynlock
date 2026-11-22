@@ -4,6 +4,9 @@ import { t } from '../i18n.js';
 import { createWorkshopLighting } from '../rendering/workshop-lighting.js';
 import { zoneDefinitions, zoneOrder } from './zone-definitions.js';
 
+/** The walker's field of view (room-walk.js). */
+const WALK_FOV = 56;
+
 export function createZoneTransitions({
   scene, camera, controls, canvas, interaction, renderer, rendererHost,
   workshopOverlay, atelierView, visualUI, homePosition, homeTarget, roomMinDistance,
@@ -204,18 +207,30 @@ export function createZoneTransitions({
     selectZoneButtons(null);
   }
 
+  // Back from a zone opened while walking: the camera flies smoothly back to
+  // where the walker stood and looked, then the walk goes on from there.
+  let onArrive = null;
+  function flyBackToWalk() {
+    const pose = cameraInput.walkPose();
+    closePanel('room');
+    rendererHost?.setWorldLighting(null);
+    if (!pose) { cameraInput.setMode('walk'); return; }
+    const forward = new THREE.Vector3(0, 0, -1).applyEuler(new THREE.Euler(pose.pitch, pose.yaw, 0, 'YXZ'));
+    const target = pose.position.clone().addScaledVector(forward, roomMinDistance + .2);
+    focus(pose.position.toArray(), target.toArray(), WALK_FOV);
+    onArrive = () => cameraInput.setMode('walk', { resumeWalk: true });
+  }
+  function arrive() {
+    const done = onArrive;
+    onArrive = null;
+    done?.();
+  }
+
   function resetView() {
     if (workshopOverlay?.isOpen()) { workshopOverlay.close(); return; }
     if (returnToWalk && currentZone) {
       returnToWalk = false;
-      transitioning = false;
-      // Back from a workshop the walk starts afresh at the entrance, as when
-      // entering walk mode; from a small zone (the gramophone, a door) it
-      // resumes where the walker stood.
-      const fromWorkshop = currentZone === 'atelier' || currentZone === 'alchemy' || currentZone === 'workbench';
-      closePanel('walk', { resumeWalk: !fromWorkshop });
-      atelierView.cancelFlight();
-      rendererHost?.setWorldLighting(null);
+      flyBackToWalk();
       return;
     }
     returnToWalk = false;
@@ -266,6 +281,7 @@ export function createZoneTransitions({
       if (currentZone === 'alchemy') camera.lookAt(controls.target);
       if (camera.position.distanceTo(desiredPosition) < .014 && controls.target.distanceTo(desiredTarget) < .014 && Math.abs(camera.fov-desiredFov)<.06) {
         transitioning = false;
+        arrive();
       }
     }
     // Reveal the loaded laboratory while the camera is still moving towards it.
@@ -281,6 +297,7 @@ export function createZoneTransitions({
 
   controls.addEventListener('start', () => {
     transitioning = false;
+    arrive();                    // a drag during the flight back walks on at once
     if (currentZone !== 'atelier' && currentZone !== 'alchemy') rendererHost.setWorldLighting(null);
   });
   zoneButtons.forEach(button => {

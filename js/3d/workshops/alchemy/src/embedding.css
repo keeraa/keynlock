@@ -59,12 +59,12 @@
   touch-action: none;
 }
 #alchemy-embedded-app .vignette {display: none}
-/* The lab's own buttons sit in one row with the Lair's «← В ЛОГОВО»,
-   which keeps the right edge (#reset-camera, top 84px, right 32px). */
+/* The lab's own buttons keep the right corner under the Lair's top bar;
+   «← В ЛОГОВО» (#reset-camera) is on the left. */
 #alchemy-embedded-app .topbar {
   top: 81px;
   left: auto;
-  right: 162px;
+  right: 32px;
   width: auto;
   height: 47px;
   padding: 0 8px;
@@ -88,3 +88,6 @@
 #alchemy-embedded-app select {pointer-events:auto}
 /* In the Lair the lab shows no drag hint: the room's own hint line covers it. */
 #alchemy-embedded-app #guide { display: none !important; }
+/* Inside @scope the root's own .visual-open class does not reach
+   `.visual-open .visual-panel`, so the panel stayed off screen. */
+#alchemy-embedded-app.visual-open .visual-panel { transform: translateX(0); }

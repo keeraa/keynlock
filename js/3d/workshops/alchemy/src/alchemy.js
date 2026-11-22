@@ -24,6 +24,7 @@ import { createAlchemyRuntime } from './runtime-host.js';
 import { ALCHEMY_TABLE } from './table-dimensions.js';
 import { getWorkshopHost, publishWorkshopApi } from '../../../core/host/workshop-host.js';
 import { mergeStaticMeshes } from '../../../core/rendering/merge-static.js';
+import { createDust } from '../../../core/rendering/dust.js';
 import { t, translator } from './i18n.js';
 
 // The standalone page translates itself; in the Lair the embedding has
@@ -44,14 +45,9 @@ const $ = id => id === 'experience' && alchemyRoot !== document
   : alchemyRoot.querySelector(`#${id}`);
 const queryAll = selector => alchemyRoot.querySelectorAll(selector);
 const canvas = $('scene');
-// In the Lair the lab only runs while it is open; its floating dust would
-// hang frozen over the table in the room, so it shows only while active.
-let dustPoints = null;
+let labDust = null;
 const runtime = createAlchemyRuntime({ THREE, canvas,
-  onActiveChange: active => {
-    if (dustPoints && runtime?.embedded) dustPoints.visible = active;
-    lair?.alchemy.reportStatus?.({ active });
-  },
+  onActiveChange: active => lair?.alchemy.reportStatus?.({ active }),
 });
 const inputSurface = runtime.embedded
   ? lair?.alchemy.inputPlane || canvas
@@ -164,7 +160,6 @@ const stickerLoader = new THREE.TextureLoader();
 const stickerTextureCache = new Map();
 let currentGlassFinish = 'watercolor';
 const hitMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, colorWrite: false });
-const particles = [];
 const interactionMeshes = [];
 const sourceObjects = [];
 const receivers = [];
@@ -194,7 +189,6 @@ let elapsed = 0;
 let toastTimer = 0;
 let fpsWindow = 0;
 let fpsFrames = 0;
-let particleStepAccumulated = 0;
 const lastContourCameraMatrix = new THREE.Matrix4();
 let contoursInitialized = false;
 
@@ -242,6 +236,13 @@ const visualPanel = createVisualPanel({$,queryAll,visuals,woodAssets:WOOD_FINISH
   onResize,viewportWidth:()=>innerWidth});
 visualPanel.bind();
 bindRecipeBook();
+// In the Lair the window is on the lab's left (seen from the lab's camera):
+// the key light and the sunbeams come from that side, not the standalone right.
+if (runtime.embedded) {
+  setLightDirection('left');
+  setSunbeam('left', true);
+  setSunbeam('right', false);
+}
 selectGlassFinish('watercolor');
 for (const id of Object.keys(GLASS_FINISHES)) ensureGlassTexture(id);
 onResize();
@@ -1598,26 +1599,11 @@ function makeSourceMotion(root) {
   return { target: root.position.clone(), dragging: false, returning: false, tilt: 0 };
 }
 
+// The game's one dust (core/rendering/dust.js). In the Lair the room's dust
+// already fills the lab's corner, so the lab adds none there.
 function buildDust() {
-  const count = 190;
-  const coords = new Float32Array(count * 3);
-  const baseX = new Float32Array(count);
-  let seed = 44421;
-  const rand = () => { seed = (Math.imul(seed, 1103515245) + 12345) | 0; return (seed >>> 0) / 4294967296; };
-  for (let i = 0; i < count; i++) {
-    coords[i * 3] = baseX[i] = (rand() - .5) * 16;
-    coords[i * 3 + 1] = .3 + rand() * 5;
-    coords[i * 3 + 2] = (rand() - .5) * 7;
-  }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(coords, 3));
-  const material = new THREE.PointsMaterial({ color: 0xf2dfb4, size: .027, transparent: true, opacity: .43, depthWrite: false, sizeAttenuation: true });
-  const points = new THREE.Points(geo, material);
-  points.frustumCulled = false;
-  scene.add(points);
-  dustPoints = points;
-  if (runtime.embedded) points.visible = runtime.isActive();
-  particles.push({ coords, baseX, geo, count });
+  if (runtime.embedded) return;
+  labDust = createDust(scene, { min: [-8, .3, -3.5], max: [8, 5.3, 3.5], count: 190, seed: 44421, scale: .7, opacity: .4 });
 }
 
 function project(x, y, z) {
@@ -2337,20 +2323,7 @@ function render() {
     candle.flame.rotation.z = Math.sin(elapsed * 3.3 + candle.seed) * .055;
     candle.glow.intensity = 9.5 + fluctuation * 8;
   }
-  particleStepAccumulated += dt;
-  if (particleStepAccumulated >= 1 / 30) {
-  const particleDt = particleStepAccumulated;
-  particleStepAccumulated = 0;
-  for (const p of particles) {
-    for (let i = 0; i < p.count; i++) {
-      const index = i * 3;
-      p.coords[index] = p.baseX[i] + Math.sin(elapsed * .19 + i) * .035;
-      p.coords[index + 1] += particleDt * (.023 + (i % 9) * .006);
-      if (p.coords[index + 1] > 5.45) p.coords[index + 1] = .28;
-    }
-    p.geo.attributes.position.needsUpdate = true;
-  }
-  }
+  labDust?.update(elapsed);
   if (toastTimer > 0) {
     toastTimer -= dt;
     if (toastTimer <= 0) $('toast').classList.remove('show');

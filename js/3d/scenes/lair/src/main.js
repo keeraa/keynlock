@@ -101,8 +101,9 @@ function setup() {
   const roomLights = scene.children.filter(child => child.isLight);
   const { materials, visual } = createMaterials();
   const room = buildLair(scene, materials);
+  let atelierPanelHeight = 0;
   const atelier = createAtelierEmbedding({ host: host.atelier, t,
-    onPanelHeight: height => app.style.setProperty('--atelier-panel-height', `${height}px`),
+    onPanelHeight: height => { atelierPanelHeight = height; app.style.setProperty('--atelier-panel-height', `${height}px`); },
   });
   const alchemy = createAlchemyEmbedding({ host: host.alchemy });
   const inRoomWorkshops = { atelier, alchemy };
@@ -139,7 +140,7 @@ function setup() {
   window.__keynlockDebug.walk = roomWalk;
   const atelierView = createAtelierView({
     camera, controls, canvas, interaction, rendererHost, host,
-    easelPose: ATELIER_EASELS, roomMinDistance,
+    easelPose: ATELIER_EASELS, roomMinDistance, panelHeight: () => atelierPanelHeight,
     setFlightInputBlocked: blocked => cameraInput.setAtelierInputBlocked('flight', blocked),
     navigation: {
       isInAtelier: () => zoneTransitions.current() === 'atelier',

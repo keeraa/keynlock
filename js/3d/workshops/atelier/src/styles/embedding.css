@@ -69,7 +69,15 @@
   grid-template-columns: repeat(3,minmax(0,1fr)) minmax(150px,.6fr);
   gap: 18px;
   padding: 13px 2.1% 14px;
+  /* The three colour sliders at half their former width. */
+  width: 58%;
 }
+/* In the Lair: no painting thumbnails (the collection chooses); the colours
+   and the reset live in the top right corner; the hints are 20 % smaller and
+   the Lair's original/copy stepper sits beside them. */
+#atelier-embedded-app .art-list {display: none}
+#atelier-embedded-app .keyboard-tip {gap: 8px; font-size: 8px}
+#atelier-embedded-app .keyboard-tip .keycap {padding: 3px 6px; font-size: 7px}
 #atelier-embedded-app .restoration-row {padding: 8px 2.1%; gap: 12px; min-height: 0}
 #atelier-embedded-app .workbench-footer {padding: 7px 2.1% 9px; min-height: 0; gap: 10px}
 #atelier-embedded-app:has(.workbench.is-collapsed) {
@@ -111,7 +119,7 @@
     inset: auto 0 0;
     width: 100%;
   }
-  #atelier-embedded-app .workbench-main {grid-template-columns: repeat(2,minmax(0,1fr));gap:12px;padding:12px 10px}
+  #atelier-embedded-app .workbench-main {grid-template-columns: repeat(2,minmax(0,1fr));gap:12px;padding:12px 10px;width:100%}
   #atelier-embedded-app .workbench-content {max-height:60vh}
   #atelier-embedded-app .restoration-row {padding:8px 10px}
   #atelier-embedded-app .workbench-footer {padding:8px 10px}

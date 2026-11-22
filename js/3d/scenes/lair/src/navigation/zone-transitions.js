@@ -211,15 +211,22 @@ export function createZoneTransitions({
   // Back from a zone opened while walking: the camera flies smoothly back to
   // where the walker stood and looked, then the walk goes on from there.
   let onArrive = null;
-  function flyBackToWalk() {
-    const pose = cameraInput.walkPose();
+  /**
+   * Fly to a walker's eyes, then walk from there: back to where the walker
+   * left off (resume), or down to the start of a new walk.
+   */
+  function flyIntoWalk(pose, resume) {
     closePanel('room');
     rendererHost?.setWorldLighting(null);
-    if (!pose) { cameraInput.setMode('walk'); return; }
     const forward = new THREE.Vector3(0, 0, -1).applyEuler(new THREE.Euler(pose.pitch, pose.yaw, 0, 'YXZ'));
     const target = pose.position.clone().addScaledVector(forward, roomMinDistance + .2);
     focus(pose.position.toArray(), target.toArray(), WALK_FOV);
-    onArrive = () => cameraInput.setMode('walk', { resumeWalk: true });
+    onArrive = () => cameraInput.setMode('walk', { resumeWalk: resume });
+  }
+  function flyBackToWalk() {
+    const pose = cameraInput.walkPose();
+    if (!pose) { closePanel('room'); rendererHost?.setWorldLighting(null); cameraInput.setMode('walk'); return; }
+    flyIntoWalk(pose, true);
   }
   function arrive() {
     const done = onArrive;
@@ -240,17 +247,24 @@ export function createZoneTransitions({
     focus(homePosition.toArray(), homeTarget.toArray());
   }
 
-  function toggleWalk() {
+  /** «Прогулка»: the camera comes smoothly down to the walker's eyes (instant: the game's first view). */
+  function toggleWalk({ instant = false } = {}) {
     if (workshopOverlay.isOpen()) return;
     if (visualUI.isOpen()) visualUI.close();
     if (cameraInput.isWalking()) {
       resetView();
       return;
     }
-    transitioning = false;
-    closePanel('walk', { resumeWalk: returnToWalk });
+    const resume = returnToWalk && Boolean(cameraInput.walkPose());
     returnToWalk = false;
     atelierView.cancelFlight();
+    if (!instant) {
+      flyIntoWalk(resume ? cameraInput.walkPose() : cameraInput.walkStartPose(), resume);
+      return;
+    }
+    transitioning = false;
+    onArrive = null;
+    closePanel('walk', { resumeWalk: resume });
     rendererHost.setWorldLighting(null);
   }
 
@@ -310,12 +324,12 @@ export function createZoneTransitions({
   // Closing a zone's panel opened from a walk goes back to the walk too.
   document.querySelector('#close-panel').addEventListener('click', () => (returnToWalk ? resetView() : closePanel()));
   document.querySelector('#reset-camera').addEventListener('click', resetView);
-  document.querySelector('#room-walk-toggle').addEventListener('click', toggleWalk);
+  document.querySelector('#room-walk-toggle').addEventListener('click', () => toggleWalk());
 
   return {
     open: openZone, reset: resetView, onWorkshopReady, resizeCamera, updateApproach, handleKey,
     /** Start in walk mode (the game's first view). */
-    startWalk: () => { if (!cameraInput.isWalking()) toggleWalk(); },
+    startWalk: () => { if (!cameraInput.isWalking()) toggleWalk({ instant: true }); },
     returnsToWalk: () => returnToWalk,
     precompileWorkshopLighting: () => workshopLighting.precompile(workshopOverlay.isReady, () => inRoomWorkshop),
     manipulateAlchemy, resetAlchemyCamera,

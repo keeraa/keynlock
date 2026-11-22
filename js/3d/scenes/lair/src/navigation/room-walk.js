@@ -97,20 +97,22 @@ export function createRoomWalk({ scene, camera, interaction, onExit, onInteract 
     return { position: camera.position.clone(), pitch: rotation.x, yaw: rotation.y };
   }
 
+  /**
+   * Where a walk begins: six metres in from the entrance, turned a little
+   * left and up, so the easels, the window, the planning table and a
+   * chandelier are in one view. The game starts here.
+   */
+  function startPose() {
+    return { position: new THREE.Vector3(-.3, .0385 + eyeHeight, ROOM_END - 6.07), pitch: .13, yaw: .25 };
+  }
+
   /** Start at the door, or at a pose from getPose() (back from a workshop). */
   function start(pose = null) {
     active = true;
     refreshObstacles();
-    if (pose) {
-      camera.position.copy(pose.position);
-      rotation.set(pose.pitch, pose.yaw, 0);
-    } else {
-      // Six metres in from the entrance, turned a little left and up: the
-      // easels, the window, the planning table and a chandelier in one view.
-      // The game starts here.
-      camera.position.set(-.3, .0385 + eyeHeight, ROOM_END - 6.07);
-      rotation.set(.13, .25, 0);
-    }
+    const { position, pitch, yaw } = pose || startPose();
+    camera.position.copy(position);
+    rotation.set(pitch, yaw, 0);
     camera.quaternion.setFromEuler(rotation);
     resize();
     camera.updateProjectionMatrix();
@@ -218,6 +220,5 @@ export function createRoomWalk({ scene, camera, interaction, onExit, onInteract 
   function face(yaw = 0, pitch = 0) { rotation.set(pitch, yaw, 0); }
 
   return { start, stop, getPose, face, resize, update, refreshObstacles, setTarget, handleKey,
-    releaseKey: code => keys.delete(code),
-  };
+    releaseKey: code => keys.delete(code), startPose };
 }

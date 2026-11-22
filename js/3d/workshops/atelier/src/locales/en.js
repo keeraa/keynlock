@@ -142,7 +142,7 @@ export default Object.freeze({
   "Тампон: зажмите ЛКМ и медленно очищайте пятна круговыми движениями": "Swab: hold the left button and clean stains slowly in circles",
   "УФ: наведите фонарь, затем зажмите ЛКМ и просканируйте повреждения": "UV: point the lamp, then hold the left button to scan for damage",
   "Реагент: зажмите ЛКМ и проведите по участкам, отмеченным УФ": "Reagent: hold the left button over the areas the UV marked",
-  "Кисть: аккуратно закрашивайте светлые сколы на полотне · размер кисти маленький": "Paintbrush: carefully paint over pale chips on the canvas · the brush is small",
+  "Кисть: касайтесь светлых сколов — каждое нажатие закрашивает один маленький кружок": "Paintbrush: touch the pale chips — each press fills one small dot",
   "Наведите курсор на пятно — игра подскажет подходящий инструмент": "Point at a stain — the game suggests the right tool",
   "Пыль и грязь удалены — проявились детали картины": "Dust and dirt removed — the painting's details show",
   "Пожелтевший лак снят — цвета раскрываются": "The yellowed varnish is off — the colours come through",

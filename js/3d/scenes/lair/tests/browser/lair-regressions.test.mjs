@@ -290,7 +290,9 @@ test('switching workshops returns the shared camera, input, and lights to the ro
   await page.waitForFunction(position =>
     window.__keynlockDebug.host.camera.position.toArray().some((value, axis) => Math.abs(value - position[axis]) > 3),
   home.position);
-  await page.locator('#lair-focus-copy').click();
+  // The original/copy stepper shows only while the panel is hidden.
+  await page.waitForFunction(() => window.__keynlockDebug.workshop('atelier')?.bridge?.focusEasel);
+  await page.evaluate(() => window.__keynlockDebug.workshop('atelier').bridge.focusEasel('copy'));
   await page.waitForFunction(() => window.__keynlockDebug.host.controls.minDistance < 2);
   const closeUp = await page.evaluate(readRoom);
   assert.equal(closeUp.atelierLights, 0, 'the Atelier is lit by the room: no jump in brightness');
@@ -319,7 +321,7 @@ test('switching workshops returns the shared camera, input, and lights to the ro
   assert.equal(await labApp.locator('.wall-choice[data-wall="ochre"]').getAttribute('aria-pressed'), 'true');
   await labApp.locator('.wall-choice[data-wall="sage"]').dispatchEvent('click');
   await page.keyboard.press('1');
-  await page.locator('#lair-easel-camera-controls').waitFor();
+  await page.locator('#lair-atelier-corner').waitFor();
   // The colours and the reset in the top right corner; the easels centred
   // above the open panel (the camera's view is lifted by half its height).
   assert.equal(await page.locator('#lair-atelier-corner .wood-pickers').count(), 1);
@@ -453,7 +455,9 @@ test('the room hosts both workshops on one canvas through the host contract', as
 
   // The Atelier's own tools work inside the room.
   await openZone(page, 'atelier');
-  await page.locator('#lair-focus-copy').click();
+  // The original/copy stepper shows only while the panel is hidden.
+  await page.waitForFunction(() => window.__keynlockDebug.workshop('atelier')?.bridge?.focusEasel);
+  await page.evaluate(() => window.__keynlockDebug.workshop('atelier').bridge.focusEasel('copy'));
   await page.waitForFunction(() => window.__keynlockDebug.host.controls.minDistance < 2);
   // The window's haze would wash out the paintings being restored.
   assert.equal(await page.evaluate(() => window.__keynlockDebug.host.renderer.getUnifiedScene()
@@ -463,10 +467,17 @@ test('the room hosts both workshops on one canvas through the host contract', as
     await button.click();
     assert.equal(await button.getAttribute('aria-pressed'), 'true', `${tool} is selected`);
   }
-  // In a close-up the easel switcher sits right of the Atelier's panel toggle.
-  const stepper = await page.locator('#lair-easel-camera-controls').boundingBox();
-  const toggle = await page.locator('#atelier-embedded-app #workbench-toggle').boundingBox();
-  assert.ok(stepper && toggle && stepper.x >= toggle.x + toggle.width, 'the easel switcher does not cover the toggle');
+  // The panel in the Lair: «ВСЯ КОЛЛЕКЦИЯ» right of «В ЛОГОВО», the readiness
+  // beside the likeness, no stepper while the panel is open.
+  const back = await page.locator('#reset-camera').boundingBox();
+  const collection = await page.locator('#lair-atelier-header #collection-footer').boundingBox();
+  assert.ok(back && collection && collection.x > back.x + back.width && Math.abs(collection.y - back.y) < 2,
+    'the collection button stands right of «В ЛОГОВО»');
+  assert.equal(await page.locator('#atelier-embedded-app .workbench-main #restoration-progress').count(), 1);
+  assert.equal(await page.locator('#lair-easel-camera-controls').isHidden(), true);
+  await page.locator('#atelier-embedded-app #workbench-toggle').click();
+  await page.locator('#lair-easel-camera-controls').waitFor();
+  await page.locator('#atelier-embedded-app #workbench-toggle').click();
 
   // The painting wall opens from the room and returns to the easels.
   await page.locator('#reset-camera').click();
@@ -514,7 +525,7 @@ for (const [id, healthy, chunk, message] of [
     if (healthy === 'alchemy') await enterAlchemy(page);
     else {
       await openZone(page, 'atelier');
-      await page.locator('#lair-easel-camera-controls').waitFor();
+      await page.locator('#lair-atelier-corner').waitFor();
     }
   });
 }

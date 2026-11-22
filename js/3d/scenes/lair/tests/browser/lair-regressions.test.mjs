@@ -742,3 +742,21 @@ test('a zone opened while walking returns to the walk; the entrance wall shows o
   assert.equal(await page.locator('#lair-music .music-controls__track[aria-current="true"]').count(), 1);
   assert.match(await page.locator('#lair-music .music-controls__track[aria-current="true"]').innerText(), /си-бемоль/);
 });
+
+test('the settings choose a quality level and a 60 FPS cap, and remember them', async t => {
+  const page = await openRoom(t);
+  await page.locator('#lair-visual-toggle').click();
+  await page.locator('#quality-mode').waitFor();
+  assert.equal(await page.locator('#quality-mode').inputValue(), 'auto');
+  const bufferWidth = () => page.evaluate(() => document.querySelector('#scene').width);
+  await page.locator('#quality-mode').selectOption('minimal');
+  await page.waitForFunction(() => /Минимальное/.test(document.querySelector('#quality-now').textContent));
+  const minimal = await bufferWidth();
+  await page.locator('#quality-mode').selectOption('high');
+  await page.waitForFunction(() => /Высокое/.test(document.querySelector('#quality-now').textContent));
+  assert.ok(await bufferWidth() > minimal, 'a higher level draws more pixels');
+  await page.locator('#fps-cap').check();
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('keynlock-lair-visual-v1')));
+  assert.equal(saved['quality-mode'], 'high');
+  assert.equal(saved['fps-cap'], true);
+});

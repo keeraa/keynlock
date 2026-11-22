@@ -74,6 +74,12 @@ async function openRoom(t, { locale = 'ru-RU', pointerLock = false, beforeLoad }
   await servePaintingsLocally(context);
   const page = await context.newPage();
   page.setDefaultTimeout(timeout);
+  // LAIR_CPU_THROTTLE=8 slows the page down like software WebGL on CI.
+  const throttle = Number(process.env.LAIR_CPU_THROTTLE) || 0;
+  if (throttle > 1) {
+    const cdp = await context.newCDPSession(page);
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: throttle });
+  }
   await beforeLoad?.(page);
   // ?start=overview: these checks begin at the overview (the game starts on foot).
   const response = await page.goto(`${baseUrl}?start=overview`, { waitUntil: 'domcontentloaded', timeout });
@@ -678,25 +684,38 @@ test('the room draws once per frame: no transmission pass and no per-frame shado
   });
   // Any transmission material makes Three.js draw every opaque object again each frame.
   assert.deepEqual(state.transmissive, []);
-  // The scene is drawn into the ink outline's buffer, the opaque part once more
-  // for its normals; the shadow map is refreshed about once a second.
+  // The scene is drawn into the ink outline's buffer (the opaque part once
+  // more for its normals) and the shadow map about once a second. Counted per
+  // second, not per frame: software WebGL on CI draws only a few frames a
+  // second, so one shadow refresh is spread over very few frames.
   const passes = await page.evaluate(async () => {
     const gl = document.querySelector('#scene').getContext('webgl2');
-    let target = null, frames = 0;
+    let target = null;
     const draws = new Map();
     const bind = gl.bindFramebuffer, draw = gl.drawElements, drawArrays = gl.drawArrays;
     const count = () => draws.set(target, (draws.get(target) ?? 0) + 1);
     gl.bindFramebuffer = function (kind, framebuffer) { target = framebuffer; return bind.call(this, kind, framebuffer); };
     gl.drawElements = function (...args) { count(); return draw.apply(this, args); };
     gl.drawArrays = function (...args) { count(); return drawArrays.apply(this, args); };
-    for (; frames < 20; frames++) await new Promise(resolve => requestAnimationFrame(resolve));
+    const started = performance.now();
+    let frames = 0;
+    while (performance.now() - started < 3000 || frames < 3) {
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      frames++;
+    }
+    const seconds = (performance.now() - started) / 1000;
     Object.assign(gl, { bindFramebuffer: bind, drawElements: draw, drawArrays });
-    const perTarget = [...draws.values()].map(total => total / frames).sort((a, b) => b - a);
-    return { scenePass: perTarget[0], normalPass: perTarget[1], others: perTarget.slice(2).reduce((sum, value) => sum + value, 0) };
+    const totals = [...draws.values()].sort((a, b) => b - a);
+    const scenePass = totals[0] / frames;
+    // A pass drawing a good part of the scene each frame is a scene pass:
+    // colour, and normals (opaque objects only, about half). The rest is per second.
+    const scenePasses = totals.filter(total => total / frames >= scenePass * .3);
+    const others = totals.filter(total => total / frames < scenePass * .3).reduce((sum, total) => sum + total, 0);
+    return { othersPerSecond: Math.round(others / seconds), scenePasses: scenePasses.length };
   });
-  // Two passes: the colour pass and the outline's normal pass (opaque only).
-  assert.ok(passes.normalPass <= passes.scenePass, `normal pass ${passes.normalPass} vs scene ${passes.scenePass}`);
-  assert.ok(passes.others < 60, `draws per frame outside the two scene passes: ${passes.others}`);
+  assert.ok(passes.scenePasses <= 2, `scene-sized passes per frame: ${passes.scenePasses}`);
+  // One shadow refresh (~320 draws) a second, plus the screen quad.
+  assert.ok(passes.othersPerSecond < 450, `other draws per second: ${passes.othersPerSecond}`);
 });
 
 test('the workshops share the room look: one gouache setting, no Atelier-only effects', async t => {
@@ -737,8 +756,10 @@ test('a zone opened while walking returns to the walk; the entrance wall shows o
   const after = await page.evaluate(() => window.__keynlockDebug.host.camera.position.toArray());
   assert.ok(after.every((value, axis) => Math.abs(value - before[axis]) < .05), 'back where the walker stood');
   // The playlist lists every track and can switch to one.
-  await page.locator('#lair-music .music-controls__title').click();
-  await page.locator('#lair-music .music-controls__track-button').nth(2).click();
+  // Dispatched clicks: on slow software WebGL (CI) the top bar never counts
+  // as "stable" for Playwright's actionability checks.
+  await page.locator('#lair-music .music-controls__title').dispatchEvent('click');
+  await page.locator('#lair-music .music-controls__track-button').nth(2).dispatchEvent('click');
   assert.equal(await page.locator('#lair-music .music-controls__track[aria-current="true"]').count(), 1);
   assert.match(await page.locator('#lair-music .music-controls__track[aria-current="true"]').innerText(), /си-бемоль/);
 });

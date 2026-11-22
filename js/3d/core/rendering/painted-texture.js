@@ -1,7 +1,5 @@
 // @ts-check
 /** Shared KEYNLOCK canvas-texture preparation; pigment recipes stay scene-specific. */
-export const PAINTED_FINISHES = Object.freeze(['steel', 'graphite', 'enamel', 'brass', 'copper']);
-
 export function createPaintedTextureSurface({ THREE, document, image, size = 512 }) {
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = size;

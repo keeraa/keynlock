@@ -460,8 +460,9 @@ test('the room hosts both workshops on one canvas through the host contract', as
   await page.evaluate(() => window.__keynlockDebug.workshop('atelier').bridge.focusEasel('copy'));
   await page.waitForFunction(() => window.__keynlockDebug.host.controls.minDistance < 2);
   // The window's haze would wash out the paintings being restored.
-  assert.equal(await page.evaluate(() => window.__keynlockDebug.host.renderer.getUnifiedScene()
-    .getObjectByName('window-light-air').visible), false, 'no window haze in front of the easels');
+  // Set by the frame loop: wait for a frame (slow software WebGL on CI).
+  await page.waitForFunction(() => window.__keynlockDebug.host.renderer.getUnifiedScene()
+    .getObjectByName('window-light-air').visible === false);
   for (const tool of ['brush', 'swab', 'uv', 'reagent', 'retouch']) {
     const button = page.locator(`#atelier-embedded-app [data-tool="${tool}"]`);
     await button.click();

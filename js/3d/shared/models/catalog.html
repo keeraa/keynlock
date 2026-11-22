@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KEYNLOCK — Каталог 3D-моделей</title>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
+<style>
+:root{color-scheme:dark;--bg:#141a20;--surface:#222b34;--border:#3e4b54;--ink:#eee5d2;--dim:#a6b0b8;--gold:#d9b783}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 system-ui,Arial,sans-serif}header{padding:25px max(20px,calc((100vw - 1500px)/2));border-bottom:1px solid var(--border);background:#181e25}h1{margin:0;font:500 clamp(27px,4vw,39px) Georgia,serif}p{color:var(--dim);margin:5px 0 14px}a{color:#dfbd88}nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}input,select{background:#2d3943;color:var(--ink);border:1px solid #54616b;border-radius:8px;padding:11px 13px;font:inherit}input{flex:1;min-width:220px}select{max-width:100%}main{max-width:1540px;margin:auto;padding:20px}#count{margin:0 0 18px;color:var(--gold)}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:15px}.card{background:var(--surface);border:1px solid var(--border);border-radius:13px;overflow:hidden;min-width:0}.preview{height:210px;display:grid;place-items:center;background:radial-gradient(ellipse at 55% 40%,#46515b,#1b2229 72%);position:relative}.preview model-viewer{width:100%;height:100%;background:transparent;--poster-color:transparent}.placeholder{padding:20px;text-align:center;color:#d7c49f}.placeholder .glyph{font:64px Georgia,serif;opacity:.65}.placeholder small{display:block;color:var(--dim);margin-top:10px}.info{padding:15px}h2{font:600 17px/1.35 system-ui;margin:0 0 7px}small{color:var(--dim)}.tag{font-size:11px;display:inline-block;border:1px solid #665b4b;border-radius:6px;padding:2px 8px;color:#e4c897;margin:4px 0 9px}.meta{overflow-wrap:anywhere;color:var(--dim);font-size:12px}.meta a{display:inline-block;margin-top:7px}.info details{margin-top:8px;border-top:1px solid #45515c;padding-top:8px}.info summary{cursor:pointer;color:#d3bb96}.info code{white-space:normal;overflow-wrap:anywhere}.empty{grid-column:1/-1;text-align:center;padding:50px;color:var(--dim)}footer{padding:24px;color:var(--dim);max-width:1500px;margin:auto}button{cursor:pointer;border:1px solid var(--border);border-radius:7px;padding:6px 10px;background:#2e3942;color:var(--ink)}.preview button{position:absolute;bottom:9px;right:9px}.kpi{display:flex;gap:15px;flex-wrap:wrap;margin:10px 0}.kpi b{color:var(--gold)}.error{color:#eda6a0}
+</style></head><body>
+<header><h1>KEYNLOCK — каталог 3D-моделей</h1>
+<p>Общий реестр моделей Keynlock: импортированные GLB/glTF, процедурные модели и встроенные предметы сцен. Без дублирования файлов.</p>
+<div class="kpi"><span><b id="total">—</b> записей</span><span><b id="files">—</b> GLB/glTF</span><span><b id="procedurals">—</b> процедурных</span></div>
+<nav><input id="search" aria-label="Поиск моделей" placeholder="Поиск по названию, сцене, категории…" />
+<select id="kind" aria-label="Тип"><option value="">Все типы</option><option value="file">GLB / glTF</option><option value="procedural">Процедурные семейства</option><option value="procedural-component">Встроенные модели сцен</option></select>
+<select id="scene" aria-label="Сцена"><option value="">Все сцены</option></select>
+<select id="category" aria-label="Категория"><option value="">Все категории</option></select>
+</nav></header>
+<main><div id="count">Загружаем реестр…</div><section id="grid" class="grid"></section></main>
+<footer>Просмотр 3D доступен для файловых моделей, если источник разрешает загрузку из браузера. У моделей, созданных кодом, указаны исходные модули; предварительный рендер для них пока отсутствует. <a href="./catalog.json">Каталог GLB/glTF</a> · <a href="./procedural-models.json">Процедурные модели</a>.</footer>
+<script type="module">
+const RAW='https://raw.githubusercontent.com/keeraa/keynlock/main/js/3d/shared/models/';
+const REPO='https://github.com/keeraa/keynlock/blob/main/';
+const $=id=>document.getElementById(id);
+const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const glyphFor=cat=>cat.startsWith('alchemy')?'⚗':cat.includes('book')?'▤':cat.includes('bridge')?'⌒':cat.includes('building')?'⌂':cat.includes('key')?'⚿':cat.includes('mechanism')?'⚙':cat.includes('lighting')?'✧':'▣';
+let records=[];
+function optionList(id,values,label){$(id).innerHTML='<option value="">'+label+'</option>'+[...new Set(values.filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru')).map(v=>'<option value="'+escape(v)+'">'+escape(v)+'</option>').join('')}
+function makeCard(m){
+ const article=document.createElement('article');article.className='card';
+ const cat=m.category||'uncategorized',isFile=m.kind==='file',name=escape(m.name||m.id);
+ const path=m.assetPath||m.sourcePath||m.definitionPath||'';
+ const code=path?'<a target="_blank" rel="noopener" href="'+REPO+encodeURI(path)+'">Исходный код / файл</a>':'';
+ article.innerHTML='<div class="preview">'+(isFile&&m.lods?.[0]?.url?
+ '<div class="placeholder"><div class="glyph">'+glyphFor(cat)+'</div><small>3D-просмотр по нажатию</small></div><button type="button" class="load3d">Показать 3D</button>':
+ '<div class="placeholder"><div class="glyph">'+glyphFor(cat)+'</div><small>Геометрия создаётся кодом</small></div>')+
+ '</div><div class="info"><h2>'+name+'</h2><span class="tag">'+escape(cat)+'</span><div class="meta">'+escape(isFile?'GLB / glTF':m.kind==='procedural'?'Процедурная модель':'Компонент сцены')+
+ '<div>Сцены: '+escape((m.usedInScenes||[]).join(', ')||'не размещена')+'</div>'+
+ (m.license?'<div>Лицензия: '+escape(m.license)+'</div>':'')+
+ (m.creator?'<div>Источник: '+escape(m.creator)+'</div>':'')+
+ (m.source?'<a href="'+escape(m.source)+'" target="_blank" rel="noopener">Сайт модели</a>':'')+
+ (code?'<div>'+code+'</div>':'')+'</div><details><summary>ID и сведения</summary><code>'+escape(m.id)+'</code>'+
+ (m.sourceFunction?'<div>Фабрика: <code>'+escape(m.sourceFunction)+'</code></div>':'')+
+ (m.note?'<div>'+escape(m.note)+'</div>':'')+'</details></div>';
+ const load=article.querySelector('.load3d');
+ if(load)load.addEventListener('click',()=>{
+  const preview=article.querySelector('.preview');
+  preview.textContent='';
+  const mv=document.createElement('model-viewer');
+  mv.setAttribute('src',m.lods[0].url);mv.setAttribute('alt',m.name);
+  mv.setAttribute('camera-controls','');mv.setAttribute('auto-rotate','');
+  mv.setAttribute('loading','eager');mv.setAttribute('shadow-intensity','0.7');
+  mv.addEventListener('error',()=>{preview.innerHTML='<div class="placeholder error">Не удалось загрузить 3D с исходного адреса</div>'});
+  preview.append(mv);
+ });
+ return article;
+}
+function draw(){
+ const q=$('search').value.toLocaleLowerCase('ru'),k=$('kind').value,sc=$('scene').value,cat=$('category').value;
+ const visible=records.filter(m=>(!k||m.kind===k)&&(!sc||(m.usedInScenes||[]).includes(sc))&&(!cat||m.category===cat)&&(!q||[m.id,m.name,m.category,m.creator,m.source,...(m.usedInScenes||[])].join(' ').toLocaleLowerCase('ru').includes(q)));
+ $('count').textContent='Показано '+visible.length+' из '+records.length;
+ const grid=$('grid');grid.replaceChildren(...visible.map(makeCard));
+ if(!visible.length)grid.innerHTML='<div class="empty">По запросу моделей не найдено</div>';
+}
+try{
+ const [fileResponse,proceduralResponse]=await Promise.all([fetch(RAW+'catalog.json'),fetch(RAW+'procedural-models.json')]);
+ if(!fileResponse.ok||!proceduralResponse.ok)throw Error('HTTP '+fileResponse.status+' / '+proceduralResponse.status);
+ const files=(await fileResponse.json()).models.map(m=>({...m,kind:'file'}));
+ const p=(await proceduralResponse.json()).models;
+ records=[...files,...p];
+ $('total').textContent=String(records.length);$('files').textContent=String(files.length);$('procedurals').textContent=String(p.length);
+ optionList('scene',records.flatMap(m=>m.usedInScenes||[]),'Все сцены');
+ optionList('category',records.map(m=>m.category),'Все категории');
+ for(const id of ['search','kind','scene','category'])$(id).addEventListener('input',draw);
+ draw();
+}catch(error){$('count').textContent='Ошибка загрузки: '+error.message+' — откройте каталог с подключением к интернету';$('count').classList.add('error');}
+</script></body></html>

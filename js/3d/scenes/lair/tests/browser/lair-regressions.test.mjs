@@ -75,7 +75,8 @@ async function openRoom(t, { locale = 'ru-RU', pointerLock = false, beforeLoad }
   const page = await context.newPage();
   page.setDefaultTimeout(timeout);
   await beforeLoad?.(page);
-  const response = await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout });
+  // ?start=overview: these checks begin at the overview (the game starts on foot).
+  const response = await page.goto(`${baseUrl}?start=overview`, { waitUntil: 'domcontentloaded', timeout });
   assert.equal(response.status(), 200);
   await page.locator('#app > #loading').waitFor({ state: 'hidden' });
   assert.equal(await page.locator('#app > #fallback').isVisible(), false, 'WebGL must render the room');
@@ -674,18 +675,23 @@ test('the room draws once per frame: no transmission pass and no per-frame shado
   });
   // Any transmission material makes Three.js draw every opaque object again each frame.
   assert.deepEqual(state.transmissive, []);
-  // The shadow map is refreshed about once a second, so most frames draw only to the screen.
+  // The scene is drawn once, into the ink outline's buffer; the shadow map is
+  // refreshed about once a second. So besides that one pass, almost nothing.
   const passes = await page.evaluate(async () => {
     const gl = document.querySelector('#scene').getContext('webgl2');
-    let target = null, offscreen = 0, frames = 0;
-    const bind = gl.bindFramebuffer, draw = gl.drawElements;
+    let target = null, frames = 0;
+    const draws = new Map();
+    const bind = gl.bindFramebuffer, draw = gl.drawElements, drawArrays = gl.drawArrays;
+    const count = () => draws.set(target, (draws.get(target) ?? 0) + 1);
     gl.bindFramebuffer = function (kind, framebuffer) { target = framebuffer; return bind.call(this, kind, framebuffer); };
-    gl.drawElements = function (...args) { if (target) offscreen++; return draw.apply(this, args); };
+    gl.drawElements = function (...args) { count(); return draw.apply(this, args); };
+    gl.drawArrays = function (...args) { count(); return drawArrays.apply(this, args); };
     for (; frames < 20; frames++) await new Promise(resolve => requestAnimationFrame(resolve));
-    Object.assign(gl, { bindFramebuffer: bind, drawElements: draw });
-    return { offscreenPerFrame: offscreen / frames };
+    Object.assign(gl, { bindFramebuffer: bind, drawElements: draw, drawArrays });
+    const perTarget = [...draws.values()].map(total => total / frames).sort((a, b) => b - a);
+    return { scenePass: perTarget[0], others: perTarget.slice(1).reduce((sum, value) => sum + value, 0) };
   });
-  assert.ok(passes.offscreenPerFrame < 60, `offscreen draws per frame: ${passes.offscreenPerFrame}`);
+  assert.ok(passes.others < 60, `draws per frame outside the scene pass: ${passes.others}`);
 });
 
 test('the workshops share the room look: one gouache setting, no Atelier-only effects', async t => {

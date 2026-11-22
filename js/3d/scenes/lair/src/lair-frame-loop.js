@@ -1,6 +1,6 @@
 import { Clock } from 'three';
 
-export function startLairFrames({ scene, camera, controls, renderer, rendererHost,
+export function startLairFrames({ scene, camera, controls, renderer, rendererHost, outlines,
   room, dayNight, zoneTransitions, zoneInteraction, cameraInput, atelierView, workshopOverlay, returnButton,
   visualUI, performancePanel }) {
   const clock = new Clock();
@@ -22,7 +22,7 @@ export function startLairFrames({ scene, camera, controls, renderer, rendererHos
     try {
       // One look for the whole Lair: the Atelier's corner uses the room's
       // settings (outlines, gouache), with no post-processing of its own.
-      renderer.render(scene, camera);
+      if (outlines) outlines.render(); else renderer.render(scene, camera);
       drawn.triangles = renderer.info.render.triangles;
       drawn.calls = renderer.info.render.calls;
     } finally {

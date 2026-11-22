@@ -3,7 +3,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createMaterials } from './room/materials.js';
 import { buildLair } from './room/build.js';
 import { ROOM_CENTER_Z, ROOM_END } from './room-layout.js';
-import { createRoomOutlines, mountVisualSettings } from './ui/visual-settings.js';
+import { mountVisualSettings } from './ui/visual-settings.js';
+import { createSceneOutline } from './rendering/scene-outline.js';
 import { mountWorkshopOverlay } from './workshops/workshop-overlay.js';
 import { createAtelierEmbedding } from '@keynlock/atelier/embedding';
 import { createAlchemyEmbedding } from '@keynlock/alchemy/embedding';
@@ -119,7 +120,8 @@ function setup() {
     onExit: () => zoneTransitions.reset(),
     onReady: id => zoneTransitions.onWorkshopReady(id),
   });
-  const outlines = createRoomOutlines(scene);
+  // One full-screen ink pass for everything on screen (the Key Archive's outline).
+  const outlines = createSceneOutline({ renderer, scene, camera });
   const performancePanel = mountPerformancePanel({ document, renderer, scene, canvas });
   const dayNight = createDayNight(night => { room.setNight(night); lighting.setNight(night); });
   const visualUI = mountVisualSettings({ visual, room, setNight: night => dayNight.set(night), outlines,
@@ -170,23 +172,9 @@ function setup() {
       if (worktable) room.windowLight.addFurniture(worktable);
       roomWalk.refreshObstacles();
       // One look for the whole room: the Atelier's furniture takes the room's
-      // outlines and gouache settings (the paintings keep their true colours).
+      // gouache settings (the paintings keep their true colours). The ink
+      // outline is full-screen, so it covers the Atelier with no setup.
       const atelierLook = getWorkshopApi('atelier')?.look;
-      outlines.attach(['restoration-worktable', 'restoration-wall-shelf']);
-      // The easels resize to each painting and the frames come and go with
-      // the paintings: one merged hull would stay behind (black bars on the
-      // floor). Each of their parts gets its own outline that moves with it,
-      // checked once a second for new frames.
-      const atelierRoot = scene.getObjectByName('keynlock-world-atelier');
-      const easels = ['restoration-left-easel', 'restoration-right-easel'].map(name => scene.getObjectByName(name));
-      const outlineMovingParts = () => {
-        for (const easel of easels) outlines.attachEach(easel, mesh => mesh.material?.isMeshStandardMaterial);
-        // Wall frames opt out (userData.excludeFromInk): they are resized in place.
-        if (atelierLook?.frameMaterial) outlines.attachEach(atelierRoot,
-          mesh => mesh.material === atelierLook.frameMaterial && !mesh.userData.excludeFromInk);
-      };
-      outlineMovingParts();
-      setInterval(outlineMovingParts, 1000);
       visual.adoptPaintedMaterials(atelierLook?.paintedMaterials?.());
     },
     onAlchemyReady() {
@@ -196,6 +184,9 @@ function setup() {
     precompileWorkshopLighting: zoneTransitions.precompileWorkshopLighting,
   });
   atelierView.bind();
+  // The game starts on foot at the entrance; ?start=overview opens the
+  // overview instead (the browser tests start there).
+  if (new URLSearchParams(location.search).get('start') !== 'overview') zoneTransitions.startWalk();
   const zoneInteraction = mountZoneInteraction({
     canvas, camera, interaction, roomWalk, cameraInput, zoneTransitions, workshopOverlay,
     anchors: room.anchors, hitTargets: room.hitTargets,
@@ -214,7 +205,7 @@ function setup() {
   window.addEventListener('resize', resize);
   resize();
   const returnButton = createReturnButton({ button: document.querySelector('#reset-camera'), t });
-  startLairFrames({ scene, camera, controls, renderer, rendererHost, room, dayNight,
+  startLairFrames({ scene, camera, controls, renderer, rendererHost, room, outlines, dayNight,
     zoneTransitions, zoneInteraction, cameraInput, atelierView, workshopOverlay, visualUI, performancePanel,
     returnButton });
 }

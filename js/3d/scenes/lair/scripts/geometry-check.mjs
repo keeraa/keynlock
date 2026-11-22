@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs';
 import * as THREE from 'three';
 import { createMaterials } from '../src/room/materials.js';
 import { buildLair } from '../src/room/build.js';
-import { createRoomOutlines } from '../src/ui/visual-settings.js';
+import { createSceneOutline } from '../src/rendering/scene-outline.js';
 import { windowLightAt, FLOOR_Y, WINDOW_LIGHT_SLOPE } from '../src/room/window-light.js';
 import { WINDOW_OPENING } from '../src/room/window.js';
 import { ALCHEMY_Z, ATELIER_Z, ROOM_END, ROOM_LENGTH, WORKBENCH_Z } from '../src/room-layout.js';
@@ -227,17 +227,15 @@ assert.equal(motes.geometry.drawRange.count, 105, 'particle density changes draw
 world.ambientParticles.setEnabled(false);
 assert.equal(motes.visible, false, 'air particles are switchable');
 world.ambientParticles.setEnabled(true);
-const outlines = createRoomOutlines(scene);
-assert.ok(outlines.shells.length >= 4, 'shared Village Engine outlines attach to the room\'s own furniture');
 const paintShader = { uniforms: {}, fragmentShader: THREE.ShaderLib.standard.fragmentShader };
 materials.walnut.onBeforeCompile(paintShader);
 assert.ok(paintShader.fragmentShader.includes('pigmentGray') && paintShader.uniforms.uPigmentContrast, 'painted pigments are adjustable in a Three.js shader');
-assert.ok(paintShader.fragmentShader.includes('inkFacing'), 'shared ink rim shading is installed');
+const fakeRenderer = { render() {}, getPixelRatio: () => 1 };
+const outlines = createSceneOutline({ renderer: fakeRenderer, scene, camera: new THREE.PerspectiveCamera() });
+assert.equal(outlines.isEnabled(), true, 'the full-screen ink outline is on by default');
 outlines.setEnabled(false);
-assert.ok(outlines.shells.every(shell => shell.visible === false), 'ink outline toggle works');
+assert.equal(outlines.isEnabled(), false, 'ink outline toggle works');
 outlines.setEnabled(true);
-outlines.setWidth(110);
-assert.ok(outlines.shells.every(shell => shell.material.uniforms.strokeScale.value === 1.1), 'outline width is adjustable');
 
 for (const name of ['wood-gouache-walnut.webp', 'wood-gouache-ash.webp', 'wood-gouache-oak.webp']) {
   assert.ok(existsSync(new URL(`../../../workshops/alchemy/src/assets/${name}`, import.meta.url)), `${name} available`);

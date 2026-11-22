@@ -44,9 +44,28 @@ export function createZoneTransitions({
     controls.update();
   }
 
+  /**
+   * The lab's own camera pose, framed a little higher in the Lair: camera and
+   * target both move up by 8 % of the view's height, as a ⌘-drag of the view
+   * downwards would. More of the wall and recipe, the table lower in the frame.
+   */
+  function alchemyPose() {
+    const pose = rendererHost?.getWorldPose('alchemy');
+    if (!pose) return null;
+    const forward = pose.target.clone().sub(pose.position);
+    const distance = forward.length();
+    forward.normalize();
+    const right = new THREE.Vector3().crossVectors(forward, camera.up).normalize();
+    const up = new THREE.Vector3().crossVectors(right, forward).normalize();
+    const lift = 2 * distance * Math.tan(THREE.MathUtils.degToRad(pose.fov / 2)) * .08;
+    pose.position.addScaledVector(up, lift);
+    pose.target.addScaledVector(up, lift);
+    return pose;
+  }
+
   function resetAlchemyCamera() {
     if (currentZone !== 'alchemy') return;
-    const pose = rendererHost.getWorldPose('alchemy');
+    const pose = alchemyPose();
     if (!pose) return;
     atelierView.cancelFlight();
     transitioning = false;
@@ -81,7 +100,7 @@ export function createZoneTransitions({
     if (id === 'alchemy') {
       zones.alchemy.status = t('Алхимическая лаборатория работает внутри общей сцены логова.');
       if (currentZone === 'alchemy' && pendingWorkshopOpen === 'alchemy') {
-        const pose = rendererHost?.getWorldPose('alchemy');
+        const pose = alchemyPose();
         if (pose) {
           alchemyApproachDistance = camera.position.distanceTo(pose.position);
           focus(pose.position.toArray(), pose.target.toArray(), pose.fov);
@@ -129,7 +148,6 @@ export function createZoneTransitions({
     for (const button of zoneButtons) {
       const selected = button.dataset.zone === id;
       button.classList.toggle('active', selected);
-      if (button.closest('.zone-nav')) button.setAttribute('aria-pressed', String(selected));
     }
   }
 
@@ -150,7 +168,7 @@ export function createZoneTransitions({
     setInRoomWorkshop(id === 'atelier' ? id : null);
     // Restoration always starts at the two easels, regardless of the source
     // Atelier's last camera pose (which could be up at the salon gallery).
-    const sourcePose = id === 'alchemy' ? rendererHost?.getWorldPose('alchemy') : null;
+    const sourcePose = id === 'alchemy' ? alchemyPose() : null;
     const workshopPosition = sourcePose?.position.toArray() || zone.camera;
     const workshopTarget = sourcePose?.target.toArray() || zone.target;
     if (id === 'alchemy') alchemyApproachDistance = camera.position.distanceTo(new THREE.Vector3(...workshopPosition));

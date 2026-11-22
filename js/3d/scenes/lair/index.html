@@ -6,7 +6,10 @@
     <meta name="theme-color" content="#141715" />
     <title>KEYNLOCK · Логово команды</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  </head>
+    <!-- Until the stylesheets arrive (in development Vite adds them from JS),
+       show only the dark background, not the raw markup. style.css reveals #app. -->
+  <style>html,body{margin:0;background:#151d1a}#app{opacity:0}</style>
+</head>
   <body>
     <div id="app">
       <canvas id="scene" aria-label="Интерактивное трёхмерное логово команды Keynlock"></canvas>
@@ -188,13 +191,6 @@
         <div id="room-walk-instructions" hidden>
           <span>WASD / ↑↓←→ — ходьба</span><span>Shift — бег</span><span id="room-walk-look"></span><span>E — взаимодействие</span><span>Esc — общий вид</span>
         </div>
-        <nav class="zone-nav" aria-label="Локации логова">
-          <button type="button" data-zone="atelier"><span class="zone-number">01</span><span>Реставрация</span></button>
-          <button type="button" data-zone="planning"><span class="zone-number">02</span><span>Штаб</span></button>
-          <button type="button" data-zone="workbench"><span class="zone-number">03</span><span>Верстак</span></button>
-          <button type="button" data-zone="alchemy"><span class="zone-number">04</span><span>Алхимия</span></button>
-          <button type="button" data-zone="gramophone"><span class="zone-number">05</span><span>Музыка</span></button>
-        </nav>
       </div>
       <button id="reset-camera" class="reset-camera" type="button" hidden>↺ <span>ОБЩИЙ ВИД</span></button>
       <div id="loading" class="loading" role="status" aria-busy="true"><div class="loading-symbol">K<span>·</span></div><div class="loading-line"><i></i></div><small>ОТКРЫВАЕМ МАСТЕРСКУЮ</small></div>

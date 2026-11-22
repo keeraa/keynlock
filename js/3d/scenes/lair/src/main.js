@@ -161,6 +161,7 @@ function setup() {
     workshopOverlay, atelierView, visualUI, homePosition, homeTarget, roomMinDistance,
     roomLights, cameraInput, quality,
   });
+  window.__keynlockDebug.zones = zoneTransitions;
   host.alchemy.manipulate = zoneTransitions.manipulateAlchemy;
   host.alchemy.resetCamera = zoneTransitions.resetAlchemyCamera;
   // Let the overlay register workshop readiness before the loading screen

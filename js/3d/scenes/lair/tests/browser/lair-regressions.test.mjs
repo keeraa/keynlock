@@ -63,6 +63,11 @@ after(async () => {
   if (server) await new Promise(resolve => server.httpServer.close(resolve));
 });
 
+/** Open a zone as a click on its spot in the room does (the zone bar is gone). */
+function openZone(page, id) {
+  return page.evaluate(zone => window.__keynlockDebug.zones.open(zone), id);
+}
+
 async function openRoom(t, { locale = 'ru-RU', pointerLock = false, beforeLoad } = {}) {
   // The headless shell rejects native pointer lock. Use full Chromium for that case.
   const roomBrowser = pointerLock && !channel
@@ -91,7 +96,7 @@ async function openRoom(t, { locale = 'ru-RU', pointerLock = false, beforeLoad }
 }
 
 async function enterAlchemy(page) {
-  await page.locator('.zone-nav [data-zone="alchemy"]').click();
+  await openZone(page, 'alchemy');
   await page.waitForFunction(() => window.__keynlockDebug.workshop('alchemy')?.lifecycle?.isActive());
   await page.getByRole('button', { name: 'Вернуться в логово' }).waitFor();
   // One way back for every mode, in one place: no second exit inside the lab.
@@ -124,10 +129,11 @@ async function clickAlchemyObject(page, kind, id) {
 }
 
 async function settleAlchemyCamera(page) {
-  await page.waitForFunction(() => {
-    const pose = window.__keynlockDebug.host.renderer.getWorldPose('alchemy');
-    return window.__keynlockDebug.host.camera.position.distanceTo(pose.position) < .04;
-  });
+  // The Lair frames the lab a little higher than its own pose, so wait for the
+  // flight to end rather than for the camera to reach the lab's exact pose.
+  await page.waitForFunction(() => window.__keynlockDebug.workshop('alchemy')?.lifecycle?.isActive()
+    && !window.__keynlockDebug.zones.isTransitioning());
+  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
 }
 
 test('the built Lair pours reagents into a vessel on its transformed alchemy table', async t => {
@@ -203,7 +209,7 @@ test('the burner accounts for active time when returning to the lab', async t =>
 test('an image load failure leaves the current painting editable', async t => {
   const page = await openRoom(t);
   const atelier = page.locator('#atelier-embedded-app');
-  await page.locator('.zone-nav [data-zone="atelier"]').click();
+  await openZone(page, 'atelier');
   await page.waitForFunction(() => window.__keynlockDebug.workshop('atelier')?.bridge?.isReady());
   const bridge = await page.evaluateHandle(() => window.__keynlockDebug.workshop('atelier')?.bridge);
   const catalogue = await bridge.evaluate(api => api.catalog());
@@ -270,14 +276,14 @@ test('switching workshops returns the shared camera, input, and lights to the ro
 
   const reset = page.locator('#reset-camera');
   // The planning corner is a placeholder: a panel, but no workshop to open.
-  await page.locator('.zone-nav [data-zone="planning"]').click();
+  await openZone(page, 'planning');
   await page.locator('#zone-panel').waitFor();
   assert.equal(await page.locator('#panel-link').isVisible(), false, 'no workshop link without a workshop');
   assert.equal((await page.locator('#reset-camera span').innerText()).trim(), 'ОБЩИЙ ВИД');
   await reset.click();
   await assertHome();
 
-  await page.locator('.zone-nav [data-zone="atelier"]').click();
+  await openZone(page, 'atelier');
   await page.waitForFunction(position =>
     window.__keynlockDebug.host.camera.position.toArray().some((value, axis) => Math.abs(value - position[axis]) > 3),
   home.position);
@@ -424,7 +430,7 @@ test('the room hosts both workshops on one canvas through the host contract', as
   assert.equal(await page.locator('#perf-panel').isHidden(), true);
 
   // The Atelier's own tools work inside the room.
-  await page.locator('.zone-nav [data-zone="atelier"]').click();
+  await openZone(page, 'atelier');
   await page.locator('#lair-focus-copy').click();
   await page.waitForFunction(() => window.__keynlockDebug.host.controls.minDistance < 2);
   // The window's haze would wash out the paintings being restored.
@@ -442,7 +448,7 @@ test('the room hosts both workshops on one canvas through the host contract', as
 
   // The painting wall opens from the room and returns to the easels.
   await page.locator('#reset-camera').click();
-  await page.locator('.zone-nav [data-zone="atelier"]').click();
+  await openZone(page, 'atelier');
   await page.locator('#wall-collection-entry').click();
   await page.waitForFunction(() => window.__keynlockDebug.host.atelier.galleryActive === true);
   assert.equal(await page.locator('#lair-gallery-controls').isVisible(), true);
@@ -478,14 +484,14 @@ for (const [id, healthy, chunk, message] of [
     assert.equal(failed.ready, false);
     assert.ok(failed.error);
 
-    await page.locator(`.zone-nav [data-zone="${id}"]`).click();
+    await openZone(page, id);
     await page.locator(`#${id}-embedded-app`).getByRole('alert').filter({ hasText: message }).waitFor();
     await page.locator('#reset-camera').click();
     assert.equal(await page.locator(`#${id}-embedded-app`).isHidden(), true);
 
     if (healthy === 'alchemy') await enterAlchemy(page);
     else {
-      await page.locator('.zone-nav [data-zone="atelier"]').click();
+      await openZone(page, 'atelier');
       await page.locator('#lair-easel-camera-controls').waitFor();
     }
   });
@@ -634,7 +640,7 @@ test('an English browser gets the Lair in English, with a language switch', asyn
   const page = await openRoom(t, { locale: 'en-US' });
   assert.equal(await page.title(), "KEYNLOCK · The team's lair");
   assert.equal(await page.evaluate(() => document.documentElement.lang), 'en');
-  assert.equal(await page.locator('.zone-nav [data-zone="workbench"] span:last-child').innerText(), 'Workbench');
+  assert.equal(await page.locator('.hotspot[data-zone="workbench"] span:last-child').innerText(), 'Workbench');
   assert.equal(await page.locator('#lair-language').inputValue(), 'en');
   assert.deepEqual(await page.locator('#lair-language option').evaluateAll(options => options.map(o => o.value)), ['ru', 'en']);
 });
@@ -652,7 +658,7 @@ test('one music player follows the Lair into its workshops and switches tracks',
   assert.equal(await page.evaluate(() => localStorage.getItem('keynlock-music-stopped-v1')), '1');
 
   // The gramophone's panel shows the same player, with volume.
-  await page.locator('.zone-nav [data-zone="gramophone"]').click();
+  await openZone(page, 'gramophone');
   await page.locator('#panel-music').waitFor();
   assert.equal(await page.locator('#panel-music .music-controls__title').innerText(), 'Шопен · Ноктюрн op. 9 № 2');
   assert.equal(await page.locator('#panel-music .music-controls__volume').inputValue(), '25');

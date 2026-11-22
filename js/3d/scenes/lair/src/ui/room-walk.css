@@ -58,7 +58,6 @@
 
 .room-walking .scene-hotspots,
 .room-walking .interaction-hint,
-.room-walking .zone-nav,
 .room-walking #wall-collection-entry {
   display: none;
 }

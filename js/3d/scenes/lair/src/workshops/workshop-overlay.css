@@ -76,7 +76,6 @@
 
 .atelier-mode .scene-hotspots,
 .atelier-mode .bottom-ui .interaction-hint,
-.atelier-mode .bottom-ui .zone-nav {display:none}
 .atelier-mode .bottom-ui {background:none;pointer-events:none}
 /* The collection entrance remains pinned to the painted left wall as the
    unified Lair camera orbits around it. */

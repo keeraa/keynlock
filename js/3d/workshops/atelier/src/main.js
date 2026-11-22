@@ -111,7 +111,7 @@ const galleryWall = embedded && rendererHost.getUnifiedScene()?.getObjectByName(
 const galleryWallCenter = galleryWall && scene.worldToLocal(galleryWall.getWorldPosition(new THREE.Vector3()));
 const wallZ = galleryWallCenter ? galleryWallCenter.z : -4.6;
 const { dust, makeEasel, wallpaperMaterial, floorWoodMaterials } = createWorkshopRoom({
-  THREE, scene, mats, includeWallTrim: !embedded, wallZ, floorY: embedded ? .0385 : -.0285,
+  THREE, scene, mats, includeWallTrim: !embedded, includeShelf: !embedded, wallZ, floorY: embedded ? .0385 : -.0285,
 });
 if (embedded) {
   // The standalone Atelier's angled sun is useful for its own room, but in

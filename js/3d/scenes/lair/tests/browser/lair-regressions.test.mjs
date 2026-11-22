@@ -394,7 +394,6 @@ test('the room hosts both workshops on one canvas through the host contract', as
       galleryMounted: paintings.length > 0
         && paintings.every(painting => range(painting, 'x').min <= leftWall + .001 && insideGalleryWall(painting))
         && insideGalleryWall(scene.getObjectByName('twelve-art-history-column-headings')),
-      atelierShelfMounted: range(scene.getObjectByName('restoration-wall-shelf'), 'x').min <= leftWall,
       atelierTableOnFloor: Math.abs(range(scene.getObjectByName('restoration-worktable'), 'y').min - .0385) < .005,
       alchemyTableOnFloor: alchemyFeet.length === 4
         && alchemyFeet.every(foot => Math.abs(range(foot, 'y').min - .0385) < .005),
@@ -406,7 +405,7 @@ test('the room hosts both workshops on one canvas through the host contract', as
     };
   });
   assert.deepEqual(supports, {
-    shelfBrackets: true, galleryMounted: true, atelierShelfMounted: true, atelierTableOnFloor: true,
+    shelfBrackets: true, galleryMounted: true, atelierTableOnFloor: true,
     alchemyTableOnFloor: true, alchemyTableLowered: true, stationsMovedTogether: true, roomShortened: true,
   });
 
@@ -725,7 +724,8 @@ test('a zone opened while walking returns to the walk; the entrance wall shows o
   assert.equal(await wallVisible(), true, 'inside the room the doors are visible');
   await page.keyboard.press('5');            // the zone bar is hidden while walking
   await page.locator('#zone-panel').waitFor();
-  assert.equal((await page.locator('#reset-camera span').innerText()).trim(), 'К ПРОГУЛКЕ');
+  // The label follows the next frame.
+  await page.waitForFunction(() => document.querySelector('#reset-camera span')?.textContent.trim() === 'К ПРОГУЛКЕ');
   await page.locator('#reset-camera').click();
   await page.waitForFunction(() => document.querySelector('#room-walk-toggle').getAttribute('aria-pressed') === 'true');
   const after = await page.evaluate(() => window.__keynlockDebug.host.camera.position.toArray());

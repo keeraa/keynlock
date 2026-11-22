@@ -5,7 +5,7 @@ import { WINDOW_OPENING } from './window.js';
 
 // The planning table in the middle of the room.
 export function buildPlanning(kit) {
-  const { m, staticGroup, animated, box, cylinder, sphere, rod, zoneTarget, makeTable, bottle } = kit;
+  const { m, staticGroup, animated, box, cylinder, sphere, rod, plane, zoneTarget, makeTable, bottle } = kit;
   function makePaper(parent, x, y, z, rotation = 0, size = [.53, .76]) {
     const sheet = new THREE.Group();
     sheet.position.set(x, y, z);
@@ -13,8 +13,10 @@ export function buildPlanning(kit) {
     parent.add(sheet);
     box(sheet, size[0], .013, size[1], m.paper, 0, .0065, 0);
     for (let i = 0; i < 6; i++) {
-      const line = box(sheet, size[0] * .64, .002, .005, m.paperDark, 0, .0135, -size[1] * .31 + i * .07);
-      line.castShadow = false;
+      // Ruled lines are drawn flat on the sheet: tiny raised strips came out
+      // as dashes in the ink outline.
+      const line = plane(sheet, size[0] * .64, .006, m.paperDark, 0, .0134, -size[1] * .31 + i * .07);
+      line.rotation.x = -Math.PI / 2;
     }
     return sheet;
   }

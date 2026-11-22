@@ -303,6 +303,521 @@
         "locks"
       ],
       "note": "Documented mechanism family, configurable variants are not counted as separate models"
+    },
+    {
+      "id": "lair-workbench",
+      "name": "Верстак логова",
+      "kind": "procedural-component",
+      "category": "interior/workshop",
+      "sourcePath": "js/3d/scenes/lair/src/room/workbench-furniture.js",
+      "sourceFunction": "buildWorkbench",
+      "usedInScenes": [
+        "lair"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lair-pegboard",
+      "name": "Стена инструментов",
+      "kind": "procedural-component",
+      "category": "interior/workshop",
+      "sourcePath": "js/3d/scenes/lair/src/room/workbench-furniture.js",
+      "sourceFunction": "buildWorkbench",
+      "usedInScenes": [
+        "lair"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lair-planning-table",
+      "name": "Планировочный стол",
+      "kind": "procedural-component",
+      "category": "interior/furniture",
+      "sourcePath": "js/3d/scenes/lair/src/room/planning.js",
+      "sourceFunction": "buildPlanning",
+      "usedInScenes": [
+        "lair"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lair-planning-chair",
+      "name": "Стул планирования",
+      "kind": "procedural-component",
+      "category": "interior/furniture",
+      "sourcePath": "js/3d/scenes/lair/src/room/planning.js",
+      "sourceFunction": "buildPlanning",
+      "usedInScenes": [
+        "lair"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lair-planning-board",
+      "name": "Настенная доска планирования",
+      "kind": "procedural-component",
+      "category": "interior/furniture",
+      "sourcePath": "js/3d/scenes/lair/src/room/planning.js",
+      "sourceFunction": "buildPlanning",
+      "usedInScenes": [
+        "lair"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lair-planning-shelf",
+      "name": "Книжная полка штаба",
+      "kind": "procedural-component",
+      "category": "interior/furniture",
+      "sourcePath": "js/3d/scenes/lair/src/room/planning.js",
+      "sourceFunction": "buildPlanning",
+      "usedInScenes": [
+        "lair"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lair-planning-candle",
+      "name": "Свеча штаба",
+      "kind": "procedural-component",
+      "category": "interior/lighting",
+      "sourcePath": "js/3d/scenes/lair/src/room/planning.js",
+      "sourceFunction": "buildPlanning",
+      "usedInScenes": [
+        "lair"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lair-planning-paper",
+      "name": "Бумажные листы на столе",
+      "kind": "procedural-component",
+      "category": "interior/decor",
+      "sourcePath": "js/3d/scenes/lair/src/room/planning.js",
+      "sourceFunction": "buildPlanning",
+      "usedInScenes": [
+        "lair"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lair-gramophone",
+      "name": "Граммофон",
+      "kind": "procedural-component",
+      "category": "interior/decor",
+      "sourcePath": "js/3d/scenes/lair/src/room/details.js",
+      "sourceFunction": "buildGramophone",
+      "usedInScenes": [
+        "lair"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lair-gramophone-table",
+      "name": "Тумба граммофона",
+      "kind": "procedural-component",
+      "category": "interior/furniture",
+      "sourcePath": "js/3d/scenes/lair/src/room/details.js",
+      "sourceFunction": "buildGramophone",
+      "usedInScenes": [
+        "lair"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lair-ink-bottle",
+      "name": "Чернильница",
+      "kind": "procedural-component",
+      "category": "interior/decor",
+      "sourcePath": "js/3d/scenes/lair/src/room/planning.js",
+      "sourceFunction": "buildPlanning",
+      "usedInScenes": [
+        "lair"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lair-workshop-key",
+      "name": "Ключ на верстаке",
+      "kind": "procedural-component",
+      "category": "interior/workshop",
+      "sourcePath": "js/3d/scenes/lair/src/room/workbench-furniture.js",
+      "sourceFunction": "buildWorkbench",
+      "usedInScenes": [
+        "lair"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "alchemy-work-table",
+      "name": "Алхимический стол",
+      "kind": "procedural-component",
+      "category": "alchemy/furniture",
+      "sourcePath": "js/3d/workshops/alchemy/src/alchemy.js",
+      "sourceFunction": "buildTable",
+      "usedInScenes": [
+        "alchemy"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "alchemy-wall-shelf",
+      "name": "Настенная полка алхимии",
+      "kind": "procedural-component",
+      "category": "alchemy/furniture",
+      "sourcePath": "js/3d/workshops/alchemy/src/alchemy.js",
+      "sourceFunction": "buildRoom",
+      "usedInScenes": [
+        "alchemy"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "alchemy-vessel",
+      "name": "Большая стеклянная колба",
+      "kind": "procedural-component",
+      "category": "alchemy/glassware",
+      "sourcePath": "js/3d/workshops/alchemy/src/alchemy.js",
+      "sourceFunction": "buildBigVessel",
+      "usedInScenes": [
+        "alchemy"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "alchemy-test-tube",
+      "name": "Пробирка",
+      "kind": "procedural-component",
+      "category": "alchemy/glassware",
+      "sourcePath": "js/3d/workshops/alchemy/src/alchemy.js",
+      "sourceFunction": "buildSourceTube",
+      "usedInScenes": [
+        "alchemy"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "alchemy-reagent-bottle",
+      "name": "Бутылочка реагента",
+      "kind": "procedural-component",
+      "category": "alchemy/glassware",
+      "sourcePath": "js/3d/workshops/alchemy/src/alchemy.js",
+      "sourceFunction": "buildBottle",
+      "usedInScenes": [
+        "alchemy"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "alchemy-bottle-holder",
+      "name": "Держатель бутылочки",
+      "kind": "procedural-component",
+      "category": "alchemy/equipment",
+      "sourcePath": "js/3d/workshops/alchemy/src/alchemy.js",
+      "sourceFunction": "buildBottleHolder",
+      "usedInScenes": [
+        "alchemy"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "alchemy-tube-rack",
+      "name": "Штатив пробирок",
+      "kind": "procedural-component",
+      "category": "alchemy/equipment",
+      "sourcePath": "js/3d/workshops/alchemy/src/alchemy.js",
+      "sourceFunction": "buildRack",
+      "usedInScenes": [
+        "alchemy"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "alchemy-burner",
+      "name": "Горелка с рычагом",
+      "kind": "procedural-component",
+      "category": "alchemy/equipment",
+      "sourcePath": "js/3d/workshops/alchemy/src/alchemy.js",
+      "sourceFunction": "buildBurner",
+      "usedInScenes": [
+        "alchemy"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "alchemy-burner-braces",
+      "name": "Подпорки горелки",
+      "kind": "procedural-component",
+      "category": "alchemy/equipment",
+      "sourcePath": "js/3d/workshops/alchemy/src/alchemy.js",
+      "sourceFunction": "buildBurner",
+      "usedInScenes": [
+        "alchemy"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "alchemy-drain-valve",
+      "name": "Сливной клапан и шланг",
+      "kind": "procedural-component",
+      "category": "alchemy/equipment",
+      "sourcePath": "js/3d/workshops/alchemy/src/alchemy.js",
+      "sourceFunction": "buildDrainValve",
+      "usedInScenes": [
+        "alchemy"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "alchemy-stopwatch",
+      "name": "Секундомер",
+      "kind": "procedural-component",
+      "category": "alchemy/equipment",
+      "sourcePath": "js/3d/workshops/alchemy/src/stopwatch.js",
+      "sourceFunction": "createStopwatch",
+      "usedInScenes": [
+        "alchemy"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "alchemy-recipe-parchment",
+      "name": "Лист рецепта",
+      "kind": "procedural-component",
+      "category": "alchemy/decor",
+      "sourcePath": "js/3d/workshops/alchemy/src/alchemy.js",
+      "sourceFunction": "buildRoom",
+      "usedInScenes": [
+        "alchemy"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "alchemy-candle",
+      "name": "Свеча алхимии",
+      "kind": "procedural-component",
+      "category": "alchemy/lighting",
+      "sourcePath": "js/3d/workshops/alchemy/src/alchemy.js",
+      "sourceFunction": "buildDecor",
+      "usedInScenes": [
+        "alchemy"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lock-housing",
+      "name": "Корпус замка",
+      "kind": "procedural-component",
+      "category": "mechanisms/parts",
+      "sourcePath": "js/3d/scenes/locks/src/js/mechanisms/lock-hardware.js",
+      "sourceFunction": "createLockHardware",
+      "usedInScenes": [
+        "locks"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lock-shackle",
+      "name": "Дужка замка",
+      "kind": "procedural-component",
+      "category": "mechanisms/parts",
+      "sourcePath": "js/3d/scenes/locks/src/js/mechanisms/lock-hardware.js",
+      "sourceFunction": "createLockHardware",
+      "usedInScenes": [
+        "locks"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lock-fasteners",
+      "name": "Винты корпуса замка",
+      "kind": "procedural-component",
+      "category": "mechanisms/parts",
+      "sourcePath": "js/3d/scenes/locks/src/js/mechanisms/lock-hardware.js",
+      "sourceFunction": "createLockHardware",
+      "usedInScenes": [
+        "locks"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lock-ball-latch",
+      "name": "Шариковая защёлка",
+      "kind": "procedural-component",
+      "category": "mechanisms/parts",
+      "sourcePath": "js/3d/scenes/locks/src/js/mechanisms/ball-latch.js",
+      "sourceFunction": "createBallLatch",
+      "usedInScenes": [
+        "locks"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lock-pin-pick",
+      "name": "Отмычка-крючок",
+      "kind": "procedural-component",
+      "category": "mechanisms/tools",
+      "sourcePath": "js/3d/scenes/locks/src/js/mechanisms/pin-tools.js",
+      "sourceFunction": "createPinPickingTools",
+      "usedInScenes": [
+        "locks"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lock-tension-wrenches",
+      "name": "Натяжители",
+      "kind": "procedural-component",
+      "category": "mechanisms/tools",
+      "sourcePath": "js/3d/scenes/locks/src/js/mechanisms/pin-tools.js",
+      "sourceFunction": "createPinPickingTools",
+      "usedInScenes": [
+        "locks"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lock-oil-can",
+      "name": "Маслёнка",
+      "kind": "procedural-component",
+      "category": "mechanisms/tools",
+      "sourcePath": "js/3d/scenes/locks/src/js/geometry/oil-can.js",
+      "usedInScenes": [
+        "locks"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lock-pin-drive",
+      "name": "Штифтовый механизм",
+      "kind": "procedural-component",
+      "category": "mechanisms/parts",
+      "sourcePath": "js/3d/scenes/locks/src/js/mechanisms/pin-drive.js",
+      "usedInScenes": [
+        "locks"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lock-plate-set",
+      "name": "Пластинчатый механизм",
+      "kind": "procedural-component",
+      "category": "mechanisms/parts",
+      "sourcePath": "js/3d/scenes/locks/src/js/mechanisms/plate-lock.js",
+      "usedInScenes": [
+        "locks"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "lock-disc-set",
+      "name": "Дисковый механизм",
+      "kind": "procedural-component",
+      "category": "mechanisms/parts",
+      "sourcePath": "js/3d/scenes/locks/src/js/mechanisms/disc-lock.js",
+      "usedInScenes": [
+        "locks"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "workbench-gear-train",
+      "name": "Шестерёнчатый механизм",
+      "kind": "procedural-component",
+      "category": "workbench/mechanisms",
+      "sourcePath": "js/3d/scenes/workbench/public/js/lab/mechanisms/gear-lock.js",
+      "sourceFunction": "createGearLockMode",
+      "usedInScenes": [
+        "workbench"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "workbench-classic-housing",
+      "name": "Корпус сборочного замка",
+      "kind": "procedural-component",
+      "category": "workbench/mechanisms",
+      "sourcePath": "js/3d/scenes/workbench/public/js/classic-lock-housing.js",
+      "usedInScenes": [
+        "workbench"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "workbench-code-box",
+      "name": "Кодовая шкатулка",
+      "kind": "procedural-component",
+      "category": "workbench/mechanisms",
+      "sourcePath": "js/3d/scenes/workbench/public/js/code-box-scene.js",
+      "sourceFunction": "createCodeBoxScene",
+      "usedInScenes": [
+        "workbench"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "city-stone-bridge",
+      "name": "Каменный арочный мост",
+      "kind": "procedural-component",
+      "category": "city/bridges",
+      "sourcePath": "js/3d/scenes/city/js/path-builder/stone-bridge.js",
+      "sourceFunction": "createStoneBridge",
+      "usedInScenes": [
+        "city"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
+    },
+    {
+      "id": "city-grand-bridge",
+      "name": "Большой многопролётный мост",
+      "kind": "procedural-component",
+      "category": "city/bridges",
+      "sourcePath": "js/3d/scenes/city/js/path-builder/grand-bridge.js",
+      "sourceFunction": "createGrandBridge",
+      "usedInScenes": [
+        "city"
+      ],
+      "status": "existing-in-scene",
+      "note": "Встроенная геометрия сцены: для независимого использования может потребоваться выделение фабрики"
     }
   ]
 }

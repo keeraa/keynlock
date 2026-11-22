@@ -96,6 +96,10 @@ const fragmentShader = /* glsl */`
   void main() {
     vec4 color = texture2D(tColor, vUv);
     float ink = uInk > 0.0 ? inkEdge() * uInk : 0.0;
+    // Glass in front (the normal buffer's alpha is 0 there): the lines behind
+    // it stay faint instead of showing through the tubes and flasks.
+    float glass = uUseNormals > .5 ? 1.0 - texture2D(tNormal, vUv).a : 0.0;
+    ink *= 1.0 - .85 * glass;
     gl_FragColor = vec4(mix(color.rgb, uInkColor, clamp(ink, 0.0, 1.0)), 1.0);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
@@ -111,6 +115,19 @@ export function createSceneOutline({ renderer, scene, camera }) {
   // See-through things (glass, glows, flames, dust) stay out of the normal
   // pass: the depth buffer does not hold them either. Found again each second.
   let hidden = [], hiddenFoundAt = -Infinity;
+  // Glass marks the normal buffer's alpha (see the shader): layer 9 holds it.
+  const GLASS_LAYER = 9;
+  // Only plain glass on the default layer: special passes (the lab's lens on
+  // layer 1) expect their own material in onBeforeRender.
+  const plainRender = THREE.Object3D.prototype.onBeforeRender;
+  const isGlass = object => object.isMesh && !object.userData.atmosphere && object.layers.isEnabled(0) &&
+    object.onBeforeRender === plainRender && [object.material].flat().some(material =>
+    material?.transparent && material.blending === THREE.NormalBlending && material.opacity >= .12 && material.colorWrite !== false);
+  const glassMask = new THREE.MeshBasicMaterial({
+    transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.CustomBlending,
+    blendEquation: THREE.AddEquation, blendSrc: THREE.ZeroFactor, blendDst: THREE.OneFactor,
+    blendSrcAlpha: THREE.ZeroFactor, blendDstAlpha: THREE.ZeroFactor,
+  });
   const seeThrough = object => object.visible && (object.isPoints || object.isLine || object.isSprite ||
     (object.isMesh && ([object.material].flat().some(material => material?.transparent || material?.depthWrite === false) ||
       object.userData.atmosphere)));
@@ -158,7 +175,11 @@ export function createSceneOutline({ renderer, scene, camera }) {
     const now = performance.now();
     if (now - hiddenFoundAt > 1000) {
       hidden = [];
-      scene.traverseVisible(object => { if (seeThrough(object)) hidden.push(object); });
+      scene.traverseVisible(object => {
+        if (!seeThrough(object)) return;
+        hidden.push(object);
+        if (isGlass(object)) object.layers.enable(GLASS_LAYER);
+      });
       hiddenFoundAt = now;
     }
     const shown = hidden.filter(object => object.visible);
@@ -175,11 +196,19 @@ export function createSceneOutline({ renderer, scene, camera }) {
     renderer.setClearColor(0x8080ff, 1);
     renderer.clear();
     renderer.render(scene, camera);
+    for (const object of shown) object.visible = true;
+    // Glass over the opaque depth just drawn clears the alpha where it is in front.
+    const layers = camera.layers.mask, autoClear = renderer.autoClear;
+    camera.layers.set(GLASS_LAYER);
+    scene.overrideMaterial = glassMask;
+    renderer.autoClear = false;
+    renderer.render(scene, camera);
+    renderer.autoClear = autoClear;
+    camera.layers.mask = layers;
     scene.background = background;
     scene.overrideMaterial = overrideMaterial;
     renderer.shadowMap.autoUpdate = shadows;
     renderer.setClearColor(clearColor, clearAlpha);
-    for (const object of shown) object.visible = true;
   }
 
   function render() {
@@ -213,7 +242,7 @@ export function createSceneOutline({ renderer, scene, camera }) {
     },
     dispose() {
       target?.depthTexture?.dispose(); target?.dispose(); normalTarget?.dispose();
-      material.dispose(); normalMaterial.dispose(); quad.geometry.dispose();
+      material.dispose(); normalMaterial.dispose(); glassMask.dispose(); quad.geometry.dispose();
     },
   };
 }

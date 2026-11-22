@@ -63,6 +63,11 @@ after(async () => {
   if (server) await new Promise(resolve => server.httpServer.close(resolve));
 });
 
+/** Open a zone as a click on its spot in the room does (the zone bar is gone). */
+function openZone(page, id) {
+  return page.evaluate(zone => window.__keynlockDebug.zones.open(zone), id);
+}
+
 async function openRoom(t, { locale = 'ru-RU', pointerLock = false, beforeLoad } = {}) {
   // The headless shell rejects native pointer lock. Use full Chromium for that case.
   const roomBrowser = pointerLock && !channel
@@ -74,6 +79,12 @@ async function openRoom(t, { locale = 'ru-RU', pointerLock = false, beforeLoad }
   await servePaintingsLocally(context);
   const page = await context.newPage();
   page.setDefaultTimeout(timeout);
+  // LAIR_CPU_THROTTLE=8 slows the page down like software WebGL on CI.
+  const throttle = Number(process.env.LAIR_CPU_THROTTLE) || 0;
+  if (throttle > 1) {
+    const cdp = await context.newCDPSession(page);
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: throttle });
+  }
   await beforeLoad?.(page);
   // ?start=overview: these checks begin at the overview (the game starts on foot).
   const response = await page.goto(`${baseUrl}?start=overview`, { waitUntil: 'domcontentloaded', timeout });
@@ -85,7 +96,7 @@ async function openRoom(t, { locale = 'ru-RU', pointerLock = false, beforeLoad }
 }
 
 async function enterAlchemy(page) {
-  await page.locator('.zone-nav [data-zone="alchemy"]').click();
+  await openZone(page, 'alchemy');
   await page.waitForFunction(() => window.__keynlockDebug.workshop('alchemy')?.lifecycle?.isActive());
   await page.getByRole('button', { name: 'Вернуться в логово' }).waitFor();
   // One way back for every mode, in one place: no second exit inside the lab.
@@ -118,10 +129,11 @@ async function clickAlchemyObject(page, kind, id) {
 }
 
 async function settleAlchemyCamera(page) {
-  await page.waitForFunction(() => {
-    const pose = window.__keynlockDebug.host.renderer.getWorldPose('alchemy');
-    return window.__keynlockDebug.host.camera.position.distanceTo(pose.position) < .04;
-  });
+  // The Lair frames the lab a little higher than its own pose, so wait for the
+  // flight to end rather than for the camera to reach the lab's exact pose.
+  await page.waitForFunction(() => window.__keynlockDebug.workshop('alchemy')?.lifecycle?.isActive()
+    && !window.__keynlockDebug.zones.isTransitioning());
+  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
 }
 
 test('the built Lair pours reagents into a vessel on its transformed alchemy table', async t => {
@@ -197,7 +209,7 @@ test('the burner accounts for active time when returning to the lab', async t =>
 test('an image load failure leaves the current painting editable', async t => {
   const page = await openRoom(t);
   const atelier = page.locator('#atelier-embedded-app');
-  await page.locator('.zone-nav [data-zone="atelier"]').click();
+  await openZone(page, 'atelier');
   await page.waitForFunction(() => window.__keynlockDebug.workshop('atelier')?.bridge?.isReady());
   const bridge = await page.evaluateHandle(() => window.__keynlockDebug.workshop('atelier')?.bridge);
   const catalogue = await bridge.evaluate(api => api.catalog());
@@ -264,14 +276,14 @@ test('switching workshops returns the shared camera, input, and lights to the ro
 
   const reset = page.locator('#reset-camera');
   // The planning corner is a placeholder: a panel, but no workshop to open.
-  await page.locator('.zone-nav [data-zone="planning"]').click();
+  await openZone(page, 'planning');
   await page.locator('#zone-panel').waitFor();
   assert.equal(await page.locator('#panel-link').isVisible(), false, 'no workshop link without a workshop');
   assert.equal((await page.locator('#reset-camera span').innerText()).trim(), 'ОБЩИЙ ВИД');
   await reset.click();
   await assertHome();
 
-  await page.locator('.zone-nav [data-zone="atelier"]').click();
+  await openZone(page, 'atelier');
   await page.waitForFunction(position =>
     window.__keynlockDebug.host.camera.position.toArray().some((value, axis) => Math.abs(value - position[axis]) > 3),
   home.position);
@@ -418,7 +430,7 @@ test('the room hosts both workshops on one canvas through the host contract', as
   assert.equal(await page.locator('#perf-panel').isHidden(), true);
 
   // The Atelier's own tools work inside the room.
-  await page.locator('.zone-nav [data-zone="atelier"]').click();
+  await openZone(page, 'atelier');
   await page.locator('#lair-focus-copy').click();
   await page.waitForFunction(() => window.__keynlockDebug.host.controls.minDistance < 2);
   // The window's haze would wash out the paintings being restored.
@@ -436,7 +448,7 @@ test('the room hosts both workshops on one canvas through the host contract', as
 
   // The painting wall opens from the room and returns to the easels.
   await page.locator('#reset-camera').click();
-  await page.locator('.zone-nav [data-zone="atelier"]').click();
+  await openZone(page, 'atelier');
   await page.locator('#wall-collection-entry').click();
   await page.waitForFunction(() => window.__keynlockDebug.host.atelier.galleryActive === true);
   assert.equal(await page.locator('#lair-gallery-controls').isVisible(), true);
@@ -472,14 +484,14 @@ for (const [id, healthy, chunk, message] of [
     assert.equal(failed.ready, false);
     assert.ok(failed.error);
 
-    await page.locator(`.zone-nav [data-zone="${id}"]`).click();
+    await openZone(page, id);
     await page.locator(`#${id}-embedded-app`).getByRole('alert').filter({ hasText: message }).waitFor();
     await page.locator('#reset-camera').click();
     assert.equal(await page.locator(`#${id}-embedded-app`).isHidden(), true);
 
     if (healthy === 'alchemy') await enterAlchemy(page);
     else {
-      await page.locator('.zone-nav [data-zone="atelier"]').click();
+      await openZone(page, 'atelier');
       await page.locator('#lair-easel-camera-controls').waitFor();
     }
   });
@@ -628,7 +640,7 @@ test('an English browser gets the Lair in English, with a language switch', asyn
   const page = await openRoom(t, { locale: 'en-US' });
   assert.equal(await page.title(), "KEYNLOCK · The team's lair");
   assert.equal(await page.evaluate(() => document.documentElement.lang), 'en');
-  assert.equal(await page.locator('.zone-nav [data-zone="workbench"] span:last-child').innerText(), 'Workbench');
+  assert.equal(await page.locator('.hotspot[data-zone="workbench"] span:last-child').innerText(), 'Workbench');
   assert.equal(await page.locator('#lair-language').inputValue(), 'en');
   assert.deepEqual(await page.locator('#lair-language option').evaluateAll(options => options.map(o => o.value)), ['ru', 'en']);
 });
@@ -646,7 +658,7 @@ test('one music player follows the Lair into its workshops and switches tracks',
   assert.equal(await page.evaluate(() => localStorage.getItem('keynlock-music-stopped-v1')), '1');
 
   // The gramophone's panel shows the same player, with volume.
-  await page.locator('.zone-nav [data-zone="gramophone"]').click();
+  await openZone(page, 'gramophone');
   await page.locator('#panel-music').waitFor();
   assert.equal(await page.locator('#panel-music .music-controls__title').innerText(), 'Шопен · Ноктюрн op. 9 № 2');
   assert.equal(await page.locator('#panel-music .music-controls__volume').inputValue(), '25');
@@ -678,25 +690,38 @@ test('the room draws once per frame: no transmission pass and no per-frame shado
   });
   // Any transmission material makes Three.js draw every opaque object again each frame.
   assert.deepEqual(state.transmissive, []);
-  // The scene is drawn into the ink outline's buffer, the opaque part once more
-  // for its normals; the shadow map is refreshed about once a second.
+  // The scene is drawn into the ink outline's buffer (the opaque part once
+  // more for its normals) and the shadow map about once a second. Counted per
+  // second, not per frame: software WebGL on CI draws only a few frames a
+  // second, so one shadow refresh is spread over very few frames.
   const passes = await page.evaluate(async () => {
     const gl = document.querySelector('#scene').getContext('webgl2');
-    let target = null, frames = 0;
+    let target = null;
     const draws = new Map();
     const bind = gl.bindFramebuffer, draw = gl.drawElements, drawArrays = gl.drawArrays;
     const count = () => draws.set(target, (draws.get(target) ?? 0) + 1);
     gl.bindFramebuffer = function (kind, framebuffer) { target = framebuffer; return bind.call(this, kind, framebuffer); };
     gl.drawElements = function (...args) { count(); return draw.apply(this, args); };
     gl.drawArrays = function (...args) { count(); return drawArrays.apply(this, args); };
-    for (; frames < 20; frames++) await new Promise(resolve => requestAnimationFrame(resolve));
+    const started = performance.now();
+    let frames = 0;
+    while (performance.now() - started < 3000 || frames < 3) {
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      frames++;
+    }
+    const seconds = (performance.now() - started) / 1000;
     Object.assign(gl, { bindFramebuffer: bind, drawElements: draw, drawArrays });
-    const perTarget = [...draws.values()].map(total => total / frames).sort((a, b) => b - a);
-    return { scenePass: perTarget[0], normalPass: perTarget[1], others: perTarget.slice(2).reduce((sum, value) => sum + value, 0) };
+    const totals = [...draws.values()].sort((a, b) => b - a);
+    const scenePass = totals[0] / frames;
+    // A pass drawing a good part of the scene each frame is a scene pass:
+    // colour, and normals (opaque objects only, about half). The rest is per second.
+    const scenePasses = totals.filter(total => total / frames >= scenePass * .3);
+    const others = totals.filter(total => total / frames < scenePass * .3).reduce((sum, total) => sum + total, 0);
+    return { othersPerSecond: Math.round(others / seconds), scenePasses: scenePasses.length };
   });
-  // Two passes: the colour pass and the outline's normal pass (opaque only).
-  assert.ok(passes.normalPass <= passes.scenePass, `normal pass ${passes.normalPass} vs scene ${passes.scenePass}`);
-  assert.ok(passes.others < 60, `draws per frame outside the two scene passes: ${passes.others}`);
+  assert.ok(passes.scenePasses <= 2, `scene-sized passes per frame: ${passes.scenePasses}`);
+  // One shadow refresh (~320 draws) a second, plus the screen quad.
+  assert.ok(passes.othersPerSecond < 450, `other draws per second: ${passes.othersPerSecond}`);
 });
 
 test('the workshops share the room look: one gouache setting, no Atelier-only effects', async t => {
@@ -737,8 +762,10 @@ test('a zone opened while walking returns to the walk; the entrance wall shows o
   const after = await page.evaluate(() => window.__keynlockDebug.host.camera.position.toArray());
   assert.ok(after.every((value, axis) => Math.abs(value - before[axis]) < .05), 'back where the walker stood');
   // The playlist lists every track and can switch to one.
-  await page.locator('#lair-music .music-controls__title').click();
-  await page.locator('#lair-music .music-controls__track-button').nth(2).click();
+  // Dispatched clicks: on slow software WebGL (CI) the top bar never counts
+  // as "stable" for Playwright's actionability checks.
+  await page.locator('#lair-music .music-controls__title').dispatchEvent('click');
+  await page.locator('#lair-music .music-controls__track-button').nth(2).dispatchEvent('click');
   assert.equal(await page.locator('#lair-music .music-controls__track[aria-current="true"]').count(), 1);
   assert.match(await page.locator('#lair-music .music-controls__track[aria-current="true"]').innerText(), /си-бемоль/);
 });

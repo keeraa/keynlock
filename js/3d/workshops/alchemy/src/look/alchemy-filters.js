@@ -8,8 +8,8 @@ import { ALCHEMY_LOOK } from './alchemy-look.js';
 export const ALCHEMY_FILTERS = ALCHEMY_LOOK.filters;
 
 export function createAlchemyFilters({scene,renderer,materials,document,
-  textureLoader,contours=[]}) {
-  const filters = createVisualSystem(scene,renderer,materials,document,textureLoader,contours);
+  textureLoader,contours=[],meshOutlines=true}) {
+  const filters = createVisualSystem(scene,renderer,materials,document,textureLoader,contours,{meshOutlines});
   return {
     ...filters,
     profile:ALCHEMY_FILTERS,

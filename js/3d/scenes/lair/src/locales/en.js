@@ -110,8 +110,6 @@ export default Object.freeze({
   "⌘ + ПЕРЕТАСКИВАЙ — ПЕРЕМЕЩЕНИЕ": "⌘ + DRAG — MOVE",
   "КОЛЕСО — МАСШТАБ": "WHEEL — ZOOM",
   "КЛИК — ВЗАИМОДЕЙСТВИЕ": "CLICK — INTERACT",
-  "Локации логова": "Places in the Lair",
-  "Штаб": "Base",
   "Музыка": "Music",
   "ОБЩИЙ ВИД": "OVERVIEW",
   "ОТКРЫВАЕМ МАСТЕРСКУЮ": "OPENING THE WORKSHOP",

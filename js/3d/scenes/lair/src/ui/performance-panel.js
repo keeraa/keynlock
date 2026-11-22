@@ -27,7 +27,7 @@ export function getTriangleBreakdown(scene, { limit = 6 } = {}) {
   const totals = new Map();
   let total = 0;
   scene.traverse(object => {
-    if (!object.isMesh || object.userData?.inkOutlineShell || object.userData?.atmosphere) return;
+    if (!object.isMesh || object.userData?.atmosphere) return;
     // A hidden ancestor hides the mesh, and the walk up gives its owner.
     let workshop = null, part = '', named = object.name || '';
     for (let node = object; node; node = node.parent) {

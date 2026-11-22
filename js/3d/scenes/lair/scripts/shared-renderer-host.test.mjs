@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import {createSharedRendererHost} from '../src/rendering/shared-renderer-host.js';
-import {createCartoonFilter} from '@keynlock/atelier/room-assets';
+// The Atelier's own filter (its standalone look) must still start through the proxy.
+import {createCartoonFilter} from '../../../workshops/atelier/src/effects/cartoon-filter.js';
 
 test('original workshops share one GPU renderer, clip to their UI stage and restore the room',()=>{
   const records=[];

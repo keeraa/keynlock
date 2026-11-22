@@ -224,7 +224,9 @@ mergeStaticMeshes(scene, { keep });
 mergeStaticMeshes(backgroundScene, { keep });
 const visuals = createAlchemyFilters({scene,renderer,
   materials:{iron,oldBrass,brass,polishedBrass,wood,darkWood,blackWood,corkMat},
-  document,textureLoader:new THREE.TextureLoader(),contours:[...glassContours,...liquidContours]});
+  document,textureLoader:new THREE.TextureLoader(),contours:[...glassContours,...liquidContours],
+  // In the Lair the room's one outline draws wood and metal; see visuals.js.
+  meshOutlines:!runtime.embedded});
 for (const id of Object.keys(GLASS_FINISHES)) $('glass-' + id).addEventListener('click', () => {
   selectGlassFinish(id);
 });

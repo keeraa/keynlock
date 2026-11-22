@@ -133,7 +133,11 @@ function outlineGeometry(geometry) {
   return rounded;
 }
 
-export function createVisualSystem(scene, renderer, metals, documentRef, textureLoader = new THREE.TextureLoader(), extraContours = []) {
+// meshOutlines: the inverted-hull ink on wood and metal. Off in the Lair,
+// whose full-screen outline already draws them; the glass and liquid contours
+// (extraContours) stay, since that outline cannot see through glass.
+export function createVisualSystem(scene, renderer, metals, documentRef, textureLoader = new THREE.TextureLoader(), extraContours = [],
+  { meshOutlines = true } = {}) {
   const state = { ...VISUAL_DEFAULTS };
   const groups = {
     frame: [metals.iron, metals.oldBrass],
@@ -153,7 +157,7 @@ export function createVisualSystem(scene, renderer, metals, documentRef, texture
   scene.traverse(object => {
     if (!object.isMesh || !object.material?.isMeshStandardMaterial || object.material.transparent) return;
     solids.push({ mesh: object, base: object.material });
-    if (outlinedMaterials.has(object.material)) outlineTargets.push(object);
+    if (meshOutlines && outlinedMaterials.has(object.material)) outlineTargets.push(object);
   });
 
   const ink = new THREE.ShaderMaterial({

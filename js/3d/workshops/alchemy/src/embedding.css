@@ -59,10 +59,12 @@
   touch-action: none;
 }
 #alchemy-embedded-app .vignette {display: none}
+/* The lab's own buttons sit in one row with the Lair's «← В ЛОГОВО»,
+   which keeps the right edge (#reset-camera, top 84px, right 32px). */
 #alchemy-embedded-app .topbar {
-  top: 55px;
+  top: 81px;
   left: auto;
-  right: 14px;
+  right: 162px;
   width: auto;
   height: 47px;
   padding: 0 8px;
@@ -75,7 +77,7 @@
 #alchemy-embedded-app .header-center,
 #alchemy-embedded-app .build-tag,
 #alchemy-embedded-app .scene-stats {display: none}
-#alchemy-embedded-app .visual-panel {top: 108px;bottom: 20px;pointer-events:auto}
+#alchemy-embedded-app .visual-panel {top: 136px;bottom: 20px;pointer-events:auto}
 #alchemy-embedded-app .visual-panel {bottom: 110px}
 #alchemy-embedded-app .scene-overlays {right:0;pointer-events:none}
 #alchemy-embedded-app .guide {bottom: 118px}
@@ -84,3 +86,5 @@
 #alchemy-embedded-app button,
 #alchemy-embedded-app input,
 #alchemy-embedded-app select {pointer-events:auto}
+/* In the Lair the lab shows no drag hint: the room's own hint line covers it. */
+#alchemy-embedded-app #guide { display: none !important; }

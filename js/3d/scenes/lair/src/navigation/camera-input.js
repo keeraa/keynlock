@@ -73,6 +73,8 @@ export function createCameraInput({ camera, controls, roomWalk, atelierView, han
     isWalking: () => mode === 'walk',
     /** Where the walker stood and looked when walking last stopped. */
     walkPose: () => walkPose,
+    /** Where a new walk begins (room-walk.js). */
+    walkStartPose: () => roomWalk.startPose(),
     isGallery: () => mode === 'gallery',
     canPickZone: () => mode === 'room' || mode === 'walk',
   };

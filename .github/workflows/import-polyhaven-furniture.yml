@@ -1,0 +1,26 @@
+name: Import approved Poly Haven 2K furniture
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/import-approved-polyhaven-models.mjs'
+      - 'js/3d/shared/models/polyhaven-imports.json'
+permissions:
+  contents: write
+jobs:
+  import-models:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/import-approved-polyhaven-models.mjs
+      - name: Commit imported binary assets
+        run: |
+          git add js/3d/shared/models/assets
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'assets(models): import approved Poly Haven 2K glTF furniture'
+          git push

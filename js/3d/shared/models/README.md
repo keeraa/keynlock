@@ -1,24 +1,26 @@
 # KEYNLOCK — общая библиотека 3D-моделей
 
-Единый каталог моделей для будущих сцен. Файлы моделей не дублируются между сценами: загрузка через закреплённые URL, указанные в `catalog.json`.
+Единый реестр внешних геометрических моделей. Каталог: [catalog.json](./catalog.json). В нём сейчас **16 файловых моделей** (GLB/glTF): 15 уже использовавшихся в Архиве ключей и 1 новая модель стеллажа.
 
-## Library Oak Bookcase
+## Состав
 
-- Источник: https://tevy.dev/models/library-oak-bookcase
-- Лицензия: [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) — разрешено коммерческое использование и изменение.
-- Версия: **v1**, закреплена в URL.
-- Габариты: 1,62 × 3,00 × 0,48 м.
-- LOD0: 1 474 треугольника / ~235 КБ; LOD1: 1 192 / ~84 КБ; LOD2: 136 / ~20 КБ.
-- Статус: **в каталоге; в сценах пока не размещена**.
-- Оригинальная модель; адаптация материалов под гуашевую стилистику KEYNLOCK выполняется отдельно.
+- **Книги:** 5 (Books Strapped, Book 7, Book Group Medium 1–3).
+- **Мебель:** 4 (Peg Rack, Painted Wooden Stool, Painted Wooden Table, Wooden Table 02).
+- **Освещение:** 4 (Candle 1–2, Chandelier, Wooden Candle Holder).
+- **Прочее:** 2 (Scroll Red, Bottle 1).
+- **Новый объект:** 1 (Library Oak Bookcase).
 
-### Подключение к Three.js
+Пятнадцать существующих GLB/glTF хранятся в `js/3d/scenes/key-archive/dist/assets/` и подключаются из общего реестра по URL исходного файла с сохранением относительных ссылок на `.bin` и текстуры. Это **реестр существующих ассетов**, а не перенос или дублирование файлов. Авторство и условия использования указаны в `key-archive/dist/assets/selected-archive-props/SOURCES.txt` и `quaternius-fantasy-props/LICENSE.txt`. Модели Quaternius и Poly Haven: CC0 1.0.
+
+**Library Oak Bookcase:** https://tevy.dev/models/library-oak-bookcase — CC0 1.0, версия v1. Габариты 1,62 × 3 × 0,48 м; LOD0 1 474 треугольника. Подключён к каталогу, но в сценах ещё не размещён. Его файлы загружаются с сайта источника, не сохранены в репозитории. Для всех внешних URL доступность и CORS следует проверить в целевой сцене.
+
+## Использование
 
 ```js
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {loadModel} from './js/3d/shared/models/model-catalog.js';
-const gltf=await loadModel('library-oak-bookcase',{loader:new GLTFLoader(),lod:0});
+const gltf=await loadModel('painted-wooden-table',{loader:new GLTFLoader()});
 scene.add(gltf.scene);
 ```
 
-Для подключения через прямой браузерный import можно также читать `catalog.json` обычным fetch и использовать `lods[0].url`. Сеть требуется при первом открытии; для офлайн-сборки надо самостоятельно скопировать закреплённые GLB локально.
+Каталог описывает только импортированные GLB/glTF. **Процедурные модели** (дома, особые здания, механизмы замков, инструменты, десять семейств ключей) существуют в исходных JS-модулях соответствующих сцен и здесь пока не перечислены. Их необходимо индексировать отдельно по фабрикам и параметрам, чтобы не путать с файловыми ресурсами.

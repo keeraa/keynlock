@@ -12,7 +12,6 @@ import { createSharedRendererHost } from './rendering/shared-renderer-host.js';
 import { addRoomLighting } from './room/lighting.js';
 import { createDayNight } from './room/day-night.js';
 import { mountPerformancePanel } from './ui/performance-panel.js';
-import { mountAmbience } from './ui/ambience.js';
 import { mountLairMusic } from './audio/music.js';
 import { startLairFrames } from './lair-frame-loop.js';
 import './ui/performance.css';
@@ -35,7 +34,6 @@ import { createReturnButton } from './ui/return-button.js';
 document.documentElement.lang = translator.language;
 translator.translateTree(document);
 bindLanguageSelect(document.querySelector('#lair-language'));
-mountAmbience(document.querySelector('#sound-toggle'));
 let musicStorage = null;
 try { musicStorage = window.localStorage; } catch { /* music then forgets its place */ }
 mountLairMusic({ window, storage: musicStorage, mounts: [

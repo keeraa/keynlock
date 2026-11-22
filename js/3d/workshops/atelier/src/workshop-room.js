@@ -2,7 +2,8 @@
 import { createFrameGeometry } from './frame-geometry.js';
 
 /** Builds the static atelier and exposes its easel factory and wood surfaces. */
-export function createWorkshopRoom({ THREE, scene, mats, includeWallTrim = true, wallZ = -4.6, floorY = -.0285 }) {
+// includeShelf: the wall shelf with pigment jars (the standalone Atelier; the Lair has none).
+export function createWorkshopRoom({ THREE, scene, mats, includeWallTrim = true, includeShelf = true, wallZ = -4.6, floorY = -.0285 }) {
   const floorWoodMaterials = [];
   // Static furniture repeats the same primitives dozens of times. Reuse their
   // immutable GPU buffers across both easels, planks, shelves and tools.
@@ -127,26 +128,28 @@ export function createWorkshopRoom({ THREE, scene, mats, includeWallTrim = true,
 
     // The entire rear wall is kept clear for optional hanging artworks.
 
-    // Tool shelving and glass pigment jars.
-    const shelfZ = wallZ + .285;
-    for (const y of [1.45, 2.45, 3.45]) {
-      box(2.15, .105, .58, mats.roomWood, -5.25, y, shelfZ).name = 'restoration-wall-shelf';
-      box(.08, .52, .50, mats.roomEdge, -6.1, y - .309, wallZ + .24);
-      box(.08, .52, .50, mats.roomEdge, -4.45, y - .309, wallZ + .24);
-    }
     const colors = ['#9a5342', '#b68d52', '#6a8477', '#b6a48c', '#4f6570', '#bd8557', '#6b4934', '#7c7763'];
-    // No transmission: in the Lair it makes Three.js draw every opaque object
-    // once more per frame, for eight small jars.
-    const jarGlass = new THREE.MeshPhysicalMaterial({ color: '#d9d3bd', roughness: .18,
-      transparent: true, opacity: .65 });
-    for (let i = 0; i < 8; i++) {
-      const row = Math.floor(i / 4), col = i % 4;
-      const x = -6 + col * .5, baseY = 1.5025 + row, z = shelfZ + .025;
-      cylinder(.12, .13, .37, jarGlass, x, baseY + .185, z);
-      const pigment = cylinder(.103, .103, .23, new THREE.MeshStandardMaterial({ color: colors[i], roughness: .91 }), x, baseY + .13, z);
-      pigment.userData.excludeFromInk = true;
-      pigment.castShadow = false;
-      cylinder(.125, .125, .075, mats.roomWood, x, baseY + .40, z);
+    if (includeShelf) {
+      // Tool shelving and glass pigment jars.
+      const shelfZ = wallZ + .285;
+      for (const y of [1.45, 2.45, 3.45]) {
+        box(2.15, .105, .58, mats.roomWood, -5.25, y, shelfZ).name = 'restoration-wall-shelf';
+        box(.08, .52, .50, mats.roomEdge, -6.1, y - .309, wallZ + .24);
+        box(.08, .52, .50, mats.roomEdge, -4.45, y - .309, wallZ + .24);
+      }
+      // No transmission: in the Lair it makes Three.js draw every opaque object
+      // once more per frame, for eight small jars.
+      const jarGlass = new THREE.MeshPhysicalMaterial({ color: '#d9d3bd', roughness: .18,
+        transparent: true, opacity: .65 });
+      for (let i = 0; i < 8; i++) {
+        const row = Math.floor(i / 4), col = i % 4;
+        const x = -6 + col * .5, baseY = 1.5025 + row, z = shelfZ + .025;
+        cylinder(.12, .13, .37, jarGlass, x, baseY + .185, z);
+        const pigment = cylinder(.103, .103, .23, new THREE.MeshStandardMaterial({ color: colors[i], roughness: .91 }), x, baseY + .13, z);
+        pigment.userData.excludeFromInk = true;
+        pigment.castShadow = false;
+        cylinder(.125, .125, .075, mats.roomWood, x, baseY + .40, z);
+      }
     }
 
     // Work table, scattered brushes, palette and restoration paraphernalia.

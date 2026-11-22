@@ -19,7 +19,9 @@ export function buildShell(kit) {
     const start = ROOM_START + i * plankStep;
     const span = Math.min(plankStep, ROOM_END - start);
     const z = start + span / 2;
-    const plank = box(staticGroup, 17.1, .047, span * .96, i % 6 === 0 ? m.floorAlternate : m.floor, 0, .015, z);
+    // Boards butt together: a gap would show the boards' side faces, which
+    // the ink outline drew as dotted lines along every seam.
+    const plank = box(staticGroup, 17.1, .047, span, i % 6 === 0 ? m.floorAlternate : m.floor, 0, .015, z);
     plank.castShadow = false;
     // Give adjoining boards different parts of the same painted grain.
     const uv = plank.geometry.getAttribute('uv');
@@ -28,7 +30,11 @@ export function buildShell(kit) {
     for (let j = 0; j < uv.count; j++) {
       uv.setXY(j, uv.getX(j) + grainX, uv.getY(j) + grainY);
     }
-    if (i % 5 === 0) box(staticGroup, 17.1, .006, .009, m.darkWood, 0, .045, start + .0075).castShadow = false;
+    if (i % 5 === 0) {
+      // A painted seam, flat on the boards (no edges for the outline).
+      const seam = plane(staticGroup, 17.1, .012, m.darkWood, 0, .0392, start + .006);
+      seam.rotation.x = -Math.PI / 2;
+    }
   }
   // Double-height room, measured from the same floor datum as the original.
   // The arched opening runs all the way through the plaster. A solid box

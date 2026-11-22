@@ -21,6 +21,7 @@ const fragmentShader = /* glsl */`
   uniform sampler2D tDepth;
   uniform vec2 uResolution;
   uniform mat4 uProjectionInverse;
+  uniform vec3 uViewUp;
   uniform float uNear, uFar, uWidth, uInk, uNormalThreshold, uDepthThreshold, uFadeNear, uFadeFar;
   uniform vec3 uInkColor;
   varying vec2 vUv;
@@ -33,13 +34,20 @@ const fragmentShader = /* glsl */`
     vec4 view = uProjectionInverse * clip;
     return view.xyz / view.w;
   }
-  // A face's normal from its depth and that of the next pixels across and up.
+  // A face's normal from its depth and its neighbours'. On each axis the side
+  // with the smaller depth change is used, so an edge next to the pixel does
+  // not bend its normal (that noise drew dashes along plank seams).
   vec3 normalAt(vec2 uv, float depth) {
     vec2 pixel = 1.0 / uResolution;
     vec3 here = viewPosition(uv, depth);
-    vec2 uvX = uv + vec2(pixel.x, 0.0), uvY = uv + vec2(0.0, pixel.y);
-    vec3 across = viewPosition(uvX, rawDepth(uvX)) - here;
-    vec3 up = viewPosition(uvY, rawDepth(uvY)) - here;
+    float right = rawDepth(uv + vec2(pixel.x, 0.0)), left = rawDepth(uv - vec2(pixel.x, 0.0));
+    float above = rawDepth(uv + vec2(0.0, pixel.y)), below = rawDepth(uv - vec2(0.0, pixel.y));
+    vec3 across = abs(right - depth) < abs(depth - left)
+      ? viewPosition(uv + vec2(pixel.x, 0.0), right) - here
+      : here - viewPosition(uv - vec2(pixel.x, 0.0), left);
+    vec3 up = abs(above - depth) < abs(depth - below)
+      ? viewPosition(uv + vec2(0.0, pixel.y), above) - here
+      : here - viewPosition(uv - vec2(0.0, pixel.y), below);
     return normalize(cross(across, up));
   }
 
@@ -60,6 +68,11 @@ const fragmentShader = /* glsl */`
       crease = max(
         smoothstep(uNormalThreshold, uNormalThreshold + .15, length(normal - neighborNormal)),
         smoothstep(uDepthThreshold, uDepthThreshold * 1.8, jump));
+      // Floor boards, table tops and papers: two upward faces with only a small
+      // step between them (plank seams, ruled lines) get no ink. A real drop,
+      // like a table top over the floor, keeps it.
+      float upward = smoothstep(.82, .94, dot(normal, uViewUp)) * smoothstep(.82, .94, dot(neighborNormal, uViewUp));
+      crease *= 1.0 - upward * (1.0 - smoothstep(.06, .14, jump));
     }
     // Ink goes on the farther surface, outside the nearer silhouette; along a
     // fold (no depth step) on the face turned further from the camera.
@@ -108,6 +121,7 @@ export function createSceneOutline({ renderer, scene, camera }) {
     tColor: { value: null }, tDepth: { value: null },
     uResolution: { value: new THREE.Vector2(1, 1) },
     uProjectionInverse: { value: new THREE.Matrix4() },
+    uViewUp: { value: new THREE.Vector3(0, 1, 0) },
     uNear: { value: camera.near }, uFar: { value: camera.far },
     uWidth: { value: /** @type {number} */ (INK.radius) }, uInk: { value: /** @type {number} */ (INK.opacity) },
     uInkColor: { value: new THREE.Color(INK.color) },
@@ -144,6 +158,8 @@ export function createSceneOutline({ renderer, scene, camera }) {
     uniforms.uNear.value = camera.near;
     uniforms.uFar.value = camera.far;
     uniforms.uProjectionInverse.value.copy(camera.projectionMatrixInverse);
+    camera.updateMatrixWorld();
+    uniforms.uViewUp.value.set(0, 1, 0).transformDirection(camera.matrixWorldInverse);
     uniforms.uWidth.value = INK.radius * widthScale * Math.max(1, renderer.getPixelRatio());
     const previous = renderer.getRenderTarget();
     renderer.setRenderTarget(frame);

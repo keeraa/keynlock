@@ -129,6 +129,7 @@ function setup() {
     onExit: () => zoneTransitions.reset(),
     onInteract: () => zoneInteraction.openWalkTarget(),
   });
+  window.__keynlockDebug.walk = roomWalk;
   const atelierView = createAtelierView({
     camera, controls, canvas, interaction, rendererHost, host,
     easelPose: ATELIER_EASELS, roomMinDistance,

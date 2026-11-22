@@ -191,7 +191,11 @@ export function createZoneTransitions({
     if (returnToWalk && currentZone) {
       returnToWalk = false;
       transitioning = false;
-      closePanel('walk', { resumeWalk: true });
+      // Back from a workshop the walk starts afresh at the entrance, as when
+      // entering walk mode; from a small zone (the gramophone, a door) it
+      // resumes where the walker stood.
+      const fromWorkshop = currentZone === 'atelier' || currentZone === 'alchemy' || currentZone === 'workbench';
+      closePanel('walk', { resumeWalk: !fromWorkshop });
       atelierView.cancelFlight();
       rendererHost?.setWorldLighting(null);
       return;
@@ -274,6 +278,8 @@ export function createZoneTransitions({
 
   return {
     open: openZone, reset: resetView, onWorkshopReady, resizeCamera, updateApproach, handleKey,
+    /** Start in walk mode (the game's first view). */
+    startWalk: () => { if (!cameraInput.isWalking()) toggleWalk(); },
     returnsToWalk: () => returnToWalk,
     precompileWorkshopLighting: () => workshopLighting.precompile(workshopOverlay.isReady, () => inRoomWorkshop),
     manipulateAlchemy, resetAlchemyCamera,

@@ -164,7 +164,7 @@
    The source stage remains hidden because the Lair owns the single 3D canvas. */
 .atelier-art-info {
   position:absolute;
-  top:155px;
+  top:138px;
   right:22px;
   z-index:23;
   width:min(348px,calc(100vw - 44px));
@@ -345,7 +345,7 @@
 @media (max-width: 660px) {
   .wall-collection-entry {font-size:8px;padding:7px 9px;gap:6px}
   .wall-collection-mark {width:25px;height:25px;font-size:16px}
-  .atelier-art-info {top:118px;right:10px;width:min(318px,calc(100vw - 20px));max-height:34vh}
+  .atelier-art-info {top:105px;right:10px;width:min(318px,calc(100vw - 20px));max-height:34vh}
   .atelier-art-heading {padding:10px 12px}
   #atelier-info-title {font-size:18px}
   #atelier-info-body {padding:0 12px 11px}

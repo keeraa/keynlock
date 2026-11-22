@@ -105,8 +105,11 @@ export function createRoomWalk({ scene, camera, interaction, onExit, onInteract 
       camera.position.copy(pose.position);
       rotation.set(pose.pitch, pose.yaw, 0);
     } else {
-      camera.position.set(.25, .0385 + eyeHeight, ROOM_END - 2.22);
-      rotation.set(0, 0, 0);
+      // Six metres in from the entrance, turned a little left and up: the
+      // easels, the window, the planning table and a chandelier in one view.
+      // The game starts here.
+      camera.position.set(-.3, .0385 + eyeHeight, ROOM_END - 6.07);
+      rotation.set(.13, .25, 0);
     }
     camera.quaternion.setFromEuler(rotation);
     resize();

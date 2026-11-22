@@ -42,8 +42,6 @@ export function createCodeLockUI({canvas,$,toast,isActive}){
       up.disabled=down.disabled=state.opened;
     });
     $('codeFallbackCasket').classList.toggle('opened',state.opened);
-    $('codeAttemptCount').textContent=String(state.attempts);
-    $('codeMatchedCount').textContent=state.matched==null?'—':`${state.matched} / 6`;
     $('codeTry').disabled=state.opened;
     const text=state.opened?
       'Шкатулка открыта. На внутренней подкладке лежит простой прямоугольник.':

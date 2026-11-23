@@ -1,0 +1,26 @@
+name: Art archive
+
+on:
+  push:
+    paths:
+      - 'art-archive/**'
+      - '.github/workflows/art-archive.yml'
+  pull_request:
+    paths:
+      - 'art-archive/**'
+      - '.github/workflows/art-archive.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and test the standalone archive
+        run: npm --prefix art-archive test

@@ -1,0 +1,3648 @@
+{
+  "date": "2026-11-23",
+  "total": 160,
+  "reused": 19,
+  "added": 141,
+  "reasons": {
+    "available": 125,
+    "oversize": 1,
+    "unassigned": 4,
+    "image": 5,
+    "unmeasured": 6
+  },
+  "paintings": [
+    {
+      "id": "ART-1800",
+      "atelierId": "great-wave",
+      "title": "The Great Wave off Kanagawa",
+      "titleRu": "Большая волна в Канагаве",
+      "artist": "Katsushika Hokusai",
+      "artistRu": "Кацусика Хокусай",
+      "year": "ок. 1831",
+      "sourceImage": "assets/restoration/great-wave.jpg",
+      "sourceUrl": "https://www.metmuseum.org/art/collection/search/45434",
+      "category": "Японская живопись и ширмы",
+      "subject": "Природа",
+      "placement": {
+        "hall": "cn",
+        "wall": "nature"
+      },
+      "physicalSizeM": {
+        "height": 0.257,
+        "width": 0.379,
+        "source": "https://www.metmuseum.org/art/collection/search/45434",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1801",
+      "atelierId": "girl-pearl",
+      "title": "Girl with a Pearl Earring",
+      "titleRu": "Девушка с жемчужной серёжкой",
+      "artist": "Johannes Vermeer",
+      "artistRu": "Ян Вермеер",
+      "year": "ок. 1665",
+      "sourceImage": "assets/restoration/girl-pearl.jpg",
+      "sourceUrl": "https://www.mauritshuis.nl/en/our-collection/artworks/670-girl-with-a-pearl-earring/",
+      "category": "Барокко и классицизм",
+      "subject": "Женщины",
+      "placement": {
+        "hall": "portraits",
+        "wall": "women"
+      },
+      "physicalSizeM": {
+        "height": 0.445,
+        "width": 0.39,
+        "source": "https://www.mauritshuis.nl/en/our-collection/artworks/670-girl-with-a-pearl-earring/",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1802",
+      "atelierId": "birth-venus",
+      "title": "The Birth of Venus",
+      "titleRu": "Рождение Венеры",
+      "artist": "Sandro Botticelli",
+      "artistRu": "Сандро Боттичелли",
+      "year": "1480-е",
+      "sourceImage": "assets/restoration/birth-venus.jpg",
+      "sourceUrl": "https://www.uffizi.it/en/artworks/birth-of-venus",
+      "category": "Европейское Возрождение и маньеризм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "religion"
+      },
+      "physicalSizeM": {
+        "height": 1.725,
+        "width": 2.785,
+        "source": "https://www.uffizi.it/en/artworks/birth-of-venus",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1803",
+      "atelierId": "the-kiss",
+      "title": "The Kiss",
+      "titleRu": "Поцелуй",
+      "artist": "Gustav Klimt",
+      "artistRu": "Густав Климт",
+      "year": "1907–1908",
+      "sourceImage": "assets/restoration/the-kiss.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Kiss_(Klimt)",
+      "category": "Модерн и экспрессионизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "life"
+      },
+      "physicalSizeM": {
+        "height": 1.8,
+        "width": 1.8,
+        "source": "https://en.wikipedia.org/wiki/The_Kiss_(Klimt)",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1804",
+      "atelierId": "the-scream",
+      "title": "The Scream",
+      "titleRu": "Крик",
+      "artist": "Edvard Munch",
+      "artistRu": "Эдвард Мунк",
+      "year": "1893",
+      "sourceImage": "assets/restoration/the-scream.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Scream",
+      "category": "Модерн и экспрессионизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "leisure"
+      },
+      "physicalSizeM": {
+        "height": 0.91,
+        "width": 0.735,
+        "source": "https://en.wikipedia.org/wiki/The_Scream",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1805",
+      "atelierId": "boating-party",
+      "title": "Luncheon of the Boating Party",
+      "titleRu": "Завтрак гребцов",
+      "artist": "Pierre-Auguste Renoir",
+      "artistRu": "Пьер Огюст Ренуар",
+      "year": "1880–1881",
+      "sourceImage": "assets/restoration/impressionism/boating-party.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Luncheon_of_the_Boating_Party",
+      "category": "Импрессионизм и постимпрессионизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "leisure"
+      },
+      "physicalSizeM": {
+        "height": 1.302,
+        "width": 1.756,
+        "source": "https://en.wikipedia.org/wiki/Luncheon_of_the_Boating_Party",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1806",
+      "atelierId": "moulin-galette",
+      "title": "Bal du moulin de la Galette",
+      "titleRu": "Бал в Мулен де ла Галетт",
+      "artist": "Pierre-Auguste Renoir",
+      "artistRu": "Пьер Огюст Ренуар",
+      "year": "1876",
+      "sourceImage": "assets/restoration/impressionism/moulin-galette.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Bal_du_moulin_de_la_Galette",
+      "category": "Импрессионизм и постимпрессионизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "leisure"
+      },
+      "physicalSizeM": {
+        "height": 1.31,
+        "width": 1.75,
+        "source": "https://en.wikipedia.org/wiki/Bal_du_moulin_de_la_Galette",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1807",
+      "atelierId": "dance-class",
+      "title": "The Dance Class",
+      "titleRu": "Танцевальный класс",
+      "artist": "Edgar Degas",
+      "artistRu": "Эдгар Дега",
+      "year": "1874",
+      "sourceImage": "assets/restoration/impressionism/dance-class.jpg",
+      "sourceUrl": "https://nelson-atkins.org/fpc/catalogue/impressionism/614/",
+      "category": "Импрессионизм и постимпрессионизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "leisure"
+      },
+      "physicalSizeM": {
+        "height": 0.85,
+        "width": 0.75,
+        "source": "https://nelson-atkins.org/fpc/catalogue/impressionism/614/",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1808",
+      "atelierId": "paris-rain",
+      "title": "Paris Street; Rainy Day",
+      "titleRu": "Парижская улица в дождливую погоду",
+      "artist": "Gustave Caillebotte",
+      "artistRu": "Гюстав Кайботт",
+      "year": "1877",
+      "sourceImage": "assets/restoration/impressionism/paris-rain.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Paris_Street;_Rainy_Day",
+      "category": "Импрессионизм и постимпрессионизм",
+      "subject": "Архитектура",
+      "placement": {
+        "hall": "jp",
+        "wall": "buildings"
+      },
+      "physicalSizeM": {
+        "height": 2.122,
+        "width": 2.762,
+        "source": "https://en.wikipedia.org/wiki/Paris_Street;_Rainy_Day",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1809",
+      "atelierId": "boulevard-montmartre",
+      "title": "Boulevard Montmartre, Spring",
+      "titleRu": "Бульвар Монмартр весной",
+      "artist": "Camille Pissarro",
+      "artistRu": "Камиль Писсарро",
+      "year": "1897",
+      "sourceImage": "assets/restoration/impressionism/boulevard-montmartre.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Le_Boulevard_de_Montmartre,_matinée_de_printemps",
+      "category": "Импрессионизм и постимпрессионизм",
+      "subject": "Архитектура",
+      "placement": {
+        "hall": "jp",
+        "wall": "buildings"
+      },
+      "physicalSizeM": {
+        "height": 0.65,
+        "width": 0.81,
+        "source": "https://en.wikipedia.org/wiki/Le_Boulevard_de_Montmartre,_matinée_de_printemps",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1810",
+      "atelierId": "cradle",
+      "title": "The Cradle",
+      "titleRu": "Колыбель",
+      "artist": "Berthe Morisot",
+      "artistRu": "Берта Моризо",
+      "year": "1872",
+      "sourceImage": "assets/restoration/impressionism/cradle.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Cradle_(Morisot)",
+      "category": "Импрессионизм и постимпрессионизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "life"
+      },
+      "physicalSizeM": {
+        "height": 0.56,
+        "width": 0.46,
+        "source": "https://en.wikipedia.org/wiki/The_Cradle_(Morisot)",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1811",
+      "atelierId": "poppies",
+      "title": "Poppies",
+      "titleRu": "Маки",
+      "artist": "Claude Monet",
+      "artistRu": "Клод Моне",
+      "year": "1873",
+      "sourceImage": "assets/restoration/impressionism/poppies.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Poppy_Field_near_Argenteuil",
+      "category": "Импрессионизм и постимпрессионизм",
+      "subject": "Природа",
+      "placement": {
+        "hall": "nature",
+        "wall": "landscape"
+      },
+      "physicalSizeM": {
+        "height": 0.5,
+        "width": 0.65,
+        "source": "https://en.wikipedia.org/wiki/The_Poppy_Field_near_Argenteuil",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1812",
+      "atelierId": "absinthe",
+      "title": "L'Absinthe",
+      "titleRu": "Абсент",
+      "artist": "Edgar Degas",
+      "artistRu": "Эдгар Дега",
+      "year": "1875–1876",
+      "sourceImage": "assets/restoration/impressionism/absinthe.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/L'Absinthe",
+      "category": "Импрессионизм и постимпрессионизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "leisure"
+      },
+      "physicalSizeM": {
+        "height": 0.92,
+        "width": 0.68,
+        "source": "https://en.wikipedia.org/wiki/L'Absinthe",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1813",
+      "atelierId": "folies-bergere",
+      "title": "A Bar at the Folies-Bergère",
+      "titleRu": "Бар в «Фоли-Бержер»",
+      "artist": "Édouard Manet",
+      "artistRu": "Эдуард Мане",
+      "year": "1882",
+      "sourceImage": "assets/restoration/impressionism/folies-bergere.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/A_Bar_at_the_Folies-Bergère",
+      "category": "Импрессионизм и постимпрессионизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "leisure"
+      },
+      "physicalSizeM": {
+        "height": 0.96,
+        "width": 1.3,
+        "source": "https://en.wikipedia.org/wiki/A_Bar_at_the_Folies-Bergère",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1814",
+      "atelierId": "montmartre-night",
+      "title": "Boulevard Montmartre at Night",
+      "titleRu": "Бульвар Монмартр ночью",
+      "artist": "Camille Pissarro",
+      "artistRu": "Камиль Писсарро",
+      "year": "1897",
+      "sourceImage": "assets/restoration/impressionism/montmartre-night.jpg",
+      "sourceUrl": "https://www.nationalgallery.org.uk/paintings/camille-pissarro-the-boulevard-montmartre-at-night",
+      "category": "Импрессионизм и постимпрессионизм",
+      "subject": "Архитектура",
+      "placement": {
+        "hall": "jp",
+        "wall": "buildings"
+      },
+      "physicalSizeM": {
+        "height": 0.533,
+        "width": 0.648,
+        "source": "https://www.nationalgallery.org.uk/paintings/camille-pissarro-the-boulevard-montmartre-at-night",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "NG4119; размеры полотна."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1815",
+      "atelierId": "red-fuji",
+      "title": "Red Fuji",
+      "titleRu": "Красная Фудзи",
+      "artist": "Katsushika Hokusai",
+      "artistRu": "Кацусика Хокусай",
+      "year": "ок. 1830–1832",
+      "sourceImage": "assets/restoration/red-fuji.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Fine_Wind,_Clear_Morning",
+      "category": "Японская живопись и ширмы",
+      "subject": "Природа",
+      "placement": {
+        "hall": "cn",
+        "wall": "nature"
+      },
+      "physicalSizeM": {
+        "height": 0.244,
+        "width": 0.356,
+        "source": "https://en.wikipedia.org/wiki/Fine_Wind,_Clear_Morning",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1816",
+      "atelierId": "kajikazawa",
+      "title": "Kajikazawa in Kai Province",
+      "titleRu": "Кадзикадзава в провинции Каи",
+      "artist": "Katsushika Hokusai",
+      "artistRu": "Кацусика Хокусай",
+      "year": "ок. 1830–1832",
+      "sourceImage": "assets/restoration/kajikazawa.jpg",
+      "sourceUrl": "https://sammlung-digital.museumangewandtekunst.de/detailpage/collection/09ebba1b-62b6-4aea-814b-64a7985eac69",
+      "category": "Японская живопись и ширмы",
+      "subject": "Природа",
+      "placement": {
+        "hall": "cn",
+        "wall": "nature"
+      },
+      "physicalSizeM": {
+        "height": 0.258,
+        "width": 0.379,
+        "source": "https://sammlung-digital.museumangewandtekunst.de/detailpage/collection/09ebba1b-62b6-4aea-814b-64a7985eac69",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1817",
+      "atelierId": "sea-satta",
+      "title": "The Sea at Satta, Suruga Province",
+      "titleRu": "Море в Сатта, провинция Суруга",
+      "artist": "Utagawa Hiroshige",
+      "artistRu": "Утагава Хиросигэ",
+      "year": "1858",
+      "sourceImage": "assets/restoration/sea-satta.jpg",
+      "sourceUrl": "https://collections.mfa.org/objects/464542",
+      "category": "Японская живопись и ширмы",
+      "subject": "Природа",
+      "placement": {
+        "hall": "cn",
+        "wall": "nature"
+      },
+      "physicalSizeM": {
+        "height": 0.358,
+        "width": 0.247,
+        "source": "https://collections.mfa.org/objects/464542",
+        "basis": "sheet",
+        "verification": "edition_reference",
+        "note": "Размер оттиска MFA 1858; размеры других оттисков и обрезки различаются. Размер конкретного исторического оттиска из источника; точный экземпляр локальной репродукции не установлен."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1818",
+      "atelierId": "sudden-shower",
+      "title": "Sudden Shower over Shin-Ōhashi Bridge",
+      "titleRu": "Внезапный ливень над мостом Син-Охаси",
+      "artist": "Utagawa Hiroshige",
+      "artistRu": "Утагава Хиросигэ",
+      "year": "1857",
+      "sourceImage": "assets/restoration/sudden-shower.jpg",
+      "sourceUrl": "https://www.artsbma.org/collection/sudden-shower-at-atake-the-great-bridge-ohashi-atake-no-yudachi-one-hundred-famous-views-of-edo-no-58-meisho-edo-hyakkei-58/",
+      "category": "Японская живопись и ширмы",
+      "subject": "Природа",
+      "placement": {
+        "hall": "cn",
+        "wall": "nature"
+      },
+      "physicalSizeM": {
+        "height": 0.37465,
+        "width": 0.250825,
+        "source": "https://www.artsbma.org/collection/sudden-shower-at-atake-the-great-bridge-ohashi-atake-no-yudachi-one-hundred-famous-views-of-edo-no-58-meisho-edo-hyakkei-58/",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1819",
+      "atelierId": "plum-garden",
+      "title": "Plum Garden in Kameido",
+      "titleRu": "Сливовый сад в Камэйдо",
+      "artist": "Utagawa Hiroshige",
+      "artistRu": "Утагава Хиросигэ",
+      "year": "1857",
+      "sourceImage": "assets/restoration/plum-garden.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Plum_Park_in_Kameido",
+      "category": "Японская живопись и ширмы",
+      "subject": "Природа",
+      "placement": {
+        "hall": "cn",
+        "wall": "nature"
+      },
+      "physicalSizeM": {
+        "height": 0.37,
+        "width": 0.25,
+        "source": "https://en.wikipedia.org/wiki/Plum_Park_in_Kameido",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1820",
+      "atelierId": "ejiri",
+      "title": "Ejiri in Suruga Province",
+      "titleRu": "Эдзири в провинции Суруга",
+      "artist": "Katsushika Hokusai",
+      "artistRu": "Кацусика Хокусай",
+      "year": "ок. 1830–1832",
+      "sourceImage": "assets/restoration/ejiri.jpg",
+      "sourceUrl": "https://chazen.wisc.edu/collection/7725/ejiri-in-suruga-province-from-the-series/",
+      "category": "Японская живопись и ширмы",
+      "subject": "Природа",
+      "placement": {
+        "hall": "cn",
+        "wall": "nature"
+      },
+      "physicalSizeM": {
+        "height": 0.249,
+        "width": 0.36,
+        "source": "https://chazen.wisc.edu/collection/7725/ejiri-in-suruga-province-from-the-series/",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1821",
+      "atelierId": "umezawa",
+      "title": "Umezawa in Sagami Province",
+      "titleRu": "Умэдзава в провинции Сагами",
+      "artist": "Katsushika Hokusai",
+      "artistRu": "Кацусика Хокусай",
+      "year": "ок. 1830–1832",
+      "sourceImage": "assets/restoration/umezawa.jpg",
+      "sourceUrl": "https://www.metmuseum.org/art/collection/search/36501",
+      "category": "Японская живопись и ширмы",
+      "subject": "Природа",
+      "placement": {
+        "hall": "cn",
+        "wall": "nature"
+      },
+      "physicalSizeM": {
+        "height": 0.257,
+        "width": 0.384,
+        "source": "https://www.metmuseum.org/art/collection/search/36501",
+        "basis": "sheet",
+        "verification": "edition_reference",
+        "note": "Размер оттиска JP20. Оттиски могут различаться обрезкой листа. Размер конкретного исторического оттиска из источника; точный экземпляр локальной репродукции не установлен."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1822",
+      "atelierId": "inume",
+      "title": "Inume Pass in Kai Province",
+      "titleRu": "Перевал Инумэ в провинции Каи",
+      "artist": "Katsushika Hokusai",
+      "artistRu": "Кацусика Хокусай",
+      "year": "ок. 1830–1832",
+      "sourceImage": "assets/restoration/inume.jpg",
+      "sourceUrl": "https://collections.lacma.org/object/79485",
+      "category": "Японская живопись и ширмы",
+      "subject": "Природа",
+      "placement": {
+        "hall": "cn",
+        "wall": "nature"
+      },
+      "physicalSizeM": {
+        "height": 0.254,
+        "width": 0.3747,
+        "source": "https://collections.lacma.org/object/79485",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1823",
+      "atelierId": "shono",
+      "title": "Shōno: Driving Rain",
+      "titleRu": "Сёно. Внезапный дождь",
+      "artist": "Utagawa Hiroshige",
+      "artistRu": "Утагава Хиросигэ",
+      "year": "1833–1834",
+      "sourceImage": "assets/restoration/shono.jpg",
+      "sourceUrl": "https://art.nelson-atkins.org/objects/14253/sudden-shower-at-shono",
+      "category": "Японская живопись и ширмы",
+      "subject": "Природа",
+      "placement": {
+        "hall": "cn",
+        "wall": "nature"
+      },
+      "physicalSizeM": {
+        "height": 0.235,
+        "width": 0.3556,
+        "source": "https://art.nelson-atkins.org/objects/14253/sudden-shower-at-shono",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1824",
+      "atelierId": "nihonbashi",
+      "title": "Nihonbashi: Morning",
+      "titleRu": "Нихонбаси. Утро",
+      "artist": "Utagawa Hiroshige",
+      "artistRu": "Утагава Хиросигэ",
+      "year": "1833–1834",
+      "sourceImage": "assets/restoration/nihonbashi.jpg",
+      "sourceUrl": "https://www.nortonsimon.org/art/detail/P.1961.01.01",
+      "category": "Японская живопись и ширмы",
+      "subject": "Природа",
+      "placement": {
+        "hall": "cn",
+        "wall": "nature"
+      },
+      "physicalSizeM": {
+        "height": 0.232,
+        "width": 0.362,
+        "source": "https://www.nortonsimon.org/art/detail/P.1961.01.01",
+        "basis": "sheet",
+        "verification": "edition_reference",
+        "note": "Размер листа P.1961.01.01; образец исторического оттиска, не замер локальной копии. Размер конкретного исторического оттиска из источника; точный экземпляр локальной репродукции не установлен."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1825",
+      "atelierId": "kanbara",
+      "title": "Kanbara: Night Snow",
+      "titleRu": "Камбара. Ночной снег",
+      "artist": "Utagawa Hiroshige",
+      "artistRu": "Утагава Хиросигэ",
+      "year": "1833–1834",
+      "sourceImage": "assets/restoration/kanbara.jpg",
+      "sourceUrl": "https://art.seattleartmuseum.org/fr/objects/34880/night-snow-kambara-kambara-yoru-no-yuki-from-the-series",
+      "category": "Японская живопись и ширмы",
+      "subject": "Природа",
+      "placement": {
+        "hall": "cn",
+        "wall": "nature"
+      },
+      "physicalSizeM": {
+        "height": 0.24765,
+        "width": 0.3683,
+        "source": "https://art.seattleartmuseum.org/fr/objects/34880/night-snow-kambara-kambara-yoru-no-yuki-from-the-series",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1826",
+      "atelierId": "last-supper",
+      "title": "The Last Supper",
+      "titleRu": "Тайная вечеря",
+      "artist": "Leonardo da Vinci",
+      "artistRu": "Леонардо да Винчи",
+      "year": "1495–1498",
+      "sourceImage": "assets/restoration/renaissance/last-supper.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Last_Supper_(Leonardo)",
+      "category": "Европейское Возрождение и маньеризм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "religion"
+      },
+      "physicalSizeM": {
+        "height": 4.6,
+        "width": 8.8,
+        "source": "https://en.wikipedia.org/wiki/The_Last_Supper_(Leonardo)",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1827",
+      "atelierId": "creation-of-adam",
+      "title": "Venus of Urbino",
+      "titleRu": "Венера Урбинская",
+      "artist": "Titian",
+      "artistRu": "Тициан",
+      "year": "1538",
+      "sourceImage": "assets/restoration/renaissance/venus-of-urbino.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Venus_of_Urbino",
+      "category": "Европейское Возрождение и маньеризм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "life"
+      },
+      "physicalSizeM": {
+        "height": 1.19,
+        "width": 1.65,
+        "source": "https://en.wikipedia.org/wiki/Venus_of_Urbino",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1828",
+      "atelierId": "arnolfini-portrait",
+      "title": "The Arnolfini Portrait",
+      "titleRu": "Портрет четы Арнольфини",
+      "artist": "Jan van Eyck",
+      "artistRu": "Ян ван Эйк",
+      "year": "1434",
+      "sourceImage": "assets/restoration/renaissance/arnolfini-portrait.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Arnolfini_Portrait",
+      "category": "Европейское Возрождение и маньеризм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "life"
+      },
+      "physicalSizeM": {
+        "height": 0.822,
+        "width": 0.6,
+        "source": "https://en.wikipedia.org/wiki/Arnolfini_Portrait",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1829",
+      "atelierId": "primavera",
+      "title": "Primavera",
+      "titleRu": "Весна",
+      "artist": "Sandro Botticelli",
+      "artistRu": "Сандро Боттичелли",
+      "year": "ок. 1482",
+      "sourceImage": "assets/restoration/renaissance/primavera.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Primavera_(Botticelli)",
+      "category": "Европейское Возрождение и маньеризм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 2.02,
+        "width": 3.14,
+        "source": "https://en.wikipedia.org/wiki/Primavera_(Botticelli)",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1830",
+      "atelierId": "sistine-madonna",
+      "title": "The Sistine Madonna",
+      "titleRu": "Сикстинская Мадонна",
+      "artist": "Raphael",
+      "artistRu": "Рафаэль Санти",
+      "year": "1512–1513",
+      "sourceImage": "assets/restoration/renaissance/sistine-madonna.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Sistine_Madonna",
+      "category": "Европейское Возрождение и маньеризм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "religion"
+      },
+      "physicalSizeM": {
+        "height": 2.65,
+        "width": 1.96,
+        "source": "https://en.wikipedia.org/wiki/Sistine_Madonna",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1831",
+      "atelierId": "lady-ermine",
+      "title": "Lady with an Ermine",
+      "titleRu": "Дама с горностаем",
+      "artist": "Leonardo da Vinci",
+      "artistRu": "Леонардо да Винчи",
+      "year": "1489–1490",
+      "sourceImage": "assets/restoration/renaissance/lady-ermine.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Lady_with_an_Ermine",
+      "category": "Европейское Возрождение и маньеризм",
+      "subject": "Женщины",
+      "placement": {
+        "hall": "portraits",
+        "wall": "women"
+      },
+      "physicalSizeM": {
+        "height": 0.548,
+        "width": 0.403,
+        "source": "https://en.wikipedia.org/wiki/Lady_with_an_Ermine",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1832",
+      "atelierId": "assumption-virgin",
+      "title": "Assumption of the Virgin",
+      "titleRu": "Вознесение Девы Марии",
+      "artist": "Titian",
+      "artistRu": "Тициан",
+      "year": "1516–1518",
+      "sourceImage": "assets/restoration/renaissance/assumption.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Assumption_of_the_Virgin_(Titian)",
+      "category": "Европейское Возрождение и маньеризм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "religion"
+      },
+      "physicalSizeM": {
+        "height": 6.9,
+        "width": 3.6,
+        "source": "https://en.wikipedia.org/wiki/Assumption_of_the_Virgin_(Titian)",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "oversize"
+    },
+    {
+      "id": "ART-1833",
+      "atelierId": "ambassadors",
+      "title": "The Ambassadors",
+      "titleRu": "Послы",
+      "artist": "Hans Holbein the Younger",
+      "artistRu": "Ганс Гольбейн Младший",
+      "year": "1533",
+      "sourceImage": "assets/restoration/renaissance/ambassadors.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Ambassadors_(Holbein)",
+      "category": "Европейское Возрождение и маньеризм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "leisure"
+      },
+      "physicalSizeM": {
+        "height": 2.07,
+        "width": 2.095,
+        "source": "https://en.wikipedia.org/wiki/The_Ambassadors_(Holbein)",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1834",
+      "atelierId": "tower-of-babel",
+      "title": "The Tower of Babel",
+      "titleRu": "Вавилонская башня",
+      "artist": "Pieter Bruegel the Elder",
+      "artistRu": "Питер Брейгель Старший",
+      "year": "1563",
+      "sourceImage": "assets/restoration/renaissance/tower-babel.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Tower_of_Babel_(Bruegel)",
+      "category": "Европейское Возрождение и маньеризм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 1.14,
+        "width": 1.55,
+        "source": "https://en.wikipedia.org/wiki/The_Tower_of_Babel_(Bruegel)",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1835",
+      "atelierId": "calling-saint-matthew",
+      "title": "The Calling of Saint Matthew",
+      "titleRu": "Призвание апостола Матфея",
+      "artist": "Caravaggio",
+      "artistRu": "Караваджо",
+      "year": "1599–1600",
+      "sourceImage": "assets/restoration/baroque/calling-saint-matthew.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Calling_of_Saint_Matthew",
+      "category": "Барокко и классицизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "religion"
+      },
+      "physicalSizeM": {
+        "height": 3.22,
+        "width": 3.4,
+        "source": "https://en.wikipedia.org/wiki/The_Calling_of_Saint_Matthew",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1836",
+      "atelierId": "judith-holofernes",
+      "title": "Judith Slaying Holofernes",
+      "titleRu": "Юдифь, обезглавливающая Олоферна",
+      "artist": "Artemisia Gentileschi",
+      "artistRu": "Артемизия Джентилески",
+      "year": "ок. 1620",
+      "sourceImage": "assets/restoration/baroque/judith-holofernes.jpg",
+      "sourceUrl": "https://www.nationalgallery.org.uk/media/35279/artemisia-ifs-report_august-2020.pdf",
+      "category": "Барокко и классицизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "religion"
+      },
+      "physicalSizeM": {
+        "height": 1.588,
+        "width": 1.255,
+        "source": "https://www.nationalgallery.org.uk/media/35279/artemisia-ifs-report_august-2020.pdf",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Неаполитанская версия: синее платье Юдифи, красное платье служанки. Не версия Уффици."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1837",
+      "atelierId": "anatomy-lesson",
+      "title": "The Anatomy Lesson of Dr Nicolaes Tulp",
+      "titleRu": "Урок анатомии доктора Тульпа",
+      "artist": "Rembrandt",
+      "artistRu": "Рембрандт",
+      "year": "1632",
+      "sourceImage": "assets/restoration/baroque/anatomy-lesson.jpg",
+      "sourceUrl": "https://rembrandtdatabase.org/images/corpus/CorpusRembrandt_2.pdf",
+      "category": "Барокко и классицизм",
+      "subject": "История и битвы",
+      "placement": {
+        "hall": "world",
+        "wall": "history"
+      },
+      "physicalSizeM": {
+        "height": 1.695,
+        "width": 2.165,
+        "source": "https://rembrandtdatabase.org/images/corpus/CorpusRembrandt_2.pdf",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Корпус Рембрандта, том II, A51; ширина больше высоты."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1838",
+      "atelierId": "milkmaid",
+      "title": "The Milkmaid",
+      "titleRu": "Молочница",
+      "artist": "Johannes Vermeer",
+      "artistRu": "Ян Вермеер",
+      "year": "ок. 1658–1660",
+      "sourceImage": "assets/restoration/baroque/milkmaid.jpg",
+      "sourceUrl": "https://www.wikidata.org/wiki/Q167605",
+      "category": "Барокко и классицизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "leisure"
+      },
+      "physicalSizeM": {
+        "height": 0.455,
+        "width": 0.41,
+        "source": "https://www.wikidata.org/wiki/Q167605",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1839",
+      "atelierId": "elevation-cross",
+      "title": "The Elevation of the Cross",
+      "titleRu": "Воздвижение Креста",
+      "artist": "Peter Paul Rubens",
+      "artistRu": "Питер Пауль Рубенс",
+      "year": "1610–1611",
+      "sourceImage": "assets/restoration/baroque/elevation-cross.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Elevation_of_the_Cross_(Rubens)",
+      "category": "Барокко и классицизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "religion"
+      },
+      "physicalSizeM": {
+        "height": 4.6,
+        "width": 6.4,
+        "source": "https://www.wikidata.org/wiki/Q2653851",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1840",
+      "atelierId": "art-of-painting",
+      "title": "The Art of Painting",
+      "titleRu": "Искусство живописи",
+      "artist": "Johannes Vermeer",
+      "artistRu": "Ян Вермеер",
+      "year": "ок. 1666–1668",
+      "sourceImage": "assets/restoration/baroque/art-of-painting.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Art_of_Painting",
+      "category": "Барокко и классицизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "leisure"
+      },
+      "physicalSizeM": {
+        "height": 1.2,
+        "width": 1,
+        "source": "https://en.wikipedia.org/wiki/The_Art_of_Painting",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1841",
+      "atelierId": "supper-emmaus",
+      "title": "Supper at Emmaus",
+      "titleRu": "Ужин в Эммаусе",
+      "artist": "Caravaggio",
+      "artistRu": "Караваджо",
+      "year": "1601",
+      "sourceImage": "assets/restoration/baroque/supper-emmaus.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Supper_at_Emmaus_(Caravaggio,_London)",
+      "category": "Барокко и классицизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "religion"
+      },
+      "physicalSizeM": {
+        "height": 1.41,
+        "width": 1.962,
+        "source": "https://en.wikipedia.org/wiki/Supper_at_Emmaus_(Caravaggio,_London)",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1842",
+      "atelierId": "night-watch",
+      "title": "The Night Watch",
+      "titleRu": "Ночной дозор",
+      "artist": "Rembrandt",
+      "artistRu": "Рембрандт",
+      "year": "1642",
+      "sourceImage": "assets/restoration/baroque/night-watch.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Night_Watch",
+      "category": "Барокко и классицизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "leisure"
+      },
+      "physicalSizeM": {
+        "height": 3.63,
+        "width": 4.37,
+        "source": "https://en.wikipedia.org/wiki/The_Night_Watch",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1843",
+      "atelierId": "rokeby-venus",
+      "title": "Venus at Her Mirror",
+      "titleRu": "Венера с зеркалом",
+      "artist": "Diego Velázquez",
+      "artistRu": "Диего Веласкес",
+      "year": "1647–1651",
+      "sourceImage": "assets/restoration/baroque/rokeby-venus.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Rokeby_Venus",
+      "category": "Барокко и классицизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "life"
+      },
+      "physicalSizeM": {
+        "height": 1.22,
+        "width": 1.77,
+        "source": "https://en.wikipedia.org/wiki/Rokeby_Venus",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1844",
+      "atelierId": "jewish-bride",
+      "title": "The Jewish Bride",
+      "titleRu": "Еврейская невеста",
+      "artist": "Rembrandt",
+      "artistRu": "Рембрандт",
+      "year": "ок. 1665–1669",
+      "sourceImage": "assets/restoration/baroque/jewish-bride.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Jewish_Bride",
+      "category": "Барокко и классицизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "life"
+      },
+      "physicalSizeM": {
+        "height": 1.215,
+        "width": 1.665,
+        "source": "https://en.wikipedia.org/wiki/The_Jewish_Bride",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1845",
+      "atelierId": "rococo-swing",
+      "title": "The Swing",
+      "titleRu": "Качели",
+      "artist": "Jean-Honoré Fragonard",
+      "artistRu": "Жан-Оноре Фрагонар",
+      "year": "1767",
+      "sourceImage": "assets/restoration/rococo/swing.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Swing_(Fragonard)",
+      "category": "Рококо и неоклассицизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "leisure"
+      },
+      "physicalSizeM": {
+        "height": 0.81,
+        "width": 0.642,
+        "source": "https://en.wikipedia.org/wiki/The_Swing_(Fragonard)",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1846",
+      "atelierId": "rococo-pierrot",
+      "title": "Pierrot",
+      "titleRu": "Пьеро",
+      "artist": "Antoine Watteau",
+      "artistRu": "Антуан Ватто",
+      "year": "ок. 1718–1719",
+      "sourceImage": "assets/restoration/rococo/pierrot.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Pierrot_(Watteau)",
+      "category": "Рококо и неоклассицизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "leisure"
+      },
+      "physicalSizeM": {
+        "height": 1.845,
+        "width": 1.495,
+        "source": "https://en.wikipedia.org/wiki/Pierrot_(Watteau)",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1847",
+      "atelierId": "rococo-gersaint",
+      "title": "The Shopsign of Gersaint",
+      "titleRu": "Вывеска лавки Жерсена",
+      "artist": "Antoine Watteau",
+      "artistRu": "Антуан Ватто",
+      "year": "1720",
+      "sourceImage": "assets/restoration/rococo/gersaint.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Antoine_Watteau_050.jpg",
+      "category": "Рококо и неоклассицизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "leisure"
+      },
+      "physicalSizeM": {
+        "height": 1.63,
+        "width": 3.06,
+        "source": "https://commons.wikimedia.org/wiki/File:Antoine_Watteau_050.jpg",
+        "basis": "unframed",
+        "verification": "secondary_checked",
+        "note": "Полный двойной холст GK 1200. У Abecedario высота 166 см; разночтение отмечено."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1848",
+      "atelierId": "rococo-blind-mans-bluff",
+      "title": "Blind Man's Buff",
+      "titleRu": "Жмурки",
+      "artist": "Jean-Honoré Fragonard",
+      "artistRu": "Жан-Оноре Фрагонар",
+      "year": "ок. 1750–1752",
+      "sourceImage": "assets/restoration/rococo/blind-mans-bluff.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Blind_Man's_Bluff_(Fragonard,_1750)",
+      "category": "Рококо и неоклассицизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "leisure"
+      },
+      "physicalSizeM": {
+        "height": 1.168,
+        "width": 0.914,
+        "source": "https://en.wikipedia.org/wiki/Blind_Man's_Bluff_(Fragonard,_1750)",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1849",
+      "atelierId": "rococo-venus-toilet",
+      "title": "The Toilet of Venus",
+      "titleRu": "Туалет Венеры",
+      "artist": "François Boucher",
+      "artistRu": "Франсуа Буше",
+      "year": "1751",
+      "sourceImage": "assets/restoration/rococo/venus-toilet.jpg",
+      "sourceUrl": "https://www.wikidata.org/wiki/Q19911802",
+      "category": "Рококо и неоклассицизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 1.083,
+        "width": 0.851,
+        "source": "https://www.wikidata.org/wiki/Q19911802",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1850",
+      "atelierId": "rococo-triumph-venus",
+      "title": "The Triumph of Venus",
+      "titleRu": "Триумф Венеры",
+      "artist": "François Boucher",
+      "artistRu": "Франсуа Буше",
+      "year": "1740",
+      "sourceImage": "assets/restoration/rococo/triumph-venus.jpg",
+      "sourceUrl": "https://collection.nationalmuseum.se/en/collection/item/17773/",
+      "category": "Рококо и неоклассицизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 1.3,
+        "width": 1.62,
+        "source": "https://collection.nationalmuseum.se/en/collection/item/17773/",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Размер живописи, не рамы 166 × 199 см."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1851",
+      "atelierId": "rococo-meeting",
+      "title": "The Meeting",
+      "titleRu": "Встреча",
+      "artist": "Jean-Honoré Fragonard",
+      "artistRu": "Жан-Оноре Фрагонар",
+      "year": "1771–1773",
+      "sourceImage": "assets/restoration/rococo/lover-crowned.jpg",
+      "sourceUrl": "https://www.frick.org/sites/default/files/Paintings%281%29.pdf",
+      "category": "Рококо и неоклассицизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "life"
+      },
+      "physicalSizeM": {
+        "height": 3.175,
+        "width": 2.4384,
+        "source": "https://www.frick.org/sites/default/files/Paintings%281%29.pdf",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "125 × 96 дюймов; переведено в сантиметры по 2,54."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1852",
+      "atelierId": "rococo-mezzetin",
+      "title": "Mezzetin",
+      "titleRu": "Меццетен",
+      "artist": "Antoine Watteau",
+      "artistRu": "Антуан Ватто",
+      "year": "ок. 1718–1720",
+      "sourceImage": "assets/restoration/rococo/mezzetin.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Mezzetino_(Watteau)",
+      "category": "Рококо и неоклассицизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "leisure"
+      },
+      "physicalSizeM": {
+        "height": 0.552,
+        "width": 0.432,
+        "source": "https://en.wikipedia.org/wiki/Mezzetino_(Watteau)",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1853",
+      "atelierId": "rococo-rinaldo-armida",
+      "title": "Rinaldo and Armida",
+      "titleRu": "Ринальдо и Армида",
+      "artist": "François Boucher",
+      "artistRu": "Франсуа Буше",
+      "year": "1734",
+      "sourceImage": "assets/restoration/rococo/rinaldo-armida.jpg",
+      "sourceUrl": "https://collections.louvre.fr/ark:/53355/cl010066934",
+      "category": "Рококо и неоклассицизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 1.355,
+        "width": 1.705,
+        "source": "https://collections.louvre.fr/ark:/53355/cl010066934",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "INV 2720; без рамы, не размеры avec accessoire."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1854",
+      "atelierId": "adele-bloch-bauer",
+      "title": "Portrait of Adele Bloch-Bauer I",
+      "titleRu": "Портрет Адели Блох-Бауэр I",
+      "artist": "Gustav Klimt",
+      "artistRu": "Густав Климт",
+      "year": "1907",
+      "sourceImage": "assets/restoration/modern/adele-bloch-bauer.jpg",
+      "sourceUrl": "https://ao.albertina.at/objects/19-640387/bildnis-adele-blochbauer-i",
+      "category": "Модерн и экспрессионизм",
+      "subject": "Женщины",
+      "placement": {
+        "hall": "portraits",
+        "wall": "women"
+      },
+      "physicalSizeM": {
+        "height": 1.38,
+        "width": 1.38,
+        "source": "https://ao.albertina.at/objects/19-640387/bildnis-adele-blochbauer-i",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Музейная запись Альбертины для оригинала Neue Galerie, 2006.04; размеры без рамы."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1855",
+      "atelierId": "mucha-dance",
+      "title": "Dance",
+      "titleRu": "Танец",
+      "artist": "Alphonse Mucha",
+      "artistRu": "Альфонс Муха",
+      "year": "1898",
+      "sourceImage": "assets/restoration/modern/mucha-dance.jpg",
+      "sourceUrl": "https://www.muchafoundation.org/en/gallery/browse-works/object/94",
+      "category": "Модерн и экспрессионизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "leisure"
+      },
+      "physicalSizeM": {
+        "height": 0.6,
+        "width": 0.38,
+        "source": "https://www.muchafoundation.org/en/gallery/browse-works/object/94",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Цветная литография, F. Champenois, Paris, 1898."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1856",
+      "atelierId": "munch-madonna",
+      "title": "Madonna",
+      "titleRu": "Мадонна",
+      "artist": "Edvard Munch",
+      "artistRu": "Эдвард Мунк",
+      "year": "1894–1895",
+      "sourceImage": "assets/restoration/modern/munch-madonna.jpg",
+      "sourceUrl": "https://www.wikidata.org/wiki/Q1989780",
+      "category": "Модерн и экспрессионизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "religion"
+      },
+      "physicalSizeM": {
+        "height": 0.91,
+        "width": 0.705,
+        "source": "https://www.wikidata.org/wiki/Q1989780",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1857",
+      "atelierId": "schiele-self-portrait",
+      "title": "Self-Portrait with Physalis",
+      "titleRu": "Автопортрет с физалисом",
+      "artist": "Egon Schiele",
+      "artistRu": "Эгон Шиле",
+      "year": "1912",
+      "sourceImage": "assets/restoration/modern/schiele-self-portrait.jpg",
+      "sourceUrl": "https://onlinecollection.leopoldmuseum.org/objekt/528-selbstbildnis-mit-lampionfruchten/",
+      "category": "Модерн и экспрессионизм",
+      "subject": "Мужчины",
+      "placement": {
+        "hall": "portraits",
+        "wall": "men"
+      },
+      "physicalSizeM": {
+        "height": 0.322,
+        "width": 0.398,
+        "source": "https://onlinecollection.leopoldmuseum.org/objekt/528-selbstbildnis-mit-lampionfruchten/",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Inv. 454."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1858",
+      "atelierId": "blue-horse",
+      "title": "Blue Horse I",
+      "titleRu": "Синяя лошадь I",
+      "artist": "Franz Marc",
+      "artistRu": "Франц Марк",
+      "year": "1911",
+      "sourceImage": "assets/restoration/modern/blue-horse.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Blue_Horse_I",
+      "category": "Модерн и экспрессионизм",
+      "subject": "Природа",
+      "placement": {
+        "hall": "nature",
+        "wall": "landscape"
+      },
+      "physicalSizeM": {
+        "height": 1.12,
+        "width": 0.845,
+        "source": "https://en.wikipedia.org/wiki/Blue_Horse_I",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1859",
+      "atelierId": "woman-with-hat",
+      "title": "Woman with a Hat",
+      "titleRu": "Женщина в шляпе",
+      "artist": "Henri Matisse",
+      "artistRu": "Анри Матисс",
+      "year": "1905",
+      "sourceImage": "assets/restoration/modern/woman-with-hat.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Woman_with_a_Hat",
+      "category": "Модерн и экспрессионизм",
+      "subject": "Женщины",
+      "placement": {
+        "hall": "portraits",
+        "wall": "women"
+      },
+      "physicalSizeM": {
+        "height": 0.8065,
+        "width": 0.5969,
+        "source": "https://en.wikipedia.org/wiki/Woman_with_a_Hat",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1860",
+      "atelierId": "tree-of-life",
+      "title": "The Tree of Life",
+      "titleRu": "Древо жизни",
+      "artist": "Gustav Klimt",
+      "artistRu": "Густав Климт",
+      "year": "1905–1909",
+      "sourceImage": "assets/restoration/modern/tree-life.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Tree_of_Life,_Stoclet_Frieze",
+      "category": "Модерн и экспрессионизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 1.95,
+        "width": 1.02,
+        "source": "https://en.wikipedia.org/wiki/The_Tree_of_Life,_Stoclet_Frieze",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1861",
+      "atelierId": "matisse-dance",
+      "title": "Dance",
+      "titleRu": "Танец",
+      "artist": "Henri Matisse",
+      "artistRu": "Анри Матисс",
+      "year": "1910",
+      "sourceImage": "assets/restoration/modern/dance-matisse.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Dance_(Matisse)",
+      "category": "Модерн и экспрессионизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "leisure"
+      },
+      "physicalSizeM": {
+        "height": 2.6,
+        "width": 3.91,
+        "source": "https://en.wikipedia.org/wiki/Dance_(Matisse)",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1862",
+      "atelierId": "franz-marc-fox",
+      "title": "The Fox",
+      "titleRu": "Лиса",
+      "artist": "Franz Marc",
+      "artistRu": "Франц Марк",
+      "year": "1911",
+      "sourceImage": "assets/restoration/modern/fox.jpg",
+      "sourceUrl": "https://guide.von-der-heydt-museum.de/de/Tour/Object?guideId=502&objectId=9217",
+      "category": "Модерн и экспрессионизм",
+      "subject": "Природа",
+      "placement": {
+        "hall": "nature",
+        "wall": "landscape"
+      },
+      "physicalSizeM": {
+        "height": 0.5,
+        "width": 0.635,
+        "source": "https://guide.von-der-heydt-museum.de/de/Tour/Object?guideId=502&objectId=9217",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "G 0686. Blauschwarzer Fuchs, 1911. Не две лисы 1913 года."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1863",
+      "atelierId": "portrait-wally",
+      "title": "Portrait of Wally",
+      "titleRu": "Портрет Валли",
+      "artist": "Egon Schiele",
+      "artistRu": "Эгон Шиле",
+      "year": "1912",
+      "sourceImage": "assets/restoration/modern/wally.jpg",
+      "sourceUrl": "https://onlinecollection.leopoldmuseum.org/objekt/527-bildnis-wally-neuzil/",
+      "category": "Модерн и экспрессионизм",
+      "subject": "Женщины",
+      "placement": {
+        "hall": "portraits",
+        "wall": "women"
+      },
+      "physicalSizeM": {
+        "height": 0.32,
+        "width": 0.398,
+        "source": "https://onlinecollection.leopoldmuseum.org/objekt/527-bildnis-wally-neuzil/",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Порядок размеров принят по музейной записи и горизонтальному файлу ателье; работа парная автопортрету."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1864",
+      "atelierId": "composition-viii",
+      "title": "Composition VIII",
+      "titleRu": "Композиция VIII",
+      "artist": "Wassily Kandinsky",
+      "artistRu": "Василий Кандинский",
+      "year": "1923",
+      "sourceImage": "assets/restoration/modern/composition-viii.jpg",
+      "sourceUrl": "https://www.guggenheim-bilbao.eus/en/learn/schools/teachers-guides/composition-8",
+      "category": "Модерн и экспрессионизм",
+      "subject": "Абстракция и орнамент",
+      "placement": {
+        "hall": "reserve",
+        "wall": "uncertain"
+      },
+      "physicalSizeM": {
+        "height": 1.4,
+        "width": 2.01,
+        "source": "https://www.guggenheim-bilbao.eus/en/learn/schools/teachers-guides/composition-8",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": ""
+      },
+      "status": "unassigned"
+    },
+    {
+      "id": "ART-1865",
+      "atelierId": "wanderer",
+      "title": "Wanderer above the Sea of Fog",
+      "titleRu": "Странник над морем тумана",
+      "artist": "Caspar David Friedrich",
+      "artistRu": "Каспар Давид Фридрих",
+      "year": "ок. 1818",
+      "sourceImage": "assets/restoration/romanticism/wanderer.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Wanderer_Above_the_Sea_of_Fog",
+      "category": "Романтизм и реализм XIX века",
+      "subject": "Природа",
+      "placement": {
+        "hall": "nature",
+        "wall": "landscape"
+      },
+      "physicalSizeM": {
+        "height": 0.948,
+        "width": 0.748,
+        "source": "https://en.wikipedia.org/wiki/Wanderer_Above_the_Sea_of_Fog",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1866",
+      "atelierId": "fighting-temeraire",
+      "title": "The Fighting Temeraire",
+      "titleRu": "Последний рейс корабля «Отважный»",
+      "artist": "J. M. W. Turner",
+      "artistRu": "Уильям Тёрнер",
+      "year": "1839",
+      "sourceImage": "assets/restoration/romanticism/fighting-temeraire.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Fighting_Temeraire",
+      "category": "Романтизм и реализм XIX века",
+      "subject": "Вода и корабли",
+      "placement": {
+        "hall": "nature",
+        "wall": "water"
+      },
+      "physicalSizeM": {
+        "height": 0.907,
+        "width": 1.216,
+        "source": "https://en.wikipedia.org/wiki/The_Fighting_Temeraire",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1867",
+      "atelierId": "hay-wain",
+      "title": "The Hay Wain",
+      "titleRu": "Телега для сена",
+      "artist": "John Constable",
+      "artistRu": "Джон Констебл",
+      "year": "1821",
+      "sourceImage": "assets/restoration/romanticism/hay-wain.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Hay_Wain",
+      "category": "Романтизм и реализм XIX века",
+      "subject": "Природа",
+      "placement": {
+        "hall": "nature",
+        "wall": "landscape"
+      },
+      "physicalSizeM": {
+        "height": 1.302,
+        "width": 1.854,
+        "source": "https://en.wikipedia.org/wiki/The_Hay_Wain",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1868",
+      "atelierId": "nightmare",
+      "title": "The Nightmare",
+      "titleRu": "Кошмар",
+      "artist": "Henry Fuseli",
+      "artistRu": "Иоганн Генрих Фюсли",
+      "year": "1781",
+      "sourceImage": "assets/restoration/romanticism/nightmare.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Nightmare",
+      "category": "Романтизм и реализм XIX века",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 1.016,
+        "width": 1.27,
+        "source": "https://en.wikipedia.org/wiki/The_Nightmare",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1869",
+      "atelierId": "monk-sea",
+      "title": "The Monk by the Sea",
+      "titleRu": "Монах у моря",
+      "artist": "Caspar David Friedrich",
+      "artistRu": "Каспар Давид Фридрих",
+      "year": "1808–1810",
+      "sourceImage": "assets/restoration/romanticism/monk-sea.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Monk_by_the_Sea",
+      "category": "Романтизм и реализм XIX века",
+      "subject": "Вода и корабли",
+      "placement": {
+        "hall": "nature",
+        "wall": "water"
+      },
+      "physicalSizeM": {
+        "height": 1.1,
+        "width": 1.715,
+        "source": "https://en.wikipedia.org/wiki/The_Monk_by_the_Sea",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1870",
+      "atelierId": "sea-of-ice",
+      "title": "The Sea of Ice",
+      "titleRu": "Море льда",
+      "artist": "Caspar David Friedrich",
+      "artistRu": "Каспар Давид Фридрих",
+      "year": "1823–1824",
+      "sourceImage": "assets/restoration/romanticism/sea-ice.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Sea_of_Ice",
+      "category": "Романтизм и реализм XIX века",
+      "subject": "Вода и корабли",
+      "placement": {
+        "hall": "nature",
+        "wall": "water"
+      },
+      "physicalSizeM": {
+        "height": 0.967,
+        "width": 1.269,
+        "source": "https://en.wikipedia.org/wiki/The_Sea_of_Ice",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1871",
+      "atelierId": "slave-ship",
+      "title": "The Slave Ship",
+      "titleRu": "Невольничий корабль",
+      "artist": "J. M. W. Turner",
+      "artistRu": "Уильям Тёрнер",
+      "year": "1840",
+      "sourceImage": "assets/restoration/romanticism/slave-ship.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Slave_Ship",
+      "category": "Романтизм и реализм XIX века",
+      "subject": "История и битвы",
+      "placement": {
+        "hall": "world",
+        "wall": "history"
+      },
+      "physicalSizeM": {
+        "height": 0.91,
+        "width": 1.23,
+        "source": "https://en.wikipedia.org/wiki/The_Slave_Ship",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1872",
+      "atelierId": "rain-steam-speed",
+      "title": "Rain, Steam and Speed",
+      "titleRu": "Дождь, пар и скорость",
+      "artist": "J. M. W. Turner",
+      "artistRu": "Уильям Тёрнер",
+      "year": "1844",
+      "sourceImage": "assets/restoration/romanticism/rain-steam-speed.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Rain,_Steam_and_Speed_–_The_Great_Western_Railway",
+      "category": "Романтизм и реализм XIX века",
+      "subject": "Вода и корабли",
+      "placement": {
+        "hall": "nature",
+        "wall": "water"
+      },
+      "physicalSizeM": {
+        "height": 0.91,
+        "width": 1.218,
+        "source": "https://en.wikipedia.org/wiki/Rain,_Steam_and_Speed_–_The_Great_Western_Railway",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1873",
+      "atelierId": "salisbury-cathedral",
+      "title": "Salisbury Cathedral from the Meadows",
+      "titleRu": "Солсберийский собор с лугов",
+      "artist": "John Constable",
+      "artistRu": "Джон Констебл",
+      "year": "1831",
+      "sourceImage": "assets/restoration/romanticism/salisbury.jpg",
+      "sourceUrl": "https://artsandculture.google.com/asset/salisbury-cathedral-from-the-meadows-0096/NwF6EQxOl66vRQ",
+      "category": "Романтизм и реализм XIX века",
+      "subject": "Архитектура",
+      "placement": {
+        "hall": "jp",
+        "wall": "buildings"
+      },
+      "physicalSizeM": {
+        "height": 1.537,
+        "width": 1.92,
+        "source": "https://artsandculture.google.com/asset/salisbury-cathedral-from-the-meadows-0096/NwF6EQxOl66vRQ",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Tate Britain: 1537 × 1920 мм. В техническом исследовании указано приблизительно 1518 × 1899 мм; сохранены каталожные размеры."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1874",
+      "atelierId": "lady-of-shalott",
+      "title": "The Lady of Shalott",
+      "titleRu": "Леди Шалотт",
+      "artist": "John William Waterhouse",
+      "artistRu": "Джон Уильям Уотерхаус",
+      "year": "1888",
+      "sourceImage": "assets/restoration/romanticism/lady-shalott.jpg",
+      "sourceUrl": "https://editions.covecollective.org/content/lady-shalott-john-william-waterhouse",
+      "category": "Романтизм и реализм XIX века",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 1.53,
+        "width": 2,
+        "source": "https://editions.covecollective.org/content/lady-shalott-john-william-waterhouse",
+        "basis": "unframed",
+        "verification": "secondary_checked",
+        "note": "N01543; Support 1530 × 2000 мм, рама отдельно. GAC ошибочно подписывает миллиметрами значения 153 × 200."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1875",
+      "atelierId": "isle-dead",
+      "title": "Isle of the Dead (first version)",
+      "titleRu": "Остров мёртвых (первая версия)",
+      "artist": "Arnold Böcklin",
+      "artistRu": "Арнольд Бёклин",
+      "year": "1880",
+      "sourceImage": "assets/restoration/symbolism/isle-dead.jpg",
+      "sourceUrl": "https://schaulager.org/de/file/216/b5d67aab/h_t_d.pdf",
+      "category": "Символизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 1.11,
+        "width": 1.55,
+        "source": "https://schaulager.org/de/file/216/b5d67aab/h_t_d.pdf",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Изображение соответствует первой базельской версии 1880, не третьей берлинской 1883."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1876",
+      "atelierId": "oedipus-sphinx",
+      "title": "Oedipus and the Sphinx",
+      "titleRu": "Эдип и Сфинкс",
+      "artist": "Gustave Moreau",
+      "artistRu": "Гюстав Моро",
+      "year": "1864",
+      "sourceImage": "assets/restoration/symbolism/oedipus-sphinx.jpg",
+      "sourceUrl": "https://www.metmuseum.org/art/collection/search/437153",
+      "category": "Символизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 2.064,
+        "width": 1.048,
+        "source": "https://www.metmuseum.org/art/collection/search/437153",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Moreau, 1864; не Энгр."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1877",
+      "atelierId": "hope",
+      "title": "Hope",
+      "titleRu": "Надежда",
+      "artist": "George Frederic Watts",
+      "artistRu": "Джордж Фредерик Уоттс",
+      "year": "1886",
+      "sourceImage": "assets/restoration/symbolism/hope.jpg",
+      "sourceUrl": "https://artsandculture.google.com/asset/hope-george-frederic-watts/CgGv3RqPFUZk4A",
+      "category": "Символизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 1.422,
+        "width": 1.118,
+        "source": "https://artsandculture.google.com/asset/hope-george-frederic-watts/CgGv3RqPFUZk4A",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Провайдер Tate Britain, 1886."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1878",
+      "atelierId": "death-life",
+      "title": "Death and Life",
+      "titleRu": "Смерть и жизнь",
+      "artist": "Gustav Klimt",
+      "artistRu": "Густав Климт",
+      "year": "1910–1915",
+      "sourceImage": "assets/restoration/symbolism/death-life.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Death_and_Life",
+      "category": "Символизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 1.808,
+        "width": 2.006,
+        "source": "https://en.wikipedia.org/wiki/Death_and_Life",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1879",
+      "atelierId": "wounded-angel",
+      "title": "The Wounded Angel",
+      "titleRu": "Раненый ангел",
+      "artist": "Hugo Simberg",
+      "artistRu": "Хуго Симберг",
+      "year": "1903",
+      "sourceImage": "assets/restoration/symbolism/wounded-angel.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Wounded_Angel",
+      "category": "Символизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 1.27,
+        "width": 1.54,
+        "source": "https://en.wikipedia.org/wiki/The_Wounded_Angel",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1880",
+      "atelierId": "jupiter-semele",
+      "title": "Jupiter and Semele",
+      "titleRu": "Юпитер и Семела",
+      "artist": "Gustave Moreau",
+      "artistRu": "Гюстав Моро",
+      "year": "1894–1895",
+      "sourceImage": "assets/restoration/symbolism/jupiter-semele.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Jupiter_and_Semele",
+      "category": "Символизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 2.13,
+        "width": 1.18,
+        "source": "https://en.wikipedia.org/wiki/Jupiter_and_Semele",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1881",
+      "atelierId": "the-sin",
+      "title": "The Sin",
+      "titleRu": "Грех",
+      "artist": "Franz von Stuck",
+      "artistRu": "Франц фон Штук",
+      "year": "1893",
+      "sourceImage": "assets/restoration/symbolism/the-sin.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Sin_(Stuck)",
+      "category": "Символизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 0.945,
+        "width": 0.596,
+        "source": "https://en.wikipedia.org/wiki/The_Sin_(Stuck)",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1882",
+      "atelierId": "poor-fisherman",
+      "title": "The Poor Fisherman",
+      "titleRu": "Бедный рыбак",
+      "artist": "Pierre Puvis de Chavannes",
+      "artistRu": "Пюви де Шаванн",
+      "year": "1881",
+      "sourceImage": "assets/restoration/symbolism/poor-fisherman.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Poor_Fisherman",
+      "category": "Символизм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "leisure"
+      },
+      "physicalSizeM": {
+        "height": 1.555,
+        "width": 1.925,
+        "source": "https://en.wikipedia.org/wiki/The_Poor_Fisherman",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1883",
+      "atelierId": "apparition",
+      "title": "The Apparition",
+      "titleRu": "Видение",
+      "artist": "Gustave Moreau",
+      "artistRu": "Гюстав Моро",
+      "year": "ок. 1876",
+      "sourceImage": "assets/restoration/symbolism/apparition.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Apparition_(Moreau,_Musée_national_Gustave_Moreau)",
+      "category": "Символизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 1.42,
+        "width": 1.03,
+        "source": "https://en.wikipedia.org/wiki/The_Apparition_(Moreau,_Musée_national_Gustave_Moreau)",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1884",
+      "atelierId": "cyclops",
+      "title": "The Cyclops",
+      "titleRu": "Циклоп",
+      "artist": "Odilon Redon",
+      "artistRu": "Одилон Редон",
+      "year": "ок. 1914",
+      "sourceImage": "assets/restoration/symbolism/cyclops.jpg",
+      "sourceUrl": "https://www.wikidata.org/wiki/Q3793426",
+      "category": "Символизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 0.658,
+        "width": 0.527,
+        "source": "https://www.wikidata.org/wiki/Q3793426",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1885",
+      "atelierId": "rex",
+      "title": "Sonata No. 5 (Sonata of the Sea). Andante",
+      "titleRu": "Соната моря. Анданте",
+      "artist": "Mikalojus Čiurlionis",
+      "artistRu": "Микалоюс Чюрлёнис",
+      "year": "1908",
+      "sourceImage": "assets/restoration/symbolism/rex.jpg",
+      "sourceUrl": "https://ciurlionis.eu/content/sonata-5-andante",
+      "category": "Символизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 0.731,
+        "width": 0.622,
+        "source": "https://ciurlionis.eu/content/sonata-5-andante",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Локальное изображение ошибочно подписано Rex. На нём Sonata No.5 (Sonata of the Sea). Andante, 1908, Čt 13."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1886",
+      "atelierId": "symbolist-dream",
+      "title": "The Dream",
+      "titleRu": "Сон",
+      "artist": "Pierre Puvis de Chavannes",
+      "artistRu": "Пюви де Шаванн",
+      "year": "1883",
+      "sourceImage": "assets/restoration/symbolism/dream.jpg",
+      "sourceUrl": "https://www.musee-orsay.fr/fr/oeuvres/le-reve-9484",
+      "category": "Символизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 0.82,
+        "width": 1.02,
+        "source": "https://www.musee-orsay.fr/fr/oeuvres/le-reve-9484",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "RF 1685."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1887",
+      "atelierId": "kiss-sphinx",
+      "title": "The Kiss of the Sphinx",
+      "titleRu": "Поцелуй Сфинкса",
+      "artist": "Franz von Stuck",
+      "artistRu": "Франц фон Штук",
+      "year": "1895",
+      "sourceImage": "assets/restoration/symbolism/kiss-sphinx.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Kiss_of_the_Sphinx",
+      "category": "Символизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 1.625,
+        "width": 1.455,
+        "source": "https://en.wikipedia.org/wiki/The_Kiss_of_the_Sphinx",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1888",
+      "atelierId": "death-gravedigger",
+      "title": "The Death of the Gravedigger",
+      "titleRu": "Смерть и могильщик",
+      "artist": "Carlos Schwabe",
+      "artistRu": "Карлос Швабе",
+      "year": "ок. 1895",
+      "sourceImage": "assets/restoration/symbolism/death-gravedigger.jpg",
+      "sourceUrl": "https://collections.louvre.fr/ark:/53355/cl020043693",
+      "category": "Символизм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 0.76,
+        "width": 0.56,
+        "source": "https://collections.louvre.fr/ark:/53355/cl020043693",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "RF 40162.BIS, Recto; акварель 1900, рисунок датирован 95."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1889",
+      "atelierId": "persistence-memory",
+      "title": "The Persistence of Memory",
+      "titleRu": "Постоянство памяти",
+      "artist": "Salvador Dalí",
+      "artistRu": "Сальвадор Дали",
+      "year": "1931",
+      "sourceImage": "assets/restoration/surrealism/persistence-memory.jpg",
+      "sourceUrl": "https://www.wikidata.org/wiki/Q25729",
+      "category": "Сюрреализм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 0.241,
+        "width": 0.33,
+        "source": "https://www.wikidata.org/wiki/Q25729",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1890",
+      "atelierId": "son-of-man",
+      "title": "The Son of Man",
+      "titleRu": "Сын человеческий",
+      "artist": "René Magritte",
+      "artistRu": "Рене Магритт",
+      "year": "1964",
+      "sourceImage": "assets/restoration/surrealism/son-of-man.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Son_of_Man",
+      "category": "Сюрреализм",
+      "subject": "Мужчины",
+      "placement": {
+        "hall": "portraits",
+        "wall": "men"
+      },
+      "physicalSizeM": {
+        "height": 1.16,
+        "width": 0.89,
+        "source": "https://en.wikipedia.org/wiki/The_Son_of_Man",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1891",
+      "atelierId": "treachery-images",
+      "title": "The Treachery of Images",
+      "titleRu": "Вероломство образов",
+      "artist": "René Magritte",
+      "artistRu": "Рене Магритт",
+      "year": "1929",
+      "sourceImage": "assets/restoration/surrealism/treachery-images.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Treachery_of_Images",
+      "category": "Сюрреализм",
+      "subject": "Натюрморты",
+      "placement": {
+        "hall": "jp",
+        "wall": "still"
+      },
+      "physicalSizeM": {
+        "height": 0.6033,
+        "width": 0.8112,
+        "source": "https://en.wikipedia.org/wiki/The_Treachery_of_Images",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1892",
+      "atelierId": "elephants",
+      "title": "The Elephants",
+      "titleRu": "Слоны",
+      "artist": "Salvador Dalí",
+      "artistRu": "Сальвадор Дали",
+      "year": "1948",
+      "sourceImage": "assets/restoration/surrealism/elephants.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Elephants",
+      "category": "Сюрреализм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 0.49,
+        "width": 0.6,
+        "source": "https://en.wikipedia.org/wiki/The_Elephants",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1893",
+      "atelierId": "human-condition",
+      "title": "The Human Condition",
+      "titleRu": "Условия человеческого существования",
+      "artist": "René Magritte",
+      "artistRu": "Рене Магритт",
+      "year": "1933",
+      "sourceImage": "assets/restoration/surrealism/human-condition.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Human_Condition_(Magritte)",
+      "category": "Сюрреализм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 1,
+        "width": 0.81,
+        "source": "https://en.wikipedia.org/wiki/The_Human_Condition_(Magritte)",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1894",
+      "atelierId": "golconda",
+      "title": "Golconda",
+      "titleRu": "Голконда",
+      "artist": "René Magritte",
+      "artistRu": "Рене Магритт",
+      "year": "1953",
+      "sourceImage": "assets/restoration/surrealism/golconda.jpg",
+      "sourceUrl": "https://www.menil.org/collection/objects/4901-golconda-golconde",
+      "category": "Сюрреализм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 0.8,
+        "width": 1.003,
+        "source": "https://www.menil.org/collection/objects/4901-golconda-golconde",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Музей указывает точную ширину 100,3 см."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1895",
+      "atelierId": "narcissus",
+      "title": "Metamorphosis of Narcissus",
+      "titleRu": "Метаморфозы Нарцисса",
+      "artist": "Salvador Dalí",
+      "artistRu": "Сальвадор Дали",
+      "year": "1937",
+      "sourceImage": "assets/restoration/surrealism/narcissus.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Metamorphosis_of_Narcissus",
+      "category": "Сюрреализм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 0.512,
+        "width": 0.781,
+        "source": "https://en.wikipedia.org/wiki/Metamorphosis_of_Narcissus",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1896",
+      "atelierId": "swans-elephants",
+      "title": "Swans Reflecting Elephants",
+      "titleRu": "Лебеди, отражённые в слонах",
+      "artist": "Salvador Dalí",
+      "artistRu": "Сальвадор Дали",
+      "year": "1937",
+      "sourceImage": "assets/restoration/surrealism/swans-elephants.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Swans_Reflecting_Elephants",
+      "category": "Сюрреализм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 0.51,
+        "width": 0.77,
+        "source": "https://en.wikipedia.org/wiki/Swans_Reflecting_Elephants",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1897",
+      "atelierId": "magritte-lovers",
+      "title": "The Lovers",
+      "titleRu": "Влюблённые",
+      "artist": "René Magritte",
+      "artistRu": "Рене Магритт",
+      "year": "1928",
+      "sourceImage": "assets/restoration/surrealism/lovers.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Lovers_(Magritte)",
+      "category": "Сюрреализм",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "life"
+      },
+      "physicalSizeM": {
+        "height": 0.54,
+        "width": 0.734,
+        "source": "https://en.wikipedia.org/wiki/The_Lovers_(Magritte)",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1898",
+      "atelierId": "false-mirror",
+      "title": "The False Mirror",
+      "titleRu": "Ложное зеркало",
+      "artist": "René Magritte",
+      "artistRu": "Рене Магритт",
+      "year": "1928",
+      "sourceImage": "assets/restoration/surrealism/false-mirror.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_False_Mirror",
+      "category": "Сюрреализм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 0.54,
+        "width": 0.809,
+        "source": "https://en.wikipedia.org/wiki/The_False_Mirror",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1899",
+      "atelierId": "time-transfixed",
+      "title": "Time Transfixed",
+      "titleRu": "Пронзённое время",
+      "artist": "René Magritte",
+      "artistRu": "Рене Магритт",
+      "year": "1938",
+      "sourceImage": "assets/restoration/surrealism/time-transfixed.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Time_Transfixed",
+      "category": "Сюрреализм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 1.47,
+        "width": 0.987,
+        "source": "https://en.wikipedia.org/wiki/Time_Transfixed",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1900",
+      "atelierId": "harlequin-carnival",
+      "title": "Harlequin's Carnival",
+      "titleRu": "Карнавал Арлекина",
+      "artist": "Joan Miró",
+      "artistRu": "Жоан Миро",
+      "year": "1924–1925",
+      "sourceImage": "assets/restoration/surrealism/harlequin-carnival.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/The_Harlequin's_Carnival",
+      "category": "Сюрреализм",
+      "subject": "Абстракция и орнамент",
+      "placement": {
+        "hall": "reserve",
+        "wall": "uncertain"
+      },
+      "physicalSizeM": {
+        "height": 0.66,
+        "width": 0.905,
+        "source": "https://en.wikipedia.org/wiki/The_Harlequin's_Carnival",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "unassigned"
+    },
+    {
+      "id": "ART-1901",
+      "atelierId": "dream-flight-bee",
+      "title": "Dream Caused by the Flight of a Bee",
+      "titleRu": "Сон, вызванный полётом пчелы",
+      "artist": "Salvador Dalí",
+      "artistRu": "Сальвадор Дали",
+      "year": "1944",
+      "sourceImage": "assets/restoration/surrealism/dream-bee.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Dream_Caused_by_the_Flight_of_a_Bee_Around_a_Pomegranate_a_Second_Before_Awakening",
+      "category": "Сюрреализм",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 0.51,
+        "width": 0.405,
+        "source": "https://en.wikipedia.org/wiki/Dream_Caused_by_the_Flight_of_a_Bee_Around_a_Pomegranate_a_Second_Before_Awakening",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1902",
+      "atelierId": "miro-painting-1936",
+      "title": "Painting",
+      "titleRu": "Живопись",
+      "artist": "Joan Miró",
+      "artistRu": "Жоан Миро",
+      "year": "1936",
+      "sourceImage": "assets/restoration/surrealism/painting-1936.jpg",
+      "sourceUrl": "https://www.museothyssen.org/en/collection/artists/miro-joan/painting",
+      "category": "Сюрреализм",
+      "subject": "Абстракция и орнамент",
+      "placement": {
+        "hall": "reserve",
+        "wall": "uncertain"
+      },
+      "physicalSizeM": {
+        "height": 0.78,
+        "width": 1.08,
+        "source": "https://www.museothyssen.org/en/collection/artists/miro-joan/painting",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Мазонит, CTB.1998.19."
+      },
+      "status": "unassigned"
+    },
+    {
+      "id": "ART-1903",
+      "atelierId": "surrealism-and-painting",
+      "title": "Surrealism and Painting",
+      "titleRu": "Сюрреализм и живопись",
+      "artist": "Max Ernst",
+      "artistRu": "Макс Эрнст",
+      "year": "1942",
+      "sourceImage": "assets/restoration/surrealism/surrealism-painting.jpg",
+      "sourceUrl": "https://www.menil.org/collection/objects/2299-surrealism-and-painting-le-surrealisme-et-la-peinture",
+      "category": "Сюрреализм",
+      "subject": "Абстракция и орнамент",
+      "placement": {
+        "hall": "reserve",
+        "wall": "uncertain"
+      },
+      "physicalSizeM": {
+        "height": 1.956,
+        "width": 2.337,
+        "source": "https://www.menil.org/collection/objects/2299-surrealism-and-painting-le-surrealisme-et-la-peinture",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Музейные размеры, не округлённые 195 × 233."
+      },
+      "status": "unassigned"
+    },
+    {
+      "id": "ART-1904",
+      "atelierId": "listening-qin",
+      "title": "Six Persimmons",
+      "titleRu": "Шесть плодов хурмы",
+      "artist": "Muqi",
+      "artistRu": "Муци",
+      "year": "XIII век",
+      "sourceImage": "assets/restoration/china/six-persimmons.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Six_Persimmons",
+      "category": "Китайская и корейская живопись тушью",
+      "subject": "Природа",
+      "placement": {
+        "hall": "cn",
+        "wall": "nature"
+      },
+      "physicalSizeM": {
+        "height": 0.362,
+        "width": 0.381,
+        "source": "https://en.wikipedia.org/wiki/Six_Persimmons",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "imageReview": "Пропорции файла ателье отличаются от измеренного оригинала; требуется сверить поля и исторический монтаж.",
+      "status": "image"
+    },
+    {
+      "id": "ART-1905",
+      "atelierId": "ladies-silk",
+      "title": "Night-Shining White",
+      "titleRu": "Белый конь, сияющий в ночи",
+      "artist": "Han Gan",
+      "artistRu": "Хань Гань",
+      "year": "VIII век",
+      "sourceImage": "assets/restoration/china/night-shining-white.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Night-Shining_White",
+      "category": "Китайская и корейская живопись тушью",
+      "subject": "Природа",
+      "placement": {
+        "hall": "cn",
+        "wall": "nature"
+      },
+      "physicalSizeM": {
+        "height": 0.308,
+        "width": 0.34,
+        "source": "https://en.wikipedia.org/wiki/Night-Shining_White",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "imageReview": "Пропорции файла ателье отличаются от измеренного оригинала; требуется сверить поля и исторический монтаж.",
+      "status": "image"
+    },
+    {
+      "id": "ART-1906",
+      "atelierId": "court-ladies",
+      "title": "Court Ladies Wearing Flowered Headdresses",
+      "titleRu": "Придворные дамы с цветами в волосах",
+      "artist": "Zhou Fang",
+      "artistRu": "Чжоу Фан",
+      "year": "VIII век",
+      "sourceImage": "art-archive/catalog/reviewed-source/court-ladies.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Zhou_Fang._Court_Ladies_Wearing_Flowered_Headdresses._(46x180)_Liaoning_Provincial_Museum,_Shenyang..jpg",
+      "category": "Китайская и корейская живопись тушью",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "cn",
+        "wall": "figures"
+      },
+      "physicalSizeM": {
+        "height": 0.46,
+        "width": 1.8,
+        "source": "https://commons.wikimedia.org/wiki/File:Zhou_Fang._Court_Ladies_Wearing_Flowered_Headdresses._(46x180)_Liaoning_Provincial_Museum,_Shenyang..jpg",
+        "basis": "unframed",
+        "verification": "secondary_checked",
+        "note": "Полный свиток; исходник ателье не соответствует произведению. Для архива получена полная репродукция, исторические поля монтажа пока требуют проверки."
+      },
+      "atelierSourceImage": "assets/restoration/china/court-ladies.jpg",
+      "imageSourceUrl": "https://commons.wikimedia.org/wiki/File:Zhou_Fang._Court_Ladies_Wearing_Flowered_Headdresses._(46x180)_Liaoning_Provincial_Museum,_Shenyang..jpg",
+      "imageReview": "Полная репродукция взамен ошибочного файла ателье. На фото есть исторические поля монтажа; размеры относятся к живописи, не к монтажу. Требуется точно выделить живописную область до развески.",
+      "status": "image"
+    },
+    {
+      "id": "ART-1907",
+      "atelierId": "han-palace",
+      "title": "Spring Morning in the Han Palace",
+      "titleRu": "Весеннее утро во дворце Хань",
+      "artist": "Qiu Ying",
+      "artistRu": "Цю Ин",
+      "year": "XVI век",
+      "sourceImage": "art-archive/catalog/reviewed-source/han-palace.jpg",
+      "sourceUrl": "https://theme.npm.edu.tw/selection/Article.aspx?sNo=04000980",
+      "category": "Китайская и корейская живопись тушью",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "cn",
+        "wall": "figures"
+      },
+      "physicalSizeM": {
+        "height": 0.306,
+        "width": 5.741,
+        "source": "https://theme.npm.edu.tw/selection/Article.aspx?sNo=04000980",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Размер всей живописной части; локальный файл показывает лишь фрагмент, требуется полная репродукция. Для архива получена полная репродукция, исторические поля монтажа пока требуют проверки."
+      },
+      "atelierSourceImage": "assets/restoration/china/han-palace.jpg",
+      "imageSourceUrl": "https://commons.wikimedia.org/wiki/File:Spring_Morning_in_the_Han_Palace.jpg",
+      "imageReview": "Полная репродукция взамен ошибочного файла ателье. На фото есть исторические поля монтажа; размеры относятся к живописи, не к монтажу. Требуется точно выделить живописную область до развески.",
+      "status": "image"
+    },
+    {
+      "id": "ART-1908",
+      "atelierId": "qianlong-hunt",
+      "title": "A Banquet for the Victory",
+      "titleRu": "Пир в честь победы",
+      "artist": "Qing court workshop master",
+      "artistRu": "Мастер придворной мастерской Цин",
+      "year": "XVIII век",
+      "sourceImage": "assets/restoration/china/victory-banquet.jpg",
+      "sourceUrl": null,
+      "category": "Китайская и корейская живопись тушью",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "cn",
+        "wall": "figures"
+      },
+      "physicalSizeM": null,
+      "status": "unmeasured"
+    },
+    {
+      "id": "ART-1909",
+      "atelierId": "tibetan-envoy",
+      "title": "Emperor Taizong Receiving the Tibetan Envoy",
+      "titleRu": "Император Тай-цзун принимает тибетского посла",
+      "artist": "Yan Liben",
+      "artistRu": "Янь Либэнь",
+      "year": "VII век",
+      "sourceImage": "assets/restoration/china/tibetan-envoy.jpg",
+      "sourceUrl": "https://english.visitbeijing.com.cn/article/47ONwYvgSQ0",
+      "category": "Китайская и корейская живопись тушью",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "cn",
+        "wall": "figures"
+      },
+      "physicalSizeM": {
+        "height": 0.385,
+        "width": 1.296,
+        "source": "https://english.visitbeijing.com.cn/article/47ONwYvgSQ0",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Полная композиция свитка; проверить соответствие локального кадрирования."
+      },
+      "imageReview": "Локальный файл не показывает полный свиток заявленной ширины; размеры полного оригинала известны, размеры этого фрагмента не установлены.",
+      "status": "image"
+    },
+    {
+      "id": "ART-1910",
+      "atelierId": "double-sixes",
+      "title": "Chōmei-ji Temple",
+      "titleRu": "Храм Тёмэйдзи",
+      "artist": "Utagawa Hiroshige II",
+      "artistRu": "Утагава Хиросигэ II",
+      "year": "1859",
+      "sourceImage": "assets/restoration/replacements/met-853241.jpg",
+      "sourceUrl": "https://www.metmuseum.org/art/collection/search/853241",
+      "category": "Японская живопись и ширмы",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "cn",
+        "wall": "figures"
+      },
+      "physicalSizeM": {
+        "height": 0.3556,
+        "width": 0.2413,
+        "source": "https://www.metmuseum.org/art/collection/search/853241",
+        "basis": "sheet",
+        "verification": "source_checked",
+        "note": "Полный лист Sheet по музейному API; изображение внутри 34.29007 × 23.495047 см."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1911",
+      "atelierId": "auspicious-cranes",
+      "title": "Auspicious Cranes",
+      "titleRu": "Благоприятные журавли",
+      "artist": "Emperor Huizong",
+      "artistRu": "Император Хуэйцзун",
+      "year": "1112",
+      "sourceImage": "assets/restoration/china/auspicious-cranes.jpg",
+      "sourceUrl": "https://smarthistory.org/emperor-huizong-auspicious-cranes/",
+      "category": "Китайская и корейская живопись тушью",
+      "subject": "Природа",
+      "placement": {
+        "hall": "cn",
+        "wall": "nature"
+      },
+      "physicalSizeM": {
+        "height": 0.51,
+        "width": 1.382,
+        "source": "https://smarthistory.org/emperor-huizong-auspicious-cranes/",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Живописная часть свитка, Liaoning Provincial Museum."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1912",
+      "atelierId": "night-revels",
+      "title": "Spring Rain at Tsuchiyama",
+      "titleRu": "Весенний дождь в Цутияма",
+      "artist": "Utagawa Hiroshige",
+      "artistRu": "Утагава Хиросигэ",
+      "year": "1834–1835",
+      "sourceImage": "assets/restoration/replacements/met-36971.jpg",
+      "sourceUrl": "https://www.metmuseum.org/art/collection/search/36971",
+      "category": "Японская живопись и ширмы",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "cn",
+        "wall": "figures"
+      },
+      "physicalSizeM": {
+        "height": 0.241,
+        "width": 0.356,
+        "source": "https://www.metmuseum.org/art/collection/search/36971",
+        "basis": "sheet",
+        "verification": "source_checked",
+        "note": "Overall по музейному API."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1913",
+      "atelierId": "peach-blossom-spring",
+      "title": "Ommayagashi on the Sumida River",
+      "titleRu": "Оммаягаси на реке Сумида",
+      "artist": "Utagawa Hiroshige",
+      "artistRu": "Утагава Хиросигэ",
+      "year": "ок. 1857",
+      "sourceImage": "assets/restoration/replacements/met-55712.jpg",
+      "sourceUrl": "https://www.metmuseum.org/art/collection/search/55712",
+      "category": "Японская живопись и ширмы",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "cn",
+        "wall": "figures"
+      },
+      "physicalSizeM": {
+        "height": 0.375,
+        "width": 0.257,
+        "source": "https://www.metmuseum.org/art/collection/search/55712",
+        "basis": "sheet",
+        "verification": "source_checked",
+        "note": "В ателье уже заменено изображение и название: Ommayagashi, Sumida River, JP1547, Hiroshige, 1857."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1914",
+      "atelierId": "qianlong-armour",
+      "title": "The Qianlong Emperor in Ceremonial Armour",
+      "titleRu": "Император Цяньлун в церемониальных доспехах",
+      "artist": "Giuseppe Castiglione",
+      "artistRu": "Джузеппе Кастильоне",
+      "year": "1739",
+      "sourceImage": "assets/restoration/china/qianlong-armour.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:The_Qianlong_Emperor_in_Ceremonial_Armour_on_Horseback.jpg",
+      "category": "Китайская и корейская живопись тушью",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "cn",
+        "wall": "figures"
+      },
+      "physicalSizeM": {
+        "height": 3.225,
+        "width": 2.32,
+        "source": "https://commons.wikimedia.org/wiki/File:The_Qianlong_Emperor_in_Ceremonial_Armour_on_Horseback.jpg",
+        "basis": "unframed",
+        "verification": "secondary_checked",
+        "note": "Palace Museum Beijing; портрет на коне, не пеший портрет."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1915",
+      "atelierId": "lovers-moon",
+      "title": "Lovers under the Moon",
+      "titleRu": "Влюблённые под луной",
+      "artist": "Shin Yun-bok",
+      "artistRu": "Син Юн Бок",
+      "year": "конец XVIII века",
+      "sourceImage": "assets/restoration/korea/lovers-moon.jpg",
+      "sourceUrl": "https://kansong.org/front/clctn/listViewCollectionFront.do?pageIndex=13",
+      "category": "Китайская и корейская живопись тушью",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "cn",
+        "wall": "figures"
+      },
+      "physicalSizeM": {
+        "height": 0.282,
+        "width": 0.356,
+        "source": "https://kansong.org/front/clctn/listViewCollectionFront.do?pageIndex=13",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Музей Кансон: 월하정인, 신윤복."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1916",
+      "atelierId": "tiger-magpie",
+      "title": "Tiger and Magpie",
+      "titleRu": "Тигр и сорока",
+      "artist": "Unknown minhwa master",
+      "artistRu": "Неизвестный мастер минхва",
+      "year": "XIX век",
+      "sourceImage": "assets/restoration/korea/tiger-magpie.jpg",
+      "sourceUrl": null,
+      "category": "Китайская и корейская живопись тушью",
+      "subject": "Природа",
+      "placement": {
+        "hall": "cn",
+        "wall": "nature"
+      },
+      "physicalSizeM": null,
+      "status": "unmeasured"
+    },
+    {
+      "id": "ART-1917",
+      "atelierId": "dancing-boy",
+      "title": "Dancing Boy",
+      "titleRu": "Танцующий мальчик",
+      "artist": "Kim Hong-do",
+      "artistRu": "Ким Хон До",
+      "year": "конец XVIII века",
+      "sourceImage": "assets/restoration/korea/dancing-boy.jpg",
+      "sourceUrl": "https://www.museum.go.kr/JPN/contents/E0403000000.do?relicId=553&schM=view&searchId=search",
+      "category": "Китайская и корейская живопись тушью",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "cn",
+        "wall": "figures"
+      },
+      "physicalSizeM": {
+        "height": 0.268,
+        "width": 0.227,
+        "source": "https://www.museum.go.kr/JPN/contents/E0403000000.do?relicId=553&schM=view&searchId=search",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Bongwan6504-24."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1918",
+      "atelierId": "ssireum",
+      "title": "Ssireum",
+      "titleRu": "Ссирым",
+      "artist": "Kim Hong-do",
+      "artistRu": "Ким Хон До",
+      "year": "конец XVIII века",
+      "sourceImage": "assets/restoration/korea/ssireum.jpg",
+      "sourceUrl": "https://www.koreana.or.kr/koreana/na/ntt/selectNttInfo.do?bbsId=1113&langTy=KOR&mi=1546&nttSn=51931",
+      "category": "Китайская и корейская живопись тушью",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "cn",
+        "wall": "figures"
+      },
+      "physicalSizeM": {
+        "height": 0.269,
+        "width": 0.222,
+        "source": "https://www.koreana.or.kr/koreana/na/ntt/selectNttInfo.do?bbsId=1113&langTy=KOR&mi=1546&nttSn=51931",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Размер альбомного листа; репродукция Национального музея Кореи."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1919",
+      "atelierId": "tiger-pine",
+      "title": "The Ono Restaurant at Ryōgoku Yanagibashi",
+      "titleRu": "Ресторан Оно у моста Рёгоку Янагибаси",
+      "artist": "Utagawa Hiroshige",
+      "artistRu": "Утагава Хиросигэ",
+      "year": "ок. 1835–1842",
+      "sourceImage": "assets/restoration/replacements/met-45305.jpg",
+      "sourceUrl": "https://www.metmuseum.org/art/collection/search/45305",
+      "category": "Японская живопись и ширмы",
+      "subject": "Природа",
+      "placement": {
+        "hall": "cn",
+        "wall": "nature"
+      },
+      "physicalSizeM": {
+        "height": 0.251,
+        "width": 0.37,
+        "source": "https://www.metmuseum.org/art/collection/search/45305",
+        "basis": "sheet",
+        "verification": "source_checked",
+        "note": "В ателье уже заменено изображение и название: The Ono at Ryogoku Yanagibashi, Hiroshige, JP1157."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1920",
+      "atelierId": "cats-sparrows",
+      "title": "Cats and Sparrows",
+      "titleRu": "Кошки и воробьи",
+      "artist": "Byeon Sang-byeok",
+      "artistRu": "Пён Санбёк",
+      "year": "XVIII век",
+      "sourceImage": "assets/restoration/korea/cats-sparrows.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Korean_art-Byeon_Sangbyeok-Myojakdo-Painting_of_Cats_and_Sparrows-01.jpg",
+      "category": "Китайская и корейская живопись тушью",
+      "subject": "Природа",
+      "placement": {
+        "hall": "cn",
+        "wall": "nature"
+      },
+      "physicalSizeM": {
+        "height": 0.937,
+        "width": 0.429,
+        "source": "https://commons.wikimedia.org/wiki/File:Korean_art-Byeon_Sangbyeok-Myojakdo-Painting_of_Cats_and_Sparrows-01.jpg",
+        "basis": "unframed",
+        "verification": "secondary_checked",
+        "note": "Описание музейного файла Национального музея Кореи."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1921",
+      "atelierId": "dano-day",
+      "title": "The Dano Festival",
+      "titleRu": "Праздник Дано",
+      "artist": "Shin Yun-bok",
+      "artistRu": "Син Юн Бок",
+      "year": "конец XVIII века",
+      "sourceImage": "assets/restoration/korea/dano-day.jpg",
+      "sourceUrl": "https://www.koreana.or.kr/koreana/na/ntt/selectNttInfo.do?bbsId=1114&nttSn=51635",
+      "category": "Китайская и корейская живопись тушью",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "cn",
+        "wall": "figures"
+      },
+      "physicalSizeM": {
+        "height": 0.282,
+        "width": 0.356,
+        "source": "https://www.koreana.or.kr/koreana/na/ntt/selectNttInfo.do?bbsId=1114&nttSn=51635",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Музейная иллюстрация из альбома Хевона, Национальное сокровище 135."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1922",
+      "atelierId": "geomungo-women",
+      "title": "Women Choosing a Geomungo",
+      "titleRu": "Женщины выбирают комунго",
+      "artist": "Shin Yun-bok",
+      "artistRu": "Син Юн Бок",
+      "year": "конец XVIII века",
+      "sourceImage": "assets/restoration/korea/geomungo-women.jpg",
+      "sourceUrl": "https://tayler.tistory.com/263",
+      "category": "Китайская и корейская живопись тушью",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "cn",
+        "wall": "figures"
+      },
+      "physicalSizeM": {
+        "height": 0.275,
+        "width": 0.23,
+        "source": "https://tayler.tistory.com/263",
+        "basis": "unframed",
+        "verification": "secondary_checked",
+        "note": "탄금, альбом Yeosokdo, музей Кореи. Размер живописной части из вторичного источника; музей указывает размеры различных листов альбома 29.7×24.5 и 28.2×19.1."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1923",
+      "atelierId": "board-game",
+      "title": "Playing a Traditional Board Game",
+      "titleRu": "Игра в традиционную настольную игру",
+      "artist": "Shin Yun-bok",
+      "artistRu": "Син Юн Бок",
+      "year": "конец XVIII века",
+      "sourceImage": "assets/restoration/korea/board-game.jpg",
+      "sourceUrl": "https://2022.koreanart21.com/education/artAppreciation/view?id=8219&page=3",
+      "category": "Китайская и корейская живопись тушью",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "cn",
+        "wall": "figures"
+      },
+      "physicalSizeM": {
+        "height": 0.282,
+        "width": 0.356,
+        "source": "https://2022.koreanart21.com/education/artAppreciation/view?id=8219&page=3",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "쌍륙삼매, музей Кансон; горизонтальный альбомный лист, не размеры позднего факсимиле."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1924",
+      "atelierId": "flowers-birds-minhwa",
+      "title": "Flowers and Birds",
+      "titleRu": "Цветы и птицы",
+      "artist": "Unknown minhwa master",
+      "artistRu": "Неизвестный мастер минхва",
+      "year": "XIX век",
+      "sourceImage": "assets/restoration/korea/flowers-birds.jpg",
+      "sourceUrl": null,
+      "category": "Китайская и корейская живопись тушью",
+      "subject": "Природа",
+      "placement": {
+        "hall": "cn",
+        "wall": "nature"
+      },
+      "physicalSizeM": null,
+      "status": "unmeasured"
+    },
+    {
+      "id": "ART-1925",
+      "atelierId": "bharat-mata",
+      "title": "Bharat Mata",
+      "titleRu": "Мать-Индия",
+      "artist": "Abanindranath Tagore",
+      "artistRu": "Абаниндранат Тагор",
+      "year": "1905",
+      "sourceImage": "assets/restoration/india/bharat-mata.jpg",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Bharat_Mata_(painting)",
+      "category": "Индийская живопись",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 0.2667,
+        "width": 0.1524,
+        "source": "https://en.wikipedia.org/wiki/Bharat_Mata_(painting)",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1926",
+      "atelierId": "shakuntala",
+      "title": "Shakuntala",
+      "titleRu": "Шакунтала",
+      "artist": "Raja Ravi Varma",
+      "artistRu": "Раджа Рави Варма",
+      "year": "1870",
+      "sourceImage": "assets/restoration/india/shakuntala.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Raja_Ravi_Varma_-_Mahabharata_-_Shakuntala.jpg",
+      "category": "Индийская живопись",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 1.81,
+        "width": 1.1,
+        "source": "https://commons.wikimedia.org/wiki/File:Raja_Ravi_Varma_-_Mahabharata_-_Shakuntala.jpg",
+        "basis": "unframed",
+        "verification": "secondary_checked",
+        "note": "Вертикальная композиция; не переставлять высоту и ширину."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1927",
+      "atelierId": "hamsa-damayanti",
+      "title": "Damayanti Talking to the Swan",
+      "titleRu": "Дамаянти беседует с лебедем",
+      "artist": "Raja Ravi Varma",
+      "artistRu": "Раджа Рави Варма",
+      "year": "1899",
+      "sourceImage": "assets/restoration/india/hamsa-damayanti.jpg",
+      "sourceUrl": "https://artsandculture.google.com/asset/_/7AGcVzKcCHcR0Q",
+      "category": "Индийская живопись",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 1.5,
+        "width": 0.83,
+        "source": "https://artsandculture.google.com/asset/_/7AGcVzKcCHcR0Q",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Фонд Ganesh Shivaswamy, версия 1899 года; не другая версия 73 × 52 см."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1928",
+      "atelierId": "galaxy-musicians",
+      "title": "Galaxy of Musicians",
+      "titleRu": "Галактика музыкантов",
+      "artist": "Raja Ravi Varma",
+      "artistRu": "Раджа Рави Варма",
+      "year": "1889",
+      "sourceImage": "assets/restoration/india/galaxy-musicians.jpg",
+      "sourceUrl": null,
+      "category": "Индийская живопись",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "leisure"
+      },
+      "physicalSizeM": null,
+      "status": "unmeasured"
+    },
+    {
+      "id": "ART-1929",
+      "atelierId": "akbar-elephant",
+      "title": "Akbar Taming the Elephant Hawa'i",
+      "titleRu": "Акбар укрощает слона Хаваи",
+      "artist": "Basawan and Chetar Munti",
+      "artistRu": "Басаван и Четар Мунти",
+      "year": "ок. 1590",
+      "sourceImage": "assets/restoration/india/akbar-elephant.jpg",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Akbar_domptant_l%27%C3%A9l%C3%A9phant_Hawai.jpg",
+      "category": "Индийская живопись",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "leisure"
+      },
+      "physicalSizeM": {
+        "height": 0.33,
+        "width": 0.2,
+        "source": "https://commons.wikimedia.org/wiki/File:Akbar_domptant_l%27%C3%A9l%C3%A9phant_Hawai.jpg",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "V&A IS.2:22-1896, отдельный левый лист двойной композиции."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1930",
+      "atelierId": "bani-thani",
+      "title": "Bani Thani",
+      "titleRu": "Бани Тхани",
+      "artist": "Nihâl Chand",
+      "artistRu": "Нихал Чанд",
+      "year": "ок. 1750",
+      "sourceImage": "assets/restoration/india/bani-thani.jpg",
+      "sourceUrl": "https://past.jamaica-gleaner.com/article/art-leisure/20240310/radha-kishangarh-mona-lisa-india",
+      "category": "Индийская живопись",
+      "subject": "Женщины",
+      "placement": {
+        "hall": "portraits",
+        "wall": "women"
+      },
+      "physicalSizeM": {
+        "height": 0.488,
+        "width": 0.363,
+        "source": "https://past.jamaica-gleaner.com/article/art-leisure/20240310/radha-kishangarh-mona-lisa-india",
+        "basis": "unframed",
+        "verification": "secondary_checked",
+        "note": "Вторичный источник о версии Radha Kishangarh в княжеском собрании. Не вариант 63.812 с чашкой, 29 × 35.5 см."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1931",
+      "atelierId": "radha-krishna",
+      "title": "Krishna with the Gopis and Radha's Sorrow",
+      "titleRu": "Кришна с гопи и печаль Радхи",
+      "artist": "Purkhu of Kangra",
+      "artistRu": "Пуркху из Кангры",
+      "year": "1810–1820",
+      "sourceImage": "assets/restoration/india/radha-krishna.jpg",
+      "sourceUrl": "https://rietberg.ch/sammlungen/rvi-1852",
+      "category": "Индийская живопись",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 0.24,
+        "width": 0.32,
+        "source": "https://rietberg.ch/sammlungen/rvi-1852",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Bild: 24 × 32 см; полный лист 28 × 36.3 см. Размеры живописи подтверждены непосредственно музеем."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1932",
+      "atelierId": "lakshmi",
+      "title": "Lakshmi (chromolithograph)",
+      "titleRu": "Лакшми (хромолитография)",
+      "artist": "Raja Ravi Varma",
+      "artistRu": "Раджа Рави Варма",
+      "year": "1930-е",
+      "sourceImage": "assets/restoration/india/lakshmi.jpg",
+      "sourceUrl": "https://artsandculture.google.com/asset/lakshmi-ravi-varma-press/tgHHDIukcwmGGw",
+      "category": "Индийская живопись",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 0.7,
+        "width": 0.5,
+        "source": "https://artsandculture.google.com/asset/lakshmi-ravi-varma-press/tgHHDIukcwmGGw",
+        "basis": "sheet",
+        "verification": "edition_reference",
+        "note": "Размер конкретной хромолитографии 1930-х, не масляного оригинала; издание Ganesh Shivaswamy. Размер конкретного исторического оттиска из источника; точный экземпляр локальной репродукции не установлен."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1933",
+      "atelierId": "keechaka-sairandhri",
+      "title": "Keechaka and Sairandhri",
+      "titleRu": "Кичака и Сайрандхри",
+      "artist": "Raja Ravi Varma",
+      "artistRu": "Раджа Рави Варма",
+      "year": "1890",
+      "sourceImage": "assets/restoration/india/keechaka-sairandhri.jpg",
+      "sourceUrl": "https://artsandculture.google.com/asset/keechaka-and-sairandhri-0137/8AGEGQsG8b-Nxg",
+      "category": "Индийская живопись",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 1.778,
+        "width": 1.27,
+        "source": "https://artsandculture.google.com/asset/keechaka-and-sairandhri-0137/8AGEGQsG8b-Nxg",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Heritage Foundation / Maharaja Fatehsingh Museum: 50 × 70 дюймов, ширина × высота; вертикальный холст."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1934",
+      "atelierId": "there-comes-papa",
+      "title": "There Comes Papa",
+      "titleRu": "Папа идёт",
+      "artist": "Raja Ravi Varma",
+      "artistRu": "Раджа Рави Варма",
+      "year": "1893",
+      "sourceImage": "assets/restoration/india/there-comes-papa.jpg",
+      "sourceUrl": "https://www.wikidata.org/wiki/Q55373382",
+      "category": "Индийская живопись",
+      "subject": "Люди и быт",
+      "placement": {
+        "hall": "world",
+        "wall": "life"
+      },
+      "physicalSizeM": {
+        "height": 1.25,
+        "width": 0.81,
+        "source": "https://www.wikidata.org/wiki/Q55373382",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1935",
+      "atelierId": "india-milkmaid",
+      "title": "The Milkmaid",
+      "titleRu": "Молочница",
+      "artist": "Raja Ravi Varma",
+      "artistRu": "Раджа Рави Варма",
+      "year": "1904",
+      "sourceImage": "assets/restoration/india/milkmaid.jpg",
+      "sourceUrl": null,
+      "category": "Индийская живопись",
+      "subject": "Женщины",
+      "placement": {
+        "hall": "portraits",
+        "wall": "women"
+      },
+      "physicalSizeM": null,
+      "status": "unmeasured"
+    },
+    {
+      "id": "ART-1936",
+      "atelierId": "krishna-holi",
+      "title": "Krishna Celebrating Holi with Radha and the Gopis",
+      "titleRu": "Кришна празднует Холи с Радхой и гопи",
+      "artist": "Nihâl Chand",
+      "artistRu": "Нихал Чанд",
+      "year": "1750–1760",
+      "sourceImage": "assets/restoration/india/krishna-holi.jpg",
+      "sourceUrl": "https://www.granthaalayahpublication.org/Arts-Journal/ShodhKosh/article/download/7391/7185/42077",
+      "category": "Индийская живопись",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 0.194,
+        "width": 0.159,
+        "source": "https://www.granthaalayahpublication.org/Arts-Journal/ShodhKosh/article/download/7391/7185/42077",
+        "basis": "unframed",
+        "verification": "secondary_checked",
+        "note": "Figure 3; Kishangarh, c.1750–60, атрибутируется Nihal Chand. MFA Boston 2002.901. Вторичный научный источник."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1937",
+      "atelierId": "birth-krishna",
+      "title": "The Birth of Krishna",
+      "titleRu": "Рождение Кришны",
+      "artist": "Kangra school master",
+      "artistRu": "Мастер школы Кангра",
+      "year": "1790",
+      "sourceImage": "assets/restoration/india/birth-krishna.jpg",
+      "sourceUrl": null,
+      "category": "Индийская живопись",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": null,
+      "status": "unmeasured"
+    },
+    {
+      "id": "ART-1938",
+      "atelierId": "murugan",
+      "title": "Shri Shanmukha Subramania Swami (chromolithograph)",
+      "titleRu": "Муруган с супругами (хромолитография)",
+      "artist": "Raja Ravi Varma",
+      "artistRu": "Раджа Рави Варма",
+      "year": "ок. 1900–1915",
+      "sourceImage": "assets/restoration/india/murugan.jpg",
+      "sourceUrl": "https://www.metmuseum.org/art/collection/search/849525",
+      "category": "Индийская живопись",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 0.505,
+        "width": 0.352,
+        "source": "https://www.metmuseum.org/art/collection/search/849525",
+        "basis": "sheet",
+        "verification": "edition_reference",
+        "note": "Хромолитография ca.1900–15, 2021.222, размер листа музейного оттиска; не размер масляного оригинала. Размер конкретного исторического оттиска из источника; точный экземпляр локальной репродукции не установлен."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1939",
+      "atelierId": "jatayu-vadham",
+      "title": "Ravana Abducting Sita and Fighting Jatayu",
+      "titleRu": "Равана похищает Ситу и сражается с Джатаю",
+      "artist": "Raja Ravi Varma",
+      "artistRu": "Раджа Рави Варма",
+      "year": "1895",
+      "sourceImage": "assets/restoration/india/jatayu.jpg",
+      "sourceUrl": "https://artsandculture.google.com/asset/jatayu-vadh-0001/dAEGJSOhLbHiJg",
+      "category": "Индийская живопись",
+      "subject": "Мифы и религия",
+      "placement": {
+        "hall": "stories",
+        "wall": "myths"
+      },
+      "physicalSizeM": {
+        "height": 0.73,
+        "width": 0.55,
+        "source": "https://artsandculture.google.com/asset/jatayu-vadh-0001/dAEGJSOhLbHiJg",
+        "basis": "unframed",
+        "verification": "source_checked",
+        "note": "Масло, 1895, Sree Chitra Art Gallery. Не размеры поздних хромолитографий."
+      },
+      "status": "available"
+    },
+    {
+      "id": "ART-1940",
+      "atelierId": "vangogh-self",
+      "title": "Self-Portrait",
+      "titleRu": "Автопортрет",
+      "artist": "Vincent van Gogh",
+      "artistRu": "Винсент ван Гог",
+      "year": "1889",
+      "sourceImage": "js/3d/workshops/atelier/src/assets/paintings/vangogh-self.jpg",
+      "sourceUrl": "https://digital.lib.buffalo.edu/items/show/33003",
+      "category": "Импрессионизм и постимпрессионизм",
+      "subject": "Мужчины",
+      "placement": {
+        "hall": "portraits",
+        "wall": "men"
+      },
+      "physicalSizeM": {
+        "height": 0.65,
+        "width": 0.54,
+        "source": "https://digital.lib.buffalo.edu/items/show/33003",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "status": "available"
+    }
+  ]
+}

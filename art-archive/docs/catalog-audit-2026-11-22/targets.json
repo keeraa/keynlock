@@ -1,0 +1,5856 @@
+[
+  {
+    "id": "ART-0045",
+    "title": "Orchids and Rocks",
+    "artist": "Yi Ha-eung (Korean, 1820–1898)",
+    "year": "1897–98",
+    "museum": "Cleveland Museum of Art",
+    "region": "Korea, Joseon dynasty (1392–1910), Korean Empire period (1897–1910)",
+    "medium": "Eight-panel folding screen; ink on silk",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Натюрморты",
+    "score": 91,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0045.webp",
+      "widthPx": 490,
+      "heightPx": 219,
+      "aspect": 2.237443,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2015.138/2015.138_print.jpg",
+      "overviewCell": 30,
+      "detail": {
+        "path": "detail/ART-0045.webp",
+        "widthPx": 2400,
+        "heightPx": 1072
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2015.138",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/2015.138"
+  },
+  {
+    "id": "ART-0048",
+    "title": "Birds and Flowers",
+    "artist": "Kano Mitsunobu (Japanese, 1565–1608); совместно с Kano Shōei (Japanese, 1519–1592)",
+    "year": "late 1500s",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Momoyama period (1573–1615)",
+    "medium": "Pair of six-panel folding screens; ink, color, and gold on paper",
+    "category": "Японская живопись и ширмы",
+    "subject": "Животные",
+    "score": 90,
+    "placement": {
+      "hall": "jp",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0048.webp",
+      "widthPx": 490,
+      "heightPx": 477,
+      "aspect": 1.027254,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1948.128/1948.128_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 33,
+      "detail": {
+        "path": "detail/ART-0048.webp",
+        "widthPx": 2400,
+        "heightPx": 2335
+      }
+    },
+    "physicalSizeM": {
+      "width": 3.4,
+      "height": 1.555,
+      "basis": "image",
+      "source": "https://clevelandart.org/art/1948.128"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1948.128",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1948.128"
+  },
+  {
+    "id": "ART-0106",
+    "title": "Pair of Panels from a Triptych: The Archangel Michael and St. Anthony Abbot",
+    "artist": "Fra Filippo Lippi (Italian, c. 1406–1469)",
+    "year": "1458",
+    "museum": "Cleveland Museum of Art",
+    "region": "Italy, Florence",
+    "medium": "tempera on wood panel",
+    "category": "Готика и религиозные образы",
+    "subject": "Мифы и религия",
+    "score": 75,
+    "placement": {
+      "hall": "stories",
+      "wall": "religion"
+    },
+    "image": {
+      "path": "images/ART-0106.webp",
+      "widthPx": 490,
+      "heightPx": 523,
+      "aspect": 0.936902,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1964.150/1964.150_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 75,
+      "detail": {
+        "path": "detail/ART-0106.webp",
+        "widthPx": 2249,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.298,
+      "height": 0.813,
+      "basis": "unframed",
+      "source": "https://clevelandart.org/art/1964.150"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1964.150",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1964.150"
+  },
+  {
+    "id": "ART-0110",
+    "title": "Portraits of the Qianlong Emperor and His Twelve Consorts",
+    "artist": "Giuseppe Castiglione (Italian, 1688–1766); совместно с others (Chinese)",
+    "year": "1736–70s",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644–1911), Qianlong reign (1736–95)",
+    "medium": "Handscroll; ink and color on silk",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Люди и быт",
+    "score": 75,
+    "placement": {
+      "hall": "cn",
+      "wall": "figures"
+    },
+    "image": {
+      "path": "images/ART-0110.webp",
+      "widthPx": 490,
+      "heightPx": 332,
+      "aspect": 1.475904,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1969.31/1969.31_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 79,
+      "detail": {
+        "path": "detail/ART-0110.webp",
+        "widthPx": 2400,
+        "heightPx": 1624
+      }
+    },
+    "physicalSizeM": {
+      "width": 6.883,
+      "height": 0.53,
+      "basis": "painting only",
+      "source": "https://clevelandart.org/art/1969.31"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1969.31",
+    "subjectMethod": "curated",
+    "dateSource": "https://clevelandart.org/art/1969.31"
+  },
+  {
+    "id": "ART-0121",
+    "title": "Mt. Qingbian",
+    "artist": "Dong Qichang (Chinese, 1555–1636)",
+    "year": "1617",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Ming dynasty (1368–1644)",
+    "medium": "hanging scroll; ink on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 74,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0121.webp",
+      "widthPx": 239,
+      "heightPx": 700,
+      "aspect": 0.341429,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1980.10/1980.10_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 88,
+      "detail": {
+        "path": "detail/ART-0121.webp",
+        "widthPx": 821,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.676,
+      "height": 2.25,
+      "basis": "painting",
+      "source": "https://clevelandart.org/art/1980.10"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1980.10",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1980.10"
+  },
+  {
+    "id": "ART-0151",
+    "title": "Night Scene on the Sumida River",
+    "artist": "Студия: Utagawa Hiroshige (Japanese, 1797–1858)",
+    "year": "1800s",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Edo period (1615–1868)",
+    "medium": "",
+    "category": "Японская живопись и ширмы",
+    "subject": "Вода и корабли",
+    "score": 72,
+    "placement": {
+      "hall": "jp",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0151.webp",
+      "widthPx": 281,
+      "heightPx": 700,
+      "aspect": 0.401429,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1920.274/1920.274_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 109,
+      "detail": {
+        "path": "detail/ART-0151.webp",
+        "widthPx": 963,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.337,
+      "height": 0.934,
+      "basis": "painting only",
+      "source": "https://clevelandart.org/art/1920.274"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1920.274",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1920.274"
+  },
+  {
+    "id": "ART-0172",
+    "title": "St. Francis Kneeling before Christ on the Cross",
+    "artist": "Sassetta (Italian, 1392–1450)",
+    "year": "1437–1444",
+    "museum": "Cleveland Museum of Art",
+    "region": "Italy",
+    "medium": "tempera and gold on wood",
+    "category": "Готика и религиозные образы",
+    "subject": "Мифы и религия",
+    "score": 68,
+    "placement": {
+      "hall": "stories",
+      "wall": "religion"
+    },
+    "image": {
+      "path": "images/ART-0172.webp",
+      "widthPx": 385,
+      "heightPx": 700,
+      "aspect": 0.55,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1962.36/1962.36_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 125,
+      "detail": {
+        "path": "detail/ART-0172.webp",
+        "widthPx": 1319,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.402,
+      "height": 0.81,
+      "basis": "unframed",
+      "source": "https://clevelandart.org/art/1962.36"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1962.36",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1962.36"
+  },
+  {
+    "id": "ART-0217",
+    "title": "The Trinity",
+    "artist": "Hendrik van Balen (Flemish, 1575–1632)",
+    "year": "c. 1620",
+    "museum": "Cleveland Museum of Art",
+    "region": "Flanders",
+    "medium": "oil on wood",
+    "category": "Голландская и фламандская школы",
+    "subject": "Мифы и религия",
+    "score": 62,
+    "placement": {
+      "hall": "stories",
+      "wall": "religion"
+    },
+    "image": {
+      "path": "images/ART-0217.webp",
+      "widthPx": 490,
+      "heightPx": 612,
+      "aspect": 0.800654,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1996.26/1996.26_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 157,
+      "detail": {
+        "path": "detail/ART-0217.webp",
+        "widthPx": 1920,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.739,
+      "height": 1.146,
+      "basis": "unframed",
+      "source": "https://clevelandart.org/art/1996.26"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1996.26",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1996.26"
+  },
+  {
+    "id": "ART-0219",
+    "title": "Conversation in Autumn",
+    "artist": "Hua Yan (Chinese, 1682–c. 1765)",
+    "year": "1732",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644–1911)",
+    "medium": "Hanging scroll; ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Люди и быт",
+    "score": 62,
+    "placement": {
+      "hall": "cn",
+      "wall": "figures"
+    },
+    "image": {
+      "path": "images/ART-0219.webp",
+      "widthPx": 284,
+      "heightPx": 700,
+      "aspect": 0.405714,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1954.263/1954.263_print.jpg",
+      "overviewCell": 158,
+      "detail": {
+        "path": "detail/ART-0219.webp",
+        "widthPx": 975,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1954.263",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1954.263"
+  },
+  {
+    "id": "ART-0229",
+    "title": "Bamboo, Rock, and Tall Tree",
+    "artist": "Ni Zan (Chinese, 1301–1374)",
+    "year": "c. 1300s",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Yuan dynasty (1271–1368)",
+    "medium": "hanging scroll; ink on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 61,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0229.webp",
+      "widthPx": 426,
+      "heightPx": 700,
+      "aspect": 0.608571,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1978.65/1978.65_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 165,
+      "detail": {
+        "path": "detail/ART-0229.webp",
+        "widthPx": 1463,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.368,
+      "height": 0.673,
+      "basis": "image",
+      "source": "https://clevelandart.org/art/1978.65"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1978.65",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1978.65"
+  },
+  {
+    "id": "ART-0258",
+    "title": "Vase of Flowers",
+    "artist": "Odilon Redon (French, 1840–1916)",
+    "year": "c. 1905",
+    "museum": "Cleveland Museum of Art",
+    "region": "France, late 19th-early 20th Century",
+    "medium": "oil on fabric",
+    "category": "Натюрморты",
+    "subject": "Натюрморты",
+    "score": 59,
+    "placement": {
+      "hall": "world",
+      "wall": "still"
+    },
+    "image": {
+      "path": "images/ART-0258.webp",
+      "widthPx": 490,
+      "heightPx": 666,
+      "aspect": 0.735736,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1935.233/1935.233_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 182,
+      "detail": {
+        "path": "detail/ART-0258.webp",
+        "widthPx": 1765,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.59,
+      "height": 0.73,
+      "basis": "unframed",
+      "source": "https://clevelandart.org/art/1935.233"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1935.233",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1935.233"
+  },
+  {
+    "id": "ART-0261",
+    "title": "Streams and Mountains",
+    "artist": "Xu Ben (Chinese, 1335–1380)",
+    "year": "1372",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Yuan dynasty (1271–1368)",
+    "medium": "hanging scroll; ink on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 59,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0261.webp",
+      "widthPx": 410,
+      "heightPx": 700,
+      "aspect": 0.585714,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1997.96/1997.96_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 185,
+      "detail": {
+        "path": "detail/ART-0261.webp",
+        "widthPx": 1406,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.376,
+      "height": 0.922,
+      "basis": "image",
+      "source": "https://clevelandart.org/art/1997.96"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1997.96",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1997.96"
+  },
+  {
+    "id": "ART-0276",
+    "title": "Portrait of An Qi",
+    "artist": "Wang Hui (Chinese, 1632–1717); Tu Luo (Chinese, active c. 1715); Yang Jin (Chinese, 1644–1728)",
+    "year": "1715",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644–1911)",
+    "medium": "hanging scroll; ink and color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Мужчины",
+    "score": 57,
+    "placement": {
+      "hall": "cn",
+      "wall": "figures"
+    },
+    "image": {
+      "path": "images/ART-0276.webp",
+      "widthPx": 356,
+      "heightPx": 700,
+      "aspect": 0.508571,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1971.17/1971.17_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 196,
+      "detail": {
+        "path": "detail/ART-0276.webp",
+        "widthPx": 1220,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.536,
+      "height": 1.22,
+      "basis": "image",
+      "source": "https://clevelandart.org/art/1971.17"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1971.17",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1971.17"
+  },
+  {
+    "id": "ART-0278",
+    "title": "Saint Catherine and Saint Barbara (pair)",
+    "artist": "Master of the Holy Blood (Netherlandish)",
+    "year": "c. 1520",
+    "museum": "Cleveland Museum of Art",
+    "region": "Flanders, Bruges",
+    "medium": "tempera on wood panel",
+    "category": "Готика и религиозные образы",
+    "subject": "Мифы и религия",
+    "score": 57,
+    "placement": {
+      "hall": "stories",
+      "wall": "religion"
+    },
+    "image": {
+      "path": "images/ART-0278.webp",
+      "widthPx": 490,
+      "heightPx": 647,
+      "aspect": 0.757342,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1942.633/1942.633_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 197,
+      "detail": {
+        "path": "detail/ART-0278.webp",
+        "widthPx": 1818,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.3,
+      "height": 0.866,
+      "basis": "unframed",
+      "source": "https://clevelandart.org/art/1942.633"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1942.633",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1942.633"
+  },
+  {
+    "id": "ART-0300",
+    "title": "Mount Hua",
+    "artist": "Tang Yin (Chinese, 1470–1523)",
+    "year": "1506",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Ming dynasty (1368–1644)",
+    "medium": "hanging scroll; ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 57,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0300.webp",
+      "widthPx": 298,
+      "heightPx": 700,
+      "aspect": 0.425714,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1969.116/1969.116_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 211,
+      "detail": {
+        "path": "detail/ART-0300.webp",
+        "widthPx": 1018,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.414,
+      "height": 1.164,
+      "basis": "painting",
+      "source": "https://clevelandart.org/art/1969.116"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1969.116",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1969.116"
+  },
+  {
+    "id": "ART-0317",
+    "title": "Reminiscences of Qinhuai River",
+    "artist": "Shitao (Chinese, 1642–1707)",
+    "year": "1642–1707",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "Album leaf; ink and color on Song paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Вода и корабли",
+    "score": 55,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0317.webp",
+      "widthPx": 490,
+      "heightPx": 549,
+      "aspect": 0.892532,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1966.31.8/1966.31.8_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 222,
+      "detail": {
+        "path": "detail/ART-0317.webp",
+        "widthPx": 2144,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.202,
+      "height": 0.255,
+      "basis": "image",
+      "source": "https://clevelandart.org/art/1966.31.8"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1966.31.8",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1966.31.8"
+  },
+  {
+    "id": "ART-0321",
+    "title": "Spring Mist over Jiangnan",
+    "artist": "Shitao (Chinese, 1642–1707)",
+    "year": "1697",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644–1911)",
+    "medium": "Hanging scroll; ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 55,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0321.webp",
+      "widthPx": 490,
+      "heightPx": 612,
+      "aspect": 0.800654,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1954.126/1954.126_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 224,
+      "detail": {
+        "path": "detail/ART-0321.webp",
+        "widthPx": 1921,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.52,
+      "height": 0.39,
+      "basis": "painting",
+      "source": "https://clevelandart.org/art/1954.126"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1954.126",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1954.126"
+  },
+  {
+    "id": "ART-0331",
+    "title": "Landscape after Guo Zhongshu",
+    "artist": "Bada Shanren (Chinese, 1626–1705)",
+    "year": "c. 1680–1705",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644–1911)",
+    "medium": "Hanging scroll; ink on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 54,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0331.webp",
+      "widthPx": 303,
+      "heightPx": 700,
+      "aspect": 0.432857,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1955.36/1955.36_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 230,
+      "detail": {
+        "path": "detail/ART-0331.webp",
+        "widthPx": 1036,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.564,
+      "height": 1.099,
+      "basis": "painting",
+      "source": "https://clevelandart.org/art/1955.36"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1955.36",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1955.36"
+  },
+  {
+    "id": "ART-0338",
+    "title": "Landscape after Jing Hao and Guan Tong",
+    "artist": "Li Shizhuo (Chinese, c. 1690–1770)",
+    "year": "1700s",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644–1911)",
+    "medium": "hanging scroll; ink on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 54,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0338.webp",
+      "widthPx": 360,
+      "heightPx": 700,
+      "aspect": 0.514286,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1952.588/1952.588_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 234,
+      "detail": {
+        "path": "detail/ART-0338.webp",
+        "widthPx": 1237,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.409,
+      "height": 0.91,
+      "basis": "image",
+      "source": "https://clevelandart.org/art/1952.588"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1952.588",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1952.588"
+  },
+  {
+    "id": "ART-0378",
+    "title": "The Madonna of Humility with the Temptation of Eve",
+    "artist": "Olivuccio di Ciccarello (Italian, Marche, 1360/65–1439)",
+    "year": "c. 1400",
+    "museum": "Cleveland Museum of Art",
+    "region": "Italy, the Marches, late 14th-early 15th Century",
+    "medium": "tempera and gold on wood panel",
+    "category": "Готика и религиозные образы",
+    "subject": "Мифы и религия",
+    "score": 51,
+    "placement": {
+      "hall": "stories",
+      "wall": "religion"
+    },
+    "image": {
+      "path": "images/ART-0378.webp",
+      "widthPx": 383,
+      "heightPx": 700,
+      "aspect": 0.547143,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1916.795/1916.795_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 258,
+      "detail": {
+        "path": "detail/ART-0378.webp",
+        "widthPx": 1315,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.886,
+      "height": 1.815,
+      "basis": "unframed",
+      "source": "https://clevelandart.org/art/1916.795"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1916.795",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1916.795"
+  },
+  {
+    "id": "ART-0383",
+    "title": "Portrait of a Woman, possibly Elizabeth Boothby",
+    "artist": "Cornelis Jonson (called Jonson van Ceulen) (British, 1593–1661)",
+    "year": "1619",
+    "museum": "Cleveland Museum of Art",
+    "region": "England, 17th century",
+    "medium": "oil on wood",
+    "category": "Барокко и классицизм",
+    "subject": "Женщины",
+    "score": 51,
+    "placement": {
+      "hall": "portraits",
+      "wall": "women"
+    },
+    "image": {
+      "path": "images/ART-0383.webp",
+      "widthPx": 490,
+      "heightPx": 637,
+      "aspect": 0.769231,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1973.185/1973.185_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 263,
+      "detail": {
+        "path": "detail/ART-0383.webp",
+        "widthPx": 1847,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.56,
+      "height": 0.657,
+      "basis": "unframed",
+      "source": "https://clevelandart.org/art/1973.185"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1973.185",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1973.185"
+  },
+  {
+    "id": "ART-0402",
+    "title": "Watching the Deer by a Pine Shaded Stream",
+    "artist": "Ma Yuan (Chinese, c. 1150–after 1255)",
+    "year": "1127–1279",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Southern Song dynasty (1127-1279)",
+    "medium": "Album leaf; ink and light color on silk",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 51,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0402.webp",
+      "widthPx": 490,
+      "heightPx": 458,
+      "aspect": 1.069869,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1997.88/1997.88_print.jpg",
+      "overviewCell": 277,
+      "detail": {
+        "path": "detail/ART-0402.webp",
+        "widthPx": 2400,
+        "heightPx": 2239
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1997.88",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1997.88"
+  },
+  {
+    "id": "ART-0417",
+    "title": "Quails and Sparrows in an Autumn Scene",
+    "artist": "Wang Yuan (Chinese, c. 1299–after 1366)",
+    "year": "1347",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Yuan dynasty (1271–1368)",
+    "medium": "hanging scroll, ink on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Животные",
+    "score": 49,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0417.webp",
+      "widthPx": 382,
+      "heightPx": 700,
+      "aspect": 0.545714,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1997.91/1997.91_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 286,
+      "detail": {
+        "path": "detail/ART-0417.webp",
+        "widthPx": 1313,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.56,
+      "height": 1.143,
+      "basis": "painting",
+      "source": "https://clevelandart.org/art/1997.91"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1997.91",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1997.91"
+  },
+  {
+    "id": "ART-0426",
+    "title": "Landscape of the Four Seasons",
+    "artist": "Yi Sumun (Korean, b. c. 1404)",
+    "year": "late 1400s",
+    "museum": "Cleveland Museum of Art",
+    "region": "Korea, Joseon dynasty (1392–1910)",
+    "medium": "Pair of six-panel screens; ink and slight color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 49,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0426.webp",
+      "widthPx": 490,
+      "heightPx": 292,
+      "aspect": 1.678082,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1976.92/1976.92_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 292,
+      "detail": {
+        "path": "detail/ART-0426.webp",
+        "widthPx": 2400,
+        "heightPx": 1428
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.571,
+      "height": 0.93,
+      "basis": "painting only",
+      "source": "https://clevelandart.org/art/1976.92"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1976.92",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1976.92"
+  },
+  {
+    "id": "ART-0451",
+    "title": "On a Terrace",
+    "artist": "Ernest Meissonier (French, 1815–1891)",
+    "year": "1867",
+    "museum": "Cleveland Museum of Art",
+    "region": "France",
+    "medium": "oil on wood panel",
+    "category": "Романтизм и реализм XIX века",
+    "subject": "Женщины",
+    "score": 48,
+    "placement": {
+      "hall": "portraits",
+      "wall": "women"
+    },
+    "image": {
+      "path": "images/ART-0451.webp",
+      "widthPx": 457,
+      "heightPx": 700,
+      "aspect": 0.652857,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1986.68/1986.68_print.jpg",
+      "overviewCell": 308,
+      "detail": {
+        "path": "detail/ART-0451.webp",
+        "widthPx": 1566,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1986.68",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1986.68"
+  },
+  {
+    "id": "ART-0453",
+    "title": "Triptych with The Lamentation of Christ (center), St. Barbara (left wing), St. Catherine of Alexandria (right wing), The Annunciation (reverse wings)",
+    "artist": "Master of the Krainburg Altar (Austrian, active c. 1485–1510)",
+    "year": "c. 1500",
+    "museum": "Cleveland Museum of Art",
+    "region": "Austria",
+    "medium": "Center: oil on poplar; Wings: oil and gold leaf on poplar panel",
+    "category": "Готика и религиозные образы",
+    "subject": "Мифы и религия",
+    "score": 48,
+    "placement": {
+      "hall": "stories",
+      "wall": "religion"
+    },
+    "image": {
+      "path": "images/ART-0453.webp",
+      "widthPx": 490,
+      "heightPx": 324,
+      "aspect": 1.512346,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2022.86/2022.86_print.jpg",
+      "overviewCell": 309,
+      "detail": {
+        "path": "detail/ART-0453.webp",
+        "widthPx": 2400,
+        "heightPx": 1584
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2022.86",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/2022.86"
+  },
+  {
+    "id": "ART-0566",
+    "title": "Playing the Qin in a Secluded Valley",
+    "artist": "Подражатель: Wen Zhengming (Chinese, 1470–1559)",
+    "year": "1548",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Ming dynasty (1368–1644)",
+    "medium": "hanging scroll; ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Люди и быт",
+    "score": 44,
+    "placement": {
+      "hall": "cn",
+      "wall": "figures"
+    },
+    "image": {
+      "path": "images/ART-0566.webp",
+      "widthPx": 307,
+      "heightPx": 700,
+      "aspect": 0.438571,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1969.60/1969.60_print.jpg",
+      "overviewCell": 370,
+      "detail": {
+        "path": "detail/ART-0566.webp",
+        "widthPx": 1054,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1969.60",
+    "subjectMethod": "reviewed",
+    "dateSource": "https://clevelandart.org/art/1969.60"
+  },
+  {
+    "id": "ART-0572",
+    "title": "Madonna and Child Enthroned",
+    "artist": "Master of San Lucchese (Italian, c. 1335–1380)",
+    "year": "c. 1350",
+    "museum": "Cleveland Museum of Art",
+    "region": "Italy",
+    "medium": "tempera and gold on poplar panel",
+    "category": "Готика и религиозные образы",
+    "subject": "Мифы и религия",
+    "score": 44,
+    "placement": {
+      "hall": "stories",
+      "wall": "religion"
+    },
+    "image": {
+      "path": "images/ART-0572.webp",
+      "widthPx": 370,
+      "heightPx": 700,
+      "aspect": 0.528571,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1968.206/1968.206_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 375,
+      "detail": {
+        "path": "detail/ART-0572.webp",
+        "widthPx": 1268,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.54,
+      "height": 1.137,
+      "basis": "unframed",
+      "source": "https://clevelandart.org/art/1968.206"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1968.206",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1968.206"
+  },
+  {
+    "id": "ART-0580",
+    "title": "Fishing in a Springtime Valley",
+    "artist": "Ike Taiga (Japanese, 1723–1776)",
+    "year": "1700s",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Edo period (1615–1868)",
+    "medium": "Hanging scroll; ink and color on silk",
+    "category": "Японская живопись и ширмы",
+    "subject": "Природа",
+    "score": 44,
+    "placement": {
+      "hall": "jp",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0580.webp",
+      "widthPx": 326,
+      "heightPx": 700,
+      "aspect": 0.465714,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1961.47/1961.47_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 382,
+      "detail": {
+        "path": "detail/ART-0580.webp",
+        "widthPx": 1114,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.494,
+      "height": 1.24,
+      "basis": "painting",
+      "source": "https://clevelandart.org/art/1961.47"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1961.47",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1961.47"
+  },
+  {
+    "id": "ART-0583",
+    "title": "Album of Seasonal Landscapes, Leaf B (previous leaf 1)",
+    "artist": "Xiao Yuncong (Chinese, 1596–1673)",
+    "year": "1668",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644–1911)",
+    "medium": "album leaf; ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 44,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0583.webp",
+      "widthPx": 490,
+      "heightPx": 578,
+      "aspect": 0.847751,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1955.302.1/1955.302.1_print.jpg",
+      "overviewCell": 384,
+      "detail": {
+        "path": "detail/ART-0583.webp",
+        "widthPx": 2036,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1955.302.1",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1955.302.1"
+  },
+  {
+    "id": "ART-0612",
+    "title": "Sanjo Kantaro II in the Role of Urashima Taro",
+    "artist": "Kaigetsudō Ando (Japanese, c. 1671–1743)",
+    "year": "early 1700s",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Edo period (1615–1868)",
+    "medium": "hanging scroll; ink and color on paper",
+    "category": "Японская живопись и ширмы",
+    "subject": "Мужчины",
+    "score": 41,
+    "placement": {
+      "hall": "jp",
+      "wall": "figures"
+    },
+    "image": {
+      "path": "images/ART-0612.webp",
+      "widthPx": 352,
+      "heightPx": 700,
+      "aspect": 0.502857,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1961.41/1961.41_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 403,
+      "detail": {
+        "path": "detail/ART-0612.webp",
+        "widthPx": 1207,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.594,
+      "height": 1.057,
+      "basis": "painting only",
+      "source": "https://clevelandart.org/art/1961.41"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1961.41",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1961.41"
+  },
+  {
+    "id": "ART-0621",
+    "title": "The Umbrian Valley, Italy",
+    "artist": "Frederick Gottwald (American, born Austria, 1860–1941)",
+    "year": "1914",
+    "museum": "Cleveland Museum of Art",
+    "region": "United States, Ohio, Cleveland",
+    "medium": "oil on canvas",
+    "category": "Пейзажи XIX–XX веков",
+    "subject": "Природа",
+    "score": 41,
+    "placement": {
+      "hall": "nature",
+      "wall": "landscape"
+    },
+    "image": {
+      "path": "images/ART-0621.webp",
+      "widthPx": 490,
+      "heightPx": 408,
+      "aspect": 1.20098,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1915.88/1915.88_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 407,
+      "detail": {
+        "path": "detail/ART-0621.webp",
+        "widthPx": 2400,
+        "heightPx": 1998
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.604,
+      "height": 0.728,
+      "basis": "unframed",
+      "source": "https://clevelandart.org/art/1915.88"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1915.88",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1915.88"
+  },
+  {
+    "id": "ART-0636",
+    "title": "Bird Sleeping on a Plum Tree",
+    "artist": "Yang Ki-hun (Seuk-Eun) (Korean, 1843–1919?)",
+    "year": "early 1900s",
+    "museum": "Cleveland Museum of Art",
+    "region": "Korea, Joseon dynasty (1392–1910)",
+    "medium": "hanging scroll; ink on silk",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Животные",
+    "score": 41,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0636.webp",
+      "widthPx": 490,
+      "heightPx": 192,
+      "aspect": 2.552083,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1998.31/1998.31_print.jpg",
+      "overviewCell": 416,
+      "detail": {
+        "path": "detail/ART-0636.webp",
+        "widthPx": 2400,
+        "heightPx": 939
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1998.31",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1998.31"
+  },
+  {
+    "id": "ART-0671",
+    "title": "Zhi and Xu's Pure Conversation",
+    "artist": "Lan Ying (Chinese, 1585–after 1664)",
+    "year": "1643",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Ming dynasty (1368–1644)",
+    "medium": "Hanging scroll; ink on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Люди и быт",
+    "score": 39,
+    "placement": {
+      "hall": "cn",
+      "wall": "figures"
+    },
+    "image": {
+      "path": "images/ART-0671.webp",
+      "widthPx": 304,
+      "heightPx": 700,
+      "aspect": 0.434286,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1970.128/1970.128_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 439,
+      "detail": {
+        "path": "detail/ART-0671.webp",
+        "widthPx": 1042,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.56,
+      "height": 1.41,
+      "basis": "painting",
+      "source": "https://clevelandart.org/art/1970.128"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1970.128",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1970.128"
+  },
+  {
+    "id": "ART-0728",
+    "title": "Landscape Album in Various Styles: Landscape after Ni Zan",
+    "artist": "Zha Shibiao (Chinese, 1615–1698)",
+    "year": "1684",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "Album leaf, ink on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 39,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0728.webp",
+      "widthPx": 490,
+      "heightPx": 312,
+      "aspect": 1.570513,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1955.37.1/1955.37.1_print.jpg",
+      "overviewCell": 471,
+      "detail": {
+        "path": "detail/ART-0728.webp",
+        "widthPx": 2400,
+        "heightPx": 1525
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1955.37.1",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1955.37.1"
+  },
+  {
+    "id": "ART-0733",
+    "title": "Reminiscences of Qinhuai River",
+    "artist": "Shitao (Chinese, 1642–1707)",
+    "year": "1642–1707",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "album leaf, ink and color on Song paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Вода и корабли",
+    "score": 39,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0733.webp",
+      "widthPx": 490,
+      "heightPx": 562,
+      "aspect": 0.871886,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1966.31.1/1966.31.1_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 476,
+      "detail": {
+        "path": "detail/ART-0733.webp",
+        "widthPx": 2094,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.202,
+      "height": 0.255,
+      "basis": "image",
+      "source": "https://clevelandart.org/art/1966.31.1"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1966.31.1",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1966.31.1"
+  },
+  {
+    "id": "ART-0736",
+    "title": "Listening to the Bamboo",
+    "artist": "Подражатель: Wen Zhengming (Chinese, 1470–1559)",
+    "year": "late 1400s-1500s",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Ming dynasty (1368–1644)",
+    "medium": "hanging scroll, ink on sutra paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 39,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0736.webp",
+      "widthPx": 262,
+      "heightPx": 700,
+      "aspect": 0.374286,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1977.172/1977.172_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 479,
+      "detail": {
+        "path": "detail/ART-0736.webp",
+        "widthPx": 899,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.305,
+      "height": 0.945,
+      "basis": "painting",
+      "source": "https://clevelandart.org/art/1977.172"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1977.172",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1977.172"
+  },
+  {
+    "id": "ART-0756",
+    "title": "Holy Family with the Mystic Marriage of Saint Catherine",
+    "artist": "Tommaso d’Antonio Manzuoli, called Maso da San Friano (Italian, 1531–1571)",
+    "year": "c. 1560",
+    "museum": "Cleveland Museum of Art",
+    "region": "Italy",
+    "medium": "oil on panel",
+    "category": "Европейское Возрождение и маньеризм",
+    "subject": "Мифы и религия",
+    "score": 35,
+    "placement": {
+      "hall": "stories",
+      "wall": "religion"
+    },
+    "image": {
+      "path": "images/ART-0756.webp",
+      "widthPx": 490,
+      "heightPx": 642,
+      "aspect": 0.76324,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2019.168/2019.168_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 490,
+      "detail": {
+        "path": "detail/ART-0756.webp",
+        "widthPx": 1832,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 1.03,
+      "height": 1.48,
+      "basis": "image",
+      "source": "https://clevelandart.org/art/2019.168"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2019.168",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/2019.168"
+  },
+  {
+    "id": "ART-0779",
+    "title": "Flowers and Trees of the Four Seasons (right screen)",
+    "artist": "Watanabe Shikō (Japanese, 1683–1755)",
+    "year": "early to mid-1700s",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Edo period (1615–1868)",
+    "medium": "Six-panel folding screen; ink, color, gold, silver, and gilding on paper",
+    "category": "Японская живопись и ширмы",
+    "subject": "Природа",
+    "score": 35,
+    "placement": {
+      "hall": "jp",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0779.webp",
+      "widthPx": 490,
+      "heightPx": 227,
+      "aspect": 2.15859,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2021.132.1/2021.132.1_print.jpg",
+      "overviewCell": 505,
+      "detail": {
+        "path": "detail/ART-0779.webp",
+        "widthPx": 2400,
+        "heightPx": 1112
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2021.132.1",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/2021.132.1"
+  },
+  {
+    "id": "ART-0803",
+    "title": "Entertainment Scene",
+    "artist": "Miyagawa Chōshun (Japanese, 1683–1753)",
+    "year": "c. 1710–53",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Edo period (1615–1868)",
+    "medium": "hanging scroll; ink and color on silk",
+    "category": "Японская живопись и ширмы",
+    "subject": "Люди и быт",
+    "score": 35,
+    "placement": {
+      "hall": "jp",
+      "wall": "figures"
+    },
+    "image": {
+      "path": "images/ART-0803.webp",
+      "widthPx": 490,
+      "heightPx": 178,
+      "aspect": 2.752809,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1985.17/1985.17_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 518,
+      "detail": {
+        "path": "detail/ART-0803.webp",
+        "widthPx": 2048,
+        "heightPx": 744
+      }
+    },
+    "physicalSizeM": {
+      "width": 1.355,
+      "height": 0.564,
+      "basis": "image",
+      "source": "https://clevelandart.org/art/1985.17"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1985.17",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1985.17"
+  },
+  {
+    "id": "ART-0805",
+    "title": "Virgin and Child",
+    "artist": "Возможно: Icilio Federico Joni (Italian, 1866–1946); Мастерская: Sano di Pietro (Italian, 1406–1481)",
+    "year": "1400s",
+    "museum": "Cleveland Museum of Art",
+    "region": "Italy",
+    "medium": "tempera and gold on wood",
+    "category": "Готика и религиозные образы",
+    "subject": "Мифы и религия",
+    "score": 35,
+    "placement": {
+      "hall": "stories",
+      "wall": "religion"
+    },
+    "image": {
+      "path": "images/ART-0805.webp",
+      "widthPx": 490,
+      "heightPx": 650,
+      "aspect": 0.753846,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1944.56/1944.56_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 520,
+      "detail": {
+        "path": "detail/ART-0805.webp",
+        "widthPx": 1536,
+        "heightPx": 2039
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.166,
+      "height": 0.242,
+      "basis": "unframed",
+      "source": "https://clevelandart.org/art/1944.56"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1944.56",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1944.56"
+  },
+  {
+    "id": "ART-0813",
+    "title": "Lions and Tigers in Peony and Bamboo",
+    "artist": "Yamaguchi Sekkei (Japanese, 1644–1732)",
+    "year": "1668",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Edo period (1615–1868)",
+    "medium": "One of a pair of six-panel folding screens; ink and color on gilded paper",
+    "category": "Японская живопись и ширмы",
+    "subject": "Животные",
+    "score": 35,
+    "placement": {
+      "hall": "jp",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0813.webp",
+      "widthPx": 490,
+      "heightPx": 242,
+      "aspect": 2.024793,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1972.10.1/1972.10.1_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 524,
+      "detail": {
+        "path": "detail/ART-0813.webp",
+        "widthPx": 2400,
+        "heightPx": 1184
+      }
+    },
+    "physicalSizeM": {
+      "width": 3.3,
+      "height": 1.49,
+      "basis": "image",
+      "source": "https://clevelandart.org/art/1972.10.1"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1972.10.1",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1972.10.1"
+  },
+  {
+    "id": "ART-0824",
+    "title": "Still Life with Pipe and Matches and Still Life with Herring, Bread, and Cheese (pair)",
+    "artist": "Alexandre-Gabriel Decamps (French, 1803–1860)",
+    "year": "1858",
+    "museum": "Cleveland Museum of Art",
+    "region": "France",
+    "medium": "oil on fabric",
+    "category": "Натюрморты",
+    "subject": "Натюрморты",
+    "score": 35,
+    "placement": {
+      "hall": "world",
+      "wall": "still"
+    },
+    "image": {
+      "path": "images/ART-0824.webp",
+      "widthPx": 490,
+      "heightPx": 408,
+      "aspect": 1.20098,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1980.254/1980.254_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 532,
+      "detail": {
+        "path": "detail/ART-0824.webp",
+        "widthPx": 2400,
+        "heightPx": 1998
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.38,
+      "height": 0.63,
+      "basis": "unframed",
+      "source": "https://clevelandart.org/art/1980.254"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1980.254",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1980.254"
+  },
+  {
+    "id": "ART-0839",
+    "title": "Album of Landscapes: Leaf 4",
+    "artist": "Wang Gai (Chinese, active c. 1677–1705)",
+    "year": "1677",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "album leaf, ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 35,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0839.webp",
+      "widthPx": 490,
+      "heightPx": 450,
+      "aspect": 1.088889,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1975.64.4/1975.64.4_print.jpg",
+      "overviewCell": 541,
+      "detail": {
+        "path": "detail/ART-0839.webp",
+        "widthPx": 2400,
+        "heightPx": 2206
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1975.64.4",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1975.64.4"
+  },
+  {
+    "id": "ART-0841",
+    "title": "Album of Landscapes: Leaf 2",
+    "artist": "Wang Gai (Chinese, active c. 1677–1705)",
+    "year": "1677",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "album leaf, ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 35,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0841.webp",
+      "widthPx": 490,
+      "heightPx": 446,
+      "aspect": 1.098655,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1975.64.2/1975.64.2_print.jpg",
+      "overviewCell": 542,
+      "detail": {
+        "path": "detail/ART-0841.webp",
+        "widthPx": 2400,
+        "heightPx": 2184
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1975.64.2",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1975.64.2"
+  },
+  {
+    "id": "ART-0842",
+    "title": "Album of Landscapes: Leaf 3",
+    "artist": "Wang Gai (Chinese, active c. 1677–1705)",
+    "year": "1677",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "album leaf, ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 35,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0842.webp",
+      "widthPx": 490,
+      "heightPx": 452,
+      "aspect": 1.084071,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1975.64.3/1975.64.3_print.jpg",
+      "overviewCell": 543,
+      "detail": {
+        "path": "detail/ART-0842.webp",
+        "widthPx": 2400,
+        "heightPx": 2212
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1975.64.3",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1975.64.3"
+  },
+  {
+    "id": "ART-0843",
+    "title": "Album of Landscapes: Leaf 5",
+    "artist": "Wang Gai (Chinese, active c. 1677–1705)",
+    "year": "1677",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "album leaf, ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 35,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0843.webp",
+      "widthPx": 490,
+      "heightPx": 452,
+      "aspect": 1.084071,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1975.64.5/1975.64.5_print.jpg",
+      "overviewCell": 544,
+      "detail": {
+        "path": "detail/ART-0843.webp",
+        "widthPx": 2400,
+        "heightPx": 2216
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1975.64.5",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1975.64.5"
+  },
+  {
+    "id": "ART-0844",
+    "title": "Album of Landscapes: Leaf 6",
+    "artist": "Wang Gai (Chinese, active c. 1677–1705)",
+    "year": "1677",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "album leaf, ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 35,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0844.webp",
+      "widthPx": 490,
+      "heightPx": 450,
+      "aspect": 1.088889,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1975.64.6/1975.64.6_print.jpg",
+      "overviewCell": 545,
+      "detail": {
+        "path": "detail/ART-0844.webp",
+        "widthPx": 2400,
+        "heightPx": 2204
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1975.64.6",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1975.64.6"
+  },
+  {
+    "id": "ART-0845",
+    "title": "Album of Landscapes: Leaf 7",
+    "artist": "Wang Gai (Chinese, active c. 1677–1705)",
+    "year": "1677",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "album leaf, ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 35,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0845.webp",
+      "widthPx": 490,
+      "heightPx": 448,
+      "aspect": 1.09375,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1975.64.7/1975.64.7_print.jpg",
+      "overviewCell": 546,
+      "detail": {
+        "path": "detail/ART-0845.webp",
+        "widthPx": 2400,
+        "heightPx": 2196
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1975.64.7",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1975.64.7"
+  },
+  {
+    "id": "ART-0846",
+    "title": "Album of Landscapes: Leaf 8",
+    "artist": "Wang Gai (Chinese, active c. 1677–1705)",
+    "year": "1677",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "album leaf, ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 35,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0846.webp",
+      "widthPx": 490,
+      "heightPx": 447,
+      "aspect": 1.096197,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1975.64.8/1975.64.8_print.jpg",
+      "overviewCell": 547,
+      "detail": {
+        "path": "detail/ART-0846.webp",
+        "widthPx": 2400,
+        "heightPx": 2191
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1975.64.8",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1975.64.8"
+  },
+  {
+    "id": "ART-0852",
+    "title": "Album of Landscapes: Leaf 1",
+    "artist": "Wang Gai (Chinese, active c. 1677–1705)",
+    "year": "1677",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "album leaf, ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 35,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0852.webp",
+      "widthPx": 490,
+      "heightPx": 445,
+      "aspect": 1.101124,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1975.64.1/1975.64.1_print.jpg",
+      "overviewCell": 551,
+      "detail": {
+        "path": "detail/ART-0852.webp",
+        "widthPx": 2400,
+        "heightPx": 2183
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1975.64.1",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1975.64.1"
+  },
+  {
+    "id": "ART-0871",
+    "title": "Shah Jahan",
+    "artist": "Hashim (Indian, active 1598-c.1650)",
+    "year": "c. 1630",
+    "museum": "Cleveland Museum of Art",
+    "region": "India, Mughal Period (1526-1756)",
+    "medium": "Gum tempera, ink, and gold on paper",
+    "category": "Индийская и персидская миниатюра",
+    "subject": "Мужчины",
+    "score": 32,
+    "placement": {
+      "hall": "portraits",
+      "wall": "men"
+    },
+    "image": {
+      "path": "images/ART-0871.webp",
+      "widthPx": 490,
+      "heightPx": 655,
+      "aspect": 0.748092,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1920.1969/1920.1969_print.jpg",
+      "overviewCell": 565,
+      "detail": {
+        "path": "detail/ART-0871.webp",
+        "widthPx": 1796,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1920.1969",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1920.1969"
+  },
+  {
+    "id": "ART-0872",
+    "title": "General Jean-Baptiste Kléber and Egyptian Family (Sketches for \"The Battle of the Pyramids\") ",
+    "artist": "Antoine-Jean Gros (French, 1771–1835)",
+    "year": "c. 1835",
+    "museum": "Cleveland Museum of Art",
+    "region": "France",
+    "medium": "oil on linen",
+    "category": "Романтизм и реализм XIX века",
+    "subject": "История и битвы",
+    "score": 32,
+    "placement": {
+      "hall": "stories",
+      "wall": "history"
+    },
+    "image": {
+      "path": "images/ART-0872.webp",
+      "widthPx": 459,
+      "heightPx": 700,
+      "aspect": 0.655714,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1972.17/1972.17_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 566,
+      "detail": {
+        "path": "detail/ART-0872.webp",
+        "widthPx": 1576,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.978,
+      "height": 3.521,
+      "basis": "unframed",
+      "source": "https://clevelandart.org/art/1972.17"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1972.17",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1972.17"
+  },
+  {
+    "id": "ART-0880",
+    "title": "Puppies, Sparrows, and Chrysanthemums",
+    "artist": "Nagasawa Rosetsu (Japanese, 1754–1799)",
+    "year": "c. 1792–94",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Edo period (1615–1868)",
+    "medium": "Fusuma panels remounted as hanging scrolls; ink and slight color on paper",
+    "category": "Японская живопись и ширмы",
+    "subject": "Животные",
+    "score": 32,
+    "placement": {
+      "hall": "jp",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0880.webp",
+      "widthPx": 490,
+      "heightPx": 222,
+      "aspect": 2.207207,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1970.71/1970.71_print.jpg",
+      "overviewCell": 571,
+      "detail": {
+        "path": "detail/ART-0880.webp",
+        "widthPx": 2400,
+        "heightPx": 1091
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1970.71",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1970.71"
+  },
+  {
+    "id": "ART-0888",
+    "title": "Album of Miscellaneous Subjects, Leaf 8",
+    "artist": "Fan Qi (Chinese, 1616–after 1694)",
+    "year": "early 1650s",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "album leaf; ink and color on silk",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 32,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0888.webp",
+      "widthPx": 490,
+      "heightPx": 257,
+      "aspect": 1.906615,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1975.22.8/1975.22.8_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 577,
+      "detail": {
+        "path": "detail/ART-0888.webp",
+        "widthPx": 2400,
+        "heightPx": 1257
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.173,
+      "height": 0.126,
+      "basis": "image",
+      "source": "https://clevelandart.org/art/1975.22.8"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1975.22.8",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1975.22.8"
+  },
+  {
+    "id": "ART-0919",
+    "title": "Court lady singing and playing the vina (recto)",
+    "artist": "Приписывается: Muhammad Rizavi Hindi (Indian, active mid-1700s)",
+    "year": "c. 1760",
+    "museum": "Cleveland Museum of Art",
+    "region": "India, Lucknow, Mughal, 18th century",
+    "medium": "Gum tempera, ink, and gold on paper",
+    "category": "Индийская и персидская миниатюра",
+    "subject": "Люди и быт",
+    "score": 32,
+    "placement": {
+      "hall": "world",
+      "wall": "life"
+    },
+    "image": {
+      "path": "images/ART-0919.webp",
+      "widthPx": 490,
+      "heightPx": 578,
+      "aspect": 0.847751,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2013.349.a/2013.349.a_print.jpg",
+      "overviewCell": 589,
+      "detail": {
+        "path": "detail/ART-0919.webp",
+        "widthPx": 2032,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2013.349.a",
+    "subjectMethod": "reviewed",
+    "dateSource": "https://clevelandart.org/art/2013.349.a"
+  },
+  {
+    "id": "ART-0924",
+    "title": "The wounded monkey bites the hand of the prince, his chessmate, in the presence of guests, from a Tuti-nama (Tales of a Parrot): Fifth Night",
+    "artist": "Dasavanta (Indian, d. 1584)",
+    "year": "c. 1560",
+    "museum": "Cleveland Museum of Art",
+    "region": "Mughal India, court of Akbar (reigned 1556–1605)",
+    "medium": "gum tempera, ink, and gold on paper",
+    "category": "Индийская и персидская миниатюра",
+    "subject": "Мифы и религия",
+    "score": 32,
+    "placement": {
+      "hall": "stories",
+      "wall": "myths"
+    },
+    "image": {
+      "path": "images/ART-0924.webp",
+      "widthPx": 454,
+      "heightPx": 700,
+      "aspect": 0.648571,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1962.279.32.b/1962.279.32.b_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 593,
+      "detail": {
+        "path": "detail/ART-0924.webp",
+        "widthPx": 1559,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.106,
+      "height": 0.102,
+      "basis": "painting only",
+      "source": "https://clevelandart.org/art/1962.279.32.b"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1962.279.32.b",
+    "subjectMethod": "reviewed",
+    "dateSource": "https://clevelandart.org/art/1962.279.32.b"
+  },
+  {
+    "id": "ART-0925",
+    "title": "The deceitful wife ejects the procuress after blackening her face, from a Tuti-nama (Tales of a Parrot): Eighth Night",
+    "artist": "Shravana (Indian, active 1550s–c.1600)",
+    "year": "c. 1560",
+    "museum": "Cleveland Museum of Art",
+    "region": "Mughal India, court of Akbar (reigned 1556–1605)",
+    "medium": "gum tempera, ink, and gold on paper",
+    "category": "Индийская и персидская миниатюра",
+    "subject": "Мифы и религия",
+    "score": 32,
+    "placement": {
+      "hall": "stories",
+      "wall": "myths"
+    },
+    "image": {
+      "path": "images/ART-0925.webp",
+      "widthPx": 439,
+      "heightPx": 700,
+      "aspect": 0.627143,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1962.279.67.b/1962.279.67.b_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 594,
+      "detail": {
+        "path": "detail/ART-0925.webp",
+        "widthPx": 1506,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.1,
+      "height": 0.105,
+      "basis": "painting only",
+      "source": "https://clevelandart.org/art/1962.279.67.b"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1962.279.67.b",
+    "subjectMethod": "reviewed",
+    "dateSource": "https://clevelandart.org/art/1962.279.67.b"
+  },
+  {
+    "id": "ART-0930",
+    "title": "Egret and Reeds",
+    "artist": "Yang Ki-hun (Seuk-Eun) (Korean, 1843–1919?)",
+    "year": "late 1800s",
+    "museum": "Cleveland Museum of Art",
+    "region": "Korea, Joseon dynasty (1392–1910)",
+    "medium": "hanging scroll; ink on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Животные",
+    "score": 32,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0930.webp",
+      "widthPx": 270,
+      "heightPx": 700,
+      "aspect": 0.385714,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2015.509/2015.509_print.jpg",
+      "overviewCell": 596,
+      "detail": {
+        "path": "detail/ART-0930.webp",
+        "widthPx": 923,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2015.509",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/2015.509"
+  },
+  {
+    "id": "ART-0939",
+    "title": "The prince sent back to the place of execution for the sixth time, from a Tuti-nama (Tales of a Parrot): Eighth Night",
+    "artist": "Suraju (Indian)",
+    "year": "c. 1560",
+    "museum": "Cleveland Museum of Art",
+    "region": "Mughal India, court of Akbar (reigned 1556–1605)",
+    "medium": "gum tempera, ink, and gold on paper",
+    "category": "Индийская и персидская миниатюра",
+    "subject": "Мифы и религия",
+    "score": 32,
+    "placement": {
+      "hall": "stories",
+      "wall": "myths"
+    },
+    "image": {
+      "path": "images/ART-0939.webp",
+      "widthPx": 447,
+      "heightPx": 700,
+      "aspect": 0.638571,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1962.279.69.b/1962.279.69.b_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 602,
+      "detail": {
+        "path": "detail/ART-0939.webp",
+        "widthPx": 1532,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.103,
+      "height": 0.103,
+      "basis": "painting only",
+      "source": "https://clevelandart.org/art/1962.279.69.b"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1962.279.69.b",
+    "subjectMethod": "reviewed",
+    "dateSource": "https://clevelandart.org/art/1962.279.69.b"
+  },
+  {
+    "id": "ART-0977",
+    "title": "Tiger",
+    "artist": "Приписывается: Soga Nichokuan (Japanese)",
+    "year": "early to mid-1600s",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Edo period (1615–1868)",
+    "medium": "six-panel folding screen; ink, slight color, gold, and silver on paper",
+    "category": "Японская живопись и ширмы",
+    "subject": "Животные",
+    "score": 32,
+    "placement": {
+      "hall": "jp",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-0977.webp",
+      "widthPx": 490,
+      "heightPx": 221,
+      "aspect": 2.217195,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1985.134.2/1985.134.2_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 623,
+      "detail": {
+        "path": "detail/ART-0977.webp",
+        "widthPx": 2400,
+        "heightPx": 1085
+      }
+    },
+    "physicalSizeM": {
+      "width": 3.048,
+      "height": 1.581,
+      "basis": "painting only",
+      "source": "https://clevelandart.org/art/1985.134.2"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1985.134.2",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1985.134.2"
+  },
+  {
+    "id": "ART-1020",
+    "title": "Portrait of the Artist's Mother (Lydia Wardwell Smith)",
+    "artist": "Allen Smith, Jr. (American, 1810–1891)",
+    "year": "probably mid-1800s",
+    "museum": "Cleveland Museum of Art",
+    "region": "United States, Ohio, Cleveland",
+    "medium": "oil on canvas",
+    "category": "Портреты XIX–XX веков",
+    "subject": "Женщины",
+    "score": 32,
+    "placement": {
+      "hall": "portraits",
+      "wall": "women"
+    },
+    "image": {
+      "path": "images/ART-1020.webp",
+      "widthPx": 490,
+      "heightPx": 606,
+      "aspect": 0.808581,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1918.569/1918.569_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 650,
+      "detail": {
+        "path": "detail/ART-1020.webp",
+        "widthPx": 1940,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.596,
+      "height": 0.655,
+      "basis": "unframed",
+      "source": "https://clevelandart.org/art/1918.569"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1918.569",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1918.569"
+  },
+  {
+    "id": "ART-1044",
+    "title": "Oath of the Peach Garden, from Romance of the Three Kingdoms",
+    "artist": "Matsumura Goshun (Japanese, 1752–1811)",
+    "year": "c. 1780",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Edo period (1615–1868)",
+    "medium": "hanging scroll; ink and color on silk",
+    "category": "Японская живопись и ширмы",
+    "subject": "Люди и быт",
+    "score": 25,
+    "placement": {
+      "hall": "jp",
+      "wall": "figures"
+    },
+    "image": {
+      "path": "images/ART-1044.webp",
+      "widthPx": 490,
+      "heightPx": 654,
+      "aspect": 0.749235,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1987.35/1987.35_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 663,
+      "detail": {
+        "path": "detail/ART-1044.webp",
+        "widthPx": 1800,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.252,
+      "height": 0.282,
+      "basis": "image",
+      "source": "https://clevelandart.org/art/1987.35"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1987.35",
+    "subjectMethod": "reviewed",
+    "dateSource": "https://clevelandart.org/art/1987.35"
+  },
+  {
+    "id": "ART-1079",
+    "title": "Water-Moon Kannon",
+    "artist": "Приписывается: Gakuō Zōkyū (Japanese, active about 1482–1514)",
+    "year": "c. 1500",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Muromachi period (1392–1573)",
+    "medium": "Hanging scroll; ink on paper",
+    "category": "Японская живопись и ширмы",
+    "subject": "Мифы и религия",
+    "score": 25,
+    "placement": {
+      "hall": "jp",
+      "wall": "figures"
+    },
+    "image": {
+      "path": "images/ART-1079.webp",
+      "widthPx": 334,
+      "heightPx": 700,
+      "aspect": 0.477143,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1985.110/1985.110_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 682,
+      "detail": {
+        "path": "detail/ART-1079.webp",
+        "widthPx": 1147,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.44,
+      "height": 1.048,
+      "basis": "painting",
+      "source": "https://clevelandart.org/art/1985.110"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1985.110",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1985.110"
+  },
+  {
+    "id": "ART-1081",
+    "title": "Women bathing before an architectural panorama",
+    "artist": "Fayzullah (Indian, active c. 1730–1765)",
+    "year": "c. 1765",
+    "museum": "Cleveland Museum of Art",
+    "region": "India, Lucknow, Mughal",
+    "medium": "Gum tempera and gold on paper",
+    "category": "Индийская и персидская миниатюра",
+    "subject": "Люди и быт",
+    "score": 25,
+    "placement": {
+      "hall": "world",
+      "wall": "life"
+    },
+    "image": {
+      "path": "images/ART-1081.webp",
+      "widthPx": 490,
+      "heightPx": 675,
+      "aspect": 0.725926,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2013.344/2013.344_print.jpg",
+      "overviewCell": 684,
+      "detail": {
+        "path": "detail/ART-1081.webp",
+        "widthPx": 1743,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2013.344",
+    "subjectMethod": "reviewed",
+    "dateSource": "https://clevelandart.org/art/2013.344"
+  },
+  {
+    "id": "ART-1092",
+    "title": "Autumn in Takao",
+    "artist": "Kiyohara Yukinobu (Japanese, 1643–1682)",
+    "year": "late 1600s",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Edo period (1615–1868)",
+    "medium": "hanging scroll; ink and color on silk",
+    "category": "Японская живопись и ширмы",
+    "subject": "Природа",
+    "score": 25,
+    "placement": {
+      "hall": "jp",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-1092.webp",
+      "widthPx": 285,
+      "heightPx": 700,
+      "aspect": 0.407143,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1991.55/1991.55_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 687,
+      "detail": {
+        "path": "detail/ART-1092.webp",
+        "widthPx": 978,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.327,
+      "height": 0.897,
+      "basis": "painting only",
+      "source": "https://clevelandart.org/art/1991.55"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1991.55",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1991.55"
+  },
+  {
+    "id": "ART-1094",
+    "title": "Women enjoying the river at the forest’s edge (recto) and flowering marigold (verso)",
+    "artist": "В стиле: Hunhar II (Indian, active mid-1700s)",
+    "year": "c. 1765",
+    "museum": "Cleveland Museum of Art",
+    "region": "India, Murshidabad or Lucknow, Mughal, 18th century",
+    "medium": "Gum tempera and gold on paper",
+    "category": "Индийская и персидская миниатюра",
+    "subject": "Люди и быт",
+    "score": 25,
+    "placement": {
+      "hall": "world",
+      "wall": "life"
+    },
+    "image": {
+      "path": "images/ART-1094.webp",
+      "widthPx": 490,
+      "heightPx": 324,
+      "aspect": 1.512346,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2013.351/2013.351_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 689,
+      "detail": {
+        "path": "detail/ART-1094.webp",
+        "widthPx": 2400,
+        "heightPx": 1585
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.249,
+      "height": 0.331,
+      "basis": "page",
+      "source": "https://clevelandart.org/art/2013.351"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2013.351",
+    "subjectMethod": "reviewed",
+    "dateSource": "https://clevelandart.org/art/2013.351"
+  },
+  {
+    "id": "ART-1117",
+    "title": "Plum Blossoms",
+    "artist": "Wang Shishen (Chinese, 1686–1759)",
+    "year": "probably 1739",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "Hanging scroll; ink on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Натюрморты",
+    "score": 25,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-1117.webp",
+      "widthPx": 329,
+      "heightPx": 700,
+      "aspect": 0.47,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1985.366/1985.366_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 698,
+      "detail": {
+        "path": "detail/ART-1117.webp",
+        "widthPx": 1128,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.757,
+      "height": 1.444,
+      "basis": "painting",
+      "source": "https://clevelandart.org/art/1985.366"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1985.366",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1985.366"
+  },
+  {
+    "id": "ART-1137",
+    "title": "Lions and Tigers in Peony and Bamboo",
+    "artist": "Yamaguchi Sekkei (Japanese, 1644–1732)",
+    "year": "1668",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Edo period (1615–1868)",
+    "medium": "One of a pair of six-panel folding screens; ink and color on gilded paper",
+    "category": "Японская живопись и ширмы",
+    "subject": "Животные",
+    "score": 25,
+    "placement": {
+      "hall": "jp",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-1137.webp",
+      "widthPx": 490,
+      "heightPx": 242,
+      "aspect": 2.024793,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1972.10.2/1972.10.2_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 712,
+      "detail": {
+        "path": "detail/ART-1137.webp",
+        "widthPx": 2400,
+        "heightPx": 1185
+      }
+    },
+    "physicalSizeM": {
+      "width": 3.3,
+      "height": 1.49,
+      "basis": "image",
+      "source": "https://clevelandart.org/art/1972.10.2"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1972.10.2",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1972.10.2"
+  },
+  {
+    "id": "ART-1144",
+    "title": "Travelers by a Lake",
+    "artist": "Esaias van de Velde (Dutch, 1587–1630)",
+    "year": "1625",
+    "museum": "Cleveland Museum of Art",
+    "region": "Netherlands",
+    "medium": "oil on wood",
+    "category": "Голландская и фламандская школы",
+    "subject": "Вода и корабли",
+    "score": 25,
+    "placement": {
+      "hall": "nature",
+      "wall": "water"
+    },
+    "image": {
+      "path": "images/ART-1144.webp",
+      "widthPx": 490,
+      "heightPx": 489,
+      "aspect": 1.002045,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1982.128/1982.128_print.jpg",
+      "overviewCell": 716,
+      "detail": {
+        "path": "detail/ART-1144.webp",
+        "widthPx": 2400,
+        "heightPx": 2397
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1982.128",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1982.128"
+  },
+  {
+    "id": "ART-1242",
+    "title": "The Death of Sophonisba",
+    "artist": "Приписывается: Pierre Guérin (French, 1774–1833)",
+    "year": "c. 1810",
+    "museum": "Cleveland Museum of Art",
+    "region": "France",
+    "medium": "oil on canvas",
+    "category": "Рококо и неоклассицизм",
+    "subject": "История и битвы",
+    "score": 20,
+    "placement": {
+      "hall": "stories",
+      "wall": "history"
+    },
+    "image": {
+      "path": "images/ART-1242.webp",
+      "widthPx": 490,
+      "heightPx": 570,
+      "aspect": 0.859649,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2008.71/2008.71_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 776,
+      "detail": {
+        "path": "detail/ART-1242.webp",
+        "widthPx": 2064,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.6,
+      "height": 0.4,
+      "basis": "unframed",
+      "source": "https://clevelandart.org/art/2008.71"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2008.71",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/2008.71"
+  },
+  {
+    "id": "ART-1253",
+    "title": "Landscape",
+    "artist": "Gion Nankai (Japanese, 1677–1751)",
+    "year": "c. 1700–1751",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Edo period (1615–1868)",
+    "medium": "hanging scroll; ink and color on paper",
+    "category": "Японская живопись и ширмы",
+    "subject": "Природа",
+    "score": 20,
+    "placement": {
+      "hall": "jp",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-1253.webp",
+      "widthPx": 304,
+      "heightPx": 700,
+      "aspect": 0.434286,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1980.81/1980.81_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 783,
+      "detail": {
+        "path": "detail/ART-1253.webp",
+        "widthPx": 1042,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.552,
+      "height": 1.022,
+      "basis": "painting",
+      "source": "https://clevelandart.org/art/1980.81"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1980.81",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1980.81"
+  },
+  {
+    "id": "ART-1256",
+    "title": "Field with Young Trees in the Foreground",
+    "artist": "Piet Mondrian (Dutch, 1872–1944)",
+    "year": "c. 1907",
+    "museum": "Cleveland Museum of Art",
+    "region": "Netherlands",
+    "medium": "oil on paper laid on board",
+    "category": "Живопись XX века",
+    "subject": "Природа",
+    "score": 20,
+    "placement": {
+      "hall": "nature",
+      "wall": "landscape"
+    },
+    "image": {
+      "path": "images/ART-1256.webp",
+      "widthPx": 490,
+      "heightPx": 398,
+      "aspect": 1.231156,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1971.220/1971.220_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 785,
+      "detail": {
+        "path": "detail/ART-1256.webp",
+        "widthPx": 2400,
+        "heightPx": 1951
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.72,
+      "height": 0.657,
+      "basis": "unframed",
+      "source": "https://clevelandart.org/art/1971.220"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1971.220",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1971.220"
+  },
+  {
+    "id": "ART-1265",
+    "title": "Portrait of a kneeling holy man, from the Prince Salim Album",
+    "artist": "Приписывается: Mir Sayyid Ali (Persian, active in Iran 1540s–50, active in India 1555–1580)",
+    "year": "c. 1556–60; border c. 1602",
+    "museum": "Cleveland Museum of Art",
+    "region": "Mughal India, court of Akbar (reigned 1556–1605)",
+    "medium": "Gum tempera, ink, and gold on paper, laid down on an album page with cream borders decorated with gold flowers and geometric motifs",
+    "category": "Индийская и персидская миниатюра",
+    "subject": "Мужчины",
+    "score": 20,
+    "placement": {
+      "hall": "portraits",
+      "wall": "men"
+    },
+    "image": {
+      "path": "images/ART-1265.webp",
+      "widthPx": 490,
+      "heightPx": 654,
+      "aspect": 0.749235,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2013.295/2013.295_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 791,
+      "detail": {
+        "path": "detail/ART-1265.webp",
+        "widthPx": 1800,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.071,
+      "height": 0.12,
+      "basis": "painting",
+      "source": "https://clevelandart.org/art/2013.295"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2013.295",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/2013.295"
+  },
+  {
+    "id": "ART-1267",
+    "title": "Akbar supervising the capture of wild elephants at Malwa in 1564, painting 90 from an Akbar-nama (Book of Akbar) of Abu’l Fazl (Indian 1551–1602)",
+    "artist": "Приписывается: Farukh Chela (Indian); или Govardhan (Indian, active c.1596–1645); или Dhanraj (Indian)",
+    "year": "c. 1602–3; borders added c. 1700s",
+    "museum": "Cleveland Museum of Art",
+    "region": "India, Mughal, 16th century, made for Akbar (reigned 1556–1605)",
+    "medium": "ink with use of colors and gold on paper, mounted on an album page with borders of gold-decorated buff and blue paper (recto); calligraphy by Faqir Ali (verso)",
+    "category": "Индийская и персидская миниатюра",
+    "subject": "История и битвы",
+    "score": 20,
+    "placement": {
+      "hall": "stories",
+      "wall": "history"
+    },
+    "image": {
+      "path": "images/ART-1267.webp",
+      "widthPx": 490,
+      "heightPx": 383,
+      "aspect": 1.279373,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2013.309/2013.309_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 793,
+      "detail": {
+        "path": "detail/ART-1267.webp",
+        "widthPx": 2400,
+        "heightPx": 1876
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.254,
+      "height": 0.375,
+      "basis": "page",
+      "source": "https://clevelandart.org/art/2013.309"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2013.309",
+    "subjectMethod": "reviewed",
+    "dateSource": "https://clevelandart.org/art/2013.309"
+  },
+  {
+    "id": "ART-1268",
+    "title": "Portrait of Suraj Singh Rathor, Raja of Marwar and Maternal Uncle of Shah Jahan: A Page from the Prince Khurram Album",
+    "artist": "Приписывается: Bishandas (Indian, active c. 1610–30)",
+    "year": "c. 1600",
+    "museum": "Cleveland Museum of Art",
+    "region": "India, Mughal court, early 17th century",
+    "medium": "Gum tempera and gold on paper",
+    "category": "Индийская и персидская миниатюра",
+    "subject": "Мужчины",
+    "score": 20,
+    "placement": {
+      "hall": "portraits",
+      "wall": "men"
+    },
+    "image": {
+      "path": "images/ART-1268.webp",
+      "widthPx": 329,
+      "heightPx": 700,
+      "aspect": 0.47,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2013.313/2013.313_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 794,
+      "detail": {
+        "path": "detail/ART-1268.webp",
+        "widthPx": 1127,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.19,
+      "height": 0.291,
+      "basis": "page",
+      "source": "https://clevelandart.org/art/2013.313"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2013.313",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/2013.313"
+  },
+  {
+    "id": "ART-1272",
+    "title": "Paintings after Ancient Masters: Mr. Five Willows (Wuliu), Tao Yuanming",
+    "artist": "Chen Hongshou (Chinese, 1598/99–1652)",
+    "year": "1598–1652",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Ming dynasty (1368–1644)",
+    "medium": "album leaf, ink and color on silk",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Мужчины",
+    "score": 20,
+    "placement": {
+      "hall": "cn",
+      "wall": "figures"
+    },
+    "image": {
+      "path": "images/ART-1272.webp",
+      "widthPx": 490,
+      "heightPx": 492,
+      "aspect": 0.995935,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1979.27.2.12/1979.27.2.12_print.jpg",
+      "overviewCell": 797,
+      "detail": {
+        "path": "detail/ART-1272.webp",
+        "widthPx": 2392,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1979.27.2.12",
+    "subjectMethod": "reviewed",
+    "dateSource": "https://clevelandart.org/art/1979.27.2.12"
+  },
+  {
+    "id": "ART-1277",
+    "title": "Zulaykha in her palace and as an elderly woman with Joseph (recto), from a Panj Ganj (Five Treasures) of Abd al- Rahman Jami (Persian, 1414–1492)",
+    "artist": "Mushfiq (Indian, active early 1600s)",
+    "year": "1603–7",
+    "museum": "Cleveland Museum of Art",
+    "region": "Western Afghanistan, Herat (text); Mughal India (paintings)",
+    "medium": "Gum tempera, ink, and gold on paper",
+    "category": "Индийская и персидская миниатюра",
+    "subject": "Мифы и религия",
+    "score": 20,
+    "placement": {
+      "hall": "stories",
+      "wall": "myths"
+    },
+    "image": {
+      "path": "images/ART-1277.webp",
+      "widthPx": 396,
+      "heightPx": 700,
+      "aspect": 0.565714,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2013.315.1.a/2013.315.1.a_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 801,
+      "detail": {
+        "path": "detail/ART-1277.webp",
+        "widthPx": 1356,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.204,
+      "height": 0.316,
+      "basis": "page",
+      "source": "https://clevelandart.org/art/2013.315.1.a"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2013.315.1.a",
+    "subjectMethod": "reviewed",
+    "dateSource": "https://clevelandart.org/art/2013.315.1.a"
+  },
+  {
+    "id": "ART-1278",
+    "title": "Portrait of Raja Jagat Singh of Nurpur (reigned 1618–46)",
+    "artist": "Приписывается: Bichitr (Indian, active c. 1615–50)",
+    "year": "probably 1619",
+    "museum": "Cleveland Museum of Art",
+    "region": "Mughal India, Court of Jahangir (reigned 1605 - 27), possibly Lahore",
+    "medium": "Gum tempera and gold on paper",
+    "category": "Индийская и персидская миниатюра",
+    "subject": "Мужчины",
+    "score": 20,
+    "placement": {
+      "hall": "portraits",
+      "wall": "men"
+    },
+    "image": {
+      "path": "images/ART-1278.webp",
+      "widthPx": 479,
+      "heightPx": 700,
+      "aspect": 0.684286,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2013.324/2013.324_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 802,
+      "detail": {
+        "path": "detail/ART-1278.webp",
+        "widthPx": 1640,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.116,
+      "height": 0.191,
+      "basis": "painting only",
+      "source": "https://clevelandart.org/art/2013.324"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2013.324",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/2013.324"
+  },
+  {
+    "id": "ART-1283",
+    "title": "Album of Landscape Paintings Illustrating Old Poems: Boy Tending a Water Buffalo",
+    "artist": "Hua Yan (Chinese, 1682–c. 1765)",
+    "year": "1745",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "Album leaf; ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 20,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-1283.webp",
+      "widthPx": 490,
+      "heightPx": 408,
+      "aspect": 1.20098,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1982.68.12/1982.68.12_print.jpg",
+      "overviewCell": 806,
+      "detail": {
+        "path": "detail/ART-1283.webp",
+        "widthPx": 2400,
+        "heightPx": 2000
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1982.68.12",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1982.68.12"
+  },
+  {
+    "id": "ART-1287",
+    "title": "In the Surf (recto); Beach Study (verso)",
+    "artist": "Edward H. Potthast (American, 1857–1927)",
+    "year": "c. 1910",
+    "museum": "Cleveland Museum of Art",
+    "region": "United States",
+    "medium": "oil on panel",
+    "category": "Живопись XX века",
+    "subject": "Вода и корабли",
+    "score": 20,
+    "placement": {
+      "hall": "nature",
+      "wall": "water"
+    },
+    "image": {
+      "path": "images/ART-1287.webp",
+      "widthPx": 439,
+      "heightPx": 700,
+      "aspect": 0.627143,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2001.41/2001.41_print.jpg",
+      "overviewCell": 807,
+      "detail": {
+        "path": "detail/ART-1287.webp",
+        "widthPx": 1506,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2001.41",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/2001.41"
+  },
+  {
+    "id": "ART-1290",
+    "title": "Illuminated page (verso), from a Panj Ganj (Five Treasures) of Abd al- Rahman Jami (Persian, 1414–1492) with two Persian masnavis: Yusuf va Zulaykha (Joseph and Zulaykha) and Khirad-nama-i Iskandari (Alexander’s Book of Wisdom)",
+    "artist": "Mushfiq (Indian, active early 1600s)",
+    "year": "1603–7",
+    "museum": "Cleveland Museum of Art",
+    "region": "Western Afghanistan, Herat (text); Mughal India (paintings)",
+    "medium": "Gum tempera, ink, and gold on paper",
+    "category": "Индийская и персидская миниатюра",
+    "subject": "Абстракция и орнамент",
+    "score": 20,
+    "placement": {
+      "hall": "reserve",
+      "wall": "uncertain"
+    },
+    "image": {
+      "path": "images/ART-1290.webp",
+      "widthPx": 402,
+      "heightPx": 700,
+      "aspect": 0.574286,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2013.315.1.b/2013.315.1.b_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 809,
+      "detail": {
+        "path": "detail/ART-1290.webp",
+        "widthPx": 1381,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.204,
+      "height": 0.316,
+      "basis": "page",
+      "source": "https://clevelandart.org/art/2013.315.1.b"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2013.315.1.b",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/2013.315.1.b"
+  },
+  {
+    "id": "ART-1305",
+    "title": "Double-leaf Doors",
+    "artist": "Pierre Rousseau (French, 1751–1829)",
+    "year": "1790s",
+    "museum": "Cleveland Museum of Art",
+    "region": "France",
+    "medium": "oil on wood",
+    "category": "Рококо и неоклассицизм",
+    "subject": "Архитектура",
+    "score": 20,
+    "placement": {
+      "hall": "world",
+      "wall": "buildings"
+    },
+    "image": {
+      "path": "images/ART-1305.webp",
+      "widthPx": 407,
+      "heightPx": 700,
+      "aspect": 0.581429,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1942.2.13/1942.2.13_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 814,
+      "detail": {
+        "path": "detail/ART-1305.webp",
+        "widthPx": 1393,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.63,
+      "height": 2.74,
+      "basis": "unframed",
+      "source": "https://clevelandart.org/art/1942.2.13"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1942.2.13",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1942.2.13"
+  },
+  {
+    "id": "ART-1311",
+    "title": "Courtesan",
+    "artist": "Kaigetsudō Doshin (Japanese, active 1711–1736)",
+    "year": "early 1700s",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Edo period (1615–1868)",
+    "medium": "hanging scroll; ink and color on paper",
+    "category": "Японская живопись и ширмы",
+    "subject": "Женщины",
+    "score": 20,
+    "placement": {
+      "hall": "jp",
+      "wall": "figures"
+    },
+    "image": {
+      "path": "images/ART-1311.webp",
+      "widthPx": 286,
+      "heightPx": 700,
+      "aspect": 0.408571,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1917.97/1917.97_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 817,
+      "detail": {
+        "path": "detail/ART-1311.webp",
+        "widthPx": 983,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.46,
+      "height": 0.917,
+      "basis": "painting only",
+      "source": "https://clevelandart.org/art/1917.97"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1917.97",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1917.97"
+  },
+  {
+    "id": "ART-1320",
+    "title": "Paintings after Ancient Masters: Chrysanthemum",
+    "artist": "Chen Hongshou (Chinese, 1598/99–1652)",
+    "year": "1598–1652",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Ming dynasty (1368–1644)",
+    "medium": "Album leaf; ink and color on silk",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Натюрморты",
+    "score": 20,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-1320.webp",
+      "widthPx": 490,
+      "heightPx": 479,
+      "aspect": 1.022965,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1979.27.2.17/1979.27.2.17_print.jpg",
+      "overviewCell": 823,
+      "detail": {
+        "path": "detail/ART-1320.webp",
+        "widthPx": 2400,
+        "heightPx": 2344
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1979.27.2.17",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1979.27.2.17"
+  },
+  {
+    "id": "ART-1325",
+    "title": "Weaving and Spinning",
+    "artist": "Kehar Singh (Indian)",
+    "year": "c. 1860",
+    "museum": "Cleveland Museum of Art",
+    "region": "India, Punjab, probably Amritsar or Lahore, Company school, 19th century",
+    "medium": "Gum tempera and ink on paper",
+    "category": "Индийская и персидская миниатюра",
+    "subject": "Люди и быт",
+    "score": 20,
+    "placement": {
+      "hall": "world",
+      "wall": "life"
+    },
+    "image": {
+      "path": "images/ART-1325.webp",
+      "widthPx": 490,
+      "heightPx": 535,
+      "aspect": 0.915888,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1987.162/1987.162_print.jpg",
+      "overviewCell": 827,
+      "detail": {
+        "path": "detail/ART-1325.webp",
+        "widthPx": 2199,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1987.162",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1987.162"
+  },
+  {
+    "id": "ART-1330",
+    "title": "Paintings after Ancient Masters: Scholar with Staff and Brush",
+    "artist": "Chen Hongshou (Chinese, 1598/99–1652)",
+    "year": "1598–1652",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Ming dynasty (1368–1644)",
+    "medium": "album leaf; ink and color on silk",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Мужчины",
+    "score": 20,
+    "placement": {
+      "hall": "cn",
+      "wall": "figures"
+    },
+    "image": {
+      "path": "images/ART-1330.webp",
+      "widthPx": 490,
+      "heightPx": 494,
+      "aspect": 0.991903,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1979.27.2.19/1979.27.2.19_print.jpg",
+      "overviewCell": 831,
+      "detail": {
+        "path": "detail/ART-1330.webp",
+        "widthPx": 2385,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1979.27.2.19",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1979.27.2.19"
+  },
+  {
+    "id": "ART-1349",
+    "title": "Portrait of Maharaja Pratap Singh (1764–1803)",
+    "artist": "Приписывается: Sahib Ram (Indian, active 1745–1803)",
+    "year": "c. 1793",
+    "museum": "Cleveland Museum of Art",
+    "region": "Northwestern India, Rajasthan, Jaipur",
+    "medium": "Colored ink drawing",
+    "category": "Индийская и персидская миниатюра",
+    "subject": "Мужчины",
+    "score": 20,
+    "placement": {
+      "hall": "portraits",
+      "wall": "men"
+    },
+    "image": {
+      "path": "images/ART-1349.webp",
+      "widthPx": 404,
+      "heightPx": 700,
+      "aspect": 0.577143,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2011.207/2011.207_print.jpg",
+      "overviewCell": 842,
+      "detail": {
+        "path": "detail/ART-1349.webp",
+        "widthPx": 1386,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2011.207",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/2011.207"
+  },
+  {
+    "id": "ART-1354",
+    "title": "Bamboo and Plum",
+    "artist": "Sesson Shūkei (Japanese, active 1504-c. 1589)",
+    "year": "1500s",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Muromachi period (1392–1573)",
+    "medium": "hanging scroll; ink on paper",
+    "category": "Японская живопись и ширмы",
+    "subject": "Природа",
+    "score": 20,
+    "placement": {
+      "hall": "jp",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-1354.webp",
+      "widthPx": 329,
+      "heightPx": 700,
+      "aspect": 0.47,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2015.503/2015.503_print.jpg",
+      "overviewCell": 843,
+      "detail": {
+        "path": "detail/ART-1354.webp",
+        "widthPx": 1129,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2015.503",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/2015.503"
+  },
+  {
+    "id": "ART-1362",
+    "title": "Album of Landscape Paintings Illustrating Old Poems: A Scholar at a Table with a Servant aside Preparing the Ink",
+    "artist": "Hua Yan (Chinese, 1682–c. 1765)",
+    "year": "1745",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "Album leaf; ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Люди и быт",
+    "score": 20,
+    "placement": {
+      "hall": "cn",
+      "wall": "figures"
+    },
+    "image": {
+      "path": "images/ART-1362.webp",
+      "widthPx": 490,
+      "heightPx": 414,
+      "aspect": 1.183575,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1982.68.10/1982.68.10_print.jpg",
+      "overviewCell": 847,
+      "detail": {
+        "path": "detail/ART-1362.webp",
+        "widthPx": 2400,
+        "heightPx": 2025
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1982.68.10",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1982.68.10"
+  },
+  {
+    "id": "ART-1363",
+    "title": "Album of Landscape Paintings Illustrating Old Poems: Boy Holding a Horse",
+    "artist": "Hua Yan (Chinese, 1682–c. 1765)",
+    "year": "1745",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "Album leaf; ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Люди и быт",
+    "score": 20,
+    "placement": {
+      "hall": "cn",
+      "wall": "figures"
+    },
+    "image": {
+      "path": "images/ART-1363.webp",
+      "widthPx": 490,
+      "heightPx": 402,
+      "aspect": 1.218905,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1982.68.8/1982.68.8_print.jpg",
+      "overviewCell": 848,
+      "detail": {
+        "path": "detail/ART-1363.webp",
+        "widthPx": 2400,
+        "heightPx": 1973
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1982.68.8",
+    "subjectMethod": "reviewed",
+    "dateSource": "https://clevelandart.org/art/1982.68.8"
+  },
+  {
+    "id": "ART-1364",
+    "title": "Album of Landscape Paintings Illustrating Old Poems: Children Playing Blindman's Buff in a Garden",
+    "artist": "Hua Yan (Chinese, 1682–c. 1765)",
+    "year": "1745",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "Album leaf; ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Люди и быт",
+    "score": 20,
+    "placement": {
+      "hall": "cn",
+      "wall": "figures"
+    },
+    "image": {
+      "path": "images/ART-1364.webp",
+      "widthPx": 490,
+      "heightPx": 405,
+      "aspect": 1.209877,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1982.68.9/1982.68.9_print.jpg",
+      "overviewCell": 849,
+      "detail": {
+        "path": "detail/ART-1364.webp",
+        "widthPx": 2400,
+        "heightPx": 1986
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1982.68.9",
+    "subjectMethod": "reviewed",
+    "dateSource": "https://clevelandart.org/art/1982.68.9"
+  },
+  {
+    "id": "ART-1381",
+    "title": "A Courtier, Possibly Khan Alam, Holding a Spinel and a Deccan Sword",
+    "artist": "Приписывается: Govardhan (Indian, active c.1596–1645)",
+    "year": "c. 1605–1610",
+    "museum": "Cleveland Museum of Art",
+    "region": "Mughal India",
+    "medium": "gum tempera, ink, and gold on paper, text on verso",
+    "category": "Индийская и персидская миниатюра",
+    "subject": "Мужчины",
+    "score": 20,
+    "placement": {
+      "hall": "portraits",
+      "wall": "men"
+    },
+    "image": {
+      "path": "images/ART-1381.webp",
+      "widthPx": 441,
+      "heightPx": 700,
+      "aspect": 0.63,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2013.323.a/2013.323.a_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 855,
+      "detail": {
+        "path": "detail/ART-1381.webp",
+        "widthPx": 1512,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.125,
+      "height": 0.178,
+      "basis": "page",
+      "source": "https://clevelandart.org/art/2013.323.a"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2013.323.a",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/2013.323.a"
+  },
+  {
+    "id": "ART-1384",
+    "title": "Chinese Literatus in an Autumn Landscape",
+    "artist": "Josui Sōen (Japanese, active c. 1489–1500)",
+    "year": "late 1400s",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Muromachi period (1392–1573)",
+    "medium": "hanging scroll; ink on paper",
+    "category": "Японская живопись и ширмы",
+    "subject": "Природа",
+    "score": 20,
+    "placement": {
+      "hall": "jp",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-1384.webp",
+      "widthPx": 490,
+      "heightPx": 330,
+      "aspect": 1.484848,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2015.467/2015.467_print.jpg",
+      "overviewCell": 858,
+      "detail": {
+        "path": "detail/ART-1384.webp",
+        "widthPx": 2400,
+        "heightPx": 1617
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2015.467",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/2015.467"
+  },
+  {
+    "id": "ART-1391",
+    "title": "Album of Landscape Paintings Illustrating Old Poems: Listening to the Qin",
+    "artist": "Hua Yan (Chinese, 1682–c. 1765)",
+    "year": "1745",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644–1911)",
+    "medium": "album leaf; ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 20,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-1391.webp",
+      "widthPx": 490,
+      "heightPx": 412,
+      "aspect": 1.18932,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1982.68.11/1982.68.11_print.jpg",
+      "overviewCell": 861,
+      "detail": {
+        "path": "detail/ART-1391.webp",
+        "widthPx": 2400,
+        "heightPx": 2021
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1982.68.11",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1982.68.11"
+  },
+  {
+    "id": "ART-1404",
+    "title": "Bodhidharma",
+    "artist": "Приписывается: Unkei Eii (Japanese, active c. 1504–1555)",
+    "year": "early to mid-1500s",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Muromachi period (1392–1573)",
+    "medium": "hanging scroll; ink on paper",
+    "category": "Японская живопись и ширмы",
+    "subject": "Мифы и религия",
+    "score": 20,
+    "placement": {
+      "hall": "jp",
+      "wall": "figures"
+    },
+    "image": {
+      "path": "images/ART-1404.webp",
+      "widthPx": 353,
+      "heightPx": 700,
+      "aspect": 0.504286,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2015.472/2015.472_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 868,
+      "detail": {
+        "path": "detail/ART-1404.webp",
+        "widthPx": 1208,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.259,
+      "height": 0.566,
+      "basis": "painting",
+      "source": "https://clevelandart.org/art/2015.472"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2015.472",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/2015.472"
+  },
+  {
+    "id": "ART-1424",
+    "title": "Fish and Rock; Fish and Seaweed",
+    "artist": "Rinkyo (Japanese)",
+    "year": "1573–1615",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Momoyama period (1573–1615)",
+    "medium": "pair of hanging scrolls; ink on paper",
+    "category": "Японская живопись и ширмы",
+    "subject": "Животные",
+    "score": 20,
+    "placement": {
+      "hall": "jp",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-1424.webp",
+      "widthPx": 490,
+      "heightPx": 551,
+      "aspect": 0.889292,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1983.186/1983.186_print.jpg",
+      "overviewCell": 881,
+      "detail": {
+        "path": "detail/ART-1424.webp",
+        "widthPx": 2133,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1983.186",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1983.186"
+  },
+  {
+    "id": "ART-1442",
+    "title": "Jesus among the doctors in the Temple",
+    "artist": "Mir Kalan Khan (Indian, c. 1730–1775)",
+    "year": "c. 1760",
+    "museum": "Cleveland Museum of Art",
+    "region": "India, Lucknow, Mughal, 18th century",
+    "medium": "Gum tempera and gold on paper",
+    "category": "Индийская и персидская миниатюра",
+    "subject": "Мифы и религия",
+    "score": 20,
+    "placement": {
+      "hall": "stories",
+      "wall": "religion"
+    },
+    "image": {
+      "path": "images/ART-1442.webp",
+      "widthPx": 435,
+      "heightPx": 700,
+      "aspect": 0.621429,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/2013.346/2013.346_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 891,
+      "detail": {
+        "path": "detail/ART-1442.webp",
+        "widthPx": 1492,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.253,
+      "height": 0.355,
+      "basis": "page",
+      "source": "https://clevelandart.org/art/2013.346"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/2013.346",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/2013.346"
+  },
+  {
+    "id": "ART-1457",
+    "title": "Album of Landscape Paintings Illustrating Old Poems: Scholar under a Pine Tree",
+    "artist": "Hua Yan (Chinese, 1682–c. 1765)",
+    "year": "1745",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644–1911)",
+    "medium": "album leaf, ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 20,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-1457.webp",
+      "widthPx": 490,
+      "heightPx": 416,
+      "aspect": 1.177885,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1982.68.1/1982.68.1_print.jpg",
+      "overviewCell": 900,
+      "detail": {
+        "path": "detail/ART-1457.webp",
+        "widthPx": 2400,
+        "heightPx": 2041
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1982.68.1",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1982.68.1"
+  },
+  {
+    "id": "ART-1460",
+    "title": "Female Daoist Figure in Landscape",
+    "artist": "Kōboku (Japanese)",
+    "year": "early 1500s",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Muromachi period (1392–1573)",
+    "medium": "hanging scroll; ink on paper",
+    "category": "Японская живопись и ширмы",
+    "subject": "Мифы и религия",
+    "score": 20,
+    "placement": {
+      "hall": "jp",
+      "wall": "figures"
+    },
+    "image": {
+      "path": "images/ART-1460.webp",
+      "widthPx": 444,
+      "heightPx": 700,
+      "aspect": 0.634286,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1988.18/1988.18_print.jpg",
+      "sizeMatch": "needs_review",
+      "overviewCell": 903,
+      "detail": {
+        "path": "detail/ART-1460.webp",
+        "widthPx": 1519,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": {
+      "width": 0.444,
+      "height": 0.27,
+      "basis": "painting only",
+      "source": "https://clevelandart.org/art/1988.18"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1988.18",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1988.18"
+  },
+  {
+    "id": "ART-1485",
+    "title": "Album of Landscape Paintings Illustrating Old Poems:  Three Big Trees, a Stream with an Old Man Sitting on the Bank",
+    "artist": "Hua Yan (Chinese, 1682–c. 1765)",
+    "year": "1745",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "album leaf, ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 20,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-1485.webp",
+      "widthPx": 490,
+      "heightPx": 402,
+      "aspect": 1.218905,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1982.68.2/1982.68.2_print.jpg",
+      "overviewCell": 913,
+      "detail": {
+        "path": "detail/ART-1485.webp",
+        "widthPx": 2400,
+        "heightPx": 1967
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1982.68.2",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1982.68.2"
+  },
+  {
+    "id": "ART-1486",
+    "title": "Album of Landscape Paintings Illustrating Old Poems: Scholar watching Fish",
+    "artist": "Hua Yan (Chinese, 1682–c. 1765)",
+    "year": "1745",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "album leaf, ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 20,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-1486.webp",
+      "widthPx": 490,
+      "heightPx": 406,
+      "aspect": 1.206897,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1982.68.4/1982.68.4_print.jpg",
+      "overviewCell": 914,
+      "detail": {
+        "path": "detail/ART-1486.webp",
+        "widthPx": 2400,
+        "heightPx": 1988
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1982.68.4",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1982.68.4"
+  },
+  {
+    "id": "ART-1487",
+    "title": "Album of Landscape Paintings Illustrating Old Poems: Man Resting under Bamboo",
+    "artist": "Hua Yan (Chinese, 1682–c. 1765)",
+    "year": "1745",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "album leaf, ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 20,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-1487.webp",
+      "widthPx": 490,
+      "heightPx": 402,
+      "aspect": 1.218905,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1982.68.5/1982.68.5_print.jpg",
+      "overviewCell": 915,
+      "detail": {
+        "path": "detail/ART-1487.webp",
+        "widthPx": 2400,
+        "heightPx": 1966
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1982.68.5",
+    "subjectMethod": "title",
+    "dateSource": "https://clevelandart.org/art/1982.68.5"
+  },
+  {
+    "id": "ART-1488",
+    "title": "Album of Landscape Paintings Illustrating Old Poems: A Man Reclining and Enjoying the View",
+    "artist": "Hua Yan (Chinese, 1682–c. 1765)",
+    "year": "1745",
+    "museum": "Cleveland Museum of Art",
+    "region": "China, Qing dynasty (1644-1911)",
+    "medium": "album leaf, ink and light color on paper",
+    "category": "Китайская и корейская живопись тушью",
+    "subject": "Природа",
+    "score": 20,
+    "placement": {
+      "hall": "cn",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-1488.webp",
+      "widthPx": 490,
+      "heightPx": 408,
+      "aspect": 1.20098,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1982.68.7/1982.68.7_print.jpg",
+      "overviewCell": 916,
+      "detail": {
+        "path": "detail/ART-1488.webp",
+        "widthPx": 2400,
+        "heightPx": 1996
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1982.68.7",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1982.68.7"
+  },
+  {
+    "id": "ART-1500",
+    "title": "Sparrows on Blossoming Plum; A Sage with Tiger; Chinese Bird on Snow-Laden Branch",
+    "artist": "Kano Tan’yū (Japanese, 1602–1674)",
+    "year": "1661",
+    "museum": "Cleveland Museum of Art",
+    "region": "Japan, Edo period (1615–1868)",
+    "medium": "Triptych of hanging scrolls; ink and slight color on silk",
+    "category": "Японская живопись и ширмы",
+    "subject": "Животные",
+    "score": 20,
+    "placement": {
+      "hall": "jp",
+      "wall": "nature"
+    },
+    "image": {
+      "path": "images/ART-1500.webp",
+      "widthPx": 275,
+      "heightPx": 700,
+      "aspect": 0.392857,
+      "quality": "offline_preview",
+      "hdUrl": "https://openaccess-cdn.clevelandart.org/1992.80/1992.80_print.jpg",
+      "overviewCell": 918,
+      "detail": {
+        "path": "detail/ART-1500.webp",
+        "widthPx": 941,
+        "heightPx": 2400
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "CC0 (музейный файл)",
+      "licenseUrl": "https://www.clevelandart.org/open-access"
+    },
+    "sourceUrl": "https://clevelandart.org/art/1992.80",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://clevelandart.org/art/1992.80"
+  },
+  {
+    "id": "ART-1503",
+    "title": "Ivan the Terrible and His Son Ivan",
+    "artist": "Ilya Repin",
+    "year": "1885",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русская живопись XIX века",
+    "subject": "История и битвы",
+    "score": 95,
+    "placement": {
+      "hall": "center",
+      "wall": "master"
+    },
+    "image": {
+      "path": "images/ART-1503.webp",
+      "widthPx": 464,
+      "heightPx": 370,
+      "aspect": 1.254054,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6c/REPIN_Ivan_Terrible%26Ivan.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 921,
+      "detail": {
+        "path": "detail/ART-1503.webp",
+        "widthPx": 2048,
+        "heightPx": 1600,
+        "sourceUrl": "https://my.tretyakov.ru/app/masterpiece/8408",
+        "originalUrl": "https://cdn.tretyakov.ru/mytretyakov/25/95296ea3edafe3aceb15f7766647d85e/9ab778c6cfd631775dc15d9d69fb6943.png"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:REPIN_Ivan_Terrible%26Ivan.jpg"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:REPIN_Ivan_Terrible%26Ivan.jpg",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:REPIN_Ivan_Terrible%26Ivan.jpg"
+  },
+  {
+    "id": "ART-1505",
+    "title": "Sadko",
+    "artist": "Ilya Repin",
+    "year": "1876",
+    "museum": "Русский музей",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русская живопись XIX века",
+    "subject": "Мифы и религия",
+    "score": 85,
+    "placement": {
+      "hall": "stories",
+      "wall": "myths"
+    },
+    "image": {
+      "path": "images/ART-1505.webp",
+      "widthPx": 490,
+      "heightPx": 690,
+      "aspect": 0.710145,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/2/21/Ilya_Repin_-_Sadko_-_Google_Art_Project.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 923,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Ilya_Repin_-_Sadko_-_Google_Art_Project.jpg/1920px-Ilya_Repin_-_Sadko_-_Google_Art_Project.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Ilya_Repin_-_Sadko_-_Google_Art_Project.jpg"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ilya_Repin_-_Sadko_-_Google_Art_Project.jpg",
+    "subjectMethod": "reviewed",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:Ilya_Repin_-_Sadko_-_Google_Art_Project.jpg"
+  },
+  {
+    "id": "ART-1508",
+    "title": "Rye",
+    "artist": "Ivan Shishkin",
+    "year": "1878",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русские пейзажи XIX века",
+    "subject": "Природа",
+    "score": 85,
+    "placement": {
+      "hall": "nature",
+      "wall": "landscape"
+    },
+    "image": {
+      "path": "images/ART-1508.webp",
+      "widthPx": 490,
+      "heightPx": 277,
+      "aspect": 1.768953,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a5/Ivan_Ivanovich_Shishkin_-_Rye_field%2C_1878.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 925,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Ivan_Ivanovich_Shishkin_-_Rye_field%2C_1878.jpg/1920px-Ivan_Ivanovich_Shishkin_-_Rye_field%2C_1878.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Ivan_Ivanovich_Shishkin_-_Rye_field,_1878.jpg"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ivan_Ivanovich_Shishkin_-_Rye_field,_1878.jpg",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:Ivan_Ivanovich_Shishkin_-_Rye_field,_1878.jpg"
+  },
+  {
+    "id": "ART-1509",
+    "title": "Oak Grove",
+    "artist": "Ivan Shishkin",
+    "year": "1887",
+    "museum": "Киевская картинная галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русские пейзажи XIX века",
+    "subject": "Природа",
+    "score": 85,
+    "placement": {
+      "hall": "nature",
+      "wall": "landscape"
+    },
+    "image": {
+      "path": "images/ART-1509.webp",
+      "widthPx": 490,
+      "heightPx": 310,
+      "aspect": 1.580645,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/5/58/Ivan_Ivanovich_Shishkin_-_Oak_Grove%2C_1887.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 926,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Ivan_Ivanovich_Shishkin_-_Oak_Grove%2C_1887.jpg/1920px-Ivan_Ivanovich_Shishkin_-_Oak_Grove%2C_1887.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Ivan_Ivanovich_Shishkin_-_Oak_Grove,_1887.jpg"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ivan_Ivanovich_Shishkin_-_Oak_Grove,_1887.jpg",
+    "subjectMethod": "title",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:Ivan_Ivanovich_Shishkin_-_Oak_Grove,_1887.jpg"
+  },
+  {
+    "id": "ART-1512",
+    "title": "The Rainbow",
+    "artist": "Ivan Aivazovsky",
+    "year": "1873",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русские пейзажи XIX века",
+    "subject": "Вода и корабли",
+    "score": 85,
+    "placement": {
+      "hall": "nature",
+      "wall": "water"
+    },
+    "image": {
+      "path": "images/ART-1512.webp",
+      "widthPx": 490,
+      "heightPx": 382,
+      "aspect": 1.282723,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/1/11/Aivazovsky%2C_Rainbow.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 929,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Aivazovsky%2C_Rainbow.JPG/1920px-Aivazovsky%2C_Rainbow.JPG"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Aivazovsky,_Rainbow.JPG"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Aivazovsky,_Rainbow.JPG",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:Aivazovsky,_Rainbow.JPG"
+  },
+  {
+    "id": "ART-1513",
+    "title": "Bogatyrs",
+    "artist": "Viktor Vasnetsov",
+    "year": "1881–1898",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русский символизм и сказочная живопись",
+    "subject": "Мужчины",
+    "score": 95,
+    "placement": {
+      "hall": "center",
+      "wall": "master"
+    },
+    "image": {
+      "path": "images/ART-1513.webp",
+      "widthPx": 490,
+      "heightPx": 315,
+      "aspect": 1.555556,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/2/21/1898_Vasnetsov_Bogatyrs_anagoria.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 930,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/1898_Vasnetsov_Bogatyrs_anagoria.JPG/1920px-1898_Vasnetsov_Bogatyrs_anagoria.JPG"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:1898_Vasnetsov_Bogatyrs_anagoria.JPG"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:1898_Vasnetsov_Bogatyrs_anagoria.JPG",
+    "subjectMethod": "curated",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:1898_Vasnetsov_Bogatyrs_anagoria.JPG"
+  },
+  {
+    "id": "ART-1514",
+    "title": "Alyonushka",
+    "artist": "Viktor Vasnetsov",
+    "year": "1881",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русский символизм и сказочная живопись",
+    "subject": "Мифы и религия",
+    "score": 85,
+    "placement": {
+      "hall": "stories",
+      "wall": "myths"
+    },
+    "image": {
+      "path": "images/ART-1514.webp",
+      "widthPx": 490,
+      "heightPx": 374,
+      "aspect": 1.31016,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/7/79/Vasnetsov_alyonushka_crop.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 931,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Vasnetsov_alyonushka_crop.jpg/1920px-Vasnetsov_alyonushka_crop.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Vasnetsov_alyonushka_crop.jpg"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Vasnetsov_alyonushka_crop.jpg",
+    "subjectMethod": "reviewed",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:Vasnetsov_alyonushka_crop.jpg"
+  },
+  {
+    "id": "ART-1515",
+    "title": "Ivan Tsarevich Riding the Grey Wolf",
+    "artist": "Viktor Vasnetsov",
+    "year": "1889",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русский символизм и сказочная живопись",
+    "subject": "Животные",
+    "score": 85,
+    "placement": {
+      "hall": "center",
+      "wall": "master"
+    },
+    "image": {
+      "path": "images/ART-1515.webp",
+      "widthPx": 490,
+      "heightPx": 645,
+      "aspect": 0.75969,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Moscou%2C_galerie_Tretiakov_Ivan-Tsarevitch_at_the_Grey_Wolf_%28Vasnetsov%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 932,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Moscou%2C_galerie_Tretiakov_Ivan-Tsarevitch_at_the_Grey_Wolf_%28Vasnetsov%29.jpg/1920px-Moscou%2C_galerie_Tretiakov_Ivan-Tsarevitch_at_the_Grey_Wolf_%28Vasnetsov%29.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Moscou,_galerie_Tretiakov_Ivan-Tsarevitch_at_the_Grey_Wolf_(Vasnetsov).jpg"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Moscou,_galerie_Tretiakov_Ivan-Tsarevitch_at_the_Grey_Wolf_(Vasnetsov).jpg",
+    "subjectMethod": "title",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:Moscou,_galerie_Tretiakov_Ivan-Tsarevitch_at_the_Grey_Wolf_(Vasnetsov).jpg"
+  },
+  {
+    "id": "ART-1516",
+    "title": "Knight at the Crossroads",
+    "artist": "Viktor Vasnetsov",
+    "year": "1882",
+    "museum": "Русский музей",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русский символизм и сказочная живопись",
+    "subject": "Мифы и религия",
+    "score": 85,
+    "placement": {
+      "hall": "stories",
+      "wall": "myths"
+    },
+    "image": {
+      "path": "images/ART-1516.webp",
+      "widthPx": 490,
+      "heightPx": 271,
+      "aspect": 1.808118,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/1/12/Victor_Vasnetsov_-_Knight_at_the_Crossroads_-_Google_Art_Project.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 933,
+      "detail": {
+        "path": "detail/ART-1516.webp",
+        "widthPx": 1920,
+        "heightPx": 1065
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Victor_Vasnetsov_-_Knight_at_the_Crossroads_-_Google_Art_Project.jpg"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Victor_Vasnetsov_-_Knight_at_the_Crossroads_-_Google_Art_Project.jpg",
+    "subjectMethod": "reviewed",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:Victor_Vasnetsov_-_Knight_at_the_Crossroads_-_Google_Art_Project.jpg"
+  },
+  {
+    "id": "ART-1520",
+    "title": "Irises",
+    "artist": "Vincent van Gogh",
+    "year": "1889",
+    "museum": "Музей Гетти",
+    "region": "Europe",
+    "medium": "painting",
+    "category": "Импрессионизм и постимпрессионизм",
+    "subject": "Натюрморты",
+    "score": 95,
+    "placement": {
+      "hall": "center",
+      "wall": "master"
+    },
+    "image": {
+      "path": "images/ART-1520.webp",
+      "widthPx": 490,
+      "heightPx": 378,
+      "aspect": 1.296296,
+      "quality": "offline_preview",
+      "hdUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vincent%20van%20Gogh%20-%20Irises%20(1889).jpg",
+      "overviewCell": 937,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Vincent_van_Gogh_-_Irises_%281889%29.jpg/1920px-Vincent_van_Gogh_-_Irises_%281889%29.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Vincent%20van%20Gogh%20-%20Irises%20(1889).jpg"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Vincent%20van%20Gogh%20-%20Irises%20(1889).jpg",
+    "subjectMethod": "title",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:Vincent%20van%20Gogh%20-%20Irises%20(1889).jpg"
+  },
+  {
+    "id": "ART-1521",
+    "title": "Café Terrace at Night",
+    "artist": "Vincent van Gogh",
+    "year": "1888",
+    "museum": "Музей Крёллер-Мюллер",
+    "region": "Europe",
+    "medium": "painting",
+    "category": "Импрессионизм и постимпрессионизм",
+    "subject": "Архитектура",
+    "score": 85,
+    "placement": {
+      "hall": "center",
+      "wall": "master"
+    },
+    "image": {
+      "path": "images/ART-1521.webp",
+      "widthPx": 490,
+      "heightPx": 643,
+      "aspect": 0.762053,
+      "quality": "offline_preview",
+      "hdUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vincent%20van%20Gogh%20-%20Cafe%20Terrace%20at%20Night%20(1888).jpg",
+      "overviewCell": 938,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Vincent_van_Gogh_-_Cafe_Terrace_at_Night_%281888%29.jpg/1920px-Vincent_van_Gogh_-_Cafe_Terrace_at_Night_%281888%29.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Vincent%20van%20Gogh%20-%20Cafe%20Terrace%20at%20Night%20(1888).jpg"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Vincent%20van%20Gogh%20-%20Cafe%20Terrace%20at%20Night%20(1888).jpg",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:Vincent%20van%20Gogh%20-%20Cafe%20Terrace%20at%20Night%20(1888).jpg"
+  },
+  {
+    "id": "ART-1522",
+    "title": "The Bedroom in Arles",
+    "artist": "Vincent van Gogh",
+    "year": "1888",
+    "museum": "Музей Ван Гога",
+    "region": "Europe",
+    "medium": "painting",
+    "category": "Импрессионизм и постимпрессионизм",
+    "subject": "Архитектура",
+    "score": 85,
+    "placement": {
+      "hall": "center",
+      "wall": "master"
+    },
+    "image": {
+      "path": "images/ART-1522.webp",
+      "widthPx": 490,
+      "heightPx": 383,
+      "aspect": 1.279373,
+      "quality": "offline_preview",
+      "hdUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/VanGogh%20Bedroom%20Arles1.jpg",
+      "overviewCell": 939,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/VanGogh_Bedroom_Arles1.jpg/1920px-VanGogh_Bedroom_Arles1.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:VanGogh%20Bedroom%20Arles1.jpg"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:VanGogh%20Bedroom%20Arles1.jpg",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:VanGogh%20Bedroom%20Arles1.jpg"
+  },
+  {
+    "id": "ART-1523",
+    "title": "Almond Blossom",
+    "artist": "Vincent van Gogh",
+    "year": "1890",
+    "museum": "Музей Ван Гога",
+    "region": "Europe",
+    "medium": "painting",
+    "category": "Импрессионизм и постимпрессионизм",
+    "subject": "Природа",
+    "score": 85,
+    "placement": {
+      "hall": "nature",
+      "wall": "landscape"
+    },
+    "image": {
+      "path": "images/ART-1523.webp",
+      "widthPx": 490,
+      "heightPx": 385,
+      "aspect": 1.272727,
+      "quality": "offline_preview",
+      "hdUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vincent%20van%20Gogh%20-%20Almond%20Blossom%20-%20VGM%20F671.jpg",
+      "overviewCell": 940,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Vincent_van_Gogh_-_Almond_Blossom_-_VGM_F671.jpg/1920px-Vincent_van_Gogh_-_Almond_Blossom_-_VGM_F671.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Vincent%20van%20Gogh%20-%20Almond%20Blossom%20-%20VGM%20F671.jpg"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Vincent%20van%20Gogh%20-%20Almond%20Blossom%20-%20VGM%20F671.jpg",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:Vincent%20van%20Gogh%20-%20Almond%20Blossom%20-%20VGM%20F671.jpg"
+  },
+  {
+    "id": "ART-1524",
+    "title": "Wheatfield with Crows",
+    "artist": "Vincent van Gogh",
+    "year": "1890",
+    "museum": "Музей Ван Гога",
+    "region": "Europe",
+    "medium": "painting",
+    "category": "Импрессионизм и постимпрессионизм",
+    "subject": "Природа",
+    "score": 85,
+    "placement": {
+      "hall": "nature",
+      "wall": "landscape"
+    },
+    "image": {
+      "path": "images/ART-1524.webp",
+      "widthPx": 490,
+      "heightPx": 229,
+      "aspect": 2.139738,
+      "quality": "offline_preview",
+      "hdUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vincent%20van%20Gogh%20(1853-1890)%20-%20Wheat%20Field%20with%20Crows%20(1890).jpg",
+      "overviewCell": 941,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Vincent_van_Gogh_%281853-1890%29_-_Wheat_Field_with_Crows_%281890%29.jpg/1920px-Vincent_van_Gogh_%281853-1890%29_-_Wheat_Field_with_Crows_%281890%29.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Vincent%20van%20Gogh%20(1853-1890)%20-%20Wheat%20Field%20with%20Crows%20(1890).jpg"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Vincent%20van%20Gogh%20(1853-1890)%20-%20Wheat%20Field%20with%20Crows%20(1890).jpg",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:Vincent%20van%20Gogh%20(1853-1890)%20-%20Wheat%20Field%20with%20Crows%20(1890).jpg"
+  },
+  {
+    "id": "ART-1525",
+    "title": "The Potato Eaters",
+    "artist": "Vincent van Gogh",
+    "year": "1885",
+    "museum": "Музей Ван Гога",
+    "region": "Europe",
+    "medium": "painting",
+    "category": "Импрессионизм и постимпрессионизм",
+    "subject": "Люди и быт",
+    "score": 85,
+    "placement": {
+      "hall": "world",
+      "wall": "life"
+    },
+    "image": {
+      "path": "images/ART-1525.webp",
+      "widthPx": 490,
+      "heightPx": 353,
+      "aspect": 1.388102,
+      "quality": "offline_preview",
+      "hdUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Van%20Gogh%20-%20Die%20Kartoffelesser.jpeg",
+      "overviewCell": 942,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Van_Gogh_-_Die_Kartoffelesser.jpeg/1920px-Van_Gogh_-_Die_Kartoffelesser.jpeg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Van%20Gogh%20-%20Die%20Kartoffelesser.jpeg"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Van%20Gogh%20-%20Die%20Kartoffelesser.jpeg",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:Van%20Gogh%20-%20Die%20Kartoffelesser.jpeg"
+  },
+  {
+    "id": "ART-1526",
+    "title": "The Night Café",
+    "artist": "Vincent van Gogh",
+    "year": "1888",
+    "museum": "Художественная галерея Йельского университета",
+    "region": "Europe",
+    "medium": "painting",
+    "category": "Импрессионизм и постимпрессионизм",
+    "subject": "Архитектура",
+    "score": 85,
+    "placement": {
+      "hall": "center",
+      "wall": "master"
+    },
+    "image": {
+      "path": "images/ART-1526.webp",
+      "widthPx": 490,
+      "heightPx": 387,
+      "aspect": 1.26615,
+      "quality": "offline_preview",
+      "hdUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Van%20Gogh%20The%20Night%20Cafe.jpg",
+      "overviewCell": 943,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Van_Gogh_The_Night_Cafe.jpg/1920px-Van_Gogh_The_Night_Cafe.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Van%20Gogh%20The%20Night%20Cafe.jpg"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Van%20Gogh%20The%20Night%20Cafe.jpg",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:Van%20Gogh%20The%20Night%20Cafe.jpg"
+  },
+  {
+    "id": "ART-1529",
+    "title": "The Morning of the Streltsy Execution",
+    "artist": "Vasily Surikov",
+    "year": "1881",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русская живопись XIX века",
+    "subject": "История и битвы",
+    "score": 95,
+    "placement": {
+      "hall": "stories",
+      "wall": "history"
+    },
+    "image": {
+      "path": "images/ART-1529.webp",
+      "widthPx": 490,
+      "heightPx": 283,
+      "aspect": 1.731449,
+      "quality": "offline_preview",
+      "hdUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Surikov%20streltsi.jpg",
+      "overviewCell": 946,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Surikov_streltsi.jpg/1920px-Surikov_streltsi.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Surikov%20streltsi.jpg"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Surikov%20streltsi.jpg",
+    "subjectMethod": "title",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:Surikov%20streltsi.jpg"
+  },
+  {
+    "id": "ART-1530",
+    "title": "Above Eternal Peace",
+    "artist": "Isaac Levitan",
+    "year": "1894",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русские пейзажи XIX века",
+    "subject": "Природа",
+    "score": 85,
+    "placement": {
+      "hall": "nature",
+      "wall": "landscape"
+    },
+    "image": {
+      "path": "images/ART-1530.webp",
+      "widthPx": 490,
+      "heightPx": 354,
+      "aspect": 1.384181,
+      "quality": "offline_preview",
+      "hdUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/LevitanAboveEternalPeace.jpg",
+      "overviewCell": 947,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/LevitanAboveEternalPeace.jpg/1920px-LevitanAboveEternalPeace.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:LevitanAboveEternalPeace.jpg"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:LevitanAboveEternalPeace.jpg",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:LevitanAboveEternalPeace.jpg"
+  },
+  {
+    "id": "ART-1531",
+    "title": "March",
+    "artist": "Isaac Levitan",
+    "year": "1895",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русские пейзажи XIX века",
+    "subject": "Природа",
+    "score": 85,
+    "placement": {
+      "hall": "nature",
+      "wall": "landscape"
+    },
+    "image": {
+      "path": "images/ART-1531.webp",
+      "widthPx": 490,
+      "heightPx": 388,
+      "aspect": 1.262887,
+      "quality": "offline_preview",
+      "hdUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/MarchOfLevitan.jpg",
+      "overviewCell": 948,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/MarchOfLevitan.jpg/1920px-MarchOfLevitan.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:MarchOfLevitan.jpg"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:MarchOfLevitan.jpg",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:MarchOfLevitan.jpg"
+  },
+  {
+    "id": "ART-1533",
+    "title": "Girl Illuminated by the Sun",
+    "artist": "Valentin Serov",
+    "year": "1888",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русская живопись XIX века",
+    "subject": "Женщины",
+    "score": 85,
+    "placement": {
+      "hall": "portraits",
+      "wall": "women"
+    },
+    "image": {
+      "path": "images/ART-1533.webp",
+      "widthPx": 500,
+      "heightPx": 638,
+      "aspect": 0.783699,
+      "quality": "offline_preview",
+      "hdUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%D0%94%D0%B5%D0%B2%D1%83%D1%88%D0%BA%D0%B0%2C%20%D0%BE%D1%81%D0%B2%D0%B5%D1%89%D1%91%D0%BD%D0%BD%D0%B0%D1%8F%20%D1%81%D0%BE%D0%BB%D0%BD%D1%86%D0%B5%D0%BC.jpg",
+      "overviewCell": 950,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/%D0%94%D0%B5%D0%B2%D1%83%D1%88%D0%BA%D0%B0%2C_%D0%BE%D1%81%D0%B2%D0%B5%D1%89%D1%91%D0%BD%D0%BD%D0%B0%D1%8F_%D1%81%D0%BE%D0%BB%D0%BD%D1%86%D0%B5%D0%BC.jpg/1920px-%D0%94%D0%B5%D0%B2%D1%83%D1%88%D0%BA%D0%B0%2C_%D0%BE%D1%81%D0%B2%D0%B5%D1%89%D1%91%D0%BD%D0%BD%D0%B0%D1%8F_%D1%81%D0%BE%D0%BB%D0%BD%D1%86%D0%B5%D0%BC.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:%D0%94%D0%B5%D0%B2%D1%83%D1%88%D0%BA%D0%B0%2C%20%D0%BE%D1%81%D0%B2%D0%B5%D1%89%D1%91%D0%BD%D0%BD%D0%B0%D1%8F%20%D1%81%D0%BE%D0%BB%D0%BD%D1%86%D0%B5%D0%BC.jpg"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:%D0%94%D0%B5%D0%B2%D1%83%D1%88%D0%BA%D0%B0%2C%20%D0%BE%D1%81%D0%B2%D0%B5%D1%89%D1%91%D0%BD%D0%BD%D0%B0%D1%8F%20%D1%81%D0%BE%D0%BB%D0%BD%D1%86%D0%B5%D0%BC.jpg",
+    "subjectMethod": "title",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:%D0%94%D0%B5%D0%B2%D1%83%D1%88%D0%BA%D0%B0%2C%20%D0%BE%D1%81%D0%B2%D0%B5%D1%89%D1%91%D0%BD%D0%BD%D0%B0%D1%8F%20%D1%81%D0%BE%D0%BB%D0%BD%D1%86%D0%B5%D0%BC.jpg"
+  },
+  {
+    "id": "ART-1535",
+    "title": "The Demon Seated",
+    "artist": "Mikhail Vrubel",
+    "year": "1890",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русский символизм и сказочная живопись",
+    "subject": "Мифы и религия",
+    "score": 85,
+    "placement": {
+      "hall": "center",
+      "wall": "master"
+    },
+    "image": {
+      "path": "images/ART-1535.webp",
+      "widthPx": 490,
+      "heightPx": 270,
+      "aspect": 1.814815,
+      "quality": "offline_preview",
+      "hdUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mikhail%20Vrubel%20-%20%D0%94%D0%B5%D0%BC%D0%BE%D0%BD%20(%D1%81%D0%B8%D0%B4%D1%8F%D1%89%D0%B8%D0%B9)%20-%20Google%20Art%20Project.jpg",
+      "overviewCell": 952,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Mikhail_Vrubel_-_%D0%94%D0%B5%D0%BC%D0%BE%D0%BD_%28%D1%81%D0%B8%D0%B4%D1%8F%D1%89%D0%B8%D0%B9%29_-_Google_Art_Project.jpg/1920px-Mikhail_Vrubel_-_%D0%94%D0%B5%D0%BC%D0%BE%D0%BD_%28%D1%81%D0%B8%D0%B4%D1%8F%D1%89%D0%B8%D0%B9%29_-_Google_Art_Project.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Mikhail%20Vrubel%20-%20%D0%94%D0%B5%D0%BC%D0%BE%D0%BD%20(%D1%81%D0%B8%D0%B4%D1%8F%D1%89%D0%B8%D0%B9)%20-%20Google%20Art%20Project.jpg"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mikhail%20Vrubel%20-%20%D0%94%D0%B5%D0%BC%D0%BE%D0%BD%20(%D1%81%D0%B8%D0%B4%D1%8F%D1%89%D0%B8%D0%B9)%20-%20Google%20Art%20Project.jpg",
+    "subjectMethod": "title",
+    "dateSource": "https://commons.wikimedia.org/wiki/File:Mikhail%20Vrubel%20-%20%D0%94%D0%B5%D0%BC%D0%BE%D0%BD%20(%D1%81%D0%B8%D0%B4%D1%8F%D1%89%D0%B8%D0%B9)%20-%20Google%20Art%20Project.jpg"
+  },
+  {
+    "id": "ART-1604",
+    "title": "Las Hilanderas",
+    "artist": "Diego Velázquez",
+    "year": "1655",
+    "museum": "Прадо",
+    "region": "Europe",
+    "medium": "painting",
+    "category": "Барокко и классицизм",
+    "subject": "Люди и быт",
+    "score": 83,
+    "placement": {
+      "hall": "world",
+      "wall": "life"
+    },
+    "image": {
+      "path": "images/ART-1604.webp",
+      "widthPx": 490,
+      "heightPx": 338,
+      "aspect": 1.449704,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a3/Velazquez-las_hilanderas.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sizeMatch": "needs_review",
+      "overviewCell": 1017,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Velazquez-las_hilanderas.jpg/1920px-Velazquez-las_hilanderas.jpg"
+      }
+    },
+    "physicalSizeM": {
+      "width": 2.89,
+      "height": 2.2,
+      "basis": "P2048/P2049",
+      "source": "https://www.wikidata.org/wiki/Q984058"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Velazquez-las_hilanderas.jpg"
+    },
+    "sourceUrl": "https://www.wikidata.org/wiki/Q984058",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://www.wikidata.org/wiki/Q984058"
+  },
+  {
+    "id": "ART-1638",
+    "title": "Annunciation",
+    "artist": "Fra Angelico",
+    "year": "1420",
+    "museum": "Прадо",
+    "region": "Europe",
+    "medium": "painting",
+    "category": "Европейское Возрождение и маньеризм",
+    "subject": "Мифы и религия",
+    "score": 72,
+    "placement": {
+      "hall": "stories",
+      "wall": "religion"
+    },
+    "image": {
+      "path": "images/ART-1638.webp",
+      "widthPx": 490,
+      "heightPx": 481,
+      "aspect": 1.018711,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/5/50/Fra_Angelico_-_The_Annunciation_-_WGA0454.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sizeMatch": "needs_review",
+      "overviewCell": 1044,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Fra_Angelico_-_The_Annunciation_-_WGA0454.jpg/1920px-Fra_Angelico_-_The_Annunciation_-_WGA0454.jpg"
+      }
+    },
+    "physicalSizeM": {
+      "width": 1.915,
+      "height": 1.623,
+      "basis": "P2048/P2049",
+      "source": "https://www.wikidata.org/wiki/Q2378567"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Fra_Angelico_-_The_Annunciation_-_WGA0454.jpg"
+    },
+    "sourceUrl": "https://www.wikidata.org/wiki/Q2378567",
+    "subjectMethod": "title",
+    "dateSource": "https://www.wikidata.org/wiki/Q2378567"
+  },
+  {
+    "id": "ART-1646",
+    "title": "Hercules Fighting the Nemean Lion",
+    "artist": "Francisco de Zurbarán",
+    "year": "1634",
+    "museum": "Прадо",
+    "region": "Europe",
+    "medium": "painting",
+    "category": "Барокко и классицизм",
+    "subject": "Мифы и религия",
+    "score": 72,
+    "placement": {
+      "hall": "stories",
+      "wall": "myths"
+    },
+    "image": {
+      "path": "images/ART-1646.webp",
+      "widthPx": 490,
+      "heightPx": 401,
+      "aspect": 1.221945,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/5/58/H%C3%A9rcules_lucha_con_el_le%C3%B3n_de_Nemea%2C_por_Zurbar%C3%A1n.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "sizeMatch": "needs_review",
+      "overviewCell": 1050,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/H%C3%A9rcules_lucha_con_el_le%C3%B3n_de_Nemea%2C_por_Zurbar%C3%A1n.jpg/1920px-H%C3%A9rcules_lucha_con_el_le%C3%B3n_de_Nemea%2C_por_Zurbar%C3%A1n.jpg"
+      }
+    },
+    "physicalSizeM": {
+      "width": 1.66,
+      "height": 1.51,
+      "basis": "P2048/P2049",
+      "source": "https://www.wikidata.org/wiki/Q5906548"
+    },
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:H%C3%A9rcules_lucha_con_el_le%C3%B3n_de_Nemea,_por_Zurbar%C3%A1n.jpg"
+    },
+    "sourceUrl": "https://www.wikidata.org/wiki/Q5906548",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://www.wikidata.org/wiki/Q5906548"
+  },
+  {
+    "id": "ART-1693",
+    "title": "Landscape. Seine at Asnieres",
+    "artist": "Claude Monet",
+    "year": "1873",
+    "museum": "Эрмитаж",
+    "region": "Europe",
+    "medium": "painting",
+    "category": "Импрессионизм и постимпрессионизм",
+    "subject": "Природа",
+    "score": 67,
+    "placement": {
+      "hall": "nature",
+      "wall": "landscape"
+    },
+    "image": {
+      "path": "images/ART-1693.webp",
+      "widthPx": 490,
+      "heightPx": 411,
+      "aspect": 1.192214,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/0/04/La_Seine_%C3%A0_Asni%C3%A8re_-_Monet.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 1092,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/La_Seine_%C3%A0_Asni%C3%A8re_-_Monet.jpg/1920px-La_Seine_%C3%A0_Asni%C3%A8re_-_Monet.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:La_Seine_%C3%A0_Asni%C3%A8re_-_Monet.jpg"
+    },
+    "sourceUrl": "https://www.wikidata.org/wiki/Q10315096",
+    "subjectMethod": "title",
+    "dateSource": "https://www.wikidata.org/wiki/Q10315096"
+  },
+  {
+    "id": "ART-1720",
+    "title": "The Swan Princess",
+    "artist": "Mikhail Vrubel",
+    "year": "1900",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русский символизм и сказочная живопись",
+    "subject": "Женщины",
+    "score": 70,
+    "placement": {
+      "hall": "center",
+      "wall": "master"
+    },
+    "image": {
+      "path": "images/ART-1720.webp",
+      "widthPx": 460,
+      "heightPx": 700,
+      "aspect": 0.657143,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/8/80/Tsarevna-Lebed_by_Mikhail_Vrubel_%28brightened%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 1116,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Tsarevna-Lebed_by_Mikhail_Vrubel_%28brightened%29.jpg/1920px-Tsarevna-Lebed_by_Mikhail_Vrubel_%28brightened%29.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Tsarevna-Lebed_by_Mikhail_Vrubel_(brightened).jpg"
+    },
+    "sourceUrl": "https://www.wikidata.org/wiki/Q4503153",
+    "subjectMethod": "title",
+    "dateSource": "https://www.wikidata.org/wiki/Q4503153"
+  },
+  {
+    "id": "ART-1728",
+    "title": "Peter the Great Interrogating the Tsarevich Alexei Petrovich at Peterhof",
+    "artist": "Nikolai Ge",
+    "year": "1871",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русский символизм и сказочная живопись",
+    "subject": "История и битвы",
+    "score": 67,
+    "placement": {
+      "hall": "stories",
+      "wall": "history"
+    },
+    "image": {
+      "path": "images/ART-1728.webp",
+      "widthPx": 490,
+      "heightPx": 380,
+      "aspect": 1.289474,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/5/50/Peter_the_Great_Interrogating_the_Tsarevich_Alexei_Petrovich.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 1123,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Peter_the_Great_Interrogating_the_Tsarevich_Alexei_Petrovich.jpg/1920px-Peter_the_Great_Interrogating_the_Tsarevich_Alexei_Petrovich.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Peter_the_Great_Interrogating_the_Tsarevich_Alexei_Petrovich.jpg"
+    },
+    "sourceUrl": "https://www.wikidata.org/wiki/Q21041551",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://www.wikidata.org/wiki/Q21041551"
+  },
+  {
+    "id": "ART-1734",
+    "title": "Spring. High water",
+    "artist": "Isaac Levitan",
+    "year": "1897",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русские пейзажи XIX века",
+    "subject": "Вода и корабли",
+    "score": 66,
+    "placement": {
+      "hall": "nature",
+      "wall": "water"
+    },
+    "image": {
+      "path": "images/ART-1734.webp",
+      "widthPx": 490,
+      "heightPx": 578,
+      "aspect": 0.847751,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Levitan_vesna_bolsh_voda.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 1128,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Levitan_vesna_bolsh_voda.jpg/1920px-Levitan_vesna_bolsh_voda.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Levitan_vesna_bolsh_voda.jpg"
+    },
+    "sourceUrl": "https://www.wikidata.org/wiki/Q4109497",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://www.wikidata.org/wiki/Q4109497"
+  },
+  {
+    "id": "ART-1737",
+    "title": "Sokolniki. Autumn",
+    "artist": "Isaac Levitan",
+    "year": "1879",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русские пейзажи XIX века",
+    "subject": "Природа",
+    "score": 66,
+    "placement": {
+      "hall": "nature",
+      "wall": "landscape"
+    },
+    "image": {
+      "path": "images/ART-1737.webp",
+      "widthPx": 490,
+      "heightPx": 633,
+      "aspect": 0.774092,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/2/26/Levitan_Sokolniki_Autumn_1879.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 1131,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Levitan_Sokolniki_Autumn_1879.jpg/1920px-Levitan_Sokolniki_Autumn_1879.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Levitan_Sokolniki_Autumn_1879.jpg"
+    },
+    "sourceUrl": "https://www.wikidata.org/wiki/Q4337609",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://www.wikidata.org/wiki/Q4337609"
+  },
+  {
+    "id": "ART-1742",
+    "title": "A Birch Grove",
+    "artist": "Arkhip Kuindzhi",
+    "year": "1879",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русские пейзажи XIX века",
+    "subject": "Природа",
+    "score": 64,
+    "placement": {
+      "hall": "nature",
+      "wall": "landscape"
+    },
+    "image": {
+      "path": "images/ART-1742.webp",
+      "widthPx": 490,
+      "heightPx": 252,
+      "aspect": 1.944444,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9c/Archip_Iwanowitsch_Kuindshi_005.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 1136,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Archip_Iwanowitsch_Kuindshi_005.jpg/1920px-Archip_Iwanowitsch_Kuindshi_005.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Archip_Iwanowitsch_Kuindshi_005.jpg"
+    },
+    "sourceUrl": "https://www.wikidata.org/wiki/Q4085405",
+    "subjectMethod": "title",
+    "dateSource": "https://www.wikidata.org/wiki/Q4085405"
+  },
+  {
+    "id": "ART-1743",
+    "title": "The Demon Downcast",
+    "artist": "Mikhail Vrubel",
+    "year": "1902",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русский символизм и сказочная живопись",
+    "subject": "Мифы и религия",
+    "score": 64,
+    "placement": {
+      "hall": "stories",
+      "wall": "myths"
+    },
+    "image": {
+      "path": "images/ART-1743.webp",
+      "widthPx": 490,
+      "heightPx": 174,
+      "aspect": 2.816092,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/4/46/Fallendemon.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 1137,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Fallendemon.jpg/1920px-Fallendemon.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Fallendemon.jpg"
+    },
+    "sourceUrl": "https://www.wikidata.org/wiki/Q16642752",
+    "subjectMethod": "curated",
+    "dateSource": "https://www.wikidata.org/wiki/Q16642752"
+  },
+  {
+    "id": "ART-1753",
+    "title": "Chumaks path in Mariupol",
+    "artist": "Arkhip Kuindzhi",
+    "year": "1875",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русские пейзажи XIX века",
+    "subject": "Природа",
+    "score": 62,
+    "placement": {
+      "hall": "nature",
+      "wall": "landscape"
+    },
+    "image": {
+      "path": "images/ART-1753.webp",
+      "widthPx": 490,
+      "heightPx": 230,
+      "aspect": 2.130435,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7c/1875._Kuindzhi_Mariupol.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 1147,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/1875._Kuindzhi_Mariupol.jpg/1920px-1875._Kuindzhi_Mariupol.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:1875._Kuindzhi_Mariupol.jpg"
+    },
+    "sourceUrl": "https://www.wikidata.org/wiki/Q3272319",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://www.wikidata.org/wiki/Q3272319"
+  },
+  {
+    "id": "ART-1755",
+    "title": "Paper Lanterns",
+    "artist": "Konstantin Korovin",
+    "year": "1896",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русская живопись XIX века",
+    "subject": "Люди и быт",
+    "score": 62,
+    "placement": {
+      "hall": "world",
+      "wall": "life"
+    },
+    "image": {
+      "path": "images/ART-1755.webp",
+      "widthPx": 284,
+      "heightPx": 700,
+      "aspect": 0.405714,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/4/44/Korovin_Paper_Lanterns.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 1148,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Korovin_Paper_Lanterns.jpg/1920px-Korovin_Paper_Lanterns.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Korovin_Paper_Lanterns.jpg"
+    },
+    "sourceUrl": "https://www.wikidata.org/wiki/Q4099132",
+    "subjectMethod": "reviewed",
+    "dateSource": "https://www.wikidata.org/wiki/Q4099132"
+  },
+  {
+    "id": "ART-1757",
+    "title": "The Pond",
+    "artist": "Victor Borisov-Musatov",
+    "year": "1902",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русская живопись XIX века",
+    "subject": "Вода и корабли",
+    "score": 62,
+    "placement": {
+      "hall": "nature",
+      "wall": "water"
+    },
+    "image": {
+      "path": "images/ART-1757.webp",
+      "widthPx": 500,
+      "heightPx": 423,
+      "aspect": 1.182033,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f3/Borisovmusatov_pool.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 1150,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Borisovmusatov_pool.JPG/1920px-Borisovmusatov_pool.JPG"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Borisovmusatov_pool.JPG"
+    },
+    "sourceUrl": "https://www.wikidata.org/wiki/Q4114182",
+    "subjectMethod": "title",
+    "dateSource": "https://www.wikidata.org/wiki/Q4114182"
+  },
+  {
+    "id": "ART-1761",
+    "title": "После дождя. Плёс",
+    "artist": "Isaac Levitan",
+    "year": "1889",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русские пейзажи XIX века",
+    "subject": "Вода и корабли",
+    "score": 62,
+    "placement": {
+      "hall": "nature",
+      "wall": "water"
+    },
+    "image": {
+      "path": "images/ART-1761.webp",
+      "widthPx": 490,
+      "heightPx": 319,
+      "aspect": 1.53605,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5f/%D0%9B%D0%B5%D0%B2%D0%B8%D1%82%D0%B0%D0%BD_%D0%9F%D0%BE%D1%81%D0%BB%D0%B5_%D0%B4%D0%BE%D0%B6%D0%B4%D1%8F.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 1154,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/%D0%9B%D0%B5%D0%B2%D0%B8%D1%82%D0%B0%D0%BD_%D0%9F%D0%BE%D1%81%D0%BB%D0%B5_%D0%B4%D0%BE%D0%B6%D0%B4%D1%8F.jpg/1920px-%D0%9B%D0%B5%D0%B2%D0%B8%D1%82%D0%B0%D0%BD_%D0%9F%D0%BE%D1%81%D0%BB%D0%B5_%D0%B4%D0%BE%D0%B6%D0%B4%D1%8F.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:%D0%9B%D0%B5%D0%B2%D0%B8%D1%82%D0%B0%D0%BD_%D0%9F%D0%BE%D1%81%D0%BB%D0%B5_%D0%B4%D0%BE%D0%B6%D0%B4%D1%8F.jpg"
+    },
+    "sourceUrl": "https://www.wikidata.org/wiki/Q4373702",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://www.wikidata.org/wiki/Q4373702"
+  },
+  {
+    "id": "ART-1763",
+    "title": "У балкона. Испанки Леонора и Ампара",
+    "artist": "Konstantin Korovin",
+    "year": "1888",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русская живопись XIX века",
+    "subject": "Женщины",
+    "score": 62,
+    "placement": {
+      "hall": "portraits",
+      "wall": "women"
+    },
+    "image": {
+      "path": "images/ART-1763.webp",
+      "widthPx": 410,
+      "heightPx": 700,
+      "aspect": 0.585714,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/b/bb/Korovin_On_Balcony.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 1156,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Korovin_On_Balcony.jpg/1920px-Korovin_On_Balcony.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Korovin_On_Balcony.jpg"
+    },
+    "sourceUrl": "https://www.wikidata.org/wiki/Q4468239",
+    "subjectMethod": "visual_review",
+    "dateSource": "https://www.wikidata.org/wiki/Q4468239"
+  },
+  {
+    "id": "ART-1766",
+    "title": "In the boat",
+    "artist": "Konstantin Korovin",
+    "year": "1888",
+    "museum": "Третьяковская галерея",
+    "region": "Russia",
+    "medium": "painting",
+    "category": "Русская живопись XIX века",
+    "subject": "Люди и быт",
+    "score": 62,
+    "placement": {
+      "hall": "world",
+      "wall": "life"
+    },
+    "image": {
+      "path": "images/ART-1766.webp",
+      "widthPx": 490,
+      "heightPx": 639,
+      "aspect": 0.766823,
+      "quality": "offline_preview",
+      "hdUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a7/K._Korovin_-_In_the_boat.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "overviewCell": 1159,
+      "detail": {
+        "path": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/K._Korovin_-_In_the_boat.jpg/1920px-K._Korovin_-_In_the_boat.jpg"
+      }
+    },
+    "physicalSizeM": null,
+    "rights": {
+      "status": "pd_candidate",
+      "license": "Public domain / PD-Art",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:K._Korovin_-_In_the_boat.jpg"
+    },
+    "sourceUrl": "https://www.wikidata.org/wiki/Q15635048",
+    "subjectMethod": "reviewed",
+    "dateSource": "https://www.wikidata.org/wiki/Q15635048"
+  }
+]

@@ -662,7 +662,9 @@ test('E hands off a pointer-locked walk to alchemy exactly once', async t => {
   await page.bringToFront();
   const toggle = page.locator('#room-walk-toggle');
   await toggle.click();
+  // The mouse is locked on the click itself, the walk begins after the descent.
   await page.waitForFunction(() => document.pointerLockElement === document.querySelector('#scene-interaction'));
+  await page.waitForFunction(() => document.querySelector('#room-walk-toggle').getAttribute('aria-pressed') === 'true');
   await page.evaluate(() => {
     const { camera, controls, renderer } = window.__keynlockDebug.host;
     const tabletop = renderer.getUnifiedScene().getObjectByName('alchemy-main-tabletop');

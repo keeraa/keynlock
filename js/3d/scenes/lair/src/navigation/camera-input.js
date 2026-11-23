@@ -75,6 +75,8 @@ export function createCameraInput({ camera, controls, roomWalk, atelierView, han
     walkPose: () => walkPose,
     /** Where a new walk begins (room-walk.js). */
     walkStartPose: () => roomWalk.startPose(),
+    /** On the click that starts a walk (room-walk.js). */
+    prepareWalk: () => roomWalk.prepare(),
     isGallery: () => mode === 'gallery',
     canPickZone: () => mode === 'room' || mode === 'walk',
   };

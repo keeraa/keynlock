@@ -73,6 +73,10 @@ export function createRoomWalk({ scene, camera, interaction, onExit, onInteract 
   const hasLock = () => document.pointerLockElement === interaction;
   let active = false;
   let hadLock = false;
+  // The mouse is locked on the click that starts a walk (the browser allows
+  // it only then); the walk itself begins after the camera's descent.
+  let lockPending = false;
+  let lockTimer = 0;
   let drag = null;
   let area;
 
@@ -109,6 +113,8 @@ export function createRoomWalk({ scene, camera, interaction, onExit, onInteract 
   /** Start at the door, or at a pose from getPose() (back from a workshop). */
   function start(pose = null) {
     active = true;
+    lockPending = false;
+    clearTimeout(lockTimer);
     refreshObstacles();
     const { position, pitch, yaw } = pose || startPose();
     camera.position.copy(position);
@@ -117,7 +123,11 @@ export function createRoomWalk({ scene, camera, interaction, onExit, onInteract 
     resize();
     camera.updateProjectionMatrix();
     updateInterface();
-    if (interaction.requestPointerLock) {
+    requestLock();
+  }
+
+  function requestLock() {
+    if (interaction.requestPointerLock && !hasLock()) {
       try {
         // The drag controls are available immediately, including in browsers
         // that reject pointer lock or report its failure only as an event.
@@ -126,6 +136,17 @@ export function createRoomWalk({ scene, camera, interaction, onExit, onInteract 
         // Continue with drag to look.
       }
     }
+  }
+
+  /** On the click that starts a walk: lock the mouse now, walk after the descent. */
+  function prepare() {
+    lockPending = true;
+    clearTimeout(lockTimer);
+    lockTimer = setTimeout(() => {
+      lockPending = false;
+      if (!active && hasLock()) document.exitPointerLock();
+    }, 6000);
+    requestLock();
   }
 
   function clearInput() {
@@ -162,7 +183,7 @@ export function createRoomWalk({ scene, camera, interaction, onExit, onInteract 
     const releasedByBrowser = hadLock && !locked;
     hadLock = locked;
     if (!active) {
-      if (locked) document.exitPointerLock();
+      if (locked && !lockPending) document.exitPointerLock();
       return;
     }
     if (releasedByBrowser) onExit();
@@ -220,5 +241,5 @@ export function createRoomWalk({ scene, camera, interaction, onExit, onInteract 
   function face(yaw = 0, pitch = 0) { rotation.set(pitch, yaw, 0); }
 
   return { start, stop, getPose, face, resize, update, refreshObstacles, setTarget, handleKey,
-    releaseKey: code => keys.delete(code), startPose };
+    releaseKey: code => keys.delete(code), startPose, prepare };
 }

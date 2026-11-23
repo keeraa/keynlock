@@ -22,7 +22,7 @@ function fixture(){
     getBoundingClientRect:()=>({left:0,right:800,top:0,bottom:600})
   };
   const changes={endDrag:0,oiler:[],rag:[],filing:[]};
-  let hit=null;
+  let hit=null,active=true;
   const scene={
     hitTest:()=>hit,beginLooseDrag:()=>true,
     endLooseDrag:()=>{changes.endDrag++;},
@@ -41,12 +41,13 @@ function fixture(){
       measuredCuts:()=>[],inspectCurrentKey:()=>({brokenAt:-1}),
       selectCut:()=>{},renderCuts:()=>{},releaseCapture:id=>canvas.releasePointerCapture(id),
       inspectKeyButton:{click:()=>{}},onAssemblySelect:()=>{},onGearChange:()=>{},
-      isActive:()=>true});
+      isActive:()=>active});
   }catch(error){if(originalWindow===undefined)delete globalThis.window;
     else globalThis.window=originalWindow;throw error;}
   return {
     canvas,state,changes,captured,released,
     setHit:value=>{hit=value;},
+    setActive:value=>{active=Boolean(value);},
     pointerDown:id=>canvasHandlers.get('pointerdown')({
       button:0,pointerId:id,clientX:100,clientY:130,
       shiftKey:false,metaKey:false,ctrlKey:false,preventDefault:()=>{}
@@ -93,6 +94,17 @@ test('window blur puts down the rag and stops filing without stuck input',()=>{
     assert.equal(x.captured.size,0);
     assert.equal(x.changes.rag.at(-1),false);
     assert.equal(x.changes.filing.at(-1),false);
+  }finally{x.dispose();}
+});
+
+test('inactive embedded workbench ignores attempts to begin a new pointer drag',()=>{
+  const x=fixture();
+  try{
+    x.setActive(false);
+    x.setHit({kind:'loose',index:0,point:{}});
+    x.pointerDown(23);
+    assert.equal(x.captured.size,0);
+    assert.equal(x.changes.endDrag,0);
   }finally{x.dispose();}
 });
 

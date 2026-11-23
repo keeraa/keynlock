@@ -18,6 +18,7 @@ export function createWorkbenchApp({root=document.querySelector('main.app')}={})
   const listen=(node,event,handler)=>{node.addEventListener(event,handler);
     hostListeners.push([node,event,handler]);};
   let disposed=false,foreground=true;
+  let detachControls=null;
   const embedded=Boolean(root.getRootNode?.()?.host);
   const isKeyboardActive=()=>foreground&&(!embedded||keyboardOwner===root);
   if(embedded){
@@ -116,14 +117,8 @@ const modes={
 function setMode(mode){
   const next=modes[mode];
   if(!next)throw new RangeError(`Unknown KEYNLOCK workbench mode: ${mode}`);
-  if(mode!=='assembly'&&state.heldTool){
-    scene.setRagContact?.(false);scene.setWiping?.(false);
-    scene.setScrewdriverHeld?.(false);scene.setToolHeld?.(false);
-    scene.setOilerHeld?.(false);
-    state.heldTool=null;state.wiping=false;
-  }
-  if(state.filing||state.spaceFiling){state.filing=false;state.spaceFiling=false;
-    scene.setFiling(false);save();try{canvas.releasePointerCapture(state.filingPointer);}catch{}}
+  // A mode change must not leave an active screw, tool or camera drag behind.
+  detachControls?.cancel?.();
   modes[state.mode]?.leave();
   state.mode=mode;state.selectedPart=null;state.cameraDragging=false;
   canvas.style.cursor='grab';
@@ -154,7 +149,7 @@ query('.workspace-tab').forEach(button=>listen(button,'click',()=>setMode(button
 function releaseCapture(pointerId){
   try{if(canvas.hasPointerCapture(pointerId))canvas.releasePointerCapture(pointerId);}catch{}
 }
-const detachControls=installWorkbenchInput({canvas,state,scene,save,toast,measuredCuts,
+detachControls=installWorkbenchInput({canvas,state,scene,save,toast,measuredCuts,
   inspectCurrentKey,selectCut,renderCuts,releaseCapture,inspectKeyButton:$('inspectKey'),
   onAssemblySelect:hit=>assemblyMode.selectPart(hit),
   onGearChange:gearsMode.render,
@@ -185,7 +180,7 @@ function dispose(){
 }
 return {root,getMode:()=>state.mode,getState:()=>structuredClone(state),setMode,
   setActive(value){foreground=Boolean(value);
-    if(!foreground){state.filing=false;state.spaceFiling=false;scene.setFiling(false);}
+    if(!foreground)detachControls?.cancel?.();
     scene.setSuspended(!foreground||state.mode==='mechanism'||state.mode==='code');
     if(!foreground){modes[state.mode].leave();if(keyboardOwner===root)keyboardOwner=null;}
     else {if(embedded)keyboardOwner=root;modes[state.mode].enter();}

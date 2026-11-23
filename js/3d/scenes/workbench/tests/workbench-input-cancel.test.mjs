@@ -98,6 +98,6 @@ test('window blur puts down the rag and stops filing without stuck input',()=>{
 
 test('host app cancels active gestures on mode change and hide',()=>{
   const app=readFileSync(new URL('../public/js/workbench-app.js',import.meta.url),'utf8');
-  assert.match(app,/detachControls\\?\\.cancel\\?\\.\\(\\)/);
-  assert.match(app,/if\\(!foreground\\)detachControls\\?\\.cancel\\?\\.\\(\\)/);
+  assert.ok(app.includes('detachControls?.cancel?.()'));
+  assert.ok(app.includes('if(!foreground)detachControls?.cancel?.()'));
 });

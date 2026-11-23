@@ -259,6 +259,7 @@ export function createZoneTransitions({
     returnToWalk = false;
     atelierView.cancelFlight();
     if (!instant) {
+      cameraInput.prepareWalk?.();
       flyIntoWalk(resume ? cameraInput.walkPose() : cameraInput.walkStartPose(), resume);
       return;
     }

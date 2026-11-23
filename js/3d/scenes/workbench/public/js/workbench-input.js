@@ -63,6 +63,7 @@ function strokeAt(index,pixels,pulse){
   return true;
 }
 listen(canvas,'pointerdown',event=>{
+  if(!isActive())return;
   if(event.button===1&&['assembly','gears'].includes(state.mode)&&!state.testing){
     cameraGestures.beginPan(event);return;
   }
@@ -208,6 +209,7 @@ listen(canvas,'pointerdown',event=>{
   canvas.style.cursor=state.cameraDragging?'grabbing':'default';
 });
 listen(canvas,'pointermove',event=>{
+  if(!isActive())return;
   if(cameraGestures.move(event))return;
   if(gearPointer===event.pointerId){
     const dx=event.clientX-gearLastX,dy=event.clientY-gearLastY;

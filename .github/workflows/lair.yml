@@ -21,7 +21,7 @@ jobs:
   lair:
     runs-on: ubuntu-latest
     # Software WebGL makes each browser test take minutes on CI.
-    timeout-minutes: 40
+    timeout-minutes: 60
     # js/3d is an npm workspace: the Lair and the workshop packages share one install.
     defaults:
       run:

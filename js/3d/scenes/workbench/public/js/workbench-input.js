@@ -418,12 +418,30 @@ listen(window,'keyup',event=>{
     event.preventDefault();state.spaceFiling=false;scene.setFiling(state.filing);save();
   }
 });
-listen(window,'blur',()=>{
-  if(!isActive())return;
+// A station may be hidden or its mode replaced while a pointer is captured.
+// Finish every pending gesture before suspending its scene or switching modes.
+function cancelActiveInput(){
   cameraGestures.cancel();
-  state.spaceFiling=false;scene.setFiling(state.filing);
-  if(!state.filing)scene.setFilePointerActive(false);
-});
+  if(gearPointer!==null){releaseCapture(gearPointer);gearPointer=null;}
+  if(ragPointer!==null)dropRag(ragPointer);
+  if(pendingDetach){releaseCapture(pendingDetach.pointerId);pendingDetach=null;}
+  if(loosePointer!==null){scene.endLooseDrag?.();releaseCapture(loosePointer);loosePointer=null;}
+  if(shacklePointer!==null){scene.setShacklePull?.(false);
+    releaseCapture(shacklePointer);shacklePointer=null;}
+  if(state.filing&&state.filingPointer!==undefined)releaseCapture(state.filingPointer);
+  state.filing=false;state.spaceFiling=false;state.cameraDragging=false;
+  state.wiping=false;state.heldTool=null;
+  scene.setFiling(false);
+  scene.setRagContact?.(false);scene.setWiping?.(false);
+  scene.setScrewdriverHeld?.(false);scene.setToolHeld?.(false);
+  scene.setOilerHeld?.(false);scene.setShacklePull?.(false);
+  scene.setHoveredDetachable?.(null);scene.setGearHover?.(null);
+  scene.setFilePointerActive?.(false);
+  canvas.style.cursor='grab';
+  onGearChange?.();
+}
+
+listen(window,'blur',()=>{if(isActive())cancelActiveInput();});
 
 // Holding Space produces continuous filing strokes even without mouse travel.
 // Each stroke is assigned to the tooth actually under the file.
@@ -438,19 +456,11 @@ const spaceTimer=setInterval(()=>{
   if(index>=0)strokeAt(index,elapsed*120,Math.sin(now*.024)*.38);
 },55);
 
-  return ()=>{
+  function detach(){
+    cancelActiveInput();
     clearInterval(spaceTimer);
-    cameraGestures.dispose();
-    if(gearPointer!==null){releaseCapture(gearPointer);gearPointer=null;}
-    if(ragPointer!==null)dropRag(ragPointer);
-    if(pendingDetach){releaseCapture(pendingDetach.pointerId);pendingDetach=null;}
-    if(loosePointer!==null){scene.endLooseDrag?.();releaseCapture(loosePointer);loosePointer=null;}
-    if(shacklePointer!==null){scene.setShacklePull?.(false);
-      releaseCapture(shacklePointer);shacklePointer=null;}
-    if(state.filing){state.filing=false;scene.setFiling(false);
-      if(state.filingPointer!==undefined)releaseCapture(state.filingPointer);}
-    if(state.spaceFiling){state.spaceFiling=false;scene.setFiling(false);}
-    state.cameraDragging=false;
     for(const [target,type,handler] of subscriptions)target.removeEventListener(type,handler);
-  };
+  }
+  detach.cancel=cancelActiveInput;
+  return detach;
 }

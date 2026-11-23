@@ -22,3 +22,16 @@ jobs:
           node-version: '22'
       - name: Test logic, integration and scene modules
         run: npm run check
+  input-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    defaults:
+      run:
+        working-directory: js/3d/scenes/workbench
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify pointer cleanup and inactive canvas behavior
+        run: node --test tests/workbench-input-cancel.test.mjs

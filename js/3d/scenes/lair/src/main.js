@@ -103,6 +103,8 @@ function setup() {
   const room = buildLair(scene, materials);
   let atelierPanelHeight = 0;
   const atelier = createAtelierEmbedding({ host: host.atelier, t,
+    // Places on the Lair's screen the Atelier puts some controls into.
+    slots: { corner: document.querySelector('#lair-atelier-corner'), header: document.querySelector('#lair-atelier-header') },
     onPanelHeight: height => { atelierPanelHeight = height; app.style.setProperty('--atelier-panel-height', `${height}px`); },
   });
   const alchemy = createAlchemyEmbedding({ host: host.alchemy });

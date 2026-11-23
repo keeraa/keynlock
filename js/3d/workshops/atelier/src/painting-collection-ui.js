@@ -2,7 +2,7 @@ import { collectionCategories, paintingCategory } from './painting-catalog.js';
 import { getPaintingLore, getPaintingLoreLabels } from './lore/painting-lore.js';
 import { t } from './i18n.js';
 
-export function createPaintingCollectionUI({ paintings, onSelect, $, root, isRestored = () => false,
+export function createPaintingCollectionUI({ paintings, onSelect, $, root, extraRoots = [], isRestored = () => false,
   getWallIds = () => [], onToggleWall = () => {}, onOpenChange = (open) => {} }) {
   const modal = $('collection-modal');
   const search = $('collection-search');
@@ -10,7 +10,8 @@ export function createPaintingCollectionUI({ paintings, onSelect, $, root, isRes
   const grid = $('collection-grid');
   const count = $('collection-results');
   const more = $('collection-more');
-  const allCount = root.querySelectorAll('.collection-total');
+  // Also in the Lair's places the Atelier put controls into (embedded-layout.js).
+  const allCount = [root, ...extraRoots].flatMap(element => [...element.querySelectorAll('.collection-total')]);
   const loreLabels = getPaintingLoreLabels();
   const normalize = (text) => String(text || '').toLocaleLowerCase('ru').replaceAll('ё', 'е');
   let category = 'all';

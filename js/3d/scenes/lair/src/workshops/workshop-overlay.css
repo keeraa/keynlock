@@ -149,32 +149,11 @@
 }
 .lair-easel-camera-controls > button:not(#lair-focus-exit){min-width:35px;font:24px/1 Georgia,serif;padding:2px 10px 6px}
 .lair-easel-camera-controls > button:hover{background:#70573b55}
-/* «ВСЯ КОЛЛЕКЦИЯ», in the look of «В ЛОГОВО» beside it (position: atelier-view.js). */
+/* Places the Atelier fills with its own controls (its embedded-layout.js and
+   styles/embedding.css): the top right corner and the header beside «В ЛОГОВО». */
 .lair-atelier-header{position:fixed;z-index:150;display:flex}
-.lair-atelier-header[hidden]{display:none!important}
-.lair-atelier-header #collection-footer{border:1px solid rgba(223,195,144,.32);color:#e2ceaa;background:rgba(16,24,21,.78);
-  padding:0 15px;font:700 10px Manrope,Arial,sans-serif;letter-spacing:.10em;white-space:nowrap;cursor:pointer}
-.lair-atelier-header #collection-footer:hover{background:#342c21}
-.lair-atelier-header #collection-footer .collection-total{color:#bc9a68;margin:0 3px}
-/* The easel and frame colours and the colour reset (top right). */
-.lair-atelier-corner{position:absolute;z-index:24;top:84px;right:36px;display:flex;align-items:flex-start;gap:16px;
-  color:#f3e1c0;text-shadow:0 1px 3px #160e0bf0,0 2px 10px #160e0b}
-.lair-atelier-corner[hidden]{display:none!important}
-.lair-atelier-corner .wood-pickers{display:flex;gap:14px}
-.lair-atelier-corner .wood-picker{display:flex;flex-direction:column;gap:4px;padding:0;border:0}
-.lair-atelier-corner .wood-picker-title{font:700 8px/1.3 Manrope,Arial,sans-serif;letter-spacing:.13em;color:#e2c595;padding:0}
-.lair-atelier-corner .wood-options{display:flex;gap:4px}
-.lair-atelier-corner .wood-option{display:flex;flex-direction:column;align-items:center;gap:3px;padding:0;border:0;background:none;
-  color:#d7c3a2;opacity:.62;cursor:pointer;text-shadow:inherit;transition:opacity .17s}
-.lair-atelier-corner .wood-option:hover,.lair-atelier-corner .wood-option.selected{opacity:1}
-.lair-atelier-corner .wood-option.selected small{color:#fff0d0;font-weight:700}
-.lair-atelier-corner .wood-option img{display:block;width:30px;height:24px;object-fit:cover;border:0;box-shadow:0 1px 5px #160e0b99}
-.lair-atelier-corner .wood-option[data-wood="0"] img{filter:saturate(.71) contrast(.94)}
-.lair-atelier-corner .wood-option[data-wood="1"] img{filter:saturate(.91) contrast(.72) brightness(1.03)}
-.lair-atelier-corner .wood-option small{font:8px/1 Manrope,Arial,sans-serif}
-.lair-atelier-corner #reset-button{align-self:center;border:0;background:none;padding:4px 0;color:#f0dab7;text-shadow:inherit;
-  font:700 9px Manrope,Arial,sans-serif;letter-spacing:.12em;cursor:pointer}
-.lair-atelier-corner #reset-button:hover{color:#fff0cf;text-decoration:underline}
+.lair-atelier-corner{position:absolute;z-index:24;top:84px;right:36px;display:flex;align-items:flex-start;gap:16px}
+.lair-atelier-header[hidden],.lair-atelier-corner[hidden]{display:none!important}
 .lair-easel-camera-controls > button:disabled{opacity:.35;cursor:default}
 #lair-easel-camera-state{min-width:131px;text-align:center;color:#f2dfc0;font:700 10px Manrope,Arial,sans-serif;letter-spacing:.11em}
 #lair-focus-exit small{display:block;margin-top:3px;color:#c4a67f;font-size:8px}
@@ -375,8 +354,6 @@
   .atelier-art-info {top:150px;left:14px;width:min(222px,calc(100vw - 28px));max-height:30vh}
   #atelier-info-title {font-size:18px}
   .lair-atelier-corner {top:62px;right:12px;gap:8px}
-  .lair-atelier-corner .wood-pickers {gap:8px}
-  .lair-atelier-corner .wood-option img {width:24px;height:19px}
   .lair-gallery-controls {bottom:52px;flex-wrap:wrap;width:calc(100% - 16px);gap:4px;padding:5px}
   .lair-gallery-controls button {font-size:9px;padding:8px 9px}
   .lair-gallery-panner {order:-1;width:100%;justify-content:center;gap:6px}

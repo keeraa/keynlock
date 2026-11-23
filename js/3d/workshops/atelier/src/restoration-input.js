@@ -21,6 +21,25 @@ export function createRestorationInput({ THREE, renderer, camera, controls, scen
   const damageHint = $('damage-hint');
   const damageHintTitle = $('damage-hint-title');
   const damageHintAction = $('damage-hint-action');
+  const notice = $('restoration-notice');
+  let noticeTimer = 0;
+  /**
+   * A message about what the player just did (the reagent found no UV mark,
+   * the stroke left the canvas): in the panel's status line and, briefly,
+   * beside the cursor, where it is seen also when that line is hidden.
+   */
+  function announce(message, event) {
+    $('restoration-description').textContent = message;
+    if (!notice || !event) return;
+    const bounds = stage.getBoundingClientRect();
+    const x = event.clientX - bounds.left, y = event.clientY - bounds.top;
+    notice.textContent = message;
+    notice.hidden = false;
+    notice.style.left = `${Math.max(8, Math.min(bounds.width - 240, x + (x > bounds.width - 260 ? -245 : 22)))}px`;
+    notice.style.top = `${Math.max(8, y - 58)}px`;
+    clearTimeout(noticeTimer);
+    noticeTimer = setTimeout(() => { notice.hidden = true; }, 2600);
+  }
   const uvSpotLight = new THREE.SpotLight('#8f82ff', 6.5, 2.2, .5, .89, 2);
   uvSpotLight.visible = false;
   uvSpotLight.castShadow = false;
@@ -152,7 +171,7 @@ export function createRestorationInput({ THREE, renderer, camera, controls, scen
       stroke.affected = surface.apply(activeTool, hit.uv);
       inputElement.setPointerCapture(event.pointerId);
       if (activeTool === 'reagent' && !stroke.affected) {
-        $('restoration-description').textContent = t('Сначала найдите этот участок УФ-фонарём');
+        announce(t('Сначала найдите этот участок УФ-фонарём'), event);
       }
       updateToolCursor(event, hit);
       event.preventDefault();
@@ -203,7 +222,7 @@ export function createRestorationInput({ THREE, renderer, camera, controls, scen
         stroke.previousUv = null;
         stroke.lastAngle = null;
         if (!stroke.outside) {
-          $('restoration-description').textContent = t('Кнопка зажата — продолжите обработку, вернувшись на картину');
+          announce(t('Кнопка зажата — продолжите обработку, вернувшись на картину'), event);
         }
         stroke.outside = true;
       }

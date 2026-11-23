@@ -194,6 +194,31 @@
   display: none;
 }
 
+/* What the player just did wrong, beside the cursor (restoration-input.js). */
+.restoration-notice {
+  position: absolute;
+  z-index: 6;
+  pointer-events: none;
+  box-sizing: border-box;
+  max-width: 236px;
+  padding: 8px 11px;
+  background: #3a241df0;
+  border: 1px solid #d49a6a;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px #160e0b80;
+  color: #f8dcc0;
+  font: 600 10px/1.35 Manrope, sans-serif;
+  animation: restoration-notice-in .18s ease-out;
+}
+
+.restoration-notice[hidden] {
+  display: none;
+}
+
+@keyframes restoration-notice-in {
+  from { opacity: 0; transform: translateY(4px); }
+}
+
 .damage-hint strong {
   font: 700 9px/1.25 Manrope, sans-serif;
   letter-spacing: .1em;

@@ -34,7 +34,9 @@ if (!directRoot) {
 const $ = (id) => {
   if (!directRoot) return document.getElementById(id);
   const selector = `#${CSS.escape(id)}`;
-  return directRoot.querySelector(selector) || lair.atelier.feedback?.querySelector(selector);
+  // Also the places on the Lair's screen the Atelier put controls into (embedded-layout.js).
+  return directRoot.querySelector(selector) || lair.atelier.feedback?.querySelector(selector) ||
+    (lair.atelier.slots || []).map(slot => slot.querySelector(selector)).find(Boolean) || null;
 };
 const rendererHost = directRoot ? lair.renderer : null;
 const embedded = Boolean(rendererHost);
@@ -195,7 +197,7 @@ const restorationStore = createRestorationStore({
 const restorationSessions = createRestorationSessions({ THREE, store: restorationStore });
 let exhibition;
 const collectionUI = createPaintingCollectionUI({
-  paintings, $, root: directRoot || document,
+  paintings, $, root: directRoot || document, extraRoots: lair?.atelier.slots || [],
   onOpenChange: open => directRoot?.classList.toggle('collection-expanded', open),
   isRestored: (id) => playerProgress.isRestored(id),
   getWallIds: () => playerProgress.getWallIds(),
@@ -384,6 +386,8 @@ if (embedded) publishWorkshopApi('atelier', { bridge: {
   returnToEasels: () => leaveLairArtworkFocus(),
   resetEaselFocus: () => navigation.leaveFocus({ immediate: true }),
   focusedSide: () => navigation.focusedSide(),
+  /** The restoration panel is shown (not collapsed by its tab). */
+  isPanelOpen: () => workshopUI?.isWorkbenchVisible() ?? true,
   easelLabelPoints: () => [
     { side: 'original', mesh: leftEasel.paintingMesh, offset: -.62 },
     { side: 'copy', mesh: rightEasel.paintingMesh, offset: .62 },

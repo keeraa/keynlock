@@ -68,6 +68,15 @@ function openZone(page, id) {
   return page.evaluate(zone => window.__keynlockDebug.zones.open(zone), id);
 }
 
+/** Polls a Node-side condition (e.g. counted network events). */
+async function expectSoon(check, message, timeout = 30000) {
+  const end = Date.now() + timeout;
+  while (!check()) {
+    if (Date.now() > end) assert.fail(message);
+    await new Promise(resolve => setTimeout(resolve, 50));
+  }
+}
+
 async function openRoom(t, { locale = 'ru-RU', pointerLock = false, beforeLoad } = {}) {
   // The headless shell rejects native pointer lock. Use full Chromium for that case.
   const roomBrowser = pointerLock && !channel
@@ -207,7 +216,14 @@ test('the burner accounts for active time when returning to the lab', async t =>
 });
 
 test('an image load failure leaves the current painting editable', async t => {
-  const page = await openRoom(t);
+  // The third painting's image fails from the very start: a request made
+  // before the test reaches it (the thumbnails, a neighbour fetched ahead)
+  // would otherwise leave nothing to fail. Failures are counted.
+  const failures = [];
+  const page = await openRoom(t, { beforeLoad: async page => {
+    page.on('requestfailed', request => { if (/vangogh-self/.test(request.url())) failures.push(request.url()); });
+    await page.route(/vangogh-self[^/]*\.jpg$/, route => route.abort('failed'));
+  } });
   const atelier = page.locator('#atelier-embedded-app');
   await openZone(page, 'atelier');
   await page.waitForFunction(() => window.__keynlockDebug.workshop('atelier')?.bridge?.isReady());
@@ -229,19 +245,17 @@ test('an image load failure leaves the current painting editable', async t => {
       },
     });
   });
-  // The thumbnails are hidden in the Lair (the collection chooses); their
-  // buttons still select a painting.
-  const artItems = atelier.locator('.art-item');
-  await artItems.nth(previous).dispatchEvent('click');
+  // The collection chooses paintings in the Lair; the bridge does the same.
+  // Not awaited: the held read keeps this selection pending on purpose.
+  await bridge.evaluate((api, index) => { void api.showPainting(index); }, previous);
   await page.waitForFunction(index => Boolean(window.releaseRestorationRead) &&
     window.__keynlockDebug.workshop('atelier')?.bridge.snapshot().selected === index, previous);
   assert.equal(await bridge.evaluate(api => api.isReady()), false, 'the current painting must be waiting on its editable layer');
 
-  const imageUrl = new URL(catalogue[broken].image, baseUrl).href;
-  await page.route(imageUrl, route => route.abort('failed'));
-  const failedRequest = page.waitForEvent('requestfailed', request => request.url() === imageUrl);
-  await artItems.nth(broken).dispatchEvent('click');
-  await failedRequest;
+  assert.match(catalogue[broken].image, /vangogh-self/);
+  const failedBefore = failures.length;
+  await bridge.evaluate((api, index) => { void api.showPainting(index); }, broken);
+  await expectSoon(() => failures.length > failedBefore, 'the broken painting was requested and failed');
   await page.waitForFunction(title =>
     document.querySelector('#atelier-embedded-app #art-title').textContent === title,
   catalogue[previous].title);
@@ -468,12 +482,33 @@ test('the room hosts both workshops on one canvas through the host contract', as
     await button.click();
     assert.equal(await button.getAttribute('aria-pressed'), 'true', `${tool} is selected`);
   }
+  // The reagent on a spot the UV lamp has not marked: the reason shows
+  // beside the cursor (the panel's status line is hidden in the Lair).
+  await page.locator('#atelier-embedded-app [data-tool="reagent"]').click();
+  // Choosing a tool flies to the copy: wait until the camera stands still.
+  await page.evaluate(async () => {
+    const camera = window.__keynlockDebug.host.camera;
+    let still = 0;
+    const last = camera.position.clone();
+    while (still < 8) {
+      await new Promise(requestAnimationFrame);
+      still = camera.position.distanceTo(last) < 1e-5 ? still + 1 : 0;
+      last.copy(camera.position);
+    }
+  });
+  const spot = await page.evaluate(() => {
+    const panel = document.querySelector('#atelier-embedded-app').getBoundingClientRect().height;
+    return { x: innerWidth / 2, y: (innerHeight - panel) / 2 };
+  });
+  await page.mouse.click(spot.x, spot.y);
+  await page.locator('#atelier-scene-feedback #restoration-notice').filter({ hasText: 'УФ-фонарём' }).waitFor();
   // The panel in the Lair: «ВСЯ КОЛЛЕКЦИЯ» right of «В ЛОГОВО», the readiness
   // beside the likeness, no stepper while the panel is open.
   const back = await page.locator('#reset-camera').boundingBox();
   const collection = await page.locator('#lair-atelier-header #collection-footer').boundingBox();
   assert.ok(back && collection && collection.x > back.x + back.width && Math.abs(collection.y - back.y) < 2,
     'the collection button stands right of «В ЛОГОВО»');
+  assert.match(await page.locator('#lair-atelier-header .collection-total').innerText(), /^\d+$/, 'the collection size is filled in');
   assert.equal(await page.locator('#atelier-embedded-app .workbench-main #restoration-progress').count(), 1);
   assert.equal(await page.locator('#lair-easel-camera-controls').isHidden(), true);
   await page.locator('#atelier-embedded-app #workbench-toggle').click();

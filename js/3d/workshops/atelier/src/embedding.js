@@ -4,8 +4,14 @@ import embeddedStyles from './styles/embedding.css?inline';
 import feedbackStyles from './styles/restoration.css?inline';
 import { createWorkshopStatus, getWorkshopApi, publishWorkshopApi } from '../../../core/host/workshop-host.js';
 import { t, translator } from './i18n.js';
+import { arrangeEmbeddedLayout } from './embedded-layout.js';
 
-export function createAtelierEmbedding({ host, onPanelHeight }) {
+/**
+ * @param {{ host: any, onPanelHeight: (height: number) => void,
+ *   slots?: { corner?: HTMLElement | null, header?: HTMLElement | null } }} options
+ *   slots: places on the Lair's screen for some controls (embedded-layout.js).
+ */
+export function createAtelierEmbedding({ host, onPanelHeight, slots = {} }) {
   const { status, update } = createWorkshopStatus();
   let root;
   let feedback;
@@ -48,11 +54,12 @@ export function createAtelierEmbedding({ host, onPanelHeight }) {
     root.inert = true;
     root.querySelectorAll('script').forEach(script => script.remove());
     translator.translateTree(root);
+    arrangeEmbeddedLayout(root, slots);
 
     feedback = document.createElement('div');
     feedback.id = 'atelier-scene-feedback';
     feedback.setAttribute('aria-hidden', 'true');
-    for (const id of ['restoration-cursor', 'damage-hint']) {
+    for (const id of ['restoration-cursor', 'damage-hint', 'restoration-notice']) {
       const element = root.querySelector(`#${id}`);
       if (element) feedback.append(element);
     }
@@ -60,7 +67,7 @@ export function createAtelierEmbedding({ host, onPanelHeight }) {
     style.textContent = `${embeddedStyles}\n@scope (#atelier-embedded-app) {\n${styles.replace(/@import\s+url\([^)]*\)\s*;/g, '')}\n}\n${feedbackStyles}`;
     document.head.append(style);
     container.append(root, feedback);
-    Object.assign(host, { root, feedback, reportStatus });
+    Object.assign(host, { root, feedback, reportStatus, slots: Object.values(slots).filter(Boolean) });
     publishWorkshopApi('atelier', { status });
 
     const reportHeight = () => onPanelHeight(Math.round(root.getBoundingClientRect().height));

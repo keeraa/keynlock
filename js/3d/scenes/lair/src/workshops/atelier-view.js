@@ -203,31 +203,7 @@ export function createAtelierView({
     document.querySelector('#atelier-info-policy').textContent = info.policy;
   }
 
-  /**
-   * The Atelier's panel in the Lair. The easel and frame colours and the
-   * colour reset go to the top right corner, «ВСЯ КОЛЛЕКЦИЯ» next to «В
-   * ЛОГОВО», the overall readiness beside the likeness and the control hints
-   * into the tools row. The original/copy stepper shows only while the panel
-   * is hidden. The nodes move with their listeners.
-   */
-  function placeAtelierControls() {
-    const app = document.querySelector('#atelier-embedded-app');
-    if (!app) return;
-    if (!corner.childElementCount) {
-      const pickers = app.querySelector('.wood-pickers');
-      const reset = app.querySelector('#reset-button');
-      if (pickers) corner.append(pickers);
-      if (reset) corner.append(reset);
-    }
-    const collection = app.querySelector('#collection-footer');
-    if (collection) headerSlot.append(collection);
-    const readiness = app.querySelector('.restoration-feedback');
-    if (readiness) app.querySelector('.workbench-main')?.append(readiness);
-    const hints = app.querySelector('.workbench-footer .keyboard-tip');
-    if (hints) app.querySelector('.restoration-row')?.append(hints);
-  }
-
-  /** «ВСЯ КОЛЛЕКЦИЯ» stands right of the «В ЛОГОВО» button. */
+  /** The header place («ВСЯ КОЛЛЕКЦИЯ») stands right of the «В ЛОГОВО» button. */
   function placeHeaderSlot() {
     const back = document.querySelector('#reset-camera');
     const bounds = back && !back.hidden ? back.getBoundingClientRect() : null;
@@ -255,12 +231,12 @@ export function createAtelierView({
   function updateAtelierEaselHUD(currentZone, blocked) {
     const bridge = atelierBridge();
     const showing = currentZone === 'atelier' && !galleryActive && Boolean(bridge) && !blocked;
-    if (bridge) placeAtelierControls();
+    // The Atelier fills these places itself (its embedded-layout.js).
     corner.hidden = !showing;
     headerSlot.hidden = !showing;
     if (showing) placeHeaderSlot();
-    const panelOpen = !document.querySelector('#atelier-embedded-app .workbench.is-collapsed');
-    easelCameraControls.hidden = !showing || panelOpen;
+    // The original/copy stepper only while the Atelier's panel is hidden.
+    easelCameraControls.hidden = !showing || bridge.isPanelOpen?.() !== false;
     const focusedSide = showing ? bridge.focusedSide?.() : null;
     easelLabels.hidden = !showing || Boolean(focusedSide);
     if (!showing) return;

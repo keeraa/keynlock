@@ -1,0 +1,24 @@
+name: Workbench regression checks
+on:
+  push:
+    paths:
+      - 'js/3d/scenes/workbench/**'
+      - '.github/workflows/workbench-check.yml'
+  pull_request:
+    paths:
+      - 'js/3d/scenes/workbench/**'
+      - '.github/workflows/workbench-check.yml'
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: js/3d/scenes/workbench
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test logic, integration and scene modules
+        run: npm run check

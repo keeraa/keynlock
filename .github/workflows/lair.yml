@@ -20,8 +20,13 @@ on:
 jobs:
   lair:
     runs-on: ubuntu-latest
-    # Software WebGL makes each browser test take minutes on CI.
-    timeout-minutes: 60
+    # Each shard gets its own runner because software WebGL is CPU-bound.
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    name: Lair browser (${{ matrix.shard }}/3)
     # js/3d is an npm workspace: the Lair and the workshop packages share one install.
     defaults:
       run:
@@ -48,4 +53,7 @@ jobs:
       - name: Install Chromium and system libraries
         run: npx playwright install --with-deps chromium
       - name: Browser tests
-        run: npm run test:browser -w keynlock-lair
+        working-directory: js/3d/scenes/lair
+        run: |
+          npm run build
+          node --test --test-shard=${{ matrix.shard }}/3 tests/browser/*.test.mjs

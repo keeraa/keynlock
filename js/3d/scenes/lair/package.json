@@ -9,7 +9,7 @@
     "preview": "vite preview --host 0.0.0.0",
     "check": "node --check public/stations/workbench/js/scene.js && node --check public/stations/workbench/js/mechanism-3d.js && node --test scripts/*.test.mjs ../../core/host/*.test.mjs && node scripts/geometry-check.mjs",
     "check:sources": "node scripts/check-sources.mjs",
-    "test:browser": "npm run build && node --test tests/browser/*.test.mjs"
+    "test:browser": "npm run build && node --test --test-concurrency=1 tests/browser/*.test.mjs"
   },
   "dependencies": {
     "@keynlock/alchemy": "0.1.0",

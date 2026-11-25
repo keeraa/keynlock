@@ -72,10 +72,8 @@ test('the room draws once per frame: no transmission pass and no per-frame shado
   });
   // Any transmission material makes Three.js draw every opaque object again each frame.
   assert.deepEqual(state.transmissive, []);
-  // The scene is drawn into the ink outline's buffer (the opaque part once
-  // more for its normals) and the shadow map about once a second. Counted per
-  // second, not per frame: software WebGL on CI draws only a few frames a
-  // second, so one shadow refresh is spread over very few frames.
+  // Count steady-state draws between shadow refreshes. Slow software WebGL can
+  // take over a second between frames, so control the clock used by the renderer.
   const passes = await page.evaluate(async () => {
     const gl = document.querySelector('#scene').getContext('webgl2');
     let target = null;
@@ -85,25 +83,31 @@ test('the room draws once per frame: no transmission pass and no per-frame shado
     gl.bindFramebuffer = function (kind, framebuffer) { target = framebuffer; return bind.call(this, kind, framebuffer); };
     gl.drawElements = function (...args) { count(); return draw.apply(this, args); };
     gl.drawArrays = function (...args) { count(); return drawArrays.apply(this, args); };
-    const started = performance.now();
-    let frames = 0;
-    while (performance.now() - started < 3000 || frames < 3) {
-      await new Promise(resolve => requestAnimationFrame(resolve));
-      frames++;
+    const realNow = performance.now;
+    let now = realNow.call(performance);
+    performance.now = () => now;
+    const nextFrame = async milliseconds => {
+      now += milliseconds;
+      await new Promise(requestAnimationFrame);
+    };
+    try {
+      await nextFrame(1100); // Allow the scheduled shadow refresh before sampling.
+      await nextFrame(25);
+      draws.clear();
+      const frames = 3;
+      for (let index = 0; index < frames; index++) await nextFrame(25);
+      const totals = [...draws.values()].sort((a, b) => b - a);
+      const threshold = (totals[0] ?? 0) * .3;
+      const scenePasses = totals.filter(total => total >= threshold).length;
+      const others = totals.filter(total => total < threshold).reduce((sum, total) => sum + total, 0);
+      return { scenePasses, otherDrawsPerFrame: others / frames };
+    } finally {
+      performance.now = realNow;
+      Object.assign(gl, { bindFramebuffer: bind, drawElements: draw, drawArrays });
     }
-    const seconds = (performance.now() - started) / 1000;
-    Object.assign(gl, { bindFramebuffer: bind, drawElements: draw, drawArrays });
-    const totals = [...draws.values()].sort((a, b) => b - a);
-    const scenePass = totals[0] / frames;
-    // A pass drawing a good part of the scene each frame is a scene pass:
-    // colour, and normals (opaque objects only, about half). The rest is per second.
-    const scenePasses = totals.filter(total => total / frames >= scenePass * .3);
-    const others = totals.filter(total => total / frames < scenePass * .3).reduce((sum, total) => sum + total, 0);
-    return { othersPerSecond: Math.round(others / seconds), scenePasses: scenePasses.length };
   });
-  assert.ok(passes.scenePasses <= 2, `scene-sized passes per frame: ${passes.scenePasses}`);
-  // One shadow refresh (~320 draws) a second, plus the screen quad.
-  assert.ok(passes.othersPerSecond < 450, `other draws per second: ${passes.othersPerSecond}`);
+  assert.ok(passes.scenePasses >= 1 && passes.scenePasses <= 2, `scene-sized passes per frame: ${passes.scenePasses}`);
+  assert.ok(passes.otherDrawsPerFrame < 12, `other draws per frame: ${passes.otherDrawsPerFrame}`);
 });
 
 test('the workshops share the room look: one gouache setting, no Atelier-only effects', async t => {

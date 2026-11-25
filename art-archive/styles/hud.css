@@ -1,0 +1,70 @@
+#scene{display:block;width:100vw;height:100vh}
+
+.topbar{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.5rem 2rem;background:linear-gradient(#142c27b8,transparent);pointer-events:none}
+
+.brand{display:flex;align-items:center;gap:.85rem;text-shadow:0 1px 4px #112a26}
+
+.emblem{font-size:2.9rem;color:#d5bc80}
+
+.eyebrow{font: .74rem/1.5 system-ui,sans-serif;letter-spacing:.2em;color:#d2c294}
+
+.brand-name{font-size:1.7rem;margin-top:.2rem}
+
+nav{display:flex;gap:.6rem;pointer-events:auto}
+
+nav button{font-size:.92rem;padding:.6rem .9rem;backdrop-filter:blur(8px)}
+
+kbd{font: .78rem system-ui,sans-serif;color:#daceb1;border:1px solid #b4bba255;border-radius:3px;padding:.15rem .3rem;margin-right:.3rem;white-space:nowrap}
+
+nav kbd{margin-left:.5rem;margin-right:0}
+
+#location{border:1px solid var(--department-color,#c6a66c);border-radius:3px;background:#18352fe6;padding:.38rem .65rem;text-shadow:0 1px 4px #112a26;font-size:1.05rem;line-height:1.15}
+
+#location span{display:block;font:.73rem system-ui,sans-serif;color:#d8d6bf;margin-top:.2rem}
+
+#fps{position:absolute;right:2rem;top:6.2rem;font:.75rem system-ui,sans-serif;color:#f4e8c3;text-shadow:0 1px 4px #142c27}
+
+#help{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:1.5rem;padding:2rem 1rem 1.3rem;background:linear-gradient(transparent,#142c27c0);font:.87rem system-ui,sans-serif;pointer-events:none}
+
+#crosshair{position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px;border-radius:50%;background:#f4ecd4;box-shadow:0 0 4px #1e281e}
+
+#prompt{position:absolute;top:58%;left:50%;transform:translateX(-50%);background:#1b342ce8;padding:.8rem 1.2rem;border:1px solid #ad9565;font:1rem system-ui,sans-serif}
+
+#toast{position:absolute;bottom:5rem;left:50%;transform:translateX(-50%);padding:1rem 1.5rem;background:#18342eee;color:#eae0c3;opacity:0;transition:opacity .2s;pointer-events:none;text-align:center;max-width:90vw}
+
+body.play #scene{cursor:none}
+
+body.plan #help,body.plan #location{display:none}
+
+body.intro #help{opacity:.5}
+
+#fps{padding:.45rem .65rem;background:#18372dd9;border:1px solid #b49c6255;line-height:1.6;text-align:right;font-size:.82rem;pointer-events:none}
+
+#fps strong{font-variant-numeric:tabular-nums;color:#f3e5be;font-weight:600}
+
+#painting-label{display:none;position:absolute;top:50%;left:0;transform:translateY(-50%);width:max-content;max-width:min(24rem,32vw);padding:1rem 1.2rem;background:#162e29ee;color:#f4e8c3;border:1px solid #b49c6255;border-left:0;box-shadow:0 .4rem 1.2rem #101b1960;pointer-events:none;overflow-wrap:anywhere}
+body.play #painting-label:not(:empty){display:grid;gap:.38rem}
+.painting-label-title{font-size:clamp(1.05rem,1.6vw,1.65rem);font-weight:600;line-height:1.15}
+.painting-label-artist{font:clamp(.8rem,1vw,1rem)/1.3 system-ui,sans-serif;color:#e6dac0}
+.painting-label-country,.painting-label-details,.painting-label-badge{font:.76rem/1.35 system-ui,sans-serif;color:#b9b29b}
+.painting-label-badge{color:#ddc58a}
+
+
+
+.topbar{gap:.8rem;padding:1rem 1.4rem}
+.brand-name{font-size:1.4rem}
+#fps{position:static;flex-shrink:0;padding:.25rem .5rem;font-size:.7rem;margin-left:auto}
+.topbar nav{flex-shrink:0}
+.topbar nav button{min-height:2.6rem;display:inline-flex;align-items:center;font-size:.82rem;padding:.55rem .65rem}
+#help{display:flex;flex-direction:column;align-items:center;gap:.6rem;padding:1.1rem 1rem}
+.movement-help{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap}
+#painting-controls{max-width:85vw;text-align:center;color:#f4e8c3}
+#painting-controls:empty{display:none}
+#toast{transition:opacity .2s,transform .2s}
+@media(prefers-reduced-motion:reduce){#toast{transition:none}}
+
+
+body:not(.play) #help,body:not(.play) #tutorial-task{display:none}
+#tutorial-task{position:absolute;top:6.6rem;left:1.4rem;max-width:min(26rem,55vw);padding:.65rem .85rem;background:#162e29ee;color:#f4e8c3;font:.9rem/1.45 system-ui,sans-serif;pointer-events:none}
+#hide-progress{position:absolute;left:50%;top:calc(50% + 15px);width:6rem;height:.35rem;transform:translateX(-50%);accent-color:#d6bb84;pointer-events:none}
+#painting-controls kbd:first-child,#painting-controls kbd+kbd{margin-left:.15em}

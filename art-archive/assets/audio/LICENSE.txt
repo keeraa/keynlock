@@ -1,0 +1,8 @@
+Footstep recordings retain their original attribution in footsteps/LICENSE.txt.
+
+frame-wood.wav is a synthesized wood contact sound for Keynlock.
+watercolor-wash.wav layers a synthesized brush sound with an excerpt from the Key Archive cleaning sound water-bubbles.wav:
+Bubbles Light Short Descend.wav by murraysortz
+https://freesound.org/people/murraysortz/sounds/192496/
+CC0 1.0 Universal
+https://creativecommons.org/publicdomain/zero/1.0/

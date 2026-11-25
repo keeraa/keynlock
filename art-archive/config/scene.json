@@ -1,0 +1,162 @@
+{
+  "version": 1,
+  "building": {
+    "radius": 14,
+    "wingLength": 27,
+    "wingWidth": 10.5,
+    "height": 7.09,
+    "floorElevation": 8,
+    "stair": {
+      "innerRadius": 1.0,
+      "outerRadius": 2.85,
+      "openingRadius": 3.15,
+      "depth": 4.2,
+      "sweep": 5.5,
+      "steps": 34,
+      "topLandingAngle": 0.24
+    },
+    "vaultRise": 0.75,
+    "wallBays": 3,
+    "domeBaseHeight": 11.2,
+    "storageTables": {
+      "count": 6,
+      "radius": 4.07,
+      "width": 2.5,
+      "depth": 1.3,
+      "height": 0.86
+    },
+    "rotundaFurniture": [
+      {"id":"chinese-sofa","model":"chinese-sofa","panel":0,"width":2.977,"depth":1.261,"y":1.118},
+      {"id":"table-rotunda-low","model":"wooden-table-01","kind":"table","panel":2,"width":1.8,"depth":0.66,"y":0.55},
+      {"id":"sofa-01","model":"sofa-01","panel":4,"width":3.14,"depth":1.32,"y":1.6}
+    ],
+    "diffuseCeiling": {
+      "widthM": 3,
+      "color": "#d7e2df",
+      "fillIntensity": 0.55,
+      "paneLengthM": 1.6
+    }
+  },
+  "paintings": {
+    "frameWidthM": 0.0675,
+    "maxTopM": 5.84,
+    "loadRadiusM": 15,
+    "maxLoaded": 72,
+    "minBottomM": 1.1,
+    "tiers": 3,
+    "horizontalGapM": 0.23,
+    "verticalGapM": 0.16,
+    "smallCanvasM": 0.66,
+    "edgeMarginM": 0.16,
+    "frameDepthM": 0.05,
+    "wallClearanceM": 0.006,
+    "placementReachM": 6,
+    "paintingAimReachM": 5,
+    "hoistFromM": 2,
+    "scatterSeed": 1122
+  },
+  "halls": [
+    {
+      "id": "cn",
+      "title": "Восток",
+      "color": "#9d543b",
+      "walls": [
+        [
+          "nature",
+          "Природа, растения и животные"
+        ],
+        [
+          "figures",
+          "Люди и сюжетные сцены"
+        ]
+      ]
+    },
+    {
+      "id": "jp",
+      "title": "Мифы и легенды",
+      "color": "#b38742",
+      "walls": [
+        [
+          "myths",
+          "Мифы и легенды"
+        ]
+      ]
+    },
+    {
+      "id": "portraits",
+      "title": "Портреты",
+      "color": "#7b608e",
+      "walls": [
+        [
+          "women",
+          "Женщины"
+        ],
+        [
+          "men",
+          "Мужчины"
+        ]
+      ]
+    },
+    {
+      "id": "nature",
+      "title": "Природа",
+      "color": "#5c8066",
+      "walls": [
+        [
+          "landscape",
+          "Пейзажи и животные"
+        ],
+        [
+          "water",
+          "Моря, реки и корабли"
+        ],
+        [
+          "buildings",
+          "Города и здания"
+        ]
+      ]
+    },
+    {
+      "id": "world",
+      "title": "Люди и жизнь",
+      "color": "#548791",
+      "walls": [
+        [
+          "life",
+          "Дом, семья и встречи"
+        ],
+        [
+          "leisure",
+          "Труд и отдых"
+        ],
+        [
+          "history",
+          "События и история"
+        ],
+        [
+          "still",
+          "Натюрморты"
+        ],
+        [
+          "interiors",
+          "Интерьеры"
+        ]
+      ]
+    },
+    {
+      "id": "stories",
+      "title": "Религиозные сюжеты",
+      "color": "#ad7852",
+      "walls": [
+        [
+          "religion",
+          "Религиозные сюжеты"
+        ]
+      ]
+    }
+  ],
+  "camera": {
+    "fov": 73,
+    "initialPitch": 0
+  }
+}

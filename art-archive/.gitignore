@@ -1,0 +1,8 @@
+node_modules/
+.sites-*/
+*.zip
+
+# Generated output and atomic build folders
+dist/
+.build-*/
+.previous-build-*/

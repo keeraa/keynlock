@@ -1,7 +1,7 @@
 /** Mirror the canonical music modules (core/audio) into the static scenes, which cannot import them.
  * Run at repository root: node js/3d/core/audio/sync.mjs --check|--sync
  */
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const here = dirname(fileURLToPath(import.meta.url));
@@ -18,6 +18,7 @@ for (const module of manifest.modules) {
     if (current === canonical) continue;
     changed++;
     if (mode === 'sync') {
+      await mkdir(dirname(destination), { recursive: true });
       await writeFile(destination, canonical);
       process.stdout.write(`synced ${consumer}/${module}\n`);
     } else process.stderr.write(`out of sync ${consumer}/${module}\n`);

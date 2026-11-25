@@ -1,0 +1,6 @@
+@media(max-width:760px){.topbar{padding:.8rem 1rem}.brand-name{font-size:1.2rem}.eyebrow{font-size:.65rem;letter-spacing:.12em}.emblem{display:none}nav kbd{display:none}nav button{padding:.55rem;font-size:.8rem}#fps{right:1rem;top:4.5rem}.veil{padding:6rem 5vw 1rem;align-items:flex-end}.panel{padding:1.4rem}.panel h1{font-size:2.1rem}.panel p{font-size:.95rem}#help{gap:.6rem;flex-wrap:wrap;font-size:.75rem}#plan-caption{left:1rem;bottom:5rem;right:1rem;padding:1rem}}
+@media(max-width:900px){
+ .topbar{flex-wrap:wrap;gap:.4rem}.brand{flex:1}.topbar nav{margin-left:auto}
+ #fps{position:static;font-size:.65rem}#painting-label{max-width:38vw;padding:.65rem .75rem}
+ #location{font-size:.88rem;padding:.3rem .45rem}.movement-help{gap:.6rem}
+}

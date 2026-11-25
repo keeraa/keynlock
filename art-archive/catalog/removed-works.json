@@ -1,0 +1,73 @@
+{
+  "reason": "user_requested_oversize_removal",
+  "works": [
+    {
+      "id": "ART-1539",
+      "title": "The Raft of the Medusa",
+      "physicalSizeM": {
+        "width": 7.16,
+        "height": 4.91,
+        "basis": "P2048/P2049",
+        "source": "https://www.wikidata.org/wiki/Q212616"
+      },
+      "reason": "oversize"
+    },
+    {
+      "id": "ART-1542",
+      "title": "The Coronation of Napoleon",
+      "physicalSizeM": {
+        "width": 9.79,
+        "height": 6.21,
+        "basis": "P2048/P2049",
+        "source": "https://www.wikidata.org/wiki/Q1231009"
+      },
+      "reason": "oversize"
+    },
+    {
+      "id": "ART-1547",
+      "title": "The Wedding at Cana",
+      "physicalSizeM": {
+        "width": 9.94,
+        "height": 6.77,
+        "basis": "P2048/P2049",
+        "source": "https://www.wikidata.org/wiki/Q185255"
+      },
+      "reason": "oversize"
+    },
+    {
+      "id": "ART-1574",
+      "title": "Bonaparte Visiting the Plague Victims of Jaffa",
+      "physicalSizeM": {
+        "width": 7.15,
+        "height": 5.23,
+        "basis": "P2048/P2049",
+        "source": "https://www.wikidata.org/wiki/Q2909916"
+      },
+      "reason": "oversize"
+    },
+    {
+      "id": "ART-1718",
+      "title": "The Appearance of Christ Before the People",
+      "physicalSizeM": {
+        "width": 7.5,
+        "height": 5.4,
+        "basis": "P2048/P2049",
+        "source": "https://www.wikidata.org/wiki/Q4536026"
+      },
+      "reason": "oversize"
+    },
+    {
+      "id": "ART-1832",
+      "title": "Вознесение Девы Марии",
+      "physicalSizeM": {
+        "height": 6.9,
+        "width": 3.6,
+        "source": "https://en.wikipedia.org/wiki/Assumption_of_the_Virgin_(Titian)",
+        "basis": "unframed",
+        "verification": "imported_source",
+        "note": "Размер сохранён из предыдущего импорта. Источник указан; повторная музейная верификация этой записи в данном проходе не выполнена."
+      },
+      "reason": "oversize"
+    }
+  ]
+}

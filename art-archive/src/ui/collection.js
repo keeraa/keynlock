@@ -1,0 +1,129 @@
+import {createPaintingLabel} from './painting-label.js';
+import {showPaintingControls} from './painting-controls.js';
+import {createHangingTutorial} from './hanging-tutorial.js';
+import {playableSelection} from '../paintings/playable-selection.js';
+import {mountedFrame} from '../../catalog/painting-geometry.js';
+import {disposalIds,isApprovedKeynlock} from '../paintings/disposal-state.js';
+import {paintingLocation} from '../player/painting-location.js';
+import {createHangingSession} from '../paintings/hanging-session.js';
+import {createPaintingInspector} from './painting-inspector.js';
+import {createLifecycle} from '../app/lifecycle.js';
+import {readJson,writeJson} from '../persistence/storage.js';
+import {getLanguage,paintingTitle} from '../localization/i18n.js';
+import {arrangeExhibition} from '../paintings/exhibition.js';
+import {createPaintingDisplay} from '../paintings/display.js';
+
+const STORAGE_KEY = 'keynlock-painting-archive-1500-v1';
+export function bindCollection({debugSelection=false,THREE, renderer, world, config, catalog, initialSelection, player, setMode, getMode, elements,notify,loadingManager,playSound,setSoundMotion,initialHanging=true}) {
+  const life = createLifecycle(), dialog = elements('collection-dialog'), frame = elements('curator');
+  const label = elements('painting-label'),controls=elements('painting-controls');
+  const showLabel=createPaintingLabel(label,catalog.paintings);
+  const approvedIds=catalog.paintings.filter(isApprovedKeynlock).map(painting=>painting.id);
+  let disposalDirty=false;
+  const display = createPaintingDisplay({THREE, renderer, world, catalog, config, loadingManager, onAim(slot) {
+    if (hanging.active) return;
+    const en = getLanguage() === 'en';
+    showLabel(slot);
+    showPaintingControls(controls,slot?(en?'F — inspect · RMB — zoom':'F — рассмотреть · ПКМ — приблизить'):'');
+  }});
+  const inspector=createPaintingInspector({elements,catalog,setMode});
+  life.own(()=>inspector.dispose());
+  const tutorial=createHangingTutorial(elements('tutorial-task'),elements('archive-task'),world.layout,config.paintings,debugSelection);
+  const hanging=createHangingSession({debugSelection,THREE,world,config,display,renderer,label,showLabel,controls,notify,playSound,setSoundMotion,onMount:tutorial.mounted,disposalTotal:approvedIds.length,onDisposed(){disposalDirty=true;if(frame.hasAttribute?.('src'))frame.removeAttribute('src');}});
+  let exhibition, page = 0, prior = 'intro';
+  function refresh(hangingMode=hanging.active) {
+    const removed=disposalIds(debugSelection);
+    exhibition = arrangeExhibition({...catalog,paintings:catalog.paintings.filter(p=>!removed.has(p.id))}, readJson(STORAGE_KEY,initialSelection), world.layout, config.paintings);
+    showPage(Math.min(page, exhibition.pageCount - 1),hangingMode);
+  }
+  function exclude(){
+    const slot=hanging.active?hanging.aimed():display.aimedSlot();
+    if(!slot)return;
+    const id=slot.painting.id,state=readJson(STORAGE_KEY,initialSelection);
+    const next={...state,included:{...state.included,[id]:false}};
+    const en=getLanguage()==='en';
+    if(!writeJson(STORAGE_KEY,next)){notify(en?'Could not save the selection':'Не удалось сохранить отбор');return;}
+    const replacement=hanging.active ? exhibition.exclude(id,page) : null;
+    const fromWall=hanging.active && mountedFrame(slot);
+    const installed=fromWall ? hanging.fillVacancy(slot,replacement) : null;
+    if(hanging.active)showPage(Math.min(page,exhibition.pageCount-1));
+    else refresh();
+    notify([paintingTitle(slot.painting)+(en?' · excluded':' · исключена'),installed && ((en?'On the wall: ':'На стене — ')+paintingTitle(installed.painting))].filter(Boolean).join(' · '));
+  }
+  function showPage(value,hangingMode=hanging.active) {
+    page = value;
+    const all=[...exhibition.byId.values()];
+    const slots=hangingMode?playableSelection(exhibition.slots(page),all):exhibition.slots(page);
+    hanging.setPage(slots,all,hangingMode);
+    tutorial.setPage(hanging.active?slots:[],hanging.find);
+    updateExhibitionControls();
+  }
+  function updateExhibitionControls(){
+    const previous=elements('exhibition-prev'),next=elements('exhibition-next');
+    previous.disabled=page===0;next.disabled=page+1===exhibition.pageCount;
+    elements('exhibition-controls').hidden=hanging.active||exhibition.pageCount<=1;
+    elements('collection-open').hidden=hanging.active;
+    elements('hanging-toggle').textContent=hanging.active
+      ? (getLanguage()==='en'?'View exhibition':'Посмотреть экспозицию')
+      : (getLanguage()==='en'?'Hang paintings':'Развешивать картины');
+  }
+  function openEditor() {
+    elements('collection-notice').textContent = '';
+    prior = getMode(); setMode('pause');
+    if (!frame.hasAttribute('src')) frame.src = './catalog/editor/index.html';
+    dialog.showModal();
+  }
+  function locate(id) {
+    let slot = exhibition.byId.get(id);
+    if (!slot) {
+      if (exhibition.reserveReasons.get(id) === 'oversize') {
+        const message = getLanguage() === 'en' ? 'The full-size work exceeds this wall. Choose a larger wall in the collection.' :
+          'В натуральную величину картина не помещается на этой стене. Можно выбрать другую стену в подборке.';
+        if (!dialog.open) openEditor();
+        elements('collection-notice').textContent = message;
+      }
+      return;
+    }
+    showPage(slot.page);
+    slot = hanging.find(id) ?? slot;
+    player.reset();
+    const view=paintingLocation(slot,world.layout,config,world.camera);
+    world.camera.position.set(view.x,view.y,view.z);
+    Object.assign(player.state,{floorY:view.floorY,yaw:view.yaw,pitch:view.pitch});
+    prior = 'play';
+    if (dialog.open) dialog.close();
+    setMode('play');
+  }
+  function switchHanging(value,enter=true) {
+    showPage(page,value);
+    if(enter)setMode('play');
+  }
+  life.listen(elements('hanging-toggle'),'click',()=>switchHanging(!hanging.active));
+  life.listen(elements('collection-open'),'click',openEditor);
+  life.listen(elements('collection-close'),'click',()=>dialog.close());
+  life.listen(dialog,'close',()=>setMode(prior));
+  life.listen(elements('exhibition-prev'),'click',()=>showPage(Math.max(0,page-1)));
+  life.listen(elements('exhibition-next'),'click',()=>showPage(Math.min(exhibition.pageCount-1,page+1)));
+  life.listen(window,'storage',event=>{if(event.key===STORAGE_KEY || event.key===null) refresh();});
+  life.listen(window,'message',event=>{
+    if(event.origin!==location.origin || event.source!==frame.contentWindow) return;
+    if(event.data?.type==='archive:locate') { refresh(); locate(event.data.id); }
+  });
+  life.listen(elements('language-select'),'change',()=>{updateExhibitionControls();tutorial.refresh();});
+  refresh(initialHanging);
+  function update(now){
+    const playing=getMode()==='play';
+    display.update(now,hanging.active?hanging.aimed:null,playing);
+    hanging.update(playing,now);
+    tutorial.update(hanging.carriedId);
+    if(disposalDirty){disposalDirty=false;refresh();}
+  }
+  return {
+    warmUp:display.warmUp,syncVisibility:display.syncVisibility,
+    setStyle:display.gouache.setStyle,setEasyMode:display.gouache.setEasyMode,setPigment:display.gouache.setPigment,
+    update,wallPick:hanging.wallPick,setPlacementEffect:hanging.setPlacementEffect,
+    canSprint:hanging.canSprint,canRaise:hanging.canRaise,raise:hanging.raise,interact:hanging.interact,exclude,
+    aimedId:()=>(hanging.active?hanging.aimed():display.aimedSlot())?.painting.id,
+    inspect(){inspector.open((hanging.active?hanging.inspectSlot():display.aimedSlot())?.painting);},
+    switchHanging,locate,dispose(){life.dispose();hanging.dispose();display.dispose();}};
+}

@@ -1,0 +1,4 @@
+Wooden Table 02 — Poly Haven, CC0-1.0
+https://polyhaven.com/a/wooden_table_02
+Source in SIKISI: model/wooden-table-02, version 1.
+The gallery bundles the original geometry with 1024 px WebP textures.

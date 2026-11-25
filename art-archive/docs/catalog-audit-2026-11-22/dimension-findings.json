@@ -1,0 +1,933 @@
+[
+  {
+    "id": "ART-0045",
+    "title": "Orchids and Rocks",
+    "physicalSizeM": {
+      "width": 4.156,
+      "height": 1.858,
+      "basis": "overall framed",
+      "source": "https://clevelandart.org/art/2015.138"
+    },
+    "note": "Полная восьмистворчатая ширма, включая историческое обрамление.",
+    "source": "https://clevelandart.org/art/2015.138"
+  },
+  {
+    "id": "ART-0219",
+    "title": "Conversation in Autumn",
+    "physicalSizeM": {
+      "width": 0.4,
+      "height": 1.16,
+      "basis": "painting only",
+      "source": "https://clevelandart.org/art/1954.263"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1954.263"
+  },
+  {
+    "id": "ART-0402",
+    "title": "Watching the Deer by a Pine Shaded Stream",
+    "physicalSizeM": {
+      "width": 0.26,
+      "height": 0.242,
+      "basis": "painting only",
+      "source": "https://clevelandart.org/art/1997.88"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1997.88"
+  },
+  {
+    "id": "ART-0451",
+    "title": "On a Terrace",
+    "physicalSizeM": {
+      "width": 0.2,
+      "height": 0.302,
+      "basis": "unframed",
+      "source": "https://clevelandart.org/art/1986.68"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1986.68"
+  },
+  {
+    "id": "ART-0453",
+    "title": "Triptych with The Lamentation of Christ (center), St. Barbara (left wing), St. Catherine of Alexandria (right wing), The Annunciation (reverse wings)",
+    "physicalSizeM": null,
+    "note": "Размеры трёх створок найдены. Общий внешний габарит раскрытого триптиха в обрамлении не указан; не подменяем его суммой ширин.",
+    "source": "https://clevelandart.org/art/2022.86"
+  },
+  {
+    "id": "ART-0566",
+    "title": "Playing the Qin in a Secluded Valley",
+    "physicalSizeM": {
+      "width": 0.505,
+      "height": 1.32,
+      "basis": "overall",
+      "source": "https://clevelandart.org/art/1969.60"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1969.60"
+  },
+  {
+    "id": "ART-0583",
+    "title": "Album of Seasonal Landscapes, Leaf B (previous leaf 1)",
+    "physicalSizeM": {
+      "width": 0.158,
+      "height": 0.21,
+      "basis": "overall",
+      "source": "https://clevelandart.org/art/1955.302.1"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1955.302.1"
+  },
+  {
+    "id": "ART-0636",
+    "title": "Bird Sleeping on a Plum Tree",
+    "physicalSizeM": {
+      "width": 0.968,
+      "height": 0.37,
+      "basis": "painting only",
+      "source": "https://clevelandart.org/art/1998.31"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1998.31"
+  },
+  {
+    "id": "ART-0728",
+    "title": "Landscape Album in Various Styles: Landscape after Ni Zan",
+    "physicalSizeM": {
+      "width": 0.394,
+      "height": 0.299,
+      "basis": "overall",
+      "source": "https://clevelandart.org/art/1955.37.1"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1955.37.1"
+  },
+  {
+    "id": "ART-0779",
+    "title": "Flowers and Trees of the Four Seasons (right screen)",
+    "physicalSizeM": {
+      "width": 3.685,
+      "height": 1.55,
+      "basis": "overall",
+      "source": "https://clevelandart.org/art/2021.132.1"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/2021.132.1"
+  },
+  {
+    "id": "ART-0839",
+    "title": "Album of Landscapes: Leaf 4",
+    "physicalSizeM": {
+      "width": 0.223,
+      "height": 0.2,
+      "basis": "each leaf",
+      "source": "https://clevelandart.org/art/1975.64.4"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1975.64.4"
+  },
+  {
+    "id": "ART-0841",
+    "title": "Album of Landscapes: Leaf 2",
+    "physicalSizeM": {
+      "width": 0.223,
+      "height": 0.2,
+      "basis": "each leaf",
+      "source": "https://clevelandart.org/art/1975.64.2"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1975.64.2"
+  },
+  {
+    "id": "ART-0842",
+    "title": "Album of Landscapes: Leaf 3",
+    "physicalSizeM": {
+      "width": 0.223,
+      "height": 0.2,
+      "basis": "each leaf",
+      "source": "https://clevelandart.org/art/1975.64.3"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1975.64.3"
+  },
+  {
+    "id": "ART-0843",
+    "title": "Album of Landscapes: Leaf 5",
+    "physicalSizeM": {
+      "width": 0.223,
+      "height": 0.2,
+      "basis": "each leaf",
+      "source": "https://clevelandart.org/art/1975.64.5"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1975.64.5"
+  },
+  {
+    "id": "ART-0844",
+    "title": "Album of Landscapes: Leaf 6",
+    "physicalSizeM": {
+      "width": 0.223,
+      "height": 0.2,
+      "basis": "each leaf",
+      "source": "https://clevelandart.org/art/1975.64.6"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1975.64.6"
+  },
+  {
+    "id": "ART-0845",
+    "title": "Album of Landscapes: Leaf 7",
+    "physicalSizeM": {
+      "width": 0.223,
+      "height": 0.2,
+      "basis": "each leaf",
+      "source": "https://clevelandart.org/art/1975.64.7"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1975.64.7"
+  },
+  {
+    "id": "ART-0846",
+    "title": "Album of Landscapes: Leaf 8",
+    "physicalSizeM": {
+      "width": 0.223,
+      "height": 0.2,
+      "basis": "each leaf",
+      "source": "https://clevelandart.org/art/1975.64.8"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1975.64.8"
+  },
+  {
+    "id": "ART-0852",
+    "title": "Album of Landscapes: Leaf 1",
+    "physicalSizeM": {
+      "width": 0.223,
+      "height": 0.2,
+      "basis": "each leaf",
+      "source": "https://clevelandart.org/art/1975.64.1"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1975.64.1"
+  },
+  {
+    "id": "ART-0871",
+    "title": "Shah Jahan",
+    "physicalSizeM": {
+      "width": 0.037,
+      "height": 0.054,
+      "basis": "overall",
+      "source": "https://clevelandart.org/art/1920.1969"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1920.1969"
+  },
+  {
+    "id": "ART-0880",
+    "title": "Puppies, Sparrows, and Chrysanthemums",
+    "physicalSizeM": {
+      "width": 0.915,
+      "height": 1.676,
+      "basis": "each painting",
+      "source": "https://clevelandart.org/art/1970.71"
+    },
+    "note": " Репродукция содержит несколько частей или не совпадает с видом измеренного объекта; требуется отдельное представление частей.",
+    "source": "https://clevelandart.org/art/1970.71"
+  },
+  {
+    "id": "ART-0919",
+    "title": "Court lady singing and playing the vina (recto)",
+    "physicalSizeM": {
+      "width": 0.168,
+      "height": 0.216,
+      "basis": "miniature",
+      "source": "https://clevelandart.org/art/2013.349.a"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/2013.349.a"
+  },
+  {
+    "id": "ART-0930",
+    "title": "Egret and Reeds",
+    "physicalSizeM": {
+      "width": 0.46,
+      "height": 1.245,
+      "basis": "painting only",
+      "source": "https://clevelandart.org/art/2015.509"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/2015.509"
+  },
+  {
+    "id": "ART-1081",
+    "title": "Women bathing before an architectural panorama",
+    "physicalSizeM": {
+      "width": 0.227,
+      "height": 0.322,
+      "basis": "painting only",
+      "source": "https://clevelandart.org/art/2013.344"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/2013.344"
+  },
+  {
+    "id": "ART-1144",
+    "title": "Travelers by a Lake",
+    "physicalSizeM": {
+      "width": 0.177,
+      "height": 0.177,
+      "basis": "diameter",
+      "source": "https://clevelandart.org/art/1982.128"
+    },
+    "note": "Круглая картина: музейный диаметр 17,7 см; фото включает внешнее оформление.",
+    "source": "https://clevelandart.org/art/1982.128"
+  },
+  {
+    "id": "ART-1272",
+    "title": "Paintings after Ancient Masters: Mr. Five Willows (Wuliu), Tao Yuanming",
+    "physicalSizeM": {
+      "width": 0.227,
+      "height": 0.245,
+      "basis": "painting only",
+      "source": "https://clevelandart.org/art/1979.27.2.12"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1979.27.2.12"
+  },
+  {
+    "id": "ART-1283",
+    "title": "Album of Landscape Paintings Illustrating Old Poems: Boy Tending a Water Buffalo",
+    "physicalSizeM": {
+      "width": 0.131,
+      "height": 0.112,
+      "basis": "each painting",
+      "source": "https://clevelandart.org/art/1982.68.12"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1982.68.12"
+  },
+  {
+    "id": "ART-1287",
+    "title": "In the Surf (recto); Beach Study (verso)",
+    "physicalSizeM": {
+      "width": 0.407,
+      "height": 0.318,
+      "basis": "overall",
+      "source": "https://clevelandart.org/art/2001.41"
+    },
+    "note": " Репродукция содержит несколько частей или не совпадает с видом измеренного объекта; требуется отдельное представление частей.",
+    "source": "https://clevelandart.org/art/2001.41"
+  },
+  {
+    "id": "ART-1320",
+    "title": "Paintings after Ancient Masters: Chrysanthemum",
+    "physicalSizeM": {
+      "width": 0.227,
+      "height": 0.237,
+      "basis": "painting only",
+      "source": "https://clevelandart.org/art/1979.27.2.17"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1979.27.2.17"
+  },
+  {
+    "id": "ART-1325",
+    "title": "Weaving and Spinning",
+    "physicalSizeM": {
+      "width": 0.19,
+      "height": 0.237,
+      "basis": "overall",
+      "source": "https://clevelandart.org/art/1987.162"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1987.162"
+  },
+  {
+    "id": "ART-1330",
+    "title": "Paintings after Ancient Masters: Scholar with Staff and Brush",
+    "physicalSizeM": {
+      "width": 0.227,
+      "height": 0.246,
+      "basis": "painting only",
+      "source": "https://clevelandart.org/art/1979.27.2.19"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1979.27.2.19"
+  },
+  {
+    "id": "ART-1349",
+    "title": "Portrait of Maharaja Pratap Singh (1764–1803)",
+    "physicalSizeM": {
+      "width": 0.405,
+      "height": 0.614,
+      "basis": "overall",
+      "source": "https://clevelandart.org/art/2011.207"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/2011.207"
+  },
+  {
+    "id": "ART-1354",
+    "title": "Bamboo and Plum",
+    "physicalSizeM": {
+      "width": 0.482,
+      "height": 1.05,
+      "basis": "painting",
+      "source": "https://clevelandart.org/art/2015.503"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/2015.503"
+  },
+  {
+    "id": "ART-1362",
+    "title": "Album of Landscape Paintings Illustrating Old Poems: A Scholar at a Table with a Servant aside Preparing the Ink",
+    "physicalSizeM": {
+      "width": 0.131,
+      "height": 0.112,
+      "basis": "each painting",
+      "source": "https://clevelandart.org/art/1982.68.10"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1982.68.10"
+  },
+  {
+    "id": "ART-1363",
+    "title": "Album of Landscape Paintings Illustrating Old Poems: Boy Holding a Horse",
+    "physicalSizeM": {
+      "width": 0.131,
+      "height": 0.112,
+      "basis": "each painting",
+      "source": "https://clevelandart.org/art/1982.68.8"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1982.68.8"
+  },
+  {
+    "id": "ART-1364",
+    "title": "Album of Landscape Paintings Illustrating Old Poems: Children Playing Blindman's Buff in a Garden",
+    "physicalSizeM": {
+      "width": 0.131,
+      "height": 0.112,
+      "basis": "each painting",
+      "source": "https://clevelandart.org/art/1982.68.9"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1982.68.9"
+  },
+  {
+    "id": "ART-1384",
+    "title": "Chinese Literatus in an Autumn Landscape",
+    "physicalSizeM": {
+      "width": 0.445,
+      "height": 0.298,
+      "basis": "painting",
+      "source": "https://clevelandart.org/art/2015.467"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/2015.467"
+  },
+  {
+    "id": "ART-1391",
+    "title": "Album of Landscape Paintings Illustrating Old Poems: Listening to the Qin",
+    "physicalSizeM": {
+      "width": 0.131,
+      "height": 0.112,
+      "basis": "each painting",
+      "source": "https://clevelandart.org/art/1982.68.11"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1982.68.11"
+  },
+  {
+    "id": "ART-1424",
+    "title": "Fish and Rock; Fish and Seaweed",
+    "physicalSizeM": {
+      "width": 0.426,
+      "height": 1.397,
+      "basis": "overall",
+      "source": "https://clevelandart.org/art/1983.186"
+    },
+    "note": " Репродукция содержит несколько частей или не совпадает с видом измеренного объекта; требуется отдельное представление частей.",
+    "source": "https://clevelandart.org/art/1983.186"
+  },
+  {
+    "id": "ART-1457",
+    "title": "Album of Landscape Paintings Illustrating Old Poems: Scholar under a Pine Tree",
+    "physicalSizeM": {
+      "width": 0.131,
+      "height": 0.112,
+      "basis": "each painting",
+      "source": "https://clevelandart.org/art/1982.68.1"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1982.68.1"
+  },
+  {
+    "id": "ART-1485",
+    "title": "Album of Landscape Paintings Illustrating Old Poems:  Three Big Trees, a Stream with an Old Man Sitting on the Bank",
+    "physicalSizeM": {
+      "width": 0.131,
+      "height": 0.112,
+      "basis": "each painting",
+      "source": "https://clevelandart.org/art/1982.68.2"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1982.68.2"
+  },
+  {
+    "id": "ART-1486",
+    "title": "Album of Landscape Paintings Illustrating Old Poems: Scholar watching Fish",
+    "physicalSizeM": {
+      "width": 0.131,
+      "height": 0.112,
+      "basis": "each painting",
+      "source": "https://clevelandart.org/art/1982.68.4"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1982.68.4"
+  },
+  {
+    "id": "ART-1487",
+    "title": "Album of Landscape Paintings Illustrating Old Poems: Man Resting under Bamboo",
+    "physicalSizeM": {
+      "width": 0.131,
+      "height": 0.112,
+      "basis": "each painting",
+      "source": "https://clevelandart.org/art/1982.68.5"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1982.68.5"
+  },
+  {
+    "id": "ART-1488",
+    "title": "Album of Landscape Paintings Illustrating Old Poems: A Man Reclining and Enjoying the View",
+    "physicalSizeM": {
+      "width": 0.131,
+      "height": 0.112,
+      "basis": "each painting",
+      "source": "https://clevelandart.org/art/1982.68.7"
+    },
+    "note": "",
+    "source": "https://clevelandart.org/art/1982.68.7"
+  },
+  {
+    "id": "ART-1500",
+    "title": "Sparrows on Blossoming Plum; A Sage with Tiger; Chinese Bird on Snow-Laden Branch",
+    "physicalSizeM": {
+      "width": 0.54,
+      "height": 1.819,
+      "basis": "overall",
+      "source": "https://clevelandart.org/art/1992.80"
+    },
+    "note": " Репродукция содержит несколько частей или не совпадает с видом измеренного объекта; требуется отдельное представление частей.",
+    "source": "https://clevelandart.org/art/1992.80"
+  },
+  {
+    "id": "ART-1503",
+    "title": "Ivan the Terrible and His Son Ivan",
+    "physicalSizeM": {
+      "width": 2.54,
+      "height": 1.995,
+      "basis": "P2048/P2049, cm",
+      "source": "https://www.wikidata.org/wiki/Q4195595"
+    },
+    "note": "",
+    "source": "https://www.wikidata.org/wiki/Q4195595"
+  },
+  {
+    "id": "ART-1505",
+    "title": "Sadko",
+    "physicalSizeM": {
+      "width": 2.3,
+      "height": 3.225,
+      "basis": "museum record",
+      "source": "https://virtualrm.spb.ru/ru/node/2520"
+    },
+    "note": "",
+    "source": "https://virtualrm.spb.ru/ru/node/2520"
+  },
+  {
+    "id": "ART-1508",
+    "title": "Rye",
+    "physicalSizeM": {
+      "width": 1.87,
+      "height": 1.07,
+      "basis": "P2048/P2049, cm",
+      "source": "https://www.wikidata.org/wiki/Q4396378"
+    },
+    "note": "",
+    "source": "https://www.wikidata.org/wiki/Q4396378"
+  },
+  {
+    "id": "ART-1509",
+    "title": "Oak Grove",
+    "physicalSizeM": {
+      "width": 1.93,
+      "height": 1.25,
+      "basis": "P2048/P2049, cm",
+      "source": "https://www.wikidata.org/wiki/Q61744001"
+    },
+    "note": "",
+    "source": "https://www.wikidata.org/wiki/Q61744001"
+  },
+  {
+    "id": "ART-1512",
+    "title": "The Rainbow",
+    "physicalSizeM": {
+      "width": 1.32,
+      "height": 1.02,
+      "basis": "P2048/P2049, cm",
+      "source": "https://www.wikidata.org/wiki/Q4387907"
+    },
+    "note": "",
+    "source": "https://www.wikidata.org/wiki/Q4387907"
+  },
+  {
+    "id": "ART-1513",
+    "title": "Bogatyrs",
+    "physicalSizeM": {
+      "width": 4.46,
+      "height": 2.9530000000000003,
+      "basis": "P2048/P2049, cm",
+      "source": "https://www.wikidata.org/wiki/Q4089077"
+    },
+    "note": "",
+    "source": "https://www.wikidata.org/wiki/Q4089077"
+  },
+  {
+    "id": "ART-1514",
+    "title": "Alyonushka",
+    "physicalSizeM": {
+      "width": 1.21,
+      "height": 1.73,
+      "basis": "reference catalogue",
+      "source": "https://ru.wikipedia.org/wiki/Алёнушка"
+    },
+    "note": "",
+    "source": "https://ru.wikipedia.org/wiki/Алёнушка"
+  },
+  {
+    "id": "ART-1515",
+    "title": "Ivan Tsarevich Riding the Grey Wolf",
+    "physicalSizeM": {
+      "width": 1.87,
+      "height": 2.49,
+      "basis": "P2048/P2049, cm",
+      "source": "https://www.wikidata.org/wiki/Q4195524"
+    },
+    "note": "",
+    "source": "https://www.wikidata.org/wiki/Q4195524"
+  },
+  {
+    "id": "ART-1516",
+    "title": "Knight at the Crossroads",
+    "physicalSizeM": {
+      "width": 2.99,
+      "height": 1.67,
+      "basis": "P2048/P2049, cm",
+      "source": "https://www.wikidata.org/wiki/Q4112530"
+    },
+    "note": "",
+    "source": "https://www.wikidata.org/wiki/Q4112530"
+  },
+  {
+    "id": "ART-1520",
+    "title": "Irises",
+    "physicalSizeM": {
+      "width": 0.93,
+      "height": 0.71,
+      "basis": "museum record",
+      "source": "https://www.getty.edu/art/collection/object/103JNH"
+    },
+    "note": "",
+    "source": "https://www.getty.edu/art/collection/object/103JNH"
+  },
+  {
+    "id": "ART-1521",
+    "title": "Café Terrace at Night",
+    "physicalSizeM": {
+      "width": 0.4715,
+      "height": 0.6286999999999999,
+      "basis": "P2048/P2049, cm",
+      "source": "https://www.wikidata.org/wiki/Q26221334"
+    },
+    "note": "Размер найден в справочных данных, но есть противоречие идентичности или источника; работа остаётся в резерве. Commons привязывает файл к Q26221334 с размерами 62,87 × 47,15 см и источнику Dallas, но каталог называет оригинал из Kröller-Müller. Требуется подтвердить версию репродукции.",
+    "source": "https://www.wikidata.org/wiki/Q26221334"
+  },
+  {
+    "id": "ART-1522",
+    "title": "The Bedroom in Arles",
+    "physicalSizeM": {
+      "width": 0.9129999999999999,
+      "height": 0.7240000000000001,
+      "basis": "P2048/P2049, cm",
+      "source": "https://www.wikidata.org/wiki/Q18713070"
+    },
+    "note": "",
+    "source": "https://www.wikidata.org/wiki/Q18713070"
+  },
+  {
+    "id": "ART-1523",
+    "title": "Almond Blossom",
+    "physicalSizeM": {
+      "width": 0.924,
+      "height": 0.735,
+      "basis": "P2048/P2049, cm",
+      "source": "https://www.wikidata.org/wiki/Q1432536"
+    },
+    "note": "",
+    "source": "https://www.wikidata.org/wiki/Q1432536"
+  },
+  {
+    "id": "ART-1524",
+    "title": "Wheatfield with Crows",
+    "physicalSizeM": {
+      "width": 1.03,
+      "height": 0.502,
+      "basis": "P2048/P2049, cm",
+      "source": "https://www.wikidata.org/wiki/Q634122"
+    },
+    "note": "",
+    "source": "https://www.wikidata.org/wiki/Q634122"
+  },
+  {
+    "id": "ART-1525",
+    "title": "The Potato Eaters",
+    "physicalSizeM": {
+      "width": 1.14,
+      "height": 0.82,
+      "basis": "P2048/P2049, cm",
+      "source": "https://www.wikidata.org/wiki/Q154469"
+    },
+    "note": "",
+    "source": "https://www.wikidata.org/wiki/Q154469"
+  },
+  {
+    "id": "ART-1526",
+    "title": "The Night Café",
+    "physicalSizeM": {
+      "width": 0.9209999999999999,
+      "height": 0.7240000000000001,
+      "basis": "P2048/P2049, cm",
+      "source": "https://www.wikidata.org/wiki/Q674846"
+    },
+    "note": "",
+    "source": "https://www.wikidata.org/wiki/Q674846"
+  },
+  {
+    "id": "ART-1529",
+    "title": "The Morning of the Streltsy Execution",
+    "physicalSizeM": {
+      "width": 3.79,
+      "height": 2.18,
+      "basis": "P2048/P2049, cm",
+      "source": "https://www.wikidata.org/wiki/Q4478998"
+    },
+    "note": "",
+    "source": "https://www.wikidata.org/wiki/Q4478998"
+  },
+  {
+    "id": "ART-1530",
+    "title": "Above Eternal Peace",
+    "physicalSizeM": {
+      "width": 2.06,
+      "height": 1.5,
+      "basis": "reference, cm",
+      "source": "https://en.wikipedia.org/wiki/Over%20Eternal%20Peace"
+    },
+    "note": "",
+    "source": "https://en.wikipedia.org/wiki/Over%20Eternal%20Peace"
+  },
+  {
+    "id": "ART-1531",
+    "title": "March",
+    "physicalSizeM": {
+      "width": 0.75,
+      "height": 0.6,
+      "basis": "P2048/P2049, cm",
+      "source": "https://www.wikidata.org/wiki/Q4282465"
+    },
+    "note": "",
+    "source": "https://www.wikidata.org/wiki/Q4282465"
+  },
+  {
+    "id": "ART-1533",
+    "title": "Girl Illuminated by the Sun",
+    "physicalSizeM": {
+      "width": 0.713,
+      "height": 0.892,
+      "basis": "museum record",
+      "source": "https://my.tretyakov.ru/app/masterpiece/21054"
+    },
+    "note": "",
+    "source": "https://my.tretyakov.ru/app/masterpiece/21054"
+  },
+  {
+    "id": "ART-1535",
+    "title": "The Demon Seated",
+    "physicalSizeM": {
+      "width": 2.138,
+      "height": 1.165,
+      "basis": "P2048/P2049, cm",
+      "source": "https://www.wikidata.org/wiki/Q4157667"
+    },
+    "note": "",
+    "source": "https://www.wikidata.org/wiki/Q4157667"
+  },
+  {
+    "id": "ART-1693",
+    "title": "Landscape. Seine at Asnieres",
+    "physicalSizeM": {
+      "width": 0.555,
+      "height": 0.46399999999999997,
+      "basis": "reference, cm",
+      "source": "https://en.wikipedia.org/wiki/The%20Seine%20at%20Asni%C3%A8res"
+    },
+    "note": "Размер найден в справочных данных, но есть противоречие идентичности или источника; работа остаётся в резерве. Справочная статья противоречит сама себе: 46,4 × 55,5 см в карточке и 65,5 × 81,5 см в тексте; натуральный габарит пока не подтверждён.",
+    "source": "https://en.wikipedia.org/wiki/The%20Seine%20at%20Asni%C3%A8res"
+  },
+  {
+    "id": "ART-1720",
+    "title": "The Swan Princess",
+    "physicalSizeM": {
+      "width": 0.935,
+      "height": 1.425,
+      "basis": "museum record",
+      "source": "https://my.tretyakov.ru/app/masterpiece/8395"
+    },
+    "note": "",
+    "source": "https://my.tretyakov.ru/app/masterpiece/8395"
+  },
+  {
+    "id": "ART-1728",
+    "title": "Peter the Great Interrogating the Tsarevich Alexei Petrovich at Peterhof",
+    "physicalSizeM": {
+      "width": 1.73,
+      "height": 1.357,
+      "basis": "reference, cm",
+      "source": "https://en.wikipedia.org/wiki/Peter%20the%20Great%20Interrogating%20the%20Tsarevich%20Alexei%20Petrovich%20at%20Peterhof"
+    },
+    "note": "",
+    "source": "https://en.wikipedia.org/wiki/Peter%20the%20Great%20Interrogating%20the%20Tsarevich%20Alexei%20Petrovich%20at%20Peterhof"
+  },
+  {
+    "id": "ART-1734",
+    "title": "Spring. High water",
+    "physicalSizeM": {
+      "width": 0.575,
+      "height": 0.65,
+      "basis": "museum record",
+      "source": "https://my.tretyakov.ru/app/masterpiece/10836"
+    },
+    "note": "",
+    "source": "https://my.tretyakov.ru/app/masterpiece/10836"
+  },
+  {
+    "id": "ART-1737",
+    "title": "Sokolniki. Autumn",
+    "physicalSizeM": {
+      "width": 0.5,
+      "height": 0.635,
+      "basis": "museum record",
+      "source": "https://my.tretyakov.ru/app/masterpiece/8436"
+    },
+    "note": "",
+    "source": "https://my.tretyakov.ru/app/masterpiece/8436"
+  },
+  {
+    "id": "ART-1742",
+    "title": "A Birch Grove",
+    "physicalSizeM": {
+      "width": 1.81,
+      "height": 0.97,
+      "basis": "reference, cm",
+      "source": "https://en.wikipedia.org/wiki/A%20Birch%20Grove"
+    },
+    "note": "",
+    "source": "https://en.wikipedia.org/wiki/A%20Birch%20Grove"
+  },
+  {
+    "id": "ART-1743",
+    "title": "The Demon Downcast",
+    "physicalSizeM": {
+      "width": 3.87,
+      "height": 1.39,
+      "basis": "reference, cm",
+      "source": "https://en.wikipedia.org/wiki/The%20Demon%20Downcast"
+    },
+    "note": "",
+    "source": "https://en.wikipedia.org/wiki/The%20Demon%20Downcast"
+  },
+  {
+    "id": "ART-1753",
+    "title": "Chumaks path in Mariupol",
+    "physicalSizeM": {
+      "width": 2.13,
+      "height": 1.06,
+      "basis": "reference, cm",
+      "source": "https://en.wikipedia.org/wiki/Chumaks%20Path%20in%20Mariupol"
+    },
+    "note": "",
+    "source": "https://en.wikipedia.org/wiki/Chumaks%20Path%20in%20Mariupol"
+  },
+  {
+    "id": "ART-1755",
+    "title": "Paper Lanterns",
+    "physicalSizeM": {
+      "width": 0.33,
+      "height": 0.798,
+      "basis": "museum record",
+      "source": "https://www.tretyakovgallerymagazine.com/img/mag/2012/1/01.pdf"
+    },
+    "note": "",
+    "source": "https://www.tretyakovgallerymagazine.com/img/mag/2012/1/01.pdf"
+  },
+  {
+    "id": "ART-1757",
+    "title": "The Pond",
+    "physicalSizeM": {
+      "width": 2.16,
+      "height": 1.81,
+      "basis": "museum record",
+      "source": "https://my.tretyakov.ru/app/masterpiece/9898"
+    },
+    "note": "",
+    "source": "https://my.tretyakov.ru/app/masterpiece/9898"
+  },
+  {
+    "id": "ART-1761",
+    "title": "После дождя. Плёс",
+    "physicalSizeM": {
+      "width": 1.25,
+      "height": 0.8,
+      "basis": "reference catalogue",
+      "source": "https://ru.wikipedia.org/wiki/%D0%9F%D0%BE%D1%81%D0%BB%D0%B5%20%D0%B4%D0%BE%D0%B6%D0%B4%D1%8F.%20%D0%9F%D0%BB%D1%91%D1%81"
+    },
+    "note": "",
+    "source": "https://ru.wikipedia.org/wiki/%D0%9F%D0%BE%D1%81%D0%BB%D0%B5%20%D0%B4%D0%BE%D0%B6%D0%B4%D1%8F.%20%D0%9F%D0%BB%D1%91%D1%81"
+  },
+  {
+    "id": "ART-1763",
+    "title": "У балкона. Испанки Леонора и Ампара",
+    "physicalSizeM": {
+      "width": 0.39,
+      "height": 0.62,
+      "basis": "museum record",
+      "source": "https://my.tretyakov.ru/app/masterpiece/20559"
+    },
+    "note": "",
+    "source": "https://my.tretyakov.ru/app/masterpiece/20559"
+  },
+  {
+    "id": "ART-1766",
+    "title": "In the boat",
+    "physicalSizeM": {
+      "width": 0.425,
+      "height": 0.535,
+      "basis": "museum record",
+      "source": "https://my.tretyakov.ru/app/masterpiece/8438"
+    },
+    "note": "",
+    "source": "https://my.tretyakov.ru/app/masterpiece/8438"
+  }
+]

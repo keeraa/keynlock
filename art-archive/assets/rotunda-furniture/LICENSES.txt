@@ -1,0 +1,6 @@
+These Poly Haven models are distributed under CC0-1.0.
+The gallery bundles the original geometry with textures converted to WebP at up to 1024 px.
+
+Chinese Sofa — https://polyhaven.com/a/chinese_sofa
+Wooden Table 01 — https://polyhaven.com/a/WoodenTable_01
+Sofa 01 — https://polyhaven.com/a/Sofa_01

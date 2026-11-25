@@ -1,0 +1,37 @@
+{
+  "id": "keynlock",
+  "title": "Коллекция Кеййнлок",
+  "paintingIds": [
+    "KNL-0001",
+    "KNL-0002",
+    "KNL-0003",
+    "KNL-0004",
+    "KNL-0005",
+    "KNL-0006",
+    "KNL-0007",
+    "KNL-0008",
+    "KNL-0009",
+    "KNL-0010",
+    "KNL-0011",
+    "KNL-0012",
+    "KNL-0013",
+    "KNL-0014",
+    "KNL-0015",
+    "KNL-0016",
+    "KNL-0017"
+  ],
+  "censorshipStatus": "approved",
+  "gameplay": {
+    "action": "dispose",
+    "implementation": "receiver_v1",
+    "supportId": "table-disposal",
+    "progressKey": "keynlock-art-disposal-v1",
+    "sourceFilesPreserved": true
+  },
+  "sizeNote": "Размеры цифровых работ назначены для игры с сохранением пропорций изображений.",
+  "story": {
+    "premise": "Государство запретило искусство по нелепым причинам и разрешает только картины, восхваляющие государство и его ценности.",
+    "playerGoal": "Убрать государственную пропаганду и восстановить художественную коллекцию.",
+    "recognition": "Единая рисовка, государственное знамя и золотой ключ на знамени или регалиях."
+  }
+}

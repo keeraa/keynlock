@@ -1,0 +1,718 @@
+{
+  "sourceQuality": "Freesound HQ MP3 previews, decoded to 48 kHz stereo PCM WAV; source originals available through linked Freesound accounts.",
+  "footstepsSource": 464519,
+  "excludedFirstStepSeconds": 0.54,
+  "footstepsActiveRms": 0.085,
+  "recordings": {
+    "drop": [
+      "selected/drop-impact.wav"
+    ],
+    "pickup": [
+      "selected/pickup-canvas.wav"
+    ],
+    "unmount": [
+      "selected/unmount.wav"
+    ],
+    "mount": [
+      "selected/mount-contact.wav"
+    ],
+    "deny": [
+      "selected/cannot-place.wav"
+    ],
+    "disposalScrape": [
+      "selected/disposal-scrape.wav"
+    ],
+    "disposal": [
+      "selected/disposal-contact.wav"
+    ],
+    "menu": [
+      "selected/menu.wav"
+    ],
+    "hallComplete": [
+      "selected/hall-complete.wav"
+    ],
+    "correctPlace": [
+      "selected/correct-place.wav"
+    ],
+    "frameFit": [
+      "selected/frame-fit.wav"
+    ],
+    "trolley": [
+      "selected/trolley-roll.wav"
+    ],
+    "wallSlide": [
+      "selected/wall-slide-1.wav",
+      "selected/wall-slide-2.wav",
+      "selected/wall-slide-3.wav",
+      "selected/wall-slide-4.wav",
+      "selected/wall-slide-5.wav",
+      "selected/wall-slide-6.wav"
+    ],
+    "heavyDrag": [
+      "selected/heavy-drag-1.wav",
+      "selected/heavy-drag-2.wav",
+      "selected/heavy-drag-3.wav",
+      "selected/heavy-drag-4.wav",
+      "selected/heavy-drag-5.wav",
+      "selected/heavy-drag-6.wav"
+    ],
+    "wood": [
+      "selected/wood-step-01.wav",
+      "selected/wood-step-02.wav",
+      "selected/wood-step-03.wav",
+      "selected/wood-step-04.wav",
+      "selected/wood-step-05.wav",
+      "selected/wood-step-06.wav",
+      "selected/wood-step-07.wav",
+      "selected/wood-step-08.wav",
+      "selected/wood-step-09.wav",
+      "selected/wood-step-10.wav",
+      "selected/wood-step-11.wav",
+      "selected/wood-step-12.wav",
+      "selected/wood-step-13.wav",
+      "selected/wood-step-14.wav"
+    ]
+  },
+  "levels": {
+    "wood": 0.42,
+    "rug": 0.33,
+    "pickup": 0.42,
+    "unmount": 0.5,
+    "mount": 0.48,
+    "drop": 0.55,
+    "deny": 0.85,
+    "menu": 0.4,
+    "hallComplete": 0.42,
+    "correctPlace": 0.32,
+    "frameFit": 0.45,
+    "disposal": 0.5,
+    "disposalScrape": 0.38,
+    "trolley": 0.3,
+    "heavyDrag": 0.38,
+    "wallSlide": 0.5,
+    "watercolor": 0.32
+  },
+  "clips": [
+    {
+      "file": "drop-impact.wav",
+      "kind": "drop",
+      "sources": [
+        572480
+      ],
+      "window": [
+        5.74,
+        6
+      ],
+      "note": "Один основной контакт внутри выбранных 5–6 с; удалена задержка перед ударом. Запуск за 100 мс до приземления.",
+      "duration": 0.26,
+      "channels": 2,
+      "peak": 0.26218,
+      "activeRms": 0.09
+    },
+    {
+      "file": "pickup-canvas.wav",
+      "kind": "pickup",
+      "sources": [
+        854340
+      ],
+      "window": [
+        1.49,
+        1.69
+      ],
+      "note": "Один короткий шорох подъёма, без соседних движений; 0,20 с.",
+      "duration": 0.2,
+      "channels": 2,
+      "peak": 0.23148,
+      "activeRms": 0.09
+    },
+    {
+      "file": "unmount.wav",
+      "kind": "unmount",
+      "sources": [
+        460467
+      ],
+      "window": [
+        32,
+        34
+      ],
+      "note": "Удалено 1.368 с тишины перед контактом; пики смягчены, громкость выровнена по слышимому фрагменту.",
+      "duration": 0.632,
+      "channels": 2,
+      "peak": 0.78231,
+      "activeRms": 0.396225
+    },
+    {
+      "file": "mount-contact.wav",
+      "kind": "mount",
+      "sources": [
+        829246
+      ],
+      "window": [
+        4,
+        5
+      ],
+      "note": "",
+      "duration": 1.0,
+      "channels": 2,
+      "peak": 0.21962,
+      "activeRms": 0.09
+    },
+    {
+      "file": "cannot-place.wav",
+      "kind": "deny",
+      "sources": [
+        376667
+      ],
+      "window": [
+        37,
+        38
+      ],
+      "note": "Уровень выше остальных коротких контактов; отдельная громкость отказа в движке.",
+      "duration": 1.0,
+      "channels": 2,
+      "peak": 0.4716,
+      "activeRms": 0.16
+    },
+    {
+      "file": "disposal-scrape.wav",
+      "kind": "disposalScrape",
+      "sources": [
+        104013
+      ],
+      "window": [
+        0,
+        4.1401666666666666
+      ],
+      "note": "",
+      "duration": 4.1402,
+      "channels": 2,
+      "peak": 0.30472,
+      "activeRms": 0.075
+    },
+    {
+      "file": "disposal-contact.wav",
+      "kind": "disposal",
+      "sources": [
+        59319
+      ],
+      "window": [
+        18,
+        19.4
+      ],
+      "note": "",
+      "duration": 1.4,
+      "channels": 2,
+      "peak": 0.23732,
+      "activeRms": 0.09
+    },
+    {
+      "file": "menu.wav",
+      "kind": "menu",
+      "sources": [
+        860360
+      ],
+      "window": null,
+      "note": "",
+      "duration": 0.3405,
+      "channels": 2,
+      "peak": 0.3366,
+      "activeRms": 0.085
+    },
+    {
+      "file": "hall-complete.wav",
+      "kind": "hallComplete",
+      "sources": [
+        878614
+      ],
+      "window": null,
+      "note": "",
+      "duration": 2.3423,
+      "channels": 2,
+      "peak": 0.26007,
+      "activeRms": 0.08
+    },
+    {
+      "file": "correct-place.wav",
+      "kind": "correctPlace",
+      "sources": [
+        656431
+      ],
+      "window": [
+        52,
+        57
+      ],
+      "note": "После каждого успешного навешивания. Продлённый хвост; затухание последние 3 секунды.",
+      "duration": 5.0,
+      "channels": 2,
+      "peak": 0.28137,
+      "activeRms": 0.075
+    },
+    {
+      "file": "frame-fit.wav",
+      "kind": "frameFit",
+      "sources": [
+        567863
+      ],
+      "window": [
+        11.36,
+        11.72
+      ],
+      "note": "Один контакт внутри выбранных 11–12 с, без начальной тишины; при входе в подходящую рамку, не каждый кадр.",
+      "duration": 0.36,
+      "channels": 2,
+      "peak": 0.3528,
+      "activeRms": 0.09
+    },
+    {
+      "file": "reserved-cutting-board.wav",
+      "kind": null,
+      "sources": [
+        634125
+      ],
+      "window": null,
+      "note": "Сохранено без назначения; к игровым событиям не подключено.",
+      "duration": 15.3891,
+      "channels": 2,
+      "peak": 0.98166,
+      "activeRms": 0.297069
+    },
+    {
+      "file": "trolley-roll.wav",
+      "kind": "trolley",
+      "sources": [
+        529076
+      ],
+      "window": [
+        1,
+        21
+      ],
+      "note": "Цикл при движении; движок плавно гасит звук при остановке.",
+      "duration": 20.0,
+      "channels": 2,
+      "peak": 0.28042,
+      "activeRms": 0.07
+    },
+    {
+      "file": "wall-slide-1.wav",
+      "kind": "wallSlide",
+      "sources": [
+        842107
+      ],
+      "window": [
+        13.05,
+        13.7
+      ],
+      "note": "Тихое окно без громких фрагментов; только ослабление, плавные края.",
+      "duration": 0.65,
+      "channels": 2,
+      "peak": 0.01535,
+      "activeRms": 0.005375
+    },
+    {
+      "file": "wall-slide-2.wav",
+      "kind": "wallSlide",
+      "sources": [
+        842107
+      ],
+      "window": [
+        84.9,
+        85.55
+      ],
+      "note": "Тихое окно без громких фрагментов; только ослабление, плавные края.",
+      "duration": 0.65,
+      "channels": 2,
+      "peak": 0.02046,
+      "activeRms": 0.006059
+    },
+    {
+      "file": "wall-slide-3.wav",
+      "kind": "wallSlide",
+      "sources": [
+        842107
+      ],
+      "window": [
+        87.75,
+        88.4
+      ],
+      "note": "Тихое окно без громких фрагментов; только ослабление, плавные края.",
+      "duration": 0.65,
+      "channels": 2,
+      "peak": 0.01703,
+      "activeRms": 0.006186
+    },
+    {
+      "file": "wall-slide-4.wav",
+      "kind": "wallSlide",
+      "sources": [
+        842107
+      ],
+      "window": [
+        88.95,
+        89.6
+      ],
+      "note": "Тихое окно без громких фрагментов; только ослабление, плавные края.",
+      "duration": 0.65,
+      "channels": 2,
+      "peak": 0.0202,
+      "activeRms": 0.005456
+    },
+    {
+      "file": "wall-slide-5.wav",
+      "kind": "wallSlide",
+      "sources": [
+        842107
+      ],
+      "window": [
+        103.2,
+        103.85
+      ],
+      "note": "Тихое окно без громких фрагментов; только ослабление, плавные края.",
+      "duration": 0.65,
+      "channels": 2,
+      "peak": 0.01453,
+      "activeRms": 0.005363
+    },
+    {
+      "file": "wall-slide-6.wav",
+      "kind": "wallSlide",
+      "sources": [
+        842107
+      ],
+      "window": [
+        127.2,
+        127.85
+      ],
+      "note": "Тихое окно без громких фрагментов; только ослабление, плавные края.",
+      "duration": 0.65,
+      "channels": 2,
+      "peak": 0.01773,
+      "activeRms": 0.005613
+    },
+    {
+      "file": "heavy-drag-1.wav",
+      "kind": "heavyDrag",
+      "sources": [
+        842107,
+        485143
+      ],
+      "window": [
+        1,
+        2.6
+      ],
+      "note": "Рама только до 25 с; стул подмешан тише, затухание 0,4 с.",
+      "duration": 1.6,
+      "channels": 2,
+      "peak": 0.30246,
+      "activeRms": 0.085
+    },
+    {
+      "file": "heavy-drag-2.wav",
+      "kind": "heavyDrag",
+      "sources": [
+        842107,
+        485143
+      ],
+      "window": [
+        4,
+        5.7
+      ],
+      "note": "Рама только до 25 с; стул подмешан тише, затухание 0,4 с.",
+      "duration": 1.7,
+      "channels": 2,
+      "peak": 0.26654,
+      "activeRms": 0.085
+    },
+    {
+      "file": "heavy-drag-3.wav",
+      "kind": "heavyDrag",
+      "sources": [
+        842107,
+        485143
+      ],
+      "window": [
+        8,
+        9.8
+      ],
+      "note": "Рама только до 25 с; стул подмешан тише, затухание 0,4 с.",
+      "duration": 1.8,
+      "channels": 2,
+      "peak": 0.27556,
+      "activeRms": 0.085
+    },
+    {
+      "file": "heavy-drag-4.wav",
+      "kind": "heavyDrag",
+      "sources": [
+        842107,
+        485143
+      ],
+      "window": [
+        12,
+        13.6
+      ],
+      "note": "Рама только до 25 с; стул подмешан тише, затухание 0,4 с.",
+      "duration": 1.6,
+      "channels": 2,
+      "peak": 0.27352,
+      "activeRms": 0.085
+    },
+    {
+      "file": "heavy-drag-5.wav",
+      "kind": "heavyDrag",
+      "sources": [
+        842107,
+        485143
+      ],
+      "window": [
+        17,
+        18.8
+      ],
+      "note": "Рама только до 25 с; стул подмешан тише, затухание 0,4 с.",
+      "duration": 1.8,
+      "channels": 2,
+      "peak": 0.24731,
+      "activeRms": 0.085
+    },
+    {
+      "file": "heavy-drag-6.wav",
+      "kind": "heavyDrag",
+      "sources": [
+        842107,
+        485143
+      ],
+      "window": [
+        22,
+        24
+      ],
+      "note": "Рама только до 25 с; стул подмешан тише, затухание 0,4 с.",
+      "duration": 2.0,
+      "channels": 2,
+      "peak": 0.26318,
+      "activeRms": 0.085
+    },
+    {
+      "file": "wood-step-01.wav",
+      "kind": "wood",
+      "sources": [
+        464519
+      ],
+      "window": [
+        1.608,
+        1.965
+      ],
+      "note": "Первый удар источника исключён. Одинаковая активная RMS-громкость, короткие плавные края.",
+      "duration": 0.357,
+      "channels": 2,
+      "peak": 0.28738,
+      "activeRms": 0.085
+    },
+    {
+      "file": "wood-step-02.wav",
+      "kind": "wood",
+      "sources": [
+        464519
+      ],
+      "window": [
+        2.848,
+        3.205
+      ],
+      "note": "Первый удар источника исключён. Одинаковая активная RMS-громкость, короткие плавные края.",
+      "duration": 0.357,
+      "channels": 2,
+      "peak": 0.29815,
+      "activeRms": 0.085
+    },
+    {
+      "file": "wood-step-03.wav",
+      "kind": "wood",
+      "sources": [
+        464519
+      ],
+      "window": [
+        4.088,
+        4.505
+      ],
+      "note": "Первый удар источника исключён. Одинаковая активная RMS-громкость, короткие плавные края.",
+      "duration": 0.417,
+      "channels": 2,
+      "peak": 0.3628,
+      "activeRms": 0.085
+    },
+    {
+      "file": "wood-step-04.wav",
+      "kind": "wood",
+      "sources": [
+        464519
+      ],
+      "window": [
+        5.268,
+        5.625
+      ],
+      "note": "Первый удар источника исключён. Одинаковая активная RMS-громкость, короткие плавные края.",
+      "duration": 0.357,
+      "channels": 2,
+      "peak": 0.26376,
+      "activeRms": 0.085
+    },
+    {
+      "file": "wood-step-05.wav",
+      "kind": "wood",
+      "sources": [
+        464519
+      ],
+      "window": [
+        6.468,
+        6.825
+      ],
+      "note": "Первый удар источника исключён. Одинаковая активная RMS-громкость, короткие плавные края.",
+      "duration": 0.357,
+      "channels": 2,
+      "peak": 0.34702,
+      "activeRms": 0.085
+    },
+    {
+      "file": "wood-step-06.wav",
+      "kind": "wood",
+      "sources": [
+        464519
+      ],
+      "window": [
+        7.568,
+        7.945
+      ],
+      "note": "Первый удар источника исключён. Одинаковая активная RMS-громкость, короткие плавные края.",
+      "duration": 0.377,
+      "channels": 2,
+      "peak": 0.25455,
+      "activeRms": 0.085
+    },
+    {
+      "file": "wood-step-07.wav",
+      "kind": "wood",
+      "sources": [
+        464519
+      ],
+      "window": [
+        8.628,
+        9.065
+      ],
+      "note": "Первый удар источника исключён. Одинаковая активная RMS-громкость, короткие плавные края.",
+      "duration": 0.437,
+      "channels": 2,
+      "peak": 0.34913,
+      "activeRms": 0.085
+    },
+    {
+      "file": "wood-step-08.wav",
+      "kind": "wood",
+      "sources": [
+        464519
+      ],
+      "window": [
+        9.868,
+        10.225
+      ],
+      "note": "Первый удар источника исключён. Одинаковая активная RMS-громкость, короткие плавные края.",
+      "duration": 0.357,
+      "channels": 2,
+      "peak": 0.33643,
+      "activeRms": 0.085
+    },
+    {
+      "file": "wood-step-09.wav",
+      "kind": "wood",
+      "sources": [
+        464519
+      ],
+      "window": [
+        11.008,
+        11.405
+      ],
+      "note": "Первый удар источника исключён. Одинаковая активная RMS-громкость, короткие плавные края.",
+      "duration": 0.397,
+      "channels": 2,
+      "peak": 0.30501,
+      "activeRms": 0.085
+    },
+    {
+      "file": "wood-step-10.wav",
+      "kind": "wood",
+      "sources": [
+        464519
+      ],
+      "window": [
+        12.128,
+        12.505
+      ],
+      "note": "Первый удар источника исключён. Одинаковая активная RMS-громкость, короткие плавные края.",
+      "duration": 0.377,
+      "channels": 2,
+      "peak": 0.27605,
+      "activeRms": 0.085
+    },
+    {
+      "file": "wood-step-11.wav",
+      "kind": "wood",
+      "sources": [
+        464519
+      ],
+      "window": [
+        13.348,
+        13.705
+      ],
+      "note": "Первый удар источника исключён. Одинаковая активная RMS-громкость, короткие плавные края.",
+      "duration": 0.357,
+      "channels": 2,
+      "peak": 0.25263,
+      "activeRms": 0.085
+    },
+    {
+      "file": "wood-step-12.wav",
+      "kind": "wood",
+      "sources": [
+        464519
+      ],
+      "window": [
+        14.388,
+        14.785
+      ],
+      "note": "Первый удар источника исключён. Одинаковая активная RMS-громкость, короткие плавные края.",
+      "duration": 0.397,
+      "channels": 2,
+      "peak": 0.30817,
+      "activeRms": 0.085
+    },
+    {
+      "file": "wood-step-13.wav",
+      "kind": "wood",
+      "sources": [
+        464519
+      ],
+      "window": [
+        15.508,
+        15.905
+      ],
+      "note": "Первый удар источника исключён. Одинаковая активная RMS-громкость, короткие плавные края.",
+      "duration": 0.397,
+      "channels": 2,
+      "peak": 0.32817,
+      "activeRms": 0.085
+    },
+    {
+      "file": "wood-step-14.wav",
+      "kind": "wood",
+      "sources": [
+        464519
+      ],
+      "window": [
+        16.648,
+        17.025
+      ],
+      "note": "Первый удар источника исключён. Одинаковая активная RMS-громкость, короткие плавные края.",
+      "duration": 0.377,
+      "channels": 2,
+      "peak": 0.36209,
+      "activeRms": 0.085
+    }
+  ]
+}

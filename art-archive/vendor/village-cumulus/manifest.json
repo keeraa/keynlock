@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "id": "@village/cumulus",
+  "version": "1.1.0",
+  "capabilities": [
+    "atmosphere.cumulus"
+  ],
+  "dependencies": {
+    "@village/runtime": "1.0.0"
+  },
+  "entry": "village-cumulus.js",
+  "files": [
+    "village-cumulus.js",
+    "village-cumulus-field.js",
+    "village-nature-variant-settings.js",
+    "village-cloud-field.js"
+  ],
+  "moduleEntries": {
+    "field": "village-cloud-field.js",
+    "settings": "village-nature-variant-settings.js"
+  },
+  "integrity": {
+    "village-cumulus.js": "92b8a1acfcab620cdd49f7a22cbc168d3dec873fb810fbcc6831e3d62d6a168e",
+    "village-cumulus-field.js": "ca3872c1839f64700f0200f73f0bff0a0bd3513582fe01c9f01edeaeb9f1ec40",
+    "village-nature-variant-settings.js": "816b47fe2bcb5de520e09f85691ac66f7b84edcff8396daf35f522beba1fd333",
+    "village-cloud-field.js": "de4e785b72ca13428619b30e79bfef0c24eb334c6fa829c66e51dec3dfb25b4d"
+  }
+}

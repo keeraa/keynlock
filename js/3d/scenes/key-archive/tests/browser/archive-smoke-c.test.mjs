@@ -14,8 +14,9 @@ test('Chromium renders the Three.js hall and opens the visual controls', { timeo
   const errors = await enterArchive(page, 'webgl');
   const visualState = await page.locator('#visual-status').textContent();
   assert.notEqual(visualState, 'Canvas 2D', 'WebGL unexpectedly fell back to Canvas');
-  const frameCount = Number(await page.locator('#fps').textContent());
-  assert.ok(Number.isFinite(frameCount) && frameCount > 0);
+  // On software WebGL the first sample can round to zero while the hall warms up.
+  await page.waitForFunction(() => Number(document.querySelector('#fps').textContent) > 0,
+    null, { timeout: 30000 * SLOW });
   // SwiftShader can stall on full-page WebGL readback; the smoke test checks
   // live rendering and shader errors instead. Canvas snapshots remain in CI.
   await page.keyboard.press('Escape');
@@ -76,7 +77,8 @@ test('the hall retains held keys, migrates old baths and accepts a drop action',
   const muddy = state.keys.find(key => key.mud);
   muddy.status = 'bath';
   muddy.bathId = 'far-mud';
-  muddy.bathUntil = Date.now() + 60000;
+  // This test checks a bath still in progress after loading and dropping a key.
+  muddy.bathUntil = Date.now() + 120000 * SLOW;
   await page.addInitScript(({ storageKey, snapshot }) => localStorage.setItem(storageKey, snapshot),
     { storageKey: STORAGE_KEY, snapshot: JSON.stringify(state) });
   const aim = await installTestCamera(page);

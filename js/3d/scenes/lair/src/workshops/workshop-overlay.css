@@ -66,6 +66,8 @@
   min-height: 0;
   border: 0;
   background: transparent;
+  /* Match the embedded document's scheme so Chromium keeps its canvas transparent. */
+  color-scheme: dark;
   visibility: hidden;
   pointer-events: none;
 }
@@ -74,9 +76,12 @@
   pointer-events: auto;
 }
 
+#app:has(.workshop-overlay.workshop-open[data-workshop="workbench"]) > :is(.topbar, .scene-hotspots, .bottom-ui) {
+  visibility: hidden;
+}
+
 .atelier-mode .scene-hotspots,
-.atelier-mode .bottom-ui .interaction-hint,
-.atelier-mode .bottom-ui {background:none;pointer-events:none}
+.atelier-mode .bottom-ui .interaction-hint {pointer-events:none}
 /* The collection entrance remains pinned to the painted left wall as the
    unified Lair camera orbits around it. */
 .wall-collection-entry {
@@ -151,7 +156,8 @@
 .lair-easel-camera-controls > button:hover{background:#70573b55}
 /* Places the Atelier fills with its own controls (its embedded-layout.js and
    styles/embedding.css): the top right corner and the header beside «В ЛОГОВО». */
-.lair-atelier-header{position:fixed;z-index:150;display:flex}
+.lair-atelier-header{display:flex;min-width:0}
+.lair-atelier-header #collection-footer{min-width:0;overflow:hidden;text-overflow:ellipsis}
 .lair-atelier-corner{position:absolute;z-index:24;top:84px;right:36px;display:flex;align-items:flex-start;gap:16px}
 .lair-atelier-header[hidden],.lair-atelier-corner[hidden]{display:none!important}
 .lair-easel-camera-controls > button:disabled{opacity:.35;cursor:default}

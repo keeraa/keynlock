@@ -286,9 +286,10 @@ test('the pause menu switches the shared music player\'s tracks', { timeout: 600
   const controls = page.locator('#music-controls');
   await controls.waitFor({ state: 'visible' });
   const title = controls.locator('.music-controls__title');
-  assert.equal(await title.innerText(), 'Шопен · Ноктюрн op. 9 № 1');
+  const titleText = async () => (await title.innerText()).replace(/\s*▾$/, '');
+  assert.equal(await titleText(), 'Шопен · Ноктюрн op. 9 № 1');
   await controls.getByRole('button', { name: 'Следующий трек' }).click();
-  assert.equal(await title.innerText(), 'Шопен · Ноктюрн op. 9 № 2');
+  assert.equal(await titleText(), 'Шопен · Ноктюрн op. 9 № 2');
   assert.equal(JSON.parse(await page.evaluate(() => localStorage.getItem('keynlock-archive-music-position-v1'))).track,
     'chopin-nocturne-op9-no2.mp3');
   await page.locator('#pause .menu-card').screenshot({ path: `${process.cwd()}/test-results/pause-music.png` });

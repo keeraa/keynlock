@@ -3,7 +3,7 @@ import { getPaintingLore, getPaintingLoreLabels } from './lore/painting-lore.js'
 import { t } from './i18n.js';
 
 export function createPaintingCollectionUI({ paintings, onSelect, $, root, extraRoots = [], isRestored = () => false,
-  getWallIds = () => [], onToggleWall = () => {}, onOpenChange = (open) => {} }) {
+  isWallEligible = () => true, getWallIds = () => [], onToggleWall = () => {}, onOpenChange = (open) => {} }) {
   const modal = $('collection-modal');
   const search = $('collection-search');
   const filters = $('collection-filters');
@@ -27,7 +27,7 @@ export function createPaintingCollectionUI({ paintings, onSelect, $, root, extra
   $('collection-policy-explanation').textContent = loreLabels.policyExplanation;
 
   function candidates() {
-    return mode === 'wall' ? paintings.filter((art) => isRestored(art.id)) : paintings;
+    return mode === 'wall' ? paintings.filter((art) => isRestored(art.id) && isWallEligible(art.id)) : paintings;
   }
 
   function renderMode() {

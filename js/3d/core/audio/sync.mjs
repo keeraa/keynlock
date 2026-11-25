@@ -1,7 +1,7 @@
-/** Mirror the canonical music modules (core/audio) into the static scenes, which cannot import them.
+/** Mirror the shared sound modules and recordings into the static scenes, which cannot import them.
  * Run at repository root: node js/3d/core/audio/sync.mjs --check|--sync
  */
-import { readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const here = dirname(fileURLToPath(import.meta.url));
@@ -9,18 +9,20 @@ const root = resolve(here, '../../../..');
 const manifest = JSON.parse(await readFile(resolve(here, 'manifest.json'), 'utf8'));
 const mode = process.argv.includes('--sync') ? 'sync' : 'check';
 let changed = 0;
-for (const module of manifest.modules) {
-  const canonical = await readFile(resolve(here, module), 'utf8');
+const files = [...manifest.modules, ...manifest.assets.map(asset => `../${asset}`)];
+for (const file of files) {
+  const canonical = await readFile(resolve(here, file));
   for (const consumer of manifest.consumers) {
-    const destination = resolve(root, consumer, module);
+    const destination = resolve(root, consumer, file);
     let current = null;
-    try { current = await readFile(destination, 'utf8'); } catch { /* missing copy */ }
-    if (current === canonical) continue;
+    try { current = await readFile(destination); } catch { /* missing copy */ }
+    if (current?.equals(canonical)) continue;
     changed++;
     if (mode === 'sync') {
+      await mkdir(dirname(destination), { recursive: true });
       await writeFile(destination, canonical);
-      process.stdout.write(`synced ${consumer}/${module}\n`);
-    } else process.stderr.write(`out of sync ${consumer}/${module}\n`);
+      process.stdout.write(`synced ${consumer}/${file}\n`);
+    } else process.stderr.write(`out of sync ${consumer}/${file}\n`);
   }
 }
 if (mode === 'check' && changed) process.exitCode = 1;

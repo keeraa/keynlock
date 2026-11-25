@@ -33,7 +33,7 @@ export function mountLairMusic({ window: browserWindow, storage, mounts }) {
     if (element) mountMusicControls(element, music, { labels: labels(), language: translator.language, volume, playlist });
   const begin = event => {
     // The controls start the player themselves (a click on pause must not play first).
-    if (event.target instanceof Element && event.target.closest('.music-controls')) return;
+    if (event.target instanceof Element && event.target.closest('.music-controls, .lair-music-dock')) return;
     music.start();
     browserWindow.removeEventListener('pointerdown', begin, true);
     browserWindow.removeEventListener('keydown', begin, true);

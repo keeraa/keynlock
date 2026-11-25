@@ -2,8 +2,7 @@ import { createFrameGeometry } from './frame-geometry.js';
 import { createWallArtworkPicker } from './wall-artwork-picker.js';
 import { createWallPreviewCache } from './wall-preview-cache.js';
 import { layoutWallPaintings, WALL_CAPACITY, WALL_TOP,
-  WALL_WIDTH, WALL_COLUMNS } from './wall-layout.js';
-import { paintingCategory } from './painting-catalog.js';
+  WALL_WIDTH, WALL_COLUMNS, wallPaintingCategory } from './wall-layout.js';
 
 /** A compact, high-mounted salon wall. Preview textures are separate from the easel LRU. */
 export function createWallGallery({ THREE, scene, camera, renderer, frameWood,
@@ -18,12 +17,14 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood,
   paintingsRoot.name = 'restored-frames';
   root.add(paintingsRoot);
   const galleryWidth = wallLayout?.width ?? WALL_WIDTH;
+  const columns = wallLayout?.columns ?? WALL_COLUMNS;
+  const categories = new Set(columns.map(({ id }) => id));
   const labelCanvas = document.createElement('canvas');
   labelCanvas.width = Math.round(4096 * galleryWidth / WALL_WIDTH);
   labelCanvas.height = 192;
   const labelContext = labelCanvas.getContext('2d');
-  const labelStep = labelCanvas.width / WALL_COLUMNS.length;
-  for (const [index, column] of WALL_COLUMNS.entries()) {
+  const labelStep = labelCanvas.width / columns.length;
+  for (const [index, column] of columns.entries()) {
     const center = (index + .5) * labelStep;
     const [name, subtitle] = column.label.toUpperCase().split(' · ');
     labelContext.fillStyle = '#f0dcb6';
@@ -45,9 +46,9 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood,
     new THREE.MeshBasicMaterial({ map: labelTexture, transparent: true, depthWrite: false,
       toneMapped: false }),
   );
-  labelStrip.name = 'twelve-art-history-column-headings';
+  labelStrip.name = 'art-history-column-headings';
   labelStrip.userData.excludeFromInk = true;
-  labelStrip.position.set(wallLayout?.centerX ?? 0, WALL_TOP - .42, .035);
+  labelStrip.position.set(wallLayout?.centerX ?? 0, (wallLayout?.topY ?? WALL_TOP) - .42, .035);
   root.add(labelStrip);
 
   const previewCache = createWallPreviewCache({ THREE, renderer });
@@ -188,7 +189,7 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood,
 
   async function setPaintings(paintings, { onProgress = () => {} } = {}) {
     const request = ++revision;
-    const selected = paintings.slice(0, WALL_CAPACITY);
+    const selected = paintings.filter(art => categories.has(wallPaintingCategory(art))).slice(0, WALL_CAPACITY);
     previewCache.retain(selected.map((art) => art.id));
     const sources = new Map(selected.map((art) => {
       const ready = previewCache.getReady(art);
@@ -204,7 +205,7 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood,
     const remaining = new Map();
     for (const art of selected) {
       if (sources.get(art.id).texture) continue;
-      const category = paintingCategory(art);
+      const category = wallPaintingCategory(art);
       remaining.set(category, (remaining.get(category) || 0) + 1);
     }
 
@@ -221,7 +222,7 @@ export function createWallGallery({ THREE, scene, camera, renderer, frameWood,
       }
       loaded++;
       onProgress({ loaded, total: selected.length });
-      const category = paintingCategory(art);
+      const category = wallPaintingCategory(art);
       remaining.set(category, remaining.get(category) - 1);
       if (remaining.get(category) === 0) {
         // Column dimensions depend on each other's aspect ratios. Reflow one

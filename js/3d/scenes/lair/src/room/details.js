@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { createDust } from '../../../../core/rendering/dust.js';
 import { WINDOW_LIGHT_GLSL, WINDOW_LIGHT_TINT } from './window-light.js';
-import { ROOM_END, ROOM_LENGTH, ROOM_START } from '../room-layout.js';
+import { ROOM_CEILING_Y, ROOM_END, ROOM_LENGTH, ROOM_START } from '../room-layout.js';
 
 // The gramophone corner and the floating dust.
 export function buildGramophone(kit) {
@@ -46,7 +46,7 @@ export function buildDetails(kit, { windowLight } = {}) {
   // Atelier's and the lab's corners included; specks in the window beam
   // catch its light (and the bird's shadow).
   const ambientParticles = createDust(staticGroup, {
-    min: [-7.8, .3, ROOM_START + .3], max: [7.8, 12.9, ROOM_END - .3],
+    min: [-7.8, .3, ROOM_START + .3], max: [7.8, ROOM_CEILING_Y - .6, ROOM_END - .3],
     count: Math.round(420 * ROOM_LENGTH / 11.9),
     light: windowLight && {
       glsl: `uniform float uWindowLight;\n${WINDOW_LIGHT_GLSL}\nfloat dustLightAt(vec3 p) { return uWindowLight * lairWindowLightAt(p); }`,

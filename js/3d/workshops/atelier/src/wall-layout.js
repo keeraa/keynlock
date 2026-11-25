@@ -1,7 +1,7 @@
 // @ts-check
 import { collectionCategories, paintingCategory } from './painting-catalog.js';
 
-/** Twelve art movements run from left to right as tall columns of restored paintings. */
+/** Art movements run from left to right as tall columns of restored paintings. */
 export const WALL_CAPACITY = 30;
 export const WALL_WIDTH = 30;
 export const WALL_HEIGHT = 8.155; // Keep the exhibition 30% shorter than the original.
@@ -14,6 +14,12 @@ export const WALL_HEADER_HEIGHT = .95;
 const VERTICAL_GAP = .19;
 const FRAME_RIM = .052;
 const MAX_IMAGE_HEIGHT = 2.23;
+const wallCategories = new Set(WALL_COLUMNS.map(({ id }) => id));
+
+export function wallPaintingCategory(art) {
+  const category = paintingCategory(art);
+  return wallCategories.has(category) ? category : 'modern';
+}
 
 function hash(id) {
   let value = 2166136261;
@@ -35,19 +41,24 @@ function dimensions(art, maxImageWidth) {
     outerWidth: width + 2 * FRAME_RIM, outerHeight: height + 2 * FRAME_RIM };
 }
 
-export function layoutWallPaintings(artworks, { width = WALL_WIDTH, centerX = 0 } = {}) {
-  const columnWidth = width / WALL_COLUMNS.length;
+export function layoutWallPaintings(artworks, { width = WALL_WIDTH, centerX = 0, topY = WALL_TOP, columns: allowedColumns = WALL_COLUMNS } = {}) {
+  const columnWidth = width / allowedColumns.length;
   const minX = centerX - width / 2;
   const maxImageWidth = columnWidth - .36;
-  const grouped = new Map(WALL_COLUMNS.map(({ id }) => [id, []]));
-  for (const art of artworks.slice(0, WALL_CAPACITY)) {
-    const category = paintingCategory(art);
-    grouped.get(grouped.has(category) ? category : 'modern').push(art);
+  const bottomY = WALL_TOP - WALL_HEIGHT;
+  const availableHeight = topY - bottomY - WALL_HEADER_HEIGHT - .18;
+  const grouped = new Map(allowedColumns.map(({ id }) => [id, []]));
+  let shown = 0;
+  for (const art of artworks) {
+    const group = grouped.get(wallPaintingCategory(art));
+    if (!group) continue;
+    group.push(art);
+    if (++shown === WALL_CAPACITY) break;
   }
 
   const columns = [];
   const placements = [];
-  for (const [index, { id, label }] of WALL_COLUMNS.entries()) {
+  for (const [index, { id, label }] of allowedColumns.entries()) {
     const columnX = minX + columnWidth * (index + .5);
     const works = grouped.get(id);
     columns.push({ id, label, index, centerX: columnX, count: works.length });
@@ -56,10 +67,9 @@ export function layoutWallPaintings(artworks, { width = WALL_WIDTH, centerX = 0 
     const rectangles = works.map((art) => ({ art, ...dimensions(art, maxImageWidth) }));
     const totalHeight = rectangles.reduce((sum, rect) => sum + rect.outerHeight, 0)
       + VERTICAL_GAP * (works.length - 1);
-    const availableHeight = WALL_HEIGHT - WALL_HEADER_HEIGHT - .18;
     const scale = Math.min(1, availableHeight / totalHeight);
     const between = VERTICAL_GAP * scale;
-    let top = WALL_TOP - WALL_HEADER_HEIGHT;
+    let top = topY - WALL_HEADER_HEIGHT;
 
     for (const rect of rectangles) {
       const width = rect.imageWidth * scale;
@@ -82,7 +92,7 @@ export function layoutWallPaintings(artworks, { width = WALL_WIDTH, centerX = 0 
   return {
     placements, columns,
     bounds: { minX, maxX: minX + width,
-      minY: WALL_TOP - WALL_HEIGHT, maxY: WALL_TOP,
+      minY: bottomY, maxY: topY,
       width, columnWidth },
   };
 }

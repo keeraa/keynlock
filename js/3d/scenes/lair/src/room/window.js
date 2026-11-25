@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { makeCurtainLinenTexture } from './materials.js';
 import { loadCityWindowTextures } from './window-city-art.js';
+import { ROOM_WINDOW_WALL_Z } from '../room-layout.js';
 
 // The arched window on the far wall, the city behind it and the curtains.
 const WINDOW_POSITION = Object.freeze([-.05, 1.00, -5.65]);
@@ -21,7 +22,7 @@ export const WINDOW_CUTOUT = Object.freeze({
 /** The glazed opening in world units; the window light is cast through it. */
 export const WINDOW_OPENING = Object.freeze({
   centerX: WINDOW_POSITION[0],
-  wallZ: -5.485,                                   // front face of the masonry
+  wallZ: ROOM_WINDOW_WALL_Z,                        // front face of the masonry
   sill: WINDOW_POSITION[1] + .08,                  // bottom of the glass
   spring: WINDOW_POSITION[1] + straightHeight - .05, // where the arch begins
   crown: WINDOW_POSITION[1] + straightHeight - .05 + archRise - .16,

@@ -8,12 +8,14 @@ const CLOSE_UP_FRAME_FRACTION = .48;
 export function createWallExhibitionController({ paintings, playerProgress, wallGallery,
   collectionUI, getNavigation, getWorkshopUI, showToast, $ }) {
   const artById = new Map(paintings.map((art) => [art.id, art]));
-  let demoArtworks = chooseDemoWallPaintings(paintings);
+  const columns = wallGallery.getLayout().columns;
+  const chooseDemo = () => chooseDemoWallPaintings(paintings, Math.random, columns);
+  let demoArtworks = chooseDemo();
   let showingDemo = true;
   let priorWorkbenchVisible = null;
   let viewedId = null;
   let lastAutoPickAt = -Infinity;
-  const artworkInfo = createWallArtworkInfo({ $ });
+  const artworkInfo = createWallArtworkInfo({ $, columnCount: columns.length });
   const displaySwitchLabel = () => showingDemo ? t('МОИ КАРТИНЫ') : t('ДЕМО · 30');
 
   function updateCounters() {
@@ -123,7 +125,7 @@ export function createWallExhibitionController({ paintings, playerProgress, wall
   }
 
   function shuffle() {
-    demoArtworks = chooseDemoWallPaintings(paintings);
+    demoArtworks = chooseDemo();
     refreshModeHeader();
   }
 

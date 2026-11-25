@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createMaterials } from './room/materials.js';
 import { buildLair } from './room/build.js';
+import { loadPlanningFurniture } from './room/planning-furniture.js';
+import { loadPlanningBooks } from './room/planning.js';
 import { ROOM_CENTER_Z, ROOM_END } from './room-layout.js';
 import { mountVisualSettings } from './ui/visual-settings.js';
 import { createSceneOutline } from './rendering/scene-outline.js';
@@ -11,9 +13,11 @@ import { createAtelierEmbedding } from '@keynlock/atelier/embedding';
 import { createAlchemyEmbedding } from '@keynlock/alchemy/embedding';
 import { createSharedRendererHost } from './rendering/shared-renderer-host.js';
 import { addRoomLighting } from './room/lighting.js';
+import { mountWindowBirds } from './room/window-birds.js';
 import { createDayNight } from './room/day-night.js';
 import { mountPerformancePanel } from './ui/performance-panel.js';
 import { mountLairMusic } from './audio/music.js';
+import { mountMusicDock } from './audio/music-dock.js';
 import { startLairFrames } from './lair-frame-loop.js';
 import './ui/performance.css';
 import { createZoneTransitions } from './navigation/zone-transitions.js';
@@ -41,6 +45,7 @@ mountLairMusic({ window, storage: musicStorage, mounts: [
   { element: document.querySelector('#lair-music'), playlist: 'menu' },
   { element: document.querySelector('#panel-music'), volume: true, playlist: 'list' },     // the gramophone's panel
 ] });
+mountMusicDock(document.querySelector('.lair-music-dock'));
 
 function setup() {
   const app = document.querySelector('#app');
@@ -71,7 +76,7 @@ function setup() {
   renderer.shadowMap.autoUpdate = false;
   renderer.shadowMap.needsUpdate = true;
 
-  const homePosition = new THREE.Vector3(.25, 8.35, ROOM_END + 4.78);
+  const homePosition = new THREE.Vector3(.25, 8.35, ROOM_END - .7);
   const homeTarget = new THREE.Vector3(0, 4.70, ROOM_CENTER_Z - .75);
   const roomMinDistance = 3;
   const scene = new THREE.Scene();
@@ -101,8 +106,10 @@ function setup() {
   const roomLights = scene.children.filter(child => child.isLight);
   const { materials, visual } = createMaterials();
   const room = buildLair(scene, materials);
+  room.animated.push(mountWindowBirds(scene, renderer, room.windowLight.birdPositions));
   let atelierPanelHeight = 0;
-  const atelier = createAtelierEmbedding({ host: host.atelier, t,
+  const atelier = createAtelierEmbedding({ host: host.atelier,
+    excludedGalleryCategories: ['china', 'korea', 'india', 'rococo'],
     // Places on the Lair's screen the Atelier puts some controls into.
     slots: { corner: document.querySelector('#lair-atelier-corner'), header: document.querySelector('#lair-atelier-header') },
     onPanelHeight: height => { atelierPanelHeight = height; app.style.setProperty('--atelier-panel-height', `${height}px`); },
@@ -129,15 +136,30 @@ function setup() {
   quality.apply();
   const performancePanel = mountPerformancePanel({ document, renderer, scene, canvas });
   const dayNight = createDayNight(night => { room.setNight(night); lighting.setNight(night); });
+  const roomWalk = createRoomWalk({
+    scene, camera, interaction,
+    onMenu: open => visualUI.setOpen(open),
+    onInteract: () => zoneInteraction.openWalkTarget(),
+  });
   const visualUI = mountVisualSettings({ visual, room, quality, setNight: night => dayNight.set(night), outlines,
-    grain: document.querySelector('.grain'), onOpen: () => { panel.hidden = true; } });
+    grain: document.querySelector('.grain'), onOpenChange(open) {
+      if (open) panel.hidden = true;
+      roomWalk.setMenuOpen(open);
+    } });
   // The lab's background choice paints the Lair's right wall (its real background).
   host.alchemy.setWallFinish = colour => visualUI.setWallTile(colour);
   host.alchemy.getWallFinish = () => visualUI.state()['wall-tile'];
-  const roomWalk = createRoomWalk({
-    scene, camera, interaction,
-    onExit: () => zoneTransitions.reset(),
-    onInteract: () => zoneInteraction.openWalkTarget(),
+  loadPlanningFurniture(scene, renderer).then(props => {
+    room.windowLight.addFurniture(...props);
+    roomWalk.refreshObstacles();
+    renderer.shadowMap.needsUpdate = true;
+  }).catch(error => {
+    console.warn('Lair: could not place the planning furniture', error);
+  });
+  loadPlanningBooks(scene).then(() => {
+    renderer.shadowMap.needsUpdate = true;
+  }).catch(error => {
+    console.warn('Lair: could not load the planning books', error);
   });
   window.__keynlockDebug.walk = roomWalk;
   const atelierView = createAtelierView({
@@ -179,8 +201,6 @@ function setup() {
     atelierStatus: atelier.status,
     alchemyStatus: alchemy.status,
     onAtelierModelsReady() {
-      const worktable = scene.getObjectByName('restoration-worktable');
-      if (worktable) room.windowLight.addFurniture(worktable);
       roomWalk.refreshObstacles();
       // One look for the whole room: the Atelier's furniture takes the room's
       // gouache settings (the paintings keep their true colours). The ink

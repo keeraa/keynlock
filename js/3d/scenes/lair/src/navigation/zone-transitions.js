@@ -3,6 +3,7 @@ import { WORKSHOPS } from '../workshops/workshop-overlay.js';
 import { t } from '../i18n.js';
 import { createWorkshopLighting } from '../rendering/workshop-lighting.js';
 import { zoneDefinitions, zoneOrder } from './zone-definitions.js';
+import { constrainRoomCameraPosition, constrainRoomCameraTarget } from './room-camera-bounds.js';
 
 /** The walker's field of view (room-walk.js). */
 const WALK_FOV = 56;
@@ -92,7 +93,9 @@ export function createZoneTransitions({
   function focus(position, target, fov = roomFov) {
     atelierView.cancelFlight();
     desiredPosition.set(...position);
+    constrainRoomCameraPosition(desiredPosition);
     desiredTarget.set(...target);
+    constrainRoomCameraTarget(desiredTarget);
     desiredFov = fov;
     transitioning = true;
     controls.minDistance = roomMinDistance;

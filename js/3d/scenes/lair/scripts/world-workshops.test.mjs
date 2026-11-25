@@ -1,3 +1,4 @@
+import { runInNewContext } from 'node:vm';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
@@ -132,3 +133,34 @@ test('embedded lab suppresses its second background rig and scales point lights 
   assert.equal(bulb.visible,false);
 });
 
+
+test('the shared room renderer can read workbench geometry from an embedded window', () => {
+  const world = new THREE.Scene();
+  const registry = createWorldWorkshopRegistry(world);
+  const scene = new THREE.Scene();
+  registry.register('workbench', { scene, camera: new THREE.PerspectiveCamera() });
+  const { vertices, indices, matrices } = runInNewContext(`({
+    vertices: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
+    indices: new Uint16Array([0, 1, 2]),
+    matrices: new Float32Array(16),
+  })`);
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+  geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+  const mesh = new THREE.InstancedMesh(geometry, new THREE.MeshBasicMaterial(), 1);
+  mesh.instanceMatrix.array = matrices;
+  scene.add(mesh);
+
+  registry.setLighting('workbench');
+  registry.update();
+  const position = geometry.getAttribute('position');
+  assert.ok(position.array instanceof Float32Array);
+  assert.ok(geometry.index.array instanceof Uint16Array);
+  assert.equal(position.array.buffer, vertices.buffer);
+  assert.ok(mesh.instanceMatrix.array instanceof Float32Array);
+  assert.equal(mesh.instanceMatrix.array.buffer, matrices.buffer);
+  vertices[3] = 2;
+  assert.equal(position.getX(1), 2);
+  registry.update();
+  assert.equal(position.array.buffer, vertices.buffer);
+});

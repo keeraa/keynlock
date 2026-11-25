@@ -1,4 +1,15 @@
 {
-  "modules": ["music-player.js", "music-tracks.js", "music-controls.js"],
+  "modules": ["music-player.js", "music-tracks.js", "music-controls.js", "foley.js", "footsteps.js"],
+  "assets": [
+    "assets/footsteps/LICENSE.txt",
+    "assets/footsteps/wood-1.wav",
+    "assets/footsteps/wood-2.wav",
+    "assets/footsteps/wood-3.wav",
+    "assets/footsteps/wood-4.wav",
+    "assets/footsteps/rug-1.wav",
+    "assets/footsteps/rug-2.wav",
+    "assets/footsteps/rug-3.wav",
+    "assets/footsteps/rug-4.wav"
+  ],
   "consumers": ["js/3d/scenes/key-archive/dist/js"]
 }

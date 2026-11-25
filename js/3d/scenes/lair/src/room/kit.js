@@ -104,15 +104,16 @@ export function createRoomKit(scene, m) {
     scene.add(collider); hitTargets.push(collider);
   };
 
-  function makeTable(parent, w, d, x, z, topY, floorY = .0385) {
+  function makeTable(parent, w, d, x, z, topY, floorY = .0385, tabletopThickness = .20, stretcherSide = 1) {
     const table = new THREE.Group(); table.position.set(x, floorY, z); parent.add(table);
-    box(table, w, .2, d, m.walnut, 0, topY, 0, .04);
-    box(table, w - .16, .12, d - .16, m.darkWood, 0, topY - .15, 0);
+    const underside = topY - tabletopThickness / 2;
+    box(table, w, tabletopThickness, d, m.walnut, 0, topY, 0, .04);
+    box(table, w - .16, .12, d - .16, m.darkWood, 0, underside - .05, 0);
     for (const xx of [-w / 2 + .19, w / 2 - .19]) for (const zz of [-d / 2 + .19, d / 2 - .19]) {
-      box(table, .16, topY - .1, .18, m.agedWood, xx, (topY - .1) / 2, zz);
-      box(table, .22, .12, .21, m.darkWood, xx, .06, zz);
+      box(table, .08, underside, .09, m.agedWood, xx, underside / 2, zz);
+      box(table, .11, .12, .105, m.darkWood, xx, .06, zz);
     }
-    box(table, w - .27, .13, .08, m.darkWood, 0, topY - .38, d / 2 - .20);
+    box(table, w - .27, .13, .08, m.darkWood, 0, underside - .28, stretcherSide * (d / 2 - .20));
     return table;
   }
 

@@ -598,12 +598,13 @@ function buildTable() {
   box(14.3, .035, .10, polishedBrass, scene, 0, -.68, 1.20);
   const footY = runtime.embedded ? ALCHEMY_TABLE.lairFootY : ALCHEMY_TABLE.standaloneFootY;
   const legBase = footY + ALCHEMY_TABLE.footHeight - .005;
+  const legWidthScale = runtime.embedded ? .5 : 1;
   for (const x of [-6.2, 6.2]) {
     for (const [z, top] of [[2.1, -.60], [-3.15, -.40]]) {
       const length = top - legBase;
-      const leg = box(.6, length, .65, darkWood, scene, x, (top + legBase) / 2, z);
+      const leg = box(.6 * legWidthScale, length, .65 * legWidthScale, darkWood, scene, x, (top + legBase) / 2, z);
       leg.name = 'table-leg';
-      const foot = box(.66, ALCHEMY_TABLE.footHeight, .7, oldBrass, scene,
+      const foot = box(.66 * legWidthScale, ALCHEMY_TABLE.footHeight, .7 * legWidthScale, oldBrass, scene,
         x, footY + ALCHEMY_TABLE.footHeight / 2, z);
       foot.name = 'table-foot';
     }

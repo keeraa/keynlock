@@ -63,14 +63,14 @@
 }
 
 .room-walking #scene-interaction {
-  cursor: grab !important;
+  cursor: none !important;
 }
 
-.room-walk-locked #scene-interaction {
-  cursor: none !important;
+.room-walk-paused #scene-interaction {
+  cursor: default !important;
 }
 
 @media (max-width: 730px) {
   #room-walk-toggle { font-size: 9px; }
-  #room-walk-instructions:not([hidden]) { font-size: 10px; }
+  #room-walk-instructions:not([hidden]) { padding-inline: 76px; font-size: 10px; }
 }

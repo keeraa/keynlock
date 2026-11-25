@@ -77,7 +77,7 @@ async function expectSoon(check, message, timeout = 30000) {
   }
 }
 
-async function openRoom(t, { locale = 'ru-RU', pointerLock = false, beforeLoad } = {}) {
+async function openRoom(t, { locale = 'ru-RU', pointerLock = false, beforeLoad, startOnFoot = false } = {}) {
   // The headless shell rejects native pointer lock. Use full Chromium for that case.
   const roomBrowser = pointerLock && !channel
     ? await chromium.launch({ channel: 'chromium', args: browserArgs })
@@ -96,11 +96,12 @@ async function openRoom(t, { locale = 'ru-RU', pointerLock = false, beforeLoad }
   }
   await beforeLoad?.(page);
   // ?start=overview: these checks begin at the overview (the game starts on foot).
-  const response = await page.goto(`${baseUrl}?start=overview`, { waitUntil: 'domcontentloaded', timeout });
+  const response = await page.goto(startOnFoot ? baseUrl : `${baseUrl}?start=overview`,
+    { waitUntil: 'domcontentloaded', timeout });
   assert.equal(response.status(), 200);
   await page.locator('#app > #loading').waitFor({ state: 'hidden' });
   assert.equal(await page.locator('#app > #fallback').isVisible(), false, 'WebGL must render the room');
-  assert.equal(await page.locator('#reset-camera').isHidden(), true, 'nothing to return to at the overview');
+  if (!startOnFoot) assert.equal(await page.locator('#reset-camera').isHidden(), true, 'nothing to return to at the overview');
   return page;
 }
 
@@ -433,30 +434,52 @@ test('the room hosts both workshops on one canvas through the host contract', as
     const alchemySpan = range(alchemyTable, 'z');
     const shift = 1.5 * (alchemySpan.max - alchemySpan.min);
     const center = name => scene.getObjectByName(name).getWorldPosition(point).z;
-    const easelCenter = (center('restoration-left-easel') + center('restoration-right-easel')) / 2;
+    const easelNames = ['restoration-left-easel', 'restoration-right-easel'];
+    const easels = easelNames.map(name => scene.getObjectByName(name));
+    const easelCenter = (center(easelNames[0]) + center(easelNames[1])) / 2;
     const insideGalleryWall = object => {
       const span = range(object, 'z');
       return span.min > gallerySpan.min && span.max < gallerySpan.max;
     };
+    const galleryCeiling = range(scene.getObjectByName('lair-wall-beam-left'), 'y').min;
+    const gallerySconces = scene.getObjectsByProperty('name', 'lair-wall-sconce')
+      .filter(sconce => sconce.position.x < 0);
+    const sconceTop = Math.max(...gallerySconces.map(sconce => {
+      const glass = sconce.children.find(part => part.material?.isMeshStandardMaterial && part.material.transparent);
+      return range(glass, 'y').max;
+    }));
+    const galleryObjects = [...paintings, scene.getObjectByName('art-history-column-headings')];
+    const workbench = scene.getObjectByName('workbench-right-of-alchemy');
+    const workbenchSpan = range(workbench, 'z');
+    const entranceZ = center('lair-entrance-wall') - .135;
     return {
+      galleryFitsBelowBeam: galleryObjects.every(object => {
+        const span = range(object, 'y');
+        return span.min > sconceTop && span.max < galleryCeiling;
+      }),
       shelfBrackets: brackets.length === 2
         && brackets.every(bracket => range(bracket, 'x').max >= rightWall && range(bracket, 'y').max >= shelf.min),
-      galleryMounted: paintings.length > 0
+      galleryColumns: new Set(paintings.map(painting => painting.position.x)).size,
+      galleryMounted: paintings.length === 30
         && paintings.every(painting => range(painting, 'x').min <= leftWall + .001 && insideGalleryWall(painting))
-        && insideGalleryWall(scene.getObjectByName('twelve-art-history-column-headings')),
-      atelierTableOnFloor: Math.abs(range(scene.getObjectByName('restoration-worktable'), 'y').min - .0385) < .005,
+        && insideGalleryWall(scene.getObjectByName('art-history-column-headings')),
+      atelierTableRemoved: ['restoration-worktable', 'restoration-brush-pad', 'restoration-palette']
+        .every(name => !scene.getObjectByName(name)),
+      smallerEaselsOnFloor: easels.every(easel => easel.scale.x === .8 && Math.abs(range(easel, 'y').min - .0385) < .005),
       alchemyTableOnFloor: alchemyFeet.length === 4
         && alchemyFeet.every(foot => Math.abs(range(foot, 'y').min - .0385) < .005),
       alchemyTableLowered: Math.abs(alchemyTop - .0385 - .95) < .005,
-      stationsMovedTogether: Math.abs(easelCenter - (10.35 - shift)) < .01
-        && Math.abs(center('alchemy-main-tabletop') - (10.10 - shift)) < .01
-        && Math.abs(center('workbench-right-of-alchemy') - (20.07 - shift)) < .01,
-      roomShortened: Math.abs(range(scene.getObjectByName('lair-floor-base'), 'z').max - (26.42 - shift)) < .01,
+      workshopSpacing: Math.abs(easelCenter - (10.35 - shift)) < .01
+        && Math.abs(center('alchemy-main-tabletop') - (11.20 - shift)) < .01
+        && Math.abs(center(workbench.name) - center('alchemy-main-tabletop') - 4.90) < .01
+        && workbenchSpan.min - alchemySpan.max > 1 && entranceZ - workbenchSpan.max > 1,
+      roomShortened: Math.abs(entranceZ - 12.90) < .01
+        && Math.abs(range(scene.getObjectByName('lair-floor-base'), 'z').max - entranceZ) < .01,
     };
   });
   assert.deepEqual(supports, {
-    shelfBrackets: true, galleryMounted: true, atelierTableOnFloor: true,
-    alchemyTableOnFloor: true, alchemyTableLowered: true, stationsMovedTogether: true, roomShortened: true,
+    galleryFitsBelowBeam: true, shelfBrackets: true, galleryColumns: 8, galleryMounted: true, atelierTableRemoved: true, smallerEaselsOnFloor: true,
+    alchemyTableOnFloor: true, alchemyTableLowered: true, workshopSpacing: true, roomShortened: true,
   });
 
   // The FPS button opens the performance panel; the triangle row shows where they are.
@@ -497,9 +520,19 @@ test('the room hosts both workshops on one canvas through the host contract', as
     }
   });
   const spot = await page.evaluate(() => {
-    const panel = document.querySelector('#atelier-embedded-app').getBoundingClientRect().height;
-    return { x: innerWidth / 2, y: (innerHeight - panel) / 2 };
+    const { camera, renderer } = window.__keynlockDebug.host;
+    const easel = renderer.getUnifiedScene().getObjectByName('restoration-right-easel');
+    let canvas;
+    easel.traverse(object => { if (object.material?.uniforms?.uPainting) canvas = object; });
+    const point = canvas.getWorldPosition(camera.position.clone()).project(camera);
+    const bounds = document.querySelector('#scene-interaction').getBoundingClientRect();
+    return {
+      x: bounds.left + (point.x + 1) * bounds.width / 2,
+      y: bounds.top + (1 - point.y) * bounds.height / 2,
+    };
   });
+  await page.mouse.move(spot.x, spot.y);
+  await page.locator('#atelier-scene-feedback #restoration-cursor[data-tool="reagent"]').waitFor();
   await page.mouse.click(spot.x, spot.y);
   await page.locator('#atelier-scene-feedback #restoration-notice').filter({ hasText: 'УФ-фонарём' }).waitFor();
   // The panel in the Lair: «ВСЯ КОЛЛЕКЦИЯ» right of «В ЛОГОВО», the readiness
@@ -523,6 +556,7 @@ test('the room hosts both workshops on one canvas through the host contract', as
   assert.equal(await page.locator('#lair-gallery-controls').isVisible(), true);
   const gallery = await page.evaluateHandle(() => window.__keynlockDebug.workshop('atelier').gallery);
   assert.equal(await gallery.evaluate(api => api.getState().canShuffle), true);
+  assert.match(await page.locator('#wall-gallery-caption').textContent(), /8 вертикальных колонок/);
   await page.locator('#gallery-switch').click();
   await page.locator('#gallery-switch').and(page.getByText('ДЕМО · 30', { exact: true })).waitFor();
   assert.equal(await gallery.evaluate(api => api.getState().canShuffle), false);
@@ -572,12 +606,12 @@ test('first-person walking slides against furniture and walls, interacts, and re
     Object.defineProperty(document.querySelector('#scene-interaction'), 'requestPointerLock', { value: undefined });
   });
   const toggle = page.locator('#room-walk-toggle');
-  await toggle.click();
-  // The camera first comes down to the walker's eyes, then the walk starts.
   const overview = await page.evaluate(() => window.__keynlockDebug.host.camera.position.y);
-  await page.waitForFunction(() => document.querySelector('#room-walk-toggle').getAttribute('aria-pressed') === 'true');
   assert.ok(overview > 2.5, 'the walk began from the overview, above eye level');
-  assert.equal(await page.locator('#room-walk-look').textContent(), 'Перетаскивай для обзора');
+  // The camera first comes down to the walker's eyes, then the walk starts.
+  await toggle.click();
+  await page.waitForFunction(() => document.querySelector('#room-walk-toggle').getAttribute('aria-pressed') === 'true');
+  assert.equal(await page.locator('#room-walk-look').textContent(), 'Мышь — обзор');
   // The walk starts turned a little left; these checks walk straight ahead.
   const spawn = await page.evaluate(() => {
     window.__keynlockDebug.walk.face(0, 0);
@@ -586,28 +620,24 @@ test('first-person walking slides against furniture and walls, interacts, and re
   assert.ok(Math.abs(spawn[1] - .0385 - 1.70) < .001, 'the camera starts at eye level');
   assert.equal((await page.evaluate(readRoom)).controls.enabled, false);
 
-  const measured = await page.evaluate(async spawnZ => {
-    const camera = window.__keynlockDebug.host.camera;
-    const nextFrame = () => new Promise(resolve => requestAnimationFrame(resolve));
+  const measured = await page.evaluate(spawnZ => {
+    const { walk: movement, host: { camera } } = window.__keynlockDebug;
     const key = (type, code) => document.dispatchEvent(new KeyboardEvent(type, { code }));
-    async function sample(sprint) {
+    function sample(sprint) {
       camera.position.z = spawnZ;
       if (sprint) key('keydown', 'ShiftLeft');
       key('keydown', 'KeyW');
-      let previous = await nextFrame();
       const start = camera.position.z;
-      let elapsed = 0;
-      for (let i = 0; i < 8; i++) {
-        const now = await nextFrame();
-        elapsed += Math.min((now - previous) / 1000, .05);
-        previous = now;
-      }
+      // Step the same movement controller with known deltas so GPU scheduling
+      // doesn't skew the comparison between walking and sprinting.
+      const frameSeconds = 1 / 60;
+      for (let i = 0; i < 8; i++) movement.update(frameSeconds);
       key('keyup', 'KeyW');
       key('keyup', 'ShiftLeft');
-      return (start - camera.position.z) / elapsed;
+      return (start - camera.position.z) / (8 * frameSeconds);
     }
-    const walk = await sample(false);
-    const sprint = await sample(true);
+    const walk = sample(false);
+    const sprint = sample(true);
     camera.position.z = spawnZ;
     return { walk, sprint };
   }, spawn[2]);
@@ -652,7 +682,25 @@ test('first-person walking slides against furniture and walls, interacts, and re
   await page.mouse.move(680, 415, { steps: 4 });
   await page.mouse.up();
   assert.ok(await page.evaluate(before => Math.abs(window.__keynlockDebug.host.camera.quaternion.y - before) > .03, yaw));
+  assert.equal(await page.locator('#scene-interaction').evaluate(el => getComputedStyle(el).cursor), 'none');
+  assert.equal(await page.locator('#room-walk-hud .room-walk-crosshair').count(), 1);
+  const settings = page.locator('#lair-visual-panel');
+  await page.locator('#lair-music-toggle').focus();
   await page.keyboard.press('Escape');
+  await settings.waitFor();
+  await page.locator('#room-walk-hud').waitFor({ state: 'hidden' });
+  assert.equal(await toggle.getAttribute('aria-pressed'), 'true');
+  assert.equal((await page.evaluate(readRoom)).controls.enabled, false);
+  const paused = (await page.evaluate(readRoom)).position;
+  await page.keyboard.down('KeyW');
+  await page.evaluate(async () => { for (let i = 0; i < 4; i++) await new Promise(requestAnimationFrame); });
+  await page.keyboard.up('KeyW');
+  assert.deepEqual((await page.evaluate(readRoom)).position, paused);
+  await page.keyboard.press('Escape');
+  await settings.waitFor({ state: 'hidden' });
+  await page.locator('#room-walk-hud').waitFor();
+  assert.equal(await toggle.getAttribute('aria-pressed'), 'true');
+  await page.locator('#reset-camera').click();
   await page.locator('#room-walk-hud').waitFor({ state: 'hidden' });
   assert.equal((await page.evaluate(readRoom)).controls.enabled, true);
 });
@@ -722,8 +770,17 @@ test('an English browser gets the Lair in English, with a language switch', asyn
 
 test('one music player follows the Lair into its workshops and switches tracks', async t => {
   const page = await openRoom(t);
+  const note = page.getByRole('button', { name: 'Музыка', exact: true });
   const title = page.locator('#lair-music .music-controls__title');
-  const titleText = async () => (await title.innerText()).replace(/\s*▾$/, '');
+  const titleText = async () => (await title.textContent()).replace(/\s*▾$/, '');
+  const bounds = await note.boundingBox();
+  assert.equal(bounds.width, 57);
+  assert.equal(bounds.height, 57);
+  assert.ok(bounds.x < 50 && viewport.height - (bounds.y + bounds.height) <= 25);
+  assert.equal(await note.getAttribute('aria-expanded'), 'false');
+  assert.equal(await title.isVisible(), false);
+  await note.hover();
+  await title.waitFor();
   assert.equal(await titleText(), 'Шопен · Ноктюрн op. 9 № 1');
   await page.locator('#lair-music').getByRole('button', { name: 'Следующий трек' }).click();
   assert.equal(await titleText(), 'Шопен · Ноктюрн op. 9 № 2');
@@ -731,6 +788,9 @@ test('one music player follows the Lair into its workshops and switches tracks',
     'chopin-nocturne-op9-no2.mp3', 'the Key Archive resumes the same record');
   await page.locator('#lair-music').getByRole('button', { name: 'Пауза' }).click();
   assert.equal(await page.evaluate(() => localStorage.getItem('keynlock-music-stopped-v1')), '1');
+  await page.mouse.move(viewport.width - 50, 115);
+  await title.waitFor({ state: 'hidden' });
+  assert.equal(await note.getAttribute('aria-expanded'), 'false');
 
   // The gramophone's panel shows the same player, with volume.
   await openZone(page, 'gramophone');
@@ -742,13 +802,17 @@ test('one music player follows the Lair into its workshops and switches tracks',
 
   // The lab is the same page: the player and its state stay.
   await enterAlchemy(page);
-  assert.equal(await title.isVisible(), true);
+  await note.hover();
+  await title.waitFor();
   assert.equal(await titleText(), 'Шопен · Ноктюрн op. 9 № 1');
 });
 
 test('an English page shows the player in English', async t => {
   const page = await openRoom(t, { locale: 'en-US' });
-  assert.equal((await page.locator('#lair-music .music-controls__title').innerText()).replace(/\s*▾$/, ''), 'Chopin · Nocturne Op. 9 No. 1');
+  await page.getByRole('button', { name: 'Music', exact: true }).press('Enter');
+  const title = page.locator('#lair-music .music-controls__title');
+  await title.waitFor();
+  assert.equal((await title.textContent()).replace(/\s*▾$/, ''), 'Chopin · Nocturne Op. 9 No. 1');
   assert.equal(await page.locator('#lair-music').getByRole('button', { name: 'Next track' }).count(), 1);
 });
 
@@ -815,24 +879,33 @@ test('the workshops share the room look: one gouache setting, no Atelier-only ef
   assert.ok(await painted.jsonValue());
 });
 
-test('a zone opened while walking returns to the walk; the entrance wall shows only inside', async t => {
-  const page = await openRoom(t);
+test('the Lair starts on foot and a zone opened from the walk returns to it', async t => {
+  const page = await openRoom(t, { startOnFoot: true, pointerLock: true });
   const wallVisible = () => page.evaluate(() =>
     window.__keynlockDebug.host.renderer.getUnifiedScene().getObjectByName('lair-entrance-wall').visible);
-  assert.equal(await wallVisible(), false, 'the overview camera stands outside the entrance wall');
-  await page.locator('#room-walk-toggle').click();
-  await page.waitForFunction(() => document.querySelector('#room-walk-toggle').getAttribute('aria-pressed') === 'true');
+  assert.equal(await page.locator('#room-walk-toggle').getAttribute('aria-pressed'), 'true');
+  assert.equal(await page.locator('.topbar #reset-camera').isVisible(), true);
+  assert.equal(await page.locator('.bottom-ui').evaluate(footer => getComputedStyle(footer).backgroundImage), 'none');
+  assert.equal(await wallVisible(), true, 'the default walk sees the entrance doors from inside');
+  assert.equal(await page.evaluate(() => document.pointerLockElement), null, 'loading needs no mouse capture');
+  await page.mouse.click(viewport.width / 2, viewport.height / 2);
+  await page.waitForFunction(() => document.pointerLockElement?.id === 'scene-interaction');
+  await page.keyboard.press('Escape');
+  await page.locator('#lair-visual-panel').waitFor();
+  await page.waitForFunction(() => document.pointerLockElement === null);
+  assert.equal(await page.locator('#room-walk-toggle').getAttribute('aria-pressed'), 'true');
+  await page.locator('#lair-visual-close').click();
+  await page.locator('#room-walk-hud').waitFor();
+  await page.mouse.click(viewport.width / 2, viewport.height / 2);
+  await page.waitForFunction(() => document.pointerLockElement?.id === 'scene-interaction');
   const before = await page.evaluate(() => {
     const camera = window.__keynlockDebug.host.camera;
     camera.position.x += 1.2;
     return camera.position.toArray();
   });
-  // The wall follows the camera on the next frame (slow on software WebGL).
-  await page.waitForFunction(() =>
-    window.__keynlockDebug.host.renderer.getUnifiedScene().getObjectByName('lair-entrance-wall').visible);
-  assert.equal(await wallVisible(), true, 'inside the room the doors are visible');
   await page.keyboard.press('5');            // the zone bar is hidden while walking
   await page.locator('#zone-panel').waitFor();
+  await page.waitForFunction(() => document.pointerLockElement === null);
   // The label follows the next frame.
   await page.waitForFunction(() => document.querySelector('#reset-camera span')?.textContent.trim() === 'К ПРОГУЛКЕ');
   await page.locator('#reset-camera').click();
@@ -840,18 +913,284 @@ test('a zone opened while walking returns to the walk; the entrance wall shows o
   const after = await page.evaluate(() => window.__keynlockDebug.host.camera.position.toArray());
   assert.ok(after.every((value, axis) => Math.abs(value - before[axis]) < .05), 'back where the walker stood');
   // The playlist lists every track and can switch to one.
-  // Dispatched clicks: on slow software WebGL (CI) the top bar never counts
-  // as "stable" for Playwright's actionability checks.
+  await page.locator('#lair-music-toggle').hover();
   await page.locator('#lair-music .music-controls__title').dispatchEvent('click');
   await page.locator('#lair-music .music-controls__track-button').nth(2).dispatchEvent('click');
   assert.equal(await page.locator('#lair-music .music-controls__track[aria-current="true"]').count(), 1);
   assert.match(await page.locator('#lair-music .music-controls__track[aria-current="true"]').innerText(), /си-бемоль/);
 });
 
+test('unlocked mouse movement turns the walker and real steps match the floor surface', async t => {
+  const page = await openRoom(t, { startOnFoot: true, beforeLoad: page => page.addInitScript(() => {
+    const files = new WeakMap(), samples = new WeakMap();
+    // Stall decode so walking starts while the wooden steps are loading.
+    const woodReady = new Promise(resolve => { window.releaseWoodSteps = resolve; });
+    const fetch = window.fetch.bind(window);
+    window.fetch = async (...args) => {
+      const response = await fetch(...args);
+      const surface = new URL(String(args[0]), location.href).pathname.match(/\/(wood|rug)-\d[^/]*\.wav$/)?.[1];
+      if (surface) {
+        const read = response.arrayBuffer.bind(response);
+        response.arrayBuffer = async () => {
+          const bytes = await read();
+          files.set(bytes, surface);
+          return bytes;
+        };
+      }
+      return response;
+    };
+    const decode = BaseAudioContext.prototype.decodeAudioData;
+    BaseAudioContext.prototype.decodeAudioData = function (bytes, ...args) {
+      return decode.call(this, bytes, ...args).then(async buffer => {
+        const surface = files.get(bytes);
+        if (surface === 'wood') await woodReady;
+        if (surface) samples.set(buffer, surface);
+        return buffer;
+      });
+    };
+    window.stepSurfaces = [];
+    const start = AudioBufferSourceNode.prototype.start;
+    AudioBufferSourceNode.prototype.start = function (...args) {
+      window.stepSurfaces.push(samples.get(this.buffer) || 'synthetic');
+      return start.apply(this, args);
+    };
+  }) });
+  const yaw = () => page.evaluate(() => window.__keynlockDebug.walk.getPose().yaw);
+  await page.mouse.move(400, 460);
+  const original = await yaw();
+  await page.mouse.move(700, 460);
+  assert.ok(Math.abs(await yaw() - original) > .5);
+  assert.equal(await page.evaluate(() => document.pointerLockElement), null);
+
+  const startZ = await page.evaluate(() => {
+    const { walk, host } = window.__keynlockDebug;
+    walk.face(0, 0);
+    return host.camera.position.z;
+  });
+  await page.keyboard.down('KeyW');
+  await page.waitForFunction(z => window.__keynlockDebug.host.camera.position.z < z - 1.25, startZ);
+  assert.deepEqual(await page.evaluate(() => window.stepSurfaces), []);
+  await page.evaluate(() => window.releaseWoodSteps());
+  await page.waitForFunction(() => window.stepSurfaces.includes('wood'));
+  await page.keyboard.up('KeyW');
+
+  await page.evaluate(() => {
+    const { camera, renderer } = window.__keynlockDebug.host;
+    const rug = renderer.getUnifiedScene().getObjectByName('planning-rug');
+    camera.position.x = rug.position.x - 2.5;
+    camera.position.z = rug.position.z + 1.8;
+  });
+  await page.keyboard.down('KeyW');
+  await page.waitForFunction(() => window.stepSurfaces.includes('rug'));
+  await page.keyboard.up('KeyW');
+  assert.ok(await page.evaluate(() => window.stepSurfaces.every(surface => surface !== 'synthetic')));
+});
+
+test('the overview camera stays inside while rotating, zooming and panning', async t => {
+  const page = await openRoom(t);
+  const result = await page.evaluate(async () => {
+    const { camera, controls, renderer } = window.__keynlockDebug.host;
+    const scene = renderer.getUnifiedScene();
+    const wall = scene.getObjectByName('lair-entrance-wall');
+    const ceiling = scene.getObjectByName('lair-ceiling');
+    ceiling.geometry.computeBoundingBox();
+    const ceilingY = ceiling.geometry.boundingBox.clone().applyMatrix4(ceiling.matrixWorld).min.y;
+    const poses = [];
+    const apply = async move => {
+      move();
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      poses.push(camera.position.toArray());
+    };
+    await apply(() => controls.dollyOut(.3));
+    for (let i = 0; i < 8; i++) await apply(() => controls.rotateLeft(Math.PI * .75));
+    await apply(() => controls.rotateUp(Math.PI * 2));
+    await apply(() => controls.rotateUp(-Math.PI * 2));
+    await apply(() => controls.pan(-5000, 2000));
+    return { poses, ceilingY, entranceZ: wall.position.z - .135, entranceVisible: wall.visible };
+  });
+  assert.equal(result.entranceVisible, true);
+  for (const [x, y, z] of result.poses) {
+    assert.ok(Math.abs(x) < 8.415 && y > .0385 && y < result.ceilingY && z > -5.485 && z < result.entranceZ,
+      `outside the room at ${[x, y, z]}`);
+  }
+  assert.ok(Math.max(...result.poses.map(pose => pose[0])) - Math.min(...result.poses.map(pose => pose[0])) > 2,
+    'the camera can still move around the room');
+});
+
+test('both sofas stand close to the corner walls and face the planning table', async t => {
+  const page = await openRoom(t, { startOnFoot: true });
+  const geometry = await page.waitForFunction(() => {
+    const { camera, renderer } = window.__keynlockDebug.host;
+    const scene = renderer.getUnifiedScene();
+    const sofas = ['planning-sofa', 'planning-sofa-left'].map(name => scene.getObjectByName(name));
+    if (sofas.some(sofa => !sofa)) return null;
+    scene.updateMatrixWorld(true);
+    const table = scene.getObjectByName('planning-main-table');
+    return sofas.map(sofa => {
+      // Measure the actual vertices. An axis-aligned box around the rotated
+      // sofa's local box overestimates clearance needed at the corner.
+      const meshes = sofa.getObjectsByProperty('isMesh', true);
+      const points = meshes[0].geometry;
+      points.computeBoundingBox();
+      const bounds = points.boundingBox.clone().setFromObject(sofa, true);
+      const toTable = table.position.clone().sub(sofa.position).setY(0).normalize();
+      const sofaFront = camera.position.clone().set(0, 0, 1).transformDirection(sofa.matrixWorld);
+      return { x: sofa.position.x, z: sofa.position.z, floor: bounds.min.y, scale: sofa.scale.x,
+        outerSide: Math.max(bounds.max.x, -bounds.min.x), rearEdge: bounds.min.z,
+        facing: sofaFront.dot(toTable), shadow: meshes.every(mesh => mesh.castShadow && mesh.receiveShadow) };
+    });
+  });
+  const [right, left] = await geometry.jsonValue();
+  assert.ok(right.x > 6.8 && right.z < -3.79);
+  assert.ok(left.x < -6.48 && left.z < -3.72);
+  assert.equal(right.scale, 1.23 * 1.6);
+  for (const sofa of [right, left]) {
+    assert.ok(sofa.outerSide < 8.24 && sofa.rearEdge > -5.33 && sofa.rearEdge < -5.20);
+    assert.ok(Math.abs(sofa.floor - .0385) < .001);
+    assert.ok(sofa.facing > .99);
+    assert.equal(sofa.shadow, true);
+  }
+});
+
+test('the added planning furniture loads and the chairs share render resources', async t => {
+  const page = await openRoom(t, { startOnFoot: true });
+  const placement = await page.waitForFunction(() => {
+    const scene = window.__keynlockDebug.host.renderer.getUnifiedScene();
+    const names = ['planning-sofa-left', 'planning-chair', 'planning-chair-right',
+      'planning-armchair', 'planning-bookcase'];
+    const models = names.map(name => scene.getObjectByName(name));
+    const tables = ['planning-side-table', 'planning-side-table-between-seats',
+      'planning-side-table-left-corner', 'planning-side-table-right-corner'].map(name => scene.getObjectByName(name));
+    const vases = ['planning-vase-antique', 'planning-vase-ceramic'].map(name => scene.getObjectByName(name));
+    if ([...models, ...tables, ...vases].some(model => !model)) return null;
+    scene.updateMatrixWorld(true);
+    const [left, chair, rightChair, armchair, bookcase] = models;
+    const sofa = scene.getObjectByName('planning-sofa');
+    const [front, between, leftCorner, rightCorner] = tables;
+    const mesh = model => model.getObjectsByProperty('isMesh', true)[0];
+    const worldBounds = model => {
+      const first = mesh(model).geometry;
+      first.computeBoundingBox();
+      const result = first.boundingBox.clone().makeEmpty();
+      model.traverse(part => {
+        if (!part.isMesh) return;
+        part.geometry.computeBoundingBox();
+        result.union(part.geometry.boundingBox.clone().applyMatrix4(part.matrixWorld));
+      });
+      return result;
+    };
+    const width = model => {
+      const bounds = mesh(model).geometry;
+      bounds.computeBoundingBox();
+      return (bounds.boundingBox.max.x - bounds.boundingBox.min.x) * model.scale.x;
+    };
+    const leftFacing = left.position.clone().set(0, 0, 1).transformDirection(left.matrixWorld);
+    const armchairFacing = leftFacing.clone().set(0, 0, 1).transformDirection(armchair.matrixWorld);
+    const toCoffeeTable = between.position.clone().sub(armchair.position).setY(0).normalize();
+    const toMainTable = scene.getObjectByName('planning-main-table').position.clone()
+      .sub(armchair.position).setY(0).normalize();
+    const cabinet = worldBounds(bookcase);
+    const alchemyTable = worldBounds(scene.getObjectByName('alchemy-main-tabletop'));
+    const alchemyShelf = worldBounds(scene.getObjectByName('alchemy-wall-shelf'));
+    const rightTrim = worldBounds(scene.getObjectByName('lair-wainscot-right-cap'));
+    const vasesOnTables = vases.every((vase, i) => {
+      const top = worldBounds([leftCorner, rightCorner][i]);
+      const base = worldBounds(vase);
+      return vase.scale.x === 1.5 && Math.abs(base.min.y - top.max.y) < .001 &&
+        base.min.x > top.min.x && base.max.x < top.max.x &&
+        base.min.z > top.min.z && base.max.z < top.max.z && mesh(vase).receiveShadow;
+    });
+    return { leftX: left.position.x, leftZ: left.position.z, widthRatio: width(left) / width(sofa),
+      rightChair: rightChair.position.x > 1,
+      chairScales: [chair.scale.x, rightChair.scale.x],
+      armchairTurn: Math.atan2(
+        toCoffeeTable.clone().cross(armchairFacing).y, toCoffeeTable.dot(armchairFacing)),
+      facesMainTable: armchairFacing.dot(toMainTable) > toCoffeeTable.dot(toMainTable),
+      bookcaseFits: cabinet.min.z > worldBounds(armchair).max.z &&
+        cabinet.max.z < Math.min(alchemyTable.min.z, alchemyShelf.min.z) && cabinet.max.x < rightTrim.min.x &&
+        Math.abs(cabinet.min.y - .0385) < .001,
+      vasesOnTables,
+      nightstandRemoved: !scene.getObjectByName('planning-nightstand'),
+      sharedChair: mesh(chair).geometry === mesh(rightChair).geometry && mesh(chair).material === mesh(rightChair).material,
+      armchairBesideSofa: armchair.scale.x === 1.4 && armchair.position.x > sofa.position.x &&
+        between.position.z > sofa.position.z && between.position.z < armchair.position.z,
+      roundTables: tables.every(table => {
+        const box = worldBounds(table);
+        const height = table === leftCorner || table === rightCorner ? 1.30 : .65;
+        return Math.abs(box.max.x - box.min.x - .70) < .01 &&
+          Math.abs(box.max.y - box.min.y - height) < .001 &&
+          mesh(table).geometry === mesh(front).geometry;
+      }) &&
+        front.position.clone().sub(left.position).dot(leftFacing) > 1 &&
+        leftCorner.position.z < left.position.z && rightCorner.position.z < sofa.position.z,
+      allCastShadows: [...models, ...tables].every(model => mesh(model).castShadow) };
+  });
+  const result = await placement.jsonValue();
+  assert.ok(result.leftX < -6 && result.leftZ < -3.4);
+  assert.ok(Math.abs(result.widthRatio - 1.1) < .01);
+  assert.ok(result.rightChair && result.sharedChair && result.allCastShadows);
+  assert.ok(result.armchairBesideSofa && result.roundTables);
+  assert.deepEqual(result.chairScales, [1.04 * 1.2, 1.04 * 1.2]);
+  assert.ok(Math.abs(result.armchairTurn - Math.PI / 9) < .01 && result.facesMainTable);
+  assert.ok(result.bookcaseFits, 'The bookcase stands between the armchair and the alchemy counter');
+  assert.ok(result.vasesOnTables && result.nightstandRemoved);
+});
+
+test('the stacked books rest on the shifted planning shelf', async t => {
+  const page = await openRoom(t);
+  const placement = await page.waitForFunction(() => {
+    const scene = window.__keynlockDebug.host.renderer.getUnifiedScene();
+    const books = scene.getObjectByName('planning-shelf-books');
+    if (!books) return null;
+    const shelf = scene.getObjectByName('planning-wall-shelf');
+    shelf.geometry.computeBoundingBox();
+    const support = shelf.geometry.boundingBox.clone().applyMatrix4(shelf.matrixWorld);
+    const stack = support.clone().makeEmpty();
+    books.traverse(mesh => {
+      if (!mesh.isMesh) return;
+      mesh.geometry.computeBoundingBox();
+      stack.union(mesh.geometry.boundingBox.clone().applyMatrix4(mesh.matrixWorld));
+    });
+    return { restsOnShelf: Math.abs(stack.min.y - support.max.y) < .001,
+      fitsShelf: stack.min.x >= support.min.x && stack.max.x <= support.max.x &&
+        stack.min.z >= support.min.z && stack.max.z <= support.max.z,
+      boxBooks: scene.getObjectByName('planning-shelf-book') != null };
+  });
+  assert.deepEqual(await placement.jsonValue(), { restsOnShelf: true, fitsShelf: true, boxBooks: false });
+});
+
+test('both SIKISI bird models load and the flock flies outside at different heights', async t => {
+  const page = await openRoom(t, { startOnFoot: true });
+  const snapshot = () => page.evaluate(() => {
+    const scene = window.__keynlockDebug.host.renderer.getUnifiedScene();
+    const flock = scene.getObjectByName('bird-flock');
+    return flock?.children.filter(actor => actor.userData.flight).map(actor => {
+      let skinned = false;
+      actor.traverse(object => { skinned ||= Boolean(object.isSkinnedMesh); });
+      return { position: actor.position.toArray(), skinned };
+    });
+  });
+  await page.waitForFunction(() => {
+    const flock = window.__keynlockDebug.host.renderer.getUnifiedScene().getObjectByName('bird-flock');
+    const heights = flock?.children.filter(actor => actor.userData.flight).map(actor => actor.position.y);
+    return heights?.length === 3 && Math.max(...heights) - Math.min(...heights) > .5;
+  });
+  const before = await snapshot();
+  assert.ok(before.every(actor => actor.skinned && actor.position[2] < -5.755));
+  await page.waitForFunction(([x, , z]) => {
+    const [first] = window.__keynlockDebug.host.renderer.getUnifiedScene().getObjectByName('bird-flock').children;
+    return Math.hypot(first.position.x - x, first.position.z - z) > .75;
+  }, before[0].position);
+});
+
 test('the settings choose a quality level and a 60 FPS cap, and remember them', async t => {
   const page = await openRoom(t);
   await page.locator('#lair-visual-toggle').click();
   await page.locator('#quality-mode').waitFor();
+  assert.deepEqual(await page.locator('#lair-visual-panel .visual-section > h3').allTextContents(), [
+    'Качество и скорость', 'Язык', 'Рисовка и воздух', 'Гуашевые текстуры',
+    'Металлические поверхности', 'Отделка правой стены',
+  ]);
   assert.equal(await page.locator('#quality-mode').inputValue(), 'auto');
   const bufferWidth = () => page.evaluate(() => document.querySelector('#scene').width);
   await page.locator('#quality-mode').selectOption('minimal');

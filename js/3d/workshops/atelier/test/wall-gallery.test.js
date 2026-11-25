@@ -58,15 +58,20 @@ test('an overfilled category scales its own column without overlapping adjacent 
   const artworks = Array.from({ length: 30 }, (_, index) => ({
     id: `same-${index}`, aspect: .65 + (index % 6) * .5, category: 'symbolism',
   }));
-  const { placements, columns } = layoutWallPaintings(artworks);
-  assert.equal(columns.find((column) => column.id === 'symbolism').count, 30);
-  assert.ok(placements.every((item) => item.columnLabel === 'Символизм'));
-  for (let i = 0; i < placements.length - 1; i++) {
-    const upper = placements[i], lower = placements[i + 1];
-    assert.equal(upper.x, lower.x);
-    assert.ok(upper.y - upper.outerHeight / 2 > lower.y + lower.outerHeight / 2);
+  for (const topY of [WALL_TOP, 10.02]) {
+    const { placements, columns, bounds } = layoutWallPaintings(artworks, { topY });
+    assert.equal(columns.find((column) => column.id === 'symbolism').count, 30);
+    assert.ok(placements.every((item) => item.columnLabel === 'Символизм'));
+    for (let i = 0; i < placements.length - 1; i++) {
+      const upper = placements[i], lower = placements[i + 1];
+      assert.equal(upper.x, lower.x);
+      assert.ok(upper.y - upper.outerHeight / 2 > lower.y + lower.outerHeight / 2);
+    }
+    assert.equal(bounds.maxY, topY);
+    assert.equal(bounds.minY, WALL_TOP - WALL_HEIGHT);
+    assert.ok(placements[0].y + placements[0].outerHeight / 2 <= topY - WALL_HEADER_HEIGHT + 1e-6);
+    assert.ok(placements.at(-1).y - placements.at(-1).outerHeight / 2 >= bounds.minY);
   }
-  assert.ok(placements.at(-1).y - placements.at(-1).outerHeight / 2 >= WALL_TOP - WALL_HEIGHT);
 });
 
 test('wall retains only 30 fully restored favorites and remembers manual selection', () => {
@@ -107,6 +112,22 @@ test('existing restoration saves migrate into the wall without resetting their p
   assert.equal(progress.state[1].completed, true);
 });
 
+test('an excluded wall category keeps its paintings and restoration progress in the collection', () => {
+  const allowed = { id: 'allowed', category: 'japan' };
+  const excluded = { id: 'excluded', category: 'rococo' };
+  const paintings = [allowed, excluded];
+  const restored = { completed: true, surfaceComplete: true };
+  const storage = { getItem: () => JSON.stringify({ version: 1, wallIds: ['excluded', 'allowed'],
+    settings: { allowed: restored, excluded: restored } }) };
+  const progress = createPlayerProgress({ paintings, storage, canPinToWall: art => art.category !== 'rococo' });
+  assert.deepEqual(progress.getWallIds(), ['allowed']);
+  assert.deepEqual(progress.getRestoredIds(), ['allowed', 'excluded']);
+  assert.equal(progress.autoPin('excluded'), false);
+  assert.equal(progress.toggleWall('excluded').changed, false);
+  const columns = WALL_COLUMNS.filter(({ id }) => id !== 'rococo');
+  assert.deepEqual(layoutWallPaintings(paintings, { columns }).placements.map(art => art.id), ['allowed']);
+});
+
 test('wall creates real framed meshes and allows selecting a mixed-size image', async () => {
   const originalImage = globalThis.Image;
   const originalDocument = globalThis.document;
@@ -135,7 +156,7 @@ test('wall creates real framed meshes and allows selecting a mixed-size image', 
     assert.equal(wall.paintingsRoot.children[0].children[0].castShadow, true);
     assert.ok(wall.root.position.z > -4.6 && wall.root.position.z < -4.5,
       'canvas backs should hang a few centimeters in front of the wall');
-    assert.equal(wall.root.getObjectByName('twelve-art-history-column-headings')?.isMesh, true);
+    assert.equal(wall.root.getObjectByName('art-history-column-headings')?.isMesh, true);
     assert.equal(renderer.shadowMap.needsUpdate, true);
     const placement = wall.getPlacement('one');
     camera.position.set(placement.x, placement.y, 1);

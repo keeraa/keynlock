@@ -1,24 +1,22 @@
 // @ts-check
 import * as THREE from 'three';
-import { ROOM_END } from '../room-layout.js';
+import { ROOM_END, ROOM_FLOOR_Y, ROOM_WALL_BASE_Y, ROOM_WALL_TOP_Y } from '../room-layout.js';
 import { t } from '../i18n.js';
 
 // The entrance wall closes the room opposite the window, with two doors:
 // to the Key Archive (on the lab and workbench side) and to the painting
 // archive (on the Atelier side). Both are placeholders for now: a zone panel says what is
-// behind them. The overview camera stands outside this wall, so the wall is
-// shown only while the camera is inside the room (a walk, or a flight to a
-// door), like the cut-away front of a doll's house.
+// behind them.
 
 const WALL_Z = ROOM_END + .135;
-const HALF_WIDTH = 8.7, HEIGHT = 13.8, THICKNESS = .27;
+const HALF_WIDTH = 8.7, THICKNESS = .27;
 // Human scale: the walker's eyes are 1.70 m above the floor (room-walk.js).
 const DOOR = { width: 1.5, height: 2.75, arch: .4, handle: 1.05 };
 export const ENTRANCE_DOORS = Object.freeze([
   Object.freeze({ id: 'paintingArchive', x: -4.6, label: t('АРХИВ КАРТИН') }),
   Object.freeze({ id: 'keyArchive', x: 4.6, label: t('АРХИВ КЛЮЧЕЙ') }),
 ]);
-const FLOOR_Y = .0385;
+const FLOOR_Y = ROOM_FLOOR_Y;
 
 /** A door outline with a shallow arch, in the wall's local x/y. */
 function doorPath(shape, x) {
@@ -65,19 +63,19 @@ function buildDoor(kit, group, { id, x, label }) {
   return door;
 }
 
-/** Builds the wall and its doors; update(camera) shows them only from inside. */
+/** Builds the wall and its doors. */
 export function buildEntranceWall(kit) {
-  const { m, staticGroup, box, hitTargets } = kit;
+  const { m, staticGroup, box } = kit;
   const group = new THREE.Group();
   group.name = 'lair-entrance-wall';
   group.position.z = WALL_Z;
   staticGroup.add(group);
 
   const outline = new THREE.Shape();
-  outline.moveTo(-HALF_WIDTH, -.14);
-  outline.lineTo(HALF_WIDTH, -.14);
-  outline.lineTo(HALF_WIDTH, HEIGHT - .14);
-  outline.lineTo(-HALF_WIDTH, HEIGHT - .14);
+  outline.moveTo(-HALF_WIDTH, ROOM_WALL_BASE_Y);
+  outline.lineTo(HALF_WIDTH, ROOM_WALL_BASE_Y);
+  outline.lineTo(HALF_WIDTH, ROOM_WALL_TOP_Y);
+  outline.lineTo(-HALF_WIDTH, ROOM_WALL_TOP_Y);
   outline.closePath();
   for (const { x } of ENTRANCE_DOORS) outline.holes.push(doorPath(new THREE.Path(), x));
   const geometry = new THREE.ExtrudeGeometry(outline, { depth: THICKNESS, bevelEnabled: false, curveSegments: 24 });
@@ -85,7 +83,7 @@ export function buildEntranceWall(kit) {
   const position = geometry.getAttribute('position'), uv = geometry.getAttribute('uv');
   const face = geometry.groups[0];
   for (let i = face.start; i < face.start + face.count; i++) {
-    uv.setXY(i, (position.getX(i) + HALF_WIDTH) / 17.4, (position.getY(i) + .14) / 13.8);
+    uv.setXY(i, (position.getX(i) + HALF_WIDTH) / 17.4, (position.getY(i) - ROOM_WALL_BASE_Y) / 13.8);
   }
   uv.needsUpdate = true;
   const wall = new THREE.Mesh(geometry, m.plaster);
@@ -101,16 +99,5 @@ export function buildEntranceWall(kit) {
     box(group, to - from, .065, .16, m.roomTimber, (from + to) / 2, 1.5, -THICKNESS / 2 - .08);
   }
 
-  const doors = ENTRANCE_DOORS.map(door => buildDoor(kit, group, door));
-  const colliders = hitTargets.filter(target => ENTRANCE_DOORS.some(door => door.id === target.userData.zone));
-  let shown = null;
-  /** Show the wall (and let its doors be picked) only while the camera is inside the room. */
-  function update(camera) {
-    const inside = camera.position.z < WALL_Z - THICKNESS;
-    if (inside === shown) return;
-    shown = inside;
-    group.visible = inside;
-    for (const collider of colliders) collider.visible = inside;
-  }
-  return { group, doors, update };
+  for (const door of ENTRANCE_DOORS) buildDoor(kit, group, door);
 }

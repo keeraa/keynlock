@@ -4,7 +4,10 @@ import { createDust } from '../../../core/rendering/dust.js';
 
 /** Builds the static atelier and exposes its easel factory and wood surfaces. */
 // includeShelf: the wall shelf with pigment jars (the standalone Atelier; the Lair has none).
-export function createWorkshopRoom({ THREE, scene, mats, includeWallTrim = true, includeShelf = true, includeDust = true, wallZ = -4.6, floorY = -.0285 }) {
+export function createWorkshopRoom({
+  THREE, scene, mats, includeWallTrim = true, includeShelf = true, includeDust = true,
+  wallZ = -4.6, floorY = -.0285, includeWorktable = true,
+}) {
   const floorWoodMaterials = [];
   // Static furniture repeats the same primitives dozens of times. Reuse their
   // immutable GPU buffers across both easels, planks, shelves and tools.
@@ -148,49 +151,51 @@ export function createWorkshopRoom({ THREE, scene, mats, includeWallTrim = true,
       }
     }
 
-    // Work table, scattered brushes, palette and restoration paraphernalia.
-    const tabletopY = .91 + .13 / 2;
-    const tableFrame = new THREE.Group();
-    tableFrame.name = 'restoration-worktable';
-    scene.add(tableFrame);
-    const worktable = box(2.75, .13, 1.15, mats.roomWood, 5.17, .91, 1.0, tableFrame);
-    worktable.name = 'restoration-worktable-top';
-    const legBottom = floorY - .003, legTop = .848;
-    for (const x of [4.07, 6.21]) for (const z of [.59, 1.43]) {
-      box(.11, legTop - legBottom, .11, mats.roomEdge, x, (legTop + legBottom) / 2, z, tableFrame);
-    }
-    const brushPad = box(1.1, .06, .72, mats.linen, 5.13, tabletopY + .03, 1.03);
-    brushPad.name = 'restoration-brush-pad';
-    const brushPadY = tabletopY + .06;
-    for (let i = 0; i < 7; i++) {
-      const x = 4.63 + i * .15;
-      const handle = rod([x, brushPadY + .016, .77], [x + .10, brushPadY + .016, 1.21],
-        .016, mats.roomWood, scene, 8);
-      handle.name = `restoration-brush-${i + 1}-handle`;
-      const ferrule = rod([x + .10, brushPadY + .011, 1.21],
-        [x + .12, brushPadY + .011, 1.33], .011, mats.metal, scene, 8);
-      ferrule.name = `restoration-brush-${i + 1}-ferrule`;
-    }
-    const palette = new THREE.Group();
-    palette.name = 'restoration-palette';
-    // Extruded bevel extends .012 below the local plane; rest it on the tabletop.
-    palette.position.set(6, tabletopY + .012, 1.08);
-    const paletteShape = new THREE.Shape();
-    paletteShape.absellipse(0, 0, .42, .3, 0, Math.PI * 2, false, 0);
-    const hole = new THREE.Path();
-    hole.absellipse(.23, -.07, .075, .07, 0, Math.PI * 2, true, 0);
-    paletteShape.holes.push(hole);
-    const paletteMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(paletteShape, { depth: .028, bevelEnabled: true, bevelSize: .015, bevelThickness: .012, bevelSegments: 2 }), mats.roomWood);
-    paletteMesh.rotation.x = -Math.PI / 2;
-    palette.add(paletteMesh);
-    scene.add(palette);
-    const paintDotGeometry = new THREE.SphereGeometry(.048, 9, 6);
-    for (let i = 0; i < 5; i++) {
-      const dot = new THREE.Mesh(paintDotGeometry, new THREE.MeshStandardMaterial({ color: colors[i], roughness: 1 }));
-      dot.scale.y = .24;
-      dot.position.set(5.78 + .1 * (i % 3), tabletopY + .04 + .048 * .24,
-        .95 + .11 * Math.floor(i / 3));
-      scene.add(dot);
+    if (includeWorktable) {
+      // Work table, scattered brushes, palette and restoration paraphernalia.
+      const tabletopY = .91 + .13 / 2;
+      const tableFrame = new THREE.Group();
+      tableFrame.name = 'restoration-worktable';
+      scene.add(tableFrame);
+      const worktable = box(2.75, .13, 1.15, mats.roomWood, 5.17, .91, 1.0, tableFrame);
+      worktable.name = 'restoration-worktable-top';
+      const legBottom = floorY - .003, legTop = .848;
+      for (const x of [4.07, 6.21]) for (const z of [.59, 1.43]) {
+        box(.11, legTop - legBottom, .11, mats.roomEdge, x, (legTop + legBottom) / 2, z, tableFrame);
+      }
+      const brushPad = box(1.1, .06, .72, mats.linen, 5.13, tabletopY + .03, 1.03);
+      brushPad.name = 'restoration-brush-pad';
+      const brushPadY = tabletopY + .06;
+      for (let i = 0; i < 7; i++) {
+        const x = 4.63 + i * .15;
+        const handle = rod([x, brushPadY + .016, .77], [x + .10, brushPadY + .016, 1.21],
+          .016, mats.roomWood, scene, 8);
+        handle.name = `restoration-brush-${i + 1}-handle`;
+        const ferrule = rod([x + .10, brushPadY + .011, 1.21],
+          [x + .12, brushPadY + .011, 1.33], .011, mats.metal, scene, 8);
+        ferrule.name = `restoration-brush-${i + 1}-ferrule`;
+      }
+      const palette = new THREE.Group();
+      palette.name = 'restoration-palette';
+      // Extruded bevel extends .012 below the local plane; rest it on the tabletop.
+      palette.position.set(6, tabletopY + .012, 1.08);
+      const paletteShape = new THREE.Shape();
+      paletteShape.absellipse(0, 0, .42, .3, 0, Math.PI * 2, false, 0);
+      const hole = new THREE.Path();
+      hole.absellipse(.23, -.07, .075, .07, 0, Math.PI * 2, true, 0);
+      paletteShape.holes.push(hole);
+      const paletteMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(paletteShape, { depth: .028, bevelEnabled: true, bevelSize: .015, bevelThickness: .012, bevelSegments: 2 }), mats.roomWood);
+      paletteMesh.rotation.x = -Math.PI / 2;
+      palette.add(paletteMesh);
+      scene.add(palette);
+      const paintDotGeometry = new THREE.SphereGeometry(.048, 9, 6);
+      for (let i = 0; i < 5; i++) {
+        const dot = new THREE.Mesh(paintDotGeometry, new THREE.MeshStandardMaterial({ color: colors[i], roughness: 1 }));
+        dot.scale.y = .24;
+        dot.position.set(5.78 + .1 * (i % 3), tabletopY + .04 + .048 * .24,
+          .95 + .11 * Math.floor(i / 3));
+        scene.add(dot);
+      }
     }
 
     // Restored frames are stacked against the right wall with their painted

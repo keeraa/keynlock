@@ -2,14 +2,17 @@
 import * as THREE from 'three';
 import { canvasTexture } from './materials.js';
 import { WINDOW_CUTOUT } from './window.js';
-import { CEILING_BEAM_Z, ROOM_CENTER_Z, ROOM_END, ROOM_LENGTH, ROOM_START } from '../room-layout.js';
+import { CEILING_BEAM_Z, ROOM_CEILING_Y, ROOM_CENTER_Z, ROOM_END, ROOM_FLOOR_Y, ROOM_LENGTH,
+  ROOM_START, ROOM_WALL_BASE_Y, ROOM_WALL_TOP_Y, ROOM_WALL_X, ROOM_WINDOW_WALL_Z } from '../room-layout.js';
 
 // The long room itself: floor, walls, ceiling, rug and the right-wall finish.
 export function buildShell(kit) {
   const { m, scene, staticGroup, box, plane } = kit;
   scene.background = new THREE.Color('#2f3834');
   scene.fog = new THREE.Fog('#514d40', 39, 94);
-  const ceilingBottom = 13.52;
+  const ceilingBottom = ROOM_CEILING_Y;
+  const wallHeight = ROOM_WALL_TOP_Y - ROOM_WALL_BASE_Y;
+  const wallCenterY = (ROOM_WALL_TOP_Y + ROOM_WALL_BASE_Y) / 2;
   const floorBase = box(staticGroup, 17.3, .22, ROOM_LENGTH, m.darkWood, 0, -.14, ROOM_CENTER_Z);
   floorBase.name = 'lair-floor-base';
   floorBase.castShadow = false;
@@ -21,7 +24,7 @@ export function buildShell(kit) {
     const z = start + span / 2;
     // Boards butt together: a gap would show the boards' side faces, which
     // the ink outline drew as dotted lines along every seam.
-    const plank = box(staticGroup, 17.1, .047, span, i % 6 === 0 ? m.floorAlternate : m.floor, 0, .015, z);
+    const plank = box(staticGroup, 17.1, .047, span, i % 6 === 0 ? m.floorAlternate : m.floor, 0, ROOM_FLOOR_Y - .047 / 2, z);
     plank.castShadow = false;
     // Give adjoining boards different parts of the same painted grain.
     const uv = plank.geometry.getAttribute('uv');
@@ -40,10 +43,10 @@ export function buildShell(kit) {
   // The arched opening runs all the way through the plaster. A solid box
   // would occlude any exterior scenery and leave the glass looking painted on.
   const backOutline = new THREE.Shape();
-  backOutline.moveTo(-8.7, -.14);
-  backOutline.lineTo(8.7, -.14);
-  backOutline.lineTo(8.7, 13.66);
-  backOutline.lineTo(-8.7, 13.66);
+  backOutline.moveTo(-8.7, ROOM_WALL_BASE_Y);
+  backOutline.lineTo(8.7, ROOM_WALL_BASE_Y);
+  backOutline.lineTo(8.7, ROOM_WALL_TOP_Y);
+  backOutline.lineTo(-8.7, ROOM_WALL_TOP_Y);
   backOutline.closePath();
   const opening = new THREE.Path();
   const { centerX: openingX, halfWidth: openingHalf, bottom: openingBottom,
@@ -64,31 +67,36 @@ export function buildShell(kit) {
   const wallUV = wallGeometry.getAttribute('uv');
   const cap = wallGeometry.groups[0];
   for (let i = cap.start; i < cap.start + cap.count; i++) {
-    wallUV.setXY(i, (wallPosition.getX(i) + 8.7) / 17.4, (wallPosition.getY(i) + .14) / 13.8);
+    wallUV.setXY(i, (wallPosition.getX(i) + 8.7) / 17.4, (wallPosition.getY(i) - ROOM_WALL_BASE_Y) / 13.8);
   }
   wallUV.needsUpdate = true;
   const backWall = new THREE.Mesh(wallGeometry, m.plaster);
   backWall.name = 'back-wall-arched-cutout';
-  backWall.position.z = -5.755;
+  backWall.position.z = ROOM_WINDOW_WALL_Z - .27;
   backWall.receiveShadow = true;
   staticGroup.add(backWall);
   // Preserve the original uninterrupted painted walls. The existing
   // workstations are reached by a camera focus, without new architecture.
-  box(staticGroup, .27, 13.8, ROOM_LENGTH, m.plaster, -8.55, 6.76, ROOM_CENTER_Z).castShadow = false;
-  box(staticGroup, .27, 13.8, ROOM_LENGTH, m.plaster, 8.55, 6.76, ROOM_CENTER_Z).castShadow = false;
+  box(staticGroup, .27, wallHeight, ROOM_LENGTH, m.plaster, -ROOM_WALL_X - .135, wallCenterY, ROOM_CENTER_Z).castShadow = false;
+  box(staticGroup, .27, wallHeight, ROOM_LENGTH, m.plaster, ROOM_WALL_X + .135, wallCenterY, ROOM_CENTER_Z).castShadow = false;
   box(staticGroup, 17.5, .20, ROOM_LENGTH, m.ceiling, 0, ceilingBottom + .10, ROOM_CENTER_Z)
     .name = 'lair-ceiling';
-  const leftFinish = plane(staticGroup, ROOM_LENGTH - .12, 13.55, m.galleryPlaster, -8.391, 6.72, ROOM_CENTER_Z);
+  const galleryBase = -.055;
+  const galleryHeight = ceilingBottom - galleryBase;
+  const leftFinish = plane(staticGroup, ROOM_LENGTH - .12, galleryHeight,
+    m.galleryPlaster, -8.391, galleryBase + galleryHeight / 2, ROOM_CENTER_Z);
   // Keep the brushwork at the same physical scale along the gallery wall.
   const galleryUV = leftFinish.geometry.getAttribute('uv');
   for (let i = 0; i < galleryUV.count; i++) {
-    galleryUV.setX(i, galleryUV.getX(i) * leftFinish.geometry.parameters.width / 17.4);
+    galleryUV.setXY(i, galleryUV.getX(i) * leftFinish.geometry.parameters.width / 17.4,
+      galleryUV.getY(i) * galleryHeight / 13.55);
   }
   leftFinish.rotation.y = Math.PI / 2;
   leftFinish.name = 'atelier-side-wall';
   // One continuous sage-green tiled finish covers the entire right wall.
   // It sits just in front of the plaster, from the floor to the ceiling.
-  const rightFinish = plane(staticGroup, ROOM_LENGTH - .08, 13.54, m.alchemyTile, 8.392, 6.77, ROOM_CENTER_Z);
+  const rightFinish = plane(staticGroup, ROOM_LENGTH - .08, ceilingBottom,
+    m.alchemyTile, 8.392, ceilingBottom / 2, ROOM_CENTER_Z);
   rightFinish.rotation.y = -Math.PI / 2;
   rightFinish.castShadow = false;
   rightFinish.name = 'alchemy-right-wall';
@@ -137,15 +145,18 @@ export function buildShell(kit) {
       side * 8.29, wallBeamY, ROOM_CENTER_Z).name = `lair-wall-beam-${side < 0 ? 'left' : 'right'}`;
   }
   // Leave the centre of the back wall open for the enlarged arched window.
+  const postBase = -.035;
+  const postTop = timberTop - wallBeamHeight + .015;
   for (const [index, x] of [-8.25, -4.68, 4.68, 8.25].entries()) {
-    box(staticGroup, .26, 13.35, .27, timber, x, 6.64, -5.32).name = `lair-wall-post-${index}`;
+    box(staticGroup, .26, postTop - postBase, .27, timber, x, (postTop + postBase) / 2, -5.32)
+      .name = `lair-wall-post-${index}`;
     box(staticGroup, .37, .20, .39, timber, x, timberTop - wallBeamHeight - .09, -5.31);
   }
   // Alternate ribs carry the three chandeliers.
   for (const [beamIndex, z] of CEILING_BEAM_Z.entries()) {
     box(staticGroup, 17.15, .30, .33, timber, 0, timberTop - .15, z)
       .name = `lair-ceiling-beam-${beamIndex}`;
-    for (const x of [-8.22, 8.22]) box(staticGroup, .39, .40, .48, timber, x, 13.22, z);
+    for (const x of [-8.22, 8.22]) box(staticGroup, .39, .40, .48, timber, x, ceilingBottom - .30, z);
   }
   box(staticGroup, 17.22, wallBeamHeight, .30, timber, 0, wallBeamY, -5.39)
     .name = 'lair-wall-beam-back';

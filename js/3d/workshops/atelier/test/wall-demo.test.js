@@ -20,6 +20,14 @@ test('demo samples 30 unique real reproductions without altering the source coll
   assert.deepEqual(keynlockPaintings.map((art) => art.id), before);
 });
 
+test('a shorter gallery fills all eight of its columns with eligible artwork', () => {
+  const columns = WALL_COLUMNS.filter(({ id }) => !['china', 'korea', 'india', 'rococo'].includes(id));
+  const sample = chooseDemoWallPaintings(keynlockPaintings, rng(123), columns);
+  assert.equal(sample.length, 30);
+  assert.equal(columns.length, 8);
+  assert.deepEqual(new Set(sample.map(paintingCategory)), new Set(columns.map(({ id }) => id)));
+});
+
 test('different demo shuffles produce different layouts and never duplicate a painting', () => {
   const arts = [...keynlockPaintings, keynlockPaintings[0]];
   const first = chooseDemoWallPaintings(arts, rng(10));

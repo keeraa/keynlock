@@ -223,6 +223,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
   function finishMount(slot,now){
     motionAudio.reset();
     playSound('mount');
+    playSound('correctPlace');
     feedback.show(slot,now,display.renderSettings?.hallColors?.[slot.wall.hall]);
     const before=compositions.summary(slot.wall,slot.along,slot.y);
     const groupFilled=before?.group.filled;
@@ -231,7 +232,6 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     const after=compositions.summary(slot.wall,slot.along,slot.y);
     const completedWall=after&&after.filled===after.total&&before.filled<after.filled;
     const completedGroup=after&&after.group.filled===after.group.places.length&&groupFilled<after.group.filled;
-    playSound('correctPlace',undefined,{after:'mount'});
     if(completedHall){playSound('hallComplete',undefined,{after:'correctPlace'});notify(text('✓ Зал оформлен','✓ Gallery complete'));}
     else if(completedWall)notify(text('✓ Стена оформлена','✓ Wall complete'));
     else if(completedGroup)notify(text('✓ Композиция собрана','✓ Composition complete'));

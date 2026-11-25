@@ -61,7 +61,7 @@ export function bindPlayerInput({canvas,player,getMode,lock,actions,hideProgress
  life.listen(canvas,'wheel',e=>{if(getMode()==='plan'){e.preventDefault();actions.zoom(e.deltaY);}},{passive:false});
  life.listen(window,'keydown',e=>{
   if(document.querySelector('dialog[open]'))return;
-  if(e.target instanceof Element&&e.target.closest('.music-controls'))return;
+  if(e.target instanceof Element&&e.target.closest('.music-controls, #archive-music-toggle'))return;
   if(e.target instanceof Element&&e.target.closest('input,select,textarea,[contenteditable="true"]'))return;
   const key=logicalKey(e),mode=getMode();
   if(mode==='loading')return;

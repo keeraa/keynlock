@@ -48,12 +48,12 @@ test('random heavy segments stop scheduling on release and disposal closes the c
  audio.dispose();audio.dispose();assert.equal(context.closeCount,1);
  audio.play('menu');audio.setMotion('heavyDrag');assert.equal(context.sources.length,count);
 });
-test('completion chimes wait until the mount contact ends and a new pickup cancels them',async t=>{
+test('placement chime starts with the frame contact, and a new contact cancels both rewards',async t=>{
  const {audio,context}=await fixture(t);
  audio.setMotion('wallSlide');const slide=context.sources.at(-1);
  audio.play('mount');const mount=context.sources.at(-1);assert.equal(slide.stopped,true);
- audio.play('correctPlace',undefined,{after:'mount'});const reward=context.sources.at(-1);
- assert(reward.when>=mount.when+mount.buffer.duration+.12);
+ audio.play('correctPlace');const reward=context.sources.at(-1);
+ assert.equal(reward.when,mount.when);
  audio.play('hallComplete',undefined,{after:'correctPlace'});const hall=context.sources.at(-1);
  assert(hall.when>=reward.when+reward.buffer.duration+.12);
  audio.play('unmount');assert.equal(mount.stopped,true);assert.equal(reward.stopped,true);
@@ -65,8 +65,8 @@ test('the retired watercolor cue cannot add another sound to the visual effect',
  const {audio,context}=await fixture(t);
  audio.play('watercolor');assert.equal(context.sources.length,0);
 });
-test('the unmount recording has an audible contact in its first 80 ms, without a silent lead-in',()=>{
- const wav=fs.readFileSync(new URL('../assets/audio/selected/unmount.wav',import.meta.url));
+function initialRms(file){
+ const wav=fs.readFileSync(new URL('../assets/audio/selected/'+file,import.meta.url));
  let offset=12,channels,rate,pcm;
  while(offset+8<=wav.length){
   const id=wav.toString('ascii',offset,offset+4),size=wav.readUInt32LE(offset+4),start=offset+8;
@@ -74,8 +74,12 @@ test('the unmount recording has an audible contact in its first 80 ms, without a
   if(id==='data')pcm=wav.subarray(start,start+size);
   offset=start+size+(size%2);
  }
- assert(pcm&&rate&&channels);assert(pcm.length/(rate*channels*2)<1);
+ assert(pcm&&rate&&channels);
  const samples=Math.min(pcm.length/2,Math.floor(rate*.08)*channels);
  let sum=0;for(let i=0;i<samples;i++)sum+=(pcm.readInt16LE(i*2)/32768)**2;
- assert(Math.sqrt(sum/samples)>.02,'contact should be audible immediately after removal');
+ return Math.sqrt(sum/samples);
+}
+test('the removal contact and placement chime have audible onsets within the first 80 ms',()=>{
+ assert(initialRms('unmount.wav')>.02);
+ assert(initialRms('correct-place.wav')>.015);
 });

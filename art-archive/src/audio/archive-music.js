@@ -10,25 +10,42 @@ export function mountArchiveMusic({window:browserWindow,elements}){
  const music=getSharedMusicPlayer(browserWindow,storage,{
   tracks:musicTracksWithUrls(file=>new URL('../../assets/music/'+file,import.meta.url).href),
  });
- const mounts=[{element:elements('archive-music'),volume:false},{element:elements('archive-music-panel'),volume:true}];
- let views=[];
+ const toggle=elements('archive-music-toggle'),panel=elements('archive-music-panel');
+ let unmountPanel=()=>{};
+ function toggleMusic(){
+  const {stopped,volume}=music.getState();
+  if(!volume){music.setVolume(25);music.play();}
+  else if(stopped)music.play();
+  else music.pause();
+ }
+ function renderToggle({stopped,volume}){
+  if(!toggle)return;
+  const on=!stopped&&volume>0,en=getLanguage()==='en';
+  toggle.setAttribute('aria-label',en?'Music':'Музыка');
+  toggle.setAttribute('aria-pressed',String(on));
+  toggle.title=on?(en?'Pause music':'Пауза музыки'):(en?'Play music':'Включить музыку');
+ }
+ toggle?.addEventListener('click',toggleMusic);
+ const unsubscribe=music.subscribe(renderToggle);
  function render(){
-  for(const unmount of views)unmount();views=[];
+  unmountPanel();
+  renderToggle(music.getState());
   const en=getLanguage()==='en';
   const labels=en?{region:'Music',previous:'Previous track',next:'Next track',play:'Play music',pause:'Pause music',volume:'Music volume'}
    :{region:'Музыка',previous:'Предыдущий трек',next:'Следующий трек',play:'Включить музыку',pause:'Пауза музыки',volume:'Громкость музыки'};
-  for(const {element,volume} of mounts)if(element)views.push(mountMusicControls(element,music,{labels,language:getLanguage(),volume}));
+  if(panel)unmountPanel=mountMusicControls(panel,music,{labels,language:getLanguage(),volume:true});
  }
  render();
  const begin=event=>{
-  if(event.target?.closest?.('.music-controls'))return;
+  if(event.target?.closest?.('.music-controls, #archive-music-toggle'))return;
   music.start();removeGesture();
  };
  function removeGesture(){browserWindow.removeEventListener('pointerdown',begin,true);browserWindow.removeEventListener('keydown',begin,true);}
  browserWindow.addEventListener('pointerdown',begin,true);browserWindow.addEventListener('keydown',begin,true);
  const language=elements('language-select');language?.addEventListener('change',render);
  return {player:music,setPaused:value=>music.setPaused(value),dispose(){
-  removeGesture();language?.removeEventListener('change',render);for(const unmount of views)unmount();views=[];
+  removeGesture();language?.removeEventListener('change',render);
+  toggle?.removeEventListener('click',toggleMusic);unsubscribe();unmountPanel();
   // The player belongs to the page/host. Leaving a scene must not stop its music.
  }};
 }

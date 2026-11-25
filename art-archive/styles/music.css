@@ -1,8 +1,6 @@
 @import "../vendor/shared-music/music-controls.css";
-.archive-music{pointer-events:auto;max-width:270px}
-.archive-music .music-controls__title{max-width:190px;margin-left:4px}
+.topbar nav #archive-music-toggle{width:2.6rem;padding:0;justify-content:center;border-radius:50%;border-color:#68583e;background:#1e241ea6;color:#d5b77b;font:1.4rem/1 Georgia,serif}
+.topbar nav #archive-music-toggle[aria-pressed=true]{background:#bd9b65;color:#1c241f}
 .archive-music-panel{margin:1rem 0;flex-wrap:wrap;row-gap:10px}
 .archive-music-panel .music-controls__title{flex:1 1 140px}
 .archive-music-panel .music-controls__volume{flex:1 1 100%;width:100%}
-@media(max-width:1100px){.archive-music .music-controls__title{display:none}}
-@media(max-width:720px){.archive-music{display:none}}

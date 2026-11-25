@@ -12,6 +12,7 @@ export function mountZoneInteraction({ canvas, camera, interaction, anchors, hit
   const point = new THREE.Vector3();
   const hotspots = [...document.querySelectorAll('.hotspot')];
   let startPointer = null;
+  let dismissingMenu = false;
   let hoveredZone = null;
 
   function hitZone(event) {
@@ -22,20 +23,21 @@ export function mountZoneInteraction({ canvas, camera, interaction, anchors, hit
     } else pointer.set(0, 0);
     raycaster.far = event ? Infinity : 4.5;
     raycaster.setFromCamera(pointer, camera);
-    // Hidden targets (the entrance doors seen from outside) cannot be picked.
     const hit = raycaster.intersectObjects(hitTargets.filter(target => target.visible), false)[0];
     return hit?.object?.userData?.zone || null;
   }
 
   function openWalkTarget() {
     const id = hitZone();
-    if (id) zoneTransitions.open(id);
+    if (!id) return false;
+    zoneTransitions.open(id);
+    return true;
   }
 
   function update(currentZone) {
     if (cameraInput.isWalking()) {
       camera.updateMatrixWorld();
-      roomWalk.setTarget(zoneTransitions.title(hitZone()));
+      roomWalk.setTarget(roomWalk.isMenuOpen() ? null : zoneTransitions.title(hitZone()));
       return;
     }
     const width = canvas.clientWidth, height = canvas.clientHeight;
@@ -57,8 +59,11 @@ export function mountZoneInteraction({ canvas, camera, interaction, anchors, hit
     }
   }
 
-  const canPickZone = () => !workshopOverlay.isOpen() && cameraInput.canPickZone();
-  interaction.addEventListener('pointerdown', event => { startPointer = [event.clientX, event.clientY]; });
+  const canPickZone = () => !roomWalk.isMenuOpen() && !workshopOverlay.isOpen() && cameraInput.canPickZone();
+  interaction.addEventListener('pointerdown', event => {
+    startPointer = [event.clientX, event.clientY];
+    dismissingMenu = roomWalk.isMenuOpen();
+  });
   interaction.addEventListener('pointermove', event => {
     if (!canPickZone() || cameraInput.isWalking() || event.buttons) return;
     const id = hitZone(event);
@@ -67,10 +72,11 @@ export function mountZoneInteraction({ canvas, camera, interaction, anchors, hit
     interaction.style.cursor = id ? 'pointer' : 'grab';
   });
   interaction.addEventListener('click', event => {
+    if (dismissingMenu) { dismissingMenu = false; return; }
     if (!canPickZone() || event.metaKey) return;
     if (startPointer && Math.hypot(event.clientX - startPointer[0], event.clientY - startPointer[1]) > 7) return;
     if (cameraInput.isWalking()) {
-      openWalkTarget();
+      if (!openWalkTarget()) roomWalk.captureMouse();
       return;
     }
     const id = hitZone(event);

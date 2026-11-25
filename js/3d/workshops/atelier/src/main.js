@@ -1,9 +1,11 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createCartoonFilter } from './effects/cartoon-filter.js';
+import { WALL_COLUMNS, wallPaintingCategory } from './wall-layout.js';
 import { createWallGallery } from './wall-gallery.js';
 import { createWallExhibitionController } from './wall-exhibition-controller.js';
 import { createWorkshopRoom } from './workshop-room.js';
+import { ATELIER_LAIR_EASEL_SCALE } from './room-assets.js';
 import { createArtworkRenderer } from './artwork-renderer.js';
 import { createPaintingTextureCache } from './painting-texture-cache.js';
 import { createPlayerProgress } from './player-progress.js';
@@ -44,7 +46,12 @@ let inRoomActive = false;
 const isRestorationActive = () => !embedded || inRoomActive;
 const stage = $('scene');
 const performanceHUD = createPerformanceHUD({ fpsElement: $('fps-value'), polygonsElement: $('poly-value') });
-const playerProgress = createPlayerProgress({ paintings });
+const excludedGalleryCategories = new Set(lair?.atelier.excludedGalleryCategories);
+const galleryColumns = WALL_COLUMNS.filter(({ id }) => !excludedGalleryCategories.has(id));
+const galleryCategories = new Set(galleryColumns.map(({ id }) => id));
+const playerProgress = createPlayerProgress({
+  paintings, canPinToWall: art => galleryCategories.has(wallPaintingCategory(art)),
+});
 const state = playerProgress.state;
 let selected = playerProgress.getSelectedIndex();
 let copyMaterial;
@@ -114,6 +121,7 @@ const galleryWallCenter = galleryWall && scene.worldToLocal(galleryWall.getWorld
 const wallZ = galleryWallCenter ? galleryWallCenter.z : -4.6;
 const { dust, makeEasel, wallpaperMaterial, floorWoodMaterials } = createWorkshopRoom({
   THREE, scene, mats, includeWallTrim: !embedded, includeShelf: !embedded, includeDust: !embedded, wallZ, floorY: embedded ? .0385 : -.0285,
+  includeWorktable: !embedded,
 });
 if (embedded) {
   // The standalone Atelier's angled sun is useful for its own room, but in
@@ -133,7 +141,12 @@ const woodStyle = createWoodStyle({ THREE, renderer, loader: textureLoader, mats
   floorWoodMaterials, variants: woodVariants });
 const wallGallery = createWallGallery({
   THREE, scene, camera, renderer, frameWood: mats.frameWood, wallZ: galleryWall ? wallZ : undefined,
-  wallLayout: galleryWall ? { width: galleryWall.geometry.parameters.width - 2, centerX: galleryWallCenter.x } : undefined,
+  wallLayout: galleryWall ? {
+    width: galleryWall.geometry.parameters.width - 2,
+    centerX: galleryWallCenter.x,
+    columns: galleryColumns,
+    topY: galleryWallCenter.y + galleryWall.geometry.parameters.height / 2 - .48,
+  } : undefined,
   pointerElement: embedded ? lair?.interactionElement : renderer.domElement,
   onLayout: (layout) => navigation.updateWallLayout(layout),
 });
@@ -145,8 +158,12 @@ if (embedded) {
   rightEasel.root.name = 'restoration-right-easel';
   // Align the only live pair of Atelier easels with the Lair's left wall.
   // Their original tools and painting meshes stay in the same coordinate space.
-  leftEasel.root.position.z = -3.25;
-  rightEasel.root.position.z = -3.25;
+  const bounds = new THREE.Box3();
+  for (const { root } of [leftEasel, rightEasel]) {
+    root.position.z = -3.25;
+    root.scale.setScalar(ATELIER_LAIR_EASEL_SCALE);
+    root.position.y += .0385 - bounds.setFromObject(root, true).min.y;
+  }
   // Preserve the original Atelier's camera-to-easel distance after moving the
   // pair toward the Lair wall. Otherwise the source overview no longer frames
   // the easel construction as it does in the standalone workshop.
@@ -199,7 +216,8 @@ let exhibition;
 const collectionUI = createPaintingCollectionUI({
   paintings, $, root: directRoot || document, extraRoots: lair?.atelier.slots || [],
   onOpenChange: open => directRoot?.classList.toggle('collection-expanded', open),
-  isRestored: (id) => playerProgress.isRestored(id),
+  isRestored: playerProgress.isRestored,
+  isWallEligible: playerProgress.isWallEligible,
   getWallIds: () => playerProgress.getWallIds(),
   onToggleWall: (id) => exhibition.toggleWall(id),
   onSelect: (index) => {
@@ -460,7 +478,7 @@ async function showPainting(index) {
     const framing = framedArtwork(leftEasel, texture, width, height);
     copyMaterial = framedArtwork(rightEasel, texture, width, height).material;
     renderer.shadowMap.needsUpdate = true;
-    navigation.setPaintingCenterY(framing.centerY);
+    navigation.setPaintingCenterY(leftEasel.root.position.y + framing.centerY * leftEasel.root.scale.y);
     paintingTextureCache.trim(art.image);
   } catch (error) {
     console.error('Ошибка подготовки 3D-полотна:', art.id, error);

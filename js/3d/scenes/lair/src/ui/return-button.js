@@ -1,5 +1,5 @@
 // @ts-check
-// The Lair's single way back: one button in one place for every mode. Inside
+// The Lair's single way back, shown in the active header. Inside
 // a workshop (the Atelier, the lab, the workbench) it reads "В логово"; in a
 // zone opened from a walk it reads "К прогулке"; elsewhere in the room (a zone
 // or a walk) it reads "Общий вид"; at the overview it is hidden.

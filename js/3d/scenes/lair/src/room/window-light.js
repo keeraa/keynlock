@@ -1,7 +1,7 @@
 // @ts-check
 import * as THREE from 'three';
 import { WINDOW_OPENING } from './window.js';
-import { BIRD_SIZE, BIRD_Z, createWindowBird } from './window-bird.js';
+import { WINDOW_BIRD_COUNT, WINDOW_BIRD_WINGSPAN } from './window-birds.js';
 import { bakeWindowFurnitureShadows } from './window-furniture-shadows.js';
 
 // Daylight through the arched window, made the same way as in the Key Archive
@@ -66,8 +66,7 @@ const f = (/** @type {number} */ x) => x.toFixed(6);
  * includes the bird and furniture shadows from createWindowLight().shaderUniforms.
  */
 export const WINDOW_LIGHT_GLSL = `
-  uniform sampler2D uWindowBirdMap;
-  uniform vec4 uWindowBirdPose;
+  uniform vec4 uWindowBirdPositions[${WINDOW_BIRD_COUNT}];
   uniform sampler2D uWindowFurnitureMap;
   float lairFurnitureShadowTap(vec2 uv, float depth) {
     return step(texture2D(uWindowFurnitureMap, uv).r + .006, depth);
@@ -86,20 +85,16 @@ export const WINDOW_LIGHT_GLSL = `
     return 1.0 - shadow * .89;
   }
   float lairBirdShade(vec3 point) {
-    if (uWindowBirdPose.z == 0.0) return 1.0;
-    // Follow the ray from the point back to the bird's plane outside the glass.
-    float distance = point.z - (${f(BIRD_Z)});
-    vec2 crossing = vec2(point.x + distance * ${f(WINDOW_LIGHT_SLOPE.x)},
-      point.y + distance * ${f(WINDOW_LIGHT_SLOPE.y)});
-    vec2 uv = (crossing - uWindowBirdPose.xy) * vec2(uWindowBirdPose.w, 1.0) /
-      vec2(${f(BIRD_SIZE.width)}, ${f(BIRD_SIZE.height)}) + .5;
-    if (min(uv.x, uv.y) < .05 || max(uv.x, uv.y) > .95) return 1.0;
-    float shadow = texture2D(uWindowBirdMap, uv).a * .36;
-    shadow += texture2D(uWindowBirdMap, uv + vec2(.048, .035)).a * .16;
-    shadow += texture2D(uWindowBirdMap, uv + vec2(-.048, .035)).a * .16;
-    shadow += texture2D(uWindowBirdMap, uv + vec2(.048, -.035)).a * .16;
-    shadow += texture2D(uWindowBirdMap, uv + vec2(-.048, -.035)).a * .16;
-    return 1.0 - shadow * .86;
+    float shade = 1.0;
+    for (int i = 0; i < ${WINDOW_BIRD_COUNT}; i++) {
+      vec4 bird = uWindowBirdPositions[i];
+      float distance = point.z - bird.z;
+      vec2 crossing = point.xy + distance * vec2(${f(WINDOW_LIGHT_SLOPE.x)}, ${f(WINDOW_LIGHT_SLOPE.y)});
+      vec2 radius = vec2(${f(WINDOW_BIRD_WINGSPAN * .5)}, .18) + vec2(distance * .018);
+      float coverage = 1.0 - smoothstep(.10, 1.0, length((crossing - bird.xy) / radius));
+      shade *= 1.0 - bird.w * coverage * .45 / (1.0 + distance * .06);
+    }
+    return shade;
   }
   float lairWindowFrameShade(float offset, float height, float distance) {
     float blur = .05 + distance * .012;
@@ -260,18 +255,18 @@ function createFloorPatch(shadowUniforms) {
 }
 
 /**
- * Adds the window light and the passing bird to `parent`. `shaderUniforms`
+ * Adds the window light to `parent`. `shaderUniforms`
  * (dust strength, dust tint and shadows) are shared with the
  * floating dust (core/rendering/dust.js, set up in room/details.js), which lights up in the beam.
  */
 export function createWindowLight(parent, furniture = []) {
-  const bird = createWindowBird(parent);
+  const birdPositions = Array.from({ length: WINDOW_BIRD_COUNT }, () => new THREE.Vector4(0, 0, 0, 0));
   const casters = new Set(furniture);
   const projection = {
     x: centerX, z: wallZ, halfWidth: shadowHalfWidth, bottom, top, range: shadowRange, slope: WINDOW_LIGHT_SLOPE,
   };
   const shadowUniforms = {
-    ...bird.uniforms,
+    uWindowBirdPositions: { value: birdPositions },
     uWindowFurnitureMap: { value: bakeWindowFurnitureShadows(furniture, projection) },
   };
   const air = createAirBeams(shadowUniforms);
@@ -301,11 +296,13 @@ export function createWindowLight(parent, furniture = []) {
   }
   apply();
   return {
-    shaderUniforms, beams: air.beams, floor: floor.patch, bird: bird.bird,
+    shaderUniforms, beams: air.beams, floor: floor.patch, birdPositions,
     /** Register furniture from a workshop once it joins the common scene. */
-    addFurniture(/** @type {THREE.Object3D} */ object) {
-      if (casters.has(object)) return;
-      casters.add(object);
+    /** @param {...THREE.Object3D} objects */
+    addFurniture(...objects) {
+      const before = casters.size;
+      for (const object of objects) casters.add(object);
+      if (casters.size === before) return;
       const previous = shadowUniforms.uWindowFurnitureMap.value;
       shadowUniforms.uWindowFurnitureMap.value = bakeWindowFurnitureShadows([...casters], projection);
       previous.dispose();
@@ -324,7 +321,5 @@ export function createWindowLight(parent, furniture = []) {
       airHidden = Boolean(hidden);
       apply();
     },
-    /** Once per frame, time in seconds: moves the bird. */
-    update: bird.update,
   };
 }

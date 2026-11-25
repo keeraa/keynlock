@@ -24,11 +24,10 @@ export function buildLair(scene, m) {
   buildWorkbench(kit, rightWallFinish.position.x);
   const gramophoneTable = buildGramophone(kit);
   const windowLight = createWindowLight(kit.staticGroup, [...planningFurniture, gramophoneTable]);
-  animated.push(windowLight.update);
   const ambientParticles = buildDetails(kit, { windowLight });
   const lamps = buildLamps(kit);
   zoneTarget('alchemy', [6.86, 1.15, ALCHEMY_Z], [3.05, 2.3, 5.22]);
-  const entranceWall = buildEntranceWall(kit);
+  buildEntranceWall(kit);
   // Hundreds of small static parts become a few meshes (draw calls).
   mergeStaticMeshes(kit.staticGroup);
   const wallpapers = {
@@ -38,7 +37,7 @@ export function buildLair(scene, m) {
     damask: m.wallpaperDamask,
   };
   return {
-    anchors, hitTargets, animated, ambientParticles, windowLight, entranceWall,
+    anchors, hitTargets, animated, ambientParticles, windowLight,
     /**
      * 0 = day: warm sun through the window, dim lamps. 1 = night: moonlight, a
      * dark city outside and the lamps as the main light. In between while it changes.

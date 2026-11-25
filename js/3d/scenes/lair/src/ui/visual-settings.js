@@ -11,7 +11,7 @@ const DEFAULTS = Object.freeze({
 });
 
 /** Compact live materials lab. All controls affect materials, geometry or Three.js particles. */
-export function mountVisualSettings({ visual, room, quality = null, setNight = null, outlines, grain, onOpen = () => {} }) {
+export function mountVisualSettings({ visual, room, quality = null, setNight = null, outlines, grain, onOpenChange = () => {} }) {
   const panel = document.querySelector('#lair-visual-panel');
   const toggle = document.querySelector('#lair-visual-toggle');
   const inputs = [...document.querySelectorAll('[data-visual-setting]')];
@@ -76,12 +76,19 @@ export function mountVisualSettings({ visual, room, quality = null, setNight = n
     state.wallpaper = paper.dataset.wallpaper;
     apply(); persist();
   });
-  const close = () => { panel.hidden = true; toggle.setAttribute('aria-expanded', 'false'); };
-  const open = () => {
-    onOpen(); panel.hidden = false; toggle.setAttribute('aria-expanded', 'true');
+  const closeButton = document.querySelector('#lair-visual-close');
+  const setOpen = open => {
+    if (open === !panel.hidden) return;
+    const restoreFocus = !open && panel.contains(document.activeElement);
+    panel.hidden = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+    onOpenChange(open);
+    if (open) closeButton.focus({ preventScroll: true });
+    else if (restoreFocus) toggle.focus({ preventScroll: true });
   };
-  toggle.addEventListener('click', () => panel.hidden ? open() : close());
-  document.querySelector('#lair-visual-close').addEventListener('click', close);
+  const close = () => setOpen(false);
+  toggle.addEventListener('click', () => setOpen(panel.hidden));
+  closeButton.addEventListener('click', close);
   document.querySelector('#visual-reset').addEventListener('click', () => {
     state = { ...DEFAULTS }; apply(); persist();
   });
@@ -104,5 +111,5 @@ export function mountVisualSettings({ visual, room, quality = null, setNight = n
     state.wallpaper = 'tile';
     apply(); refreshControls(); persist();
   }
-  return { close, isOpen: () => !panel.hidden, state: () => ({ ...state }), setWallTile };
+  return { setOpen, close, isOpen: () => !panel.hidden, state: () => ({ ...state }), setWallTile };
 }

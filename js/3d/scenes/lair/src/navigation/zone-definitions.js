@@ -1,8 +1,13 @@
+import { ATELIER_LAIR_EASEL_SCALE } from '@keynlock/atelier/room-assets';
 import { WORKSHOPS } from '../workshops/workshop-overlay.js';
 import { t } from '../i18n.js';
-import { ALCHEMY_Z, ATELIER_Z, ROOM_END, WORKBENCH_Z } from '../room-layout.js';
+import { ALCHEMY_Z, ATELIER_Z, ROOM_END, ROOM_FLOOR_Y, WORKBENCH_Z } from '../room-layout.js';
 
-export const ATELIER_EASELS = { position: [1.56, 3.22, ATELIER_Z], target: [-7.05, 2.48, ATELIER_Z] };
+const easelViewHeight = height => ROOM_FLOOR_Y + (height - ROOM_FLOOR_Y) * ATELIER_LAIR_EASEL_SCALE;
+export const ATELIER_EASELS = {
+  position: [1.56, easelViewHeight(3.22), ATELIER_Z],
+  target: [-7.05, easelViewHeight(2.48), ATELIER_Z],
+};
 
 export const zoneDefinitions = {
   atelier: {

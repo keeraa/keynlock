@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { ALCHEMY_LAIR_SCALE, makeGouacheWallTexture, WOOD_FINISH_ASSETS } from '@keynlock/alchemy/room-assets';
 import { atelierWallpaperSource } from '@keynlock/atelier/room-assets';
 import { t } from '../i18n.js';
-import { ROOM_LENGTH } from '../room-layout.js';
+import { ROOM_CEILING_Y, ROOM_LENGTH } from '../room-layout.js';
 
 const roomWalnutSource = new URL('./assets/surfaces/walnut-floor-gouache.jpg', import.meta.url).href;
 
@@ -39,7 +39,7 @@ export function createMaterials() {
   const tileTextures = new Map();
   function tileTexture(colour) {
     if (!tileTextures.has(colour)) tileTextures.set(colour, makeGouacheWallTexture(THREE, colour, {
-      width: ROOM_LENGTH / ALCHEMY_LAIR_SCALE, height: 48.4, textureWidth: 2560, textureHeight: 1024,
+      width: ROOM_LENGTH / ALCHEMY_LAIR_SCALE, height: ROOM_CEILING_Y / ALCHEMY_LAIR_SCALE, textureWidth: 2560, textureHeight: 1024,
     }));
     return tileTextures.get(colour);
   }

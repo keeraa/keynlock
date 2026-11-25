@@ -8,10 +8,11 @@ import { arrangeEmbeddedLayout } from './embedded-layout.js';
 
 /**
  * @param {{ host: any, onPanelHeight: (height: number) => void,
+ *   excludedGalleryCategories?: string[],
  *   slots?: { corner?: HTMLElement | null, header?: HTMLElement | null } }} options
  *   slots: places on the Lair's screen for some controls (embedded-layout.js).
  */
-export function createAtelierEmbedding({ host, onPanelHeight, slots = {} }) {
+export function createAtelierEmbedding({ host, onPanelHeight, excludedGalleryCategories = [], slots = {} }) {
   const { status, update } = createWorkshopStatus();
   let root;
   let feedback;
@@ -67,7 +68,8 @@ export function createAtelierEmbedding({ host, onPanelHeight, slots = {} }) {
     style.textContent = `${embeddedStyles}\n@scope (#atelier-embedded-app) {\n${styles.replace(/@import\s+url\([^)]*\)\s*;/g, '')}\n}\n${feedbackStyles}`;
     document.head.append(style);
     container.append(root, feedback);
-    Object.assign(host, { root, feedback, reportStatus, slots: Object.values(slots).filter(Boolean) });
+    Object.assign(host, { root, feedback, reportStatus, excludedGalleryCategories,
+      slots: Object.values(slots).filter(Boolean) });
     publishWorkshopApi('atelier', { status });
 
     const reportHeight = () => onPanelHeight(Math.round(root.getBoundingClientRect().height));

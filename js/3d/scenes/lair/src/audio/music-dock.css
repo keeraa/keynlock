@@ -1,0 +1,88 @@
+.lair-music-dock {
+  --music-button-size: 57px;
+  --music-edge: 38px;
+  --music-bottom: max(22px, env(safe-area-inset-bottom));
+  --music-panel-width: calc(100vw - 2 * var(--music-edge) - var(--music-button-size) + 1px);
+  position: fixed;
+  z-index: 149;
+  bottom: var(--music-bottom);
+  left: var(--music-edge);
+  display: flex;
+  align-items: center;
+  height: var(--music-button-size);
+}
+
+.atelier-mode .lair-music-dock {
+  bottom: clamp(var(--music-bottom), calc(var(--atelier-panel-height, 0px) + 12px), calc(100dvh - 100px));
+}
+
+.lair-music-toggle {
+  display: grid;
+  width: var(--music-button-size);
+  height: var(--music-button-size);
+  place-items: center;
+  padding: 0;
+  border: 1px solid #9f8459;
+  border-radius: 50%;
+  background: #1b231fea;
+  color: #e8c790;
+  font: 34px Georgia, serif;
+}
+
+.lair-music-toggle:hover,
+.lair-music-toggle[aria-expanded="true"] {
+  background: #393226;
+  color: #ffe2ae;
+}
+
+.lair-music {
+  position: absolute;
+  left: calc(100% - 1px);
+  width: max-content;
+  max-width: var(--music-panel-width);
+  min-height: 38px;
+  padding: 4px 12px 4px 9px;
+  border: 1px solid #796847;
+  border-radius: 0 8px 8px 0;
+  background: #18211df5;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-6px);
+  transition: opacity .2s ease, transform .2s ease, visibility .2s;
+}
+
+.lair-music-toggle[aria-expanded="true"] + .lair-music {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+.lair-music .music-controls__title {
+  margin-left: 4px;
+  max-width: 320px;
+}
+
+.lair-music .music-controls__playlist--menu {
+  top: auto;
+  bottom: 100%;
+  right: auto;
+  left: 0;
+  min-width: min(290px, var(--music-panel-width));
+  border-radius: 8px 8px 0 0;
+}
+
+#app:has(> .loading:not(.done)) .lair-music-dock {
+  visibility: hidden;
+}
+
+@media (max-width: 1100px) {
+  .lair-music-dock { --music-edge: 20px; }
+}
+
+@media (max-width: 720px) {
+  .lair-music-dock { --music-edge: 14px; --music-bottom: max(14px, env(safe-area-inset-bottom)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lair-music { transition: none; }
+}

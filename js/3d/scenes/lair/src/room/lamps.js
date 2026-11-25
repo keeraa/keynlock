@@ -1,9 +1,9 @@
 // @ts-check
 import * as THREE from 'three';
-import { CEILING_BEAM_Z, ROOM_END } from '../room-layout.js';
+import { ATELIER_Z, CEILING_BEAM_Z, ROOM_CEILING_Y, ROOM_END, WORKBENCH_Z } from '../room-layout.js';
 
 // The Lair's lamps: three candle chandeliers in the middle of the room and
-// eight wall sconces. Only the chandeliers are real lights; each sconce paints
+// seven wall sconces. Only the chandeliers are real lights; each sconce paints
 // a warm patch on the wall around itself (like the window's patch on the
 // floor), which reads as lamplight and costs nothing per pixel. By day the
 // lamps are dim, at night they are the room's main light (setNight).
@@ -13,15 +13,17 @@ import { CEILING_BEAM_Z, ROOM_END } from '../room-layout.js';
 
 /** Chandeliers along the middle of the room; the ring hangs above the window's arch. */
 export const CHANDELIERS = Object.freeze([1, 3, 5].map(index =>
-  Object.freeze({ x: 0, y: 9.8, z: CEILING_BEAM_Z[index] })));
+  Object.freeze({ x: 0, y: ROOM_CEILING_Y - 2.15, z: CEILING_BEAM_Z[index] })));
 /** Wall sconces on both long walls, with space around the tool board. */
 export const SCONCES = Object.freeze([-1, 1].flatMap(side =>
-  [-1.10, 4.70, 11.0, ROOM_END - 1.77].map(z => Object.freeze({ side, y: 3.1, z }))));
+  // The sconce that sat behind the restoration easels is omitted on the left.
+  [-1.10, ...(side === 1 ? [4.70, WORKBENCH_Z - 1.40] : [ATELIER_Z + 3.90]), ROOM_END - 1.77]
+    .map(z => Object.freeze({ side, y: 3.1, z }))));
 const WALL_X = 8.39;
-const CEILING_Y = 13.26;
+const CHANDELIER_MOUNT_Y = ROOM_CEILING_Y - .26;
 /** Day and night values; setNight blends between them. */
 const LEVELS = Object.freeze({
-  chandelier: { day: 22, night: 120 },   // hung higher: more light to reach the floor
+  chandelier: { day: 17, night: 90 },   // keep similar light on the floor after lowering the rings
   glow: { day: .32, night: 1.1 },
   wall: { day: .14, night: .95 },
 });
@@ -91,7 +93,7 @@ function buildChandelier(kit, { x, y, z }, flames) {
   group.name = 'lair-chandelier';
   group.position.set(x, y, z);
   staticGroup.add(group);
-  rod(group, [0, CEILING_Y - y, 0], [0, HUB, 0], .04, m.oldBrass, 8);
+  rod(group, [0, CHANDELIER_MOUNT_Y - y, 0], [0, HUB, 0], .04, m.oldBrass, 8);
   for (const [radius, tube, segments, height] of [[RING, .048, 48, 0], [INNER, .022, 40, .06]]) {
     const ring = new THREE.Mesh(new THREE.TorusGeometry(radius, tube, 6, segments), m.oldBrass);
     ring.rotation.x = Math.PI / 2;

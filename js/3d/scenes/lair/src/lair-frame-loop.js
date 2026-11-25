@@ -43,10 +43,9 @@ export function startLairFrames({ scene, camera, controls, renderer, rendererHos
     dayNight.update(frameDelta);
     cameraInput.update(delta, now);
     rendererHost.stepWorldRuntime(now);
-    cameraInput.syncGalleryCamera();
+    cameraInput.finishFrame();
 
     for (const update of room.animated) update(clock.elapsedTime);
-    room.entranceWall?.update(camera);
     const currentZone = zoneTransitions.current();
     room.windowLight?.setAirHidden(currentZone === 'atelier');
     returnButton?.update({ zone: currentZone, walking: cameraInput.isWalking(), overlayOpen: workshopOverlay.isOpen(),

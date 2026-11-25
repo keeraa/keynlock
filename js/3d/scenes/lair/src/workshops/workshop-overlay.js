@@ -27,6 +27,8 @@ export function mountWorkshopOverlay({onExit = () => {},onReady = () => {}, rend
   const title = document.querySelector('#workshop-title');
   const external = document.querySelector('#workshop-external');
   const returnButton = document.querySelector('#reset-camera');
+  const roomHeader = returnButton.parentElement;
+  const workshopHeader = overlay.querySelector('.workshop-bar');
   const loader = document.querySelector('#workshop-loading');
   const loadingTitle = document.querySelector('#workshop-loading-title');
   const warning = document.querySelector('#workshop-warning');
@@ -115,6 +117,7 @@ export function mountWorkshopOverlay({onExit = () => {},onReady = () => {}, rend
     if (id !== 'alchemy') rendererHost?.activate(id);
     overlay.classList.add('workshop-open');
     overlay.setAttribute('aria-hidden', 'false');
+    workshopHeader.prepend(returnButton);
     showCurrentFrame();
     ensureFrame(id);
     if (readyWorkshops.has(id)) markReady(id);
@@ -131,6 +134,7 @@ export function mountWorkshopOverlay({onExit = () => {},onReady = () => {}, rend
     opened = false;
     overlay.classList.remove('workshop-open');
     overlay.setAttribute('aria-hidden', 'true');
+    roomHeader.prepend(returnButton);
     showCurrentFrame();
     clearTimers();
     rendererHost?.deactivate(workshopId);

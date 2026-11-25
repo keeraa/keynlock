@@ -22,7 +22,7 @@ test('shared key modules match the canonical library', () => {
   assert.match(output, /check: 0 mirror\(s\) out of sync/);
 });
 
-test('music modules match the canonical player in js/3d/core/audio', () => {
+test('audio modules and recordings match their canonical files in js/3d/core', () => {
   const sync = new URL('../../../core/audio/sync.mjs', import.meta.url);
   const repositoryRoot = new URL('../../../../../', import.meta.url);
   const output = execFileSync(process.execPath, [sync.pathname, '--check'], { cwd: repositoryRoot.pathname, encoding: 'utf8' });

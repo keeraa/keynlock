@@ -203,16 +203,6 @@ export function createAtelierView({
     document.querySelector('#atelier-info-policy').textContent = info.policy;
   }
 
-  /** The header place («ВСЯ КОЛЛЕКЦИЯ») stands right of the «В ЛОГОВО» button. */
-  function placeHeaderSlot() {
-    const back = document.querySelector('#reset-camera');
-    const bounds = back && !back.hidden ? back.getBoundingClientRect() : null;
-    if (!bounds?.width) { headerSlot.hidden = true; return; }
-    headerSlot.style.left = `${Math.round(bounds.right + 10)}px`;
-    headerSlot.style.top = `${Math.round(bounds.top)}px`;
-    headerSlot.style.height = `${Math.round(bounds.height)}px`;
-  }
-
   function updateViewLift(currentZone) {
     const goal = currentZone === 'atelier' && !galleryActive ? panelHeight() / 2 : 0;
     if (Math.abs(goal - viewLift) < .5) viewLift = goal;
@@ -234,7 +224,6 @@ export function createAtelierView({
     // The Atelier fills these places itself (its embedded-layout.js).
     corner.hidden = !showing;
     headerSlot.hidden = !showing;
-    if (showing) placeHeaderSlot();
     // The original/copy stepper only while the Atelier's panel is hidden.
     easelCameraControls.hidden = !showing || bridge.isPanelOpen?.() !== false;
     const focusedSide = showing ? bridge.focusedSide?.() : null;

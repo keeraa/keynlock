@@ -1,6 +1,6 @@
 // @ts-check
-// Short, procedural Foley. Clips are generated once per session and reused.
-const SAMPLE_RATE = 24000;
+import { makeClip, noise, ring } from './foley.js';
+import { createFootsteps } from './footsteps.js';
 const EFFECT_LEVEL = {
   pickup: .65, throw: .56, dropWood: .67, dropRug: .60, row: .62, keyShine: .3995,
   water: .47, lift: .52, waxStart: .42, waxDone: .52, melt: .19, fanfare: .62, finale: .7,
@@ -8,21 +8,12 @@ const EFFECT_LEVEL = {
 const PROCEDURAL_FALLBACKS = { pickup: 'take', throw: 'release', keyShine: 'waxDone' };
 const SOUND_KEY = 'keynlock-archive-sound-v1';
 
-// Each layer is a decaying impact or a filtered burst of noise. Offsets give
-// keys their loose metallic rattle and let water and the forge trail off.
-const ring = (frequency, length, level, at = 0, bend = 0) =>
-  ({ frequency, length, level, at, bend });
-const noise = (low, high, length, level, at = 0, attack = .003) =>
-  ({ low, high, length, level, at, attack });
-
 const CLIPS = {
   take: [noise(1450, 4800, .045, .25), ring(1390, .13, .19), ring(2320, .09, .12, .029), ring(3020, .062, .09, .045)],
   release: [noise(680, 3300, .064, .11), ring(1770, .075, .11, .015)],
   dropWood: [noise(420, 4700, .075, .36), ring(770, .095, .21), ring(1800, .17, .20),
     ring(2410, .115, .13, .16), ring(1670, .09, .085, .25)],
   dropRug: [noise(95, 840, .12, .31), ring(106, .083, .23), ring(1420, .078, .15), ring(1930, .085, .065, .13)],
-  stepWood: [noise(95, 850, .14, .25), ring(116, .105, .21, 0, 40), noise(660, 1950, .063, .12, .065)],
-  stepRug: [noise(75, 480, .13, .21), ring(87, .075, .16, 0, 23), noise(360, 1300, .10, .18, .042)],
   place: [noise(240, 1650, .072, .25), ring(265, .075, .17), ring(1300, .14, .20, .011), ring(2050, .083, .10, .030)],
   bundle: [noise(950, 4250, .14, .24), ring(1050, .16, .17), ring(1610, .13, .16, .048), ring(1990, .095, .13, .091)],
   water: [noise(390, 2370, .23, .38), noise(1200, 4500, .098, .15, .058),
@@ -53,51 +44,19 @@ function chord(frequencies, at, step, length, level) {
   return frequencies.map((frequency, index) => ring(frequency, length, level, at + index * step));
 }
 
-function makeClip(context, layers) {
-  const duration = Math.max(...layers.map(layer => layer.at + layer.length));
-  const clip = context.createBuffer(1, Math.ceil(duration * SAMPLE_RATE), SAMPLE_RATE);
-  const samples = clip.getChannelData(0);
-  let seed = 90230;
-  for (const layer of layers) {
-    const start = Math.round(layer.at * SAMPLE_RATE);
-    let high = 0, low = 0;
-    const highRate = 1 - Math.exp(-2 * Math.PI * (layer.high ?? 1) / SAMPLE_RATE);
-    const lowRate = 1 - Math.exp(-2 * Math.PI * (layer.low ?? 1) / SAMPLE_RATE);
-    for (let i = 0; i < layer.length * SAMPLE_RATE && start + i < samples.length; i++) {
-      const t = i / SAMPLE_RATE;
-      const attack = Math.min(1, t / (layer.attack ?? .003));
-      const envelope = attack * (1 - t / layer.length) ** 2.7;
-      let signal;
-      if (layer.frequency) {
-        signal = Math.sin(2 * Math.PI * (layer.frequency - layer.bend * t / 2) * t);
-      } else {
-        seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
-        const sample = seed / 2147483648 - 1;
-        high += (sample - high) * highRate;
-        low += (sample - low) * lowRate;
-        signal = (high - low) * 2;
-      }
-      samples[start + i] += signal * envelope * layer.level;
-    }
-  }
-  return clip;
-}
 
 export function createArchiveAudio(browserWindow) {
   let muted = false;
   try { muted = browserWindow.localStorage?.getItem(SOUND_KEY) === 'off'; } catch { /* optional */ }
   let context, master;
   let playing = false;
-  let stride = 0;
-  let walking = false;
   let variation = 0;
+  const footsteps = createFootsteps(browserWindow, { nextVariation: () => variation++ });
   let waxVoice;
   let spatialVoices = 0;
   const clips = new Map();
   const lastPlayed = new Map();
   const paths = {
-    stepWood: Array.from({ length: 4 }, (_, i) => `footsteps/wood-${i + 1}.wav`),
-    stepRug: Array.from({ length: 4 }, (_, i) => `footsteps/rug-${i + 1}.wav`),
     waxStart: ['cleaning/wax-sizzle.wav'],
     waterBubbles: ['cleaning/water-bubbles.wav'],
     water: ['cleaning/water-dip.wav'],
@@ -134,6 +93,7 @@ export function createArchiveAudio(browserWindow) {
         master.gain.value = playing ? .56 : 0;
         master.connect(context.destination);
         loadRecordings();
+        footsteps.unlock({ context, output: master });
       }
       if (context.state === 'suspended') context.resume()?.catch(() => {});
     } catch { /* sound is optional */ }
@@ -272,18 +232,8 @@ export function createArchiveAudio(browserWindow) {
   }
 
   function walk(distance, rug, running) {
-    if (distance < .0001) {
-      stride = 0;
-      walking = false;
-      return;
-    }
-    if (!walking) stride = running ? 1.6 : 1.32;
-    walking = true;
-    stride += distance;
-    const interval = running ? 2.13 : 1.76;
-    if (stride < interval) return;
-    stride -= interval;
-    tone(rug ? 'stepRug' : 'stepWood', running ? .415 : .33);
+    if (playing && !muted) footsteps.update(distance, rug ? 'rug' : 'wood', running);
+    else footsteps.reset();
   }
 
   function setMuted(value) {

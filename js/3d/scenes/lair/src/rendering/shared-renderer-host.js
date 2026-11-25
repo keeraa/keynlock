@@ -1,6 +1,7 @@
 // @ts-check
 import * as THREE from 'three';
 import {createWorldWorkshopRegistry} from './world-workshops.js';
+import {adoptWorkbenchBuffers} from './workbench-buffers.js';
 
 /**
  * The three preserved workshops use their exact source files and their own
@@ -141,7 +142,8 @@ export function createSharedRendererHost({renderer,canvas,worldScene, onWorkshop
       render:()=> (scene,camera)=>{
         if(active!==workshopId)return;
         local.scene=scene;local.camera=camera;
-        world?.update();
+        if(world)world.update(workshopId==='workbench'?scene:null);
+        else if(workshopId==='workbench')adoptWorkbenchBuffers(scene);
         const target=renderer.getRenderTarget();
         if(target){renderer.render(scene,camera);return;}
         if(!localCanvas.isConnected||!localCanvas.clientWidth||!localCanvas.clientHeight)return;

@@ -28,7 +28,7 @@ export default Object.freeze({
   "Мышь — обзор": "Mouse — look",
   "Перетаскивай для обзора": "Drag to look",
   "E — взаимодействие": "E — interact",
-  "Esc — общий вид": "Esc — overview",
+  "Esc — настройки": "Esc — settings",
   "МАСТЕРСКАЯ ЦВЕТА": "COLOUR WORKSHOP",
   "Закрыть настройки": "Close settings",
   "Язык": "Language",

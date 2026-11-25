@@ -3,7 +3,7 @@ import { getPaintingLore, getPaintingLoreLabels } from './lore/painting-lore.js'
 import { t } from './i18n.js';
 
 /** One presenter for gallery overview, auto-selected artwork and zoomed artwork. */
-export function createWallArtworkInfo({ $ }) {
+export function createWallArtworkInfo({ $, columnCount }) {
   function show(art, showingDemo) {
     $('wall-gallery-title').textContent = art.title;
     $('wall-gallery-caption').textContent =
@@ -19,10 +19,11 @@ export function createWallArtworkInfo({ $ }) {
 
   function showOverview(showingDemo, hasWallArt) {
     $('wall-gallery-title').textContent = t('Стена восстановленных картин');
+    const columns = { columns: columnCount };
     $('wall-gallery-caption').textContent = showingDemo
-      ? t('12 вертикальных колонок · 30 случайных работ · листайте влево и вправо')
-      : hasWallArt ? t('12 направлений · листайте колонки и выбирайте картину')
-        : t('12 тематических колонок ждут ваших отреставрированных картин');
+      ? t('{columns} вертикальных колонок · 30 случайных работ · листайте влево и вправо', columns)
+      : hasWallArt ? t('{columns} направлений · листайте колонки и выбирайте картину', columns)
+        : t('{columns} тематических колонок ждут ваших отреставрированных картин', columns);
     $('wall-art-lore').hidden = true;
   }
 

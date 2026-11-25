@@ -1,4 +1,5 @@
 import { Vector3 } from 'three';
+import { constrainRoomCamera } from './room-camera-bounds.js';
 
 /** Own the active camera and input mode for the shared Lair view. */
 export function createCameraInput({ camera, controls, roomWalk, atelierView, handleZoneKey,
@@ -42,8 +43,9 @@ export function createCameraInput({ camera, controls, roomWalk, atelierView, han
     }
   }
 
-  function syncGalleryCamera() {
+  function finishFrame() {
     if (mode === 'gallery') atelierView.updateGalleryCamera();
+    if (mode !== 'walk') constrainRoomCamera(camera, controls.target);
   }
 
   function resize(fov) {
@@ -69,7 +71,7 @@ export function createCameraInput({ camera, controls, roomWalk, atelierView, han
     if (mode === 'walk') roomWalk.releaseKey(event.code);
   });
 
-  return { setMode, setAtelierInputBlocked, update, syncGalleryCamera, resize,
+  return { setMode, setAtelierInputBlocked, update, finishFrame, resize,
     isWalking: () => mode === 'walk',
     /** Where the walker stood and looked when walking last stopped. */
     walkPose: () => walkPose,

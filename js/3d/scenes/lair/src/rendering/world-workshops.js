@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { ALCHEMY_LAIR_SCALE, ALCHEMY_TABLE } from '@keynlock/alchemy/room-assets';
 import { ALCHEMY_Z, ATELIER_Z, WORKBENCH_Z } from '../room-layout.js';
+import { adoptWorkbenchBuffers } from './workbench-buffers.js';
 
 const LAIR_FLOOR_TOP = .0385;
 
@@ -160,7 +161,8 @@ export function createWorldWorkshopRegistry(worldScene) {
     }
   }
 
-  function update() {
+  /** @param {THREE.Object3D | null} workbenchScene */
+  function update(workbenchScene = null) {
     for (const entry of entries.values()) {
       if (!entry.lightsUpdated) {
         entry.updateLights();
@@ -168,6 +170,8 @@ export function createWorldWorkshopRegistry(worldScene) {
       }
     }
     syncLighting();
+    const workbench = workbenchScene ?? roots.get('workbench');
+    if (workbench?.visible) adoptWorkbenchBuffers(workbench);
     // WebGLRenderer.render() updates the entire shared scene's world matrices.
     // Updating every workshop recursively here duplicates a costly traversal.
   }

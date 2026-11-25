@@ -1,0 +1,13 @@
+Both bird models are offered under CC0 1.0.
+https://creativecommons.org/publicdomain/zero/1.0/
+
+Hooded Crow LOD1, tevy
+Source https://tevy.dev/models/hooded-crow
+Download https://tevy.dev/models/hooded-crow/v1/lod1.glb
+
+Rigged bird sample, afk.ai
+Source https://afk.ai/auto-rig/bird
+Download https://afk.ai/auto-rig-models/bird.glb
+
+Three.js loaders and decoding utilities retain their upstream license comments.
+Three.js MIT license is in vendor/THREE-LICENSE.txt.

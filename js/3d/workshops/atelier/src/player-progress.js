@@ -7,7 +7,7 @@ function defaults() {
   return { hue: 0, saturation: 100, brightness: 100, completed: false };
 }
 
-export function createPlayerProgress({ paintings, storage, key = SAVE_KEY } = {}) {
+export function createPlayerProgress({ paintings, storage, key = SAVE_KEY, canPinToWall = () => true } = {}) {
   if (storage === undefined) {
     try { storage = globalThis.localStorage; }
     catch { storage = null; }
@@ -32,11 +32,12 @@ export function createPlayerProgress({ paintings, storage, key = SAVE_KEY } = {}
     const entry = state[indexById.get(id)];
     return Boolean(entry?.completed && entry.surfaceComplete);
   };
+  const isWallEligible = (id) => indexById.has(id) && canPinToWall(paintings[indexById.get(id)]);
   // Older saves had no gallery field. Preserve already finished paintings on migration.
   let wallIds = saved?.version === 1 && Array.isArray(saved.wallIds)
     ? saved.wallIds.filter((id) => typeof id === 'string' && isRestored(id))
     : paintings.filter((art) => isRestored(art.id)).map((art) => art.id);
-  wallIds = [...new Set(wallIds)].slice(0, WALL_CAPACITY);
+  wallIds = [...new Set(wallIds)].filter(isWallEligible).slice(0, WALL_CAPACITY);
 
   function save() {
     const settings = {};
@@ -56,7 +57,7 @@ export function createPlayerProgress({ paintings, storage, key = SAVE_KEY } = {}
   }
 
   function autoPin(id) {
-    if (!isRestored(id) || wallIds.includes(id) || wallIds.length >= WALL_CAPACITY) return false;
+    if (!isWallEligible(id) || !isRestored(id) || wallIds.includes(id) || wallIds.length >= WALL_CAPACITY) return false;
     wallIds.push(id);
     save();
     return true;
@@ -64,6 +65,7 @@ export function createPlayerProgress({ paintings, storage, key = SAVE_KEY } = {}
 
   function toggleWall(id) {
     if (!isRestored(id)) return { changed: false, reason: 'unfinished' };
+    if (!isWallEligible(id)) return { changed: false, reason: 'unavailable' };
     if (wallIds.includes(id)) {
       wallIds = wallIds.filter((value) => value !== id);
       save();
@@ -83,7 +85,7 @@ export function createPlayerProgress({ paintings, storage, key = SAVE_KEY } = {}
   }
 
   return {
-    state, save, setSelected, autoPin, toggleWall, removeFromWall, isRestored,
+    state, save, setSelected, autoPin, toggleWall, removeFromWall, isRestored, isWallEligible,
     getWallIds: () => wallIds.slice(),
     getRestoredIds: () => paintings.filter((art) => isRestored(art.id)).map((art) => art.id),
     getSelectedIndex: () => Math.max(0, paintings.findIndex(art => art.id === selectedId)),

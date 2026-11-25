@@ -520,9 +520,19 @@ test('the room hosts both workshops on one canvas through the host contract', as
     }
   });
   const spot = await page.evaluate(() => {
-    const panel = document.querySelector('#atelier-embedded-app').getBoundingClientRect().height;
-    return { x: innerWidth / 2, y: (innerHeight - panel) / 2 };
+    const { camera, renderer } = window.__keynlockDebug.host;
+    const easel = renderer.getUnifiedScene().getObjectByName('restoration-right-easel');
+    let canvas;
+    easel.traverse(object => { if (object.material?.uniforms?.uPainting) canvas = object; });
+    const point = canvas.getWorldPosition(camera.position.clone()).project(camera);
+    const bounds = document.querySelector('#scene-interaction').getBoundingClientRect();
+    return {
+      x: bounds.left + (point.x + 1) * bounds.width / 2,
+      y: bounds.top + (1 - point.y) * bounds.height / 2,
+    };
   });
+  await page.mouse.move(spot.x, spot.y);
+  await page.locator('#atelier-scene-feedback #restoration-cursor[data-tool="reagent"]').waitFor();
   await page.mouse.click(spot.x, spot.y);
   await page.locator('#atelier-scene-feedback #restoration-notice').filter({ hasText: 'УФ-фонарём' }).waitFor();
   // The panel in the Lair: «ВСЯ КОЛЛЕКЦИЯ» right of «В ЛОГОВО», the readiness

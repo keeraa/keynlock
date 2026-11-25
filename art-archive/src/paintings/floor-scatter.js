@@ -16,6 +16,18 @@ export function tutorialWork(slots,settings){
  return candidates.find(slot=>slot.painting.id==='ART-1815')
   ??candidates.find(slot=>slot.painting.titleRu?.length<=30)??candidates[0];
 }
+export function tutorialWorks(slots,settings){
+ const first=tutorialWork(slots,settings);
+ if(!first)return [];
+ const candidates=slots.filter(slot=>{
+  const {width,height}=frameDimensions(slot,settings);
+  return slot!==first && slot.wall.hall!=='center' && slot.painting.collection!=='keynlock' &&
+   Math.min(width,height)>=.36 && Math.max(width,height)<=.76;
+ });
+ const second=candidates.find(slot=>slot.wall.hall!==first.wall.hall);
+ const wrong=candidates.find(slot=>slot!==second);
+ return [first,second,wrong].filter(Boolean);
+}
 // All initial frames have independent, supported poses. No lanes, towers or piles.
 export function scatterFloor(slots,layout,config){
  const saved=cache.get(slots);if(saved?.layout===layout&&saved.config===config&&saved.seed===(config.paintings.scatterSeed??1122))return saved.slots.map(s=>({...s}));
@@ -51,10 +63,9 @@ export function scatterFloor(slots,layout,config){
   const rise=leanPitch?frameDimensions(p,settings).height*Math.cos(leanPitch)+settings.frameDepthM*Math.abs(Math.sin(leanPitch)):settings.frameDepthM;
   staged.push({...p,y:support.y+rise/2,supportId:support.id,floorRoom:support.room});assigned.add(slot.painting.id);return true;
  }
- const tutorial=tutorialWork(slots,settings);
- if(tutorial){
-  for(const x of [.36,-.36,.95,-.95]){
-   if(commit(tutorial,{x:spawn.x+x,z:spawn.z-1.35},0,0,0,true))break;
+ for(const [index,tutorial]of tutorialWorks(slots,settings).entries()){
+  for(const [x,z]of [[.36,1.35],[index===2?-.65:.36,index===2?1.35:2.4],[-.65,2.4],[.95,3.4],[-.95,3.4]]){
+   if(commit(tutorial,{x:spawn.x+x,z:spawn.z-z},0,0,0,true))break;
   }
  }
  if(slots.length>=24){

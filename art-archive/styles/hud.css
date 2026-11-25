@@ -66,5 +66,10 @@ body.play #painting-label:not(:empty){display:grid;gap:.38rem}
 
 body:not(.play) #help,body:not(.play) #tutorial-task{display:none}
 #tutorial-task{position:absolute;top:6.6rem;left:1.4rem;max-width:min(26rem,55vw);padding:.65rem .85rem;background:#162e29ee;color:#f4e8c3;font:.9rem/1.45 system-ui,sans-serif;pointer-events:none}
+#tutorial-marker{position:absolute;transform:translate(-50%,-100%);display:flex;align-items:center;flex-direction:column-reverse;gap:.3rem;pointer-events:none;z-index:12;color:#ffe29a;text-shadow:0 2px 4px #000}
+#tutorial-marker[hidden],body:not(.play) #tutorial-marker{display:none}
+.tutorial-marker-symbol{display:block;font:1.8rem/1 system-ui,sans-serif;filter:drop-shadow(0 2px 2px #000)}
+.tutorial-marker-caption{max-width:min(18rem,50vw);padding:.35rem .6rem;border:1px solid #d8b766;border-radius:.4rem;background:#142821ee;color:#fff1c7;text-align:center;font:1rem/1.3 system-ui,sans-serif}
+#tutorial-marker[data-edge=true] .tutorial-marker-caption{max-width:min(12rem,35vw)}
 #hide-progress{position:absolute;left:50%;top:calc(50% + 15px);width:6rem;height:.35rem;transform:translateX(-50%);accent-color:#d6bb84;pointer-events:none}
 #painting-controls kbd:first-child,#painting-controls kbd+kbd{margin-left:.15em}

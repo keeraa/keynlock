@@ -15,7 +15,7 @@ import {getLanguage,t,paintingTitle} from '../localization/i18n.js';
 import {createPaintingMotionAudio,createFrameFitAudio,heaviestPaintingIds} from '../audio/painting-motion-audio.js';
 
 const text=(ru,en)=>getLanguage()==='en'?en:ru;
-export function createHangingSession({debugSelection=false,THREE,world,config,display,renderer,label,showLabel=value=>{label.textContent=value?.painting?.title??value??'';},controls=null,notify=()=>{},playSound=()=>{},setSoundMotion=()=>{},onMount=()=>{},disposalTotal,onDisposed=()=>{}}) {
+export function createHangingSession({debugSelection=false,THREE,world,config,display,renderer,label,showLabel=value=>{label.textContent=value?.painting?.title??value??'';},controls=null,notify=()=>{},playSound=()=>{},setSoundMotion=()=>{},onMount=()=>{},onThrow=()=>{},disposalTotal,onDisposed=()=>{}}) {
   const settings=config.paintings,layout=world.layout;
   const motion=createFrameMotion(THREE,config,layout);
   const wallSettings=w=>({...settings,edgeMarginM:0,horizontalGapM:0,verticalGapM:0,minBottomM:.84,
@@ -140,7 +140,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       }
       if(p<1){preview.lowering(path,p,ballistic,slot.trolley);return;}
       if(mountedFrame(slot))finishMount(slot,now);
-      else completePlacement(slot);
+      else {completePlacement(slot);if(ballistic)onThrow(slot);}
 
     }
     const hit=aim(),reachable=hit && hit.distance<=(settings.placementReachM??6),action=text('E / ЛКМ','E / LMB');

@@ -1,6 +1,7 @@
 import {createPaintingLabel} from './painting-label.js';
 import {showPaintingControls} from './painting-controls.js';
 import {createHangingTutorial} from './hanging-tutorial.js';
+import {createTutorialGuide} from './tutorial-guide.js';
 import {playableSelection} from '../paintings/playable-selection.js';
 import {mountedFrame} from '../../catalog/painting-geometry.js';
 import {disposalIds,isApprovedKeynlock} from '../paintings/disposal-state.js';
@@ -29,7 +30,9 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
   const inspector=createPaintingInspector({elements,catalog,setMode});
   life.own(()=>inspector.dispose());
   const tutorial=createHangingTutorial(elements('tutorial-task'),elements('archive-task'),world.layout,config.paintings,debugSelection);
-  const hanging=createHangingSession({debugSelection,THREE,world,config,display,renderer,label,showLabel,controls,notify,playSound,setSoundMotion,onMount:tutorial.mounted,disposalTotal:approvedIds.length,onDisposed(){disposalDirty=true;if(frame.hasAttribute?.('src'))frame.removeAttribute('src');}});
+  const guide=createTutorialGuide({THREE,camera:world.camera,layout:world.layout,floorElevation:config.building.floorElevation});
+  life.own(()=>guide.dispose());
+  const hanging=createHangingSession({debugSelection,THREE,world,config,display,renderer,label,showLabel,controls,notify,playSound,setSoundMotion,onMount:tutorial.mounted,onThrow:tutorial.thrown,disposalTotal:approvedIds.length,onDisposed(){disposalDirty=true;if(frame.hasAttribute?.('src'))frame.removeAttribute('src');}});
   let exhibition, page = 0, prior = 'intro';
   function refresh(hangingMode=hanging.active) {
     const removed=disposalIds(debugSelection);
@@ -115,7 +118,8 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
     const playing=getMode()==='play';
     display.update(now,hanging.active?hanging.aimed:null,playing);
     hanging.update(playing,now);
-    tutorial.update(hanging.carriedId);
+    tutorial.update(hanging.carriedId,hanging.phase);
+    guide.update(tutorial.target(),playing);
     if(disposalDirty){disposalDirty=false;refresh();}
   }
   return {

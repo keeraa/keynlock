@@ -60,7 +60,7 @@ test('the starter work is face-up near spawn and plays distinct pickup and mount
  const work=tutorialWork(page,config.paintings),floor=session.find(work.painting.id),spawn=PLAYER_DEFAULTS.spawn;
  assert(floor.floorAngle!==undefined&&!floor.faceDown);
  assert(Math.hypot(floor.x-spawn.x,floor.z-spawn.z)<1.65);
- assert.match(node.textContent,/Красная Фудзи.*Восток/);
+ assert.match(node.textContent,/Поднимите отмеченную картину.*Красная Фудзи/);
  assert.equal(archiveTask.hidden,true);
  const fy=config.building.floorElevation,wall=layout.hangingWalls.find(w=>w.id===work.wall.hall+'/end');
  camera.position.set(spawn.x,fy+PLAYER_DEFAULTS.eyeHeight,spawn.z);
@@ -70,9 +70,10 @@ test('the starter work is face-up near spawn and plays distinct pickup and mount
  camera.position.set(x+wall.normal.x*2.6,fy+1.78,z+wall.normal.z*2.6);camera.lookAt(x,fy+2.15,z);
  session.update(true);assert(session.interact());assert(session.interact());
  assert.equal(session.find(work.painting.id).wall.id,wall.id);
- assert.equal(node.hidden,true);
- assert.equal(archiveTask.hidden,false);
- assert.match(archiveTask.textContent,/Шедевры.*ротонде/);
+ tutorial.update(null);
+ assert.equal(node.hidden,false);
+ assert.equal(archiveTask.hidden,true);
+ assert.match(node.textContent,/Теперь другой зал/);
  assert.deepEqual(sounds,['pickup','mount','correctPlace']);
  const installed=session.find(work.painting.id);
  camera.lookAt(installed.x,fy+installed.y,installed.z);session.update(true);
@@ -437,8 +438,8 @@ test('context E throws toward the floor, starts its cue just before landing and 
  const memory=new Map();globalThis.window={};globalThis.localStorage={getItem:k=>memory.get(k),setItem:(k,v)=>memory.set(k,v)};
  t.after(()=>{delete globalThis.window;delete globalThis.localStorage;});
  const slot=page.find(s=>s.wall.id==='cn/end' && s.width<.6 && s.height<.6),camera=new THREE.PerspectiveCamera(),scene=new THREE.Scene();
- const sounds=[];
- let visible;const session=createHangingSession({THREE,world:{camera,scene,layout},config,label:{},playSound:kind=>sounds.push(kind),display:{setSlots(v){visible=v;}}});
+ const sounds=[],thrown=[];
+ let visible;const session=createHangingSession({THREE,world:{camera,scene,layout},config,label:{},onThrow:slot=>thrown.push(slot.painting.id),playSound:kind=>sounds.push(kind),display:{setSlots(v){visible=v;}}});
  session.setPage([slot]);session.setActive(true);
  const source=visible[0],fy=config.building.floorElevation;
  camera.position.set(source.x,fy+1.78,source.z+1);camera.lookAt(source.x,fy+source.y,source.z);
@@ -448,6 +449,7 @@ test('context E throws toward the floor, starts its cue just before landing and 
  const held=scene.getObjectByName('carried-painting'),start=held.position.clone();
  assert(session.interact());assert.equal(session.phase,'lowering');
  assert(!sounds.includes('drop'),'floor impact must not sound while the painting is still in flight');
+ assert.deepEqual(thrown,[],'the tutorial must wait until the throw lands');
  assert(held.position.distanceTo(start)<.001,'throw starts at the held pose');
  let earlyImpact=false;
  const throwStart=performance.now();
@@ -459,6 +461,7 @@ test('context E throws toward the floor, starts its cue just before landing and 
  session.update(true,performance.now()+3000);
  assert.equal(sounds.filter(kind=>kind==='drop').length,1);
  assert.equal(session.phase,'idle');assert.equal(visible.length,1);
+ assert.deepEqual(thrown,[slot.painting.id]);
  assert.equal(visible[0].painting.id,slot.painting.id);assert(visible[0].supportId.startsWith('floor/'));
  assert(Math.abs(visible[0].z-camera.position.z)>1,'lands ahead, not below the player');
  assert.equal(JSON.parse(memory.get('keynlock-art-hanging-v1'))[slot.painting.id].kind,'floor');

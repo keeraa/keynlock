@@ -174,10 +174,11 @@ test('scene exclusion updates the same selection used by the open catalog editor
  assert.equal(logicalKey({code:'KeyF',key:'а'}),'f');
  const state=new Map(),editor=new EventTarget(),browser=new EventTarget();
  globalThis.window=browser;
+ globalThis.document=Object.assign(new EventTarget(),{body:{append(){}},createElement(){return {setAttribute(){},append(){},remove(){},style:{},dataset:{}};}});
  globalThis.localStorage={getItem:k=>state.get(k),setItem:(key,newValue)=>{
    state.set(key,newValue);editor.dispatchEvent(Object.assign(new Event('storage'),{key,newValue}));
  }};
- t.after(()=>{delete globalThis.window;delete globalThis.localStorage;});
+ t.after(()=>{delete globalThis.window;delete globalThis.localStorage;delete globalThis.document;});
  t.mock.method(THREE.TextureLoader.prototype,'load',()=>new THREE.Texture());
  const editorData=catalog.paintings.map(p=>({...p,rights:p.rights.status,gamePlacement:p.placement}));
  editor.editorCatalog=editorData;

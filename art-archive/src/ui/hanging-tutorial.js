@@ -1,22 +1,43 @@
 import {mountedFrame} from '../../catalog/painting-geometry.js';
-import {tutorialWork} from '../paintings/floor-scatter.js';
+import {tutorialWorks} from '../paintings/floor-scatter.js';
 import {getLanguage,paintingTitle,t} from '../localization/i18n.js';
 import {STORAGE_KEYS,readText,writeText} from '../persistence/storage.js';
 
 export function createHangingTutorial(node,archiveTask,layout,settings,debug=false){
   const key=STORAGE_KEYS.tutorial+(debug?'-debug':'');
-  let completed=readText(key)==='done',active=false,work,carrying=false;
+  const saved=readText(key);
+  let completed=saved==='done',stage='wrong',active=false,first,second,wrong,carriedId=null,find=()=>null;
+  try{stage=JSON.parse(saved)?.stage??stage;}catch{}
+  if(!['wrong','drop','first','second'].includes(stage))stage='wrong';
+  const work=()=>stage==='wrong'||stage==='drop'?wrong:stage==='second'?second:first;
+  const installed=slot=>{const placed=slot&&find(slot.painting.id);return Boolean(placed&&mountedFrame(placed));};
+  function save(){writeText(key,completed?'done':JSON.stringify({version:2,stage}));}
+  function advance(){
+    if(installed(first))stage='second';
+    if(stage==='second'&&(!second||installed(second))){completed=true;save();}
+  }
   function refresh(){
-    const inTutorial=active&&!completed&&Boolean(work);
+    const inTutorial=active&&!completed&&Boolean(work());
     node.hidden=!inTutorial;
     archiveTask.hidden=!active||inTutorial;
     if(!active)return;
     const en=getLanguage()==='en';
     if(inTutorial){
-      const name=paintingTitle(work.painting),hall=t(layout.halls.find(h=>h.id===work.wall.hall).title);
-      const message=en
-        ? (carrying?'Hang “'+name+'” in a spot it fits in the '+hall+' gallery.':'Pick up “'+name+'” from the floor near you and take it to the '+hall+' gallery.')
-        : (carrying?'Повесьте «'+name+'» на подходящее по размеру место в зале «'+hall+'».':'Поднимите с пола рядом с вами «'+name+'» и отнесите в зал «'+hall+'».');
+      const target=work(),name=paintingTitle(target.painting);
+      const hall=t(layout.halls.find(h=>h.id===target.wall.hall)?.title??'Ротонда');
+      const holding=carriedId===target.painting.id;
+      let message;
+      if(stage==='wrong')message=en?'Pick up the marked painting · E / LMB. We need “'+paintingTitle(first.painting)+'”.':
+        'Поднимите отмеченную картину · E / ЛКМ. Нам нужна «'+paintingTitle(first.painting)+'».';
+      else if(stage==='drop')message=en?'That is not “'+paintingTitle(first.painting)+'”! Look down at a clear spot on the floor and press E / LMB to throw this painting.':
+        'А это не «'+paintingTitle(first.painting)+'»! Посмотрите вниз на свободное место на полу и нажмите E / ЛКМ, чтобы бросить картину.';
+      else if(holding)message=en?'Hang “'+name+'” in a spot it fits in the '+hall+' gallery · E / LMB to preview, then again to hang.':
+        'Повесьте «'+name+'» на подходящее по размеру место в зале «'+hall+'» · E / ЛКМ — примерить, ещё раз — повесить.';
+      else message=(stage==='second'?(en?'Now another gallery! ':'Теперь другой зал! '):'')+(en?
+        'Follow the marker to “'+name+'”, pick it up with E / LMB and take it to the '+hall+' gallery.':
+        'Найдите по указателю «'+name+'», поднимите её · E / ЛКМ — и отнесите в зал «'+hall+'».');
+      if(carriedId&&!holding&&stage!=='drop')message=en?'You are holding a different painting. Look down and press E / LMB to release it, then follow the marker.':
+        'У вас другая картина. Посмотрите вниз и нажмите E / ЛКМ, чтобы отпустить её, затем следуйте указателю.';
       if(node.textContent!==message)node.textContent=message;
       return;
     }
@@ -24,15 +45,36 @@ export function createHangingTutorial(node,archiveTask,layout,settings,debug=fal
       'Развесьте остальные картины по залам. Шедевры отмечены звездой на раме. Их место в ротонде.';
     if(archiveTask.textContent!==message)archiveTask.textContent=message;
   }
-  function complete(){completed=true;writeText(key,'done');refresh();}
   return {
-    setPage(slots,find){active=slots.length>0;work=tutorialWork(slots,settings);carrying=false;
-      const placed=work&&find(work.painting.id);
-      if(placed&&mountedFrame(placed)&&!completed)complete();
-      else refresh();
+    setPage(slots,locate){
+      active=slots.length>0;find=locate;[first,second,wrong]=tutorialWorks(slots,settings);carriedId=null;
+      if(stage==='drop')stage='wrong';
+      if(!wrong&&stage==='wrong')stage='first';
+      advance();refresh();
     },
-    update(id){const held=Boolean(id&&id===work?.painting.id);if(held!==carrying){carrying=held;refresh();}},
-    mounted(slot){if(!completed&&slot.painting.id===work?.painting.id)complete();},
+    update(id,phase){
+      if(!completed&&stage==='drop'&&!id&&phase==='idle'){stage='wrong';save();carriedId=id;refresh();return;}
+      if(id===carriedId)return;
+      carriedId=id;
+      if(!completed&&stage==='wrong'&&id===wrong?.painting.id){stage='drop';save();}
+      else if(!completed&&stage==='wrong'&&id===first?.painting.id){stage='first';save();}
+      refresh();
+    },
+    thrown(slot){
+      if(!completed&&stage==='drop'&&slot.painting.id===wrong?.painting.id){stage='first';carriedId=null;save();refresh();}
+    },
+    mounted(){if(!completed){advance();save();refresh();}},
+    target(){
+      if(!active||completed)return null;
+      const target=work();if(!target)return null;
+      if(stage==='drop')return {kind:'drop'};
+      if(carriedId===target.painting.id){
+        const hall=layout.halls.find(h=>h.id===target.wall.hall);
+        if(hall)return {kind:'hall',hall,label:t(hall.title)};
+      }
+      const slot=find(target.painting.id);
+      return slot?{kind:'painting',slot,label:paintingTitle(target.painting)}:null;
+    },
     refresh,
   };
 }

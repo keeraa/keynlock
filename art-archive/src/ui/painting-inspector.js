@@ -1,5 +1,6 @@
 import {createLifecycle} from '../app/lifecycle.js';
 import {t,paintingTitle,paintingArtist} from '../localization/i18n.js';
+import {logicalKey} from '../player/keys.js';
 
 export function createPaintingInspector({elements,catalog,setMode}) {
   const life = createLifecycle();
@@ -21,6 +22,13 @@ export function createPaintingInspector({elements,catalog,setMode}) {
   life.listen(zoom,'click',()=>setView(mode==='actual'?layout:'actual'));
   life.listen(image,'click',()=>setView(mode==='cover'?'fit':'cover'));
   life.listen(elements('inspect-close'),'click',()=>dialog.close());
+  // Consume the dismissal before the game handles Escape as its pause shortcut.
+  life.listen(document,'keydown',event=>{
+    if(!dialog.open || !['escape','f'].includes(logicalKey(event)))return;
+    event.preventDefault();event.stopImmediatePropagation();
+    if(!event.repeat)dialog.close();
+  },{capture:true});
+  life.listen(dialog,'cancel',event=>{event.preventDefault();dialog.close();});
   life.listen(dialog,'close',()=>{
     generation++;
     image.removeAttribute('src');

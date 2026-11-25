@@ -1,6 +1,7 @@
 name: 3D lint and types
 on:
   push:
+    branches: [main]
     paths:
       - 'js/3d/**'
       - '.github/workflows/js3d-lint.yml'
@@ -8,6 +9,10 @@ on:
     paths:
       - 'js/3d/**'
       - '.github/workflows/js3d-lint.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   lint:

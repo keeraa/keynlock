@@ -4,7 +4,7 @@ import { clickAlchemyObject, enterAlchemy, expectSoon, openRoom, openZone, readR
 
 test('the built Lair pours reagents into a vessel on its transformed alchemy table', async t => {
   const page = await openRoom(t);
-  const favicon = await page.request.get(new URL('favicon.ico', baseUrl).href);
+  const favicon = await page.request.get(new URL('favicon.ico', page.url()).href);
   assert.equal(favicon.status(), 200);
   assert.match(favicon.headers()['content-type'], /^image\//);
   assert.equal((await page.locator('link[rel="icon"]').getAttribute('href')), '/favicon.ico');

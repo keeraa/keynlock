@@ -606,11 +606,11 @@ test('first-person walking slides against furniture and walls, interacts, and re
     Object.defineProperty(document.querySelector('#scene-interaction'), 'requestPointerLock', { value: undefined });
   });
   const toggle = page.locator('#room-walk-toggle');
-  await toggle.click();
-  // The camera first comes down to the walker's eyes, then the walk starts.
   const overview = await page.evaluate(() => window.__keynlockDebug.host.camera.position.y);
-  await page.waitForFunction(() => document.querySelector('#room-walk-toggle').getAttribute('aria-pressed') === 'true');
   assert.ok(overview > 2.5, 'the walk began from the overview, above eye level');
+  // The camera first comes down to the walker's eyes, then the walk starts.
+  await toggle.click();
+  await page.waitForFunction(() => document.querySelector('#room-walk-toggle').getAttribute('aria-pressed') === 'true');
   assert.equal(await page.locator('#room-walk-look').textContent(), 'Мышь — обзор');
   // The walk starts turned a little left; these checks walk straight ahead.
   const spawn = await page.evaluate(() => {

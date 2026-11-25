@@ -1,6 +1,7 @@
 name: Lair and workshops
 on:
   push:
+    branches: [main]
     paths:
       - 'js/3d/scenes/lair/**'
       - 'js/3d/workshops/**'
@@ -16,6 +17,10 @@ on:
       - 'js/3d/package.json'
       - 'js/3d/package-lock.json'
       - '.github/workflows/lair.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   lair:

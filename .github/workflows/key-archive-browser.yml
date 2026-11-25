@@ -1,6 +1,7 @@
 name: Key Archive browser smoke
 on:
   push:
+    branches: [main]
     paths:
       - 'js/3d/scenes/key-archive/**'
       - '.github/workflows/key-archive-browser.yml'
@@ -8,6 +9,10 @@ on:
     paths:
       - 'js/3d/scenes/key-archive/**'
       - '.github/workflows/key-archive-browser.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   browser:

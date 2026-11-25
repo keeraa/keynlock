@@ -112,6 +112,10 @@ test('E hands off a pointer-locked walk to alchemy exactly once', async t => {
   await page.bringToFront();
   const toggle = page.locator('#room-walk-toggle');
   await page.waitForFunction(() => document.querySelector('#room-walk-toggle').getAttribute('aria-pressed') === 'true');
+  // Capture from the active walk before aiming at a workshop, where a click
+  // would open the workshop instead of locking the mouse.
+  await page.mouse.click(viewport.width / 2, viewport.height / 2);
+  await page.waitForFunction(() => document.pointerLockElement === document.querySelector('#scene-interaction'));
   await page.evaluate(() => {
     const { camera, controls, renderer } = window.__keynlockDebug.host;
     const tabletop = renderer.getUnifiedScene().getObjectByName('alchemy-main-tabletop');
@@ -138,10 +142,7 @@ test('E hands off a pointer-locked walk to alchemy exactly once', async t => {
     });
   });
   await page.getByText('E · Алхимия', { exact: true }).waitFor();
-  // Capture from an active walk so the timeout for the overview descent
-  // cannot release the mouse before the handoff on slow software WebGL.
-  await page.mouse.click(viewport.width / 2, viewport.height / 2);
-  await page.waitForFunction(() => document.pointerLockElement === document.querySelector('#scene-interaction'));
+  assert.equal(await page.evaluate(() => document.pointerLockElement?.id), 'scene-interaction');
   await page.keyboard.down('KeyE');
   await page.keyboard.down('KeyE'); // Repeated keydown while E is still held.
   await page.keyboard.up('KeyE');

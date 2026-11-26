@@ -1,3 +1,5 @@
+import {createPlaytestCollector} from '../playtest/collector.js';
+import {mountPlaytestInterface} from '../playtest/interface.js';
 import {createArchiveBirds} from '../environment/birds.js';
 import {GLTFLoader} from '../../vendor/loaders/GLTFLoader.js';
 import {bindCollection} from '../ui/collection.js';
@@ -24,6 +26,8 @@ import { t, localizeDocument } from '../localization/i18n.js';
 // Manor integration should use scene/create-scene.js instead.
 export async function startArchiveApplication({ THREE, config, catalog, initialSelection, onProgress=()=>{} }) {
   const life = createLifecycle();
+  const playtest=createPlaytestCollector();
+  const track=(name,data)=>playtest.track(name,data);
   const elements = id => document.getElementById(id);
   const canvas = elements('scene');
   const frameLimit=createFrameLimit();
@@ -74,6 +78,8 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
     function setMode(next) {
       const previous = mode;
       mode = next;
+      if(next==='play'&&playtest.start({language:document.documentElement.lang,test:params.get('playtest')==='qa',viewportWidth:Math.round(innerWidth/100)*100,viewportHeight:Math.round(innerHeight/100)*100}))collection.beginPlaytest();
+      playtest.setMode(next);
       audio.setPlaying(next==='play');
       music?.setPaused(next!=='play');
       if(next==='pause'&&previous==='play')audio.play('menu');
@@ -133,7 +139,17 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
     const input=own(bindPlayerInput({ canvas, player, hideProgress:elements('hide-progress'), getMode: () => starting?'loading':mode, lock, actions }));
     own(bindInterface({ elements, actions, world, plan, hud, player, getMode: () => mode }));
 
-    const collection = own(bindCollection({debugSelection,initialHanging:params.get('mode')!=='walk',THREE,renderer,world,config,catalog,initialSelection,player,setMode,getMode:()=>mode,elements,notify:hud.toast,loadingManager,playSound:audio.play,setSoundMotion:audio.setMotion}));
+    const collection = own(bindCollection({debugSelection,initialHanging:params.get('mode')!=='walk',THREE,renderer,world,config,catalog,initialSelection,player,setMode,getMode:()=>mode,elements,notify:hud.toast,loadingManager,playSound:audio.play,setSoundMotion:audio.setMotion,onEvent:track}));
+
+    own(mountPlaytestInterface({collector:playtest,elements,setMode}));
+    const checkpoint=setInterval(()=>playtest.checkpoint(collection.playtestSnapshot()),30000);
+    life.own(()=>clearInterval(checkpoint));
+    life.listen(window,'online',()=>void playtest.flush());
+    life.listen(document,'visibilitychange',()=>{if(document.visibilityState==='hidden')playtest.checkpoint(collection.playtestSnapshot());});
+    const errorMessage=value=>String(value??'Unknown error').replace(/https?:\/\/[^\s)]+/g,'[resource]').replace(/[\w.+-]+@[\w.-]+/g,'[redacted]').slice(0,240);
+    life.listen(window,'error',event=>track('technical_error',{kind:'error',message:errorMessage(event.message),line:event.lineno??0}));
+    life.listen(window,'unhandledrejection',event=>track('technical_error',{kind:'unhandled_rejection',message:errorMessage(event.reason?.message??event.reason)}));
+    life.listen(canvas,'webglcontextlost',()=>track('technical_error',{kind:'webgl_context_lost'}));
 
     own(bindPlayerSettings({ player, painted, elements, collection, dust:world.dust, ink:world.ink,
       setSkyColor:world.setSkyColor,setWallFinish:world.setWallFinish,setFrameLimit:frameLimit.setEnabled }));
@@ -161,6 +177,7 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
       if (disposed) return;
       frameId = requestAnimationFrame(frame);
       if(!frameLimit.shouldRender(now))return;
+      playtest.frame(now-last);
       const dt = Math.min((now - last) / 1000, .04);
       last = now;
       const canSprint=collection.canSprint();
@@ -240,7 +257,7 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
         life.dispose();
       },
     };
-    life.listen(window, 'pagehide', () => app.dispose(), { once: true });
+    life.listen(window, 'pagehide', () => {playtest.checkpoint(collection.playtestSnapshot());playtest.unload(navigator.sendBeacon?.bind(navigator));app.dispose();}, { once: true });
     return app;
   } catch (error) {
     disposed = true;

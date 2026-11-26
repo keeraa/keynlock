@@ -15,7 +15,7 @@ import {getLanguage,t,paintingTitle} from '../localization/i18n.js';
 import {createPaintingMotionAudio,createFrameFitAudio,heaviestPaintingIds} from '../audio/painting-motion-audio.js';
 
 const text=(ru,en)=>getLanguage()==='en'?en:ru;
-export function createHangingSession({debugSelection=false,THREE,world,config,display,renderer,label,showLabel=value=>{label.textContent=value?.painting?.title??value??'';},controls=null,notify=()=>{},playSound=()=>{},setSoundMotion=()=>{},onMount=()=>{},onThrow=()=>{},disposalTotal,onDisposed=()=>{}}) {
+export function createHangingSession({debugSelection=false,THREE,world,config,display,renderer,label,showLabel=value=>{label.textContent=value?.painting?.title??value??'';},controls=null,notify=()=>{},playSound=()=>{},setSoundMotion=()=>{},onMount=()=>{},onThrow=()=>{},disposalTotal,onDisposed=()=>{},onEvent=()=>{}}) {
   const settings=config.paintings,layout=world.layout;
   const motion=createFrameMotion(THREE,config,layout);
   const wallSettings=w=>({...settings,edgeMarginM:0,horizontalGapM:0,verticalGapM:0,minBottomM:freePlacement ? .02 : .84,
@@ -27,7 +27,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
   const usesTrolley=slot=>Math.max(slot.height,slot.painting.physicalSizeM.width)>=settings.hoistFromM;
   const motionAudio=createPaintingMotionAudio(setSoundMotion);
   const fitAudio=createFrameFitAudio(playSound);
-  let aimedPlace=null,freePlacement=false;
+  let aimedPlace=null,freePlacement=false,placementFailure='no_wall',lastIntegrity=-Infinity,lastMissing='';
   let heavyIds=new Set();
   let cursor=null,coveredPick=false;
   const clamp=(x,min,max)=>max>=min?Math.max(min,Math.min(max,x)):(min+max)/2;
@@ -110,6 +110,12 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
   }
   function update(playing,now=performance.now()){
     updateScene(playing,now);
+    if(playing&&active&&now-lastIntegrity>10000){
+      lastIntegrity=now;const present=new Set(visible.map(s=>s.painting.id));
+      for(const slot of [interaction.carrying,interaction.landing?.slot])if(slot)present.add(slot.painting.id);
+      const missing=page.filter(s=>!disposal.has(s.painting.id)&&!present.has(s.painting.id)).map(s=>s.painting.id);
+      const signature=missing.join(',');if(signature&&signature!==lastMissing)onEvent('painting_missing',{count:missing.length,paintingIds:missing.slice(0,10).join(',')});lastMissing=signature;
+    }
     const slot=active&&!interaction.landing?interaction.carrying:null;
     motionAudio.update({playing,slot,large:slot&&usesTrolley(slot),heavy:slot&&heavyIds.has(slot.painting.id),
       placing:interaction.placing,raised:interaction.raised,position:world.camera.position,
@@ -117,7 +123,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     fitAudio.update(playing?aimedPlace:null);
   }
   function updateScene(playing,now) {
-    aimedPlace=null;
+    aimedPlace=null;placementFailure='no_wall';
     completion.update(now);
     compositions.updateVisibility(active&&!freePlacement);
     feedback.update(now);
@@ -154,9 +160,11 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       if(!reachable)cursor=null;
       if(!interaction.placing || !reachable)preview.follow(interaction.carrying,large,hall,origin,dir,interaction.source,now,interaction.raised);
       if(preview.takeLiftFailure()){
+        onEvent('placement_failed',{reason:'pickup_blocked',paintingId:interaction.carrying.painting.id,hall:room});
         notify(text('Рама упирается в препятствие. Отойдите немного назад — картина остаётся у вас.','The frame is blocked. Step back a little — you are still holding the painting.'));
       }
       if(!interaction.placing)hint=text('E / ЛКМ — примерить на стене, положить на стол или отпустить · ПКМ — рассмотреть','E / LMB — preview on wall, place on table or release · RMB — inspect');
+      if(hit&&!reachable)placementFailure='out_of_reach';
       if(hit && !reachable)hint=text('Подойдите ближе · установка до 6 м','Move closer · placement within 6 m');
       if(interaction.placing && reachable){
         const w=hit.wall,limits=wallSettings(w),half=frameDimensions(interaction.carrying,settings).height/2;
@@ -167,6 +175,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
         const k=1-Math.exp(-24*Math.max(0,now-cursor.time)/1000);
         cursor.x+=(aimX-cursor.x)*k;cursor.y+=(aimY-cursor.y)*k;cursor.time=now;
         const correctHall=freePlacement||acceptsHall(interaction.carrying,w);
+        placementFailure=correctHall?'occupied_or_too_large':'wrong_hall';
         if(correctHall){
           const tryPosition=(x,y)=>{
             const slot=placedSlot(interaction.carrying,w,x,y,limits,hung);
@@ -174,7 +183,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
             // Reach is measured to the aimed point, exactly as for the preview.
             // Clamping a large frame to the wall must not change that limit.
             const pose=motion.pose(slot);
-            return motion.blocked(slot,pose.position,pose.quaternion)?null:slot;
+            if(motion.blocked(slot,pose.position,pose.quaternion)){placementFailure='collision';return null;}return slot;
           };
           const snap=freePlacement?null:adjacentPosition(interaction.carrying,w,cursor.x,cursor.y,hung,settings.frameWidthM);
           const fitted=freePlacement?null:compositions.snap(interaction.carrying,w,hit.along,hit.y,tryPosition);
@@ -223,6 +232,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
   function finishMount(slot,now){
     motionAudio.reset();
     playSound('mount');
+    onEvent('painting_mount',{paintingId:slot.painting.id,hall:slot.wall.hall,freePlacement});
     if(!freePlacement)playSound('correctPlace');
     feedback.show(slot,now,display.renderSettings?.hallColors?.[slot.wall.hall]);
     const before=compositions.summary(slot.wall,slot.along,slot.y);
@@ -232,7 +242,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     const after=compositions.summary(slot.wall,slot.along,slot.y);
     const completedWall=after&&after.filled===after.total&&before.filled<after.filled;
     const completedGroup=after&&after.group.filled===after.group.places.length&&groupFilled<after.group.filled;
-    if(completedHall){playSound('hallComplete',undefined,{after:'correctPlace'});notify(text('✓ Зал оформлен','✓ Gallery complete'));}
+    if(completedHall){onEvent('hall_complete',{hall:slot.wall.hall});playSound('hallComplete',undefined,{after:'correctPlace'});notify(text('✓ Зал оформлен','✓ Gallery complete'));}
     else if(completedWall)notify(text('✓ Стена оформлена','✓ Wall complete'));
     else if(completedGroup)notify(text('✓ Композиция собрана','✓ Composition complete'));
     interaction.reset();cursor=null;preview.select(null);
@@ -262,7 +272,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
         else drop();
         return true;
       }
-      if(!interaction.placing){if(reachable){preview.beginWall(performance.now());interaction.place();update(true);}else playSound('deny');return true;}
+      if(!interaction.placing){if(reachable){preview.beginWall(performance.now());interaction.place();update(true);}else{playSound('deny');onEvent('placement_failed',{reason:'out_of_reach',paintingId:interaction.carrying.painting.id,hall:room});}return true;}
       if(target && placements.mount(target)){
         const {normal}=target.wall;
         const animated=usesTrolley(interaction.carrying)&&
@@ -270,19 +280,21 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
            animateSettle(target,new THREE.Vector3(normal.x*.095,0,normal.z*.095),250));
         if(!animated)finishMount(target,performance.now());
         update(true);
-      }else playSound('deny');
+      }else{playSound('deny');onEvent('placement_failed',{reason:target?'save_failed':placementFailure,paintingId:interaction.carrying.painting.id,hall:room});}
       return true;
     }
-    if(!picked || coveredPick)return false;
+    if(!picked || coveredPick){if(coveredPick)onEvent('placement_failed',{reason:'covered',paintingId:picked?.painting.id??'',hall:room});return false;}
     if(mountedFrame(picked) && heldId!==picked.painting.id)return true;
     motionAudio.reset();
     playSound(mountedFrame(picked)?'unmount':'pickup');
+    onEvent(mountedFrame(picked)?'painting_unmount':'painting_pickup',{paintingId:picked.painting.id,hall:room,trolley:usesTrolley(picked)});
     interaction.pick(page.find(s=>s.painting.id===picked.painting.id)??storedPage.find(s=>s.painting.id===picked.painting.id)??picked,picked);
     changeSlot(interaction.source,false);preview.resetHover();preview.select(interaction.carrying);preview.beginLift(interaction.source,performance.now());update(true);return true;
   }
   function restoreCarrySource(){
     const source=interaction.source;
     if(!source)return false;
+    onEvent('painting_recovered',{paintingId:source.painting.id,reason:'no_drop_path'});
     interaction.reset();cursor=null;preview.select(null);changeSlot(source,true);update(true);
     notify(text('Картина возвращена на место, откуда вы её взяли','Painting returned to its pickup location'));
     return true;
@@ -297,6 +309,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       const parked=settleTrolley({...interaction.carrying,trolley:true,x:pose.position.x,z:pose.position.z,
         normal:{x:Math.sin(yaw),z:Math.cos(yaw)}},layout,config);
       if(!placements.park(parked,yaw))return;
+      onEvent('painting_drop',{paintingId:parked.painting.id,hall:room,surface:'trolley'});
       if(!animateSettle(parked,new THREE.Vector3(-Math.sin(yaw)*.075,0,-Math.cos(yaw)*.075),230))completePlacement(parked);
       update(true);return;
     }
@@ -319,12 +332,14 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       }
     }
     if(!slot || !path){
+      onEvent('placement_failed',{reason:'no_drop_path',paintingId:interaction.carrying.painting.id,hall:room});
       playSound('deny');
       if(!surface && restoreCarrySource())return;
       notify(text('Нет свободного пути. Отойдите от препятствия и попробуйте положить картину ещё раз.','No clear path. Step away from the obstacle and try placing the painting again.'));return;
     }
     if(!placements.placeOnFloor(slot))return;
     const travel=path.slice(1).reduce((d,b,i)=>d+b.position.distanceTo(path[i].position),0);
+    onEvent(throwing?'painting_throw':'painting_drop',{paintingId:slot.painting.id,hall:room,surface:slot.supportId?.startsWith('table-')?'table':'floor'});
     interaction.lower({slot,path,start:performance.now(),ballistic:throwing,duration:flight?.duration??Math.min(1600,360+travel*80)});cursor=null;update(true);
   }
   function aimed(){
@@ -372,6 +387,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     get active(){return active;},
     setActive(value){updateMode(value);interaction.reset();rebuild();},
     setPage,update,interact,drop,
+    playtestSnapshot:()=>({hall:room,carrying:interaction.carrying?.painting.id??'',hung:hung.length,floor:floor.length,total:page.length,freePlacement}),
     aimed,inspectSlot(){return interaction.carrying ?? interaction.landing?.slot ?? aimed();},
     fillVacancy(slot,replacement){
       const occupied=hung.filter(s=>s!==slot);

@@ -4,3 +4,6 @@ asset-manifest.json
 .env*
 .DS_Store
 node_modules/
+
+# Local anonymous playtest records
+art-archive/.playtest/

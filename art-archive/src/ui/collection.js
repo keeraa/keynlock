@@ -16,7 +16,7 @@ import {arrangeExhibition} from '../paintings/exhibition.js';
 import {createPaintingDisplay} from '../paintings/display.js';
 
 const STORAGE_KEY = 'keynlock-painting-archive-1500-v1';
-export function bindCollection({debugSelection=false,THREE, renderer, world, config, catalog, initialSelection, player, setMode, getMode, elements,notify,loadingManager,playSound,setSoundMotion,initialHanging=true}) {
+export function bindCollection({debugSelection=false,THREE, renderer, world, config, catalog, initialSelection, player, setMode, getMode, elements,notify,loadingManager,playSound,setSoundMotion,initialHanging=true,onEvent=()=>{}}) {
   const life = createLifecycle(), dialog = elements('collection-dialog'), frame = elements('curator');
   const label = elements('painting-label'),controls=elements('painting-controls');
   const showLabel=createPaintingLabel(label,catalog.paintings);
@@ -30,10 +30,10 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
   }});
   const inspector=createPaintingInspector({elements,catalog,setMode});
   life.own(()=>inspector.dispose());
-  const tutorial=createHangingTutorial(elements('tutorial-task'),elements('archive-task'),world.layout,config.paintings,debugSelection);
+  const tutorial=createHangingTutorial(elements('tutorial-task'),elements('archive-task'),world.layout,config.paintings,debugSelection,onEvent);
   const guide=createTutorialGuide({THREE,scene:world.scene,settings:config.paintings,camera:world.camera,layout:world.layout,floorElevation:config.building.floorElevation});
   life.own(()=>guide.dispose());
-  const hanging=createHangingSession({debugSelection,THREE,world,config,display,renderer,label,showLabel,controls,notify,playSound,setSoundMotion,onMount:tutorial.mounted,onThrow:tutorial.thrown,disposalTotal:approvedIds.length,onDisposed(){disposalDirty=true;if(frame.hasAttribute?.('src'))frame.removeAttribute('src');}});
+  const hanging=createHangingSession({debugSelection,THREE,world,config,display,renderer,label,showLabel,controls,notify,playSound,setSoundMotion,onMount:tutorial.mounted,onThrow:tutorial.thrown,onEvent,disposalTotal:approvedIds.length,onDisposed(ids){onEvent('painting_disposed',{count:ids.length,paintingIds:ids.slice(0,10).join(',')});disposalDirty=true;if(frame.hasAttribute?.('src'))frame.removeAttribute('src');}});
   let exhibition, currentSlots=[], page = 0, prior = 'intro';
   function refreshTutorial(){tutorial.setPage(hanging.active&&!hanging.freePlacement?currentSlots:[],hanging.find);}
   function refresh(hangingMode=hanging.active) {
@@ -51,6 +51,7 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
     void preserveAuthorExclusion(id).then(saved=>{
       if(saved===false)notify(en?'Excluded in this browser; could not save the project copy':'Исключена в браузере, но не удалось сохранить копию в проекте');
     });
+    onEvent('painting_excluded',{paintingId:id});
     const replacement=hanging.active ? exhibition.exclude(id,page) : null;
     const fromWall=hanging.active && mountedFrame(slot);
     const installed=fromWall ? hanging.fillVacancy(slot,replacement) : null;
@@ -129,6 +130,7 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
     if(disposalDirty){disposalDirty=false;refresh();}
   }
   return {
+    beginPlaytest:tutorial.beginPlaytest,playtestSnapshot:()=>({...hanging.playtestSnapshot(),tutorial:tutorial.stage}),
     warmUp:display.warmUp,syncVisibility:display.syncVisibility,
     setStyle:display.gouache.setStyle,setEasyMode:display.gouache.setEasyMode,setPigment:display.gouache.setPigment,
     update,wallPick:hanging.wallPick,setPlacementEffect:hanging.setPlacementEffect,
@@ -136,6 +138,6 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
     constrainMovement:hanging.constrainMovement,
     setFreePlacement(value){hanging.setFreePlacement(value);refreshTutorial();},
     aimedId:()=>(hanging.active?hanging.aimed():display.aimedSlot())?.painting.id,
-    inspect(){inspector.open((hanging.active?hanging.inspectSlot():display.aimedSlot())?.painting);},
+    inspect(){const slot=hanging.active?hanging.inspectSlot():display.aimedSlot();if(slot){onEvent('painting_inspect',{paintingId:slot.painting.id});inspector.open(slot.painting);}},
     switchHanging,locate,dispose(){life.dispose();hanging.dispose();display.dispose();}};
 }

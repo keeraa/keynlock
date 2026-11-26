@@ -3,7 +3,9 @@ import {tutorialWorks} from '../paintings/floor-scatter.js';
 import {getLanguage,paintingTitle,t} from '../localization/i18n.js';
 import {STORAGE_KEYS,readText,writeText} from '../persistence/storage.js';
 
-export function createHangingTutorial(node,archiveTask,layout,settings,debug=false){
+export function createHangingTutorial(node,archiveTask,layout,settings,debug=false,onEvent=()=>{}){
+  let reported=null,stageSince=performance.now();
+  function report(){const current=completed?'complete':stage;if(current===reported)return;const now=performance.now();onEvent('tutorial_step',{stage:current,previous:reported??'none',stepElapsedMs:Math.round(now-stageSince)});reported=current;stageSince=now;}
   const key=STORAGE_KEYS.tutorial+(debug?'-debug':'');
   const saved=readText(key);
   let completed=saved==='done',stage='wrong',active=false,first,second,wrong,carriedId=null,find=()=>null;
@@ -22,6 +24,7 @@ export function createHangingTutorial(node,archiveTask,layout,settings,debug=fal
     node.hidden=!inTutorial;
     archiveTask.hidden=!active||inTutorial;
     if(!active)return;
+    report();
     const en=getLanguage()==='en';
     if(inTutorial){
       const target=work(),name=paintingTitle(target.painting);
@@ -50,6 +53,8 @@ export function createHangingTutorial(node,archiveTask,layout,settings,debug=fal
     if(archiveTask.textContent!==message)archiveTask.textContent=message;
   }
   return {
+    get stage(){return completed?'complete':stage;},
+    beginPlaytest(){reported=null;stageSince=performance.now();if(active)report();},
     setPage(slots,locate){
       active=slots.length>0;find=locate;[first,second,wrong]=tutorialWorks(slots,settings);carriedId=null;
       if(stage==='drop')stage='wrong';

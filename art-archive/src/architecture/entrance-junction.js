@@ -28,6 +28,6 @@ export function rotundaPlasterU(panel,x,z){
  return along/4;
 }
 export function entrancePaintColor(THREE,color){
- return new THREE.Color(color).lerp(new THREE.Color(0x897966),.22);
+ return new THREE.Color(color);
 }
 

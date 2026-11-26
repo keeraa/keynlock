@@ -96,7 +96,7 @@ export function bindPlayerInput({canvas,player,getMode,lock,actions,hideProgress
    // F remains the deliberate hold-to-exclude shortcut; inspection uses held RMB.
   }
   if(logicalKey(e)==='e' && press){
-   const commit=tap && !longPress && getMode()==='play' && actions.canRaise();
+   const commit=tap && !longPress && !inspecting && getMode()==='play';
    if(commit)actions.interact();resetGesture();
   }
   if(e.key==='Escape')lock.clearBrowserRelease();});

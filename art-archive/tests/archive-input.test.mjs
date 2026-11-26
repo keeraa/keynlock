@@ -48,3 +48,14 @@ test('held RMB allows mouse look in locked and unlocked modes without a jump on 
  mouse(501,601);assert.equal(turns.length,3,'first pointer after release only resets its origin');
  mouse(503,604);assert.deepEqual(turns[3],[2,3]);
 });
+
+test('a short E press still commits when automatic wall preview starts between keydown and keyup',t=>{
+ const window=new EventTarget(),document=new EventTarget(),canvas=new EventTarget();document.querySelector=()=>null;
+ const saved=[globalThis.window,globalThis.document,globalThis.Element];Object.assign(globalThis,{window,document,Element:class Element{}});
+ t.after(()=>{[globalThis.window,globalThis.document,globalThis.Element]=saved;});
+ let canRaise=true,commits=0;
+ const input=bindPlayerInput({canvas,player:{held:new Set(),zoom(){}},getMode:()=>'play',lock:{},hideProgress:{},
+  actions:{wallPick:()=>null,canRaise:()=>canRaise,interact(){commits++;},raise(){}}});t.after(()=>input.dispose());
+ const key=type=>window.dispatchEvent(Object.assign(new Event(type),{code:'KeyE',key:'e'}));
+ key('keydown');canRaise=false;key('keyup');assert.equal(commits,1,'preview entering its placing phase must not swallow this input');
+});

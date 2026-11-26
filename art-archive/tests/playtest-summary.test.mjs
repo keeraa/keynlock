@@ -22,3 +22,14 @@ test('QA can be explicitly included and unrecognized input fails instead of prod
  assert.equal(summarizePlaytests([rows],{includeQA:true}).server.mounts,1);
  assert.throws(()=>summarizePlaytests([{unknown:'format'}]),/Unsupported report format/);
 });
+
+test('report CLI writes both formats and refuses to overwrite its input',async t=>{
+ const {mkdtemp,writeFile,readFile,rm}=await import('node:fs/promises'),{tmpdir}=await import('node:os'),{join}=await import('node:path'),{execFileSync}=await import('node:child_process');
+ const dir=await mkdtemp(join(tmpdir(),'art-report-'));t.after(()=>rm(dir,{recursive:true,force:true}));
+ const input=join(dir,'player.json'),output=join(dir,'summary.md'),script=new URL('../scripts/playtest-report.mjs',import.meta.url).pathname;
+ await writeFile(input,JSON.stringify({schemaVersion:2,game:'art-archive',playthroughId:'cli',activeMs:1000,counts:{placed:1}}));
+ execFileSync(process.execPath,[script,input,'--output',output]);
+ assert.match(await readFile(output,'utf8'),/Локальные отчёты/);assert.equal(JSON.parse(await readFile(join(dir,'summary.json'),'utf8')).local.reports,1);
+ assert.throws(()=>execFileSync(process.execPath,[script,input,'--output',join(dir,'player.md')],{stdio:'pipe'}));
+ assert.equal(JSON.parse(await readFile(input,'utf8')).playthroughId,'cli');
+});

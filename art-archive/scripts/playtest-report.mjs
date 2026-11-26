@@ -10,6 +10,6 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  if(!files.length)throw Error('Usage: npm run report:playtest -- report.json [events.json feedback.json ...] [--output reports/summary.md] [--include-qa]');
  const documents=await Promise.all(files.map(async file=>JSON.parse(await readFile(file,'utf8'))));
  const report=summarizePlaytests(documents,{includeQA}),markdown=renderPlaytestSummary(report);
- if(output){output=resolve(output);const json=output.replace(/\.md$/i,'')+'.json';if(json===output)throw Error('Use a Markdown output path, not a .json input path');await mkdir(dirname(output),{recursive:true});await writeFile(output,markdown);await writeFile(json,JSON.stringify(report,null,2)+'\n');console.log(output+'\n'+json);}
+ if(output){output=resolve(output);if(!/\.md$/i.test(output))throw Error('Use a .md output path');const json=output.replace(/\.md$/i,'')+'.json';if(files.some(file=>[output,json].includes(resolve(file))))throw Error('Output would overwrite an input report');await mkdir(dirname(output),{recursive:true});await writeFile(output,markdown);await writeFile(json,JSON.stringify(report,null,2)+'\n');console.log(output+'\n'+json);}
  else process.stdout.write(markdown);
 }

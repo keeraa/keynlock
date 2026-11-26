@@ -1,9 +1,15 @@
 // Exactly one interaction phase; no incompatible preview/inspection/drop flags.
 export function createPaintingInteraction(){
  let state={phase:'idle',slot:null,source:null,landing:null};
+ // Held RMB is input, not a second interaction phase. Derive its presentation
+ // here so the session cannot combine inspection with a wall preview.
+ let inspecting=false;
  const carrying=()=>['carrying','examining','placing'].includes(state.phase);
  return {
   get phase(){return state.phase;},get carrying(){return carrying()?state.slot:null;},
+  get inspecting(){return inspecting;},inspect(value){inspecting=Boolean(value);},
+  get canAimAtWall(){return carrying()&&!inspecting&&state.phase!=='examining';},
+  carryView(large){return {raised:(state.phase==='examining'&&!inspecting)||(inspecting&&!large),inspectHeavy:inspecting&&large};},
   get source(){return state.source;},get placing(){return state.phase==='placing';},
   get raised(){return state.phase==='examining';},get landing(){return state.landing;},
   pick(slot,source){if(state.phase!=='idle')throw Error('Cannot pick during '+state.phase);state={phase:'carrying',slot,source,landing:null};},

@@ -1,3 +1,4 @@
+import {createWallPlacement} from './wall-placement.js';
 import {showPaintingControls} from '../ui/painting-controls.js';
 import {createWallCompositions} from './wall-compositions.js';
 import {createHallCompletion} from './hall-completion.js';
@@ -18,8 +19,8 @@ const text=(ru,en)=>getLanguage()==='en'?en:ru;
 export function createHangingSession({debugSelection=false,THREE,world,config,display,renderer,label,showLabel=value=>{label.textContent=value?.painting?.title??value??'';},controls=null,notify=()=>{},playSound=()=>{},setSoundMotion=()=>{},onMount=()=>{},onThrow=()=>{},getCarryYaw=()=>null,disposalTotal,onDisposed=()=>{},onEvent=()=>{}}) {
   const settings=config.paintings,layout=world.layout;
   const motion=createFrameMotion(THREE,config,layout);
-  const wallSettings=w=>({...settings,edgeMarginM:0,horizontalGapM:0,verticalGapM:0,minBottomM:freePlacement ? .02 : .84,
-    maxTopM:config.building.height-(w.hall==='center' ? .13 : config.building.vaultRise+.03)});
+  const wallPlacement=createWallPlacement(config,motion,{isFree:()=>freePlacement,occupied:()=>hung});
+  const wallSettings=wallPlacement.limits;
   const compositions=createWallCompositions(THREE,world,config);
   const completion=createHallCompletion(layout.halls,(id,value)=>world.building?.setHallGlow?.(id,value),
     (index,value)=>display.gouache?.setFrameFlash?.(index,value));
@@ -27,7 +28,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
   const usesTrolley=slot=>Math.max(slot.height,slot.painting.physicalSizeM.width)>=settings.hoistFromM;
   const motionAudio=createPaintingMotionAudio(setSoundMotion);
   const fitAudio=createFrameFitAudio(playSound);
-  let inspectionHeld=false,wallPreviewArmed=true;
+  let wallPreviewArmed=true;
   let aimedPlace=null,freePlacement=false,placementFailure='no_wall',lastIntegrity=-Infinity,lastMissing='';
   let heavyIds=new Set();
   let cursor=null,coveredPick=false;
@@ -159,7 +160,8 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       const large=usesTrolley(interaction.carrying);
       let hint=text('Наведите на стену','Aim at a wall');
       if(!reachable)cursor=null;
-      preview.follow(interaction.carrying,large,hall,origin,dir,interaction.source,now,(interaction.raised&&!inspectionHeld)||(inspectionHeld&&!large),inspectionHeld&&large);
+      const carryView=interaction.carryView(large);
+      preview.follow(interaction.carrying,large,hall,origin,dir,interaction.source,now,carryView.raised,carryView.inspectHeavy);
       if(preview.takeLiftFailure()){
         onEvent('placement_failed',{reason:'pickup_blocked',paintingId:interaction.carrying.painting.id,hall:room});
         notify(text('Рама упирается в препятствие. Отойдите немного назад — картина остаётся у вас.','The frame is blocked. Step back a little — you are still holding the painting.'));
@@ -167,23 +169,20 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       if(!interaction.placing)hint=text('E / ЛКМ — повесить, положить на стол или отпустить · удерживайте ПКМ — рассмотреть','E / LMB — hang, place on table or release · hold RMB — inspect');
       if(hit&&!reachable)placementFailure='out_of_reach';
       if(hit && !reachable)hint=interaction.placing?text('Подойдите ближе · установка до 6 м','Move closer · placement within 6 m'):large?text('E / ЛКМ — оставить картину на тележке','E / LMB — leave the painting on its trolley'):text('E / ЛКМ — короткий бросок в этом направлении','E / LMB — short throw in this direction');
-      if(!inspectionHeld && !interaction.raised && reachable){
+      if(interaction.canAimAtWall && reachable){
         const w=hit.wall,limits=wallSettings(w),half=frameDimensions(interaction.carrying,settings).height/2;
         const aimX=hit.along;
         const aimY=clamp(hit.y,limits.minBottomM+half,limits.maxTopM-half);
         if(cursor?.wall!==w)cursor={wall:w,x:aimX,y:aimY,time:now};
         const k=1-Math.exp(-24*Math.max(0,now-cursor.time)/1000);
         cursor.x+=(aimX-cursor.x)*k;cursor.y+=(aimY-cursor.y)*k;cursor.time=now;
-        const correctHall=freePlacement||acceptsHall(interaction.carrying,w);
+        const correctHall=wallPlacement.accepts(interaction.carrying,w);
         placementFailure=correctHall?'occupied_or_too_large':'wrong_hall';
         if(correctHall){
           const tryPosition=(x,y)=>{
-            const slot=placedSlot(interaction.carrying,w,x,y,limits,hung);
-            if(!slot)return null;
-            // Reach is measured to the aimed point, exactly as for the preview.
-            // Clamping a large frame to the wall must not change that limit.
-            const pose=motion.pose(slot);
-            if(motion.blocked(slot,pose.position,pose.quaternion)){placementFailure='collision';return null;}return slot;
+            const result=wallPlacement.evaluate(interaction.carrying,w,x,y);
+            if(result.reason)placementFailure=result.reason;
+            return result.slot;
           };
           const snap=freePlacement?null:adjacentPosition(interaction.carrying,w,cursor.x,cursor.y,hung,settings.frameWidthM);
           const fitted=freePlacement?null:compositions.snap(interaction.carrying,w,hit.along,hit.y,tryPosition);
@@ -197,25 +196,25 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
         else if(!correctHall)hint=text('Нужен зал «','Required hall “')+t(destHall?.title??'Ротонда')+text('»','”');
       }
       if(!target||!reachable)wallPreviewArmed=true;
-      const wallPreview=wallPreviewArmed&&target&&!inspectionHeld&&!interaction.raised&&!aimedSupport(origin,dir,layout,config,hit?.distance,settings.placementReachM??6);
+      const wallPreview=wallPreviewArmed&&target&&interaction.canAimAtWall&&!aimedSupport(origin,dir,layout,config,hit?.distance,settings.placementReachM??6);
       if(wallPreview){
         if(!interaction.placing){preview.beginWall(now);interaction.place();}
         preview.wall(interaction.carrying,hit.wall,target.along,target.y,true,large,now);
       }else if(interaction.placing){
-        if(!inspectionHeld)preview.beginReturn(now);
+        if(!interaction.inspecting)preview.beginReturn(now);
         interaction.carry();
       }
       let tablePlan=null;
-      if(!inspectionHeld&&!interaction.placing){
+      if(!interaction.inspecting&&!interaction.placing){
         const plan=tablePlan=tablePreview.update({origin,dir,carrying:interaction.carrying,floor,room,wallDistance:hit?.distance,now});
         if(plan){preview.table(plan.slot,now,plan.valid);hint=plan.valid?text('E / ЛКМ — положить на стол','E / LMB — place on the table'):text('Место занято · сдвиньте прицел','Space occupied · move the reticle');}
       }
       // A red hint may indicate the wrong hall or an occupied place, but it
       // still needs a complete wall face behind the frame, including at arches.
-      const invalidHint=!target&&reachable&&!inspectionHeld&&!interaction.raised&&cursor&&!tablePlan&&
-        Boolean(placedSlot(interaction.carrying,hit.wall,cursor.x,cursor.y,wallSettings(hit.wall),[]));
+      const invalidHint=!target&&reachable&&interaction.canAimAtWall&&cursor&&!tablePlan&&
+        Boolean(wallPlacement.surface(interaction.carrying,hit.wall,cursor.x,cursor.y));
       if(invalidHint)preview.wall(interaction.carrying,hit.wall,cursor.x,cursor.y,false,large,now,true);
-      if(!interaction.placing)preview.returnToCarry(now,inspectionHeld||Boolean(tablePlan)||Boolean(invalidHint));
+      if(!interaction.placing)preview.returnToCarry(now,interaction.inspecting||Boolean(tablePlan)||Boolean(invalidHint));
       description=interaction.carrying;
       commands=hint;
       message=[paintingTitle(interaction.carrying.painting),large?text('Тележка и подъёмник','Trolley and hoist'):null,dest,hint].filter(Boolean).join(' · ');
@@ -287,14 +286,16 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
         else drop();
         return true;
       }
-      if(target && placements.mount(target)){
+      const mountTarget=target&&wallPlacement.evaluate(target,target.wall,target.along,target.y);
+      if(mountTarget?.reason)placementFailure=mountTarget.reason;
+      if(mountTarget?.slot && placements.mount(mountTarget.slot)){
         const {normal}=target.wall;
         const animated=usesTrolley(interaction.carrying)&&
           (animateSettle(target,new THREE.Vector3(normal.x*.19,.065,normal.z*.19),180)||
            animateSettle(target,new THREE.Vector3(normal.x*.095,0,normal.z*.095),140));
         if(!animated)finishMount(target,performance.now());
         update(true);
-      }else{playSound('deny');onEvent('placement_failed',{reason:target?'save_failed':placementFailure,paintingId:interaction.carrying.painting.id,hall:room});}
+      }else{playSound('deny');onEvent('placement_failed',{reason:mountTarget?.slot?'save_failed':placementFailure,paintingId:interaction.carrying.painting.id,hall:room});}
       return true;
     }
     if(!picked || coveredPick){if(coveredPick)onEvent('placement_failed',{reason:'covered',paintingId:picked?.painting.id??'',hall:room});return false;}
@@ -403,7 +404,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     raise:value=>interaction.raise(value),
     get active(){return active;},
     setActive(value){updateMode(value);interaction.reset();rebuild();},
-    setPage,update,interact,drop,setInspecting(value){inspectionHeld=Boolean(value);if(inspectionHeld)update(true);},
+    setPage,update,interact,drop,setInspecting(value){interaction.inspect(value);if(interaction.inspecting)update(true);},
     playtestSnapshot:()=>({hall:room,carrying:interaction.carrying?.painting.id??'',hung:hung.filter(s=>page.some(p=>p.painting.id===s.painting.id)).length,floor:floor.length,total:page.length,disposed:page.filter(s=>disposal.has(s.painting.id)).length,completedHalls:completion.completedCount,freePlacement}),
     inspectionTarget(){
       const slot=interaction.carrying,pose=preview.carriedPose();

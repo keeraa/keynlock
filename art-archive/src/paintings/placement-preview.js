@@ -2,13 +2,14 @@ import {createPaintingProps} from './props.js';
 import {overviewGeometry} from './overview.js';
 import {frameDimensions,frameOrientation,mountedFrame,frameCornerCut,clippedFrameCorners} from '../../catalog/painting-geometry.js';
 import {trolleyDimensions} from './trolley-model.js';
-import {TOP_RAIL_GAP} from '../architecture/stair-profile.js';
+import {createCarryPose} from './carry-pose.js';
 import {supportHeightAt} from '../architecture/support-height.js';
-import {PLAYER_DEFAULTS} from '../../config/runtime.js';
+import {constrainCarryMovement} from './carry-movement.js';
 
 export function createPlacementPreview(THREE,world,display,config,motion) {
   const root=new THREE.Group(),settings=config.paintings;
   const props=createPaintingProps(THREE,settings);
+  const resolveCarryPose=createCarryPose(THREE,world,config,motion);
   let cart=new THREE.Group(),seal=null;
   const mat=new THREE.MeshBasicMaterial({map:display.texture??null});
   display.gouache?.apply(mat);
@@ -137,72 +138,9 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
   }
 
   function carry(slot,large,hall,origin,dir,source,raised,inspectHeavy=false){
-    root.visible=true;cart.visible=large;
-    const fy=config.building.floorElevation;
-    const eye=world.camera,stair=config.building.stair,radius=Math.hypot(eye.position.x,eye.position.z);
-    // Keep the long edge along the flight, independent of where the player looks.
-    // The usual low, sideways hand pose cannot fit between the curved railings.
-    const angle=Math.atan2(eye.position.x,eye.position.z);
-    const entrance=stair&&angle>-TOP_RAIL_GAP&&angle<stair.topLandingAngle+.3;
-    stairCarry=!large&&!raised&&stair&&(radius<stair.openingRadius+.45||entrance&&radius<stair.openingRadius+1.6);
-    if(stairCarry){
-      // At the mouth the path runs radially; turn progressively with the bend.
-      const bend=angle < -TOP_RAIL_GAP?angle+Math.PI*2:angle;
-      const progress=Math.max(0,Math.min(1,bend/.9));
-      const turn=(1-progress)*Math.PI/2;
-      root.rotation.set(0,angle+turn,0,'YXZ');
-      root.position.copy(eye.position);root.position.y-=.12;
-      const outward=.2*(1-progress);
-      root.position.x+=Math.sin(angle)*outward+Math.sin(angle+turn)*.28;
-      root.position.z+=Math.cos(angle)*outward+Math.cos(angle+turn)*.28;
-      cart.visible=false;return;
-    }
-    if(!large || raised){
-      const eye=world.camera;
-      cart.visible=false;
-      root.quaternion.copy(eye.quaternion);
-      root.rotateX(raised?0:-.58);
-      const tan=Math.tan(eye.fov*Math.PI/360);
-      if(raised){
-        const distance=Math.max(.65,(slot.height+2*settings.frameWidthM)/(1.7*tan),slot.width/(1.7*tan*eye.aspect));
-        root.position.set(0,0,-distance).applyQuaternion(eye.quaternion).add(eye.position);
-        return;
-      }
-      root.position.set(.35+slot.width*.26,-.32-slot.height*.38,-.72-slot.width*.3)
-        .applyQuaternion(eye.quaternion).add(eye.position);
-      return;
-    }
-    const layout=world.layout;
-    // Park ahead, upright and facing the player even when the pickup ray points down.
-    const yaw=world.carryYaw?.()??Math.atan2(-dir.x,-dir.z);
-    const halfWidth=slot.width/2,baseTurn=.65,pull=.30;
-    const oldTurn=Math.asin(Math.min(.94,Math.sin(baseTurn)+pull/slot.width));
-    // Keep the close transport centre from before the screen-centering change.
-    // Only rotate around that centre until the far vertical edge is straight ahead.
-    const distance=.45+Math.sin(baseTurn)*halfWidth-pull/2;
-    const side=.35+(Math.cos(baseTurn)-Math.cos(oldTurn))*halfWidth;
-    const turn=Math.acos(Math.min(1,side/halfWidth));
-    let cartYaw=yaw-turn;
-    let x=origin.x-Math.sin(yaw)*distance+Math.cos(yaw)*side;
-    let z=origin.z-Math.cos(yaw)*distance-Math.sin(yaw)*side;
-    if(hall){
-      const p=layout.local(hall,x,z),angle=cartYaw-hall.angle;
-      const clamp=(v,lo,hi)=>lo>hi?(lo+hi)/2:Math.max(lo,Math.min(hi,v));
-      const across=Math.abs(Math.cos(angle))*halfWidth+.32;
-      const along=Math.abs(Math.sin(angle))*halfWidth+.32;
-      ({x,z}=layout.world(hall,clamp(p.x,-hall.width/2+across,hall.width/2-across),
-        clamp(p.z,hall.start+along,hall.start+hall.length-along)));
-    }
-    const pose={x,z,cartYaw};
-    const y=fy+trolleyDimensions(slot,settings).centerHeight;
-    if(inspectHeavy){
-      const facing=Math.atan2(eye.position.x-pose.x,eye.position.z-pose.z);
-      const position=new THREE.Vector3(pose.x,y,pose.z);
-      const rotation=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),facing);
-      if(!motion.blocked(slot,position,rotation))pose.cartYaw=facing;
-    }
-    root.rotation.set(0,pose.cartYaw,0);root.position.set(pose.x,y,pose.z);
-
+    const pose=resolveCarryPose(slot,large,hall,origin,dir,raised,inspectHeavy);
+    root.position.copy(pose.position);root.quaternion.copy(pose.quaternion);
+    root.visible=true;cart.visible=pose.trolley;stairCarry=pose.stair;
   }
   function beginLift(slot,now){
     const from=motion.pose(slot);root.position.copy(from.position);root.quaternion.copy(from.quaternion);
@@ -377,55 +315,7 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
   }
   function constrainMovement(from,to){
     if(!current||(!root.visible&&!returnFlight))return 1;
-    const reach=Math.max(2.8,current.width/2+1.5);
-    let allowed=1;
-    if(to.distanceTo(root.position)>reach&&to.distanceToSquared(root.position)>from.distanceToSquared(root.position)){
-      let low=0,high=1;const point=new THREE.Vector3();
-      for(let i=0;i<16;i++){
-        const middle=(low+high)/2;point.lerpVectors(from,to,middle);
-        if(point.distanceTo(root.position)<=reach)low=middle;else high=middle;
-      }
-      allowed=low;
-    }
-    const delta=to.clone().sub(from);
-    const stopped=lift||motion.blocked(current,root.position,root.quaternion);
-    const frameAdvance=stopped?0:
-      motion.advance(current,root,{position:root.position.clone().add(delta),quaternion:root.quaternion});
-    if(!stopped)allowed=Math.min(allowed,frameAdvance);
-    if(frameAdvance>=allowed)return allowed;
-    // Once the frame stops at an obstacle, the player must stop at its actual
-    // volume too. Test the remaining relative movement, including pickup/recovery.
-    const size=frameDimensions(current,settings),inverse=root.quaternion.clone().invert(),radius=.28;
-    const local=from.clone().sub(root.position).applyQuaternion(inverse);
-    const vertical=new THREE.Vector3(0,1,0).applyQuaternion(inverse);
-    const relative=delta.clone().applyQuaternion(inverse);
-    function clearance(t){
-      const center=local.clone().addScaledVector(relative,Math.max(0,t-frameAdvance));
-      const sdf=h=>{
-        const x=Math.abs(center.x+vertical.x*h)-size.width/2;
-        const y=Math.abs(center.y+vertical.y*h)-size.height/2;
-        const z=Math.abs(center.z+vertical.z*h)-size.depth/2;
-        return Math.hypot(Math.max(0,x),Math.max(0,y),Math.max(0,z))+Math.min(0,Math.max(x,y,z));
-      };
-      let low=-PLAYER_DEFAULTS.eyeHeight+radius,high=0;
-      for(let i=0;i<24;i++){
-        const a=(2*low+high)/3,b=(low+2*high)/3;
-        if(sdf(a)<sdf(b))high=b;else low=a;
-      }
-      return Math.min(sdf(low),sdf(high),sdf(-PLAYER_DEFAULTS.eyeHeight+radius),sdf(0))-radius;
-    }
-    const initial=clearance(0),steps=Math.max(1,Math.ceil(delta.length()/.04));
-    let previous=0;
-    for(let i=1;i<=steps;i++){
-      const t=allowed*i/steps,gap=clearance(t);
-      if(gap<Math.min(0,initial)-1e-6){
-        let low=previous,high=t;
-        for(let j=0;j<16;j++){const mid=(low+high)/2;if(clearance(mid)>=Math.min(0,initial)-1e-6)low=mid;else high=mid;}
-        return low;
-      }
-      previous=t;
-    }
-    return allowed;
+    return constrainCarryMovement(THREE,settings,motion,current,root,from,to,Boolean(lift));
   }
   return {constrainMovement,takeLiftFailure(){const value=liftFailure;liftFailure=false;return value;},
     carriedPose(){return root.visible||returnFlight?{position:root.position,quaternion:root.quaternion}:null;},

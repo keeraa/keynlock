@@ -628,3 +628,19 @@ test('only a flat painting resting on the frame blocks a floor pickup',()=>{
  assert.equal(covered(lower,[lower,{...upper,trolley:true}],config.paintings),false);
  assert.equal(covered(lower,[lower,{...upper,y:.0575}],config.paintings),false);
 });
+
+test('a painting restored below the stairs from another exhibition page keeps its ID when picked up',t=>{
+ const previous=[globalThis.window,globalThis.localStorage],memory=new Map();
+ globalThis.window={};globalThis.localStorage={getItem:k=>memory.get(k),setItem:(k,v)=>memory.set(k,v)};
+ t.after(()=>{[globalThis.window,globalThis.localStorage]=previous;});
+ const extra=page.find(s=>s.painting.id==='ART-1815'),fy=config.building.floorElevation;
+ memory.set('keynlock-art-hanging-v1',JSON.stringify({[extra.painting.id]:{version:3,kind:'floor',destination:extra.destination,
+  x:4,y:0,z:0,floorAngle:0,floorRoom:'center',supportId:'table-disposal'}}));
+ const camera=new THREE.PerspectiveCamera(),scene=new THREE.Scene();
+ const session=createHangingSession({THREE,world:{camera,scene,layout},config,label:{},display:{setSlots(){}}});t.after(()=>session.dispose());
+ session.setPage([],[extra],true);
+ const found=session.find(extra.painting.id);assert(found);
+ camera.position.set(found.x,fy+found.y+1.78,found.z+1);camera.lookAt(found.x,fy+found.y,found.z);
+ assert(session.interact());assert.equal(session.phase,'carrying');
+ assert.equal(session.inspectSlot()?.painting.id,extra.painting.id,'a visible painting cannot become an empty carried slot');
+});

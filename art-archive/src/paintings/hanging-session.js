@@ -277,7 +277,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     if(mountedFrame(picked) && heldId!==picked.painting.id)return true;
     motionAudio.reset();
     playSound(mountedFrame(picked)?'unmount':'pickup');
-    interaction.pick(page.find(s=>s.painting.id===picked.painting.id),picked);
+    interaction.pick(page.find(s=>s.painting.id===picked.painting.id)??storedPage.find(s=>s.painting.id===picked.painting.id)??picked,picked);
     changeSlot(interaction.source,false);preview.resetHover();preview.select(interaction.carrying);preview.beginLift(interaction.source,performance.now());update(true);return true;
   }
   function restoreCarrySource(){

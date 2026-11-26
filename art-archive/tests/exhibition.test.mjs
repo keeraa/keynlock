@@ -323,19 +323,21 @@ test('each hall has a single increasing size sequence across its two side walls'
  }
 });
 
-test('the shipped author selection restores 466 exclusions across browser origins without resetting placement or later choices',async t=>{
+test('the shipped author selection restores 471 exclusions across browser origins without resetting placement or later choices',async t=>{
  const {prepareSavedSelection}=await import('../catalog/selection-migrations.js');
  const previous=globalThis.localStorage,key='keynlock-painting-archive-1500-v1',memory=new Map();
  globalThis.localStorage={getItem:k=>memory.get(k)??null,setItem:(k,v)=>memory.set(k,v)};
  t.after(()=>{globalThis.localStorage=previous;});
  const fresh=structuredClone(seed);prepareSavedSelection(fresh);
- assert.equal(fresh.curatedExclusions.length,466);
- const e=arrange(fresh);assert.equal(e.selected,705);
+ assert.equal(fresh.curatedExclusions.length,471);
+ const e=arrange(fresh);assert.equal(e.selected,700);
  for(const id of fresh.curatedExclusions)assert(!e.byId.has(id),id+' returned to the game');
- const old={selectionRevision:3,included:{'ART-0001':true,'ART-0002':false},placements:{'ART-0002':'stories/religion'},categories:{'ART-0002':'Custom'}};
+ for(const id of ['ART-0871','ART-1265','ART-1268','ART-1278','ART-1381'])assert(fresh.included[id]===false,'F-deleted miniature returned: '+id);
+ const old={selectionRevision:4,included:{'ART-0001':true,'ART-0002':false,'ART-1278':true},placements:{'ART-0002':'stories/religion'},categories:{'ART-0002':'Custom'}};
  memory.set(key,JSON.stringify(old));memory.set('keynlock-art-hanging-v1','{"saved-work":{"wall":"cn/end","y":2}}');
  prepareSavedSelection(structuredClone(seed));const restored=JSON.parse(memory.get(key));
  assert.equal(restored.included['ART-0001'],false);assert.equal(restored.included['ART-0002'],false);
+ assert.equal(restored.included['ART-1278'],false,'the previous 705-work save must also remove the screenshot work');
  assert.deepEqual(restored.placements,old.placements);assert.deepEqual(restored.categories,old.categories);
  assert.equal(memory.get('keynlock-art-hanging-v1'),'{"saved-work":{"wall":"cn/end","y":2}}');
  restored.included['ART-0001']=true;memory.set(key,JSON.stringify(restored));

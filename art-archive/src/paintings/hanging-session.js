@@ -15,7 +15,7 @@ import {getLanguage,t,paintingTitle} from '../localization/i18n.js';
 import {createPaintingMotionAudio,createFrameFitAudio,heaviestPaintingIds} from '../audio/painting-motion-audio.js';
 
 const text=(ru,en)=>getLanguage()==='en'?en:ru;
-export function createHangingSession({debugSelection=false,THREE,world,config,display,renderer,label,showLabel=value=>{label.textContent=value?.painting?.title??value??'';},controls=null,notify=()=>{},playSound=()=>{},setSoundMotion=()=>{},onMount=()=>{},onThrow=()=>{},disposalTotal,onDisposed=()=>{},onEvent=()=>{}}) {
+export function createHangingSession({debugSelection=false,THREE,world,config,display,renderer,label,showLabel=value=>{label.textContent=value?.painting?.title??value??'';},controls=null,notify=()=>{},playSound=()=>{},setSoundMotion=()=>{},onMount=()=>{},onThrow=()=>{},getCarryYaw=()=>null,disposalTotal,onDisposed=()=>{},onEvent=()=>{}}) {
   const settings=config.paintings,layout=world.layout;
   const motion=createFrameMotion(THREE,config,layout);
   const wallSettings=w=>({...settings,edgeMarginM:0,horizontalGapM:0,verticalGapM:0,minBottomM:freePlacement ? .02 : .84,
@@ -36,7 +36,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     onError:()=>notify(text('Не удалось сохранить положение','Could not save placement'))});
   const origin=new THREE.Vector3(),dir=new THREE.Vector3();
   const feedback=createPlacementFeedback(THREE,world.scene,config,world.camera,renderer);
-  const preview=createPlacementPreview(THREE,world,display,config,motion);
+  const preview=createPlacementPreview(THREE,{...world,carryYaw:getCarryYaw},display,config,motion);
   let storedPage=[],active=false,page=[],hung=[],floor=[],target=null,picked=null,room='center',hall=null,pausedAt=null;
   const disposal=createDisposalStation({THREE,world,config,display,debug:debugSelection,notify,playSound,total:disposalTotal,onDisposed(ids){
     for(const slot of [...visible])if(ids.includes(slot.painting.id))changeSlot(slot,false);
@@ -159,7 +159,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       const large=usesTrolley(interaction.carrying);
       let hint=text('Наведите на стену','Aim at a wall');
       if(!reachable)cursor=null;
-      if(inspectionHeld || !interaction.placing || !reachable)preview.follow(interaction.carrying,large,hall,origin,dir,interaction.source,now,interaction.raised||inspectionHeld);
+      if(inspectionHeld || !interaction.placing || !reachable)preview.follow(interaction.carrying,large,hall,origin,dir,interaction.source,now,(interaction.raised&&!inspectionHeld)||(inspectionHeld&&!large));
       if(preview.takeLiftFailure()){
         onEvent('placement_failed',{reason:'pickup_blocked',paintingId:interaction.carrying.painting.id,hall:room});
         notify(text('Рама упирается в препятствие. Отойдите немного назад — картина остаётся у вас.','The frame is blocked. Step back a little — you are still holding the painting.'));
@@ -389,8 +389,12 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     raise:value=>interaction.raise(value),
     get active(){return active;},
     setActive(value){updateMode(value);interaction.reset();rebuild();},
-    setPage,update,interact,drop,setInspecting(value){inspectionHeld=Boolean(value);},
+    setPage,update,interact,drop,setInspecting(value){inspectionHeld=Boolean(value);if(inspectionHeld)update(true);},
     playtestSnapshot:()=>({hall:room,carrying:interaction.carrying?.painting.id??'',hung:hung.filter(s=>page.some(p=>p.painting.id===s.painting.id)).length,floor:floor.length,total:page.length,disposed:page.filter(s=>disposal.has(s.painting.id)).length,completedHalls:completion.completedCount,freePlacement}),
+    inspectionTarget(){
+      const slot=interaction.carrying,pose=preview.carriedPose();
+      return slot&&usesTrolley(slot)&&pose?{position:pose.position,height:slot.height}:null;
+    },
     aimed,inspectSlot(){return interaction.carrying ?? interaction.landing?.slot ?? aimed();},
     fillVacancy(slot,replacement){
       const occupied=hung.filter(s=>s!==slot);

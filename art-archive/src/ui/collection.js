@@ -30,7 +30,7 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
   const tutorial=createHangingTutorial(elements('tutorial-task'),elements('archive-task'),world.layout,config.paintings,debugSelection,onEvent);
   const guide=createTutorialGuide({THREE,scene:world.scene,settings:config.paintings,camera:world.camera,layout:world.layout,floorElevation:config.building.floorElevation});
   life.own(()=>guide.dispose());
-  const hanging=createHangingSession({debugSelection,THREE,world,config,display,renderer,label,showLabel,controls,notify,playSound,setSoundMotion,onMount:tutorial.mounted,onThrow:tutorial.thrown,onEvent,disposalTotal:approvedIds.length,onDisposed(ids){onEvent('painting_disposed',{count:ids.length,paintingIds:ids.slice(0,10).join(',')});disposalDirty=true;if(frame.hasAttribute?.('src'))frame.removeAttribute('src');}});
+  const hanging=createHangingSession({debugSelection,THREE,world,config,display,renderer,label,showLabel,controls,notify,playSound,setSoundMotion,onMount:tutorial.mounted,onThrow:tutorial.thrown,getCarryYaw:()=>player.state.yaw,onEvent,disposalTotal:approvedIds.length,onDisposed(ids){onEvent('painting_disposed',{count:ids.length,paintingIds:ids.slice(0,10).join(',')});disposalDirty=true;if(frame.hasAttribute?.('src'))frame.removeAttribute('src');}});
   let exhibition, currentSlots=[], page = 0, prior = 'intro';
   function refreshTutorial(){tutorial.setPage(hanging.active&&!hanging.freePlacement?currentSlots:[],hanging.find);}
   function refresh(hangingMode=hanging.active) {
@@ -137,13 +137,13 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
     aimedId:()=>(hanging.active?hanging.aimed():display.aimedSlot())?.painting.id,
     inspect(value){
       if(!value){
-        hanging.setInspecting(false);player.zoom?.(false);
+        hanging.setInspecting(false);player.lookAtCarry?.(null);player.zoom?.(false);
         if(inspectionStart&&performance.now()-inspectionStart.time>=350&&hanging.carriedId===inspectionStart.slot.painting.id)tutorial.inspected(inspectionStart.slot);
         inspectionStart=null;return true;
       }
       const slot=hanging.active?hanging.inspectSlot():display.aimedSlot();
-      if(!slot){hanging.setInspecting(false);player.zoom?.(false);inspectionStart=null;return false;}
-      hanging.setInspecting(true);player.zoom?.(!hanging.carriedId);
+      if(!slot){hanging.setInspecting(false);player.lookAtCarry?.(null);player.zoom?.(false);inspectionStart=null;return false;}
+      hanging.setInspecting(true);player.lookAtCarry?.(hanging.inspectionTarget());player.zoom?.(!hanging.carriedId);
       inspectionStart=hanging.carriedId===slot.painting.id?{slot,time:performance.now()}:null;
       onEvent('painting_inspect',{paintingId:slot.painting.id});return true;
     },

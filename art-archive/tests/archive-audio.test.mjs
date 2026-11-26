@@ -9,6 +9,7 @@ async function fixture(t){
  class Context{
   constructor(){this.state='running';this.currentTime=0;this.destination={output:true};this.sources=[];this.closeCount=0;contexts.push(this);}
   createGain(){return {gain:{value:0,setTargetAtTime(){},cancelScheduledValues(){}},connect(to){this.to=to;},disconnect(){}};}
+  createStereoPanner(){return {pan:{value:0},connect(to){this.to=to;},disconnect(){this.disconnected=true;}};}
   createBufferSource(){const source={connect(to){this.to=to;},disconnect(){},start(when=0){this.started=true;this.when=when;},stop(){this.stopped=true;},playbackRate:{value:1}};this.sources.push(source);return source;}
   decodeAudioData(url){return Promise.resolve({url,duration:1});}
   resume(){return Promise.resolve();}
@@ -82,4 +83,14 @@ function initialRms(file){
 test('the removal contact and placement chime have audible onsets within the first 80 ms',()=>{
  assert(initialRms('unmount.wav')>.02);
  assert(initialRms('correct-place.wav')>.015);
+});
+
+test('trolley and very heavy dragging are panned right while other cues remain centered',async t=>{
+ const {audio,context}=await fixture(t);
+ for(const kind of ['trolley','heavyDrag']){
+  audio.setMotion(kind);const source=context.sources.at(-1),pan=source.to.to;
+  assert.equal(pan.pan.value,.62);assert(pan.to.to===context.destination);
+  audio.setMotion(null);source.onended();assert(pan.disconnected);
+ }
+ audio.play('wood');assert.equal(context.sources.at(-1).to.to.pan,undefined);
 });

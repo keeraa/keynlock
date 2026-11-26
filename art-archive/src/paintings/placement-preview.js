@@ -157,11 +157,12 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
     }
     const layout=world.layout;
     // Park ahead, upright and facing the player even when the pickup ray points down.
-    const yaw=Math.atan2(-dir.x,-dir.z);
-    const turn=.93, halfWidth=slot.width/2;
-    const distance=1.2+Math.sin(turn)*halfWidth;
-    const side=halfWidth*Math.cos(turn)+.48;
-    const cartYaw=yaw-turn;
+    const yaw=world.carryYaw?.()??Math.atan2(-dir.x,-dir.z);
+    const turn=1.28, halfWidth=slot.width/2;
+    // Anchor the near end beside the player; the long edge extends forward.
+    const distance=.62+Math.sin(turn)*halfWidth;
+    const side=.68+halfWidth*Math.cos(turn);
+    const cartYaw=yaw+turn+Math.PI;
     let x=origin.x-Math.sin(yaw)*distance+Math.cos(yaw)*side,z=origin.z-Math.cos(yaw)*distance-Math.sin(yaw)*side;
     if(hall){
       const p=layout.local(hall,x,z);

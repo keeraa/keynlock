@@ -54,10 +54,13 @@ export function createArchiveAudio(layout){
     source.buffer=buffers.get(file);source.loop=loop;
     source.playbackRate.value=kind==='wood'||kind==='rug'?.98+Math.random()*.04:1;
     gain.gain.value=volume??levels[kind]??.4;
-    source.connect(gain);gain.connect(kind==='menu'?context.destination:master);
+    const pan=['trolley','heavyDrag'].includes(kind)&&context.createStereoPanner?context.createStereoPanner():null;
+    if(pan)pan.pan.value=.62;
+    source.connect(gain);
+    if(pan){gain.connect(pan);pan.connect(master);}else gain.connect(kind==='menu'?context.destination:master);
     const startAt=context.currentTime+delay;
     const voice={source,gain,kind,startAt,endAt:loop?Infinity:startAt+source.buffer.duration/source.playbackRate.value};voices.add(voice);
-    source.onended=()=>{voices.delete(voice);source.disconnect();gain.disconnect();onEnded?.();};
+    source.onended=()=>{voices.delete(voice);source.disconnect();gain.disconnect();pan?.disconnect();onEnded?.();};
     source.start(startAt);return voice;
   }
   function play(kind,volume=levels[kind],{after}={}){

@@ -155,6 +155,22 @@ export function createFrameMotion(THREE,config,layout){
         if(valid&&clear([path.at(-1),finish]))return [...path,finish];
       }
     }
+    if(pickup){
+      // First stand a room-wide floor canvas up at its own centre. Turning it
+      // while still flat sweeps its diagonal into both side walls.
+      const widthAxis=basis[0].clone().applyQuaternion(start.quaternion);
+      const upright=new THREE.Quaternion().setFromAxisAngle(basis[1],Math.atan2(-widthAxis.z,widthAxis.x));
+      const path=[start];let clearTilt=true;
+      for(let i=1;i<=32;i++){
+        const point=copy(start);point.quaternion.slerpQuaternions(start.quaternion,upright,i/32);
+        const volume=box(slot,point.position,point.quaternion),halfY=radiusOn(volume,basis[1]);
+        const floor=fy+supportHeightAt(point.position.x,point.position.z,point.position.y-fy,config);
+        point.position.y=Math.max(start.position.y,floor+halfY+.012*Math.sin(Math.PI*i/64));
+        if(point.position.y+halfY>fy+config.building.height||advance(slot,path.at(-1),point)!==1){clearTilt=false;break;}
+        path.push(point);
+      }
+      if(clearTilt){const rest=route(slot,path.at(-1),finish);if(rest)return [...path,...rest.slice(1)];}
+    }
     // Rotate clear of the floor and stacks, then lower the frame flat onto its support.
     const size=frameDimensions(slot,config.paintings),radius=Math.hypot(size.width/2,size.height/2,size.depth/2);
     if(lowArc){

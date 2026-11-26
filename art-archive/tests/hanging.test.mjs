@@ -677,6 +677,11 @@ test('E leaves a heavy painting on its current trolley when the reticle hits a d
  const source=session.find(slot.painting.id),fy=config.building.floorElevation;
  camera.position.set(source.x,fy+1.78,source.z+1);camera.lookAt(source.x,fy+source.y,source.z);assert(session.interact());
  for(let i=1;i<=40;i++){now+=40;session.update(true,now);}
+ const inspected=scene.getObjectByName('carried-painting'),heightBefore=inspected.position.y;
+ session.setInspecting(true);for(let i=0;i<40;i++){now+=40;session.update(true,now);}
+ assert(inspected.getObjectByName('painting-trolley').visible,'RMB must show the painting together with its carrier');
+ assert(Math.abs(inspected.position.y-heightBefore)<.02,'inspection must keep the wheels on the floor');
+ assert(session.inspectionTarget());session.setInspecting(false);
  const wall=layout.hangingWalls.find(w=>w.id==='cn/end');
  camera.lookAt((wall.a.x+wall.b.x)/2,fy+1.78,(wall.a.z+wall.b.z)/2);
  for(let i=41;i<=80;i++){now+=40;session.update(true,now);}

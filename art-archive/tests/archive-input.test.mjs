@@ -30,10 +30,10 @@ test('F only excludes on a deliberate hold; RMB inspects until release and cance
  assert.deepEqual(zoom,[false],'reset clears any aimed-camera zoom');
 });
 
-test('held RMB freezes mouse and edge look until release without a pointer jump',t=>{
+test('held RMB allows mouse look in locked and unlocked modes without a jump on release',t=>{
  const window=new EventTarget(),document=new EventTarget(),canvas=new EventTarget();document.querySelector=()=>null;
- const saved=[globalThis.window,globalThis.document,globalThis.Element];Object.assign(globalThis,{window,document,Element:class Element{}});
- t.after(()=>{[globalThis.window,globalThis.document,globalThis.Element]=saved;});
+ const saved=[globalThis.window,globalThis.document,globalThis.Element,globalThis.innerWidth,globalThis.innerHeight];Object.assign(globalThis,{window,document,Element:class Element{},innerWidth:1000,innerHeight:800});
+ t.after(()=>{[globalThis.window,globalThis.document,globalThis.Element,globalThis.innerWidth,globalThis.innerHeight]=saved;});
  const state={lastPointer:{x:10,y:10},edge:{until:100000}},turns=[];
  let locked=true,levels=0;
  const input=bindPlayerInput({canvas,player:{state,held:new Set(),turn:(...delta)=>turns.push(delta),level(){levels++;},zoom(){}},getMode:()=>'play',lock:{locked:()=>locked},
@@ -42,9 +42,9 @@ test('held RMB freezes mouse and edge look until release without a pointer jump'
  mouse(3,4);assert.deepEqual(turns,[[3,4]]);
  canvas.dispatchEvent(Object.assign(new Event('pointerdown'),{button:2}));assert.equal(state.edge.until,0);
  mouse(50,60);window.dispatchEvent(Object.assign(new Event('keydown'),{code:'KeyL',key:'l'}));
- assert.equal(turns.length,1);assert.equal(levels,0);
- locked=false;mouse(500,600);assert.equal(turns.length,1);
+ assert.deepEqual(turns[1],[50,60]);assert.equal(levels,1);
+ locked=false;mouse(500,600);mouse(502,603);assert.deepEqual(turns[2],[2,3]);
  window.dispatchEvent(Object.assign(new Event('pointerup'),{button:2}));
- mouse(501,601);assert.equal(turns.length,1,'first pointer after release only resets its origin');
- mouse(503,604);assert.deepEqual(turns[1],[2,3]);
+ mouse(501,601);assert.equal(turns.length,3,'first pointer after release only resets its origin');
+ mouse(503,604);assert.deepEqual(turns[3],[2,3]);
 });

@@ -167,11 +167,11 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       if(!interaction.placing)hint=text('E / ЛКМ — примерить на стене, положить на стол или отпустить · удерживайте ПКМ — рассмотреть','E / LMB — preview on wall, place on table or release · hold RMB — inspect');
       if(hit&&!reachable)placementFailure='out_of_reach';
       if(hit && !reachable)hint=interaction.placing?text('Подойдите ближе · установка до 6 м','Move closer · placement within 6 m'):large?text('E / ЛКМ — оставить картину на тележке','E / LMB — leave the painting on its trolley'):text('E / ЛКМ — короткий бросок в этом направлении','E / LMB — short throw in this direction');
-      if(!inspectionHeld && interaction.placing && reachable){
+      if(!inspectionHeld && !interaction.raised && reachable){
         const w=hit.wall,limits=wallSettings(w),half=frameDimensions(interaction.carrying,settings).height/2;
         const aimX=hit.along;
         const aimY=clamp(hit.y,limits.minBottomM+half,limits.maxTopM-half);
-        if(!cursor)preview.beginWall(now);
+        if(!cursor&&interaction.placing)preview.beginWall(now);
         if(cursor?.wall!==w)cursor={wall:w,x:aimX,y:aimY,time:now};
         const k=1-Math.exp(-24*Math.max(0,now-cursor.time)/1000);
         cursor.x+=(aimX-cursor.x)*k;cursor.y+=(aimY-cursor.y)*k;cursor.time=now;
@@ -192,8 +192,8 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
           target=fitted
             ??(snap?tryPosition(snap.x,snap.y):null)??tryPosition(cursor.x,cursor.y);
         }
-        preview.wall(interaction.carrying,w,target?.along??cursor.x,target?.y??cursor.y,Boolean(target),large,now);
-        hint=target?action+text(' — повесить',' — hang'):text('Рама не помещается или место занято','Frame does not fit or the space is occupied');
+        if(interaction.placing||target)preview.wall(interaction.carrying,w,target?.along??cursor.x,target?.y??cursor.y,Boolean(target),large,now,!interaction.placing);
+        hint=target?action+(interaction.placing?text(' — повесить',' — hang'):text(' — поднести к стене',' — move to the wall')):text('Рама не помещается или место занято','Frame does not fit or the space is occupied');
         if(!freePlacement&&interaction.carrying.painting.collection==='keynlock')
           hint=text('Эту работу можно оставить на столе или отнести к приёмнику','Leave this work on a table or take it to the receiver');
         else if(!correctHall)hint=text('Нужен зал «','Required hall “')+t(destHall?.title??'Ротонда')+text('»','”');

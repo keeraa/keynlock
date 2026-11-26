@@ -690,3 +690,22 @@ test('E leaves a heavy painting on its current trolley when the reticle hits a d
  assert(events.some(e=>e.name==='painting_drop'&&e.surface==='trolley'));
  assert(!events.some(e=>e.name==='painting_recovered'||e.name==='placement_failed'&&e.reason==='out_of_reach'));
 });
+
+test('aiming a carried painting at a suitable wall shows its dashed ghost before pressing E',t=>{
+ const memory=new Map();globalThis.window={};globalThis.localStorage={getItem:k=>memory.get(k),setItem:(k,v)=>memory.set(k,v)};
+ t.after(()=>{delete globalThis.window;delete globalThis.localStorage;});
+ const slot=page.find(s=>s.wall.hall==='cn'&&s.height<.85),wall=layout.hangingWalls.find(w=>w.id==='cn/end'),n=wall.normal,fy=config.building.floorElevation;
+ const camera=new THREE.PerspectiveCamera(),scene=new THREE.Scene();
+ const session=createHangingSession({THREE,world:{camera,scene,layout},config,label:{},display:{setSlots(){}}});t.after(()=>session.dispose());
+ session.setPage([slot]);session.setActive(true);const source=session.find(slot.painting.id);
+ camera.position.set(source.x,fy+1.7,source.z+1);camera.lookAt(source.x,fy+source.y,source.z);assert(session.interact());
+ const x=(wall.a.x+wall.b.x)/2,z=(wall.a.z+wall.b.z)/2;
+ const aim=distance=>{camera.position.set(x+n.x*distance,fy+1.7,z+n.z*distance);camera.lookAt(x,fy+2,z);session.update(true);};
+ aim(3);assert.equal(session.phase,'carrying');assert(scene.getObjectByName('table-placement-preview').visible);
+ assert(scene.getObjectByName('table-placement-outline').visible);assert(scene.getObjectByName('carried-painting').visible);
+ assert(!scene.getObjectByName('wall-preview').visible,'the hint must not become the real held pose or the origin of a throw');
+ session.setInspecting(true);session.update(true);assert(!scene.getObjectByName('table-placement-preview').visible);
+ session.setInspecting(false);aim(3);assert(scene.getObjectByName('table-placement-preview').visible);
+ aim(10);assert(!scene.getObjectByName('table-placement-preview').visible,'no unreachable placement hint');assert.equal(memory.size,0);
+ aim(3);session.interact();session.interact();assert.equal(session.find(slot.painting.id).wall.id,wall.id);
+});

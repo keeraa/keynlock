@@ -21,6 +21,12 @@ export function paperPalette(THREE,hallColor){
   ];
 }
 
+export function placementWatercolorOptions(THREE,mode,hallColor){
+ return {appearance:mode,...(mode==='paper'
+   ?{substeps:3,emissionDuration:.95,palette:paperPalette(THREE,hallColor)}
+   :{pressureIterations:7,...(mode==='smoke'?{palette:paperPalette(THREE,hallColor)}:{})})};
+}
+
 export function createWatercolorPlacement(THREE,scene,renderer,config){
   let runtime=null,blank=null,result=null,mesh=null,start=-Infinity,last=-Infinity;
   let pending=0,selected='classic',runtimeColor=null;
@@ -41,7 +47,7 @@ export function createWatercolorPlacement(THREE,scene,renderer,config){
   async function show(slot,now,hallColor){
     const mode=selected;
     if(mode==='classic'||!renderer?.isWebGLRenderer||unsupported.has(mode))return false;
-    const color=mode==='paper'?hallColor??null:null;
+    const color=mode==='paper'||mode==='smoke'?hallColor??null:null;
     if(runtime && runtimeColor!==color)clear();
     const ticket=++pending;
     const size=frameDimensions(slot,config.paintings);
@@ -49,7 +55,7 @@ export function createWatercolorPlacement(THREE,scene,renderer,config){
     try{
       if(!runtime){
         const created=await createWatercolorEffect({THREE,renderer,width:width*180,height:height*180,resolution,
-          options:{appearance:mode,...(mode==='paper'?{substeps:3,emissionDuration:.95,palette:paperPalette(THREE,color)}:{pressureIterations:7})}});
+          options:placementWatercolorOptions(THREE,mode,color)});
         if(ticket!==pending){created.dispose();return true;}
         runtime=created;runtimeColor=color;
         const target=()=>new THREE.WebGLRenderTarget(320,320,{depthBuffer:false});

@@ -16,3 +16,12 @@ test('paper watercolor keeps the hall color and four related shades dominant',()
   assert(distance.slice(5).every(d=>d>.09));
  }
 });
+
+test('original watercolor smoke uses the same hall-dominant palette as paper and keeps its fluid solver',async()=>{
+ const {placementWatercolorOptions}=await import('../src/paintings/watercolor-placement.js');
+ for(const color of ['#548791','#7b608e','#5c8066']){
+  const smoke=placementWatercolorOptions(THREE,'smoke',color),paper=placementWatercolorOptions(THREE,'paper',color);
+  assert.deepEqual(smoke.palette,paper.palette);assert.equal(smoke.palette[0],color);
+  assert.equal(smoke.appearance,'smoke');assert.equal(smoke.pressureIterations,7);assert.equal(smoke.substeps,undefined);
+ }
+});

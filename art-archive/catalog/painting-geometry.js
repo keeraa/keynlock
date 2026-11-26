@@ -34,3 +34,10 @@ export function clippedFrameCorners(x,y,cut){
  return [[-x+cut,-y],[x-cut,-y],[x,-y+cut],[x,y-cut],
   [x-cut,y],[-x+cut,y],[-x,y-cut],[-x,-y+cut]];
 }
+
+// Stable random choice keeps the same wood when a work changes scene pose or LOD.
+export function frameTextureIndex(painting){
+ let hash=2166136261;
+ for(const char of painting.id)hash=Math.imul(hash^char.charCodeAt(0),16777619);
+ return (hash>>>0)%3;
+}

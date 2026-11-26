@@ -1,11 +1,11 @@
 import {paintingSections} from './display-sections.js';
 import {createRoomIndex} from '../rendering/room-index.js';
 import {reproductionFit} from '../../catalog/reproduction-fit.js';
-import {frameDimensions,frameOrientation,mountedFrame,frameCornerCut,clippedFrameCorners} from '../../catalog/painting-geometry.js';
+import {frameDimensions,frameTextureIndex,frameOrientation,mountedFrame,frameCornerCut,clippedFrameCorners} from '../../catalog/painting-geometry.js';
 import {createDecalGeometry,createDecalMaterial} from '../rendering/surface-decals.js';
 // One textured mesh covers the active exhibition, including pictures beyond the detail budget.
 export function overviewGeometry(THREE, slots, atlas, settings, sections=null, hiddenFaces=null) {
-  const positions = [], uvs = [], surface = [], back = [], colors = [], halls = [], indices = [];
+  const positions = [], uvs = [], surface = [], back = [], colors = [], halls = [], styles = [], indices = [];
   function face(slot,corners,width,height,depth,u0,v0,u1,v1,grain=0,rear=false){
     const first=positions.length/3,{x,y,z}=slot,{c,s,cp,sp}=frameOrientation(slot);
     for(const [across,vertical] of corners){
@@ -52,8 +52,9 @@ export function overviewGeometry(THREE, slots, atlas, settings, sections=null, h
       }
       const hall=slot.destination?.split('/')[0]??slot.painting.placement?.hall;
       const color=new THREE.Color(settings.hallColors?.[hall]??(hall==='center'?'#d8b766':'#594335'));
+      const frameStyle=frameTextureIndex(slot.painting);
       const frameHall=mountedFrame(slot)?settings.hallIndices?.[slot.wall?.hall]??0:0;
-      for(let i=colorStart;i<positions.length/3;i++){colors.push(color.r,color.g,color.b);halls.push(frameHall);}
+      for(let i=colorStart;i<positions.length/3;i++){colors.push(color.r,color.g,color.b);halls.push(frameHall);styles.push(frameStyle);}
     }
     section.end=indices.length;
     if(sections){
@@ -68,6 +69,7 @@ export function overviewGeometry(THREE, slots, atlas, settings, sections=null, h
   geometry.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));
   geometry.setAttribute('archiveSurface',new THREE.Float32BufferAttribute(surface,3));
   geometry.setAttribute('archiveHallColor',new THREE.Float32BufferAttribute(colors,3));
+  geometry.setAttribute('archiveFrameStyle',new THREE.Float32BufferAttribute(styles,1));
   geometry.setAttribute('archiveFrameHall',new THREE.Float32BufferAttribute(halls,1));
   geometry.setAttribute('archiveBack',new THREE.Float32BufferAttribute(back,3));
   geometry.setIndex(indices);

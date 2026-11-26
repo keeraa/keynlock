@@ -120,3 +120,21 @@ test('starting and resuming after the exhibition changes keeps the player outsid
  player.held.add('d');player.update(.04,32,true);
  assert(camera.position.distanceTo(start)>.1);
 });
+
+test('random frame finishes remain identical in the atlas, detailed front and back after moving a work',async()=>{
+ const catalog=JSON.parse(fs.readFileSync(new URL('../catalog/manifest.json',import.meta.url)));
+ const counts=[0,0,0];
+ const {frameTextureIndex}=await import('../catalog/painting-geometry.js');
+ for(const p of catalog.paintings)counts[frameTextureIndex(p)]++;
+ assert(counts.every(n=>n>catalog.paintings.length*.25),'all three finishes are well represented');
+ for(let style=0;style<3;style++){
+  const p={...painting,id:catalog.paintings.find(p=>frameTextureIndex(p)===style).id};
+  const view=await createPaintingObject({THREE,painting:p,imageUrl:'preview',gouache:{apply(){}},loader:{loadAsync:async()=>new THREE.Texture({width:300,height:200})}});
+  for(const pose of [{x:0,y:1,z:0,normal:{x:0,z:1}},{x:5,y:.025,z:3,floorAngle:1.2,normal:{x:1,z:0}}]){
+   const distant=overviewGeometry(THREE,[{painting:p,width:3.135,height:2,...pose}],{columns:2,rows:2,cellSize:64,gutter:2},config.paintings);
+   assert([...distant.attributes.archiveFrameStyle.array].every(n=>n===style));distant.dispose();
+  }
+  view.object.traverse(mesh=>{if(mesh.isMesh)assert([...mesh.geometry.attributes.archiveFrameStyle.array].every(n=>n===style));});
+  view.dispose();
+ }
+});

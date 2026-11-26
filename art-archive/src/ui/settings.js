@@ -27,7 +27,7 @@ export function bindPlayerSettings({player,painted,elements,collection,dust,ink,
   fpsLimit.checked=saved?.limitFps===true;
   setFrameLimit(fpsLimit.checked);
   depth.checked=saved?.distanceBlur ?? VISUAL_DEFAULTS.distanceBlurEnabled;
-  finish.value=GOUACHE_STYLES.includes(saved?.gouache) ? saved.gouache : GOUACHE_STYLES[0];
+  finish.value=saved?.frameTextureMode===1&&GOUACHE_STYLES.includes(saved?.gouache) ? saved.gouache : 'mixed';
   const sky=elements('sky-color');
   setWallFinish('white');
   sky.value=/^#[0-9a-f]{6}$/i.test(saved?.skyColor)?saved.skyColor:'#75a3bd';
@@ -35,7 +35,7 @@ export function bindPlayerSettings({player,painted,elements,collection,dust,ink,
   life.listen(sky,'input',()=>{setSkyColor(sky.value);save();});
   function save() {
     writeJson(STORAGE_KEYS.player,{skyColor:sky.value,sensitivity:player.state.sensitivity,toon:toon.checked,
-      distanceBlur:depth.checked,gouache:finish.value,canvasPigment:pigment.checked,hardMode:hard.checked,
+      distanceBlur:depth.checked,gouache:finish.value,frameTextureMode:1,canvasPigment:pigment.checked,hardMode:hard.checked,
       limitFps:fpsLimit.checked,placementEffect:placement.value,freePlacement:free.checked});
   }
   function lighting() {

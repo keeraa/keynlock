@@ -1,5 +1,5 @@
 import {reproductionFit} from './reproduction-fit.js';
-import {paintingSize,frameCornerCut,clippedFrameCorners} from './painting-geometry.js';
+import {paintingSize,frameTextureIndex,frameCornerCut,clippedFrameCorners} from './painting-geometry.js';
 /** Three.js r187-compatible adapter, without an implicit dependency on a specific Three build. */
 export class PaintingTexturePool {
   constructor({idleBytes=0, idleMs=30000}={}) {
@@ -111,6 +111,7 @@ export async function createPaintingObject({
     const color=new THREE.Color(frameHallColor),values=[];
     for(let i=0;i<geometry.attributes.position.count;i++)values.push(color.r,color.g,color.b);
     geometry.setAttribute('archiveHallColor',new THREE.Float32BufferAttribute(values,3));
+    geometry.setAttribute('archiveFrameStyle',new THREE.BufferAttribute(new Float32Array(geometry.attributes.position.count).fill(frameTextureIndex(painting)),1));
   }
   hallColor(canvas.geometry);
   // Fill the measured canvas without stretching a slightly cropped or padded preview.

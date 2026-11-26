@@ -94,13 +94,13 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
   function beginWall(now){
     wallFlight={position:root.position.clone(),quaternion:root.quaternion.clone(),start:now};
   }
-  function wall(slot,w,along,y,valid,large,now){
-    ghost.visible=true;
+  function wall(slot,w,along,y,valid,large,now,hintOnly=false){
+    ghost.visible=!hintOnly;
     const depth=settings.wallClearanceM+settings.frameDepthM/2+(valid?0:.035);
     ghost.position.set(w.a.x+(w.b.x-w.a.x)*along/w.length+w.normal.x*depth,config.building.floorElevation+y,
       w.a.z+(w.b.z-w.a.z)*along/w.length+w.normal.z*depth);
     ghost.rotation.set(0,Math.atan2(w.normal.x,w.normal.z),0);
-    if(wallFlight){
+    if(wallFlight&&!hintOnly){
       const t=Math.max(0,Math.min(1,(now-wallFlight.start)/360));
       ghost.position.lerp(wallFlight.position,1-smooth(t));
       ghost.quaternion.slerp(wallFlight.quaternion,1-smooth(t));

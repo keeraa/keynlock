@@ -174,10 +174,12 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
     const layout=world.layout;
     // Park ahead, upright and facing the player even when the pickup ray points down.
     const yaw=world.carryYaw?.()??Math.atan2(-dir.x,-dir.z);
-    const turn=.65, halfWidth=slot.width/2;
-    // Keep the centre close and show the face across the view. The near edge
-    // extends toward the lower right instead of pointing away like a blade.
-    const distance=.45+Math.sin(turn)*halfWidth,side=.35;
+    const halfWidth=slot.width/2,baseTurn=.65,pull=.30;
+    // Pull the near edge 30 cm toward the player, keeping its rightward position
+    // and the far edge's depth instead of just sliding the whole canvas.
+    const turn=Math.asin(Math.min(.94,Math.sin(baseTurn)+pull/slot.width));
+    const distance=.45+Math.sin(baseTurn)*halfWidth-pull/2;
+    const side=.35+(Math.cos(baseTurn)-Math.cos(turn))*halfWidth;
     let cartYaw=yaw-turn;
     let x=origin.x-Math.sin(yaw)*distance+Math.cos(yaw)*side,z=origin.z-Math.cos(yaw)*distance-Math.sin(yaw)*side;
     if(inspectHeavy)cartYaw=Math.atan2(eye.position.x-x,eye.position.z-z);

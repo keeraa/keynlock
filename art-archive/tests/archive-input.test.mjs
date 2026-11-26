@@ -59,3 +59,29 @@ test('a short E press still commits when automatic wall preview starts between k
  const key=type=>window.dispatchEvent(Object.assign(new Event(type),{code:'KeyE',key:'e'}));
  key('keydown');canRaise=false;key('keyup');assert.equal(commits,1,'preview entering its placing phase must not swallow this input');
 });
+
+test('RMB pointer dragging turns the actual inspection camera, with no doubled compatibility mouse events',async t=>{
+ const THREE=await import('../vendor/three.js'),{createPlayerController}=await import('../src/player/controller.js');
+ const window=new EventTarget(),document=new EventTarget(),canvas=new EventTarget();document.querySelector=()=>null;
+ const saved=[globalThis.window,globalThis.document,globalThis.Element,globalThis.innerWidth,globalThis.innerHeight];
+ Object.assign(globalThis,{window,document,Element:class Element{},innerWidth:1000,innerHeight:800});
+ t.after(()=>{[globalThis.window,globalThis.document,globalThis.Element,globalThis.innerWidth,globalThis.innerHeight]=saved;});
+ const camera=new THREE.PerspectiveCamera(73,1.5);camera.position.set(0,9.78,20);
+ const player=createPlayerController({THREE,camera,config:{building:{floorElevation:8}},navigation:{obstacleRevision:0,move:(p,h,y,d,f)=>({floorY:f})}});
+ let locked=false,requests=0,now=1000;
+ const target={position:new THREE.Vector3(1,9.4,18),height:2.5};
+ const input=bindPlayerInput({canvas,player,getMode:()=>'play',lock:{locked:()=>locked,request(){requests++;}},hideProgress:{},
+  actions:{inspect(value){player.lookAtCarry(value?target:null);return true;},raise(){}}});t.after(()=>input.dispose());
+ const advance=()=>{for(let i=0;i<90;i++){now+=16;player.update(.016,now,true);}};
+ const move=(type,x,y,dx,dy)=>{const event=Object.assign(new Event(type),{clientX:x,clientY:y,movementX:dx,movementY:dy,buttons:2});document.dispatchEvent(event);return event;};
+ canvas.dispatchEvent(Object.assign(new Event('pointerdown',{cancelable:true}),{button:2}));assert.equal(requests,1);
+ advance();move('pointermove',600,400,0,0);const before=camera.rotation.y;
+ const pointer=move('pointermove',760,450,160,50);
+ const compatibility=Object.assign(new Event('mousemove'),{clientX:760,clientY:450,movementX:160,movementY:50});
+ Object.defineProperty(compatibility,'timeStamp',{value:pointer.timeStamp});document.dispatchEvent(compatibility);
+ advance();const speed=player.state.sensitivity*.000145;
+ assert(Math.abs(camera.rotation.y-before+160*speed)<.001,'drag rotates once, not zero or twice');assert.equal(player.state.yaw,0);
+ locked=true;const prior=camera.rotation.y;move('pointermove',760,450,40,-20);advance();
+ assert(Math.abs(camera.rotation.y-prior+40*speed)<.001,'pointer-lock drag also remains responsive');
+ window.dispatchEvent(Object.assign(new Event('pointerup'),{button:2}));advance();assert(Math.abs(camera.rotation.y)<.001);
+});

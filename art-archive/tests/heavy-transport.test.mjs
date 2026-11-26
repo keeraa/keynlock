@@ -26,7 +26,7 @@ test('The Last Supper can turn around and leave a gallery at its real 880 by 460
  for(let i=0;i<=160;i++){yaw=hall.angle+Math.PI*(1-i/160);follow();}
  for(let i=0;i<120;i++)follow();
  assert(!motion.blocked(slot,root.position,root.quaternion));
- assert(root.quaternion.angleTo(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),yaw-.65))<.02,'turn must finish rather than stick against a wall');
+ assert(root.quaternion.angleTo(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),yaw-Math.asin(Math.sin(.65)+.30/slot.width)))<.02,'turn must finish rather than stick against a wall');
  for(let i=0;i<450;i++){
   const before=camera.position.clone();nav.move(camera.position,new Set(['w']),yaw,.016,0);
   camera.position.lerpVectors(before,camera.position,preview.constrainMovement(before,camera.position));follow();
@@ -54,7 +54,7 @@ for(const [width,height] of [[2.3,2.5],[8.8,4.6]])test(`the ${width}m trolley st
  assert(cart.visible);
  const near=new THREE.Vector3(slot.width/2,0,0).applyQuaternion(root.quaternion).add(root.position).sub(camera.position);
  near.applyAxisAngle(new THREE.Vector3(0,1,0),-player.state.yaw);
- assert(near.x>width*.35&&near.z<-.3&&near.z>-.6,'the near edge must move farther right while its depth stays close');
+ assert(near.x>width*.35&&near.z<-.08&&near.z>-.25,'the near edge must move farther right while its depth stays close');
  const center=root.position.clone().sub(camera.position).applyAxisAngle(new THREE.Vector3(0,1,0),-player.state.yaw);
  assert(center.x>.2&&center.x<.6);assert(-center.z<width*.4+.5,'centre is closer than the previous edge-on transport');
  const facing=()=>new THREE.Vector3(0,0,1).applyQuaternion(root.quaternion).dot(camera.position.clone().sub(root.position).setY(0).normalize());

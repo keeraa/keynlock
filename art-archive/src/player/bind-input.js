@@ -46,9 +46,10 @@ export function bindPlayerInput({canvas,player,getMode,lock,actions,hideProgress
  life.own(()=>clearTimeout(timer));
  life.listen(canvas,'contextmenu',e=>{if(getMode()==='play')e.preventDefault();});
  life.listen(canvas,'pointerdown',e=>{
-  if(e.button===2&&getMode()==='play'){e.preventDefault();inspecting=actions.inspect(true)!==false;if(inspecting&&state){state.lastPointer=null;state.edge.until=0;}}
+  if(e.button===2&&getMode()==='play'){e.preventDefault();lock.request?.();inspecting=actions.inspect(true)!==false;if(inspecting&&state){state.lastPointer=null;state.edge.until=0;}}
  });
- life.listen(document,'mousemove',e=>{
+ let lastPointerMotion=null;
+ function moveLook(e){
   if(getMode()!=='play')return;
   if(lock.locked()){state.edge.until=0;player.turn(e.movementX,e.movementY);}
   else{
@@ -57,6 +58,12 @@ export function bindPlayerInput({canvas,player,getMode,lock,actions,hideProgress
    const rate=(p,total)=>p<total*.1?-(1-p/(total*.1)):p>total*.9?(p-total*.9)/(total*.1):0;
    state.edge={x:lock.unavailable?rate(e.clientX,innerWidth):0,y:lock.unavailable?rate(e.clientY,innerHeight):0,until:performance.now()+160};
   }
+ }
+ life.listen(document,'pointermove',e=>{lastPointerMotion={time:e.timeStamp,x:e.clientX,y:e.clientY,dx:e.movementX,dy:e.movementY};moveLook(e);});
+ life.listen(document,'mousemove',e=>{
+  const p=lastPointerMotion;
+  if(p&&Math.abs(e.timeStamp-p.time)<8&&e.clientX===p.x&&e.clientY===p.y&&e.movementX===p.dx&&e.movementY===p.dy)return;
+  moveLook(e);
  });
  life.listen(document,'mouseleave',()=>{state.lastPointer=null;state.edge.until=0;});
  life.listen(canvas,'pointerdown',e=>{if(getMode()==='play'&&!inspecting&&e.button===0){lock.request();if(!holdWall('mouse')){actions.interact();resetGesture();}}});

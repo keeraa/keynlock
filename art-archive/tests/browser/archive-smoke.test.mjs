@@ -3,7 +3,7 @@ import test,{before,after} from 'node:test';
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 import {spawn} from 'node:child_process';
-import {mkdir} from 'node:fs/promises';
+import {mkdir,writeFile} from 'node:fs/promises';
 import {once} from 'node:events';
 import {fileURLToPath} from 'node:url';
 const cwd=fileURLToPath(new URL('../../',import.meta.url));
@@ -17,15 +17,26 @@ before(async()=>{
 },{timeout:60000});
 after(async()=>{if(server&&server.exitCode===null){server.kill();await once(server,'exit');}});
 async function open(t,art){
- const browser=await chromium.launch({headless:true,args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
- const context=await browser.newContext({viewport:{width:1280,height:720}}),page=await context.newPage(),errors=[];
+ const browser=await chromium.launch({headless:true,args:['--enable-webgl','--mute-audio','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+ const context=await browser.newContext({locale:'ru-RU',viewport:{width:1280,height:720}}),page=await context.newPage(),errors=[];
  page.on('pageerror',error=>errors.push(error.message));
+ await page.addInitScript(()=>{
+  // Exercise the supported fallback used by embedded browsers. Pointer-lock
+  // mouse movement must not turn the camera while clicking menu controls.
+  HTMLCanvasElement.prototype.requestPointerLock=undefined;
+  if(!localStorage.getItem('keynlock-art-archive-controls-v1'))localStorage.setItem('keynlock-art-archive-controls-v1',JSON.stringify({limitFps:true}));
+ });
  t.after(async()=>{
   try{
    // A live software-WebGL frame can delay readback. Capture the stable pause
    // view, and always release GPU resources even if capture itself fails.
-   if(!await page.locator('#pause').isVisible())await page.locator('#pause-btn').click({timeout:5000});
+   if(!await page.locator('#pause').isVisible())await page.keyboard.press('p');
    await mkdir(new URL('../../test-results/',import.meta.url),{recursive:true});
+   await writeFile(cwd+'/test-results/'+art+'.html',await page.content());
+   await writeFile(cwd+'/test-results/'+art+'.errors.json',JSON.stringify(errors));
+   // Freeze only after every gameplay assertion: let software WebGL finish the
+   // last frame instead of queuing new frames while capture waits for readback.
+   await page.evaluate(()=>{window.requestAnimationFrame=()=>0;});
    await page.screenshot({path:cwd+'/test-results/'+art+'.png',timeout:60000});
   }finally{await context.close();await browser.close();}
   assert.deepEqual(errors,[]);
@@ -44,12 +55,10 @@ test('pause shows the exact build and preserves visual defaults without a retire
  assert.equal(await page.locator('#toon').isChecked(),false);
  assert.equal(await page.locator('#placement-effect').inputValue(),'smoke');
  assert.equal(await page.locator('#distance-blur').count(),0);
- await page.locator('#fps-limit').check();
  await page.locator('#resume-btn').click();await page.locator('#pause').waitFor({state:'hidden'});
 });
 test('a heavy painting can be picked up, inspected, parked and restored after reload',{timeout:240000},async t=>{
  const page=await open(t,'ART-1548');
- await page.locator('#pause-btn').click();await page.locator('#fps-limit').check();await page.locator('#resume-btn').click();
  await page.keyboard.press('e');await page.keyboard.press('l');
  await page.locator('#painting-controls').getByText(/оставить картину на тележке/).waitFor({timeout:30000});
  await page.mouse.down({button:'right'});await page.mouse.move(700,330,{steps:8});await page.mouse.up({button:'right'});

@@ -86,11 +86,11 @@ test('original-size frames have guaranteed gaps on all three rows and every exhi
  }
 });
 
-test('miniatures hang in low pairs and frames sit against the plaster face',()=>{
+test('miniatures share compact columns of up to three rows and frames sit against the plaster face',()=>{
  const result=arrange(seed),s=config.paintings, page=result.slots(0);
  const small=page.filter(p=>!p.wall.centerComposition && Math.max(p.painting.physicalSizeM.width,p.height)<=s.smallCanvasM);
  assert(small.length>2);
- assert(small.every(p=>p.tier===1 && p.y+p.height/2+s.frameWidthM <= s.minBottomM+2*(s.smallCanvasM+2*s.frameWidthM)+s.verticalGapM+1e-8));
+ assert(small.every(p=>p.tier<=s.tiers && p.y+p.height/2+s.frameWidthM <= s.maxTopM+1e-8));
  assert(small.some(a=>small.some(b=>a!==b && a.x===b.x && a.z===b.z &&
    Math.abs(Math.abs(a.y-b.y)-(a.height+b.height)/2-2*s.frameWidthM-s.verticalGapM)<1e-8)));
  for(const slot of result.byId.values()){
@@ -282,11 +282,11 @@ test('Composition VII and the pair below share the rotunda panel’s vertical ax
  assert(Math.abs(lower[0].y-lower[1].y)<1e-7);
 });
 
-test('wing rows grow by canvas area from the viewer’s left to right, with only the largest eligible work on the rear wall',()=>{
+test('all rows of each wing column precede larger columns from the viewer’s left to right, with the largest work on the rear wall',()=>{
  const e=arrange(seed),area=s=>s.painting.physicalSizeM.width*s.height;
  for(let i=0;i<e.pageCount;i++){
   const slots=e.slots(i).filter(s=>s.wall.hall!=='center'&&!s.supportId);
-  for(const row of Map.groupBy(slots,s=>s.wall.id+'/'+s.tier).values()){
+  for(const row of Map.groupBy(slots,s=>s.wall.id).values()){
    const right=s=>(s.x-s.wall.a.x)*s.wall.normal.z-(s.z-s.wall.a.z)*s.wall.normal.x;
    for(const a of row)for(const b of row)if(right(b)-right(a)>1e-6)
     assert(area(a)<=area(b)+1e-7,a.painting.id+' is larger than its right neighbour '+b.painting.id);
@@ -295,5 +295,20 @@ test('wing rows grow by canvas area from the viewer’s left to right, with only
    const end=slots.filter(s=>s.wall.id===h.id+'/end');
    assert.equal(end.length,1);assert.equal(end[0].featured,true);
   }
+ }
+});
+
+test('small works use three-row columns and large side-wall works remain available in the active exhibition',()=>{
+ const e=arrange(seed),area=s=>s.painting.physicalSizeM.width*s.height;
+ const sides=[...e.byId.values()].filter(s=>s.wall.hall!=='center'&&s.wall.theme!=='end'&&!s.supportId);
+ for(const works of Map.groupBy(sides,s=>s.wall.id).values()){
+  const anchor=works.reduce((a,b)=>area(a)>area(b)?a:b);
+  for(let i=0;i<e.pageCount;i++)assert(e.slots(i).includes(anchor),'largest side work disappeared from page '+i+': '+anchor.painting.id);
+ }
+ const small=e.slots(0).filter(s=>s.wall.hall!=='center'&&s.wall.theme!=='end'&&!s.supportId&&area(s)<=config.paintings.smallCanvasM**2);
+ const columns=Map.groupBy(small,s=>s.wall.id+'/'+s.x.toFixed(6)+'/'+s.z.toFixed(6));
+ assert([...columns.values()].some(column=>column.length===3&&new Set(column.map(s=>s.y)).size===3));
+ for(const hall of config.halls){
+  assert(e.slots(0).some(s=>s.wall.hall===hall.id&&!s.supportId&&Math.max(s.painting.physicalSizeM.width,s.height)>=2),hall.id+' has no large painting places');
  }
 });

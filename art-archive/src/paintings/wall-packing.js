@@ -211,66 +211,81 @@ export function arrangeWall(wall, works, settings, byId, reserveReasons, feature
   });
 }
 
-// Wing walls read left-to-right as seen from inside the room. Keep columns in
-// increasing canvas area; small pairs stay low, with the larger item above.
+// Size zones run horizontally, while each zone uses several vertical rows.
+// Keep a large side-wall anchor on the active page instead of filling it with
+// small works and sending every large canvas to a later exhibition.
 function arrangeSizeOrderedWall(wall,works,settings,byId,reserveReasons,featured){
- const {min,max}=wallRange(wall,settings),frame=settings.frameWidthM;
+ const {min,max}=wallRange(wall,settings),frame=settings.frameWidthM,gap=settings.horizontalGapM;
+ const availableHeight=settings.maxTopM-settings.minBottomM;
  const areaOrder=(a,b)=>canvasArea(a)-canvasArea(b)||a.painting.id.localeCompare(b.painting.id);
- const small=work=>Math.max(work.painting.physicalSizeM.width,work.height)<=settings.smallCanvasM;
- const groups=[],sorted=[...works].sort(areaOrder);
- for(let i=0;i<sorted.length;i++){
-  const items=[sorted[i]];
-  if(small(sorted[i])&&sorted[i+1]&&small(sorted[i+1]))items.push(sorted[++i]);
-  groups.push({items,width:Math.max(...items.map(w=>w.width)),
-   height:items.reduce((sum,w)=>sum+w.height+2*frame,0)+(items.length-1)*settings.verticalGapM,
-   lowOnly:items.every(small)});
- }
- const pages=[];
- if(featured)pages.push([{items:[featured],width:featured.width,height:featured.height+2*frame,bottom:settings.minBottomM,tier:1}]);
- let rows=[],row=null;
- function flush(){if(rows.length)pages.push(rows.flatMap(r=>r.groups));rows=[];row=null;}
- for(const group of groups){
-  if(group.width>max-min+1e-7||group.height>settings.maxTopM-settings.minBottomM+1e-7){
-   for(const w of group.items)reserveReasons.set(w.painting.id,'oversize');continue;
-  }
-  if(!row)row={bottom:settings.minBottomM,tier:1,width:0,height:0,groups:[]};
-  if(group.lowOnly&&row.tier>1){
-   if(row.groups.length)rows.push(row);flush();row={bottom:settings.minBottomM,tier:1,width:0,height:0,groups:[]};
-  }
-  if(row.groups.length&&row.width+settings.horizontalGapM+group.width>max-min+1e-7){
-   rows.push(row);
-   const bottom=row.bottom+row.height+settings.verticalGapM,tier=row.tier+1;
-   if(group.lowOnly||tier>settings.tiers||bottom+group.height>settings.maxTopM+1e-7){flush();row={bottom:settings.minBottomM,tier:1,width:0,height:0,groups:[]};}
-   else row={bottom,tier,width:0,height:0,groups:[]};
-  }
-  if(row.bottom+group.height>settings.maxTopM+1e-7){
-   if(row.groups.length)rows.push(row);flush();row={bottom:settings.minBottomM,tier:1,width:0,height:0,groups:[]};
-  }
-  row.width+=(row.groups.length?settings.horizontalGapM:0)+group.width;
-  row.height=Math.max(row.height,group.height);
-  row.groups.push({...group,bottom:row.bottom,tier:row.tier});
- }
- if(row?.groups.length)rows.push(row);flush();
- const depth=settings.frameDepthM/2+settings.wallClearanceM;
- const dx=(wall.b.x-wall.a.x)/wall.length,dz=(wall.b.z-wall.a.z)/wall.length;
- const forward=dx*wall.normal.z-dz*wall.normal.x>0;
- return pages.map((page,index)=>{
-  const result=[];
-  for(const row of Map.groupBy(page,g=>g.tier).values()){
-   const width=row.reduce((sum,g)=>sum+g.width,0)+(row.length-1)*settings.horizontalGapM;
-   let left=(min+max-width)/2;
-   for(const group of row){
-    const center=left+group.width/2,along=forward?center:min+max-center;
-    let bottom=group.bottom;
-    for(const work of group.items){
-     const slot={...work,wall,normal:wall.normal,page:index,tier:group.tier,featured:work===featured,
-      x:wall.a.x+dx*along+wall.normal.x*depth,z:wall.a.z+dz*along+wall.normal.z*depth,
-      y:bottom+frame+work.height/2};
-     result.push(slot);byId.set(work.painting.id,slot);
-     bottom+=work.height+2*frame+settings.verticalGapM;
-    }
-    left+=group.width+settings.horizontalGapM;
+ const sorted=[...works].sort(areaOrder),bands=[[],[],[]];
+ const bandOf=w=>canvasArea(w)<=settings.smallCanvasM**2?0:canvasArea(w)<settings.hoistFromM**2?1:2;
+ const valid=w=>w.width<=max-min+1e-7&&w.height+2*frame<=availableHeight+1e-7;
+ const eligible=sorted.filter(w=>{if(valid(w))return true;reserveReasons.set(w.painting.id,'oversize');return false;});
+ const anchor=featured??eligible.pop();
+ if(!anchor)return [];
+ for(const w of eligible)bands[bandOf(w)].push(w);
+ const queues=bands.map((items,band)=>{
+  const columns=[];const count=band===0?settings.tiers:band===1?2:1;
+  for(let i=0;i<items.length;){
+   const column=[];let height=0;
+   while(i<items.length&&column.length<count){
+    const next=items[i],add=next.height+2*frame+(column.length?settings.verticalGapM:0);
+    if(column.length&&height+add>availableHeight+1e-7)break;
+    column.push(next);height+=add;i++;
    }
+   columns.push({items:column,width:Math.max(...column.map(w=>w.width)),band});
+  }
+  return columns;
+ });
+ const pages=[];
+ if(featured)pages.push({columns:[],anchor:true});
+ else if(!queues.some(q=>q.length))pages.push({columns:[],anchor:true});
+ while(queues.some(q=>q.length)){
+  const columns=[],used=[0,0,0];let remaining=max-min-anchor.width-gap;
+  function take(band){
+   const q=queues[band];
+   const starter=q.findIndex(c=>c.width<=remaining+1e-7&&c.items.some(w=>w.painting.id==='ART-1815'));
+   const index=starter>=0?starter:band===2?q.findLastIndex(c=>c.width<=remaining+1e-7):q.findIndex(c=>c.width<=remaining+1e-7);
+   if(index<0)return false;
+   const [column]=q.splice(index,1);columns.push(column);remaining-=column.width+gap;used[band]+=column.width+gap;return true;
+  }
+  // Every page gets a representative of each available zone before extra fill.
+  for(const band of [0,1,2])take(band);
+  while(true){
+   const priority=[0,1,2].sort((a,b)=>used[a]/[.3,.35,.35][a]-used[b]/[.3,.35,.35][b]);
+   if(!priority.some(take))break;
+  }
+  if(!columns.length){
+   // Two unusually wide works may require independent pages at full size.
+   if(!pages.length)pages.push({columns:[],anchor:true});
+   const band=queues.findIndex(q=>q.length),column=queues[band].shift();
+   pages.push({columns:[column],anchor:false});
+  }else pages.push({columns,anchor:true});
+ }
+ const dx=(wall.b.x-wall.a.x)/wall.length,dz=(wall.b.z-wall.a.z)/wall.length;
+ const forward=dx*wall.normal.z-dz*wall.normal.x>0,depth=settings.frameDepthM/2+settings.wallClearanceM;
+ let anchorSlot;
+ function makeSlot(work,center,bottom,tier,index){
+  const along=forward?center:min+max-center;
+  const result={...work,wall,normal:wall.normal,page:index,tier,featured:work===featured,
+   x:wall.a.x+dx*along+wall.normal.x*depth,z:wall.a.z+dz*along+wall.normal.z*depth,y:bottom+frame+work.height/2};
+  byId.set(work.painting.id,result);return result;
+ }
+ return pages.map(({columns,anchor:showAnchor},index)=>{
+  const result=[];let left=min;
+  columns.sort((a,b)=>canvasArea(a.items[0])-canvasArea(b.items[0]));
+  for(const column of columns){
+   let bottom=settings.minBottomM;
+   for(const [row,work]of column.items.entries()){
+    result.push(makeSlot(work,left+column.width/2,bottom,row+1,index));
+    bottom+=work.height+2*frame+settings.verticalGapM;
+   }
+   left+=column.width+gap;
+  }
+  if(showAnchor){
+   if(!anchorSlot)anchorSlot=makeSlot(anchor,featured?(min+max)/2:max-anchor.width/2,settings.minBottomM,1,index);
+   result.push(anchorSlot);
   }
   return result;
  });

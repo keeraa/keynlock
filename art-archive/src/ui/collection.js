@@ -10,6 +10,7 @@ import {createHangingSession} from '../paintings/hanging-session.js';
 import {createPaintingInspector} from './painting-inspector.js';
 import {createLifecycle} from '../app/lifecycle.js';
 import {readJson,writeJson} from '../persistence/storage.js';
+import {preserveAuthorExclusion} from '../persistence/author-exclusions.js';
 import {getLanguage,paintingTitle} from '../localization/i18n.js';
 import {arrangeExhibition} from '../paintings/exhibition.js';
 import {createPaintingDisplay} from '../paintings/display.js';
@@ -47,6 +48,9 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
     const next={...state,included:{...state.included,[id]:false}};
     const en=getLanguage()==='en';
     if(!writeJson(STORAGE_KEY,next)){notify(en?'Could not save the selection':'Не удалось сохранить отбор');return;}
+    void preserveAuthorExclusion(id).then(saved=>{
+      if(saved===false)notify(en?'Excluded in this browser; could not save the project copy':'Исключена в браузере, но не удалось сохранить копию в проекте');
+    });
     const replacement=hanging.active ? exhibition.exclude(id,page) : null;
     const fromWall=hanging.active && mountedFrame(slot);
     const installed=fromWall ? hanging.fillVacancy(slot,replacement) : null;

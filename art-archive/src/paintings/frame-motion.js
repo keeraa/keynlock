@@ -114,7 +114,7 @@ export function createFrameMotion(THREE,config,layout){
     }
     return 1;
   }
-  function route(slot,from,to,{lowArc=false,wallNormal=null,pickup=false}={}){
+  function route(slot,from,to,{lowArc=false,wallNormal=null,pickup=false,grounded=false}={}){
     const start=copy(from),finish=copy(to);
     const clear=points=>points.slice(1).every((b,i)=>advance(slot,points[i],b)===1);
     if(wallNormal){
@@ -135,6 +135,23 @@ export function createFrameMotion(THREE,config,layout){
       return null;
     }
     if(clear([start,finish]))return [start,finish];
+    // A long trolley frame may need to slide toward the middle of the hall
+    // before pivoting. A single translation/rotation chord can jam its corner.
+    if(Math.abs(start.position.y-finish.position.y)<.12&&
+       box(slot,start.position,start.quaternion).axes[1].dot(basis[1])>.98&&
+       box(slot,finish.position,finish.quaternion).axes[1].dot(basis[1])>.98){
+      const centers=[start.position.clone().lerp(finish.position,.5),v(start.position.x,start.position.y,finish.position.z),v(finish.position.x,start.position.y,start.position.z)];
+      for(const hall of layout?.halls??[]){
+        const a=layout.local(hall,start.position.x,start.position.z),b=layout.local(hall,finish.position.x,finish.position.z);
+        if(a.z<hall.start||b.z<hall.start||a.z>hall.start+hall.length||b.z>hall.start+hall.length)continue;
+        const center=layout.world(hall,0,(a.z+b.z)/2);centers.push(v(center.x,start.position.y,center.z));
+      }
+      for(const center of centers){
+        const shifted=copy(start),turned=copy(finish);shifted.position.copy(center);turned.position.copy(center);
+        const path=[start,shifted,turned,finish];if(clear(path))return path;
+      }
+    }
+    if(grounded)return null;
     if(pickup){
       // Tilt a floor frame while lifting its actual lower edge. A wide canvas
       // does not need its full diagonal radius of clearance above the floor.

@@ -26,7 +26,7 @@ test('The Last Supper can turn around and leave a gallery at its real 880 by 460
  for(let i=0;i<=160;i++){yaw=hall.angle+Math.PI*(1-i/160);follow();}
  for(let i=0;i<120;i++)follow();
  assert(!motion.blocked(slot,root.position,root.quaternion));
- assert(root.quaternion.angleTo(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),yaw+1.28+Math.PI))<.02,'turn must finish rather than stick against a wall');
+ assert(root.quaternion.angleTo(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),yaw-.65))<.02,'turn must finish rather than stick against a wall');
  for(let i=0;i<450;i++){
   const before=camera.position.clone();nav.move(camera.position,new Set(['w']),yaw,.016,0);
   camera.position.lerpVectors(before,camera.position,preview.constrainMovement(before,camera.position));follow();
@@ -46,21 +46,25 @@ for(const [width,height] of [[2.3,2.5],[8.8,4.6]])test(`the ${width}m trolley st
  camera.position.set(at.x,fy+1.78,at.z);
  const slot={painting:{...painting,physicalSizeM:{width,height}},width:width+.135,height,x:source.x,y:.025,z:source.z,floorAngle:hall.angle,normal:{x:0,z:1}};
  const motion=createFrameMotion(THREE,config,layout),preview=createPlacementPreview(THREE,{camera,scene,layout,carryYaw:()=>player.state.yaw},{},config,motion);
- preview.select(slot);preview.beginLift(slot,0);let now=0;
+ preview.select(slot);preview.beginLift(slot,0);let now=0,inspecting=false;
  const origin=new THREE.Vector3(),dir=new THREE.Vector3();
- const follow=()=>{player.update(.016,now,true);origin.copy(camera.position);origin.y-=fy;camera.getWorldDirection(dir);preview.follow(slot,true,hall,origin,dir,slot,now,false);now+=16;};
+ const follow=()=>{player.update(.016,now,true);origin.copy(camera.position);origin.y-=fy;camera.getWorldDirection(dir);preview.follow(slot,true,hall,origin,dir,slot,now,false,inspecting);now+=16;};
  for(let i=0;i<220;i++)follow();assert(!preview.takeLiftFailure());
  const root=scene.getObjectByName('carried-painting'),cart=root.getObjectByName('painting-trolley'),before=root.position.clone(),rotation=root.quaternion.clone();
  assert(cart.visible);
  const near=new THREE.Vector3(slot.width/2,0,0).applyQuaternion(root.quaternion).add(root.position).sub(camera.position);
  near.applyAxisAngle(new THREE.Vector3(0,1,0),-player.state.yaw);
- assert(near.x>.45&&near.x<.95&&near.z<-.35&&near.z>-.95,'near edge must stay beside the lower right of the view, not metres away');
- const bodyYaw=player.state.yaw;player.lookAtCarry({position:root.position,height});
+ assert(near.x>width*.35&&near.z<-.3&&near.z>-.6,'the near edge must move farther right while its depth stays close');
+ const center=root.position.clone().sub(camera.position).applyAxisAngle(new THREE.Vector3(0,1,0),-player.state.yaw);
+ assert(center.x>.2&&center.x<.6);assert(-center.z<width*.4+.5,'centre is closer than the previous edge-on transport');
+ const facing=()=>new THREE.Vector3(0,0,1).applyQuaternion(root.quaternion).dot(camera.position.clone().sub(root.position).setY(0).normalize());
+ assert(facing()>.75,'normal transport already shows the face instead of its edge');
+ const bodyYaw=player.state.yaw;inspecting=true;player.lookAtCarry({position:root.position,height});
  for(let i=0;i<100;i++)follow();
  assert(Math.abs(Math.atan2(Math.sin(camera.rotation.y-bodyYaw),Math.cos(camera.rotation.y-bodyYaw)))>.1,'head turns toward the painting');
  player.turn(80,-30);for(let i=0;i<60;i++)follow();
  assert.equal(player.state.yaw,bodyYaw,'looking around must not steer a nine-metre canvas into a wall');
- assert(root.position.distanceTo(before)<.01);assert(root.quaternion.angleTo(rotation)<.01);assert(cart.visible);
- player.lookAtCarry(null);for(let i=0;i<100;i++)follow();
+ assert(root.position.distanceTo(before)<.01);assert(facing()>.99,'RMB faces the reproduction toward the player');assert(cart.visible);
+ inspecting=false;player.lookAtCarry(null);for(let i=0;i<100;i++)follow();
  assert(Math.abs(camera.rotation.y-bodyYaw)<.001);assert(cart.visible);preview.dispose();
 });

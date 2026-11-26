@@ -32,6 +32,7 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
   let tableDetail=null,tablePairs=[],tableTime=-Infinity;
   function clearTableDetail(){tableDetail?.removeFromParent();tableDetail=null;for(const pair of tablePairs)pair.material.dispose();tablePairs=[];}
   let last=0,lift=null,hovered=null,hoverTime=0;
+  let lastRecoveryAttempt=-Infinity;
   let wallFlight=null,returnFlight=null,liftFailure=false,stuckSince=null,parkingPose=null,avoidance=null,preferredClearSince=null;
   const parked={position:new THREE.Vector3(),quaternion:new THREE.Quaternion()};
   const smooth=t=>t*t*t*(10+t*(-15+6*t));
@@ -44,7 +45,7 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
   function select(slot){
     if(slot===current)return;
     if(slot && slot.painting.id===current?.painting.id)return;
-    wallFlight=returnFlight=null;lift=null;liftFailure=false;stuckSince=null;parkingPose=null;avoidance=null;preferredClearSince=null;
+    lastRecoveryAttempt=-Infinity;wallFlight=returnFlight=null;lift=null;liftFailure=false;stuckSince=null;parkingPose=null;avoidance=null;preferredClearSince=null;
     cart.removeFromParent();cart=new THREE.Group();
     seal?.removeFromParent();seal=null;
     const generation=++request;
@@ -134,7 +135,7 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
     pulseGhost(now,valid);
   }
 
-  function carry(slot,large,hall,origin,dir,source,raised){
+  function carry(slot,large,hall,origin,dir,source,raised,inspectHeavy=false){
     root.visible=true;cart.visible=large;
     const fy=config.building.floorElevation;
     const eye=world.camera,stair=config.building.stair,radius=Math.hypot(eye.position.x,eye.position.z);
@@ -173,12 +174,13 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
     const layout=world.layout;
     // Park ahead, upright and facing the player even when the pickup ray points down.
     const yaw=world.carryYaw?.()??Math.atan2(-dir.x,-dir.z);
-    const turn=1.28, halfWidth=slot.width/2;
-    // Anchor the near end beside the player; the long edge extends forward.
-    const distance=.62+Math.sin(turn)*halfWidth;
-    const side=.68+halfWidth*Math.cos(turn);
-    const cartYaw=yaw+turn+Math.PI;
+    const turn=.65, halfWidth=slot.width/2;
+    // Keep the centre close and show the face across the view. The near edge
+    // extends toward the lower right instead of pointing away like a blade.
+    const distance=.45+Math.sin(turn)*halfWidth,side=.35;
+    let cartYaw=yaw-turn;
     let x=origin.x-Math.sin(yaw)*distance+Math.cos(yaw)*side,z=origin.z-Math.cos(yaw)*distance-Math.sin(yaw)*side;
+    if(inspectHeavy)cartYaw=Math.atan2(eye.position.x-x,eye.position.z-z);
     if(hall){
       const p=layout.local(hall,x,z);
       const angle=cartYaw-hall.angle;
@@ -188,6 +190,7 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
       ({x,z}=layout.world(hall,clamp(p.x,-hall.width/2+across,hall.width/2-across),
         clamp(p.z,hall.start+along,hall.start+hall.length-along)));
     }
+    if(inspectHeavy)cartYaw=Math.atan2(eye.position.x-x,eye.position.z-z);
     root.rotation.set(0,cartYaw,0);root.position.set(x,fy+trolleyDimensions(slot,settings).centerHeight,z);
 
   }
@@ -215,9 +218,9 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
     }
     tableTime+=elapsed;
   }
-  function follow(slot,large,hall,origin,dir,source,now,raised){
+  function follow(slot,large,hall,origin,dir,source,now,raised,inspectHeavy=false){
     previous.position.copy(root.position);previous.quaternion.copy(root.quaternion);
-    carry(slot,large,hall,origin,dir,source,raised);
+    carry(slot,large,hall,origin,dir,source,raised,inspectHeavy);
     const floorY=config.building.floorElevation+supportHeightAt(root.position.x,root.position.z,root.position.y-config.building.floorElevation,config);
     const size=frameDimensions(slot,settings);
     const orientation=carryRotation.makeRotationFromQuaternion(root.quaternion).elements;
@@ -249,6 +252,7 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
       if(avoidance)apply(avoidance);
       else {root.position.copy(desiredPosition);root.quaternion.copy(desiredRotation);}
     }
+    const intended={position:root.position.clone(),quaternion:root.quaternion.clone()};
     const dt=Math.max(0,Math.min(.1,(now-last)/1000));last=now;
     if(lift){
       // Clear the source stack before rotating; simultaneous lift/rotation can
@@ -297,7 +301,7 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
           if(lift.leg===lift.lengths.length){lift=null;stuckSince=null;}
         }
       }
-      cart.visible=large && !raised && !lift && trolleyIsOnFloor(slot);
+      cart.visible=large && !raised && (!lift||lift.recovery) && trolleyIsOnFloor(slot);
       if(cart.visible)rememberTrolley();
       lastEyeRotation.copy(world.camera.quaternion);lastEyePosition.copy(world.camera.position);return;
     }else{
@@ -322,6 +326,17 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
     // A blocked follow pose stays stable. Do not restart a lift animation on
     // every wall contact; movement is constrained by the same swept volume.
     stuckSince=t<1?(stuckSince??now):null;
+    const view=root.position.clone().sub(world.camera.position).applyQuaternion(world.camera.quaternion.clone().invert());
+    const outOfView=view.z>-.1||Math.abs(view.x)>Math.max(.15,-view.z)*Math.tan(world.camera.fov*Math.PI/360)*world.camera.aspect+size.width*.3;
+    if(outOfView&&stuckSince!==null&&now-stuckSince>=120&&now-lastRecoveryAttempt>=400&&motion.route){
+      lastRecoveryAttempt=now;
+      const from={position:root.position.clone(),quaternion:root.quaternion.clone()};
+      const path=motion.route(slot,from,intended,{grounded:large&&!raised});
+      if(path){
+        const lengths=path.slice(1).map((b,i)=>b.position.distanceTo(path[i].position)+.25*b.quaternion.angleTo(path[i].quaternion));
+        lift={recovery:true,from,start:now,duration:large?380:280,path,leg:0,legStart:now,lengths,total:lengths.reduce((a,b)=>a+b,0)};
+      }
+    }
   }
   function dropPath(slot){return motion.route(slot,ghost.visible?ghost:root,motion.pose(slot),{lowArc:slot.supportId?.startsWith('table-')});}
   function lowering(path,p,ballistic=false,trolley=false){

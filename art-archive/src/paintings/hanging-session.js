@@ -159,7 +159,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       const large=usesTrolley(interaction.carrying);
       let hint=text('Наведите на стену','Aim at a wall');
       if(!reachable)cursor=null;
-      preview.follow(interaction.carrying,large,hall,origin,dir,interaction.source,now,(interaction.raised&&!inspectionHeld)||(inspectionHeld&&!large));
+      preview.follow(interaction.carrying,large,hall,origin,dir,interaction.source,now,(interaction.raised&&!inspectionHeld)||(inspectionHeld&&!large),inspectionHeld&&large);
       if(preview.takeLiftFailure()){
         onEvent('placement_failed',{reason:'pickup_blocked',paintingId:interaction.carrying.painting.id,hall:room});
         notify(text('Рама упирается в препятствие. Отойдите немного назад — картина остаётся у вас.','The frame is blocked. Step back a little — you are still holding the painting.'));

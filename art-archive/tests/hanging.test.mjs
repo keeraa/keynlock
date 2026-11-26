@@ -278,10 +278,11 @@ test('a large painting parks upright at its actual trolley pose and restores the
  session.update(true,performance.now()+400);
  const parked=session.find(slot.painting.id);
  assert(parked.trolley);assert.equal(parked.floorAngle,undefined);
- assert(new THREE.Vector3(parked.x,fy+parked.y,parked.z).distanceTo(before)<1e-8);
+ assert(Math.hypot(parked.x-before.x,parked.z-before.z)<1e-8);
+ assert(Math.abs(fy+parked.y-before.y)<=.05,'only the floor or rug may adjust wheel contact height');
  const restored=create();restored.setPage([slot]);restored.setActive(true);
  assert.equal(restored.find(slot.painting.id).floorAngle,undefined,'restored cart must not inherit the staged floor rotation');
- assert(Math.abs(restored.find(slot.painting.id).y-slot.height/2-config.paintings.frameWidthM-.29)<1e-8);
+ assert.equal(restored.find(slot.painting.id).y,parked.y);
  assert.deepEqual(restored.find(slot.painting.id).normal,parked.normal);
  assert.equal(restored.find(slot.painting.id).x,parked.x);
  const supported=restored.find(slot.painting.id);

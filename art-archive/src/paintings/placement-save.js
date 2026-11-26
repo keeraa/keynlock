@@ -1,6 +1,7 @@
 import {STORAGE_KEYS,readJson,writeJson} from '../persistence/storage.js';
 import {LEGACY_DISPOSAL_SUPPORT} from './disposal-state.js';
 import {placedSlot,wallRange} from './hanging.js';
+import {frameDimensions} from '../../catalog/painting-geometry.js';
 import {settleTrolley} from './floor-drop.js';
 
 export function createPlacementSave({debug,layout,config,wallSettings,onError}){
@@ -44,7 +45,10 @@ export function createPlacementSave({debug,layout,config,wallSettings,onError}){
       const min=range.min+slot.width/2,max=range.max-slot.width/2;
       along=max>=min?Math.max(min,Math.min(max,along)):(min+max)/2;
     }
-    return placedSlot(slot,wall,along,saved.y,limits,occupied);
+    const halfHeight=frameDimensions(slot,limits).height/2;
+    const minY=limits.minBottomM+halfHeight,maxY=limits.maxTopM-halfHeight;
+    const y=Number.isFinite(saved.y)&&maxY>=minY?Math.max(minY,Math.min(maxY,saved.y)):saved.y;
+    return placedSlot(slot,wall,along,y,limits,occupied);
   }
 
   function restorePortable(slot){

@@ -5,8 +5,9 @@ import {acceptsHall,placedSlot} from './hanging.js';
 export function createWallPlacement(config,motion,{isFree=()=>false,occupied=()=>[]}={}){
  const settings=config.paintings;
  function limits(wall){
-  return {...settings,edgeMarginM:0,horizontalGapM:0,verticalGapM:0,minBottomM:isFree() ? .02 : .84,
-   maxTopM:config.building.height-(wall.hall==='center' ? .13 : config.building.vaultRise+.03)};
+  // Free mode relaxes the hall assignment, never the physical hanging area.
+  return {...settings,horizontalGapM:0,verticalGapM:0,
+   maxTopM:config.building.height-(wall.hall==='center' ? 0 : config.building.vaultRise)-settings.edgeMarginM};
  }
  function accepts(slot,wall){return isFree()||acceptsHall(slot,wall);}
  function surface(slot,wall,along,y){return placedSlot(slot,wall,along,y,limits(wall),[]);}

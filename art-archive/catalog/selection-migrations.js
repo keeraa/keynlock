@@ -20,6 +20,7 @@ export function migrateSelection(storage, seed) {
   const revision=previous?.selectionRevision??0;
   if(revision>=seed.selectionRevision)return;
   if(previous){
+    if(seed.curatedExclusions?.length)previous.included={...previous.included,...Object.fromEntries(seed.curatedExclusions.map(id=>[id,false]))};
     previous.placements??={};
     if(oldWater && seed.placements['ART-1539'])previous.placements['ART-1539']=seed.placements['ART-1539'];
     for(const [id,destination] of Object.entries(previous.placements))
@@ -43,6 +44,7 @@ export function migrateSelection(storage, seed) {
 }
 
 export function prepareSavedSelection(seed) {
+  seed.included={...seed.included,...Object.fromEntries((seed.curatedExclusions??[]).map(id=>[id,false]))};
   try { migrateSelection(localStorage, seed); }
   catch { /* Browsers with unavailable storage use the bundled selection. */ }
 }

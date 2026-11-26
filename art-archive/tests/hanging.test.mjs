@@ -404,7 +404,7 @@ test('R recovers a carried miniature stranded outside the building without losin
 test('click or R releases a large carried frame, including while examining it',t=>{
  const memory=new Map();globalThis.window={};globalThis.localStorage={getItem:k=>memory.get(k),setItem:(k,v)=>memory.set(k,v)};
  t.after(()=>{delete globalThis.window;delete globalThis.localStorage;});
- const slot=page.find(s=>s.width>=config.paintings.hoistFromM);
+ const slot=page.find(s=>Math.max(s.painting.physicalSizeM.width,s.height)>=config.paintings.hoistFromM);
  assert(slot);
  for(const click of [true,false]){
   memory.clear();

@@ -303,7 +303,7 @@ test('small works use three-row columns and large side-wall works remain availab
  const sides=[...e.byId.values()].filter(s=>s.wall.hall!=='center'&&s.wall.theme!=='end'&&!s.supportId);
  for(const works of Map.groupBy(sides,s=>s.wall.id).values()){
   const anchor=works.reduce((a,b)=>area(a)>area(b)?a:b);
-  for(let i=0;i<e.pageCount;i++)assert(e.slots(i).includes(anchor),'largest side work disappeared from page '+i+': '+anchor.painting.id);
+  for(let i=0;i<e.pageCount;i++)assert(e.slots(i).some(s=>s.wall.id===anchor.wall.id&&area(s)>=area(anchor)-1e-7),'largest side work disappeared from page '+i+': '+anchor.painting.id);
  }
  const small=e.slots(0).filter(s=>s.wall.hall!=='center'&&s.wall.theme!=='end'&&!s.supportId&&area(s)<=config.paintings.smallCanvasM**2);
  const columns=Map.groupBy(small,s=>s.wall.id+'/'+s.x.toFixed(6)+'/'+s.z.toFixed(6));
@@ -311,4 +311,33 @@ test('small works use three-row columns and large side-wall works remain availab
  for(const hall of config.halls){
   assert(e.slots(0).some(s=>s.wall.hall===hall.id&&!s.supportId&&Math.max(s.painting.physicalSizeM.width,s.height)>=2),hall.id+' has no large painting places');
  }
+});
+
+test('each hall has a single increasing size sequence across its two side walls',()=>{
+ const e=arrange(seed),area=s=>s.painting.physicalSizeM.width*s.height;
+ for(const hall of config.halls){
+  const works=[...e.byId.values()].filter(s=>s.wall.hall===hall.id&&s.wall.theme!=='end'&&!s.supportId);
+  const first=works.filter(s=>s.wall.id.split('/')[1]==='-1'),second=works.filter(s=>s.wall.id.split('/')[1]==='1');
+  assert(first.length&&second.length,hall.id);
+  assert(Math.max(...first.map(area))<=Math.min(...second.map(area))+1e-7,hall.id+' restarts from smaller works on the second wall');
+ }
+});
+
+test('the shipped author selection restores 466 exclusions across browser origins without resetting placement or later choices',async t=>{
+ const {prepareSavedSelection}=await import('../catalog/selection-migrations.js');
+ const previous=globalThis.localStorage,key='keynlock-painting-archive-1500-v1',memory=new Map();
+ globalThis.localStorage={getItem:k=>memory.get(k)??null,setItem:(k,v)=>memory.set(k,v)};
+ t.after(()=>{globalThis.localStorage=previous;});
+ const fresh=structuredClone(seed);prepareSavedSelection(fresh);
+ assert.equal(fresh.curatedExclusions.length,466);
+ const e=arrange(fresh);assert.equal(e.selected,705);
+ for(const id of fresh.curatedExclusions)assert(!e.byId.has(id),id+' returned to the game');
+ const old={selectionRevision:3,included:{'ART-0001':true,'ART-0002':false},placements:{'ART-0002':'stories/religion'},categories:{'ART-0002':'Custom'}};
+ memory.set(key,JSON.stringify(old));memory.set('keynlock-art-hanging-v1','{"saved-work":{"wall":"cn/end","y":2}}');
+ prepareSavedSelection(structuredClone(seed));const restored=JSON.parse(memory.get(key));
+ assert.equal(restored.included['ART-0001'],false);assert.equal(restored.included['ART-0002'],false);
+ assert.deepEqual(restored.placements,old.placements);assert.deepEqual(restored.categories,old.categories);
+ assert.equal(memory.get('keynlock-art-hanging-v1'),'{"saved-work":{"wall":"cn/end","y":2}}');
+ restored.included['ART-0001']=true;memory.set(key,JSON.stringify(restored));
+ prepareSavedSelection(structuredClone(seed));assert.equal(JSON.parse(memory.get(key)).included['ART-0001'],true);
 });

@@ -55,6 +55,7 @@ export function arrangeExhibition(catalog, state, layout, settings) {
   }
   // Reserve the largest artwork in each wing before balancing the side walls.
   pending.sort((a,b)=>canvasArea(b.work)-canvasArea(a.work));
+  const wingWorks=new Map();
   for(const {work,eligible} of pending){
     const end=eligible.find(p=>p.wall.theme==='end'&&!p.featured);
     if(end &&
@@ -72,11 +73,36 @@ export function arrangeExhibition(catalog, state, layout, settings) {
     });
     const candidates=besideFeature.length?besideFeature:eligible.filter(panel=>panel.wall.theme!=='end');
     if(!candidates.length){reserveReasons.set(work.painting.id,'oversize');continue;}
-    const target=eligible[0].wall.hall==='center'
-      ? chooseMasterpiecePanel(eligible,work,settings)
-      : candidates.reduce((a,b)=>a.area/a.wall.length<=b.area/b.wall.length?a:b);
+    if(eligible[0].wall.hall!=='center'){
+      const hall=eligible[0].wall.hall;
+      if(!wingWorks.has(hall))wingWorks.set(hall,[]);
+      wingWorks.get(hall).push({work,candidates});continue;
+    }
+    const target=chooseMasterpiecePanel(eligible,work,settings);
     target.works.push(work);
     target.area+=work.width*(work.height+2*settings.frameWidthM);
+  }
+  // One continuous size sequence per hall: the second side continues the
+  // first, rather than restarting a second small-to-large collection.
+  for(const [hall,entries]of wingWorks){
+    entries.sort((a,b)=>canvasArea(a.work)-canvasArea(b.work)||a.work.painting.id.localeCompare(b.work.painting.id));
+    const sides=surfaces.filter(p=>p.wall.hall===hall&&p.wall.theme!=='end')
+      .sort((a,b)=>Number(a.wall.id.split('/')[1])-Number(b.wall.id.split('/')[1]));
+    const cost=({work})=>{
+      const size=canvasArea(work)<=settings.smallCanvasM**2?settings.tiers:canvasArea(work)<settings.hoistFromM**2?2:1;
+      const rows=Math.max(1,Math.min(size,Math.floor((settings.maxTopM-settings.minBottomM+settings.verticalGapM)/(work.height+2*settings.frameWidthM+settings.verticalGapM))));
+      return (work.width+settings.horizontalGapM)/rows;
+    };
+    const total=entries.reduce((sum,e)=>sum+cost(e),0);let sum=0,cut=1,best=Infinity;
+    for(let i=0;i<entries.length-1;i++){
+      sum+=cost(entries[i]);const difference=Math.abs(total/2-sum);
+      if(difference<best){best=difference;cut=i+1;}
+    }
+    for(const [i,{work,candidates}]of entries.entries()){
+      const side=sides[i<cut?0:Math.min(1,sides.length-1)];
+      const target=candidates.includes(side)?side:candidates[0];
+      target.works.push(work);target.area+=canvasArea(work);
+    }
   }
   const groups = [], byId = new Map(tabletop);
   for (const {wall, works, featured} of surfaces) {

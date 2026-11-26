@@ -237,6 +237,10 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       const {group,filled,total}=wallProgress;
       commands+=' · '+text('Группа ','Group ')+group.filled+'/'+group.places.length+' · '+text('Стена ','Wall ')+filled+'/'+total;
     }
+    if(controls?.dataset){
+      const canPark=Boolean(interaction.carrying&&usesTrolley(interaction.carrying)&&preview.parkPose());
+      if(controls.dataset.canPark!==String(canPark))controls.dataset.canPark=String(canPark);
+    }
     if(controls){showLabel(description);showPaintingControls(controls,commands);return;}
     if(label.textContent!==message)label.textContent=message;
   }

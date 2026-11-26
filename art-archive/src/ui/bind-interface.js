@@ -1,3 +1,4 @@
+import {showBuildInfo} from '../app/build-info.js';
 import {createLifecycle} from '../app/lifecycle.js';
 import {getLanguage,setLanguage,localizeDocument} from '../localization/i18n.js';
 export function bindInterface({elements,actions,world,plan,hud,player,getMode}){
@@ -7,7 +8,7 @@ export function bindInterface({elements,actions,world,plan,hud,player,getMode}){
  for(const [id,handler]of Object.entries(clicks))life.listen(elements(id),'click',handler);
  const language=elements('language-select');language.value=getLanguage();
  life.listen(language,'change',()=>{
-  setLanguage(language.value);localizeDocument();world.building.refreshLanguage();plan.refreshLanguage();
+  setLanguage(language.value);localizeDocument();showBuildInfo(elements('build-info'));world.building.refreshLanguage();plan.refreshLanguage();
   hud.updateLocation(getMode(),player.state.floorY);
  });return life;
 }

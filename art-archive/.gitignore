@@ -6,3 +6,9 @@ node_modules/
 dist/
 .build-*/
 .previous-build-*/
+
+# Release bundles, browser artifacts and local analysis
+.releases/
+test-results/
+reports/
+scripts/__pycache__/

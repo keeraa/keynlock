@@ -1,0 +1,59 @@
+name: Art Archive checks
+on:
+  push:
+    paths:
+      - 'art-archive/**'
+      - 'js/3d/core/audio/**'
+      - 'js/3d/scenes/key-archive/dist/assets/music/**'
+      - '.github/workflows/art-archive.yml'
+  pull_request:
+    paths:
+      - 'art-archive/**'
+      - 'js/3d/core/audio/**'
+      - 'js/3d/scenes/key-archive/dist/assets/music/**'
+      - '.github/workflows/art-archive.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: art-archive-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: art-archive
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: art-archive/.node-version
+          cache: npm
+          cache-dependency-path: art-archive/package-lock.json
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Geometry, interactions, storage and release contracts
+        run: npm test
+      - name: Prepare and verify the committed release
+        run: npm run release -- --commit "$GITHUB_SHA" --output "$RUNNER_TEMP/art-archive-release"
+      - name: Build local browser preview
+        run: npm run build
+      - name: Install pinned Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Actual game browser checks
+        run: npm run test:browser
+      - name: Keep game screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: art-archive-browser-${{ github.sha }}
+          path: art-archive/test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Keep verified release bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: art-archive-release-${{ github.sha }}
+          path: ${{ runner.temp }}/art-archive-release.tar.gz
+          retention-days: 7

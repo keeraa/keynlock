@@ -1,3 +1,4 @@
+import {showBuildInfo} from './build-info.js';
 import {createPlaytestStatistics} from '../playtest/statistics.js';
 import {createPlaytestCollector} from '../playtest/collector.js';
 import {mountPlaytestInterface} from '../playtest/interface.js';
@@ -32,6 +33,7 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
   let gameModes={placement:'blocks',difficulty:'normal'};
   const track=(name,data)=>{statistics?.track(name,data);playtest.track(name,{...data,runId:statistics?.playthroughId??''});queueMicrotask(()=>{if(!disposed&&statistics&&collectionForStatistics)statistics.progress(collectionForStatistics.playtestSnapshot());});};
   const elements = id => document.getElementById(id);
+  showBuildInfo(elements('build-info'));
   const canvas = elements('scene');
   const frameLimit=createFrameLimit();
   let disposed = false;

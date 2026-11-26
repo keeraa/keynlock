@@ -1,3 +1,4 @@
+import {PLAYTEST_BUILD} from './schema.js';
 import {getLanguage} from '../localization/i18n.js';
 export function mountPlaytestInterface({collector,elements,setMode,getStatistics}){
  const en=getLanguage()==='en',text=(ru,english)=>en?english:ru;
@@ -15,7 +16,9 @@ export function mountPlaytestInterface({collector,elements,setMode,getStatistics
  elements('pause').querySelector('.panel').append(button);
  const dialog=document.createElement('dialog');dialog.id='playtest-feedback';dialog.className='playtest-feedback';
  dialog.innerHTML=`<form><h2>${text('Как прошла игра?','How was the game?')}</h2><p>${text('Отзыв связан со случайным ID этой сессии. Не указывайте имя, почту или другие личные данные.','Feedback uses this session’s random ID. Please omit names, emails and personal details.')}</p><label>${text('Что было непонятно?','What was unclear?')}<textarea name="unclear" maxlength="2000" rows="3"></textarea></label><label>${text('Что раздражало или мешало?','What was frustrating?')}<textarea name="frustrating" maxlength="2000" rows="3"></textarea></label><label>${text('Хотелось ли продолжать?','Did you want to keep playing?')}<select name="continuePlaying" required><option value="">${text('Выберите ответ','Choose an answer')}</option><option value="yes">${text('Да','Yes')}</option><option value="no">${text('Нет','No')}</option><option value="unsure">${text('Не уверен(а)','Not sure')}</option></select></label><label>${text('Если был баг — что произошло?','If there was a bug, what happened?')}<textarea name="bug" maxlength="3000" rows="3"></textarea></label><p class="playtest-status" role="status"></p><div class="playtest-actions"><button type="button" data-close>${text('Вернуться в игру','Back to game')}</button><button type="submit">${text('Отправить отзыв','Send feedback')}</button></div></form>`;
- document.body.append(dialog);const form=dialog.querySelector('form'),status=dialog.querySelector('[role="status"]'),submit=dialog.querySelector('[type="submit"]');
+ document.body.append(dialog);
+ const build=document.createElement('p');build.className='small';build.textContent=text('Сборка: ','Build: ')+PLAYTEST_BUILD.slice(0,8);build.title=PLAYTEST_BUILD;dialog.querySelector('h2').after(build);
+ const form=dialog.querySelector('form'),status=dialog.querySelector('[role="status"]'),submit=dialog.querySelector('[type="submit"]');
  const open=()=>{setMode('pause');status.textContent='';dialog.showModal();};button.addEventListener('click',open);
  const close=()=>{dialog.close();setMode('play');};dialog.querySelector('[data-close]').addEventListener('click',close);
  const send=async event=>{

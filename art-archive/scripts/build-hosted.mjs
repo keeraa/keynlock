@@ -1,15 +1,15 @@
 import {readFile,writeFile,mkdir,rm,cp} from 'node:fs/promises';
 import {resolve,join} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {execFileSync} from 'node:child_process';
+import {resolveBuildId} from './build-id.mjs';
 import {build} from './build.mjs';
 const project=fileURLToPath(new URL('../',import.meta.url));
 export async function buildHosted(output=resolve(project,'dist'),{buildId}={}){
- if(!buildId)try{buildId=execFileSync('git',['rev-parse','HEAD'],{cwd:project,encoding:'utf8'}).trim();}catch{buildId='2026-11-26-playtest-1';}
+ buildId??=resolveBuildId();
  await rm(output,{recursive:true,force:true});await mkdir(output,{recursive:true});
- await build(join(output,'client'));
+ await build(join(output,'client'),{buildId});
  const schemaPath=join(output,'client/js/playtest/schema.js');
- let schema=await readFile(schemaPath,'utf8');schema=schema.replace(/export const PLAYTEST_BUILD=.*?;/,'export const PLAYTEST_BUILD='+JSON.stringify(buildId)+';');await writeFile(schemaPath,schema);
+ const schema=await readFile(schemaPath,'utf8');
  const handler=(await readFile(join(project,'server/playtest.js'),'utf8')).replace(/^import .*?;\n/,'').replace('export async function handlePlaytest','async function handlePlaytest');
  const worker=(await readFile(join(project,'server/worker.js'),'utf8')).replace(/^import .*?;\n/,'');
  await mkdir(join(output,'server'),{recursive:true});

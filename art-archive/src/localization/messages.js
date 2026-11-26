@@ -1,4 +1,5 @@
 export const messages={
+ 'Сборка':'Build','локальные изменения':'local changes',
  'Свободный режим · размещение на любой стене без разметки':'Free mode · any wall, no marked places',
 
  'Новая игра':'New game',

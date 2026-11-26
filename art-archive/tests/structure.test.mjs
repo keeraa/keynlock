@@ -11,11 +11,11 @@ test('generated modules exactly match source and all relative imports resolve',a
  const temp=await fs.mkdtemp(join(tmpdir(),'keynlock-build-test-'));
  t.after(()=>fs.rm(temp,{recursive:true,force:true}));
  const dist=join(temp,'dist');
- await build(dist);
+ await build(dist,{buildId:'test-archive-build'});
  const bundle=pathToFileURL(dist+sep);
  const source=new URL('src/',root),output=new URL('js/',bundle),sources=await files(source),built=await files(output);
  assert.equal(built.length,sources.length);
- for(const url of sources){const relative=url.href.slice(source.href.length),generated=new URL(relative,output),text=await fs.readFile(url,'utf8');assert.equal(await fs.readFile(generated,'utf8'),text,relative);
+ for(const url of sources){const relative=url.href.slice(source.href.length),generated=new URL(relative,output),text=await fs.readFile(url,'utf8');if(relative==='playtest/schema.js')assert((await fs.readFile(generated,'utf8')).includes("PLAYTEST_BUILD=\"test-archive-build\""));else assert.equal(await fs.readFile(generated,'utf8'),text,relative);
   for(const match of text.matchAll(/(?:from\s+|import\s*)['"](\.[^'"]+)['"]/g))await fs.access(new URL(match[1],generated));
  }
  const html=await fs.readFile(new URL('index.html',bundle),'utf8');assert(html.includes('./js/app/bootstrap.js'));assert(html.includes('./styles/index.css'));

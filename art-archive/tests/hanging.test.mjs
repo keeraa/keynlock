@@ -599,7 +599,7 @@ test('reading the wall label stops at five metres and a nearer wall still occlud
  assert.equal(aimedFrameAtRay({x:0,y:1,z:4.9},direction,[slot],config.paintings,4.8),null);
 });
 
-test('free mode mounts on another gallery’s wall without marked places and keeps a separate saved arrangement',t=>{
+test('mode changes hide marked places while preserving mounted paintings across reloads',t=>{
  const memory=new Map(),previous=[globalThis.window,globalThis.localStorage];
  globalThis.window={};globalThis.localStorage={getItem:k=>memory.get(k),setItem:(k,v)=>memory.set(k,v)};
  t.after(()=>{[globalThis.window,globalThis.localStorage]=previous;});
@@ -616,12 +616,25 @@ test('free mode mounts on another gallery’s wall without marked places and kee
  session.update(true);assert(session.interact());assert(session.interact());
  assert.equal(session.find(slot.painting.id).wall.id,wall.id);
  assert.equal(scene.getObjectByName('painting-compositions').children.length,0);
- assert.equal(JSON.parse(memory.get('keynlock-art-hanging-v1-free'))[slot.painting.id].wall,wall.id);
- assert.equal(memory.has('keynlock-art-hanging-v1'),false);
+ assert.equal(JSON.parse(memory.get('keynlock-art-hanging-v1'))[slot.painting.id].wall,wall.id);
+ const mounted=session.find(slot.painting.id);
  session.setFreePlacement(false);
- assert.notEqual(session.find(slot.painting.id).floorAngle,undefined);
+ assert.equal(session.find(slot.painting.id),mounted,'switching mode does not rebuild or move the work');
+ assert(scene.getObjectByName('painting-compositions').children.length>0);
  session.setFreePlacement(true);
- assert.equal(session.find(slot.painting.id).wall.id,wall.id);
+ assert.equal(session.find(slot.painting.id),mounted);
+ assert.equal(scene.getObjectByName('painting-compositions').children.length,0);
+ const restored=createHangingSession({THREE,world:{camera,scene:new THREE.Scene(),layout},config,label:{},display:{setSlots(){}}});
+ t.after(()=>restored.dispose());
+ restored.setPage([slot]);restored.setActive(true);
+ assert.equal(restored.find(slot.painting.id).wall.id,wall.id,'a free placement survives reload in block mode');
+ // Old free-mode saves are also retained when upgrading, with shared records winning conflicts.
+ memory.set('keynlock-art-hanging-v1-free',memory.get('keynlock-art-hanging-v1'));
+ memory.delete('keynlock-art-hanging-v1');
+ const legacy=createHangingSession({THREE,world:{camera,scene:new THREE.Scene(),layout},config,label:{},display:{setSlots(){}}});
+ t.after(()=>legacy.dispose());
+ legacy.setPage([slot]);legacy.setActive(true);
+ assert.equal(legacy.find(slot.painting.id).wall.id,wall.id);
 });
 
 test('only a flat painting resting on the frame blocks a floor pickup',()=>{

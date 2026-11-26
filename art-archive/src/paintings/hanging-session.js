@@ -395,7 +395,11 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     setFreePlacement(value){
       if(freePlacement===Boolean(value))return;
       freePlacement=Boolean(value);motionAudio.reset();fitAudio.update(null);
-      interaction.reset();placements.setFreePlacement(freePlacement);rebuild();
+      if(interaction.placing)interaction.carry();
+      preview.hide();preview.resetHover();cursor=null;target=null;picked=null;
+      compositions.rebuild(freePlacement?[]:page,slot=>slot.wall?.id?placements.physicalWall(slot.wall):null);
+      compositions.refresh(hung);compositions.updateVisibility(active&&!freePlacement);
+      if(freePlacement)completion.clear();else completion.sync(page,hung,{reset:true});
     },
     wallPick,setPlacementEffect:feedback.setEffect,
     canSprint(){

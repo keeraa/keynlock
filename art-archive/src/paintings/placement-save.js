@@ -1,22 +1,22 @@
 import {STORAGE_KEYS,readJson,writeJson} from '../persistence/storage.js';
 import {LEGACY_DISPOSAL_SUPPORT} from './disposal-state.js';
-import {acceptsHall,placedSlot,wallRange} from './hanging.js';
+import {placedSlot,wallRange} from './hanging.js';
 import {settleTrolley} from './floor-drop.js';
 
 export function createPlacementSave({debug,layout,config,wallSettings,onError}){
-  let freePlacement=false;
-  const saveKey=()=>STORAGE_KEYS.hanging+(freePlacement?'-free':'')+(debug?'-debug':'');
-  let key=saveKey();
+  const key=STORAGE_KEYS.hanging+(debug?'-debug':'');
+  const legacyFreeKey=STORAGE_KEYS.hanging+'-free'+(debug?'-debug':'');
   const fallback=debug?readJson(STORAGE_KEYS.hanging,{}):{};
   const walls=new Map(layout.hangingWalls.map(wall=>[wall.id,wall]));
   const legacyWalls=new Map(layout.walls.map(wall=>[wall.id,wall]));
   const tables=new Map(layout.storageTables?.map(table=>[table.id,table]));
-  let records=readJson(key,fallback);
+  // Keep older free-mode placements when no shared record exists for that work.
+  let records={...readJson(legacyFreeKey,{}),...readJson(key,fallback)};
 
   function lookup(id){return records[id];}
 
   function save(id,record){
-    const latest={...readJson(key,records),[id]:{version:3,...record}};
+    const latest={...records,...readJson(key,{}),[id]:{version:3,...record}};
     if(!writeJson(key,latest)){onError();return false;}
     records=latest;
     return true;
@@ -31,7 +31,8 @@ export function createPlacementSave({debug,layout,config,wallSettings,onError}){
     if(!saved?.wall)return null;
     const legacy=saved.version!==3&&legacyWalls.get(saved.wall);
     const wall=legacy?physicalWall(legacy):walls.get(saved.wall);
-    if(!wall||(!freePlacement&&!acceptsHall(slot,wall)))return null;
+    // Mode rules apply to new placements, never to paintings already installed.
+    if(!wall)return null;
     const limits=wallSettings(wall);
     let along=saved.along;
     if(legacy){
@@ -70,10 +71,6 @@ export function createPlacementSave({debug,layout,config,wallSettings,onError}){
   }
 
   return {
-    setFreePlacement(value){
-      freePlacement=Boolean(value);key=saveKey();
-      records=readJson(key,freePlacement?{}:fallback);
-    },
     has:id=>Boolean(lookup(id)),
     wasOnLegacyReceiver:id=>lookup(id)?.supportId===LEGACY_DISPOSAL_SUPPORT,
     physicalWall,restoreWall,restorePortable,

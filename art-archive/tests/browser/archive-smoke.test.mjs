@@ -7,20 +7,29 @@ import {mkdir} from 'node:fs/promises';
 import {once} from 'node:events';
 import {fileURLToPath} from 'node:url';
 const cwd=fileURLToPath(new URL('../../',import.meta.url));
-let server,browser,baseUrl;
+let server,baseUrl;
 before(async()=>{
  server=spawn(process.execPath,['serve.mjs'],{cwd,env:{...process.env,PORT:'4198'},stdio:['ignore','pipe','pipe']});
  baseUrl=await new Promise((resolve,reject)=>{
   const timer=setTimeout(()=>reject(Error('Preview did not start')),15000);server.once('error',reject);server.once('exit',code=>reject(Error('Preview exited '+code)));
   server.stdout.on('data',chunk=>{const match=chunk.toString().match(/http:\/\/127\.0\.0\.1:\d+/);if(match){clearTimeout(timer);resolve(match[0]);}});
  });
- browser=await chromium.launch({headless:true,args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 },{timeout:60000});
-after(async()=>{await browser?.close();if(server&&server.exitCode===null){server.kill();await once(server,'exit');}});
+after(async()=>{if(server&&server.exitCode===null){server.kill();await once(server,'exit');}});
 async function open(t,art){
+ const browser=await chromium.launch({headless:true,args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const context=await browser.newContext({viewport:{width:1280,height:720}}),page=await context.newPage(),errors=[];
  page.on('pageerror',error=>errors.push(error.message));
- t.after(async()=>{await mkdir(new URL('../../test-results/',import.meta.url),{recursive:true});await page.screenshot({path:cwd+'/test-results/'+art+'.png'});await context.close();assert.deepEqual(errors,[]);});
+ t.after(async()=>{
+  try{
+   // A live software-WebGL frame can delay readback. Capture the stable pause
+   // view, and always release GPU resources even if capture itself fails.
+   if(!await page.locator('#pause').isVisible())await page.locator('#pause-btn').click({timeout:5000});
+   await mkdir(new URL('../../test-results/',import.meta.url),{recursive:true});
+   await page.screenshot({path:cwd+'/test-results/'+art+'.png',timeout:60000});
+  }finally{await context.close();await browser.close();}
+  assert.deepEqual(errors,[]);
+ });
  await page.goto(baseUrl+'/?art='+art+'&playtest=qa',{waitUntil:'domcontentloaded'});
  await page.locator('#load-screen').waitFor({state:'hidden',timeout:180000});
  await page.locator('#painting-controls').getByText(/взять/).waitFor({timeout:30000});
@@ -35,10 +44,12 @@ test('pause shows the exact build and preserves visual defaults without a retire
  assert.equal(await page.locator('#toon').isChecked(),false);
  assert.equal(await page.locator('#placement-effect').inputValue(),'smoke');
  assert.equal(await page.locator('#distance-blur').count(),0);
+ await page.locator('#fps-limit').check();
  await page.locator('#resume-btn').click();await page.locator('#pause').waitFor({state:'hidden'});
 });
 test('a heavy painting can be picked up, inspected, parked and restored after reload',{timeout:240000},async t=>{
  const page=await open(t,'ART-1548');
+ await page.locator('#pause-btn').click();await page.locator('#fps-limit').check();await page.locator('#resume-btn').click();
  await page.keyboard.press('e');await page.keyboard.press('l');
  await page.locator('#painting-controls').getByText(/оставить картину на тележке/).waitFor({timeout:30000});
  await page.mouse.down({button:'right'});await page.mouse.move(700,330,{steps:8});await page.mouse.up({button:'right'});

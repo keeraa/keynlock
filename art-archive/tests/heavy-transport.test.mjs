@@ -26,7 +26,9 @@ test('The Last Supper can turn around and leave a gallery at its real 880 by 460
  for(let i=0;i<=160;i++){yaw=hall.angle+Math.PI*(1-i/160);follow();}
  for(let i=0;i<120;i++)follow();
  assert(!motion.blocked(slot,root.position,root.quaternion));
- assert(root.quaternion.angleTo(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),yaw-Math.asin(Math.sin(.65)+.30/slot.width)))<.02,'turn must finish rather than stick against a wall');
+ camera.updateMatrixWorld();
+ const far=new THREE.Vector3(-slot.width/2,0,0).applyQuaternion(root.quaternion).add(root.position).project(camera);
+ assert(Math.abs(far.x)<.04,'after turning, the far frame edge must return to the horizontal centre');
  for(let i=0;i<450;i++){
   const before=camera.position.clone();nav.move(camera.position,new Set(['w']),yaw,.016,0);
   camera.position.lerpVectors(before,camera.position,preview.constrainMovement(before,camera.position));follow();
@@ -38,7 +40,7 @@ test('The Last Supper can turn around and leave a gallery at its real 880 by 460
 });
 
 import {createPlayerController} from '../src/player/controller.js';
-for(const [width,height] of [[2.3,2.5],[8.8,4.6]])test(`the ${width}m trolley stays close on the right while inspection turns the head independently`,()=>{
+for(const [width,height] of [[2.3,2.5],[4.96,3.92],[8.8,4.6]])test(`the ${width}m trolley stays close on the right while inspection turns the head independently`,()=>{
  const hall=layout.halls.find(h=>h.id===painting.placement.hall),camera=new THREE.PerspectiveCamera(73,16/9),scene=new THREE.Scene();
  const nav={move:(p,held,yaw,dt,floorY)=>({floorY}),obstacleRevision:0},player=createPlayerController({THREE,camera,navigation:nav,config});
  player.state.yaw=hall.angle;
@@ -56,7 +58,11 @@ for(const [width,height] of [[2.3,2.5],[8.8,4.6]])test(`the ${width}m trolley st
  near.applyAxisAngle(new THREE.Vector3(0,1,0),-player.state.yaw);
  assert(near.x>width*.35&&near.z<-.08&&near.z>-.25,'the near edge must move farther right while its depth stays close');
  const center=root.position.clone().sub(camera.position).applyAxisAngle(new THREE.Vector3(0,1,0),-player.state.yaw);
- assert(center.x>.2&&center.x<.6);assert(-center.z<width*.4+.5,'centre is closer than the previous edge-on transport');
+ assert(center.x>.6&&center.z<-.5);
+ camera.updateMatrixWorld();
+ const far=new THREE.Vector3(-slot.width/2,0,0).applyQuaternion(root.quaternion).add(root.position).project(camera);
+ assert(Math.abs(far.x)<.04,'the far edge must stay within 2% of the screen width from its centre');
+ assert(!motion.blocked(slot,root.position,root.quaternion),'centering must preserve physical frame clearance');
  const facing=()=>new THREE.Vector3(0,0,1).applyQuaternion(root.quaternion).dot(camera.position.clone().sub(root.position).setY(0).normalize());
  assert(facing()>.75,'normal transport already shows the face instead of its edge');
  const bodyYaw=player.state.yaw;inspecting=true;player.lookAtCarry({position:root.position,height});
@@ -64,7 +70,7 @@ for(const [width,height] of [[2.3,2.5],[8.8,4.6]])test(`the ${width}m trolley st
  assert(Math.abs(Math.atan2(Math.sin(camera.rotation.y-bodyYaw),Math.cos(camera.rotation.y-bodyYaw)))>.1,'head turns toward the painting');
  player.turn(80,-30);for(let i=0;i<60;i++)follow();
  assert.equal(player.state.yaw,bodyYaw,'looking around must not steer a nine-metre canvas into a wall');
- assert(root.position.distanceTo(before)<.01);assert(facing()>.99,'RMB faces the reproduction toward the player');assert(cart.visible);
+ assert(root.position.distanceTo(before)<.01);assert(facing()>.90,'RMB keeps the reproduction readable within the room clearance');assert(cart.visible);
  inspecting=false;player.lookAtCarry(null);for(let i=0;i<100;i++)follow();
  assert(Math.abs(camera.rotation.y-bodyYaw)<.001);assert(cart.visible);preview.dispose();
 });

@@ -175,26 +175,49 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
     const layout=world.layout;
     // Park ahead, upright and facing the player even when the pickup ray points down.
     const yaw=world.carryYaw?.()??Math.atan2(-dir.x,-dir.z);
-    const halfWidth=slot.width/2,baseTurn=.65,pull=.30;
-    // Pull the near edge 30 cm toward the player, keeping its rightward position
-    // and the far edge's depth instead of just sliding the whole canvas.
-    const turn=Math.asin(Math.min(.94,Math.sin(baseTurn)+pull/slot.width));
-    const distance=.45+Math.sin(baseTurn)*halfWidth-pull/2;
-    const side=.35+(Math.cos(baseTurn)-Math.cos(turn))*halfWidth;
-    let cartYaw=yaw-turn;
-    let x=origin.x-Math.sin(yaw)*distance+Math.cos(yaw)*side,z=origin.z-Math.cos(yaw)*distance-Math.sin(yaw)*side;
-    if(inspectHeavy)cartYaw=Math.atan2(eye.position.x-x,eye.position.z-z);
-    if(hall){
-      const p=layout.local(hall,x,z);
-      const angle=cartYaw-hall.angle;
-      const clamp=(v,lo,hi)=>lo>hi?(lo+hi)/2:Math.max(lo,Math.min(hi,v));
-      const across=Math.abs(Math.cos(angle))*slot.width/2+.32;
-      const along=Math.abs(Math.sin(angle))*slot.width/2+.32;
-      ({x,z}=layout.world(hall,clamp(p.x,-hall.width/2+across,hall.width/2-across),
-        clamp(p.z,hall.start+along,hall.start+hall.length-along)));
+    const halfWidth=slot.width/2;
+    const baseTurn=Math.asin(Math.min(.94,Math.sin(.65)+.30/slot.width));
+    const clamp=(v,lo,hi)=>lo>hi?(lo+hi)/2:Math.max(lo,Math.min(hi,v));
+    function transportPose(turn){
+      // The far vertical edge lies on the forward centre line. The near edge
+      // stays 15 cm ahead of the player, on the right side of the view.
+      const distance=.15+Math.sin(turn)*halfWidth,side=Math.cos(turn)*halfWidth;
+      const cartYaw=yaw-turn;
+      const wantedX=origin.x-Math.sin(yaw)*distance+Math.cos(yaw)*side;
+      const wantedZ=origin.z-Math.cos(yaw)*distance-Math.sin(yaw)*side;
+      let x=wantedX,z=wantedZ;
+      if(hall){
+        const p=layout.local(hall,x,z),angle=cartYaw-hall.angle;
+        const across=Math.abs(Math.cos(angle))*halfWidth+.32;
+        const along=Math.abs(Math.sin(angle))*halfWidth+.32;
+        ({x,z}=layout.world(hall,clamp(p.x,-hall.width/2+across,hall.width/2-across),
+          clamp(p.z,hall.start+along,hall.start+hall.length-along)));
+      }
+      return {x,z,cartYaw,error:Math.hypot(x-wantedX,z-wantedZ)};
     }
-    if(inspectHeavy)cartYaw=Math.atan2(eye.position.x-x,eye.position.z-z);
-    root.rotation.set(0,cartYaw,0);root.position.set(x,fy+trolleyDimensions(slot,settings).centerHeight,z);
+    let pose=transportPose(baseTurn);
+    // Wide canvases need a steeper angle to keep the right edge inside the hall.
+    if(hall&&pose.error>.001){
+      let previousTurn=baseTurn;
+      for(let i=1;i<=24;i++){
+        const turn=baseTurn+(1.48-baseTurn)*i/24,candidate=transportPose(turn);
+        if(candidate.error<pose.error)pose=candidate;
+        if(candidate.error<=.001){
+          let low=previousTurn,high=turn;
+          for(let j=0;j<8;j++){const mid=(low+high)/2;if(transportPose(mid).error<=.001)high=mid;else low=mid;}
+          pose=transportPose(high);break;
+        }
+        previousTurn=turn;
+      }
+    }
+    const y=fy+trolleyDimensions(slot,settings).centerHeight;
+    if(inspectHeavy){
+      const facing=Math.atan2(eye.position.x-pose.x,eye.position.z-pose.z);
+      const position=new THREE.Vector3(pose.x,y,pose.z);
+      const rotation=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),facing);
+      if(!motion.blocked(slot,position,rotation))pose.cartYaw=facing;
+    }
+    root.rotation.set(0,pose.cartYaw,0);root.position.set(pose.x,y,pose.z);
 
   }
   function beginLift(slot,now){

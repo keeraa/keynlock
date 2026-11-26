@@ -10,10 +10,10 @@ export function createHangingTutorial(node,archiveTask,layout,settings,debug=fal
   const saved=readText(key);
   let completed=saved==='done',stage='wrong',active=false,first,second,wrong,carriedId=null,find=()=>null;
   try{stage=JSON.parse(saved)?.stage??stage;}catch{}
-  if(!['wrong','drop','first','second'].includes(stage))stage='wrong';
-  const work=()=>stage==='wrong'||stage==='drop'?wrong:stage==='second'?second:first;
+  if(!['wrong','inspect','drop','first','second'].includes(stage))stage='wrong';
+  const work=()=>['wrong','inspect','drop'].includes(stage)?wrong:stage==='second'?second:first;
   const installed=slot=>{const placed=slot&&find(slot.painting.id);return Boolean(placed&&mountedFrame(placed));};
-  function save(){writeText(key,completed?'done':JSON.stringify({version:2,stage}));}
+  function save(){writeText(key,completed?'done':JSON.stringify({version:3,stage}));}
   function advance(){
     if(!first)return;
     if(installed(first))stage='second';
@@ -33,13 +33,13 @@ export function createHangingTutorial(node,archiveTask,layout,settings,debug=fal
       let message;
       if(stage==='wrong')message=en?'Pick up the marked painting · E / LMB. We need “'+paintingTitle(first.painting)+'”.':
         'Поднимите отмеченную картину · E / ЛКМ. Нам нужна «'+paintingTitle(first.painting)+'».';
+      else if(stage==='inspect')message=en?'Hold RMB to examine the framed painting, then release it. Check whether this is “'+paintingTitle(first.painting)+'”.':
+        'Удерживайте ПКМ, чтобы рассмотреть картину в рамке, затем отпустите кнопку. Проверьте, это ли «'+paintingTitle(first.painting)+'».';
       else if(stage==='drop')message=en?'That is not “'+paintingTitle(first.painting)+'”! Look down at a clear spot on the floor and press E / LMB to throw this painting.':
         'А это не «'+paintingTitle(first.painting)+'»! Посмотрите вниз на свободное место на полу и нажмите E / ЛКМ, чтобы бросить картину.';
-      else if(holding)message=stage==='first'?(en?
-        'Hang “'+name+'” inside the green frame in the '+hall+' gallery · E / LMB to preview, then again to hang.':
-        'Повесьте «'+name+'» в область с зелёной рамкой в зале «'+hall+'» · E / ЛКМ — примерить, ещё раз — повесить.'):
-        (en?'Hang “'+name+'” in a spot it fits in the '+hall+' gallery · E / LMB to preview, then again to hang.':
-        'Повесьте «'+name+'» на подходящее по размеру место в зале «'+hall+'» · E / ЛКМ — примерить, ещё раз — повесить.');
+      else if(holding)message=(en?
+        'Each gallery has its own colour: match the frame to the painted entrance. Hang “'+name+'” inside the green frame in the '+hall+' gallery · E / LMB to preview, then again to hang.':
+        'У каждого зала свой цвет: цвет рамы совпадает с цветом входа в нужный зал. Повесьте «'+name+'» в область с зелёной рамкой в зале «'+hall+'» · E / ЛКМ — примерить, ещё раз — повесить.');
       else message=(stage==='second'?(en?'Now another gallery! ':'Теперь другой зал! '):'')+(en?
         'Follow the marker to “'+name+'”, pick it up with E / LMB and take it to the '+hall+' gallery.':
         'Найдите по указателю «'+name+'», поднимите её · E / ЛКМ — и отнесите в зал «'+hall+'».');
@@ -57,17 +57,20 @@ export function createHangingTutorial(node,archiveTask,layout,settings,debug=fal
     beginPlaytest(){reported=null;stageSince=performance.now();if(active)report();},
     setPage(slots,locate){
       active=slots.length>0;find=locate;[first,second,wrong]=tutorialWorks(slots,settings);carriedId=null;
-      if(stage==='drop')stage='wrong';
+      if(stage==='drop'||stage==='inspect')stage='wrong';
       if(!wrong&&stage==='wrong')stage='first';
       advance();refresh();
     },
     update(id,phase){
-      if(!completed&&stage==='drop'&&!id&&phase==='idle'){stage='wrong';save();carriedId=id;refresh();return;}
+      if(!completed&&['inspect','drop'].includes(stage)&&!id&&phase==='idle'){stage='wrong';save();carriedId=id;refresh();return;}
       if(id===carriedId)return;
       carriedId=id;
-      if(!completed&&stage==='wrong'&&id===wrong?.painting.id){stage='drop';save();}
+      if(!completed&&stage==='wrong'&&id===wrong?.painting.id){stage='inspect';save();}
       else if(!completed&&stage==='wrong'&&id===first?.painting.id){stage='first';save();}
       refresh();
+    },
+    inspected(slot){
+      if(!completed&&stage==='inspect'&&carriedId===wrong?.painting.id&&slot.painting.id===wrong.painting.id){stage='drop';save();refresh();}
     },
     thrown(slot){
       if(!completed&&stage==='drop'&&slot.painting.id===wrong?.painting.id){stage='first';carriedId=null;save();refresh();}
@@ -77,10 +80,10 @@ export function createHangingTutorial(node,archiveTask,layout,settings,debug=fal
       if(!active||completed)return null;
       const target=work();if(!target)return null;
       if(stage==='drop')return {kind:'drop'};
+      if(stage==='inspect')return null;
       if(carriedId===target.painting.id){
         const hall=layout.halls.find(h=>h.id===target.wall.hall);
-        if(stage==='first')return {kind:'placement',slot:first,hall,label:getLanguage()==='en'?'Hang inside the green frame':'Повесьте в зелёную рамку'};
-        if(hall)return {kind:'hall',hall,label:t(hall.title)};
+        return {kind:'placement',slot:target,hall,label:getLanguage()==='en'?'Hang inside the green frame':'Повесьте в зелёную рамку'};
       }
       const slot=find(target.painting.id);
       return slot?{kind:'painting',slot,label:paintingTitle(target.painting)}:null;

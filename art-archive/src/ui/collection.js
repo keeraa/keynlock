@@ -20,7 +20,7 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
   const label = elements('painting-label'),controls=elements('painting-controls');
   const showLabel=createPaintingLabel(label,catalog.paintings);
   const approvedIds=catalog.paintings.filter(isApprovedKeynlock).map(painting=>painting.id);
-  let disposalDirty=false;
+  let disposalDirty=false,inspectionStart=null;
   const display = createPaintingDisplay({THREE, renderer, world, catalog, config, loadingManager, onAim(slot) {
     if (hanging.active) return;
     const en = getLanguage() === 'en';
@@ -135,6 +135,17 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
     constrainMovement:hanging.constrainMovement,
     setFreePlacement(value){hanging.setFreePlacement(value);refreshTutorial();},
     aimedId:()=>(hanging.active?hanging.aimed():display.aimedSlot())?.painting.id,
-    inspect(value){hanging.setInspecting(Boolean(value));player.zoom?.(Boolean(value)&&!hanging.carriedId);if(!value)return true;const slot=hanging.active?hanging.inspectSlot():display.aimedSlot();if(!slot){player.zoom?.(false);return false;}onEvent('painting_inspect',{paintingId:slot.painting.id});return true;},
+    inspect(value){
+      if(!value){
+        hanging.setInspecting(false);player.zoom?.(false);
+        if(inspectionStart&&performance.now()-inspectionStart.time>=350&&hanging.carriedId===inspectionStart.slot.painting.id)tutorial.inspected(inspectionStart.slot);
+        inspectionStart=null;return true;
+      }
+      const slot=hanging.active?hanging.inspectSlot():display.aimedSlot();
+      if(!slot){hanging.setInspecting(false);player.zoom?.(false);inspectionStart=null;return false;}
+      hanging.setInspecting(true);player.zoom?.(!hanging.carriedId);
+      inspectionStart=hanging.carriedId===slot.painting.id?{slot,time:performance.now()}:null;
+      onEvent('painting_inspect',{paintingId:slot.painting.id});return true;
+    },
     switchHanging,locate,dispose(){life.dispose();hanging.dispose();display.dispose();}};
 }

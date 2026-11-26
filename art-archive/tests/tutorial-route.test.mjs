@@ -13,7 +13,7 @@ const json=name=>JSON.parse(fs.readFileSync(new URL(name,import.meta.url)));
 const config=json('../config/scene.json'),layout=makeLayout(config);
 const page=arrangeExhibition(json('../catalog/manifest.json'),json('../catalog/initial-selection.json'),layout,config.paintings).slots(0);
 
-test('tutorial teaches a wrong pickup and completed throw, then two different galleries, retaining progress',t=>{
+test('tutorial teaches held inspection before a wrong-picture throw, then two marked galleries, retaining progress',t=>{
  const saved=[globalThis.window,globalThis.localStorage],memory=new Map();
  globalThis.window={};globalThis.localStorage={getItem:k=>memory.get(k),setItem:(k,v)=>memory.set(k,v)};
  t.after(()=>{[globalThis.window,globalThis.localStorage]=saved;});
@@ -30,16 +30,20 @@ test('tutorial teaches a wrong pickup and completed throw, then two different ga
  tutorial.setPage(page,id=>poses.get(id));
  assert.equal(tutorial.target().slot.painting.id,wrong.painting.id);
  tutorial.update(wrong.painting.id);
+ assert.equal(tutorial.stage,'inspect');assert.match(node.textContent,/Удерживайте ПКМ.*рассмотреть/);
+ tutorial.thrown(wrong);assert.equal(tutorial.stage,'inspect','throwing before inspection cannot skip the lesson');
+ tutorial.inspected(first);assert.equal(tutorial.stage,'inspect','examining another work cannot complete this step');
+ tutorial.inspected(wrong);
  assert.match(node.textContent,/А это не.*Посмотрите вниз.*бросить/);
  assert.equal(tutorial.target().kind,'drop');
  tutorial.update(null,'idle'); // Placing it down without a throw offers the pickup again.
  assert.equal(tutorial.target().slot.painting.id,wrong.painting.id);
- tutorial.update(wrong.painting.id);
+ tutorial.update(wrong.painting.id);tutorial.inspected(wrong);
  tutorial.update(null); // A temporarily empty hand alone must not complete the throwing lesson.
  assert.equal(tutorial.target().kind,'drop');
  tutorial.thrown(first);assert.equal(tutorial.target().kind,'drop');
  tutorial.thrown(wrong);assert.equal(tutorial.target().slot.painting.id,first.painting.id);
- tutorial.update(first.painting.id);assert.equal(tutorial.target().hall.id,first.wall.hall);
+ tutorial.update(first.painting.id);assert.equal(tutorial.target().hall.id,first.wall.hall);assert.match(node.textContent,/У каждого зала свой цвет.*цвет рамы.*цветом входа/);
  poses.set(first.painting.id,first);tutorial.mounted(first);tutorial.update(null);
  assert.equal(node.hidden,false);assert.match(node.textContent,/Теперь другой зал/);
  assert.notEqual(memory.get(STORAGE_KEYS.tutorial),'done');
@@ -68,7 +72,7 @@ test('objective marker follows moved paintings, stays on screen behind the playe
  guide.dispose();assert.equal(marker.removed,true);
 });
 
-test('the first carried tutorial work points to a green frame of its real size and removes it after that step',t=>{
+test('both carried tutorial works point to green frames at their own planned wall positions',t=>{
  const previous=[globalThis.document,globalThis.window,globalThis.localStorage];
  class Element{constructor(){this.style={};this.dataset={};this.children=[];}setAttribute(){}append(...nodes){this.children.push(...nodes);}remove(){}}
  globalThis.document={createElement:()=>new Element()};globalThis.window={};globalThis.localStorage={getItem:()=>null,setItem(){}};
@@ -84,6 +88,11 @@ test('the first carried tutorial work points to a green frame of its real size a
  assert(Math.abs(zone.position.y-config.building.floorElevation-first.y)<1e-8);
  assert(zone.children[0].scale.x>first.width);
  poses.set(first.painting.id,first);tutorial.mounted(first);tutorial.update(second.painting.id);
- guide.update(tutorial.target(),true);assert.equal(zone.visible,false);
+ const secondTarget=tutorial.target();assert.equal(secondTarget.kind,'placement');assert.equal(secondTarget.slot,second);
+ guide.update(secondTarget,true);assert.equal(zone.visible,true);
+ assert(Math.abs(zone.position.x-second.x-second.normal.x*.018)<1e-8);
+ assert(Math.abs(zone.position.z-second.z-second.normal.z*.018)<1e-8);
+ assert(Math.abs(zone.position.y-config.building.floorElevation-second.y)<1e-8);
+ poses.set(second.painting.id,second);tutorial.mounted(second);guide.update(tutorial.target(),true);assert.equal(zone.visible,false);
  guide.dispose();assert.equal(scene.children.length,0);
 });

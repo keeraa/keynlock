@@ -166,7 +166,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       }
       if(!interaction.placing)hint=text('E / ЛКМ — примерить на стене, положить на стол или отпустить · удерживайте ПКМ — рассмотреть','E / LMB — preview on wall, place on table or release · hold RMB — inspect');
       if(hit&&!reachable)placementFailure='out_of_reach';
-      if(hit && !reachable)hint=(interaction.placing||large)?text('Подойдите ближе · установка до 6 м','Move closer · placement within 6 m'):text('E / ЛКМ — короткий бросок в этом направлении','E / LMB — short throw in this direction');
+      if(hit && !reachable)hint=interaction.placing?text('Подойдите ближе · установка до 6 м','Move closer · placement within 6 m'):large?text('E / ЛКМ — оставить картину на тележке','E / LMB — leave the painting on its trolley'):text('E / ЛКМ — короткий бросок в этом направлении','E / LMB — short throw in this direction');
       if(!inspectionHeld && interaction.placing && reachable){
         const w=hit.wall,limits=wallSettings(w),half=frameDimensions(interaction.carrying,settings).height/2;
         const aimX=hit.along;
@@ -266,7 +266,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     if(interaction.carrying){
       const hit=aim(),support=aimedSupport(origin,dir,layout,config,hit?.distance,settings.placementReachM??6);
       const reachable=hit && hit.distance<=(settings.placementReachM??6);
-      if(support||!hit||(!reachable&&!interaction.placing&&!usesTrolley(interaction.carrying))){
+      if(support||!hit||(!reachable&&!interaction.placing)){
         if(interaction.placing){interaction.carry();cursor=null;update(true);}
         if((!support||support.kind==='floor')&&!usesTrolley(interaction.carrying))drop({throwing:true,surface:'floor'});
         else if(support?.kind==='table')drop({surface:'table'});

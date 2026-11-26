@@ -4,7 +4,7 @@ export function bindPlayerInput({canvas,player,getMode,lock,actions,hideProgress
  const life=createLifecycle(),{state,held}=player;
  let timer=null,press=false,longPress=false,tap=false;
  let hide=null,inspecting=false;
- function stopInspection(){if(inspecting){inspecting=false;actions.inspect(false);}}
+ function stopInspection(){if(inspecting){inspecting=false;if(state){state.lastPointer=null;state.edge.until=0;}actions.inspect(false);}}
  const hideDuration=2000;
  function resetHide(){
   hide=null;
@@ -46,10 +46,10 @@ export function bindPlayerInput({canvas,player,getMode,lock,actions,hideProgress
  life.own(()=>clearTimeout(timer));
  life.listen(canvas,'contextmenu',e=>{if(getMode()==='play')e.preventDefault();});
  life.listen(canvas,'pointerdown',e=>{
-  if(e.button===2&&getMode()==='play'){e.preventDefault();inspecting=actions.inspect(true)!==false;}
+  if(e.button===2&&getMode()==='play'){e.preventDefault();inspecting=actions.inspect(true)!==false;if(inspecting&&state){state.lastPointer=null;state.edge.until=0;}}
  });
  life.listen(document,'mousemove',e=>{
-  if(getMode()!=='play')return;
+  if(getMode()!=='play'||inspecting)return;
   if(lock.locked()){state.edge.until=0;player.turn(e.movementX,e.movementY);}
   else{
    if(state.lastPointer)player.turn(e.clientX-state.lastPointer.x,e.clientY-state.lastPointer.y);
@@ -70,7 +70,7 @@ export function bindPlayerInput({canvas,player,getMode,lock,actions,hideProgress
   if(['tab',' ','w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(key))e.preventDefault();
   if(e.repeat){if(mode==='play'&&['w','a','s','d','shift','arrowup','arrowdown','arrowleft','arrowright'].includes(key))held.add(key);return;}
   if(key==='tab'){actions.plan();return;}
-  if(e.code==='KeyL'&&mode==='play'){player.level();return;}
+  if(e.code==='KeyL'&&mode==='play'){if(!inspecting)player.level();return;}
   if(key==='escape'){if(lock.justReleasedByBrowser())return;mode==='intro'?actions.play():actions.pause();return;}
   if(mode!=='play')return;
   if(key===' '||key==='p'){actions.pause();return;}if(key==='h')actions.hints();

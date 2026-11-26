@@ -324,8 +324,8 @@ test('preview and placement share the same reach; leaving reach restores carryin
  const x=(wall.a.x+wall.b.x)/2,z=(wall.a.z+wall.b.z)/2;
  const at=distance=>{camera.position.set(x+n.x*distance,fy+1.7,z+n.z*distance);camera.lookAt(x,fy+2.1,z);};
  const ghost=scene.getObjectByName('wall-preview'),held=scene.getObjectByName('carried-painting');
- at(10);session.interact();session.interact();assert.equal(memory.size,0);
- assert(controls.textContent.includes('Подойдите ближе'));
+ at(10);session.update(true);assert.equal(memory.size,0);
+ assert(controls.textContent.includes('оставить картину на тележке'));
  assert.equal(session.phase,'carrying');assert(!ghost.visible);assert(held.visible);
  at(3);session.interact();assert.equal(session.phase,'placing');assert(ghost.visible);assert(!held.visible);
  at(10);session.update(true);assert(!ghost.visible);assert(held.visible);
@@ -665,4 +665,28 @@ test('interacting with a distant reticle throws weakly forward instead of denyin
  const landed=visible[0],dx=landed.x-start.x,dz=landed.z-start.z,fx=ahead.x-start.x,fz=ahead.z-start.z;
  assert(dx*fx+dz*fz>0);assert(Math.abs(dx*fz-dz*fx)<1e-5);assert(Math.hypot(dx,dz)<=2.6+1e-6);
  assert(!events.some(e=>e.name==='painting_recovered'));
+});
+
+test('E leaves a heavy painting on its current trolley when the reticle hits a distant wall',t=>{
+ let now=1000;t.mock.method(performance,'now',()=>now);
+ const memory=new Map(),events=[];globalThis.window={};globalThis.localStorage={getItem:k=>memory.get(k),setItem:(k,v)=>memory.set(k,v)};
+ t.after(()=>{delete globalThis.window;delete globalThis.localStorage;});
+ const slot=page.find(s=>s.destination.startsWith('center/')&&s.width>2),camera=new THREE.PerspectiveCamera(73,1.5),scene=new THREE.Scene(),controls={};
+ const session=createHangingSession({THREE,world:{camera,scene,layout},config,label:{},controls,onEvent:(name,data)=>events.push({name,...data}),display:{setSlots(){}}});t.after(()=>session.dispose());
+ session.setPage([slot]);session.setActive(true);
+ const source=session.find(slot.painting.id),fy=config.building.floorElevation;
+ camera.position.set(source.x,fy+1.78,source.z+1);camera.lookAt(source.x,fy+source.y,source.z);assert(session.interact());
+ for(let i=1;i<=40;i++){now+=40;session.update(true,now);}
+ const wall=layout.hangingWalls.find(w=>w.id==='cn/end');
+ camera.lookAt((wall.a.x+wall.b.x)/2,fy+1.78,(wall.a.z+wall.b.z)/2);
+ for(let i=41;i<=80;i++){now+=40;session.update(true,now);}
+ assert.match(controls.textContent,/оставить картину на тележке/,'a real distant wall must take the parking branch');
+ const before=scene.getObjectByName('carried-painting').position.clone();
+ assert(session.interact());now+=400;session.update(true,now);
+ assert.equal(session.phase,'idle');assert.equal(session.carriedId,undefined);
+ const parked=session.find(slot.painting.id);assert(parked.trolley);
+ assert(Math.hypot(parked.x-before.x,parked.z-before.z)<.001,'park at the actual trolley, rather than the distant reticle');
+ assert(Math.abs(fy+parked.y-before.y)<.05,'only settle the wheels onto the supporting floor or rug');
+ assert(events.some(e=>e.name==='painting_drop'&&e.surface==='trolley'));
+ assert(!events.some(e=>e.name==='painting_recovered'||e.name==='placement_failed'&&e.reason==='out_of_reach'));
 });

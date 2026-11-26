@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import {readFileSync} from 'node:fs';
 import {createPlaytestCollector} from '../src/playtest/collector.js';
+import {createPlaytestStatistics} from '../src/playtest/statistics.js';
 import {handlePlaytest} from '../server/playtest.js';
 function memory(){const map=new Map();return {getItem:k=>map.get(k)??null,setItem:(k,v)=>map.set(k,v),map};}
 function fixture(t){
@@ -46,7 +47,7 @@ test('the ingestion API rejects other origins and malformed batches atomically',
 test('a performance summary records stalls and the elapsed tutorial stage, not per-frame uploads',async()=>{
  let time=0,serial=0;const bodies=[];
  const collector=createPlaytestCollector({storage:memory(),now:()=>time,uuid:()=>`random_id_${++serial}`,send:async(_path,options)=>{const b=JSON.parse(options.body);bodies.push(b);return {ok:true,json:async()=>({accepted:b.events.map(e=>e.id)})};}});
- collector.start();collector.setMode('play');for(let i=0;i<600;i++){time+=i%60===0?120:50;collector.frame(i%60===0?120:50);}collector.track('tutorial_step',{stage:'drop',previous:'wrong',stepElapsedMs:time});await collector.flush();
+ const statistics=createPlaytestStatistics({storage:memory(),now:()=>time});statistics.setMode('play');collector.start();collector.setMode('play');for(let i=0;i<600;i++){const ms=i%60===0?120:50;time+=ms;const sample=statistics.frame(ms);if(sample)collector.track('performance_sample',sample);}collector.track('tutorial_step',{stage:'drop',previous:'wrong',stepElapsedMs:time});await collector.flush();
  const events=bodies.flatMap(b=>b.events);assert.equal(events.filter(e=>e.name==='performance_sample').length,1);
  assert(events.find(e=>e.name==='performance_sample').data.slowFrames>0);assert.equal(events.find(e=>e.name==='tutorial_step').data.previous,'wrong');assert(events.length<10);
 });

@@ -130,7 +130,7 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
     if(disposalDirty){disposalDirty=false;refresh();}
   }
   return {
-    beginPlaytest:tutorial.beginPlaytest,playtestSnapshot:()=>({...hanging.playtestSnapshot(),tutorial:tutorial.stage}),
+    carriedId:()=>hanging.carriedId,beginPlaytest:tutorial.beginPlaytest,playtestSnapshot:()=>({...hanging.playtestSnapshot(),tutorial:tutorial.stage,catalogSelected:exhibition.selected}),
     warmUp:display.warmUp,syncVisibility:display.syncVisibility,
     setStyle:display.gouache.setStyle,setEasyMode:display.gouache.setEasyMode,setPigment:display.gouache.setPigment,
     update,wallPick:hanging.wallPick,setPlacementEffect:hanging.setPlacementEffect,

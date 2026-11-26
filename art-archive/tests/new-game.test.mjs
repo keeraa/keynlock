@@ -4,14 +4,15 @@ import {resetArchiveProgress} from '../src/persistence/new-game.js';
 import {STORAGE_KEYS} from '../src/persistence/storage.js';
 
 test('a new game clears the active run while preserving selection, settings and the other save',()=>{
- const {hanging,disposal,tutorial,player}=STORAGE_KEYS;
+ const {hanging,disposal,tutorial,player,statistics}=STORAGE_KEYS;
  const selection='keynlock-painting-archive-1500-v1';
  const data=new Map([[hanging,'{"work":{}}'],[disposal,'{"destroyed":["KNL-0001"]}'],[tutorial,'done'],
   [player,'{"limitFps":true}'],[selection,'{"included":{"work":false}}'],[hanging+'-debug','{"debugWork":{}}'],
-  [hanging+'-free','{"freeWork":{}}'],[hanging+'-free-debug','{"debugFree":{}}']]);
+  [statistics,'{"activeMs":20000}'],[statistics+'-free','{"activeMs":8000}'],[statistics+'-debug','{"activeMs":1000}'],[hanging+'-free','{"freeWork":{}}'],[hanging+'-free-debug','{"debugFree":{}}']]);
  const storage={getItem:key=>data.get(key)??null,setItem:(key,value)=>data.set(key,value),removeItem:key=>data.delete(key)};
  assert.equal(resetArchiveProgress(storage),true);
  assert.deepEqual([data.get(hanging),data.get(disposal),data.get(tutorial)],['{}','{}','']);
+ assert.equal(data.get(statistics),'{}');assert.equal(data.get(statistics+'-free'),'{}');assert.equal(data.get(statistics+'-debug'),'{"activeMs":1000}');
  assert.equal(data.get(player),'{"limitFps":true}');
  assert.equal(data.get(selection),'{"included":{"work":false}}');
  assert.equal(data.get(hanging+'-debug'),'{"debugWork":{}}');

@@ -2,7 +2,7 @@ import {PLAYTEST_EVENTS,PLAYTEST_BUILD} from './schema.js';
 const KEY='keynlock-art-playtest-outbox-v1',PREF='keynlock-art-playtest-enabled-v1',allowed=new Set(PLAYTEST_EVENTS);
 const noop=()=>{};
 export function createPlaytestCollector({storage,send=globalThis.fetch?.bind(globalThis),now=()=>performance.now(),date=()=>new Date().toISOString(),uuid=()=>crypto.randomUUID(),build=PLAYTEST_BUILD}={}){
- let enabled=true,outbox={events:[],feedback:[]},session=null,mode='intro',mark=now(),active=0,persisted=true,flushing=null,performanceMark=mark,samples=[];
+ let enabled=true,outbox={events:[],feedback:[]},session=null,mode='intro',mark=now(),active=0,persisted=true,flushing=null;
  try{storage??=globalThis.localStorage;enabled=storage.getItem(PREF)!=='false';const saved=JSON.parse(storage.getItem(KEY));if(saved&&Array.isArray(saved.events)&&Array.isArray(saved.feedback))outbox=saved;}catch{}
  outbox.events=outbox.events.slice(-1000);outbox.feedback=outbox.feedback.slice(-10);
  const save=()=>{try{storage.setItem(KEY,JSON.stringify(outbox));persisted=true;return true;}catch{persisted=false;return false;}};
@@ -54,7 +54,7 @@ export function createPlaytestCollector({storage,send=globalThis.fetch?.bind(glo
  function flush(){if(!flushing)flushing=drain().finally(()=>{flushing=null;});return flushing;}
  function start(data={}){
   if(session&&!session.ended)return false;
-  session={id:uuid(),start:now(),ended:false};active=0;mark=now();performanceMark=mark;samples=[];
+  session={id:uuid(),start:now(),ended:false};active=0;mark=now();
   track('session_start',data);void flush();return true;
  }
  function end(reason='feedback'){if(!session||session.ended)return;track('session_end',{reason});session.ended=true;void flush();}
@@ -64,14 +64,6 @@ export function createPlaytestCollector({storage,send=globalThis.fetch?.bind(glo
   setEnabled(value){enabled=Boolean(value);try{storage.setItem(PREF,String(enabled));}catch{}if(!enabled){outbox.events=[];save();}else if(session&&!session.ended)track('session_start',{reason:'collection_enabled'});},
   setMode(next){tally();mode=next;track('mode_change',{mode:next});},
   checkpoint(data={}){track('session_checkpoint',data);void flush();},
-  frame(ms){
-   if(!enabled||!session||session.ended||mode!=='play'||!Number.isFinite(ms)||ms<=0)return;
-   samples.push(ms);if(samples.length>7200)samples.shift();
-   if(now()-performanceMark<30000)return;
-   const sorted=[...samples].sort((a,b)=>a-b),mean=samples.reduce((a,b)=>a+b,0)/samples.length;
-   track('performance_sample',{fps:Math.round(1000/mean),p95Ms:Math.round(sorted[Math.floor(sorted.length*.95)]),slowFrames:samples.filter(v=>v>50).length,frames:samples.length});
-   performanceMark=now();samples=[];
-  },
   async feedback(answers){
    if(!session)start();
    const existing=outbox.feedback.find(f=>f.sessionId===session.id),item={id:existing?.id??uuid(),sessionId:session.id,build,unclear:String(answers.unclear??'').slice(0,2000),frustrating:String(answers.frustrating??'').slice(0,2000),bug:String(answers.bug??'').slice(0,3000),continuePlaying:answers.continuePlaying,elapsedMs:Math.min(604800000,Math.max(0,Math.round(now()-session.start)))};

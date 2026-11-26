@@ -41,5 +41,5 @@ export function createHallCompletion(halls,setArchGlow,setFrameFlash){
   }
   return celebrated;
  }
- return {sync,update,clear(){for(const [id,state] of rooms){state.started=null;state.complete=false;present(id,state,0,0);}}};
+ return {get completedCount(){return [...rooms.values()].filter(room=>room.complete).length;},sync,update,clear(){for(const [id,state] of rooms){state.started=null;state.complete=false;present(id,state,0,0);}}};
 }

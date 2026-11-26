@@ -1,5 +1,5 @@
 import {getLanguage} from '../localization/i18n.js';
-export function mountPlaytestInterface({collector,elements,setMode}){
+export function mountPlaytestInterface({collector,elements,setMode,getStatistics}){
  const en=getLanguage()==='en',text=(ru,english)=>en?english:ru;
  const notice=document.createElement('label');notice.className='playtest-notice';
  const consent=document.createElement('input');consent.type='checkbox';consent.checked=collector.enabled;
@@ -8,6 +8,9 @@ export function mountPlaytestInterface({collector,elements,setMode}){
  const setting=notice.cloneNode(true),pauseConsent=setting.querySelector('input');elements('pause').querySelector('.panel').append(setting);
  const change=e=>{collector.setEnabled(e.target.checked);consent.checked=pauseConsent.checked=collector.enabled;};
  consent.addEventListener('change',change);pauseConsent.addEventListener('change',change);
+ const download=document.createElement('button');download.id='playtest-report-download';download.textContent=text('Скачать статистику JSON','Download statistics JSON');
+ const exportReport=()=>{const blob=new Blob([JSON.stringify(getStatistics(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='art-archive-statistics.json';document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+ download.addEventListener('click',exportReport);elements('pause').querySelector('.panel').append(download);
  const button=document.createElement('button');button.id='playtest-feedback-open';button.textContent=text('Завершить плейтест и оставить отзыв','Finish playtest and leave feedback');
  elements('pause').querySelector('.panel').append(button);
  const dialog=document.createElement('dialog');dialog.id='playtest-feedback';dialog.className='playtest-feedback';
@@ -23,5 +26,5 @@ export function mountPlaytestInterface({collector,elements,setMode}){
   submit.disabled=false;
  };
  form.addEventListener('submit',send);
- return {open,dispose(){notice.remove();setting.remove();button.remove();dialog.remove();}};
+ return {open,dispose(){notice.remove();setting.remove();download.remove();button.remove();dialog.remove();}};
 }

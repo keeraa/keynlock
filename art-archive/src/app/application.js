@@ -1,3 +1,4 @@
+import {createPlaytestStatistics} from '../playtest/statistics.js';
 import {createPlaytestCollector} from '../playtest/collector.js';
 import {mountPlaytestInterface} from '../playtest/interface.js';
 import {createArchiveBirds} from '../environment/birds.js';
@@ -27,7 +28,8 @@ import { t, localizeDocument } from '../localization/i18n.js';
 export async function startArchiveApplication({ THREE, config, catalog, initialSelection, onProgress=()=>{} }) {
   const life = createLifecycle();
   const playtest=createPlaytestCollector();
-  const track=(name,data)=>playtest.track(name,data);
+  let statistics,collectionForStatistics=null;
+  const track=(name,data)=>{statistics?.track(name,data);playtest.track(name,{...data,runId:statistics?.playthroughId??''});queueMicrotask(()=>{if(!disposed&&statistics&&collectionForStatistics)statistics.progress(collectionForStatistics.playtestSnapshot());});};
   const elements = id => document.getElementById(id);
   const canvas = elements('scene');
   const frameLimit=createFrameLimit();
@@ -78,8 +80,8 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
     function setMode(next) {
       const previous = mode;
       mode = next;
-      if(next==='play'&&playtest.start({language:document.documentElement.lang,test:params.get('playtest')==='qa',viewportWidth:Math.round(innerWidth/100)*100,viewportHeight:Math.round(innerHeight/100)*100}))collection.beginPlaytest();
-      playtest.setMode(next);
+      if(next==='play'&&playtest.start({runId:statistics?.playthroughId??'',language:document.documentElement.lang,test:params.get('playtest')==='qa',viewportWidth:Math.round(innerWidth/100)*100,viewportHeight:Math.round(innerHeight/100)*100}))collection.beginPlaytest();
+      playtest.setMode(next);statistics?.setMode(next);
       audio.setPlaying(next==='play');
       music?.setPaused(next!=='play');
       if(next==='pause'&&previous==='play')audio.play('menu');
@@ -139,13 +141,21 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
     const input=own(bindPlayerInput({ canvas, player, hideProgress:elements('hide-progress'), getMode: () => starting?'loading':mode, lock, actions }));
     own(bindInterface({ elements, actions, world, plan, hud, player, getMode: () => mode }));
 
+    statistics=createPlaytestStatistics({debug:debugSelection});
+    life.own(()=>statistics.save());
     const collection = own(bindCollection({debugSelection,initialHanging:params.get('mode')!=='walk',THREE,renderer,world,config,catalog,initialSelection,player,setMode,getMode:()=>mode,elements,notify:hud.toast,loadingManager,playSound:audio.play,setSoundMotion:audio.setMotion,onEvent:track}));
 
-    own(mountPlaytestInterface({collector:playtest,elements,setMode}));
-    const checkpoint=setInterval(()=>playtest.checkpoint(collection.playtestSnapshot()),30000);
+    collectionForStatistics=collection;statistics.progress(collection.playtestSnapshot());
+    const setFreePlacement=collection.setFreePlacement;
+    collection.setFreePlacement=value=>{statistics.setFreePlacement(value);setFreePlacement(value);statistics.progress(collection.playtestSnapshot());};
+    own(mountPlaytestInterface({collector:playtest,elements,setMode,getStatistics(){statistics.progress(collection.playtestSnapshot());return statistics.report();}}));
+    const checkpoint=setInterval(()=>{statistics.progress(collection.playtestSnapshot());statistics.save();playtest.checkpoint({...collection.playtestSnapshot(),runId:statistics.playthroughId,runActiveMs:statistics.activeMs});},30000);
     life.own(()=>clearInterval(checkpoint));
     life.listen(window,'online',()=>void playtest.flush());
-    life.listen(document,'visibilitychange',()=>{if(document.visibilityState==='hidden')playtest.checkpoint(collection.playtestSnapshot());});
+    life.listen(document,'visibilitychange',()=>{
+      if(document.visibilityState==='hidden'){statistics.setMode('background');statistics.save();playtest.setMode('background');playtest.checkpoint({...collection.playtestSnapshot(),runId:statistics.playthroughId,runActiveMs:statistics.activeMs});}
+      else{last=performance.now();statistics.setMode(mode);playtest.setMode(mode);}
+    });
     const errorMessage=value=>String(value??'Unknown error').replace(/https?:\/\/[^\s)]+/g,'[resource]').replace(/[\w.+-]+@[\w.-]+/g,'[redacted]').slice(0,240);
     life.listen(window,'error',event=>track('technical_error',{kind:'error',message:errorMessage(event.message),line:event.lineno??0}));
     life.listen(window,'unhandledrejection',event=>track('technical_error',{kind:'unhandled_rejection',message:errorMessage(event.reason?.message??event.reason)}));
@@ -177,7 +187,7 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
       if (disposed) return;
       frameId = requestAnimationFrame(frame);
       if(!frameLimit.shouldRender(now))return;
-      playtest.frame(now-last);
+      const sample=statistics.frame(now-last);if(sample)playtest.track('performance_sample',sample);
       const dt = Math.min((now - last) / 1000, .04);
       last = now;
       const canSprint=collection.canSprint();
@@ -191,6 +201,7 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
           distance*=allowed;
         }
       }
+      statistics.walk(distance,Boolean(collection.carriedId()));
       audio.walk(distance,camera.position,player.state.floorY,canSprint&&player.held.has('shift'));
       world.clouds.update(mode === 'play' ? dt : 0);
       world.birds.update(mode === 'play' ? dt : 0);
@@ -257,7 +268,7 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
         life.dispose();
       },
     };
-    life.listen(window, 'pagehide', () => {playtest.checkpoint(collection.playtestSnapshot());playtest.unload(navigator.sendBeacon?.bind(navigator));app.dispose();}, { once: true });
+    life.listen(window, 'pagehide', () => {playtest.checkpoint({...collection.playtestSnapshot(),runId:statistics.playthroughId,runActiveMs:statistics.activeMs});playtest.unload(navigator.sendBeacon?.bind(navigator));app.dispose();}, { once: true });
     return app;
   } catch (error) {
     disposed = true;

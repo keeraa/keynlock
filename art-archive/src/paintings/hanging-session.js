@@ -387,7 +387,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     get active(){return active;},
     setActive(value){updateMode(value);interaction.reset();rebuild();},
     setPage,update,interact,drop,
-    playtestSnapshot:()=>({hall:room,carrying:interaction.carrying?.painting.id??'',hung:hung.length,floor:floor.length,total:page.length,freePlacement}),
+    playtestSnapshot:()=>({hall:room,carrying:interaction.carrying?.painting.id??'',hung:hung.filter(s=>page.some(p=>p.painting.id===s.painting.id)).length,floor:floor.length,total:page.length,disposed:page.filter(s=>disposal.has(s.painting.id)).length,completedHalls:completion.completedCount,freePlacement}),
     aimed,inspectSlot(){return interaction.carrying ?? interaction.landing?.slot ?? aimed();},
     fillVacancy(slot,replacement){
       const occupied=hung.filter(s=>s!==slot);

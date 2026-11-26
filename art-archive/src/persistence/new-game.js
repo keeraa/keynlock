@@ -7,6 +7,8 @@ export function resetArchiveProgress(storage,debug=false){
   [STORAGE_KEYS.hanging+'-free'+suffix,'{}'],
   [STORAGE_KEYS.disposal+suffix,'{}'],
   [STORAGE_KEYS.tutorial+suffix,''],
+  [STORAGE_KEYS.statistics+suffix,'{}'],
+  [STORAGE_KEYS.statistics+'-free'+suffix,'{}'],
  ];
  const previous=[];
  try{

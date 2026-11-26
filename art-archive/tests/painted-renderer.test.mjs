@@ -17,12 +17,13 @@ test('painted lighting shares the contour draw and still works independently',()
   painted.setSettings({...VISUAL_DEFAULTS,...settings});
   painted.render();painted.render();
   assert.equal(painted.getPassCount(),passes);
-  assert.equal(painted.getStatus().stages.toon,settings.toonEnabled===false?'off':'active');
+  assert.equal(painted.getStatus().stages.toon,(settings.toonEnabled??VISUAL_DEFAULTS.toonEnabled)?'active':'off');
   assert.equal(target,null);
  }
  try{
   expect({},4);
-  expect({outlineEnabled:false,distanceBlurEnabled:false},2);
+  expect({toonEnabled:true},4);
+  expect({toonEnabled:true,outlineEnabled:false,distanceBlurEnabled:false},2);
   expect({toonEnabled:false},4);
   expect({toonEnabled:false,outlineEnabled:false,distanceBlurEnabled:false},1);
  }finally{painted.dispose();}

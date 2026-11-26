@@ -34,11 +34,14 @@ test('the mode report distinguishes the four combinations and their active play 
  const free=stats.report();assert.equal(free.modeSelections.free_normal,1);assert.equal(free.modeSelections.free_hard,1);assert.equal(free.modeActiveMs.free_normal,1000);assert.equal(free.modeActiveMs.free_hard,2000);
 });
 test('settings report restored choices and each placement/difficulty change with both current values',t=>{
- const previous=[globalThis.window,globalThis.localStorage];globalThis.window={};globalThis.localStorage={getItem:()=>JSON.stringify({freePlacement:true,hardMode:true}),setItem(){}};
+ const previous=[globalThis.window,globalThis.localStorage];globalThis.window={};globalThis.localStorage={getItem:()=>JSON.stringify({freePlacement:true,hardMode:true,distanceBlur:false}),setItem(){}};
  t.after(()=>{[globalThis.window,globalThis.localStorage]=previous;});
  const nodes=new Map(),elements=id=>{if(!nodes.has(id))nodes.set(id,Object.assign(new EventTarget(),{value:'',checked:false}));return nodes.get(id);};
- const choices=[],noop=()=>{};
- const controls=bindPlayerSettings({elements,onModeSelection:value=>choices.push(value),player:{state:{}},painted:{setSettings:noop},collection:{setPlacementEffect:noop,setFreePlacement:noop,setStyle:noop,setPigment:noop,setEasyMode:noop},dust:{setEnabled:noop},ink:{setEnabled:noop},setSkyColor:noop,setWallFinish:noop,setFrameLimit:noop});t.after(()=>controls.dispose());
+ const choices=[],noop=()=>{};let lighting=null,placementEffect=null;
+ const controls=bindPlayerSettings({elements,onModeSelection:value=>choices.push(value),player:{state:{}},painted:{setSettings:value=>lighting=value},collection:{setPlacementEffect:value=>placementEffect=value,setFreePlacement:noop,setStyle:noop,setPigment:noop,setEasyMode:noop},dust:{setEnabled:noop},ink:{setEnabled:noop},setSkyColor:noop,setWallFinish:noop,setFrameLimit:noop});t.after(()=>controls.dispose());
+ assert.equal(elements('toon').checked,false);assert.equal(placementEffect,'smoke');
+ assert.equal(lighting.distanceBlurEnabled,true,'retired depth setting cannot disable the permanent effect');
+ assert(!nodes.has('distance-blur'),'the removed control must not be queried or bound');
  assert.deepEqual(choices[0],{placement:'free',difficulty:'hard',source:'initial',changed:'none'});
  elements('free-placement').checked=false;elements('free-placement').dispatchEvent(new Event('change'));
  elements('hard-mode').checked=false;elements('hard-mode').dispatchEvent(new Event('change'));

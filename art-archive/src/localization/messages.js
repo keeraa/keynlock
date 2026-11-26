@@ -1,6 +1,6 @@
 export const messages={
  'Сборка':'Build','локальные изменения':'local changes',
- 'Свободный режим · размещение на любой стене без разметки':'Free mode · any wall, no marked places',
+ 'Свободный режим · в своём зале без разметки':'Free mode · own hall, no marked places',
 
  'Новая игра':'New game',
  'Начать новую игру? Развешивание, утилизация и обучение начнутся заново. Подборка и настройки сохранятся.':'Start a new game? Hanging, disposal and the tutorial will start over. Your selection and settings will be kept.',

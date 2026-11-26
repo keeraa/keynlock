@@ -610,7 +610,7 @@ test('mode changes hide marked places while preserving mounted paintings across 
  const floor=session.find(slot.painting.id),fy=config.building.floorElevation;
  camera.position.set(floor.x,fy+1.78,floor.z+1);camera.lookAt(floor.x,fy+floor.y,floor.z);
  assert(session.interact());
- const wall=layout.hangingWalls.find(w=>w.hall!==slot.wall.hall&&w.hall!=='center'&&w.id.endsWith('/end'));
+ const wall=layout.hangingWalls.find(w=>w.hall===slot.destination.split('/')[0]&&w.id.endsWith('/end'));
  const x=(wall.a.x+wall.b.x)/2,z=(wall.a.z+wall.b.z)/2;
  camera.position.set(x+wall.normal.x*2.5,fy+1.78,z+wall.normal.z*2.5);camera.lookAt(x,fy+1.7,z);
  session.update(true);assert(session.interact());assert(session.interact());
@@ -627,7 +627,7 @@ test('mode changes hide marked places while preserving mounted paintings across 
  const restored=createHangingSession({THREE,world:{camera,scene:new THREE.Scene(),layout},config,label:{},display:{setSlots(){}}});
  t.after(()=>restored.dispose());
  restored.setPage([slot]);restored.setActive(true);
- assert.equal(restored.find(slot.painting.id).wall.id,wall.id,'a free placement survives reload in block mode');
+ assert.equal(restored.find(slot.painting.id).wall.id,wall.id,'a free placement inside its hall survives reload in block mode');
  // Old free-mode saves are also retained when upgrading, with shared records winning conflicts.
  memory.set('keynlock-art-hanging-v1-free',memory.get('keynlock-art-hanging-v1'));
  memory.delete('keynlock-art-hanging-v1');

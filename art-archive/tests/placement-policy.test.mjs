@@ -26,7 +26,8 @@ test('wall policy rechecks occupancy and obstacles when a preview is committed, 
  motion.setObstacles([]);
  const other=layout.hangingWalls.find(w=>w.id==='nature/end');
  assert.equal(rules.evaluate(slot,other,other.length/2,y).reason,'wrong_hall');
- free=true;assert(rules.evaluate(slot,other,other.length/2,y).slot);
+ free=true;assert.equal(rules.evaluate(slot,other,other.length/2,y).reason,'wrong_hall');
+ assert(rules.evaluate(slot,wall,along,y).slot,'free placement remains available inside the assigned hall');
  const half=frameDimensions(slot,config.paintings).height/2;
  for(const mode of [false,true]){
   free=mode;

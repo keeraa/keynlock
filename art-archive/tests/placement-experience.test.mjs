@@ -118,10 +118,11 @@ test('wall flight and its reverse finish in 150 ms, with no snap when aim return
  const carry=root.position.clone();preview.beginWall(1000);preview.wall(slot,wall,2,2,true,false,1000);
  assert(ghost.position.distanceTo(carry)<1e-8);assert(!root.visible);
  preview.wall(slot,wall,2,2,true,false,1150);const atWall=ghost.position.clone();assert(Math.abs(atWall.x-2)<1e-8);assert(atWall.distanceTo(carry)>1);
- preview.beginReturn(1150);follow(1150);preview.returnToCarry(1150);assert(ghost.position.distanceTo(atWall)<1e-8);
- follow(1225);preview.returnToCarry(1225);const halfway=ghost.position.clone();
+ const outline=scene.getObjectByName('table-placement-outline');assert(outline.visible);
+ preview.beginReturn(1150);assert(!outline.visible,'the dashed border disappears as soon as the painting returns');follow(1150);preview.returnToCarry(1150);assert(ghost.position.distanceTo(atWall)<1e-8);
+ follow(1225);preview.returnToCarry(1225);assert(!outline.visible);const halfway=ghost.position.clone();
  assert(halfway.distanceTo(atWall)>.1&&halfway.distanceTo(root.position)>.1);
- preview.beginWall(1225);preview.wall(slot,wall,2,2,true,false,1225);assert(ghost.position.distanceTo(halfway)<1e-8,'reversing direction starts at the visible frame');
+ preview.beginWall(1225);preview.wall(slot,wall,2,2,true,false,1225);assert(ghost.position.distanceTo(halfway)<1e-8,'reversing direction starts at the visible frame');assert(outline.visible,'the border returns only when aiming at a placement');
  preview.wall(slot,wall,2,2,true,false,1375);preview.beginReturn(1375);
  follow(1525);preview.returnToCarry(1525);assert(root.visible);assert(!ghost.visible);
  preview.dispose();

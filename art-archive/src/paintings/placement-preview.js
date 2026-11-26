@@ -99,6 +99,7 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
     wallFlight={position:from.position.clone(),quaternion:from.quaternion.clone(),start:now};returnFlight=null;
   }
   function beginReturn(now){
+    tableOutline.visible=false;
     returnFlight={position:ghost.position.clone(),quaternion:ghost.quaternion.clone(),start:now};wallFlight=null;
   }
   function returnToCarry(now,cancel=false){
@@ -113,6 +114,7 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
     if(t===1)returnFlight=null;
   }
   function wall(slot,w,along,y,valid,large,now,hintOnly=false){
+    tableOutline.visible=true;
     ghost.visible=!hintOnly;if(!hintOnly)root.visible=false;
     const depth=settings.wallClearanceM+settings.frameDepthM/2+(valid?0:.035);
     ghost.position.set(w.a.x+(w.b.x-w.a.x)*along/w.length+w.normal.x*depth,config.building.floorElevation+y,
@@ -130,6 +132,7 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
   }
 
   function table(slot,now,valid=true){
+    tableOutline.visible=true;
     const pose=motion.pose(slot);
     pose.position.y+=.008;
     const delta=Math.max(0,now-tableTime),k=delta>180?1:1-Math.exp(-24*delta/1000);

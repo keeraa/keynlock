@@ -154,9 +154,9 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     const hit=aim(),reachable=hit && hit.distance<=(settings.placementReachM??6),action=text('E / ЛКМ','E / LMB');
     let message,description=null,commands='';
     if(interaction.carrying){
-      const destHall=layout.halls.find(h=>h.id===interaction.carrying.wall.hall);
+      const destHall=layout.halls.find(h=>h.id===interaction.carrying.destination.split('/')[0]);
       const theme=destHall?.walls.find(([id])=>destHall.id+'/'+id===interaction.carrying.destination);
-      const dest=freePlacement?text('Свободное размещение · любая стена','Free placement · any wall'):interaction.carrying.destination.split('/')[0]==='center'?text('✦ Шедевр · Центральная ротонда','✦ Masterpiece · Central rotunda'):[t(destHall?.title??'Ротонда'),theme&&t(theme[1])].filter(Boolean).join(' · ');
+      const dest=freePlacement?text('Свободное размещение · зал «','Free placement · hall “')+t(destHall?.title??'Ротонда')+text('»','”'):interaction.carrying.destination.split('/')[0]==='center'?text('✦ Шедевр · Центральная ротонда','✦ Masterpiece · Central rotunda'):[t(destHall?.title??'Ротонда'),theme&&t(theme[1])].filter(Boolean).join(' · ');
       const large=usesTrolley(interaction.carrying);
       let hint=text('Наведите на стену','Aim at a wall');
       if(!reachable)cursor=null;

@@ -76,7 +76,8 @@ export function settleFloor(slots,layout,config,restored=[]){
 }
 export function covered(slot,floor,settings){
   const r=footprint(slot,settings.frameWidthM);
-  return floor.some(p=>roomOf(p)===roomOf(slot)&&p.y>slot.y+.001&&p.y<=slot.y+settings.frameDepthM+.001&&overlaps(r,footprint(p,settings.frameWidthM)));
+  return floor.some(p=>p.painting.id!==slot.painting.id&&p.floorAngle!==undefined&&!p.leanPitch&&!p.trolley&&
+    roomOf(p)===roomOf(slot)&&Math.abs(p.y-slot.y-settings.frameDepthM)<.003&&overlaps(r,footprint(p,settings.frameWidthM)));
 }
 export function findDrop(slot,origin,dir,room,layout,config,floor,wallDistance=Infinity){
   const {frameWidthM:frame,frameDepthM:depth}=config.paintings;

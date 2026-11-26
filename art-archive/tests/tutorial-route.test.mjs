@@ -67,3 +67,23 @@ test('objective marker follows moved paintings, stays on screen behind the playe
  guide.update(null,true);assert.equal(marker.hidden,true);
  guide.dispose();assert.equal(marker.removed,true);
 });
+
+test('the first carried tutorial work points to a green frame of its real size and removes it after that step',t=>{
+ const previous=[globalThis.document,globalThis.window,globalThis.localStorage];
+ class Element{constructor(){this.style={};this.dataset={};this.children=[];}setAttribute(){}append(...nodes){this.children.push(...nodes);}remove(){}}
+ globalThis.document={createElement:()=>new Element()};globalThis.window={};globalThis.localStorage={getItem:()=>null,setItem(){}};
+ t.after(()=>{[globalThis.document,globalThis.window,globalThis.localStorage]=previous;});
+ const [first,second]=tutorialWorks(page,config.paintings),poses=new Map(scatterFloor(page,layout,config).map(s=>[s.painting.id,s]));
+ const tutorial=createHangingTutorial({}, {},layout,config.paintings);tutorial.setPage(page,id=>poses.get(id));tutorial.update(first.painting.id);
+ const target=tutorial.target();assert.equal(target.kind,'placement');assert.equal(target.slot,first);
+ const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera();
+ camera.position.set(first.x+first.normal.x*3,config.building.floorElevation+first.y,first.z+first.normal.z*3);camera.lookAt(first.x,config.building.floorElevation+first.y,first.z);
+ const guide=createTutorialGuide({THREE,scene,settings:config.paintings,camera,layout,floorElevation:config.building.floorElevation,parent:new Element()});
+ guide.update(target,true);const zone=scene.getObjectByName('tutorial-placement-zone');
+ assert(zone.visible);assert.equal(zone.children.length,4);assert.equal(zone.children[0].material.color.getHex(),0x45ff75);
+ assert(Math.abs(zone.position.y-config.building.floorElevation-first.y)<1e-8);
+ assert(zone.children[0].scale.x>first.width);
+ poses.set(first.painting.id,first);tutorial.mounted(first);tutorial.update(second.painting.id);
+ guide.update(tutorial.target(),true);assert.equal(zone.visible,false);
+ guide.dispose();assert.equal(scene.children.length,0);
+});

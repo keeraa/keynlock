@@ -156,6 +156,7 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
     canvas.dataset.halls = String(config.halls.length);
 
     let lastDiagnostics = -Infinity;
+    const previousEye=new THREE.Vector3();
     function frame(now) {
       if (disposed) return;
       frameId = requestAnimationFrame(frame);
@@ -163,7 +164,16 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
       const dt = Math.min((now - last) / 1000, .04);
       last = now;
       const canSprint=collection.canSprint();
-      const distance=player.update(dt,now,mode==='play',canSprint);
+      previousEye.copy(camera.position);const previousFloor=player.state.floorY;
+      let distance=player.update(dt,now,mode==='play',canSprint);
+      if(mode==='play'){
+        const allowed=collection.constrainMovement(previousEye,camera.position);
+        if(allowed<1){
+          camera.position.lerpVectors(previousEye,camera.position,allowed);
+          player.state.floorY=previousFloor+(player.state.floorY-previousFloor)*allowed;
+          distance*=allowed;
+        }
+      }
       audio.walk(distance,camera.position,player.state.floorY,canSprint&&player.held.has('shift'));
       world.clouds.update(mode === 'play' ? dt : 0);
       world.birds.update(mode === 'play' ? dt : 0);

@@ -32,8 +32,11 @@ export function createHangingTutorial(node,archiveTask,layout,settings,debug=fal
         'Поднимите отмеченную картину · E / ЛКМ. Нам нужна «'+paintingTitle(first.painting)+'».';
       else if(stage==='drop')message=en?'That is not “'+paintingTitle(first.painting)+'”! Look down at a clear spot on the floor and press E / LMB to throw this painting.':
         'А это не «'+paintingTitle(first.painting)+'»! Посмотрите вниз на свободное место на полу и нажмите E / ЛКМ, чтобы бросить картину.';
-      else if(holding)message=en?'Hang “'+name+'” in a spot it fits in the '+hall+' gallery · E / LMB to preview, then again to hang.':
-        'Повесьте «'+name+'» на подходящее по размеру место в зале «'+hall+'» · E / ЛКМ — примерить, ещё раз — повесить.';
+      else if(holding)message=stage==='first'?(en?
+        'Hang “'+name+'” inside the green frame in the '+hall+' gallery · E / LMB to preview, then again to hang.':
+        'Повесьте «'+name+'» в область с зелёной рамкой в зале «'+hall+'» · E / ЛКМ — примерить, ещё раз — повесить.'):
+        (en?'Hang “'+name+'” in a spot it fits in the '+hall+' gallery · E / LMB to preview, then again to hang.':
+        'Повесьте «'+name+'» на подходящее по размеру место в зале «'+hall+'» · E / ЛКМ — примерить, ещё раз — повесить.');
       else message=(stage==='second'?(en?'Now another gallery! ':'Теперь другой зал! '):'')+(en?
         'Follow the marker to “'+name+'”, pick it up with E / LMB and take it to the '+hall+' gallery.':
         'Найдите по указателю «'+name+'», поднимите её · E / ЛКМ — и отнесите в зал «'+hall+'».');
@@ -71,6 +74,7 @@ export function createHangingTutorial(node,archiveTask,layout,settings,debug=fal
       if(stage==='drop')return {kind:'drop'};
       if(carriedId===target.painting.id){
         const hall=layout.halls.find(h=>h.id===target.wall.hall);
+        if(stage==='first')return {kind:'placement',slot:first,hall,label:getLanguage()==='en'?'Hang inside the green frame':'Повесьте в зелёную рамку'};
         if(hall)return {kind:'hall',hall,label:t(hall.title)};
       }
       const slot=find(target.painting.id);

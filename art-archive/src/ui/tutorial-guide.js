@@ -1,17 +1,35 @@
 import {getLanguage} from '../localization/i18n.js';
+import {frameDimensions} from '../../catalog/painting-geometry.js';
 
 // Like the key archive's first-route guide: project the current objective,
 // then keep a direction cue on screen when the player looks away.
-export function createTutorialGuide({THREE,camera,layout,floorElevation,parent=document.body}){
+export function createTutorialGuide({THREE,scene,settings,camera,layout,floorElevation,parent=document.body}){
  const marker=document.createElement('div');marker.id='tutorial-marker';marker.hidden=true;
  marker.setAttribute('aria-hidden','true');
  const symbol=document.createElement('span'),caption=document.createElement('span');
  symbol.className='tutorial-marker-symbol';caption.className='tutorial-marker-caption';
  marker.append(symbol,caption);parent.append(marker);
  const point=new THREE.Vector3(),local=new THREE.Vector3();
+ const zone=scene?new THREE.Group():null;
+ const geometry=zone?new THREE.BoxGeometry(1,1,1):null;
+ const material=zone?new THREE.MeshBasicMaterial({color:0x45ff75,toneMapped:false,depthWrite:false}):null;
+ if(zone){zone.name='tutorial-placement-zone';zone.visible=false;for(let i=0;i<4;i++)zone.add(new THREE.Mesh(geometry,material));scene.add(zone);}
  return {
   update(target,playing){
    marker.hidden=!target||!playing;
+   if(zone){
+    zone.visible=Boolean(playing&&target?.kind==='placement');
+    if(zone.visible){
+     const slot=target.slot,{width,height}=frameDimensions(slot,settings),normal=slot.normal??slot.wall.normal;
+     zone.position.set(slot.x+normal.x*.018,floorElevation+slot.y,slot.z+normal.z*.018);
+     zone.rotation.y=Math.atan2(normal.x,normal.z);
+     for(let i=0;i<4;i++){
+      const bar=zone.children[i],horizontal=i<2,side=i%2?1:-1;
+      bar.scale.set(horizontal?width+.08:.04,horizontal ? .04 : height+.08,.012);
+      bar.position.set(horizontal?0:side*(width+.04)/2,horizontal?side*(height+.04)/2:0,.01);
+     }
+    }
+   }
    if(marker.hidden)return;
    const en=getLanguage()==='en';let label=target.label;
    if(target.kind==='drop'){
@@ -50,6 +68,6 @@ export function createTutorialGuide({THREE,camera,layout,floorElevation,parent=d
    symbol.style.transform=inView?'':`rotate(${Math.atan2(y,x)}rad)`;
    caption.textContent=label+' · '+Math.round(distance)+(en?' m':' м');
   },
-  dispose(){marker.remove();},
+  dispose(){marker.remove();zone?.removeFromParent();geometry?.dispose();material?.dispose();},
  };
 }

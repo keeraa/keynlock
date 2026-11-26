@@ -30,7 +30,7 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
   const inspector=createPaintingInspector({elements,catalog,setMode});
   life.own(()=>inspector.dispose());
   const tutorial=createHangingTutorial(elements('tutorial-task'),elements('archive-task'),world.layout,config.paintings,debugSelection);
-  const guide=createTutorialGuide({THREE,camera:world.camera,layout:world.layout,floorElevation:config.building.floorElevation});
+  const guide=createTutorialGuide({THREE,scene:world.scene,settings:config.paintings,camera:world.camera,layout:world.layout,floorElevation:config.building.floorElevation});
   life.own(()=>guide.dispose());
   const hanging=createHangingSession({debugSelection,THREE,world,config,display,renderer,label,showLabel,controls,notify,playSound,setSoundMotion,onMount:tutorial.mounted,onThrow:tutorial.thrown,disposalTotal:approvedIds.length,onDisposed(){disposalDirty=true;if(frame.hasAttribute?.('src'))frame.removeAttribute('src');}});
   let exhibition, currentSlots=[], page = 0, prior = 'intro';
@@ -129,6 +129,7 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
     setStyle:display.gouache.setStyle,setEasyMode:display.gouache.setEasyMode,setPigment:display.gouache.setPigment,
     update,wallPick:hanging.wallPick,setPlacementEffect:hanging.setPlacementEffect,
     canSprint:hanging.canSprint,canRaise:hanging.canRaise,raise:hanging.raise,interact:hanging.interact,exclude,
+    constrainMovement:hanging.constrainMovement,
     setFreePlacement(value){hanging.setFreePlacement(value);refreshTutorial();},
     aimedId:()=>(hanging.active?hanging.aimed():display.aimedSlot())?.painting.id,
     inspect(){inspector.open((hanging.active?hanging.inspectSlot():display.aimedSlot())?.painting);},

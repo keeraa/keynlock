@@ -154,7 +154,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       if(!reachable)cursor=null;
       if(!interaction.placing || !reachable)preview.follow(interaction.carrying,large,hall,origin,dir,interaction.source,now,interaction.raised);
       if(preview.takeLiftFailure()){
-        restoreCarrySource();notify(text('Не удалось поднять картину: путь перекрыт. Она возвращена на исходное место.','Pickup path blocked. Painting returned to its original location.'));return;
+        notify(text('Рама упирается в препятствие. Отойдите немного назад — картина остаётся у вас.','The frame is blocked. Step back a little — you are still holding the painting.'));
       }
       if(!interaction.placing)hint=text('E / ЛКМ — примерить на стене, положить на стол или отпустить · ПКМ — рассмотреть','E / LMB — preview on wall, place on table or release · RMB — inspect');
       if(hit && !reachable)hint=text('Подойдите ближе · установка до 6 м','Move closer · placement within 6 m');
@@ -353,6 +353,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     rebuild();
   }
   return {
+    constrainMovement(from,to){return interaction.carrying&&!interaction.placing?preview.constrainMovement(from,to):1;},
     get freePlacement(){return freePlacement;},
     setFreePlacement(value){
       if(freePlacement===Boolean(value))return;

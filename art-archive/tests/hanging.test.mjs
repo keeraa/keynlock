@@ -8,6 +8,7 @@ import {accepts,placedSlot,floorSlots,aimedFrameAtRay} from '../src/paintings/ha
 import {createHangingSession} from '../src/paintings/hanging-session.js';
 import {tutorialWork} from '../src/paintings/floor-scatter.js';
 import {createHangingTutorial} from '../src/ui/hanging-tutorial.js';
+import {covered} from '../src/paintings/floor-drop.js';
 import {PLAYER_DEFAULTS} from '../config/runtime.js';
 import {createNavigation} from '../src/player/movement.js';
 const json=path=>JSON.parse(fs.readFileSync(new URL(path,import.meta.url)));
@@ -65,7 +66,7 @@ test('the starter work is face-up near spawn and plays distinct pickup and mount
  const fy=config.building.floorElevation,wall=layout.hangingWalls.find(w=>w.id===work.wall.hall+'/end');
  camera.position.set(spawn.x,fy+PLAYER_DEFAULTS.eyeHeight,spawn.z);
  camera.lookAt(floor.x,fy+floor.y,floor.z);
- assert(session.interact());tutorial.update(session.carriedId);assert.match(node.textContent,/Повесьте.*подходящее по размеру место/);
+ assert(session.interact());tutorial.update(session.carriedId);assert.match(node.textContent,/Повесьте.*зелёной рамкой/);
  const x=(wall.a.x+wall.b.x)/2,z=(wall.a.z+wall.b.z)/2;
  camera.position.set(x+wall.normal.x*2.6,fy+1.78,z+wall.normal.z*2.6);camera.lookAt(x,fy+2.15,z);
  session.update(true);assert(session.interact());assert(session.interact());
@@ -617,4 +618,13 @@ test('free mode mounts on another gallery’s wall without marked places and kee
  assert.notEqual(session.find(slot.painting.id).floorAngle,undefined);
  session.setFreePlacement(true);
  assert.equal(session.find(slot.painting.id).wall.id,wall.id);
+});
+
+test('only a flat painting resting on the frame blocks a floor pickup',()=>{
+ const lower={...page.find(s=>s.painting.id==='ART-1815'),floorAngle:0,x:0,y:.025,z:20,floorRoom:'cn'};
+ const upper={...lower,painting:{...lower.painting,id:'upper'},y:.075};
+ assert.equal(covered(lower,[lower,upper],config.paintings),true);
+ assert.equal(covered(lower,[lower,{...upper,leanPitch:-.22}],config.paintings),false);
+ assert.equal(covered(lower,[lower,{...upper,trolley:true}],config.paintings),false);
+ assert.equal(covered(lower,[lower,{...upper,y:.0575}],config.paintings),false);
 });

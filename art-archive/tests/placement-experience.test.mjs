@@ -52,3 +52,57 @@ test('success smoke starts around all four sides, disperses briefly, then costs 
  feedback.update(1500);assert(smoke.visible);feedback.update(2100);assert(!smoke.visible);
  feedback.dispose();assert.equal(scene.children.length,0);
 });
+
+test('a wide floor painting tilts into the trolley pose without requiring its diagonal above the ceiling',()=>{
+ const motion=createFrameMotion(THREE,config,layout),hall=layout.halls[0],at=layout.world(hall,0,hall.start+10);
+ const large={...slot,painting:{...slot.painting,physicalSizeM:{width:5,height:2.5}},width:5.135,height:2.5,
+  x:at.x,z:at.z,y:.025,floorAngle:hall.angle,normal:{x:0,z:1}};
+ const from=motion.pose(large),to={position:new THREE.Vector3(at.x+.6,fy+1.6075,at.z+1),quaternion:new THREE.Quaternion()};
+ const path=motion.route(large,from,to,{pickup:true});assert(path,'an unobstructed tilt must be possible');
+ assert(Math.max(...path.map(p=>p.position.y))<fy+2.4,'do not hoist the diagonal above the painting');
+ for(let i=1;i<path.length;i++)assert.equal(motion.advance(large,path[i-1],path[i]),1);
+});
+
+test('a blocked initial pickup keeps its visible frame and reports its obstruction only once',()=>{
+ const camera=new THREE.PerspectiveCamera(73,1.5),scene=new THREE.Scene();camera.position.set(0,fy+1.78,20);
+ const motion={pose:s=>({position:new THREE.Vector3(s.x,fy+s.y,s.z),quaternion:new THREE.Quaternion()}),blocked:()=>true,advance:()=>0,route:()=>null};
+ const preview=createPlacementPreview(THREE,{camera,scene,layout},{},config,motion);preview.select(slot);preview.beginLift(slot,0);
+ let warnings=0;
+ for(let now=0;now<2500;now+=16){preview.follow(slot,false,null,new THREE.Vector3(0,1.78,20),new THREE.Vector3(0,0,-1),slot,now,false);if(preview.takeLiftFailure())warnings++;}
+ assert.equal(warnings,1);assert(scene.getObjectByName('carried-painting').visible);
+ preview.dispose();
+});
+
+test('walking with a carried painting stops at the wall without losing the frame or jumping between poses',()=>{
+ const camera=new THREE.PerspectiveCamera(73,1.5),scene=new THREE.Scene(),hall=layout.halls[0],at=layout.world(hall,0,hall.start+10);
+ camera.position.set(at.x,fy+1.78,at.z);camera.lookAt(at.x,fy+1.78,at.z-1);
+ const motion=createFrameMotion(THREE,config,layout),preview=createPlacementPreview(THREE,{camera,scene,layout},{},config,motion);
+ const s={...slot,x:at.x,y:.025,z:at.z-1,floorAngle:hall.angle};preview.select(s);preview.beginLift(s,0);
+ const origin=new THREE.Vector3(),dir=new THREE.Vector3();
+ const follow=now=>{origin.copy(camera.position);origin.y-=fy;camera.getWorldDirection(dir);preview.follow(s,false,hall,origin,dir,s,now,false);};
+ for(let now=0;now<1000;now+=16)follow(now);
+ const held=scene.getObjectByName('carried-painting');let stopped=false;
+ for(let now=1000;now<5000;now+=16){
+  const before=camera.position.clone(),desired=before.clone();desired.x+=.06;
+  const allowed=preview.constrainMovement(before,desired);stopped||=allowed<1;
+  camera.position.lerpVectors(before,desired,allowed);
+  const pose=held.position.clone();follow(now);
+  assert(held.visible);assert(held.position.distanceTo(pose)<.3,'wall contact cannot restart a lifting bounce');
+  assert(held.position.distanceTo(camera.position)<3,'the camera cannot run away from the carried frame');
+ }
+ assert(stopped);preview.dispose();
+});
+
+test('running during a blocked pickup cannot leave the frame behind at a stair height change',()=>{
+ const camera=new THREE.PerspectiveCamera(73,1.5),scene=new THREE.Scene();camera.position.set(0,fy+1.78,20);
+ const motion={pose:s=>({position:new THREE.Vector3(s.x,fy+s.y,s.z),quaternion:new THREE.Quaternion()}),blocked:()=>true,advance:()=>0,route:()=>null};
+ const preview=createPlacementPreview(THREE,{camera,scene,layout},{},config,motion);preview.select(slot);preview.beginLift(slot,0);
+ const origin=new THREE.Vector3(),dir=new THREE.Vector3(0,0,-1),held=scene.getObjectByName('carried-painting');
+ for(let now=0;now<3500;now+=16){
+  const from=camera.position.clone(),to=from.clone().add(new THREE.Vector3(.05,-.025,.075));
+  camera.position.lerpVectors(from,to,preview.constrainMovement(from,to));
+  origin.copy(camera.position);origin.y-=fy;preview.follow(slot,false,null,origin,dir,slot,now,false);
+  assert(held.visible);assert(held.position.distanceTo(camera.position)<=2.8001);
+ }
+ preview.dispose();
+});

@@ -31,7 +31,7 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
   let tableDetail=null,tablePairs=[],tableTime=-Infinity;
   function clearTableDetail(){tableDetail?.removeFromParent();tableDetail=null;for(const pair of tablePairs)pair.material.dispose();tablePairs=[];}
   let last=0,lift=null,hovered=null,hoverTime=0;
-  let wallFlight=null,liftFailure=false,stuckSince=null,parkingPose=null;
+  let wallFlight=null,liftFailure=false,stuckSince=null,parkingPose=null,avoidance=null,preferredClearSince=null;
   const parked={position:new THREE.Vector3(),quaternion:new THREE.Quaternion()};
   const smooth=t=>t*t*t*(10+t*(-15+6*t));
   const lastEyeRotation=new THREE.Quaternion(),lastEyePosition=new THREE.Vector3();
@@ -43,7 +43,7 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
   function select(slot){
     if(slot===current)return;
     if(slot && slot.painting.id===current?.painting.id)return;
-    wallFlight=null;lift=null;liftFailure=false;stuckSince=null;parkingPose=null;
+    wallFlight=null;lift=null;liftFailure=false;stuckSince=null;parkingPose=null;avoidance=null;preferredClearSince=null;
     cart.removeFromParent();cart=new THREE.Group();
     seal?.removeFromParent();seal=null;
     const generation=++request;
@@ -187,22 +187,31 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
     const orientation=carryRotation.makeRotationFromQuaternion(root.quaternion).elements;
     const halfY=(Math.abs(orientation[1])*size.width+Math.abs(orientation[5])*size.height+Math.abs(orientation[9])*size.depth)/2;
     root.position.y=Math.max(floorY+halfY+.04,root.position.y);
-    if(!large && motion.blocked(slot,root.position,root.quaternion)){
+    if(!large || raised){
       const desiredPosition=root.position.clone(),desiredRotation=root.quaternion.clone();
-      search:for(const pull of [.25,.5,.7])for(const turn of [0,.4,-.4,.8,-.8]){
-        root.position.lerpVectors(desiredPosition,world.camera.position,pull);
-        root.quaternion.copy(desiredRotation);root.rotateY(turn);
-        if(!motion.blocked(slot,root.position,root.quaternion))break search;
-        root.position.copy(desiredPosition);root.quaternion.copy(desiredRotation);
+      const apply=choice=>{
+        root.position.lerpVectors(desiredPosition,world.camera.position,choice.pull);
+        root.position.y+=choice.rise;
+        root.quaternion.copy(desiredRotation);root.rotateY(choice.turn);
+      };
+      const preferredBlocked=motion.blocked(slot,root.position,root.quaternion);
+      if(!preferredBlocked){
+        preferredClearSince??=now;
+        if(now-preferredClearSince>180)avoidance=null;
+      }else preferredClearSince=null;
+      if(avoidance){apply(avoidance);if(motion.blocked(slot,root.position,root.quaternion))avoidance=null;}
+      if(!avoidance&&preferredBlocked){
+        let best=null,score=Infinity;
+        for(const pull of [.25,.5,.7,.9])for(const turn of [0,.4,-.4])for(const rise of [0,.3,.6]){
+          const choice={pull,turn,rise};apply(choice);
+          if(motion.blocked(slot,root.position,root.quaternion))continue;
+          const cost=root.position.distanceTo(previous.position)+.3*root.quaternion.angleTo(previous.quaternion)+pull*.03+rise*.02;
+          if(cost<score){score=cost;best=choice;}
+        }
+        avoidance=best;
       }
-    }
-    const baseY=root.position.y;
-    if(motion.blocked(slot,root.position,root.quaternion)){
-      for(const rise of [.12,.3,.6,1]){
-        root.position.y=baseY+rise;
-        if(!motion.blocked(slot,root.position,root.quaternion))break;
-        root.position.y=baseY;
-      }
+      if(avoidance)apply(avoidance);
+      else {root.position.copy(desiredPosition);root.quaternion.copy(desiredRotation);}
     }
     const dt=Math.max(0,Math.min(.1,(now-last)/1000));last=now;
     if(lift){
@@ -217,7 +226,7 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
             desired.position.set(position.x,lift.wallNormal?root.position.y+rise:
               Math.max(root.position.y+rise,lift.from.position.y+.22),position.z);
             if(position===lift.from.position && (position.distanceTo(eye)>2.7||lift.recovery))break;
-            const path=motion.route(slot,lift.from,desired,{wallNormal:lift.wallNormal});
+            const path=motion.route(slot,lift.from,desired,{wallNormal:lift.wallNormal,pickup:!lift.recovery&&!lift.wallNormal});
             if(!path)continue;
             lift.path=path;lift.legStart=now;
             lift.lengths=path.slice(1).map((b,i)=>b.position.distanceTo(path[i].position)+.25*b.quaternion.angleTo(path[i].quaternion));
@@ -240,13 +249,17 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
       }
       if(!lift.path){
         root.position.copy(previous.position);root.quaternion.copy(previous.quaternion);
-        if(!lift.recovery && now-lift.start>500)liftFailure=true;
+        if(!lift.recovery && !lift.warned && now-lift.start>500){lift.warned=true;liftFailure=true;}
       }else{
-        const i=lift.leg,seconds=lift.duration*lift.lengths[i]/Math.max(.0001,lift.total);
-        const t=Math.min(1,Math.max(0,(now-lift.legStart)/Math.max(1,seconds))),k=smooth(t);
-        root.position.lerpVectors(lift.path[i].position,lift.path[i+1].position,k);
-        root.quaternion.slerpQuaternions(lift.path[i].quaternion,lift.path[i+1].quaternion,k);
-        if(t===1){lift.leg++;lift.legStart=now;if(lift.leg===lift.lengths.length){lift=null;stuckSince=null;}}
+        while(lift){
+          const i=lift.leg,seconds=Math.max(1,lift.duration*lift.lengths[i]/Math.max(.0001,lift.total));
+          const elapsed=Math.max(0,now-lift.legStart),t=Math.min(1,elapsed/seconds),k=smooth(t);
+          root.position.lerpVectors(lift.path[i].position,lift.path[i+1].position,k);
+          root.quaternion.slerpQuaternions(lift.path[i].quaternion,lift.path[i+1].quaternion,k);
+          if(t<1)break;
+          lift.leg++;lift.legStart+=seconds;
+          if(lift.leg===lift.lengths.length){lift=null;stuckSince=null;}
+        }
       }
       cart.visible=large && !raised && !lift && trolleyIsOnFloor(slot);
       if(cart.visible)rememberTrolley();
@@ -269,12 +282,9 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
     root.position.lerpVectors(previous.position,goal.position,t);
     root.quaternion.slerpQuaternions(previous.quaternion,goal.quaternion,t);
     if(large && !raised){cart.visible=trolleyIsOnFloor(slot);if(cart.visible && t===1)rememberTrolley();}
-    if(t<1){
-      stuckSince??=now;
-      if(now-stuckSince>200){
-        lift={from:{position:root.position.clone(),quaternion:root.quaternion.clone()},start:now,duration:280,path:null,leg:0,recovery:true};
-      }
-    }else stuckSince=null;
+    // A blocked follow pose stays stable. Do not restart a lift animation on
+    // every wall contact; movement is constrained by the same swept volume.
+    stuckSince=t<1?(stuckSince??now):null;
   }
   function dropPath(slot){return motion.route(slot,ghost.visible?ghost:root,motion.pose(slot),{lowArc:slot.supportId?.startsWith('table-')});}
   function lowering(path,p,ballistic=false,trolley=false){
@@ -303,7 +313,23 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
     glow.rotation.set(pitch,yaw,0,'YXZ');
     glow.position.set(hovered.x,config.building.floorElevation+hovered.y,hovered.z);
   }
-  return {takeLiftFailure(){const value=liftFailure;liftFailure=false;return value;},
+  function constrainMovement(from,to){
+    if(!current||!root.visible)return 1;
+    const reach=Math.max(2.8,current.width/2+1.5);
+    let allowed=1;
+    if(to.distanceTo(root.position)>reach&&to.distanceToSquared(root.position)>from.distanceToSquared(root.position)){
+      let low=0,high=1;const point=new THREE.Vector3();
+      for(let i=0;i<16;i++){
+        const middle=(low+high)/2;point.lerpVectors(from,to,middle);
+        if(point.distanceTo(root.position)<=reach)low=middle;else high=middle;
+      }
+      allowed=low;
+    }
+    if(lift||motion.blocked(current,root.position,root.quaternion))return allowed;
+    const desired={position:root.position.clone().add(to.clone().sub(from)),quaternion:root.quaternion};
+    return Math.min(allowed,motion.advance(current,root,desired));
+  }
+  return {constrainMovement,takeLiftFailure(){const value=liftFailure;liftFailure=false;return value;},
     carriedPose(){return root.visible?{position:root.position,quaternion:root.quaternion}:null;},
     parkPose(){return parkingPose && parkingPose.position.distanceTo(world.camera.position)<=Math.max(3,(current?.width??0)+1)?parkingPose:null;},
     select,beginWall,wall,table,follow,beginLift,resumeAfterPause,lowering,dropPath,throwPath(slot){return motion.throwRoute(slot,ghost.visible?ghost:root,motion.pose(slot));},hover,hide(){root.visible=ghost.visible=tableGhost.visible=false;},

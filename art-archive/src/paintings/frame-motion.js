@@ -65,7 +65,7 @@ export function createFrameMotion(THREE,config,layout){
     }
     return 1;
   }
-  function route(slot,from,to,{lowArc=false,wallNormal=null}={}){
+  function route(slot,from,to,{lowArc=false,wallNormal=null,pickup=false}={}){
     const start=copy(from),finish=copy(to);
     const clear=points=>points.slice(1).every((b,i)=>advance(slot,points[i],b)===1);
     if(wallNormal){
@@ -86,6 +86,26 @@ export function createFrameMotion(THREE,config,layout){
       return null;
     }
     if(clear([start,finish]))return [start,finish];
+    if(pickup){
+      // Tilt a floor frame while lifting its actual lower edge. A wide canvas
+      // does not need its full diagonal radius of clearance above the floor.
+      for(const extra of [.025,.12,.3]){
+        const path=[start];
+        const count=Math.max(24,Math.ceil(start.position.distanceTo(finish.position)/.06));
+        let valid=true;
+        for(let i=1;i<=count;i++){
+          const t=i/count,point=copy(finish);
+          point.position.lerpVectors(start.position,finish.position,t);
+          point.quaternion.slerpQuaternions(start.quaternion,finish.quaternion,t);
+          const volume=box(slot,point.position,point.quaternion),halfY=radiusOn(volume,basis[1]);
+          const floor=fy+supportHeightAt(point.position.x,point.position.z,point.position.y-fy,config);
+          point.position.y=Math.max(point.position.y,floor+halfY+extra*Math.sin(Math.PI*t));
+          if(point.position.y+halfY>fy+config.building.height||advance(slot,path.at(-1),point)!==1){valid=false;break;}
+          path.push(point);
+        }
+        if(valid&&clear([path.at(-1),finish]))return [...path,finish];
+      }
+    }
     // Rotate clear of the floor and stacks, then lower the frame flat onto its support.
     const size=frameDimensions(slot,config.paintings),radius=Math.hypot(size.width/2,size.height/2,size.depth/2);
     if(lowArc){

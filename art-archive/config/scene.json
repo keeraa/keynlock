@@ -59,7 +59,7 @@
     {
       "id": "cn",
       "title": "Восток",
-      "color": "#A33E4A",
+      "color": "#85484F",
       "walls": [
         [
           "nature",
@@ -74,7 +74,7 @@
     {
       "id": "jp",
       "title": "Мифы и легенды",
-      "color": "#D1A338",
+      "color": "#AB8D46",
       "walls": [
         [
           "myths",
@@ -85,7 +85,7 @@
     {
       "id": "portraits",
       "title": "Портреты",
-      "color": "#8753A5",
+      "color": "#78588A",
       "walls": [
         [
           "women",
@@ -100,7 +100,7 @@
     {
       "id": "nature",
       "title": "Природа",
-      "color": "#3F7B45",
+      "color": "#426746",
       "walls": [
         [
           "landscape",
@@ -119,7 +119,7 @@
     {
       "id": "world",
       "title": "Люди и жизнь",
-      "color": "#3D65B4",
+      "color": "#496292",
       "walls": [
         [
           "life",
@@ -146,7 +146,7 @@
     {
       "id": "stories",
       "title": "Религиозные сюжеты",
-      "color": "#36AAA3",
+      "color": "#438985",
       "walls": [
         [
           "religion",

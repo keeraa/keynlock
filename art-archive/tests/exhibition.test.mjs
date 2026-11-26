@@ -281,3 +281,19 @@ test('Composition VII and the pair below share the rotunda panel’s vertical ax
  assert(Math.abs(along(upper)-wall.length/2)<1e-7);
  assert(Math.abs(lower[0].y-lower[1].y)<1e-7);
 });
+
+test('wing rows grow by canvas area from the viewer’s left to right, with only the largest eligible work on the rear wall',()=>{
+ const e=arrange(seed),area=s=>s.painting.physicalSizeM.width*s.height;
+ for(let i=0;i<e.pageCount;i++){
+  const slots=e.slots(i).filter(s=>s.wall.hall!=='center'&&!s.supportId);
+  for(const row of Map.groupBy(slots,s=>s.wall.id+'/'+s.tier).values()){
+   const right=s=>(s.x-s.wall.a.x)*s.wall.normal.z-(s.z-s.wall.a.z)*s.wall.normal.x;
+   for(const a of row)for(const b of row)if(right(b)-right(a)>1e-6)
+    assert(area(a)<=area(b)+1e-7,a.painting.id+' is larger than its right neighbour '+b.painting.id);
+  }
+  for(const h of config.halls){
+   const end=slots.filter(s=>s.wall.id===h.id+'/end');
+   assert.equal(end.length,1);assert.equal(end[0].featured,true);
+  }
+ }
+});

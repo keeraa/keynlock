@@ -18,7 +18,7 @@ const text=(ru,en)=>getLanguage()==='en'?en:ru;
 export function createHangingSession({debugSelection=false,THREE,world,config,display,renderer,label,showLabel=value=>{label.textContent=value?.painting?.title??value??'';},controls=null,notify=()=>{},playSound=()=>{},setSoundMotion=()=>{},onMount=()=>{},onThrow=()=>{},disposalTotal,onDisposed=()=>{}}) {
   const settings=config.paintings,layout=world.layout;
   const motion=createFrameMotion(THREE,config,layout);
-  const wallSettings=w=>({...settings,edgeMarginM:0,horizontalGapM:0,verticalGapM:0,minBottomM:.84,
+  const wallSettings=w=>({...settings,edgeMarginM:0,horizontalGapM:0,verticalGapM:0,minBottomM:freePlacement ? .02 : .84,
     maxTopM:config.building.height-(w.hall==='center' ? .13 : config.building.vaultRise+.03)});
   const compositions=createWallCompositions(THREE,world,config);
   const completion=createHallCompletion(layout.halls,(id,value)=>world.building?.setHallGlow?.(id,value),
@@ -27,7 +27,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
   const usesTrolley=slot=>Math.max(slot.height,slot.painting.physicalSizeM.width)>=settings.hoistFromM;
   const motionAudio=createPaintingMotionAudio(setSoundMotion);
   const fitAudio=createFrameFitAudio(playSound);
-  let aimedPlace=null;
+  let aimedPlace=null,freePlacement=false;
   let heavyIds=new Set();
   let cursor=null,coveredPick=false;
   const clamp=(x,min,max)=>max>=min?Math.max(min,Math.min(max,x)):(min+max)/2;
@@ -79,8 +79,8 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       floorByRoom.get(id).push(slot);
     }
     visible=[...hung,...floor];
-    compositions.rebuild(page,slot=>slot.wall?.id?placements.physicalWall(slot.wall):null);compositions.refresh(hung);
-    completion.sync(page,hung,{reset:true});
+    compositions.rebuild(freePlacement?[]:page,slot=>slot.wall?.id?placements.physicalWall(slot.wall):null);compositions.refresh(hung);
+    if(freePlacement)completion.clear();else completion.sync(page,hung,{reset:true});
     motion.setObstacles(visible);display.setSlots(visible,true);
   }
   function changeSlot(slot,add,celebrate=false){
@@ -90,7 +90,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     if(mountedFrame(slot)){
       hung=add?[...hung,slot]:hung.filter(s=>s!==slot);
       compositions.refresh(hung);
-      completedHall=completion.sync(page,hung,celebrate?{celebrate:id,now:performance.now()}:undefined);
+      if(!freePlacement)completedHall=completion.sync(page,hung,celebrate?{celebrate:id,now:performance.now()}:undefined);
     }
     else {
       floor=add?[...floor,slot]:floor.filter(s=>s!==slot);
@@ -119,7 +119,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
   function updateScene(playing,now) {
     aimedPlace=null;
     completion.update(now);
-    compositions.updateVisibility(active);
+    compositions.updateVisibility(active&&!freePlacement);
     feedback.update(now);
     const disposalHint=disposal.update(now,playing&&active&&!interaction.landing,interaction.carrying);
     if(!playing){pausedAt??=now;preview.resetHover();return;}
@@ -148,7 +148,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     if(interaction.carrying){
       const destHall=layout.halls.find(h=>h.id===interaction.carrying.wall.hall);
       const theme=destHall?.walls.find(([id])=>destHall.id+'/'+id===interaction.carrying.destination);
-      const dest=interaction.carrying.destination.split('/')[0]==='center'?text('✦ Шедевр · Центральная ротонда','✦ Masterpiece · Central rotunda'):[t(destHall?.title??'Ротонда'),theme&&t(theme[1])].filter(Boolean).join(' · ');
+      const dest=freePlacement?text('Свободное размещение · любая стена','Free placement · any wall'):interaction.carrying.destination.split('/')[0]==='center'?text('✦ Шедевр · Центральная ротонда','✦ Masterpiece · Central rotunda'):[t(destHall?.title??'Ротонда'),theme&&t(theme[1])].filter(Boolean).join(' · ');
       const large=usesTrolley(interaction.carrying);
       let hint=text('Наведите на стену','Aim at a wall');
       if(!reachable)cursor=null;
@@ -156,7 +156,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       if(preview.takeLiftFailure()){
         restoreCarrySource();notify(text('Не удалось поднять картину: путь перекрыт. Она возвращена на исходное место.','Pickup path blocked. Painting returned to its original location.'));return;
       }
-      if(!interaction.placing)hint=text('E / ЛКМ — примерить на стене, положить на стол или отпустить · ПКМ — приблизить','E / LMB — preview on wall, place on table or release · RMB — zoom');
+      if(!interaction.placing)hint=text('E / ЛКМ — примерить на стене, положить на стол или отпустить · ПКМ — рассмотреть','E / LMB — preview on wall, place on table or release · RMB — inspect');
       if(hit && !reachable)hint=text('Подойдите ближе · установка до 6 м','Move closer · placement within 6 m');
       if(interaction.placing && reachable){
         const w=hit.wall,limits=wallSettings(w),half=frameDimensions(interaction.carrying,settings).height/2;
@@ -166,7 +166,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
         if(cursor?.wall!==w)cursor={wall:w,x:aimX,y:aimY,time:now};
         const k=1-Math.exp(-24*Math.max(0,now-cursor.time)/1000);
         cursor.x+=(aimX-cursor.x)*k;cursor.y+=(aimY-cursor.y)*k;cursor.time=now;
-        const correctHall=acceptsHall(interaction.carrying,w);
+        const correctHall=freePlacement||acceptsHall(interaction.carrying,w);
         if(correctHall){
           const tryPosition=(x,y)=>{
             const slot=placedSlot(interaction.carrying,w,x,y,limits,hung);
@@ -176,15 +176,15 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
             const pose=motion.pose(slot);
             return motion.blocked(slot,pose.position,pose.quaternion)?null:slot;
           };
-          const snap=adjacentPosition(interaction.carrying,w,cursor.x,cursor.y,hung,settings.frameWidthM);
-          const fitted=compositions.snap(interaction.carrying,w,hit.along,hit.y,tryPosition);
+          const snap=freePlacement?null:adjacentPosition(interaction.carrying,w,cursor.x,cursor.y,hung,settings.frameWidthM);
+          const fitted=freePlacement?null:compositions.snap(interaction.carrying,w,hit.along,hit.y,tryPosition);
           if(fitted)aimedPlace=interaction.carrying.painting.id+'/'+w.id+'/'+fitted.along.toFixed(3)+'/'+fitted.y.toFixed(3);
           target=fitted
             ??(snap?tryPosition(snap.x,snap.y):null)??tryPosition(cursor.x,cursor.y);
         }
         preview.wall(interaction.carrying,w,target?.along??cursor.x,target?.y??cursor.y,Boolean(target),large,now);
         hint=target?action+text(' — повесить',' — hang'):text('Рама не помещается или место занято','Frame does not fit or the space is occupied');
-        if(interaction.carrying.painting.collection==='keynlock')
+        if(!freePlacement&&interaction.carrying.painting.collection==='keynlock')
           hint=text('Эту работу можно оставить на столе или отнести к приёмнику','Leave this work on a table or take it to the receiver');
         else if(!correctHall)hint=text('Нужен зал «','Required hall “')+t(destHall?.title??'Ротонда')+text('»','”');
       }
@@ -201,7 +201,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       coveredPick=pickFloor && pickFloor.floorAngle!==undefined && covered(pickFloor,floorByRoom.get(pickFloor.floorRoom??pickFloor.wall.hall)??emptyRoom,settings);
       preview.hover(pickFloor,now);
       description=picked;
-      commands=picked?[(pickFloor?action+text(' — взять',' — pick up'):text('Удерживайте E / ЛКМ — снять','Hold E / LMB to take down')),text('F — рассмотреть','F — inspect'),text('ПКМ — приблизить','RMB — zoom')].filter(Boolean).join(' · '):text('Наведите на картину · E / ЛКМ — взять','Aim at a painting · E / LMB — pick up');
+      commands=picked?[(pickFloor?action+text(' — взять',' — pick up'):text('Удерживайте E / ЛКМ — снять','Hold E / LMB to take down')),text('F — рассмотреть','F — inspect'),text('ПКМ — рассмотреть','RMB — inspect')].filter(Boolean).join(' · '):text('Наведите на картину · E / ЛКМ — взять','Aim at a painting · E / LMB — pick up');
       message=picked?paintingTitle(picked.painting)+(picked.destination.split('/')[0]==='center'?text(' · ✦ Шедевр · Центральная ротонда',' · ✦ Masterpiece · Central rotunda'):'')+' · '+(pickFloor?action+text(' — взять',' — pick up'):text('Удерживайте E / ЛКМ — снять','Hold E / LMB to take down'))+text(' · F — рассмотреть',' · F — inspect'):
         page.length===0?text('Выберите картины в подборке','Select paintings in the collection'):hung.length===page.length?text('Эта экспозиция развешена','This exhibition is hung'):
         text('Наведите прицел на картину на полу · E / ЛКМ — взять','Aim at a painting on the floor · E / LMB — pick up');
@@ -223,7 +223,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
   function finishMount(slot,now){
     motionAudio.reset();
     playSound('mount');
-    playSound('correctPlace');
+    if(!freePlacement)playSound('correctPlace');
     feedback.show(slot,now,display.renderSettings?.hallColors?.[slot.wall.hall]);
     const before=compositions.summary(slot.wall,slot.along,slot.y);
     const groupFilled=before?.group.filled;
@@ -353,6 +353,12 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     rebuild();
   }
   return {
+    get freePlacement(){return freePlacement;},
+    setFreePlacement(value){
+      if(freePlacement===Boolean(value))return;
+      freePlacement=Boolean(value);motionAudio.reset();fitAudio.update(null);
+      interaction.reset();placements.setFreePlacement(freePlacement);rebuild();
+    },
     wallPick,setPlacementEffect:feedback.setEffect,
     canSprint(){
       const slot=interaction.carrying??interaction.landing?.slot;

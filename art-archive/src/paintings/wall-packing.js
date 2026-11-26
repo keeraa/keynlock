@@ -137,6 +137,7 @@ function centerRowHeights(page, horizontalOffset, settings) {
 }
 
 export function arrangeWall(wall, works, settings, byId, reserveReasons, featured=null) {
+  if(wall.hall!=='center')return arrangeSizeOrderedWall(wall,works,settings,byId,reserveReasons,featured);
   const pages = [], frame = settings.frameWidthM;
   const {min,max}=wallRange(wall,settings);
   const anchor = featured && {
@@ -208,4 +209,69 @@ export function arrangeWall(wall, works, settings, byId, reserveReasons, feature
     }
     return slots;
   });
+}
+
+// Wing walls read left-to-right as seen from inside the room. Keep columns in
+// increasing canvas area; small pairs stay low, with the larger item above.
+function arrangeSizeOrderedWall(wall,works,settings,byId,reserveReasons,featured){
+ const {min,max}=wallRange(wall,settings),frame=settings.frameWidthM;
+ const areaOrder=(a,b)=>canvasArea(a)-canvasArea(b)||a.painting.id.localeCompare(b.painting.id);
+ const small=work=>Math.max(work.painting.physicalSizeM.width,work.height)<=settings.smallCanvasM;
+ const groups=[],sorted=[...works].sort(areaOrder);
+ for(let i=0;i<sorted.length;i++){
+  const items=[sorted[i]];
+  if(small(sorted[i])&&sorted[i+1]&&small(sorted[i+1]))items.push(sorted[++i]);
+  groups.push({items,width:Math.max(...items.map(w=>w.width)),
+   height:items.reduce((sum,w)=>sum+w.height+2*frame,0)+(items.length-1)*settings.verticalGapM,
+   lowOnly:items.every(small)});
+ }
+ const pages=[];
+ if(featured)pages.push([{items:[featured],width:featured.width,height:featured.height+2*frame,bottom:settings.minBottomM,tier:1}]);
+ let rows=[],row=null;
+ function flush(){if(rows.length)pages.push(rows.flatMap(r=>r.groups));rows=[];row=null;}
+ for(const group of groups){
+  if(group.width>max-min+1e-7||group.height>settings.maxTopM-settings.minBottomM+1e-7){
+   for(const w of group.items)reserveReasons.set(w.painting.id,'oversize');continue;
+  }
+  if(!row)row={bottom:settings.minBottomM,tier:1,width:0,height:0,groups:[]};
+  if(group.lowOnly&&row.tier>1){
+   if(row.groups.length)rows.push(row);flush();row={bottom:settings.minBottomM,tier:1,width:0,height:0,groups:[]};
+  }
+  if(row.groups.length&&row.width+settings.horizontalGapM+group.width>max-min+1e-7){
+   rows.push(row);
+   const bottom=row.bottom+row.height+settings.verticalGapM,tier=row.tier+1;
+   if(group.lowOnly||tier>settings.tiers||bottom+group.height>settings.maxTopM+1e-7){flush();row={bottom:settings.minBottomM,tier:1,width:0,height:0,groups:[]};}
+   else row={bottom,tier,width:0,height:0,groups:[]};
+  }
+  if(row.bottom+group.height>settings.maxTopM+1e-7){
+   if(row.groups.length)rows.push(row);flush();row={bottom:settings.minBottomM,tier:1,width:0,height:0,groups:[]};
+  }
+  row.width+=(row.groups.length?settings.horizontalGapM:0)+group.width;
+  row.height=Math.max(row.height,group.height);
+  row.groups.push({...group,bottom:row.bottom,tier:row.tier});
+ }
+ if(row?.groups.length)rows.push(row);flush();
+ const depth=settings.frameDepthM/2+settings.wallClearanceM;
+ const dx=(wall.b.x-wall.a.x)/wall.length,dz=(wall.b.z-wall.a.z)/wall.length;
+ const forward=dx*wall.normal.z-dz*wall.normal.x>0;
+ return pages.map((page,index)=>{
+  const result=[];
+  for(const row of Map.groupBy(page,g=>g.tier).values()){
+   const width=row.reduce((sum,g)=>sum+g.width,0)+(row.length-1)*settings.horizontalGapM;
+   let left=(min+max-width)/2;
+   for(const group of row){
+    const center=left+group.width/2,along=forward?center:min+max-center;
+    let bottom=group.bottom;
+    for(const work of group.items){
+     const slot={...work,wall,normal:wall.normal,page:index,tier:group.tier,featured:work===featured,
+      x:wall.a.x+dx*along+wall.normal.x*depth,z:wall.a.z+dz*along+wall.normal.z*depth,
+      y:bottom+frame+work.height/2};
+     result.push(slot);byId.set(work.painting.id,slot);
+     bottom+=work.height+2*frame+settings.verticalGapM;
+    }
+    left+=group.width+settings.horizontalGapM;
+   }
+  }
+  return result;
+ });
 }

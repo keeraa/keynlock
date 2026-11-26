@@ -25,5 +25,6 @@ test('F inspects on a tap, hides once at two seconds, and cancels when the targe
  assert.equal(hidden,1);assert.equal(opened,1);
  const pointer=(target,type)=>target.dispatchEvent(Object.assign(new Event(type),{button:2}));
  pointer(canvas,'pointerdown');pointer(window,'pointerup');
- assert.deepEqual(zoom,[true,false]);
+ assert.equal(opened,2,'right click opens the painting inspector');
+ assert.deepEqual(zoom,[],'right click does not change the field of view');
 });

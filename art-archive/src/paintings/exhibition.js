@@ -52,12 +52,14 @@ export function arrangeExhibition(catalog, state, layout, settings) {
       continue;
     }
     const besideFeature=eligible.filter(panel=>{
+      if(panel.wall.theme==='end')return false;
       if(!panel.featured)return true;
       const {min,max}=wallRange(panel.wall,settings);
       const sideSpace=(max-min-panel.featured.width)/2-settings.horizontalGapM;
       return work.width<=sideSpace+1e-7;
     });
-    const candidates=besideFeature.length?besideFeature:eligible;
+    const candidates=besideFeature.length?besideFeature:eligible.filter(panel=>panel.wall.theme!=='end');
+    if(!candidates.length){reserveReasons.set(work.painting.id,'oversize');continue;}
     const target=eligible[0].wall.hall==='center'
       ? chooseMasterpiecePanel(eligible,work,settings)
       : candidates.reduce((a,b)=>a.area/a.wall.length<=b.area/b.wall.length?a:b);

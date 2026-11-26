@@ -169,7 +169,7 @@ test('floor highlight fades, lift starts at the selected frame and R starts at i
  let now=1000;
  t.mock.method(performance,'now',()=>now);
  const hall=layout.halls[0],fy=config.building.floorElevation;
- const s=page.find(s=>s.wall.hall===hall.id && s.width<.6 && s.height<.8);
+ const s=page.find(s=>s.painting.id==='ART-1815');
  const camera=new THREE.PerspectiveCamera(),scene=new THREE.Scene(),label={};
  let visible;const session=createHangingSession({THREE,world:{camera,scene,layout},config,label,display:{setSlots(v){visible=v;}}});
  session.setPage([s]);session.setActive(true);
@@ -437,7 +437,7 @@ test('click or R releases a large carried frame, including while examining it',t
 test('context E throws toward the floor, starts its cue just before landing and preserves the ID',t=>{
  const memory=new Map();globalThis.window={};globalThis.localStorage={getItem:k=>memory.get(k),setItem:(k,v)=>memory.set(k,v)};
  t.after(()=>{delete globalThis.window;delete globalThis.localStorage;});
- const slot=page.find(s=>s.wall.id==='cn/end' && s.width<.6 && s.height<.6),camera=new THREE.PerspectiveCamera(),scene=new THREE.Scene();
+ const slot=page.find(s=>s.painting.id==='ART-1815'),camera=new THREE.PerspectiveCamera(),scene=new THREE.Scene();
  const sounds=[],thrown=[];
  let visible;const session=createHangingSession({THREE,world:{camera,scene,layout},config,label:{},onThrow:slot=>thrown.push(slot.painting.id),playSound:kind=>sounds.push(kind),display:{setSlots(v){visible=v;}}});
  session.setPage([slot]);session.setActive(true);
@@ -592,4 +592,29 @@ test('reading the wall label stops at five metres and a nearer wall still occlud
  assert.equal(aimedFrameAtRay({x:0,y:1,z:5.3},direction,[slot],config.paintings),null);
  assert.equal(aimedFrameAtRay({x:0,y:1,z:4.9},direction,[slot],config.paintings),slot);
  assert.equal(aimedFrameAtRay({x:0,y:1,z:4.9},direction,[slot],config.paintings,4.8),null);
+});
+
+test('free mode mounts on another gallery’s wall without marked places and keeps a separate saved arrangement',t=>{
+ const memory=new Map(),previous=[globalThis.window,globalThis.localStorage];
+ globalThis.window={};globalThis.localStorage={getItem:k=>memory.get(k),setItem:(k,v)=>memory.set(k,v)};
+ t.after(()=>{[globalThis.window,globalThis.localStorage]=previous;});
+ const slot=page.find(s=>s.painting.id==='ART-1815'),camera=new THREE.PerspectiveCamera(),scene=new THREE.Scene();
+ const session=createHangingSession({THREE,world:{camera,scene,layout},config,label:{},display:{setSlots(){}}});
+ t.after(()=>session.dispose());
+ session.setPage([slot]);session.setActive(true);session.setFreePlacement(true);
+ const floor=session.find(slot.painting.id),fy=config.building.floorElevation;
+ camera.position.set(floor.x,fy+1.78,floor.z+1);camera.lookAt(floor.x,fy+floor.y,floor.z);
+ assert(session.interact());
+ const wall=layout.hangingWalls.find(w=>w.hall!==slot.wall.hall&&w.hall!=='center'&&w.id.endsWith('/end'));
+ const x=(wall.a.x+wall.b.x)/2,z=(wall.a.z+wall.b.z)/2;
+ camera.position.set(x+wall.normal.x*2.5,fy+1.78,z+wall.normal.z*2.5);camera.lookAt(x,fy+1.7,z);
+ session.update(true);assert(session.interact());assert(session.interact());
+ assert.equal(session.find(slot.painting.id).wall.id,wall.id);
+ assert.equal(scene.getObjectByName('painting-compositions').children.length,0);
+ assert.equal(JSON.parse(memory.get('keynlock-art-hanging-v1-free'))[slot.painting.id].wall,wall.id);
+ assert.equal(memory.has('keynlock-art-hanging-v1'),false);
+ session.setFreePlacement(false);
+ assert.notEqual(session.find(slot.painting.id).floorAngle,undefined);
+ session.setFreePlacement(true);
+ assert.equal(session.find(slot.painting.id).wall.id,wall.id);
 });

@@ -22,6 +22,7 @@ export function createPaintingInspector({elements,catalog,setMode}) {
   life.listen(zoom,'click',()=>setView(mode==='actual'?layout:'actual'));
   life.listen(image,'click',()=>setView(mode==='cover'?'fit':'cover'));
   life.listen(elements('inspect-close'),'click',()=>dialog.close());
+  life.listen(dialog,'contextmenu',event=>event.preventDefault());
   // Consume the dismissal before the game handles Escape as its pause shortcut.
   life.listen(document,'keydown',event=>{
     if(!dialog.open || !['escape','f'].includes(logicalKey(event)))return;

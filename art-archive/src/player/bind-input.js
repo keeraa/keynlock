@@ -34,9 +34,8 @@ export function bindPlayerInput({canvas,player,getMode,lock,actions,hideProgress
  life.own(cancelRemoval);
  life.listen(window,'pointerup',e=>{
   if(e.button===0&&removal?.button==='mouse')cancelRemoval();
-  if(e.button===2)player.zoom(false);
  });
- life.listen(window,'pointercancel',()=>{cancelRemoval();player.zoom(false);});
+ life.listen(window,'pointercancel',cancelRemoval);
  function resetGesture(){
   cancelRemoval();
   clearTimeout(timer);press=longPress=tap=false;actions.raise(false);
@@ -44,7 +43,7 @@ export function bindPlayerInput({canvas,player,getMode,lock,actions,hideProgress
  life.own(()=>clearTimeout(timer));
  life.listen(canvas,'contextmenu',e=>{if(getMode()==='play')e.preventDefault();});
  life.listen(canvas,'pointerdown',e=>{
-  if(e.button===2&&getMode()==='play'){e.preventDefault();player.zoom(true);}
+  if(e.button===2&&getMode()==='play'){e.preventDefault();actions.inspect();}
  });
  life.listen(document,'mousemove',e=>{
   if(getMode()!=='play')return;

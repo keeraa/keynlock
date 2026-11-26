@@ -14,6 +14,10 @@ export function bindPlayerSettings({player,painted,elements,collection,dust,ink,
   collection.setPlacementEffect(placement.value);
   life.listen(placement,'change',()=>{collection.setPlacementEffect(placement.value);save();});
   const hard=elements('hard-mode');
+  const free=elements('free-placement');
+  free.checked=saved?.freePlacement===true;
+  collection.setFreePlacement(free.checked);
+  life.listen(free,'change',()=>{collection.setFreePlacement(free.checked);save();});
   hard.checked=saved?.hardMode===true;
   pigment.checked=saved?.canvasPigment === true;
   sensitivity.value=player.state.sensitivity;
@@ -32,7 +36,7 @@ export function bindPlayerSettings({player,painted,elements,collection,dust,ink,
   function save() {
     writeJson(STORAGE_KEYS.player,{skyColor:sky.value,sensitivity:player.state.sensitivity,toon:toon.checked,
       distanceBlur:depth.checked,gouache:finish.value,canvasPigment:pigment.checked,hardMode:hard.checked,
-      limitFps:fpsLimit.checked,placementEffect:placement.value});
+      limitFps:fpsLimit.checked,placementEffect:placement.value,freePlacement:free.checked});
   }
   function lighting() {
     ink.setEnabled(true);

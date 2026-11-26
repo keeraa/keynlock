@@ -4,7 +4,9 @@ import {acceptsHall,placedSlot,wallRange} from './hanging.js';
 import {settleTrolley} from './floor-drop.js';
 
 export function createPlacementSave({debug,layout,config,wallSettings,onError}){
-  const key=STORAGE_KEYS.hanging+(debug?'-debug':'');
+  let freePlacement=false;
+  const saveKey=()=>STORAGE_KEYS.hanging+(freePlacement?'-free':'')+(debug?'-debug':'');
+  let key=saveKey();
   const fallback=debug?readJson(STORAGE_KEYS.hanging,{}):{};
   const walls=new Map(layout.hangingWalls.map(wall=>[wall.id,wall]));
   const legacyWalls=new Map(layout.walls.map(wall=>[wall.id,wall]));
@@ -29,7 +31,7 @@ export function createPlacementSave({debug,layout,config,wallSettings,onError}){
     if(!saved?.wall)return null;
     const legacy=saved.version!==3&&legacyWalls.get(saved.wall);
     const wall=legacy?physicalWall(legacy):walls.get(saved.wall);
-    if(!wall||!acceptsHall(slot,wall))return null;
+    if(!wall||(!freePlacement&&!acceptsHall(slot,wall)))return null;
     const limits=wallSettings(wall);
     let along=saved.along;
     if(legacy){
@@ -68,6 +70,10 @@ export function createPlacementSave({debug,layout,config,wallSettings,onError}){
   }
 
   return {
+    setFreePlacement(value){
+      freePlacement=Boolean(value);key=saveKey();
+      records=readJson(key,freePlacement?{}:fallback);
+    },
     has:id=>Boolean(lookup(id)),
     wasOnLegacyReceiver:id=>lookup(id)?.supportId===LEGACY_DISPOSAL_SUPPORT,
     physicalWall,restoreWall,restorePortable,

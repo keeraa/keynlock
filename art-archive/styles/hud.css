@@ -26,7 +26,7 @@ nav kbd{margin-left:.5rem;margin-right:0}
 
 #help{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:1.5rem;padding:2rem 1rem 1.3rem;background:linear-gradient(transparent,#142c27c0);font:.87rem system-ui,sans-serif;pointer-events:none}
 
-#crosshair{position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px;border-radius:50%;background:#f4ecd4;box-shadow:0 0 4px #1e281e}
+#crosshair{pointer-events:none;position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px;border-radius:50%;background:#f4ecd4;box-shadow:0 0 4px #1e281e}
 
 #prompt{position:absolute;top:58%;left:50%;transform:translateX(-50%);background:#1b342ce8;padding:.8rem 1.2rem;border:1px solid #ad9565;font:1rem system-ui,sans-serif}
 

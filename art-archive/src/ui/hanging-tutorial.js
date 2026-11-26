@@ -13,6 +13,7 @@ export function createHangingTutorial(node,archiveTask,layout,settings,debug=fal
   const installed=slot=>{const placed=slot&&find(slot.painting.id);return Boolean(placed&&mountedFrame(placed));};
   function save(){writeText(key,completed?'done':JSON.stringify({version:2,stage}));}
   function advance(){
+    if(!first)return;
     if(installed(first))stage='second';
     if(stage==='second'&&(!second||installed(second))){completed=true;save();}
   }

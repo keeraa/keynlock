@@ -25,7 +25,7 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
     if (hanging.active) return;
     const en = getLanguage() === 'en';
     showLabel(slot);
-    showPaintingControls(controls,slot?(en?'F — inspect · RMB — zoom':'F — рассмотреть · ПКМ — приблизить'):'');
+    showPaintingControls(controls,slot?(en?'RMB / F — inspect':'ПКМ / F — рассмотреть'):'');
   }});
   const inspector=createPaintingInspector({elements,catalog,setMode});
   life.own(()=>inspector.dispose());
@@ -33,7 +33,8 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
   const guide=createTutorialGuide({THREE,camera:world.camera,layout:world.layout,floorElevation:config.building.floorElevation});
   life.own(()=>guide.dispose());
   const hanging=createHangingSession({debugSelection,THREE,world,config,display,renderer,label,showLabel,controls,notify,playSound,setSoundMotion,onMount:tutorial.mounted,onThrow:tutorial.thrown,disposalTotal:approvedIds.length,onDisposed(){disposalDirty=true;if(frame.hasAttribute?.('src'))frame.removeAttribute('src');}});
-  let exhibition, page = 0, prior = 'intro';
+  let exhibition, currentSlots=[], page = 0, prior = 'intro';
+  function refreshTutorial(){tutorial.setPage(hanging.active&&!hanging.freePlacement?currentSlots:[],hanging.find);}
   function refresh(hangingMode=hanging.active) {
     const removed=disposalIds(debugSelection);
     exhibition = arrangeExhibition({...catalog,paintings:catalog.paintings.filter(p=>!removed.has(p.id))}, readJson(STORAGE_KEY,initialSelection), world.layout, config.paintings);
@@ -57,8 +58,9 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
     page = value;
     const all=[...exhibition.byId.values()];
     const slots=hangingMode?playableSelection(exhibition.slots(page),all):exhibition.slots(page);
+    currentSlots=slots;
     hanging.setPage(slots,all,hangingMode);
-    tutorial.setPage(hanging.active?slots:[],hanging.find);
+    refreshTutorial();
     updateExhibitionControls();
   }
   function updateExhibitionControls(){
@@ -127,6 +129,7 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
     setStyle:display.gouache.setStyle,setEasyMode:display.gouache.setEasyMode,setPigment:display.gouache.setPigment,
     update,wallPick:hanging.wallPick,setPlacementEffect:hanging.setPlacementEffect,
     canSprint:hanging.canSprint,canRaise:hanging.canRaise,raise:hanging.raise,interact:hanging.interact,exclude,
+    setFreePlacement(value){hanging.setFreePlacement(value);refreshTutorial();},
     aimedId:()=>(hanging.active?hanging.aimed():display.aimedSlot())?.painting.id,
     inspect(){inspector.open((hanging.active?hanging.inspectSlot():display.aimedSlot())?.painting);},
     switchHanging,locate,dispose(){life.dispose();hanging.dispose();display.dispose();}};

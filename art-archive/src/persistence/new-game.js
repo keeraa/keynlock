@@ -4,6 +4,7 @@ export function resetArchiveProgress(storage,debug=false){
  const suffix=debug?'-debug':'';
  const reset=[
   [STORAGE_KEYS.hanging+suffix,'{}'],
+  [STORAGE_KEYS.hanging+'-free'+suffix,'{}'],
   [STORAGE_KEYS.disposal+suffix,'{}'],
   [STORAGE_KEYS.tutorial+suffix,''],
  ];

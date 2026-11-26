@@ -32,7 +32,7 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
   let tableDetail=null,tablePairs=[],tableTime=-Infinity;
   function clearTableDetail(){tableDetail?.removeFromParent();tableDetail=null;for(const pair of tablePairs)pair.material.dispose();tablePairs=[];}
   let last=0,lift=null,hovered=null,hoverTime=0;
-  let wallFlight=null,liftFailure=false,stuckSince=null,parkingPose=null,avoidance=null,preferredClearSince=null;
+  let wallFlight=null,returnFlight=null,liftFailure=false,stuckSince=null,parkingPose=null,avoidance=null,preferredClearSince=null;
   const parked={position:new THREE.Vector3(),quaternion:new THREE.Quaternion()};
   const smooth=t=>t*t*t*(10+t*(-15+6*t));
   const lastEyeRotation=new THREE.Quaternion(),lastEyePosition=new THREE.Vector3();
@@ -44,7 +44,7 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
   function select(slot){
     if(slot===current)return;
     if(slot && slot.painting.id===current?.painting.id)return;
-    wallFlight=null;lift=null;liftFailure=false;stuckSince=null;parkingPose=null;avoidance=null;preferredClearSince=null;
+    wallFlight=returnFlight=null;lift=null;liftFailure=false;stuckSince=null;parkingPose=null;avoidance=null;preferredClearSince=null;
     cart.removeFromParent();cart=new THREE.Group();
     seal?.removeFromParent();seal=null;
     const generation=++request;
@@ -92,16 +92,31 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
     for(const {source,material} of tablePairs){material.map=source.map;material.opacity=tableMat.opacity;material.color.copy(source.color);if(!valid)material.color.multiply(tableInvalidColor);}
   }
   function beginWall(now){
-    wallFlight={position:root.position.clone(),quaternion:root.quaternion.clone(),start:now};
+    const from=returnFlight?tableGhost:root;
+    wallFlight={position:from.position.clone(),quaternion:from.quaternion.clone(),start:now};returnFlight=null;
+  }
+  function beginReturn(now){
+    returnFlight={position:ghost.position.clone(),quaternion:ghost.quaternion.clone(),start:now};wallFlight=null;
+  }
+  function returnToCarry(now,cancel=false){
+    if(cancel){returnFlight=null;return;}
+    if(!returnFlight)return;
+    const t=Math.max(0,Math.min(1,(now-returnFlight.start)/150));
+    ghost.visible=false;root.visible=t===1;
+    tableGhost.visible=t<1;
+    tableGhost.position.lerpVectors(returnFlight.position,root.position,smooth(t));
+    tableGhost.quaternion.slerpQuaternions(returnFlight.quaternion,root.quaternion,smooth(t));
+    pulseGhost(now);
+    if(t===1)returnFlight=null;
   }
   function wall(slot,w,along,y,valid,large,now,hintOnly=false){
-    ghost.visible=!hintOnly;
+    ghost.visible=!hintOnly;if(!hintOnly)root.visible=false;
     const depth=settings.wallClearanceM+settings.frameDepthM/2+(valid?0:.035);
     ghost.position.set(w.a.x+(w.b.x-w.a.x)*along/w.length+w.normal.x*depth,config.building.floorElevation+y,
       w.a.z+(w.b.z-w.a.z)*along/w.length+w.normal.z*depth);
     ghost.rotation.set(0,Math.atan2(w.normal.x,w.normal.z),0);
     if(wallFlight&&!hintOnly){
-      const t=Math.max(0,Math.min(1,(now-wallFlight.start)/360));
+      const t=Math.max(0,Math.min(1,(now-wallFlight.start)/150));
       ghost.position.lerp(wallFlight.position,1-smooth(t));
       ghost.quaternion.slerp(wallFlight.quaternion,1-smooth(t));
       if(t===1)wallFlight=null;
@@ -192,6 +207,7 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
     last+=elapsed;
     if(stuckSince!==null)stuckSince+=elapsed;
     if(wallFlight)wallFlight.start+=elapsed;
+    if(returnFlight)returnFlight.start+=elapsed;
     if(lift){
       lift.start+=elapsed;
       if(lift.legStart!==undefined)lift.legStart+=elapsed;
@@ -335,7 +351,7 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
     glow.position.set(hovered.x,config.building.floorElevation+hovered.y,hovered.z);
   }
   function constrainMovement(from,to){
-    if(!current||!root.visible)return 1;
+    if(!current||(!root.visible&&!returnFlight))return 1;
     const reach=Math.max(2.8,current.width/2+1.5);
     let allowed=1;
     if(to.distanceTo(root.position)>reach&&to.distanceToSquared(root.position)>from.distanceToSquared(root.position)){
@@ -351,9 +367,9 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
     return Math.min(allowed,motion.advance(current,root,desired));
   }
   return {constrainMovement,takeLiftFailure(){const value=liftFailure;liftFailure=false;return value;},
-    carriedPose(){return root.visible?{position:root.position,quaternion:root.quaternion}:null;},
+    carriedPose(){return root.visible||returnFlight?{position:root.position,quaternion:root.quaternion}:null;},
     parkPose(){return parkingPose && parkingPose.position.distanceTo(world.camera.position)<=Math.max(3,(current?.width??0)+1)?parkingPose:null;},
-    select,beginWall,wall,table,follow,beginLift,resumeAfterPause,lowering,dropPath,throwPath(slot){return motion.throwRoute(slot,ghost.visible?ghost:root,motion.pose(slot));},hover,hide(){root.visible=ghost.visible=tableGhost.visible=false;},
+    select,beginWall,beginReturn,returnToCarry,wall,table,follow,beginLift,resumeAfterPause,lowering,dropPath,throwPath(slot){return motion.throwRoute(slot,ghost.visible?ghost:root,motion.pose(slot));},hover,hide(){root.visible=ghost.visible=tableGhost.visible=false;},
     resetHover(){glow.visible=false;glowMat.opacity=0;hovered=null;},
     dispose(){select(null);root.removeFromParent();ghost.removeFromParent();glow.removeFromParent();tableGhost.removeFromParent();tableOutline.geometry.dispose();tableMat.dispose();dashMat.dispose();glowMat.dispose();
     fast.geometry.dispose();glowBox.dispose();props.dispose();mat.dispose();}};

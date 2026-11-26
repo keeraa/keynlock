@@ -32,12 +32,11 @@ test('pick from floor, walk to the end wall, hang at the reticle and restore by 
  const x=(wall.a.x+wall.b.x)/2,z=(wall.a.z+wall.b.z)/2;
  camera.position.set(x+n.x*3,fy+1.7,z+n.z*3);camera.lookAt(x,fy+2.1,z);
  const before=camera.position.clone();
- session.update(true);assert(scene.getObjectByName('carried-painting').visible);
+ session.update(true);assert(scene.getObjectByName('wall-preview').visible);
  session.setInspecting(true);session.update(true,performance.now()+1000);
  const examined=scene.getObjectByName('carried-painting');assert(examined.visible,'held inspection uses the framed scene object');
  assert.equal(session.carriedId,slot.painting.id,'inspection does not drop or replace the painting');
  session.setInspecting(false);session.update(true,performance.now()+1200);
- assert(session.interact());assert.equal(visible.length,0);
  assert(scene.getObjectByName('wall-preview').visible);
  assert(!scene.getObjectByName('carried-painting').visible);
  assert(session.interact());assert(camera.position.equals(before));assert.equal(visible[0].wall.id,wall.id);
@@ -327,11 +326,11 @@ test('preview and placement share the same reach; leaving reach restores carryin
  at(10);session.update(true);assert.equal(memory.size,0);
  assert(controls.textContent.includes('оставить картину на тележке'));
  assert.equal(session.phase,'carrying');assert(!ghost.visible);assert(held.visible);
- at(3);session.interact();assert.equal(session.phase,'placing');assert(ghost.visible);assert(!held.visible);
- at(10);session.update(true);assert(!ghost.visible);assert(held.visible);
- session.interact();assert.equal(memory.size,0);assert.equal(session.phase,'placing');
+ at(3);session.update(true);assert.equal(session.phase,'placing');assert(ghost.visible);assert(!held.visible);
+ at(10);session.update(true);assert(!ghost.visible);assert(scene.getObjectByName('table-placement-preview').visible,'return animation starts at the wall');
+ assert.equal(memory.size,0);assert.equal(session.phase,'carrying');
  camera.lookAt(camera.position.clone().add(new THREE.Vector3(0,20,0)));
- session.update(true);assert(!ghost.visible);assert(held.visible);
+ session.update(true,performance.now()+200);assert(!ghost.visible);assert(held.visible);
  // Returning to reach resumes the same placement intent; there is never a distant red ghost.
  at(3);session.update(true);assert(ghost.visible);assert(!held.visible);
  session.interact();assert.equal(memory.size,1);
@@ -706,11 +705,11 @@ test('aiming a carried painting at a suitable wall shows its dashed ghost before
  camera.position.set(source.x,fy+1.7,source.z+1);camera.lookAt(source.x,fy+source.y,source.z);assert(session.interact());
  const x=(wall.a.x+wall.b.x)/2,z=(wall.a.z+wall.b.z)/2;
  const aim=distance=>{camera.position.set(x+n.x*distance,fy+1.7,z+n.z*distance);camera.lookAt(x,fy+2,z);session.update(true);};
- aim(3);assert.equal(session.phase,'carrying');assert(scene.getObjectByName('table-placement-preview').visible);
- assert(scene.getObjectByName('table-placement-outline').visible);assert(scene.getObjectByName('carried-painting').visible);
- assert(!scene.getObjectByName('wall-preview').visible,'the hint must not become the real held pose or the origin of a throw');
+ aim(3);assert.equal(session.phase,'placing');assert(scene.getObjectByName('table-placement-preview').visible);
+ assert(scene.getObjectByName('table-placement-outline').visible);assert(!scene.getObjectByName('carried-painting').visible);
+ assert(scene.getObjectByName('wall-preview').visible,'aiming starts the wall flight without a preparatory click');
  session.setInspecting(true);session.update(true);assert(!scene.getObjectByName('table-placement-preview').visible);
  session.setInspecting(false);aim(3);assert(scene.getObjectByName('table-placement-preview').visible);
- aim(10);assert(!scene.getObjectByName('table-placement-preview').visible,'no unreachable placement hint');assert.equal(memory.size,0);
- aim(3);session.interact();session.interact();assert.equal(session.find(slot.painting.id).wall.id,wall.id);
+ aim(10);assert(!scene.getObjectByName('wall-preview').visible,'no unreachable installation target');session.update(true,performance.now()+200);assert(!scene.getObjectByName('table-placement-preview').visible,'return finishes without leaving a wall hint');assert.equal(memory.size,0);
+ aim(3);assert(session.interact());assert.equal(session.find(slot.painting.id).wall.id,wall.id,'one click installs the previewed painting');
 });

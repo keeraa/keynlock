@@ -106,3 +106,23 @@ test('running during a blocked pickup cannot leave the frame behind at a stair h
  }
  preview.dispose();
 });
+
+test('wall flight and its reverse finish in 150 ms, with no snap when aim returns mid-flight',()=>{
+ const camera=new THREE.PerspectiveCamera(73,1.5),scene=new THREE.Scene();camera.position.set(0,fy+1.78,20);
+ const motion={blocked:()=>false,advance:()=>1};
+ const preview=createPlacementPreview(THREE,{camera,scene,layout},{},config,motion),origin=new THREE.Vector3(0,1.78,20),dir=new THREE.Vector3(0,0,-1);
+ preview.select(slot);
+ const follow=now=>preview.follow(slot,false,null,origin,dir,slot,now,false);
+ for(let now=0;now<1000;now+=16)follow(now);
+ const root=scene.getObjectByName('carried-painting'),ghost=scene.getObjectByName('table-placement-preview'),wall={a:{x:0,z:17},b:{x:8,z:17},length:8,normal:{x:0,z:1}};
+ const carry=root.position.clone();preview.beginWall(1000);preview.wall(slot,wall,2,2,true,false,1000);
+ assert(ghost.position.distanceTo(carry)<1e-8);assert(!root.visible);
+ preview.wall(slot,wall,2,2,true,false,1150);const atWall=ghost.position.clone();assert(Math.abs(atWall.x-2)<1e-8);assert(atWall.distanceTo(carry)>1);
+ preview.beginReturn(1150);follow(1150);preview.returnToCarry(1150);assert(ghost.position.distanceTo(atWall)<1e-8);
+ follow(1225);preview.returnToCarry(1225);const halfway=ghost.position.clone();
+ assert(halfway.distanceTo(atWall)>.1&&halfway.distanceTo(root.position)>.1);
+ preview.beginWall(1225);preview.wall(slot,wall,2,2,true,false,1225);assert(ghost.position.distanceTo(halfway)<1e-8,'reversing direction starts at the visible frame');
+ preview.wall(slot,wall,2,2,true,false,1375);preview.beginReturn(1375);
+ follow(1525);preview.returnToCarry(1525);assert(root.visible);assert(!ghost.visible);
+ preview.dispose();
+});

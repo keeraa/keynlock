@@ -38,8 +38,8 @@ export function createHangingTutorial(node,archiveTask,layout,settings,debug=fal
       else if(stage==='drop')message=en?'That is not “'+paintingTitle(first.painting)+'”! Look down at a clear spot on the floor and press E / LMB to throw this painting.':
         'А это не «'+paintingTitle(first.painting)+'»! Посмотрите вниз на свободное место на полу и нажмите E / ЛКМ, чтобы бросить картину.';
       else if(holding)message=(en?
-        'Each gallery has its own colour: match the frame to the painted entrance. Hang “'+name+'” inside the green frame in the '+hall+' gallery · E / LMB to preview, then again to hang.':
-        'У каждого зала свой цвет: цвет рамы совпадает с цветом входа в нужный зал. Повесьте «'+name+'» в область с зелёной рамкой в зале «'+hall+'» · E / ЛКМ — примерить, ещё раз — повесить.');
+        'Each gallery has its own colour: match the frame to the painted entrance. Hang “'+name+'” inside the green frame in the '+hall+' gallery · E / LMB to hang.':
+        'У каждого зала свой цвет: цвет рамы совпадает с цветом входа в нужный зал. Повесьте «'+name+'» в область с зелёной рамкой в зале «'+hall+'» · E / ЛКМ — повесить.');
       else message=(stage==='second'?(en?'Now another gallery! ':'Теперь другой зал! '):'')+(en?
         'Follow the marker to “'+name+'”, pick it up with E / LMB and take it to the '+hall+' gallery.':
         'Найдите по указателю «'+name+'», поднимите её · E / ЛКМ — и отнесите в зал «'+hall+'».');

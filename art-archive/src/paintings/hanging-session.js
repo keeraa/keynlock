@@ -27,7 +27,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
   const usesTrolley=slot=>Math.max(slot.height,slot.painting.physicalSizeM.width)>=settings.hoistFromM;
   const motionAudio=createPaintingMotionAudio(setSoundMotion);
   const fitAudio=createFrameFitAudio(playSound);
-  let inspectionHeld=false;
+  let inspectionHeld=false,wallPreviewArmed=true;
   let aimedPlace=null,freePlacement=false,placementFailure='no_wall',lastIntegrity=-Infinity,lastMissing='';
   let heavyIds=new Set();
   let cursor=null,coveredPick=false;
@@ -159,19 +159,18 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       const large=usesTrolley(interaction.carrying);
       let hint=text('Наведите на стену','Aim at a wall');
       if(!reachable)cursor=null;
-      if(inspectionHeld || !interaction.placing || !reachable)preview.follow(interaction.carrying,large,hall,origin,dir,interaction.source,now,(interaction.raised&&!inspectionHeld)||(inspectionHeld&&!large));
+      preview.follow(interaction.carrying,large,hall,origin,dir,interaction.source,now,(interaction.raised&&!inspectionHeld)||(inspectionHeld&&!large));
       if(preview.takeLiftFailure()){
         onEvent('placement_failed',{reason:'pickup_blocked',paintingId:interaction.carrying.painting.id,hall:room});
         notify(text('Рама упирается в препятствие. Отойдите немного назад — картина остаётся у вас.','The frame is blocked. Step back a little — you are still holding the painting.'));
       }
-      if(!interaction.placing)hint=text('E / ЛКМ — примерить на стене, положить на стол или отпустить · удерживайте ПКМ — рассмотреть','E / LMB — preview on wall, place on table or release · hold RMB — inspect');
+      if(!interaction.placing)hint=text('E / ЛКМ — повесить, положить на стол или отпустить · удерживайте ПКМ — рассмотреть','E / LMB — hang, place on table or release · hold RMB — inspect');
       if(hit&&!reachable)placementFailure='out_of_reach';
       if(hit && !reachable)hint=interaction.placing?text('Подойдите ближе · установка до 6 м','Move closer · placement within 6 m'):large?text('E / ЛКМ — оставить картину на тележке','E / LMB — leave the painting on its trolley'):text('E / ЛКМ — короткий бросок в этом направлении','E / LMB — short throw in this direction');
       if(!inspectionHeld && !interaction.raised && reachable){
         const w=hit.wall,limits=wallSettings(w),half=frameDimensions(interaction.carrying,settings).height/2;
         const aimX=hit.along;
         const aimY=clamp(hit.y,limits.minBottomM+half,limits.maxTopM-half);
-        if(!cursor&&interaction.placing)preview.beginWall(now);
         if(cursor?.wall!==w)cursor={wall:w,x:aimX,y:aimY,time:now};
         const k=1-Math.exp(-24*Math.max(0,now-cursor.time)/1000);
         cursor.x+=(aimX-cursor.x)*k;cursor.y+=(aimY-cursor.y)*k;cursor.time=now;
@@ -192,16 +191,28 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
           target=fitted
             ??(snap?tryPosition(snap.x,snap.y):null)??tryPosition(cursor.x,cursor.y);
         }
-        if(interaction.placing||target)preview.wall(interaction.carrying,w,target?.along??cursor.x,target?.y??cursor.y,Boolean(target),large,now,!interaction.placing);
-        hint=target?action+(interaction.placing?text(' — повесить',' — hang'):text(' — поднести к стене',' — move to the wall')):text('Рама не помещается или место занято','Frame does not fit or the space is occupied');
+        hint=target?action+text(' — повесить',' — hang'):text('Рама не помещается или место занято','Frame does not fit or the space is occupied');
         if(!freePlacement&&interaction.carrying.painting.collection==='keynlock')
           hint=text('Эту работу можно оставить на столе или отнести к приёмнику','Leave this work on a table or take it to the receiver');
         else if(!correctHall)hint=text('Нужен зал «','Required hall “')+t(destHall?.title??'Ротонда')+text('»','”');
       }
+      if(!target||!reachable)wallPreviewArmed=true;
+      const wallPreview=wallPreviewArmed&&target&&!inspectionHeld&&!interaction.raised&&!aimedSupport(origin,dir,layout,config,hit?.distance,settings.placementReachM??6);
+      if(wallPreview){
+        if(!interaction.placing){preview.beginWall(now);interaction.place();}
+        preview.wall(interaction.carrying,hit.wall,target.along,target.y,true,large,now);
+      }else if(interaction.placing){
+        if(!inspectionHeld)preview.beginReturn(now);
+        interaction.carry();
+      }
+      let tablePlan=null;
       if(!inspectionHeld&&!interaction.placing){
-        const plan=tablePreview.update({origin,dir,carrying:interaction.carrying,floor,room,wallDistance:hit?.distance,now});
+        const plan=tablePlan=tablePreview.update({origin,dir,carrying:interaction.carrying,floor,room,wallDistance:hit?.distance,now});
         if(plan){preview.table(plan.slot,now,plan.valid);hint=plan.valid?text('E / ЛКМ — положить на стол','E / LMB — place on the table'):text('Место занято · сдвиньте прицел','Space occupied · move the reticle');}
       }
+      const invalidHint=!target&&reachable&&!inspectionHeld&&!interaction.raised&&cursor&&!tablePlan;
+      if(invalidHint)preview.wall(interaction.carrying,hit.wall,cursor.x,cursor.y,false,large,now,true);
+      if(!interaction.placing)preview.returnToCarry(now,inspectionHeld||Boolean(tablePlan)||Boolean(invalidHint));
       description=interaction.carrying;
       commands=hint;
       message=[paintingTitle(interaction.carrying.painting),large?text('Тележка и подъёмник','Trolley and hoist'):null,dest,hint].filter(Boolean).join(' · ');
@@ -273,12 +284,11 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
         else drop();
         return true;
       }
-      if(!interaction.placing){if(reachable){preview.beginWall(performance.now());interaction.place();update(true);}else{playSound('deny');onEvent('placement_failed',{reason:'out_of_reach',paintingId:interaction.carrying.painting.id,hall:room});}return true;}
       if(target && placements.mount(target)){
         const {normal}=target.wall;
         const animated=usesTrolley(interaction.carrying)&&
-          (animateSettle(target,new THREE.Vector3(normal.x*.19,.065,normal.z*.19),340)||
-           animateSettle(target,new THREE.Vector3(normal.x*.095,0,normal.z*.095),250));
+          (animateSettle(target,new THREE.Vector3(normal.x*.19,.065,normal.z*.19),180)||
+           animateSettle(target,new THREE.Vector3(normal.x*.095,0,normal.z*.095),140));
         if(!animated)finishMount(target,performance.now());
         update(true);
       }else{playSound('deny');onEvent('placement_failed',{reason:target?'save_failed':placementFailure,paintingId:interaction.carrying.painting.id,hall:room});}
@@ -289,6 +299,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     motionAudio.reset();
     playSound(mountedFrame(picked)?'unmount':'pickup');
     onEvent(mountedFrame(picked)?'painting_unmount':'painting_pickup',{paintingId:picked.painting.id,hall:room,trolley:usesTrolley(picked)});
+    wallPreviewArmed=!mountedFrame(picked);
     interaction.pick(page.find(s=>s.painting.id===picked.painting.id)??storedPage.find(s=>s.painting.id===picked.painting.id)??picked,picked);
     changeSlot(interaction.source,false);preview.resetHover();preview.select(interaction.carrying);preview.beginLift(interaction.source,performance.now());update(true);return true;
   }

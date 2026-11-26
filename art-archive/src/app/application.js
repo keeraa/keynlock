@@ -28,7 +28,8 @@ import { t, localizeDocument } from '../localization/i18n.js';
 export async function startArchiveApplication({ THREE, config, catalog, initialSelection, onProgress=()=>{} }) {
   const life = createLifecycle();
   const playtest=createPlaytestCollector();
-  let statistics,collectionForStatistics=null;
+  let statistics,collectionForStatistics=null,hasStarted=false;
+  let gameModes={placement:'blocks',difficulty:'normal'};
   const track=(name,data)=>{statistics?.track(name,data);playtest.track(name,{...data,runId:statistics?.playthroughId??''});queueMicrotask(()=>{if(!disposed&&statistics&&collectionForStatistics)statistics.progress(collectionForStatistics.playtestSnapshot());});};
   const elements = id => document.getElementById(id);
   const canvas = elements('scene');
@@ -80,7 +81,7 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
     function setMode(next) {
       const previous = mode;
       mode = next;
-      if(next==='play'&&playtest.start({runId:statistics?.playthroughId??'',language:document.documentElement.lang,test:params.get('playtest')==='qa',viewportWidth:Math.round(innerWidth/100)*100,viewportHeight:Math.round(innerHeight/100)*100}))collection.beginPlaytest();
+      if(next==='play'&&playtest.start({...gameModes,runId:statistics?.playthroughId??'',language:document.documentElement.lang,test:params.get('playtest')==='qa',viewportWidth:Math.round(innerWidth/100)*100,viewportHeight:Math.round(innerHeight/100)*100})){hasStarted=true;track('mode_selected',{...gameModes,source:'session_start'});collection.beginPlaytest();}
       playtest.setMode(next);statistics?.setMode(next);
       audio.setPlaying(next==='play');
       music?.setPaused(next!=='play');
@@ -128,7 +129,7 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
       raise: value => collection.raise(value),
       aimedId: () => collection.aimedId(),
       exclude: () => collection.exclude(),
-      inspect: () => collection.inspect(),
+      inspect: value => collection.inspect(value),
       interact(heldId) {
         if (collection.interact(heldId)) return;
         if (!hud.canInteract()) return;
@@ -149,11 +150,11 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
     const setFreePlacement=collection.setFreePlacement;
     collection.setFreePlacement=value=>{statistics.setFreePlacement(value);setFreePlacement(value);statistics.progress(collection.playtestSnapshot());};
     own(mountPlaytestInterface({collector:playtest,elements,setMode,getStatistics(){statistics.progress(collection.playtestSnapshot());return statistics.report();}}));
-    const checkpoint=setInterval(()=>{statistics.progress(collection.playtestSnapshot());statistics.save();playtest.checkpoint({...collection.playtestSnapshot(),runId:statistics.playthroughId,runActiveMs:statistics.activeMs});},30000);
+    const checkpoint=setInterval(()=>{statistics.progress(collection.playtestSnapshot());statistics.save();playtest.checkpoint({...collection.playtestSnapshot(),...gameModes,runId:statistics.playthroughId,runActiveMs:statistics.activeMs});},30000);
     life.own(()=>clearInterval(checkpoint));
     life.listen(window,'online',()=>void playtest.flush());
     life.listen(document,'visibilitychange',()=>{
-      if(document.visibilityState==='hidden'){statistics.setMode('background');statistics.save();playtest.setMode('background');playtest.checkpoint({...collection.playtestSnapshot(),runId:statistics.playthroughId,runActiveMs:statistics.activeMs});}
+      if(document.visibilityState==='hidden'){statistics.setMode('background');statistics.save();playtest.setMode('background');playtest.checkpoint({...collection.playtestSnapshot(),...gameModes,runId:statistics.playthroughId,runActiveMs:statistics.activeMs});}
       else{last=performance.now();statistics.setMode(mode);playtest.setMode(mode);}
     });
     const errorMessage=value=>String(value??'Unknown error').replace(/https?:\/\/[^\s)]+/g,'[resource]').replace(/[\w.+-]+@[\w.-]+/g,'[redacted]').slice(0,240);
@@ -162,7 +163,7 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
     life.listen(canvas,'webglcontextlost',()=>track('technical_error',{kind:'webgl_context_lost'}));
 
     own(bindPlayerSettings({ player, painted, elements, collection, dust:world.dust, ink:world.ink,
-      setSkyColor:world.setSkyColor,setWallFinish:world.setWallFinish,setFrameLimit:frameLimit.setEnabled }));
+      setSkyColor:world.setSkyColor,setWallFinish:world.setWallFinish,setFrameLimit:frameLimit.setEnabled,onModeSelection(choice){gameModes={placement:choice.placement,difficulty:choice.difficulty};statistics.setModes(gameModes);if(hasStarted&&choice.source==='change')track('mode_selected',choice);} }));
     music=own(mountArchiveMusic({window,elements}));
 
     function resize() {
@@ -268,7 +269,7 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
         life.dispose();
       },
     };
-    life.listen(window, 'pagehide', () => {playtest.checkpoint({...collection.playtestSnapshot(),runId:statistics.playthroughId,runActiveMs:statistics.activeMs});playtest.unload(navigator.sendBeacon?.bind(navigator));app.dispose();}, { once: true });
+    life.listen(window, 'pagehide', () => {playtest.checkpoint({...collection.playtestSnapshot(),...gameModes,runId:statistics.playthroughId,runActiveMs:statistics.activeMs});playtest.unload(navigator.sendBeacon?.bind(navigator));app.dispose();}, { once: true });
     return app;
   } catch (error) {
     disposed = true;

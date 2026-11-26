@@ -1,7 +1,8 @@
 import {STORAGE_KEYS} from '../persistence/storage.js';
 import {PLAYTEST_BUILD} from './schema.js';
 export const STATISTICS_KEY=STORAGE_KEYS.statistics;
-const defaults=()=>({schemaVersion:2,game:'art-archive',build:PLAYTEST_BUILD,activeMs:0,pausedMs:0,trackedFromProcessed:null,stage:'wrong',lastProgress:null,counts:{pickedUp:0,throws:0,placed:0,takenFromWall:0,wrongHall:0,noSpace:0,collisions:0,throwRepicks:0,quickRepicks:0,pauses:0,excluded:0,inspected:0,disposed:0,recovered:0,missingPictures:0},failures:{},milestones:{},completionMs:null,walkedM:0,carriedM:0,placementTimes:[],hallTimes:{},performance:[],errors:[],_recentThrows:{},_lastPlaceMs:null});
+const modeTotals=()=>({blocks_normal:0,blocks_hard:0,free_normal:0,free_hard:0});
+const defaults=()=>({schemaVersion:2,game:'art-archive',build:PLAYTEST_BUILD,activeMs:0,pausedMs:0,trackedFromProcessed:null,stage:'wrong',modes:{placement:'blocks',difficulty:'normal'},modeSelections:modeTotals(),modeActiveMs:modeTotals(),lastProgress:null,counts:{pickedUp:0,throws:0,placed:0,takenFromWall:0,wrongHall:0,noSpace:0,collisions:0,throwRepicks:0,quickRepicks:0,pauses:0,excluded:0,inspected:0,disposed:0,recovered:0,missingPictures:0},failures:{},milestones:{},completionMs:null,walkedM:0,carriedM:0,placementTimes:[],hallTimes:{},performance:[],errors:[],_recentThrows:{},_lastPlaceMs:null});
 export function createPlaytestStatistics({storage,now=()=>performance.now(),free=false,debug=false,uuid=()=>crypto.randomUUID()}={}){
  try{storage??=globalThis.localStorage;}catch{}
  let key,stats,mode='intro',last=now(),lastSave=last,lastPlace=null,lastThrow=new Map(),frames=[],frameMs=0;
@@ -9,15 +10,16 @@ export function createPlaytestStatistics({storage,now=()=>performance.now(),free
   save();key=STATISTICS_KEY+(isFree?'-free':'')+(debug?'-debug':'');
   const initial=defaults();let stored;
   try{stored=JSON.parse(storage.getItem(key));}catch{}
-  stats=stored?.schemaVersion===2&&stored.game==='art-archive'?{...initial,...stored,counts:{...initial.counts,...stored.counts},failures:{...stored.failures},milestones:{...stored.milestones},hallTimes:{...stored.hallTimes},placementTimes:Array.isArray(stored.placementTimes)?stored.placementTimes.slice(-1000):[],performance:Array.isArray(stored.performance)?stored.performance.slice(-120):[],errors:Array.isArray(stored.errors)?stored.errors.slice(-20):[]}:initial;
-  stats.playthroughId??=uuid();stats.build=PLAYTEST_BUILD;
+  stats=stored?.schemaVersion===2&&stored.game==='art-archive'?{...initial,...stored,counts:{...initial.counts,...stored.counts},modeSelections:{...initial.modeSelections,...stored.modeSelections},modeActiveMs:{...initial.modeActiveMs,...stored.modeActiveMs},failures:{...stored.failures},milestones:{...stored.milestones},hallTimes:{...stored.hallTimes},placementTimes:Array.isArray(stored.placementTimes)?stored.placementTimes.slice(-1000):[],performance:Array.isArray(stored.performance)?stored.performance.slice(-120):[],errors:Array.isArray(stored.errors)?stored.errors.slice(-20):[]}:initial;
+  stats.playthroughId??=uuid();stats.build=PLAYTEST_BUILD;stats.modes.placement=isFree?'free':'blocks';
   for(const key of ['activeMs','pausedMs','walkedM','carriedM'])if(!Number.isFinite(stats[key])||stats[key]<0)stats[key]=0;last=now();lastPlace=Number.isFinite(stats._lastPlaceMs)?stats._lastPlaceMs:null;lastThrow=new Map(Object.entries(stats._recentThrows??{}).filter(([,value])=>Number.isFinite(value)).slice(-1000));frames=[];frameMs=0;
  }
- function tally(){const at=now(),delta=Math.max(0,at-last);if(stats){if(mode==='play')stats.activeMs+=delta;else if(mode==='pause'||mode==='plan')stats.pausedMs+=delta;}last=at;}
+ function tally(){const at=now(),delta=Math.max(0,at-last);if(stats){if(mode==='play'){stats.activeMs+=delta;const modeKey=stats.modes.placement+'_'+stats.modes.difficulty;stats.modeActiveMs[modeKey]=(stats.modeActiveMs[modeKey]??0)+delta;}else if(mode==='pause'||mode==='plan')stats.pausedMs+=delta;}last=at;}
  function save(){if(!stats)return;tally();stats._recentThrows=Object.fromEntries(lastThrow);stats._lastPlaceMs=lastPlace;try{storage.setItem(key,JSON.stringify(stats));}catch{}lastSave=now();}
  function milestone(name){stats.milestones[name]??=Math.round(stats.activeMs);}
  function track(name,data={}){
   tally();const c=stats.counts;
+  if(name==='mode_selected'){stats.modes={placement:data.placement,difficulty:data.difficulty};const modeKey=data.placement+'_'+data.difficulty;stats.modeSelections[modeKey]=(stats.modeSelections[modeKey]??0)+1;}
   if(name==='painting_pickup'||name==='painting_unmount'){
    c.pickedUp++;milestone('firstPickup');if(name==='painting_unmount')c.takenFromWall++;
    const thrown=lastThrow.get(data.paintingId);if(thrown!==undefined){c.throwRepicks++;if(stats.activeMs-thrown<=5000)c.quickRepicks++;lastThrow.delete(data.paintingId);}
@@ -52,7 +54,7 @@ export function createPlaytestStatistics({storage,now=()=>performance.now(),free
  }
  select(free);
  return {
-  track,progress,save,get playthroughId(){return stats.playthroughId;},get activeMs(){tally();return Math.round(stats.activeMs);},
+  track,progress,save,setModes(value){tally();stats.modes={placement:value.placement,difficulty:value.difficulty};save();},get playthroughId(){return stats.playthroughId;},get activeMs(){tally();return Math.round(stats.activeMs);},
   setFreePlacement(value){select(Boolean(value));},
   setMode(next){tally();if(next==='pause'&&mode==='play')stats.counts.pauses++;mode=next;save();},
   walk(distance,carrying=false){if(mode!=='play'||!Number.isFinite(distance)||distance<0)return;stats.walkedM+=distance;if(carrying)stats.carriedM+=distance;if(now()-lastSave>5000)save();},

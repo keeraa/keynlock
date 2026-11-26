@@ -33,6 +33,10 @@ test('pick from floor, walk to the end wall, hang at the reticle and restore by 
  camera.position.set(x+n.x*3,fy+1.7,z+n.z*3);camera.lookAt(x,fy+2.1,z);
  const before=camera.position.clone();
  session.update(true);assert(scene.getObjectByName('carried-painting').visible);
+ session.setInspecting(true);session.update(true,performance.now()+1000);
+ const examined=scene.getObjectByName('carried-painting');assert(examined.visible,'held inspection uses the framed scene object');
+ assert.equal(session.carriedId,slot.painting.id,'inspection does not drop or replace the painting');
+ session.setInspecting(false);session.update(true,performance.now()+1200);
  assert(session.interact());assert.equal(visible.length,0);
  assert(scene.getObjectByName('wall-preview').visible);
  assert(!scene.getObjectByName('carried-painting').visible);
@@ -643,4 +647,22 @@ test('a painting restored below the stairs from another exhibition page keeps it
  camera.position.set(found.x,fy+found.y+1.78,found.z+1);camera.lookAt(found.x,fy+found.y,found.z);
  assert(session.interact());assert.equal(session.phase,'carrying');
  assert.equal(session.inspectSlot()?.painting.id,extra.painting.id,'a visible painting cannot become an empty carried slot');
+});
+test('interacting with a distant reticle throws weakly forward instead of denying or restoring the source',t=>{
+ const memory=new Map(),old=[globalThis.window,globalThis.localStorage];
+ globalThis.window={};globalThis.localStorage={getItem:k=>memory.get(k),setItem:(k,v)=>memory.set(k,v)};
+ t.after(()=>{[globalThis.window,globalThis.localStorage]=old;});
+ const slot=page.find(s=>s.wall.hall==='cn'&&s.height<.5&&s.width<.5),camera=new THREE.PerspectiveCamera(),scene=new THREE.Scene(),events=[];
+ let visible=[];const session=createHangingSession({THREE,world:{camera,scene,layout},config,label:{},display:{setSlots:slots=>{visible=slots;}},onEvent:(name,data)=>events.push({name,data})});t.after(()=>session.dispose());
+ session.setPage([slot]);session.setActive(true);
+ const floor=visible[0],fy=config.building.floorElevation;
+ camera.position.set(floor.x,fy+1.7,floor.z+1);camera.lookAt(floor.x,fy+floor.y,floor.z);assert(session.interact());
+ const hall=layout.halls.find(h=>h.id==='cn'),start=layout.world(hall,0,hall.start+4),ahead=layout.world(hall,0,hall.start+20);
+ camera.position.set(start.x,fy+1.7,start.z);camera.lookAt(ahead.x,fy+1.7,ahead.z);
+ session.update(true,performance.now()+2000);session.interact();
+ assert.equal(session.phase,'lowering');const thrown=events.find(e=>e.name==='painting_throw');assert(thrown);assert.equal(thrown.data.weakThrow,true);
+ session.update(true,performance.now()+5000);assert.equal(visible.length,1);
+ const landed=visible[0],dx=landed.x-start.x,dz=landed.z-start.z,fx=ahead.x-start.x,fz=ahead.z-start.z;
+ assert(dx*fx+dz*fz>0);assert(Math.abs(dx*fz-dz*fx)<1e-5);assert(Math.hypot(dx,dz)<=2.6+1e-6);
+ assert(!events.some(e=>e.name==='painting_recovered'));
 });

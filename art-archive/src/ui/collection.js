@@ -7,7 +7,6 @@ import {mountedFrame} from '../../catalog/painting-geometry.js';
 import {disposalIds,isApprovedKeynlock} from '../paintings/disposal-state.js';
 import {paintingLocation} from '../player/painting-location.js';
 import {createHangingSession} from '../paintings/hanging-session.js';
-import {createPaintingInspector} from './painting-inspector.js';
 import {createLifecycle} from '../app/lifecycle.js';
 import {readJson,writeJson} from '../persistence/storage.js';
 import {preserveAuthorExclusion} from '../persistence/author-exclusions.js';
@@ -26,10 +25,8 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
     if (hanging.active) return;
     const en = getLanguage() === 'en';
     showLabel(slot);
-    showPaintingControls(controls,slot?(en?'RMB / F — inspect':'ПКМ / F — рассмотреть'):'');
+    showPaintingControls(controls,slot?(en?'Hold RMB — inspect':'Удерживайте ПКМ — рассмотреть'):'');
   }});
-  const inspector=createPaintingInspector({elements,catalog,setMode});
-  life.own(()=>inspector.dispose());
   const tutorial=createHangingTutorial(elements('tutorial-task'),elements('archive-task'),world.layout,config.paintings,debugSelection,onEvent);
   const guide=createTutorialGuide({THREE,scene:world.scene,settings:config.paintings,camera:world.camera,layout:world.layout,floorElevation:config.building.floorElevation});
   life.own(()=>guide.dispose());
@@ -138,6 +135,6 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
     constrainMovement:hanging.constrainMovement,
     setFreePlacement(value){hanging.setFreePlacement(value);refreshTutorial();},
     aimedId:()=>(hanging.active?hanging.aimed():display.aimedSlot())?.painting.id,
-    inspect(){const slot=hanging.active?hanging.inspectSlot():display.aimedSlot();if(slot){onEvent('painting_inspect',{paintingId:slot.painting.id});inspector.open(slot.painting);}},
+    inspect(value){hanging.setInspecting(Boolean(value));player.zoom?.(Boolean(value)&&!hanging.carriedId);if(!value)return true;const slot=hanging.active?hanging.inspectSlot():display.aimedSlot();if(!slot){player.zoom?.(false);return false;}onEvent('painting_inspect',{paintingId:slot.painting.id});return true;},
     switchHanging,locate,dispose(){life.dispose();hanging.dispose();display.dispose();}};
 }

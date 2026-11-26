@@ -3,7 +3,8 @@ import {createLifecycle} from '../app/lifecycle.js';
 export function bindPlayerInput({canvas,player,getMode,lock,actions,hideProgress}){
  const life=createLifecycle(),{state,held}=player;
  let timer=null,press=false,longPress=false,tap=false;
- let hide=null;
+ let hide=null,inspecting=false;
+ function stopInspection(){if(inspecting){inspecting=false;actions.inspect(false);}}
  const hideDuration=2000;
  function resetHide(){
   hide=null;
@@ -34,8 +35,10 @@ export function bindPlayerInput({canvas,player,getMode,lock,actions,hideProgress
  life.own(cancelRemoval);
  life.listen(window,'pointerup',e=>{
   if(e.button===0&&removal?.button==='mouse')cancelRemoval();
+  if(e.button===2)stopInspection();
  });
- life.listen(window,'pointercancel',cancelRemoval);
+ life.listen(window,'pointercancel',()=>{cancelRemoval();stopInspection();});
+ life.own(stopInspection);
  function resetGesture(){
   cancelRemoval();
   clearTimeout(timer);press=longPress=tap=false;actions.raise(false);
@@ -43,7 +46,7 @@ export function bindPlayerInput({canvas,player,getMode,lock,actions,hideProgress
  life.own(()=>clearTimeout(timer));
  life.listen(canvas,'contextmenu',e=>{if(getMode()==='play')e.preventDefault();});
  life.listen(canvas,'pointerdown',e=>{
-  if(e.button===2&&getMode()==='play'){e.preventDefault();actions.inspect();}
+  if(e.button===2&&getMode()==='play'){e.preventDefault();inspecting=actions.inspect(true)!==false;}
  });
  life.listen(document,'mousemove',e=>{
   if(getMode()!=='play')return;
@@ -56,7 +59,7 @@ export function bindPlayerInput({canvas,player,getMode,lock,actions,hideProgress
   }
  });
  life.listen(document,'mouseleave',()=>{state.lastPointer=null;state.edge.until=0;});
- life.listen(canvas,'pointerdown',e=>{if(getMode()==='play'&&e.button===0){lock.request();if(!holdWall('mouse')){actions.interact();resetGesture();}}});
+ life.listen(canvas,'pointerdown',e=>{if(getMode()==='play'&&!inspecting&&e.button===0){lock.request();if(!holdWall('mouse')){actions.interact();resetGesture();}}});
  life.listen(canvas,'wheel',e=>{if(getMode()==='plan'){e.preventDefault();actions.zoom(e.deltaY);}},{passive:false});
  life.listen(window,'keydown',e=>{
   if(document.querySelector('dialog[open]'))return;
@@ -74,6 +77,7 @@ export function bindPlayerInput({canvas,player,getMode,lock,actions,hideProgress
   if(e.ctrlKey||e.metaKey||e.altKey)return;
   if(key==='f'){e.preventDefault();hide={id:actions.aimedId(),start:performance.now()};return;}
   if(key==='e'){
+   if(inspecting)return;
    if(press)return;
    press=true;if(holdWall('key'))return;tap=actions.canRaise();
    if(!tap)actions.interact();
@@ -87,16 +91,15 @@ export function bindPlayerInput({canvas,player,getMode,lock,actions,hideProgress
  life.listen(window,'keyup',e=>{held.delete(logicalKey(e));
   if(logicalKey(e)==='f'&&hide){
    const now=performance.now(),short=now-hide.start<hideDuration;
-   const sameTarget=!hide.id||actions.aimedId()===hide.id;
    if(!short)update(now);
    resetHide();
-   if(short&&sameTarget&&getMode()==='play')actions.inspect();
+   // F remains the deliberate hold-to-exclude shortcut; inspection uses held RMB.
   }
   if(logicalKey(e)==='e' && press){
    const commit=tap && !longPress && getMode()==='play' && actions.canRaise();
    if(commit)actions.interact();resetGesture();
   }
   if(e.key==='Escape')lock.clearBrowserRelease();});
- life.listen(window,'blur',()=>{player.clearInput();if(getMode()==='play')actions.pause();});
- return {...life,update,resetGesture(){resetGesture();resetHide();player.zoom(false);}};
+ life.listen(window,'blur',()=>{stopInspection();player.clearInput();if(getMode()==='play')actions.pause();});
+ return {...life,update,resetGesture(){stopInspection();resetGesture();resetHide();player.zoom(false);}};
 }

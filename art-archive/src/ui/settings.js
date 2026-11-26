@@ -5,7 +5,7 @@ import {STORAGE_KEYS,readJson,writeJson} from '../persistence/storage.js';
 import {createLifecycle} from '../app/lifecycle.js';
 import {setShadowHatch} from '../rendering/shadow-hatch.js';
 
-export function bindPlayerSettings({player,painted,elements,collection,dust,ink,setSkyColor,setWallFinish,setFrameLimit}) {
+export function bindPlayerSettings({player,painted,elements,collection,dust,ink,setSkyColor,setWallFinish,setFrameLimit,onModeSelection=()=>{}}) {
   const life=createLifecycle(), saved=readJson(STORAGE_KEYS.player);
   const sensitivity=elements('sensitivity'), toon=elements('toon'), finish=elements('gouache');
   if(Number.isFinite(saved?.sensitivity)) player.state.sensitivity=Math.min(PLAYER_DEFAULTS.maxSensitivity,Math.max(PLAYER_DEFAULTS.minSensitivity,saved.sensitivity));
@@ -17,7 +17,7 @@ export function bindPlayerSettings({player,painted,elements,collection,dust,ink,
   const free=elements('free-placement');
   free.checked=saved?.freePlacement===true;
   collection.setFreePlacement(free.checked);
-  life.listen(free,'change',()=>{collection.setFreePlacement(free.checked);save();});
+  life.listen(free,'change',()=>{collection.setFreePlacement(free.checked);save();reportMode('change','placement');});
   hard.checked=saved?.hardMode===true;
   pigment.checked=saved?.canvasPigment === true;
   sensitivity.value=player.state.sensitivity;
@@ -44,7 +44,9 @@ export function bindPlayerSettings({player,painted,elements,collection,dust,ink,
   }
   lighting(); collection.setStyle(finish.value); collection.setPigment(pigment.checked);
   collection.setEasyMode(!hard.checked);
-  life.listen(hard,'change',()=>{collection.setEasyMode(!hard.checked);save();});
+  life.listen(hard,'change',()=>{collection.setEasyMode(!hard.checked);save();reportMode('change','difficulty');});
+  function reportMode(source,changed){onModeSelection({placement:free.checked?'free':'blocks',difficulty:hard.checked?'hard':'normal',source,changed});}
+  reportMode('initial','none');
   life.listen(sensitivity,'input',()=>{player.state.sensitivity=Number(sensitivity.value);save();});
   life.listen(toon,'change',()=>{lighting();save();});
   life.listen(fpsLimit,'change',()=>{setFrameLimit(fpsLimit.checked);save();});

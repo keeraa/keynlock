@@ -3,6 +3,7 @@
 import {frameFootprint,footprintExtent as extent,footprintsOverlap as overlaps,footprintCorners as corners} from '../../catalog/painting-geometry.js';
 import {trolleyDimensions} from './trolley-model.js';
 import {specialSupport,supportingLevels,tableDropPoses} from './support-surfaces.js';
+import {supportHeightAt} from '../architecture/support-height.js';
 const footprint=(p,frame)=>frameFootprint(p,{frameWidthM:frame,frameDepthM:0});
 function ground(r,hall,layout,config){
   if(!hall){
@@ -120,6 +121,26 @@ export function findDrop(slot,origin,dir,room,layout,config,floor,wallDistance=I
     }
   }
   return null;
+}
+
+// A distant reticle changes the strength, never the horizontal direction.
+// Collision-tested short arcs are tried by the caller in this order.
+export function throwTargets(slot,origin,dir,room,layout,config,floor,wallDistance=Infinity){
+  const targets=[],reach=config.paintings.placementReachM??6;
+  const aimed=findDrop(slot,origin,dir,room,layout,config,floor,wallDistance);
+  if(aimed&&dir.y<-.015&&!aimed.supportId?.startsWith('table-')&&Math.hypot(aimed.x-origin.x,aimed.z-origin.z)<=reach)
+    targets.push({slot:aimed,weak:false});
+  const horizontal=Math.hypot(dir.x,dir.z);
+  if(horizontal<.0001)return targets;
+  for(const distance of [2.6,2,1.4,.9]){
+    const x=origin.x+dir.x/horizontal*distance,z=origin.z+dir.z/horizontal*distance;
+    const height=supportHeightAt(x,z,origin.y,config);
+    const ray={x:x-origin.x,y:height-origin.y,z:z-origin.z};
+    const length=Math.hypot(ray.x,ray.y,ray.z);for(const axis of ['x','y','z'])ray[axis]/=length;
+    const candidate=findDrop(slot,origin,ray,room,layout,config,floor,wallDistance);
+    if(candidate&&!candidate.supportId?.startsWith('table-'))targets.push({slot:candidate,weak:true});
+  }
+  return targets;
 }
 
 // Only direct contact hides a canvas at every viewing angle. Partial overlap

@@ -8,7 +8,7 @@ import {frameDimensions,mountedFrame} from '../../catalog/painting-geometry.js';
 import {acceptsHall,adjacentPosition,aimedFrameAtRay, floorSlots, placedSlot, wallAtRay} from './hanging.js';
 import {createPlacementFeedback} from './placement-feedback.js';
 import {createFrameMotion} from './frame-motion.js';
-import {findDrop,aimedSupport,settleFloor,settleTrolley,covered} from './floor-drop.js';
+import {findDrop,throwTargets,aimedSupport,settleFloor,settleTrolley,covered} from './floor-drop.js';
 import {createPlacementPreview} from './placement-preview.js';
 import {createTablePreview} from './table-preview.js';
 import {getLanguage,t,paintingTitle} from '../localization/i18n.js';
@@ -27,6 +27,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
   const usesTrolley=slot=>Math.max(slot.height,slot.painting.physicalSizeM.width)>=settings.hoistFromM;
   const motionAudio=createPaintingMotionAudio(setSoundMotion);
   const fitAudio=createFrameFitAudio(playSound);
+  let inspectionHeld=false;
   let aimedPlace=null,freePlacement=false,placementFailure='no_wall',lastIntegrity=-Infinity,lastMissing='';
   let heavyIds=new Set();
   let cursor=null,coveredPick=false;
@@ -158,15 +159,15 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       const large=usesTrolley(interaction.carrying);
       let hint=text('Наведите на стену','Aim at a wall');
       if(!reachable)cursor=null;
-      if(!interaction.placing || !reachable)preview.follow(interaction.carrying,large,hall,origin,dir,interaction.source,now,interaction.raised);
+      if(inspectionHeld || !interaction.placing || !reachable)preview.follow(interaction.carrying,large,hall,origin,dir,interaction.source,now,interaction.raised||inspectionHeld);
       if(preview.takeLiftFailure()){
         onEvent('placement_failed',{reason:'pickup_blocked',paintingId:interaction.carrying.painting.id,hall:room});
         notify(text('Рама упирается в препятствие. Отойдите немного назад — картина остаётся у вас.','The frame is blocked. Step back a little — you are still holding the painting.'));
       }
-      if(!interaction.placing)hint=text('E / ЛКМ — примерить на стене, положить на стол или отпустить · ПКМ — рассмотреть','E / LMB — preview on wall, place on table or release · RMB — inspect');
+      if(!interaction.placing)hint=text('E / ЛКМ — примерить на стене, положить на стол или отпустить · удерживайте ПКМ — рассмотреть','E / LMB — preview on wall, place on table or release · hold RMB — inspect');
       if(hit&&!reachable)placementFailure='out_of_reach';
-      if(hit && !reachable)hint=text('Подойдите ближе · установка до 6 м','Move closer · placement within 6 m');
-      if(interaction.placing && reachable){
+      if(hit && !reachable)hint=(interaction.placing||large)?text('Подойдите ближе · установка до 6 м','Move closer · placement within 6 m'):text('E / ЛКМ — короткий бросок в этом направлении','E / LMB — short throw in this direction');
+      if(!inspectionHeld && interaction.placing && reachable){
         const w=hit.wall,limits=wallSettings(w),half=frameDimensions(interaction.carrying,settings).height/2;
         const aimX=hit.along;
         const aimY=clamp(hit.y,limits.minBottomM+half,limits.maxTopM-half);
@@ -197,7 +198,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
           hint=text('Эту работу можно оставить на столе или отнести к приёмнику','Leave this work on a table or take it to the receiver');
         else if(!correctHall)hint=text('Нужен зал «','Required hall “')+t(destHall?.title??'Ротонда')+text('»','”');
       }
-      if(!interaction.placing){
+      if(!inspectionHeld&&!interaction.placing){
         const plan=tablePreview.update({origin,dir,carrying:interaction.carrying,floor,room,wallDistance:hit?.distance,now});
         if(plan){preview.table(plan.slot,now,plan.valid);hint=plan.valid?text('E / ЛКМ — положить на стол','E / LMB — place on the table'):text('Место занято · сдвиньте прицел','Space occupied · move the reticle');}
       }
@@ -210,8 +211,8 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       coveredPick=pickFloor && pickFloor.floorAngle!==undefined && covered(pickFloor,floorByRoom.get(pickFloor.floorRoom??pickFloor.wall.hall)??emptyRoom,settings);
       preview.hover(pickFloor,now);
       description=picked;
-      commands=picked?[(pickFloor?action+text(' — взять',' — pick up'):text('Удерживайте E / ЛКМ — снять','Hold E / LMB to take down')),text('F — рассмотреть','F — inspect'),text('ПКМ — рассмотреть','RMB — inspect')].filter(Boolean).join(' · '):text('Наведите на картину · E / ЛКМ — взять','Aim at a painting · E / LMB — pick up');
-      message=picked?paintingTitle(picked.painting)+(picked.destination.split('/')[0]==='center'?text(' · ✦ Шедевр · Центральная ротонда',' · ✦ Masterpiece · Central rotunda'):'')+' · '+(pickFloor?action+text(' — взять',' — pick up'):text('Удерживайте E / ЛКМ — снять','Hold E / LMB to take down'))+text(' · F — рассмотреть',' · F — inspect'):
+      commands=picked?[(pickFloor?action+text(' — взять',' — pick up'):text('Удерживайте E / ЛКМ — снять','Hold E / LMB to take down')),text('удерживайте ПКМ — рассмотреть','hold RMB — inspect')].filter(Boolean).join(' · '):text('Наведите на картину · E / ЛКМ — взять','Aim at a painting · E / LMB — pick up');
+      message=picked?paintingTitle(picked.painting)+(picked.destination.split('/')[0]==='center'?text(' · ✦ Шедевр · Центральная ротонда',' · ✦ Masterpiece · Central rotunda'):'')+' · '+(pickFloor?action+text(' — взять',' — pick up'):text('Удерживайте E / ЛКМ — снять','Hold E / LMB to take down'))+text(' · удерживайте ПКМ — рассмотреть',' · hold RMB — inspect'):
         page.length===0?text('Выберите картины в подборке','Select paintings in the collection'):hung.length===page.length?text('Эта экспозиция развешена','This exhibition is hung'):
         text('Наведите прицел на картину на полу · E / ЛКМ — взять','Aim at a painting on the floor · E / LMB — pick up');
     }
@@ -265,9 +266,9 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     if(interaction.carrying){
       const hit=aim(),support=aimedSupport(origin,dir,layout,config,hit?.distance,settings.placementReachM??6);
       const reachable=hit && hit.distance<=(settings.placementReachM??6);
-      if(support||!hit){
+      if(support||!hit||(!reachable&&!interaction.placing&&!usesTrolley(interaction.carrying))){
         if(interaction.placing){interaction.carry();cursor=null;update(true);}
-        if(support?.kind==='floor'&&!usesTrolley(interaction.carrying))drop({throwing:true,surface:'floor'});
+        if((!support||support.kind==='floor')&&!usesTrolley(interaction.carrying))drop({throwing:true,surface:'floor'});
         else if(support?.kind==='table')drop({surface:'table'});
         else drop();
         return true;
@@ -316,9 +317,11 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     const hit=aim();
     let slot=findDrop(interaction.carrying,origin,dir,room,layout,config,floor,hit?.distance);
     if(slot && ((surface==='table' && !slot.supportId?.startsWith('table-')) || (throwing && slot.supportId?.startsWith('table-'))))slot=null;
-    let flight=throwing && slot && preview.throwPath(slot);
-    let path=slot && (throwing?flight?.path:preview.dropPath(slot));
-    if(!path && surface!=='table'){
+    let flight=null,weakThrow=false,path=throwing?null:slot&&preview.dropPath(slot);
+    if(throwing){for(const candidate of throwTargets(interaction.carrying,origin,dir,room,layout,config,floor,hit?.distance)){
+      const arc=preview.throwPath(candidate.slot);if(arc){slot=candidate.slot;flight=arc;path=arc.path;weakThrow=candidate.weak;break;}
+    }}
+    if(!throwing&&!path && surface!=='table'){
       // If the reticle hits a crowded spot, find a nearby supported free surface.
       const yaw=Math.atan2(dir.x,dir.z);
       search:for(const radius of [.8,1.3,1.9,2.6,3.4])for(const offset of [0,.35,-.35,.7,-.7,1.2,-1.2,Math.PI]){
@@ -339,7 +342,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     }
     if(!placements.placeOnFloor(slot))return;
     const travel=path.slice(1).reduce((d,b,i)=>d+b.position.distanceTo(path[i].position),0);
-    onEvent(throwing?'painting_throw':'painting_drop',{paintingId:slot.painting.id,hall:room,surface:slot.supportId?.startsWith('table-')?'table':'floor'});
+    onEvent(throwing?'painting_throw':'painting_drop',{paintingId:slot.painting.id,hall:room,surface:slot.supportId?.startsWith('table-')?'table':'floor',weakThrow});
     interaction.lower({slot,path,start:performance.now(),ballistic:throwing,duration:flight?.duration??Math.min(1600,360+travel*80)});cursor=null;update(true);
   }
   function aimed(){
@@ -386,7 +389,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     raise:value=>interaction.raise(value),
     get active(){return active;},
     setActive(value){updateMode(value);interaction.reset();rebuild();},
-    setPage,update,interact,drop,
+    setPage,update,interact,drop,setInspecting(value){inspectionHeld=Boolean(value);},
     playtestSnapshot:()=>({hall:room,carrying:interaction.carrying?.painting.id??'',hung:hung.filter(s=>page.some(p=>p.painting.id===s.painting.id)).length,floor:floor.length,total:page.length,disposed:page.filter(s=>disposal.has(s.painting.id)).length,completedHalls:completion.completedCount,freePlacement}),
     aimed,inspectSlot(){return interaction.carrying ?? interaction.landing?.slot ?? aimed();},
     fillVacancy(slot,replacement){

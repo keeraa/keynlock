@@ -3,7 +3,19 @@ import {arrangeWall,canvasArea} from './wall-packing.js';
 
 export function arrangeExhibition(catalog, state, layout, settings) {
   const zones = new Map(), reserveReasons = new Map();
-  const surfaces = layout.walls.map(wall=>({wall,works:[],area:0}));
+  // Size ordering spans a whole side wall, across the former thematic sections.
+  const seenSides=new Set();
+  const surfaces = layout.walls.flatMap(original=>{
+    if(original.hall==='center'||original.theme==='end')return [{wall:original,works:[],area:0}];
+    const side=original.id.split('/')[1],key=original.hall+'/'+side;
+    if(seenSides.has(key))return [];
+    seenSides.add(key);
+    const physical=layout.hangingWalls.find(w=>w.id===original.hall+'/side/'+side);
+    const hall=layout.halls.find(h=>h.id===original.hall);
+    const wall=physical?{...original,...physical,id:original.id,theme:original.theme,
+      themes:hall.walls.map(([id])=>id)}:original;
+    return [{wall,works:[],area:0}];
+  });
   for (const surface of surfaces) {
     for (const theme of surface.wall.themes ?? [surface.wall.theme]) {
       const key = surface.wall.hall+'/'+theme;

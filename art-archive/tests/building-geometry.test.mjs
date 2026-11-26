@@ -224,3 +224,10 @@ test('diffusers have actual pane rebates and one shared static frost shader',()=
  assert(shader.fragmentShader.includes('opalNoise'));assert(shader.fragmentShader.includes('fwidth'));
  assert(!shader.fragmentShader.includes('uniform float time'));assert(shader.vertexShader.includes('vOpalCoordinates=uv'));
 });
+
+test('the bottom stair shares one surface with the landing and cannot z-fight',()=>{
+ const s=config.building.stair,tread=stairTreads(s).at(-1),angle=(tread.a+tread.b)/2,r=(s.innerRadius+s.outerRadius)/2;
+ const ray=new THREE.Raycaster(new THREE.Vector3(r*Math.sin(angle),config.building.floorElevation-s.depth+.08,r*Math.cos(angle)),new THREE.Vector3(0,-1,0),0,.1);
+ const hits=ray.intersectObject(building.root,true).filter(hit=>Math.abs(hit.point.y-config.building.floorElevation+s.depth)<1e-5);
+ assert.equal(new Set(hits.map(hit=>hit.object.id)).size,1,'the bottom tread must have exactly one visible top surface');
+});

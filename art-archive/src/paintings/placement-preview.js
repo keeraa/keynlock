@@ -2,6 +2,7 @@ import {createPaintingProps} from './props.js';
 import {overviewGeometry} from './overview.js';
 import {frameDimensions,frameOrientation,mountedFrame,frameCornerCut,clippedFrameCorners} from '../../catalog/painting-geometry.js';
 import {trolleyDimensions} from './trolley-model.js';
+import {TOP_RAIL_GAP} from '../architecture/stair-profile.js';
 import {supportHeightAt} from '../architecture/support-height.js';
 
 export function createPlacementPreview(THREE,world,display,config,motion) {
@@ -39,7 +40,7 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
   const carryRotation=new THREE.Matrix4();
   const previous={position:new THREE.Vector3(),quaternion:new THREE.Quaternion()};
   const goal={position:new THREE.Vector3(),quaternion:new THREE.Quaternion()};
-  let view=null,current=null,request=0;
+  let view=null,current=null,request=0,stairCarry=false;
   function select(slot){
     if(slot===current)return;
     if(slot && slot.painting.id===current?.painting.id)return;
@@ -121,6 +122,24 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
   function carry(slot,large,hall,origin,dir,source,raised){
     root.visible=true;cart.visible=large;
     const fy=config.building.floorElevation;
+    const eye=world.camera,stair=config.building.stair,radius=Math.hypot(eye.position.x,eye.position.z);
+    // Keep the long edge along the flight, independent of where the player looks.
+    // The usual low, sideways hand pose cannot fit between the curved railings.
+    const angle=Math.atan2(eye.position.x,eye.position.z);
+    const entrance=stair&&angle>-TOP_RAIL_GAP&&angle<stair.topLandingAngle+.3;
+    stairCarry=!large&&!raised&&stair&&(radius<stair.openingRadius+.45||entrance&&radius<stair.openingRadius+1.6);
+    if(stairCarry){
+      // At the mouth the path runs radially; turn progressively with the bend.
+      const bend=angle < -TOP_RAIL_GAP?angle+Math.PI*2:angle;
+      const progress=Math.max(0,Math.min(1,bend/.9));
+      const turn=(1-progress)*Math.PI/2;
+      root.rotation.set(0,angle+turn,0,'YXZ');
+      root.position.copy(eye.position);root.position.y-=.12;
+      const outward=.2*(1-progress);
+      root.position.x+=Math.sin(angle)*outward+Math.sin(angle+turn)*.28;
+      root.position.z+=Math.cos(angle)*outward+Math.cos(angle+turn)*.28;
+      cart.visible=false;return;
+    }
     if(!large || raised){
       const eye=world.camera;
       cart.visible=false;
@@ -270,6 +289,7 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
       if(!large || raised){
         const eye=world.camera;
         cameraDelta.copy(eye.quaternion).multiply(lastEyeRotation.invert());
+        if(stairCarry)cameraDelta.identity();
         carriedFrom.sub(lastEyePosition).applyQuaternion(cameraDelta).add(eye.position);
         goal.quaternion.copy(previous.quaternion).premultiply(cameraDelta);
         root.quaternion.slerp(goal.quaternion,1-t);

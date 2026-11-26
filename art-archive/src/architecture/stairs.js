@@ -6,7 +6,8 @@ export function buildStairs(context){
  cylinder(0,-depth/2,0,inner*.8,inner*.9,depth+.3,m.stone);
  // The upper landing overlaps the floor slab; the first tread is exactly at y=0.
  const landing=shapeMesh(sector(-TOP_RAIL_GAP,stair.topLandingAngle,inner,stair.openingRadius+.4,12),[],-.22,.22,m.stone);landing.name='stair-top-landing';
- for(const {a,b,y}of stairTreads(stair)){
+ // The final tread is the lower landing itself: no duplicate coplanar top face.
+ for(const {a,b,y}of stairTreads(stair).slice(0,-1)){
   shapeMesh(sector(a,b,inner,outer),[],y-.15,.15,m.stone);
  }
  // Guardrail around the opening, leaving only the staircase entrance open.

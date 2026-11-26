@@ -2,7 +2,7 @@
 import {frameDimensions,frameOrientation} from '../../catalog/painting-geometry.js';
 import {furnitureBounds} from '../architecture/furniture-bounds.js';
 import {supportHeightAt} from '../architecture/support-height.js';
-import {guardSegments,topGuardPaths} from '../architecture/stair-profile.js';
+import {LOWER_WALL_RADIUS,TOP_RAIL_GAP,stairTreads,guardSegments,topGuardPaths} from '../architecture/stair-profile.js';
 export function createFrameMotion(THREE,config,layout){
   const {frameWidthM,frameDepthM}=config.paintings,fy=config.building.floorElevation;
   const v=(x=0,y=0,z=0)=>new THREE.Vector3(x,y,z);
@@ -49,10 +49,59 @@ export function createFrameMotion(THREE,config,layout){
         half:[length/2+.025,halfHeight,.069],radius:Math.hypot(length/2+.025,halfHeight,.069)});
     }
   }
+  // Convex pieces of the rendered stairwell. Checking the whole frame against
+  // these volumes also catches a corner crossing a riser or the floor slab.
+  const structure=[];
+  function prism(points,bottom,top){
+    const center=v(points.reduce((n,p)=>n+p.x,0)/points.length,fy+(bottom+top)/2,points.reduce((n,p)=>n+p.z,0)/points.length);
+    const vertices=points.flatMap(p=>[v(p.x,fy+bottom,p.z),v(p.x,fy+top,p.z)]);
+    const edges=points.map((p,i)=>v(points[(i+1)%points.length].x-p.x,0,points[(i+1)%points.length].z-p.z).normalize());
+    const normals=[basis[1],...edges.map(e=>v(-e.z,0,e.x))];
+    structure.push({position:center,radius:Math.max(...vertices.map(p=>p.distanceTo(center))),vertices,normals,edges:[basis[1],...edges]});
+  }
+  function sector(a,b,inner,outer,bottom,top,segments=4){
+    for(let i=0;i<segments;i++){
+      const left=a+(b-a)*i/segments,right=a+(b-a)*(i+1)/segments;
+      prism([[inner,left],[outer,left],[outer,right],[inner,right]].map(([r,t])=>({x:r*Math.sin(t),z:r*Math.cos(t)})),bottom,top);
+    }
+  }
+  if(layout&&config.building.stair){
+    const s=config.building.stair;
+    for(const t of stairTreads(s).slice(0,-1))sector(t.a,t.b,s.innerRadius,s.outerRadius,t.y-.15,t.y);
+    sector(-TOP_RAIL_GAP,s.topLandingAngle,s.innerRadius,s.openingRadius+.4,-.22,0,12);
+    sector(0,Math.PI*2,s.openingRadius,config.building.radius,-.22,0,64);
+    sector(0,Math.PI*2,.001,s.innerRadius*.9,-s.depth-.15,.15,12);
+    const receiver=layout.disposalStation,door=layout.lowerDoor,r=LOWER_WALL_RADIUS;
+    if(receiver&&door){
+      const halfArc=Math.asin(1.4/r),entry=receiver.bearing-receiver.arc,end=entry+2*receiver.arc;
+      const offset=((door.angle-entry)%(Math.PI*2)+Math.PI*2)%(Math.PI*2),start=entry+offset-halfArc,finish=start+2*halfArc;
+      const wall=(a,b,low,high)=>sector(a,b,r-.015,r+.08,-s.depth+low,-s.depth+high,Math.ceil((b-a)*12));
+      wall(end,start,0,3.9);wall(finish,entry+Math.PI*2,0,3.9);
+      wall(entry,end,0,receiver.bottom);wall(entry,end,receiver.bottom+receiver.height,3.9);wall(start,finish,3,3.9);
+      // The painted door closes its opening, with the same recessed chord.
+      const chord=r*Math.cos(halfArc)+.055,sin=Math.sin(door.angle),cos=Math.cos(door.angle);
+      prism([[-1.4,chord-.015],[1.4,chord-.015],[1.4,chord+.08],[-1.4,chord+.08]].map(([x,z])=>({x:x*cos+z*sin,z:z*cos-x*sin})),-s.depth,-s.depth+3);
+    }
+  }
+  function intersectsPrism(b,solid){
+    if(b.position.distanceToSquared(solid.position)>=(b.radius+solid.radius)**2)return false;
+    const separate=n=>{
+      let lo=Infinity,hi=-Infinity;
+      for(const p of solid.vertices){const t=p.dot(n);lo=Math.min(lo,t);hi=Math.max(hi,t);}
+      const center=b.position.dot(n),radius=radiusOn(b,n);
+      return center+radius<=lo+.00005||center-radius>=hi-.00005;
+    };
+    if(b.axes.some(separate)||solid.normals.some(separate))return false;
+    for(const a of b.axes)for(const edge of solid.edges){
+      cross.crossVectors(a,edge);
+      if(cross.lengthSq()>1e-9&&separate(cross.normalize()))return false;
+    }
+    return true;
+  }
   function blocked(slot,position,rotation){
     const b=box(slot,position,rotation);
     const floor=fy+supportHeightAt(position.x,position.z,position.y-fy,config);
-    return position.y-radiusOn(b,basis[1])<floor-.00005 || furniture.some(w=>intersects(b,w)) || rail.some(w=>intersects(b,w)) || walls.some(w=>intersects(b,w)) || obstacles.some(o=>intersects(b,o));
+    return position.y-radiusOn(b,basis[1])<floor-.00005 || furniture.some(w=>intersects(b,w)) || rail.some(w=>intersects(b,w)) || walls.some(w=>intersects(b,w)) || obstacles.some(o=>intersects(b,o)) || structure.some(w=>intersectsPrism(b,w));
   }
   function copy(a){return {position:a.position.clone(),quaternion:a.quaternion.clone()};}
   function advance(slot,from,to){

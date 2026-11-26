@@ -1,6 +1,7 @@
 import {PLAYER_DEFAULTS} from '../../config/runtime.js';
 export function createPlayerController({THREE,camera,navigation,config}){
  const baseFov=camera.fov;
+ let targetFov=baseFov;
  const initialPitch=config.camera?.initialPitch??0;
  const state={yaw:0,pitch:initialPitch,floorY:0,sensitivity:PLAYER_DEFAULTS.sensitivity,lastPointer:null,edge:{x:0,y:0,until:0}};
  const held=new Set();
@@ -22,6 +23,11 @@ export function createPlayerController({THREE,camera,navigation,config}){
   if(changed)camera.position.set(safe.x,config.building.floorElevation+PLAYER_DEFAULTS.eyeHeight+safe.floorY,safe.z);
  }
  function update(dt,now,playing,canSprint=true){
+  if(camera.fov!==targetFov){
+   camera.fov+=(targetFov-camera.fov)*(-Math.expm1(-7*dt));
+   if(Math.abs(camera.fov-targetFov)<.002)camera.fov=targetFov;
+   camera.updateProjectionMatrix();
+  }
   let distance=0;
   if(playing){
    resolvePosition();
@@ -43,6 +49,6 @@ export function createPlayerController({THREE,camera,navigation,config}){
   camera.rotation.set(THREE.MathUtils.clamp(state.pitch+headPitch,-1.31,1.27),state.yaw+headYaw,0,'YXZ');
   return distance;
  }
- function zoom(value){camera.fov=value ? baseFov*.62 : baseFov;camera.updateProjectionMatrix();}
+ function zoom(value){targetFov=value ? baseFov*.62 : baseFov;}
  return {state,held,turn,clearInput,update,zoom,lookAtCarry(target){inspection=target;headMouseYaw=headMousePitch=0;state.edge.until=0;},prepareView(){resolvePosition(.85);},level(){state.pitch=0;},reset(){inspection=null;headYaw=headPitch=headMouseYaw=headMousePitch=0;checkedRevision=-1;camera.position.set(PLAYER_DEFAULTS.spawn.x,config.building.floorElevation+PLAYER_DEFAULTS.eyeHeight,PLAYER_DEFAULTS.spawn.z);state.floorY=0;state.yaw=0;state.pitch=initialPitch;clearInput();}};
 }

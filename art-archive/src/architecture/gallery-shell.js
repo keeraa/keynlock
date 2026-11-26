@@ -1,4 +1,4 @@
-import {entranceFront} from './entrance-junction.js';
+import {entranceFront,entrancePaintColor} from './entrance-junction.js';
 export function buildGalleryShell(context, {h,g,roof,start,end,junctions}){
  const {THREE, layout, m, w, len, vaultRise, height, mesh, box, tube, shapeMesh}=context;
   box(0,-.12,start+len/2,w,.24,len,m.floor,g).name='gallery-floor';
@@ -18,8 +18,10 @@ export function buildGalleryShell(context, {h,g,roof,start,end,junctions}){
   const endUV=endGeometry.attributes.uv;for(let i=0;i<endUV.count;i++)endUV.setXY(i,endUV.getX(i)/3.5,endUV.getY(i)/3.5);
   const endWall=mesh(endGeometry,m.plaster,g);endWall.name='gallery-end-wall';endWall.position.z=end-.15;
   // Cove moulding follows the actual ceiling intersection, around both end corners.
+  const trim=new THREE.MeshBasicMaterial({color:entrancePaintColor(THREE,h.color)});
+  context.disposable.add(trim);
   const tx=w/2-.18,ty=height+vaultRise*Math.sqrt(1-(tx/(w/2))**2)-.06;
-  for(const side of [-1,1])tube([new THREE.Vector3(side*tx,ty,entranceFront(layout,h,side*tx,junctions)+.025),new THREE.Vector3(side*tx,ty,end-.23)],.065,m.ivory,roof);
-  const arch=Array.from({length:49},(_,i)=>{const x=-tx+2*tx*i/48;return new THREE.Vector3(x,height+vaultRise*Math.sqrt(1-(x/(w/2))**2)-.06,end-.23);});tube(arch,.065,m.ivory,roof);
+  for(const side of [-1,1])tube([new THREE.Vector3(side*tx,ty,entranceFront(layout,h,side*tx,junctions)+.025),new THREE.Vector3(side*tx,ty,end-.23)],.065,trim,roof).name='gallery-cove-trim';
+  const arch=Array.from({length:49},(_,i)=>{const x=-tx+2*tx*i/48;return new THREE.Vector3(x,height+vaultRise*Math.sqrt(1-(x/(w/2))**2)-.06,end-.23);});tube(arch,.065,trim,roof).name='gallery-cove-trim';
 
 }

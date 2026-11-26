@@ -142,7 +142,7 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
         inspectionStart=null;return true;
       }
       const slot=hanging.active?hanging.inspectSlot():display.aimedSlot();
-      if(!slot){hanging.setInspecting(false);player.lookAtCarry?.(null);player.zoom?.(false);inspectionStart=null;return false;}
+      if(!slot){hanging.setInspecting(false);player.lookAtCarry?.(null);player.zoom?.(true);inspectionStart=null;return true;}
       hanging.setInspecting(true);player.lookAtCarry?.(hanging.inspectionTarget());player.zoom?.(!hanging.carriedId);
       inspectionStart=hanging.carriedId===slot.painting.id?{slot,time:performance.now()}:null;
       onEvent('painting_inspect',{paintingId:slot.painting.id});return true;

@@ -126,3 +126,24 @@ test('wall flight and its reverse finish in 150 ms, with no snap when aim return
  follow(1525);preview.returnToCarry(1525);assert(root.visible);assert(!ghost.visible);
  preview.dispose();
 });
+
+for(const yaw of [0,.7,2.4])test(`a stuck transported frame blocks the player crossing it at yaw ${yaw}`,()=>{
+ const camera=new THREE.PerspectiveCamera(73,1.5),scene=new THREE.Scene();
+ const large={...slot,painting:{...slot.painting,physicalSizeM:{width:8.8,height:4.6}},width:8.935,height:4.6,y:2.6};
+ const motion={pose:s=>({position:new THREE.Vector3(s.x,fy+s.y,s.z),quaternion:new THREE.Quaternion()}),blocked:()=>true,advance:()=>0,route:()=>null};
+ const preview=createPlacementPreview(THREE,{camera,scene,layout},{},config,motion);preview.select(large);preview.beginLift(large,0);
+ const root=scene.getObjectByName('carried-painting');root.visible=true;root.rotation.y=yaw;
+ const normal=new THREE.Vector3(0,0,1).applyQuaternion(root.quaternion);
+ const from=root.position.clone().addScaledVector(normal,.9);from.y=fy+1.78;
+ const to=from.clone().addScaledVector(normal,-1.8);
+ const fraction=preview.constrainMovement(from,to);
+ assert(fraction>.1&&fraction<.5,'swept player capsule must stop before the canvas, even during a blocked pickup');
+ const stopped=from.clone().lerp(to,fraction);
+ assert(preview.constrainMovement(stopped,to)<.001,'repeated input must not creep through');
+ assert.equal(preview.constrainMovement(stopped,from),1,'player can retreat from the jam');
+ const inside=root.position.clone().addScaledVector(normal,.15);inside.y=from.y;
+ assert.equal(preview.constrainMovement(inside,from),1,'an existing overlap can be escaped');
+ const along=from.clone().add(new THREE.Vector3(.2,0,0).applyQuaternion(root.quaternion));
+ assert.equal(preview.constrainMovement(from,along),1,'moving beside the painting remains possible');
+ preview.dispose();
+});

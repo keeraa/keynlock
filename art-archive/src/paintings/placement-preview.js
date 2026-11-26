@@ -4,6 +4,7 @@ import {frameDimensions,frameOrientation,mountedFrame,frameCornerCut,clippedFram
 import {trolleyDimensions} from './trolley-model.js';
 import {TOP_RAIL_GAP} from '../architecture/stair-profile.js';
 import {supportHeightAt} from '../architecture/support-height.js';
+import {PLAYER_DEFAULTS} from '../../config/runtime.js';
 
 export function createPlacementPreview(THREE,world,display,config,motion) {
   const root=new THREE.Group(),settings=config.paintings;
@@ -379,9 +380,45 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
       }
       allowed=low;
     }
-    if(lift||motion.blocked(current,root.position,root.quaternion))return allowed;
-    const desired={position:root.position.clone().add(to.clone().sub(from)),quaternion:root.quaternion};
-    return Math.min(allowed,motion.advance(current,root,desired));
+    const delta=to.clone().sub(from);
+    const stopped=lift||motion.blocked(current,root.position,root.quaternion);
+    const frameAdvance=stopped?0:
+      motion.advance(current,root,{position:root.position.clone().add(delta),quaternion:root.quaternion});
+    if(!stopped)allowed=Math.min(allowed,frameAdvance);
+    if(frameAdvance>=allowed)return allowed;
+    // Once the frame stops at an obstacle, the player must stop at its actual
+    // volume too. Test the remaining relative movement, including pickup/recovery.
+    const size=frameDimensions(current,settings),inverse=root.quaternion.clone().invert(),radius=.28;
+    const local=from.clone().sub(root.position).applyQuaternion(inverse);
+    const vertical=new THREE.Vector3(0,1,0).applyQuaternion(inverse);
+    const relative=delta.clone().applyQuaternion(inverse);
+    function clearance(t){
+      const center=local.clone().addScaledVector(relative,Math.max(0,t-frameAdvance));
+      const sdf=h=>{
+        const x=Math.abs(center.x+vertical.x*h)-size.width/2;
+        const y=Math.abs(center.y+vertical.y*h)-size.height/2;
+        const z=Math.abs(center.z+vertical.z*h)-size.depth/2;
+        return Math.hypot(Math.max(0,x),Math.max(0,y),Math.max(0,z))+Math.min(0,Math.max(x,y,z));
+      };
+      let low=-PLAYER_DEFAULTS.eyeHeight+radius,high=0;
+      for(let i=0;i<24;i++){
+        const a=(2*low+high)/3,b=(low+2*high)/3;
+        if(sdf(a)<sdf(b))high=b;else low=a;
+      }
+      return Math.min(sdf(low),sdf(high),sdf(-PLAYER_DEFAULTS.eyeHeight+radius),sdf(0))-radius;
+    }
+    const initial=clearance(0),steps=Math.max(1,Math.ceil(delta.length()/.04));
+    let previous=0;
+    for(let i=1;i<=steps;i++){
+      const t=allowed*i/steps,gap=clearance(t);
+      if(gap<Math.min(0,initial)-1e-6){
+        let low=previous,high=t;
+        for(let j=0;j<16;j++){const mid=(low+high)/2;if(clearance(mid)>=Math.min(0,initial)-1e-6)low=mid;else high=mid;}
+        return low;
+      }
+      previous=t;
+    }
+    return allowed;
   }
   return {constrainMovement,takeLiftFailure(){const value=liftFailure;liftFailure=false;return value;},
     carriedPose(){return root.visible||returnFlight?{position:root.position,quaternion:root.quaternion}:null;},

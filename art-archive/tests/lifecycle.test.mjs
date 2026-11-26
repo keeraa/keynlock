@@ -39,3 +39,19 @@ test('a late Promise-based pointer lock grant is released after the host was dis
  const lock=createPointerLock({canvas,document:doc,isPlayMode:()=>true});
  lock.request();lock.dispose();doc.pointerLockElement=canvas;grant();await Promise.resolve();assert.equal(released,1);assert.equal(lock.locked(),false);
 });
+
+test('RMB zoom eases in and out while mouse look remains available in any direction',()=>{
+ const config={building:{floorElevation:8}},camera=new THREE.PerspectiveCamera(73,1.5);
+ const player=createPlayerController({THREE,camera,navigation:{move:()=>({floorY:0})},config});
+ player.zoom(true);assert.equal(camera.fov,73,'pressing RMB must not snap the projection');
+ player.update(.016,16,false);const first=camera.fov;
+ assert(first<73&&first>73*.62);
+ player.turn(100,35);player.update(.016,32,false);
+ assert(camera.fov<first);assert(camera.rotation.y<0);assert(camera.rotation.x<0);
+ for(let i=0;i<100;i++)player.update(.016,48+i*16,false);
+ assert(Math.abs(camera.fov-73*.62)<.002);
+ player.zoom(false);const near=camera.fov;player.update(.016,1700,false);
+ assert(camera.fov>near&&camera.fov<73,'release must ease back too');
+ for(let i=0;i<100;i++)player.update(.016,1716+i*16,false);
+ assert.equal(camera.fov,73);
+});

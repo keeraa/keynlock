@@ -210,7 +210,10 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
         const plan=tablePlan=tablePreview.update({origin,dir,carrying:interaction.carrying,floor,room,wallDistance:hit?.distance,now});
         if(plan){preview.table(plan.slot,now,plan.valid);hint=plan.valid?text('E / ЛКМ — положить на стол','E / LMB — place on the table'):text('Место занято · сдвиньте прицел','Space occupied · move the reticle');}
       }
-      const invalidHint=!target&&reachable&&!inspectionHeld&&!interaction.raised&&cursor&&!tablePlan;
+      // A red hint may indicate the wrong hall or an occupied place, but it
+      // still needs a complete wall face behind the frame, including at arches.
+      const invalidHint=!target&&reachable&&!inspectionHeld&&!interaction.raised&&cursor&&!tablePlan&&
+        Boolean(placedSlot(interaction.carrying,hit.wall,cursor.x,cursor.y,wallSettings(hit.wall),[]));
       if(invalidHint)preview.wall(interaction.carrying,hit.wall,cursor.x,cursor.y,false,large,now,true);
       if(!interaction.placing)preview.returnToCarry(now,inspectionHeld||Boolean(tablePlan)||Boolean(invalidHint));
       description=interaction.carrying;

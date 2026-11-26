@@ -714,3 +714,26 @@ test('aiming a carried painting at a suitable wall shows its dashed ghost before
  aim(10);assert(!scene.getObjectByName('wall-preview').visible,'no unreachable installation target');session.update(true,performance.now()+200);assert(!scene.getObjectByName('table-placement-preview').visible,'return finishes without leaving a wall hint');assert.equal(memory.size,0);
  aim(3);assert(session.interact());assert.equal(session.find(slot.painting.id).wall.id,wall.id,'one click installs the previewed painting');
 });
+
+test('invalid wall previews disappear at gallery corners, arch jambs and rotunda panel edges',()=>{
+ const slot=exhibition.byId.get('ART-1586'),camera=new THREE.PerspectiveCamera(),scene=new THREE.Scene();
+ let slots,now=1000;
+ const session=createHangingSession({THREE,world:{camera,scene,layout},config,label:{},display:{setSlots:value=>slots=value}});
+ session.setPage([slot]);session.setActive(true);
+ const floor=slots[0],fy=config.building.floorElevation;
+ camera.position.set(floor.x,fy+1.78,floor.z+.8);camera.lookAt(floor.x,fy+floor.y,floor.z);assert(session.interact());
+ const hint=scene.getObjectByName('table-placement-preview'),held=scene.getObjectByName('carried-painting');
+ const aim=(wall,along)=>{
+  const x=wall.a.x+(wall.b.x-wall.a.x)*along/wall.length,z=wall.a.z+(wall.b.z-wall.a.z)*along/wall.length;
+  camera.position.set(x+wall.normal.x*2,fy+2.4,z+wall.normal.z*2);camera.lookAt(x,fy+2.4,z);
+  session.update(true,now+=1000);session.update(true,now+=1000);
+ };
+ for(const wall of [layout.hangingWalls.find(w=>w.id==='nature/end'),layout.hangingWalls.find(w=>w.id==='nature/side/1'),layout.hangingWalls.find(w=>w.id==='center/0')]){
+  aim(wall,wall.length/2);assert(hint.visible,'a complete wall face in the wrong hall still gets a red hint');
+  assert.equal(scene.getObjectByName('table-placement-outline').material.color.getHex(),0xff3939);
+  for(const along of [(wall.minAlong??0)+.05,(wall.maxAlong??wall.length)-.05]){
+   aim(wall,along);assert(!hint.visible,wall.id+': no frame may straddle the end of the wall');assert(held.visible);
+  }
+ }
+ session.dispose();
+});

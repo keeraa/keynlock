@@ -277,8 +277,7 @@ function arrangeSizeOrderedWall(wall,works,settings,byId,reserveReasons,featured
   const result=[];let left=min;
   columns.sort((a,b)=>heightOrder(a.items[0],b.items[0]));
   for(const column of columns){
-   const height=column.items.reduce((sum,w)=>sum+w.height+2*frame,0)+(column.items.length-1)*settings.verticalGapM;
-   let bottom=settings.minBottomM+(availableHeight-height)/2;
+   let bottom=settings.minBottomM;
    for(const [row,work]of column.items.entries()){
     result.push(makeSlot(work,left+column.width/2,bottom,row+1,index));
     bottom+=work.height+2*frame+settings.verticalGapM;
@@ -286,7 +285,7 @@ function arrangeSizeOrderedWall(wall,works,settings,byId,reserveReasons,featured
    left+=column.width+gap;
   }
   if(showAnchor){
-   if(!anchorSlot)anchorSlot=makeSlot(anchor,featured?(min+max)/2:max-anchor.width/2,settings.minBottomM+(availableHeight-anchor.height-2*frame)/2,1,index);
+   if(!anchorSlot)anchorSlot=makeSlot(anchor,featured?(min+max)/2:max-anchor.width/2,settings.minBottomM,1,index);
    result.push(anchorSlot);
   }
   return result;
@@ -294,12 +293,12 @@ function arrangeSizeOrderedWall(wall,works,settings,byId,reserveReasons,featured
 }
 
 
-// A rear wall holds either one monumental work or a balanced trio, all centred
-// vertically in the usable plaster area. The largest work stays on the axis.
+// A rear wall holds either one monumental work or a balanced trio, lowered
+// together until the tallest frame reaches the plaster baseline.
 function arrangeRearWall(wall,companions,settings,byId,featured){
  const {min,max}=wallRange(wall,settings),axis=(min+max)/2;
  const dx=(wall.b.x-wall.a.x)/wall.length,dz=(wall.b.z-wall.a.z)/wall.length;
- const depth=settings.frameDepthM/2+settings.wallClearanceM,y=(settings.minBottomM+settings.maxTopM)/2;
+ const depth=settings.frameDepthM/2+settings.wallClearanceM,y=settings.minBottomM+featured.height/2+settings.frameWidthM;
  const pieces=[{work:featured,along:axis}];
  if(companions.length===2){
   pieces.push({work:companions[0],along:axis-featured.width/2-settings.horizontalGapM-companions[0].width/2},

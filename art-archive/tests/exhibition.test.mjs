@@ -203,14 +203,16 @@ test('scene exclusion updates the same selection used by the open catalog editor
  assert.equal(result.included[slot.painting.id],false);assert.deepEqual(result.placements,seed.placements);
 });
 
-test('every wing end wall is a vertically centred single work or trio on every exhibition page',()=>{
+test('every wing end-wall composition is lowered to the plaster baseline on every page',()=>{
  const e=arrange(seed),s=config.paintings;
  for(let i=0;i<e.pageCount;i++){
   const groups=Map.groupBy(e.slots(i).filter(slot=>slot.wall.theme==='end'),slot=>slot.wall.id);
   assert.equal(groups.size,config.halls.length);
   for(const [wall,slots] of groups){
    assert([1,3].includes(slots.length),wall);
-   assert(slots.every(slot=>Math.abs(slot.y-(s.minBottomM+s.maxTopM)/2)<1e-7),wall);
+   const hero=slots.find(slot=>slot.featured);
+   assert(slots.every(slot=>Math.abs(slot.y-hero.y)<1e-7),wall);
+   assert(Math.abs(hero.y-hero.height/2-s.frameWidthM-s.minBottomM)<1e-7,wall);
   }
  }
 });
@@ -345,15 +347,16 @@ test('the shipped author selection restores 471 exclusions across browser origin
 });
 
 
-test('each wing column is centred vertically instead of sitting on the bottom baseline',()=>{
- const e=arrange(seed),settings=config.paintings,axis=(settings.minBottomM+settings.maxTopM)/2;
+test('each wing column starts at the lowest allowed height above the wooden panel',()=>{
+ const e=arrange(seed),settings=config.paintings;
  for(let page=0;page<e.pageCount;page++){
   const columns=Map.groupBy(e.slots(page).filter(s=>s.wall.hall!=='center'&&s.wall.theme!=='end'&&!s.supportId),
    s=>s.wall.id+'/'+s.x.toFixed(6)+'/'+s.z.toFixed(6));
   for(const slots of columns.values()){
    const bottom=Math.min(...slots.map(s=>s.y-s.height/2-settings.frameWidthM));
    const top=Math.max(...slots.map(s=>s.y+s.height/2+settings.frameWidthM));
-   assert(Math.abs((bottom+top)/2-axis)<1e-7,slots[0].painting.id);
+   assert(Math.abs(bottom-settings.minBottomM)<1e-7,slots[0].painting.id);
+   assert(top<=settings.maxTopM+1e-7);
   }
  }
 });

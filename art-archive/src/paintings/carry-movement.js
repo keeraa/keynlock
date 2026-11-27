@@ -19,6 +19,13 @@ export function constrainCarryMovement(THREE,settings,motion,slot,pose,from,to,r
       motion.advance(slot,pose,{position:pose.position.clone().add(delta),quaternion:pose.quaternion});
     if(!stopped)allowed=Math.min(allowed,frameAdvance);
     if(frameAdvance>=allowed)return allowed;
+    return constrainFrameMovement(THREE,settings,slot,pose,from,to,allowed,frameAdvance);
+}
+
+// The same capsule test also protects a stationary frame while a drop animation
+// hands it over to the navigation obstacle index, without tethering the player.
+export function constrainFrameMovement(THREE,settings,slot,pose,from,to,allowed=1,frameAdvance=0){
+    const delta=to.clone().sub(from);
     // Once the frame stops at an obstacle, the player must stop at its actual
     // volume too. Test the remaining relative movement, including pickup/recovery.
     const size=frameDimensions(slot,settings),inverse=pose.quaternion.clone().invert(),radius=.28;

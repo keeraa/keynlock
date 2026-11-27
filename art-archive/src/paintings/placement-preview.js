@@ -4,7 +4,7 @@ import {frameDimensions,frameOrientation,mountedFrame,frameCornerCut,clippedFram
 import {trolleyDimensions} from './trolley-model.js';
 import {createCarryPose} from './carry-pose.js';
 import {supportHeightAt} from '../architecture/support-height.js';
-import {constrainCarryMovement} from './carry-movement.js';
+import {constrainCarryMovement,constrainFrameMovement} from './carry-movement.js';
 
 export function createPlacementPreview(THREE,world,display,config,motion) {
   const root=new THREE.Group(),settings=config.paintings;
@@ -316,8 +316,9 @@ export function createPlacementPreview(THREE,world,display,config,motion) {
     glow.rotation.set(pitch,yaw,0,'YXZ');
     glow.position.set(hovered.x,config.building.floorElevation+hovered.y,hovered.z);
   }
-  function constrainMovement(from,to){
+  function constrainMovement(from,to,stationary=false){
     if(!current||(!root.visible&&!returnFlight))return 1;
+    if(stationary)return constrainFrameMovement(THREE,settings,current,root,from,to);
     return constrainCarryMovement(THREE,settings,motion,current,root,from,to,Boolean(lift));
   }
   return {constrainMovement,takeLiftFailure(){const value=liftFailure;liftFailure=false;return value;},

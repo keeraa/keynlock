@@ -390,7 +390,10 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     rebuild();
   }
   return {
-    constrainMovement(from,to){return interaction.carrying&&!interaction.placing?preview.constrainMovement(from,to):1;},
+    constrainMovement(from,to){
+      if(interaction.landing?.slot.trolley)return preview.constrainMovement(from,to,true);
+      return interaction.carrying&&!interaction.placing?preview.constrainMovement(from,to):1;
+    },
     get freePlacement(){return freePlacement;},
     setFreePlacement(value){
       if(freePlacement===Boolean(value))return;

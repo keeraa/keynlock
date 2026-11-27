@@ -60,7 +60,7 @@ test('pause shows the exact build and preserves visual defaults without a retire
 test('a heavy painting can be picked up, inspected, parked and restored after reload',{timeout:240000},async t=>{
  const page=await open(t,'ART-1548');
  await page.keyboard.press('e');await page.keyboard.press('l');
- await page.locator('#painting-controls').getByText(/оставить картину на тележке/).waitFor({timeout:30000});
+ await page.locator('#painting-controls[data-can-park="true"]').waitFor({timeout:30000});
  await page.mouse.down({button:'right'});await page.mouse.move(700,330,{steps:8});await page.mouse.up({button:'right'});
  await page.locator('#painting-controls[data-can-park="true"]').waitFor({timeout:30000});
  await page.keyboard.press('e');

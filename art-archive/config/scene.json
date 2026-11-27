@@ -48,6 +48,7 @@
     "verticalGapM": 0.16,
     "smallCanvasM": 0.66,
     "edgeMarginM": 0.16,
+    "cornerMarginM": 0.45,
     "frameDepthM": 0.05,
     "wallClearanceM": 0.006,
     "placementReachM": 6,

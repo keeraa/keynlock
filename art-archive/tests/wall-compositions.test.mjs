@@ -35,3 +35,22 @@ test('planned places snap by size, count actual occupants and reappear when a wo
  model.dispose();
  assert.equal(scene.children.length,0);
 });
+
+
+test('similar sizes cannot snap into or overlap a reserved footprint',()=>{
+ const wall={id:'portraits/end',hall:'portraits',length:8,a:{x:0,z:0},b:{x:8,z:0},normal:{x:0,z:1}};
+ const config={building:{floorElevation:8},paintings:{frameWidthM:.05}};
+ const model=createWallCompositions(THREE,{scene:new THREE.Scene()},config);
+ const piece=(id,x,width,height)=>({painting:{id,physicalSizeM:{width:width-.1,height:height-.1}},width,height:height-.1,wall,x,z:0,y:2,tier:1});
+ const small=piece('small',2,1,1.2),large=piece('large',4,1.08,1.28);
+ model.rebuild([small,large],()=>wall);model.refresh([]);
+ assert.equal(model.snap(small,wall,4,2,()=>assert.fail('must not snap to a slightly larger cell')),null);
+ assert.equal(model.acceptsPlacement({...small,along:4}),false);
+ assert.equal(model.acceptsPlacement({...small,along:2.03}),false,'off-centre placement cannot consume part of a reserved cell');
+ assert.equal(model.acceptsPlacement({...small,along:2}),true);
+ assert.equal(model.acceptsPlacement({...small,painting:{...small.painting,id:'same-size'},along:2}),true,'identical sizes can safely swap');
+ assert.equal(model.acceptsPlacement({...small,along:6}),true,'unused wall space remains available');
+ model.refresh([{...small,along:4}]);
+ assert.equal(model.summary(wall,4,2).filled,0,'a small work does not count as filling a larger place');
+ model.dispose();
+});

@@ -1,6 +1,7 @@
 import {frameDimensions,frameOrientation} from '../../catalog/painting-geometry.js';
 export function wallRange(wall,settings){
- return {min:Math.max(settings.edgeMarginM??0,wall.minAlong??0),max:Math.min(wall.length-(settings.edgeMarginM??0),wall.maxAlong??wall.length)};
+ const margin=wall.hall==='center'?(settings.edgeMarginM??0):(settings.cornerMarginM??settings.edgeMarginM??0);
+ return {min:Math.max(margin,wall.minAlong??0),max:Math.min(wall.length-margin,wall.maxAlong??wall.length)};
 }
 // Saved positions use wall coordinates in metres, independent of the scene's world transform.
 export function placedSlot(slot,wall,along,y,settings,occupied) {

@@ -5,6 +5,8 @@ import * as THREE from '../vendor/three.js';
 import {makeLayout} from '../src/architecture/layout.js';
 import {createFrameMotion} from '../src/paintings/frame-motion.js';
 import {createWallPlacement} from '../src/paintings/wall-placement.js';
+import {createWallCompositions} from '../src/paintings/wall-compositions.js';
+import {arrangeExhibition} from '../src/paintings/exhibition.js';
 import {createPlacementSave} from '../src/paintings/placement-save.js';
 import {frameDimensions} from '../catalog/painting-geometry.js';
 import {createPaintingInteraction} from '../src/paintings/interaction-state.js';
@@ -80,5 +82,37 @@ test('old free-mode saves below the plaster are restored above the panel with a 
  const restored=saves.restoreWall(slot,[]);
  assert(restored,'a previously low painting is retained on the wall');
  assert(Math.abs(restored.y-frameDimensions(slot,config.paintings).height/2-config.paintings.minBottomM)<1e-7);
- assert(Math.abs(restored.along-slot.width/2-config.paintings.edgeMarginM)<1e-7);
+ assert(Math.abs(restored.along-slot.width/2-config.paintings.cornerMarginM)<1e-7);
+});
+
+
+test('every page can be fully hung in reverse order without consuming another painting’s space',()=>{
+ const catalog=JSON.parse(fs.readFileSync(new URL('../catalog/manifest.json',import.meta.url)));
+ const selection=JSON.parse(fs.readFileSync(new URL('../catalog/initial-selection.json',import.meta.url)));
+ const exhibition=arrangeExhibition(catalog,selection,layout,config.paintings);
+ const physical=slot=>layout.hangingWalls.find(w=>w.id===slot.wall.id)||layout.hangingWalls.find(w=>w.id===slot.wall.hall+'/side/'+slot.wall.id.split('/')[1]);
+ const compositions=createWallCompositions(THREE,{scene:new THREE.Scene()},config);
+ let hung=[];
+ const motion=createFrameMotion(THREE,config,layout);
+ const rules=createWallPlacement(config,motion,{occupied:()=>hung,acceptsPlanned:slot=>compositions.acceptsPlacement(slot)});
+ for(let index=0;index<exhibition.pageCount;index++){
+  const page=exhibition.slots(index).filter(s=>s.painting.collection!=='keynlock');
+  compositions.rebuild(page,physical);compositions.refresh([]);hung=[];motion.setObstacles([]);
+  for(const slot of [...page].reverse()){
+   const wall=physical(slot),along=((slot.x-wall.a.x)*(wall.b.x-wall.a.x)+(slot.z-wall.a.z)*(wall.b.z-wall.a.z))/wall.length;
+   if(wall.hall!=='center'){
+    assert(along-slot.width/2>=config.paintings.cornerMarginM-1e-7);
+    assert(wall.length-along-slot.width/2>=config.paintings.cornerMarginM-1e-7);
+   }
+   const result=rules.evaluate(slot,wall,along,slot.y);
+   assert(result.slot,slot.painting.id+' page '+index+': '+result.reason);
+   hung.push(result.slot);compositions.refresh(hung);motion.setObstacles(hung);
+  }
+  assert.equal(hung.length,page.length);
+  for(const wall of new Set(page.map(physical))){
+   const progress=compositions.summary(wall,wall.length/2,2);
+   assert.equal(progress.filled,progress.total,'all marked places on '+wall.id+' are filled');
+  }
+ }
+ compositions.dispose();
 });

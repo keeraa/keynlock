@@ -130,7 +130,7 @@ test('each wing features its largest eligible work in the centre of its rear wal
   const wall=hero.wall,along=((hero.x-wall.a.x)*(wall.b.x-wall.a.x)+(hero.z-wall.a.z)*(wall.b.z-wall.a.z))/wall.length;
   assert(Math.abs(along-wall.length/2)<1e-7);
   const area=s=>s.painting.physicalSizeM.width*s.height;
-  assert(works.every(s=>s.width>wall.length-2*config.paintings.edgeMarginM || area(s)<=area(hero)+1e-7));
+  assert(works.every(s=>s.width>wall.length-2*config.paintings.cornerMarginM || area(s)<=area(hero)+1e-7));
  }
  assert(slots.filter(s=>s.wall.hall==='center').length>=20);
 });
@@ -267,7 +267,7 @@ test('Last Supper fits at full size with 1.1m below and half a metre below the v
  assert(config.building.height-config.building.vaultRise-top>=.5-1e-7);
  const minimum=1.1+framedHeight+.5+config.building.vaultRise;
  assert(config.building.height>=minimum);assert(config.building.height-minimum<.01);
- assert(slot.width<=slot.wall.length-2*config.paintings.edgeMarginM);
+ assert(slot.width<=slot.wall.length-2*config.paintings.cornerMarginM);
 });
 
 test('Composition VII and the pair below share the rotunda panel’s vertical axis',()=>{

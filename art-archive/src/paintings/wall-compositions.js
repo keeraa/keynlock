@@ -3,8 +3,7 @@ import {frameDimensions,frameCornerCut,clippedFrameCorners} from '../../catalog/
 const distance = (a, x, y) => Math.hypot(a.along - x, a.y - y);
 const sizeFits = (piece, place, settings) => {
   const {width,height}=frameDimensions(piece,settings);
-  return Math.abs(width-place.width)<=Math.min(.12,place.width*.1) &&
-    Math.abs(height-place.height)<=Math.min(.12,place.height*.1);
+  return Math.abs(width-place.width)<=1e-6 && Math.abs(height-place.height)<=1e-6;
 };
 
 export function createWallCompositions(THREE, world, config) {
@@ -102,6 +101,16 @@ export function createWallCompositions(THREE, world, config) {
     }
     return {group:nearest,filled,total};
   }
+  // Every marked footprint stays available for its exact frame size. Identical
+  // sizes are interchangeable; a smaller work cannot consume a larger place.
+  function acceptsPlacement(slot){
+    const {width,height}=frameDimensions(slot,settings);
+    return (places.get(slot.wall.id)??[]).every(p=>{
+      if(Math.abs(slot.along-p.along)>=(width+p.width)/2-1e-6 ||
+         Math.abs(slot.y-p.y)>=(height+p.height)/2-1e-6)return true;
+      return sizeFits(slot,p,settings)&&distance(p,slot.along,slot.y)<1e-6;
+    });
+  }
   function snap(slot,wall,x,y,tryPosition){
     if(slot.painting.collection==='keynlock')return null;
     const nearby=(places.get(wall.id)??[]).filter(p=>!p.filled&&distance(p,x,y)<.24&&sizeFits(slot,p,settings));
@@ -113,7 +122,7 @@ export function createWallCompositions(THREE, world, config) {
     return null;
   }
   return {
-    rebuild,refresh,summary,snap,clear,
+    rebuild,refresh,summary,snap,acceptsPlacement,clear,
     updateVisibility(active){
       root.visible=active;
       for(const [hall,mesh] of meshes)mesh.visible=!world.visibleHalls||world.visibleHalls.has(hall);

@@ -19,7 +19,7 @@ const text=(ru,en)=>getLanguage()==='en'?en:ru;
 export function createHangingSession({debugSelection=false,THREE,world,config,display,renderer,label,showLabel=value=>{label.textContent=value?.painting?.title??value??'';},controls=null,notify=()=>{},playSound=()=>{},setSoundMotion=()=>{},onMount=()=>{},onThrow=()=>{},getCarryYaw=()=>null,disposalTotal,onDisposed=()=>{},onEvent=()=>{}}) {
   const settings=config.paintings,layout=world.layout;
   const motion=createFrameMotion(THREE,config,layout);
-  const wallPlacement=createWallPlacement(config,motion,{isFree:()=>freePlacement,occupied:()=>hung});
+  const wallPlacement=createWallPlacement(config,motion,{isFree:()=>freePlacement,occupied:()=>hung,acceptsPlanned:slot=>compositions.acceptsPlacement(slot)});
   const wallSettings=wallPlacement.limits;
   const compositions=createWallCompositions(THREE,world,config);
   const completion=createHallCompletion(layout.halls,(id,value)=>world.building?.setHallGlow?.(id,value),
@@ -190,7 +190,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
           target=fitted
             ??(snap?tryPosition(snap.x,snap.y):null)??tryPosition(cursor.x,cursor.y);
         }
-        hint=target?action+text(' — повесить',' — hang'):text('Рама не помещается или место занято','Frame does not fit or the space is occupied');
+        hint=target?action+text(' — повесить',' — hang'):placementFailure==='reserved_place'?text('Размер картины не совпадает с разметкой','The painting size does not match this marked place'):text('Рама не помещается или место занято','Frame does not fit or the space is occupied');
         if(!freePlacement&&interaction.carrying.painting.collection==='keynlock')
           hint=text('Эту работу можно оставить на столе или отнести к приёмнику','Leave this work on a table or take it to the receiver');
         else if(!correctHall)hint=text('Нужен зал «','Required hall “')+t(destHall?.title??'Ротонда')+text('»','”');

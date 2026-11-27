@@ -2,7 +2,7 @@ import {acceptsHall,placedSlot} from './hanging.js';
 
 // One policy for wall previews and the placement committed by a click. Storage
 // remains responsible for serialization, while this module checks game rules.
-export function createWallPlacement(config,motion,{isFree=()=>false,occupied=()=>[]}={}){
+export function createWallPlacement(config,motion,{isFree=()=>false,occupied=()=>[],acceptsPlanned=()=>true}={}){
  const settings=config.paintings;
  function limits(wall){
   // Both placement modes share the same physical hanging area.
@@ -15,6 +15,7 @@ export function createWallPlacement(config,motion,{isFree=()=>false,occupied=()=
   if(!accepts(slot,wall))return {slot:null,reason:'wrong_hall'};
   const placed=placedSlot(slot,wall,along,y,limits(wall),occupied());
   if(!placed)return {slot:null,reason:'occupied_or_too_large'};
+  if(!isFree()&&!acceptsPlanned(placed))return {slot:null,reason:'reserved_place'};
   const pose=motion.pose(placed);
   if(motion.blocked(placed,pose.position,pose.quaternion))return {slot:null,reason:'collision'};
   return {slot:placed,reason:null};

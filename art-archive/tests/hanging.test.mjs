@@ -66,25 +66,25 @@ test('the starter work is face-up near spawn and plays distinct pickup and mount
  assert(Math.hypot(floor.x-spawn.x,floor.z-spawn.z)<1.65);
  assert.match(node.textContent,/Поднимите отмеченную картину.*Красная Фудзи/);
  assert.equal(archiveTask.hidden,true);
- const fy=config.building.floorElevation,wall=layout.hangingWalls.find(w=>w.id===work.wall.hall+'/end');
+ const fy=config.building.floorElevation,wall=layout.hangingWalls.find(w=>w.id===work.wall.id)||layout.hangingWalls.find(w=>w.id===work.wall.hall+'/side/'+work.wall.id.split('/')[1]);
  camera.position.set(spawn.x,fy+PLAYER_DEFAULTS.eyeHeight,spawn.z);
  camera.lookAt(floor.x,fy+floor.y,floor.z);
  assert(session.interact());tutorial.update(session.carriedId);assert.match(node.textContent,/Повесьте.*зелёной рамкой/);
- const x=(wall.a.x+wall.b.x)/2,z=(wall.a.z+wall.b.z)/2;
- camera.position.set(x+wall.normal.x*2.6,fy+1.78,z+wall.normal.z*2.6);camera.lookAt(x,fy+2.15,z);
+ const x=work.x,z=work.z;
+ camera.position.set(x+wall.normal.x*2.6,fy+1.78,z+wall.normal.z*2.6);camera.lookAt(x,fy+work.y,z);
  session.update(true);assert(session.interact());assert(session.interact());
  assert.equal(session.find(work.painting.id).wall.id,wall.id);
  tutorial.update(null);
  assert.equal(node.hidden,false);
  assert.equal(archiveTask.hidden,true);
  assert.match(node.textContent,/Теперь другой зал/);
- assert.deepEqual(sounds,['pickup','mount','correctPlace']);
+ assert.deepEqual(sounds,['pickup','frameFit','mount','correctPlace']);
  const installed=session.find(work.painting.id);
  camera.lookAt(installed.x,fy+installed.y,installed.z);session.update(true);
  assert.equal(session.wallPick(),work.painting.id);
  assert(session.interact(session.wallPick()));
  assert.equal(session.phase,'carrying');
- assert.deepEqual(sounds,['pickup','mount','correctPlace','unmount']);
+ assert.deepEqual(sounds,['pickup','frameFit','mount','correctPlace','unmount','frameFit']);
 });
 
 test('automatic arrangement enforces wall themes, frame clearance and wall boundaries',()=>{

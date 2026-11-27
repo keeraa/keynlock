@@ -360,3 +360,25 @@ test('each wing column starts at the lowest allowed height above the wooden pane
   }
  }
 });
+
+
+test('wing columns use similar frame widths and each size zone shares row baselines',()=>{
+ const e=arrange(seed),settings=config.paintings;
+ const band=s=>s.height<=settings.smallCanvasM?0:s.height<settings.hoistFromM?1:2;
+ let stacked=0;
+ for(let page=0;page<e.pageCount;page++){
+  const sides=e.slots(page).filter(s=>s.wall.hall!=='center'&&s.wall.theme!=='end'&&!s.supportId);
+  const columns=Map.groupBy(sides,s=>s.wall.id+'/'+s.x.toFixed(6)+'/'+s.z.toFixed(6));
+  for(const works of columns.values()){
+   const widths=works.map(s=>s.width);
+   assert(Math.max(...widths)/Math.min(...widths)<=1.25+1e-7,works.map(s=>s.painting.id).join(','));
+   if(works.length>1)stacked++;
+  }
+  const rows=Map.groupBy(sides,s=>s.wall.id+'/'+band(s)+'/'+s.tier);
+  for(const works of rows.values()){
+   const baselines=works.map(s=>s.y-s.height/2-settings.frameWidthM);
+   assert(Math.max(...baselines)-Math.min(...baselines)<1e-7,works[0].wall.id+' row '+works[0].tier);
+  }
+ }
+ assert(stacked>0,'similar-width grouping retains multiple rows');
+});

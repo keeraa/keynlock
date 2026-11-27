@@ -213,32 +213,42 @@ export function arrangeWall(wall, works, settings, byId, reserveReasons, feature
   });
 }
 
+// Consecutive height-ordered works share a column only when their frame widths
+// differ by at most 25%. Do not pull a taller work past skipped smaller works.
+export function galleryColumns(works,settings){
+ const available=settings.maxTopM-settings.minBottomM,frame=settings.frameWidthM;
+ const bandOf=w=>w.height<=settings.smallCanvasM?0:w.height<settings.hoistFromM?1:2;
+ const columns=[];
+ for(const band of [0,1,2]){
+  const items=works.filter(w=>bandOf(w)===band).sort(heightOrder);
+  const tallest=Math.max(0,...items.map(w=>w.height+2*frame));
+  const count=Math.max(1,Math.min(band===0?settings.tiers:band===1?2:1,
+   Math.floor((available+settings.verticalGapM)/(tallest+settings.verticalGapM))));
+  for(let i=0;i<items.length;){
+   const column=[];let narrow=Infinity,wide=0;
+   while(i<items.length&&column.length<count){
+    const next=items[i],min=Math.min(narrow,next.width),max=Math.max(wide,next.width);
+    if(column.length&&max/min>1.25+1e-7)break;
+    column.push(next);narrow=min;wide=max;i++;
+   }
+   columns.push({items:column,width:wide,band});
+  }
+ }
+ return columns;
+}
+
 // Height zones run horizontally, while each zone uses several vertical rows.
 // Keep a large side-wall anchor on the active page instead of filling it with
 // small works and sending every large canvas to a later exhibition.
 function arrangeSizeOrderedWall(wall,works,settings,byId,reserveReasons,featured){
  const {min,max}=wallRange(wall,settings),frame=settings.frameWidthM,gap=settings.horizontalGapM;
  const availableHeight=settings.maxTopM-settings.minBottomM;
- const sorted=[...works].sort(heightOrder),bands=[[],[],[]];
- const bandOf=w=>w.height<=settings.smallCanvasM?0:w.height<settings.hoistFromM?1:2;
  const valid=w=>w.width<=max-min+1e-7&&w.height+2*frame<=availableHeight+1e-7;
- const eligible=sorted.filter(w=>{if(valid(w))return true;reserveReasons.set(w.painting.id,'oversize');return false;});
+ const eligible=[...works].sort(heightOrder).filter(w=>{if(valid(w))return true;reserveReasons.set(w.painting.id,'oversize');return false;});
  const anchor=featured??eligible.pop();
  if(!anchor)return [];
- for(const w of eligible)bands[bandOf(w)].push(w);
- const queues=bands.map((items,band)=>{
-  const columns=[];const count=band===0?settings.tiers:band===1?2:1;
-  for(let i=0;i<items.length;){
-   const column=[];let height=0;
-   while(i<items.length&&column.length<count){
-    const next=items[i],add=next.height+2*frame+(column.length?settings.verticalGapM:0);
-    if(column.length&&height+add>availableHeight+1e-7)break;
-    column.push(next);height+=add;i++;
-   }
-   columns.push({items:column,width:Math.max(...column.map(w=>w.width)),band});
-  }
-  return columns;
- });
+ const grouped=galleryColumns(eligible,settings);
+ const queues=[0,1,2].map(band=>grouped.filter(column=>column.band===band));
  const pages=[];
  if(featured)pages.push({columns:[],anchor:true});
  else if(!queues.some(q=>q.length))pages.push({columns:[],anchor:true});
@@ -276,11 +286,19 @@ function arrangeSizeOrderedWall(wall,works,settings,byId,reserveReasons,featured
  return pages.map(({columns,anchor:showAnchor},index)=>{
   const result=[];let left=min;
   columns.sort((a,b)=>heightOrder(a.items[0],b.items[0]));
+  const rowBottoms=new Map();
+  for(const band of [0,1,2]){
+   const heights=[];
+   for(const column of columns.filter(c=>c.band===band))column.items.forEach((w,row)=>{
+    heights[row]=Math.max(heights[row]??0,w.height+2*frame);
+   });
+   const bottoms=[];let bottom=settings.minBottomM;
+   for(const height of heights){bottoms.push(bottom);bottom+=height+settings.verticalGapM;}
+   rowBottoms.set(band,bottoms);
+  }
   for(const column of columns){
-   let bottom=settings.minBottomM;
    for(const [row,work]of column.items.entries()){
-    result.push(makeSlot(work,left+column.width/2,bottom,row+1,index));
-    bottom+=work.height+2*frame+settings.verticalGapM;
+    result.push(makeSlot(work,left+column.width/2,rowBottoms.get(column.band)[row],row+1,index));
    }
    left+=column.width+gap;
   }

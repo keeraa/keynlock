@@ -1,5 +1,5 @@
 import {placedSlot,wallRange} from './hanging.js';
-import {arrangeWall,canvasArea,heightOrder} from './wall-packing.js';
+import {arrangeWall,canvasArea,heightOrder,galleryColumns} from './wall-packing.js';
 
 export function arrangeExhibition(catalog, state, layout, settings) {
   const zones = new Map(), reserveReasons = new Map();
@@ -100,15 +100,13 @@ export function arrangeExhibition(catalog, state, layout, settings) {
     const sides=surfaces.filter(p=>p.wall.hall===hall&&p.wall.theme!=='end')
       // Facing into the hall from its entrance, local +X is the left wall.
       .sort((a,b)=>Number(b.wall.id.split('/')[1])-Number(a.wall.id.split('/')[1]));
-    const cost=({work})=>{
-      const size=work.height<=settings.smallCanvasM?settings.tiers:work.height<settings.hoistFromM?2:1;
-      const rows=Math.max(1,Math.min(size,Math.floor((settings.maxTopM-settings.minBottomM+settings.verticalGapM)/(work.height+2*settings.frameWidthM+settings.verticalGapM))));
-      return (work.width+settings.horizontalGapM)/rows;
-    };
-    const total=entries.reduce((sum,e)=>sum+cost(e),0);let sum=0,cut=1,best=Infinity;
-    for(let i=0;i<entries.length-1;i++){
-      sum+=cost(entries[i]);const difference=Math.abs(total/2-sum);
-      if(difference<best){best=difference;cut=i+1;}
+    const columns=galleryColumns(entries.map(e=>e.work),settings);
+    const costs=columns.map(c=>c.width+settings.horizontalGapM);
+    const total=costs.reduce((sum,value)=>sum+value,0);let sum=0,cut=1,best=Infinity,count=0;
+    for(let i=0;i<columns.length-1;i++){
+      sum+=costs[i];count+=columns[i].items.length;
+      const difference=Math.abs(total/2-sum);
+      if(difference<best){best=difference;cut=count;}
     }
     for(const [i,{work,candidates}]of entries.entries()){
       const side=sides[i<cut?0:Math.min(1,sides.length-1)];

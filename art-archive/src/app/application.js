@@ -81,7 +81,7 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
     own(bindCloudControls(world.clouds));
     const birdsReady=world.birds.configure('both');
 
-    function setMode(next) {
+    function setMode(next,options) {
       const previous = mode;
       mode = next;
       if(next==='play'&&playtest.start({...gameModes,runId:statistics?.playthroughId??'',language:document.documentElement.lang,test:params.get('playtest')==='qa',viewportWidth:Math.round(innerWidth/100)*100,viewportHeight:Math.round(innerHeight/100)*100})){hasStarted=true;track('mode_selected',{...gameModes,source:'session_start'});collection.beginPlaytest();}
@@ -92,7 +92,7 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
       if(next!=='play')input.resetGesture();
       player.clearInput();
       if (next !== 'play') lock.release();
-      hud.refreshMode(next);
+      hud.refreshMode(next,options);
       world.clouds.setVisible(next !== 'plan');
       world.birds.setVisible(next !== 'plan');
       plan.setVisible(next === 'plan');

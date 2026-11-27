@@ -15,8 +15,8 @@ export function createHud({canvas,camera,layout,config,elements}){
   el('prompt').hidden=mode!=='play'||!nearDoor;
  }
  function toast(message){el('toast').textContent=t(message);el('toast').style.opacity=1;clearTimeout(timer);timer=setTimeout(()=>el('toast').style.opacity=0,4000);}
- function refreshMode(mode){
-  for(const [id,visible]of [['intro','intro'],['pause','pause'],['plan-caption','plan'],['crosshair','play']])el(id).hidden=mode!==visible;
+ function refreshMode(mode,{pauseMenu=true}={}){
+  for(const [id,visible]of [['intro','intro'],['pause','pause'],['plan-caption','plan'],['crosshair','play']])el(id).hidden=mode!==visible||(id==='pause'&&!pauseMenu);
   el('prompt').hidden=true;document.body.className=mode;
  }
  return {toast,updateLocation,refreshMode,canInteract:()=>!el('prompt').hidden,

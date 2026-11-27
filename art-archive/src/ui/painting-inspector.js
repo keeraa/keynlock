@@ -92,7 +92,7 @@ export function createPaintingInspector({elements,catalog,setMode}) {
     elements('inspect-original').textContent=t('Оригинал ↗');fit.textContent=t('Заполнить экран');
     elements('inspect-scale').textContent='';
     image.alt=paintingTitle(painting);image.draggable=false;
-    setMode('pause');dialog.showModal();image.src=preview;
+    setMode('pause',{pauseMenu:false});dialog.showModal();image.src=preview;
     if(!high||high===preview)return;
     pending=new Image();
     pending.onload=()=>{if(request===generation){image.src=high;pending=null;}};

@@ -12,20 +12,20 @@ function fixture(t){
   close(){this.open=false;this.dispatchEvent(new Event('close'));}
   setPointerCapture(id){this.capture=id;}hasPointerCapture(id){return this.capture===id;}releasePointerCapture(){this.capture=null;}
  }
- const doc=new EventTarget(),nodes=new Map(),modes=[],sources=[];
+ const doc=new EventTarget(),nodes=new Map(),modes=[],sources=[],modeOptions=[];
  globalThis.document=doc;globalThis.window=new EventTarget();globalThis.Image=class{constructor(){sources.push(this);}};
  t.after(()=>{[globalThis.document,globalThis.window,globalThis.Image]=previous;});
  const elements=id=>{if(!nodes.has(id))nodes.set(id,new Element());return nodes.get(id);};
- const inspector=createPaintingInspector({elements,catalog:{imageUrl:id=>'/preview/'+id,detailUrl:id=>'/detail/'+id},setMode:mode=>modes.push(mode)});
+ const inspector=createPaintingInspector({elements,catalog:{imageUrl:id=>'/preview/'+id,detailUrl:id=>'/detail/'+id},setMode:(mode,options)=>{modes.push(mode);modeOptions.push(options); }});
  t.after(()=>inspector.dispose());
  const load=(width=4000,height=2000)=>{Object.assign(elements('inspect-image'),{naturalWidth:width,naturalHeight:height});elements('inspect-image').dispatchEvent(new Event('load'));};
  const event=(id,type,data={})=>{const e=Object.assign(new Event(type,{cancelable:true}),data);elements(id).dispatchEvent(e);return e;};
- return {doc,elements,inspector,modes,sources,load,event};
+ return {doc,elements,inspector,modes,modeOptions,sources,load,event};
 }
 const painting={id:'test',title:'Test',image:{}};
 for(const [code,key]of [['Escape','Escape'],['KeyQ','й']])test('inspector consumes '+code+' and returns directly to play',t=>{
- const {doc,elements,inspector,modes}=fixture(t);
- inspector.open(painting);assert(elements('art-inspector').open);
+ const {doc,elements,inspector,modes,modeOptions}=fixture(t);
+ inspector.open(painting);assert(elements('art-inspector').open);assert.deepEqual(modeOptions[0],{pauseMenu:false});
  let leaked=0;doc.addEventListener('keydown',()=>leaked++);
  const event=Object.assign(new Event('keydown',{cancelable:true}),{code,key});doc.dispatchEvent(event);
  assert(event.defaultPrevented);assert.equal(leaked,0);

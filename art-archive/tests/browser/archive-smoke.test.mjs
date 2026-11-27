@@ -90,6 +90,7 @@ test('Q opens a mounted painting, wheel zooms, dragging pans, and Q or Escape re
  await page.keyboard.press('q');await page.locator('#art-inspector').waitFor({state:'visible'});
  await page.waitForFunction(()=>document.querySelector('#inspect-image').naturalWidth>0&&JSON.parse(document.querySelector('#scene').dataset.player??'{}').mode==='pause',null,{timeout:30000});
  assert.match(await page.locator('#inspect-title').textContent(),/Volunteer/);
+ assert.equal(await page.locator('#pause').isVisible(),false,'the viewer pauses gameplay without drawing the pause menu');
  await page.mouse.move(640,360);await page.mouse.wheel(0,-900);
  await page.waitForFunction(()=>Number(document.querySelector('#inspect-viewport').dataset.zoom)>2,null,{timeout:30000});
  const oldPan=Number(await page.locator('#inspect-viewport').getAttribute('data-pan-x'));
@@ -103,6 +104,7 @@ test('Q opens a mounted painting, wheel zooms, dragging pans, and Q or Escape re
  assert.equal(await page.locator('#pause').isVisible(),false);
  await page.keyboard.press('q');await page.locator('#art-inspector').waitFor({state:'visible'});
  await page.keyboard.press('q');await page.locator('#art-inspector').waitFor({state:'hidden'});
+ await page.locator('#pause').waitFor({state:'hidden'});
  await page.waitForFunction(()=>JSON.parse(document.querySelector('#scene').dataset.player).mode==='play',null,{timeout:30000});
  assert.equal(await page.locator('#pause').isVisible(),false);
 });

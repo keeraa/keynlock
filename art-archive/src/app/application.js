@@ -4,6 +4,7 @@ import {createPlaytestCollector} from '../playtest/collector.js';
 import {mountPlaytestInterface} from '../playtest/interface.js';
 import {createArchiveBirds} from '../environment/birds.js';
 import {GLTFLoader} from '../../vendor/loaders/GLTFLoader.js';
+import {createPaintingInspector} from '../ui/painting-inspector.js';
 import {bindCollection} from '../ui/collection.js';
 import { VISUAL_DEFAULTS, RENDER_DEFAULTS } from '../../config/runtime.js';
 import { createLifecycle } from './lifecycle.js';
@@ -132,6 +133,7 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
       aimedId: () => collection.aimedId(),
       exclude: () => collection.exclude(),
       inspect: value => collection.inspect(value),
+      openPainting(){const painting=collection.wallPainting();if(painting){inspector.open(painting);track('painting_inspect',{paintingId:painting.id,source:'viewer'});}},
       interact(heldId) {
         if (collection.interact(heldId)) return;
         if (!hud.canInteract()) return;
@@ -147,6 +149,8 @@ export async function startArchiveApplication({ THREE, config, catalog, initialS
     statistics=createPlaytestStatistics({debug:debugSelection});
     life.own(()=>statistics.save());
     const collection = own(bindCollection({debugSelection,initialHanging:params.get('mode')!=='walk',THREE,renderer,world,config,catalog,initialSelection,player,setMode,getMode:()=>mode,elements,notify:hud.toast,loadingManager,playSound:audio.play,setSoundMotion:audio.setMotion,onEvent:track}));
+
+    const inspector=own(createPaintingInspector({elements,catalog,setMode}));
 
     collectionForStatistics=collection;statistics.progress(collection.playtestSnapshot());
     const setFreePlacement=collection.setFreePlacement;

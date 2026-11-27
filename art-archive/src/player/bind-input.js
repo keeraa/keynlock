@@ -82,6 +82,7 @@ export function bindPlayerInput({canvas,player,getMode,lock,actions,hideProgress
   if(mode!=='play')return;
   if(key===' '||key==='p'){actions.pause();return;}if(key==='h')actions.hints();
   if(e.ctrlKey||e.metaKey||e.altKey)return;
+  if(key==='q'){e.preventDefault();stopInspection();resetGesture();resetHide();actions.openPainting?.();return;}
   if(key==='f'){e.preventDefault();hide={id:actions.aimedId(),start:performance.now()};return;}
   if(key==='e'){
    if(inspecting)return;

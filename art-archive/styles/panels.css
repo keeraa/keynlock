@@ -67,11 +67,15 @@
 #inspect-close:focus-visible{outline-offset:1px}
 #archive-task{margin:-.55rem 0 1.1rem;color:#e6dac0;font:.9rem/1.45 system-ui,sans-serif}
 #pause .movement-help{justify-content:flex-start;font:.84rem system-ui,sans-serif;gap:.55rem .8rem;margin:0 0 1.1rem}
-#inspect-viewport {position:absolute;inset:0;overflow:hidden}
-#inspect-image {display:block;width:100%;height:100%;object-fit:cover;cursor:zoom-out}
-.fit-image #inspect-image {object-fit:contain;cursor:zoom-in}
-#inspect-viewport.full-size {overflow:auto}
-.full-size #inspect-image {width:auto;height:auto;margin:auto}
+#art-inspector[open] {display:grid;grid-template-rows:auto minmax(0,1fr) auto}
+#art-inspector .inspect-toolbar {position:relative;inset:auto;padding:.65rem .9rem;background:#0c1815}
+#inspect-viewport {position:relative;min-height:0;overflow:hidden;touch-action:none;user-select:none}
+#inspect-image {position:absolute;left:0;top:0;display:block;max-width:none;max-height:none;object-fit:fill;transform-origin:0 0;pointer-events:none;user-select:none}
+#inspect-viewport.can-pan {cursor:grab}
+#inspect-viewport.dragging {cursor:grabbing}
+#inspect-scale {min-width:3.5em;text-align:center;font-variant-numeric:tabular-nums}
+#inspect-plus,#inspect-minus {border:0;background:transparent;font-size:1.25rem}
+#inspect-hint {margin:0;padding:.5rem 1rem;color:#c7c9bc;background:#0c1815;text-align:center;font:.82rem/1.4 system-ui,sans-serif}
 
 #load-screen {
  position:fixed;inset:0;display:grid;align-content:center;justify-items:center;gap:1rem;

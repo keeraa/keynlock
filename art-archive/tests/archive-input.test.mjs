@@ -85,3 +85,16 @@ test('RMB pointer dragging turns the actual inspection camera, with no doubled c
  assert(Math.abs(camera.rotation.y-prior+40*speed)<.001,'pointer-lock drag also remains responsive');
  window.dispatchEvent(Object.assign(new Event('pointerup'),{button:2}));advance();assert(Math.abs(camera.rotation.y)<.001);
 });
+
+
+test('Q and Cyrillic Й open the separate viewer once, without stealing F or RMB',t=>{
+ const saved=[globalThis.window,globalThis.document,globalThis.Element];
+ const window=new EventTarget(),document=new EventTarget(),canvas=new EventTarget();document.querySelector=()=>null;
+ Object.assign(globalThis,{window,document,Element:class{}});t.after(()=>{[globalThis.window,globalThis.document,globalThis.Element]=saved;});
+ let opened=0;
+ const input=bindPlayerInput({canvas,player:{held:new Set(),zoom(){}},hideProgress:{},getMode:()=>'play',lock:{},actions:{raise(){},openPainting(){opened++;}}});
+ t.after(()=>input.dispose());
+ const key=repeat=>window.dispatchEvent(Object.assign(new Event('keydown',{cancelable:true}),{code:'KeyQ',key:'й',repeat}));
+ key(false);key(true);assert.equal(opened,1);
+ document.querySelector=()=>({open:true});key(false);assert.equal(opened,1,'a modal consumes the opening shortcut');
+});

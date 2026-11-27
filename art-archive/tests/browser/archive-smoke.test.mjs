@@ -16,7 +16,7 @@ before(async()=>{
  });
 },{timeout:60000});
 after(async()=>{if(server&&server.exitCode===null){server.kill();await once(server,'exit');}});
-async function open(t,art){
+async function open(t,art,{mounted=null}={}){
  const browser=await chromium.launch({headless:true,args:['--enable-webgl','--mute-audio','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const context=await browser.newContext({locale:'ru-RU',viewport:{width:1280,height:720}}),page=await context.newPage(),errors=[];
  page.on('pageerror',error=>errors.push(error.message));
@@ -41,9 +41,10 @@ async function open(t,art){
   }finally{await context.close();await browser.close();}
   assert.deepEqual(errors,[]);
  });
+ if(mounted)await page.addInitScript(({art,record})=>localStorage.setItem('keynlock-art-hanging-v1',JSON.stringify({[art]:record})),{art,record:mounted});
  await page.goto(baseUrl+'/?art='+art+'&playtest=qa',{waitUntil:'domcontentloaded'});
  await page.locator('#load-screen').waitFor({state:'hidden',timeout:180000});
- await page.locator('#painting-controls').getByText(/взять/).waitFor({timeout:30000});
+ await page.locator('#painting-controls').getByText(mounted?/Q.*открыть картину/:/взять/).waitFor({timeout:30000});
  await page.locator('#scene').click({button:'right'});
  return page;
 }
@@ -59,7 +60,9 @@ test('pause shows the exact build and preserves visual defaults without a retire
 });
 test('a heavy painting can be picked up, inspected, parked and restored after reload',{timeout:240000},async t=>{
  const page=await open(t,'ART-1548');
+ await page.keyboard.press('q');assert.equal(await page.locator('#art-inspector').isVisible(),false,'floor paintings do not open the viewer');
  await page.keyboard.press('e');await page.keyboard.press('l');
+ await page.keyboard.press('q');assert.equal(await page.locator('#art-inspector').isVisible(),false,'a carried painting retains RMB inspection');
  await page.locator('#painting-controls[data-can-park="true"]').waitFor({timeout:30000});
  await page.mouse.down({button:'right'});await page.mouse.move(700,330,{steps:8});await page.mouse.up({button:'right'});
  await page.locator('#painting-controls[data-can-park="true"]').waitFor({timeout:30000});
@@ -77,4 +80,29 @@ test('a heavy painting can be picked up, inspected, parked and restored after re
  const restored=await page.evaluate(()=>JSON.parse(localStorage.getItem('keynlock-art-hanging-v1'))['ART-1548']);
  assert.deepEqual(restored,saved);
  await page.locator('#painting-label').getByText('Смерть Сарданапала',{exact:true}).waitFor({timeout:30000});
+});
+
+
+test('Q opens a mounted painting, wheel zooms, dragging pans, and Q or Escape return to play',{timeout:240000},async t=>{
+ const page=await open(t,'ART-1164',{mounted:{version:3,wall:'portraits/side/1',along:7,y:2}});
+ await page.waitForFunction(()=>JSON.parse(document.querySelector('#scene').dataset.player??'{}').mode==='play',null,{timeout:30000});
+ const before=await page.locator('#scene').getAttribute('data-player');
+ await page.keyboard.press('q');await page.locator('#art-inspector').waitFor({state:'visible'});
+ await page.waitForFunction(()=>document.querySelector('#inspect-image').naturalWidth>0&&JSON.parse(document.querySelector('#scene').dataset.player??'{}').mode==='pause',null,{timeout:30000});
+ assert.match(await page.locator('#inspect-title').textContent(),/Volunteer/);
+ await page.mouse.move(640,360);await page.mouse.wheel(0,-900);
+ await page.waitForFunction(()=>Number(document.querySelector('#inspect-viewport').dataset.zoom)>2,null,{timeout:30000});
+ const oldPan=Number(await page.locator('#inspect-viewport').getAttribute('data-pan-x'));
+ await page.mouse.move(640,360);await page.mouse.down();await page.mouse.move(740,410,{steps:8});await page.mouse.up();
+ const newPan=Number(await page.locator('#inspect-viewport').getAttribute('data-pan-x'));assert(Math.abs(newPan-oldPan)>10);
+ await page.keyboard.press('w');
+ const current=JSON.parse(await page.locator('#scene').getAttribute('data-player')),start=JSON.parse(before);
+ assert.equal(current.mode,'pause');assert.equal(current.x,start.x);assert.equal(current.z,start.z);
+ await page.keyboard.press('Escape');await page.locator('#art-inspector').waitFor({state:'hidden'});
+ await page.waitForFunction(()=>JSON.parse(document.querySelector('#scene').dataset.player).mode==='play',null,{timeout:30000});
+ assert.equal(await page.locator('#pause').isVisible(),false);
+ await page.keyboard.press('q');await page.locator('#art-inspector').waitFor({state:'visible'});
+ await page.keyboard.press('q');await page.locator('#art-inspector').waitFor({state:'hidden'});
+ await page.waitForFunction(()=>JSON.parse(document.querySelector('#scene').dataset.player).mode==='play',null,{timeout:30000});
+ assert.equal(await page.locator('#pause').isVisible(),false);
 });

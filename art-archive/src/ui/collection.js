@@ -25,7 +25,7 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
     if (hanging.active) return;
     const en = getLanguage() === 'en';
     showLabel(slot);
-    showPaintingControls(controls,slot?(en?'Hold RMB — inspect':'Удерживайте ПКМ — рассмотреть'):'');
+    showPaintingControls(controls,slot?[(en?'Hold RMB — inspect':'Удерживайте ПКМ — рассмотреть'),mountedFrame(slot)&&(en?'Q — open painting':'Q — открыть картину')].filter(Boolean).join(' · '):'');
   }});
   const tutorial=createHangingTutorial(elements('tutorial-task'),elements('archive-task'),world.layout,config.paintings,debugSelection,onEvent);
   const guide=createTutorialGuide({THREE,scene:world.scene,settings:config.paintings,camera:world.camera,layout:world.layout,floorElevation:config.building.floorElevation});
@@ -135,6 +135,11 @@ export function bindCollection({debugSelection=false,THREE, renderer, world, con
     constrainMovement:hanging.constrainMovement,
     setFreePlacement(value){hanging.setFreePlacement(value);refreshTutorial();},
     aimedId:()=>(hanging.active?hanging.aimed():display.aimedSlot())?.painting.id,
+    wallPainting(){
+      const id=hanging.active?hanging.wallPick():null;
+      const slot=hanging.active?(id?hanging.find(id):null):display.aimedSlot();
+      return slot&&mountedFrame(slot)?slot.painting:null;
+    },
     inspect(value){
       if(!value){
         hanging.setInspecting(false);player.lookAtCarry?.(null);player.zoom?.(false);

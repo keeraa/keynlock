@@ -225,7 +225,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       coveredPick=pickFloor && pickFloor.floorAngle!==undefined && covered(pickFloor,floorByRoom.get(pickFloor.floorRoom??pickFloor.wall.hall)??emptyRoom,settings);
       preview.hover(pickFloor,now);
       description=picked;
-      commands=picked?[(pickFloor?action+text(' — взять',' — pick up'):text('Удерживайте E / ЛКМ — снять','Hold E / LMB to take down')),text('удерживайте ПКМ — рассмотреть','hold RMB — inspect')].filter(Boolean).join(' · '):text('Наведите на картину · E / ЛКМ — взять','Aim at a painting · E / LMB — pick up');
+      commands=picked?[(pickFloor?action+text(' — взять',' — pick up'):text('Удерживайте E / ЛКМ — снять','Hold E / LMB to take down')),text('удерживайте ПКМ — рассмотреть','hold RMB — inspect'),!pickFloor&&text('Q — открыть картину','Q — open painting')].filter(Boolean).join(' · '):text('Наведите на картину · E / ЛКМ — взять','Aim at a painting · E / LMB — pick up');
       message=picked?paintingTitle(picked.painting)+(picked.destination.split('/')[0]==='center'?text(' · ✦ Шедевр · Центральная ротонда',' · ✦ Masterpiece · Central rotunda'):'')+' · '+(pickFloor?action+text(' — взять',' — pick up'):text('Удерживайте E / ЛКМ — снять','Hold E / LMB to take down'))+text(' · удерживайте ПКМ — рассмотреть',' · hold RMB — inspect'):
         page.length===0?text('Выберите картины в подборке','Select paintings in the collection'):hung.length===page.length?text('Эта экспозиция развешена','This exhibition is hung'):
         text('Наведите прицел на картину на полу · E / ЛКМ — взять','Aim at a painting on the floor · E / LMB — pick up');

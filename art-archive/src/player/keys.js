@@ -1,13 +1,13 @@
 // Use physical key positions so WASD/E/F work on both Latin and Cyrillic layouts.
 const BY_CODE = {
-  KeyF: 'f', KeyW: 'w', KeyA: 'a', KeyS: 's', KeyD: 'd', KeyE: 'e',
+  KeyQ: 'q', KeyF: 'f', KeyW: 'w', KeyA: 'a', KeyS: 's', KeyD: 'd', KeyE: 'e',
   KeyP: 'p', KeyH: 'h', KeyM: 'm', KeyV: 'v', Digit1: '1', Digit2: '2',
   Digit3: '3', Digit4: '4', ShiftLeft: 'shift', ShiftRight: 'shift',
   Space: ' ', ArrowUp: 'arrowup', ArrowDown: 'arrowdown',
   ArrowLeft: 'arrowleft', ArrowRight: 'arrowright',
 };
 const BY_RUSSIAN_LETTER = {
-  'а': 'f', 'ц': 'w', 'ф': 'a', 'ы': 's', 'в': 'd', 'у': 'e',
+  'й': 'q', 'а': 'f', 'ц': 'w', 'ф': 'a', 'ы': 's', 'в': 'd', 'у': 'e',
   'з': 'p', 'р': 'h', 'ь': 'm', 'м': 'v',
 };
 

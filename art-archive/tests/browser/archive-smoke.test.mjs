@@ -63,6 +63,11 @@ test('a heavy painting can be picked up, inspected, parked and restored after re
  await page.locator('#painting-controls[data-can-park="true"]').waitFor({timeout:30000});
  await page.mouse.down({button:'right'});await page.mouse.move(700,330,{steps:8});await page.mouse.up({button:'right'});
  await page.locator('#painting-controls[data-can-park="true"]').waitFor({timeout:30000});
+ // Aim down at the floor so E tests parking even when a matching wall place
+ // is reachable from this layout.
+ await page.keyboard.press('l');await page.mouse.move(700,715,{steps:12});
+ await page.waitForFunction(()=>JSON.parse(document.querySelector('#scene').dataset.player??'{}').pitch<-.7,null,{timeout:30000});
+ await page.locator('#painting-controls[data-can-park="true"]').waitFor({timeout:30000});
  await page.keyboard.press('e');
  await page.waitForFunction(()=>{
   const saved=JSON.parse(localStorage.getItem('keynlock-art-hanging-v1')??'{}');return saved['ART-1548']?.kind==='trolley';

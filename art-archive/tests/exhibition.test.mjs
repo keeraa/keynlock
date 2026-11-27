@@ -121,7 +121,7 @@ test('all paintings on the active page remain textured beyond the detailed view 
  assert.equal(scene.children.length,0);
 });
 
-test('each wing features its largest eligible work in the centre of its rear wall',()=>{
+test('each wing features its tallest eligible work in the centre of its rear wall',()=>{
  const e=arrange(seed),slots=e.slots(0);
  for(const hall of config.halls){
   const works=[...e.byId.values()].filter(s=>s.wall.hall===hall.id&&s.painting.collection!=='keynlock');
@@ -130,18 +130,18 @@ test('each wing features its largest eligible work in the centre of its rear wal
   const wall=hero.wall,along=((hero.x-wall.a.x)*(wall.b.x-wall.a.x)+(hero.z-wall.a.z)*(wall.b.z-wall.a.z))/wall.length;
   assert(Math.abs(along-wall.length/2)<1e-7);
   const area=s=>s.painting.physicalSizeM.width*s.height;
-  assert(works.every(s=>s.width>wall.length-2*config.paintings.cornerMarginM || area(s)<=area(hero)+1e-7));
+  assert(works.every(s=>s.width>wall.length-2*config.paintings.cornerMarginM || s.height<=hero.height+1e-7));
  }
  assert(slots.filter(s=>s.wall.hall==='center').length>=20);
 });
 
-test('automatic hanging never places a smaller canvas directly above a larger canvas',()=>{
+test('automatic hanging orders stacked wing canvases by height and retains the rotunda composition',()=>{
  const e=arrange(seed);
  const area=s=>s.painting.physicalSizeM.width*s.height;
  for(let i=0;i<e.pageCount;i++)for(const works of Map.groupBy(e.slots(i),s=>s.wall.id).values()){
   for(const lower of works)for(const upper of works){
    if(upper.y<=lower.y||Math.hypot(lower.x-upper.x,lower.z-upper.z)>=(lower.width+upper.width)/2-1e-7)continue;
-   assert(area(upper)>=area(lower)-1e-7,lower.painting.id+' under '+upper.painting.id);
+   assert(lower.wall.hall==='center'?area(upper)>=area(lower)-1e-7:upper.height>=lower.height-1e-7,lower.painting.id+' under '+upper.painting.id);
   }
  }
 });
@@ -203,14 +203,14 @@ test('scene exclusion updates the same selection used by the open catalog editor
  assert.equal(result.included[slot.painting.id],false);assert.deepEqual(result.placements,seed.placements);
 });
 
-test('every wing end wall starts at the side-wall baseline on every exhibition page',()=>{
+test('every wing end wall is a vertically centred single work or trio on every exhibition page',()=>{
  const e=arrange(seed),s=config.paintings;
  for(let i=0;i<e.pageCount;i++){
   const groups=Map.groupBy(e.slots(i).filter(slot=>slot.wall.theme==='end'),slot=>slot.wall.id);
   assert.equal(groups.size,config.halls.length);
   for(const [wall,slots] of groups){
-   const base=Math.min(...slots.map(slot=>slot.y-slot.height/2-s.frameWidthM));
-   assert(Math.abs(base-s.minBottomM)<1e-7,wall);
+   assert([1,3].includes(slots.length),wall);
+   assert(slots.every(slot=>Math.abs(slot.y-(s.minBottomM+s.maxTopM)/2)<1e-7),wall);
   }
  }
 });
@@ -286,14 +286,14 @@ test('all rows of each wing column precede larger columns from the viewer’s le
  const e=arrange(seed),area=s=>s.painting.physicalSizeM.width*s.height;
  for(let i=0;i<e.pageCount;i++){
   const slots=e.slots(i).filter(s=>s.wall.hall!=='center'&&!s.supportId);
-  for(const row of Map.groupBy(slots,s=>s.wall.id).values()){
+  for(const row of Map.groupBy(slots.filter(s=>s.wall.theme!=='end'),s=>s.wall.id).values()){
    const right=s=>(s.x-s.wall.a.x)*s.wall.normal.z-(s.z-s.wall.a.z)*s.wall.normal.x;
    for(const a of row)for(const b of row)if(right(b)-right(a)>1e-6)
-    assert(area(a)<=area(b)+1e-7,a.painting.id+' is larger than its right neighbour '+b.painting.id);
+    assert(a.height<=b.height+1e-7,a.painting.id+' is taller than its right neighbour '+b.painting.id);
   }
   for(const h of config.halls){
    const end=slots.filter(s=>s.wall.id===h.id+'/end');
-   assert.equal(end.length,1);assert.equal(end[0].featured,true);
+   assert([1,3].includes(end.length));assert.equal(end.filter(s=>s.featured).length,1);
   }
  }
 });
@@ -302,10 +302,10 @@ test('small works use three-row columns and large side-wall works remain availab
  const e=arrange(seed),area=s=>s.painting.physicalSizeM.width*s.height;
  const sides=[...e.byId.values()].filter(s=>s.wall.hall!=='center'&&s.wall.theme!=='end'&&!s.supportId);
  for(const works of Map.groupBy(sides,s=>s.wall.id).values()){
-  const anchor=works.reduce((a,b)=>area(a)>area(b)?a:b);
-  for(let i=0;i<e.pageCount;i++)assert(e.slots(i).some(s=>s.wall.id===anchor.wall.id&&area(s)>=area(anchor)-1e-7),'largest side work disappeared from page '+i+': '+anchor.painting.id);
+  const anchor=works.reduce((a,b)=>a.height>b.height?a:b);
+  for(let i=0;i<e.pageCount;i++)assert(e.slots(i).some(s=>s.wall.id===anchor.wall.id&&s.height>=anchor.height-1e-7),'largest side work disappeared from page '+i+': '+anchor.painting.id);
  }
- const small=e.slots(0).filter(s=>s.wall.hall!=='center'&&s.wall.theme!=='end'&&!s.supportId&&area(s)<=config.paintings.smallCanvasM**2);
+ const small=e.slots(0).filter(s=>s.wall.hall!=='center'&&s.wall.theme!=='end'&&!s.supportId&&s.height<=config.paintings.smallCanvasM);
  const columns=Map.groupBy(small,s=>s.wall.id+'/'+s.x.toFixed(6)+'/'+s.z.toFixed(6));
  assert([...columns.values()].some(column=>column.length===3&&new Set(column.map(s=>s.y)).size===3));
  for(const hall of config.halls){
@@ -313,13 +313,13 @@ test('small works use three-row columns and large side-wall works remain availab
  }
 });
 
-test('each hall has a single increasing size sequence across its two side walls',()=>{
+test('each hall increases in height from its entrance-left wall to its entrance-right wall',()=>{
  const e=arrange(seed),area=s=>s.painting.physicalSizeM.width*s.height;
  for(const hall of config.halls){
   const works=[...e.byId.values()].filter(s=>s.wall.hall===hall.id&&s.wall.theme!=='end'&&!s.supportId);
-  const first=works.filter(s=>s.wall.id.split('/')[1]==='-1'),second=works.filter(s=>s.wall.id.split('/')[1]==='1');
+  const first=works.filter(s=>s.wall.id.split('/')[1]==='1'),second=works.filter(s=>s.wall.id.split('/')[1]==='-1');
   assert(first.length&&second.length,hall.id);
-  assert(Math.max(...first.map(area))<=Math.min(...second.map(area))+1e-7,hall.id+' restarts from smaller works on the second wall');
+  assert(Math.max(...first.map(s=>s.height))<=Math.min(...second.map(s=>s.height))+1e-7,hall.id+' restarts from smaller works on the second wall');
  }
 });
 
@@ -342,4 +342,18 @@ test('the shipped author selection restores 471 exclusions across browser origin
  assert.equal(memory.get('keynlock-art-hanging-v1'),'{"saved-work":{"wall":"cn/end","y":2}}');
  restored.included['ART-0001']=true;memory.set(key,JSON.stringify(restored));
  prepareSavedSelection(structuredClone(seed));assert.equal(JSON.parse(memory.get(key)).included['ART-0001'],true);
+});
+
+
+test('each wing column is centred vertically instead of sitting on the bottom baseline',()=>{
+ const e=arrange(seed),settings=config.paintings,axis=(settings.minBottomM+settings.maxTopM)/2;
+ for(let page=0;page<e.pageCount;page++){
+  const columns=Map.groupBy(e.slots(page).filter(s=>s.wall.hall!=='center'&&s.wall.theme!=='end'&&!s.supportId),
+   s=>s.wall.id+'/'+s.x.toFixed(6)+'/'+s.z.toFixed(6));
+  for(const slots of columns.values()){
+   const bottom=Math.min(...slots.map(s=>s.y-s.height/2-settings.frameWidthM));
+   const top=Math.max(...slots.map(s=>s.y+s.height/2+settings.frameWidthM));
+   assert(Math.abs((bottom+top)/2-axis)<1e-7,slots[0].painting.id);
+  }
+ }
 });

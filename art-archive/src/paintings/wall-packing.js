@@ -1,5 +1,6 @@
 import {wallRange} from './hanging.js';
 export const canvasArea = work => work.painting.physicalSizeM.width * work.height;
+export const heightOrder=(a,b)=>a.height-b.height||a.width-b.width||a.painting.id.localeCompare(b.painting.id);
 // Miniatures share a lower-tier footprint. Pair similar widths for a clean stack.
 function hangingGroups(works, settings, prioritizeTall) {
   const miniature=work=>Math.max(work.painting.physicalSizeM.width,work.height)<=settings.smallCanvasM;
@@ -137,6 +138,7 @@ function centerRowHeights(page, horizontalOffset, settings) {
 }
 
 export function arrangeWall(wall, works, settings, byId, reserveReasons, featured=null) {
+  if(wall.hall!=='center'&&wall.theme==='end'&&featured)return arrangeRearWall(wall,works,settings,byId,featured);
   if(wall.hall!=='center')return arrangeSizeOrderedWall(wall,works,settings,byId,reserveReasons,featured);
   const pages = [], frame = settings.frameWidthM;
   const {min,max}=wallRange(wall,settings);
@@ -211,15 +213,14 @@ export function arrangeWall(wall, works, settings, byId, reserveReasons, feature
   });
 }
 
-// Size zones run horizontally, while each zone uses several vertical rows.
+// Height zones run horizontally, while each zone uses several vertical rows.
 // Keep a large side-wall anchor on the active page instead of filling it with
 // small works and sending every large canvas to a later exhibition.
 function arrangeSizeOrderedWall(wall,works,settings,byId,reserveReasons,featured){
  const {min,max}=wallRange(wall,settings),frame=settings.frameWidthM,gap=settings.horizontalGapM;
  const availableHeight=settings.maxTopM-settings.minBottomM;
- const areaOrder=(a,b)=>canvasArea(a)-canvasArea(b)||a.painting.id.localeCompare(b.painting.id);
- const sorted=[...works].sort(areaOrder),bands=[[],[],[]];
- const bandOf=w=>canvasArea(w)<=settings.smallCanvasM**2?0:canvasArea(w)<settings.hoistFromM**2?1:2;
+ const sorted=[...works].sort(heightOrder),bands=[[],[],[]];
+ const bandOf=w=>w.height<=settings.smallCanvasM?0:w.height<settings.hoistFromM?1:2;
  const valid=w=>w.width<=max-min+1e-7&&w.height+2*frame<=availableHeight+1e-7;
  const eligible=sorted.filter(w=>{if(valid(w))return true;reserveReasons.set(w.painting.id,'oversize');return false;});
  const anchor=featured??eligible.pop();
@@ -274,9 +275,10 @@ function arrangeSizeOrderedWall(wall,works,settings,byId,reserveReasons,featured
  }
  return pages.map(({columns,anchor:showAnchor},index)=>{
   const result=[];let left=min;
-  columns.sort((a,b)=>canvasArea(a.items[0])-canvasArea(b.items[0]));
+  columns.sort((a,b)=>heightOrder(a.items[0],b.items[0]));
   for(const column of columns){
-   let bottom=settings.minBottomM;
+   const height=column.items.reduce((sum,w)=>sum+w.height+2*frame,0)+(column.items.length-1)*settings.verticalGapM;
+   let bottom=settings.minBottomM+(availableHeight-height)/2;
    for(const [row,work]of column.items.entries()){
     result.push(makeSlot(work,left+column.width/2,bottom,row+1,index));
     bottom+=work.height+2*frame+settings.verticalGapM;
@@ -284,9 +286,28 @@ function arrangeSizeOrderedWall(wall,works,settings,byId,reserveReasons,featured
    left+=column.width+gap;
   }
   if(showAnchor){
-   if(!anchorSlot)anchorSlot=makeSlot(anchor,featured?(min+max)/2:max-anchor.width/2,settings.minBottomM,1,index);
+   if(!anchorSlot)anchorSlot=makeSlot(anchor,featured?(min+max)/2:max-anchor.width/2,settings.minBottomM+(availableHeight-anchor.height-2*frame)/2,1,index);
    result.push(anchorSlot);
   }
   return result;
  });
+}
+
+
+// A rear wall holds either one monumental work or a balanced trio, all centred
+// vertically in the usable plaster area. The largest work stays on the axis.
+function arrangeRearWall(wall,companions,settings,byId,featured){
+ const {min,max}=wallRange(wall,settings),axis=(min+max)/2;
+ const dx=(wall.b.x-wall.a.x)/wall.length,dz=(wall.b.z-wall.a.z)/wall.length;
+ const depth=settings.frameDepthM/2+settings.wallClearanceM,y=(settings.minBottomM+settings.maxTopM)/2;
+ const pieces=[{work:featured,along:axis}];
+ if(companions.length===2){
+  pieces.push({work:companions[0],along:axis-featured.width/2-settings.horizontalGapM-companions[0].width/2},
+   {work:companions[1],along:axis+featured.width/2+settings.horizontalGapM+companions[1].width/2});
+ }
+ return [pieces.map(({work,along})=>{
+  const slot={...work,wall,normal:wall.normal,page:0,tier:1,featured:work===featured,
+   x:wall.a.x+dx*along+wall.normal.x*depth,z:wall.a.z+dz*along+wall.normal.z*depth,y};
+  byId.set(work.painting.id,slot);return slot;
+ })];
 }

@@ -1,5 +1,5 @@
 import {placedSlot,wallRange} from './hanging.js';
-import {arrangeWall,canvasArea} from './wall-packing.js';
+import {arrangeWall,canvasArea,heightOrder} from './wall-packing.js';
 
 export function arrangeExhibition(catalog, state, layout, settings) {
   const zones = new Map(), reserveReasons = new Map();
@@ -53,10 +53,21 @@ export function arrangeExhibition(catalog, state, layout, settings) {
     if (!eligible.length) { reserveReasons.set(painting.id,'oversize'); continue; }
     pending.push({work,eligible});
   }
-  // Reserve the largest artwork in each wing before balancing the side walls.
+  // Keep the rotunda area-balanced; choose the gallery rear compositions by height.
   pending.sort((a,b)=>canvasArea(b.work)-canvasArea(a.work));
-  const wingWorks=new Map();
+  const wingWorks=new Map(),rearWorks=new Set();
+  for(const surface of surfaces.filter(p=>p.wall.theme==='end')){
+    const candidates=pending.filter(e=>e.eligible.includes(surface)&&e.work.height+2*settings.frameWidthM<=settings.maxTopM-settings.minBottomM)
+      .sort((a,b)=>heightOrder(b.work,a.work));
+    const hero=candidates[0]?.work;
+    if(!hero)continue;
+    surface.featured=hero;rearWorks.add(hero);
+    const {min,max}=wallRange(surface.wall,settings),sideSpace=(max-min-hero.width)/2-settings.horizontalGapM;
+    const companions=candidates.slice(1).map(e=>e.work).filter(w=>w.height>=hero.height*.65&&w.width<=sideSpace+1e-7).slice(0,2);
+    if(companions.length===2){surface.works.push(...companions);for(const w of companions)rearWorks.add(w);}
+  }
   for(const {work,eligible} of pending){
+    if(rearWorks.has(work))continue;
     const end=eligible.find(p=>p.wall.theme==='end'&&!p.featured);
     if(end &&
       work.height+2*settings.frameWidthM<=settings.maxTopM-settings.minBottomM){
@@ -82,14 +93,15 @@ export function arrangeExhibition(catalog, state, layout, settings) {
     target.works.push(work);
     target.area+=work.width*(work.height+2*settings.frameWidthM);
   }
-  // One continuous size sequence per hall: the second side continues the
+  // One continuous height sequence per hall: the right side continues the
   // first, rather than restarting a second small-to-large collection.
   for(const [hall,entries]of wingWorks){
-    entries.sort((a,b)=>canvasArea(a.work)-canvasArea(b.work)||a.work.painting.id.localeCompare(b.work.painting.id));
+    entries.sort((a,b)=>heightOrder(a.work,b.work));
     const sides=surfaces.filter(p=>p.wall.hall===hall&&p.wall.theme!=='end')
-      .sort((a,b)=>Number(a.wall.id.split('/')[1])-Number(b.wall.id.split('/')[1]));
+      // Facing into the hall from its entrance, local +X is the left wall.
+      .sort((a,b)=>Number(b.wall.id.split('/')[1])-Number(a.wall.id.split('/')[1]));
     const cost=({work})=>{
-      const size=canvasArea(work)<=settings.smallCanvasM**2?settings.tiers:canvasArea(work)<settings.hoistFromM**2?2:1;
+      const size=work.height<=settings.smallCanvasM?settings.tiers:work.height<settings.hoistFromM?2:1;
       const rows=Math.max(1,Math.min(size,Math.floor((settings.maxTopM-settings.minBottomM+settings.verticalGapM)/(work.height+2*settings.frameWidthM+settings.verticalGapM))));
       return (work.width+settings.horizontalGapM)/rows;
     };

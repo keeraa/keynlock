@@ -116,3 +116,11 @@ test('every page can be fully hung in reverse order without consuming another pa
  }
  compositions.dispose();
 });
+
+
+test('large frames use an eight-metre mounting reach while ordinary frames retain six metres',()=>{
+ const rules=createWallPlacement(config,createFrameMotion(THREE,config,layout));
+ assert.equal(rules.reach({painting:{physicalSizeM:{width:.8}},height:1}),6);
+ assert.equal(rules.reach({painting:{physicalSizeM:{width:4.96}},height:3.92}),8);
+ assert.equal(rules.reach({painting:{physicalSizeM:{width:1}},height:2.4}),8);
+});

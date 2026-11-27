@@ -113,7 +113,12 @@ export function createWallCompositions(THREE, world, config) {
   }
   function snap(slot,wall,x,y,tryPosition){
     if(slot.painting.collection==='keynlock')return null;
-    const nearby=(places.get(wall.id)??[]).filter(p=>!p.filled&&distance(p,x,y)<.24&&sizeFits(slot,p,settings));
+    const available=(places.get(wall.id)??[]).filter(p=>!p.filled);
+    const edgeDistance=p=>Math.hypot(Math.max(0,Math.abs(p.along-x)-p.width/2),Math.max(0,Math.abs(p.y-y)-p.height/2));
+    const underReticle=available.filter(p=>edgeDistance(p)<1e-6);
+    // Aim anywhere inside a marked frame, including a monumental canvas.
+    // A differently sized cell under the reticle must not attract a neighbour.
+    const nearby=(underReticle.length?underReticle:available.filter(p=>edgeDistance(p)<.24)).filter(p=>sizeFits(slot,p,settings));
     nearby.sort((a,b)=>distance(a,x,y)-distance(b,x,y));
     for(const p of nearby){
       const target=tryPosition(p.along,p.y);

@@ -765,3 +765,31 @@ test('invalid wall previews disappear at gallery corners, arch jambs and rotunda
  }
  session.dispose();
 });
+
+test('Sardanapalus mounts in its marked place from seven metres while aiming away from its centre',t=>{
+ let now=1000;t.mock.method(performance,'now',()=>now);
+ const memory=new Map(),previous=[globalThis.window,globalThis.localStorage];
+ globalThis.window={};globalThis.localStorage={getItem:k=>memory.get(k),setItem:(k,v)=>memory.set(k,v)};
+ t.after(()=>{[globalThis.window,globalThis.localStorage]=previous;});
+ const slot=exhibition.byId.get('ART-1548'),camera=new THREE.PerspectiveCamera(73,1.5),scene=new THREE.Scene(),controls={};
+ assert(slot);
+ const session=createHangingSession({THREE,world:{camera,scene,layout},config,label:{},controls,display:{setSlots(){}}});
+ t.after(()=>session.dispose());session.setPage([slot]);session.setActive(true);
+ const source=session.find(slot.painting.id),fy=config.building.floorElevation;
+ camera.position.set(source.x,fy+1.78,source.z+1);camera.lookAt(source.x,fy+source.y,source.z);
+ assert(session.interact());
+ for(let i=0;i<40;i++){now+=40;session.update(true,now);}
+ const wall=layout.hangingWalls.find(w=>w.id===slot.wall.id)||layout.hangingWalls.find(w=>w.id===slot.wall.hall+'/side/'+slot.wall.id.split('/')[1]);
+ const dx=(wall.b.x-wall.a.x)/wall.length,dz=(wall.b.z-wall.a.z)/wall.length;
+ camera.position.set(slot.x+wall.normal.x*7,fy+1.78,slot.z+wall.normal.z*7);
+ camera.lookAt(slot.x+dx*.9,fy+slot.y+.6,slot.z+dz*.9);
+ now+=40;session.update(true,now);
+ assert.equal(session.phase,'placing','an off-centre ray inside the large mark must produce a valid preview beyond six metres');
+ assert.match(controls.textContent,/повесить/);
+ assert(session.interact());now+=400;session.update(true,now);
+ const mounted=session.find(slot.painting.id);
+ assert.equal(session.phase,'idle');assert.equal(mounted.wall.id,wall.id);
+ assert(Math.abs(mounted.y-slot.y)<1e-7);
+ assert(Math.hypot(mounted.x-slot.x,mounted.z-slot.z)<1e-7);
+ assert.equal(JSON.parse(memory.get('keynlock-art-hanging-v1'))[slot.painting.id].wall,wall.id);
+});

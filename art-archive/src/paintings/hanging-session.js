@@ -21,6 +21,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
   const motion=createFrameMotion(THREE,config,layout);
   const wallPlacement=createWallPlacement(config,motion,{isFree:()=>freePlacement,occupied:()=>hung,acceptsPlanned:slot=>compositions.acceptsPlacement(slot)});
   const wallSettings=wallPlacement.limits;
+  const placementReach=()=>wallPlacement.reach(interaction.carrying);
   const compositions=createWallCompositions(THREE,world,config);
   const completion=createHallCompletion(layout.halls,(id,value)=>world.building?.setHallGlow?.(id,value),
     (index,value)=>display.gouache?.setFrameFlash?.(index,value));
@@ -151,7 +152,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       else {completePlacement(slot);if(ballistic)onThrow(slot);}
 
     }
-    const hit=aim(),reachable=hit && hit.distance<=(settings.placementReachM??6),action=text('E / ЛКМ','E / LMB');
+    const hit=aim(),reachable=hit && hit.distance<=(placementReach()),action=text('E / ЛКМ','E / LMB');
     let message,description=null,commands='';
     if(interaction.carrying){
       const destHall=layout.halls.find(h=>h.id===interaction.carrying.destination.split('/')[0]);
@@ -168,7 +169,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
       }
       if(!interaction.placing)hint=text('E / ЛКМ — повесить, положить на стол или отпустить · удерживайте ПКМ — рассмотреть','E / LMB — hang, place on table or release · hold RMB — inspect');
       if(hit&&!reachable)placementFailure='out_of_reach';
-      if(hit && !reachable)hint=interaction.placing?text('Подойдите ближе · установка до 6 м','Move closer · placement within 6 m'):large?text('E / ЛКМ — оставить картину на тележке','E / LMB — leave the painting on its trolley'):text('E / ЛКМ — короткий бросок в этом направлении','E / LMB — short throw in this direction');
+      if(hit && !reachable)hint=interaction.placing?text('Подойдите ближе · установка до ','Move closer · placement within ')+placementReach()+text(' м',' m'):large?text('E / ЛКМ — оставить картину на тележке','E / LMB — leave the painting on its trolley'):text('E / ЛКМ — короткий бросок в этом направлении','E / LMB — short throw in this direction');
       if(interaction.canAimAtWall && reachable){
         const w=hit.wall,limits=wallSettings(w),half=frameDimensions(interaction.carrying,settings).height/2;
         const aimX=hit.along;
@@ -196,7 +197,7 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
         else if(!correctHall)hint=text('Нужен зал «','Required hall “')+t(destHall?.title??'Ротонда')+text('»','”');
       }
       if(!target||!reachable)wallPreviewArmed=true;
-      const wallPreview=wallPreviewArmed&&target&&interaction.canAimAtWall&&!aimedSupport(origin,dir,layout,config,hit?.distance,settings.placementReachM??6);
+      const wallPreview=wallPreviewArmed&&target&&interaction.canAimAtWall&&!aimedSupport(origin,dir,layout,config,hit?.distance,placementReach());
       if(wallPreview){
         if(!interaction.placing){preview.beginWall(now);interaction.place();}
         preview.wall(interaction.carrying,hit.wall,target.along,target.y,true,large,now);
@@ -281,8 +282,8 @@ export function createHangingSession({debugSelection=false,THREE,world,config,di
     tablePreview.reset();update(true);
     if(interaction.landing)return true;
     if(interaction.carrying){
-      const hit=aim(),support=aimedSupport(origin,dir,layout,config,hit?.distance,settings.placementReachM??6);
-      const reachable=hit && hit.distance<=(settings.placementReachM??6);
+      const hit=aim(),support=aimedSupport(origin,dir,layout,config,hit?.distance,placementReach());
+      const reachable=hit && hit.distance<=(placementReach());
       if(support||!hit||(!reachable&&!interaction.placing)){
         if(interaction.placing){interaction.carry();cursor=null;update(true);}
         if((!support||support.kind==='floor')&&!usesTrolley(interaction.carrying))drop({throwing:true,surface:'floor'});

@@ -20,5 +20,10 @@ export function createWallPlacement(config,motion,{isFree=()=>false,occupied=()=
   if(motion.blocked(placed,pose.position,pose.quaternion))return {slot:null,reason:'collision'};
   return {slot:placed,reason:null};
  }
- return {limits,accepts,surface,evaluate};
+ function reach(slot){
+  const base=settings.placementReachM??6;
+  return slot&&Math.max(slot.height,slot.painting.physicalSizeM.width)>=settings.hoistFromM
+   ?Math.max(base,settings.largePlacementReachM??8):base;
+ }
+ return {limits,accepts,surface,evaluate,reach};
 }

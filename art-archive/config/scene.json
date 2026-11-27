@@ -52,6 +52,7 @@
     "frameDepthM": 0.05,
     "wallClearanceM": 0.006,
     "placementReachM": 6,
+    "largePlacementReachM": 8,
     "paintingAimReachM": 5,
     "hoistFromM": 2,
     "scatterSeed": 1122

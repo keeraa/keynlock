@@ -23,7 +23,8 @@ test('planned places snap by size, count actual occupants and reappear when a wo
  assert(points.getY(1)<points.getY(2), 'the two vertices around the corner form a short diagonal');
  const compatible=piece('other',1),tryPosition=(along,y)=>({along,y});
  assert.deepEqual(model.snap(compatible,wall,1.17,2,tryPosition),{along:1,y:2});
- assert.equal(model.snap(compatible,wall,1.31,2,tryPosition),null);
+ assert.deepEqual(model.snap(compatible,wall,1.31,2,tryPosition),{along:1,y:2},'the whole marked rectangle accepts the reticle');
+ assert.equal(model.snap(compatible,wall,1,3,tryPosition),null);
  assert.equal(model.snap(piece('wide',1,1.6),wall,1,2,tryPosition),null);
  model.refresh([{...compatible,along:1},{...piece('free',5),along:5.4}]);
  const {group,filled,total}=model.summary(wall,1,2);
@@ -52,5 +53,18 @@ test('similar sizes cannot snap into or overlap a reserved footprint',()=>{
  assert.equal(model.acceptsPlacement({...small,along:6}),true,'unused wall space remains available');
  model.refresh([{...small,along:4}]);
  assert.equal(model.summary(wall,4,2).filled,0,'a small work does not count as filling a larger place');
+ model.dispose();
+});
+
+
+test('a large marked place accepts off-centre aim without snapping to a wrong-sized cell',()=>{
+ const wall={id:'world/end',hall:'world',length:15,a:{x:0,z:0},b:{x:15,z:0},normal:{x:0,z:1}};
+ const model=createWallCompositions(THREE,{scene:new THREE.Scene()},{building:{floorElevation:8},paintings:{frameWidthM:.0675}});
+ const large={painting:{id:'ART-1548',physicalSizeM:{width:4.96,height:3.92}},width:5.095,height:3.92,wall,x:5,y:3.1275,z:0,tier:1};
+ const small={...large,painting:{id:'other',physicalSizeM:{width:1,height:1}},width:1.135,height:1,x:9,y:2};
+ model.rebuild([large,small],()=>wall);model.refresh([]);
+ const target=(along,y)=>({along,y});
+ assert.deepEqual(model.snap(large,wall,6.8,4.2,target),{along:5,y:3.1275});
+ assert.equal(model.snap(large,wall,9,2,target),null);
  model.dispose();
 });

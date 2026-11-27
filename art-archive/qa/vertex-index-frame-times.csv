@@ -1,0 +1,13 @@
+route,outline_postprocess,HD_streaming,run,frames,frame_p99_ms,frames_over_25_ms,GPU_frame_median_ms,GPU_frame_p95_ms,HD_maps_applied
+walk,True,False,1,256,16.8,0,2.067,6.651,0
+walk,False,False,1,256,16.8,0,1.748,5.787,0
+turn,True,True,1,248,33.4,5,1.757,5.933,4
+turn,True,False,1,256,16.8,0,2.867,7.544,0
+walk,False,False,2,256,16.8,0,1.847,4.876,0
+walk,True,False,2,256,16.8,0,3.192,8.147,0
+turn,True,False,2,256,16.8,0,3.082,7.845,0
+turn,True,True,2,248,33.4,4,1.541,6.738,4
+walk,True,False,3,256,16.8,0,2.423,7.662,0
+walk,False,False,3,256,16.8,0,2.024,5.199,0
+turn,True,True,3,248,33.4,4,2.833,6.717,4
+turn,True,False,3,256,16.8,0,3.278,7.736,0

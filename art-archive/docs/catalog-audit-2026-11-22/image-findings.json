@@ -1,0 +1,450 @@
+[
+  {
+    "id": "ART-0048",
+    "title": "Birds and Flowers",
+    "status": "needs_review",
+    "note": "Две ширмы показаны одна над другой; в источнике указан размер одной ширмы.",
+    "source": "https://clevelandart.org/art/1948.128"
+  },
+  {
+    "id": "ART-0106",
+    "title": "Pair of Panels from a Triptych: The Archangel Michael and St. Anthony Abbot",
+    "status": "needs_review",
+    "note": "Две створки рядом; музейные размеры относятся к одной створке.",
+    "source": "https://clevelandart.org/art/1964.150"
+  },
+  {
+    "id": "ART-0110",
+    "title": "Portraits of the Qianlong Emperor and His Twelve Consorts",
+    "status": "needs_review",
+    "note": "Репродукция показывает фрагмент императорского свитка; размеры относятся ко всему свитку.",
+    "source": "https://clevelandart.org/art/1969.31"
+  },
+  {
+    "id": "ART-0121",
+    "title": "Mt. Qingbian",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1980.10"
+  },
+  {
+    "id": "ART-0151",
+    "title": "Night Scene on the Sumida River",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1920.274"
+  },
+  {
+    "id": "ART-0172",
+    "title": "St. Francis Kneeling before Christ on the Cross",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1962.36"
+  },
+  {
+    "id": "ART-0217",
+    "title": "The Trinity",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1996.26"
+  },
+  {
+    "id": "ART-0229",
+    "title": "Bamboo, Rock, and Tall Tree",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1978.65"
+  },
+  {
+    "id": "ART-0258",
+    "title": "Vase of Flowers",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1935.233"
+  },
+  {
+    "id": "ART-0261",
+    "title": "Streams and Mountains",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1997.96"
+  },
+  {
+    "id": "ART-0276",
+    "title": "Portrait of An Qi",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1971.17"
+  },
+  {
+    "id": "ART-0278",
+    "title": "Saint Catherine and Saint Barbara (pair)",
+    "status": "needs_review",
+    "note": "Парные панели: размер одной створки нельзя применять ко всей фотографии.",
+    "source": "https://clevelandart.org/art/1942.633"
+  },
+  {
+    "id": "ART-0300",
+    "title": "Mount Hua",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1969.116"
+  },
+  {
+    "id": "ART-0317",
+    "title": "Reminiscences of Qinhuai River",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1966.31.8"
+  },
+  {
+    "id": "ART-0321",
+    "title": "Spring Mist over Jiangnan",
+    "status": "needs_review",
+    "note": "Вместе с пейзажем показана отдельная каллиграфическая часть; общий габарит не подтверждён.",
+    "source": "https://clevelandart.org/art/1954.126"
+  },
+  {
+    "id": "ART-0331",
+    "title": "Landscape after Guo Zhongshu",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1955.36"
+  },
+  {
+    "id": "ART-0338",
+    "title": "Landscape after Jing Hao and Guan Tong",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1952.588"
+  },
+  {
+    "id": "ART-0378",
+    "title": "The Madonna of Humility with the Temptation of Eve",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1916.795"
+  },
+  {
+    "id": "ART-0383",
+    "title": "Portrait of a Woman, possibly Elizabeth Boothby",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1973.185"
+  },
+  {
+    "id": "ART-0417",
+    "title": "Quails and Sparrows in an Autumn Scene",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1997.91"
+  },
+  {
+    "id": "ART-0426",
+    "title": "Landscape of the Four Seasons",
+    "status": "needs_review",
+    "note": "Снимок скомпонован из двух ширм; размер одной панели не описывает всю композицию.",
+    "source": "https://clevelandart.org/art/1976.92"
+  },
+  {
+    "id": "ART-0572",
+    "title": "Madonna and Child Enthroned",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1968.206"
+  },
+  {
+    "id": "ART-0580",
+    "title": "Fishing in a Springtime Valley",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1961.47"
+  },
+  {
+    "id": "ART-0612",
+    "title": "Sanjo Kantaro II in the Role of Urashima Taro",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1961.41"
+  },
+  {
+    "id": "ART-0621",
+    "title": "The Umbrian Valley, Italy",
+    "status": "needs_review",
+    "note": "Пейзаж горизонтальный, а размеры музейной карточки вертикальные. Противоречие источника оставлено видимым.",
+    "source": "https://clevelandart.org/art/1915.88"
+  },
+  {
+    "id": "ART-0671",
+    "title": "Zhi and Xu's Pure Conversation",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1970.128"
+  },
+  {
+    "id": "ART-0733",
+    "title": "Reminiscences of Qinhuai River",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1966.31.1"
+  },
+  {
+    "id": "ART-0736",
+    "title": "Listening to the Bamboo",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1977.172"
+  },
+  {
+    "id": "ART-0756",
+    "title": "Holy Family with the Mystic Marriage of Saint Catherine",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/2019.168"
+  },
+  {
+    "id": "ART-0803",
+    "title": "Entertainment Scene",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1985.17"
+  },
+  {
+    "id": "ART-0805",
+    "title": "Virgin and Child",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1944.56"
+  },
+  {
+    "id": "ART-0813",
+    "title": "Lions and Tigers in Peony and Bamboo",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1972.10.1"
+  },
+  {
+    "id": "ART-0824",
+    "title": "Still Life with Pipe and Matches and Still Life with Herring, Bread, and Cheese (pair)",
+    "status": "needs_review",
+    "note": "Парные натюрморты: снимок показывает оба, музей указывает размер одного.",
+    "source": "https://clevelandart.org/art/1980.254"
+  },
+  {
+    "id": "ART-0872",
+    "title": "General Jean-Baptiste Kléber and Egyptian Family (Sketches for \"The Battle of the Pyramids\") ",
+    "status": "needs_review",
+    "note": "Два эскиза в одном снимке, размеры одного. Нужны отдельные части.",
+    "source": "https://clevelandart.org/art/1972.17"
+  },
+  {
+    "id": "ART-0888",
+    "title": "Album of Miscellaneous Subjects, Leaf 8",
+    "status": "needs_review",
+    "note": "Рядом с живописным листом показана каллиграфия; размеры относятся к изображению, а не всему развороту.",
+    "source": "https://clevelandart.org/art/1975.22.8"
+  },
+  {
+    "id": "ART-0924",
+    "title": "The wounded monkey bites the hand of the prince, his chessmate, in the presence of guests, from a Tuti-nama (Tales of a Parrot): Fifth Night",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1962.279.32.b"
+  },
+  {
+    "id": "ART-0925",
+    "title": "The deceitful wife ejects the procuress after blackening her face, from a Tuti-nama (Tales of a Parrot): Eighth Night",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1962.279.67.b"
+  },
+  {
+    "id": "ART-0939",
+    "title": "The prince sent back to the place of execution for the sixth time, from a Tuti-nama (Tales of a Parrot): Eighth Night",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1962.279.69.b"
+  },
+  {
+    "id": "ART-0977",
+    "title": "Tiger",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1985.134.2"
+  },
+  {
+    "id": "ART-1020",
+    "title": "Portrait of the Artist's Mother (Lydia Wardwell Smith)",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1918.569"
+  },
+  {
+    "id": "ART-1044",
+    "title": "Oath of the Peach Garden, from Romance of the Three Kingdoms",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1987.35"
+  },
+  {
+    "id": "ART-1079",
+    "title": "Water-Moon Kannon",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1985.110"
+  },
+  {
+    "id": "ART-1092",
+    "title": "Autumn in Takao",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1991.55"
+  },
+  {
+    "id": "ART-1094",
+    "title": "Women enjoying the river at the forest’s edge (recto) and flowering marigold (verso)",
+    "status": "needs_review",
+    "note": "Лицевая и оборотная стороны показаны рядом. Один размер страницы не описывает этот монтаж.",
+    "source": "https://clevelandart.org/art/2013.351"
+  },
+  {
+    "id": "ART-1117",
+    "title": "Plum Blossoms",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1985.366"
+  },
+  {
+    "id": "ART-1137",
+    "title": "Lions and Tigers in Peony and Bamboo",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1972.10.2"
+  },
+  {
+    "id": "ART-1242",
+    "title": "The Death of Sophonisba",
+    "status": "needs_review",
+    "note": "Музейная карточка задаёт горизонтальный формат 60 × 40 см, но репродукция вертикальная; не меняем оси догадкой.",
+    "source": "https://clevelandart.org/art/2008.71"
+  },
+  {
+    "id": "ART-1253",
+    "title": "Landscape",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1980.81"
+  },
+  {
+    "id": "ART-1256",
+    "title": "Field with Young Trees in the Foreground",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1971.220"
+  },
+  {
+    "id": "ART-1265",
+    "title": "Portrait of a kneeling holy man, from the Prince Salim Album",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/2013.295"
+  },
+  {
+    "id": "ART-1267",
+    "title": "Akbar supervising the capture of wild elephants at Malwa in 1564, painting 90 from an Akbar-nama (Book of Akbar) of Abu’l Fazl (Indian 1551–1602)",
+    "status": "needs_review",
+    "note": "Две стороны листа в одном снимке. Не растягиваем до габарита одной страницы.",
+    "source": "https://clevelandart.org/art/2013.309"
+  },
+  {
+    "id": "ART-1268",
+    "title": "Portrait of Suraj Singh Rathor, Raja of Marwar and Maternal Uncle of Shah Jahan: A Page from the Prince Khurram Album",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/2013.313"
+  },
+  {
+    "id": "ART-1277",
+    "title": "Zulaykha in her palace and as an elderly woman with Joseph (recto), from a Panj Ganj (Five Treasures) of Abd al- Rahman Jami (Persian, 1414–1492)",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/2013.315.1.a"
+  },
+  {
+    "id": "ART-1278",
+    "title": "Portrait of Raja Jagat Singh of Nurpur (reigned 1618–46)",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/2013.324"
+  },
+  {
+    "id": "ART-1290",
+    "title": "Illuminated page (verso), from a Panj Ganj (Five Treasures) of Abd al- Rahman Jami (Persian, 1414–1492) with two Persian masnavis: Yusuf va Zulaykha (Joseph and Zulaykha) and Khirad-nama-i Iskandari (Alexander’s Book of Wisdom)",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/2013.315.1.b"
+  },
+  {
+    "id": "ART-1305",
+    "title": "Double-leaf Doors",
+    "status": "needs_review",
+    "note": "Это пара расписных дверей, а не одно полотно; указан размер одной створки.",
+    "source": "https://clevelandart.org/art/1942.2.13"
+  },
+  {
+    "id": "ART-1311",
+    "title": "Courtesan",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1917.97"
+  },
+  {
+    "id": "ART-1381",
+    "title": "A Courtier, Possibly Khan Alam, Holding a Spinel and a Deccan Sword",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/2013.323.a"
+  },
+  {
+    "id": "ART-1404",
+    "title": "Bodhidharma",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/2015.472"
+  },
+  {
+    "id": "ART-1442",
+    "title": "Jesus among the doctors in the Temple",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/2013.346"
+  },
+  {
+    "id": "ART-1460",
+    "title": "Female Daoist Figure in Landscape",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://clevelandart.org/art/1988.18"
+  },
+  {
+    "id": "ART-1604",
+    "title": "Las Hilanderas",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://www.wikidata.org/wiki/Q984058"
+  },
+  {
+    "id": "ART-1638",
+    "title": "Annunciation",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://www.wikidata.org/wiki/Q2378567"
+  },
+  {
+    "id": "ART-1646",
+    "title": "Hercules Fighting the Nemean Lion",
+    "status": "verified",
+    "note": "Репродукция визуально сверена с названием и музейными данными. Показ целиком с полями вместо автоматической обрезки; пропорции файла сохранены.",
+    "source": "https://www.wikidata.org/wiki/Q5906548"
+  }
+]

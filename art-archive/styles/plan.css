@@ -1,0 +1,9 @@
+#plan-caption{position:absolute;bottom:5rem;left:2rem;padding:1.4rem 1.6rem;border-left:2px solid #c1a977;background:#17382fe8}
+
+#plan-caption h2{font-weight:normal;font-size:1.5rem;margin:.5rem 0}
+
+#plan-caption p{font: .88rem system-ui,sans-serif;color:#ccd0bd}
+
+#plan-labels{position:absolute;inset:0;pointer-events:none}
+
+.hall-tag{position:absolute;transform:translate(-50%,-50%);padding:.35rem .6rem;background:#19372ee8;border:1px solid #c1a97799;color:#eee3c3;font:.85rem Georgia,serif;white-space:nowrap;text-align:center}

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Кейнлок · Архив картин</title>
+<link rel="stylesheet" href="styles.css"></head><body>
+<header><div class="top"><div><div class="eyebrow">Keynlock · Collections</div><h1>Архив картин</h1><div class="sub">Сердечко включает работу в экспозицию. Игровое размещение выбирает зал и стену.</div></div><div class="stats"><div class="stat"><strong id="total">…</strong><span>в каталоге</span></div><div class="stat"><strong id="included">…</strong><span>в игровом отборе</span></div><div class="stat"><button id="excludedButton" class="stat-action" type="button" title="Показать все исключённые картины"><strong id="excluded">0</strong><span>вне отбора ↗</span></button></div><div class="stat"><strong id="visible">…</strong><span>в фильтре</span></div></div></div>
+<div class="toolbar">
+  <input id="search" type="search" placeholder="Поиск по названию, художнику, музею, ID...">
+  <input type="hidden" id="gameZone" value="">
+  <details class="dd" id="gameZoneDrop"><summary><span id="gameZoneIcon"></span><span id="gameZoneLabel">Все игровые залы</span><span class="arrow" id="gameZoneArrow"></span></summary><div class="dd-menu" id="gameZoneMenu"></div></details>
+  <input type="hidden" id="filter" value="">
+  <details class="dd" id="filterDrop"><summary><span id="filterIcon"></span><span id="filterLabel">Все категории</span><span class="arrow" id="filterArrow"></span></summary><div class="dd-menu" id="filterMenu"></div></details>
+  <input type="hidden" id="subject" value="">
+  <details class="dd" id="subjectDrop"><summary><span id="subjectIcon"></span><span id="subjectLabel">Все сюжеты</span><span class="arrow" id="subjectArrow"></span></summary><div class="dd-menu" id="subjectMenu"></div></details>
+  <input type="hidden" id="museum" value="">
+  <details class="dd" id="museumDrop"><summary><span id="museumIcon"></span><span id="museumLabel">Все музеи</span><span class="arrow" id="museumArrow"></span></summary><div class="dd-menu" id="museumMenu"></div></details>
+  <input type="hidden" id="status" value="all">
+  <details class="dd" id="statusDrop"><summary><span id="statusIcon"></span><span id="statusLabel">Все картины</span><span class="arrow" id="statusArrow"></span></summary><div class="dd-menu" id="statusMenu"></div></details>
+  <input type="hidden" id="sort" value="rating">
+  <details class="dd" id="sortDrop"><summary><span id="sortIcon"></span><span id="sortLabel">Рейтинг: сначала известные</span><span class="arrow" id="sortArrow"></span></summary><div class="dd-menu" id="sortMenu"></div></details>
+  <button id="export" class="primary icon-export" type="button" aria-label="Скачать отбор JSON" title="Скачать отбор JSON">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg>
+  </button>
+  <button id="exportcsv">Скачать CSV</button>
+  <button id="import-selection" type="button">Загрузить отбор JSON</button>
+  <input id="file" class="invisible" type="file" accept="application/json,.json">
+</div></header>
+<main>
+  <section class="game-overview" aria-label="Пробная развеска по игровым залам">
+    <div class="game-head"><div><span class="eyebrow">Предварительная планировка</span><h2>Залы и стены</h2><p>Клик по залу или стене покажет соответствующие картины. Распределение можно исправлять в карточках. Никакие работы не удаляются.</p></div></div>
+    <div id="gameSummary" class="game-halls"></div>
+
+  </section>
+  <details class="subjects-overview" aria-label="Справочные сюжетные метки">
+    <summary class="subjects-title">Справочные сюжетные метки (не игровые стены)</summary>
+    <div class="subjects-title">Сюжеты · количество одобренных работ</div>
+    <div class="subjects-list" id="subjectSummary"></div>
+  </details>
+  <div class="line" id="result"></div>
+  <section class="excluded-overview" id="excludedOverview" hidden><div class="excluded-head"><strong id="excludedHeading">Вне отбора</strong><span id="excludedBreakdown"></span></div><div class="excluded-list" id="excludedList"></div></section>
+  <div class="grid" id="gallery"></div>
+  <div class="foot"><button id="more">Показать ещё 60</button></div>
+</main>
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Просмотр картины">
+  <button class="modal-close" id="close" aria-label="Закрыть">×</button>
+  <div class="modal-inner"><div class="modal-image"><img id="big" alt=""></div>
+    <aside class="modal-side"><div class="rating" id="bigscore"></div><h2 id="btitle"></h2>
+      <p id="bartist"></p><p id="byear"></p><p id="bmuseum"></p><p id="bcategory"></p>
+      <p id="bsubject"></p><p id="bplacement"></p><p id="brights"></p>
+      <p><a id="boriginal" target="_blank" rel="noopener noreferrer">Рассмотреть оригинал ↗</a></p>
+      <p><a id="bsource" target="_blank" rel="noopener noreferrer">Открыть источник ↗</a></p>
+      <div class="modal-nav"><button id="prev">← Предыдущая</button><button id="next">Следующая →</button></div>
+    </aside>
+  </div>
+</div>
+
+<script type="module" src="start.js"></script></body></html>

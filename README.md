@@ -37,3 +37,14 @@ For automatic web previews, import `keeraa/keynlock` into Vercel once and keep `
 Stable checkpoints: `v250-stable`, `v251-stable`, `v252-stable`.
 
 Гуашевые материалы: [каталог с миниатюрами и путями использования](js/3d/shared/materials/catalog.html) · [реестр](js/3d/shared/materials/manifest.json).
+
+## Архив картин
+
+[Самостоятельная сцена архива картин](art-archive/README.md) находится в `art-archive/`: ротонда, шесть галерей, каталог 1160 работ, редактор подборки и ручная развеска. Проект использует собственный запуск и сборку; подключение к основному игровому меню выполняется отдельно.
+
+```bash
+npm --prefix art-archive run dev   # http://127.0.0.1:4186/
+npm --prefix art-archive test      # сборка и проверки сцены
+```
+
+Node.js 22+, установка зависимостей для запуска не нужна. Исходники, локальные репродукции, лицензии поставляемых моделей и документация хранятся в репозитории. `art-archive/dist/` генерируется при сборке; резервные копии исключённых работ не входят в Git.
